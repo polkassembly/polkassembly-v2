@@ -55,29 +55,38 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 			if (userPreferences.wallet === EWallet.MIMIR) {
 				if (!apiService) return;
 
-				const remarkHash = await apiService.loginWithRemark({
+				await apiService.loginWithRemark({
 					address,
 					onSuccess: (hash) => {
 						console.log('remark hash', hash?.toString());
+
+						const remarkHash = hash?.toString();
+
+						if (!remarkHash) {
+							setLoading(false);
+							return;
+						}
+
+						console.log('sending request to mimir login');
+
+						AuthClientService.mimirLogin({
+							address: getSubstrateAddress(address) || address,
+							wallet: EWallet.MIMIR,
+							remarkHash
+						})
+							.then((res) => {
+								result = res;
+							})
+							.catch((error) => {
+								setErrorMessage(error);
+								setLoading(false);
+							});
 					},
 					onFailed: (error) => {
 						setErrorMessage(error);
 						setLoading(false);
 					},
 					wallet: userPreferences.wallet
-				});
-
-				if (!remarkHash) {
-					setLoading(false);
-					return;
-				}
-
-				console.log('sending request to mimir login');
-
-				result = await AuthClientService.mimirLogin({
-					address: getSubstrateAddress(address) || address,
-					wallet: userPreferences.wallet,
-					remarkHash
 				});
 			} else {
 				const signature = await walletService.signMessage({

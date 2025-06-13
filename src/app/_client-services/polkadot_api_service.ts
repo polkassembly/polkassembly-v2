@@ -91,9 +91,25 @@ export class PolkadotApiService {
 				return;
 			}
 
-			tx
+			if (!injected.signer?.signPayload) {
+				return;
+			}
+
+			const result: any = await injected.signer?.signPayload({
+				address,
+				method: tx.method.toHex(),
+				genesisHash: this.api.genesisHash.toHex()
+			} as any);
+
+			const method = this.api.registry.createType('Call', result.payload.method);
+
+			const newTx = this.api.tx[method.section][method.method](...method.args);
+
+			newTx.addSignature(result.signer, result.signature, result.payload);
+
+			newTx
 				// eslint-disable-next-line sonarjs/cognitive-complexity
-				.signAndSend('5CSKEeQw1e84JSy4dkrwZ5KW63vV8gbmB9WsezNE8kRQ4qc3', { signer: injected.signer as any, withSignedTransaction: true }, async ({ status, events, txHash }) => {
+				.send(async ({ status, events, txHash }) => {
 					if (status.isInvalid) {
 						console.log('Transaction invalid');
 						setStatus?.('Transaction invalid');
@@ -1232,25 +1248,18 @@ export class PolkadotApiService {
 	}
 
 	async loginWithRemark({ address, onSuccess, onFailed, wallet }: { address: string; onSuccess: (pre?: unknown) => void; onFailed: (error: string) => void; wallet: EWallet }) {
-		if (!this.api) return '';
+		if (!this.api) return;
 
 		const tx = this.api.tx.system.remark(`PolkassemblyUser:${getSubstrateAddress(address)}`);
-
-		let hash = '';
 
 		await this.executeTx({
 			tx,
 			address,
 			errorMessageFallback: 'Failed to login with remark',
-			onSuccess: (pre) => {
-				hash = pre?.toString() || '';
-				onSuccess(hash);
-			},
+			onSuccess,
 			onFailed,
 			waitTillFinalizedHash: true,
 			wallet
 		});
-
-		return hash;
 	}
 }

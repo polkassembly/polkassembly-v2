@@ -412,13 +412,7 @@ export class AuthService {
 			return paramObj.name === 'remark' && paramObj.value === `PolkassemblyUser:${formattedAddress}`;
 		});
 
-		const userSubstrateAddressFromHash = getSubstrateAddress(extrinsicDetails.data.account_id || '');
-
-		if (!remarkExists || !extrinsicDetails.data.account_id || !userSubstrateAddressFromHash) {
-			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'The remark does not exist in this transaction hash. Please provide a different hash.');
-		}
-
-		if (userSubstrateAddressFromHash !== formattedAddress) {
+		if (!remarkExists || !extrinsicDetails.data.account_id) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'The remark does not exist in this transaction hash. Please provide a different hash.');
 		}
 
