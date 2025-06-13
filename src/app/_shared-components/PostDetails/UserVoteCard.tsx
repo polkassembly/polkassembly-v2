@@ -36,7 +36,7 @@ interface VoteReferendumButtonProps {
 	isError: boolean;
 }
 
-function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg', track, proposalType, voteData, isLoading, isError }: VoteReferendumButtonProps) {
+function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', track, proposalType, voteData, isLoading, isError }: VoteReferendumButtonProps) {
 	const t = useTranslations();
 	const [openModal, setOpenModal] = useState(false);
 	const [openRemoveConfirmModal, setOpenRemoveConfirmModal] = useState(false);
@@ -205,4 +205,4 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 	);
 }
 
-export default VoteReferendumButton;
+export default UserVoteCard;
