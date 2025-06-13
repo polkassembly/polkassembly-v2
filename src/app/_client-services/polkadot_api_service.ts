@@ -23,6 +23,7 @@ import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, EWallet
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
 import { APPNAME } from '@/_shared/_constants/appName';
 import { web3Enable, web3FromSource } from '@polkadot/extension-dapp';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { BlockCalculationsService } from './block_calculations_service';
 
 // Usage:
@@ -1227,6 +1228,22 @@ export class PolkadotApiService {
 			onSuccess,
 			onFailed,
 			waitTillFinalizedHash: true
+		});
+	}
+
+	async loginWithRemark({ address, onSuccess, onFailed, wallet }: { address: string; onSuccess: (pre?: unknown) => void; onFailed: (error: string) => void; wallet: EWallet }) {
+		if (!this.api) return;
+
+		const tx = this.api.tx.remark.remark(`PolkassemblyUser:${getSubstrateAddress(address)}`);
+
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to login with remark',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true,
+			wallet
 		});
 	}
 }

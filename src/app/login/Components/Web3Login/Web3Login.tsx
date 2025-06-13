@@ -20,6 +20,7 @@ import { useTranslations } from 'next-intl';
 import { useToast } from '@/hooks/useToast';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import { useRouter } from 'nextjs-toploader/app';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import classes from './Web3Login.module.scss';
 
 function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; onTfaEnabled: (token: string) => void }) {
@@ -40,6 +41,8 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 	const searchParams = useSearchParams();
 	const nextUrl = searchParams.get('nextUrl');
 
+	const { apiService } = usePolkadotApiService();
+
 	const handleLogin = async () => {
 		try {
 			if (!userPreferences.wallet || !userPreferences?.selectedAccount?.address || !walletService) return;
@@ -50,9 +53,32 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 			let result: { data: IAuthResponse | null; error: IErrorResponse | null } = { data: null, error: null };
 
 			if (userPreferences.wallet === EWallet.MIMIR) {
+				if (!apiService) return;
+
+				let remarkHash: string = '';
+
+				await apiService.loginWithRemark({
+					address,
+					onSuccess: (hash) => {
+						console.log('remark hash', hash);
+						remarkHash = hash as string;
+					},
+					onFailed: (error) => {
+						setErrorMessage(error);
+						setLoading(false);
+					},
+					wallet: userPreferences.wallet
+				});
+
+				if (!remarkHash) {
+					setLoading(false);
+					return;
+				}
+
 				result = await AuthClientService.mimirLogin({
 					address: getSubstrateAddress(address) || address,
-					wallet: userPreferences.wallet
+					wallet: userPreferences.wallet,
+					remarkHash
 				});
 			} else {
 				const signature = await walletService.signMessage({

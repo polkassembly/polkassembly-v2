@@ -9,6 +9,7 @@ import { APIError } from '@api/_api-utils/apiError';
 import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { getReqBody } from '@api/_api-utils/getReqBody';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
+import { isMimirIframeRequest } from '@api/_api-utils/detectIframe';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
@@ -19,12 +20,13 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 
 	const zodBodySchema = z.object({
 		address: z.string().refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Not a valid web3 address'),
-		wallet: z.literal(EWallet.MIMIR)
+		wallet: z.literal(EWallet.MIMIR),
+		remarkHash: z.string().min(3, 'A valid remark hash is required')
 	});
 
 	const bodyRaw = await getReqBody(req);
 
-	const { address, wallet } = zodBodySchema.parse(bodyRaw);
+	const { address, wallet, remarkHash } = zodBodySchema.parse(bodyRaw);
 
 	const {
 		accessToken = '',
@@ -34,7 +36,8 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	} = await AuthService.MimirWalletLogin({
 		address,
 		wallet,
-		network
+		network,
+		remarkHash
 	});
 
 	// If 2FA is not enabled and accessToken is not generated, throw error
@@ -49,14 +52,16 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Refresh token not generated.');
 	}
 
-	// Pass headers for iframe-compatible cookie generation
-	const refreshTokenCookie = await AuthService.GetRefreshTokenCookie(refreshToken);
+	// Detect if this request is from Mimir iframe for iframe-compatible cookies
+	const isFromMimirIframe = isMimirIframeRequest(req);
+
+	const refreshTokenCookie = await AuthService.GetRefreshTokenCookie(refreshToken, isFromMimirIframe);
 
 	if (!refreshTokenCookie) {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Refresh token cookie not generated.');
 	}
 
-	const accessTokenCookie = await AuthService.GetAccessTokenCookie(accessToken);
+	const accessTokenCookie = await AuthService.GetAccessTokenCookie(accessToken, isFromMimirIframe);
 
 	if (!accessTokenCookie) {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Access token cookie not generated.');

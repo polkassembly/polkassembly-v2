@@ -5,7 +5,7 @@
 import jwt from 'jsonwebtoken';
 import { StatusCodes } from 'http-status-codes';
 import { APIError } from '@app/api/_api-utils/apiError';
-import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from '@app/api/_api-constants/jwt';
+import { getAccessTokenCookieOptions, getRefreshTokenCookieOptions } from '@app/api/_api-constants/jwt';
 import { ERROR_CODES, ERROR_MESSAGES } from '@shared/_constants/errorLiterals';
 import {
 	ACCESS_TOKEN_PASSPHRASE,
@@ -30,6 +30,7 @@ import { RedisService } from '../redis_service';
 import { ACCESS_TOKEN_LIFE_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS } from '../../_api-constants/timeConstants';
 import { NotificationService } from '../notification_service';
 import { generateRandomBase32 } from '../../_api-utils/generateRandomBase32';
+import { OnChainDbService } from '../onchain_db_service';
 
 if (!ACCESS_TOKEN_PRIVATE_KEY || !ACCESS_TOKEN_PUBLIC_KEY || !ACCESS_TOKEN_PASSPHRASE) {
 	throw new APIError(
@@ -299,12 +300,14 @@ export class AuthService {
 		};
 	}
 
-	static async GetRefreshTokenCookie(refreshToken: string) {
-		return serialize(ECookieNames.REFRESH_TOKEN, refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
+	static async GetRefreshTokenCookie(refreshToken: string, isIframe: boolean = false) {
+		const options = getRefreshTokenCookieOptions(isIframe);
+		return serialize(ECookieNames.REFRESH_TOKEN, refreshToken, options);
 	}
 
-	static async GetAccessTokenCookie(accessToken: string) {
-		return serialize(ECookieNames.ACCESS_TOKEN, accessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
+	static async GetAccessTokenCookie(accessToken: string, isIframe: boolean = false) {
+		const options = getAccessTokenCookieOptions(isIframe);
+		return serialize(ECookieNames.ACCESS_TOKEN, accessToken, options);
 	}
 
 	static async Web3LoginOrRegister({ address, wallet, signature, network }: { address: string; wallet: EWallet; signature: string; network: ENetwork }): Promise<IAuthResponse> {
@@ -379,7 +382,7 @@ export class AuthService {
 		};
 	}
 
-	static async MimirWalletLogin({ address, wallet, network }: { address: string; wallet: EWallet; network: ENetwork }): Promise<IAuthResponse> {
+	static async MimirWalletLogin({ address, wallet, network, remarkHash }: { address: string; wallet: EWallet; network: ENetwork; remarkHash: string }): Promise<IAuthResponse> {
 		if (!ValidatorService.isValidNetwork(network)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network');
 		}
@@ -395,6 +398,29 @@ export class AuthService {
 		}
 
 		const formattedAddress = isEvmAddress ? address : getSubstrateAddress(address)!;
+
+		const extrinsicDetails = await OnChainDbService.GetExtrinsicDetails({ network, hash: remarkHash });
+
+		if (extrinsicDetails.message !== 'Success') {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Could not get transaction data. Please try again.');
+		}
+
+		// check tx data if it has the remark with user id
+		const txParams = (extrinsicDetails.data.params || []) as { name: string; value: string }[];
+
+		const remarkExists = txParams.find((paramObj) => {
+			return paramObj.name === 'remark' && paramObj.value === `PolkassemblyUser:${formattedAddress}`;
+		});
+
+		const userSubstrateAddressFromHash = getSubstrateAddress(extrinsicDetails.data.account_id || '');
+
+		if (!remarkExists || !extrinsicDetails.data.account_id || !userSubstrateAddressFromHash) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'The remark does not exist in this transaction hash. Please provide a different hash.');
+		}
+
+		if (userSubstrateAddressFromHash !== formattedAddress) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'The remark does not exist in this transaction hash. Please provide a different hash.');
+		}
 
 		// find if user exists
 		const user = await OffChainDbService.GetUserByAddress(formattedAddress);

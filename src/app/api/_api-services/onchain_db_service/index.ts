@@ -309,4 +309,14 @@ export class OnChainDbService {
 	}) {
 		return SubsquidService.GetOnChainPostsByProposer({ network, proposer, page, limit, proposalType });
 	}
+
+	static async GetExtrinsicDetails({
+		network,
+		hash
+	}: {
+		network: ENetwork;
+		hash: string;
+	}): Promise<{ message: string; data: { account_id: string; params: { name: string; value: string }[] } }> {
+		return SubscanOnChainService.GetExtrinsicDetails({ network, hash });
+	}
 }

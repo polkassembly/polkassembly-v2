@@ -374,6 +374,10 @@ export class NextApiClientService {
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
 		const currentNetwork = await this.getCurrentNetwork();
 
+		// Detect if we're in an iframe and specifically from Mimir
+		const isInIframe = typeof window !== 'undefined' && window !== window.top;
+		const isMimirIframe = isInIframe && window.location.ancestorOrigins && Array.from(window.location.ancestorOrigins).some((origin) => origin.includes('app.mimir.global'));
+
 		const response = await fetch(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
@@ -382,7 +386,9 @@ export class NextApiClientService {
 				'Content-Type': 'application/json',
 				'x-api-key': getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
 				'x-network': currentNetwork,
-				[EHttpHeaderKey.SKIP_CACHE]: skipCache.toString()
+				[EHttpHeaderKey.SKIP_CACHE]: skipCache.toString(),
+				...(isMimirIframe ? { 'x-iframe-context': 'mimir' } : {}),
+				...(isInIframe && !isMimirIframe ? { 'x-iframe-context': 'true' } : {})
 			},
 			method
 		});
@@ -416,9 +422,9 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IAuthResponse>({ url, method, data: { address, signature, wallet } });
 	}
 
-	protected static async mimirLoginApi({ address, wallet }: { address: string; wallet: EWallet }) {
+	protected static async mimirLoginApi({ address, wallet, remarkHash }: { address: string; wallet: EWallet; remarkHash: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.MIMIR_LOGIN });
-		return this.nextApiClientFetch<IAuthResponse>({ url, method, data: { address, wallet } });
+		return this.nextApiClientFetch<IAuthResponse>({ url, method, data: { address, wallet, remarkHash } });
 	}
 
 	protected static async checkForUsernameAndEmailApi({ email, username }: { email: string; username: string }) {
