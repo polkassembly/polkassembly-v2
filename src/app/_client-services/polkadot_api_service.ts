@@ -101,9 +101,9 @@ export class PolkadotApiService {
 				genesisHash: this.api.genesisHash.toHex()
 			} as any);
 
-			const method = this.api.registry.createType('Call', result.payload.method);
+			const call = this.api.registry.createType('Call', result.payload.method);
 
-			const newTx = this.api.tx[method.section][method.method](...method.args);
+			const newTx = this.api.tx[call.section][call.method](...call.args);
 
 			newTx.addSignature(result.signer, result.signature, result.payload);
 

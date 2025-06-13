@@ -4,7 +4,7 @@
 
 'use client';
 
-import { ENotificationStatus, EWallet, IAuthResponse, IErrorResponse } from '@/_shared/types';
+import { ENotificationStatus, EWallet } from '@/_shared/types';
 import React, { useState } from 'react';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -34,6 +34,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 	const { setUser } = useUser();
 
 	const [loading, setLoading] = useState(false);
+	const [pendingMimirAuth, setPendingMimirAuth] = useState(false);
 
 	const [errorMessage, setErrorMessage] = useState<string>('');
 
@@ -43,6 +44,65 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 
 	const { apiService } = usePolkadotApiService();
 
+	// Constants
+	const LOGIN_FAILED_MESSAGE = t('Profile.loginFailed');
+
+	// Handle Mimir login completion after remark transaction
+	const completeMimirLogin = async (remarkHash: string) => {
+		try {
+			if (!userPreferences?.selectedAccount?.address) return;
+			const { address } = userPreferences.selectedAccount;
+
+			console.log('completing mimir login with hash:', remarkHash);
+
+			const result = await AuthClientService.mimirLogin({
+				address: getSubstrateAddress(address) || address,
+				wallet: userPreferences.wallet!,
+				remarkHash
+			});
+
+			if (result.error || !result.data) {
+				setErrorMessage(result.error?.message || LOGIN_FAILED_MESSAGE);
+				setLoading(false);
+				setPendingMimirAuth(false);
+				return;
+			}
+
+			if (result.data.isTFAEnabled && result.data.tfaToken) {
+				onTfaEnabled(result.data.tfaToken);
+				setLoading(false);
+				setPendingMimirAuth(false);
+				return;
+			}
+
+			const accessTokenPayload = CookieClientService.getAccessTokenPayload();
+
+			if (!accessTokenPayload) {
+				setLoading(false);
+				setPendingMimirAuth(false);
+				setErrorMessage(t('Profile.noAccessTokenFound'));
+				return;
+			}
+
+			setUser(accessTokenPayload);
+
+			if (nextUrl) {
+				const url = nextUrl.startsWith('/') ? nextUrl.slice(1) : nextUrl;
+				router.replace(`/${url}`);
+			} else {
+				router.back();
+			}
+		} catch (error) {
+			console.log('mimir login error', error);
+			toast({
+				status: ENotificationStatus.ERROR,
+				title: LOGIN_FAILED_MESSAGE
+			});
+			setLoading(false);
+			setPendingMimirAuth(false);
+		}
+	};
+
 	const handleLogin = async () => {
 		try {
 			if (!userPreferences.wallet || !userPreferences?.selectedAccount?.address || !walletService) return;
@@ -50,60 +110,60 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 
 			setLoading(true);
 
-			let result: { data: IAuthResponse | null; error: IErrorResponse | null } = { data: null, error: null };
-
 			if (userPreferences.wallet === EWallet.MIMIR) {
 				if (!apiService) return;
 
-				let remarkHash: string = '';
-				await apiService.loginWithRemark({
+				setPendingMimirAuth(true);
+
+				// Start the remark transaction
+				apiService.loginWithRemark({
 					address,
 					onSuccess: (hash) => {
-						remarkHash = hash?.toString() || '';
+						const remarkHash = hash?.toString() || '';
+						console.log('remark hash received:', remarkHash);
+
+						if (remarkHash) {
+							// Complete the login process in the success callback
+							completeMimirLogin(remarkHash);
+						} else {
+							console.log('no remark hash received');
+							setLoading(false);
+							setPendingMimirAuth(false);
+							setErrorMessage('Failed to get transaction hash');
+						}
 					},
 					onFailed: (error) => {
+						console.log('remark failed:', error);
 						setErrorMessage(error);
 						setLoading(false);
+						setPendingMimirAuth(false);
 					},
 					wallet: userPreferences.wallet
 				});
 
-				console.log('remark hash', remarkHash);
-
-				if (!remarkHash) {
-					console.log('no remark hash');
-					setLoading(false);
-					return;
-				}
-
-				console.log('sending request to mimir login');
-
-				result = await AuthClientService.mimirLogin({
-					address: getSubstrateAddress(address) || address,
-					wallet: userPreferences.wallet,
-					remarkHash
-				});
-			} else {
-				const signature = await walletService.signMessage({
-					data: WEB3_AUTH_SIGN_MESSAGE,
-					address,
-					selectedWallet: userPreferences.wallet
-				});
-
-				if (!signature) {
-					setLoading(false);
-					return;
-				}
-
-				result = await AuthClientService.web3LoginOrSignup({
-					address: getSubstrateAddress(address) || address,
-					signature,
-					wallet: userPreferences.wallet
-				});
+				// Don't continue execution here - wait for onSuccess/onFailed callbacks
+				return;
 			}
 
+			const signature = await walletService.signMessage({
+				data: WEB3_AUTH_SIGN_MESSAGE,
+				address,
+				selectedWallet: userPreferences.wallet
+			});
+
+			if (!signature) {
+				setLoading(false);
+				return;
+			}
+
+			const result = await AuthClientService.web3LoginOrSignup({
+				address: getSubstrateAddress(address) || address,
+				signature,
+				wallet: userPreferences.wallet
+			});
+
 			if (result.error || !result.data) {
-				setErrorMessage(result.error?.message || t('Profile.loginFailed'));
+				setErrorMessage(result.error?.message || LOGIN_FAILED_MESSAGE);
 				setLoading(false);
 				return;
 			}
@@ -134,9 +194,10 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 			// TODO: add to language files
 			toast({
 				status: ENotificationStatus.ERROR,
-				title: t('Profile.loginFailed')
+				title: LOGIN_FAILED_MESSAGE
 			});
 			setLoading(false);
+			setPendingMimirAuth(false);
 		}
 	};
 
@@ -156,7 +217,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 						isLoading={loading}
 						onClick={handleLogin}
 						size='lg'
-						disabled={!userPreferences?.selectedAccount?.address || !userPreferences.wallet}
+						disabled={!userPreferences?.selectedAccount?.address || !userPreferences.wallet || pendingMimirAuth}
 						className={classes.loginButton}
 					>
 						{t('Profile.login')}
