@@ -452,6 +452,8 @@
 		"reply": "Antworten",
 		"remove": "Entfernen",
 		"removing": "Entfernen",
+		"removeVote": "Abstimmung entfernen",
+		"removeVoteConfirmation": "Möchten Sie Ihre Abstimmung wirklich entfernen?",
 		"proposalPassed": "Vorschlag angenommen",
 		"proposalFailed": "Vorschlag abgelehnt",
 		"confirmationPeriod": "Bestätigungszeitraum",

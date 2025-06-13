@@ -458,6 +458,8 @@
 		"reply": "Reply",
 		"remove": "Remove",
 		"removing": "Removing",
+		"removeVote": "Remove Vote",
+		"removeVoteConfirmation": "Are you sure you want to remove your vote?",
 		"proposalPassed": "Proposal Passed",
 		"proposalFailed": "Proposal Failed",
 		"confirmationPeriod": "Confirmation Period",

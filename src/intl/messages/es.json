@@ -454,6 +454,8 @@
 		"reply": "Responder",
 		"remove": "Eliminar",
 		"removing": "Eliminando",
+		"removeVote": "Eliminar Voto",
+		"removeVoteConfirmation": "¿Está seguro de que desea eliminar su voto?",
 		"proposalPassed": "Propuesta Aprobada",
 		"proposalFailed": "Propuesta Rechazada",
 		"confirmationPeriod": "Período de Confirmación",

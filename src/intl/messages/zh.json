@@ -453,6 +453,8 @@
 		"reply": "回复",
 		"remove": "删除",
 		"removing": "删除中",
+		"removeVote": "删除投票",
+		"removeVoteConfirmation": "您确定要删除您的投票吗？",
 		"proposalPassed": "提案通过",
 		"proposalFailed": "提案失败",
 		"confirmationPeriod": "确认期",

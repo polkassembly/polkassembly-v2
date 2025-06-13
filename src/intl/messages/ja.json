@@ -453,6 +453,8 @@
 		"reply": "返信",
 		"remove": "削除",
 		"removing": "削除中",
+		"removeVote": "投票を削除",
+		"removeVoteConfirmation": "本当に投票を削除しますか？",
 		"proposalPassed": "提案が可決されました",
 		"proposalFailed": "提案が否決されました",
 		"confirmationPeriod": "確認期間",

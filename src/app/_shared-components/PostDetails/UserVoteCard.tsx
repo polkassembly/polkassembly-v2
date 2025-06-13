@@ -19,7 +19,7 @@ import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useToast } from '@/hooks/useToast';
 import { Button } from '../Button';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../Dialog/Dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '../Dialog/Dialog';
 import { Separator } from '../Separator';
 import VoteReferendum from './VoteReferendum/VoteReferendum';
 import classes from './PostDetails.module.scss';
@@ -39,6 +39,7 @@ interface VoteReferendumButtonProps {
 function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg', track, proposalType, voteData, isLoading, isError }: VoteReferendumButtonProps) {
 	const t = useTranslations();
 	const [openModal, setOpenModal] = useState(false);
+	const [openRemoveConfirmModal, setOpenRemoveConfirmModal] = useState(false);
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
@@ -70,6 +71,7 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 						status: ENotificationStatus.SUCCESS
 					});
 					queryClient.invalidateQueries({ queryKey: ['userVotes', proposalType, index, userPreferences.selectedAccount?.address] });
+					setOpenRemoveConfirmModal(false);
 				},
 				onFailed: (errorMessage) => {
 					toast({
@@ -98,7 +100,7 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 				<button
 					type='button'
 					className={classes.userVoteCardRemoveButton}
-					onClick={handleRemoveVote}
+					onClick={() => setOpenRemoveConfirmModal(true)}
 					disabled={isRemoving}
 				>
 					{isRemoving ? t('PostDetails.removing') : t('PostDetails.remove')}
@@ -158,13 +160,45 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 					</Button>
 				</DialogTrigger>
 				<DialogContent className='max-w-xl p-3 sm:p-6'>
-					<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
+					<DialogHeader>
+						<DialogTitle className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogTitle>
+					</DialogHeader>
 					<VoteReferendum
 						index={index}
 						track={track}
 						onClose={() => setOpenModal(false)}
 						proposalType={proposalType}
 					/>
+				</DialogContent>
+			</Dialog>
+
+			<Dialog
+				open={openRemoveConfirmModal}
+				onOpenChange={setOpenRemoveConfirmModal}
+			>
+				<DialogContent className='max-w-md p-3 sm:p-6'>
+					<DialogHeader>
+						<DialogTitle className='text-xl font-semibold text-text_primary'>{t('PostDetails.removeVote')}</DialogTitle>
+					</DialogHeader>
+					<div className='mt-4'>
+						<p className='text-base text-basic_text'>{t('PostDetails.removeVoteConfirmation')}</p>
+						<div className='mt-6 flex justify-end gap-3'>
+							<Button
+								variant='outline'
+								onClick={() => setOpenRemoveConfirmModal(false)}
+								disabled={isRemoving}
+							>
+								{t('PostDetails.cancel')}
+							</Button>
+							<Button
+								onClick={handleRemoveVote}
+								isLoading={isRemoving}
+								disabled={isRemoving}
+							>
+								{isRemoving ? t('PostDetails.removing') : t('PostDetails.remove')}
+							</Button>
+						</div>
+					</div>
 				</DialogContent>
 			</Dialog>
 		</div>
