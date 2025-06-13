@@ -117,6 +117,48 @@ export class AIService {
 		`
 	} as const;
 
+	private static cleanPostSummaryResponse(response: string): string {
+		// Keep only markdown bullet points
+		let cleaned = response
+			.split('\n')
+			.filter((line: string) => line.trim().startsWith('- ') || line.trim().startsWith('* '))
+			.join('\n');
+
+		// Ensure the response starts with the 'Main objective/purpose' bullet point
+		const mainObjectiveIndex = cleaned.toLowerCase().indexOf('main objective/purpose');
+		if (mainObjectiveIndex !== -1) {
+			// Find the start of the bullet point containing 'Main objective/purpose'
+			const before = cleaned.toLowerCase().lastIndexOf('\n', mainObjectiveIndex);
+			cleaned = cleaned.substring(before === -1 ? 0 : before + 1);
+		}
+
+		return cleaned;
+	}
+
+	private static cleanSingleWordResponse(response: string, validValues: string[]): string {
+		// Extract the final response by looking from the end
+		// This handles cases where AI includes reasoning before the final answer
+		const lines = response.split('\n');
+		// Find the last line that contains only a valid value
+		for (let i = lines.length - 1; i >= 0; i -= 1) {
+			const line = lines[Number(i)].trim().toLowerCase();
+			if (validValues.includes(line)) {
+				return line;
+			}
+		}
+		return '';
+	}
+
+	private static cleanCommentsSummaryResponse(response: string): string {
+		// Extract only the structured summary part, starting with the first heading
+		const summaryStartMatch = response.match(/### Users feeling optimistic say:/);
+		if (summaryStartMatch) {
+			const startIndex = response.indexOf(summaryStartMatch[0]);
+			return response.substring(startIndex);
+		}
+		return response;
+	}
+
 	private static async getAIResponse(prompt: string): Promise<string | null> {
 		if (!IS_AI_ENABLED) {
 			return null;
@@ -154,31 +196,17 @@ export class AIService {
 			// Remove thinking tags
 			cleanedResponse = cleanedResponse.replace(/<think>[\s\S]*?<\/think>/g, '');
 
-			// Remove any explanatory text that doesn't match expected format
+			// Apply specific cleaning based on prompt type
 			if (prompt.includes(this.BASE_PROMPTS.POST_SUMMARY)) {
-				// Keep only markdown bullet points
-				cleanedResponse = cleanedResponse
-					.split('\n')
-					.filter((line: string) => line.trim().startsWith('- ') || line.trim().startsWith('* '))
-					.join('\n');
-				// Ensure the response starts with the 'Main objective/purpose' bullet point
-				const mainObjectiveIndex = cleanedResponse.toLowerCase().indexOf('main objective/purpose');
-				if (mainObjectiveIndex !== -1) {
-					// Find the start of the bullet point containing 'Main objective/purpose'
-					const before = cleanedResponse.toLowerCase().lastIndexOf('\n', mainObjectiveIndex);
-					cleanedResponse = cleanedResponse.substring(before === -1 ? 0 : before + 1);
-				}
+				cleanedResponse = this.cleanPostSummaryResponse(cleanedResponse);
 			} else if (prompt.includes(this.BASE_PROMPTS.COMMENT_SENTIMENT_ANALYSIS)) {
-				// Extract just the single word response
-				const match = cleanedResponse.match(/\b(against|slightly_against|neutral|slightly_for|for)\b/i);
-				cleanedResponse = match ? match[0].toLowerCase() : '';
+				const validSentiments = ['against', 'slightly_against', 'neutral', 'slightly_for', 'for'];
+				cleanedResponse = this.cleanSingleWordResponse(cleanedResponse, validSentiments);
+			} else if (prompt.includes(this.BASE_PROMPTS.CONTENT_SPAM_CHECK)) {
+				const validSpamResponses = ['true', 'false'];
+				cleanedResponse = this.cleanSingleWordResponse(cleanedResponse, validSpamResponses);
 			} else if (prompt.includes(this.BASE_PROMPTS.COMMENTS_SUMMARY)) {
-				// Extract only the structured summary part, starting with the first heading
-				const summaryStartMatch = cleanedResponse.match(/### Users feeling optimistic say:/);
-				if (summaryStartMatch) {
-					const startIndex = cleanedResponse.indexOf(summaryStartMatch[0]);
-					cleanedResponse = cleanedResponse.substring(startIndex);
-				}
+				cleanedResponse = this.cleanCommentsSummaryResponse(cleanedResponse);
 			}
 
 			return cleanedResponse;
@@ -314,15 +342,11 @@ export class AIService {
 
 		const response = await this.getAIResponse(fullPrompt);
 
-		// extract the result from the response using regex
-		const resultRegex = /(true|false)/;
-		const result = response?.match(resultRegex)?.[0];
-
-		if (!result || typeof result !== 'string' || !['true', 'false'].includes(result.toLowerCase())) {
+		if (!response || !['true', 'false'].includes(response.toLowerCase())) {
 			return null;
 		}
 
-		return result.toLowerCase() === 'true';
+		return response.toLowerCase() === 'true';
 	}
 
 	private static async getCommentSentiment({ mdContent }: { mdContent: string }): Promise<ECommentSentiment | null> {
@@ -334,15 +358,11 @@ export class AIService {
 
 		const response = await this.getAIResponse(fullPrompt);
 
-		// extract the sentiment from the response using regex
-		const sentimentRegex = /(against|slightly_against|neutral|slightly_for|for)/;
-		const sentiment = response?.match(sentimentRegex)?.[0];
-
-		if (!sentiment || typeof sentiment !== 'string' || !['against', 'slightly_against', 'neutral', 'slightly_for', 'for'].includes(sentiment.toLowerCase())) {
+		if (!response || !['against', 'slightly_against', 'neutral', 'slightly_for', 'for'].includes(response.toLowerCase())) {
 			return null;
 		}
 
-		return sentiment as ECommentSentiment;
+		return response as ECommentSentiment;
 	}
 
 	static async GenerateAndUpdatePostSummary({
