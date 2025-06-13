@@ -75,13 +75,13 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 	const fetchListingData = async () => {
 		const { data, error } = await NextApiClientService.fetchListingData({ proposalType, page, statuses, origins: origin ? [origin] : undefined });
 		if (error || !data) {
-			return initialData;
+			throw new Error(error?.message || 'Failed to fetch listing data');
 		}
 		return data;
 	};
 
 	const { data: listingData } = useQuery({
-		queryKey: ['listingData', proposalType, page, statuses.join(','), origin],
+		queryKey: ['listingData', proposalType, page, [...statuses].sort().join(','), origin],
 		queryFn: () => fetchListingData(),
 		placeholderData: (previousData) => previousData || initialData,
 		retry: true,
