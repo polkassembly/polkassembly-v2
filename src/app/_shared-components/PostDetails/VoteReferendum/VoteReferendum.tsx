@@ -203,6 +203,7 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 			setIsLoading(true);
 			await apiService.voteReferendum({
 				selectedAccount: userPreferences.selectedAccount,
+				wallet: userPreferences.wallet,
 				address: getRegularAddress(userPreferences.selectedAccount),
 				onSuccess: () => {
 					toast({

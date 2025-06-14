@@ -4,10 +4,14 @@
 
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ECookieNames, ELocales, ETheme, IAccessTokenPayload, IRefreshTokenPayload } from '@/_shared/types';
-import { deleteCookie, getCookie, setCookie } from 'cookies-next/client';
+import { deleteCookie, getCookie, setCookie, getCookies } from 'cookies-next/client';
 import { decodeToken } from 'react-jwt';
 
 export class CookieClientService {
+	private static getCookies() {
+		return getCookies();
+	}
+
 	private static getCookieInClient(cookieName: ECookieNames) {
 		return getCookie(cookieName);
 	}
@@ -31,7 +35,10 @@ export class CookieClientService {
 	}
 
 	static getAccessTokenPayload() {
+		console.log('all cookies', this.getCookies());
+
 		const accessToken = this.getCookieInClient(ECookieNames.ACCESS_TOKEN);
+		console.log('accessToken', accessToken);
 		return this.decodeCookieToken<IAccessTokenPayload>(accessToken || '');
 	}
 
