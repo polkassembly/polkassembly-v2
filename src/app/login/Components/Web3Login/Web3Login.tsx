@@ -53,8 +53,6 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 			if (!userPreferences?.selectedAccount?.address) return;
 			const { address } = userPreferences.selectedAccount;
 
-			console.log('completing mimir login with hash:', remarkHash);
-
 			const result = await AuthClientService.mimirLogin({
 				address: getSubstrateAddress(address) || address,
 				wallet: userPreferences.wallet!,
@@ -120,13 +118,11 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 					address,
 					onSuccess: (hash) => {
 						const remarkHash = hash?.toString() || '';
-						console.log('remark hash received:', remarkHash);
 
 						if (remarkHash) {
 							// Complete the login process in the success callback
 							completeMimirLogin(remarkHash);
 						} else {
-							console.log('no remark hash received');
 							setLoading(false);
 							setPendingMimirAuth(false);
 							setErrorMessage('Failed to get transaction hash');
@@ -137,8 +133,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 						setErrorMessage(error);
 						setLoading(false);
 						setPendingMimirAuth(false);
-					},
-					wallet: userPreferences.wallet
+					}
 				});
 
 				// Don't continue execution here - wait for onSuccess/onFailed callbacks

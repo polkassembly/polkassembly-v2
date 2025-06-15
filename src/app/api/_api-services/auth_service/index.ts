@@ -31,6 +31,7 @@ import { ACCESS_TOKEN_LIFE_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS } from '../
 import { NotificationService } from '../notification_service';
 import { generateRandomBase32 } from '../../_api-utils/generateRandomBase32';
 import { OnChainDbService } from '../onchain_db_service';
+import { validateRemarkLogin } from '../../_api-utils/validateRemarkLogin';
 
 if (!ACCESS_TOKEN_PRIVATE_KEY || !ACCESS_TOKEN_PUBLIC_KEY || !ACCESS_TOKEN_PASSPHRASE) {
 	throw new APIError(
@@ -405,12 +406,8 @@ export class AuthService {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Could not get transaction data. Please try again.');
 		}
 
-		// check tx data if it has the remark with user id
-		const txParams = (extrinsicDetails.data.params || []) as { name: string; value: string }[];
-
-		const remarkExists = txParams.find((paramObj) => {
-			return paramObj.name === 'remark' && paramObj.value === `PolkassemblyUser:${formattedAddress}`;
-		});
+		// check tx data if it has the remark with user id (supports nested calls)
+		const remarkExists = validateRemarkLogin(extrinsicDetails.data, formattedAddress);
 
 		if (!remarkExists || !extrinsicDetails.data.account_id) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'The remark does not exist in this transaction hash. Please provide a different hash.');

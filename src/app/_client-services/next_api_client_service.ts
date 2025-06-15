@@ -387,8 +387,7 @@ export class NextApiClientService {
 				'x-api-key': getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
 				'x-network': currentNetwork,
 				[EHttpHeaderKey.SKIP_CACHE]: skipCache.toString(),
-				...(isMimirIframe ? { 'x-iframe-context': 'mimir' } : {}),
-				...(isInIframe && !isMimirIframe ? { 'x-iframe-context': 'true' } : {})
+				...(isMimirIframe ? { 'x-iframe-context': 'mimir' } : {})
 			},
 			method
 		});

@@ -229,8 +229,6 @@ export class SubscanOnChainService {
 		hash: string;
 	}): Promise<{ message: string; data: { account_id: string; params: { name: string; value: string }[] } }> {
 		const request = this.extrinsicDetailsRequest({ network, hash });
-		const subscanResponse = await fetchSubscanData({ url: request.url, network, body: request.body, method: 'POST' });
-
-		return subscanResponse.data;
+		return fetchSubscanData({ url: request.url, network, body: request.body, method: 'POST' });
 	}
 }

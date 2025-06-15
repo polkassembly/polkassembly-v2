@@ -9,7 +9,6 @@ import { APIError } from '@api/_api-utils/apiError';
 import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { getReqBody } from '@api/_api-utils/getReqBody';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
-import { isMimirIframeRequest } from '@api/_api-utils/detectIframe';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
@@ -17,6 +16,11 @@ import { z } from 'zod';
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
 	const network = await getNetworkFromHeaders();
+	const iframeHeader = req.headers.get('x-iframe-context');
+
+	if (iframeHeader !== 'mimir') {
+		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Invalid iframe context');
+	}
 
 	const zodBodySchema = z.object({
 		address: z.string().refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Not a valid web3 address'),
@@ -52,16 +56,13 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Refresh token not generated.');
 	}
 
-	// Detect if this request is from Mimir iframe for iframe-compatible cookies
-	const isFromMimirIframe = isMimirIframeRequest(req);
-
-	const refreshTokenCookie = await AuthService.GetRefreshTokenCookie(refreshToken, isFromMimirIframe);
+	const refreshTokenCookie = await AuthService.GetRefreshTokenCookie(refreshToken, true);
 
 	if (!refreshTokenCookie) {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Refresh token cookie not generated.');
 	}
 
-	const accessTokenCookie = await AuthService.GetAccessTokenCookie(accessToken, isFromMimirIframe);
+	const accessTokenCookie = await AuthService.GetAccessTokenCookie(accessToken, true);
 
 	if (!accessTokenCookie) {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Access token cookie not generated.');

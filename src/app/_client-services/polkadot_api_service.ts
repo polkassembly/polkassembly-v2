@@ -19,11 +19,13 @@ import { getTypeDef } from '@polkadot/types';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, EWallet, IBeneficiaryInput, IParamDef, IPayout, ISelectedAccount, IVoteCartItem } from '@shared/types';
+import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IPayout, ISelectedAccount, IVoteCartItem } from '@shared/types';
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
 import { APPNAME } from '@/_shared/_constants/appName';
 import { web3Enable, web3FromSource } from '@polkadot/extension-dapp';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { isMimirReady, MIMIR_REGEXP } from '@mimirdev/apps-inject';
+import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
 import { BlockCalculationsService } from './block_calculations_service';
 
 // Usage:
@@ -53,6 +55,86 @@ export class PolkadotApiService {
 		return new PolkadotApiService(network, api);
 	}
 
+	// eslint-disable-next-line sonarjs/cognitive-complexity
+	private async executeTxCallback({
+		status,
+		events,
+		txHash,
+		setStatus,
+		onBroadcast,
+		onSuccess,
+		onFailed,
+		waitTillFinalizedHash,
+		errorMessageFallback,
+		setIsTxFinalized
+	}: {
+		status: ExtrinsicStatus;
+		events: EventRecord[];
+		txHash: Hash;
+		setStatus?: (pre: string) => void;
+		onBroadcast?: () => void;
+		onSuccess: (pre?: unknown) => Promise<void> | void;
+		onFailed: (errorMessageFallback: string) => Promise<void> | void;
+		waitTillFinalizedHash: boolean;
+		errorMessageFallback: string;
+		setIsTxFinalized?: (pre: string) => void;
+	}) {
+		let isFailed = false;
+		if (status.isInvalid) {
+			console.log('Transaction invalid');
+			setStatus?.('Transaction invalid');
+		} else if (status.isReady) {
+			console.log('Transaction is ready');
+			setStatus?.('Transaction is ready');
+		} else if (status.isBroadcast) {
+			console.log('Transaction has been broadcasted');
+			setStatus?.('Transaction has been broadcasted');
+			onBroadcast?.();
+		} else if (status.isInBlock) {
+			console.log('Transaction is in block');
+			setStatus?.('Transaction is in block');
+
+			// eslint-disable-next-line no-restricted-syntax
+			for (const { event } of events) {
+				if (event.method === 'ExtrinsicSuccess') {
+					setStatus?.('Transaction Success');
+					isFailed = false;
+					if (!waitTillFinalizedHash) {
+						// eslint-disable-next-line no-await-in-loop
+						await onSuccess(txHash);
+					}
+				} else if (event.method === 'ExtrinsicFailed') {
+					// eslint-disable-next-line sonarjs/no-duplicate-string
+					console.log('Transaction failed');
+					setStatus?.('Transaction failed');
+					const dispatchError = (event.data as any)?.dispatchError;
+					isFailed = true;
+
+					if (dispatchError?.isModule) {
+						const errorModule = (event.data as any)?.dispatchError?.asModule;
+						const { method, section, docs } = this.api.registry.findMetaError(errorModule);
+						// eslint-disable-next-line no-param-reassign
+						errorMessageFallback = `${section}.${method} : ${docs.join(' ')}`;
+						console.log(errorMessageFallback, 'error module');
+						await onFailed(errorMessageFallback);
+					} else if (dispatchError?.isToken) {
+						console.log(`${dispatchError.type}.${dispatchError.asToken.type}`);
+						await onFailed(`${dispatchError.type}.${dispatchError.asToken.type}`);
+					} else {
+						await onFailed(`${dispatchError.type}` || errorMessageFallback);
+					}
+				}
+			}
+		} else if (status.isFinalized) {
+			console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
+			console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
+			setIsTxFinalized?.(txHash.toString());
+			if (!isFailed && waitTillFinalizedHash) {
+				await onSuccess(txHash);
+			}
+		}
+	}
+
 	private async executeTx({
 		tx,
 		address,
@@ -64,8 +146,7 @@ export class PolkadotApiService {
 		setStatus,
 		setIsTxFinalized,
 		waitTillFinalizedHash = false,
-		selectedAccount,
-		wallet
+		selectedAccount
 	}: {
 		tx: SubmittableExtrinsic<'promise'>;
 		address: string;
@@ -78,12 +159,14 @@ export class PolkadotApiService {
 		setIsTxFinalized?: (pre: string) => void;
 		waitTillFinalizedHash?: boolean;
 		selectedAccount?: ISelectedAccount;
-		wallet?: EWallet;
 	}) {
-		let isFailed = false;
 		if (!this.api || !tx) return;
 
-		if (wallet === EWallet.MIMIR) {
+		const openInIframe = typeof window !== 'undefined' && window !== window.parent;
+
+		const origin = await isMimirReady();
+
+		if (origin && MIMIR_REGEXP.test(origin) && openInIframe) {
 			await web3Enable(APPNAME);
 			const injected = await web3FromSource('mimir');
 			const isMimir = injected.name === 'mimir';
@@ -109,62 +192,9 @@ export class PolkadotApiService {
 
 			newTx
 				// eslint-disable-next-line sonarjs/cognitive-complexity
-				.send(async ({ status, events, txHash }) => {
-					if (status.isInvalid) {
-						console.log('Transaction invalid');
-						setStatus?.('Transaction invalid');
-					} else if (status.isReady) {
-						console.log('Transaction is ready');
-						setStatus?.('Transaction is ready');
-					} else if (status.isBroadcast) {
-						console.log('Transaction has been broadcasted');
-						setStatus?.('Transaction has been broadcasted');
-						onBroadcast?.();
-					} else if (status.isInBlock) {
-						console.log('Transaction is in block');
-						setStatus?.('Transaction is in block');
-
-						// eslint-disable-next-line no-restricted-syntax
-						for (const { event } of events) {
-							if (event.method === 'ExtrinsicSuccess') {
-								setStatus?.('Transaction Success');
-								isFailed = false;
-								if (!waitTillFinalizedHash) {
-									// eslint-disable-next-line no-await-in-loop
-									await onSuccess(txHash);
-								}
-							} else if (event.method === 'ExtrinsicFailed') {
-								// eslint-disable-next-line sonarjs/no-duplicate-string
-								setStatus?.('Transaction failed');
-								console.log('Transaction failed');
-								setStatus?.('Transaction failed');
-								const dispatchError = (event.data as any)?.dispatchError;
-								isFailed = true;
-
-								if (dispatchError?.isModule) {
-									const errorModule = (event.data as any)?.dispatchError?.asModule;
-									const { method, section, docs } = this.api.registry.findMetaError(errorModule);
-									// eslint-disable-next-line no-param-reassign
-									errorMessageFallback = `${section}.${method} : ${docs.join(' ')}`;
-									console.log(errorMessageFallback, 'error module');
-									await onFailed(errorMessageFallback);
-								} else if (dispatchError?.isToken) {
-									console.log(`${dispatchError.type}.${dispatchError.asToken.type}`);
-									await onFailed(`${dispatchError.type}.${dispatchError.asToken.type}`);
-								} else {
-									await onFailed(`${dispatchError.type}` || errorMessageFallback);
-								}
-							}
-						}
-					} else if (status.isFinalized) {
-						console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
-						console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
-						setIsTxFinalized?.(txHash.toString());
-						if (!isFailed && waitTillFinalizedHash) {
-							await onSuccess(txHash);
-						}
-					}
-				})
+				.send(async ({ status, events, txHash }) =>
+					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
+				)
 				.catch((error: unknown) => {
 					console.log(':( transaction failed');
 					setStatus?.(':( transaction failed');
@@ -207,62 +237,9 @@ export class PolkadotApiService {
 
 			extrinsic
 				// eslint-disable-next-line sonarjs/cognitive-complexity
-				.signAndSend(address, signerOptions, async ({ status, events, txHash }) => {
-					if (status.isInvalid) {
-						console.log('Transaction invalid');
-						setStatus?.('Transaction invalid');
-					} else if (status.isReady) {
-						console.log('Transaction is ready');
-						setStatus?.('Transaction is ready');
-					} else if (status.isBroadcast) {
-						console.log('Transaction has been broadcasted');
-						setStatus?.('Transaction has been broadcasted');
-						onBroadcast?.();
-					} else if (status.isInBlock) {
-						console.log('Transaction is in block');
-						setStatus?.('Transaction is in block');
-
-						// eslint-disable-next-line no-restricted-syntax
-						for (const { event } of events) {
-							if (event.method === 'ExtrinsicSuccess') {
-								setStatus?.('Transaction Success');
-								isFailed = false;
-								if (!waitTillFinalizedHash) {
-									// eslint-disable-next-line no-await-in-loop
-									await onSuccess(txHash);
-								}
-							} else if (event.method === 'ExtrinsicFailed') {
-								// eslint-disable-next-line sonarjs/no-duplicate-string
-								setStatus?.('Transaction failed');
-								console.log('Transaction failed');
-								setStatus?.('Transaction failed');
-								const dispatchError = (event.data as any)?.dispatchError;
-								isFailed = true;
-
-								if (dispatchError?.isModule) {
-									const errorModule = (event.data as any)?.dispatchError?.asModule;
-									const { method, section, docs } = this.api.registry.findMetaError(errorModule);
-									// eslint-disable-next-line no-param-reassign
-									errorMessageFallback = `${section}.${method} : ${docs.join(' ')}`;
-									console.log(errorMessageFallback, 'error module');
-									await onFailed(errorMessageFallback);
-								} else if (dispatchError?.isToken) {
-									console.log(`${dispatchError.type}.${dispatchError.asToken.type}`);
-									await onFailed(`${dispatchError.type}.${dispatchError.asToken.type}`);
-								} else {
-									await onFailed(`${dispatchError.type}` || errorMessageFallback);
-								}
-							}
-						}
-					} else if (status.isFinalized) {
-						console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
-						console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
-						setIsTxFinalized?.(txHash.toString());
-						if (!isFailed && waitTillFinalizedHash) {
-							await onSuccess(txHash);
-						}
-					}
-				})
+				.signAndSend(address, signerOptions, async ({ status, events, txHash }) =>
+					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
+				)
 				.catch((error: unknown) => {
 					console.log(':( transaction failed');
 					setStatus?.(':( transaction failed');
@@ -405,8 +382,7 @@ export class PolkadotApiService {
 		ayeVoteValue,
 		nayVoteValue,
 		abstainVoteValue,
-		selectedAccount,
-		wallet
+		selectedAccount
 	}: {
 		address: string;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
@@ -419,7 +395,6 @@ export class PolkadotApiService {
 		nayVoteValue?: BN;
 		abstainVoteValue?: BN;
 		selectedAccount?: ISelectedAccount;
-		wallet?: EWallet;
 	}) {
 		let voteTx: SubmittableExtrinsic<'promise'> | null = null;
 
@@ -441,8 +416,7 @@ export class PolkadotApiService {
 				waitTillFinalizedHash: true,
 				onSuccess,
 				onFailed,
-				selectedAccount,
-				wallet
+				selectedAccount
 			});
 		}
 	}
@@ -1246,7 +1220,7 @@ export class PolkadotApiService {
 		});
 	}
 
-	async loginWithRemark({ address, onSuccess, onFailed, wallet }: { address: string; onSuccess: (pre?: unknown) => void; onFailed: (error: string) => void; wallet: EWallet }) {
+	async loginWithRemark({ address, onSuccess, onFailed }: { address: string; onSuccess: (pre?: unknown) => void; onFailed: (error: string) => void }) {
 		if (!this.api) return;
 
 		const tx = this.api.tx.system.remark(`PolkassemblyUser:${getSubstrateAddress(address)}`);
@@ -1257,8 +1231,7 @@ export class PolkadotApiService {
 			errorMessageFallback: 'Failed to login with remark',
 			onSuccess,
 			onFailed,
-			waitTillFinalizedHash: true,
-			wallet
+			waitTillFinalizedHash: true
 		});
 	}
 }
