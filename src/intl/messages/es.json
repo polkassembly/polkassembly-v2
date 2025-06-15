@@ -471,6 +471,13 @@
 		"account": "Cuenta",
 		"abstain": "Abstención",
 		"onchainInfo": "Información en cadena",
+		"BeneficiariesDetails": {
+			"requested": "Solicitado",
+			"details": "Detalles",
+			"immediately": "inmediatamente",
+			"in": "en",
+			"requestedAmountDetails": "Detalles del monto solicitado"
+		},
 		"OnchainInfo": {
 			"metadata": "Metadatos",
 			"table": "Tabla",
