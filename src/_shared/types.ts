@@ -1299,3 +1299,11 @@ export interface IPayout {
 		generalIndex: string;
 	};
 }
+export interface IBeneficiaryDetails extends IBeneficiary {
+	expireIn: string | null;
+}
+
+export interface TimeUnitOptions {
+	withUnitSpace?: boolean;
+	withPluralSuffix?: boolean;
+}
