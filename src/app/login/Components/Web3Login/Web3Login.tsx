@@ -50,7 +50,12 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 	// Handle Mimir login completion after remark transaction
 	const completeMimirLogin = async (remarkHash: string) => {
 		try {
-			if (!userPreferences?.selectedAccount?.address) return;
+			if (!userPreferences?.selectedAccount?.address) {
+				setLoading(false);
+				setPendingMimirAuth(false);
+				return;
+			}
+
 			const { address } = userPreferences.selectedAccount;
 
 			const result = await AuthClientService.mimirLogin({
@@ -109,7 +114,10 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 			setLoading(true);
 
 			if (userPreferences.wallet === EWallet.MIMIR) {
-				if (!apiService) return;
+				if (!apiService) {
+					setLoading(false);
+					return;
+				}
 
 				setPendingMimirAuth(true);
 
