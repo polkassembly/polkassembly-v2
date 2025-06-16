@@ -22,7 +22,7 @@
 	},
 	"ignorePatterns": ["lib/**"],
 	"plugins": ["@typescript-eslint", "header", "import"],
-	"extends": ["plugin:@typescript-eslint/recommended", "airbnb", "prettier", "plugin:prettier/recommended"],
+	"extends": ["plugin:@typescript-eslint/recommended", "airbnb", "google", "prettier", "plugin:prettier/recommended"],
 	"rules": {
 		"@typescript-eslint/no-duplicate-enum-values": "off",
 		"@typescript-eslint/no-unused-vars": "error",
@@ -37,7 +37,7 @@
 		],
 		"no-nested-ternary": "off",
 		"import/prefer-default-export": "off",
-		"header/header": [2, "./header.js"],
+		"header/header": "off",
 		"no-tabs": [
 			"error",
 			{
