@@ -68,7 +68,7 @@ enum EApiRoute {
 	WEB2_LOGIN = 'WEB2_LOGIN',
 	WEB2_SIGNUP = 'WEB2_SIGNUP',
 	WEB3_LOGIN = 'WEB3_LOGIN',
-	MIMIR_LOGIN = 'MIMIR_LOGIN',
+	REMARK_LOGIN = 'REMARK_LOGIN',
 	REFRESH_ACCESS_TOKEN = 'REFRESH_ACCESS_TOKEN',
 	USER_EXISTS = 'USER_EXISTS',
 	TFA_LOGIN = 'TFA_LOGIN',
@@ -261,8 +261,8 @@ export class NextApiClientService {
 				path = '/auth/web2-auth/signup';
 				method = 'POST';
 				break;
-			case EApiRoute.MIMIR_LOGIN:
-				path = '/auth/web3-auth/mimir-auth';
+			case EApiRoute.REMARK_LOGIN:
+				path = '/auth/web3-auth/remark';
 				method = 'POST';
 				break;
 			case EApiRoute.WEB3_LOGIN:
@@ -376,7 +376,24 @@ export class NextApiClientService {
 
 		// Detect if we're in an iframe and specifically from Mimir
 		const isInIframe = typeof window !== 'undefined' && window !== window.top;
-		const isMimirIframe = isInIframe && window.location.ancestorOrigins && Array.from(window.location.ancestorOrigins).some((origin) => origin.includes('app.mimir.global'));
+		let isMimirIframe = false;
+
+		if (isInIframe) {
+			// Try ancestorOrigins first (Chrome/WebKit support)
+			if (window.location.ancestorOrigins) {
+				isMimirIframe = Array.from(window.location.ancestorOrigins).some((origin) => origin.includes('app.mimir.global'));
+			}
+			// Fallback to document.referrer for Safari/Firefox
+			else if (document.referrer) {
+				try {
+					const referrerUrl = new URL(document.referrer);
+					isMimirIframe = referrerUrl.hostname.includes('app.mimir.global');
+				} catch {
+					// If referrer URL parsing fails, check if referrer string contains mimir
+					isMimirIframe = document.referrer.includes('app.mimir.global');
+				}
+			}
+		}
 
 		const response = await fetch(url, {
 			body: JSON.stringify(data),
@@ -421,8 +438,8 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IAuthResponse>({ url, method, data: { address, signature, wallet } });
 	}
 
-	protected static async mimirLoginApi({ address, wallet, remarkHash }: { address: string; wallet: EWallet; remarkHash: string }) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.MIMIR_LOGIN });
+	protected static async remarkLoginApi({ address, wallet, remarkHash }: { address: string; wallet: EWallet; remarkHash: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.REMARK_LOGIN });
 		return this.nextApiClientFetch<IAuthResponse>({ url, method, data: { address, wallet, remarkHash } });
 	}
 

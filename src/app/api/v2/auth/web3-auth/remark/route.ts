@@ -18,13 +18,9 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	const network = await getNetworkFromHeaders();
 	const iframeHeader = req.headers.get('x-iframe-context');
 
-	if (iframeHeader !== 'mimir') {
-		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Invalid iframe context');
-	}
-
 	const zodBodySchema = z.object({
 		address: z.string().refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Not a valid web3 address'),
-		wallet: z.literal(EWallet.MIMIR),
+		wallet: z.nativeEnum(EWallet),
 		remarkHash: z.string().min(3, 'A valid remark hash is required')
 	});
 
@@ -37,7 +33,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		isTFAEnabled = false,
 		tfaToken = '',
 		refreshToken
-	} = await AuthService.MimirWalletLogin({
+	} = await AuthService.Web3LoginOrRegisterWithRemark({
 		address,
 		wallet,
 		network,
@@ -56,13 +52,13 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Refresh token not generated.');
 	}
 
-	const refreshTokenCookie = await AuthService.GetRefreshTokenCookie(refreshToken, true);
+	const refreshTokenCookie = await AuthService.GetRefreshTokenCookie(refreshToken, iframeHeader === 'mimir');
 
 	if (!refreshTokenCookie) {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Refresh token cookie not generated.');
 	}
 
-	const accessTokenCookie = await AuthService.GetAccessTokenCookie(accessToken, true);
+	const accessTokenCookie = await AuthService.GetAccessTokenCookie(accessToken, iframeHeader === 'mimir');
 
 	if (!accessTokenCookie) {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Access token cookie not generated.');

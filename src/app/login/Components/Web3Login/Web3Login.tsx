@@ -58,7 +58,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 
 			const { address } = userPreferences.selectedAccount;
 
-			const result = await AuthClientService.mimirLogin({
+			const result = await AuthClientService.remarkLogin({
 				address: getSubstrateAddress(address) || address,
 				wallet: userPreferences.wallet!,
 				remarkHash

@@ -24,9 +24,9 @@ import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateA
 import { APPNAME } from '@/_shared/_constants/appName';
 import { web3Enable, web3FromSource } from '@polkadot/extension-dapp';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { isMimirReady, MIMIR_REGEXP } from '@mimirdev/apps-inject';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
 import { BlockCalculationsService } from './block_calculations_service';
+import { isMimirDetected } from './isMimirDetected';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -162,11 +162,9 @@ export class PolkadotApiService {
 	}) {
 		if (!this.api || !tx) return;
 
-		const openInIframe = typeof window !== 'undefined' && window !== window.parent;
+		const isMimirIframe = await isMimirDetected();
 
-		const origin = await isMimirReady();
-
-		if (origin && MIMIR_REGEXP.test(origin) && openInIframe) {
+		if (isMimirIframe) {
 			await web3Enable(APPNAME);
 			const injected = await web3FromSource('mimir');
 			const isMimir = injected.name === 'mimir';

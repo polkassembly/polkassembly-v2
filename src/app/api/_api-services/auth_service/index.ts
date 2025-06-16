@@ -5,7 +5,7 @@
 import jwt from 'jsonwebtoken';
 import { StatusCodes } from 'http-status-codes';
 import { APIError } from '@app/api/_api-utils/apiError';
-import { getAccessTokenCookieOptions, getRefreshTokenCookieOptions } from '@app/api/_api-constants/jwt';
+import { ACCESS_TOKEN_COOKIE_OPTIONS, IFRAME_ACCESS_TOKEN_COOKIE_OPTIONS, IFRAME_REFRESH_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from '@app/api/_api-constants/jwt';
 import { ERROR_CODES, ERROR_MESSAGES } from '@shared/_constants/errorLiterals';
 import {
 	ACCESS_TOKEN_PASSPHRASE,
@@ -302,12 +302,12 @@ export class AuthService {
 	}
 
 	static async GetRefreshTokenCookie(refreshToken: string, isIframe: boolean = false) {
-		const options = getRefreshTokenCookieOptions(isIframe);
+		const options = isIframe ? IFRAME_REFRESH_TOKEN_COOKIE_OPTIONS : REFRESH_TOKEN_COOKIE_OPTIONS;
 		return serialize(ECookieNames.REFRESH_TOKEN, refreshToken, options);
 	}
 
 	static async GetAccessTokenCookie(accessToken: string, isIframe: boolean = false) {
-		const options = getAccessTokenCookieOptions(isIframe);
+		const options = isIframe ? IFRAME_ACCESS_TOKEN_COOKIE_OPTIONS : ACCESS_TOKEN_COOKIE_OPTIONS;
 		return serialize(ECookieNames.ACCESS_TOKEN, accessToken, options);
 	}
 
@@ -383,14 +383,24 @@ export class AuthService {
 		};
 	}
 
-	static async MimirWalletLogin({ address, wallet, network, remarkHash }: { address: string; wallet: EWallet; network: ENetwork; remarkHash: string }): Promise<IAuthResponse> {
+	static async Web3LoginOrRegisterWithRemark({
+		address,
+		wallet,
+		network,
+		remarkHash
+	}: {
+		address: string;
+		wallet: EWallet;
+		network: ENetwork;
+		remarkHash: string;
+	}): Promise<IAuthResponse> {
 		if (!ValidatorService.isValidNetwork(network)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network');
 		}
 
-		if (wallet !== EWallet.MIMIR) {
-			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Not a Mimir wallet');
-		}
+		// if (wallet !== EWallet.MIMIR) {
+		// throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Not a Mimir wallet');
+		// }
 
 		const isEvmAddress = ValidatorService.isValidEVMAddress(address);
 

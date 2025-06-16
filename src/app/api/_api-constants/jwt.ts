@@ -8,32 +8,35 @@ import { ACCESS_TOKEN_LIFE_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS } from './t
 
 // const { NEXT_PUBLIC_APP_ENV } = getSharedEnvVars();
 
-// Standard options for same-site usage
-const STANDARD_COOKIE_OPTIONS: CookieSerializeOptions = {
+export const REFRESH_TOKEN_COOKIE_OPTIONS: CookieSerializeOptions = {
 	httpOnly: false,
 	path: '/',
 	sameSite: true,
-	secure: true
+	secure: true,
+	maxAge: REFRESH_TOKEN_LIFE_IN_SECONDS
+};
+
+export const ACCESS_TOKEN_COOKIE_OPTIONS: CookieSerializeOptions = {
+	httpOnly: false,
+	path: '/',
+	sameSite: true,
+	secure: true,
+	maxAge: ACCESS_TOKEN_LIFE_IN_SECONDS
 };
 
 // Options for iframe compatibility (cross-site)
-const IFRAME_COMPATIBLE_OPTIONS: CookieSerializeOptions = {
+export const IFRAME_ACCESS_TOKEN_COOKIE_OPTIONS: CookieSerializeOptions = {
 	httpOnly: false,
 	path: '/',
 	sameSite: 'none',
-	secure: true
+	secure: true,
+	maxAge: ACCESS_TOKEN_LIFE_IN_SECONDS
 };
 
-export function getRefreshTokenCookieOptions(isIframe: boolean = false): CookieSerializeOptions {
-	return {
-		...(isIframe ? IFRAME_COMPATIBLE_OPTIONS : STANDARD_COOKIE_OPTIONS),
-		maxAge: REFRESH_TOKEN_LIFE_IN_SECONDS
-	};
-}
-
-export function getAccessTokenCookieOptions(isIframe: boolean = false): CookieSerializeOptions {
-	return {
-		...(isIframe ? IFRAME_COMPATIBLE_OPTIONS : STANDARD_COOKIE_OPTIONS),
-		maxAge: ACCESS_TOKEN_LIFE_IN_SECONDS
-	};
-}
+export const IFRAME_REFRESH_TOKEN_COOKIE_OPTIONS: CookieSerializeOptions = {
+	httpOnly: false,
+	path: '/',
+	sameSite: 'none',
+	secure: true,
+	maxAge: REFRESH_TOKEN_LIFE_IN_SECONDS
+};

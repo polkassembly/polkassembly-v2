@@ -2,6 +2,11 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import dayjs from 'dayjs';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { StatusCodes } from 'http-status-codes';
+import { APIError } from './apiError';
+
 interface TxParam {
 	name: string;
 	value: string | Record<string, unknown> | unknown;
@@ -9,6 +14,7 @@ interface TxParam {
 
 interface TxData {
 	params?: TxParam[];
+	block_timestamp: number;
 	[key: string]: unknown;
 }
 
@@ -77,6 +83,12 @@ function findRemarkRecursively(data: TxData, targetRemark: string): boolean {
 export function validateRemarkLogin(extrinsicData: unknown, formattedAddress: string): boolean {
 	if (!extrinsicData || !formattedAddress) {
 		return false;
+	}
+
+	const blockTimestamp = (extrinsicData as TxData).block_timestamp;
+
+	if (dayjs().subtract(5, 'minutes').isAfter(dayjs.unix(blockTimestamp))) {
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'The remark is expired. Please try again.');
 	}
 
 	const targetRemark = `PolkassemblyUser:${formattedAddress}`;
