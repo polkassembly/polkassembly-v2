@@ -37,7 +37,7 @@
 		],
 		"no-nested-ternary": "off",
 		"import/prefer-default-export": "off",
-		"header/header": "off",
+		"header/header": [2, "./header.js"],
 		"no-tabs": [
 			"error",
 			{
