@@ -470,6 +470,13 @@
 		"account": "アカウント",
 		"abstain": "棄権",
 		"onchainInfo": "オンチェーン情報",
+		"HighlightMenu": {
+			"quote": "引用",
+			"share": "共有",
+			"copy": "コピー",
+			"textCopiedToClipboard": "テキストがクリップボードにコピーされました",
+			"failedToCopyText": "テキストのコピーに失敗しました"
+		},
 		"OnchainInfo": {
 			"metadata": "メタデータ",
 			"table": "テーブル",

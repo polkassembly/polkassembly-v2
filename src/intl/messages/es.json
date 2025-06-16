@@ -471,6 +471,13 @@
 		"account": "Cuenta",
 		"abstain": "Abstención",
 		"onchainInfo": "Información en cadena",
+		"HighlightMenu": {
+			"quote": "Citar",
+			"share": "Compartir",
+			"copy": "Copiar",
+			"textCopiedToClipboard": "Texto copiado al portapapeles",
+			"failedToCopyText": "Error al copiar el texto"
+		},
 		"OnchainInfo": {
 			"metadata": "Metadatos",
 			"table": "Tabla",

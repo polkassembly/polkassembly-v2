@@ -106,6 +106,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 				<div className='w-full px-6 py-6'>
 					<AddComment
 						proposalType={proposalType}
+						id='commentForm'
 						proposalIndex={index}
 						onConfirm={(newComment, publicUser) => {
 							queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [...(prev || []), { ...newComment, user: publicUser }]);
@@ -113,7 +114,10 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 					/>
 				</div>
 			) : (
-				<div className={classes.loginToComment}>
+				<div
+					className={classes.loginToComment}
+					id='commentLoginPrompt'
+				>
 					{t('PostDetails.please')}
 					<Link
 						className='text-text_pink'
