@@ -35,7 +35,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		}
 	}
 
-	const analytics = await OnChainDbService.getPostTillesVotes({ network, proposalType, index: Number(index), analyticsType, votesType });
+	const analytics = await OnChainDbService.getPostTilesVotes({ network, proposalType, index: Number(index), analyticsType, votesType });
 
 	await RedisService.SetPostTilesVotesData({ network, proposalType, indexOrHash: index, data: analytics, votesType, analyticsType });
 

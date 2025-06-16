@@ -1092,7 +1092,7 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async getPostTillesVotes({
+	static async getPostTilesVotes({
 		network,
 		proposalType,
 		index,

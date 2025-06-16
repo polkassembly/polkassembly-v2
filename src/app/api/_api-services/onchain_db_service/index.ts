@@ -316,7 +316,7 @@ export class OnChainDbService {
 		return SubsquidService.getPostAnalytics({ network, proposalType, index });
 	}
 
-	static async getPostTillesVotes({
+	static async getPostTilesVotes({
 		network,
 		proposalType,
 		index,
@@ -329,6 +329,6 @@ export class OnChainDbService {
 		analyticsType?: EAnalyticsType;
 		votesType: EPostTilesVotesType;
 	}) {
-		return SubsquidService.getPostTillesVotes({ network, proposalType, index, analyticsType, votesType });
+		return SubsquidService.getPostTilesVotes({ network, proposalType, index, analyticsType, votesType });
 	}
 }

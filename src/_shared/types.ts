@@ -722,8 +722,8 @@ export enum EAssets {
 export enum EPostDetailsTab {
 	DESCRIPTION = 'description',
 	TIMELINE = 'timeline',
-	ONCHAIN_INFO = 'onchain info',
-	POST_ANALYTICS = 'post_analytics'
+	ONCHAIN_INFO = 'onchainInfo',
+	POST_ANALYTICS = 'postAnalytics'
 }
 
 export enum EActivityName {
