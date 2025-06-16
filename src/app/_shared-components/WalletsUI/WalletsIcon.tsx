@@ -9,7 +9,7 @@ import SubWalletIcon from '@assets/wallet-icons/subwallet-icon.svg';
 import PolkagateIcon from '@assets/wallet-icons/polkagate-icon.svg';
 import NovaIcon from '@assets/wallet-icons/nova-wallet-star.svg';
 import Image from 'next/image';
-import MimirIcon from '@assets/wallet-icons/mimir-icon.jpg';
+import MimirIcon from '@assets/wallet-icons/mimir-logo.jpg';
 
 export function WalletIcon({ wallet, className }: { wallet: EWallet; className?: string }) {
 	switch (wallet) {
