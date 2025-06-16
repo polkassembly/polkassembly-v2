@@ -475,6 +475,9 @@
 			"details": "詳細",
 			"immediately": "すぐに",
 			"in": "で",
+			"to": "に",
+			"totalEstimatedUSD": "合計推定USD相当",
+			"seeMore": "もっと見る",
 			"requestedAmountDetails": "リクエストされた金額の詳細"
 		},
 		"OnchainInfo": {
