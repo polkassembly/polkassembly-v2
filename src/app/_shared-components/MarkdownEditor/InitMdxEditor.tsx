@@ -49,6 +49,8 @@ import './MardownEditor.scss';
 import { cn } from '@/lib/utils';
 import { ETheme } from '@/_shared/types';
 import { useTheme } from 'next-themes';
+import { useQuoteCommentText } from '@/hooks/useQuoteCommentText';
+import { useEffect } from 'react';
 
 const { NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY, NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
 const algoliaClient = algoliasearch(NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY);
@@ -56,6 +58,40 @@ const MAX_MENTION_SUGGESTIONS = 5;
 
 // Only import this to the next file
 export default function InitializedMDXEditor({ editorRef, ...props }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
+	const { quoteCommentText, setQuoteCommentText } = useQuoteCommentText();
+	const { theme } = useTheme();
+
+	// Handle quoted text insertion
+	useEffect(() => {
+		if (!quoteCommentText || !editorRef || typeof editorRef === 'function') {
+			return;
+		}
+
+		const editor = editorRef.current;
+		if (!editor) {
+			return;
+		}
+
+		const currentContent = editor.getMarkdown();
+
+		// Format the quoted text
+		const quotedText = `\n\n> ${quoteCommentText}\n\n`;
+
+		// Append to existing content
+		const newContent = currentContent + quotedText;
+
+		// Update the editor
+		editor.setMarkdown(newContent);
+
+		// Clear the quote text after using it
+		setQuoteCommentText('');
+
+		// Trigger onChange if provided
+		if (props?.onChange) {
+			props.onChange(newContent, false);
+		}
+	}, [quoteCommentText, editorRef, setQuoteCommentText, props]);
+
 	// eslint-disable-next-line sonarjs/cognitive-complexity
 	const preprocessMarkdown = (markdown: string): string => {
 		let inCode = false;
@@ -117,8 +153,6 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 
 		return result;
 	};
-
-	const { theme } = useTheme();
 
 	const handleMentionSuggestions = (editor: MDXEditorMethods, textContent: string, cursorPosition: number, currentTheme: string) => {
 		const textBeforeCursor = textContent.substring(0, cursorPosition);
