@@ -87,8 +87,8 @@ function ImageUploadDialog({
 				open={isDialogOpen}
 				onOpenChange={setIsDialogOpen}
 			>
-				<DialogContent className='min-w-[300px] max-w-max pb-4 pt-3'>
-					<DialogHeader className='px-4'>
+				<DialogContent className='w-[400px] pb-4 pt-3 lg:max-w-max'>
+					<DialogHeader className='px-4 py-2'>
 						<DialogTitle>{t('uploadImage')}</DialogTitle>
 					</DialogHeader>
 
