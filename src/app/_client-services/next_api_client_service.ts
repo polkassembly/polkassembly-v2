@@ -68,6 +68,8 @@ enum EApiRoute {
 	WEB2_LOGIN = 'WEB2_LOGIN',
 	WEB2_SIGNUP = 'WEB2_SIGNUP',
 	WEB3_LOGIN = 'WEB3_LOGIN',
+	REMARK_LOGIN = 'REMARK_LOGIN',
+	GET_REMARK_LOGIN_MESSAGE = 'GET_REMARK_LOGIN_MESSAGE',
 	REFRESH_ACCESS_TOKEN = 'REFRESH_ACCESS_TOKEN',
 	USER_EXISTS = 'USER_EXISTS',
 	TFA_LOGIN = 'TFA_LOGIN',
@@ -167,6 +169,9 @@ export class NextApiClientService {
 			case EApiRoute.REFRESH_ACCESS_TOKEN:
 				path = '/auth/refresh-access-token';
 				break;
+			case EApiRoute.GET_REMARK_LOGIN_MESSAGE:
+				path = '/auth/web3-auth/remark';
+				break;
 			case EApiRoute.GENERATE_QR_SESSION:
 				path = '/auth/qr-session';
 				break;
@@ -258,6 +263,10 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.WEB2_SIGNUP:
 				path = '/auth/web2-auth/signup';
+				method = 'POST';
+				break;
+			case EApiRoute.REMARK_LOGIN:
+				path = '/auth/web3-auth/remark';
 				method = 'POST';
 				break;
 			case EApiRoute.WEB3_LOGIN:
@@ -369,6 +378,27 @@ export class NextApiClientService {
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
 		const currentNetwork = await this.getCurrentNetwork();
 
+		// Detect if we're in an iframe and specifically from Mimir
+		const isInIframe = typeof window !== 'undefined' && window !== window.top;
+		let isMimirIframe = false;
+
+		if (isInIframe) {
+			// Try ancestorOrigins first (Chrome/WebKit support)
+			if (window.location.ancestorOrigins) {
+				isMimirIframe = Array.from(window.location.ancestorOrigins).some((origin) => origin.includes('app.mimir.global'));
+			}
+			// Fallback to document.referrer for Safari/Firefox
+			else if (document.referrer) {
+				try {
+					const referrerUrl = new URL(document.referrer);
+					isMimirIframe = referrerUrl.hostname.includes('app.mimir.global');
+				} catch {
+					// If referrer URL parsing fails, check if referrer string contains mimir
+					isMimirIframe = document.referrer.includes('app.mimir.global');
+				}
+			}
+		}
+
 		const response = await fetch(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
@@ -377,7 +407,8 @@ export class NextApiClientService {
 				'Content-Type': 'application/json',
 				'x-api-key': getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
 				'x-network': currentNetwork,
-				[EHttpHeaderKey.SKIP_CACHE]: skipCache.toString()
+				[EHttpHeaderKey.SKIP_CACHE]: skipCache.toString(),
+				...(isMimirIframe ? { 'x-iframe-context': 'mimir' } : {})
 			},
 			method
 		});
@@ -409,6 +440,17 @@ export class NextApiClientService {
 	protected static async web3LoginOrSignupApi({ address, signature, wallet }: { address: string; signature: string; wallet: EWallet }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.WEB3_LOGIN });
 		return this.nextApiClientFetch<IAuthResponse>({ url, method, data: { address, signature, wallet } });
+	}
+
+	protected static async remarkLoginApi({ address, wallet, remarkHash }: { address: string; wallet: EWallet; remarkHash: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.REMARK_LOGIN });
+		return this.nextApiClientFetch<IAuthResponse>({ url, method, data: { address, wallet, remarkHash } });
+	}
+
+	protected static async getRemarkLoginMessageApi({ address }: { address: string }) {
+		const queryParams = new URLSearchParams({ address });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_REMARK_LOGIN_MESSAGE, queryParams });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
 	protected static async checkForUsernameAndEmailApi({ email, username }: { email: string; username: string }) {

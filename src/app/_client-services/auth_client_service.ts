@@ -35,6 +35,18 @@ export class AuthClientService extends NextApiClientService {
 		});
 	}
 
+	static async remarkLogin({ address, wallet, remarkHash }: { address: string; wallet: EWallet; remarkHash: string }) {
+		return this.remarkLoginApi({
+			address,
+			wallet,
+			remarkHash
+		});
+	}
+
+	static async getRemarkLoginMessage({ address }: { address: string }) {
+		return this.getRemarkLoginMessageApi({ address });
+	}
+
 	static async checkForUsernameAndEmail({ email, username }: { email: string; username: string }) {
 		return this.checkForUsernameAndEmailApi({
 			username,

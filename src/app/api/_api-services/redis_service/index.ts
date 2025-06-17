@@ -55,7 +55,8 @@ enum ERedisKeys {
 	TRACK_ANALYTICS_DELEGATION = 'TAD',
 	TRACK_ANALYTICS_STATS = 'TAS',
 	TREASURY_STATS = 'TRS',
-	OVERVIEW_PAGE_DATA = 'OPD'
+	OVERVIEW_PAGE_DATA = 'OPD',
+	REMARK_LOGIN_MESSAGE = 'RLM'
 }
 
 export class RedisService {
@@ -112,7 +113,8 @@ export class RedisService {
 		[ERedisKeys.TRACK_ANALYTICS_DELEGATION]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-${origin}`,
 		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
 		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
-		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`
+		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
+		[ERedisKeys.REMARK_LOGIN_MESSAGE]: (address: string): string => `${ERedisKeys.REMARK_LOGIN_MESSAGE}-${address}`
 	} as const;
 
 	// helper methods
@@ -616,5 +618,18 @@ export class RedisService {
 
 	static async DeleteOverviewPageData({ network }: { network: ENetwork }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
+	}
+
+	// Remark login message caching methods
+	static async SetRemarkLoginMessage({ address, message }: { address: string; message: string }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.REMARK_LOGIN_MESSAGE](address), value: message, ttlSeconds: FIVE_MIN, forceCache: true });
+	}
+
+	static async GetRemarkLoginMessage(address: string): Promise<string | null> {
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.REMARK_LOGIN_MESSAGE](address), forceCache: true });
+	}
+
+	static async DeleteRemarkLoginMessage(address: string): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.REMARK_LOGIN_MESSAGE](address), forceCache: true });
 	}
 }
