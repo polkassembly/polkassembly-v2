@@ -785,6 +785,17 @@
 			"titlePlaceholder": "Enter poll title"
 		},
 
+		"UploadImage": {
+			"uploadImage": "Upload Image",
+			"uploadFromDevice": "Upload from device",
+			"addFromURL": "Add from URL",
+			"alt": "Alt",
+			"title": "Title",
+			"save": "Save",
+			"cancel": "Cancel",
+			"insertImage": "Insert Image",
+			"failedToUploadImage": "Failed to upload image"
+		},
 		"AllowedCommentors": {
 			"advanced": "Advanced",
 			"title": "Who can comment ?",

@@ -718,6 +718,17 @@
 		"titleTooShort": "Bitte geben Sie einen gültigen Titel ein.",
 		"titlePlaceholder": "Titel eingeben",
 		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung ein.",
+		"UploadImage": {
+			"uploadImage": "Bild hochladen",
+			"uploadFromDevice": "Vom Gerät hochladen",
+			"addFromURL": "Von URL hinzufügen",
+			"alt": "Alt",
+			"title": "Titel",
+			"save": "Speichern",
+			"cancel": "Abbrechen",
+			"insertImage": "Bild einfügen",
+			"failedToUploadImage": "Bild konnte nicht hochgeladen werden"
+		},	
 		"AllowedCommentors": {
 			"advanced": "Erweitert",
 			"title": "Wer kann kommentieren?",
