@@ -808,6 +808,7 @@
 		"requestJudgement": "请求判断",
 		"minimumDeposit": "最低存款",
 		"registrarFee": "注册商费用",
+		"gasFee": "Gas 费用",
 		"totalAmountRequired": "所需总金额",
 		"viewAmountBreakup": "查看金额明细",
 		"registrarFees": "注册商费用",
