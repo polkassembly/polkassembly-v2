@@ -241,13 +241,15 @@ export class PolkadotApiService {
 		let freeBalance = BN_ZERO;
 		let lockedBalance = BN_ZERO;
 		let totalBalance = BN_ZERO;
+		let reservedBalance = BN_ZERO;
 		let transferableBalance = BN_ZERO;
 
 		const responseObj = {
 			freeBalance,
 			lockedBalance,
 			totalBalance,
-			transferableBalance
+			transferableBalance,
+			reservedBalance
 		};
 
 		if (!address || !this.api?.derive?.balances?.all) {
@@ -275,6 +277,7 @@ export class PolkadotApiService {
 
 				totalBalance = free.add(reserved);
 				freeBalance = free;
+				reservedBalance = reserved;
 
 				if (free.gt(frozen)) {
 					transferableBalance = free.sub(frozen);
@@ -294,7 +297,8 @@ export class PolkadotApiService {
 			freeBalance,
 			lockedBalance,
 			totalBalance,
-			transferableBalance
+			transferableBalance,
+			reservedBalance
 		};
 	}
 
