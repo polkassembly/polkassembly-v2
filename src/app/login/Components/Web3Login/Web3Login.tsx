@@ -119,11 +119,20 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 					return;
 				}
 
+				const { data, error } = await AuthClientService.getRemarkLoginMessage({ address: getSubstrateAddress(address) || address });
+
+				if (error || !data || !data.message) {
+					setLoading(false);
+					setErrorMessage(error?.message || 'Cannot generate message.');
+					return;
+				}
+
 				setPendingMimirAuth(true);
 
 				// Start the remark transaction
 				apiService.loginWithRemark({
 					address,
+					remarkLoginMessage: data.message,
 					onSuccess: (hash) => {
 						const remarkHash = hash?.toString() || '';
 
@@ -136,9 +145,9 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 							setErrorMessage('Failed to get transaction hash');
 						}
 					},
-					onFailed: (error) => {
-						console.log('remark failed:', error);
-						setErrorMessage(error);
+					onFailed: (e) => {
+						console.log('remark failed:', e);
+						setErrorMessage(e);
 						setLoading(false);
 						setPendingMimirAuth(false);
 					}

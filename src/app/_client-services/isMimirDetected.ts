@@ -5,7 +5,11 @@
 import { isMimirReady, MIMIR_REGEXP } from '@mimirdev/apps-inject';
 
 export const isMimirDetected = async () => {
-	const isInIframe = typeof window !== 'undefined' && window !== window.parent;
+	if (typeof window === 'undefined') {
+		return false;
+	}
+
+	const isInIframe = window !== window.parent;
 
 	const origin = await isMimirReady();
 

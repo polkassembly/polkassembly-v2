@@ -69,6 +69,7 @@ enum EApiRoute {
 	WEB2_SIGNUP = 'WEB2_SIGNUP',
 	WEB3_LOGIN = 'WEB3_LOGIN',
 	REMARK_LOGIN = 'REMARK_LOGIN',
+	GET_REMARK_LOGIN_MESSAGE = 'GET_REMARK_LOGIN_MESSAGE',
 	REFRESH_ACCESS_TOKEN = 'REFRESH_ACCESS_TOKEN',
 	USER_EXISTS = 'USER_EXISTS',
 	TFA_LOGIN = 'TFA_LOGIN',
@@ -167,6 +168,9 @@ export class NextApiClientService {
 			// get routes
 			case EApiRoute.REFRESH_ACCESS_TOKEN:
 				path = '/auth/refresh-access-token';
+				break;
+			case EApiRoute.GET_REMARK_LOGIN_MESSAGE:
+				path = '/auth/web3-auth/remark';
 				break;
 			case EApiRoute.GENERATE_QR_SESSION:
 				path = '/auth/qr-session';
@@ -441,6 +445,12 @@ export class NextApiClientService {
 	protected static async remarkLoginApi({ address, wallet, remarkHash }: { address: string; wallet: EWallet; remarkHash: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.REMARK_LOGIN });
 		return this.nextApiClientFetch<IAuthResponse>({ url, method, data: { address, wallet, remarkHash } });
+	}
+
+	protected static async getRemarkLoginMessageApi({ address }: { address: string }) {
+		const queryParams = new URLSearchParams({ address });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_REMARK_LOGIN_MESSAGE, queryParams });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
 	protected static async checkForUsernameAndEmailApi({ email, username }: { email: string; username: string }) {

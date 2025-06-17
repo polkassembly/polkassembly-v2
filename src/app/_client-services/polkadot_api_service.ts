@@ -23,7 +23,6 @@ import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBenefi
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
 import { APPNAME } from '@/_shared/_constants/appName';
 import { web3Enable, web3FromSource } from '@polkadot/extension-dapp';
-import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
 import { BlockCalculationsService } from './block_calculations_service';
 import { isMimirDetected } from './isMimirDetected';
@@ -176,7 +175,7 @@ export class PolkadotApiService {
 				return;
 			}
 
-			const result: any = await injected.signer?.signPayload({
+			const result: any = await injected.signer.signPayload({
 				address,
 				method: tx.method.toHex(),
 				genesisHash: this.api.genesisHash.toHex()
@@ -1218,10 +1217,20 @@ export class PolkadotApiService {
 		});
 	}
 
-	async loginWithRemark({ address, onSuccess, onFailed }: { address: string; onSuccess: (pre?: unknown) => void; onFailed: (error: string) => void }) {
+	async loginWithRemark({
+		address,
+		remarkLoginMessage,
+		onSuccess,
+		onFailed
+	}: {
+		address: string;
+		remarkLoginMessage: string;
+		onSuccess: (pre?: unknown) => void;
+		onFailed: (error: string) => void;
+	}) {
 		if (!this.api) return;
 
-		const tx = this.api.tx.system.remark(`PolkassemblyUser:${getSubstrateAddress(address)}`);
+		const tx = this.api.tx.system.remark(remarkLoginMessage);
 
 		await this.executeTx({
 			tx,

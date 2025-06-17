@@ -398,10 +398,6 @@ export class AuthService {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network');
 		}
 
-		// if (wallet !== EWallet.MIMIR) {
-		// throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Not a Mimir wallet');
-		// }
-
 		const isEvmAddress = ValidatorService.isValidEVMAddress(address);
 
 		if (!isEvmAddress && !ValidatorService.isValidSubstrateAddress(address)) {
@@ -416,8 +412,13 @@ export class AuthService {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Could not get transaction data. Please try again.');
 		}
 
+		const remarkLoginMessage = await RedisService.GetRemarkLoginMessage(formattedAddress);
+		if (!remarkLoginMessage) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Sign message not found. Please try again.');
+		}
+
 		// check tx data if it has the remark with user id (supports nested calls)
-		const remarkExists = validateRemarkLogin(extrinsicDetails.data, formattedAddress);
+		const remarkExists = validateRemarkLogin({ extrinsicData: extrinsicDetails.data, remarkLoginMessage });
 
 		if (!remarkExists || !extrinsicDetails.data.account_id) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'The remark does not exist in this transaction hash. Please provide a different hash.');

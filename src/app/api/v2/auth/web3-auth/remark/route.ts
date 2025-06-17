@@ -5,6 +5,7 @@
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { EWallet } from '@/_shared/types';
 import { AuthService } from '@api/_api-services/auth_service';
+import { RedisService } from '@api/_api-services/redis_service';
 import { APIError } from '@api/_api-utils/apiError';
 import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { getReqBody } from '@api/_api-utils/getReqBody';
@@ -13,6 +14,31 @@ import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { createId as createCuid } from '@paralleldrive/cuid2';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+
+export const GET = withErrorHandling(async (req: NextRequest) => {
+	const { searchParams } = new URL(req.url);
+	const address = searchParams.get('address');
+
+	if (!address) {
+		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Address is required');
+	}
+
+	if (!ValidatorService.isValidWeb3Address(address)) {
+		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid web3 address');
+	}
+
+	const substrateAddress = getSubstrateAddress(address) || address;
+
+	const cuidString = createCuid();
+	const signingMessage = `Connect with Polkassembly - ${cuidString}`;
+
+	// Store the cuidString in Redis with the address as key
+	await RedisService.SetRemarkLoginMessage({ address: substrateAddress, message: cuidString });
+
+	return NextResponse.json({ message: signingMessage });
+});
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
 	const network = await getNetworkFromHeaders();
@@ -63,6 +89,8 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	if (!accessTokenCookie) {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Access token cookie not generated.');
 	}
+
+	await RedisService.DeleteRemarkLoginMessage(getSubstrateAddress(address) || address);
 
 	// no 2FA, successful login/signup
 	const response = NextResponse.json({ isTFAEnabled, message: 'Web3 authentication successful' });

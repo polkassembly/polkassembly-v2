@@ -43,6 +43,10 @@ export class AuthClientService extends NextApiClientService {
 		});
 	}
 
+	static async getRemarkLoginMessage({ address }: { address: string }) {
+		return this.getRemarkLoginMessageApi({ address });
+	}
+
 	static async checkForUsernameAndEmail({ email, username }: { email: string; username: string }) {
 		return this.checkForUsernameAndEmailApi({
 			username,

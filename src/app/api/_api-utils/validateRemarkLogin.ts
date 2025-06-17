@@ -33,7 +33,7 @@ function findRemarkRecursively(data: TxData, targetRemark: string): boolean {
 
 	// First, check if there's a direct remark parameter
 	const remarkParam = params.find((param) => param.name === 'remark');
-	if (remarkParam && remarkParam.value === targetRemark) {
+	if (remarkParam && (remarkParam.value as string).split('-')[1].trim() === targetRemark) {
 		return true;
 	}
 
@@ -80,8 +80,8 @@ function findRemarkRecursively(data: TxData, targetRemark: string): boolean {
  * @param formattedAddress - The formatted user address
  * @returns boolean indicating if the remark exists and matches the expected format
  */
-export function validateRemarkLogin(extrinsicData: unknown, formattedAddress: string): boolean {
-	if (!extrinsicData || !formattedAddress) {
+export function validateRemarkLogin({ extrinsicData, remarkLoginMessage }: { extrinsicData: unknown; remarkLoginMessage: string }): boolean {
+	if (!extrinsicData || !remarkLoginMessage) {
 		return false;
 	}
 
@@ -91,10 +91,8 @@ export function validateRemarkLogin(extrinsicData: unknown, formattedAddress: st
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'The remark is expired. Please try again.');
 	}
 
-	const targetRemark = `PolkassemblyUser:${formattedAddress}`;
-
 	try {
-		return findRemarkRecursively(extrinsicData as TxData, targetRemark);
+		return findRemarkRecursively(extrinsicData as TxData, remarkLoginMessage);
 	} catch (error) {
 		console.error('Error validating remark login:', error);
 		return false;
