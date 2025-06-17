@@ -234,6 +234,12 @@
 			"followed_user": "关注用户",
 			"unfollowed_user": "取消关注用户"
 		},
+		"Posts": {
+			"posts": "帖子",
+			"discussions": "讨论",
+			"openGov": "链下帖子",
+			"noData": "未找到帖子"
+		},
 		"overview": "概览",
 		"onchainIdentity": "链上身份",
 		"linkAddress": "链接地址",
@@ -267,6 +273,10 @@
 			"newEmail": "新电子邮件",
 			"type": "类型",
 			"belowToConfirm": "在下方确认",
+			"appQrLogin": "应用QR码登录",
+			"scanToLoginInApp": "扫描登录",
+			"generateQr": "生成QR码",
+			"appQrLoginDescription": "通过移动应用扫描，直接访问您的web3账户",
 			"TFA": {
 				"configuringGoogleAuthenticator": "配置Google Authenticator",
 				"installGoogleAuthenticator": "1. 安装Google Authenticator（iOS/Android）。",
@@ -483,6 +493,8 @@
 		"deleteComment": "删除评论",
 		"deleteCommentConfirmation": "您确定要删除此评论吗？",
 		"delete": "删除",
+		"save": "保存",
+		"edit": "编辑",
 		"hideReplies": "隐藏回复",
 		"viewReplies": "查看回复",
 		"commentSummary": "评论摘要",
@@ -514,6 +526,18 @@
 			"decisionDeposit": "决策保证金",
 			"payDecisionDeposit": "支付决策保证金",
 			"continue": "继续"
+		},
+		"ClaimPayout": {
+			"claim": "认领",
+			"index": "索引",
+			"beneficiary": "受益人",
+			"amount": "金额",
+			"expireIn": "到期于",
+			"claimPayout": "认领支付",
+			"payoutClaimedSuccessfully": "支付认领成功",
+			"payoutClaimFailed": "支付认领失败",
+			"payoutClaimedSuccessfullyDescription": "您的支付已成功认领",
+			"payoutClaimFailedDescription": "请再试一次"
 		}
 	},
 	"ListingPage_Status": {
@@ -581,7 +605,8 @@
 		"created": "已创建",
 		"curatorassigned": "已分配 curator",
 		"curatorunassigned": "未分配 curator",
-		"curatorproposed": "已提议 curator",
+		"curatorproposed": "已提议策展人",
+		"tabled": "已提交",
 		"undefined": "未定义"
 	},
 	"Pagination": {
@@ -604,18 +629,32 @@
 		"voteSuccess": "您的投票已成功投出",
 		"voteFailed": "您的投票未成功投出",
 		"voteSuccessTitle": "投票成功",
-		"voteFailedTitle": "投票失败"
+		"voteFailedTitle": "投票失败",
+		"delegatedPower": "委托权重",
+		"commentSuccessTitle": "评论添加成功",
+		"commentSuccess": "您的评论已成功添加",
+		"voted": "已投票",
+		"successfully": "成功",
+		"with": "与",
+		"yourVoteIsIn": "您的投票已提交！愿意在评论中分享您支持的原因吗？",
+		"your": "您的",
+		"voteIsIn": "投票已提交！愿意在评论中分享您支持的原因吗？"
 	},
 	"Balance": {
 		"voteBalance": "投票余额",
-		"balance": "余额"
+		"Balance": "余额",
+		"PeopleChainBalance": "人民链余额"
 	},
 	"EditPost": {
 		"edit": "编辑",
 		"title": "标题",
 		"content": "内容",
 		"save": "保存",
-		"editPostButton": "编辑"
+		"editPostButton": "编辑",
+		"success": "帖子更新成功",
+		"successDescription": "您的帖子已成功更新",
+		"error": "更新帖子失败",
+		"errorDescription": "更新帖子时发生错误"
 	},
 	"Footer": {
 		"helpCenter": "帮助中心",
@@ -635,16 +674,23 @@
 	"Preimages": {
 		"hash": "哈希",
 		"author": "作者",
-		"deposit": "存款",
+		"deposit": "押金",
 		"arguments": "参数",
 		"size": "大小",
 		"status": "状态",
 		"copy": "复制",
-		"subscan": "子扫描",
+		"subscan": "Subscan",
 		"close": "关闭",
 		"showAll": "显示全部",
 		"searchByHash": "按哈希搜索",
-		"preimageNotFound": "预映像未找到"
+		"preimageNotFound": "未找到原像",
+		"unrequested": "未请求",
+		"unrequested_description": "原像未被请求",
+		"unnoted": "未记录",
+		"unnoted_description": "原像未被记录",
+		"failed": "失败",
+		"unrequest": "取消请求",
+		"unnote": "删除记录"
 	},
 	"Create": {
 		"createDiscussionTitle": "创建讨论",
@@ -681,7 +727,8 @@
 			"fellowship": "研究员",
 			"council": "理事会",
 			"democracy": "民主",
-			"whitelist": "白名单"
+			"whitelist": "白名单",
+			"technicalcommittee": "技术委员会"
 		},
 		"please": "请",
 		"login": "登录",
@@ -879,35 +926,43 @@
 	"CreateProposal": {
 		"create": "创建",
 		"quickActions": "快捷操作",
+		"trendingNow": "热门趋势",
 		"submitProposal": "提交提案",
-		"createDiscussion": "讨论帖子",
-		"createPreimage": "新建预映像",
+		"createDiscussion": "创建讨论帖子",
+		"createPreimage": "创建预映像",
 		"existingPreimage": "我已有预映像",
 		"spend": "支出",
 		"from": "从",
 		"Treasury": "国库",
-		"usdxProposal": "从AssetHub支出资产 (USDC/USDT, DOT, 等)",
+		"usdxProposal": "创建USDC/USDT提案",
 		"cancelReferendum": "取消公投",
 		"killReferendum": "终止公投",
+		"createBounty": "创建赏金",
+		"createDiscussionDescription": "发起对话并收集反馈。",
 		"createPreimageDescription": "从头创建一个提案。",
 		"existingPreimageDescription": "从现有预映像中选择以创建提案。",
 		"createTreasuryProposalDescription": "创建一个国库提案以分配资金 ",
-		"usdxProposalDescription": "提议从资产中心支出，安排付款并包括多个受益人。",
+		"usdxProposalDescription": "提议从AssetHub支出，安排付款，并包含多个受益人。",
 		"cancelReferendumDescription": "提议取消一个活跃的公投。",
-		"killReferendumDescription": "在通过之前终止公投。",
-		"createDiscussionDescription": "发起对话并收集反馈。",
+		"killReferendumDescription": "在通过前终止公投。",
+		"createBountyDescription": "为特定任务或项目提议赏金。",
 		"goBack": "返回",
 		"preimageHash": "预映像哈希",
 		"preimageLength": "长度",
 		"preimageHashDescription": "输入哈希",
 		"viewPreimage": "查看预映像",
-		"stepDescriptionKillReferendum": "这将创建一个预映像和一个提案，用于从资产中心支出资产。支出需由用户主动领取。",
-		"stepDescriptionCancelReferendum": "提议取消一个正在进行的公投。",
-		"stepDescriptionTreasuryProposal": "提议以 形式进行国库支出。",
-		"stepDescriptionUsdxProposal": "创建一个预映像和支出提案。支出需由用户主动领取。",
-		"stepDescriptionCreatePreimage": "预映像是与提案相关的编码调用数据（如运行时升级或国库支出）。",
-		"createBounty": "创建赏金",
-		"createBountyDescription": "为特定任务或项目提议赏金。"
+		"stepDescriptionKillReferendum": "这将创建一个预映像和一个从AssetHub支出的提案，支出需要被认领。",
+		"stepDescriptionCancelReferendum": "提议取消一个活跃的公投。",
+		"stepDescriptionTreasuryProposal": "提议DOT国库支出。",
+		"stepDescriptionUsdxProposal": "创建一个预映像和支出提案。支出必须被认领。",
+		"stepDescriptionCreatePreimage": "预映像是与提案相关的编码调用数据（例如，运行时升级或国库支出）。",
+		"Congratulations": "恭喜！",
+		"proposal": "提案",
+		"createdSuccessfully": "创建成功！",
+		"redirectingToProposal": "正在跳转到提案...",
+		"addContextToProposal": "为提案添加上下文",
+		"redirectingToPost": "正在跳转到帖子...",
+		"discussion": "讨论"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",
@@ -927,7 +982,9 @@
 		"validFrom": "生效时间",
 		"addValidFrom": "添加生效时间",
 		"invalidBlockHeight": "请输入有效的区块高度",
-		"enterFutureBlockHeight": "请输入未来的区块高度"
+		"enterFutureBlockHeight": "请输入未来的区块高度",
+		"invalidParameters": "无效的参数",
+		"invalidParametersDescription": "请检查参数并重试"
 	},
 	"CreatePreimage": {
 		"addItem": "添加受益人/支付",
@@ -944,7 +1001,13 @@
 		"length": "长度",
 		"beneficiary": "受益人",
 		"noBeneficiarySelected": "未选择受益人",
-		"on": "开启"
+		"on": "开启",
+		"Congratulations": "恭喜！",
+		"createProposalFromPreimage": "您现在可以从预映像创建提案",
+		"CreateProposal": "创建提案",
+		"goBack": "返回",
+		"Preimage": "预映像",
+		"createSuccessfully": "创建成功！"
 	},
 	"AddressInput": {
 		"invalidAddress": "无效地址",
@@ -1142,9 +1205,15 @@
 		"bountyProposedSuccessfully": "赏金提案成功",
 		"bountyProposedSuccessfullyDescription": "赏金已成功提案",
 		"bountyProposalFailed": "赏金提案失败",
-		"bountyProposalFailedDescription": "赏金提案过程中出现错误",
-		"bountyAmount": "赏金金额",
-		"proposeBounty": "提案赏金"
+		"bountyProposalFailedDescription": "提案赏金时出现错误",
+		"bountyAmount": "赏金数额",
+		"proposeBounty": "提案赏金",
+		"enterBountyId": "输入赏金ID",
+		"yes": "是",
+		"no": "否",
+		"createProposal": "创建提案",
+		"haveYouCreatedABountyAlready": "您是否已经创建了赏金？",
+		"yourAreNotTheProposer": "您不是此赏金的提案人"
 	},
 	"Parachains": {
 		"projects": "项目",
@@ -1181,5 +1250,18 @@
 		"votes": "投票",
 		"voteDetails": "投票详情",
 		"target": "目标"
+	},
+	"LinkDiscussionPost": {
+		"linkDiscussion": "链接讨论",
+		"noDiscussionsFound": "我们找不到任何可链接的讨论！",
+		"noPostFound": "未找到帖子",
+		"notAuthorized": "您无权链接此帖子。",
+		"discussionPostLinkedSuccessfully": "讨论帖子链接成功",
+		"theDiscussionPostHasBeenLinkedToTheProposal": "讨论帖子已链接到提案",
+		"errorLinkingDiscussionPost": "链接讨论帖子时出错",
+		"pleaseTryAgain": "请重试",
+		"pasteURLorEnterPostID": "粘贴URL或输入帖子ID",
+		"yourDiscussions": "您的讨论",
+		"confirm": "确认"
 	}
 }

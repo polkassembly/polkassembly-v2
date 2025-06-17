@@ -38,13 +38,18 @@ import {
 	ITrackDelegationStats,
 	ITrackDelegationDetails,
 	ISocialHandle,
-	IVoteHistoryData,
 	ITreasuryStats,
 	IContentSummary,
 	IAddressRelations,
 	IVoteCurve,
 	ITrackAnalyticsStats,
-	ITrackAnalyticsDelegations
+	IVoteHistoryData,
+	IUserPosts,
+	ITrackAnalyticsDelegations,
+	IOnChainMetadata,
+	EVoteSortOptions,
+	EHttpHeaderKey,
+	IPostLink
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -52,6 +57,7 @@ import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { getCookieHeadersServer } from '@/_shared/_utils/getCookieHeadersServer';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { ClientError } from '../_client-utils/clientError';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 import { redisServiceSSR } from '../api/_api-utils/redisServiceSSR';
@@ -81,9 +87,10 @@ enum EApiRoute {
 	PUBLIC_USER_DATA_BY_USERNAME = 'PUBLIC_USER_DATA_BY_USERNAME',
 	EDIT_PROPOSAL_DETAILS = 'EDIT_PROPOSAL_DETAILS',
 	FETCH_USER_ACTIVITY = 'FETCH_USER_ACTIVITY',
-	GET_PREIMAGE_FOR_POST = 'GET_PREIMAGE_FOR_POST',
+	GET_ON_CHAIN_METADATA_FOR_POST = 'GET_ON_CHAIN_METADATA_FOR_POST',
 	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
 	DELETE_COMMENT = 'DELETE_COMMENT',
+	EDIT_COMMENT = 'EDIT_COMMENT',
 	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
 	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION',
 	LINK_ADDRESS = 'LINK_ADDRESS',
@@ -118,10 +125,11 @@ enum EApiRoute {
 	CONFIRM_SOCIAL_VERIFICATION = 'CONFIRM_SOCIAL_VERIFICATION',
 	JUDGEMENT_CALL = 'JUDGEMENT_CALL',
 	GET_TREASURY_STATS = 'GET_TREASURY_STATS',
-	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_ADDRESS_RELATIONS = 'GET_ADDRESS_RELATIONS',
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
-	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS'
+	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
+	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
+	GET_USER_POSTS = 'GET_USER_POSTS'
 }
 
 export class NextApiClientService {
@@ -190,8 +198,10 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_ADDRESS_RELATIONS:
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
+			case EApiRoute.GET_USER_POSTS:
 				path = '/users/address';
 				break;
+
 			case EApiRoute.PUBLIC_USER_DATA_BY_USERNAME:
 				path = '/users/username';
 				break;
@@ -210,7 +220,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_CHILD_BOUNTIES:
 			case EApiRoute.POSTS_LISTING:
 			case EApiRoute.FETCH_PROPOSAL_DETAILS:
-			case EApiRoute.GET_PREIMAGE_FOR_POST:
+			case EApiRoute.GET_ON_CHAIN_METADATA_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
 			case EApiRoute.GET_CONTENT_SUMMARY:
@@ -295,6 +305,7 @@ export class NextApiClientService {
 				method = 'PATCH';
 				break;
 			case EApiRoute.EDIT_PROPOSAL_DETAILS:
+			case EApiRoute.EDIT_COMMENT:
 				method = 'PATCH';
 				break;
 
@@ -348,11 +359,13 @@ export class NextApiClientService {
 	private static async nextApiClientFetch<T>({
 		url,
 		method,
-		data
+		data,
+		skipCache = false
 	}: {
 		url: URL;
 		method: Method;
 		data?: Record<string, unknown>;
+		skipCache?: boolean;
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
 		const currentNetwork = await this.getCurrentNetwork();
 
@@ -363,7 +376,8 @@ export class NextApiClientService {
 				...(!global.window ? await getCookieHeadersServer() : {}),
 				'Content-Type': 'application/json',
 				'x-api-key': getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
-				'x-network': currentNetwork
+				'x-network': currentNetwork,
+				[EHttpHeaderKey.SKIP_CACHE]: skipCache.toString()
 			},
 			method
 		});
@@ -433,7 +447,8 @@ export class NextApiClientService {
 		statuses,
 		origins = [],
 		tags = [],
-		limit = DEFAULT_LISTING_LIMIT
+		limit = DEFAULT_LISTING_LIMIT,
+		userId
 	}: {
 		proposalType: string;
 		page: number;
@@ -441,9 +456,10 @@ export class NextApiClientService {
 		origins?: EPostOrigin[];
 		tags?: string[];
 		limit?: number;
+		userId?: number;
 	}): Promise<{ data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null }> {
 		// try redis cache first if ssr
-		if (this.isServerSide()) {
+		if (this.isServerSide() && !ValidatorService.isValidNumber(userId)) {
 			const currentNetwork = await this.getCurrentNetwork();
 
 			const cachedData = await redisServiceSSR('GetPostsListing', {
@@ -465,6 +481,10 @@ export class NextApiClientService {
 			page: page.toString(),
 			limit: DEFAULT_LISTING_LIMIT.toString()
 		});
+
+		if (userId) {
+			queryParams.set('userId', userId.toString());
+		}
 
 		if (limit) {
 			queryParams.set('limit', limit.toString());
@@ -500,8 +520,8 @@ export class NextApiClientService {
 	}
 
 	// details
-	static async fetchProposalDetails({ proposalType, indexOrHash }: { proposalType: EProposalType; indexOrHash: string }) {
-		if (this.isServerSide()) {
+	static async fetchProposalDetails({ proposalType, indexOrHash, skipCache = false }: { proposalType: EProposalType; indexOrHash: string; skipCache?: boolean }) {
+		if (this.isServerSide() && !skipCache) {
 			const currentNetwork = await this.getCurrentNetwork();
 
 			const cachedData = await redisServiceSSR('GetPostData', {
@@ -516,17 +536,25 @@ export class NextApiClientService {
 		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PROPOSAL_DETAILS, routeSegments: [proposalType, indexOrHash] });
-		return this.nextApiClientFetch<IPost>({ url, method });
+		return this.nextApiClientFetch<IPost>({ url, method, skipCache });
 	}
 
-	static async editProposalDetails({ proposalType, index, data }: { proposalType: EProposalType; index: string; data: { title: string; content: string } }) {
+	static async editProposalDetails({
+		proposalType,
+		index,
+		data
+	}: {
+		proposalType: EProposalType;
+		index: string;
+		data: { title: string; content: string; linkedPost?: IPostLink };
+	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
 	}
 
-	static async getPreimageForPost(proposalType: EProposalType, index: string) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_PREIMAGE_FOR_POST, routeSegments: [proposalType, index, 'preimage'] });
-		return this.nextApiClientFetch<IPreimage>({ url, method });
+	static async getOnChainMetadataForPost(proposalType: EProposalType, index: string) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ON_CHAIN_METADATA_FOR_POST, routeSegments: [proposalType, index, 'on-chain-metadata'] });
+		return this.nextApiClientFetch<IOnChainMetadata>({ url, method });
 	}
 
 	// comments
@@ -562,12 +590,30 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
+	protected static async editCommentFromPostApi({ id, proposalType, index, content }: { id: string; proposalType: EProposalType; index: string; content: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_COMMENT, routeSegments: [proposalType, index, 'comments', id] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { content } });
+	}
+
 	// votes
-	static async getVotesHistory({ proposalType, index, page, decision }: { proposalType: EProposalType; index: string; page: number; decision: EVoteDecision }) {
+	static async getVotesHistory({
+		proposalType,
+		index,
+		page,
+		decision,
+		orderBy
+	}: {
+		proposalType: EProposalType;
+		index: string;
+		page: number;
+		decision: EVoteDecision;
+		orderBy: EVoteSortOptions;
+	}) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: DEFAULT_LISTING_LIMIT.toString(),
-			decision
+			decision,
+			orderBy
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_HISTORY, routeSegments: [proposalType, index, 'votes'], queryParams });
 		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });
@@ -766,7 +812,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPreimage>({ url, method });
 	}
 
-	protected static async generateQRSession() {
+	protected static async generateQRSessionApi() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
 		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
 	}
@@ -966,5 +1012,73 @@ export class NextApiClientService {
 	static async getTrackAnalyticsDelegations({ origin }: { origin: EPostOrigin | 'all' }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TRACK_ANALYTICS, routeSegments: [origin, 'delegations'] });
 		return this.nextApiClientFetch<ITrackAnalyticsDelegations>({ url, method });
+	}
+
+	static async fetchOverviewData(): Promise<{
+		allTracks: { data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null };
+		treasuryStats: { data: ITreasuryStats[] | null; error: IErrorResponse | null };
+	}> {
+		const currentNetwork = await this.getCurrentNetwork();
+
+		if (this.isServerSide()) {
+			const cachedOverviewData = await redisServiceSSR('GetOverviewPageData', {
+				network: currentNetwork
+			});
+
+			if (cachedOverviewData) {
+				return {
+					allTracks: {
+						data: cachedOverviewData.allTracks,
+						error: null
+					},
+					treasuryStats: {
+						data: cachedOverviewData.treasuryStats,
+						error: null
+					}
+				};
+			}
+		}
+
+		const [allTracksResponse, treasuryStatsResponse] = await Promise.all([
+			this.fetchListingData({
+				proposalType: EProposalType.REFERENDUM_V2,
+				limit: DEFAULT_LISTING_LIMIT,
+				page: 1
+			}),
+			this.getTreasuryStats({
+				from: dayjs().subtract(1, 'hour').toDate(),
+				to: dayjs().toDate()
+			})
+		]);
+
+		if (allTracksResponse.data && treasuryStatsResponse.data) {
+			await redisServiceSSR('SetOverviewPageData', {
+				network: currentNetwork,
+				data: {
+					allTracks: allTracksResponse.data,
+					treasuryStats: treasuryStatsResponse.data
+				}
+			});
+		}
+
+		return {
+			allTracks: {
+				data: allTracksResponse.data,
+				error: allTracksResponse.error
+			},
+			treasuryStats: {
+				data: treasuryStatsResponse.data,
+				error: treasuryStatsResponse.error
+			}
+		};
+	}
+
+	static async getUserPosts({ address, page, limit }: { address: string; page: number; limit: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS, routeSegments: [address, 'posts'], queryParams });
+		return this.nextApiClientFetch<IUserPosts>({ url, method });
 	}
 }

@@ -19,7 +19,7 @@ const TAG_MAX_LENGTH = 20;
 const TAG_MIN_LENGTH = 1;
 export class ValidatorService {
 	static isValidEmail(email: string): boolean {
-		return validator.isEmail(email);
+		return !!email && validator.isEmail(email);
 	}
 
 	static isValidNetwork(network: string): boolean {
@@ -35,9 +35,8 @@ export class ValidatorService {
 	}
 
 	static isValidUsername(username: string): boolean {
-		const regexp = /^[A-Za-z0-9]{1}[A-Za-z0-9.-_]{2,29}$/;
 		// check if username is not blacklisted and matches the regex
-		return regexp.test(username) && !BLACKLISTED_USERNAMES.includes(username.toLowerCase());
+		return username.length >= 2 && username.length <= 40 && !BLACKLISTED_USERNAMES.includes(username.toLowerCase());
 	}
 
 	static isValidPassword(password: string): boolean {
@@ -226,7 +225,7 @@ export class ValidatorService {
 	}
 
 	static isUrl(url: string): boolean {
-		return validator.isURL(url);
+		return !!url && validator.isURL(url);
 	}
 
 	static isValidTag(tag: string): boolean {

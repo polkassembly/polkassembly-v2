@@ -9,7 +9,6 @@ import { ReactNode } from 'react';
 import { Provider as JotaiProvider } from 'jotai';
 import { ETheme, IUserPreferences } from '@/_shared/types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AbstractIntlMessages, NextIntlClientProvider } from 'next-intl';
 import { getTimeZoneForLocale } from '@/_shared/_utils/getTimeZoneForLocale';
 import { SidebarProvider } from './Sidebar/Sidebar';
@@ -45,7 +44,6 @@ export function Providers({
 						<SidebarProvider>{children}</SidebarProvider>
 						<ToastProviderWrapper />
 					</ThemeProvider>
-					<ReactQueryDevtools initialIsOpen={false} />
 				</QueryClientProvider>
 			</NextIntlClientProvider>
 		</JotaiProvider>

@@ -10,6 +10,7 @@ import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, ICommentRespon
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { htmlToMarkdown } from '@/_shared/_utils/htmlToMarkdown';
+import dayjs from 'dayjs';
 import { FirestoreService } from '../firestore_service';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -42,7 +43,9 @@ export class SubsquareOffChainService {
 		try {
 			const data = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
 
-			if (!data || data?.dataSource === EDataSource.POLKASSEMBLY) {
+			const MIGRATION_DATE = dayjs('2025-06-08');
+
+			if ((!data || data?.dataSource === EDataSource.POLKASSEMBLY) && proposalType !== EProposalType.BOUNTY && dayjs(data?.createdAt).isBefore(MIGRATION_DATE)) {
 				return null;
 			}
 
@@ -58,8 +61,11 @@ export class SubsquareOffChainService {
 
 			let content = data?.content;
 
+			let isDefaultContent = false;
+
 			if (!content) {
 				content = getDefaultPostContent(proposalType, data?.proposer);
+				isDefaultContent = true;
 			} else {
 				content = data?.contentType === 'markdown' ? data.content : htmlToMarkdown(data.content);
 			}
@@ -81,7 +87,8 @@ export class SubsquareOffChainService {
 				network,
 				dataSource: EDataSource.SUBSQUARE,
 				allowedCommentor: EAllowedCommentor.ALL,
-				isDeleted: false
+				isDeleted: false,
+				isDefaultContent
 			};
 		} catch {
 			return null;
@@ -113,9 +120,30 @@ export class SubsquareOffChainService {
 		mappedUrl = `${mappedUrl}/comments`;
 
 		try {
-			const commentsData = await fetchWithTimeout(new URL(mappedUrl)).then((res) => res.json());
+			const allComments: any[] = [];
+			const MAX_COMMENTS_PER_PAGE = 100;
+			let page = 1;
+			let hasMorePages = true;
 
-			if (!commentsData?.items?.length) {
+			// Fetch comments page by page until we get an empty response
+			while (hasMorePages) {
+				const url = new URL(mappedUrl);
+				url.searchParams.set('page', page.toString());
+				url.searchParams.set('page_size', MAX_COMMENTS_PER_PAGE.toString());
+
+				// eslint-disable-next-line no-await-in-loop
+				const commentsData = await fetchWithTimeout(url).then((res) => res.json());
+
+				if (!commentsData?.items?.length) {
+					hasMorePages = false;
+				} else {
+					// Add all comments from this page to our collection
+					allComments.push(...commentsData.items);
+					page += 1;
+				}
+			}
+
+			if (!allComments.length) {
 				return [];
 			}
 
@@ -125,18 +153,29 @@ export class SubsquareOffChainService {
 
 				const content = comment.contentType === 'markdown' ? comment.content : htmlToMarkdown(comment.content);
 
+				// Convert comment author address to substrate format if needed
+				const authorAddress = comment.author.address.startsWith('0x') ? comment.author.address : getSubstrateAddress(comment.author.address);
+
+				// Combine and deduplicate addresses with authorAddress first
+				const addresses = publicUser?.addresses ? [authorAddress, ...new Set(publicUser.addresses.filter((addr) => addr !== authorAddress))] : [authorAddress];
+
 				return {
 					// eslint-disable-next-line no-underscore-dangle
 					id: comment._id,
 					content,
 					userId: publicUser?.id ?? 0,
-					user: publicUser ?? {
-						addresses: [comment.author.address.startsWith('0x') ? comment.author.address : getSubstrateAddress(comment.author.address)],
-						id: -1,
-						username: '',
-						profileScore: 0,
-						profileDetails: DEFAULT_PROFILE_DETAILS
-					},
+					publicUser: publicUser
+						? {
+								...publicUser,
+								addresses
+							}
+						: {
+								addresses,
+								id: -1,
+								username: '',
+								profileScore: 0,
+								profileDetails: DEFAULT_PROFILE_DETAILS
+							},
 					createdAt: new Date(comment.createdAt),
 					updatedAt: new Date(comment.updatedAt),
 					isDeleted: false,
@@ -157,7 +196,7 @@ export class SubsquareOffChainService {
 				return [...mainComments, ...replies.flat()];
 			};
 
-			return await processCommentsWithReplies(commentsData.items);
+			return await processCommentsWithReplies(allComments);
 		} catch {
 			return [];
 		}

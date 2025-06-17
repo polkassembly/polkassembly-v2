@@ -10,7 +10,7 @@ import userIcon from '@assets/profile/user-icon.svg';
 import { Hits, Index, useInstantSearch, useSearchBox, Configure, usePagination } from 'react-instantsearch';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Link from 'next/link';
-import { ESearchDiscussionType, ESearchType } from '@/_shared/types';
+import { EProposalType, ESearchType } from '@/_shared/types';
 import CommentIcon from '@assets/icons/Comment.svg';
 import { POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
 import { cn } from '@/lib/utils';
@@ -26,16 +26,16 @@ import Tags from './Tags';
 import styles from './Search.module.scss';
 
 interface Post {
-	id: string;
+	index: string;
 	objectID: string;
 	title: string;
 	content: string;
 	proposer_address: string;
-	post_type: ESearchDiscussionType;
-	created_at: number;
+	proposalType: EProposalType;
+	createdAtTimestamp: number;
 	track?: number;
 	tags?: string[];
-	parsed_content?: string;
+	parsedContent?: string;
 	__position?: number;
 	network?: string;
 	topic_id?: number;
@@ -67,7 +67,7 @@ function PostHit({ hit }: { hit: Post }) {
 
 	return (
 		<Link
-			href={hit.post_type !== ESearchDiscussionType.DISCUSSIONS ? `/referenda/${hit.id}` : `/post/${hit.id}`}
+			href={hit.proposalType !== EProposalType.DISCUSSION ? `/referenda/${hit.index}` : `/post/${hit.index}`}
 			target='_blank'
 		>
 			<div className={`${styles.search_results_wrapper} ${backgroundColor} hover:bg-bg_pink/10`}>
@@ -82,11 +82,11 @@ function PostHit({ hit }: { hit: Post }) {
 				</div>
 				<h2 className='text-lg font-medium'>
 					<p className='text-sm font-medium'>
-						#{hit.id} {hit.title.length > 90 ? `${hit.title.slice(0, 90)}...` : hit.title}
+						#{hit.index} {hit.title?.length > 90 ? `${hit.title?.slice(0, 90)}...` : hit?.title}
 					</p>
 				</h2>
 				<div className={styles.post_content}>
-					<p className='line-clamp-4 break-all text-sm text-text_primary'>{hit.parsed_content}</p>
+					<p className='line-clamp-4 break-all text-sm text-text_primary'>{hit.parsedContent}</p>
 				</div>
 				<div className='mt-2 flex flex-wrap gap-2 text-sm'>
 					<div className='flex items-center gap-2'>
@@ -119,9 +119,9 @@ function PostHit({ hit }: { hit: Post }) {
 							/>{' '}
 						</div>
 					)}
-					{hit.created_at && (
+					{hit.createdAtTimestamp && (
 						<div className='flex items-center gap-2'>
-							<CreatedAtTime createdAt={dayjs.utc(hit.created_at * 1000).toDate()} />
+							<CreatedAtTime createdAt={dayjs.utc(hit.createdAtTimestamp * 1000).toDate()} />
 							<Separator
 								orientation='vertical'
 								className='h-4'
@@ -142,13 +142,13 @@ function PostHit({ hit }: { hit: Post }) {
 							/>{' '}
 						</div>
 					)}
-					{hit.post_type && (
+					{hit.proposalType && (
 						<div className='flex items-center gap-2'>
 							<p className='text-text_secondary text-xs'>{t('Search.in')}</p>
-							{hit.post_type === ESearchDiscussionType.REFERENDUMS_V2 ? (
+							{hit.proposalType === EProposalType.DISCUSSION ? (
 								<span className='text-xs text-text_pink'>{t('Search.referenda')}</span>
 							) : (
-								<span className={styles.post_type}>{hit.post_type.charAt(0).toUpperCase() + hit.post_type.slice(1).replace('_', ' ')}</span>
+								<span className={styles.post_type}>{hit.proposalType.charAt(0).toUpperCase() + hit.proposalType.slice(1).replace('_', ' ')}</span>
 							)}
 						</div>
 					)}
@@ -193,7 +193,7 @@ function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 
 	return (
 		<div>
-			<div className='h-[60vh] overflow-hidden'>
+			<div className='h-[50vh] overflow-hidden md:h-[58vh]'>
 				{isLoading ? (
 					<div className='flex h-full items-center justify-center'>
 						<Image
@@ -264,21 +264,21 @@ function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 						) : (
 							<div className='h-full overflow-y-auto pr-2'>
 								{activeIndex === ESearchType.POSTS ? (
-									<Index indexName='polkassembly_posts'>
-										<Configure filters='NOT post_type:discussions AND NOT post_type:grants' />
+									<Index indexName='polkassembly_v2_posts'>
+										<Configure filters='NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS' />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>
 									</Index>
 								) : activeIndex === ESearchType.DISCUSSIONS ? (
-									<Index indexName='polkassembly_posts'>
-										<Configure filters='post_type:discussions OR post_type:grants' />
+									<Index indexName='polkassembly_v2_posts'>
+										<Configure filters='proposalType:DISCUSSION OR proposalType:GRANTS' />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>
 									</Index>
 								) : (
-									<Index indexName='polkassembly_users'>
+									<Index indexName='polkassembly_v2_users'>
 										<Configure />
 										<div className='space-y-4'>
 											<Hits hitComponent={UserHit} />

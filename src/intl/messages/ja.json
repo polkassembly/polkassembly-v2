@@ -236,6 +236,12 @@
 			"followed_user": "ユーザーをフォロー",
 			"unfollowed_user": "ユーザーをフォロー解除"
 		},
+		"Posts": {
+			"posts": "投稿",
+			"discussions": "議論",
+			"openGov": "OpenGov",
+			"noData": "投稿が見つかりません"
+		},
 		"overview": "概要",
 		"onchainIdentity": "オンチェーンID",
 		"linkAddress": "アドレスをリンク",
@@ -267,6 +273,10 @@
 			"newEmail": "新しいメール",
 			"type": "タイプ",
 			"belowToConfirm": "確認するには下",
+			"appQrLogin": "アプリQRログイン",
+			"scanToLoginInApp": "スキャンしてログイン",
+			"generateQr": "QRを生成",
+			"appQrLoginDescription": "モバイルアプリでスキャンしてWeb3アカウントに直接アクセス",
 			"TFA": {
 				"configuringGoogleAuthenticator": "Google Authenticatorを設定",
 				"installGoogleAuthenticator": "1. Google Authenticatorをインストール（iOS/Android）。",
@@ -483,6 +493,8 @@
 		"deleteComment": "コメントを削除",
 		"deleteCommentConfirmation": "このコメントを削除してもよろしいですか？",
 		"delete": "削除",
+		"save": "保存",
+		"edit": "編集",
 		"hideReplies": "返信を非表示",
 		"viewReplies": "返信を表示",
 		"commentSummary": "コメントの要約",
@@ -514,6 +526,18 @@
 			"decisionDeposit": "決定デポジット",
 			"payDecisionDeposit": "決定デポジットを支払う",
 			"continue": "続行"
+		},
+		"ClaimPayout": {
+			"claim": "請求",
+			"index": "インデックス",
+			"beneficiary": "受益者",
+			"amount": "金額",
+			"expireIn": "有効期限",
+			"claimPayout": "支払いを請求",
+			"payoutClaimedSuccessfully": "支払いが正常に請求されました",
+			"payoutClaimFailed": "支払いの請求に失敗しました",
+			"payoutClaimedSuccessfullyDescription": "支払いが正常に請求されました",
+			"payoutClaimFailedDescription": "もう一度お試しください"
 		}
 	},
 	"ListingPage_Status": {
@@ -581,7 +605,8 @@
 		"created": "作成済み",
 		"curatorassigned": "クレジットアサイン済み",
 		"curatorunassigned": "クレジット未アサイン",
-		"curatorproposed": "クレジット提案済み",
+		"curatorproposed": "キュレーター提案済み",
+		"tabled": "提出済み",
 		"undefined": "未定義"
 	},
 	"Pagination": {
@@ -604,18 +629,32 @@
 		"voteSuccess": "投票が成功しました",
 		"voteFailed": "投票が失敗しました",
 		"voteSuccessTitle": "投票成功",
-		"voteFailedTitle": "投票失敗"
+		"voteFailedTitle": "投票失敗",
+		"delegatedPower": "委任された投票力",
+		"commentSuccessTitle": "コメントが正常に追加されました",
+		"commentSuccess": "コメントが正常に追加されました",
+		"voted": "投票済み",
+		"successfully": "正常に",
+		"with": "で",
+		"yourVoteIsIn": "あなたの投票が完了しました！なぜこれを支持するのかコメントで共有しませんか？",
+		"your": "あなたの",
+		"voteIsIn": "投票が完了しました！なぜこれを支持するのかコメントで共有しませんか？"
 	},
 	"Balance": {
 		"voteBalance": "投票残高",
-		"balance": "残高"
+		"Balance": "残高",
+		"PeopleChainBalance": "ピープルチェーン残高"
 	},
 	"EditPost": {
 		"edit": "編集",
 		"title": "タイトル",
 		"content": "内容",
 		"save": "保存",
-		"editPostButton": "編集"
+		"editPostButton": "編集",
+		"success": "投稿が正常に更新されました",
+		"successDescription": "あなたの投稿は正常に更新されました",
+		"error": "投稿の更新に失敗しました",
+		"errorDescription": "投稿の更新中にエラーが発生しました"
 	},
 	"Footer": {
 		"helpCenter": "ヘルプセンター",
@@ -634,17 +673,24 @@
 	},
 	"Preimages": {
 		"hash": "ハッシュ",
-		"author": "著者",
+		"author": "作成者",
 		"deposit": "デポジット",
 		"arguments": "引数",
 		"size": "サイズ",
 		"status": "ステータス",
 		"copy": "コピー",
-		"subscan": "サブスキャン",
+		"subscan": "Subscan",
 		"close": "閉じる",
 		"showAll": "すべて表示",
 		"searchByHash": "ハッシュで検索",
-		"preimageNotFound": "プレイメージが見つかりません"
+		"preimageNotFound": "プレイメージが見つかりません",
+		"unrequested": "未リクエスト",
+		"unrequested_description": "プレイメージはリクエストされていません",
+		"unnoted": "未記録",
+		"unnoted_description": "プレイメージは記録されていません",
+		"failed": "失敗",
+		"unrequest": "リクエストを取り消す",
+		"unnote": "記録を削除"
 	},
 	"Create": {
 		"createDiscussionTitle": "ディスカッションを作成",
@@ -681,7 +727,8 @@
 			"fellowship": "フェローシップ",
 			"council": "カウンシル",
 			"democracy": "デモクラシー",
-			"whitelist": "ホワイトリスト"
+			"whitelist": "ホワイトリスト",
+			"technicalcommittee": "技術委員会"
 		},
 		"please": "お願いします",
 		"login": "ログイン",
@@ -856,35 +903,43 @@
 	"CreateProposal": {
 		"create": "作成",
 		"quickActions": "クイックアクション",
+		"trendingNow": "トレンド中",
 		"submitProposal": "提案を提出",
-		"createDiscussion": "ディスカッションポスト",
-		"createPreimage": "新しいプリイメージ",
-		"existingPreimage": "プリイメージを既に持っています",
+		"createDiscussion": "ディスカッションポストを作成",
+		"createPreimage": "プリイメージを作成",
+		"existingPreimage": "既にプリイメージを持っています",
 		"spend": "支出",
 		"from": "から",
 		"Treasury": "トレジャリー",
-		"usdxProposal": "AssetHubから資産を支出 (USDC/USDT, DOT, etc.)",
+		"usdxProposal": "USDC/USDT提案を作成",
 		"cancelReferendum": "レファレンダムをキャンセル",
 		"killReferendum": "レファレンダムを終了",
+		"createBounty": "バウンティを作成",
+		"createDiscussionDescription": "会話を開始し、フィードバックを収集します。",
 		"createPreimageDescription": "提案を一から作成します。",
-		"existingPreimageDescription": "既存のプレイメージから提案を作成します。",
-		"createTreasuryProposalDescription": "資金を割り当てるための国庫提案を作成します。",
+		"existingPreimageDescription": "既存のプリイメージから提案を作成します。",
+		"createTreasuryProposalDescription": "資金を割り当てるためのトレジャリープロポーザルを作成します ",
 		"usdxProposalDescription": "AssetHubからの支出を提案し、支払いをスケジュールし、複数の受益者を含めます。",
 		"cancelReferendumDescription": "アクティブなレファレンダムのキャンセルを提案します。",
-		"killReferendumDescription": "可決される前にレファレンダムを終了します。",
-		"createDiscussionDescription": "会話を開始し、フィードバックを収集します。",
+		"killReferendumDescription": "可決前にレファレンダムを終了します。",
+		"createBountyDescription": "特定のタスクやプロジェクトのためのバウンティを提案します。",
 		"goBack": "戻る",
 		"preimageHash": "プリイメージハッシュ",
 		"preimageLength": "長さ",
 		"preimageHashDescription": "ハッシュを入力",
-		"viewPreimage": "プレイメージを表示",
-		"stepDescriptionKillReferendum": "AssetHubから資産を支出するプレイメージと提案を作成します。支出は請求する必要があります。",
-		"stepDescriptionCancelReferendum": "アクティブなレファレンダムをキャンセルする提案を行います。",
-		"stepDescriptionTreasuryProposal": "で財務支出を提案します。",
-		"stepDescriptionUsdxProposal": "資産を支出するプレイメージと提案を作成します。支出は請求する必要があります。",
-		"stepDescriptionCreatePreimage": "プレイメージは、提案に関連付けられたエンコードされた呼び出しデータ（例：ランタイムのアップグレードや財務支出）です。",
-		"createBounty": "バウンティを作成",
-		"createBountyDescription": "特定のタスクやプロジェクトのバウンティを提案します。"
+		"viewPreimage": "プリイメージを表示",
+		"stepDescriptionKillReferendum": "これにより、AssetHubから資産を支出するためのプリイメージと提案が作成されます。支出は請求する必要があります。",
+		"stepDescriptionCancelReferendum": "アクティブなレファレンダムのキャンセルを提案します。",
+		"stepDescriptionTreasuryProposal": "DOTでのトレジャリー支出を提案します。",
+		"stepDescriptionUsdxProposal": "資産を支出するためのプリイメージと提案を作成します。支出は請求する必要があります。",
+		"stepDescriptionCreatePreimage": "プリイメージは、提案に関連付けられたエンコードされたコールデータ（例：ランタイムアップグレードやトレジャリー支出）です。",
+		"Congratulations": "おめでとうございます！",
+		"proposal": "提案",
+		"createdSuccessfully": "正常に作成されました！",
+		"redirectingToProposal": "提案にリダイレクト中...",
+		"addContextToProposal": "提案にコンテキストを追加",
+		"redirectingToPost": "投稿にリダイレクト中...",
+		"discussion": "ディスカッション"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",
@@ -901,10 +956,12 @@
 		"preimageNoteFailed": "プレイメージの記録に失敗しました",
 		"preimageNoteFailedDescription": "プレイメージの記録中にエラーが発生しました",
 		"selectTrack": "トラックを選択",
-		"validFrom": "有効開始",
-		"addValidFrom": "有効開始を追加",
+		"validFrom": "有効開始日",
+		"addValidFrom": "有効開始日を追加",
 		"invalidBlockHeight": "有効なブロック高を入力してください",
-		"enterFutureBlockHeight": "将来のブロック高を入力してください"
+		"enterFutureBlockHeight": "将来のブロック高を入力してください",
+		"invalidParameters": "無効なパラメータ",
+		"invalidParametersDescription": "パラメータを確認して再試行してください"
 	},
 	"CreatePreimage": {
 		"addItem": "受取人/支払いを追加",
@@ -921,7 +978,13 @@
 		"length": "長さ",
 		"beneficiary": "受取人",
 		"noBeneficiarySelected": "受取人が選択されていません",
-		"on": "オン"
+		"on": "オン",
+		"Congratulations": "おめでとうございます！",
+		"createProposalFromPreimage": "これでプレイメージから提案を作成できます",
+		"CreateProposal": "提案を作成",
+		"goBack": "戻る",
+		"Preimage": "プレイメージ",
+		"createSuccessfully": "正常に作成されました！"
 	},
 	"AddressInput": {
 		"invalidAddress": "無効なアドレス",
@@ -1139,12 +1202,18 @@
 		"viewAllChildBounties": "すべて表示"
 	},
 	"CreateBounty": {
-		"bountyProposedSuccessfully": "バウンティの提案が成功しました",
-		"bountyProposedSuccessfullyDescription": "バウンティが正常に提案されました",
-		"bountyProposalFailed": "バウンティの提案に失敗しました",
-		"bountyProposalFailedDescription": "バウンティの提案中にエラーが発生しました",
-		"bountyAmount": "バウンティ金額",
-		"proposeBounty": "バウンティを提案"
+		"bountyProposedSuccessfully": "報奨金が正常に提案されました",
+		"bountyProposedSuccessfullyDescription": "報奨金が正常に提案されました",
+		"bountyProposalFailed": "報奨金の提案に失敗しました",
+		"bountyProposalFailedDescription": "報奨金の提案中にエラーが発生しました",
+		"bountyAmount": "報奨金額",
+		"proposeBounty": "報奨金を提案",
+		"enterBountyId": "報奨金IDを入力してください",
+		"yes": "はい",
+		"no": "いいえ",
+		"createProposal": "提案を作成",
+		"haveYouCreatedABountyAlready": "すでに報奨金を作成していますか？",
+		"yourAreNotTheProposer": "あなたはこの報奨金の提案者ではありません"
 	},
 	"Parachains": {
 		"projects": "プロジェクト",
@@ -1181,5 +1250,18 @@
 		"votes": "投票",
 		"voteDetails": "投票詳細",
 		"target": "ターゲット"
+	},
+	"LinkDiscussionPost": {
+		"linkDiscussion": "ディスカッションをリンク",
+		"noDiscussionsFound": "リンクできるディスカッションが見つかりませんでした！",
+		"noPostFound": "投稿が見つかりません",
+		"notAuthorized": "この投稿をリンクする権限がありません。",
+		"discussionPostLinkedSuccessfully": "ディスカッション投稿が正常にリンクされました",
+		"theDiscussionPostHasBeenLinkedToTheProposal": "ディスカッション投稿が提案にリンクされました",
+		"errorLinkingDiscussionPost": "ディスカッション投稿のリンクエラー",
+		"pleaseTryAgain": "もう一度お試しください",
+		"pasteURLorEnterPostID": "URLを貼り付けるか投稿IDを入力してください",
+		"yourDiscussions": "あなたのディスカッション",
+		"confirm": "確認"
 	}
 }

@@ -8,9 +8,11 @@ import {
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
+	EVoteSortOptions,
 	IBountyProposal,
 	IDelegationStats,
 	IGenericListingResponse,
+	IOnChainMetadata,
 	IOnChainPostInfo,
 	IOnChainPostListing,
 	IPreimage,
@@ -35,6 +37,7 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { SubsquidUtils } from './subsquidUtils';
 
+const VOTING_POWER_DIVISOR = new BN('10');
 export class SubsquidService extends SubsquidUtils {
 	private static subsquidGqlClient = (network: ENetwork) => {
 		const subsquidUrl = NETWORKS_DETAILS[network.toString() as keyof typeof NETWORKS_DETAILS]?.subsquidUrl;
@@ -49,7 +52,15 @@ export class SubsquidService extends SubsquidUtils {
 		});
 	};
 
-	static async GetPostVoteMetrics({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IVoteMetrics> {
+	private static getVotingPower(balance: string, lockPeriod: number): BN {
+		return lockPeriod ? new BN(balance).mul(new BN(lockPeriod)) : new BN(balance).div(VOTING_POWER_DIVISOR);
+	}
+
+	static async GetPostVoteMetrics({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IVoteMetrics | null> {
+		if ([EProposalType.BOUNTY, EProposalType.CHILD_BOUNTY].includes(proposalType)) {
+			return null;
+		}
+
 		const gqlClient = this.subsquidGqlClient(network);
 
 		let query = [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
@@ -112,7 +123,7 @@ export class SubsquidService extends SubsquidUtils {
 
 		const proposal = subsquidData.proposals[0];
 
-		const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType, indexOrHash: String(proposal.index || proposal.hash) });
+		const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType, indexOrHash: String(proposal.index ?? proposal.hash) });
 
 		const allPeriodEnds =
 			proposal.statusHistory && proposalType === EProposalType.REFERENDUM_V2 ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
@@ -128,7 +139,7 @@ export class SubsquidService extends SubsquidUtils {
 			hash: proposal.hash,
 			origin: proposal.origin,
 			description: proposal.description || '',
-			voteMetrics,
+			...(voteMetrics && { voteMetrics }),
 			...(proposal.reward && { reward: proposal.reward }),
 			...(proposal.fee && { fee: proposal.fee }),
 			...(proposal.deposit && { deposit: proposal.deposit }),
@@ -300,7 +311,8 @@ export class SubsquidService extends SubsquidUtils {
 		page,
 		limit,
 		decision,
-		voterAddress: address
+		voterAddress: address,
+		orderBy
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -309,6 +321,7 @@ export class SubsquidService extends SubsquidUtils {
 		limit: number;
 		decision?: EVoteDecision;
 		voterAddress?: string;
+		orderBy?: EVoteSortOptions;
 	}) {
 		const voterAddress = address ? (getEncodedAddress(address, network) ?? undefined) : undefined;
 
@@ -344,6 +357,7 @@ export class SubsquidService extends SubsquidUtils {
 						type_eq: proposalType,
 						limit,
 						offset: (page - 1) * limit,
+						orderBy: this.getOrderByForSubsquid({ orderBy }),
 						...(subsquidDecision && { decision_in: subsquidDecisionIn }),
 						...(subsquidDecision === 'yes' && { aye_not_eq: BN_ZERO.toString(), value_isNull: false }),
 						...(subsquidDecision === 'no' && { nay_not_eq: BN_ZERO.toString(), value_isNull: false })
@@ -423,10 +437,18 @@ export class SubsquidService extends SubsquidUtils {
 		return subsquidData.curveData as IVoteCurve[];
 	}
 
-	static async GetPostPreimage({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IPreimage | null> {
+	static async GetPostOnChainMetadata({
+		network,
+		indexOrHash,
+		proposalType
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+	}): Promise<IOnChainMetadata | null> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = proposalType === EProposalType.TIP ? this.GET_PREIMAGE_BY_PROPOSAL_HASH_AND_TYPE : this.GET_PREIMAGE_BY_PROPOSAL_INDEX_AND_TYPE;
+		const query = proposalType === EProposalType.TIP ? this.GET_ON_CHAIN_METADATA_BY_PROPOSAL_HASH_AND_TYPE : this.GET_ON_CHAIN_METADATA_BY_PROPOSAL_INDEX_AND_TYPE;
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient
 			.query(query, { ...(proposalType === EProposalType.TIP ? { hash_eq: indexOrHash } : { index_eq: Number(indexOrHash) }), type_eq: proposalType })
@@ -437,12 +459,21 @@ export class SubsquidService extends SubsquidUtils {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post preimage from Subsquid');
 		}
 
-		const proposer = subsquidData.proposals[0].preimage.proposer ? getSubstrateAddress(subsquidData.proposals[0].preimage.proposer) : '';
+		const data = subsquidData.proposals[0];
 
-		return {
-			...subsquidData.proposals[0].preimage,
-			proposer
-		} as IPreimage;
+		const proposer = data.preimage?.proposer || data.proposer;
+
+		const metadata: IOnChainMetadata = {
+			preimage: data.preimage,
+			proposedCall: data.proposalArguments,
+			proposer: getSubstrateAddress(proposer) || undefined,
+			trackNumber: data.trackNumber,
+			updatedAtBlock: data.updatedAtBlock,
+			enactmentAtBlock: data.enactmentAtBlock,
+			enactmentAfterBlock: data.enactmentAfterBlock
+		};
+
+		return metadata;
 	}
 
 	static async GetPreimageListing({ network, page, limit }: { network: ENetwork; page: number; limit: number }): Promise<IGenericListingResponse<IPreimage>> {
@@ -696,7 +727,9 @@ export class SubsquidService extends SubsquidUtils {
 
 		subsquidData.votingDelegations.forEach((delegation: { to: string; balance: string; lockPeriod: number }) => {
 			result[delegation.to] = {
-				votingPower: result[delegation.to]?.votingPower ? new BN(result[delegation.to].votingPower).add(new BN(delegation.balance)).toString() : delegation.balance,
+				votingPower: result[delegation.to]?.votingPower
+					? new BN(result[delegation.to].votingPower).add(this.getVotingPower(delegation.balance, delegation.lockPeriod)).toString()
+					: this.getVotingPower(delegation.balance, delegation.lockPeriod).toString(),
 				receivedDelegationsCount: result[delegation.to]?.receivedDelegationsCount ? result[delegation.to].receivedDelegationsCount + 1 : 1
 			};
 		});
@@ -857,6 +890,8 @@ export class SubsquidService extends SubsquidUtils {
 							}
 						: undefined;
 
+					const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType: EProposalType.REFERENDUM_V2, indexOrHash: String(proposal.index ?? proposal.hash)! });
+
 					return {
 						createdAt: new Date(proposal.createdAt),
 						description: proposal.description || '',
@@ -866,7 +901,7 @@ export class SubsquidService extends SubsquidUtils {
 						status: proposal.status || EProposalStatus.Unknown,
 						type: EProposalType.REFERENDUM_V2,
 						hash: proposal.hash || '',
-						voteMetrics: await this.GetPostVoteMetrics({ network, proposalType: EProposalType.REFERENDUM_V2, indexOrHash: String(proposal.index || proposal.hash)! }),
+						...(voteMetrics && { voteMetrics }),
 						beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 						decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 						preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,
@@ -972,6 +1007,54 @@ export class SubsquidService extends SubsquidUtils {
 			totalDelegates: Object.keys(totalDelegateesObj)?.length,
 			totalDelegators: Object.keys(totalDelegatorsObj)?.length,
 			totalVotesBalance: totalVotesBalance.toString()
+		};
+	}
+
+	static async GetOnChainPostsByProposer({
+		network,
+		proposer,
+		page,
+		limit,
+		proposalType
+	}: {
+		network: ENetwork;
+		proposer: string;
+		page: number;
+		limit: number;
+		proposalType: EProposalType;
+	}) {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_POSTS_BY_PROPOSER;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient
+			.query(query, { proposer_eq: proposer, type_eq: proposalType, limit, offset: (page - 1) * limit })
+			.toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain posts by proposer from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain posts by proposer from Subsquid');
+		}
+		const subsquidPostsData = subsquidData.proposals;
+		if (!subsquidPostsData?.length) {
+			return {
+				totalCount: 0,
+				items: []
+			};
+		}
+		const postsPromises = subsquidPostsData.map((post: { index: number }) => {
+			return this.GetOnChainPostInfo({
+				network,
+				indexOrHash: String(post.index),
+				proposalType
+			});
+		});
+
+		const postsResult = await Promise.allSettled(postsPromises);
+
+		return {
+			items: postsResult.map((post) => (post.status === 'fulfilled' ? post.value : null))?.filter((post) => post !== null),
+			totalCount: subsquidData.proposalsConnection.totalCount || 0
 		};
 	}
 }

@@ -18,12 +18,20 @@ import {
 	IPost,
 	IPostListing,
 	ITrackAnalyticsDelegations,
-	ITrackAnalyticsStats
+	ITrackAnalyticsStats,
+	ITreasuryStats
 } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { createId as createCuid } from '@paralleldrive/cuid2';
-import { FIVE_MIN, ONE_DAY, ONE_HOUR_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS, SIX_HOURS_IN_SECONDS, THREE_DAYS_IN_SECONDS } from '../../_api-constants/timeConstants';
+import {
+	FIVE_MIN,
+	HALF_HOUR_IN_SECONDS,
+	ONE_DAY_IN_SECONDS,
+	REFRESH_TOKEN_LIFE_IN_SECONDS,
+	SIX_HOURS_IN_SECONDS,
+	THIRTY_DAYS_IN_SECONDS
+} from '../../_api-constants/timeConstants';
 
 if (!REDIS_URL) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'REDIS_URL is not set');
@@ -45,7 +53,9 @@ enum ERedisKeys {
 	DELEGATION_STATS = 'DGS',
 	DELEGATE_DETAILS = 'DLD',
 	TRACK_ANALYTICS_DELEGATION = 'TAD',
-	TRACK_ANALYTICS_STATS = 'TAS'
+	TRACK_ANALYTICS_STATS = 'TAS',
+	TREASURY_STATS = 'TRS',
+	OVERVIEW_PAGE_DATA = 'OPD'
 }
 
 export class RedisService {
@@ -71,7 +81,10 @@ export class RedisService {
 		[ERedisKeys.PASSWORD_RESET_TOKEN]: (token: string): string => `${ERedisKeys.PASSWORD_RESET_TOKEN}-${token}`,
 		[ERedisKeys.EMAIL_VERIFICATION_TOKEN]: (token: string): string => `${ERedisKeys.EMAIL_VERIFICATION_TOKEN}-${token}`,
 		[ERedisKeys.TWO_FACTOR_AUTH_TOKEN]: (tfaToken: string): string => `${ERedisKeys.TWO_FACTOR_AUTH_TOKEN}-${tfaToken}`,
-		[ERedisKeys.SUBSCAN_DATA]: (network: string, url: string): string => `${ERedisKeys.SUBSCAN_DATA}-${network}-${url}`,
+		[ERedisKeys.SUBSCAN_DATA]: (network: string, url: string, body?: Record<string, unknown>): string => {
+			const bodyPart = body ? `-b:${JSON.stringify(body)}` : '';
+			return `${ERedisKeys.SUBSCAN_DATA}-${network}-${url}${bodyPart}`;
+		},
 		[ERedisKeys.REFRESH_TOKEN_SET]: (userId: number): string => `${ERedisKeys.REFRESH_TOKEN_SET}-${userId}`,
 		[ERedisKeys.REFRESH_TOKEN_ITEM]: (userId: number, tokenId: string): string => `${ERedisKeys.REFRESH_TOKEN_ITEM}-${userId}-${tokenId}`,
 		[ERedisKeys.POST_DATA]: (network: string, proposalType: string, indexOrHash: string): string => `${ERedisKeys.POST_DATA}-${network}-${proposalType}-${indexOrHash}`,
@@ -92,11 +105,14 @@ export class RedisService {
 			return `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-${userId}-${page}-${limit}`;
 		},
 		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`,
-		[ERedisKeys.CONTENT_SUMMARY]: (network: string, indexOrHash: string, proposalType: string): string => `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}`,
+		[ERedisKeys.CONTENT_SUMMARY]: ({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): string =>
+			`${ERedisKeys.CONTENT_SUMMARY}-${network}-${proposalType}-${indexOrHash}`,
 		[ERedisKeys.DELEGATION_STATS]: (network: string): string => `${ERedisKeys.DELEGATION_STATS}-${network}`,
 		[ERedisKeys.DELEGATE_DETAILS]: (network: string): string => `${ERedisKeys.DELEGATE_DETAILS}-${network}`,
 		[ERedisKeys.TRACK_ANALYTICS_DELEGATION]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-${origin}`,
-		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`
+		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
+		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
+		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`
 	} as const;
 
 	// helper methods
@@ -123,26 +139,45 @@ export class RedisService {
 	}
 
 	private static async DeleteKeys({ pattern, forceCache = false }: { pattern: string; forceCache?: boolean }): Promise<void> {
-		if (!IS_CACHE_ENABLED && !forceCache) return;
+		if (!IS_CACHE_ENABLED && !forceCache) return Promise.resolve();
 
-		const stream = this.client.scanStream({
-			count: 200,
-			match: pattern
-		});
+		return new Promise((resolve, reject) => {
+			const stream = this.client.scanStream({
+				count: 200,
+				match: pattern
+			});
 
-		stream.on('data', async (keys) => {
-			if (keys.length) {
-				const pipeline = this.client.pipeline();
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				keys.forEach((key: any) => {
-					pipeline.del(key);
-				});
-				await pipeline.exec();
-			}
-		});
+			let hasError = false;
 
-		stream.on('end', () => {
-			console.log('All keys matching pattern deleted.');
+			stream.on('data', async (keys) => {
+				if (keys.length && !hasError) {
+					try {
+						const pipeline = this.client.pipeline();
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						keys.forEach((key: any) => {
+							pipeline.del(key);
+						});
+						await pipeline.exec();
+					} catch (error) {
+						hasError = true;
+						console.error('Error deleting keys:', error);
+						reject(error);
+					}
+				}
+			});
+
+			stream.on('end', () => {
+				if (!hasError) {
+					console.log(`All keys matching pattern ${pattern} deleted.`);
+					resolve();
+				}
+			});
+
+			stream.on('error', (error) => {
+				hasError = true;
+				console.error('Stream error:', error);
+				reject(error);
+			});
 		});
 	}
 
@@ -164,9 +199,26 @@ export class RedisService {
 		return this.client.smembers(key);
 	}
 
+	static async DeleteAllCacheForNetwork(network: ENetwork): Promise<void> {
+		await Promise.all([
+			this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCAN_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POSTS_LISTING}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.DELEGATION_STATS}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.DELEGATE_DETAILS}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}-*` })
+		]);
+	}
+
 	// auth and third party methods
 	static async SetEmailVerificationToken({ token, email }: { token: string; email: string }): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.EMAIL_VERIFICATION_TOKEN](token), value: email, ttlSeconds: ONE_DAY, forceCache: true });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.EMAIL_VERIFICATION_TOKEN](token), value: email, ttlSeconds: ONE_DAY_IN_SECONDS, forceCache: true });
 	}
 
 	static async SetRefreshToken({ userId, refreshToken }: { userId: number; refreshToken: string }): Promise<void> {
@@ -244,16 +296,16 @@ export class RedisService {
 		return this.Get({ key: this.redisKeysMap[ERedisKeys.TWO_FACTOR_AUTH_TOKEN](tfaToken), forceCache: true });
 	}
 
-	static async GetSubscanData({ network, url }: { network: string; url: string }): Promise<string | null> {
-		return this.Get({ key: this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url) });
+	static async GetSubscanData({ network, url, body }: { network: string; url: string; body?: Record<string, unknown> }): Promise<string | null> {
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url, body) });
 	}
 
-	static async SetSubscanData({ network, url, data }: { network: string; url: string; data: string }): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url), value: data, ttlSeconds: SIX_HOURS_IN_SECONDS });
+	static async SetSubscanData({ network, url, body, data }: { network: string; url: string; body?: Record<string, unknown>; data: string }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.SUBSCAN_DATA](network, url, body), value: data, ttlSeconds: SIX_HOURS_IN_SECONDS });
 	}
 
 	static async SetResetPasswordToken({ token, userId }: { token: string; userId: number }): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), value: userId.toString(), ttlSeconds: ONE_DAY, forceCache: true });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), value: userId.toString(), ttlSeconds: ONE_DAY_IN_SECONDS, forceCache: true });
 	}
 
 	static async GetUserIdFromResetPasswordToken(token: string): Promise<number | null> {
@@ -272,10 +324,12 @@ export class RedisService {
 	}
 
 	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: string; indexOrHash: string; data: IPost }): Promise<void> {
+		const isActivePost = data.onChainInfo?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.onChainInfo?.status);
+
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash),
 			value: JSON.stringify(data),
-			ttlSeconds: data.onChainInfo?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.onChainInfo?.status) ? ONE_HOUR_IN_SECONDS : THREE_DAYS_IN_SECONDS
+			ttlSeconds: isActivePost ? ONE_DAY_IN_SECONDS : THIRTY_DAYS_IN_SECONDS
 		});
 	}
 
@@ -326,7 +380,7 @@ export class RedisService {
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags),
 			value: JSON.stringify(data),
-			ttlSeconds: SIX_HOURS_IN_SECONDS
+			ttlSeconds: ONE_DAY_IN_SECONDS
 		});
 	}
 
@@ -335,7 +389,7 @@ export class RedisService {
 	}
 
 	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<IContentSummary | null> {
-		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType) });
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY]({ network, indexOrHash, proposalType }) });
 		return data ? (deepParseJson(data) as IContentSummary) : null;
 	}
 
@@ -350,11 +404,11 @@ export class RedisService {
 		proposalType: string;
 		data: IContentSummary;
 	}): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY](network, indexOrHash, proposalType), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY]({ network, indexOrHash, proposalType }), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
 
 	static async DeleteContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<void> {
-		await this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-${indexOrHash}-${proposalType}` });
+		await this.DeleteKeys({ pattern: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY]({ network, indexOrHash, proposalType }) });
 	}
 
 	// Activity feed caching methods
@@ -390,7 +444,7 @@ export class RedisService {
 		userId?: number;
 		origins?: string[];
 	}): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
 
 	static async DeleteActivityFeed({ network }: { network: string }): Promise<void> {
@@ -426,7 +480,7 @@ export class RedisService {
 		data: IGenericListingResponse<IPostListing>;
 		userId: number;
 	}): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.SUBSCRIPTION_FEED](network, page, limit, userId), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.SUBSCRIPTION_FEED](network, page, limit, userId), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
 
 	static async DeleteSubscriptionFeed({ network, userId }: { network: string; userId: number }): Promise<void> {
@@ -440,12 +494,19 @@ export class RedisService {
 	// toolkit methods
 
 	static async ClearCacheForAllPostsForNetwork(network: ENetwork): Promise<void> {
-		// clear everything posts related
-		await this.DeleteKeys({ pattern: `${ERedisKeys.POSTS_LISTING}-${network}-*` });
-		await this.DeleteKeys({ pattern: `${ERedisKeys.POST_DATA}-${network}-*` });
-		await this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` });
-		await this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-*` });
-		await this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` });
+		await Promise.all([
+			// clear everything posts related
+			this.DeleteKeys({ pattern: `${ERedisKeys.POSTS_LISTING}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` }),
+			// clear overview page data
+			this.DeleteOverviewPageData({ network }),
+
+			// clear treasury stats
+			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` })
+		]);
 	}
 
 	// QR session caching methods
@@ -470,7 +531,7 @@ export class RedisService {
 	}
 
 	static async SetDelegationStats(network: ENetwork, data: IDelegationStats): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.DELEGATION_STATS](network), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.DELEGATION_STATS](network), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
 
 	static async DeleteDelegationStats(network: ENetwork): Promise<void> {
@@ -484,7 +545,7 @@ export class RedisService {
 	}
 
 	static async SetDelegateDetails(network: ENetwork, data: IDelegateDetails[]): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.DELEGATE_DETAILS](network), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.DELEGATE_DETAILS](network), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
 
 	static async DeleteDelegateDetails(network: ENetwork): Promise<void> {
@@ -501,7 +562,7 @@ export class RedisService {
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_DELEGATION](network, origin),
 			value: JSON.stringify(data),
-			ttlSeconds: ONE_DAY
+			ttlSeconds: ONE_DAY_IN_SECONDS
 		});
 	}
 
@@ -516,10 +577,44 @@ export class RedisService {
 	}
 
 	static async SetTrackAnalyticsStats({ network, origin, data }: { network: string; origin: string; data: ITrackAnalyticsStats }): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin), value: JSON.stringify(data), ttlSeconds: ONE_DAY });
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
 
 	static async DeleteTrackAnalyticsStats({ network, origin }: { network: string; origin: string }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin) });
+	}
+
+	// Treasury stats caching methods
+	static async GetTreasuryStats({ network, from, to }: { network: ENetwork; from: string; to: string }): Promise<ITreasuryStats[] | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS]({ network, from, to }) });
+		return data ? (deepParseJson(data) as ITreasuryStats[]) : null;
+	}
+
+	static async SetTreasuryStats({ network, from, to, data }: { network: ENetwork; from: string; to: string; data?: ITreasuryStats[] }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS]({ network, from, to }), value: JSON.stringify(data), ttlSeconds: HALF_HOUR_IN_SECONDS });
+	}
+
+	static async DeleteTreasuryStats({ network, from, to }: { network: ENetwork; from: string; to: string }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS]({ network, from, to }) });
+	}
+
+	// Overview page caching methods
+	static async GetOverviewPageData({ network }: { network: ENetwork }): Promise<{ allTracks: IGenericListingResponse<IPostListing>; treasuryStats: ITreasuryStats[] } | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
+		return data ? (deepParseJson(data) as { allTracks: IGenericListingResponse<IPostListing>; treasuryStats: ITreasuryStats[] }) : null;
+	}
+
+	static async SetOverviewPageData({
+		network,
+		data
+	}: {
+		network: ENetwork;
+		data: { allTracks: IGenericListingResponse<IPostListing>; treasuryStats: ITreasuryStats[] };
+	}): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network), value: JSON.stringify(data), ttlSeconds: HALF_HOUR_IN_SECONDS });
+	}
+
+	static async DeleteOverviewPageData({ network }: { network: ENetwork }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
 	}
 }

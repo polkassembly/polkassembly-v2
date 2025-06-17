@@ -17,8 +17,33 @@ import Link from 'next/link';
 import { useUser } from '@/hooks/useUser';
 import { useRouter } from 'nextjs-toploader/app';
 import { useToast } from '@/hooks/useToast';
+import { useSuccessModal } from '@/hooks/useSuccessModal';
+import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import HeaderLabel from '../HeaderLabel';
 import classes from './CreateDiscussion.module.scss';
+
+function SuccessModalContent({ proposalId }: { proposalId: number }) {
+	const t = useTranslations();
+
+	return (
+		<div className='flex flex-col items-center gap-y-4'>
+			<p className='text-xl font-semibold text-text_primary'>{t('CreateProposal.Congratulations')}</p>
+			<p className='flex items-center gap-x-2 text-sm font-medium text-wallet_btn_text'>
+				<Link
+					href={`/post/${proposalId}`}
+					className='text-base font-semibold text-text_pink underline'
+				>
+					{t('CreateProposal.discussion')} #{proposalId}
+				</Link>{' '}
+				{t('CreateProposal.createdSuccessfully')}
+			</p>
+			<div className='flex items-center gap-x-2'>
+				<p className='text-sm font-medium text-wallet_btn_text'>{t('CreateProposal.redirectingToPost')}</p>
+				<LoadingSpinner size='small' />
+			</div>
+		</div>
+	);
+}
 
 function CreateDiscussion() {
 	const formData = useForm<IWritePostFormFields>();
@@ -31,6 +56,7 @@ function CreateDiscussion() {
 	const router = useRouter();
 
 	const { toast } = useToast();
+	const { setOpenSuccessModal, setSuccessModalContent } = useSuccessModal();
 
 	const handleCreateDiscussionPost = async (values: IWritePostFormFields) => {
 		const { title, description, tags, topic, allowedCommentor } = values;
@@ -62,6 +88,9 @@ function CreateDiscussion() {
 			title: t('Create.discussionCreatedSuccessfully'),
 			status: ENotificationStatus.SUCCESS
 		});
+
+		setSuccessModalContent(<SuccessModalContent proposalId={data.data.index} />);
+		setOpenSuccessModal(true);
 
 		// redirect to the discussion page
 		router.push(`/post/${data.data.index}`);

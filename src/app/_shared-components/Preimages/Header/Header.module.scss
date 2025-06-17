@@ -1,15 +1,7 @@
 .header {
-    @apply flex items-center justify-between;
+	@apply flex w-full items-center justify-between;
 }
 
 .header_title {
-    @apply text-2xl font-bold text-navbar_title;
-}
-
-.input_container {
-    @apply h-8 w-52 overflow-x-auto pr-12;
-}
-
-.input_search {
-    @apply -translate-y-1/2 h-8 absolute right-2 top-4 cursor-pointer border-l border-border_grey pl-1 text-2xl text-gray-500;
+	@apply text-2xl font-bold text-navbar_title;
 }

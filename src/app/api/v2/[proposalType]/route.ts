@@ -32,8 +32,6 @@ import { APIError } from '../../_api-utils/apiError';
 import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
 import { RedisService } from '../../_api-services/redis_service';
-import { AIService } from '../../_api-services/ai_service';
-import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType)
@@ -47,19 +45,19 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
 		status: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EProposalStatus))).optional(),
 		origin: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EPostOrigin))).optional(),
-		tags: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.string()).max(30)).optional() // max 30 tags because of firestore query limit
+		tags: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.string()).max(30)).optional(),
+		userId: z.coerce.number().optional()
 	});
 
 	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
 
-	const { page, limit, status: statuses, origin: origins, tags } = zodQuerySchema.parse(searchParamsObject);
+	const { page, limit, status: statuses, origin: origins, tags, userId } = zodQuerySchema.parse(searchParamsObject);
 
 	const [network, headersList] = await Promise.all([getNetworkFromHeaders(), headers()]);
-	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE);
-	const toolsPassphrase = headersList.get(EHttpHeaderKey.TOOLS_PASSPHRASE);
+	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
 
 	// Only get from cache if not skipping cache
-	if (!(skipCache === 'true' && toolsPassphrase === TOOLS_PASSPHRASE)) {
+	if (!skipCache) {
 		const cachedData = await RedisService.GetPostsListing({ network, proposalType, page, limit, statuses, origins, tags });
 
 		if (cachedData) {
@@ -129,7 +127,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 						proposer: onChainPostInfo.proposer,
 						status: onChainPostInfo.status,
 						description: onChainPostInfo.description || '',
-						index: onChainPostInfo.index || post.index,
+						index: onChainPostInfo.index ?? post.index,
 						origin: onChainPostInfo.origin || '',
 						type: proposalType,
 						hash: onChainPostInfo.hash || post.hash || '',
@@ -149,7 +147,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 			proposalType,
 			limit,
 			page,
-			tags
+			tags,
+			userId
 		});
 
 		totalCount = await OffChainDbService.GetTotalOffChainPostsCount({ network, proposalType });
@@ -177,8 +176,10 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		totalCount
 	};
 
-	// Cache the response
-	await RedisService.SetPostsListing({ network, proposalType, page, limit, data: response, statuses, origins, tags });
+	// Cache the response if there are items
+	if (response.items.length > 0) {
+		await RedisService.SetPostsListing({ network, proposalType, page, limit, data: response, statuses, origins, tags });
+	}
 
 	// 3. return the data
 	return NextResponse.json(response);
@@ -217,11 +218,10 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		allowedCommentor
 	});
 
-	await AIService.UpdatePostSummary({ network, proposalType, indexOrHash });
-
 	// Invalidate post listings since a new post was added
 	await RedisService.DeletePostsListing({ network, proposalType });
 	await RedisService.DeleteActivityFeed({ network }); // Invalidate activity feed since a new post was added
+	await RedisService.DeleteOverviewPageData({ network });
 
 	const response = NextResponse.json({ message: 'Post created successfully', data: { id, index: Number(indexOrHash) } });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));

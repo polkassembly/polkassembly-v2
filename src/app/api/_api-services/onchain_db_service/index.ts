@@ -16,7 +16,8 @@ import {
 	IBountyProposal,
 	IBountyUserActivity,
 	IDelegationStats,
-	EBountyStatus
+	EBountyStatus,
+	EVoteSortOptions
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -99,7 +100,8 @@ export class OnChainDbService {
 		page,
 		limit,
 		decision,
-		voterAddress
+		voterAddress,
+		orderBy
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -108,8 +110,9 @@ export class OnChainDbService {
 		limit: number;
 		decision?: EVoteDecision;
 		voterAddress?: string;
+		orderBy?: EVoteSortOptions;
 	}) {
-		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddress });
+		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddress, orderBy });
 		if (postVoteData) return postVoteData;
 
 		return {
@@ -125,9 +128,9 @@ export class OnChainDbService {
 		return [];
 	}
 
-	static async GetPostPreimage({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }) {
-		const preimage = await SubsquidService.GetPostPreimage({ network, indexOrHash, proposalType });
-		if (preimage) return preimage;
+	static async GetPostOnChainMetadata({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }) {
+		const onChainMetadata = await SubsquidService.GetPostOnChainMetadata({ network, indexOrHash, proposalType });
+		if (onChainMetadata) return onChainMetadata;
 
 		return null;
 	}
@@ -289,5 +292,21 @@ export class OnChainDbService {
 
 	static async GetTrackAnalyticsDelegations({ network, trackId }: { network: ENetwork; trackId?: number }) {
 		return SubsquidService.GetTrackAnalyticsDelegations({ network, trackId });
+	}
+
+	static async GetOnChainPostsByProposer({
+		network,
+		proposer,
+		page,
+		limit,
+		proposalType
+	}: {
+		network: ENetwork;
+		proposer: string;
+		page: number;
+		limit: number;
+		proposalType: EProposalType;
+	}) {
+		return SubsquidService.GetOnChainPostsByProposer({ network, proposer, page, limit, proposalType });
 	}
 }

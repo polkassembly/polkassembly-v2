@@ -15,20 +15,37 @@ import { StatusCodes } from 'http-status-codes';
 import { TOOLS_PASSPHRASE } from '@/app/api/_api-constants/apiEnvVars';
 import { headers } from 'next/headers';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { RedisService } from '@/app/api/_api-services/redis_service';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 
 export const maxDuration = 300;
 
 const zodQuerySchema = z.object({
-	from: z.coerce.date().optional(),
-	to: z.coerce.date().optional(),
+	from: z.coerce.date().optional().default(dayjs().subtract(1, 'hour').toDate()),
+	to: z.coerce.date().optional().default(dayjs().toDate()),
 	limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
 	page: z.coerce.number().optional().default(1)
 });
 
 export const GET = withErrorHandling(async (req: NextRequest): Promise<NextResponse<ITreasuryStats[]>> => {
-	const network = await getNetworkFromHeaders();
+	const [network, readonlyHeaders] = await Promise.all([getNetworkFromHeaders(), headers()]);
 	const { from, to, limit, page } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
-	const treasuryStats = await OffChainDbService.GetTreasuryStats({ network, from, to, limit, page });
+
+	const fromFormatted = dayjs(from).format('YYYY-MM-DD-HH');
+	const toFormatted = dayjs(to).format('YYYY-MM-DD-HH');
+
+	const skipCache = readonlyHeaders.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
+
+	let treasuryStats = await RedisService.GetTreasuryStats({ network, from: fromFormatted, to: toFormatted });
+	if (treasuryStats && !skipCache) {
+		return NextResponse.json(treasuryStats);
+	}
+
+	treasuryStats = await OffChainDbService.GetTreasuryStats({ network, from, to, limit, page });
+	if (treasuryStats) {
+		await RedisService.SetTreasuryStats({ network, from: fromFormatted, to: toFormatted, data: treasuryStats });
+	}
+
 	return NextResponse.json(treasuryStats);
 });
 

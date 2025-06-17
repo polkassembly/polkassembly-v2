@@ -87,7 +87,7 @@ export class AuthService {
 
 		const { password, salt } = await this.GetSaltAndHashedPassword(newPassword);
 
-		const newUserId = (await OffChainDbService.GetTotalUsersCount()) + 1;
+		const newUserId = await OffChainDbService.GetNextUserId();
 		const newUser: IUser = {
 			createdAt: new Date(),
 			email,
@@ -231,7 +231,7 @@ export class AuthService {
 		const isEmail = ValidatorService.isValidEmail(emailOrUsername);
 
 		// check if username is in blacklisted usernames
-		if (!isEmail && ValidatorService.isValidUsername(emailOrUsername)) {
+		if (!isEmail && !ValidatorService.isValidUsername(emailOrUsername)) {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Username is not allowed.');
 		}
 

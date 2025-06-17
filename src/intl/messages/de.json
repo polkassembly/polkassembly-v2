@@ -233,6 +233,12 @@
 			"followed_user": "Benutzer folgen",
 			"unfollowed_user": "Benutzer entfolgen"
 		},
+		"Posts": {
+			"posts": "Beiträge",
+			"discussions": "Diskussionsbeiträge",
+			"OpenGov": "Offchain-Beiträge",
+			"noData": "Keine Beiträge gefunden"
+		},
 		"overview": "Übersicht",
 		"onchainIdentity": "Onchain-Identität",
 		"linkAddress": "Adresse verknüpfen",
@@ -266,6 +272,10 @@
 			"newEmail": "Neue E-Mail",
 			"type": "Typ",
 			"belowToConfirm": "unten zur Bestätigung",
+			"appQrLogin": "App QR-Login",
+			"scanToLoginInApp": "Scannen zum Login",
+			"generateQr": "QR generieren",
+			"appQrLoginDescription": "Scannen Sie mit der mobilen App für direkten Zugriff auf Ihr Web3-Konto",
 			"TFA": {
 				"configuringGoogleAuthenticator": "Google Authenticator konfigurieren",
 				"installGoogleAuthenticator": "1. Installieren Sie Google Authenticator (iOS/Android).",
@@ -482,6 +492,8 @@
 		"deleteComment": "Kommentar löschen",
 		"deleteCommentConfirmation": "Möchten Sie diesen Kommentar wirklich löschen?",
 		"delete": "Löschen",
+		"save": "Speichern",
+		"edit": "Bearbeiten",
 		"hideReplies": "Antworten ausblenden",
 		"viewReplies": "Antworten anzeigen",
 		"commentSummary": "Kommentar Zusammenfassung",
@@ -513,6 +525,18 @@
 			"decisionDeposit": "Entscheidungskaution",
 			"payDecisionDeposit": "Entscheidungskaution zahlen",
 			"continue": "Weiter"
+		},
+		"ClaimPayout": {
+			"claim": "Beanspruchen",
+			"index": "Index",
+			"beneficiary": "Begünstigter",
+			"amount": "Betrag",
+			"expireIn": "Läuft ab in",
+			"claimPayout": "Auszahlung beanspruchen",
+			"payoutClaimedSuccessfully": "Auszahlung erfolgreich beansprucht",
+			"payoutClaimFailed": "Auszahlung konnte nicht beansprucht werden",
+			"payoutClaimedSuccessfullyDescription": "Ihre Auszahlung wurde erfolgreich beansprucht",
+			"payoutClaimFailedDescription": "Bitte versuchen Sie es erneut"
 		}
 	},
 	"ListingPage_Status": {
@@ -580,7 +604,8 @@
 		"created": "Erstellt",
 		"curatorassigned": "Curator zugewiesen",
 		"curatorunassigned": "Curator nicht zugewiesen",
-		"curatorproposed": "Curator vorgeschlagen",
+		"curatorproposed": "Kurator vorgeschlagen",
+		"tabled": "Eingereicht",
 		"undefined": "Undefiniert"
 	},
 	"Pagination": {
@@ -603,18 +628,32 @@
 		"voteSuccess": "Ihre Abstimmung wurde erfolgreich abgegeben",
 		"voteFailed": "Ihre Abstimmung wurde nicht erfolgreich abgegeben",
 		"voteSuccessTitle": "Abstimmung erfolgreich",
-		"voteFailedTitle": "Abstimmung fehlgeschlagen"
+		"voteFailedTitle": "Abstimmung fehlgeschlagen",
+		"delegatedPower": "Delegierte Macht",
+		"commentSuccessTitle": "Kommentar erfolgreich hinzugefügt",
+		"commentSuccess": "Ihr Kommentar wurde erfolgreich hinzugefügt",
+		"voted": "Abgestimmt",
+		"successfully": "erfolgreich",
+		"with": "mit",
+		"yourVoteIsIn": "Ihre Stimme ist abgegeben! Möchten Sie in einem Kommentar mitteilen, warum Sie dies unterstützen?",
+		"your": "Ihre",
+		"voteIsIn": "Stimme ist abgegeben! Möchten Sie in einem Kommentar mitteilen, warum Sie dies unterstützen?"
 	},
 	"Balance": {
 		"voteBalance": "Abstimmungsguthaben",
-		"balance": "Guthaben"
+		"Balance": "Guthaben",
+		"PeopleChainBalance": "People Chain Guthaben"
 	},
 	"EditPost": {
 		"edit": "Bearbeiten",
 		"title": "Titel",
 		"content": "Inhalt",
 		"save": "Speichern",
-		"editPostButton": "Bearbeiten"
+		"editPostButton": "Bearbeiten",
+		"success": "Beitrag erfolgreich aktualisiert",
+		"successDescription": "Ihr Beitrag wurde erfolgreich aktualisiert",
+		"error": "Beitrag konnte nicht aktualisiert werden",
+		"errorDescription": "Beim Aktualisieren Ihres Beitrags ist ein Fehler aufgetreten"
 	},
 	"Footer": {
 		"helpCenter": "Hilfezentrum",
@@ -643,7 +682,14 @@
 		"close": "Schließen",
 		"showAll": "Alle anzeigen",
 		"searchByHash": "Nach Hash suchen",
-		"preimageNotFound": "Vorabbild nicht gefunden"
+		"preimageNotFound": "Preimage nicht gefunden",
+		"unrequested": "Nicht angefordert",
+		"unrequested_description": "Das Preimage wurde nicht angefordert",
+		"unnoted": "Nicht notiert",
+		"unnoted_description": "Das Preimage wurde nicht notiert",
+		"failed": "Fehlgeschlagen",
+		"unrequest": "Anforderung zurückziehen",
+		"unnote": "Notiz entfernen"
 	},
 	"Create": {
 		"createDiscussionTitle": "Diskussion erstellen",
@@ -680,7 +726,8 @@
 			"fellowship": "Fellowship",
 			"council": "Rat",
 			"democracy": "Demokratie",
-			"whitelist": "Whitelist"
+			"whitelist": "Whitelist",
+			"technicalcommittee": "Technisches Komitee"
 		},
 		"please": "Bitte",
 		"login": "Anmelden",
@@ -890,14 +937,14 @@
 		"cancelReferendum": "Referendum abbrechen",
 		"killReferendum": "Referendum beenden",
 		"createBounty": "Kopfgeld erstellen",
-		"createBountyDescription": "Schlagen Sie ein Kopfgeld für eine bestimmte Aufgabe oder ein Projekt vor.",
+		"createDiscussionDescription": "Beginnen Sie ein Gespräch und sammeln Sie Feedback.",
 		"createPreimageDescription": "Erstellen Sie einen Vorschlag von Grund auf.",
 		"existingPreimageDescription": "Wählen Sie aus vorhandenen Preimages, um einen Vorschlag zu erstellen.",
 		"createTreasuryProposalDescription": "Erstellen Sie einen Treasury-Vorschlag zur Zuteilung von Mitteln in ",
 		"usdxProposalDescription": "Schlagen Sie eine Ausgabe aus dem AssetHub vor, planen Sie Zahlungen und fügen Sie mehrere Begünstigte hinzu.",
 		"cancelReferendumDescription": "Vorschlag zum Abbruch eines aktiven Referendums.",
 		"killReferendumDescription": "Beenden Sie ein Referendum, bevor es angenommen wird.",
-		"createDiscussionDescription": "Beginnen Sie ein Gespräch und sammeln Sie Feedback.",
+		"createBountyDescription": "Schlagen Sie ein Kopfgeld für eine bestimmte Aufgabe oder ein Projekt vor.",
 		"goBack": "Zurück",
 		"preimageHash": "Preimage-Hash",
 		"preimageLength": "Länge",
@@ -905,9 +952,16 @@
 		"viewPreimage": "Preimage anzeigen",
 		"stepDescriptionKillReferendum": "Dies erstellt ein Preimage und einen Vorschlag zum Ausgeben von Vermögenswerten aus dem AssetHub. Die Ausgabe muss beansprucht werden.",
 		"stepDescriptionCancelReferendum": "Vorschlag zum Abbruch eines aktiven Referendums.",
-		"stepDescriptionTreasuryProposal": "Schlagen Sie Ausgaben aus dem Treasury in vor.",
+		"stepDescriptionTreasuryProposal": "Schlagen Sie Ausgaben aus dem Treasury in DOT vor.",
 		"stepDescriptionUsdxProposal": "Erstellt ein Preimage und einen Vorschlag zum Ausgeben von Vermögenswerten. Die Ausgabe muss beansprucht werden.",
-		"stepDescriptionCreatePreimage": "Ein Preimage ist die codierte Aufrufdaten (z. B. ein Runtime-Upgrade oder eine Treasury-Ausgabe), die mit einem Vorschlag verknüpft sind."
+		"stepDescriptionCreatePreimage": "Ein Preimage ist die codierte Aufrufdaten (z. B. ein Runtime-Upgrade oder eine Treasury-Ausgabe), die mit einem Vorschlag verknüpft sind.",
+		"Congratulations": "Glückwunsch!",
+		"proposal": "Vorschlag",
+		"createdSuccessfully": "erfolgreich erstellt!",
+		"redirectingToProposal": "Weiterleitung zum Vorschlag...",
+		"addContextToProposal": "Kontext zum Vorschlag hinzufügen",
+		"redirectingToPost": "Weiterleitung zum Beitrag...",
+		"discussion": "Diskussion"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Begünstigter",
@@ -927,7 +981,9 @@
 		"validFrom": "Gültig ab",
 		"addValidFrom": "Gültig ab hinzufügen",
 		"invalidBlockHeight": "Bitte geben Sie eine gültige Blockhöhe ein",
-		"enterFutureBlockHeight": "Bitte geben Sie eine zukünftige Blockhöhe ein"
+		"enterFutureBlockHeight": "Bitte geben Sie eine zukünftige Blockhöhe ein",
+		"invalidParameters": "Ungültige Parameter",
+		"invalidParametersDescription": "Bitte überprüfen Sie die Parameter und versuchen Sie es erneut"
 	},
 	"CreatePreimage": {
 		"addItem": "Begünstigten/Auszahlungen hinzufügen",
@@ -944,7 +1000,13 @@
 		"length": "Länge",
 		"beneficiary": "Begünstigter",
 		"noBeneficiarySelected": "Kein Begünstigter ausgewählt",
-		"on": "an"
+		"on": "an",
+		"Congratulations": "Glückwunsch!",
+		"createProposalFromPreimage": "Sie können jetzt einen Vorschlag aus dem Preimage erstellen",
+		"CreateProposal": "Vorschlag erstellen",
+		"goBack": "Zurück",
+		"Preimage": "Preimage",
+		"createSuccessfully": "erfolgreich erstellt!"
 	},
 	"AddressInput": {
 		"invalidAddress": "Ungültige Adresse",
@@ -1145,7 +1207,13 @@
 		"bountyProposalFailed": "Kopfgeld-Vorschlag fehlgeschlagen",
 		"bountyProposalFailedDescription": "Beim Vorschlagen des Kopfgeldes ist ein Fehler aufgetreten",
 		"bountyAmount": "Kopfgeld-Betrag",
-		"proposeBounty": "Kopfgeld vorschlagen"
+		"proposeBounty": "Kopfgeld vorschlagen",
+		"enterBountyId": "Geben Sie die Kopfgeld-ID ein",
+		"yes": "Ja",
+		"no": "Nein",
+		"createProposal": "Vorschlag erstellen",
+		"haveYouCreatedABountyAlready": "Haben Sie bereits ein Kopfgeld erstellt?",
+		"yourAreNotTheProposer": "Sie sind nicht der Vorschlagende dieses Kopfgeldes"
 	},
 	"Parachains": {
 		"projects": "Projekte",
@@ -1182,5 +1250,18 @@
 		"votes": "Stimmen",
 		"voteDetails": "Abstimmungsdetails",
 		"target": "Ziel"
+	},
+	"LinkDiscussionPost": {
+		"linkDiscussion": "Diskussion verlinken",
+		"noDiscussionsFound": "Wir konnten keine zu verlinkende Diskussion finden!",
+		"noPostFound": "Kein Beitrag gefunden",
+		"notAuthorized": "Sie sind nicht berechtigt, diesen Beitrag zu verlinken.",
+		"discussionPostLinkedSuccessfully": "Diskussionsbeitrag erfolgreich verlinkt",
+		"theDiscussionPostHasBeenLinkedToTheProposal": "Der Diskussionsbeitrag wurde mit dem Vorschlag verlinkt",
+		"errorLinkingDiscussionPost": "Fehler beim Verlinken des Diskussionsbeitrags",
+		"pleaseTryAgain": "Bitte versuchen Sie es erneut",
+		"pasteURLorEnterPostID": "URL einfügen oder Beitrags-ID eingeben",
+		"yourDiscussions": "Ihre Diskussionen",
+		"confirm": "Bestätigen"
 	}
 }

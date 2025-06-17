@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { QueryDocumentSnapshot, QuerySnapshot, WriteBatch } from 'firebase-admin/firestore';
+import { QueryDocumentSnapshot, QuerySnapshot, Timestamp, WriteBatch } from 'firebase-admin/firestore';
 import {
 	EDataSource,
 	ENetwork,
@@ -52,6 +52,11 @@ export class FirestoreService extends FirestoreUtils {
 	static async GetTotalUsersCount(): Promise<number> {
 		const userDocSnapshot = await this.usersCollectionRef().get();
 		return userDocSnapshot.docs.length;
+	}
+
+	static async GetNextUserId(): Promise<number> {
+		const userDocSnapshot = await this.usersCollectionRef().orderBy('id', 'desc').limit(1).get();
+		return userDocSnapshot.docs[0].data().id + 1;
 	}
 
 	static async GetUserByEmail(email: string): Promise<IUser | null> {
@@ -290,7 +295,15 @@ export class FirestoreService extends FirestoreUtils {
 		return {
 			...postData,
 			content: postData.content || '',
-			tags: postData.tags?.map((tag: ITag) => ({ value: tag.value, lastUsedAt: tag.lastUsedAt, network })) || [],
+			tags:
+				postData.tags?.map((tag: { value: string; lastUsedAt: unknown }) => ({
+					value: tag.value,
+					lastUsedAt:
+						typeof tag.lastUsedAt === 'object' && tag.lastUsedAt !== null && typeof (tag.lastUsedAt as Timestamp).toDate === 'function'
+							? (tag.lastUsedAt as Timestamp).toDate()
+							: new Date(tag.lastUsedAt as string) || new Date(),
+					network
+				})) || [],
 			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate(),
@@ -303,18 +316,24 @@ export class FirestoreService extends FirestoreUtils {
 		proposalType,
 		limit,
 		page,
-		tags
+		tags,
+		userId
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
 		limit: number;
 		page: number;
 		tags?: string[];
+		userId?: number;
 	}): Promise<IOffChainPost[]> {
 		let postsQuery = this.postsCollectionRef().where('proposalType', '==', proposalType).where('network', '==', network);
 
 		if (tags?.length) {
 			postsQuery = postsQuery.where('tags', 'array-contains-any', tags);
+		}
+
+		if (userId) {
+			postsQuery = postsQuery.where('userId', '==', userId);
 		}
 
 		postsQuery = postsQuery
@@ -440,7 +459,7 @@ export class FirestoreService extends FirestoreUtils {
 
 			return {
 				...commentData,
-				user,
+				publicUser: user,
 				children: []
 			} as ICommentResponse;
 		});
@@ -472,14 +491,19 @@ export class FirestoreService extends FirestoreUtils {
 	static async GetPostReactions({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IReaction[]> {
 		const reactionsQuery = this.reactionsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash);
 		const reactionsQuerySnapshot = await reactionsQuery.get();
-		return reactionsQuerySnapshot.docs.map((doc) => {
+		const reactionPromises = reactionsQuerySnapshot.docs.map(async (doc) => {
 			const data = doc.data();
+			const publicUser = await this.GetPublicUserById(data.userId);
+
 			return {
 				...data,
 				createdAt: data.createdAt?.toDate(),
-				updatedAt: data.updatedAt?.toDate()
+				updatedAt: data.updatedAt?.toDate(),
+				publicUser
 			} as IReaction;
 		});
+
+		return Promise.all(reactionPromises);
 	}
 
 	static async GetCommentReactions({
@@ -500,10 +524,19 @@ export class FirestoreService extends FirestoreUtils {
 			.where('commentId', '==', id);
 
 		const reactionsQuerySnapshot = await reactionsQuery.get();
-		return reactionsQuerySnapshot.docs.map((doc) => {
+		const reactionPromises = reactionsQuerySnapshot.docs.map(async (doc) => {
 			const data = doc.data();
-			return { ...data, createdAt: data.createdAt?.toDate(), updatedAt: data.updatedAt?.toDate() } as IReaction;
+			const publicUser = await this.GetPublicUserById(data.userId);
+
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate(),
+				publicUser
+			} as IReaction;
 		});
+
+		return Promise.all(reactionPromises);
 	}
 
 	static async GetReactionById(id: string): Promise<IReaction | null> {
@@ -518,10 +551,13 @@ export class FirestoreService extends FirestoreUtils {
 			return null;
 		}
 
+		const publicUser = await this.GetPublicUserById(data.userId);
+
 		return {
 			...data,
 			createdAt: data.createdAt?.toDate(),
-			updatedAt: data.updatedAt?.toDate()
+			updatedAt: data.updatedAt?.toDate(),
+			publicUser
 		} as IReaction;
 	}
 
@@ -564,7 +600,19 @@ export class FirestoreService extends FirestoreUtils {
 
 		const reactionQuerySnapshot = await reactionQuery.get();
 
-		return (reactionQuerySnapshot.docs?.[0]?.data?.() || null) as IReaction | null;
+		const publicUser = await this.GetPublicUserById(userId);
+		const data = reactionQuerySnapshot.docs?.[0]?.data?.();
+
+		if (!data) return null;
+
+		const reaction: IReaction = {
+			...reactionQuerySnapshot.docs?.[0]?.data?.(),
+			createdAt: data.createdAt?.toDate(),
+			updatedAt: data.updatedAt?.toDate(),
+			publicUser
+		} as IReaction;
+
+		return reaction;
 	}
 
 	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IContentSummary | null> {
@@ -572,6 +620,7 @@ export class FirestoreService extends FirestoreUtils {
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
 			.where('indexOrHash', '==', indexOrHash)
+			.orderBy('createdAt', 'desc') // just in case there are multiple summaries for the same post
 			.limit(1);
 
 		const contentSummaryQuerySnapshot = await contentSummaryQuery.get();
@@ -1100,6 +1149,29 @@ export class FirestoreService extends FirestoreUtils {
 		await this.postsCollectionRef()
 			.doc(String(id))
 			.set({ content, title, allowedCommentor, updatedAt: new Date(), ...(linkedPost && { linkedPost }) }, { merge: true });
+
+		// add back link to linkedPost for linkedPost if it exists
+		if (linkedPost) {
+			const updatedPostData = (await this.postsCollectionRef().doc(String(id)).get()).data() as IOffChainPost;
+
+			const linkedPostSnapshot = await this.postsCollectionRef()
+				.where('network', '==', updatedPostData.network)
+				.where('proposalType', '==', linkedPost.proposalType)
+				.where('indexOrHash', '==', linkedPost.indexOrHash)
+				.limit(1)
+				.get();
+
+			const linkedPostDoc = !linkedPostSnapshot.empty ? linkedPostSnapshot.docs[0] : null;
+
+			const backLink: IPostLink = {
+				proposalType: updatedPostData.proposalType,
+				indexOrHash: String(updatedPostData.index ?? updatedPostData.hash)
+			};
+
+			if (linkedPostDoc && backLink.indexOrHash) {
+				await linkedPostDoc.ref.set({ linkedPost: backLink }, { merge: true });
+			}
+		}
 	}
 
 	static async CreatePost({
@@ -1513,11 +1585,39 @@ export class FirestoreService extends FirestoreUtils {
 		}
 	}
 
-	static async DeleteOffChainPost({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
-		const post = await this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash).limit(1).get();
+	static async DeleteOffChainPost({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }) {
+		const post = await this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('index', '==', index).limit(1).get();
 
 		if (post.docs.length) {
 			await post.docs[0].ref.set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
+		}
+	}
+
+	static async GetPostsByUserId({ userId, network, page, limit, proposalType }: { userId: number; network: ENetwork; page: number; limit: number; proposalType: EProposalType }) {
+		const postRef = this.postsCollectionRef().where('userId', '==', userId).where('network', '==', network).where('proposalType', '==', proposalType);
+		const totalCount = await postRef.count().get();
+		const posts = await postRef
+			.orderBy('createdAt', 'desc')
+			.limit(limit)
+			.offset((page - 1) * limit)
+			.get();
+
+		return {
+			items: posts.docs.map((doc) => doc.data() as IOffChainPost),
+			totalCount: totalCount.data().count
+		};
+	}
+
+	static async DeleteContentSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+		const contentSummary = await this.contentSummariesCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.get();
+
+		if (contentSummary.docs.length) {
+			// sometimes multiple content summaries are generated for the same post
+			await Promise.all(contentSummary.docs.map((doc) => doc.ref.delete()));
 		}
 	}
 }

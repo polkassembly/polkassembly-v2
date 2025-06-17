@@ -235,6 +235,12 @@
 			"followed_user": "Seguido",
 			"unfollowed_user": "Dejó de seguir"
 		},
+		"Posts": {
+			"posts": "Publicaciones",
+			"discussions": "Discusiones",
+			"openGov": "OpenGov",
+			"noData": "No se encontraron publicaciones"
+		},
 		"overview": "Resumen",
 		"onchainIdentity": "Identidad en cadena",
 		"linkAddress": "Vincular dirección",
@@ -268,6 +274,10 @@
 			"newEmail": "Nuevo correo electrónico",
 			"type": "Tipo",
 			"belowToConfirm": "abajo para confirmar",
+			"appQrLogin": "Inicio de sesión QR de la aplicación",
+			"scanToLoginInApp": "Escanear para iniciar sesión",
+			"generateQr": "Generar QR",
+			"appQrLoginDescription": "Escanee a través de la aplicación móvil para acceso directo a su cuenta web3",
 			"TFA": {
 				"configuringGoogleAuthenticator": "Configurando Google Authenticator",
 				"installGoogleAuthenticator": "1. Instale Google Authenticator (iOS/Android).",
@@ -484,6 +494,8 @@
 		"deleteComment": "Eliminar comentario",
 		"deleteCommentConfirmation": "¿Está seguro de que desea eliminar este comentario?",
 		"delete": "Eliminar",
+		"save": "Guardar",
+		"edit": "Editar",
 		"hideReplies": "Ocultar respuestas",
 		"viewReplies": "Ver respuestas",
 		"commentSummary": "Resumen del comentario",
@@ -515,6 +527,18 @@
 			"decisionDeposit": "Depósito de decisión",
 			"payDecisionDeposit": "Pagar depósito de decisión",
 			"continue": "Continuar"
+		},
+		"ClaimPayout": {
+			"claim": "Reclamar",
+			"index": "Índice",
+			"beneficiary": "Beneficiario",
+			"amount": "Cantidad",
+			"expireIn": "Expira en",
+			"claimPayout": "Reclamar pago",
+			"payoutClaimedSuccessfully": "Pago reclamado con éxito",
+			"payoutClaimFailed": "Error al reclamar el pago",
+			"payoutClaimedSuccessfullyDescription": "Su pago ha sido reclamado con éxito",
+			"payoutClaimFailedDescription": "Por favor, inténtelo de nuevo"
 		}
 	},
 	"ListingPage_Status": {
@@ -582,7 +606,8 @@
 		"created": "Creado",
 		"curatorassigned": "Curador Asignado",
 		"curatorunassigned": "Curador No Asignado",
-		"curatorproposed": "Curador Propuesto",
+		"curatorproposed": "Curador propuesto",
+		"tabled": "Presentado",
 		"undefined": "Indefinido"
 	},
 	"Pagination": {
@@ -605,18 +630,32 @@
 		"voteSuccess": "Su voto ha sido emitido correctamente",
 		"voteFailed": "Su voto no ha sido emitido correctamente",
 		"voteSuccessTitle": "Voto exitoso",
-		"voteFailedTitle": "Voto fallido"
+		"voteFailedTitle": "Voto fallido",
+		"delegatedPower": "Poder delegado",
+		"commentSuccessTitle": "Comentario agregado con éxito",
+		"commentSuccess": "Su comentario ha sido agregado con éxito",
+		"voted": "Votado",
+		"successfully": "exitosamente",
+		"with": "con",
+		"yourVoteIsIn": "¡Su voto está registrado! ¿Le gustaría compartir por qué apoya esto en un comentario?",
+		"your": "Su",
+		"voteIsIn": "voto está registrado! ¿Le gustaría compartir por qué apoya esto en un comentario?"
 	},
 	"Balance": {
-		"voteBalance": "Saldo de Votación",
-		"balance": "Saldo"
+		"voteBalance": "Balance de Votos",
+		"Balance": "Balance",
+		"PeopleChainBalance": "Balance de People Chain"
 	},
 	"EditPost": {
 		"edit": "Editar",
 		"title": "Título",
 		"content": "Contenido",
 		"save": "Guardar",
-		"editPostButton": "Editar"
+		"editPostButton": "Editar",
+		"success": "Publicación actualizada con éxito",
+		"successDescription": "Tu publicación ha sido actualizada con éxito",
+		"error": "Error al actualizar la publicación",
+		"errorDescription": "Hubo un error al actualizar tu publicación"
 	},
 	"Footer": {
 		"helpCenter": "Centro de Ayuda",
@@ -643,9 +682,16 @@
 		"copy": "Copiar",
 		"subscan": "Subscan",
 		"close": "Cerrar",
-		"showAll": "Mostrar todos",
+		"showAll": "Mostrar todo",
 		"searchByHash": "Buscar por hash",
-		"preimageNotFound": "Vorabbild nicht gefunden"
+		"preimageNotFound": "Preimage no encontrado",
+		"unrequested": "No solicitado",
+		"unrequested_description": "El preimage no ha sido solicitado",
+		"unnoted": "No anotado",
+		"unnoted_description": "El preimage no ha sido anotado",
+		"failed": "Fallido",
+		"unrequest": "Cancelar solicitud",
+		"unnote": "Eliminar anotación"
 	},
 	"Create": {
 		"createDiscussionTitle": "Crear Discusión",
@@ -682,7 +728,8 @@
 			"fellowship": "Fellowship",
 			"council": "Consejo",
 			"democracy": "Democracia",
-			"whitelist": "Lista blanca"
+			"whitelist": "Lista blanca",
+			"technicalcommittee": "Comité Técnico"
 		},
 		"please": "Por favor",
 		"login": "Iniciar sesión",
@@ -855,58 +902,67 @@
 		"proposals": "Propuestas"
 	},
 	"CreateProposal": {
-		"create": "Erstellen",
-		"quickActions": "Schnellaktionen",
-		"trendingNow": "Aktuell im Trend",
-		"submitProposal": "Vorschlag einreichen",
-		"createDiscussion": "Diskussionsbeitrag erstellen",
-		"createPreimage": "Preimage erstellen",
-		"existingPreimage": "Ich habe bereits ein Preimage",
-		"spend": "Ausgeben",
-		"from": "von",
-		"Treasury": "Treasury",
-		"usdxProposal": "USDC/USDT-Vorschlag erstellen",
-		"cancelReferendum": "Referendum abbrechen",
-		"killReferendum": "Referendum beenden",
-		"createPreimageDescription": "Crea eine propuesta von Grund auf.",
-		"existingPreimageDescription": "Wähle aus vorhandenen Preimages, um eine propuesta zu erstellen.",
-		"createTreasuryProposalDescription": "Crea eine propuesta des Treasuries, um Gelder in ",
-		"usdxProposalDescription": "Propón einen Ausgabenauftrag von AssetHub, Zahlungsprogramm und mehreren Empfängern einschließlich.",
-		"cancelReferendumDescription": "Propón das Abbrechen eines aktiven Referendums.",
-		"killReferendumDescription": "Beendet ein Referendum, bevor es genehmigt wird.",
-		"createDiscussionDescription": "Startet eine Unterhaltung und sammelt Meinungen.",
-		"goBack": "Zurück",
-		"preimageHash": "Preimage-Hash",
-		"preimageLength": "Länge",
-		"preimageHashDescription": "Hash eingeben",
-		"viewPreimage": "Preimage anzeigen",
-		"stepDescriptionKillReferendum": "Dies erstellt ein Preimage und einen Vorschlag zum Ausgeben von Vermögenswerten aus dem AssetHub. Die Ausgabe muss beansprucht werden.",
-		"stepDescriptionCancelReferendum": "Vorschlag zum Abbruch eines aktiven Referendums.",
-		"stepDescriptionTreasuryProposal": "Schlagen Sie Ausgaben aus dem Treasury in vor.",
-		"stepDescriptionUsdxProposal": "Erstellt ein Preimage und einen Vorschlag zum Ausgeben von Vermögenswerten. Die Ausgabe muss beansprucht werden.",
-		"stepDescriptionCreatePreimage": "Ein Preimage ist die codierte Aufrufdaten (z. B. ein Runtime-Upgrade oder eine Treasury-Ausgabe), die mit einem Vorschlag verknüpft sind.",
+		"create": "Crear",
+		"quickActions": "Acciones rápidas",
+		"trendingNow": "Tendencias ahora",
+		"submitProposal": "Enviar propuesta",
+		"createDiscussion": "Crear publicación de discusión",
+		"createPreimage": "Crear preimagen",
+		"existingPreimage": "Ya tengo una preimagen",
+		"spend": "Gastar",
+		"from": "de",
+		"Treasury": "Tesorería",
+		"usdxProposal": "Crear propuesta USDC/USDT",
+		"cancelReferendum": "Cancelar referéndum",
+		"killReferendum": "Eliminar referéndum",
 		"createBounty": "Crear recompensa",
-		"createBountyDescription": "Proponer una recompensa para una tarea o proyecto específico."
+		"createDiscussionDescription": "Inicia una conversación y recopila comentarios.",
+		"createPreimageDescription": "Crea una propuesta desde cero.",
+		"existingPreimageDescription": "Selecciona de preimágenes existentes para crear una propuesta.",
+		"createTreasuryProposalDescription": "Crea una propuesta de tesorería para asignar fondos en ",
+		"usdxProposalDescription": "Propón un gasto desde AssetHub, programa pagos e incluye múltiples beneficiarios.",
+		"cancelReferendumDescription": "Propón cancelar un referéndum activo.",
+		"killReferendumDescription": "Termina un referéndum antes de que se apruebe.",
+		"createBountyDescription": "Propón una recompensa para una tarea o proyecto específico.",
+		"goBack": "Volver",
+		"preimageHash": "Hash de preimagen",
+		"preimageLength": "Longitud",
+		"preimageHashDescription": "Introduce el hash",
+		"viewPreimage": "Ver preimagen",
+		"stepDescriptionKillReferendum": "Esto creará una preimagen y una propuesta para gastar activos desde AssetHub, el gasto deberá ser reclamado.",
+		"stepDescriptionCancelReferendum": "Propón cancelar un referéndum activo.",
+		"stepDescriptionTreasuryProposal": "Propón un gasto de tesorería en DOT.",
+		"stepDescriptionUsdxProposal": "Crea una preimagen y una propuesta para gastar activos. El gasto debe ser reclamado.",
+		"stepDescriptionCreatePreimage": "Una preimagen es el dato de llamada codificado (por ejemplo, una actualización de runtime o gasto de tesorería) asociado a una propuesta.",
+		"Congratulations": "¡Felicidades!",
+		"proposal": "Propuesta",
+		"createdSuccessfully": "¡creada exitosamente!",
+		"redirectingToProposal": "Redirigiendo a la propuesta...",
+		"addContextToProposal": "Agregar contexto a la propuesta",
+		"redirectingToPost": "Redirigiendo a la publicación...",
+		"discussion": "Discusión"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiario",
 		"amount": "Cantidad",
-		"track": "Pista",
+		"track": "Track",
 		"createProposal": "Crear Propuesta",
 		"create": "Crear",
 		"proposalCreatedSuccessfully": "Propuesta creada exitosamente",
 		"proposalCreatedSuccessfullyDescription": "La propuesta ha sido creada exitosamente",
 		"proposalCreationFailed": "Error al crear la propuesta",
 		"proposalCreationFailedDescription": "Hubo un error al crear la propuesta",
-		"preimageNotedSuccessfully": "Preimage registrada exitosamente",
-		"preimageNotedSuccessfullyDescription": "La preimage ha sido registrada exitosamente",
-		"preimageNoteFailed": "Error al registrar preimage",
-		"preimageNoteFailedDescription": "Hubo un error al registrar la preimage",
-		"selectTrack": "Seleccionar Pista",
+		"preimageNotedSuccessfully": "Preimage anotada exitosamente",
+		"preimageNotedSuccessfullyDescription": "La preimage ha sido anotada exitosamente",
+		"preimageNoteFailed": "Error al anotar la preimage",
+		"preimageNoteFailedDescription": "Hubo un error al anotar la preimage",
+		"selectTrack": "Seleccionar Track",
 		"validFrom": "Válido Desde",
 		"addValidFrom": "Agregar Válido Desde",
 		"invalidBlockHeight": "Por favor ingrese una altura de bloque válida",
-		"enterFutureBlockHeight": "Por favor ingrese una altura de bloque futura"
+		"enterFutureBlockHeight": "Por favor ingrese una altura de bloque futura",
+		"invalidParameters": "Parámetros inválidos",
+		"invalidParametersDescription": "Por favor revise los parámetros e intente nuevamente"
 	},
 	"CreatePreimage": {
 		"addItem": "Agregar Beneficiario/Pagos",
@@ -923,7 +979,13 @@
 		"length": "Longitud",
 		"beneficiary": "Beneficiario",
 		"noBeneficiarySelected": "Ningún Beneficiario Seleccionado",
-		"on": "en"
+		"on": "en",
+		"Congratulations": "¡Felicidades!",
+		"createProposalFromPreimage": "Ahora puede crear una propuesta a partir del preimage",
+		"CreateProposal": "Crear Propuesta",
+		"goBack": "Regresar",
+		"Preimage": "Preimage",
+		"createSuccessfully": "¡creado exitosamente!"
 	},
 	"AddressInput": {
 		"invalidAddress": "Dirección Inválida",
@@ -1141,12 +1203,18 @@
 		"viewAllChildBounties": "Ver todas"
 	},
 	"CreateBounty": {
-		"bountyProposedSuccessfully": "Recompensa propuesta con éxito",
-		"bountyProposedSuccessfullyDescription": "La recompensa ha sido propuesta con éxito",
+		"bountyProposedSuccessfully": "Recompensa propuesta exitosamente",
+		"bountyProposedSuccessfullyDescription": "La recompensa ha sido propuesta exitosamente",
 		"bountyProposalFailed": "Error al proponer la recompensa",
 		"bountyProposalFailedDescription": "Hubo un error al proponer la recompensa",
 		"bountyAmount": "Cantidad de la recompensa",
-		"proposeBounty": "Proponer recompensa"
+		"proposeBounty": "Proponer recompensa",
+		"enterBountyId": "Ingrese el ID de la recompensa",
+		"yes": "Sí",
+		"no": "No",
+		"createProposal": "Crear propuesta",
+		"haveYouCreatedABountyAlready": "¿Ya has creado una recompensa?",
+		"yourAreNotTheProposer": "No eres el proponente de esta recompensa"
 	},
 	"Parachains": {
 		"projects": "Proyectos",
@@ -1183,5 +1251,18 @@
 		"votes": "Votos",
 		"voteDetails": "Detalles de Votación",
 		"target": "Objetivo"
+	},
+	"LinkDiscussionPost": {
+		"linkDiscussion": "Vincular Discusión",
+		"noDiscussionsFound": "¡No pudimos encontrar ninguna discusión para vincular!",
+		"noPostFound": "No se encontró ninguna publicación",
+		"notAuthorized": "No estás autorizado para vincular esta publicación.",
+		"discussionPostLinkedSuccessfully": "Publicación de discusión vinculada exitosamente",
+		"theDiscussionPostHasBeenLinkedToTheProposal": "La publicación de discusión ha sido vinculada a la propuesta",
+		"errorLinkingDiscussionPost": "Error al vincular la publicación de discusión",
+		"pleaseTryAgain": "Por favor, inténtalo de nuevo",
+		"pasteURLorEnterPostID": "Pega la URL o ingresa el ID de la publicación",
+		"yourDiscussions": "Tus Discusiones",
+		"confirm": "Confirmar"
 	}
 }

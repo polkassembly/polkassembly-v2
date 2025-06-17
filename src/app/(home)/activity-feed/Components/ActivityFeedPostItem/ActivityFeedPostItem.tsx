@@ -140,12 +140,14 @@ function ActivityFeedPostItem({
 					<StatusTag status={postData.onChainInfo?.status} />
 				</div>
 				<div className='hidden lg:block'>
-					{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
+					{voteButton && canVote(postData.onChainInfo?.status) && (
 						<div className='relative z-50'>
 							<VoteReferendumButton
 								index={postData?.index?.toString() || ''}
 								btnClassName='bg-transparent border border-navbar_border text-text_pink hover:bg-transparent hover:text-text_pink font-semibold'
 								size='sm'
+								track={postData.onChainInfo?.origin}
+								proposalType={postData.proposalType}
 							/>
 						</div>
 					)}
@@ -247,12 +249,14 @@ function ActivityFeedPostItem({
 			)}
 
 			<div className='block lg:hidden'>
-				{voteButton && canVote(postData.onChainInfo?.status, postData.onChainInfo?.preparePeriodEndsAt) && (
+				{voteButton && canVote(postData.onChainInfo?.status) && (
 					<div className='relative z-50 pt-5'>
 						<VoteReferendumButton
 							index={postData?.index?.toString() || ''}
 							btnClassName='bg-transparent border border-navbar_border text-text_pink hover:bg-transparent hover:text-text_pink font-semibold'
 							size='sm'
+							track={postData.onChainInfo?.origin}
+							proposalType={postData.proposalType}
 						/>
 					</div>
 				)}

@@ -5,9 +5,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ETheme, IGenericListingResponse, IPreimage } from '@/_shared/types';
+import { ETheme, IPreimage } from '@/_shared/types';
 import { PREIMAGES_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import ReactJson from 'react-json-view';
+import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -17,7 +17,13 @@ import { Dialog, DialogContent, DialogTitle } from '../../Dialog/Dialog';
 import styles from './ListingTable.module.scss';
 import PreimageRow from './PreimageRow';
 
-function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
+// Dynamically import ReactJson to prevent SSR issues
+const ReactJson = dynamic(() => import('react-json-view'), {
+	ssr: false,
+	loading: () => <div className='flex items-center justify-center p-4'>Loading...</div>
+});
+
+function ListingTable({ data, totalCount }: { data: IPreimage[]; totalCount: number }) {
 	const searchParams = useSearchParams();
 	const page = searchParams?.get('page') || 1;
 	const { userPreferences } = useUserPreferences();
@@ -26,13 +32,28 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 	const modalarg = selectedPreimage?.proposedCall.args;
 	const t = useTranslations('Preimages');
 
+	const [preimages, setPreimages] = useState<IPreimage[]>(data);
+
 	const hanldeDialogOpen = (preimage: IPreimage) => {
 		setSelectedPreimage(preimage);
 		setOpen(true);
 	};
+
+	const onUnnotePreimage = (preimage: IPreimage) => {
+		setPreimages((prev) => {
+			const index = prev.findIndex((p) => p.hash === preimage.hash && p.proposer === preimage.proposer);
+			if (index !== -1) {
+				const newPreimages = [...prev];
+				newPreimages[`${index}`] = { ...newPreimages[`${index}`], status: 'Cleared' };
+				return newPreimages;
+			}
+			return prev;
+		});
+	};
+
 	return (
-		<div className='mt-5 rounded-lg bg-bg_modal p-6'>
-			{data ? (
+		<div className='mt-5 w-full rounded-lg bg-bg_modal p-6'>
+			{data && data.length > 0 ? (
 				<>
 					<Table>
 						<TableHeader>
@@ -46,28 +67,30 @@ function ListingTable({ data }: { data: IGenericListingResponse<IPreimage> }) {
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{Array.isArray(data?.items) ? (
-								data.items.map((preimage: IPreimage) => (
+							{Array.isArray(preimages) ? (
+								preimages.map((preimage: IPreimage) => (
 									<PreimageRow
 										key={preimage?.id}
 										preimage={preimage}
 										handleDialogOpen={() => hanldeDialogOpen(preimage)}
+										onUnnotePreimage={() => onUnnotePreimage(preimage)}
 									/>
 								))
 							) : (
 								<PreimageRow
 									preimage={data as unknown as IPreimage}
 									handleDialogOpen={() => hanldeDialogOpen(data as unknown as IPreimage)}
+									onUnnotePreimage={() => onUnnotePreimage(data as unknown as IPreimage)}
 								/>
 							)}
 						</TableBody>
 					</Table>
-					{data?.totalCount && data?.totalCount > PREIMAGES_LISTING_LIMIT && (
+					{totalCount && totalCount > PREIMAGES_LISTING_LIMIT && (
 						<div className='mt-5 flex w-full justify-end'>
 							<PaginationWithLinks
 								page={Number(page)}
 								pageSize={PREIMAGES_LISTING_LIMIT}
-								totalCount={data?.totalCount || 0}
+								totalCount={totalCount}
 								pageSearchParam='page'
 							/>
 						</div>

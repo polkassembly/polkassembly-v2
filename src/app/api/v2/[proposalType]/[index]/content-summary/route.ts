@@ -4,7 +4,6 @@
 
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { EHttpHeaderKey, EProposalType, IContentSummary } from '@/_shared/types';
-import { TOOLS_PASSPHRASE } from '@/app/api/_api-constants/apiEnvVars';
 import { AIService } from '@/app/api/_api-services/ai_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { SubsquareOffChainService } from '@/app/api/_api-services/offchain_db_service/subsquare_offchain_service';
@@ -17,6 +16,8 @@ import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
+export const maxDuration = 300;
+
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
 	index: z.string()
@@ -26,14 +27,13 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const { proposalType, index } = zodParamsSchema.parse(await params);
 
 	const [network, headersList] = await Promise.all([getNetworkFromHeaders(), headers()]);
-	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE);
-	const toolsPassphrase = headersList.get(EHttpHeaderKey.TOOLS_PASSPHRASE);
+	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
 
 	let contentSummary: IContentSummary | null = null;
 
 	// Try to get from cache first
 	let cachedData = null;
-	if (!(skipCache === 'true' && toolsPassphrase === TOOLS_PASSPHRASE)) {
+	if (!skipCache) {
 		cachedData = await RedisService.GetContentSummary({ network, indexOrHash: index, proposalType });
 	}
 
@@ -45,7 +45,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	if (!contentSummary?.postSummary) {
 		// try and generate content summary
-		contentSummary = await AIService.UpdatePostSummary({ network, proposalType, indexOrHash: index });
+		contentSummary = await AIService.GenerateAndUpdatePostSummary({ network, proposalType, indexOrHash: index });
 	}
 
 	if (!contentSummary?.commentsSummary) {

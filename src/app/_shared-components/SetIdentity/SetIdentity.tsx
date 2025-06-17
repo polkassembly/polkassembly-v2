@@ -220,7 +220,7 @@ function SetIdentity() {
 						small
 						withBalance
 						disabled={identityLoading}
-						usedInIdentityFlow
+						showPeopleChainBalance
 					/>
 
 					{/* Display Name */}

@@ -42,6 +42,7 @@ import ParallelLogo from '@assets/parachain-logos/parallel-logo.jpg';
 import PendulumLogo from '@assets/parachain-logos/pendulum-logo.jpg';
 import PolimecLogo from '@assets/parachain-logos/polimec-logo.png';
 import ZeitgeistLogo from '@assets/parachain-logos/zeitgeist-logo.png';
+import PaseoLogo from '@assets/parachain-logos/paseo-logo.png';
 import MythosLogo from '@assets/parachain-logos/mythical-logo.png';
 import AltairLogo from '@assets/parachain-logos/altair-logo.jpeg';
 import GenshiroLogo from '@assets/parachain-logos/genshiro.png';
@@ -141,7 +142,7 @@ const NETWORKS_DISPLAY_DATA: INetworkDisplayData = {
 		Mandala: MandalaLogo
 	},
 	testChains: {
-		Paseo: WestendLogo,
+		Paseo: PaseoLogo,
 		Genshiro: GenshiroLogo,
 		Gmordie: GmordieLogo,
 		Moonbase: MoonbaseLogo,

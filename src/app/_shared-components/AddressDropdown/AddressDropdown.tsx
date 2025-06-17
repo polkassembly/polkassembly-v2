@@ -28,14 +28,14 @@ function AddressDropdown({
 	disabled,
 	withRadioSelect,
 	onRadioSelect,
-	usedInIdentityFlow
+	showPeopleChainBalance = false
 }: {
 	onChange?: (account: InjectedAccount) => void;
 	withBalance?: boolean;
 	disabled?: boolean;
 	withRadioSelect?: boolean;
 	onRadioSelect?: (address: string) => void;
-	usedInIdentityFlow?: boolean;
+	showPeopleChainBalance?: boolean;
 }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const t = useTranslations();
@@ -145,7 +145,7 @@ function AddressDropdown({
 						{withBalance && (
 							<Balance
 								address={userPreferences?.selectedAccount?.address || ''}
-								usedInIdentityFlow={usedInIdentityFlow}
+								showPeopleChainBalance={showPeopleChainBalance}
 							/>
 						)}
 					</div>
@@ -207,7 +207,7 @@ function AddressDropdown({
 					{withBalance && (
 						<Balance
 							address={userPreferences?.selectedAccount?.address || ''}
-							usedInIdentityFlow={usedInIdentityFlow}
+							showPeopleChainBalance={showPeopleChainBalance}
 						/>
 					)}
 				</div>

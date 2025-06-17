@@ -27,6 +27,7 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import Link from 'next/link';
 import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
+import { ArrowLeftIcon } from 'lucide-react';
 import classes from './PostHeader.module.scss';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 
@@ -56,11 +57,23 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 	const createdAt = postData.createdAt || postData.onChainInfo?.createdAt;
 
 	return (
-		<div className='mx-auto max-w-7xl'>
+		<div className='mx-auto max-w-[100vw] lg:max-w-7xl'>
+			<Link
+				href={
+					postData.onChainInfo?.origin
+						? `/${postData.onChainInfo?.origin?.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}`
+						: `/${postData.proposalType?.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}s`
+				}
+				className='mb-4 flex items-center gap-x-1 text-xs text-listing_page_btn hover:underline'
+			>
+				<ArrowLeftIcon className='h-3 w-4' />
+				View All {postData.onChainInfo?.origin ? `${convertCamelCaseToTitleCase(postData.onChainInfo?.origin || '')}` : `${postData.proposalType}`}
+			</Link>
+
 			<div className='mb-4'>
 				<div className={classes.requestedWrapper}>
 					{postData.onChainInfo?.beneficiaries && postData.onChainInfo?.beneficiaries.length > 0 && groupedByAsset && (
-						<div className='flex flex-wrap items-center gap-x-2'>
+						<div className='flex flex-wrap items-center gap-x-2 gap-y-2'>
 							<span className={classes.requestedText}>{t('PostDetails.requested')}:</span>
 							<span className={classes.requestedAmount}>
 								{Object.entries(groupedByAsset).map(([assetId, amount], i) => (
@@ -90,7 +103,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 				</div>
 				<p className={classes.postTitle}>{postData.title}</p>
 				<div className={classes.proposerWrapper}>
-					<div className='flex items-center gap-x-2'>
+					<div className='flex flex-wrap items-center gap-x-2 gap-y-2'>
 						{postData?.onChainInfo?.proposer ? (
 							<Address address={postData.onChainInfo?.proposer} />
 						) : postData.publicUser?.username ? (
@@ -101,29 +114,37 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 								{postData.publicUser?.username}
 							</Link>
 						) : null}
+
 						{postData.onChainInfo?.origin && (
 							<>
 								<span className='text-xs text-wallet_btn_text'>{t('Search.in')}</span>
 								<span className={`${getSpanStyle(postData.onChainInfo?.origin || '', 1)} ${classes.originStyle}`}>
 									{convertCamelCaseToTitleCase(postData.onChainInfo?.origin || '')}
 								</span>
-								<Separator
-									orientation='vertical'
-									className='h-3'
-								/>
 							</>
 						)}
-						{createdAt && <CreatedAtTime createdAt={createdAt} />}
-						{postData.tags && postData.tags.length > 0 && (
+
+						{createdAt && (
 							<>
 								<Separator
 									orientation='vertical'
 									className='h-3'
 								/>
-								<PostTags tags={postData.tags} />
+								<CreatedAtTime createdAt={createdAt} />
 							</>
 						)}
+
+						{postData.tags && postData.tags.length > 0 && (
+							<div className='flex items-center gap-x-2'>
+								<Separator
+									orientation='vertical'
+									className='h-3'
+								/>
+								<PostTags tags={postData.tags} />
+							</div>
+						)}
 					</div>
+
 					{postData?.onChainInfo?.beneficiaries && postData?.onChainInfo?.beneficiaries.length > 0 && (
 						<div className={classes.beneficiaryWrapper}>
 							<Separator
@@ -140,10 +161,11 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 								/>
 								<span className={classes.beneficiaryText}>{t('PostDetails.beneficiary')}:</span>
 							</div>
+
 							{postData.onChainInfo?.beneficiaries?.slice(0, 2).map((beneficiary) => (
 								<div
 									key={`${beneficiary.amount}-${beneficiary.address}-${beneficiary.assetId}`}
-									className='flex items-center gap-x-1'
+									className='flex flex-wrap items-center gap-x-1 gap-y-2'
 								>
 									<Address address={beneficiary.address} />
 									<span className='text-xs text-wallet_btn_text'>
@@ -151,6 +173,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 									</span>
 								</div>
 							))}
+
 							{postData?.onChainInfo?.beneficiaries?.length > 2 && (
 								<Tooltip>
 									<TooltipTrigger>
@@ -162,9 +185,12 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 										{postData?.onChainInfo?.beneficiaries?.slice(2).map((beneficiary) => (
 											<div
 												key={beneficiary.amount}
-												className='flex items-center gap-x-1'
+												className='flex flex-wrap items-center gap-x-1 gap-y-2'
 											>
-												<Address address={beneficiary.address} />
+												<Address
+													disableTooltip
+													address={beneficiary.address}
+												/>
 												<span className='text-xs text-wallet_btn_text'>
 													({formatBnBalance(beneficiary.amount, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network, beneficiary.assetId as EAssets)})
 												</span>
@@ -175,6 +201,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 							)}
 						</div>
 					)}
+
 					{postData?.onChainInfo?.voteMetrics && isModalOpen && (
 						<div className='flex items-center gap-x-2'>
 							<Separator
@@ -193,27 +220,11 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 					)}
 				</div>
 			</div>
-			<TabsList>
-				<TabsTrigger
-					className='uppercase'
-					value={EPostDetailsTab.DESCRIPTION}
-				>
-					{t('PostDetails.description')}
-				</TabsTrigger>
-				<TabsTrigger
-					className='uppercase'
-					value={EPostDetailsTab.TIMELINE}
-				>
-					{t('PostDetails.timeline')}
-				</TabsTrigger>
-				{!isOffchainPost && (
-					<TabsTrigger
-						className='uppercase'
-						value={EPostDetailsTab.ONCHAIN_INFO}
-					>
-						{t('PostDetails.onchainInfo')}
-					</TabsTrigger>
-				)}
+
+			<TabsList className={`mx-auto max-w-full overflow-auto pl-4 font-bold capitalize md:pl-0 ${classes.hideScrollbar}`}>
+				<TabsTrigger value={EPostDetailsTab.DESCRIPTION}>{t('PostDetails.description')}</TabsTrigger>
+				<TabsTrigger value={EPostDetailsTab.TIMELINE}>{t('PostDetails.timeline')}</TabsTrigger>
+				{!isOffchainPost && <TabsTrigger value={EPostDetailsTab.ONCHAIN_INFO}>{t('PostDetails.onchainInfo')}</TabsTrigger>}
 			</TabsList>
 		</div>
 	);

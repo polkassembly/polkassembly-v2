@@ -97,7 +97,7 @@
 	},
 	"AddressDropdown": {
 		"fallbackText": "Please select wallet",
-		"chooseLinkedAccount": "Choose Linked Account",
+		"chooseLinkedAccount": "Choose Account",
 		"noAccountsFound": "No Accounts Found",
 		"selectWallet": "Please Select Wallet",
 		"fetchingAddresses": "For fetching your addresses, Polkassembly needs access to your wallet extensions. Please authorize this transaction.",
@@ -240,6 +240,12 @@
 			"followed_user": "Followed User",
 			"unfollowed_user": "Unfollowed User"
 		},
+		"Posts": {
+			"posts": "Posts",
+			"discussions": "Discussions",
+			"openGov": "OpenGov",
+			"noData": "No posts found"
+		},
 		"overview": "Overview",
 		"onchainIdentity": "Onchain Identity",
 		"linkAddress": "Link Address",
@@ -291,6 +297,10 @@
 			"newEmail": "New Email",
 			"type": "Type",
 			"belowToConfirm": "below to confirm",
+			"appQrLogin": "App QR Login",
+			"scanToLoginInApp": "Scan to Login",
+			"generateQr": "Generate QR",
+			"appQrLoginDescription": "Scan through mobile app for direct access to your web3 account",
 			"TFA": {
 				"configuringGoogleAuthenticator": "Configuring Google Authenticator",
 				"installGoogleAuthenticator": "1. Install Google Authenticator (iOS/Android).",
@@ -424,6 +434,8 @@
 		}
 	},
 	"PostDetails": {
+		"save": "Save",
+		"edit": "Edit",
 		"castVote": "Cast Vote",
 		"castYourVote": "Cast Your Vote",
 		"loginToVote": "Login to Vote",
@@ -489,7 +501,14 @@
 			"fee": "Fee",
 			"parentBountyIndex": "Parent Bounty Index",
 			"payee": "Payee",
-			"curator": "Curator"
+			"curator": "Curator",
+			"proposer": "Proposer",
+			"createdAt": "Created At",
+			"createdAtBlock": "Created At Block",
+			"updatedAtBlock": "Updated At Block",
+			"enactmentAtBlock": "Enactment At Block",
+			"enactmentAfterBlock": "Enactment After Block",
+			"trackNumber": "Track Number"
 		},
 		"ProposalType": {
 			"discussion": "Discussion",
@@ -536,6 +555,18 @@
 			"decisionDeposit": "Decision Deposit",
 			"payDecisionDeposit": "Pay Decision Deposit",
 			"continue": "Continue"
+		},
+		"ClaimPayout": {
+			"claim": "Claim",
+			"index": "Index",
+			"beneficiary": "Beneficiary",
+			"amount": "Amount",
+			"expireIn": "Expires in",
+			"claimPayout": "Claim Payout",
+			"payoutClaimedSuccessfully": "Payout claimed successfully",
+			"payoutClaimFailed": "Payout claim failed",
+			"payoutClaimedSuccessfullyDescription": "Your payout has been claimed successfully",
+			"payoutClaimFailedDescription": "Please try again"
 		}
 	},
 	"ListingPage_Status": {
@@ -610,6 +641,7 @@
 		"curatorassigned": "Curator Assigned",
 		"curatorunassigned": "Curator Unassigned",
 		"curatorproposed": "Curator Proposed",
+		"tabled": "Tabled",
 		"undefined": "Undefined"
 	},
 	"Pagination": {
@@ -632,18 +664,45 @@
 		"voteSuccess": "Your vote has been cast successfully",
 		"voteFailed": "Your vote has not been cast successfully",
 		"voteSuccessTitle": "Vote Successful",
-		"voteFailedTitle": "Vote Failed"
+		"voteFailedTitle": "Vote Failed",
+		"delegatedPower": "Delegated Power",
+		"commentSuccessTitle": "Comment Added Successfully",
+		"commentSuccess": "Your comment has been added successfully",
+		"voted": "Voted",
+		"successfully": "successfully",
+		"with": "with",
+		"yourVoteIsIn": "Your vote is in! Mind sharing why you support this in a comment?",
+		"your": "Your",
+		"voteIsIn": "vote is in! Mind sharing why you support this in a comment?"
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance",
-		"balance": "Balance"
+		"Balance": "Balance",
+		"PeopleChainBalance": "People Chain Balance"
 	},
 	"EditPost": {
 		"edit": "Edit",
 		"title": "Title",
 		"content": "Content",
 		"save": "Save",
-		"editPostButton": "Edit"
+		"editPostButton": "Edit",
+		"success": "Post updated successfully",
+		"successDescription": "Your post has been updated successfully",
+		"error": "Failed to update post",
+		"errorDescription": "There was an error while updating your post"
+	},
+	"LinkDiscussionPost": {
+		"linkDiscussion": "Link Discussion",
+		"noDiscussionsFound": "We couldn't find any discussion to be linked!",
+		"noPostFound": "No post found",
+		"notAuthorized": "You are not authorized to link this post.",
+		"discussionPostLinkedSuccessfully": "Discussion post linked successfully",
+		"theDiscussionPostHasBeenLinkedToTheProposal": "The discussion post has been linked to the proposal",
+		"errorLinkingDiscussionPost": "Error linking discussion post",
+		"pleaseTryAgain": "Please try again",
+		"pasteURLorEnterPostID": "Paste URL or Enter Post ID",
+		"yourDiscussions": "Your Discussions",
+		"confirm": "Confirm"
 	},
 	"Footer": {
 		"helpCenter": "Help Center",
@@ -672,7 +731,15 @@
 		"close": "Close",
 		"showAll": "Show All",
 		"searchByHash": "Search by hash",
-		"preimageNotFound": "Preimage not found"
+		"preimageNotFound": "Preimage not found",
+		"unrequested": "Unrequested",
+		"unrequested_description": "The preimage has been unrequested",
+		"unnoted": "Unnoted",
+		"unnoted_description": "The preimage has been unnoted",
+		"failed": "Failed",
+		"unrequest": "Unrequest",
+		"unnote": "Unnote",
+		"unnoteOrUnrequestPreimageDescription": "Are you sure you want to unnote or unrequest this preimage?"
 	},
 	"Create": {
 		"createDiscussionTitle": "Create Discussion",
@@ -709,7 +776,8 @@
 			"fellowship": "Fellowship",
 			"council": "Council",
 			"democracy": "Democracy",
-			"whitelist": "Whitelist"
+			"whitelist": "Whitelist",
+			"technicalcommittee": "Technical Committee"
 		},
 		"please": "Please",
 		"login": "Login",
@@ -936,7 +1004,14 @@
 		"stepDescriptionCancelReferendum": "Propose to cancel an active referendum.",
 		"stepDescriptionTreasuryProposal": "Propose treasury spending in DOT.",
 		"stepDescriptionUsdxProposal": "Creates a preimage and proposal to spend assets. The spend must be claimed.",
-		"stepDescriptionCreatePreimage": "A preimage is the encoded call data (e.g., a runtime upgrade or treasury spend) associated with a proposal."
+		"stepDescriptionCreatePreimage": "A preimage is the encoded call data (e.g., a runtime upgrade or treasury spend) associated with a proposal.",
+		"Congratulations": "Congratulations!",
+		"proposal": "Proposal",
+		"createdSuccessfully": "created successfully!",
+		"redirectingToProposal": "Redirecting to proposal...",
+		"addContextToProposal": "Add Context to Proposal",
+		"redirectingToPost": "Redirecting to post...",
+		"discussion": "Discussion"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",
@@ -956,7 +1031,9 @@
 		"validFrom": "Valid From",
 		"addValidFrom": "Add Valid From",
 		"invalidBlockHeight": "Please enter a valid block height",
-		"enterFutureBlockHeight": "Please enter a future block height"
+		"enterFutureBlockHeight": "Please enter a future block height",
+		"invalidParameters": "Invalid parameters",
+		"invalidParametersDescription": "Please check the parameters and try again"
 	},
 	"CreatePreimage": {
 		"addItem": "Add Beneficiary/Payouts",
@@ -973,7 +1050,13 @@
 		"length": "Length",
 		"beneficiary": "Beneficiary",
 		"noBeneficiarySelected": "No Beneficiary Selected",
-		"on": "on"
+		"on": "on",
+		"Congratulations": "Congratulations!",
+		"createProposalFromPreimage": "You can now create a proposal from the preimage",
+		"CreateProposal": "Create Proposal",
+		"goBack": "Go Back",
+		"Preimage": "Preimage",
+		"createSuccessfully": "created successfully!"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "Bounty proposed successfully",
@@ -981,7 +1064,13 @@
 		"bountyProposalFailed": "Failed to propose bounty",
 		"bountyProposalFailedDescription": "There was an error while proposing the bounty",
 		"bountyAmount": "Bounty Amount",
-		"proposeBounty": "Propose Bounty"
+		"proposeBounty": "Propose Bounty",
+		"enterBountyId": "Enter the bounty ID",
+		"yes": "Yes",
+		"no": "No",
+		"createProposal": "Create Proposal",
+		"haveYouCreatedABountyAlready": "Have you created a bounty already?",
+		"yourAreNotTheProposer": "You are not the proposer of this bounty"
 	},
 	"KillCancelReferendum": {
 		"referendumId": "Enter Referendum Index",

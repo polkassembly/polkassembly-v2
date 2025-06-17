@@ -29,7 +29,7 @@ import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddres
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
 
-function KillReferendum() {
+function KillReferendum({ onSuccess }: { onSuccess: (proposalId: number) => void }) {
 	const t = useTranslations();
 
 	const network = getCurrentNetwork();
@@ -112,6 +112,7 @@ function KillReferendum() {
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: ENotificationStatus.SUCCESS
 				});
+				onSuccess(postId);
 				window.location.href = `/referenda/${postId}?created=true`;
 			},
 			onFailed: () => {
@@ -143,7 +144,7 @@ function KillReferendum() {
 						<Skeleton className='h-4 w-full' />
 					) : (
 						data &&
-						(canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt) ? (
+						(canVote(data?.onChainInfo?.status) ? (
 							<div className='flex items-center gap-x-4 rounded-lg bg-bg_pink/10 px-4 py-2 text-sm font-medium text-text_primary'>
 								<span>#{data.index}</span>
 								<span className='flex-1 truncate'>{data.title}</span>
@@ -202,7 +203,7 @@ function KillReferendum() {
 						!selectedEnactment ||
 						!data ||
 						!ValidatorService.isValidNumber(data.index) ||
-						!canVote(data?.onChainInfo?.status, data?.onChainInfo?.preparePeriodEndsAt) ||
+						!canVote(data?.onChainInfo?.status) ||
 						!batchCallTx
 					}
 				>

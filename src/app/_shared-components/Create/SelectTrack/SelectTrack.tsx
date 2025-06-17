@@ -4,7 +4,7 @@
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { ENetwork, EPostOrigin } from '@/_shared/types';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
@@ -57,9 +57,9 @@ function SelectTrack({
 
 	const sortedTracks = useMemo(() => getSortedTracks(trackArr, network), [trackArr, network]);
 
-	const appropriateTrack = useMemo(() => {
+	useEffect(() => {
 		if (!requestedAmount || requestedAmount.isZero()) {
-			return selectedTrack;
+			return;
 		}
 
 		const suitableTrack = sortedTracks.find((tr) => {
@@ -72,23 +72,16 @@ function SelectTrack({
 		if (trackToUse) {
 			onChange(trackToUse);
 		}
-
-		return trackToUse;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [network, requestedAmount, sortedTracks]);
-
-	const formatTrackDisplay = useMemo(() => {
-		if (!appropriateTrack) {
-			return t('CreateTreasuryProposal.selectTrack');
-		}
-		return `[${appropriateTrack.trackId}] ${convertCamelCaseToTitleCase(appropriateTrack.name)}`;
-	}, [appropriateTrack, t]);
+	}, [requestedAmount]);
 
 	return (
 		<div className='flex flex-col gap-y-1'>
 			<p className='text-xs text-wallet_btn_text sm:text-sm'>{t('CreateTreasuryProposal.track')}</p>
 			<DropdownMenu>
-				<DropdownMenuTrigger className='text-sm font-medium text-text_primary'>{formatTrackDisplay}</DropdownMenuTrigger>
+				<DropdownMenuTrigger className='text-sm font-medium text-text_primary'>
+					{!selectedTrack ? t('CreateTreasuryProposal.selectTrack') : `[${selectedTrack.trackId}] ${convertCamelCaseToTitleCase(selectedTrack.name)}`}
+				</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					{sortedTracks.map((tr) => (
 						<DropdownMenuItem

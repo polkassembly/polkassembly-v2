@@ -4,7 +4,6 @@
 
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { EAllowedCommentor, ENetwork, EProposalType, IPostLink } from '@/_shared/types';
-import { AIService } from '../_api-services/ai_service';
 import { OffChainDbService } from '../_api-services/offchain_db_service';
 import { RedisService } from '../_api-services/redis_service';
 
@@ -51,13 +50,16 @@ export async function updatePostServer({
 		});
 	}
 
-	await AIService.UpdatePostSummary({ network, proposalType, indexOrHash });
+	// delete post summary and invalidate cache
+	await OffChainDbService.DeleteContentSummary({ network, proposalType, indexOrHash });
 
 	// Invalidate caches
-	await RedisService.DeletePostData({ network, proposalType, indexOrHash });
-	await RedisService.DeletePostsListing({ network, proposalType });
-	await RedisService.DeleteContentSummary({ network, indexOrHash, proposalType });
-	await RedisService.DeleteActivityFeed({ network });
-	await RedisService.DeleteAllSubscriptionFeedsForNetwork(network);
-	await RedisService.DeleteDelegationStats(network);
+	Promise.all([
+		RedisService.DeletePostData({ network, proposalType, indexOrHash }),
+		RedisService.DeletePostsListing({ network, proposalType }),
+		RedisService.DeleteContentSummary({ network, indexOrHash, proposalType }),
+		RedisService.DeleteActivityFeed({ network }),
+		RedisService.DeleteAllSubscriptionFeedsForNetwork(network),
+		RedisService.DeleteOverviewPageData({ network })
+	]);
 }

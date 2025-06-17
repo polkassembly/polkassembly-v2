@@ -19,7 +19,7 @@
 }
 
 .beneficiaryWrapper {
-	@apply flex flex-wrap items-center gap-x-2;
+	@apply flex flex-wrap items-center gap-x-2 gap-y-2;
 }
 
 .beneficiaryText {
@@ -27,9 +27,18 @@
 }
 
 .beneficiaryTooltipContent {
-	@apply flex flex-col gap-y-2 bg-bg_modal shadow-lg;
+	@apply flex max-h-[300px] flex-col gap-y-2 overflow-y-auto bg-bg_modal shadow-lg;
 }
 
 .originStyle {
 	@apply whitespace-normal break-words rounded-md px-1.5 py-1 text-[10px] lg:text-xs;
+}
+
+.hideScrollbar {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+	&::-webkit-scrollbar {
+		/* Chrome, Safari and Opera */
+		display: none;
+	}
 }

@@ -4,8 +4,8 @@
 
 'use client';
 
-import { EProposalType, ICommentResponse, IComment, IPublicUser } from '@/_shared/types';
-import { Dispatch, SetStateAction, useCallback, memo, useState } from 'react';
+import { EProposalType, ICommentResponse, IComment, IPublicUser, ENotificationStatus } from '@/_shared/types';
+import { Dispatch, SetStateAction, useCallback, memo, useState, useRef } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
 import Image from 'next/image';
@@ -21,11 +21,16 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import UserIcon from '@assets/profile/user-icon.svg';
 import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { EVM_NETWORKS } from '@/_shared/_constants/evmNetworks';
+import { MDXEditorMethods } from '@mdxeditor/editor';
+import { useToast } from '@/hooks/useToast';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import VoteComments from '../VoteComments/VoteComments';
+import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 
 interface SingleCommentProps {
 	commentData: ICommentResponse;
@@ -42,11 +47,31 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 	const [loading, setLoading] = useState<boolean>(false);
 	const [openDeleteModal, setOpenDeleteModal] = useState<boolean>(false);
 
+	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
+
+	const [isEditing, setIsEditing] = useState<boolean>(false);
+	const [content, setContent] = useState<string>(commentData.content);
+
 	const user = useAtomValue(userAtom);
 
+	const { toast } = useToast();
+
+	const toggleEditComment = useCallback(() => {
+		if (!user || !comment || user.id !== comment.userId) {
+			return;
+		}
+
+		setIsEditing((prev) => !prev);
+	}, [comment, user]);
+
 	const handleDeleteComment = useCallback(async () => {
-		if (!user || !comment || user.id !== comment.user.id) {
-			throw new ClientError('You are not the owner of this comment');
+		if (!user || !comment || user.id !== comment.userId) {
+			toast({
+				title: 'Failed!',
+				description: 'You are not the owner of this comment',
+				status: ENotificationStatus.ERROR
+			});
+			return;
 		}
 
 		setLoading(true);
@@ -75,7 +100,65 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 		} else {
 			setComment(null);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [comment, index, proposalType, setParentComment, user]);
+
+	const handleEditComment = useCallback(async () => {
+		if (!user || !comment || user.id !== comment.userId) {
+			toast({
+				title: 'Failed!',
+				description: 'You are not the owner of this comment',
+				status: ENotificationStatus.ERROR
+			});
+			return;
+		}
+
+		// Store original content for rollback if needed
+		const originalContent = comment.content;
+		const originalUpdatedAt = comment.updatedAt;
+
+		// Optimistically update the comment content
+		setComment((prev) => {
+			if (!prev) return null;
+			return {
+				...prev,
+				content,
+				updatedAt: new Date()
+			};
+		});
+		setIsEditing(false);
+
+		setLoading(true);
+
+		const { data, error } = await CommentClientService.editCommentFromPost({
+			id: comment.id,
+			proposalType,
+			index,
+			content
+		});
+
+		setLoading(false);
+
+		if (error || !data) {
+			// Revert to original content if the API call failed
+			setComment((prev) => {
+				if (!prev) return null;
+				return {
+					...prev,
+					content: originalContent,
+					updatedAt: originalUpdatedAt || comment.createdAt
+				};
+			});
+
+			toast({
+				title: 'Failed!',
+				description: error?.message || 'Failed to edit comment',
+				status: ENotificationStatus.ERROR
+			});
+		}
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [comment, content, index, proposalType, user]);
 
 	const handleCloseDeleteModal = useCallback(() => setOpenDeleteModal(false), []);
 	const handleOpenDeleteModal = useCallback(() => setOpenDeleteModal(true), []);
@@ -84,7 +167,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 
 	const handleCancelReply = useCallback(() => setReply(false), []);
 
-	const handleConfirmReply = useCallback((newComment: IComment, publicUser: Omit<IPublicUser, 'rank'>) => {
+	const handleConfirmReply = useCallback((newComment: IComment, publicUser: IPublicUser) => {
 		setComment((prev) => {
 			if (!prev) return null;
 			return {
@@ -93,7 +176,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 					...(prev.children || []),
 					{
 						...newComment,
-						user: publicUser
+						publicUser
 					}
 				]
 			};
@@ -105,6 +188,11 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 	if (!comment) {
 		return null;
 	}
+
+	const network = getCurrentNetwork();
+	const userAddresses = !EVM_NETWORKS.includes(network) ? comment?.publicUser?.addresses?.filter((address) => !address.startsWith('0x')) : comment?.publicUser?.addresses;
+
+	const addressToDisplay = userAddresses?.[0] || comment?.publicUser?.addresses?.[0];
 
 	return (
 		<div className={classes.wrapper}>
@@ -134,15 +222,15 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 				</DialogContent>
 			</Dialog>
 			<div>
-				{comment.user.addresses[0] ? (
+				{addressToDisplay ? (
 					<Identicon
 						size={30}
-						value={comment.user.addresses[0]}
+						value={addressToDisplay}
 						theme='polkadot'
 					/>
-				) : comment.user.profileDetails?.image ? (
+				) : comment?.publicUser?.profileDetails?.image ? (
 					<Image
-						src={comment.user.profileDetails.image}
+						src={comment.publicUser.profileDetails.image}
 						alt='profile'
 						className='rounded-full'
 						width={30}
@@ -159,22 +247,22 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 				)}
 			</div>
 			<div className={classes.innerWrapper}>
-				<div className='flex items-center gap-x-2'>
+				<div className='flex flex-wrap items-center gap-x-2 gap-y-2'>
 					<span className={classes.username}>
-						{comment.user.addresses[0] ? (
+						{addressToDisplay ? (
 							<Address
-								address={comment.user.addresses[0]}
+								address={addressToDisplay}
 								showIdenticon={false}
 							/>
 						) : (
-							<span className='text-text_primary'>{comment.user.username}</span>
+							<span className='text-text_primary'>{comment?.publicUser?.username}</span>
 						)}
 					</span>
 					<Separator
 						orientation='vertical'
 						className='h-3'
 					/>
-					<CreatedAtTime createdAt={comment.createdAt} />
+					<CreatedAtTime createdAt={comment.updatedAt || comment.createdAt} />
 					{comment.voteData && comment.voteData.length > 0 && (
 						<>
 							<Separator
@@ -185,10 +273,39 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 						</>
 					)}
 				</div>
-				<MarkdownViewer
-					markdown={comment.content}
-					className={classes.editor}
-				/>
+				{isEditing ? (
+					<div>
+						<div className='mb-2'>
+							<MarkdownEditor
+								markdown={comment.content}
+								ref={markdownEditorRef}
+								onChange={(newContent) => setContent(newContent)}
+							/>
+						</div>
+						<div className='flex w-full items-center justify-end gap-x-2'>
+							<Button
+								variant='secondary'
+								onClick={toggleEditComment}
+								disabled={loading}
+							>
+								{t('PostDetails.cancel')}
+							</Button>
+							<Button
+								className={classes.postBtn}
+								onClick={handleEditComment}
+								disabled={!content?.trim()}
+								isLoading={loading}
+							>
+								{t('PostDetails.save')}
+							</Button>
+						</div>
+					</div>
+				) : (
+					<MarkdownViewer
+						markdown={comment.content}
+						className={classes.editor}
+					/>
+				)}
 
 				{user && (
 					<div className={classes.tools}>
@@ -220,10 +337,22 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 										/>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent>
-										<DropdownMenuItem>
+										<DropdownMenuItem className='hover:bg-bg_pink/10'>
 											<Button
 												variant='ghost'
-												className='p-0 text-sm text-text_primary'
+												className='h-auto p-0 text-sm text-text_primary'
+												disabled={comment.userId !== user.id}
+												onClick={toggleEditComment}
+												size='sm'
+												isLoading={loading}
+											>
+												{t('PostDetails.edit')}
+											</Button>
+										</DropdownMenuItem>
+										<DropdownMenuItem className='hover:bg-bg_pink/10'>
+											<Button
+												variant='ghost'
+												className='h-auto p-0 text-sm text-text_primary'
 												disabled={comment.userId !== user.id}
 												onClick={handleOpenDeleteModal}
 												size='sm'
@@ -247,7 +376,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 						onCancel={handleCancelReply}
 						onConfirm={handleConfirmReply}
 						isReply
-						replyTo={comment?.user}
+						replyTo={comment?.publicUser}
 					/>
 				)}
 

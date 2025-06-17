@@ -7,16 +7,24 @@ import { Pencil } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 import { Button } from '../../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import EditPost from './EditPost';
 
-function EditPostButton({ postData, onEditPostSuccess }: { postData: IPostListing | IPost; onEditPostSuccess: (title: string, content: string) => void }) {
+function EditPostButton({ postData, className }: { postData: IPostListing | IPost; className?: string }) {
 	const t = useTranslations();
 	const { user } = useUser();
 	const [isOpen, setIsOpen] = useState(false);
 
-	if (!user || !user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || '')) return null;
+	const canEditOffChain = user && user.id === postData.userId;
+
+	const proposerAddress = postData.onChainInfo?.proposer && getSubstrateAddress(postData.onChainInfo?.proposer);
+	const canEditOnChain = user && proposerAddress && user.addresses.includes(proposerAddress);
+
+	const canEdit = canEditOffChain || canEditOnChain;
+
+	if (!canEdit) return null;
 	return (
 		<Dialog
 			open={isOpen}
@@ -26,9 +34,9 @@ function EditPostButton({ postData, onEditPostSuccess }: { postData: IPostListin
 				<Button
 					variant='ghost'
 					size='sm'
-					className='bg-grey_bg text-xs font-medium text-wallet_btn_text'
+					className={cn('bg-grey_bg text-xs font-medium text-wallet_btn_text', className)}
 					leftIcon={<Pencil size={16} />}
-					disabled={!user || !user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || '')}
+					disabled={!canEdit}
 				>
 					{t('EditPost.editPostButton')}
 				</Button>
@@ -40,7 +48,6 @@ function EditPostButton({ postData, onEditPostSuccess }: { postData: IPostListin
 				<div className='max-w-3xl'>
 					<EditPost
 						postData={postData}
-						onEditPostSuccess={onEditPostSuccess}
 						onClose={() => setIsOpen(false)}
 					/>
 				</div>

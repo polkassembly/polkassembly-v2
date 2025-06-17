@@ -18,7 +18,8 @@ export default function OverviewHeading() {
 			<Button
 				variant='secondary'
 				onClick={() => router.push('/activity-feed')}
-				rightIcon={<RefreshCw className='h-4 w-4' />}
+				rightIcon={<RefreshCw className='hidden h-4 w-4 md:block' />}
+				size='sm'
 			>
 				{t('switchToActivityFeed')}
 			</Button>

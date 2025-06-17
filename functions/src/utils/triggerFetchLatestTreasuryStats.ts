@@ -13,9 +13,8 @@ export async function triggerFetchLatestTreasuryStats({ toolsPassphrase }: { too
 			try {
 				logger.info(`Fetching treasury stats for network: ${network}`);
 
-				// TODO: `https://${network}.polkassembly.io/api/v2/meta/treasury-stats`,
 				const response = await axios.post(
-					'https://test.polkassembly.io/api/v2/meta/treasury-stats',
+					`https://${network}.polkassembly.io/api/v2/meta/treasury-stats`,
 					{}, // Empty body
 					{
 						headers: {

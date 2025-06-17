@@ -9,12 +9,29 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { Metadata } from 'next';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 import DelegationTrack from './Component/DelegationTrack/DelegationTrack';
 
 interface Props {
 	params: Promise<{ track: string }>;
 }
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+	const { track } = await params;
+	const network = await getNetworkFromHeaders();
+	const { title } = OPENGRAPH_METADATA;
+
+	return getGeneratedContentMetadata({
+		title: `${title} - Delegation Track`,
+		description: 'Track your delegation on Polkassembly',
+		network,
+		url: `https://${network}.polkassembly.io/delegation/${track}`,
+		imageAlt: 'Polkassembly Delegation Track'
+	});
+}
 async function DelegationTrackPage({ params }: Props) {
 	const { track } = await params;
 	const user = await CookieService.getUserFromCookie();

@@ -1,9 +1,9 @@
 .headerWrapper {
-	@apply w-full bg-bg_modal px-4 pt-6 shadow-lg lg:px-16;
+	@apply w-full max-w-[100vw] bg-bg_modal px-4 pt-6 shadow-lg lg:px-16;
 }
 
 .detailsWrapper {
-	@apply grid w-full gap-4 px-4 py-6 lg:px-16;
+	@apply grid w-full gap-4 px-0 py-6 lg:px-16;
 }
 
 .leftWrapper {
@@ -15,7 +15,7 @@
 }
 
 .descBox {
-	@apply rounded-xl bg-bg_modal p-6 shadow-lg;
+	@apply rounded-none bg-bg_modal p-4 shadow-lg lg:rounded-xl lg:p-6;
 }
 
 .commentsBox {

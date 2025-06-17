@@ -1,59 +1,55 @@
 .popoverContent {
-    @apply max-w-lg border-none bg-[var(--sidebar-primary-foreground)] p-6 shadow-lg !important;
-}
-
-.tooltipContent {
-    @apply rounded-md bg-gray-800 px-2 py-1 text-white shadow-lg;
+	@apply max-w-lg border-none bg-[var(--sidebar-primary-foreground)] p-6 shadow-lg !important;
 }
 
 .closeButton {
-    @apply cursor-pointer text-base font-medium text-text_pink;
+	@apply cursor-pointer text-base font-medium text-text_pink;
 }
 
 .modalContent {
-    @apply max-h-[60vh] w-full overflow-auto;
+	@apply max-h-[60vh] w-full overflow-auto;
 }
 
 .modalContent_title {
-    @apply text-xl font-semibold text-navbar_title;
+	@apply text-xl font-semibold text-navbar_title;
 }
 
 .mdlisticon {
-    @apply cursor-pointer text-lg text-wallet_btn_text hover:text-text_pink;
+	@apply cursor-pointer text-lg text-wallet_btn_text hover:text-text_pink;
 }
 
 .tableRow {
-    @apply overflow-hidden rounded-t-lg bg-page_background px-6;
+	@apply overflow-hidden rounded-t-lg bg-page_background px-6;
 }
 
 .tableCell_1 {
-    @apply p-6 first:rounded-tl-lg last:rounded-tr-lg
+	@apply p-6 first:rounded-tl-lg last:rounded-tr-lg;
 }
 
 .tableCell_last {
-    @apply p-6 last:rounded-tr-lg
+	@apply p-6 last:rounded-tr-lg;
 }
 
 .tableCell_2 {
-    @apply w-1/4 px-6 py-5;
+	@apply w-1/4 px-6 py-5;
 }
 
 .tableCell {
-    @apply p-6;
+	@apply p-6;
 }
 
 .table_content_cell {
-    @apply flex items-center gap-3 mt-3 min-w-44
+	@apply mt-3 flex min-w-44 items-center gap-3;
 }
 
 .table_content_cell_1 {
-    @apply cursor-pointer text-base text-wallet_btn_text;
+	@apply cursor-pointer text-base text-wallet_btn_text;
 }
 
 .table_content_cell_2 {
-    @apply flex items-center gap-3 mt-3;
+	@apply mt-3 flex items-center gap-3;
 }
 
 .table_content_cell_2_content {
-    @apply rounded-lg bg-wallet_disabled_bg px-2 py-1;
+	@apply rounded-lg bg-wallet_disabled_bg px-2 py-1;
 }

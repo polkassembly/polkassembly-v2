@@ -24,7 +24,7 @@ import { dayjs } from '@shared/_utils/dayjsInit';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
 
-function TreasuryProposalLocal() {
+function TreasuryProposalLocal({ onSuccess }: { onSuccess: (proposalId: number) => void }) {
 	const t = useTranslations();
 	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact' });
 
@@ -93,6 +93,7 @@ function TreasuryProposalLocal() {
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: ENotificationStatus.SUCCESS
 				});
+				onSuccess(postId);
 				window.location.href = `/referenda/${postId}?created=true`;
 			},
 			onFailed: () => {
