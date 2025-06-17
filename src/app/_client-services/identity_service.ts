@@ -232,7 +232,7 @@ export class IdentityService {
 			.catch((error: unknown) => {
 				console.log(':( transaction failed');
 				setStatus?.(':( transaction failed');
-				console.log(error?.toString?.(), 'error?.toString?.()', errorMessageFallback, 'errorMessageFallback22');
+				console.log(error?.toString?.(), 'error?.toString?.()', errorMessageFallback);
 				onFailed(error?.toString?.() || errorMessageFallback);
 				console.error('ERROR:', error);
 			});
