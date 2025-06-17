@@ -710,6 +710,17 @@
 		"titleTooShort": "Por favor proporciona un título válido.",
 		"titlePlaceholder": "Ingresa el título",
 		"descriptionRequired": "Por favor proporciona una descripción válida.",
+		"UploadImage": {
+			"uploadImage": "Cargar Imagen",
+			"uploadFromDevice": "Cargar desde dispositivo",
+			"addFromURL": "Agregar desde URL",
+			"alt": "Alt",
+			"title": "Título",
+			"save": "Guardar",
+			"cancel": "Cancelar",
+			"insertImage": "Insertar Imagen",
+			"failedToUploadImage": "Error al cargar la imagen"
+		},
 		"AllowedCommentors": {
 			"title": "¿Quién puede comentar?",
 			"all": "Todos",

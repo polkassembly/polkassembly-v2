@@ -709,6 +709,17 @@
 		"titleTooShort": "有効なタイトルを入力してください。",
 		"titlePlaceholder": "タイトルを入力",
 		"descriptionRequired": "有効な説明を入力してください。",
+		"UploadImage": {
+			"uploadImage": "画像をアップロード",
+			"uploadFromDevice": "デバイスからアップロード",
+			"addFromURL": "URLから追加",
+			"alt": "代替テキスト",
+			"title": "タイトル",
+			"save": "保存",
+			"cancel": "キャンセル",
+			"insertImage": "画像を挿入",
+			"failedToUploadImage": "画像のアップロードに失敗しました"
+		},
 		"AllowedCommentors": {
 			"title": "誰がコメントできますか？",
 			"all": "全員",
