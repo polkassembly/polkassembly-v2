@@ -709,6 +709,17 @@
 		"titleTooShort": "请提供有效的标题。",
 		"titlePlaceholder": "输入标题",
 		"descriptionRequired": "请提供有效的描述。",
+		"UploadImage": {
+			"uploadImage": "上传图片",
+			"uploadFromDevice": "从设备上传",
+			"addFromURL": "从URL添加",
+			"alt": "替代文本",
+			"title": "标题",
+			"save": "保存",
+			"cancel": "取消",
+			"insertImage": "插入图片",
+			"failedToUploadImage": "上传图片失败"
+		},
 		"AllowedCommentors": {
 			"title": "谁可以评论？",
 			"all": "所有人",
