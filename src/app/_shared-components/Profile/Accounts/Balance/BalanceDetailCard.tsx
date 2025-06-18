@@ -21,10 +21,8 @@ function BalanceDetailCard({ title, balance, icon }: { title: string; balance: s
 				height={48}
 			/>
 			<div className={classes.balanceDetailCardContent}>
-				<div className={classes.balanceDetailCardContentItem}>
-					<p className={classes.balanceDetailCardContentTitle}>{t(`Profile.${title}`)}</p>
-					<div className={classes.balanceDetailCardContentText}>{formatBnBalance(balance, { numberAfterComma: 2, withUnit: true }, network)}</div>
-				</div>
+				<p className={classes.balanceDetailCardContentTitle}>{t(`Profile.${title}`)}</p>
+				<div className={classes.balanceDetailCardContentText}>{formatBnBalance(balance, { numberAfterComma: 2, withUnit: true }, network)}</div>
 			</div>
 		</div>
 	);

@@ -19,15 +19,11 @@
 }
 
 .balanceDetailCard {
-	@apply flex items-center gap-x-4;
+	@apply flex items-center gap-x-2;
 }
 
 .balanceDetailCardContent {
-	@apply flex flex-col gap-y-2;
-}
-
-.balanceDetailCardContentItem {
-	@apply flex flex-col gap-y-1;
+	@apply flex flex-col;
 }
 
 .balanceDetailCardContentTitle {
