@@ -537,7 +537,9 @@
 			"payoutClaimFailed": "Auszahlung konnte nicht beansprucht werden",
 			"payoutClaimedSuccessfullyDescription": "Ihre Auszahlung wurde erfolgreich beansprucht",
 			"payoutClaimFailedDescription": "Bitte versuchen Sie es erneut"
-		}
+		},
+		"commentsDisabled": "Die Kommentare wurden für diesen Beitrag deaktiviert.",
+		"commentsDisabledForNonVerifiedUsers": "Kommentare wurden für nicht verifizierte Benutzer deaktiviert."
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",
@@ -653,7 +655,8 @@
 		"success": "Beitrag erfolgreich aktualisiert",
 		"successDescription": "Ihr Beitrag wurde erfolgreich aktualisiert",
 		"error": "Beitrag konnte nicht aktualisiert werden",
-		"errorDescription": "Beim Aktualisieren Ihres Beitrags ist ein Fehler aufgetreten"
+		"errorDescription": "Beim Aktualisieren Ihres Beitrags ist ein Fehler aufgetreten",
+		"whoCanComment": "Wer kann kommentieren?"
 	},
 	"Footer": {
 		"helpCenter": "Hilfezentrum",

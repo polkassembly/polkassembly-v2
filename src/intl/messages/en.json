@@ -483,6 +483,8 @@
 		"aiSummary": "AI Summary",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
+		"commentsDisabled": "Comments have been disabled for this post.",
+		"commentsDisabledForNonVerifiedUsers": "Comments have been disabled for non verified users.",
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",
@@ -684,6 +686,7 @@
 		"edit": "Edit",
 		"title": "Title",
 		"content": "Content",
+		"whoCanComment": "Who can comment?",
 		"save": "Save",
 		"editPostButton": "Edit",
 		"success": "Post updated successfully",
