@@ -3,20 +3,17 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import React, { useEffect, useState } from 'react';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
-import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Separator } from '@/app/_shared-components/Separator';
 import { UnlockKeyhole } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import Image from 'next/image';
 import TransferableIcon from '@/_assets/icons/tranferable-balance.svg';
 import LockedIcon from '@/_assets/icons/locked-balance.svg';
 import ReservedIcon from '@/_assets/icons/reserved-balance.svg';
 import classes from './Balance.module.scss';
+import BalanceDetailCard from './BalanceDetailCard';
 
 interface IBalanceDetails {
-	freeBalance: string;
 	lockedBalance: string;
 	reservedBalance: string;
 	transferableBalance: string;
@@ -25,10 +22,8 @@ interface IBalanceDetails {
 function Balance({ address }: { address: string }) {
 	const t = useTranslations();
 	const { apiService } = usePolkadotApiService();
-	const network = getCurrentNetwork();
 
 	const [balanceDetails, setBalanceDetails] = useState<IBalanceDetails>({
-		freeBalance: '0',
 		lockedBalance: '0',
 		reservedBalance: '0',
 		transferableBalance: '0'
@@ -40,12 +35,11 @@ function Balance({ address }: { address: string }) {
 		setLoading(true);
 
 		(async () => {
-			const { freeBalance, lockedBalance, reservedBalance, transferableBalance } = await apiService.getUserBalances({
+			const { lockedBalance, reservedBalance, transferableBalance } = await apiService.getUserBalances({
 				address
 			});
 
 			setBalanceDetails({
-				freeBalance: freeBalance.toString(),
 				lockedBalance: lockedBalance.toString(),
 				reservedBalance: reservedBalance.toString(),
 				transferableBalance: transferableBalance.toString()
@@ -67,64 +61,39 @@ function Balance({ address }: { address: string }) {
 					{t('Profile.unlock')} {t('Profile.in')} {t('Profile.days')} {t('Profile.hours')}
 				</button>
 			</div>
-			<div className={classes.accountWrapper}>
-				<div className={classes.accountDetails}>
-					<Image
-						src={TransferableIcon}
-						alt='transferable'
-						width={48}
-						height={48}
-					/>
-					<div className={classes.accountBalance}>
-						<div className={classes.accountBalanceWrapper}>
-							<p className={classes.accountBalanceTitle}>{t('Profile.transferable')}</p>
-							<div className={classes.accountBalanceText}>
-								{loading ? <Skeleton className='h-4 w-5' /> : formatBnBalance(balanceDetails.transferableBalance, { numberAfterComma: 2, withUnit: true }, network)}
-							</div>
-						</div>
-					</div>
+			{loading ? (
+				<div className={classes.balanceDetailCardWrapper}>
+					<Skeleton className='h-8 w-full' />
+					<Skeleton className='h-8 w-full' />
+					<Skeleton className='h-8 w-full' />
 				</div>
-				<Separator
-					orientation='horizontal'
-					className='h-px w-full bg-border_grey'
-				/>
-				<div className={classes.accountDetails}>
-					<Image
-						src={LockedIcon}
-						alt='locked'
-						width={48}
-						height={48}
+			) : (
+				<div className={classes.balanceDetailCardWrapper}>
+					<BalanceDetailCard
+						title='transferable'
+						balance={balanceDetails.transferableBalance}
+						icon={TransferableIcon}
 					/>
-					<div className={classes.accountBalance}>
-						<div className={classes.accountBalanceWrapper}>
-							<p className={classes.accountBalanceTitle}>{t('Profile.locked')}</p>
-							<div className={classes.accountBalanceText}>
-								{loading ? <Skeleton className='h-4 w-5' /> : formatBnBalance(balanceDetails.lockedBalance, { numberAfterComma: 2, withUnit: true }, network)}
-							</div>
-						</div>
-					</div>
-				</div>
-				<Separator
-					orientation='horizontal'
-					className='h-px w-full bg-border_grey'
-				/>
-				<div className={classes.accountDetails}>
-					<Image
-						src={ReservedIcon}
-						alt='reserved'
-						width={48}
-						height={48}
+					<Separator
+						orientation='horizontal'
+						className='h-px w-full bg-border_grey'
 					/>
-					<div className={classes.accountBalance}>
-						<div className={classes.accountBalanceWrapper}>
-							<p className={classes.accountBalanceTitle}>{t('Profile.reserved')}</p>
-							<div className={classes.accountBalanceText}>
-								{loading ? <Skeleton className='h-4 w-5' /> : formatBnBalance(balanceDetails.reservedBalance, { numberAfterComma: 2, withUnit: true }, network)}
-							</div>
-						</div>
-					</div>
+					<BalanceDetailCard
+						title='locked'
+						balance={balanceDetails.lockedBalance}
+						icon={LockedIcon}
+					/>
+					<Separator
+						orientation='horizontal'
+						className='h-px w-full bg-border_grey'
+					/>
+					<BalanceDetailCard
+						title='reserved'
+						balance={balanceDetails.reservedBalance}
+						icon={ReservedIcon}
+					/>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 }

@@ -14,26 +14,26 @@
 	@apply flex items-center gap-x-2 rounded-lg border border-border_blue bg-border_blue/10 px-3 py-1 text-sm text-border_blue;
 }
 
-.accountWrapper {
+.balanceDetailCardWrapper {
 	@apply flex flex-col gap-y-3 rounded-xl border border-border_grey p-4;
 }
 
-.accountDetails {
+.balanceDetailCard {
 	@apply flex items-center gap-x-4;
 }
 
-.accountBalance {
+.balanceDetailCardContent {
 	@apply flex flex-col gap-y-2;
 }
 
-.accountBalanceWrapper {
+.balanceDetailCardContentItem {
 	@apply flex flex-col gap-y-1;
 }
 
-.accountBalanceTitle {
+.balanceDetailCardContentTitle {
 	@apply text-base font-semibold text-basic_text;
 }
 
-.accountBalanceText {
+.balanceDetailCardContentText {
 	@apply text-2xl font-bold text-text_primary;
 }
