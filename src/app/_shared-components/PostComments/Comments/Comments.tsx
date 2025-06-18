@@ -74,8 +74,10 @@ function Comments({
 	const { canComment, commentDisabledMessage } = useMemo(() => {
 		if (user && postUserId && user.id === postUserId) return { canComment: true, commentDisabledMessage: '' };
 		if (allowedCommentor === EAllowedCommentor.ALL) return { canComment: true, commentDisabledMessage: '' };
-		if (allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED)
+		if (allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED) {
+			console.log('onchainIdentities', onchainIdentities);
 			return { canComment: onchainIdentities?.some((identity) => identity?.isVerified), commentDisabledMessage: t('PostDetails.commentsDisabledForNonVerifiedUsers') };
+		}
 		return { canComment: !(allowedCommentor === EAllowedCommentor.NONE), commentDisabledMessage: t('PostDetails.commentsDisabled') };
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [allowedCommentor, onchainIdentities]);
