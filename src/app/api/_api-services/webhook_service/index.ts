@@ -39,7 +39,8 @@ enum EWebhookEvent {
 	PROPOSAL_STATUS_UPDATED = 'proposal_status_updated',
 	CACHE_REFRESH = 'cache_refresh',
 	USER_CREATED = 'user_created',
-	ADDRESS_CREATED = 'address_created'
+	ADDRESS_CREATED = 'address_created',
+	CLEAR_CACHE = 'clear_cache'
 }
 
 enum ECacheRefreshType {
@@ -120,7 +121,8 @@ export class WebhookService {
 			network: z.nativeEnum(ENetwork),
 			userId: z.number().refine((userId) => ValidatorService.isValidUserId(userId), ERROR_MESSAGES.INVALID_USER_ID),
 			wallet: z.string()
-		})
+		}),
+		[EWebhookEvent.CLEAR_CACHE]: z.object({})
 	} as const;
 
 	static async handleIncomingEvent({ event, body, network }: { event: string; body: unknown; network: ENetwork }) {
@@ -149,8 +151,38 @@ export class WebhookService {
 				return this.handleUserCreated({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.USER_CREATED]> });
 			case EWebhookEvent.ADDRESS_CREATED:
 				return this.handleAddressCreated({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.ADDRESS_CREATED]> });
+			case EWebhookEvent.CLEAR_CACHE:
+				return this.handleClearCache();
 			default:
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, `Unsupported event: ${event}`);
+		}
+	}
+
+	private static async handleClearCache() {
+		try {
+			console.log('Starting cache clear for all networks...');
+
+			const networks = Object.values(ENetwork);
+			console.log(`Clearing cache for networks: ${networks.join(', ')}`);
+
+			// Use Promise.all to ensure all operations complete and throw on any failure
+			await Promise.all(
+				networks.map(async (network) => {
+					try {
+						console.log(`Clearing cache for network: ${network}`);
+						await RedisService.DeleteAllCacheForNetwork(network);
+						console.log(`Successfully cleared cache for network: ${network}`);
+					} catch (error) {
+						console.error(`Failed to clear cache for network ${network}:`, error);
+						throw error; // Re-throw to fail the entire operation
+					}
+				})
+			);
+
+			console.log('Cache cleared successfully for all networks');
+		} catch (error) {
+			console.error('Failed to clear cache for some networks:', error);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to clear cache completely');
 		}
 	}
 

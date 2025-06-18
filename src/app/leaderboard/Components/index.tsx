@@ -34,7 +34,7 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 			return { startRank: 4, endRank: 10 };
 		}
 
-		const uniqueRanks = [...new Set(data.items.map((item) => item.rank))].sort((a, b) => (a ?? 0) - (b ?? 0));
+		const uniqueRanks = [...new Set(data.items.filter((item) => item.rank != null).map((item) => item.rank!))].sort((a, b) => a - b);
 		const startIndex = (currentPage - 1) * DEFAULT_LISTING_LIMIT - 3;
 		const endIndex = startIndex + DEFAULT_LISTING_LIMIT - 1;
 
@@ -48,10 +48,10 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 		const { startRank, endRank } = calculateRankRange(page);
 		const items =
 			page === 1
-				? data.items.filter((item) => item.rank >= 4 && item.rank <= 10)
+				? data.items.filter((item) => item.rank != null && item.rank >= 4 && item.rank <= 10)
 				: page === 2
-					? data.items.filter((item) => item.rank >= 11 && item.rank <= 20)
-					: data.items.filter((item) => item.rank >= startRank && item.rank <= endRank);
+					? data.items.filter((item) => item.rank != null && item.rank >= 11 && item.rank <= 20)
+					: data.items.filter((item) => item.rank != null && item.rank >= startRank && item.rank <= endRank);
 
 		const rankGroups = items.reduce<Record<number, IPublicUser[]>>((acc, item) => {
 			const rank = item.rank ?? 0;
@@ -70,7 +70,7 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 			return Object.values(rankGroups).flat();
 		}
 
-		const sameRankUsers = data.items.filter((item) => item.rank === userRank);
+		const sameRankUsers = data.items.filter((item) => item.rank != null && item.rank === userRank);
 		const isUserRankInCurrentPage = page === 1 ? userRank >= 4 && userRank <= 10 : userRank >= startRank && userRank <= endRank;
 
 		if (!isUserRankInCurrentPage) {
