@@ -3,16 +3,12 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import SetIdentityIllustration from '@assets/illustrations/set-identity.svg';
 import Image from 'next/image';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { BN } from '@polkadot/util';
-import { ChevronDown } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import { Separator } from '@/app/_shared-components/Separator';
 import { Button } from '@/app/_shared-components/Button';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
 import classes from './SetIdentityFees.module.scss';
+import IdentityFeeCollaps from '../IdentityFeeCollaps/IdentityFeeCollaps';
 
 function SetIdentityFees({
 	onNext,
@@ -25,10 +21,7 @@ function SetIdentityFees({
 	disabledRequestJudgement: boolean;
 	registrarFee: BN;
 }) {
-	const network = getCurrentNetwork();
 	const t = useTranslations();
-
-	const minDeposit = NETWORKS_DETAILS[`${network}`].peopleChainDetails.identityMinDeposit;
 
 	return (
 		<div className={classes.wrapper}>
@@ -42,7 +35,7 @@ function SetIdentityFees({
 				<li>{t('SetIdentity.identityDescription1')}</li>
 				<li>{t('SetIdentity.identityDescription2')}</li>
 			</ul>
-			<Collapsible className={classes.collapsible}>
+			{/* <Collapsible className={classes.collapsible}>
 				<CollapsibleTrigger className={classes.collapsibleTrigger}>
 					<div className={classes.collapsibleTriggerContent}>
 						<span className='text-sm'>{t('SetIdentity.totalAmountRequired')}</span>
@@ -68,7 +61,8 @@ function SetIdentityFees({
 						</div>
 					</div>
 				</CollapsibleContent>
-			</Collapsible>
+			</Collapsible> */}
+			<IdentityFeeCollaps registrarFee={registrarFee} />
 			<Separator />
 			<Button onClick={onNext}>{t('SetIdentity.letBegin')}</Button>
 			<Button

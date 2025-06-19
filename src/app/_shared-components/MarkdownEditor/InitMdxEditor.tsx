@@ -36,11 +36,11 @@ import {
 	CodeToggle,
 	ListsToggle,
 	BlockTypeSelect,
-	InsertImage,
 	InsertTable,
 	CreateLink,
 	InsertThematicBreak,
-	StrikeThroughSupSubToggles
+	StrikeThroughSupSubToggles,
+	ButtonWithTooltip
 } from '@mdxeditor/editor';
 import { liteClient as algoliasearch } from 'algoliasearch/lite';
 
@@ -49,6 +49,10 @@ import './MardownEditor.scss';
 import { cn } from '@/lib/utils';
 import { ETheme } from '@/_shared/types';
 import { useTheme } from 'next-themes';
+import { ImagePlus } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import ImageUploadDialog from './ImageUploadDialog';
 
 const { NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY, NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
 const algoliaClient = algoliasearch(NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY);
@@ -56,6 +60,8 @@ const MAX_MENTION_SUGGESTIONS = 5;
 
 // Only import this to the next file
 export default function InitializedMDXEditor({ editorRef, ...props }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
+	const t = useTranslations('Create.UploadImage');
+	const [openImageUploadDialog, setOpenImageUploadDialog] = useState(false);
 	// eslint-disable-next-line sonarjs/cognitive-complexity
 	const preprocessMarkdown = (markdown: string): string => {
 		let inCode = false;
@@ -348,7 +354,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 		linkPlugin(),
 		linkDialogPlugin(),
 		imagePlugin({
-			imageUploadHandler
+			disableImageSettingsButton: true
 		}),
 		tablePlugin(),
 		thematicBreakPlugin(),
@@ -385,7 +391,14 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 									<Separator />
 
 									<CreateLink />
-									<InsertImage />
+									<ButtonWithTooltip
+										onClick={() => {
+											setOpenImageUploadDialog(true);
+										}}
+										title={t('insertImage')}
+									>
+										<ImagePlus className='h-5 w-5' />
+									</ButtonWithTooltip>
 
 									<Separator />
 
@@ -407,6 +420,12 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 
 	return (
 		<div className='mdxEditorWrapper w-full'>
+			<ImageUploadDialog
+				editorRef={editorRef as RefObject<MDXEditorMethods>}
+				imageUploadHandler={imageUploadHandler}
+				isDialogOpen={openImageUploadDialog}
+				setIsDialogOpen={setOpenImageUploadDialog}
+			/>
 			<MDXEditor
 				plugins={plugins}
 				{...props}

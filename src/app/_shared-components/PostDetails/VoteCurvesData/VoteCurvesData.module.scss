@@ -13,3 +13,34 @@
 .errorText {
 	@apply mt-2 text-red-500;
 }
+
+.voteCurvesDetailsWrapper {
+	@apply mt-6 flex w-full flex-col gap-y-2 text-xs text-wallet_btn_text;
+}
+.voteCurvesDetailsWrapperItem {
+	@apply flex w-full items-center gap-x-4;
+}
+.voteCurvesDetailsWrapperItemTitle {
+	@apply flex w-1/2 items-center justify-between;
+}
+.voteCurvesDetailsWrapperItemTitleText {
+	@apply flex items-center gap-x-2;
+}
+.voteCurvesDetailsWrapperItemTitleTextIcon {
+	@apply h-4 rotate-45 border-l-2 border-dashed border-success;
+}
+.voteCurvesDetailsWrapperItemTitleTextValue {
+	@apply font-medium text-text_primary;
+}
+.dialogTitle {
+	@apply text-lg font-semibold text-text_primary dark:text-white;
+}
+.dialogContent {
+	@apply w-[500px] max-lg:w-full;
+}
+.dialogHeader {
+	@apply p-4;
+}
+.dialogTitle {
+	@apply flex items-center gap-x-1;
+}

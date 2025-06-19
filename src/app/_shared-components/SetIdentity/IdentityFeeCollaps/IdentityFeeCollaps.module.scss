@@ -1,0 +1,34 @@
+.collapsible {
+	@apply w-full rounded-lg bg-grey_bg p-3;
+}
+
+.collapsibleTrigger {
+	@apply w-full;
+}
+
+.collapsibleTriggerContent {
+	@apply flex w-full items-start justify-between text-text_primary;
+}
+
+.collapsibleTriggerContentInner {
+	@apply flex items-start gap-x-2;
+}
+
+.collapsibleTriggerContentInnerText {
+	@apply flex flex-col items-end;
+}
+.feeWrapper {
+	@apply flex w-full flex-col gap-y-2;
+}
+
+.feeItem {
+	@apply flex items-center justify-between;
+}
+
+.feeItemText {
+	@apply text-sm text-wallet_btn_text;
+}
+
+.feeItemValue {
+	@apply text-sm font-medium text-text_primary;
+}
