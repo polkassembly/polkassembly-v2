@@ -28,6 +28,7 @@ interface AddressProps {
 	textClassName?: string;
 	redirectToProfile?: boolean;
 	disableTooltip?: boolean;
+	showOnlyIdenticon?: boolean;
 }
 
 function Address({
@@ -39,7 +40,8 @@ function Address({
 	walletAddressName,
 	textClassName,
 	redirectToProfile,
-	disableTooltip = false
+	disableTooltip = false,
+	showOnlyIdenticon = false
 }: AddressProps) {
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
@@ -101,6 +103,7 @@ function Address({
 				showIdenticon={showIdenticon}
 				textClassName={textClassName}
 				redirectToProfile={redirectToProfile}
+				showOnlyIdenticon={showOnlyIdenticon}
 			/>
 		);
 	}
@@ -121,6 +124,7 @@ function Address({
 								showIdenticon={showIdenticon}
 								textClassName={textClassName}
 								redirectToProfile={redirectToProfile}
+								showOnlyIdenticon={showOnlyIdenticon}
 							/>
 						</div>
 					</TooltipTrigger>

@@ -17,6 +17,17 @@ export enum ENetwork {
 	PASEO = 'paseo'
 }
 
+export enum ENetworkSocial {
+	HOME = 'home',
+	TWITTER = 'twitter',
+	DISCORD = 'discord',
+	GITHUB = 'github',
+	YOUTUBE = 'youtube',
+	REDDIT = 'reddit',
+	TELEGRAM = 'telegram',
+	SUBSCAN = 'subscan'
+}
+
 export enum EGovType {
 	GOV_1 = 'gov_1',
 	OPENGOV = 'opengov'
@@ -1299,8 +1310,8 @@ export interface IPayout {
 		generalIndex: string;
 	};
 }
-export interface IBeneficiaryDetails extends IBeneficiary {
-	expireIn: string | null;
+export interface IBeneficiaryPayoutDetails extends IBeneficiary {
+	payoutExpiry: string | null;
 }
 
 export interface TimeUnitOptions {

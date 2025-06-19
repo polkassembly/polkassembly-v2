@@ -478,7 +478,7 @@
 			"in": "en",
 			"to": "a",
 			"totalEstimatedUSD": "Total estimado en USD",
-			"seeMore": "Ver más",
+			"more": "más",
 			"requestedAmountDetails": "Detalles del monto solicitado"
 		},
 		"OnchainInfo": {

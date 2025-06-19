@@ -2,31 +2,38 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EAssets, ENetwork, IBeneficiaryDetails } from '@/_shared/types';
-import { useTranslations } from 'next-intl';
+import { EAssets } from '@/_shared/types';
 import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/networks';
 import Image from 'next/image';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { BN } from '@polkadot/util';
+import { useTranslations } from 'next-intl';
 import { Separator } from '../../Separator';
 import classes from './BeneficiariesDetails.module.scss';
+import Address from '../../Profile/Address/Address';
 
 interface BeneficiaryItemProps {
-	beneficiary: IBeneficiaryDetails;
+	assetId: string;
+	amount: BN;
+	addresses: string[];
 	index: number;
 	totalLength: number;
-	network: ENetwork;
 }
 
-function BeneficiaryItem({ beneficiary, index, totalLength, network }: BeneficiaryItemProps) {
-	const t = useTranslations('PostDetails.BeneficiariesDetails');
-	const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${beneficiary.assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || beneficiary.assetId;
-	const icon = treasuryAssetsData[unit as EAssets]?.icon || NETWORKS_DETAILS[`${network}`].logo;
+const DISPLAY_LIMIT = 5;
+const SHOW_ONLY_IDENTICON_LIMIT = 3;
 
+function BeneficiaryItem({ assetId, amount, addresses, index, totalLength }: BeneficiaryItemProps) {
+	const t = useTranslations('PostDetails.BeneficiariesDetails');
+	const network = getCurrentNetwork();
+	const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
+	const icon = treasuryAssetsData[unit as EAssets]?.icon || NETWORKS_DETAILS[`${network}`].logo;
 	return (
 		<div
 			className={classes.beneficiaryItem}
-			key={`${beneficiary.address}-${beneficiary.assetId}`}
+			key={`${addresses[0]}-${assetId}`}
 		>
 			<div className={classes.beneficiaryItemHeader}>
 				<div className={classes.beneficiaryItemHeaderAmount}>
@@ -40,18 +47,26 @@ function BeneficiaryItem({ beneficiary, index, totalLength, network }: Beneficia
 						/>
 						<div className={classes.beneficiaryItemHeaderAmountContentText}>
 							{formatUSDWithUnits(
-								formatBnBalance(
-									beneficiary.amount.toString(),
-									{ withUnit: true, numberAfterComma: 2 },
-									network,
-									beneficiary.assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : beneficiary.assetId
-								)
+								formatBnBalance(amount.toString(), { withUnit: true, numberAfterComma: 2 }, network, assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId)
 							)}
 						</div>
 					</div>
 				</div>
 				<div className={classes.beneficiaryItemHeaderExpireIn}>
-					<div className={classes.beneficiaryItemHeaderExpireInText}>{beneficiary.expireIn ? `in ${beneficiary.expireIn}` : t('immediately')}</div>
+					{addresses.slice(0, DISPLAY_LIMIT).map((address) => (
+						<Address
+							key={address}
+							address={address}
+							truncateCharLen={SHOW_ONLY_IDENTICON_LIMIT}
+							showOnlyIdenticon={addresses.length > SHOW_ONLY_IDENTICON_LIMIT}
+							className='text-xs font-bold lg:text-sm'
+						/>
+					))}
+					{addresses.length > DISPLAY_LIMIT && (
+						<div className={classes.beneficiaryItemHeaderExpireInText}>
+							+{addresses.length - DISPLAY_LIMIT} {t('more')}
+						</div>
+					)}
 				</div>
 			</div>
 			{index !== totalLength - 1 && <Separator orientation='horizontal' />}

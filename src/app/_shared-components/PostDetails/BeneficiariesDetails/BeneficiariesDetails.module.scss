@@ -1,23 +1,23 @@
-.beneficiariesDetailsWrapper {
+.beneficiariesWrapper {
 	@apply flex flex-col rounded-xl bg-bg_modal p-6 shadow-lg;
 }
 
-.beneficiariesDetailsTitle {
+.beneficiariesTitle {
 	@apply text-xl font-semibold text-text_primary;
 }
-.beneficiariesDetailsHeader {
+.beneficiariesHeader {
 	@apply flex items-center justify-between;
 }
-.beneficiariesDetailsButton {
+.beneficiariesButton {
 	@apply text-sm text-text_pink;
 }
-.beneficiariesDetailsList {
+.beneficiariesList {
 	@apply mt-6 flex flex-col gap-2;
 }
-.beneficiariesDetailsSeeMore {
+.beneficiariesSeeMore {
 	@apply flex items-center gap-1 text-sm text-basic_text;
 }
-.beneficiariesDetailsSeeMoreButton {
+.beneficiariesSeeMoreButton {
 	@apply p-0 text-sm text-text_pink;
 }
 .beneficiariesDetailsDialogContent {
@@ -29,33 +29,30 @@
 .beneficiariesDetailsDialogContentHeaderAmount {
 	@apply flex items-center gap-1;
 }
-.beneficiariesDetailsDialogContentHeaderTotalEstimatedUSD {
+.beneficiariesDialogTotalEstimatedUSD {
 	@apply text-base font-bold text-basic_text;
 }
 .beneficiariesDetailsDialogContentList {
 	@apply mt-6 flex max-h-[60vh] flex-col gap-3 overflow-y-auto;
 }
-.beneficiariesDetailsDialogContentListItem {
+.beneficiariesDialogListItem {
 	@apply flex justify-between gap-8 max-lg:flex-col max-lg:gap-2;
 }
-.beneficiariesDetailsDialogContentListItemAmount {
+.beneficiariesDialogListItemAmount {
 	@apply text-base font-semibold text-text_primary dark:text-white;
 }
-.beneficiariesDetailsDialogContentListItemAmountUSD {
+.beneficiariesDialogListItemAmountUSD {
 	@apply rounded-sm bg-bg_code p-1 text-xs text-basic_text;
 }
-.beneficiariesDetailsDialogContentListItemTo {
-	@apply text-xs font-normal text-text_primary;
-}
-.beneficiariesDetailsDialogContentListItemExpireIn {
+
+.beneficiariesExpireIn {
 	@apply text-sm text-basic_text;
 }
+
 .beneficiariesSkeleton {
-	@apply mt-6 flex flex-col gap-4;
+	@apply mt-6 flex flex-col gap-3;
 }
-.beneficiariesSkeletonItem {
-	@apply mt-2 flex justify-between gap-5;
-}
+
 .beneficiariesSkeletonItemAmount {
 	@apply h-8 w-full;
 }

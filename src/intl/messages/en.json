@@ -490,7 +490,7 @@
 			"in": "in",
 			"to": "to",
 			"totalEstimatedUSD": "Total estimated USD equivalent",
-			"seeMore": "See more",
+			"more": "more",
 			"requestedAmountDetails": "Requested Amount Details"
 		},
 		"OnchainInfo": {

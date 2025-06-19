@@ -9,18 +9,9 @@ function BeneficiariesSkeleton({ usedInDialog = false }: { usedInDialog?: boolea
 	return (
 		<div className={classes.beneficiariesSkeleton}>
 			{usedInDialog && <Skeleton className='full h-8' />}
-			<div className={classes.beneficiariesSkeletonItem}>
-				<Skeleton className={classes.beneficiariesSkeletonItemAmount} />
-				<Skeleton className={classes.beneficiariesSkeletonItemAmount} />
-			</div>
-			<div className={classes.beneficiariesSkeletonItem}>
-				<Skeleton className={classes.beneficiariesSkeletonItemAmount} />
-				<Skeleton className={classes.beneficiariesSkeletonItemAmount} />
-			</div>
-			<div className={classes.beneficiariesSkeletonItem}>
-				<Skeleton className={classes.beneficiariesSkeletonItemAmount} />
-				<Skeleton className={classes.beneficiariesSkeletonItemAmount} />
-			</div>
+			<Skeleton className={classes.beneficiariesSkeletonItemAmount} />
+			<Skeleton className={classes.beneficiariesSkeletonItemAmount} />
+			<Skeleton className={classes.beneficiariesSkeletonItemAmount} />
 			<Skeleton className={classes.beneficiariesSkeletonItemExpireIn} />
 		</div>
 	);

@@ -9,7 +9,7 @@ import { BlockCalculationsService } from '../_client-services/block_calculations
 
 // Utility functions
 export const formatDate = (timestamp: Date | string): string => {
-	return dayjs(timestamp).format('YYYY-MM-DD');
+	return dayjs(timestamp).format('MMM DD, YYYY');
 };
 
 export const buildTimeUnit = (value: number, unit: string, options: TimeUnitOptions = {}): string | null => {
@@ -52,5 +52,5 @@ export const calculatePayoutExpiry = (currentBlockHeight: number, validFromBlock
 		return formatDate(date);
 	}
 
-	return getTimeRemaining(date, true);
+	return getTimeRemaining(date, false);
 };

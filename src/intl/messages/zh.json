@@ -476,7 +476,7 @@
 			"in": "在",
 			"to": "到",
 			"totalEstimatedUSD": "总计估计美元等值",
-			"seeMore": "查看更多",
+			"more": "更多",
 			"requestedAmountDetails": "已请求金额详情"
 		},
 		"OnchainInfo": {
