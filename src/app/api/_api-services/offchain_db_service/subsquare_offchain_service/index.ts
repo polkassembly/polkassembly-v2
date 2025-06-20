@@ -65,7 +65,11 @@ export class SubsquareOffChainService {
 
 			if (!content) {
 				content = getDefaultPostContent(proposalType, data?.proposer);
-				isDefaultContent = true;
+
+				// if content AND title are both empty, only then it is default content
+				if (!title) {
+					isDefaultContent = true;
+				}
 			} else {
 				content = data?.contentType === 'markdown' ? data.content : htmlToMarkdown(data.content);
 			}
