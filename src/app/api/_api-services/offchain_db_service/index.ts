@@ -177,8 +177,8 @@ export class OffChainDbService {
 			metrics: postMetrics,
 			allowedCommentor: EAllowedCommentor.ALL,
 			isDeleted: false,
-			isDefaultContent: getDefaultContent,
-			poll
+			poll,
+			isDefaultContent: true
 		} as IOffChainPost;
 	}
 
