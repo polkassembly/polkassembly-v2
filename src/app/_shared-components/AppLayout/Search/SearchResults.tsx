@@ -265,14 +265,20 @@ function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 							<div className='h-full overflow-y-auto pr-2'>
 								{activeIndex === ESearchType.POSTS ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters='NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS' />
+										<Configure 
+											filters='NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS'
+											customRanking={['desc(createdAtTimestamp)']}
+										/>
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>
 									</Index>
 								) : activeIndex === ESearchType.DISCUSSIONS ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters='proposalType:DISCUSSION OR proposalType:GRANTS' />
+										<Configure 
+											filters='proposalType:DISCUSSION OR proposalType:GRANTS'
+											customRanking={['desc(createdAtTimestamp)']}
+										/>
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>

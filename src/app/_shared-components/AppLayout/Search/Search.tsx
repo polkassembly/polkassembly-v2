@@ -87,6 +87,7 @@ function Search() {
 							hitsPerPage={10}
 							distinct
 							filters={`${networkFilterQuery}${postFilterQuery}`.trim()}
+							customRanking={['desc(createdAtTimestamp)']}
 						/>
 
 						<div>

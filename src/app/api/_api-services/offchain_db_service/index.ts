@@ -229,7 +229,7 @@ export class OffChainDbService {
 		const buildCommentTree = (parentId: string | null): ICommentResponse[] => {
 			return allCommentsWithReactions
 				.filter((comment) => comment.parentCommentId === parentId)
-				.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()) // Sort by creation date, latest first
+				.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()) // Sort by creation date, oldest first
 				.map((comment) => ({
 					...comment,
 					children: buildCommentTree(comment.id)
