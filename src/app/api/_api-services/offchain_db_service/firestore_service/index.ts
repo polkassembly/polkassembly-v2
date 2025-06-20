@@ -292,6 +292,10 @@ export class FirestoreService extends FirestoreUtils {
 
 		const postData = postDocSnapshot.docs[0].data();
 
+		const isDefaultContent =
+			(!postData.title && !postData.content) ||
+			(postData.title === 'Untitled Post' && (!postData.content?.trim?.() || postData.content.includes('login and tell us more about your proposal')));
+
 		return {
 			...postData,
 			content: postData.content || '',
@@ -307,7 +311,8 @@ export class FirestoreService extends FirestoreUtils {
 			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate(),
-			allowedCommentor: postData.allowedCommentor || EAllowedCommentor.ALL
+			allowedCommentor: postData.allowedCommentor || EAllowedCommentor.ALL,
+			isDefaultContent
 		} as IOffChainPost;
 	}
 
