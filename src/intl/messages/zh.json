@@ -469,6 +469,16 @@
 		"capital": "资本",
 		"account": "账户",
 		"abstain": "弃权",
+		"BeneficiariesDetails": {
+			"requested": "已请求",
+			"details": "详情",
+			"immediately": "立即",
+			"in": "在",
+			"to": "到",
+			"totalEstimatedUSD": "总计估计美元等值",
+			"more": "更多",
+			"requestedAmountDetails": "已请求金额详情"
+		},
 		"OnchainInfo": {
 			"metadata": "元数据",
 			"table": "表格",

@@ -470,6 +470,16 @@
 		"account": "アカウント",
 		"abstain": "棄権",
 		"onchainInfo": "オンチェーン情報",
+		"BeneficiariesDetails": {
+			"requested": "リクエスト済み",
+			"details": "詳細",
+			"immediately": "すぐに",
+			"in": "で",
+			"to": "に",
+			"totalEstimatedUSD": "合計推定USD相当",
+			"more": "もっと",
+			"requestedAmountDetails": "リクエストされた金額の詳細"
+		},
 		"OnchainInfo": {
 			"metadata": "メタデータ",
 			"table": "テーブル",

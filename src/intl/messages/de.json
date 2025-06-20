@@ -469,6 +469,16 @@
 		"account": "Konto",
 		"abstain": "Enthaltung",
 		"onchainInfo": "Onchain-Informationen",
+		"BeneficiariesDetails": {
+			"requested": "Angefordert",
+			"details": "Details",
+			"immediately": "sofort",
+			"in": "in",
+			"to": "zu",
+			"totalEstimatedUSD": "Geschätzter USD-Äquivalent",
+			"more": "mehr",
+			"requestedAmountDetails": "Angeforderter Betrag Details"
+		},
 		"OnchainInfo": {
 			"metadata": "Metadaten",
 			"table": "Tabelle",
