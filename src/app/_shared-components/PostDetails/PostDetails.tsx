@@ -13,6 +13,7 @@ import { useAISummary } from '@/hooks/useAISummary';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
+import { ClientError } from '@/app/_client-utils/clientError';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -26,9 +27,10 @@ import OnchainInfo from './OnchainInfo/OnchainInfo';
 import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
-import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
 import PlaceDecisionDeposit from './PlaceDecisionDeposit/PlaceDecisionDeposit';
 import ClaimPayout from './ClaimPayout/ClaimPayout';
+import PostAnalytics from './Analytics/PostAnalytics';
+import VotesData from './VotesData/VotesData';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
@@ -63,6 +65,20 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 		initialData: post?.contentSummary,
 		proposalType: post?.proposalType || postData.proposalType,
 		indexOrHash: String(post?.index ?? postData.index ?? post?.hash ?? postData.hash)
+	});
+
+	const getPostAnalytics = async () => {
+		const { data, error } = await NextApiClientService.getPostAnalytics({ proposalType: post?.proposalType as EProposalType, index: index.toString() });
+		if (error || !data) {
+			throw new ClientError(error?.message || 'Failed to fetch data');
+		}
+		return data;
+	};
+
+	const { data: analytics, isFetching: isAnalyticsFetching } = useQuery({
+		queryKey: ['postAnalytics', post?.proposalType, index],
+		queryFn: getPostAnalytics,
+		enabled: !!post?.proposalType && !!index
 	});
 
 	useEffect(() => {
@@ -117,6 +133,14 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									proposalType={post.proposalType}
 									index={index}
 									onchainInfo={post.onChainInfo}
+								/>
+							</TabsContent>
+							<TabsContent value={EPostDetailsTab.POST_ANALYTICS}>
+								<PostAnalytics
+									analytics={analytics}
+									isFetching={isAnalyticsFetching}
+									proposalType={post.proposalType}
+									index={index}
 								/>
 							</TabsContent>
 						</div>
@@ -183,22 +207,20 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								trackName={post.onChainInfo?.origin || EPostOrigin.ROOT}
 							/>
 							<VoteSummary
-								proposalType={post.proposalType}
 								index={index}
 								voteMetrics={post.onChainInfo?.voteMetrics}
 								approvalThreshold={thresholdValues.approvalThreshold}
 							/>
-							{post.onChainInfo?.origin && post.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced) && (
-								<VoteCurvesData
-									proposalType={post.proposalType}
-									index={index}
-									createdAt={post.createdAt}
-									trackName={post.onChainInfo?.origin}
-									timeline={post.onChainInfo?.timeline}
-									setThresholdValues={setThresholdValues}
-									thresholdValues={thresholdValues}
-								/>
-							)}
+
+							<VotesData
+								proposalType={post.proposalType}
+								index={index}
+								trackName={post.onChainInfo?.origin || EPostOrigin.ROOT}
+								createdAt={post.createdAt}
+								timeline={post.onChainInfo?.timeline}
+								setThresholdValues={setThresholdValues}
+								thresholdValues={thresholdValues}
+							/>
 						</div>
 					)}
 

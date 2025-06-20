@@ -142,6 +142,10 @@ export const THEME_COLORS = {
 		read_more_txt: '#2563eb',
 		aye_color: '#6DE1A2',
 		nay_color: '#FF778F',
+		abstain_color: '#407BFF',
+		turnout_color: '#796EEC',
+		issuance_color: '#B6B0FB',
+		time_split_color: '#4064FF',
 		not_voted_bg: '#fff0f3',
 		voted_bg: '#fff6ee',
 		bg_code: '#fbfbfd',
@@ -159,7 +163,17 @@ export const THEME_COLORS = {
 		bg_light_pink: '#fef0f7',
 		progress_pink_indicator: '#ededed',
 		tag_input_bg: '#f4f6f8',
-		parachain_badge_bg: '#ea729d'
+		parachain_badge_bg: '#ea729d',
+		nivo_fill_color: '#595959',
+		analytics_description_bg: '#efeefe',
+		toggle_btn_active_bg: '#E5007A',
+		toggle_btn_active_text: '#FFF',
+		toggle_btn_inactive_bg: '#F4F6F8',
+		toggle_btn_inactive_text: '#485F7D',
+		votes_tab_bg: '#F5F6F8',
+		sidebar_tile_aye: '#aeeddc',
+		sidebar_tile_nay: '#febebe',
+		sidebar_tile_abstain: '#d9d9ff'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -298,6 +312,10 @@ export const THEME_COLORS = {
 		read_more_txt: '#2563eb',
 		aye_color: '#6DE1A2',
 		nay_color: '#FF778F',
+		abstain_color: '#407BFF',
+		turnout_color: '#796EEC',
+		issuance_color: '#B6B0FB',
+		time_split_color: '#4064FF',
 		not_voted_bg: '#1e160d',
 		voted_bg: '#1e1113',
 		bg_code: '#222222',
@@ -315,6 +333,16 @@ export const THEME_COLORS = {
 		bg_light_pink: '#fef0f7',
 		progress_pink_indicator: '#343744',
 		tag_input_bg: '#222222',
-		parachain_badge_bg: '#ea729d'
+		parachain_badge_bg: '#ea729d',
+		nivo_fill_color: '#fff',
+		analytics_description_bg: '#262535',
+		toggle_btn_active_bg: '#E5007A',
+		toggle_btn_active_text: '#FFF',
+		toggle_btn_inactive_bg: '#222222',
+		toggle_btn_inactive_text: '#9E9E9E',
+		votes_tab_bg: '#222222',
+		sidebar_tile_aye: '#aeeddc',
+		sidebar_tile_nay: '#febebe',
+		sidebar_tile_abstain: '#407bff66'
 	}
 };
