@@ -12,10 +12,11 @@ import Image from 'next/image';
 import { Button } from '@ui/Button';
 import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
 import { Separator } from '@ui/Separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useTranslations } from 'next-intl';
-import { Ellipsis } from 'lucide-react';
+import { CopyIcon, Ellipsis } from 'lucide-react';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
@@ -185,6 +186,29 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 		setShowReplies(true);
 	}, []);
 
+	const handleCopyCommentLink = useCallback(() => {
+		let url = '';
+		switch (proposalType) {
+			case EProposalType.DISCUSSION:
+				url = `${window?.location?.origin}/post/${index}#comment-${comment?.id}`;
+				break;
+			case EProposalType.BOUNTY:
+				url = `${window?.location?.origin}/bounty/${index}#comment-${comment?.id}`;
+				break;
+			case EProposalType.CHILD_BOUNTY:
+				url = `${window?.location?.origin}/child-bounty/${index}#comment-${comment?.id}`;
+				break;
+			default:
+				url = `${window?.location?.origin}/referenda/${index}#comment-${comment?.id}`;
+		}
+		navigator.clipboard.writeText(url);
+		toast({
+			title: 'Success!',
+			description: 'Comment link copied to clipboard',
+			status: ENotificationStatus.SUCCESS
+		});
+	}, [comment, index, proposalType, toast]);
+
 	if (!comment) {
 		return null;
 	}
@@ -193,9 +217,14 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 	const userAddresses = !EVM_NETWORKS.includes(network) ? comment?.publicUser?.addresses?.filter((address) => !address.startsWith('0x')) : comment?.publicUser?.addresses;
 
 	const addressToDisplay = userAddresses?.[0] || comment?.publicUser?.addresses?.[0];
+	const isHighlighted = typeof window !== 'undefined' && window?.location?.hash === `#comment-${comment.id}`;
+	const wrapperClassName = isHighlighted ? `${classes.wrapper} ${classes.highlighted}` : classes.wrapper;
 
 	return (
-		<div className={classes.wrapper}>
+		<div
+			id={`comment-${comment.id}`}
+			className={wrapperClassName}
+		>
 			<Dialog
 				open={openDeleteModal}
 				onOpenChange={setOpenDeleteModal}
@@ -307,66 +336,83 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 					/>
 				)}
 
-				{user && (
-					<div className={classes.tools}>
-						<Button
-							variant='ghost'
-							className={classes.replyButton}
-							onClick={handleToggleReply}
-							size='sm'
-							leftIcon={
-								<Image
-									src={ReplyIcon}
-									alt='reply'
-									className='darkIcon'
-								/>
-							}
-						>
-							{t('PostDetails.reply')}
-						</Button>
-						<div>
-							{comment.userId === user.id && (
-								<DropdownMenu>
-									<DropdownMenuTrigger
-										noArrow
-										className='border-none'
-									>
-										<Ellipsis
-											className='text-text_primary/[0.8]'
-											size={14}
-										/>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent>
-										<DropdownMenuItem className='hover:bg-bg_pink/10'>
-											<Button
-												variant='ghost'
-												className='h-auto p-0 text-sm text-text_primary'
-												disabled={comment.userId !== user.id}
-												onClick={toggleEditComment}
-												size='sm'
-												isLoading={loading}
-											>
-												{t('PostDetails.edit')}
-											</Button>
-										</DropdownMenuItem>
-										<DropdownMenuItem className='hover:bg-bg_pink/10'>
-											<Button
-												variant='ghost'
-												className='h-auto p-0 text-sm text-text_primary'
-												disabled={comment.userId !== user.id}
-												onClick={handleOpenDeleteModal}
-												size='sm'
-												isLoading={loading}
-											>
-												{t('PostDetails.delete')}
-											</Button>
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							)}
+				<div className={classes.tools}>
+					{user && (
+						<div className={classes.tools}>
+							<Button
+								variant='ghost'
+								className={classes.replyButton}
+								onClick={handleToggleReply}
+								size='sm'
+								leftIcon={
+									<Image
+										src={ReplyIcon}
+										alt='reply'
+										className='darkIcon'
+									/>
+								}
+							>
+								{t('PostDetails.reply')}
+							</Button>
+							<div>
+								{comment.userId === user.id && (
+									<DropdownMenu>
+										<DropdownMenuTrigger
+											noArrow
+											className='border-none'
+										>
+											<Ellipsis
+												className='text-text_primary/[0.8]'
+												size={14}
+											/>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent>
+											<DropdownMenuItem className='hover:bg-bg_pink/10'>
+												<Button
+													variant='ghost'
+													className='h-auto p-0 text-sm text-text_primary'
+													disabled={comment.userId !== user.id}
+													onClick={toggleEditComment}
+													size='sm'
+													isLoading={loading}
+												>
+													{t('PostDetails.edit')}
+												</Button>
+											</DropdownMenuItem>
+											<DropdownMenuItem className='hover:bg-bg_pink/10'>
+												<Button
+													variant='ghost'
+													className='h-auto p-0 text-sm text-text_primary'
+													disabled={comment.userId !== user.id}
+													onClick={handleOpenDeleteModal}
+													size='sm'
+													isLoading={loading}
+												>
+													{t('PostDetails.delete')}
+												</Button>
+											</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
+								)}
+							</div>
 						</div>
-					</div>
-				)}
+					)}
+
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant='ghost'
+								className='ml-auto'
+								onClick={handleCopyCommentLink}
+								size='sm'
+								leftIcon={<CopyIcon className='darkIcon' />}
+							/>
+						</TooltipTrigger>
+						<TooltipContent className={classes.tooltipContent}>
+							<span>{t('PostDetails.copyLink')}</span>
+						</TooltipContent>
+					</Tooltip>
+				</div>
 
 				{reply && (
 					<AddComment
