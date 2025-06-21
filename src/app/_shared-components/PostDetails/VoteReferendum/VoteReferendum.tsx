@@ -30,6 +30,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { cn } from '@/lib/utils';
+import { Ban, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { Button } from '../../Button';
 import BalanceInput from '../../BalanceInput/BalanceInput';
 import ChooseVote from './ChooseVote/ChooseVote';
@@ -38,6 +39,7 @@ import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAdd
 import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelationsPicker';
 import Address from '../../Profile/Address/Address';
 import AddComment from '../../PostComments/AddComment/AddComment';
+import classes from '../PostDetails.module.scss';
 
 function VoteSuccessContent({
 	decision,
@@ -129,7 +131,19 @@ function VoteSuccessContent({
 	);
 }
 
-function VoteReferendum({ index, track, onClose, proposalType }: { index: string; track?: EPostOrigin; onClose: () => void; proposalType: EProposalType }) {
+function VoteReferendum({
+	index,
+	track,
+	onClose,
+	proposalType,
+	existingVote
+}: {
+	index: string;
+	track?: EPostOrigin;
+	onClose: () => void;
+	proposalType: EProposalType;
+	existingVote?: IVoteData;
+}) {
 	const { userPreferences } = useUserPreferences();
 	const [voteDecision, setVoteDecision] = useState(EVoteDecision.AYE);
 	const t = useTranslations();
@@ -303,6 +317,33 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 					</div>
 				</div>
 			</div>
+			{existingVote && (
+				<div className='flex flex-col gap-y-3 rounded-xl bg-info_bg p-4'>
+					<p className='text-sm font-semibold text-text_primary'>{t('VoteReferendum.existingVote')}</p>
+					<p className='text-sm text-basic_text'>{t('VoteReferendum.existingVoteDescription')}</p>
+					<div className={classes.userVoteCardLayout}>
+						<h3 className={classes.userVoteCardTitleIcon}>
+							{existingVote.decision === 'abstain' && <Ban className='h-4 w-4 text-basic_text' />}
+							{existingVote.decision === 'aye' && <ThumbsUp className='h-4 w-4 text-basic_text' />}
+							{existingVote.decision === 'nay' && <ThumbsDown className='h-4 w-4 text-basic_text' />}
+							{t(`PostDetails.${existingVote.decision}`)}
+						</h3>
+
+						<p className='text-sm text-basic_text'>
+							{formatBnBalance(
+								existingVote.selfVotingPower || '0',
+								{
+									withUnit: true,
+									numberAfterComma: 2,
+									compactNotation: true
+								},
+								network
+							)}{' '}
+							({!existingVote.lockPeriod || existingVote.lockPeriod === 0 ? 0.1 : existingVote.lockPeriod}x)
+						</p>
+					</div>
+				</div>
+			)}
 			<div className='flex items-center justify-end gap-x-4'>
 				<Button
 					disabled={isInvalidAmount}

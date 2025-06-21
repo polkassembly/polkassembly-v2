@@ -348,6 +348,37 @@ export class PolkadotApiService {
 		}
 	}
 
+	async removeVoteReferendum({
+		address,
+		referendumId,
+		onSuccess,
+		onFailed,
+		selectedAccount
+	}: {
+		address: string;
+		referendumId: number;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		selectedAccount?: ISelectedAccount;
+	}) {
+		if (!this.api) return;
+
+		try {
+			const tx: SubmittableExtrinsic<'promise'> = this.api.tx.convictionVoting.removeVote(null, referendumId);
+			await this.executeTx({
+				tx,
+				address,
+				errorMessageFallback: 'Failed to remove vote',
+				waitTillFinalizedHash: true,
+				onSuccess,
+				onFailed,
+				selectedAccount
+			});
+		} catch (error: unknown) {
+			onFailed((error as Error)?.message || 'Failed to remove vote');
+		}
+	}
+
 	async batchVoteReferendum({
 		address,
 		voteCartItems,
