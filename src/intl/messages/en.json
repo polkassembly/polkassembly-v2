@@ -802,6 +802,17 @@
 		"titleTooShort": "Please provide a valid title.",
 		"titlePlaceholder": "Enter title",
 		"descriptionRequired": "Please provide a valid description.",
+		"UploadImage": {
+			"uploadImage": "Upload Image",
+			"uploadFromDevice": "Upload from device",
+			"addFromURL": "Add from URL",
+			"alt": "Alt",
+			"title": "Title",
+			"save": "Save",
+			"cancel": "Cancel",
+			"insertImage": "Insert Image",
+			"failedToUploadImage": "Failed to upload image"
+		},
 		"AllowedCommentors": {
 			"title": "Who can comment ?",
 			"all": "All",
@@ -890,6 +901,7 @@
 		"requestJudgement": "Request Judgement",
 		"minimumDeposit": "Minimum Deposit",
 		"registrarFee": "Registrar Fee",
+		"gasFee": "Gas Fee",
 		"totalAmountRequired": "Total Amount Required",
 		"viewAmountBreakup": "View Amount Breakup",
 		"registrarFees": "Registrar Fees",

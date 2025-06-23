@@ -1067,7 +1067,7 @@ export class SubsquidService extends SubsquidUtils {
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain post analytics from Subsquid: ${subsquidErr}`);
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post analytics from Subsquid');
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, subsquidErr?.message || 'Error fetching on-chain post analytics from Subsquid');
 		}
 
 		const votes = subsquidData.flattenedConvictionVotes?.map((vote: { decision: string }) => {
