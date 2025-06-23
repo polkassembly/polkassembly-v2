@@ -4,4 +4,4 @@
 
 import { ENetwork } from '../types';
 
-export const LEADERBOARD_SUPPORTED_NETWORKS = [ENetwork.POLKADOT];
+export const LEADERBOARD_SUPPORTED_NETWORKS: ENetwork[] = [];

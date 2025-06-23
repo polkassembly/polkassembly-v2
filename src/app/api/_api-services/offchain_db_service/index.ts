@@ -172,7 +172,7 @@ export class OffChainDbService {
 			metrics: postMetrics,
 			allowedCommentor: EAllowedCommentor.ALL,
 			isDeleted: false,
-			isDefaultContent: getDefaultContent
+			isDefaultContent: true
 		} as IOffChainPost;
 	}
 
