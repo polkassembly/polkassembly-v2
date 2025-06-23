@@ -79,7 +79,10 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 				</div>
 			</div>
 			<div className={classes.rightGrid}>
-				<Balance address={address || userProfile?.addresses[0] || ''} />
+				<Balance
+					address={address || userProfile?.addresses[0] || ''}
+					userProfile={userProfile}
+				/>
 				<div className={classes.onchainIdentityCard}>
 					<div className={classes.onchainIdentityCardHeader}>
 						<p className={classes.onchainIdentityCardHeaderTitle}>{t('Profile.onchainIdentity')}</p>

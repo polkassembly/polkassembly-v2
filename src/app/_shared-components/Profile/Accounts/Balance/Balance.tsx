@@ -10,6 +10,8 @@ import { useTranslations } from 'next-intl';
 import TransferableIcon from '@/_assets/icons/tranferable-balance.svg';
 import LockedIcon from '@/_assets/icons/locked-balance.svg';
 import ReservedIcon from '@/_assets/icons/reserved-balance.svg';
+import { useUser } from '@/hooks/useUser';
+import { IPublicUser } from '@/_shared/types';
 import classes from './Balance.module.scss';
 import BalanceDetailCard from './BalanceDetailCard';
 
@@ -19,9 +21,11 @@ interface IBalanceDetails {
 	transferableBalance: string;
 }
 
-function Balance({ address }: { address: string }) {
+function Balance({ address, userProfile }: { address: string; userProfile?: IPublicUser }) {
 	const t = useTranslations();
 	const { apiService } = usePolkadotApiService();
+
+	const { user } = useUser();
 
 	const [balanceDetails, setBalanceDetails] = useState<IBalanceDetails>({
 		lockedBalance: '0',
@@ -53,13 +57,15 @@ function Balance({ address }: { address: string }) {
 		<div className={classes.balanceWrapper}>
 			<div className={classes.balanceTitleWrapper}>
 				<h3 className={classes.balanceTitle}>{t('Profile.myBalance')}</h3>
-				<button
-					type='button'
-					className={classes.unlockBalanceButton}
-				>
-					<UnlockKeyhole className='h-4 w-4 text-border_blue' />
-					{t('Profile.unlock')} {t('Profile.in')} {t('Profile.days')} {t('Profile.hours')}
-				</button>
+				{userProfile && userProfile.id === user?.id && (
+					<button
+						type='button'
+						className={classes.unlockBalanceButton}
+					>
+						<UnlockKeyhole className='h-4 w-4 text-border_blue' />
+						{t('Profile.unlock')} {t('Profile.in')} {t('Profile.days')} {t('Profile.hours')}
+					</button>
+				)}
 			</div>
 			{loading ? (
 				<div className={classes.balanceDetailCardWrapper}>
