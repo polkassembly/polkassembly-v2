@@ -54,7 +54,7 @@ function Comments({
 		setShowMore(false);
 	};
 
-	const { getOnChainIdentity } = useIdentityService();
+	const { getOnChainIdentity, identityService } = useIdentityService();
 
 	const fetchOnChainIdentity = async () => {
 		if (!user?.addresses?.length || !user?.id) return [];
@@ -65,6 +65,7 @@ function Comments({
 	const { data: onchainIdentities } = useQuery({
 		queryKey: ['onchainIdentities', user?.id],
 		queryFn: fetchOnChainIdentity,
+		enabled: !!user?.id && !!identityService,
 		staleTime: FIVE_MIN_IN_MILLI,
 		retry: true,
 		refetchOnWindowFocus: true,
@@ -75,7 +76,6 @@ function Comments({
 		if (user && postUserId && user.id === postUserId) return { canComment: true, commentDisabledMessage: '' };
 		if (allowedCommentor === EAllowedCommentor.ALL) return { canComment: true, commentDisabledMessage: '' };
 		if (allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED) {
-			console.log('onchainIdentities', onchainIdentities);
 			return { canComment: onchainIdentities?.some((identity) => identity?.isVerified), commentDisabledMessage: t('PostDetails.commentsDisabledForNonVerifiedUsers') };
 		}
 		return { canComment: !(allowedCommentor === EAllowedCommentor.NONE), commentDisabledMessage: t('PostDetails.commentsDisabled') };
