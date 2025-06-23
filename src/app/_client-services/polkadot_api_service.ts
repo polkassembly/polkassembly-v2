@@ -279,12 +279,12 @@ export class PolkadotApiService {
 				freeBalance = free;
 				reservedBalance = reserved;
 
-				if (free.gt(frozen)) {
-					transferableBalance = free.sub(frozen);
+				// Calculate effective frozen balance (frozen - reserved to avoid double counting)
+				const effectiveFrozen = frozen.sub(reserved);
+				const minToSubtract = BN.max(effectiveFrozen, existentialDeposit);
 
-					if (transferableBalance.lt(existentialDeposit)) {
-						transferableBalance = BN_ZERO;
-					}
+				if (free.gt(minToSubtract)) {
+					transferableBalance = free.sub(minToSubtract);
 				} else {
 					transferableBalance = BN_ZERO;
 				}
