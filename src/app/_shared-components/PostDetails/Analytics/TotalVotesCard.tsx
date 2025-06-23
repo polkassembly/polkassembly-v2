@@ -105,13 +105,13 @@ function TotalVotesCard({ analytics, isAccountsAnalytics = false }: { analytics:
 					height={20}
 					className={theme === ETheme.DARK ? 'darkIcon' : ''}
 				/>
-				<h2 className='text-base font-bold text-text_primary'>{t('totalVotesCasted')}</h2>
+				<h2 className='text-base font-bold text-text_primary xl:text-sm 2xl:text-base'>{t('totalVotesCasted')}</h2>
 			</div>
 			<div className={classes.chartWrapper}>
 				<Doughnut
 					data={chartData}
 					options={chartOptions}
-					className='h-[170px] w-[180px] max-lg:mt-2 max-lg:w-full'
+					className='h-[170px] w-full max-lg:mt-2'
 				/>
 				<p className='absolute mt-4 flex items-center gap-1 text-lg font-bold dark:text-white'>
 					{isAccountsAnalytics

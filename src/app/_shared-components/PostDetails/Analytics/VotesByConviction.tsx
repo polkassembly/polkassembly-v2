@@ -158,11 +158,12 @@ function VotesByConvictions({ votesByConviction, isAccountsAnalytics }: IVoteCon
 
 	return (
 		<div className={classes.cardWithFullWidth}>
-			<h2 className='text-base font-bold'>{t('votesByConviction')}</h2>
+			<h2 className='text-base font-bold text-text_primary xl:text-sm 2xl:text-base'>{t('votesByConviction')}</h2>
 			<div className={classes.barChartWrapper}>
 				<Bar
 					data={chartData}
 					options={chartOptions}
+					className='h-[250px] w-full'
 				/>
 			</div>
 		</div>

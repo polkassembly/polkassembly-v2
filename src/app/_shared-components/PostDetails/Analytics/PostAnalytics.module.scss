@@ -8,7 +8,7 @@
 	@apply relative flex h-[180px] items-center justify-center;
 }
 .barChartWrapper {
-	@apply relative mt-2 flex h-[250px] items-center justify-center;
+	@apply relative mt-2 flex h-[250px] w-full items-center justify-center;
 }
 .timeSplitChartWrapper {
 	@apply relative mt-4 flex h-[250px] items-center justify-center;

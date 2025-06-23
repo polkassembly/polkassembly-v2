@@ -147,11 +147,12 @@ function DelegationVotesByConvictions({ delegationVotesByConviction, isAccountsA
 
 	return (
 		<div className={classes.cardWithFullWidth}>
-			<h2 className='text-base font-bold text-text_primary'>{t('delegationVotesByConviction')}</h2>
+			<h2 className='text-base font-bold text-text_primary xl:text-sm 2xl:text-base'>{t('delegationVotesByConviction')}</h2>
 			<div className={classes.barChartWrapper}>
 				<Bar
 					data={chartData}
 					options={chartOptions}
+					className='h-[250px] w-full'
 				/>
 			</div>
 		</div>

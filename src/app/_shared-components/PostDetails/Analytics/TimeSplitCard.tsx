@@ -138,7 +138,7 @@ function TimeSplitCard({
 
 	return (
 		<div className={classes.cardWithFullWidth}>
-			<h2 className='text-base font-bold text-text_primary'>{t('timeSplit')}</h2>
+			<h2 className='text-base font-bold text-text_primary xl:text-sm 2xl:text-base'>{t('timeSplit')}</h2>
 			{!timeSplitVotes || timeSplitVotes?.length < 1 ? (
 				<div className='flex flex-col items-center justify-center gap-5'>
 					<Image

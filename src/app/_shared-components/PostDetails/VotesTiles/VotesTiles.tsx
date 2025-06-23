@@ -192,25 +192,6 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 	const t = useTranslations('PostDetails.VotesTiles');
 	const network = getCurrentNetwork();
 	const [votesType, setVotesType] = useState<EPostTilesVotesType>(EPostTilesVotesType.FLATTENED);
-	const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
-
-	// Handle window resize for responsive labelSkipSize
-	React.useEffect(() => {
-		const handleResize = () => setWindowWidth(window.innerWidth);
-		if (typeof window !== 'undefined') {
-			window.addEventListener('resize', handleResize);
-			return () => window.removeEventListener('resize', handleResize);
-		}
-		return undefined;
-	}, []);
-
-	// Calculate responsive labelSkipSize based on screen width
-	const getLabelSkipSize = () => {
-		if (windowWidth < 480) return 3; // Very small screens - very aggressive
-		if (windowWidth < 768) return 5; // Mobile - more aggressive
-		if (windowWidth < 1024) return 8; // Tablet
-		return 12; // Desktop
-	};
 
 	const getPostAnalytics = async () => {
 		const { data, error } = await NextApiClientService.getPostTilesVotes({
@@ -305,7 +286,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 	return (
 		<div className={classes.card}>
 			<div className='flex items-center justify-between'>
-				<h2 className='text-base font-bold'>{t('votesDistribution')}</h2>
+				<h2 className='text-base font-bold text-text_primary xl:text-sm 2xl:text-base'>{t('votesDistribution')}</h2>
 				<div className='flex items-center gap-1 rounded-sm bg-bg_code p-1'>
 					{[EPostTilesVotesType.NESTED, EPostTilesVotesType.FLATTENED].map((type) => (
 						<Button
@@ -354,14 +335,13 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 						tooltip={renderTooltip}
 						theme={{
 							text: {
-								fontSize: 11,
-								fontWeight: 600,
-								fontStyle: 'initial',
+								fontSize: 12,
+								fontWeight: 500,
 								fill: THEME_COLORS.light.text_primary
 							}
 						}}
 						margin={{ top: 2, right: 2, bottom: 2, left: 2 }}
-						labelSkipSize={getLabelSkipSize()}
+						labelSkipSize={30}
 						parentLabelPosition='left'
 						motionConfig='gentle'
 					/>
