@@ -148,7 +148,7 @@ function TurnoutOrSupportCard({ turnout, support }: IVotesTurnoutProps) {
 				<Doughnut
 					data={chartData}
 					options={chartOptions}
-					className='h-[170px] w-[180px]'
+					className='h-[170px] w-[180px] max-lg:mt-2 max-lg:w-full'
 				/>
 				<p className='absolute mt-4 block gap-2 text-base font-bold dark:text-white'>{percentage ? `${percentage.toFixed(1)}%` : ''}</p>
 			</div>

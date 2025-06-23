@@ -60,7 +60,7 @@ const calculateTotalDecisionVotes = ({
 	votesTilesData: IPostTilesVotes['votes'];
 	decision: Exclude<EVoteDecision, EVoteDecision.SPLIT | EVoteDecision.SPLIT_ABSTAIN>;
 }): BN => {
-	return new BN(votesTilesData?.[decision]?.reduce((acc, curr) => new BN(acc).add(new BN(curr.votingPower || curr.balance)), BN_ZERO));
+	return new BN(votesTilesData?.[`${decision}`]?.reduce((acc, curr) => new BN(acc).add(new BN(curr.votingPower || curr.balance)), BN_ZERO));
 };
 
 const calculatePerVotePercentage = ({
@@ -88,7 +88,7 @@ const useVotesDistribution = ({ votesTilesData }: { votesTilesData: IPostTilesVo
 
 		decisions.forEach((decision) => {
 			const distributionKey = decision;
-			const votesList = votesTilesData?.[distributionKey];
+			const votesList = votesTilesData?.[`${distributionKey}`];
 
 			if (votesList?.length > 0) {
 				const otherVotes: IVoteDistribution = {
@@ -192,6 +192,25 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 	const t = useTranslations('PostDetails.VotesTiles');
 	const network = getCurrentNetwork();
 	const [votesType, setVotesType] = useState<EPostTilesVotesType>(EPostTilesVotesType.FLATTENED);
+	const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
+
+	// Handle window resize for responsive labelSkipSize
+	React.useEffect(() => {
+		const handleResize = () => setWindowWidth(window.innerWidth);
+		if (typeof window !== 'undefined') {
+			window.addEventListener('resize', handleResize);
+			return () => window.removeEventListener('resize', handleResize);
+		}
+		return undefined;
+	}, []);
+
+	// Calculate responsive labelSkipSize based on screen width
+	const getLabelSkipSize = () => {
+		if (windowWidth < 480) return 3; // Very small screens - very aggressive
+		if (windowWidth < 768) return 5; // Mobile - more aggressive
+		if (windowWidth < 1024) return 8; // Tablet
+		return 12; // Desktop
+	};
 
 	const getPostAnalytics = async () => {
 		const { data, error } = await NextApiClientService.getPostTilesVotes({
@@ -218,7 +237,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 	const renderTooltip = useCallback(
 		// eslint-disable-next-line react/no-unused-prop-types
 		({ node: { id, formattedValue } }: { node: { id: string; formattedValue: string | number } }) => {
-			const vote = allVotes.find((vote) => vote.voter === id);
+			const vote = allVotes.find((value) => value.voter === id);
 			const voteType = vote?.voteType;
 			const percentage = vote?.percentage || 0;
 			const delegatorsCount = vote?.delegatorsCount;
@@ -236,7 +255,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 							<span className='text-primary_text text-sm font-bold dark:text-white'>{t('others')}</span>
 							<div className='flex items-center justify-center gap-1 text-xs text-text_primary'>
 								<span className='font-bold text-basic_text'>
-									{formattedValue} {NETWORKS_DETAILS[network].tokenSymbol}
+									{formattedValue} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
 								</span>
 								<span className='text-basic_text'>{percentage}%</span>
 							</div>
@@ -251,7 +270,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 								<div className='flex flex-col items-center justify-center gap-1 text-xs text-text_primary'>
 									<div className='flex flex-col items-center gap-1 font-bold text-basic_text'>
 										<span className='text-basic_text'>
-											{t('votes')}: {formattedValue} {NETWORKS_DETAILS[network].tokenSymbol}
+											{t('votes')}: {formattedValue} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
 										</span>
 										<span className='text-basic_text'>
 											{t('delegators')}: {delegatorsCount}
@@ -268,7 +287,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 											<span className='text-basic_text'>{isDelegated ? `(${lockPeriod}x/d) ` : `(${lockPeriod}x)`}</span>
 										</div>
 										<span className='text-basic_text'>
-											{t('votes')}: {formattedValue} {NETWORKS_DETAILS[network].tokenSymbol}
+											{t('votes')}: {formattedValue} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
 										</span>
 									</div>
 									<span className='text-basic_text'>{percentage}%</span>
@@ -279,6 +298,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 				</div>
 			);
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[allVotes, t, network]
 	);
 
@@ -287,32 +307,22 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 			<div className='flex items-center justify-between'>
 				<h2 className='text-base font-bold'>{t('votesDistribution')}</h2>
 				<div className='flex items-center gap-1 rounded-sm bg-bg_code p-1'>
-					<Button
-						variant='ghost'
-						size='sm'
-						disabled={isFetching}
-						onClick={() => setVotesType(EPostTilesVotesType.NESTED)}
-						className={`h-7 px-3 text-xs font-medium transition-all ${
-							votesType === EPostTilesVotesType.NESTED
-								? 'bg-toggle_btn_active_bg text-toggle_btn_active_text shadow-sm'
-								: 'bg-toggle_btn_inactive_bg text-toggle_btn_inactive_text hover:bg-primary_border'
-						}`}
-					>
-						{t('nested')}
-					</Button>
-					<Button
-						variant='ghost'
-						size='sm'
-						disabled={isFetching}
-						onClick={() => setVotesType(EPostTilesVotesType.FLATTENED)}
-						className={`h-7 px-3 text-xs font-medium transition-all ${
-							votesType === EPostTilesVotesType.FLATTENED
-								? 'bg-toggle_btn_active_bg text-toggle_btn_active_text shadow-sm'
-								: 'bg-toggle_btn_inactive_bg text-toggle_btn_inactive_text hover:bg-primary_border'
-						}`}
-					>
-						{t('flattened')}
-					</Button>
+					{[EPostTilesVotesType.NESTED, EPostTilesVotesType.FLATTENED].map((type) => (
+						<Button
+							key={type}
+							variant='ghost'
+							size='sm'
+							disabled={isFetching}
+							onClick={() => setVotesType(type)}
+							className={`h-7 px-3 text-xs font-medium transition-all ${
+								votesType === type
+									? 'bg-toggle_btn_active_bg text-toggle_btn_active_text shadow-sm'
+									: 'bg-toggle_btn_inactive_bg text-toggle_btn_inactive_text hover:bg-primary_border'
+							}`}
+						>
+							{t(type)}
+						</Button>
+					))}
 				</div>
 			</div>
 			{isFetching ? (
@@ -321,7 +331,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 				<div className={classes.chartWrapper}>
 					<ResponsiveTreeMap
 						data={chartData}
-						tile='binary'
+						tile='squarify'
 						colorBy='color'
 						identity='name'
 						colors={(bar) => {
@@ -330,10 +340,10 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 						leavesOnly
 						value='value'
 						valueFormat={(value) => formatUSDWithUnits(value?.toString(), 1)}
-						innerPadding={8}
-						outerPadding={4}
-						borderWidth={0}
-						borderColor='transparent'
+						innerPadding={6}
+						outerPadding={2}
+						borderWidth={1}
+						borderColor='rgba(255, 255, 255, 0.3)'
 						enableParentLabel
 						nodeOpacity={1}
 						labelTextColor={THEME_COLORS.light.text_primary}
@@ -343,11 +353,17 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 						}}
 						tooltip={renderTooltip}
 						theme={{
-							text: { fontSize: 12, fontWeight: 500, fontStyle: 'initial' }
+							text: {
+								fontSize: 11,
+								fontWeight: 600,
+								fontStyle: 'initial',
+								fill: THEME_COLORS.light.text_primary
+							}
 						}}
-						margin={{ top: 4, right: 4, bottom: 4, left: 4 }}
-						labelSkipSize={40}
+						margin={{ top: 2, right: 2, bottom: 2, left: 2 }}
+						labelSkipSize={getLabelSkipSize()}
 						parentLabelPosition='left'
+						motionConfig='gentle'
 					/>
 				</div>
 			)}

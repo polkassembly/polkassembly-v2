@@ -32,14 +32,14 @@ function PostAnalytics({ analytics, isFetching, proposalType, index }: { analyti
 				<div className='flex flex-col gap-4'>
 					<Skeleton className='h-[40px] w-[150px] rounded-lg' />
 					<Skeleton className='h-[50px] w-full rounded-lg' />
-					<div className='flex gap-4'>
+					<div className='flex gap-4 max-lg:flex-col'>
 						<Skeleton className='h-[180px] w-full rounded-lg' />
 						<Skeleton className='h-[180px] w-full rounded-lg' />
 						<Skeleton className='h-[180px] w-full rounded-lg' />
 					</div>
 					<Skeleton className='h-[250px] w-full rounded-lg' />
 					<Skeleton className='h-[300px] w-full rounded-lg' />
-					<div className='flex gap-4'>
+					<div className='flex gap-4 max-lg:flex-col'>
 						<Skeleton className='h-[250px] w-full rounded-lg' />
 						<Skeleton className='h-[250px] w-full rounded-lg' />
 					</div>

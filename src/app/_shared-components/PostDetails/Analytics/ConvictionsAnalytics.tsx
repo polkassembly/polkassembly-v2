@@ -14,7 +14,7 @@ import VotesTiles from '../VotesTiles/VotesTiles';
 function ConvictionsAnalytics({ convictionsAnalytics, proposalType, index }: { convictionsAnalytics: IAnalytics; proposalType: EProposalType; index: number }) {
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='flex gap-4'>
+			<div className='flex gap-4 max-lg:flex-col'>
 				<TotalVotesCard analytics={convictionsAnalytics} />
 				<DelegatedVsSoloCard
 					delegatedValue={convictionsAnalytics.delegated}
@@ -31,7 +31,7 @@ function ConvictionsAnalytics({ convictionsAnalytics, proposalType, index }: { c
 				/>
 			</div>
 			<Separator className='dashed my-4' />
-			<div className='flex gap-4'>
+			<div className='flex gap-4 max-lg:flex-col'>
 				<VotesByConvictions votesByConviction={convictionsAnalytics?.votesByConviction || []} />
 				<DelegationVotesByConvictions delegationVotesByConviction={convictionsAnalytics?.delegationVotesByConviction || []} />
 			</div>

@@ -111,13 +111,13 @@ function TotalVotesCard({ analytics, isAccountsAnalytics = false }: { analytics:
 				<Doughnut
 					data={chartData}
 					options={chartOptions}
-					className='h-[170px] w-[180px]'
+					className='h-[170px] w-[180px] max-lg:mt-2 max-lg:w-full'
 				/>
 				<p className='absolute mt-4 flex items-center gap-1 text-lg font-bold dark:text-white'>
 					{isAccountsAnalytics
 						? maxValue
 						: formatUSDWithUnits(formatBnBalance(maxValue.toString(), { numberAfterComma: 0, withThousandDelimitor: false, withUnit: false }, network), 1)}
-					<span className='text-text_secondary text-sm'>{isAccountsAnalytics ? t('users') : NETWORKS_DETAILS[network].tokenSymbol}</span>
+					<span className='text-text_secondary text-sm'>{isAccountsAnalytics ? t('users') : NETWORKS_DETAILS[`${network}`].tokenSymbol}</span>
 				</p>
 			</div>
 		</div>
