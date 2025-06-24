@@ -1209,7 +1209,8 @@ export class SubsquidService extends SubsquidUtils {
 
 			// Group support percentages by track number using reduce
 			const trackSupportPercentages = subsquidData.proposals.reduce((acc: Record<string, TrackData>, proposal: Proposal) => {
-				if (!proposal.trackNumber || !proposal.convictionVoting?.length) return acc;
+				// Handle trackNumber being 0 (ROOT track) - check for null/undefined but allow 0
+				if (proposal.trackNumber === null || proposal.trackNumber === undefined || !proposal.convictionVoting?.length) return acc;
 
 				const trackNumber = proposal.trackNumber.toString();
 
