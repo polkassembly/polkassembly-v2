@@ -1156,10 +1156,6 @@ export class SubsquidService extends SubsquidUtils {
 
 	static async GetTurnoutPercentageData({ network }: { network: ENetwork }): Promise<ITurnoutPercentageData> {
 		try {
-			console.error('=== TURNOUT PERCENTAGE DEBUG START ===');
-			console.error('Network:', network);
-			console.error('Query:', SubsquidQueries.GET_TURNOUT_PERCENTAGE_DATA);
-
 			const { data: subsquidData, error: subsquidErr } = await this.subsquidGqlClient(network).query(SubsquidQueries.GET_TURNOUT_PERCENTAGE_DATA, {}).toPromise();
 
 			if (subsquidErr) {
@@ -1167,56 +1163,103 @@ export class SubsquidService extends SubsquidUtils {
 				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching turnout percentage data from Subsquid');
 			}
 
-			console.error('Subsquid Response:', JSON.stringify(subsquidData, null, 2));
-
 			if (!subsquidData?.proposals) {
 				console.error('No proposals found in response');
 				return { averageSupportPercentages: {} };
 			}
 
+			// Get total active issuance from blockchain
+			const wsProvider = NETWORKS_DETAILS[network].rpcEndpoints[0].url;
+
+			// Create API connection to get total issuance
+			const { ApiPromise, WsProvider } = await import('@polkadot/api');
+			const provider = new WsProvider(wsProvider);
+			const api = await ApiPromise.create({ provider });
+			await api.isReady;
+
+			// Get total issuance and inactive issuance
+			const totalIssuance = await api.query.balances.totalIssuance();
+			const inactiveIssuance = await api.query.balances.inactiveIssuance();
+			const activeIssuance = new BN(totalIssuance.toString()).sub(new BN(inactiveIssuance.toString()));
+
+			await api.disconnect();
+
+			interface VoteBalance {
+				value?: string;
+				aye?: string;
+				nay?: string;
+				abstain?: string;
+			}
+
+			interface ConvictionVote {
+				balance: VoteBalance;
+				decision: 'yes' | 'no' | 'abstain' | 'split' | 'splitAbstain';
+			}
+
 			interface Proposal {
+				index: number;
 				trackNumber?: number;
-				tally?: {
-					support?: string;
-				};
+				convictionVoting: ConvictionVote[];
 			}
 
 			interface TrackData {
-				totalSupport: number;
+				totalSupport: BN;
 				count: number;
 			}
 
 			// Group support percentages by track number using reduce
 			const trackSupportPercentages = subsquidData.proposals.reduce((acc: Record<string, TrackData>, proposal: Proposal) => {
-				if (!proposal.trackNumber || !proposal.tally?.support) return acc;
+				if (!proposal.trackNumber || !proposal.convictionVoting?.length) return acc;
 
 				const trackNumber = proposal.trackNumber.toString();
-				const { support } = proposal.tally;
-				const supportPercentage = Number(support) / 1e16;
+
+				// Calculate total support for this proposal by summing up all vote balances
+				// Support includes 'aye' votes and abstain votes (following V1 logic)
+				const proposalSupport = proposal.convictionVoting.reduce((support: BN, vote: ConvictionVote) => {
+					let voteBalance = BN_ZERO;
+
+					if (vote.decision === 'yes' || vote.decision === 'abstain') {
+						if (vote.balance.value) {
+							voteBalance = new BN(vote.balance.value);
+						} else if (vote.balance.aye) {
+							voteBalance = new BN(vote.balance.aye);
+						} else if (vote.balance.abstain) {
+							voteBalance = new BN(vote.balance.abstain);
+						}
+					}
+
+					return support.add(voteBalance);
+				}, BN_ZERO);
 
 				if (!acc[trackNumber]) {
-					acc[trackNumber] = { totalSupport: 0, count: 0 };
+					acc[trackNumber] = { totalSupport: BN_ZERO, count: 0 };
 				}
 
-				acc[trackNumber].totalSupport += supportPercentage;
+				acc[trackNumber].totalSupport = acc[trackNumber].totalSupport.add(proposalSupport);
 				acc[trackNumber].count += 1;
 
 				return acc;
 			}, {});
 
-			// Calculate average support percentages and convert track numbers to track names using Object.entries and reduce
+			// Calculate average support percentages and convert track numbers to track names
 			const averageSupportPercentages = Object.entries(trackSupportPercentages as Record<string, TrackData>).reduce<Record<string, number>>((acc, [trackNumber, data]) => {
 				if (data.count > 0) {
 					const trackName = getTrackNameFromId({ trackId: parseInt(trackNumber, 10), network });
 					if (trackName) {
-						acc[trackName] = Number((data.totalSupport / data.count).toFixed(16));
+						// Calculate average support per proposal for this track
+						const averageSupport = data.totalSupport.divn(data.count);
+
+						// Calculate turnout percentage with higher precision
+						// Multiply by 10000 to get 2 decimal places precision, then divide by 100 at the end
+						const turnoutPercentageBN = averageSupport.muln(10000).div(activeIssuance);
+						const turnoutPercentage = Number(turnoutPercentageBN.toString()) / 100;
+
+						// Round to exactly 2 decimal places
+						acc[trackName] = Math.round(turnoutPercentage * 100) / 100;
 					}
 				}
 				return acc;
 			}, {});
-
-			console.error('Final Results:', averageSupportPercentages);
-			console.error('=== TURNOUT PERCENTAGE DEBUG END ===');
 
 			return { averageSupportPercentages };
 		} catch (error) {

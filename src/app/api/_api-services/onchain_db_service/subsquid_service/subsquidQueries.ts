@@ -1084,10 +1084,21 @@ export class SubsquidQueries {
 
 	protected static GET_TURNOUT_PERCENTAGE_DATA = `
 		query GetTurnoutPercentageData {
-			proposals(where: {type_eq: ReferendumV2}, orderBy: createdAt_DESC) {
+			proposals(where: {type_eq: ReferendumV2, status_in: [Executed, Approved, Confirmed, Rejected, Killed, ExecutionFailed, TimedOut, Cancelled]}, orderBy: createdAt_DESC) {
+				index
 				trackNumber
-				tally {
-					support
+				convictionVoting(where: {removedAtBlock_isNull: true}) {
+					balance {
+						... on StandardVoteBalance {
+							value
+						}
+						... on SplitVoteBalance {
+							aye
+							nay
+							abstain
+						}
+					}
+					decision
 				}
 			}
 		}
