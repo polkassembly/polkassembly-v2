@@ -5,3 +5,4 @@
 import { EProposalStatus } from '@shared/types';
 
 export const FAILED_PROPOSAL_STATUSES = [EProposalStatus.Cancelled, EProposalStatus.TimedOut, EProposalStatus.Rejected, EProposalStatus.Killed, EProposalStatus.ExecutionFailed];
+export const PASSED_PROPOSAL_STATUSES = [EProposalStatus.Passed, EProposalStatus.Executed, EProposalStatus.Confirmed];
