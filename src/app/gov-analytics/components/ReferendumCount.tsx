@@ -9,8 +9,13 @@ import { useQuery } from '@tanstack/react-query';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { PieChart } from 'react-minimal-pie-chart';
+import { Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, TooltipItem } from 'chart.js';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { useTheme } from 'next-themes';
+
+// Register Chart.js components
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface IReferendumCount {
 	[key: string]: number;
@@ -19,7 +24,7 @@ interface IReferendumCount {
 function ReferendumCount() {
 	const t = useTranslations('GovAnalytics');
 	const network = getCurrentNetwork();
-
+	const { theme } = useTheme();
 	const { data, isLoading } = useQuery({
 		queryKey: ['gov-analytics-track-proposals', network],
 		queryFn: async () => {
@@ -39,26 +44,80 @@ function ReferendumCount() {
 		});
 	}
 
-	const chartData = Object.entries(trackInfo).map(([key, value], index) => ({
-		color: `hsl(${index * 30}, 70%, 50%)`,
-		id: key.split('_').join(' '),
-		label: key
+	const chartLabels = Object.entries(trackInfo).map(([key]) =>
+		key
 			.split('_')
 			.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-			.join(' '),
-		value
+			.join(' ')
+	);
+
+	const chartValues = Object.values(trackInfo);
+
+	const chartData = {
+		labels: chartLabels,
+		datasets: [
+			{
+				data: chartValues,
+				backgroundColor: chartLabels.map((_, index) => `hsl(${index * 30}, 70%, 50%)`),
+				borderColor: theme === 'dark' ? '#000000' : '#ffffff',
+				borderWidth: 2, // Add spacing between segments
+				hoverBackgroundColor: chartLabels.map((_, index) => `hsl(${index * 30}, 70%, 55%)`),
+				hoverBorderColor: '#ffffff',
+				hoverBorderWidth: 3,
+				borderRadius: 8, // Rounded edges for segments
+				borderSkipped: false // Ensure all borders are rounded
+			}
+		]
+	};
+
+	const chartOptions = {
+		responsive: true,
+		maintainAspectRatio: false,
+		cutout: '75%', // Increased cutout for thinner arc width
+		plugins: {
+			legend: {
+				display: false // We'll use our custom legend
+			},
+			tooltip: {
+				callbacks: {
+					label: (tooltipItem: TooltipItem<'doughnut'>) => {
+						const value = tooltipItem.raw as number;
+						const total = (tooltipItem.dataset.data as number[]).reduce((sum: number, val: number) => sum + val, 0);
+						const percentage = ((value / total) * 100).toFixed(2);
+						return `${value} proposals [${percentage}%]`;
+					}
+				},
+				backgroundColor: 'rgba(0, 0, 0, 0.8)',
+				titleColor: 'white',
+				bodyColor: 'white',
+				borderColor: 'rgba(255, 255, 255, 0.1)',
+				borderWidth: 1,
+				cornerRadius: 8,
+				displayColors: true
+			}
+		},
+		animation: {
+			animateRotate: true,
+			animateScale: false
+		}
+	};
+
+	// Split chart data into three sections for legend
+	const legendData = chartLabels.map((label, index) => ({
+		label,
+		value: chartValues[index],
+		color: `hsl(${index * 30}, 70%, 50%)`
 	}));
 
-	// Split chart data into three sections
-	const firstRowData = chartData.slice(0, 6);
-	const secondRowData = chartData.slice(6, 11);
-	const thirdRowData = chartData.slice(11);
+	const firstRowData = legendData.slice(0, 6);
+	const secondRowData = legendData.slice(6, 11);
+	const thirdRowData = legendData.slice(11);
 
-	const renderLegendRow = (items: typeof chartData) => (
+	const renderLegendRow = (items: typeof legendData) => (
 		<div className='flex w-full flex-wrap gap-x-4 gap-y-2'>
 			{items.map((item) => (
 				<div
-					key={item.id}
+					key={`${item.label}`}
 					className='flex items-center text-xs'
 				>
 					<div
@@ -90,16 +149,12 @@ function ReferendumCount() {
 		<div className='flex flex-col gap-4 rounded-lg border border-border_grey p-4'>
 			<h3 className='text-blue-light-high dark:text-blue-dark-high text-base font-semibold'>{t('referendumCount')}</h3>
 			<div className='flex flex-col items-center justify-center gap-x-10 sm:flex-row sm:justify-around'>
-				<PieChart
-					data={chartData}
-					className='mx-10 my-5 h-[200px] w-full'
-					center={[50, 50]}
-					startAngle={0}
-					lengthAngle={360}
-					rounded
-					paddingAngle={13}
-					lineWidth={20}
-				/>
+				<div className='mx-10 my-5 h-[200px] w-full max-w-[400px]'>
+					<Doughnut
+						data={chartData}
+						options={chartOptions}
+					/>
+				</div>
 				{renderLegendRow(firstRowData)}
 				{renderLegendRow(secondRowData)}
 				{renderLegendRow(thirdRowData)}
