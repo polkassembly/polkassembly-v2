@@ -22,10 +22,12 @@ function ActivityFeedAbout() {
 				<span className='dark:text-white'>{t('ActivityFeed.AboutDescription')} </span>
 				<span className='hover:underline'>
 					<Link
-						href='https://polkadot.network/about'
+						href='https://polkadot.com/blog/polkadot-dao-explained/'
 						className={styles.knowMoreLink}
+						target='_blank'
+						rel='noopener noreferrer'
 					>
-						{t('ActivityFeed.KnowMore')} <MdOpenInNew />
+						{t('ActivityFeed.ReadMore')} <MdOpenInNew />
 					</Link>
 				</span>
 			</div>
