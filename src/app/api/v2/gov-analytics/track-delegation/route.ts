@@ -6,7 +6,7 @@ import { NextRequest } from 'next/server';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EHttpHeaderKey, ENetwork } from '@/_shared/types';
-import { SubsquidService } from '@/app/api/_api-services/onchain_db_service/subsquid_service';
+import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 
 export async function GET(req: NextRequest) {
 	try {
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 			}
 		}
 
-		const data = await SubsquidService.GetTrackDelegationAnalyticsStats({ network });
+		const data = await OnChainDbService.GetTrackDelegationAnalyticsStats({ network });
 
 		// Cache the data
 		await RedisService.SetTrackDelegationAnalytics({ network, data });

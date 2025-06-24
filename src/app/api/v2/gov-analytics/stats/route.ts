@@ -4,7 +4,7 @@
 
 import { NextRequest } from 'next/server';
 import { RedisService } from '@/app/api/_api-services/redis_service';
-import { SubsquidService } from '@/app/api/_api-services/onchain_db_service/subsquid_service';
+import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EHttpHeaderKey, ENetwork } from '@/_shared/types';
 
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 		}
 
 		// If not in cache or skipCache is true, fetch from Subsquid
-		const data = await SubsquidService.GetGovAnalyticsStats({ network });
+		const data = await OnChainDbService.GetGovAnalyticsStats({ network });
 
 		// Cache the data
 		await RedisService.SetGovAnalyticsStats({ network, data });

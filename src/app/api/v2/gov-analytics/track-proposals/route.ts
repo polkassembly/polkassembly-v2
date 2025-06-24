@@ -4,7 +4,7 @@
 
 import { NextRequest } from 'next/server';
 import { RedisService } from '@/app/api/_api-services/redis_service';
-import { SubsquidService } from '@/app/api/_api-services/onchain_db_service/subsquid_service';
+import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EHttpHeaderKey, ENetwork } from '@/_shared/types';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
 
 		const promises = trackIds.map(async (trackId) => {
 			try {
-				const stats = await SubsquidService.GetTrackAnalyticsStats({
+				const stats = await OnChainDbService.GetTrackLevelAnalyticsStats({
 					network,
 					trackId
 				});
