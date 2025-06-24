@@ -35,7 +35,8 @@
 		"ExploreTab": "Erkunden",
 		"SubscribedTab": "Abonniert",
 		"About": "Über",
-		"AboutDescription": "Polkadot ist die All-in-One DeFi-Zentrale von Polkadot.",
+		"AboutDescription": "Polkadot ist eine dezentrale Blockchain-Plattform, die entwickelt wurde, um mehrere spezialisierte Blockchains (Parachains) in einem einheitlichen Netzwerk zu verbinden und Interoperabilität, Skalierbarkeit und sichere Chain-übergreifende Kommunikation zu ermöglichen. Seine Architektur verfügt über eine zentrale Relay Chain und unterstützt verschiedene Anwendungen, von DeFi bis hin zu Governance, indem es einen nahtlosen Daten- und Wertetransfer zwischen den Chains ermöglicht.",
+		"ReadMore": "Weiterlesen",
 		"KnowMore": "Mehr erfahren",
 		"VotedProposals": "Abgestimmte Vorschläge",
 		"ActiveProposals": "Aktive Vorschläge",
@@ -718,7 +719,7 @@
 			"cancel": "Abbrechen",
 			"insertImage": "Bild einfügen",
 			"failedToUploadImage": "Bild konnte nicht hochgeladen werden"
-		},	
+		},
 		"AllowedCommentors": {
 			"title": "Wer kann kommentieren?",
 			"all": "Alle",
