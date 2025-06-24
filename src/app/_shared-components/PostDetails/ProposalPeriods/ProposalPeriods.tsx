@@ -5,13 +5,11 @@ import React from 'react';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { EPeriodType, EPostOrigin, EProposalStatus } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
-import { FAILED_PROPOSAL_STATUSES } from '@/_shared/_constants/failedProposalStatuses';
+import { FAILED_PROPOSAL_STATUSES, PASSED_PROPOSAL_STATUSES } from '@/_shared/_constants/proposalResultStatuses';
 import PeriodProgress from './PeriodProgress';
 import classes from './ProposalPeriods.module.scss';
 
 const TOTAL_PERIODS = 3;
-
-const PASSED_STATUSES = [EProposalStatus.Passed, EProposalStatus.Executed];
 
 function ProposalPeriods({
 	confirmationPeriodEndsAt,
@@ -31,7 +29,7 @@ function ProposalPeriods({
 	const decisionPeriodEnded = decisionPeriodEndsAt ? dayjs(decisionPeriodEndsAt).isBefore(dayjs()) : false;
 	const confirmationPeriodEnded = confirmationPeriodEndsAt ? dayjs(confirmationPeriodEndsAt).isBefore(dayjs()) : false;
 	const proposalHasFailed = FAILED_PROPOSAL_STATUSES.includes(status);
-	const proposalHasPassed = PASSED_STATUSES.includes(status);
+	const proposalHasPassed = PASSED_PROPOSAL_STATUSES.includes(status);
 
 	const periodsEnded = [preparePeriodEnded, decisionPeriodEnded, confirmationPeriodEnded].filter((period) => period);
 
