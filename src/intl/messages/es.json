@@ -457,6 +457,7 @@
 		"preparePeriod": "Período de Preparación",
 		"decisionPeriod": "Período de Decisión",
 		"summary": "Resumen",
+		"summarise": "Resumen",
 		"aye": "Sí",
 		"nay": "No",
 		"split": "Dividido",
@@ -479,7 +480,9 @@
 			"to": "a",
 			"totalEstimatedUSD": "Total estimado en USD",
 			"more": "más",
-			"requestedAmountDetails": "Detalles del monto solicitado"
+			"requestedAmountDetails": "Detalles del monto solicitado",
+			"showMore": "Mostrar más",
+			"showLess": "Mostrar menos"
 		},
 		"OnchainInfo": {
 			"metadata": "Metadatos",
@@ -488,6 +491,7 @@
 			"origin": "Origen",
 			"method": "Método",
 			"proposalHash": "Hash de propuesta",
+			"details": "Detalles",
 			"preimage": "Preimagen",
 			"description": "Descripción",
 			"section": "Sección",
@@ -499,7 +503,13 @@
 			"fee": "Gastos",
 			"parentBountyIndex": "Índice de recompensa principal",
 			"payee": "Beneficiario",
-			"curator": "Curador"
+			"curator": "Curador",
+			"requested":"Solicitado",
+			"calls": "Llamadas",
+			"showMore": "Mostrar más",
+			"showLess": "Mostrar menos",
+			"call": "Llamada",
+			"timeline": "Línea de Tiempo"
 		},
 		"deleteComment": "Eliminar comentario",
 		"deleteCommentConfirmation": "¿Está seguro de que desea eliminar este comentario?",

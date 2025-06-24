@@ -12,7 +12,7 @@
 	@apply text-sm text-text_pink;
 }
 .beneficiariesList {
-	@apply mt-6 flex flex-col gap-2;
+	@apply mt-4 flex flex-col gap-2;
 }
 .beneficiariesSeeMore {
 	@apply flex items-center gap-1 text-sm text-basic_text;
@@ -33,7 +33,7 @@
 	@apply text-base font-bold text-basic_text;
 }
 .beneficiariesDetailsDialogContentList {
-	@apply mt-6 flex max-h-[60vh] flex-col gap-3 overflow-y-auto;
+	@apply flex max-h-[60vh] flex-col gap-3 overflow-y-auto;
 }
 .beneficiariesDialogListItem {
 	@apply flex justify-between gap-8 max-lg:flex-col max-lg:gap-2;

@@ -22,6 +22,8 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import Link from 'next/link';
 import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
 import { ArrowLeftIcon } from 'lucide-react';
+import SummariseIcon from '@/_assets/icons/summarise.svg';
+import Image from 'next/image';
 import classes from './PostHeader.module.scss';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 
@@ -127,8 +129,19 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 
 			<TabsList className={`mx-auto max-w-full overflow-auto pl-4 font-bold capitalize md:pl-0 ${classes.hideScrollbar}`}>
 				<TabsTrigger value={EPostDetailsTab.DESCRIPTION}>{t('PostDetails.description')}</TabsTrigger>
-				<TabsTrigger value={EPostDetailsTab.TIMELINE}>{t('PostDetails.timeline')}</TabsTrigger>
 				{!isOffchainPost && <TabsTrigger value={EPostDetailsTab.ONCHAIN_INFO}>{t('PostDetails.onchainInfo')}</TabsTrigger>}
+				<TabsTrigger
+					value={EPostDetailsTab.SUMMARISE}
+					className='flex items-center gap-x-1 text-text_pink'
+				>
+					<Image
+						src={SummariseIcon}
+						alt='summarise'
+						width={16}
+						height={16}
+					/>
+					<span>{t('PostDetails.summarise')}</span>
+				</TabsTrigger>
 			</TabsList>
 		</div>
 	);

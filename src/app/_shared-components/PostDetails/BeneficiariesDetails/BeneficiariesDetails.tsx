@@ -12,7 +12,6 @@ import classes from './BeneficiariesDetails.module.scss';
 import { Button } from '../../Button';
 import BeneficiariesDetailsDialog from './BeneficiariesDetailsDialog';
 import BeneficiaryItem from './BeneficiaryItem';
-import BeneficiariesSkeleton from './BeneficiariesSkeleton';
 
 // Main component
 function BeneficiariesDetails({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
@@ -41,22 +40,18 @@ function BeneficiariesDetails({ beneficiaries }: { beneficiaries: IBeneficiary[]
 					<ChevronRightIcon className='h-4 w-4' />
 				</Button>
 			</div>
-			{!beneficiaries?.length ? (
-				<BeneficiariesSkeleton />
-			) : (
-				<div className={classes.beneficiariesList}>
-					{Object.entries(groupedBeneficiaries).map(([assetId, { amount, addresses }], index) => (
-						<BeneficiaryItem
-							key={`${addresses[0]}-${assetId}`}
-							assetId={assetId}
-							amount={amount}
-							addresses={addresses}
-							index={index}
-							totalLength={Object.keys(groupedBeneficiaries).length}
-						/>
-					))}
-				</div>
-			)}
+
+			<div className={classes.beneficiariesList}>
+				{Object.entries(groupedBeneficiaries).map(([assetId, { amount, addresses }], index) => (
+					<BeneficiaryItem
+						assetId={assetId}
+						amount={amount}
+						addresses={addresses}
+						index={index}
+						totalLength={Object.keys(groupedBeneficiaries).length}
+					/>
+				))}
+			</div>
 			<BeneficiariesDetailsDialog
 				open={openDialog}
 				onOpenChange={setOpenDialog}

@@ -456,6 +456,7 @@
 		"preparePeriod": "準備期間",
 		"decisionPeriod": "決定期間",
 		"summary": "要約",
+		"summarise": "要約",
 		"aye": "賛成",
 		"nay": "反対",
 		"split": "分割",
@@ -478,7 +479,9 @@
 			"to": "に",
 			"totalEstimatedUSD": "合計推定USD相当",
 			"more": "もっと",
-			"requestedAmountDetails": "リクエストされた金額の詳細"
+			"requestedAmountDetails": "リクエストされた金額の詳細",	
+			"showMore": "もっと表示",
+			"showLess": "もっと少なく表示"
 		},
 		"OnchainInfo": {
 			"metadata": "メタデータ",
@@ -488,6 +491,7 @@
 			"method": "メソッド",
 			"proposalHash": "提案ハッシュ",
 			"preimage": "プレイメージ",
+			"details": "詳細",
 			"description": "説明",
 			"section": "セクション",
 			"name": "名前",
@@ -498,7 +502,13 @@
 			"fee": "料金",
 			"parentBountyIndex": "親報奨金インデックス",
 			"payee": "受益者",
-			"curator": "クレジット"
+			"curator": "クレジット",
+			"requested":"リクエスト済み",
+			"calls": "呼び出し",
+			"showMore": "もっと表示",
+			"showLess": "もっと少なく表示",
+			"call": "呼び出し",
+			"timeline": "タイムライン"
 		},
 		"deleteComment": "コメントを削除",
 		"deleteCommentConfirmation": "このコメントを削除してもよろしいですか？",

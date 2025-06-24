@@ -159,7 +159,8 @@ export const THEME_COLORS = {
 		bg_light_pink: '#fef0f7',
 		progress_pink_indicator: '#ededed',
 		tag_input_bg: '#f4f6f8',
-		parachain_badge_bg: '#ea729d'
+		parachain_badge_bg: '#ea729d',
+		call_args_bg: '#F5F6F8'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -315,6 +316,7 @@ export const THEME_COLORS = {
 		bg_light_pink: '#fef0f7',
 		progress_pink_indicator: '#343744',
 		tag_input_bg: '#222222',
-		parachain_badge_bg: '#ea729d'
+		parachain_badge_bg: '#ea729d',
+		call_args_bg: '#222222'
 	}
 };

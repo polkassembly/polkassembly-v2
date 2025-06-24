@@ -31,10 +31,7 @@ function BeneficiaryItem({ assetId, amount, addresses, index, totalLength }: Ben
 	const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
 	const icon = treasuryAssetsData[unit as EAssets]?.icon || NETWORKS_DETAILS[`${network}`].logo;
 	return (
-		<div
-			className={classes.beneficiaryItem}
-			key={`${addresses[0]}-${assetId}`}
-		>
+		<div className={classes.beneficiaryItem}>
 			<div className={classes.beneficiaryItemHeader}>
 				<div className={classes.beneficiaryItemHeaderAmount}>
 					<div className={classes.beneficiaryItemHeaderAmountContent}>

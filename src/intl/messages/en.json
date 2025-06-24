@@ -461,6 +461,7 @@
 		"preparePeriod": "Prepare Period",
 		"decisionPeriod": "Decision Period",
 		"summary": "Summary",
+		"summarise": "SUMMARISE",
 		"aye": "Aye",
 		"nay": "Nay",
 		"split": "Split",
@@ -491,7 +492,9 @@
 			"to": "to",
 			"totalEstimatedUSD": "Total estimated USD equivalent",
 			"more": "more",
-			"requestedAmountDetails": "Requested Amount Details"
+			"requestedAmountDetails": "Requested Amount Details",
+			"showMore": "Show More",
+			"showLess": "Show Less"
 		},
 		"OnchainInfo": {
 			"metadata": "Metadata",
@@ -502,6 +505,7 @@
 			"proposalHash": "Proposal Hash",
 			"preimage": "Preimage",
 			"description": "Description",
+			"details": "Details",
 			"section": "Section",
 			"name": "Name",
 			"value": "Value",
@@ -518,7 +522,13 @@
 			"updatedAtBlock": "Updated At Block",
 			"enactmentAtBlock": "Enactment At Block",
 			"enactmentAfterBlock": "Enactment After Block",
-			"trackNumber": "Track Number"
+			"trackNumber": "Track Number",
+			"requested": "Requested",
+			"calls": "Calls",
+			"showMore": "Show More",
+			"showLess": "Show Less",
+			"call": "Call",
+			"timeline": "Timeline"
 		},
 		"ProposalType": {
 			"discussion": "Discussion",

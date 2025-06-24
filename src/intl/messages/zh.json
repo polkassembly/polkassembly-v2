@@ -456,6 +456,7 @@
 		"preparePeriod": "准备期",
 		"decisionPeriod": "决策期",
 		"summary": "摘要",
+		"summarise": "摘要",
 		"aye": "赞成",
 		"nay": "反对",
 		"split": "分割",
@@ -477,7 +478,9 @@
 			"to": "到",
 			"totalEstimatedUSD": "总计估计美元等值",
 			"more": "更多",
-			"requestedAmountDetails": "已请求金额详情"
+			"requestedAmountDetails": "已请求金额详情",
+			"showMore": "显示更多",
+			"showLess": "显示更少"
 		},
 		"OnchainInfo": {
 			"metadata": "元数据",
@@ -488,6 +491,7 @@
 			"proposalHash": "提案哈希",
 			"preimage": "预映像",
 			"description": "描述",
+			"details": "详情",
 			"section": "部分",
 			"name": "名称",
 			"value": "值",
@@ -497,7 +501,13 @@
 			"fee": "费用",
 			"parentBountyIndex": "父赏金索引",
 			"payee": "受益者",
-			"curator": " curator"
+			"curator": " curator",
+			"requested":"已请求",
+			"calls": "调用",
+			"showMore": "显示更多",
+			"showLess": "显示更少",
+			"call": "调用",	
+			"timeline": "时间线"
 		},
 		"onchainInfo": "链上信息",
 		"deleteComment": "删除评论",
