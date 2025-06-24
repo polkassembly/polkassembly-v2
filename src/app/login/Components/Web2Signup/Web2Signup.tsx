@@ -18,6 +18,7 @@ import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/hooks/useToast';
 import { useRouter } from 'nextjs-toploader/app';
+import { cn } from '@/lib/utils';
 import SignupStepHeader from './SignupStepHeader';
 import classes from './Web2Signup.module.scss';
 
@@ -124,127 +125,128 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 			/>
 
 			<form onSubmit={formData.handleSubmit(handleSignup)}>
-				{step === ESignupSteps.USERNAME ? (
-					<div className={classes.formFields}>
-						<div>
-							<FormField
-								control={formData.control}
-								disabled={loading}
-								name='username'
-								key='username'
-								rules={{
-									validate: (value) => {
-										if (!ValidatorService.isValidUsername(value)) return 'Invalid username';
-										return true;
-									},
-									required: true
-								}}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Enter Username</FormLabel>
-										<FormControl>
-											<Input
-												placeholder='Type here'
-												type='text'
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
-
-						<div>
-							<FormField
-								disabled={loading}
-								control={formData.control}
-								name='email'
-								key='email'
-								rules={{
-									validate: (value) => {
-										if (!ValidatorService.isValidEmail(value)) return 'Invalid Email';
-										return true;
-									},
-									required: true
-								}}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Enter Email</FormLabel>
-										<FormControl>
-											<Input
-												placeholder='Type here'
-												type='email'
-												{...field}
-											/>
-										</FormControl>
-
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
+				<div className={cn(classes.formFields, step === ESignupSteps.PASSWORD && 'hidden')}>
+					<div>
+						<FormField
+							control={formData.control}
+							disabled={loading}
+							name='username'
+							key='username'
+							rules={{
+								validate: (value) => {
+									if (step !== ESignupSteps.USERNAME) return true;
+									if (!ValidatorService.isValidUsername(value)) return 'Invalid username';
+									return true;
+								},
+								required: step === ESignupSteps.USERNAME
+							}}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Enter Username</FormLabel>
+									<FormControl>
+										<Input
+											placeholder='Type here'
+											type='text'
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 					</div>
-				) : (
-					<div className={classes.formFields}>
-						<div>
-							<FormField
-								control={formData.control}
-								name='password'
-								key='password'
-								rules={{
-									validate: (value) => {
-										if (!ValidatorService.isValidPassword(value)) return 'Invalid Password';
-										return true;
-									},
-									required: true
-								}}
-								disabled={loading}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Set Password</FormLabel>
-										<FormControl>
-											<PasswordInput
-												placeholder='Type here'
-												{...field}
-											/>
-										</FormControl>
 
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
-						<div>
-							<FormField
-								control={formData.control}
-								name='finalPassword'
-								key='finalPassword'
-								rules={{
-									required: true,
-									validate: (value, allFields) => {
-										if (value !== allFields.password) return "Password don't match";
-										return true;
-									}
-								}}
-								disabled={loading}
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Re-enter Password</FormLabel>
-										<FormControl>
-											<PasswordInput
-												placeholder='Type here'
-												{...field}
-											/>
-										</FormControl>
+					<div>
+						<FormField
+							disabled={loading}
+							control={formData.control}
+							name='email'
+							key='email'
+							rules={{
+								validate: (value) => {
+									if (step !== ESignupSteps.USERNAME) return true;
+									if (!ValidatorService.isValidEmail(value)) return 'Invalid Email';
+									return true;
+								},
+								required: step === ESignupSteps.USERNAME
+							}}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Enter Email</FormLabel>
+									<FormControl>
+										<Input
+											placeholder='Type here'
+											type='email'
+											{...field}
+										/>
+									</FormControl>
 
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 					</div>
-				)}
+				</div>
+				<div className={cn(classes.formFields, step === ESignupSteps.USERNAME && 'hidden')}>
+					<div>
+						<FormField
+							control={formData.control}
+							name='password'
+							key='password'
+							rules={{
+								validate: (value) => {
+									if (step !== ESignupSteps.PASSWORD) return true;
+									if (!ValidatorService.isValidPassword(value)) return 'Invalid Password';
+									return true;
+								},
+								required: step === ESignupSteps.PASSWORD
+							}}
+							disabled={loading}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Set Password</FormLabel>
+									<FormControl>
+										<PasswordInput
+											placeholder='Type here'
+											{...field}
+										/>
+									</FormControl>
+
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
+					<div>
+						<FormField
+							control={formData.control}
+							name='finalPassword'
+							key='finalPassword'
+							rules={{
+								required: step === ESignupSteps.PASSWORD,
+								validate: (value, allFields) => {
+									if (step !== ESignupSteps.PASSWORD) return true;
+									if (value !== allFields.password) return "Password don't match";
+									return true;
+								}
+							}}
+							disabled={loading}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Re-enter Password</FormLabel>
+									<FormControl>
+										<PasswordInput
+											placeholder='Type here'
+											{...field}
+										/>
+									</FormControl>
+
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
+				</div>
 				{errorMessage && <ErrorMessage errorMessage={errorMessage} />}
 				<div className='my-4 flex justify-center text-xs text-text_grey'>{t('Profile.orLoginWith')}</div>
 				<WalletButtons

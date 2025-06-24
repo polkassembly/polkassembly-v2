@@ -146,6 +146,8 @@ function ActivityFeedPostItem({
 								index={postData?.index?.toString() || ''}
 								btnClassName='bg-transparent border border-navbar_border text-text_pink hover:bg-transparent hover:text-text_pink font-semibold'
 								size='sm'
+								track={postData.onChainInfo?.origin}
+								proposalType={postData.proposalType}
 							/>
 						</div>
 					)}
@@ -253,6 +255,8 @@ function ActivityFeedPostItem({
 							index={postData?.index?.toString() || ''}
 							btnClassName='bg-transparent border border-navbar_border text-text_pink hover:bg-transparent hover:text-text_pink font-semibold'
 							size='sm'
+							track={postData.onChainInfo?.origin}
+							proposalType={postData.proposalType}
 						/>
 					</div>
 				)}

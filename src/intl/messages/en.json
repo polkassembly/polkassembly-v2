@@ -297,6 +297,10 @@
 			"newEmail": "New Email",
 			"type": "Type",
 			"belowToConfirm": "below to confirm",
+			"appQrLogin": "App QR Login",
+			"scanToLoginInApp": "Scan to Login",
+			"generateQr": "Generate QR",
+			"appQrLoginDescription": "Scan through mobile app for direct access to your web3 account",
 			"TFA": {
 				"configuringGoogleAuthenticator": "Configuring Google Authenticator",
 				"installGoogleAuthenticator": "1. Install Google Authenticator (iOS/Android).",
@@ -430,6 +434,8 @@
 		}
 	},
 	"PostDetails": {
+		"save": "Save",
+		"edit": "Edit",
 		"castVote": "Cast Vote",
 		"castYourVote": "Cast Your Vote",
 		"loginToVote": "Login to Vote",
@@ -658,11 +664,21 @@
 		"voteSuccess": "Your vote has been cast successfully",
 		"voteFailed": "Your vote has not been cast successfully",
 		"voteSuccessTitle": "Vote Successful",
-		"voteFailedTitle": "Vote Failed"
+		"voteFailedTitle": "Vote Failed",
+		"delegatedPower": "Delegated Power",
+		"commentSuccessTitle": "Comment Added Successfully",
+		"commentSuccess": "Your comment has been added successfully",
+		"voted": "Voted",
+		"successfully": "successfully",
+		"with": "with",
+		"yourVoteIsIn": "Your vote is in! Mind sharing why you support this in a comment?",
+		"your": "Your",
+		"voteIsIn": "vote is in! Mind sharing why you support this in a comment?"
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance",
-		"Balance": "Balance"
+		"Balance": "Balance",
+		"PeopleChainBalance": "People Chain Balance"
 	},
 	"EditPost": {
 		"edit": "Edit",
@@ -722,7 +738,8 @@
 		"unnoted_description": "The preimage has been unnoted",
 		"failed": "Failed",
 		"unrequest": "Unrequest",
-		"unnote": "Unnote"
+		"unnote": "Unnote",
+		"unnoteOrUnrequestPreimageDescription": "Are you sure you want to unnote or unrequest this preimage?"
 	},
 	"Create": {
 		"createDiscussionTitle": "Create Discussion",
@@ -741,6 +758,17 @@
 		"titleTooShort": "Please provide a valid title.",
 		"titlePlaceholder": "Enter title",
 		"descriptionRequired": "Please provide a valid description.",
+		"UploadImage": {
+			"uploadImage": "Upload Image",
+			"uploadFromDevice": "Upload from device",
+			"addFromURL": "Add from URL",
+			"alt": "Alt",
+			"title": "Title",
+			"save": "Save",
+			"cancel": "Cancel",
+			"insertImage": "Insert Image",
+			"failedToUploadImage": "Failed to upload image"
+		},
 		"AllowedCommentors": {
 			"title": "Who can comment ?",
 			"all": "All",
@@ -759,7 +787,8 @@
 			"fellowship": "Fellowship",
 			"council": "Council",
 			"democracy": "Democracy",
-			"whitelist": "Whitelist"
+			"whitelist": "Whitelist",
+			"technicalcommittee": "Technical Committee"
 		},
 		"please": "Please",
 		"login": "Login",
@@ -828,6 +857,7 @@
 		"requestJudgement": "Request Judgement",
 		"minimumDeposit": "Minimum Deposit",
 		"registrarFee": "Registrar Fee",
+		"gasFee": "Gas Fee",
 		"totalAmountRequired": "Total Amount Required",
 		"viewAmountBreakup": "View Amount Breakup",
 		"registrarFees": "Registrar Fees",
@@ -985,7 +1015,14 @@
 		"stepDescriptionCancelReferendum": "Propose to cancel an active referendum.",
 		"stepDescriptionTreasuryProposal": "Propose treasury spending in DOT.",
 		"stepDescriptionUsdxProposal": "Creates a preimage and proposal to spend assets. The spend must be claimed.",
-		"stepDescriptionCreatePreimage": "A preimage is the encoded call data (e.g., a runtime upgrade or treasury spend) associated with a proposal."
+		"stepDescriptionCreatePreimage": "A preimage is the encoded call data (e.g., a runtime upgrade or treasury spend) associated with a proposal.",
+		"Congratulations": "Congratulations!",
+		"proposal": "Proposal",
+		"createdSuccessfully": "created successfully!",
+		"redirectingToProposal": "Redirecting to proposal...",
+		"addContextToProposal": "Add Context to Proposal",
+		"redirectingToPost": "Redirecting to post...",
+		"discussion": "Discussion"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",
@@ -1024,7 +1061,13 @@
 		"length": "Length",
 		"beneficiary": "Beneficiary",
 		"noBeneficiarySelected": "No Beneficiary Selected",
-		"on": "on"
+		"on": "on",
+		"Congratulations": "Congratulations!",
+		"createProposalFromPreimage": "You can now create a proposal from the preimage",
+		"CreateProposal": "Create Proposal",
+		"goBack": "Go Back",
+		"Preimage": "Preimage",
+		"createSuccessfully": "created successfully!"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "Bounty proposed successfully",

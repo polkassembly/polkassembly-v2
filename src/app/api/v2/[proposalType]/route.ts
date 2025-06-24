@@ -127,7 +127,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 						proposer: onChainPostInfo.proposer,
 						status: onChainPostInfo.status,
 						description: onChainPostInfo.description || '',
-						index: onChainPostInfo.index || post.index,
+						index: onChainPostInfo.index ?? post.index,
 						origin: onChainPostInfo.origin || '',
 						type: proposalType,
 						hash: onChainPostInfo.hash || post.hash || '',
@@ -176,8 +176,10 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 		totalCount
 	};
 
-	// Cache the response
-	await RedisService.SetPostsListing({ network, proposalType, page, limit, data: response, statuses, origins, tags });
+	// Cache the response if there are items
+	if (response.items.length > 0) {
+		await RedisService.SetPostsListing({ network, proposalType, page, limit, data: response, statuses, origins, tags });
+	}
 
 	// 3. return the data
 	return NextResponse.json(response);
@@ -215,8 +217,6 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		topic: topic || EOffChainPostTopic.GENERAL,
 		allowedCommentor
 	});
-
-	// await AIService.UpdatePostSummary({ network, proposalType, indexOrHash });
 
 	// Invalidate post listings since a new post was added
 	await RedisService.DeletePostsListing({ network, proposalType });

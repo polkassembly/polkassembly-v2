@@ -48,7 +48,8 @@ import {
 	ITrackAnalyticsDelegations,
 	IOnChainMetadata,
 	EVoteSortOptions,
-	EHttpHeaderKey
+	EHttpHeaderKey,
+	IPostLink
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -89,6 +90,7 @@ enum EApiRoute {
 	GET_ON_CHAIN_METADATA_FOR_POST = 'GET_ON_CHAIN_METADATA_FOR_POST',
 	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
 	DELETE_COMMENT = 'DELETE_COMMENT',
+	EDIT_COMMENT = 'EDIT_COMMENT',
 	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
 	CLAIM_QR_SESSION = 'CLAIM_QR_SESSION',
 	LINK_ADDRESS = 'LINK_ADDRESS',
@@ -303,6 +305,7 @@ export class NextApiClientService {
 				method = 'PATCH';
 				break;
 			case EApiRoute.EDIT_PROPOSAL_DETAILS:
+			case EApiRoute.EDIT_COMMENT:
 				method = 'PATCH';
 				break;
 
@@ -536,7 +539,15 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPost>({ url, method, skipCache });
 	}
 
-	static async editProposalDetails({ proposalType, index, data }: { proposalType: EProposalType; index: string; data: { title: string; content: string } }) {
+	static async editProposalDetails({
+		proposalType,
+		index,
+		data
+	}: {
+		proposalType: EProposalType;
+		index: string;
+		data: { title: string; content: string; linkedPost?: IPostLink };
+	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
 	}
@@ -577,6 +588,11 @@ export class NextApiClientService {
 	protected static async deleteCommentFromPostApi({ id, proposalType, index }: { id: string; proposalType: EProposalType; index: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_COMMENT, routeSegments: [proposalType, index, 'comments', id] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	protected static async editCommentFromPostApi({ id, proposalType, index, content }: { id: string; proposalType: EProposalType; index: string; content: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_COMMENT, routeSegments: [proposalType, index, 'comments', id] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { content } });
 	}
 
 	// votes
@@ -796,7 +812,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPreimage>({ url, method });
 	}
 
-	protected static async generateQRSession() {
+	protected static async generateQRSessionApi() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
 		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
 	}

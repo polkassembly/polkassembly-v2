@@ -29,7 +29,7 @@ import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddres
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
 
-function KillReferendum() {
+function KillReferendum({ onSuccess }: { onSuccess: (proposalId: number) => void }) {
 	const t = useTranslations();
 
 	const network = getCurrentNetwork();
@@ -112,6 +112,7 @@ function KillReferendum() {
 					description: t('CreateTreasuryProposal.proposalCreatedSuccessfullyDescription'),
 					status: ENotificationStatus.SUCCESS
 				});
+				onSuccess(postId);
 				window.location.href = `/referenda/${postId}?created=true`;
 			},
 			onFailed: () => {

@@ -45,7 +45,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	if (!contentSummary?.postSummary) {
 		// try and generate content summary
-		contentSummary = await AIService.UpdatePostSummary({ network, proposalType, indexOrHash: index });
+		contentSummary = await AIService.GenerateAndUpdatePostSummary({ network, proposalType, indexOrHash: index });
 	}
 
 	if (!contentSummary?.commentsSummary) {

@@ -29,4 +29,13 @@ export class CommentClientService extends NextApiClientService {
 			index
 		});
 	}
+
+	static async editCommentFromPost({ id, proposalType, index, content }: { id: string; proposalType: EProposalType; index: string; content: string }) {
+		return this.editCommentFromPostApi({
+			id,
+			proposalType,
+			index,
+			content
+		});
+	}
 }

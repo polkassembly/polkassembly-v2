@@ -13,7 +13,8 @@ import { StatusCodes } from 'http-status-codes';
 export enum ENetwork {
 	KUSAMA = 'kusama',
 	POLKADOT = 'polkadot',
-	WESTEND = 'westend'
+	WESTEND = 'westend',
+	PASEO = 'paseo'
 }
 
 export enum EGovType {
@@ -136,7 +137,7 @@ export interface IPublicUser {
 	username: string;
 	profileScore: number;
 	addresses: string[];
-	rank: number;
+	rank?: number;
 	profileDetails: IProfileDetails;
 }
 
@@ -345,6 +346,7 @@ export interface IReaction {
 	createdAt: Date;
 	updatedAt: Date;
 	commentId?: string;
+	publicUser: IPublicUser;
 }
 
 export interface IPostOffChainMetrics {
@@ -683,7 +685,7 @@ export interface IComment {
 }
 
 export interface ICommentResponse extends IComment {
-	user: Omit<IPublicUser, 'rank'>;
+	publicUser: Omit<IPublicUser, 'rank'>;
 	children?: ICommentResponse[];
 	reactions?: IReaction[];
 	voteData?: IVoteData[];
@@ -965,8 +967,11 @@ export interface IPostSubscription {
 	userId: number;
 }
 
+// react query keys enum TODO: add other keys
 export enum EReactQueryKeys {
-	BATCH_VOTE_CART = 'batch-vote-cart'
+	BATCH_VOTE_CART = 'batch-vote-cart',
+	COMMENTS = 'comments',
+	POST_DETAILS = 'postDetails'
 }
 
 export interface IParamDef {
@@ -1041,7 +1046,7 @@ export interface ITreasuryStats {
 	createdAt: Date;
 	updatedAt: Date;
 	relayChain: {
-		dot?: string;
+		nativeToken?: string;
 		myth?: string;
 		nextBurn?: string;
 		nextSpendAt?: Date;
@@ -1052,32 +1057,32 @@ export interface ITreasuryStats {
 		[key: string]: string | undefined;
 	};
 	assetHub?: {
-		dot?: string;
+		nativeToken?: string;
 		usdc?: string;
 		usdt?: string;
 		[key: string]: string | undefined;
 	};
 	hydration?: {
-		dot?: string;
+		nativeToken?: string;
 		usdc?: string;
 		usdt?: string;
 		[key: string]: string | undefined;
 	};
 	bounties?: {
-		dot?: string;
+		nativeToken?: string;
 		[key: string]: string | undefined;
 	};
 	fellowship?: {
-		dot?: string;
+		nativeToken?: string;
 		usdt?: string;
 		[key: string]: string | undefined;
 	};
 	total?: {
-		totalDot?: string;
+		totalNativeToken?: string;
 		totalUsdc?: string;
 		totalUsdt?: string;
 		totalMyth?: string;
-		[key: string]: string | undefined;
+		totalInUsd?: string;
 	};
 	nativeTokenUsdPrice?: string;
 	nativeTokenUsdPrice24hChange?: string;

@@ -187,7 +187,10 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 												key={beneficiary.amount}
 												className='flex flex-wrap items-center gap-x-1 gap-y-2'
 											>
-												<Address address={beneficiary.address} />
+												<Address
+													disableTooltip
+													address={beneficiary.address}
+												/>
 												<span className='text-xs text-wallet_btn_text'>
 													({formatBnBalance(beneficiary.amount, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network, beneficiary.assetId as EAssets)})
 												</span>

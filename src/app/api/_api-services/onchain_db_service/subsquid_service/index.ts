@@ -37,6 +37,7 @@ import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { SubsquidUtils } from './subsquidUtils';
 
+const VOTING_POWER_DIVISOR = new BN('10');
 export class SubsquidService extends SubsquidUtils {
 	private static subsquidGqlClient = (network: ENetwork) => {
 		const subsquidUrl = NETWORKS_DETAILS[network.toString() as keyof typeof NETWORKS_DETAILS]?.subsquidUrl;
@@ -51,7 +52,15 @@ export class SubsquidService extends SubsquidUtils {
 		});
 	};
 
-	static async GetPostVoteMetrics({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IVoteMetrics> {
+	private static getVotingPower(balance: string, lockPeriod: number): BN {
+		return lockPeriod ? new BN(balance).mul(new BN(lockPeriod)) : new BN(balance).div(VOTING_POWER_DIVISOR);
+	}
+
+	static async GetPostVoteMetrics({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IVoteMetrics | null> {
+		if ([EProposalType.BOUNTY, EProposalType.CHILD_BOUNTY].includes(proposalType)) {
+			return null;
+		}
+
 		const gqlClient = this.subsquidGqlClient(network);
 
 		let query = [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
@@ -114,7 +123,7 @@ export class SubsquidService extends SubsquidUtils {
 
 		const proposal = subsquidData.proposals[0];
 
-		const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType, indexOrHash: String(proposal.index || proposal.hash) });
+		const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType, indexOrHash: String(proposal.index ?? proposal.hash) });
 
 		const allPeriodEnds =
 			proposal.statusHistory && proposalType === EProposalType.REFERENDUM_V2 ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
@@ -130,7 +139,7 @@ export class SubsquidService extends SubsquidUtils {
 			hash: proposal.hash,
 			origin: proposal.origin,
 			description: proposal.description || '',
-			voteMetrics,
+			...(voteMetrics && { voteMetrics }),
 			...(proposal.reward && { reward: proposal.reward }),
 			...(proposal.fee && { fee: proposal.fee }),
 			...(proposal.deposit && { deposit: proposal.deposit }),
@@ -718,7 +727,9 @@ export class SubsquidService extends SubsquidUtils {
 
 		subsquidData.votingDelegations.forEach((delegation: { to: string; balance: string; lockPeriod: number }) => {
 			result[delegation.to] = {
-				votingPower: result[delegation.to]?.votingPower ? new BN(result[delegation.to].votingPower).add(new BN(delegation.balance)).toString() : delegation.balance,
+				votingPower: result[delegation.to]?.votingPower
+					? new BN(result[delegation.to].votingPower).add(this.getVotingPower(delegation.balance, delegation.lockPeriod)).toString()
+					: this.getVotingPower(delegation.balance, delegation.lockPeriod).toString(),
 				receivedDelegationsCount: result[delegation.to]?.receivedDelegationsCount ? result[delegation.to].receivedDelegationsCount + 1 : 1
 			};
 		});
@@ -879,6 +890,8 @@ export class SubsquidService extends SubsquidUtils {
 							}
 						: undefined;
 
+					const voteMetrics = await this.GetPostVoteMetrics({ network, proposalType: EProposalType.REFERENDUM_V2, indexOrHash: String(proposal.index ?? proposal.hash)! });
+
 					return {
 						createdAt: new Date(proposal.createdAt),
 						description: proposal.description || '',
@@ -888,7 +901,7 @@ export class SubsquidService extends SubsquidUtils {
 						status: proposal.status || EProposalStatus.Unknown,
 						type: EProposalType.REFERENDUM_V2,
 						hash: proposal.hash || '',
-						voteMetrics: await this.GetPostVoteMetrics({ network, proposalType: EProposalType.REFERENDUM_V2, indexOrHash: String(proposal.index || proposal.hash)! }),
+						...(voteMetrics && { voteMetrics }),
 						beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 						decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 						preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined,

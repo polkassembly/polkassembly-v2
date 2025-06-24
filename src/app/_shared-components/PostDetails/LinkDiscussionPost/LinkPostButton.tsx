@@ -13,7 +13,7 @@ import { Button } from '../../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import LinkDiscussionPost from './LinkDiscussionPost';
 
-function LinkPostButton({ postData, onSuccess, className }: { postData: IPostListing | IPost; onSuccess: (title: string, content: string) => void; className?: string }) {
+function LinkPostButton({ postData, className }: { postData: IPostListing | IPost; className?: string }) {
 	const t = useTranslations();
 	const { user } = useUser();
 	const [isOpen, setIsOpen] = useState(false);
@@ -45,7 +45,6 @@ function LinkPostButton({ postData, onSuccess, className }: { postData: IPostLis
 				</DialogHeader>
 				<LinkDiscussionPost
 					postData={postData}
-					onSuccess={onSuccess}
 					onClose={() => setIsOpen(false)}
 				/>
 			</DialogContent>

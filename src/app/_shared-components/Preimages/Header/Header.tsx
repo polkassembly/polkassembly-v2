@@ -4,10 +4,11 @@
 
 'use client';
 
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { MdSearch } from '@react-icons/all-files/md/MdSearch';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'nextjs-toploader/app';
+import { Search } from 'lucide-react';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
 import styles from './Header.module.scss';
@@ -28,7 +29,7 @@ function Header({ data }: { data: { totalCount: number } }) {
 			<div className='flex items-center gap-2'>
 				<div className='relative'>
 					<Input
-						className={styles.input_container}
+						className='w-60 pr-12 sm:pr-12'
 						value={inputValue}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter') {
@@ -42,7 +43,10 @@ function Header({ data }: { data: { totalCount: number } }) {
 						onChange={(e) => setInputValue(e.target.value)}
 						placeholder={t('Preimages.searchByHash')}
 					/>
-					<MdSearch
+					<Button
+						variant='ghost'
+						size='icon'
+						className='absolute right-0 top-0 h-full rounded-l-none border-l border-border_grey px-2 text-2xl text-text_grey'
 						onClick={() => {
 							if (pathname === preImagePath) {
 								router.push(`${preImagePath}/${inputValue}`);
@@ -50,8 +54,9 @@ function Header({ data }: { data: { totalCount: number } }) {
 								router.replace(`${preImagePath}/${inputValue}`);
 							}
 						}}
-						className={styles.input_search}
-					/>
+					>
+						<Search />
+					</Button>
 				</div>
 				{pathname.startsWith(`${preImagePath}/`) && (
 					<Button

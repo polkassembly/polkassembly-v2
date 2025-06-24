@@ -6,7 +6,7 @@
 
 import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { EAssets, ITreasuryStats } from '@/_shared/types';
+import { EAssets, ENetwork, ITreasuryStats } from '@/_shared/types';
 import { Info } from 'lucide-react';
 import Image, { StaticImageData } from 'next/image';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -111,7 +111,7 @@ const useTreasuryData = (data: ITreasuryStats[]) => {
 
 	return {
 		totalInUsd: formatUSDWithUnits(data?.[0]?.total?.totalInUsd || BN_ZERO?.toString(), 2),
-		dotBalance: formatAssetBalance(data?.[0]?.total?.totalDot || BN_ZERO),
+		nativeTokenBalance: formatAssetBalance(data?.[0]?.total?.totalNativeToken || BN_ZERO),
 		usdcBalance: formatAssetBalance(data?.[0]?.total?.totalUsdc || BN_ZERO?.toString(), EAssets.USDC),
 		usdtBalance: formatAssetBalance(data?.[0]?.total?.totalUsdt || BN_ZERO?.toString(), EAssets.USDT),
 		mythBalance: formatMythBalance(data?.[0]?.total?.totalMyth || BN_ZERO?.toString())
@@ -156,39 +156,51 @@ function TreasuryStats({ isActivityFeed = false, data }: { isActivityFeed?: bool
 						)}
 					</div>
 
-					<div className={cn('mt-4 grid w-full grid-cols-2 gap-4 font-semibold', isActivityFeed ? 'text-xs' : 'text-xs lg:text-sm xl:ml-9 2xl:ml-12')}>
-						<div>
+					<div
+						className={cn(
+							'mt-4 w-full gap-4 font-semibold',
+							isActivityFeed ? 'text-xs' : 'text-xs lg:text-sm xl:ml-9 2xl:ml-12',
+							network === ENetwork.POLKADOT ? 'grid grid-cols-2' : 'flex items-center justify-center xl:ml-0 2xl:ml-0'
+						)}
+					>
+						<div className={cn(network !== ENetwork.POLKADOT ? 'mt-2 text-lg' : 'w-full')}>
 							<AssetDisplay
 								icon={NETWORKS_DETAILS[`${network}`].logo}
 								alt={network}
-								value={treasuryData.dotBalance}
+								value={treasuryData.nativeTokenBalance}
 								inActivityFeed={isActivityFeed}
 							/>
 						</div>
-						<div>
-							<AssetDisplay
-								icon={treasuryAssetsData[EAssets.USDC]?.icon}
-								alt={EAssets.USDC}
-								value={treasuryData.usdcBalance}
-								inActivityFeed={isActivityFeed}
-							/>
-						</div>
-						<div>
-							<AssetDisplay
-								icon={treasuryAssetsData[EAssets.USDT]?.icon}
-								alt={EAssets.USDT}
-								value={treasuryData.usdtBalance}
-								inActivityFeed={isActivityFeed}
-							/>
-						</div>
-						<div>
-							<AssetDisplay
-								icon={treasuryAssetsData[EAssets.MYTH]?.icon}
-								alt={EAssets.MYTH}
-								value={`${treasuryData.mythBalance} ${treasuryAssetsData[EAssets.MYTH]?.symbol}`}
-								inActivityFeed={isActivityFeed}
-							/>
-						</div>
+						{network === ENetwork.POLKADOT && (
+							<div>
+								<AssetDisplay
+									icon={treasuryAssetsData[EAssets.USDC]?.icon}
+									alt={EAssets.USDC}
+									value={treasuryData.usdcBalance}
+									inActivityFeed={isActivityFeed}
+								/>
+							</div>
+						)}
+						{network === ENetwork.POLKADOT && (
+							<div>
+								<AssetDisplay
+									icon={treasuryAssetsData[EAssets.USDT]?.icon}
+									alt={EAssets.USDT}
+									value={treasuryData.usdtBalance}
+									inActivityFeed={isActivityFeed}
+								/>
+							</div>
+						)}
+						{network === ENetwork.POLKADOT && (
+							<div>
+								<AssetDisplay
+									icon={treasuryAssetsData[EAssets.MYTH]?.icon}
+									alt={EAssets.MYTH}
+									value={`${treasuryData.mythBalance} ${treasuryAssetsData[EAssets.MYTH]?.symbol}`}
+									inActivityFeed={isActivityFeed}
+								/>
+							</div>
+						)}
 					</div>
 				</div>
 

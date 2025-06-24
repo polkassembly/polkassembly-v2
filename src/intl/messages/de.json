@@ -272,6 +272,10 @@
 			"newEmail": "Neue E-Mail",
 			"type": "Typ",
 			"belowToConfirm": "unten zur Bestätigung",
+			"appQrLogin": "App QR-Login",
+			"scanToLoginInApp": "Scannen zum Login",
+			"generateQr": "QR generieren",
+			"appQrLoginDescription": "Scannen Sie mit der mobilen App für direkten Zugriff auf Ihr Web3-Konto",
 			"TFA": {
 				"configuringGoogleAuthenticator": "Google Authenticator konfigurieren",
 				"installGoogleAuthenticator": "1. Installieren Sie Google Authenticator (iOS/Android).",
@@ -488,6 +492,8 @@
 		"deleteComment": "Kommentar löschen",
 		"deleteCommentConfirmation": "Möchten Sie diesen Kommentar wirklich löschen?",
 		"delete": "Löschen",
+		"save": "Speichern",
+		"edit": "Bearbeiten",
 		"hideReplies": "Antworten ausblenden",
 		"viewReplies": "Antworten anzeigen",
 		"commentSummary": "Kommentar Zusammenfassung",
@@ -622,11 +628,21 @@
 		"voteSuccess": "Ihre Abstimmung wurde erfolgreich abgegeben",
 		"voteFailed": "Ihre Abstimmung wurde nicht erfolgreich abgegeben",
 		"voteSuccessTitle": "Abstimmung erfolgreich",
-		"voteFailedTitle": "Abstimmung fehlgeschlagen"
+		"voteFailedTitle": "Abstimmung fehlgeschlagen",
+		"delegatedPower": "Delegierte Macht",
+		"commentSuccessTitle": "Kommentar erfolgreich hinzugefügt",
+		"commentSuccess": "Ihr Kommentar wurde erfolgreich hinzugefügt",
+		"voted": "Abgestimmt",
+		"successfully": "erfolgreich",
+		"with": "mit",
+		"yourVoteIsIn": "Ihre Stimme ist abgegeben! Möchten Sie in einem Kommentar mitteilen, warum Sie dies unterstützen?",
+		"your": "Ihre",
+		"voteIsIn": "Stimme ist abgegeben! Möchten Sie in einem Kommentar mitteilen, warum Sie dies unterstützen?"
 	},
 	"Balance": {
 		"voteBalance": "Abstimmungsguthaben",
-		"Balance": "Guthaben"
+		"Balance": "Guthaben",
+		"PeopleChainBalance": "People Chain Guthaben"
 	},
 	"EditPost": {
 		"edit": "Bearbeiten",
@@ -692,6 +708,17 @@
 		"titleTooShort": "Bitte geben Sie einen gültigen Titel ein.",
 		"titlePlaceholder": "Titel eingeben",
 		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung ein.",
+		"UploadImage": {
+			"uploadImage": "Bild hochladen",
+			"uploadFromDevice": "Vom Gerät hochladen",
+			"addFromURL": "Von URL hinzufügen",
+			"alt": "Alt",
+			"title": "Titel",
+			"save": "Speichern",
+			"cancel": "Abbrechen",
+			"insertImage": "Bild einfügen",
+			"failedToUploadImage": "Bild konnte nicht hochgeladen werden"
+		},	
 		"AllowedCommentors": {
 			"title": "Wer kann kommentieren?",
 			"all": "Alle",
@@ -710,7 +737,8 @@
 			"fellowship": "Fellowship",
 			"council": "Rat",
 			"democracy": "Demokratie",
-			"whitelist": "Whitelist"
+			"whitelist": "Whitelist",
+			"technicalcommittee": "Technisches Komitee"
 		},
 		"please": "Bitte",
 		"login": "Anmelden",
@@ -779,8 +807,9 @@
 		"requestJudgement": "Beurteilung anfordern",
 		"minimumDeposit": "Mindesteinzahlung",
 		"registrarFee": "Registrierungsgebühr",
-		"totalAmountRequired": "Erforderlicher Gesamtbetrag",
-		"viewAmountBreakup": "Aufschlüsselung des Betrags anzeigen",
+		"gasFee": "Gebühr",
+		"totalAmountRequired": "Gesamtbetrag erforderlich",
+		"viewAmountBreakup": "Betragsaufschlüsselung anzeigen",
 		"registrarFees": "Registrierungsgebühren",
 		"success": "Identität erfolgreich festgelegt",
 		"successDescription": "Ihre Identität wurde erfolgreich festgelegt",
@@ -919,14 +948,14 @@
 		"cancelReferendum": "Referendum abbrechen",
 		"killReferendum": "Referendum beenden",
 		"createBounty": "Kopfgeld erstellen",
-		"createBountyDescription": "Schlagen Sie ein Kopfgeld für eine bestimmte Aufgabe oder ein Projekt vor.",
+		"createDiscussionDescription": "Beginnen Sie ein Gespräch und sammeln Sie Feedback.",
 		"createPreimageDescription": "Erstellen Sie einen Vorschlag von Grund auf.",
 		"existingPreimageDescription": "Wählen Sie aus vorhandenen Preimages, um einen Vorschlag zu erstellen.",
 		"createTreasuryProposalDescription": "Erstellen Sie einen Treasury-Vorschlag zur Zuteilung von Mitteln in ",
 		"usdxProposalDescription": "Schlagen Sie eine Ausgabe aus dem AssetHub vor, planen Sie Zahlungen und fügen Sie mehrere Begünstigte hinzu.",
 		"cancelReferendumDescription": "Vorschlag zum Abbruch eines aktiven Referendums.",
 		"killReferendumDescription": "Beenden Sie ein Referendum, bevor es angenommen wird.",
-		"createDiscussionDescription": "Beginnen Sie ein Gespräch und sammeln Sie Feedback.",
+		"createBountyDescription": "Schlagen Sie ein Kopfgeld für eine bestimmte Aufgabe oder ein Projekt vor.",
 		"goBack": "Zurück",
 		"preimageHash": "Preimage-Hash",
 		"preimageLength": "Länge",
@@ -934,9 +963,16 @@
 		"viewPreimage": "Preimage anzeigen",
 		"stepDescriptionKillReferendum": "Dies erstellt ein Preimage und einen Vorschlag zum Ausgeben von Vermögenswerten aus dem AssetHub. Die Ausgabe muss beansprucht werden.",
 		"stepDescriptionCancelReferendum": "Vorschlag zum Abbruch eines aktiven Referendums.",
-		"stepDescriptionTreasuryProposal": "Schlagen Sie Ausgaben aus dem Treasury in vor.",
+		"stepDescriptionTreasuryProposal": "Schlagen Sie Ausgaben aus dem Treasury in DOT vor.",
 		"stepDescriptionUsdxProposal": "Erstellt ein Preimage und einen Vorschlag zum Ausgeben von Vermögenswerten. Die Ausgabe muss beansprucht werden.",
-		"stepDescriptionCreatePreimage": "Ein Preimage ist die codierte Aufrufdaten (z. B. ein Runtime-Upgrade oder eine Treasury-Ausgabe), die mit einem Vorschlag verknüpft sind."
+		"stepDescriptionCreatePreimage": "Ein Preimage ist die codierte Aufrufdaten (z. B. ein Runtime-Upgrade oder eine Treasury-Ausgabe), die mit einem Vorschlag verknüpft sind.",
+		"Congratulations": "Glückwunsch!",
+		"proposal": "Vorschlag",
+		"createdSuccessfully": "erfolgreich erstellt!",
+		"redirectingToProposal": "Weiterleitung zum Vorschlag...",
+		"addContextToProposal": "Kontext zum Vorschlag hinzufügen",
+		"redirectingToPost": "Weiterleitung zum Beitrag...",
+		"discussion": "Diskussion"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Begünstigter",
@@ -975,7 +1011,13 @@
 		"length": "Länge",
 		"beneficiary": "Begünstigter",
 		"noBeneficiarySelected": "Kein Begünstigter ausgewählt",
-		"on": "an"
+		"on": "an",
+		"Congratulations": "Glückwunsch!",
+		"createProposalFromPreimage": "Sie können jetzt einen Vorschlag aus dem Preimage erstellen",
+		"CreateProposal": "Vorschlag erstellen",
+		"goBack": "Zurück",
+		"Preimage": "Preimage",
+		"createSuccessfully": "erfolgreich erstellt!"
 	},
 	"AddressInput": {
 		"invalidAddress": "Ungültige Adresse",

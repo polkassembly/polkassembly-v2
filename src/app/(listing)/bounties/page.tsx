@@ -7,12 +7,29 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { z } from 'zod';
+import { Metadata } from 'next';
+import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 import BountiesListingPage from './Components/BountiesListingPage';
 
 const zodQuerySchema = z.object({
 	page: z.coerce.number().min(1).optional().default(1),
 	status: z.nativeEnum(EBountyStatus).optional().default(EBountyStatus.ALL)
 });
+
+export async function generateMetadata(): Promise<Metadata> {
+	const network = await getNetworkFromHeaders();
+	const { title } = OPENGRAPH_METADATA;
+
+	return getGeneratedContentMetadata({
+		title: `${title} - Bounties`,
+		description: 'Explore all Bounties on Polkassembly',
+		url: `https://${network}.polkassembly.io/bounties`,
+		imageAlt: 'Polkassembly Bounties',
+		network
+	});
+}
 
 const convertStatusToStatusesArray = (status: EBountyStatus): EProposalStatus[] => {
 	switch (status) {

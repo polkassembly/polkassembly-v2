@@ -292,6 +292,10 @@ export class FirestoreService extends FirestoreUtils {
 
 		const postData = postDocSnapshot.docs[0].data();
 
+		const isDefaultContent =
+			(!postData.title && !postData.content) ||
+			(postData.title === 'Untitled Post' && (!postData.content?.trim?.() || postData.content.includes('login and tell us more about your proposal')));
+
 		return {
 			...postData,
 			content: postData.content || '',
@@ -307,7 +311,8 @@ export class FirestoreService extends FirestoreUtils {
 			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate(),
-			allowedCommentor: postData.allowedCommentor || EAllowedCommentor.ALL
+			allowedCommentor: postData.allowedCommentor || EAllowedCommentor.ALL,
+			isDefaultContent
 		} as IOffChainPost;
 	}
 
@@ -459,7 +464,7 @@ export class FirestoreService extends FirestoreUtils {
 
 			return {
 				...commentData,
-				user,
+				publicUser: user,
 				children: []
 			} as ICommentResponse;
 		});
@@ -491,14 +496,19 @@ export class FirestoreService extends FirestoreUtils {
 	static async GetPostReactions({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IReaction[]> {
 		const reactionsQuery = this.reactionsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash);
 		const reactionsQuerySnapshot = await reactionsQuery.get();
-		return reactionsQuerySnapshot.docs.map((doc) => {
+		const reactionPromises = reactionsQuerySnapshot.docs.map(async (doc) => {
 			const data = doc.data();
+			const publicUser = await this.GetPublicUserById(data.userId);
+
 			return {
 				...data,
 				createdAt: data.createdAt?.toDate(),
-				updatedAt: data.updatedAt?.toDate()
+				updatedAt: data.updatedAt?.toDate(),
+				publicUser
 			} as IReaction;
 		});
+
+		return Promise.all(reactionPromises);
 	}
 
 	static async GetCommentReactions({
@@ -519,10 +529,19 @@ export class FirestoreService extends FirestoreUtils {
 			.where('commentId', '==', id);
 
 		const reactionsQuerySnapshot = await reactionsQuery.get();
-		return reactionsQuerySnapshot.docs.map((doc) => {
+		const reactionPromises = reactionsQuerySnapshot.docs.map(async (doc) => {
 			const data = doc.data();
-			return { ...data, createdAt: data.createdAt?.toDate(), updatedAt: data.updatedAt?.toDate() } as IReaction;
+			const publicUser = await this.GetPublicUserById(data.userId);
+
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate(),
+				updatedAt: data.updatedAt?.toDate(),
+				publicUser
+			} as IReaction;
 		});
+
+		return Promise.all(reactionPromises);
 	}
 
 	static async GetReactionById(id: string): Promise<IReaction | null> {
@@ -537,10 +556,13 @@ export class FirestoreService extends FirestoreUtils {
 			return null;
 		}
 
+		const publicUser = await this.GetPublicUserById(data.userId);
+
 		return {
 			...data,
 			createdAt: data.createdAt?.toDate(),
-			updatedAt: data.updatedAt?.toDate()
+			updatedAt: data.updatedAt?.toDate(),
+			publicUser
 		} as IReaction;
 	}
 
@@ -583,7 +605,19 @@ export class FirestoreService extends FirestoreUtils {
 
 		const reactionQuerySnapshot = await reactionQuery.get();
 
-		return (reactionQuerySnapshot.docs?.[0]?.data?.() || null) as IReaction | null;
+		const publicUser = await this.GetPublicUserById(userId);
+		const data = reactionQuerySnapshot.docs?.[0]?.data?.();
+
+		if (!data) return null;
+
+		const reaction: IReaction = {
+			...reactionQuerySnapshot.docs?.[0]?.data?.(),
+			createdAt: data.createdAt?.toDate(),
+			updatedAt: data.updatedAt?.toDate(),
+			publicUser
+		} as IReaction;
+
+		return reaction;
 	}
 
 	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IContentSummary | null> {
@@ -591,6 +625,7 @@ export class FirestoreService extends FirestoreUtils {
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
 			.where('indexOrHash', '==', indexOrHash)
+			.orderBy('createdAt', 'desc') // just in case there are multiple summaries for the same post
 			.limit(1);
 
 		const contentSummaryQuerySnapshot = await contentSummaryQuery.get();
@@ -1119,6 +1154,29 @@ export class FirestoreService extends FirestoreUtils {
 		await this.postsCollectionRef()
 			.doc(String(id))
 			.set({ content, title, allowedCommentor, updatedAt: new Date(), ...(linkedPost && { linkedPost }) }, { merge: true });
+
+		// add back link to linkedPost for linkedPost if it exists
+		if (linkedPost) {
+			const updatedPostData = (await this.postsCollectionRef().doc(String(id)).get()).data() as IOffChainPost;
+
+			const linkedPostSnapshot = await this.postsCollectionRef()
+				.where('network', '==', updatedPostData.network)
+				.where('proposalType', '==', linkedPost.proposalType)
+				.where('indexOrHash', '==', linkedPost.indexOrHash)
+				.limit(1)
+				.get();
+
+			const linkedPostDoc = !linkedPostSnapshot.empty ? linkedPostSnapshot.docs[0] : null;
+
+			const backLink: IPostLink = {
+				proposalType: updatedPostData.proposalType,
+				indexOrHash: String(updatedPostData.index ?? updatedPostData.hash)
+			};
+
+			if (linkedPostDoc && backLink.indexOrHash) {
+				await linkedPostDoc.ref.set({ linkedPost: backLink }, { merge: true });
+			}
+		}
 	}
 
 	static async CreatePost({
@@ -1553,5 +1611,18 @@ export class FirestoreService extends FirestoreUtils {
 			items: posts.docs.map((doc) => doc.data() as IOffChainPost),
 			totalCount: totalCount.data().count
 		};
+	}
+
+	static async DeleteContentSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+		const contentSummary = await this.contentSummariesCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('indexOrHash', '==', indexOrHash)
+			.get();
+
+		if (contentSummary.docs.length) {
+			// sometimes multiple content summaries are generated for the same post
+			await Promise.all(contentSummary.docs.map((doc) => doc.ref.delete()));
+		}
 	}
 }

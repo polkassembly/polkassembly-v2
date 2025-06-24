@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EPostDetailsTab, IPost, EProposalStatus, EPostOrigin, EProposalType } from '@/_shared/types';
+import { EPostDetailsTab, IPost, EProposalStatus, EPostOrigin, EProposalType, EReactQueryKeys } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -12,7 +12,7 @@ import { canVote } from '@/_shared/_utils/canVote';
 import { useAISummary } from '@/hooks/useAISummary';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { useSuccessModal } from '@/hooks/useSuccessModal';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -37,6 +37,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 
 	const queryClient = useQueryClient();
 
+	const { setOpenSuccessModal, open: openSuccessModal } = useSuccessModal();
+
 	const fetchPostDetails = async () => {
 		const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: postData.proposalType, indexOrHash: index, skipCache: true });
 
@@ -48,19 +50,14 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	};
 
 	const { data: post } = useQuery({
-		queryKey: ['postDetails', index],
+		queryKey: [EReactQueryKeys.POST_DETAILS, index],
 		queryFn: fetchPostDetails,
 		enabled: !!index,
-		staleTime: FIVE_MIN_IN_MILLI,
 		placeholderData: (prev) => prev || postData,
 		retry: true,
 		refetchOnWindowFocus: true,
 		refetchOnMount: true
 	});
-
-	const onEditPostSuccess = (title: string, content: string) => {
-		queryClient.setQueryData(['postDetails', index], (prev: IPost) => ({ ...prev, title, content }));
-	};
 
 	const { data: aiSummary } = useAISummary({
 		initialData: post?.contentSummary,
@@ -69,9 +66,13 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	});
 
 	useEffect(() => {
+		if (openSuccessModal) {
+			setOpenSuccessModal(false);
+		}
 		if (aiSummary?.isSpam) {
 			setShowSpamModal(true);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [aiSummary]);
 
 	const isOffchainPost = ValidatorService.isValidOffChainProposalType(post?.proposalType ?? postData.proposalType);
@@ -101,7 +102,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								<PostContent
 									postData={post}
 									isModalOpen={isModalOpen ?? false}
-									onEditPostSuccess={onEditPostSuccess}
 								/>
 							</TabsContent>
 							<TabsContent value={EPostDetailsTab.TIMELINE}>
@@ -109,6 +109,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									proposalType={post.proposalType}
 									timeline={post.onChainInfo?.timeline}
 									createdAt={post.createdAt}
+									linkedPost={post.linkedPost}
 								/>
 							</TabsContent>
 							<TabsContent value={EPostDetailsTab.ONCHAIN_INFO}>
@@ -133,6 +134,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									<VoteReferendumButton
 										iconClassName='hidden'
 										index={index}
+										track={post.onChainInfo?.origin}
+										proposalType={post.proposalType}
 									/>
 								)}
 							</div>
@@ -167,6 +170,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								<VoteReferendumButton
 									iconClassName='hidden'
 									index={index}
+									track={post.onChainInfo?.origin}
+									proposalType={post.proposalType}
 								/>
 							)}
 							<ClaimPayout beneficiaries={post.onChainInfo?.beneficiaries || []} />
