@@ -12,8 +12,8 @@ export class CookieClientService {
 		return getCookie(cookieName);
 	}
 
-	private static deleteCookieFromClient(cookieName: ECookieNames) {
-		return deleteCookie(cookieName);
+	private static deleteCookieFromClient(cookieName: ECookieNames, options?: { domain?: string; path: string; sameSite: 'none' | 'lax' | 'strict'; secure: boolean }) {
+		return deleteCookie(cookieName, options);
 	}
 
 	private static setCookieInClient(cookieName: ECookieNames, value: string) {
@@ -40,12 +40,14 @@ export class CookieClientService {
 		return this.decodeCookieToken<IRefreshTokenPayload>(refreshToken || '');
 	}
 
-	static deleteAccessToken() {
-		this.deleteCookieFromClient(ECookieNames.ACCESS_TOKEN);
+	static deleteAccessToken(isIframe?: boolean) {
+		console.log('deleteAccessToken', isIframe);
+		this.deleteCookieFromClient(ECookieNames.ACCESS_TOKEN, isIframe ? { path: '/', sameSite: 'none', secure: true } : undefined);
 	}
 
-	static deleteRefreshToken() {
-		this.deleteCookieFromClient(ECookieNames.REFRESH_TOKEN);
+	static deleteRefreshToken(isIframe?: boolean) {
+		console.log('deleteRefreshToken', isIframe);
+		this.deleteCookieFromClient(ECookieNames.REFRESH_TOKEN, isIframe ? { path: '/', sameSite: 'none', secure: true } : undefined);
 	}
 
 	static setThemeCookie(theme: ETheme) {
