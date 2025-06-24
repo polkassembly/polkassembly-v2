@@ -41,12 +41,10 @@ export class CookieClientService {
 	}
 
 	static deleteAccessToken(isIframe?: boolean) {
-		console.log('deleteAccessToken', isIframe);
 		this.deleteCookieFromClient(ECookieNames.ACCESS_TOKEN, isIframe ? { path: '/', sameSite: 'none', secure: true } : undefined);
 	}
 
 	static deleteRefreshToken(isIframe?: boolean) {
-		console.log('deleteRefreshToken', isIframe);
 		this.deleteCookieFromClient(ECookieNames.REFRESH_TOKEN, isIframe ? { path: '/', sameSite: 'none', secure: true } : undefined);
 	}
 
