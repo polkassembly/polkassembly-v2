@@ -99,6 +99,7 @@ function AnalyticTurnOutPercentage() {
 								},
 								ticks: {
 									padding: 0,
+									maxTicksLimit: 6,
 									font: {
 										size: 10,
 										weight: 500
