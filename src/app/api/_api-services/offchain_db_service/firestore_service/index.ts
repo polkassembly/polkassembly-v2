@@ -37,7 +37,10 @@ import {
 	ESocial,
 	ISocialHandle,
 	ESocialVerificationStatus,
-	IPostLink
+	IPostLink,
+	IPollVote,
+	IPoll,
+	EPollVotesType
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -45,6 +48,7 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
+import dayjs from 'dayjs';
 import { FirestoreUtils } from './firestoreUtils';
 
 export class FirestoreService extends FirestoreUtils {
@@ -1619,5 +1623,169 @@ export class FirestoreService extends FirestoreUtils {
 			// sometimes multiple content summaries are generated for the same post
 			await Promise.all(contentSummary.docs.map((doc) => doc.ref.delete()));
 		}
+	}
+
+	static async CreatePoll({
+		network,
+		proposalType,
+		index,
+		poll
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: string;
+		poll: { title: string; options: string[]; voteTypes?: EPollVotesType[]; endsAt: Date };
+	}) {
+		const pollDoc = this.pollsCollectionRef().doc();
+		await pollDoc.set({
+			network,
+			proposalType,
+			index,
+			title: poll.title,
+			options: poll.options,
+			voteTypes: poll.voteTypes || [],
+			endsAt: new Date(poll.endsAt),
+			createdAt: new Date(),
+			id: pollDoc.id
+		});
+	}
+
+	static async GetPollForPost({ network, index, proposalType }: { network: ENetwork; index: string; proposalType: EProposalType }) {
+		const pollSnapshot = await this.pollsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('index', '==', index).limit(1).get();
+		if (!pollSnapshot.docs?.length) {
+			return null;
+		}
+
+		const pollDoc = pollSnapshot.docs[0];
+
+		const pollData = pollDoc.data();
+		const payload: IPoll = {
+			createdAt: pollData?.createdAt?.toDate?.(),
+			title: pollData?.title,
+			options: pollData?.options || [],
+			voteTypes: pollData?.voteTypes || [],
+			endsAt: pollData?.endsAt?.toDate?.(),
+			index: pollData?.index,
+			network: pollData?.network,
+			proposalType: pollData?.proposalType,
+			id: pollData?.id,
+			votes: [] // initially empty, will be fetched from the votes collection client side
+		};
+		return payload;
+	}
+
+	static async DeletePollVote({ network, proposalType, index, userId, pollId }: { network: ENetwork; proposalType: EProposalType; index: string; userId: number; pollId: string }) {
+		const pollSnapshot = await this.pollsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('index', '==', index)
+			.where('id', '==', pollId)
+			.limit(1)
+			.get();
+
+		if (!pollSnapshot.docs?.length) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Poll not found');
+		}
+
+		const pollDoc = pollSnapshot.docs[0];
+		const pollVoteDoc = await pollDoc.ref.collection('votes').where('isDeleted', '==', false).where('userId', '==', userId).limit(1).get();
+
+		if (pollVoteDoc.empty) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Invalid vote or user not found');
+		}
+
+		// soft delete the vote
+		await pollVoteDoc.docs[0].ref.set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
+	}
+
+	static async CreatePollVote({
+		network,
+		proposalType,
+		index,
+		userId,
+		pollId,
+		selectedOption
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: string;
+		userId: number;
+		pollId: string;
+		selectedOption: string;
+	}) {
+		const pollSnapshot = await this.pollsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('index', '==', index)
+			.where('id', '==', pollId)
+			.limit(1)
+			.get();
+		if (!pollSnapshot.docs?.length) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Poll not found');
+		}
+
+		const pollDoc = pollSnapshot.docs[0];
+
+		// if user has already voted, delete the vote
+		const pollVoteDoc = await pollDoc.ref.collection('votes').where('isDeleted', '==', false).where('userId', '==', userId).limit(1).get();
+		if (pollVoteDoc.docs.length) {
+			await this.DeletePollVote({ network, proposalType, index, userId, pollId });
+		}
+
+		const newPollVoteDoc = pollDoc.ref.collection('votes').doc();
+		const vote = { network, proposalType, index, userId, selectedOption, createdAt: new Date(), id: newPollVoteDoc.id, isDeleted: false, updatedAt: new Date() };
+
+		await newPollVoteDoc.set(vote, { merge: true });
+
+		return vote;
+	}
+
+	static async GetPollVotes({ network, proposalType, index, pollId }: { network: ENetwork; proposalType: EProposalType; index: string; pollId: string }) {
+		const pollSnapshot = await this.pollsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('index', '==', index)
+			.where('id', '==', pollId)
+			.get();
+
+		if (!pollSnapshot.docs?.length) {
+			return [];
+		}
+
+		const pollDoc = pollSnapshot.docs[0];
+
+		// if poll is ended and vote type is masked, don't include public user
+		const pollData = pollDoc.data() as IPoll;
+		const isPollEnded = dayjs().isAfter(dayjs(pollData.endsAt));
+		const includePublicUser = !pollData?.voteTypes?.includes(EPollVotesType.ANONYMOUS) && !(pollData?.voteTypes?.includes(EPollVotesType.MASKED) && isPollEnded);
+
+		const votesDoc = await pollDoc.ref.collection('votes').where('isDeleted', '==', false).get();
+		if (votesDoc.empty) {
+			return [];
+		}
+		const votesPromises = votesDoc.docs.map(async (doc) => {
+			const data = doc.data();
+			const publicUser = includePublicUser ? await this.GetPublicUserById(data.userId) : null;
+			if (!doc.exists) {
+				return null;
+			}
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate?.(),
+				updatedAt: data.updatedAt?.toDate?.(),
+				publicUser: publicUser || null
+			} as IPollVote;
+		});
+
+		return Promise.allSettled(votesPromises).then((results) => {
+			return results
+				.map((result) => {
+					if (result.status === 'fulfilled') {
+						return result.value;
+					}
+					return null;
+				})
+				.filter((vote): vote is IPollVote => vote !== null);
+		});
 	}
 }

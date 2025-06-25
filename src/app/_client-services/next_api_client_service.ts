@@ -27,8 +27,6 @@ import {
 	ESocial,
 	IFollowEntry,
 	ITag,
-	EAllowedCommentor,
-	EOffChainPostTopic,
 	IBountyStats,
 	IBountyUserActivity,
 	IVoteCartItem,
@@ -49,7 +47,9 @@ import {
 	IOnChainMetadata,
 	EVoteSortOptions,
 	EHttpHeaderKey,
-	IPostLink
+	IPostLink,
+	ICreateOffChainPostPayload,
+	IPollVote
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -129,7 +129,10 @@ enum EApiRoute {
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
-	GET_USER_POSTS = 'GET_USER_POSTS'
+	GET_USER_POSTS = 'GET_USER_POSTS',
+	GET_POLL_VOTES = 'GET_POLL_VOTES',
+	ADD_POLL_VOTE = 'ADD_POLL_VOTE',
+	REMOVE_POLL_VOTE = 'REMOVE_POLL_VOTE'
 }
 
 export class NextApiClientService {
@@ -226,6 +229,17 @@ export class NextApiClientService {
 			case EApiRoute.GET_CONTENT_SUMMARY:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 			case EApiRoute.GET_VOTE_CURVES:
+				break;
+
+			case EApiRoute.GET_POLL_VOTES:
+				method = 'GET';
+				break;
+
+			case EApiRoute.ADD_POLL_VOTE:
+				method = 'POST';
+				break;
+			case EApiRoute.REMOVE_POLL_VOTE:
+				method = 'DELETE';
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
 				path = '/track-analytics';
@@ -830,26 +844,16 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { tags } });
 	}
 
-	static async createOffChainPost({
-		proposalType,
-		allowedCommentor,
-		content,
-		title,
-		tags,
-		topic
-	}: {
-		proposalType: EProposalType;
-		content: string;
-		title: string;
-		allowedCommentor: EAllowedCommentor;
-		tags?: ITag[];
-		topic?: EOffChainPostTopic;
-	}) {
+	static async createOffChainPost({ proposalType, allowedCommentor, content, title, tags, topic, poll }: ICreateOffChainPostPayload) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new ClientError(ERROR_CODES.CLIENT_ERROR, ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 		}
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_OFFCHAIN_POST, routeSegments: [proposalType] });
-		return this.nextApiClientFetch<{ message: string; data: { id: string; index: number } }>({ url, method, data: { content, title, allowedCommentor, tags, topic } });
+		return this.nextApiClientFetch<{ message: string; data: { id: string; index: number } }>({
+			url,
+			method,
+			data: { content, title, allowedCommentor, tags, topic, poll }
+		});
 	}
 
 	static async fetchLeaderboardApi({ page, limit }: { page: number; limit?: number }) {
@@ -1080,5 +1084,20 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS, routeSegments: [address, 'posts'], queryParams });
 		return this.nextApiClientFetch<IUserPosts>({ url, method });
+	}
+
+	static async addPollVote({ proposalType, index, pollId, decision }: { proposalType: EProposalType; index: string; pollId: string; decision: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_POLL_VOTE, routeSegments: [proposalType, index, 'poll', pollId, 'votes'] });
+		return this.nextApiClientFetch<{ vote: IPollVote }>({ url, method, data: { decision } });
+	}
+
+	static async removePollVote({ proposalType, index, pollId }: { proposalType: EProposalType; index: string; pollId: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.REMOVE_POLL_VOTE, routeSegments: [proposalType, index, 'poll', pollId, 'votes'] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	static async getPollVotes({ proposalType, index, pollId }: { proposalType: EProposalType; index: string; pollId: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POLL_VOTES, routeSegments: [proposalType, index, 'poll', pollId, 'votes'] });
+		return this.nextApiClientFetch<{ votes: IPollVote[] }>({ url, method });
 	}
 }

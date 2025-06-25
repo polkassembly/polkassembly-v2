@@ -470,6 +470,16 @@
 		"account": "アカウント",
 		"abstain": "棄権",
 		"onchainInfo": "オンチェーン情報",
+		"Poll": {
+			"endsOn": "終了日",
+			"endedOn": "終了日",
+			"noVotes": "まだ投票がありません",
+			"anonVotes": "匿名投票",
+			"viewPollVotes": "投票を表示",
+			"pollVotesList": "投票リスト",
+			"seeMore": "もっと見る",
+			"seeLess": "もっと見る"
+		},
 		"OnchainInfo": {
 			"metadata": "メタデータ",
 			"table": "テーブル",
@@ -710,11 +720,28 @@
 		"titlePlaceholder": "タイトルを入力",
 		"descriptionRequired": "有効な説明を入力してください。",
 		"AllowedCommentors": {
+			"advanced": "詳細",
 			"title": "誰がコメントできますか？",
 			"all": "全員",
 			"onchainVerified": "オンチェーン認証済み",
 			"none": "なし",
 			"tooltip": "この投稿にコメントや返信ができる人を選択"
+		},
+		"AddPoll": {
+			"addPoll": "投票を追加",
+			"title": "タイトル",
+			"options": "オプション",
+			"titleRequired": "有効なタイトルを入力してください。",
+			"settings": "設定",
+			"anonymousPolls": "匿名投票（投票者の名前は表示されません）",
+			"maskedPolls": "マスクされた投票（投票が終了した後にのみ結果が表示されます）",
+			"addAnotherOption": "別のオプションを追加..",
+			"pollEndsIn": "投票は",
+			"optionDuplicated": "このオプションは重複しています",
+			"optionsDuplicated": "投票オプションは重複できません",
+			"endDateRequired": "投票の終了日を選択してください",
+			"endDateInFuture": "投票の終了日は未来の日付にする必要があります",
+			"titlePlaceholder": "投票のタイトルを入力"
 		},
 		"Topic": {
 			"general": "一般",

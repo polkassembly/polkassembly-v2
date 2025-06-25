@@ -159,7 +159,9 @@ export const THEME_COLORS = {
 		bg_light_pink: '#fef0f7',
 		progress_pink_indicator: '#ededed',
 		tag_input_bg: '#f4f6f8',
-		parachain_badge_bg: '#ea729d'
+		parachain_badge_bg: '#ea729d',
+		poll_option_bg: '#d2d8e04d',
+		poll_header_bg: '#EFF4FF'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -315,6 +317,8 @@ export const THEME_COLORS = {
 		bg_light_pink: '#fef0f7',
 		progress_pink_indicator: '#343744',
 		tag_input_bg: '#222222',
-		parachain_badge_bg: '#ea729d'
+		parachain_badge_bg: '#ea729d',
+		poll_option_bg: '#222222',
+		poll_header_bg: '#333843'
 	}
 };

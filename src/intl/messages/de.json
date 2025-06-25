@@ -469,6 +469,16 @@
 		"account": "Konto",
 		"abstain": "Enthaltung",
 		"onchainInfo": "Onchain-Informationen",
+		"Poll": {
+			"endsOn": "Endet am",
+			"endedOn": "Endet am",
+			"noVotes": "Keine Abstimmungen gefunden",
+			"anonVotes": "Anonyme Abstimmungen",
+			"viewPollVotes": "Abstimmungen anzeigen",
+			"pollVotesList": "Abstimmungsliste",
+			"seeMore": "Mehr anzeigen",
+			"seeLess": "Weniger anzeigen"
+		},
 		"OnchainInfo": {
 			"metadata": "Metadaten",
 			"table": "Tabelle",
@@ -709,11 +719,28 @@
 		"titlePlaceholder": "Titel eingeben",
 		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung ein.",
 		"AllowedCommentors": {
+			"advanced": "Erweitert",
 			"title": "Wer kann kommentieren?",
 			"all": "Alle",
 			"onchainVerified": "Onchain verifiziert",
 			"none": "Niemand",
 			"tooltip": "Wählen Sie aus, wer diesen Beitrag kommentieren und beantworten kann"
+		},
+		"AddPoll": {
+			"addPoll": "Abstimmung hinzufügen",
+			"title": "Titel",
+			"options": "Optionen",
+			"titleRequired": "Bitte geben Sie einen gültigen Titel ein.",
+			"settings": "Einstellungen",
+			"anonymousPolls": "Anonyme Abstimmungen (Name der Abstimmenden wird nicht sichtbar sein)",
+			"maskedPolls": "Maskierte Abstimmungen (Ergebnis wird nur angezeigt, wenn ein Benutzer auf die Abstimmung abgestimmt hat)",
+			"addAnotherOption": "Weitere Option hinzufügen..",
+			"pollEndsIn": "Abstimmung endet in",
+			"optionDuplicated": "Diese Option ist doppelt",
+			"optionsDuplicated": "Abstimmungsoptionen können nicht doppelt sein",
+			"endDateRequired": "Bitte wählen Sie ein Enddatum für die Abstimmung",
+			"endDateInFuture": "Das Enddatum der Abstimmung muss in der Zukunft liegen",
+			"titlePlaceholder": "Abstimmungstitel eingeben"
 		},
 		"Topic": {
 			"general": "Allgemein",

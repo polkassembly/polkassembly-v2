@@ -402,6 +402,32 @@ export interface IOffChainContentHistoryItem {
 	title?: string;
 	createdAt: Date;
 }
+export interface IPollVote {
+	id: string;
+	userId: number;
+	createdAt: Date;
+	selectedOption: string;
+	updatedAt?: Date;
+	publicUser: IPublicUser | null;
+}
+
+export enum EPollVotesType {
+	ANONYMOUS = 'anonymous',
+	MASKED = 'masked'
+}
+
+export interface IPoll {
+	id: string;
+	network: ENetwork;
+	proposalType: EProposalType;
+	index: number;
+	endsAt: Date;
+	createdAt: Date;
+	title: string;
+	options: string[];
+	votes: IPollVote[];
+	voteTypes: EPollVotesType[];
+}
 
 export interface IOffChainPost {
 	id?: string;
@@ -426,6 +452,7 @@ export interface IOffChainPost {
 	topic?: EOffChainPostTopic;
 	history?: IOffChainContentHistoryItem[];
 	isDefaultContent?: boolean;
+	poll?: IPoll | null;
 }
 
 export enum EProposalStatus {
@@ -999,6 +1026,11 @@ export interface IWritePostFormFields {
 	tags: ITag[];
 	topic: EOffChainPostTopic;
 	allowedCommentor: EAllowedCommentor;
+	pollTitle?: string;
+	pollOptions?: string[];
+	pollEndDate?: Date;
+	pollVoteTypes?: EPollVotesType[];
+	isAddingPoll?: boolean;
 }
 
 export enum ENotificationStatus {
@@ -1297,5 +1329,20 @@ export interface IPayout {
 		amount: string;
 		expiresAt: Date;
 		generalIndex: string;
+	};
+}
+
+export interface ICreateOffChainPostPayload {
+	proposalType: EProposalType;
+	content: string;
+	title: string;
+	allowedCommentor: EAllowedCommentor;
+	tags?: ITag[];
+	topic?: EOffChainPostTopic;
+	poll?: {
+		title: string;
+		options: string[];
+		voteTypes: EPollVotesType[];
+		endsAt: Date;
 	};
 }

@@ -483,6 +483,16 @@
 		"aiSummary": "AI Summary",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
+		"Poll": {
+			"endsOn": "Ends on",
+			"endedOn": "Ended on",
+			"noVotes": "No votes yet",
+			"anonVotes": "Anon Votes",
+			"viewPollVotes": "View Poll Votes",
+			"pollVotesList": "Poll Votes List",
+			"seeMore": "See More",
+			"seeLess": "See Less"
+		},
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",
@@ -758,7 +768,25 @@
 		"titleTooShort": "Please provide a valid title.",
 		"titlePlaceholder": "Enter title",
 		"descriptionRequired": "Please provide a valid description.",
+		"AddPoll": {
+			"addPoll": "Add Poll",
+			"title": "Title",
+			"options": "Options",
+			"titleRequired": "Please provide a valid title.",
+			"settings": "Settings",
+			"anonymousPolls": "Anonymous polls (Voters’ name will not be visible)",
+			"maskedPolls": "Masked Polls (Result is only shown after a user has voted on the poll)",
+			"addAnotherOption": "Add Another Option..",
+			"pollEndsIn": "Poll ends in",
+			"optionDuplicated": "This option is duplicated",
+			"optionsDuplicated": "Poll options cannot be duplicated",
+			"endDateRequired": "Please select an end date for the poll",
+			"endDateInFuture": "Poll end date must be in the future",
+			"titlePlaceholder": "Enter poll title"
+		},
+
 		"AllowedCommentors": {
+			"advanced": "Advanced",
 			"title": "Who can comment ?",
 			"all": "All",
 			"onchainVerified": "Onchain Verified",
