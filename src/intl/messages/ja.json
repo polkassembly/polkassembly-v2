@@ -166,6 +166,7 @@
 		"on": "日時",
 		"days": "日",
 		"hours": "時間",
+		"minutes": "分",
 		"judgements": "判定",
 		"since": "日時",
 		"UnlockTokens": "トークンをロック解除",
@@ -174,6 +175,7 @@
 		"UnlockIn": "ロック解除",
 		"ProposalUnlockIn": "提案のロック解除",
 		"LockedOn": "ロックされた日時",
+		"NoUnlocks": "ロック解除可能なトークンがありません",
 		"Delegations": {
 			"noDelegations": "委任が見つかりません",
 			"delegation": "委任",

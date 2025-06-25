@@ -47,13 +47,13 @@ function VoteDetailCard({ vote }: VoteDetailCardProps) {
 		const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
 
 		if (days > 0) {
-			return `${days} day${days !== 1 ? 's' : ''}, ${hours} hour${hours !== 1 ? 's' : ''}`;
+			return `${days} ${t('Profile.days')}, ${hours} ${t('Profile.hours')}`;
 		}
 		if (hours > 0) {
-			return `${hours} hour${hours !== 1 ? 's' : ''}, ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+			return `${hours} ${t('Profile.hours')}, ${minutes} ${t('Profile.minutes')}`;
 		}
 		if (minutes > 0) {
-			return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+			return `${minutes} ${t('Profile.minutes')}`;
 		}
 		return 'Less than 1 minute';
 	};

@@ -12,6 +12,8 @@ import { useToast } from '@/hooks/useToast';
 import { ENotificationStatus, IVotingLocks } from '@/_shared/types';
 import { UnlockKeyhole } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 import classes from './VoteUnlock.module.scss';
 import VoteUnlockModal from './VoteUnlockModal';
 
@@ -29,6 +31,7 @@ function VoteUnlock({ addresses = [], isReferendaPage = false, referendumIndex, 
 	const { userPreferences } = useUserPreferences();
 	const { apiService } = usePolkadotApiService();
 	const { toast } = useToast();
+	const network = getCurrentNetwork();
 
 	const [loading, setLoading] = useState(false);
 	const [votingLocks, setVotingLocks] = useState<IVotingLocks>({
@@ -47,6 +50,46 @@ function VoteUnlock({ addresses = [], isReferendaPage = false, referendumIndex, 
 
 	// For referenda page, only show if there are unlockable votes for this referendum
 	const shouldShowOnReferendaPage = !isReferendaPage || votingLocks.unlockableVotes.some((vote) => vote.refId === referendumIndex?.toString());
+
+	// Find the closest unlock time from locked and ongoing votes
+	const getClosestUnlockTime = () => {
+		const allLockedVotes = [...votingLocks.lockedVotes, ...votingLocks.ongoingVotes];
+
+		if (allLockedVotes.length === 0) {
+			return null;
+		}
+
+		// Find the vote with the smallest blocksRemaining
+		const closestVote = allLockedVotes.reduce((closest, current) => {
+			if (!closest.blocksRemaining || !current.blocksRemaining) return closest;
+			return current.blocksRemaining.lt(closest.blocksRemaining) ? current : closest;
+		});
+
+		if (!closestVote.blocksRemaining) {
+			return null;
+		}
+
+		// Calculate time remaining using the same logic as VoteDetailCard
+		const { totalSeconds } = BlockCalculationsService.getTimeForBlocks({
+			network,
+			blocks: closestVote.blocksRemaining
+		});
+
+		const days = Math.floor(totalSeconds / (24 * 60 * 60));
+		const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
+		const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+
+		if (days > 0) {
+			return `${days} ${t('Profile.days')}, ${hours} ${t('Profile.hours')}`;
+		}
+		if (hours > 0) {
+			return `${hours} ${t('Profile.hours')}, ${minutes} ${t('Profile.minutes')}`;
+		}
+		if (minutes > 0) {
+			return `${minutes} ${t('Profile.minutes')}`;
+		}
+		return t('Profile.LessThanOneMinute');
+	};
 
 	const fetchVotingLocks = async () => {
 		if (!apiService || !currentAddress) return;
@@ -111,6 +154,8 @@ function VoteUnlock({ addresses = [], isReferendaPage = false, referendumIndex, 
 		return null;
 	}
 
+	const closestUnlockTime = getClosestUnlockTime();
+
 	return (
 		<>
 			{hasUnlockAccess && (
@@ -120,7 +165,13 @@ function VoteUnlock({ addresses = [], isReferendaPage = false, referendumIndex, 
 					onClick={() => setOpen(true)}
 				>
 					<UnlockKeyhole className='h-4 w-4 text-border_blue' />
-					{t('Profile.UnlockIn')} {t('Profile.days')} {t('Profile.hours')}
+					{closestUnlockTime ? (
+						<>
+							{t('Profile.UnlockIn')} {closestUnlockTime}
+						</>
+					) : (
+						<>{t('Profile.NoUnlocks')}</>
+					)}
 				</button>
 			)}
 			<VoteUnlockModal

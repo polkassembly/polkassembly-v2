@@ -3,7 +3,7 @@
 }
 
 .unlockBalanceButton {
-	@apply flex items-center gap-x-2 rounded-lg border border-border_blue bg-border_blue/10 px-3 py-1 text-sm text-border_blue;
+	@apply flex items-center gap-x-2 rounded-lg border border-border_blue bg-border_blue/10 px-3 py-1 text-xs text-border_blue;
 }
 
 .dialogContent {
