@@ -120,7 +120,7 @@ function VoteUnlock({ addresses = [], isReferendaPage = false, referendumIndex, 
 					onClick={() => setOpen(true)}
 				>
 					<UnlockKeyhole className='h-4 w-4 text-border_blue' />
-					{t('Profile.unlock')} {t('Profile.in')} {t('Profile.days')} {t('Profile.hours')}
+					{t('Profile.UnlockIn')} {t('Profile.days')} {t('Profile.hours')}
 				</button>
 			)}
 			<VoteUnlockModal

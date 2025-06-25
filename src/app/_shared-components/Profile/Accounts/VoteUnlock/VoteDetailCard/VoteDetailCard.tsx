@@ -12,6 +12,7 @@ import { BlockCalculationsService } from '@/app/_client-services/block_calculati
 import { getFormattedDateFromBlock } from '@/_shared/_utils/blockToDateUtils';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import { IVoteLock } from '@/_shared/types';
 import classes from './VoteDetailCard.module.scss';
@@ -33,6 +34,7 @@ interface VoteLockWithDate {
 }
 
 function VoteDetailCard({ vote }: VoteDetailCardProps) {
+	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
 	const [voteWithDate, setVoteWithDate] = useState<VoteLockWithDate>(vote);
@@ -88,14 +90,18 @@ function VoteDetailCard({ vote }: VoteDetailCardProps) {
 	return (
 		<div className={classes.container}>
 			<div className={classes.voteInfo}>
-				{voteWithDate.blocksRemaining && <span className={classes.timeRemaining}>Proposal Unlock in: {getTimeRemainingForBlocks(voteWithDate.blocksRemaining)}</span>}
+				{voteWithDate.blocksRemaining && (
+					<span className={classes.timeRemaining}>
+						{t('Profile.ProposalUnlockIn')}: {getTimeRemainingForBlocks(voteWithDate.blocksRemaining)}
+					</span>
+				)}
 				{voteWithDate.lockedAtDate && (
 					<Link
 						href={`/referenda/${voteWithDate.refId}`}
 						className={classes.lockedDate}
 						target='_blank'
 					>
-						Locked on {voteWithDate.lockedAtDate}
+						{t('Profile.LockedOn')} {voteWithDate.lockedAtDate}
 						<SquareArrowOutUpRight className='h-3 w-3 text-border_blue' />
 					</Link>
 				)}

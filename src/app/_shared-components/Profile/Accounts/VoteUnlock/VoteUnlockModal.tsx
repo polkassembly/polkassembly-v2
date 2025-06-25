@@ -11,6 +11,7 @@ import Image from 'next/image';
 import TreasureChestIcon from '@assets/icons/treasure-chest.svg';
 import { IVotingLocks } from '@/_shared/types';
 import { LockKeyhole, CheckCircle, UnlockKeyhole } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Separator } from '@/app/_shared-components/Separator';
 import classes from './VoteUnlock.module.scss';
 import VotesList from './VotesList/VotesList';
@@ -26,6 +27,7 @@ interface VoteUnlockModalProps {
 }
 
 function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnlockableBalance, onUnlock, loading }: VoteUnlockModalProps) {
+	const t = useTranslations();
 	return (
 		<Dialog
 			open={open}
@@ -47,7 +49,7 @@ function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnloc
 					<VotesList
 						votingLocks={votingLocks.unlockableVotes}
 						balance={totalUnlockableBalance}
-						balanceLabel='Unlockable'
+						balanceLabel={t('Profile.Unlockable')}
 						icon={
 							<CheckCircle
 								fill='#51D36E'
@@ -59,7 +61,7 @@ function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnloc
 					<VotesList
 						votingLocks={votingLocks.lockedVotes.concat(votingLocks.ongoingVotes)}
 						balance={lockedBalance}
-						balanceLabel='Locked Balance'
+						balanceLabel={t('Profile.LockedBalance')}
 						icon={<LockKeyhole className='h-5 w-5 text-gold_balance' />}
 					/>
 				</div>
@@ -72,7 +74,7 @@ function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnloc
 						disabled={totalUnlockableBalance.isZero()}
 					>
 						<UnlockKeyhole className='h-4 w-4 text-white' />
-						Unlock Tokens
+						{t('Profile.UnlockTokens')}
 					</Button>
 				</div>
 			</DialogContent>
