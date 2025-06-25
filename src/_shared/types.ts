@@ -1323,3 +1323,15 @@ export interface IRelativeTime {
 	hours: number;
 	minutes: number;
 }
+
+export interface INextUnlockData {
+	unlockTime: string;
+	refId: string;
+	track: string;
+	lockedAtBlock?: BN;
+	endBlock: BN;
+	balance: BN;
+	conviction: number;
+	status: string;
+	blocksRemaining?: BN;
+}

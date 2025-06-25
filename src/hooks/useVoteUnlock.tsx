@@ -2,156 +2,126 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BN } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
+import { IVotingLocks, ENotificationStatus, INextUnlockData } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { ENotificationStatus, IVotingLocks, IVoteLock } from '@/_shared/types';
-import { processVotingLocksForDisplay, getnextUnlockTime, shouldShowOnReferendaPage } from '@/app/_client-utils/voteUnlockUtils';
+import { getNextUnlockData, calculateTotalUnlockableBalance } from '@/app/_client-utils/voteUnlockUtils';
 import { useToast } from './useToast';
-import { useUserPreferences } from './useUserPreferences';
 import { usePolkadotApiService } from './usePolkadotApiService';
 
-interface UseVoteUnlockProps {
-	addresses?: string[];
-	isReferendaPage?: boolean;
-	referendumIndex?: number;
-	onRefresh?: () => void;
-}
-
-interface UseVoteUnlockReturn {
-	// State
-	loading: boolean;
+export interface IUseVoteUnlockReturn {
 	votingLocks: IVotingLocks;
-
-	// Computed values
+	loading: boolean;
+	error: string | null;
+	nextUnlockData: INextUnlockData | null;
 	totalUnlockableBalance: BN;
-	combinedLockedVotes: IVoteLock[];
-	hasUnlockableVotes: boolean;
-	hasLockedVotes: boolean;
-	nextUnlockTime: string | null;
-	shouldShow: boolean;
-
-	// Actions
-	fetchVotingLocks: () => Promise<void>;
 	handleUnlockTokens: () => Promise<void>;
-
-	// Utils
-	currentAddress: string;
-	network: ReturnType<typeof getCurrentNetwork>;
+	refetch: () => void;
 }
 
-export const useVoteUnlock = ({ addresses = [], isReferendaPage = false, referendumIndex, onRefresh }: UseVoteUnlockProps): UseVoteUnlockReturn => {
-	const t = useTranslations();
-	const { userPreferences } = useUserPreferences();
+export const useVoteUnlock = (address: string): IUseVoteUnlockReturn => {
 	const { apiService } = usePolkadotApiService();
 	const { toast } = useToast();
+	const t = useTranslations();
 	const network = getCurrentNetwork();
 
-	const [loading, setLoading] = useState(false);
 	const [votingLocks, setVotingLocks] = useState<IVotingLocks>({
 		lockedVotes: [],
 		unlockableVotes: [],
 		ongoingVotes: []
 	});
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
-	const currentAddress = userPreferences.selectedAccount?.address || addresses[0] || '';
-
-	// Memoized computed values to prevent unnecessary recalculations
-	const computedValues = useMemo(() => {
-		const processed = processVotingLocksForDisplay(votingLocks);
-		const nextUnlockTime = getnextUnlockTime(votingLocks, network, t);
-		const shouldShow = shouldShowOnReferendaPage(isReferendaPage, votingLocks.unlockableVotes, referendumIndex);
-
-		return {
-			...processed,
-			nextUnlockTime,
-			shouldShow
-		};
-	}, [votingLocks, network, t, isReferendaPage, referendumIndex]);
-
-	// Fetch voting locks with error handling
 	const fetchVotingLocks = useCallback(async () => {
-		if (!apiService || !currentAddress) return;
+		if (!apiService || !address) return;
 
 		setLoading(true);
+		setError(null);
+
 		try {
-			const locks = await apiService.getVotingLocks(currentAddress);
-			if (locks) {
-				setVotingLocks(locks);
-			}
-		} catch (error) {
-			console.error('Error fetching voting locks:', error);
-			toast({
-				title: 'Error',
-				description: 'Failed to fetch voting locks',
-				status: ENotificationStatus.ERROR
+			const locks = await apiService.getVotingLocks(address);
+			setVotingLocks(
+				locks || {
+					lockedVotes: [],
+					unlockableVotes: [],
+					ongoingVotes: []
+				}
+			);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Failed to fetch voting locks');
+			setVotingLocks({
+				lockedVotes: [],
+				unlockableVotes: [],
+				ongoingVotes: []
 			});
 		} finally {
 			setLoading(false);
 		}
-	}, [apiService, currentAddress, toast]);
+	}, [apiService, address]);
 
-	// Handle token unlocking with optimized transaction batching
+	const nextUnlockData = useMemo(() => {
+		return getNextUnlockData(votingLocks, network, t);
+	}, [votingLocks, network, t]);
+
+	const totalUnlockableBalance = useMemo(() => {
+		return calculateTotalUnlockableBalance(votingLocks.unlockableVotes);
+	}, [votingLocks.unlockableVotes]);
+
 	const handleUnlockTokens = useCallback(async () => {
-		if (!apiService || !currentAddress || !votingLocks.unlockableVotes.length) return;
+		if (!apiService || !address || !votingLocks.unlockableVotes.length) return;
 
 		setLoading(true);
 		try {
 			await apiService.unlockVotingTokens({
-				address: currentAddress,
+				address,
 				unlockableVotes: votingLocks.unlockableVotes,
 				onSuccess: () => {
 					toast({
-						title: 'Success',
-						description: 'Tokens unlocked successfully',
+						title: t('Profile.success'),
+						description: t('Profile.tokensUnlockedSuccessfully'),
 						status: ENotificationStatus.SUCCESS
 					});
 					// Refresh data after successful unlock
 					fetchVotingLocks();
-					onRefresh?.();
 				},
-				onFailed: (error: string) => {
+				onFailed: (errorMessage: string) => {
 					toast({
-						title: 'Error',
-						description: error,
+						title: t('Profile.error'),
+						description: errorMessage,
 						status: ENotificationStatus.ERROR
 					});
 				}
 			});
-		} catch (error) {
-			console.error('Error unlocking tokens:', error);
+		} catch (err) {
+			console.error('Error unlocking tokens:', err);
 			toast({
-				title: 'Error',
-				description: 'Failed to unlock tokens',
+				title: t('Profile.error'),
+				description: t('Profile.failedToUnlockTokens'),
 				status: ENotificationStatus.ERROR
 			});
 		} finally {
 			setLoading(false);
 		}
-	}, [apiService, currentAddress, votingLocks.unlockableVotes, toast, fetchVotingLocks, onRefresh]);
+	}, [apiService, address, votingLocks.unlockableVotes, toast, t, fetchVotingLocks]);
 
-	// Auto-fetch when dependencies change
+	const refetch = useCallback(() => {
+		fetchVotingLocks();
+	}, [fetchVotingLocks]);
+
 	useEffect(() => {
-		if (currentAddress) {
-			fetchVotingLocks();
-		}
-	}, [currentAddress, fetchVotingLocks]);
+		fetchVotingLocks();
+	}, [fetchVotingLocks]);
 
 	return {
-		// State
-		loading,
 		votingLocks,
-
-		// Computed values
-		...computedValues,
-
-		// Actions
-		fetchVotingLocks,
+		loading,
+		error,
+		nextUnlockData,
+		totalUnlockableBalance,
 		handleUnlockTokens,
-
-		// Utils
-		currentAddress,
-		network
+		refetch
 	};
 };

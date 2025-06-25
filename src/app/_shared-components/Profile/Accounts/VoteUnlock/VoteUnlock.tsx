@@ -9,52 +9,47 @@ import { BN } from '@polkadot/util';
 import { UnlockKeyhole } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useVoteUnlock } from '@/hooks/useVoteUnlock';
+import { useUser } from '@/hooks/useUser';
 import classes from './VoteUnlock.module.scss';
 import VoteUnlockModal from './VoteUnlockModal';
 
 interface VoteUnlockProps {
-	addresses?: string[];
-	isReferendaPage?: boolean;
-	referendumIndex?: number;
-	onRefresh?: () => void;
 	lockedBalance: string;
 	hasUnlockAccess: boolean;
 }
 
-function VoteUnlock({ addresses = [], isReferendaPage = false, referendumIndex, onRefresh, lockedBalance, hasUnlockAccess }: VoteUnlockProps) {
+function VoteUnlock({ lockedBalance, hasUnlockAccess }: VoteUnlockProps) {
 	const t = useTranslations();
+	const { user } = useUser();
 	const [open, setOpen] = useState(false);
 
-	// Use the optimized hook for all vote unlock logic
-	const { loading, votingLocks, totalUnlockableBalance, nextUnlockTime, shouldShow, handleUnlockTokens } = useVoteUnlock({
-		addresses,
-		isReferendaPage,
-		referendumIndex,
-		onRefresh
-	});
+	// Get the current user's address - prioritize defaultAddress, then first address
+	const currentAddress = user?.defaultAddress || user?.addresses?.[0] || '';
 
-	if (!shouldShow) {
+	// Use the complete hook for vote unlock logic
+	const { votingLocks, loading, nextUnlockData, totalUnlockableBalance, handleUnlockTokens } = useVoteUnlock(currentAddress);
+
+	// Don't show if user doesn't have unlock access or no address
+	if (!hasUnlockAccess || !currentAddress) {
 		return null;
 	}
 
 	return (
 		<>
-			{hasUnlockAccess && (
-				<button
-					type='button'
-					className={classes.unlockBalanceButton}
-					onClick={() => setOpen(true)}
-				>
-					<UnlockKeyhole className='h-4 w-4 text-border_blue' />
-					{nextUnlockTime ? (
-						<>
-							{t('Profile.UnlockIn')} {nextUnlockTime}
-						</>
-					) : (
-						<>{t('Profile.NoUnlocks')}</>
-					)}
-				</button>
-			)}
+			<button
+				type='button'
+				className={classes.unlockBalanceButton}
+				onClick={() => setOpen(true)}
+			>
+				<UnlockKeyhole className='h-4 w-4 text-border_blue' />
+				{nextUnlockData?.unlockTime ? (
+					<>
+						{t('Profile.UnlockIn')} {nextUnlockData.unlockTime}
+					</>
+				) : (
+					<>{t('Profile.NoUnlocks')}</>
+				)}
+			</button>
 			<VoteUnlockModal
 				open={open}
 				setOpen={setOpen}

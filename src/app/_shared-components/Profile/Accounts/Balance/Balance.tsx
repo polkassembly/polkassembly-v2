@@ -32,7 +32,7 @@ function Balance({ address, userProfile }: { address: string; userProfile?: IPub
 		reservedBalance: '0',
 		transferableBalance: '0'
 	});
-	const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		if (!apiService || !address) return;
@@ -52,7 +52,7 @@ function Balance({ address, userProfile }: { address: string; userProfile?: IPub
 		})();
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [address]);
+	}, [address, apiService]);
 	return (
 		<div className={classes.balanceWrapper}>
 			<div className={classes.balanceTitleWrapper}>
