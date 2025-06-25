@@ -11,12 +11,17 @@ import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
 import {
 	ENetwork,
+	EProposalStatus,
+	EAnalyticsType,
 	IContentSummary,
 	IDelegateDetails,
 	IDelegationStats,
 	IGenericListingResponse,
 	IPost,
+	IPostAnalytics,
 	IPostListing,
+	EPostTilesVotesType,
+	IPostTilesVotes,
 	ITrackAnalyticsDelegations,
 	ITrackAnalyticsStats,
 	ITreasuryStats
@@ -30,6 +35,7 @@ import {
 	ONE_DAY_IN_SECONDS,
 	REFRESH_TOKEN_LIFE_IN_SECONDS,
 	SIX_HOURS_IN_SECONDS,
+	TEN_DAYS_IN_SECONDS,
 	THIRTY_DAYS_IN_SECONDS
 } from '../../_api-constants/timeConstants';
 
@@ -55,7 +61,9 @@ enum ERedisKeys {
 	TRACK_ANALYTICS_DELEGATION = 'TAD',
 	TRACK_ANALYTICS_STATS = 'TAS',
 	TREASURY_STATS = 'TRS',
-	OVERVIEW_PAGE_DATA = 'OPD'
+	OVERVIEW_PAGE_DATA = 'OPD',
+	POST_ANALYTICS_DATA = 'PAD',
+	POST_TILES_VOTES_DATA = 'PTVD'
 }
 
 export class RedisService {
@@ -112,7 +120,11 @@ export class RedisService {
 		[ERedisKeys.TRACK_ANALYTICS_DELEGATION]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-${origin}`,
 		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
 		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
-		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`
+		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
+		[ERedisKeys.POST_ANALYTICS_DATA]: (network: string, proposalType: string, indexOrHash: string): string =>
+			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${indexOrHash}`,
+		[ERedisKeys.POST_TILES_VOTES_DATA]: (network: string, proposalType: string, indexOrHash: string, votesType: EPostTilesVotesType, analyticsType?: EAnalyticsType): string =>
+			`${ERedisKeys.POST_TILES_VOTES_DATA}-${network}-${proposalType}-${indexOrHash}-${votesType}-${analyticsType || ''}`
 	} as const;
 
 	// helper methods
@@ -616,5 +628,73 @@ export class RedisService {
 
 	static async DeleteOverviewPageData({ network }: { network: ENetwork }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
+	}
+
+	// Post analytics caching methods
+	static async SetPostAnalyticsData({
+		network,
+		proposalType,
+		indexOrHash,
+		data
+	}: {
+		network: string;
+		proposalType: string;
+		indexOrHash: string;
+		data: IPostAnalytics;
+	}): Promise<void> {
+		const isActivePost = data.proposal.status && ACTIVE_PROPOSAL_STATUSES.includes(data.proposal.status as EProposalStatus);
+
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, indexOrHash),
+			value: JSON.stringify(data),
+			ttlSeconds: isActivePost ? HALF_HOUR_IN_SECONDS : TEN_DAYS_IN_SECONDS
+		});
+	}
+
+	// Posts caching methods
+	static async GetPostAnalyticsData({ network, proposalType, indexOrHash }: { network: string; proposalType: string; indexOrHash: string }): Promise<IPostAnalytics | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, indexOrHash) });
+		return data ? (deepParseJson(data) as IPostAnalytics) : null;
+	}
+
+	static async SetPostTilesVotesData({
+		network,
+		proposalType,
+		indexOrHash,
+		data,
+		votesType,
+		analyticsType
+	}: {
+		network: string;
+		proposalType: string;
+		indexOrHash: string;
+		data: IPostTilesVotes;
+		votesType: EPostTilesVotesType;
+		analyticsType?: EAnalyticsType;
+	}): Promise<void> {
+		const isActivePost = data.proposal?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.proposal.status as EProposalStatus);
+
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.POST_TILES_VOTES_DATA](network, proposalType, indexOrHash, votesType, analyticsType),
+			value: JSON.stringify(data),
+			ttlSeconds: isActivePost ? HALF_HOUR_IN_SECONDS : TEN_DAYS_IN_SECONDS
+		});
+	}
+
+	static async GetPostTilesVotesData({
+		network,
+		proposalType,
+		indexOrHash,
+		votesType,
+		analyticsType
+	}: {
+		network: string;
+		proposalType: string;
+		indexOrHash: string;
+		votesType: EPostTilesVotesType;
+		analyticsType?: EAnalyticsType;
+	}): Promise<IPostTilesVotes | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_TILES_VOTES_DATA](network, proposalType, indexOrHash, votesType, analyticsType) });
+		return data ? (deepParseJson(data) as IPostTilesVotes) : null;
 	}
 }

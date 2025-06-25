@@ -1,0 +1,62 @@
+.header {
+	@apply flex w-full items-center justify-between;
+}
+
+.chartWrapper {
+	@apply relative mt-4 flex h-[300px] items-center justify-center p-0;
+}
+
+.chartWrapper > div {
+	height: 100% !important;
+	width: 100% !important;
+}
+.card {
+	@apply mx-auto max-h-[400px] w-full flex-1 rounded-2xl border-[1px] border-solid border-border_grey bg-transparent p-4 text-basic_text;
+}
+
+.description {
+	@apply my-4 flex items-center gap-2 rounded-lg border-[1px] border-solid border-turnout_color bg-analytics_description_bg px-4 py-2 text-sm font-medium text-text_primary dark:text-white;
+}
+
+.chartWrapper {
+	rect {
+		// border-radius: 4px !important;
+		rx: 4 !important;
+		ry: 4 !important;
+	}
+}
+
+.tabs {
+	@apply flex items-center justify-end gap-1 rounded-sm bg-votes_tab_bg p-1;
+}
+
+.heading {
+	@apply text-base font-bold;
+}
+.tab {
+	@apply h-5 w-full rounded-sm px-3 text-xs font-bold tracking-wide transition-all;
+}
+.activeTab {
+	@apply bg-bg_modal text-text_pink shadow-sm;
+}
+.inactiveTab {
+	@apply bg-transparent text-toggle_btn_inactive_text hover:bg-primary_border;
+}
+.skeleton {
+	@apply mt-4 h-[280px] w-full;
+}
+.tooltip {
+	@apply flex flex-col items-center justify-center rounded-md bg-bg_code p-4;
+}
+.tooltipTitle {
+	@apply text-sm font-bold text-text_primary dark:text-white;
+}
+.tooltipContent {
+	@apply flex flex-col items-center justify-center gap-1 text-xs text-text_primary;
+}
+.tooltipNestedContent {
+	@apply flex flex-col items-center gap-1 font-bold text-basic_text;
+}
+.tooltipFlattenedContent {
+	@apply flex items-center gap-1 font-bold text-basic_text;
+}
