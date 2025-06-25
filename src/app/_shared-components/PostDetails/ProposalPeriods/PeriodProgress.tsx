@@ -29,7 +29,7 @@ function PeriodProgress({ periodEndsAt, periodName, trackName, periodType }: Pro
 				{Array.from({ length: TOTAL_SEGMENTS }, (_, index) => (
 					<div
 						key={index}
-						className={`h-5 w-full rounded-sm ${index < percentage ? 'bg-pink-500' : 'bg-gray-200'}`}
+						className={`h-5 w-full rounded-sm ${index < percentage ? 'bg-bg_pink' : 'bg-border_grey'}`}
 					/>
 				))}
 			</div>
