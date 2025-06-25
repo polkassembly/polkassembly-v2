@@ -8,9 +8,9 @@ import { BN } from '@polkadot/util';
 import { useState, useEffect } from 'react';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 import { getFormattedDateFromBlock } from '@/_shared/_utils/blockToDateUtils';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { getMemoizedTimeFromBlocks } from '@/app/_client-utils/voteUnlockUtils';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { SquareArrowOutUpRight } from 'lucide-react';
@@ -21,15 +21,7 @@ interface VoteDetailCardProps {
 	vote: IVoteLock;
 }
 
-interface VoteLockWithDate {
-	refId: string;
-	track: string;
-	balance: BN;
-	conviction: number;
-	endBlock: BN;
-	status: string;
-	blocksRemaining?: BN;
-	lockedAtBlock?: BN;
+interface VoteLockWithDate extends IVoteLock {
 	lockedAtDate?: string;
 }
 
@@ -39,53 +31,35 @@ function VoteDetailCard({ vote }: VoteDetailCardProps) {
 	const { apiService } = usePolkadotApiService();
 	const [voteWithDate, setVoteWithDate] = useState<VoteLockWithDate>(vote);
 
+	// Use memoized time calculation for better performance
 	const getTimeRemainingForBlocks = (blocks: BN) => {
-		// Use theoretical calculation for now (we could make this async to use improved calculation)
-		const { totalSeconds } = BlockCalculationsService.getTimeForBlocks({ network, blocks });
-		const days = Math.floor(totalSeconds / (24 * 60 * 60));
-		const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
-		const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
-
-		if (days > 0) {
-			return `${days} ${t('Profile.days')}, ${hours} ${t('Profile.hours')}`;
-		}
-		if (hours > 0) {
-			return `${hours} ${t('Profile.hours')}, ${minutes} ${t('Profile.minutes')}`;
-		}
-		if (minutes > 0) {
-			return `${minutes} ${t('Profile.minutes')}`;
-		}
-		return 'Less than 1 minute';
+		return getMemoizedTimeFromBlocks(blocks, network, t).formatted;
 	};
 
 	// Fetch formatted dates for votes that have lockedAtBlock
 	useEffect(() => {
 		const fetchDatesForVote = async () => {
-			if (!apiService) return;
+			if (!apiService || !vote.lockedAtBlock) return;
 
-			const processVote = async (vote: VoteLockWithDate) => {
-				let lockedAtDate;
-				if (vote.lockedAtBlock) {
-					try {
-						lockedAtDate = await getFormattedDateFromBlock({
-							targetBlockNumber: vote.lockedAtBlock,
-							network,
-							apiService
-						});
-					} catch (error) {
-						console.error('Error getting locked at date:', error);
-					}
-				}
-				return { ...vote, lockedAtDate };
-			};
-
-			const voteWithDate = await processVote(vote);
-
-			setVoteWithDate(voteWithDate);
+			try {
+				const lockedAtDate = await getFormattedDateFromBlock({
+					targetBlockNumber: vote.lockedAtBlock,
+					network,
+					apiService
+				});
+				setVoteWithDate((prev) => ({ ...prev, lockedAtDate }));
+			} catch (error) {
+				console.error('Error getting locked at date:', error);
+			}
 		};
 
 		fetchDatesForVote();
-	}, [vote, apiService, network]);
+	}, [vote.lockedAtBlock, apiService, network]);
+
+	// Update vote data when prop changes
+	useEffect(() => {
+		setVoteWithDate(vote);
+	}, [vote]);
 
 	return (
 		<div className={classes.container}>

@@ -13,6 +13,7 @@ import { IVotingLocks } from '@/_shared/types';
 import { LockKeyhole, CheckCircle, UnlockKeyhole } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Separator } from '@/app/_shared-components/Separator';
+import { combineLockedVotes } from '@/app/_client-utils/voteUnlockUtils';
 import classes from './VoteUnlock.module.scss';
 import VotesList from './VotesList/VotesList';
 
@@ -28,6 +29,10 @@ interface VoteUnlockModalProps {
 
 function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnlockableBalance, onUnlock, loading }: VoteUnlockModalProps) {
 	const t = useTranslations();
+
+	// Use utility to combine locked and ongoing votes for display
+	const combinedLockedVotes = combineLockedVotes(votingLocks);
+
 	return (
 		<Dialog
 			open={open}
@@ -59,7 +64,7 @@ function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnloc
 					/>
 
 					<VotesList
-						votingLocks={votingLocks.lockedVotes.concat(votingLocks.ongoingVotes)}
+						votingLocks={combinedLockedVotes}
 						balance={lockedBalance}
 						balanceLabel={t('Profile.LockedBalance')}
 						icon={<LockKeyhole className='h-5 w-5 text-gold_balance' />}

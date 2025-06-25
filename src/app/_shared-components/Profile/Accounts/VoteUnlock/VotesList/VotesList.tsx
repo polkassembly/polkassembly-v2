@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { BN } from '@polkadot/util';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -20,19 +20,18 @@ interface VotesListProps {
 	icon: React.ReactNode;
 }
 
-function VoteListTitle({
-	balanceLabel,
-	icon,
-	balance,
-	network,
-	withChevron = false
-}: {
+interface VoteListTitleProps {
 	balanceLabel: string;
 	icon: React.ReactNode;
 	balance: BN;
 	network: ENetwork;
 	withChevron?: boolean;
-}) {
+}
+
+function VoteListTitle({ balanceLabel, icon, balance, network, withChevron = false }: VoteListTitleProps) {
+	// Memoize balance formatting to prevent unnecessary recalculations
+	const formattedBalance = useMemo(() => formatBnBalance(balance.toString(), { numberAfterComma: 2, withUnit: true }, network), [balance, network]);
+
 	return (
 		<div className={classes.sectionTitle}>
 			<div className={classes.titleIcon}>
@@ -40,7 +39,7 @@ function VoteListTitle({
 				<span className={classes.titleLabel}>{balanceLabel}</span>
 			</div>
 			<div className='flex items-center gap-2'>
-				<span className={classes.balanceValue}>{formatBnBalance(balance.toString(), { numberAfterComma: 2, withUnit: true }, network)}</span>
+				<span className={classes.balanceValue}>{formattedBalance}</span>
 				{withChevron && <ChevronDown className='text-lg font-semibold text-text_primary' />}
 			</div>
 		</div>
@@ -49,40 +48,43 @@ function VoteListTitle({
 
 function VotesList({ votingLocks, balance, balanceLabel, icon }: VotesListProps) {
 	const network = getCurrentNetwork();
+	const hasVotes = votingLocks.length > 0;
 
-	return votingLocks.length === 0 ? (
-		<VoteListTitle
-			balanceLabel={balanceLabel}
-			icon={icon}
-			balance={balance}
-			network={network}
-		/>
-	) : (
+	// Memoize vote cards to prevent unnecessary re-renders
+	const voteCards = useMemo(
+		() =>
+			votingLocks.map((vote) => (
+				<React.Fragment key={vote.refId}>
+					<Separator className='my-0' />
+					<VoteDetailCard vote={vote} />
+				</React.Fragment>
+			)),
+		[votingLocks]
+	);
+
+	const titleProps = {
+		balanceLabel,
+		icon,
+		balance,
+		network
+	};
+
+	if (!hasVotes) {
+		return <VoteListTitle {...titleProps} />;
+	}
+
+	return (
 		<Collapsible
 			className={classes.container}
 			defaultOpen
 		>
 			<CollapsibleTrigger>
 				<VoteListTitle
-					balanceLabel={balanceLabel}
-					icon={icon}
-					balance={balance}
-					network={network}
+					{...titleProps}
 					withChevron
 				/>
 			</CollapsibleTrigger>
-			<CollapsibleContent className={classes.collapsibleContent}>
-				{votingLocks.length > 0 &&
-					votingLocks.map((vote) => (
-						<>
-							<Separator className='my-0' />
-							<VoteDetailCard
-								key={vote.refId}
-								vote={vote}
-							/>
-						</>
-					))}
-			</CollapsibleContent>
+			<CollapsibleContent className={classes.collapsibleContent}>{voteCards}</CollapsibleContent>
 		</Collapsible>
 	);
 }
