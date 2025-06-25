@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { BN, BN_ZERO } from '@polkadot/util';
-import { IVoteLock, IVotingLocks, ENetwork, INextUnlockData } from '@/_shared/types';
+import { IVoteLock, IVotingLocks, ENetwork } from '@/_shared/types';
 import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 
 export interface TimeRemaining {
@@ -83,7 +83,7 @@ export const calculateTotalUnlockableBalance = (unlockableVotes: IVoteLock[]): B
 /**
  * Get comprehensive data for the next unlock from locked and ongoing votes
  */
-export const getNextUnlockData = (votingLocks: IVotingLocks, network: ENetwork, t: (key: string) => string): INextUnlockData | null => {
+export const getNextUnlockData = (votingLocks: IVotingLocks, network: ENetwork, t: (key: string) => string): IVoteLock | null => {
 	const allLockedVotes = [...votingLocks.lockedVotes, ...votingLocks.ongoingVotes];
 	const closestVote = findClosestUnlockVote(allLockedVotes);
 
@@ -92,15 +92,8 @@ export const getNextUnlockData = (votingLocks: IVotingLocks, network: ENetwork, 
 	const unlockTime = getFormattedTimeFromBlocks(closestVote.blocksRemaining, network, t).formatted;
 
 	return {
-		unlockTime,
-		refId: closestVote.refId,
-		track: closestVote.track,
-		lockedAtBlock: closestVote.lockedAtBlock,
-		endBlock: closestVote.endBlock,
-		balance: closestVote.balance,
-		conviction: closestVote.conviction,
-		status: closestVote.status,
-		blocksRemaining: closestVote.blocksRemaining
+		...closestVote,
+		unlockTime
 	};
 };
 

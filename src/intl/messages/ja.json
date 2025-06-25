@@ -174,8 +174,10 @@
 		"LockedBalance": "ロックされた残高",
 		"UnlockIn": "ロック解除",
 		"ProposalUnlockIn": "提案のロック解除",
+		"NextUnlockIn": "次のロック解除",
 		"LockedOn": "ロックされた日時",
 		"NoUnlocks": "ロック解除可能なトークンがありません",
+		"unlockSuccess": "トークンが正常にロック解除されました",
 		"Delegations": {
 			"noDelegations": "委任が見つかりません",
 			"delegation": "委任",

@@ -172,8 +172,10 @@
 		"LockedBalance": "Gesperrtes Guthaben",
 		"UnlockIn": "Entsperren in",
 		"ProposalUnlockIn": "Vorschlag entsperren in",
+		"NextUnlockIn": "Nächster Entsperrung in",
 		"LockedOn": "Gesperrt am",
 		"NoUnlocks": "Keine Entsperrungen verfügbar",
+		"unlockSuccess": "Tokens erfolgreich entsperrt",
 		"Delegations": {
 			"noDelegations": "Keine Delegationen gefunden",
 			"delegation": "Delegation",

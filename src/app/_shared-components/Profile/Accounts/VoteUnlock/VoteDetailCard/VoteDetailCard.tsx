@@ -13,19 +13,20 @@ import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { getMemoizedTimeFromBlocks } from '@/app/_client-utils/voteUnlockUtils';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { SquareArrowOutUpRight } from 'lucide-react';
+import { SquareArrowOutUpRight, UnlockKeyhole } from 'lucide-react';
 import { IVoteLock } from '@/_shared/types';
 import classes from './VoteDetailCard.module.scss';
 
 interface VoteDetailCardProps {
 	vote: IVoteLock;
+	isNextUnlock?: boolean;
 }
 
 interface VoteLockWithDate extends IVoteLock {
 	lockedAtDate?: string;
 }
 
-function VoteDetailCard({ vote }: VoteDetailCardProps) {
+function VoteDetailCard({ vote, isNextUnlock }: VoteDetailCardProps) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
@@ -63,22 +64,25 @@ function VoteDetailCard({ vote }: VoteDetailCardProps) {
 
 	return (
 		<div className={classes.container}>
-			<div className={classes.voteInfo}>
-				{voteWithDate.blocksRemaining && (
-					<span className={classes.timeRemaining}>
-						{t('Profile.ProposalUnlockIn')}: {getTimeRemainingForBlocks(voteWithDate.blocksRemaining)}
-					</span>
-				)}
-				{voteWithDate.lockedAtDate && (
-					<Link
-						href={`/referenda/${voteWithDate.refId}`}
-						className={classes.lockedDate}
-						target='_blank'
-					>
-						{t('Profile.LockedOn')} {voteWithDate.lockedAtDate}
-						<SquareArrowOutUpRight className='h-3 w-3 text-border_blue' />
-					</Link>
-				)}
+			<div className='flex items-start gap-1'>
+				{isNextUnlock && <UnlockKeyhole className='h-4 w-4 text-border_blue' />}
+				<div className={classes.voteInfo}>
+					{voteWithDate.blocksRemaining && (
+						<span className={classes.timeRemaining}>
+							{isNextUnlock ? t('Profile.NextUnlockIn') : t('Profile.ProposalUnlockIn')}: {getTimeRemainingForBlocks(voteWithDate.blocksRemaining)}
+						</span>
+					)}
+					{voteWithDate.lockedAtDate && (
+						<Link
+							href={`/referenda/${voteWithDate.refId}`}
+							className={classes.lockedDate}
+							target='_blank'
+						>
+							{t('Profile.LockedOn')} {voteWithDate.lockedAtDate}
+							<SquareArrowOutUpRight className='h-3 w-3 text-border_blue' />
+						</Link>
+					)}
+				</div>
 			</div>
 			<div className={classes.voteBalance}>{formatBnBalance(voteWithDate.balance.toString(), { numberAfterComma: 2, withUnit: true }, network)}</div>
 		</div>

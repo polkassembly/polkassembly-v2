@@ -1309,7 +1309,8 @@ export interface IVoteLock {
 	endBlock: BN;
 	status: string;
 	blocksRemaining?: BN;
-	lockedAtBlock?: BN; // Block number when the vote was placed
+	lockedAtBlock?: BN;
+	unlockTime?: string;
 }
 
 export interface IVotingLocks {
@@ -1322,16 +1323,4 @@ export interface IRelativeTime {
 	days: number;
 	hours: number;
 	minutes: number;
-}
-
-export interface INextUnlockData {
-	unlockTime: string;
-	refId: string;
-	track: string;
-	lockedAtBlock?: BN;
-	endBlock: BN;
-	balance: BN;
-	conviction: number;
-	status: string;
-	blocksRemaining?: BN;
 }

@@ -12,6 +12,7 @@ import { useVoteUnlock } from '@/hooks/useVoteUnlock';
 import { useUser } from '@/hooks/useUser';
 import classes from './VoteUnlock.module.scss';
 import VoteUnlockModal from './VoteUnlockModal';
+import UnlockSuccessModal from './UnlockSuccessModal/UnlockSuccessModal';
 
 interface VoteUnlockProps {
 	lockedBalance: string;
@@ -22,6 +23,7 @@ function VoteUnlock({ lockedBalance, hasUnlockAccess }: VoteUnlockProps) {
 	const t = useTranslations();
 	const { user } = useUser();
 	const [open, setOpen] = useState(false);
+	const [openSuccessModal, setOpenSuccessModal] = useState(false);
 
 	// Get the current user's address - prioritize defaultAddress, then first address
 	const currentAddress = user?.defaultAddress || user?.addresses?.[0] || '';
@@ -58,6 +60,11 @@ function VoteUnlock({ lockedBalance, hasUnlockAccess }: VoteUnlockProps) {
 				totalUnlockableBalance={totalUnlockableBalance}
 				onUnlock={handleUnlockTokens}
 				loading={loading}
+			/>
+			<UnlockSuccessModal
+				open={openSuccessModal}
+				setOpen={setOpenSuccessModal}
+				address={currentAddress}
 			/>
 		</>
 	);

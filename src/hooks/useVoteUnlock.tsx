@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BN } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
-import { IVotingLocks, ENotificationStatus, INextUnlockData } from '@/_shared/types';
+import { IVotingLocks, ENotificationStatus, IVoteLock } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getNextUnlockData, calculateTotalUnlockableBalance } from '@/app/_client-utils/voteUnlockUtils';
 import { useToast } from './useToast';
@@ -15,7 +15,7 @@ export interface IUseVoteUnlockReturn {
 	votingLocks: IVotingLocks;
 	loading: boolean;
 	error: string | null;
-	nextUnlockData: INextUnlockData | null;
+	nextUnlockData: IVoteLock | null;
 	totalUnlockableBalance: BN;
 	handleUnlockTokens: () => Promise<void>;
 	refetch: () => void;

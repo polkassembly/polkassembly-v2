@@ -172,8 +172,10 @@
 		"LockedBalance": "Saldo Bloqueado",
 		"UnlockIn": "Desbloquear en",
 		"ProposalUnlockIn": "Desbloquear en propuesta",
+		"NextUnlockIn": "Próximo desbloqueo en",
 		"LockedOn": "Bloqueado el",
 		"NoUnlocks": "No hay desbloqueos disponibles",
+		"unlockSuccess": "Tokens desbloqueados correctamente",
 		"Delegations": {
 			"noDelegations": "No se encontraron delegaciones",
 			"index": "Índice",

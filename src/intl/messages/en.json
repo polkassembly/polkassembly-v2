@@ -176,8 +176,10 @@
 		"LockedBalance": "Locked Balance",
 		"UnlockIn": "Unlock in",
 		"ProposalUnlockIn": "Proposal Unlock in",
+		"NextUnlockIn": "Next Unlock in",
 		"LockedOn": "Locked on",
 		"NoUnlocks": "No Unlocks Available",
+		"unlockSuccess": "Tokens unlocked successfully",
 		"Delegations": {
 			"noDelegations": "No Delegations Found",
 			"delegation": "Delegation",
