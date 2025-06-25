@@ -91,6 +91,15 @@ export class SubscanOnChainService {
 		}
 	});
 
+	private static extrinsicDetailsRequest = ({ network, hash }: { network: ENetwork; hash: string }) => ({
+		url: new URL(`https://${network}.api.subscan.io/api/scan/extrinsic`),
+		body: {
+			events_limit: 1,
+			hash,
+			only_extrinsic_event: true
+		}
+	});
+
 	static async GetOnChainPostInfo({
 		network,
 		indexOrHash,
@@ -210,5 +219,16 @@ export class SubscanOnChainService {
 		};
 
 		return addressRelationsResponse;
+	}
+
+	static async GetExtrinsicDetails({
+		network,
+		hash
+	}: {
+		network: ENetwork;
+		hash: string;
+	}): Promise<{ message: string; data: { account_id: string; params: { name: string; value: string }[] } }> {
+		const request = this.extrinsicDetailsRequest({ network, hash });
+		return fetchSubscanData({ url: request.url, network, body: request.body, method: 'POST' });
 	}
 }
