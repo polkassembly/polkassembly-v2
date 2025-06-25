@@ -74,10 +74,7 @@ function VotesList({ votingLocks, balance, balanceLabel, icon }: VotesListProps)
 	}
 
 	return (
-		<Collapsible
-			className={classes.container}
-			defaultOpen
-		>
+		<Collapsible className={classes.container}>
 			<CollapsibleTrigger>
 				<VoteListTitle
 					{...titleProps}
