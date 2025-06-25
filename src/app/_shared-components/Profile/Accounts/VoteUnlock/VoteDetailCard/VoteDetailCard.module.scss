@@ -1,0 +1,15 @@
+.container {
+	@apply flex items-center justify-between gap-4 px-4 py-2;
+}
+
+.voteInfo {
+	@apply flex flex-col gap-1 text-xs font-normal text-basic_text;
+}
+
+.lockedDate {
+	@apply flex items-center gap-1 text-xs font-normal text-border_blue;
+}
+
+.voteBalance {
+	@apply text-sm font-semibold text-text_primary;
+}

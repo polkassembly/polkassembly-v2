@@ -1,0 +1,23 @@
+.dialog {
+	@apply border-4 border-border_blue;
+}
+
+.unlockBalanceButton {
+	@apply flex items-center gap-x-2 rounded-lg border border-border_blue bg-border_blue/10 px-3 py-1 text-sm text-border_blue;
+}
+
+.dialogContent {
+	@apply w-full max-w-[500px];
+}
+
+.dialogTitle {
+	@apply absolute -top-[40px] left-1/2 flex -translate-x-1/2 items-center justify-center text-lg font-semibold text-text_primary;
+}
+
+.contentContainer {
+	@apply flex flex-col gap-4 p-4 pb-0;
+}
+
+.modalFooter {
+	@apply flex flex-col gap-4 p-4 pt-0;
+}

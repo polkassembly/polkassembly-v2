@@ -10,10 +10,6 @@
 	@apply text-xl font-semibold text-text_primary;
 }
 
-.unlockBalanceButton {
-	@apply flex items-center gap-x-2 rounded-lg border border-border_blue bg-border_blue/10 px-3 py-1 text-sm text-border_blue;
-}
-
 .balanceDetailCardWrapper {
 	@apply flex flex-col gap-y-3 rounded-xl border border-border_grey p-4;
 }

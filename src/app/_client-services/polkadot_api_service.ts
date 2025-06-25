@@ -1150,4 +1150,338 @@ export class PolkadotApiService {
 			waitTillFinalizedHash: true
 		});
 	}
+
+	// Vote unlock methods
+	async getVotingLocks(address: string) {
+		if (!this.api || !this.api.isReady) return null;
+
+		try {
+			// Get class locks for the address
+			const classLocks = await this.api.query.convictionVoting.classLocksFor(address);
+			const classLocksData = classLocks.toHuman() as any[];
+
+			if (!classLocksData || classLocksData.length === 0) {
+				return {
+					lockedVotes: [],
+					unlockableVotes: [],
+					ongoingVotes: []
+				};
+			}
+
+			// Get voting data for each track
+			const trackQueries = classLocksData.map((lock: any) => [address, lock[0]]);
+			const votingData = await this.api.query.convictionVoting.votingFor.multi(trackQueries);
+
+			// Get current block number for time calculations
+			const currentBlock = await this.api.derive.chain.bestNumber();
+
+			// Get lock period constant
+			const lockPeriod = this.api.consts.convictionVoting.voteLockingPeriod;
+
+			// Process track votes and get referendum info
+			const { trackVotes, allRefIds } = PolkadotApiService.extractTrackVotes(votingData, classLocksData);
+			const referendumInfoMap = await this.getReferendumInfoMap(allRefIds);
+
+			// Process votes and calculate lock periods
+			const { lockedVotes, unlockableVotes, ongoingVotes } = PolkadotApiService.processVotingLocks({
+				trackVotes,
+				referendumInfoMap,
+				currentBlock,
+				lockPeriod
+			});
+
+			return {
+				lockedVotes: lockedVotes.sort((a: any, b: any) => a.blocksRemaining.cmp(b.blocksRemaining)),
+				unlockableVotes,
+				ongoingVotes
+			};
+		} catch (error) {
+			console.error('Error fetching voting locks:', error);
+			return null;
+		}
+	}
+
+	private static extractTrackVotes(votingData: any[], classLocksData: any[]) {
+		const allRefIds: string[] = [];
+		const trackVotes: Array<{ track: any; votes: any }> = [];
+
+		votingData.forEach((vote: any, index: number) => {
+			if (vote.isCasting) {
+				const casting = vote.asCasting;
+				const track = classLocksData[index][0];
+				const votes = casting.votes.map(([refId]: any) => refId.toString());
+
+				allRefIds.push(...votes);
+				trackVotes.push({ track, votes: casting.votes });
+			}
+		});
+
+		return { trackVotes, allRefIds };
+	}
+
+	private async getReferendumInfoMap(allRefIds: string[]) {
+		const uniqueRefIds = [...new Set(allRefIds)];
+		const referendumInfos = uniqueRefIds.length > 0 ? await this.api.query.referenda.referendumInfoFor.multi(uniqueRefIds) : [];
+
+		// Create referendum info map
+		const referendumInfoMap = new Map();
+		uniqueRefIds.forEach((refId, index) => {
+			const info = referendumInfos[index];
+			if (info && (info as any).isSome) {
+				referendumInfoMap.set(refId, (info as any).unwrap());
+			}
+		});
+
+		return referendumInfoMap;
+	}
+
+	private static processVotingLocks({
+		trackVotes,
+		referendumInfoMap,
+		currentBlock,
+		lockPeriod
+	}: {
+		trackVotes: Array<{ track: any; votes: any }>;
+		referendumInfoMap: Map<string, any>;
+		currentBlock: BN;
+		lockPeriod: any;
+	}) {
+		const lockedVotes: any[] = [];
+		const unlockableVotes: any[] = [];
+		const ongoingVotes: any[] = [];
+
+		trackVotes.forEach(({ track, votes }) => {
+			votes.forEach(([refId, accountVote]: any) => {
+				const refIdStr = refId.toString();
+				const referendumInfo = referendumInfoMap.get(refIdStr);
+
+				if (!referendumInfo) return;
+
+				const { balance, conviction } = PolkadotApiService.parseAccountVote(accountVote);
+				const voteData = PolkadotApiService.createVoteData({
+					refIdStr,
+					track,
+					balance,
+					conviction,
+					referendumInfo,
+					currentBlock,
+					lockPeriod
+				});
+
+				if (voteData.status === 'ongoing') {
+					ongoingVotes.push(voteData);
+				} else if (voteData.status === 'unlockable') {
+					unlockableVotes.push(voteData);
+				} else {
+					lockedVotes.push(voteData);
+				}
+			});
+		});
+
+		return { lockedVotes, unlockableVotes, ongoingVotes };
+	}
+
+	private static parseAccountVote(accountVote: any) {
+		let balance = new BN(0);
+		let conviction = 0;
+
+		if (accountVote.isStandard) {
+			const standard = accountVote.asStandard;
+			balance = new BN(standard.balance.toString());
+			conviction = standard.vote.conviction.index;
+		} else if (accountVote.isSplit) {
+			const split = accountVote.asSplit;
+			balance = new BN(split.aye.toString()).add(new BN(split.nay.toString()));
+		} else if (accountVote.isSplitAbstain) {
+			const splitAbstain = accountVote.asSplitAbstain;
+			balance = new BN(splitAbstain.aye.toString()).add(new BN(splitAbstain.nay.toString())).add(new BN(splitAbstain.abstain.toString()));
+		}
+
+		return { balance, conviction };
+	}
+
+	private static createVoteData({
+		refIdStr,
+		track,
+		balance,
+		conviction,
+		referendumInfo,
+		currentBlock,
+		lockPeriod
+	}: {
+		refIdStr: string;
+		track: any;
+		balance: BN;
+		conviction: number;
+		referendumInfo: any;
+		currentBlock: BN;
+		lockPeriod: any;
+	}) {
+		// Calculate end block based on referendum status
+		if (referendumInfo.isOngoing) {
+			const ongoing = referendumInfo.asOngoing;
+			const submittedAt = ongoing.submitted ? new BN(ongoing.submitted.toString()) : null;
+
+			// Calculate estimated unlock block for ongoing referendum
+			// This is when the referendum will end + lock period based on conviction
+			const convictionMultipliers = [0.1, 1, 2, 4, 8, 16, 32];
+			const lockBlocks = new BN(lockPeriod.toString()).muln(convictionMultipliers[conviction] || 0.1);
+
+			// Get the deciding period end from ongoing data
+			let estimatedEndBlock = currentBlock;
+			if (ongoing.deciding && ongoing.deciding.since) {
+				// Try to get actual track decision period, fallback to typical period
+				let decisionPeriod = new BN('403200'); // Default ~28 days
+
+				try {
+					// Get track details from network constants if available
+					const trackId = track.toString();
+					// You could enhance this to look up actual track details from NETWORKS_DETAILS
+					// For now, use reasonable defaults based on common track periods
+					switch (trackId) {
+						case '30': // small_tipper
+						case '31': // big_tipper
+							decisionPeriod = new BN('100800'); // ~7 days
+							break;
+						case '32': // small_spender
+						case '33': // medium_spender
+						case '34': // big_spender
+							decisionPeriod = new BN('403200'); // ~28 days
+							break;
+						case '1': // whitelisted_caller
+							decisionPeriod = new BN('201600'); // ~14 days
+							break;
+						default:
+							decisionPeriod = new BN('403200'); // ~28 days default
+					}
+				} catch (error) {
+					// Fallback to default if track lookup fails
+					decisionPeriod = new BN('403200');
+					console.error('Error getting decision period:', error);
+				}
+
+				estimatedEndBlock = new BN(ongoing.deciding.since.toString()).add(decisionPeriod);
+			} else {
+				// If no deciding info, estimate based on current block + decision period
+				estimatedEndBlock = currentBlock.add(new BN('403200'));
+			}
+
+			// Add lock period to get unlock block
+			const unlockBlock = estimatedEndBlock.add(lockBlocks);
+
+			return {
+				refId: refIdStr,
+				track: track.toString(),
+				balance,
+				conviction,
+				endBlock: unlockBlock,
+				status: 'ongoing',
+				blocksRemaining: unlockBlock.sub(currentBlock),
+				lockedAtBlock: submittedAt
+			};
+		}
+
+		const { unlockBlock, submittedAt } = PolkadotApiService.calculateUnlockBlock({
+			referendumInfo,
+			currentBlock,
+			lockPeriod,
+			conviction
+		});
+
+		const isUnlockable = unlockBlock.lte(currentBlock);
+
+		return {
+			refId: refIdStr,
+			track: track.toString(),
+			balance,
+			conviction,
+			endBlock: unlockBlock,
+			status: isUnlockable ? 'unlockable' : 'locked',
+			blocksRemaining: isUnlockable ? new BN(0) : unlockBlock.sub(currentBlock),
+			lockedAtBlock: submittedAt
+		};
+	}
+
+	private static calculateUnlockBlock({ referendumInfo, currentBlock, lockPeriod, conviction }: { referendumInfo: any; currentBlock: BN; lockPeriod: any; conviction: number }) {
+		const convictionMultipliers = [0.1, 1, 2, 4, 8, 16, 32];
+		let unlockBlock = new BN(0);
+		let submittedAt = null;
+
+		if (referendumInfo.isApproved || referendumInfo.isRejected) {
+			const finishedAt = referendumInfo.isApproved ? referendumInfo.asApproved[0] : referendumInfo.asRejected[0];
+
+			// Try to get the referendum submission block for locked at estimate
+			if (referendumInfo.isApproved) {
+				const approved = referendumInfo.asApproved;
+				submittedAt = approved[1] ? new BN(approved[1].toString()) : null; // submitted block
+			} else if (referendumInfo.isRejected) {
+				const rejected = referendumInfo.asRejected;
+				submittedAt = rejected[1] ? new BN(rejected[1].toString()) : null; // submitted block
+			}
+
+			// Calculate unlock block with conviction multiplier
+			const lockBlocks = new BN(lockPeriod.toString()).muln(convictionMultipliers[conviction] || 0.1);
+			unlockBlock = new BN(finishedAt.toString()).add(lockBlocks);
+		} else if (referendumInfo.isCancelled || referendumInfo.isTimedOut || referendumInfo.isKilled) {
+			// These are immediately unlockable
+			unlockBlock = currentBlock;
+		}
+
+		return { unlockBlock, submittedAt };
+	}
+
+	async unlockVotingTokens({
+		address,
+		unlockableVotes,
+		onSuccess,
+		onFailed
+	}: {
+		address: string;
+		unlockableVotes: any[];
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+	}) {
+		if (!this.api || !this.api.isReady || !unlockableVotes.length) return;
+
+		try {
+			const txs: any[] = [];
+
+			// Group votes by track for unlocking
+			const trackVotes = new Map<string, string[]>();
+
+			unlockableVotes.forEach((vote) => {
+				const { track } = vote;
+				const { refId } = vote;
+
+				// Add removeVote transaction
+				txs.push(this.api.tx.convictionVoting.removeVote(track, refId));
+
+				// Group by track for unlock transactions
+				if (!trackVotes.has(track)) {
+					trackVotes.set(track, []);
+				}
+				trackVotes.get(track)!.push(refId);
+			});
+
+			// Add unlock transactions for each track
+			trackVotes.forEach((refIds, track) => {
+				txs.push(this.api.tx.convictionVoting.unlock(track, address));
+			});
+
+			// Batch all transactions
+			const batchTx = this.api.tx.utility.batch(txs);
+
+			await this.executeTx({
+				tx: batchTx,
+				address,
+				errorMessageFallback: 'Failed to unlock voting tokens',
+				onSuccess,
+				onFailed,
+				waitTillFinalizedHash: true
+			});
+		} catch (error) {
+			console.error('Error unlocking voting tokens:', error);
+			onFailed('Failed to unlock voting tokens');
+		}
+	}
 }

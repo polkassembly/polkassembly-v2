@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Separator } from '@/app/_shared-components/Separator';
-import { UnlockKeyhole } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import TransferableIcon from '@/_assets/icons/tranferable-balance.svg';
 import LockedIcon from '@/_assets/icons/locked-balance.svg';
@@ -14,6 +13,7 @@ import { useUser } from '@/hooks/useUser';
 import { IPublicUser } from '@/_shared/types';
 import classes from './Balance.module.scss';
 import BalanceDetailCard from './BalanceDetailCard';
+import VoteUnlock from '../VoteUnlock/VoteUnlock';
 
 interface IBalanceDetails {
 	lockedBalance: string;
@@ -57,15 +57,10 @@ function Balance({ address, userProfile }: { address: string; userProfile?: IPub
 		<div className={classes.balanceWrapper}>
 			<div className={classes.balanceTitleWrapper}>
 				<h3 className={classes.balanceTitle}>{t('Profile.myBalance')}</h3>
-				{userProfile && userProfile.id === user?.id && (
-					<button
-						type='button'
-						className={classes.unlockBalanceButton}
-					>
-						<UnlockKeyhole className='h-4 w-4 text-border_blue' />
-						{t('Profile.unlock')} {t('Profile.in')} {t('Profile.days')} {t('Profile.hours')}
-					</button>
-				)}
+				<VoteUnlock
+					lockedBalance={balanceDetails.lockedBalance}
+					hasUnlockAccess={!!(userProfile && userProfile.id === user?.id)}
+				/>
 			</div>
 			{loading ? (
 				<div className={classes.balanceDetailCardWrapper}>
