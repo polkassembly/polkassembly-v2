@@ -1058,7 +1058,7 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async getPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics> {
+	static async GetPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_ALL_FLATTENED_VOTES_FOR_POST;
@@ -1092,7 +1092,7 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async getPostTillesVotes({
+	static async GetPostTillesVotes({
 		network,
 		proposalType,
 		index,

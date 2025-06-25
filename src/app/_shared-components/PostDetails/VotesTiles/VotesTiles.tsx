@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useMemo, useCallback, useState } from 'react';
-import { EAnalyticsType, ENetwork, EPostTilesVotesType, EProposalType, EVoteDecision, IPostTilesVotes } from '@/_shared/types';
+import { EAnalyticsType, EPostTilesVotesType, EProposalType, EVoteDecision, IPostTilesVotes } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { ResponsiveTreeMap } from '@nivo/treemap';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -137,7 +137,9 @@ const useVotesDistribution = ({ votesTilesData }: { votesTilesData: IPostTilesVo
 	}, [votesTilesData]);
 };
 
-const useChartData = ({ allVotes, t, network }: { allVotes: IVoteDistribution[]; t: (key: string) => string; network: ENetwork }) => {
+const useChartData = ({ allVotes }: { allVotes: IVoteDistribution[] }) => {
+	const t = useTranslations('PostDetails.VotesTiles');
+	const network = getCurrentNetwork();
 	return useMemo(() => {
 		const createChildren = (decision: EVoteDecision, color: string): IChartNode[] => {
 			return allVotes
@@ -213,7 +215,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 	});
 
 	const allVotes = useVotesDistribution({ votesTilesData: votesTilesData?.votes || { aye: [], nay: [], abstain: [] } });
-	const chartData = useChartData({ allVotes, t, network });
+	const chartData = useChartData({ allVotes });
 
 	const renderTooltip = useCallback(
 		// eslint-disable-next-line react/no-unused-prop-types

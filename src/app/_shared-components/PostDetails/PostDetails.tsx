@@ -14,6 +14,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { ClientError } from '@/app/_client-utils/clientError';
+import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -78,7 +79,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	const { data: analytics, isFetching: isAnalyticsFetching } = useQuery({
 		queryKey: ['postAnalytics', post?.proposalType, index],
 		queryFn: getPostAnalytics,
-		enabled: !!post?.proposalType && !!index
+		enabled: POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(post?.proposalType as EProposalType) && !!index
 	});
 
 	useEffect(() => {
@@ -135,14 +136,16 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									onchainInfo={post.onChainInfo}
 								/>
 							</TabsContent>
-							<TabsContent value={EPostDetailsTab.POST_ANALYTICS}>
-								<PostAnalytics
-									analytics={analytics}
-									isFetching={isAnalyticsFetching}
-									proposalType={post.proposalType}
-									index={Number(index)}
-								/>
-							</TabsContent>
+							{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(post.proposalType) && (
+								<TabsContent value={EPostDetailsTab.POST_ANALYTICS}>
+									<PostAnalytics
+										analytics={analytics}
+										isFetching={isAnalyticsFetching}
+										proposalType={post.proposalType}
+										index={Number(index)}
+									/>
+								</TabsContent>
+							)}
 						</div>
 						<div className={classes.commentsBox}>
 							<PostComments

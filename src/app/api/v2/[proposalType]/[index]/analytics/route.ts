@@ -29,7 +29,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		}
 	}
 
-	const analytics = await OnChainDbService.getPostAnalytics({ network, proposalType, index: Number(index) });
+	const analytics = await OnChainDbService.GetPostAnalytics({ network, proposalType, index: Number(index) });
 
 	await RedisService.SetPostAnalyticsData({ network, proposalType, indexOrHash: index, data: analytics });
 

@@ -312,11 +312,11 @@ export class OnChainDbService {
 		return SubsquidService.GetOnChainPostsByProposer({ network, proposer, page, limit, proposalType });
 	}
 
-	static async getPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }) {
-		return SubsquidService.getPostAnalytics({ network, proposalType, index });
+	static async GetPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }) {
+		return SubsquidService.GetPostAnalytics({ network, proposalType, index });
 	}
 
-	static async getPostTillesVotes({
+	static async GetPostTillesVotes({
 		network,
 		proposalType,
 		index,
@@ -329,6 +329,6 @@ export class OnChainDbService {
 		analyticsType?: EAnalyticsType;
 		votesType: EPostTilesVotesType;
 	}) {
-		return SubsquidService.getPostTillesVotes({ network, proposalType, index, analyticsType, votesType });
+		return SubsquidService.GetPostTillesVotes({ network, proposalType, index, analyticsType, votesType });
 	}
 }
