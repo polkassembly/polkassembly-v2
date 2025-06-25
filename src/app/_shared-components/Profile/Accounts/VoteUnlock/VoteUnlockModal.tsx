@@ -5,11 +5,12 @@
 'use client';
 
 import { BN } from '@polkadot/util';
+import { useState, useMemo, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import Image from 'next/image';
 import TreasureChestIcon from '@assets/icons/treasure-chest.svg';
-import { IVotingLocks } from '@/_shared/types';
+import { IVotingLocks, IVoteLock } from '@/_shared/types';
 import { UnlockKeyhole } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Separator } from '@/app/_shared-components/Separator';
@@ -24,12 +25,71 @@ interface VoteUnlockModalProps {
 	votingLocks: IVotingLocks;
 	lockedBalance: BN;
 	totalUnlockableBalance: BN;
-	onUnlock: () => void;
+	onUnlock: (selectedVotes: IVoteLock[]) => void;
 	loading: boolean;
 }
 
 function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnlockableBalance, onUnlock, loading }: VoteUnlockModalProps) {
 	const t = useTranslations();
+
+	// Create a unique key for each vote to track selection
+	const getVoteKey = (vote: IVoteLock) => `${vote.refId}-${vote.track}`;
+
+	// Initialize selected votes (all unlockable votes selected by default)
+	const [selectedVotes, setSelectedVotes] = useState<Set<string>>(() => {
+		const initialSelection = new Set<string>();
+		votingLocks.unlockableVotes.forEach((vote) => {
+			initialSelection.add(getVoteKey(vote));
+		});
+		return initialSelection;
+	});
+
+	// Calculate selected votes and total balance
+	const { selectedVotesList } = useMemo(() => {
+		const selectedList: IVoteLock[] = [];
+
+		votingLocks.unlockableVotes.forEach((vote) => {
+			if (selectedVotes.has(getVoteKey(vote))) {
+				selectedList.push(vote);
+			}
+		});
+
+		return {
+			selectedVotesList: selectedList
+		};
+	}, [votingLocks.unlockableVotes, selectedVotes]);
+
+	// Handle vote selection change
+	const handleVoteSelectionChange = useCallback((vote: IVoteLock, selected: boolean) => {
+		const voteKey = getVoteKey(vote);
+		setSelectedVotes((prev) => {
+			const newSelection = new Set(prev);
+			if (selected) {
+				newSelection.add(voteKey);
+			} else {
+				newSelection.delete(voteKey);
+			}
+			return newSelection;
+		});
+	}, []);
+
+	// Handle unlock action
+	const handleUnlock = () => {
+		onUnlock(selectedVotesList);
+	};
+
+	// Reset selection when modal opens
+	const handleOpenChange = (isOpen: boolean) => {
+		if (isOpen) {
+			// Reset to all selected when opening
+			const initialSelection = new Set<string>();
+			votingLocks.unlockableVotes.forEach((vote) => {
+				initialSelection.add(getVoteKey(vote));
+			});
+			setSelectedVotes(initialSelection);
+		}
+		setOpen(isOpen);
+	};
 
 	// Use utility to combine locked and ongoing votes for display
 	const combinedLockedVotes = combineLockedVotes(votingLocks);
@@ -37,7 +97,7 @@ function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnloc
 	return (
 		<Dialog
 			open={open}
-			onOpenChange={setOpen}
+			onOpenChange={handleOpenChange}
 		>
 			<DialogContent className={classes.dialogContent}>
 				<DialogHeader className='border-0 p-4'>
@@ -53,8 +113,10 @@ function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnloc
 
 				<div className={classes.contentContainer}>
 					<UnlockVotesList
-						votingLocks={combinedLockedVotes}
+						votingLocks={votingLocks.unlockableVotes}
 						balance={totalUnlockableBalance}
+						selectedVotes={selectedVotes}
+						onVoteSelectionChange={handleVoteSelectionChange}
 					/>
 
 					<LockVotesList
@@ -66,9 +128,9 @@ function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnloc
 				<div className={classes.modalFooter}>
 					<Button
 						variant='default'
-						onClick={onUnlock}
+						onClick={handleUnlock}
 						isLoading={loading}
-						disabled={totalUnlockableBalance.isZero()}
+						disabled={totalUnlockableBalance.isZero() || selectedVotesList.length === 0}
 					>
 						<UnlockKeyhole className='h-4 w-4 text-white' />
 						{t('Profile.UnlockTokens')}

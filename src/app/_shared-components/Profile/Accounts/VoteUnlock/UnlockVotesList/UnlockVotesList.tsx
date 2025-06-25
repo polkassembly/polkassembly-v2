@@ -17,6 +17,8 @@ import UnlockVoteDetailCard from '../UnlockVoteDetailCard/UnlockVoteDetailCard';
 interface UnlockVotesListProps {
 	votingLocks: IVoteLock[];
 	balance: BN;
+	selectedVotes?: Set<string>;
+	onVoteSelectionChange?: (vote: IVoteLock, selected: boolean) => void;
 }
 
 interface VoteListTitleProps {
@@ -45,20 +47,33 @@ function VoteListTitle({ balanceLabel, icon, balance, network, withChevron = fal
 	);
 }
 
-function UnlockVotesList({ votingLocks, balance }: UnlockVotesListProps) {
+function UnlockVotesList({ votingLocks, balance, selectedVotes, onVoteSelectionChange }: UnlockVotesListProps) {
 	const network = getCurrentNetwork();
 	const hasVotes = votingLocks.length > 0;
 	const t = useTranslations();
+
+	// Create a unique key for each vote to track selection
+	const getVoteKey = (vote: IVoteLock) => `${vote.refId}-${vote.track}`;
+
 	// Memoize vote cards to prevent unnecessary re-renders
 	const voteCards = useMemo(
 		() =>
-			votingLocks.map((vote) => (
-				<React.Fragment key={vote.refId}>
-					<Separator className='my-0' />
-					<UnlockVoteDetailCard vote={vote} />
-				</React.Fragment>
-			)),
-		[votingLocks]
+			votingLocks.map((vote) => {
+				const voteKey = getVoteKey(vote);
+				const isSelected = selectedVotes ? selectedVotes.has(voteKey) : true;
+
+				return (
+					<React.Fragment key={voteKey}>
+						<Separator className='my-0' />
+						<UnlockVoteDetailCard
+							vote={vote}
+							isSelected={isSelected}
+							onSelectionChange={onVoteSelectionChange}
+						/>
+					</React.Fragment>
+				);
+			}),
+		[votingLocks, selectedVotes, onVoteSelectionChange]
 	);
 
 	const titleProps = {

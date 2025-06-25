@@ -17,7 +17,7 @@ export interface IUseVoteUnlockReturn {
 	error: string | null;
 	nextUnlockData: IVoteLock | null;
 	totalUnlockableBalance: BN;
-	handleUnlockTokens: () => Promise<void>;
+	unlockSelectedVotes: (selectedVotes: IVoteLock[]) => Promise<{ success: boolean; unlockedAmount: BN }>;
 	refetch: () => void;
 }
 
@@ -70,42 +70,53 @@ export const useVoteUnlock = (address: string): IUseVoteUnlockReturn => {
 		return calculateTotalUnlockableBalance(votingLocks.unlockableVotes);
 	}, [votingLocks.unlockableVotes]);
 
-	const handleUnlockTokens = useCallback(async () => {
-		if (!apiService || !address || !votingLocks.unlockableVotes.length) return;
+	const unlockSelectedVotes = useCallback(
+		async (selectedVotes: IVoteLock[]) => {
+			if (!apiService || !address || !selectedVotes.length) {
+				return { success: false, unlockedAmount: new BN(0) };
+			}
 
-		setLoading(true);
-		try {
-			await apiService.unlockVotingTokens({
-				address,
-				unlockableVotes: votingLocks.unlockableVotes,
-				onSuccess: () => {
-					toast({
-						title: t('Profile.success'),
-						description: t('Profile.tokensUnlockedSuccessfully'),
-						status: ENotificationStatus.SUCCESS
-					});
-					// Refresh data after successful unlock
-					fetchVotingLocks();
-				},
-				onFailed: (errorMessage: string) => {
-					toast({
-						title: t('Profile.error'),
-						description: errorMessage,
-						status: ENotificationStatus.ERROR
-					});
-				}
-			});
-		} catch (err) {
-			console.error('Error unlocking tokens:', err);
-			toast({
-				title: t('Profile.error'),
-				description: t('Profile.failedToUnlockTokens'),
-				status: ENotificationStatus.ERROR
-			});
-		} finally {
-			setLoading(false);
-		}
-	}, [apiService, address, votingLocks.unlockableVotes, toast, t, fetchVotingLocks]);
+			// Calculate total amount being unlocked
+			const unlockedAmount = selectedVotes.reduce((total, vote) => total.add(vote.balance), new BN(0));
+
+			setLoading(true);
+			try {
+				await apiService.unlockVotingTokens({
+					address,
+					unlockableVotes: selectedVotes,
+					onSuccess: () => {
+						toast({
+							title: t('Profile.success'),
+							description: t('Profile.tokensUnlockedSuccessfully'),
+							status: ENotificationStatus.SUCCESS
+						});
+						// Refresh data after successful unlock
+						fetchVotingLocks();
+					},
+					onFailed: (errorMessage: string) => {
+						toast({
+							title: t('Profile.error'),
+							description: errorMessage,
+							status: ENotificationStatus.ERROR
+						});
+					}
+				});
+
+				return { success: true, unlockedAmount };
+			} catch (err) {
+				console.error('Error unlocking tokens:', err);
+				toast({
+					title: t('Profile.error'),
+					description: t('Profile.failedToUnlockTokens'),
+					status: ENotificationStatus.ERROR
+				});
+				return { success: false, unlockedAmount: new BN(0) };
+			} finally {
+				setLoading(false);
+			}
+		},
+		[apiService, address, toast, t, fetchVotingLocks]
+	);
 
 	const refetch = useCallback(() => {
 		fetchVotingLocks();
@@ -121,7 +132,7 @@ export const useVoteUnlock = (address: string): IUseVoteUnlockReturn => {
 		error,
 		nextUnlockData,
 		totalUnlockableBalance,
-		handleUnlockTokens,
+		unlockSelectedVotes,
 		refetch
 	};
 };

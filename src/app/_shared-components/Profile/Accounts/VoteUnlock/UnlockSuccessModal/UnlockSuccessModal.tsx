@@ -4,11 +4,14 @@
 
 'use client';
 
+import { BN } from '@polkadot/util';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import Image from 'next/image';
 import TreasureChestOpenIcon from '@assets/icons/treasure-chest-open.svg';
 import { useTranslations } from 'next-intl';
 import { useVoteUnlock } from '@/hooks/useVoteUnlock';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import classes from './UnlockSuccessModal.module.scss';
 import LockVoteDetailCard from '../LockVoteDetailCard/LockVoteDetailCard';
 
@@ -16,12 +19,15 @@ interface UnlockSuccessModalProps {
 	open: boolean;
 	setOpen: (open: boolean) => void;
 	address: string;
+	unlockedAmount: BN;
 }
 
-function UnlockSuccessModal({ open, setOpen, address }: UnlockSuccessModalProps) {
+function UnlockSuccessModal({ open, setOpen, address, unlockedAmount }: UnlockSuccessModalProps) {
 	const t = useTranslations();
-
+	const network = getCurrentNetwork();
 	const { nextUnlockData } = useVoteUnlock(address);
+
+	const formattedUnlockedAmount = formatBnBalance(unlockedAmount.toString(), { numberAfterComma: 2, withUnit: true }, network);
 
 	return (
 		<Dialog
@@ -33,7 +39,7 @@ function UnlockSuccessModal({ open, setOpen, address }: UnlockSuccessModalProps)
 					<DialogTitle className={classes.dialogTitle}>
 						<Image
 							src={TreasureChestOpenIcon}
-							alt='Vote Unlock'
+							alt='Unlock Success'
 							width={100}
 							height={100}
 						/>
@@ -42,6 +48,7 @@ function UnlockSuccessModal({ open, setOpen, address }: UnlockSuccessModalProps)
 
 				<div className={classes.dialogContent}>
 					<h2 className={classes.title}>{t('Profile.unlockSuccess')}</h2>
+					<span className={classes.amountValue}>{formattedUnlockedAmount}</span>
 					{nextUnlockData && (
 						<div className={classes.card}>
 							<LockVoteDetailCard

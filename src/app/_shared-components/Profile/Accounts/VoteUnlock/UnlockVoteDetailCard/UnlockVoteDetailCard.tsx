@@ -18,13 +18,15 @@ import classes from './UnlockVoteDetailCard.module.scss';
 
 interface UnlockVoteDetailCardProps {
 	vote: IVoteLock;
+	isSelected?: boolean;
+	onSelectionChange?: (vote: IVoteLock, selected: boolean) => void;
 }
 
 interface VoteLockWithDate extends IVoteLock {
 	lockedAtDate?: string;
 }
 
-function UnlockVoteDetailCard({ vote }: UnlockVoteDetailCardProps) {
+function UnlockVoteDetailCard({ vote, isSelected = true, onSelectionChange }: UnlockVoteDetailCardProps) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
@@ -55,6 +57,12 @@ function UnlockVoteDetailCard({ vote }: UnlockVoteDetailCardProps) {
 		setVoteWithDate(vote);
 	}, [vote]);
 
+	const handleCheckboxChange = (checked: boolean) => {
+		if (onSelectionChange) {
+			onSelectionChange(vote, checked);
+		}
+	};
+
 	return (
 		<div className={classes.container}>
 			<div className={classes.voteInfo}>
@@ -72,7 +80,11 @@ function UnlockVoteDetailCard({ vote }: UnlockVoteDetailCardProps) {
 			</div>
 			<div className='flex items-center gap-3'>
 				<div className={classes.voteBalance}>{formatBnBalance(voteWithDate.balance.toString(), { numberAfterComma: 2, withUnit: true }, network)}</div>
-				<Checkbox className={classes.checkbox} />
+				<Checkbox
+					className={classes.checkbox}
+					checked={isSelected}
+					onCheckedChange={handleCheckboxChange}
+				/>
 			</div>
 		</div>
 	);

@@ -18,6 +18,10 @@
 	@apply text-center text-lg font-semibold text-text_primary;
 }
 
+.amountValue {
+	@apply text-center text-lg font-bold text-text_primary;
+}
+
 .card {
 	@apply w-full rounded-lg bg-info_bg;
 }

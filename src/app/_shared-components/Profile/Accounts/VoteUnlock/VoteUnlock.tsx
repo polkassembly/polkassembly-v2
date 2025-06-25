@@ -6,10 +6,11 @@
 
 import { useState } from 'react';
 import { BN } from '@polkadot/util';
+import { useUser } from '@/hooks/useUser';
+import { useVoteUnlock } from '@/hooks/useVoteUnlock';
 import { UnlockKeyhole } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useVoteUnlock } from '@/hooks/useVoteUnlock';
-import { useUser } from '@/hooks/useUser';
+import { IVoteLock } from '@/_shared/types';
 import classes from './VoteUnlock.module.scss';
 import VoteUnlockModal from './VoteUnlockModal';
 import UnlockSuccessModal from './UnlockSuccessModal/UnlockSuccessModal';
@@ -24,12 +25,32 @@ function VoteUnlock({ lockedBalance, hasUnlockAccess }: VoteUnlockProps) {
 	const { user } = useUser();
 	const [open, setOpen] = useState(false);
 	const [openSuccessModal, setOpenSuccessModal] = useState(false);
+	const [unlockedAmount, setUnlockedAmount] = useState<BN>(new BN(0));
 
 	// Get the current user's address - prioritize defaultAddress, then first address
 	const currentAddress = user?.defaultAddress || user?.addresses?.[0] || '';
 
-	// Use the complete hook for vote unlock logic
-	const { votingLocks, loading, nextUnlockData, totalUnlockableBalance, handleUnlockTokens } = useVoteUnlock(currentAddress);
+	const { votingLocks, loading, nextUnlockData, totalUnlockableBalance, unlockSelectedVotes } = useVoteUnlock(currentAddress);
+
+	// Handle unlock with selected votes - smooth flow between modals
+	const handleUnlock = async (selectedVotes: IVoteLock[]) => {
+		if (selectedVotes.length === 0) return;
+
+		try {
+			const result = await unlockSelectedVotes(selectedVotes);
+
+			if (result.success) {
+				// Close unlock modal and show success modal with unlocked amount
+				setUnlockedAmount(result.unlockedAmount);
+				setOpen(false);
+				setOpenSuccessModal(true);
+				// Data will be refetched automatically by the hook
+			}
+			// Error handling is already done in the hook
+		} catch (error) {
+			console.error('Error unlocking tokens:', error);
+		}
+	};
 
 	// Don't show if user doesn't have unlock access or no address
 	if (!hasUnlockAccess || !currentAddress) {
@@ -52,19 +73,22 @@ function VoteUnlock({ lockedBalance, hasUnlockAccess }: VoteUnlockProps) {
 					<>{t('Profile.NoUnlocks')}</>
 				)}
 			</button>
+
 			<VoteUnlockModal
 				open={open}
 				setOpen={setOpen}
 				votingLocks={votingLocks}
 				lockedBalance={new BN(lockedBalance)}
 				totalUnlockableBalance={totalUnlockableBalance}
-				onUnlock={handleUnlockTokens}
+				onUnlock={handleUnlock}
 				loading={loading}
 			/>
+
 			<UnlockSuccessModal
 				open={openSuccessModal}
 				setOpen={setOpenSuccessModal}
 				address={currentAddress}
+				unlockedAmount={unlockedAmount}
 			/>
 		</>
 	);
