@@ -173,6 +173,7 @@
 		"Unlockable": "ロック解除可能",
 		"LockedBalance": "ロックされた残高",
 		"UnlockIn": "ロック解除",
+		"ProposalUnlock": "提案のロック解除",
 		"ProposalUnlockIn": "提案のロック解除",
 		"NextUnlockIn": "次のロック解除",
 		"LockedOn": "ロックされた日時",

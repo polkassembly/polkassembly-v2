@@ -10,7 +10,7 @@ import TreasureChestOpenIcon from '@assets/icons/treasure-chest-open.svg';
 import { useTranslations } from 'next-intl';
 import { useVoteUnlock } from '@/hooks/useVoteUnlock';
 import classes from './UnlockSuccessModal.module.scss';
-import VoteDetailCard from '../VoteDetailCard/VoteDetailCard';
+import LockVoteDetailCard from '../LockVoteDetailCard/LockVoteDetailCard';
 
 interface UnlockSuccessModalProps {
 	open: boolean;
@@ -44,7 +44,7 @@ function UnlockSuccessModal({ open, setOpen, address }: UnlockSuccessModalProps)
 					<h2 className={classes.title}>{t('Profile.unlockSuccess')}</h2>
 					{nextUnlockData && (
 						<div className={classes.card}>
-							<VoteDetailCard
+							<LockVoteDetailCard
 								vote={nextUnlockData}
 								isNextUnlock
 							/>

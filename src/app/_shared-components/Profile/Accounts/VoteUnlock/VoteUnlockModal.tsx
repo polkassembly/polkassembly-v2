@@ -10,12 +10,13 @@ import { Button } from '@/app/_shared-components/Button';
 import Image from 'next/image';
 import TreasureChestIcon from '@assets/icons/treasure-chest.svg';
 import { IVotingLocks } from '@/_shared/types';
-import { LockKeyhole, CheckCircle, UnlockKeyhole } from 'lucide-react';
+import { UnlockKeyhole } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Separator } from '@/app/_shared-components/Separator';
 import { combineLockedVotes } from '@/app/_client-utils/voteUnlockUtils';
 import classes from './VoteUnlock.module.scss';
-import VotesList from './VotesList/VotesList';
+import LockVotesList from './LockVotesList/LockVotesList';
+import UnlockVotesList from './UnlockVotesList/UnlockVotesList';
 
 interface VoteUnlockModalProps {
 	open: boolean;
@@ -51,23 +52,14 @@ function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnloc
 				</DialogHeader>
 
 				<div className={classes.contentContainer}>
-					<VotesList
-						votingLocks={votingLocks.unlockableVotes}
+					<UnlockVotesList
+						votingLocks={combinedLockedVotes}
 						balance={totalUnlockableBalance}
-						balanceLabel={t('Profile.Unlockable')}
-						icon={
-							<CheckCircle
-								fill='#51D36E'
-								className='h-5 w-5 text-info_bg'
-							/>
-						}
 					/>
 
-					<VotesList
+					<LockVotesList
 						votingLocks={combinedLockedVotes}
 						balance={lockedBalance}
-						balanceLabel={t('Profile.LockedBalance')}
-						icon={<LockKeyhole className='h-5 w-5 text-gold_balance' />}
 					/>
 				</div>
 				<Separator className='my-0' />

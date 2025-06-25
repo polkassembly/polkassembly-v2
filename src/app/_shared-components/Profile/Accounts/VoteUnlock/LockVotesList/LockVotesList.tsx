@@ -7,17 +7,16 @@ import { BN } from '@polkadot/util';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { IVoteLock, ENetwork } from '@/_shared/types';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, LockKeyhole } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import { Separator } from '@/app/_shared-components/Separator';
-import classes from './VotesList.module.scss';
-import VoteDetailCard from '../VoteDetailCard/VoteDetailCard';
+import { useTranslations } from 'next-intl';
+import classes from './LockVotesList.module.scss';
+import LockVoteDetailCard from '../LockVoteDetailCard/LockVoteDetailCard';
 
-interface VotesListProps {
+interface LockVotesListProps {
 	votingLocks: IVoteLock[];
 	balance: BN;
-	balanceLabel: string;
-	icon: React.ReactNode;
 }
 
 interface VoteListTitleProps {
@@ -46,25 +45,25 @@ function VoteListTitle({ balanceLabel, icon, balance, network, withChevron = fal
 	);
 }
 
-function VotesList({ votingLocks, balance, balanceLabel, icon }: VotesListProps) {
+function LockVotesList({ votingLocks, balance }: LockVotesListProps) {
 	const network = getCurrentNetwork();
 	const hasVotes = votingLocks.length > 0;
-
+	const t = useTranslations();
 	// Memoize vote cards to prevent unnecessary re-renders
 	const voteCards = useMemo(
 		() =>
 			votingLocks.map((vote) => (
 				<React.Fragment key={vote.refId}>
 					<Separator className='my-0' />
-					<VoteDetailCard vote={vote} />
+					<LockVoteDetailCard vote={vote} />
 				</React.Fragment>
 			)),
 		[votingLocks]
 	);
 
 	const titleProps = {
-		balanceLabel,
-		icon,
+		balanceLabel: t('Profile.LockedBalance'),
+		icon: <LockKeyhole className='h-5 w-5 text-gold_balance' />,
 		balance,
 		network
 	};
@@ -86,4 +85,4 @@ function VotesList({ votingLocks, balance, balanceLabel, icon }: VotesListProps)
 	);
 }
 
-export default VotesList;
+export default LockVotesList;

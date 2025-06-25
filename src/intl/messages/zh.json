@@ -171,6 +171,7 @@
 		"Unlockable": "可解锁",
 		"LockedBalance": "已锁定余额",
 		"UnlockIn": "解锁",
+		"ProposalUnlock": "提案解锁",
 		"ProposalUnlockIn": "提案解锁",
 		"NextUnlockIn": "下次解锁",
 		"LockedOn": "已锁定",
