@@ -16,7 +16,7 @@ interface Options {
 export function formatBnBalance(value: string | BN, options: Options, network: ENetwork, assetId?: string | null): string {
 	const tokenDecimals = assetId ? NETWORKS_DETAILS[`${network}`]?.supportedAssets[`${assetId}`]?.tokenDecimal : NETWORKS_DETAILS[`${network}`]?.tokenDecimals;
 
-	const valueString = value instanceof BN ? value.toString() : String(value);
+	const valueString = value instanceof BN ? value.toString() : value;
 
 	let suffix = '';
 	let prefix = '';

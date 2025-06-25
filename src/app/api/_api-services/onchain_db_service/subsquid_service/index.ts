@@ -39,7 +39,7 @@ import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalSta
 import { BN, BN_ZERO } from '@polkadot/util';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { dayjs } from '@shared/_utils/dayjsInit';
-import { TRACK_GROUPS } from '@/_shared/_constants/trackGroups';
+import { getTrackGroups } from '@/_shared/_constants/trackGroups';
 import { getTrackNameFromId } from '@/_shared/_utils/getTrackNameFromId';
 import { SubsquidUtils } from './subsquidUtils';
 import { SubsquidQueries } from './subsquidQueries';
@@ -1114,7 +1114,8 @@ export class SubsquidService extends SubsquidUtils {
 
 		const query = this.GET_TOTAL_CATEGORY_PROPOSALS;
 
-		const promises = Object.entries(TRACK_GROUPS).map(async ([group, trackIds]) => {
+		const trackGroups = getTrackGroups(network);
+		const promises = Object.entries(trackGroups).map(async ([group, trackIds]) => {
 			try {
 				const response = await gqlClient
 					.query(query, {

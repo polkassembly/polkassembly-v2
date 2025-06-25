@@ -2,42 +2,30 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { EHttpHeaderKey, ENetwork } from '@/_shared/types';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
+import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
+import { EHttpHeaderKey } from '@/_shared/types';
 
-export async function GET(req: NextRequest) {
-	try {
-		const networkHeader = req.headers.get(EHttpHeaderKey.NETWORK);
-		const network = (networkHeader as ENetwork) || (await getCurrentNetwork());
-		const skipCache = req.headers.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
+export const GET = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
+	const network = await getNetworkFromHeaders();
+	const skipCache = req.headers.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
 
-		// Try to get from cache first
-		if (!skipCache) {
-			const cachedData = await RedisService.GetGovAnalyticsReferendumCount(network);
-			if (cachedData) {
-				console.log('Returning cached referendum count data');
-				return Response.json(cachedData);
-			}
+	// Try to get from cache first
+	if (!skipCache) {
+		const cachedData = await RedisService.GetGovAnalyticsReferendumCount(network);
+		if (cachedData) {
+			return NextResponse.json(cachedData);
 		}
-
-		// If not in cache or skipCache is true, fetch from Subsquid
-		const data = await OnChainDbService.GetGovAnalyticsReferendumCount({ network });
-
-		// Cache the data
-		await RedisService.SetGovAnalyticsReferendumCount({ network, data });
-
-		return Response.json(data);
-	} catch (error) {
-		if (error instanceof Error) {
-			console.error('Error details:', {
-				message: error.message,
-				stack: error.stack,
-				name: error.name
-			});
-		}
-		return Response.json({ error: 'Failed to fetch referendum count data' }, { status: 500 });
 	}
-}
+
+	// If not in cache or skipCache is true, fetch from Subsquid
+	const data = await OnChainDbService.GetGovAnalyticsReferendumCount({ network });
+
+	// Cache the data
+	await RedisService.SetGovAnalyticsReferendumCount({ network, data });
+
+	return NextResponse.json(data);
+});

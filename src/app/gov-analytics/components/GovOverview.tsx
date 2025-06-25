@@ -6,8 +6,6 @@
 
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
-import { NoVotesIcon } from '@ui/NoVotesIcon';
 import TimeLineIcon from '@assets/icons/timeline.svg';
 import { Separator } from '@/app/_shared-components/Separator';
 import { ChevronDown } from 'lucide-react';
@@ -20,7 +18,6 @@ import ReferendumCount from './ReferendumCount';
 
 function GovOverview() {
 	const t = useTranslations('GovAnalytics');
-	const [noData] = useState<boolean>(false);
 
 	return (
 		<Collapsible
@@ -41,24 +38,17 @@ function GovOverview() {
 			</CollapsibleTrigger>
 			<CollapsibleContent>
 				<Separator className='my-0' />
-				{noData ? (
-					<div className='flex flex-col items-center justify-center gap-5 p-10'>
-						<NoVotesIcon />
-						<p className='text-sm'>{t('notEnoughData')}</p>
+				<div className='p-4'>
+					<div className='mb-4 flex flex-col gap-4 md:grid md:grid-cols-2'>
+						<AnalyticsReferendumOutcome />
+						<AnalyticsReferendumCount />
 					</div>
-				) : (
-					<div className='p-4'>
-						<div className='mb-4 flex flex-col gap-4 md:grid md:grid-cols-2'>
-							<AnalyticsReferendumOutcome />
-							<AnalyticsReferendumCount />
-						</div>
-						<div className='mb-4 flex flex-col gap-4 md:grid md:grid-cols-2'>
-							<MonthlySpend />
-							<AnalyticTurnOutPercentage />
-						</div>
-						<ReferendumCount />
+					<div className='mb-4 flex flex-col gap-4 md:grid md:grid-cols-2'>
+						<MonthlySpend />
+						<AnalyticTurnOutPercentage />
 					</div>
-				)}
+					<ReferendumCount />
+				</div>
 			</CollapsibleContent>
 		</Collapsible>
 	);
