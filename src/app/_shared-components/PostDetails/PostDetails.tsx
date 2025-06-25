@@ -15,6 +15,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -37,6 +38,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
 
 	const [thresholdValues, setThresholdValues] = useState({ approvalThreshold: 0, supportThreshold: 0 });
+	const isMobile = useIsMobile();
 
 	const queryClient = useQueryClient();
 
@@ -147,14 +149,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								</TabsContent>
 							)}
 						</div>
-						<div className={classes.commentsBox}>
-							<PostComments
-								proposalType={post.proposalType}
-								index={index}
-								contentSummary={post.contentSummary}
-								comments={post.comments}
-							/>
-						</div>
 						{isModalOpen && !isOffchainPost && (
 							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
 								{canVote(post.onChainInfo?.status) && (
@@ -165,6 +159,16 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 										proposalType={post.proposalType}
 									/>
 								)}
+							</div>
+						)}
+						{!isMobile && (
+							<div className={classes.commentsBox}>
+								<PostComments
+									proposalType={post.proposalType}
+									index={index}
+									contentSummary={post.contentSummary}
+									comments={post.comments}
+								/>
 							</div>
 						)}
 					</div>
@@ -239,6 +243,18 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						<div className={classes.rightWrapper}>
 							<div className={classes.parentBountyCardWrapper}>
 								<ParentBountyCard parentBountyIndex={post.onChainInfo?.parentBountyIndex} />
+							</div>
+						</div>
+					)}
+					{isMobile && (
+						<div className={classes.leftWrapper}>
+							<div className={classes.commentsBox}>
+								<PostComments
+									proposalType={post.proposalType}
+									index={index}
+									contentSummary={post.contentSummary}
+									comments={post.comments}
+								/>
 							</div>
 						</div>
 					)}
