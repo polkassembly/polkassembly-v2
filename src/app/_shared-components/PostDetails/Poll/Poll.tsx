@@ -118,7 +118,7 @@ function Poll({ poll }: { poll: IPoll | null }) {
 			setLoading(false);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[user?.id]
+		[user?.id, votes]
 	);
 
 	if (!poll) {
