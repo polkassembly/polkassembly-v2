@@ -82,6 +82,11 @@ function Poll({ poll }: { poll: IPoll | null }) {
 
 				setVotes((prev) => prev.filter((vote) => vote.userId !== user?.id || vote.selectedOption !== option));
 				setLoading(false);
+				toast({
+					title: 'Success!',
+					description: 'Your vote has been removed',
+					status: ENotificationStatus.ERROR
+				});
 				return;
 			}
 
@@ -156,7 +161,7 @@ function Poll({ poll }: { poll: IPoll | null }) {
 							variant='ghost'
 							key={option}
 							className={cn(
-								'relative flex w-full items-center justify-between overflow-hidden rounded-md bg-poll_option_bg px-3 py-2.5 text-xs font-semibold text-text_primary',
+								'relative flex w-full flex-wrap items-center justify-between overflow-hidden break-all rounded-md bg-poll_option_bg px-3 py-2.5 text-xs font-semibold text-text_primary',
 								percentage > 0 && isMyVote ? 'text-white' : ''
 							)}
 						>
@@ -167,8 +172,8 @@ function Poll({ poll }: { poll: IPoll | null }) {
 								/>
 							)}
 
-							<span className='relative z-10'>{option}</span>
-							<div className='flex items-end gap-1'>
+							<span className='relative z-10 flex flex-wrap break-all'>{option}</span>
+							<div className='flex flex-wrap items-end gap-1 break-all'>
 								{(isPollEnded || !poll?.voteTypes?.includes(EPollVotesType.MASKED)) && !isLoading && ValidatorService.isValidNumber(percentage) && (
 									<span className={classes.votePercentage}>{percentage}%</span>
 								)}

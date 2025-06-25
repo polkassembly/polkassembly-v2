@@ -73,7 +73,7 @@ function PollVotesListDialog({ votes, poll, loading }: { votes: IPollVote[]; pol
 									)}
 								>
 									<span className={cn('text-base font-bold', selectedOption === option ? 'text-text_pink' : 'text-text_primary')}>{count}</span>
-									<span>
+									<span className='flex-wrap break-words'>
 										{option?.slice(0, POLL_OPTION_SLICE_TILL)}
 										{option?.length > POLL_OPTION_SLICE_TILL && '...'}
 									</span>
@@ -108,7 +108,7 @@ function PollVotesListDialog({ votes, poll, loading }: { votes: IPollVote[]; pol
 												<span>{vote.publicUser?.username}</span>
 											)}
 											<span className=''>{dayjs(vote.createdAt).format('DD/MM/YYYY')}</span>
-											<span>
+											<span className='flex-wrap break-words'>
 												{vote.selectedOption?.slice(0, POLL_OPTION_SLICE_TILL)}
 												{vote.selectedOption?.length > POLL_OPTION_SLICE_TILL && '...'}
 											</span>
