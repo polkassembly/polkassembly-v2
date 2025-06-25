@@ -12,6 +12,8 @@ import { getFormattedDateFromBlock } from '@/_shared/_utils/blockToDateUtils';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { getMemoizedTimeFromBlocks } from '@/app/_client-utils/voteUnlockUtils';
 import Link from 'next/link';
+import Image from 'next/image';
+import ProposalUnlockIcon from '@assets/icons/create-proposal.svg';
 import { useTranslations } from 'next-intl';
 import { SquareArrowOutUpRight, UnlockKeyhole } from 'lucide-react';
 import { IVoteLock } from '@/_shared/types';
@@ -68,7 +70,15 @@ function LockVoteDetailCard({ vote, isNextUnlock }: LockVoteDetailCardProps) {
 				{isNextUnlock && <UnlockKeyhole className='h-4 w-4 text-border_blue' />}
 				<div className={classes.voteInfo}>
 					{voteWithDate.blocksRemaining && (
-						<span className={classes.timeRemaining}>
+						<span className='flex items-center gap-1'>
+							{!isNextUnlock && (
+								<Image
+									src={ProposalUnlockIcon}
+									alt='proposal-unlock'
+									width={20}
+									height={20}
+								/>
+							)}
 							{isNextUnlock ? t('Profile.NextUnlockIn') : t('Profile.ProposalUnlockIn')}: {getTimeRemainingForBlocks(voteWithDate.blocksRemaining)}
 						</span>
 					)}

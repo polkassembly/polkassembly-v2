@@ -14,6 +14,8 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import { IVoteLock } from '@/_shared/types';
+import Image from 'next/image';
+import ProposalUnlockIcon from '@assets/icons/create-proposal.svg';
 import classes from './UnlockVoteDetailCard.module.scss';
 
 interface UnlockVoteDetailCardProps {
@@ -66,7 +68,15 @@ function UnlockVoteDetailCard({ vote, isSelected = true, onSelectionChange }: Un
 	return (
 		<div className={classes.container}>
 			<div className={classes.voteInfo}>
-				{voteWithDate.blocksRemaining && <span className={classes.timeRemaining}>{t('Profile.ProposalUnlock')}</span>}
+				<span className={classes.voteInfoText}>
+					<Image
+						src={ProposalUnlockIcon}
+						alt='proposal-unlock'
+						width={20}
+						height={20}
+					/>
+					{t('Profile.ProposalUnlock')}
+				</span>
 				{voteWithDate.lockedAtDate && (
 					<Link
 						href={`/referenda/${voteWithDate.refId}`}
