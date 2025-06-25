@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import dayjs from 'dayjs';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
+import { POLL_OPTION_SLICE_TILL } from '@/_shared/_constants/pollLimits';
 import { Button } from '../../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import classes from './Poll.module.scss';
@@ -72,7 +73,10 @@ function PollVotesListDialog({ votes, poll, loading }: { votes: IPollVote[]; pol
 									)}
 								>
 									<span className={cn('text-base font-bold', selectedOption === option ? 'text-text_pink' : 'text-text_primary')}>{count}</span>
-									<span>{option}</span>
+									<span>
+										{option?.slice(0, POLL_OPTION_SLICE_TILL)}
+										{option?.length > POLL_OPTION_SLICE_TILL && '...'}
+									</span>
 								</Button>
 							))}
 						</div>
@@ -104,7 +108,10 @@ function PollVotesListDialog({ votes, poll, loading }: { votes: IPollVote[]; pol
 												<span>{vote.publicUser?.username}</span>
 											)}
 											<span className=''>{dayjs(vote.createdAt).format('DD/MM/YYYY')}</span>
-											<span>{vote.selectedOption}</span>
+											<span>
+												{vote.selectedOption?.slice(0, POLL_OPTION_SLICE_TILL)}
+												{vote.selectedOption?.length > POLL_OPTION_SLICE_TILL && '...'}
+											</span>
 										</div>
 									);
 								})}
