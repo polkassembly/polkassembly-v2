@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useMemo, useCallback, useState } from 'react';
-import { EAnalyticsType, EPostTilesVotesType, EProposalType, EVoteDecision, IPostTilesVotes } from '@/_shared/types';
+import { EAnalyticsType, EPostTileVotesType, EProposalType, EVoteDecision, IPostTilesVotes } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { ResponsiveTreeMap } from '@nivo/treemap';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -137,7 +137,7 @@ const useVotesDistribution = ({ votesTilesData }: { votesTilesData: IPostTilesVo
 	}, [votesTilesData]);
 };
 
-const useChartData = ({ allVotes }: { allVotes: IVoteDistribution[] }) => {
+const useChartData = ({ allVotes, votesType }: { allVotes: IVoteDistribution[]; votesType: EPostTileVotesType }) => {
 	const t = useTranslations('PostDetails.VotesTiles');
 	const network = getCurrentNetwork();
 	return useMemo(() => {
@@ -186,14 +186,15 @@ const useChartData = ({ allVotes }: { allVotes: IVoteDistribution[] }) => {
 			});
 		}
 		return payload;
-	}, [allVotes, t, network]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [allVotes, t, network, votesType]);
 };
 
 // Component
 function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EProposalType; index: number; analyticsType: EAnalyticsType }) {
 	const t = useTranslations('PostDetails.VotesTiles');
 	const network = getCurrentNetwork();
-	const [votesType, setVotesType] = useState<EPostTilesVotesType>(EPostTilesVotesType.FLATTENED);
+	const [votesType, setVotesType] = useState<EPostTileVotesType>(EPostTileVotesType.FLATTENED);
 
 	const getPostAnalytics = async () => {
 		const { data, error } = await NextApiClientService.getPostTilesVotes({
@@ -215,7 +216,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 	});
 
 	const allVotes = useVotesDistribution({ votesTilesData: votesTilesData?.votes || { aye: [], nay: [], abstain: [] } });
-	const chartData = useChartData({ allVotes });
+	const chartData = useChartData({ allVotes, votesType });
 
 	const renderTooltip = useCallback(
 		// eslint-disable-next-line react/no-unused-prop-types
@@ -249,7 +250,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 								address={id}
 								textClassName='text-sm'
 							/>
-							{votesType === EPostTilesVotesType.NESTED ? (
+							{votesType === EPostTileVotesType.NESTED ? (
 								<div className='flex flex-col items-center justify-center gap-1 text-xs text-text_primary'>
 									<div className='flex flex-col items-center gap-1 font-bold text-basic_text'>
 										<span className='text-basic_text'>
@@ -290,7 +291,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 			<div className='flex items-center justify-between'>
 				<h2 className='text-base font-bold text-text_primary xl:text-sm 2xl:text-base'>{t('votesDistribution')}</h2>
 				<div className='flex items-center gap-1 rounded-sm bg-bg_code p-1'>
-					{[EPostTilesVotesType.NESTED, EPostTilesVotesType.FLATTENED].map((type) => (
+					{[EPostTileVotesType.NESTED, EPostTileVotesType.FLATTENED].map((type) => (
 						<Button
 							key={type}
 							variant='ghost'

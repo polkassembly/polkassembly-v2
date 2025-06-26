@@ -6,7 +6,7 @@ import {
 	EAnalyticsType,
 	ENetwork,
 	EPostOrigin,
-	EPostTilesVotesType,
+	EPostTileVotesType,
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
@@ -1103,11 +1103,11 @@ export class SubsquidService extends SubsquidUtils {
 		proposalType: EProposalType;
 		index: number;
 		analyticsType?: EAnalyticsType;
-		votesType: EPostTilesVotesType;
+		votesType: EPostTileVotesType;
 	}): Promise<IPostTilesVotes> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = votesType === EPostTilesVotesType.FLATTENED ? this.GET_ALL_FLATTENED_VOTES_FOR_POST : this.GET_ALL_NESTED_VOTES;
+		const query = votesType === EPostTileVotesType.FLATTENED ? this.GET_ALL_FLATTENED_VOTES_FOR_POST : this.GET_ALL_NESTED_VOTES;
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { type_eq: proposalType, index_eq: index }).toPromise();
 
 		if (subsquidErr || !subsquidData) {
@@ -1115,7 +1115,7 @@ export class SubsquidService extends SubsquidUtils {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post analytics from Subsquid');
 		}
 
-		const data = votesType === EPostTilesVotesType.FLATTENED ? subsquidData.flattenedConvictionVotes : subsquidData.convictionVotes;
+		const data = votesType === EPostTileVotesType.FLATTENED ? subsquidData.flattenedConvictionVotes : subsquidData.convictionVotes;
 
 		const votesData: IPostTilesVotes = {
 			votes: {
@@ -1124,7 +1124,7 @@ export class SubsquidService extends SubsquidUtils {
 				[EVoteDecision.ABSTAIN]: []
 			},
 			proposal: {
-				status: data?.[0]?.proposal?.status as EProposalStatus
+				status: (data?.[0]?.proposal?.status as EProposalStatus) || EProposalStatus.Unknown
 			}
 		};
 
@@ -1144,7 +1144,7 @@ export class SubsquidService extends SubsquidUtils {
 				const balance = new BN(vote.balance.value || vote.balance.abstain || BN_ZERO.toString());
 				const votingPower =
 					analyticsType === EAnalyticsType.CONVICTIONS
-						? votesType === EPostTilesVotesType.FLATTENED
+						? votesType === EPostTileVotesType.FLATTENED
 							? this.getVotingPower(balance?.toString(), vote?.lockPeriod)
 							: this.getNestedVoteVotingPower(
 									vote?.parentVote?.delegatedVotingPower || vote?.delegatedVotingPower || BN_ZERO.toString(),

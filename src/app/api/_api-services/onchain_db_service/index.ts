@@ -19,7 +19,7 @@ import {
 	EBountyStatus,
 	EVoteSortOptions,
 	EAnalyticsType,
-	EPostTilesVotesType
+	EPostTileVotesType
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -327,7 +327,7 @@ export class OnChainDbService {
 		proposalType: EProposalType;
 		index: number;
 		analyticsType?: EAnalyticsType;
-		votesType: EPostTilesVotesType;
+		votesType: EPostTileVotesType;
 	}) {
 		return SubsquidService.GetPostTillesVotes({ network, proposalType, index, analyticsType, votesType });
 	}

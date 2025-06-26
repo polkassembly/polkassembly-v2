@@ -20,7 +20,7 @@ import {
 	IPost,
 	IPostAnalytics,
 	IPostListing,
-	EPostTilesVotesType,
+	EPostTileVotesType,
 	IPostTilesVotes,
 	ITrackAnalyticsDelegations,
 	ITrackAnalyticsStats,
@@ -123,7 +123,7 @@ export class RedisService {
 		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
 		[ERedisKeys.POST_ANALYTICS_DATA]: (network: string, proposalType: string, indexOrHash: string): string =>
 			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${indexOrHash}`,
-		[ERedisKeys.POST_TILES_VOTES_DATA]: (network: string, proposalType: string, indexOrHash: string, votesType: EPostTilesVotesType, analyticsType?: EAnalyticsType): string =>
+		[ERedisKeys.POST_TILES_VOTES_DATA]: (network: string, proposalType: string, indexOrHash: string, votesType: EPostTileVotesType, analyticsType?: EAnalyticsType): string =>
 			`${ERedisKeys.POST_TILES_VOTES_DATA}-${network}-${proposalType}-${indexOrHash}-${votesType}-${analyticsType || ''}`
 	} as const;
 
@@ -669,7 +669,7 @@ export class RedisService {
 		proposalType: string;
 		indexOrHash: string;
 		data: IPostTilesVotes;
-		votesType: EPostTilesVotesType;
+		votesType: EPostTileVotesType;
 		analyticsType?: EAnalyticsType;
 	}): Promise<void> {
 		const isActivePost = data.proposal?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.proposal.status as EProposalStatus);
@@ -691,7 +691,7 @@ export class RedisService {
 		network: string;
 		proposalType: string;
 		indexOrHash: string;
-		votesType: EPostTilesVotesType;
+		votesType: EPostTileVotesType;
 		analyticsType?: EAnalyticsType;
 	}): Promise<IPostTilesVotes | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_TILES_VOTES_DATA](network, proposalType, indexOrHash, votesType, analyticsType) });

@@ -1394,7 +1394,7 @@ export type IPostTilesVotes = {
 	};
 };
 
-export enum EPostTilesVotesType {
+export enum EPostTileVotesType {
 	NESTED = 'nested',
 	FLATTENED = 'flattened'
 }
