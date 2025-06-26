@@ -219,16 +219,18 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							</div>
 						</div>
 					)}
-					<div className={classes.leftWrapper}>
-						<div className={classes.commentsBox}>
-							<PostComments
-								proposalType={post.proposalType}
-								index={index}
-								contentSummary={post.contentSummary}
-								comments={post.comments}
-							/>
+					{isMobile && (
+						<div className={classes.leftWrapper}>
+							<div className={classes.commentsBox}>
+								<PostComments
+									proposalType={post.proposalType}
+									index={index}
+									contentSummary={post.contentSummary}
+									comments={post.comments}
+								/>
+							</div>
 						</div>
-					</div>
+					)}
 				</div>
 			</Tabs>
 		</>
