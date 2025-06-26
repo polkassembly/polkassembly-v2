@@ -33,8 +33,9 @@ export function blockToTime(blocks: BN | number, network: ENetwork, blocktime?: 
 	const networkBlockTime = NETWORKS_DETAILS[network]?.blockTime;
 	const finalBlockTime = blocktime ? blocktime / 1000 : (networkBlockTime || 6000) / 1000;
 
-	// bn.js toNumber() was crashing
-	const blockCount = typeof blocks !== 'number' ? Number(blocks) : blocks;
+	// Safe conversion with bounds checking
+	const blockCount = typeof blocks !== 'number' ? (blocks.gt(new BN(Number.MAX_SAFE_INTEGER)) ? Number.MAX_SAFE_INTEGER : blocks.toNumber()) : blocks;
+
 	const totalSeconds = blockCount * finalBlockTime;
 	const time = secondsToDhm(totalSeconds);
 
