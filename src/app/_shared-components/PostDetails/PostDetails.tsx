@@ -13,7 +13,6 @@ import { useAISummary } from '@/hooks/useAISummary';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
-import { useIsMobile } from '@/hooks/useIsMobile';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -33,7 +32,6 @@ import ClaimPayout from './ClaimPayout/ClaimPayout';
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
-	const isMobile = useIsMobile();
 
 	const [thresholdValues, setThresholdValues] = useState({ approvalThreshold: 0, supportThreshold: 0 });
 
@@ -122,16 +120,14 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								/>
 							</TabsContent>
 						</div>
-						{!isMobile && (
-							<div className={classes.commentsBox}>
-								<PostComments
-									proposalType={post.proposalType}
-									index={index}
-									contentSummary={post.contentSummary}
-									comments={post.comments}
-								/>
-							</div>
-						)}
+						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
+							<PostComments
+								proposalType={post.proposalType}
+								index={index}
+								contentSummary={post.contentSummary}
+								comments={post.comments}
+							/>
+						</div>
 						{isModalOpen && !isOffchainPost && (
 							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
 								{canVote(post.onChainInfo?.status) && (
@@ -219,18 +215,17 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							</div>
 						</div>
 					)}
-					{isMobile && (
-						<div className={classes.leftWrapper}>
-							<div className={classes.commentsBox}>
-								<PostComments
-									proposalType={post.proposalType}
-									index={index}
-									contentSummary={post.contentSummary}
-									comments={post.comments}
-								/>
-							</div>
+
+					<div className={cn(classes.leftWrapper, 'xl:hidden')}>
+						<div className={classes.commentsBox}>
+							<PostComments
+								proposalType={post.proposalType}
+								index={index}
+								contentSummary={post.contentSummary}
+								comments={post.comments}
+							/>
 						</div>
-					)}
+					</div>
 				</div>
 			</Tabs>
 		</>
