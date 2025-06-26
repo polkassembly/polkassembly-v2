@@ -264,6 +264,8 @@ export class WebhookService {
 
 			console.log(`Processing ${fetchUrls.length} URLs in batches of ${batchSize}`);
 
+			console.log({ urls: fetchUrls });
+
 			const processResults = await this.processBatchesWithRetries(fetchUrls, headers, batchSize, timeout, maxRetries);
 			console.log(`Cache refresh completed. Success: ${processResults.successCount}, Failed: ${processResults.failCount}`);
 		} catch (error) {
