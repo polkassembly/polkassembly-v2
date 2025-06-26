@@ -83,7 +83,7 @@ function Poll({ poll }: { poll: IPoll | null }) {
 				setLoading(false);
 				toast({
 					title: 'Success!',
-					description: 'Your vote has been removed',
+					description: 'Your vote has been removed!',
 					status: ENotificationStatus.SUCCESS
 				});
 				return;
