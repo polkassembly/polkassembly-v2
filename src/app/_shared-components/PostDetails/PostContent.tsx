@@ -13,7 +13,6 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
 import PostActions from './PostActions/PostActions';
-import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 import { MarkdownViewer } from '../MarkdownViewer/MarkdownViewer';
 import LinkPostButton from './LinkDiscussionPost/LinkPostButton';
 
@@ -24,13 +23,6 @@ function PostContent({ postData, isModalOpen }: { postData: IPost; isModalOpen: 
 
 	return (
 		<div>
-			<AISummaryCollapsible
-				indexOrHash={String(postData?.index ?? postData?.hash)}
-				proposalType={postData.proposalType}
-				summaryType='content'
-				initialData={postData?.contentSummary}
-			/>
-
 			{user && user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || '') && postData.isDefaultContent ? (
 				<div className='flex flex-col items-center justify-center gap-y-4'>
 					<Image
