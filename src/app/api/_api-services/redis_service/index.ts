@@ -30,7 +30,8 @@ import {
 	ONE_DAY_IN_SECONDS,
 	REFRESH_TOKEN_LIFE_IN_SECONDS,
 	SIX_HOURS_IN_SECONDS,
-	THIRTY_DAYS_IN_SECONDS
+	THIRTY_DAYS_IN_SECONDS,
+	THREE_DAYS_IN_SECONDS
 } from '../../_api-constants/timeConstants';
 
 if (!REDIS_URL) {
@@ -380,7 +381,7 @@ export class RedisService {
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags),
 			value: JSON.stringify(data),
-			ttlSeconds: ONE_DAY_IN_SECONDS
+			ttlSeconds: THREE_DAYS_IN_SECONDS
 		});
 	}
 
