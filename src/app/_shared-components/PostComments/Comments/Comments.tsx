@@ -105,6 +105,7 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 			{user ? (
 				<div className='w-full px-6 py-6'>
 					<AddComment
+						id='commentForm'
 						proposalType={proposalType}
 						proposalIndex={index}
 						onConfirm={(newComment, publicUser) => {
@@ -113,7 +114,10 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 					/>
 				</div>
 			) : (
-				<div className={classes.loginToComment}>
+				<div
+					className={classes.loginToComment}
+					id='commentLoginPrompt'
+				>
 					{t('PostDetails.please')}
 					<Link
 						className='text-text_pink'

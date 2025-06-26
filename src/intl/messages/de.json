@@ -500,6 +500,13 @@
 		"aiSummary": "KI Zusammenfassung",
 		"showLikelySpam": "Wahrscheinlichen Spam anzeigen",
 		"hideLikelySpam": "Wahrscheinlichen Spam ausblenden",
+		"HighlightMenu": {
+			"quote": "Zitieren",
+			"share": "Teilen",
+			"copy": "Kopieren",
+			"textCopiedToClipboard": "Text in die Zwischenablage kopiert",
+			"failedToCopyText": "Text konnte nicht kopiert werden"
+		},
 		"voted": "Abgestimmt",
 		"votes": "Abstimmungen",
 		"vote": "Abstimmung",
