@@ -73,7 +73,7 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 	const { user } = useUser();
 
 	const fetchListingData = async () => {
-		const { data, error } = await NextApiClientService.fetchListingData({ proposalType, page, statuses, origins: origin ? [origin] : undefined });
+		const { data, error } = await NextApiClientService.fetchListingData({ proposalType, page, statuses, origins: origin ? [origin] : undefined, skipCache: true });
 		if (error || !data) {
 			throw new Error(error?.message || 'Failed to fetch listing data');
 		}

@@ -11,6 +11,7 @@ import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
 import {
 	ENetwork,
+	EPostOrigin,
 	EProposalType,
 	IContentSummary,
 	IDelegateDetails,
@@ -90,14 +91,22 @@ export class RedisService {
 		[ERedisKeys.REFRESH_TOKEN_SET]: (userId: number): string => `${ERedisKeys.REFRESH_TOKEN_SET}-${userId}`,
 		[ERedisKeys.REFRESH_TOKEN_ITEM]: (userId: number, tokenId: string): string => `${ERedisKeys.REFRESH_TOKEN_ITEM}-${userId}-${tokenId}`,
 		[ERedisKeys.POST_DATA]: (network: string, proposalType: EProposalType, indexOrHash: string): string => `${ERedisKeys.POST_DATA}-${network}-${proposalType}-${indexOrHash}`,
-		[ERedisKeys.POSTS_LISTING]: (network: string, proposalType: EProposalType, page: number, limit: number, statuses?: string[], origins?: string[], tags?: string[]): string => {
+		[ERedisKeys.POSTS_LISTING]: (
+			network: string,
+			proposalType: EProposalType,
+			page: number,
+			limit: number,
+			statuses?: string[],
+			origins?: EPostOrigin[],
+			tags?: string[]
+		): string => {
 			const baseKey = `${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-${page}-${limit}`;
 			const statusesPart = statuses?.length ? `-s:${statuses.sort().join(',')}` : '';
 			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
 			const tagsPart = tags?.length ? `-t:${tags.sort().join(',')}` : '';
 			return baseKey + statusesPart + originsPart + tagsPart;
 		},
-		[ERedisKeys.ACTIVITY_FEED]: (network: string, page: number, limit: number, userId?: number, origins?: string[]): string => {
+		[ERedisKeys.ACTIVITY_FEED]: (network: string, page: number, limit: number, userId?: number, origins?: EPostOrigin[]): string => {
 			const baseKey = `${ERedisKeys.ACTIVITY_FEED}-${network}-${page}-${limit}`;
 			const userPart = userId ? `-u:${userId}` : '';
 			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
@@ -111,8 +120,8 @@ export class RedisService {
 			`${ERedisKeys.CONTENT_SUMMARY}-${network}-${proposalType}-${indexOrHash}`,
 		[ERedisKeys.DELEGATION_STATS]: (network: string): string => `${ERedisKeys.DELEGATION_STATS}-${network}`,
 		[ERedisKeys.DELEGATE_DETAILS]: (network: string): string => `${ERedisKeys.DELEGATE_DETAILS}-${network}`,
-		[ERedisKeys.TRACK_ANALYTICS_DELEGATION]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-${origin}`,
-		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: string): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
+		[ERedisKeys.TRACK_ANALYTICS_DELEGATION]: (network: string, origin: EPostOrigin | 'all'): string => `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-${origin}`,
+		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: EPostOrigin | 'all'): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
 		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
 		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`
 	} as const;
@@ -353,7 +362,7 @@ export class RedisService {
 		page: number;
 		limit: number;
 		statuses?: string[];
-		origins?: string[];
+		origins?: EPostOrigin[];
 		tags?: string[];
 	}): Promise<IGenericListingResponse<IPostListing> | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POSTS_LISTING](network, proposalType, page, limit, statuses, origins, tags) });
@@ -376,7 +385,7 @@ export class RedisService {
 		limit: number;
 		data: IGenericListingResponse<IPostListing>;
 		statuses?: string[];
-		origins?: string[];
+		origins?: EPostOrigin[];
 		tags?: string[];
 	}): Promise<void> {
 		await this.Set({
@@ -425,7 +434,7 @@ export class RedisService {
 		page: number;
 		limit: number;
 		userId?: number;
-		origins?: string[];
+		origins?: EPostOrigin[];
 	}): Promise<IGenericListingResponse<IPostListing> | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins) });
 		return data ? (deepParseJson(data) as IGenericListingResponse<IPostListing>) : null;
@@ -444,7 +453,7 @@ export class RedisService {
 		limit: number;
 		data: IGenericListingResponse<IPostListing>;
 		userId?: number;
-		origins?: string[];
+		origins?: EPostOrigin[];
 	}): Promise<void> {
 		await this.Set({ key: this.redisKeysMap[ERedisKeys.ACTIVITY_FEED](network, page, limit, userId, origins), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
@@ -555,12 +564,12 @@ export class RedisService {
 	}
 
 	// Track analytics delegation caching methods
-	static async GetTrackAnalyticsDelegation({ network, origin }: { network: string; origin: string }): Promise<ITrackAnalyticsDelegations | null> {
+	static async GetTrackAnalyticsDelegation({ network, origin }: { network: string; origin: EPostOrigin | 'all' }): Promise<ITrackAnalyticsDelegations | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_DELEGATION](network, origin) });
 		return data ? (deepParseJson(data) as ITrackAnalyticsDelegations) : null;
 	}
 
-	static async SetTrackAnalyticsDelegation({ network, origin, data }: { network: string; origin: string; data: ITrackAnalyticsDelegations }): Promise<void> {
+	static async SetTrackAnalyticsDelegation({ network, origin, data }: { network: string; origin: EPostOrigin | 'all'; data: ITrackAnalyticsDelegations }): Promise<void> {
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_DELEGATION](network, origin),
 			value: JSON.stringify(data),
@@ -568,21 +577,21 @@ export class RedisService {
 		});
 	}
 
-	static async DeleteTrackAnalyticsDelegation({ network, origin }: { network: string; origin: string }): Promise<void> {
+	static async DeleteTrackAnalyticsDelegation({ network, origin }: { network: string; origin: EPostOrigin | 'all' }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_DELEGATION](network, origin) });
 	}
 
 	// Track analytics stats caching methods
-	static async GetTrackAnalyticsStats({ network, origin }: { network: string; origin: string }): Promise<ITrackAnalyticsStats | null> {
+	static async GetTrackAnalyticsStats({ network, origin }: { network: string; origin: EPostOrigin | 'all' }): Promise<ITrackAnalyticsStats | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin) });
 		return data ? (deepParseJson(data) as ITrackAnalyticsStats) : null;
 	}
 
-	static async SetTrackAnalyticsStats({ network, origin, data }: { network: string; origin: string; data: ITrackAnalyticsStats }): Promise<void> {
+	static async SetTrackAnalyticsStats({ network, origin, data }: { network: string; origin: EPostOrigin | 'all'; data: ITrackAnalyticsStats }): Promise<void> {
 		await this.Set({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
 
-	static async DeleteTrackAnalyticsStats({ network, origin }: { network: string; origin: string }): Promise<void> {
+	static async DeleteTrackAnalyticsStats({ network, origin }: { network: string; origin: EPostOrigin | 'all' }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin) });
 	}
 
