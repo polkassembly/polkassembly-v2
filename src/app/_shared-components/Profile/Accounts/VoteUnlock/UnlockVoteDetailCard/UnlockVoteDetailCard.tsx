@@ -7,8 +7,7 @@
 import { useState, useEffect } from 'react';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { getFormattedDateFromBlock } from '@/_shared/_utils/blockToDateUtils';
-import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { getDateFromBlock } from '@/_shared/_utils/blockToTime';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -24,40 +23,25 @@ interface UnlockVoteDetailCardProps {
 	onSelectionChange?: (vote: IVoteLock, selected: boolean) => void;
 }
 
-interface VoteLockWithDate extends IVoteLock {
-	lockedAtDate?: string;
-}
-
 function UnlockVoteDetailCard({ vote, isSelected = true, onSelectionChange }: UnlockVoteDetailCardProps) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
-	const { apiService } = usePolkadotApiService();
-	const [voteWithDate, setVoteWithDate] = useState<VoteLockWithDate>(vote);
+	const [lockedDate, setLockedDate] = useState<string | null>(null);
 
-	// Fetch formatted dates for votes that have lockedAtBlock
+	// Get locked date if available
 	useEffect(() => {
-		const fetchDatesForVote = async () => {
-			if (!apiService || !vote.lockedAtBlock) return;
-
+		const fetchLockedDate = async () => {
+			if (!vote.lockedAtBlock) return;
 			try {
-				const lockedAtDate = await getFormattedDateFromBlock({
-					targetBlockNumber: vote.lockedAtBlock,
-					network,
-					apiService
-				});
-				setVoteWithDate((prev) => ({ ...prev, lockedAtDate }));
+				const date = await getDateFromBlock(vote.lockedAtBlock, network);
+				setLockedDate(date);
 			} catch (error) {
-				console.error('Error getting locked at date:', error);
+				console.error('Error getting locked date:', error);
 			}
 		};
 
-		fetchDatesForVote();
-	}, [vote.lockedAtBlock, apiService, network]);
-
-	// Update vote data when prop changes
-	useEffect(() => {
-		setVoteWithDate(vote);
-	}, [vote]);
+		fetchLockedDate();
+	}, [vote.lockedAtBlock, network]);
 
 	const handleCheckboxChange = (checked: boolean) => {
 		if (onSelectionChange) {
@@ -77,19 +61,19 @@ function UnlockVoteDetailCard({ vote, isSelected = true, onSelectionChange }: Un
 					/>
 					{t('Profile.ProposalUnlock')}
 				</span>
-				{voteWithDate.lockedAtDate && (
+				{lockedDate && (
 					<Link
-						href={`/referenda/${voteWithDate.refId}`}
+						href={`/referenda/${vote.refId}`}
 						className={classes.lockedDate}
 						target='_blank'
 					>
-						{t('Profile.LockedOn')} {voteWithDate.lockedAtDate}
+						{t('Profile.LockedOn')} {lockedDate}
 						<SquareArrowOutUpRight className='h-3 w-3 text-border_blue' />
 					</Link>
 				)}
 			</div>
 			<div className='flex items-center gap-3'>
-				<div className={classes.voteBalance}>{formatBnBalance(voteWithDate.balance.toString(), { numberAfterComma: 2, withUnit: true }, network)}</div>
+				<div className={classes.voteBalance}>{formatBnBalance(vote.balance.toString(), { numberAfterComma: 2, withUnit: true }, network)}</div>
 				<Checkbox
 					className={classes.checkbox}
 					checked={isSelected}

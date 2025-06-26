@@ -5,7 +5,7 @@
 'use client';
 
 import { useState } from 'react';
-import { BN } from '@polkadot/util';
+import { BN, BN_MAX_INTEGER } from '@polkadot/util';
 import { useUser } from '@/hooks/useUser';
 import { useVoteUnlock } from '@/hooks/useVoteUnlock';
 import { UnlockKeyhole } from 'lucide-react';
@@ -57,6 +57,9 @@ function VoteUnlock({ lockedBalance, hasUnlockAccess }: VoteUnlockProps) {
 		return null;
 	}
 
+	// Get display text for the button
+	const buttonText = nextUnlockData?.endBlock.eq(BN_MAX_INTEGER) ? `${t('Profile.ProposalOngoing')}: #${nextUnlockData.refId}` : t('Profile.NoUnlocks');
+
 	return (
 		<>
 			<button
@@ -65,13 +68,7 @@ function VoteUnlock({ lockedBalance, hasUnlockAccess }: VoteUnlockProps) {
 				onClick={() => setOpen(true)}
 			>
 				<UnlockKeyhole className='h-4 w-4 text-border_blue' />
-				{nextUnlockData?.unlockTime ? (
-					<>
-						{t('Profile.UnlockIn')} {nextUnlockData.unlockTime}
-					</>
-				) : (
-					<>{t('Profile.NoUnlocks')}</>
-				)}
+				{buttonText}
 			</button>
 
 			<VoteUnlockModal

@@ -6,7 +6,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BN } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
 import { IVotingLocks, ENotificationStatus, IVoteLock } from '@/_shared/types';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getNextUnlockData, calculateTotalUnlockableBalance } from '@/app/_client-utils/voteUnlockUtils';
 import { useToast } from './useToast';
 import { usePolkadotApiService } from './usePolkadotApiService';
@@ -25,7 +24,6 @@ export const useVoteUnlock = (address: string): IUseVoteUnlockReturn => {
 	const { apiService } = usePolkadotApiService();
 	const { toast } = useToast();
 	const t = useTranslations();
-	const network = getCurrentNetwork();
 
 	const [votingLocks, setVotingLocks] = useState<IVotingLocks>({
 		lockedVotes: [],
@@ -63,8 +61,8 @@ export const useVoteUnlock = (address: string): IUseVoteUnlockReturn => {
 	}, [apiService, address]);
 
 	const nextUnlockData = useMemo(() => {
-		return getNextUnlockData(votingLocks, network, t);
-	}, [votingLocks, network, t]);
+		return getNextUnlockData(votingLocks);
+	}, [votingLocks]);
 
 	const totalUnlockableBalance = useMemo(() => {
 		return calculateTotalUnlockableBalance(votingLocks.unlockableVotes);

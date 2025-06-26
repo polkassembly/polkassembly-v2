@@ -3,73 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { BN, BN_ZERO } from '@polkadot/util';
-import { IVoteLock, IVotingLocks, ENetwork } from '@/_shared/types';
-import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
-
-export interface TimeRemaining {
-	days: number;
-	hours: number;
-	minutes: number;
-	totalSeconds: number;
-}
-
-export interface FormattedTimeRemaining {
-	formatted: string;
-	raw: TimeRemaining;
-}
-
-/**
- * Calculate time remaining from blocks using network-specific block times
- */
-export const getTimeRemainingFromBlocks = (blocks: BN, network: ENetwork): TimeRemaining => {
-	const { totalSeconds } = BlockCalculationsService.getTimeForBlocks({ network, blocks });
-
-	const days = Math.floor(totalSeconds / (24 * 60 * 60));
-	const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
-	const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
-
-	return { days, hours, minutes, totalSeconds };
-};
-
-/**
- * Format time remaining with internationalization support
- */
-export const formatTimeRemaining = (timeRemaining: TimeRemaining, t: (key: string) => string): string => {
-	const { days, hours, minutes } = timeRemaining;
-
-	if (days > 0) {
-		return `${days} ${t('Profile.days')}, ${hours} ${t('Profile.hours')}`;
-	}
-	if (hours > 0) {
-		return `${hours} ${t('Profile.hours')}, ${minutes} ${t('Profile.minutes')}`;
-	}
-	if (minutes > 0) {
-		return `${minutes} ${t('Profile.minutes')}`;
-	}
-	return t('Profile.LessThanOneMinute');
-};
-
-/**
- * Get formatted time remaining from blocks
- */
-export const getFormattedTimeFromBlocks = (blocks: BN, network: ENetwork, t: (key: string) => string): FormattedTimeRemaining => {
-	const raw = getTimeRemainingFromBlocks(blocks, network);
-	const formatted = formatTimeRemaining(raw, t);
-
-	return { formatted, raw };
-};
-
-/**
- * Find the vote with the closest unlock time from a collection of votes
- */
-export const findClosestUnlockVote = (votes: IVoteLock[]): IVoteLock | null => {
-	if (votes.length === 0) return null;
-
-	return votes.reduce((closest, current) => {
-		if (!closest.blocksRemaining || !current.blocksRemaining) return closest;
-		return current.blocksRemaining.lt(closest.blocksRemaining) ? current : closest;
-	});
-};
+import { IVoteLock, IVotingLocks } from '@/_shared/types';
 
 /**
  * Calculate total unlockable balance (max of all unlockable vote balances)
@@ -81,86 +15,35 @@ export const calculateTotalUnlockableBalance = (unlockableVotes: IVoteLock[]): B
 };
 
 /**
- * Get comprehensive data for the next unlock from locked and ongoing votes
+ * Get the next unlock information for display
  */
-export const getNextUnlockData = (votingLocks: IVotingLocks, network: ENetwork, t: (key: string) => string): IVoteLock | null => {
-	const allLockedVotes = [...votingLocks.lockedVotes, ...votingLocks.ongoingVotes];
-	const closestVote = findClosestUnlockVote(allLockedVotes);
+export const getNextUnlockData = (votingLocks: IVotingLocks): IVoteLock | null => {
+	// First check for unlockable votes (highest priority)
+	if (votingLocks.unlockableVotes.length > 0) {
+		return votingLocks.unlockableVotes.reduce((max, vote) => (vote.balance.gt(max.balance) ? vote : max));
+	}
 
-	if (!closestVote?.blocksRemaining) return null;
+	// Then check for locked votes (next unlock)
+	if (votingLocks.lockedVotes.length > 0) {
+		// Sort by end block and return the closest one
+		const sortedLocked = [...votingLocks.lockedVotes].sort((a, b) => {
+			if (!a.endBlock || !b.endBlock) return 0;
+			return a.endBlock.cmp(b.endBlock);
+		});
+		return sortedLocked[0];
+	}
 
-	const unlockTime = getFormattedTimeFromBlocks(closestVote.blocksRemaining, network, t).formatted;
+	// Finally check for ongoing votes
+	if (votingLocks.ongoingVotes.length > 0) {
+		return votingLocks.ongoingVotes.reduce((max, vote) => (vote.balance.gt(max.balance) ? vote : max));
+	}
 
-	return {
-		...closestVote,
-		unlockTime
-	};
-};
-
-/**
- * Get the closest unlock time from locked and ongoing votes (legacy function for backward compatibility)
- */
-export const getnextUnlockTime = (votingLocks: IVotingLocks, network: ENetwork, t: (key: string) => string): string | null => {
-	const nextUnlockData = getNextUnlockData(votingLocks, network, t);
-	return nextUnlockData?.unlockTime || null;
-};
-
-/**
- * Check if component should show on referenda page
- */
-export const shouldShowOnReferendaPage = (isReferendaPage: boolean, unlockableVotes: IVoteLock[], referendumIndex?: number): boolean => {
-	return !isReferendaPage || unlockableVotes.some((vote) => vote.refId === referendumIndex?.toString());
+	return null;
 };
 
 /**
  * Combine locked and ongoing votes for display
  */
 export const combineLockedVotes = (votingLocks: IVotingLocks): IVoteLock[] => {
-	return votingLocks.lockedVotes.concat(votingLocks.ongoingVotes);
-};
-
-/**
- * Process voting locks data for optimized rendering
- */
-export const processVotingLocksForDisplay = (votingLocks: IVotingLocks) => {
-	const totalUnlockableBalance = calculateTotalUnlockableBalance(votingLocks.unlockableVotes);
-	const combinedLockedVotes = combineLockedVotes(votingLocks);
-
-	return {
-		totalUnlockableBalance,
-		combinedLockedVotes,
-		hasUnlockableVotes: votingLocks.unlockableVotes.length > 0,
-		hasLockedVotes: combinedLockedVotes.length > 0
-	};
-};
-
-/**
- * Memoized time calculation to prevent unnecessary recalculations
- */
-const timeCalculationCache = new Map<string, FormattedTimeRemaining>();
-
-export const getMemoizedTimeFromBlocks = (blocks: BN, network: ENetwork, t: (key: string) => string): FormattedTimeRemaining => {
-	const cacheKey = `${blocks.toString()}-${network}`;
-
-	if (timeCalculationCache.has(cacheKey)) {
-		const cached = timeCalculationCache.get(cacheKey)!;
-		// Re-format with current translation function
-		return {
-			formatted: formatTimeRemaining(cached.raw, t),
-			raw: cached.raw
-		};
-	}
-
-	const result = getFormattedTimeFromBlocks(blocks, network, t);
-	timeCalculationCache.set(cacheKey, result);
-
-	// Clear cache if it gets too large (prevent memory leaks)
-	if (timeCalculationCache.size > 100) {
-		const firstKey = timeCalculationCache.keys().next().value;
-		if (firstKey) {
-			timeCalculationCache.delete(firstKey);
-		}
-	}
-
-	return result;
+	return [...votingLocks.lockedVotes, ...votingLocks.ongoingVotes];
 };

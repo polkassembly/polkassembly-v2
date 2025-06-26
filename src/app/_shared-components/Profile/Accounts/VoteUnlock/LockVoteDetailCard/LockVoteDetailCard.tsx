@@ -4,13 +4,11 @@
 
 'use client';
 
-import { BN } from '@polkadot/util';
+import { BN_MAX_INTEGER } from '@polkadot/util';
 import { useState, useEffect } from 'react';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { getFormattedDateFromBlock } from '@/_shared/_utils/blockToDateUtils';
-import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
-import { getMemoizedTimeFromBlocks } from '@/app/_client-utils/voteUnlockUtils';
+import { getDateFromBlock } from '@/_shared/_utils/blockToTime';
 import Link from 'next/link';
 import Image from 'next/image';
 import ProposalUnlockIcon from '@assets/icons/create-proposal.svg';
@@ -24,77 +22,68 @@ interface LockVoteDetailCardProps {
 	isNextUnlock?: boolean;
 }
 
-interface VoteLockWithDate extends IVoteLock {
-	lockedAtDate?: string;
-}
-
 function LockVoteDetailCard({ vote, isNextUnlock }: LockVoteDetailCardProps) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
-	const { apiService } = usePolkadotApiService();
-	const [voteWithDate, setVoteWithDate] = useState<VoteLockWithDate>(vote);
+	const [lockedDate, setLockedDate] = useState<string | null>(null);
 
-	// Use memoized time calculation for better performance
-	const getTimeRemainingForBlocks = (blocks: BN) => {
-		return getMemoizedTimeFromBlocks(blocks, network, t).formatted;
-	};
-
-	// Fetch formatted dates for votes that have lockedAtBlock
+	// Get locked date if available
 	useEffect(() => {
-		const fetchDatesForVote = async () => {
-			if (!apiService || !vote.lockedAtBlock) return;
-
+		const fetchLockedDate = async () => {
+			if (!vote.lockedAtBlock) return;
 			try {
-				const lockedAtDate = await getFormattedDateFromBlock({
-					targetBlockNumber: vote.lockedAtBlock,
-					network,
-					apiService
-				});
-				setVoteWithDate((prev) => ({ ...prev, lockedAtDate }));
+				const date = await getDateFromBlock(vote.lockedAtBlock, network);
+				setLockedDate(date);
 			} catch (error) {
-				console.error('Error getting locked at date:', error);
+				console.error('Error getting locked date:', error);
 			}
 		};
 
-		fetchDatesForVote();
-	}, [vote.lockedAtBlock, apiService, network]);
+		fetchLockedDate();
+	}, [vote.lockedAtBlock, network]);
 
-	// Update vote data when prop changes
-	useEffect(() => {
-		setVoteWithDate(vote);
-	}, [vote]);
+	// Get display text - unique to this component
+	const getDisplayText = () => {
+		if (vote.endBlock.eq(BN_MAX_INTEGER)) {
+			return `${t('Profile.ProposalOngoing')}: #${vote.refId}`;
+		}
+
+		if (isNextUnlock) {
+			return `${t('Profile.NextUnlock')}: #${vote.refId}`;
+		}
+
+		return `${t('Profile.LockedVote')}: #${vote.refId}`;
+	};
 
 	return (
 		<div className={classes.container}>
 			<div className='flex items-start gap-1'>
 				{isNextUnlock && <UnlockKeyhole className='h-4 w-4 text-border_blue' />}
 				<div className={classes.voteInfo}>
-					{voteWithDate.blocksRemaining && (
-						<span className='flex items-center gap-1'>
-							{!isNextUnlock && (
-								<Image
-									src={ProposalUnlockIcon}
-									alt='proposal-unlock'
-									width={20}
-									height={20}
-								/>
-							)}
-							{isNextUnlock ? t('Profile.NextUnlockIn') : t('Profile.ProposalUnlockIn')}: {getTimeRemainingForBlocks(voteWithDate.blocksRemaining)}
-						</span>
-					)}
-					{voteWithDate.lockedAtDate && (
+					<span className='flex items-center gap-1'>
+						{!isNextUnlock && (
+							<Image
+								src={ProposalUnlockIcon}
+								alt='proposal-unlock'
+								width={20}
+								height={20}
+							/>
+						)}
+						{getDisplayText()}
+					</span>
+					{lockedDate && (
 						<Link
-							href={`/referenda/${voteWithDate.refId}`}
+							href={`/referenda/${vote.refId}`}
 							className={classes.lockedDate}
 							target='_blank'
 						>
-							{t('Profile.LockedOn')} {voteWithDate.lockedAtDate}
+							{t('Profile.LockedOn')} {lockedDate}
 							<SquareArrowOutUpRight className='h-3 w-3 text-border_blue' />
 						</Link>
 					)}
 				</div>
 			</div>
-			<div className={classes.voteBalance}>{formatBnBalance(voteWithDate.balance.toString(), { numberAfterComma: 2, withUnit: true }, network)}</div>
+			<div className={classes.voteBalance}>{formatBnBalance(vote.balance.toString(), { numberAfterComma: 2, withUnit: true }, network)}</div>
 		</div>
 	);
 }

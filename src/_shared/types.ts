@@ -1301,6 +1301,11 @@ export interface IPayout {
 	};
 }
 
+export enum EVoteSource {
+	CONVICTION_VOTING = 'conviction_voting',
+	REFERENDA = 'referenda'
+}
+
 export interface IVoteLock {
 	refId: string;
 	track: string;
@@ -1308,9 +1313,9 @@ export interface IVoteLock {
 	conviction: number;
 	endBlock: BN;
 	status: string;
-	blocksRemaining?: BN;
+	voteSource: EVoteSource;
+	locked: string;
 	lockedAtBlock?: BN;
-	unlockTime?: string;
 }
 
 export interface IVotingLocks {

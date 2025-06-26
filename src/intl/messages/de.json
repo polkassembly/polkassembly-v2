@@ -172,8 +172,9 @@
 		"LockedBalance": "Gesperrtes Guthaben",
 		"UnlockIn": "Entsperren in",
 		"ProposalUnlock": "Vorschlag entsperren",
+		"ProposalOngoing": "Vorschlag in Arbeit",
 		"ProposalUnlockIn": "Vorschlag entsperren in",
-		"NextUnlockIn": "Nächster Entsperrung in",
+		"NextUnlock": "Nächster Entsperrung",
 		"LockedOn": "Gesperrt am",
 		"NoUnlocks": "Keine Entsperrungen verfügbar",
 		"unlockSuccess": "Tokens erfolgreich entsperrt",
@@ -734,7 +735,7 @@
 			"cancel": "Abbrechen",
 			"insertImage": "Bild einfügen",
 			"failedToUploadImage": "Bild konnte nicht hochgeladen werden"
-		},	
+		},
 		"AllowedCommentors": {
 			"title": "Wer kann kommentieren?",
 			"all": "Alle",
