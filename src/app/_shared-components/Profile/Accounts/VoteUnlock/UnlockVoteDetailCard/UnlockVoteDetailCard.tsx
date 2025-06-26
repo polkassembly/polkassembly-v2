@@ -61,16 +61,14 @@ function UnlockVoteDetailCard({ vote, isSelected = true, onSelectionChange }: Un
 					/>
 					{t('Profile.ProposalUnlock')}
 				</span>
-				{lockedDate && (
-					<Link
-						href={`/referenda/${vote.refId}`}
-						className={classes.lockedDate}
-						target='_blank'
-					>
-						{t('Profile.LockedOn')} {lockedDate}
-						<SquareArrowOutUpRight className='h-3 w-3 text-border_blue' />
-					</Link>
-				)}
+				<Link
+					href={`/referenda/${vote.refId}`}
+					className={classes.lockedDate}
+					target='_blank'
+				>
+					{lockedDate ? `${t('Profile.LockedOn')} ${lockedDate}` : `Referendum #${vote.refId}`}
+					<SquareArrowOutUpRight className='h-3 w-3 text-border_blue' />
+				</Link>
 			</div>
 			<div className='flex items-center gap-3'>
 				<div className={classes.voteBalance}>{formatBnBalance(vote.balance.toString(), { numberAfterComma: 2, withUnit: true }, network)}</div>
