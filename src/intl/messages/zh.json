@@ -469,6 +469,13 @@
 		"capital": "资本",
 		"account": "账户",
 		"abstain": "弃权",
+		"HighlightMenu": {
+			"quote": "引用",
+			"share": "分享",
+			"copy": "复制",
+			"textCopiedToClipboard": "文本已复制到剪贴板",
+			"failedToCopyText": "复制文本失败"
+		},
 		"OnchainInfo": {
 			"metadata": "元数据",
 			"table": "表格",

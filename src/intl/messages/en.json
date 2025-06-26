@@ -483,6 +483,13 @@
 		"aiSummary": "AI Summary",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
+		"HighlightMenu": {
+			"quote": "Quote",
+			"share": "Share",
+			"copy": "Copy",
+			"textCopiedToClipboard": "Text copied to clipboard",
+			"failedToCopyText": "Failed to copy text"
+		},
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",
