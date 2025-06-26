@@ -796,6 +796,23 @@
 			"insertImage": "Insert Image",
 			"failedToUploadImage": "Failed to upload image"
 		},
+		"AddPoll": {
+			"addPoll": "Add Poll",
+			"title": "Title",
+			"options": "Options",
+			"titleRequired": "Please provide a valid title.",
+			"settings": "Settings",
+			"anonymousPolls": "Anonymous polls (Voters’ name will not be visible)",
+			"maskedPolls": "Masked Polls (Result is only shown after a user has voted on the poll)",
+			"addAnotherOption": "Add Another Option..",
+			"pollEndsIn": "Poll ends in",
+			"optionDuplicated": "This option is duplicated",
+			"optionsDuplicated": "Poll options cannot be duplicated",
+			"endDateRequired": "Please select an end date for the poll",
+			"endDateInFuture": "Poll end date must be in the future",
+			"titlePlaceholder": "Enter poll title"
+		},
+
 		"AllowedCommentors": {
 			"advanced": "Advanced",
 			"title": "Who can comment ?",
