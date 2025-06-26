@@ -53,7 +53,6 @@ function Poll({ poll }: { poll: IPoll | null }) {
 			const optionVotes = (votes || []).filter((vote) => vote.selectedOption === option).length;
 			return Number(((optionVotes / totalVotes) * 100).toFixed(0));
 		},
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[votes]
 	);
 
@@ -85,7 +84,7 @@ function Poll({ poll }: { poll: IPoll | null }) {
 				toast({
 					title: 'Success!',
 					description: 'Your vote has been removed',
-					status: ENotificationStatus.ERROR
+					status: ENotificationStatus.SUCCESS
 				});
 				return;
 			}
@@ -118,7 +117,7 @@ function Poll({ poll }: { poll: IPoll | null }) {
 			setLoading(false);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[user?.id, votes]
+		[user?.id, votes, isPollEnded]
 	);
 
 	if (!poll) {

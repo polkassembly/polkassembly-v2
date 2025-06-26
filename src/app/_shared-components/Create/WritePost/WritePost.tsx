@@ -164,7 +164,7 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 				<Button
 					variant='ghost'
 					type='button'
-					aria-expanded={isAdvanced}
+					aria-label={`${t('Create.AllowedCommentors.advanced')} - ${isAdvanced}`}
 					className='flex h-5 w-full items-center justify-between p-0'
 					onClick={() => setIsAdvanced(!isAdvanced)}
 				>

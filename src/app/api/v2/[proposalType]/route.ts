@@ -29,7 +29,7 @@ import { z } from 'zod';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
-import { MAX_POLL_OPTIONS_COUNT, MIN_POLL_OPTIONS_COUNT } from '@/_shared/_constants/pollLimits';
+import { MAX_POLL_OPTION_LENGTH, MAX_POLL_OPTIONS_COUNT, MIN_POLL_OPTIONS_COUNT } from '@/_shared/_constants/pollLimits';
 import { APIError } from '../../_api-utils/apiError';
 import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
@@ -205,7 +205,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 			.object({
 				title: z.string().min(1, 'Title is required'),
 				options: z
-					.array(z.string())
+					.array(z.string().max(MAX_POLL_OPTION_LENGTH, `Poll option must not exceed ${MAX_POLL_OPTION_LENGTH} characters`))
 					.min(MIN_POLL_OPTIONS_COUNT, `At least ${MIN_POLL_OPTIONS_COUNT} options are required`)
 					.max(MAX_POLL_OPTIONS_COUNT, `At most ${MAX_POLL_OPTIONS_COUNT} options are allowed`),
 				voteTypes: z.array(z.nativeEnum(EPollVotesType)).optional(),

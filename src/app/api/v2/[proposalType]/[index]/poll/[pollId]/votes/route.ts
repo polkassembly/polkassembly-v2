@@ -21,7 +21,7 @@ const zodParamsSchema = z.object({
 	pollId: z.string()
 });
 
-export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
+export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string; pollId: string }> }): Promise<NextResponse> => {
 	const { proposalType, index, pollId } = zodParamsSchema.parse(await params);
 
 	const network = await getNetworkFromHeaders();
@@ -31,7 +31,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	return NextResponse.json({ votes });
 });
 
-export const POST = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
+export const POST = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string; pollId: string }> }): Promise<NextResponse> => {
 	const { proposalType, index, pollId } = zodParamsSchema.parse(await params);
 
 	const zodBodySchema = z.object({
@@ -56,22 +56,24 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	return NextResponse.json({ vote });
 });
 
-export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse> => {
-	const { proposalType, index, pollId } = zodParamsSchema.parse(await params);
+export const DELETE = withErrorHandling(
+	async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string; pollId: string }> }): Promise<NextResponse> => {
+		const { proposalType, index, pollId } = zodParamsSchema.parse(await params);
 
-	const network = await getNetworkFromHeaders();
+		const network = await getNetworkFromHeaders();
 
-	// 1. check if user is authenticated
-	const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
+		// 1. check if user is authenticated
+		const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
-	// 2. get user id
-	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
+		// 2. get user id
+		const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
 
-	// 3. delete poll vote
-	await OffChainDbService.DeletePollVote({ network, proposalType, index, userId, pollId });
+		// 3. delete poll vote
+		await OffChainDbService.DeletePollVote({ network, proposalType, index, userId, pollId });
 
-	// 4. invalidate cache
-	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+		// 4. invalidate cache
+		await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
 
-	return NextResponse.json({ message: 'Poll vote deleted successfully' });
-});
+		return NextResponse.json({ message: 'Poll vote deleted successfully' });
+	}
+);

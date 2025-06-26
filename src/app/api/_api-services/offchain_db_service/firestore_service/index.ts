@@ -1757,7 +1757,7 @@ export class FirestoreService extends FirestoreUtils {
 		// if poll is ended and vote type is masked, don't include public user
 		const pollData = pollDoc.data() as IPoll;
 		const isPollEnded = dayjs().isAfter(dayjs(pollData.endsAt));
-		const includePublicUser = !pollData?.voteTypes?.includes(EPollVotesType.ANONYMOUS) && !(pollData?.voteTypes?.includes(EPollVotesType.MASKED) && isPollEnded);
+		const includePublicUser = !pollData?.voteTypes?.includes(EPollVotesType.ANONYMOUS) && (!pollData?.voteTypes?.includes(EPollVotesType.MASKED) || isPollEnded);
 
 		const votesDoc = await pollDoc.ref.collection('votes').where('isDeleted', '==', false).get();
 		if (votesDoc.empty) {

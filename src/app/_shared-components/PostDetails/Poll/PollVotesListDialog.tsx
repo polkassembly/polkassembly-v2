@@ -61,7 +61,10 @@ function PollVotesListDialog({ votes, poll, loading }: { votes: IPollVote[]; pol
 				<div className={classes.pollVotesList}>
 					<div className={classes.pollTitle}>{poll.title}</div>
 					<div className={classes.pollVotesListWrapper}>
-						<div className={`grid grid-cols-${poll.options.length} gap-2`}>
+						<div
+							className='grid gap-2'
+							style={{ gridTemplateColumns: `repeat(${poll.options.length}, 1fr)` }}
+						>
 							{Object.entries(voteStats).map(([option, { count }]) => (
 								<Button
 									variant='ghost'
