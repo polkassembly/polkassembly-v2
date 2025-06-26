@@ -16,10 +16,12 @@ import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
+import dynamic from 'next/dynamic';
 import ListingTab from '../ListingTab/ListingTab';
-import ExternalTab from '../ExternalTab';
 import styles from './ListingPage.module.scss';
-import TrackAnalytics from '../TrackAnalytics/TrackAnalytics';
+
+const TrackAnalytics = dynamic(() => import('../TrackAnalytics/TrackAnalytics'), { ssr: false });
+const ExternalTab = dynamic(() => import('../ExternalTab'), { ssr: false });
 
 // Constants
 enum EListingTabState {
