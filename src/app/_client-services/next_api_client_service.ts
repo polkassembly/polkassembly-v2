@@ -548,7 +548,7 @@ export class NextApiClientService {
 	}: {
 		proposalType: EProposalType;
 		index: string;
-		data: { title: string; content: string; linkedPost?: IPostLink };
+		data: { title: string; content: string; allowedCommentor: EAllowedCommentor; linkedPost?: IPostLink };
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
