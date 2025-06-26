@@ -34,19 +34,19 @@ function UnlockSuccessModal({ open, setOpen, address, unlockedAmount }: UnlockSu
 			open={open}
 			onOpenChange={setOpen}
 		>
-			<DialogContent className={classes.dialogContent}>
+			<DialogContent className={`${classes.dialogContent} ${classes.dialog}`}>
 				<DialogHeader className='border-0 p-4'>
 					<DialogTitle className={classes.dialogTitle}>
 						<Image
 							src={TreasureChestOpenIcon}
 							alt='Unlock Success'
-							width={100}
-							height={100}
+							width={120}
+							height={120}
 						/>
 					</DialogTitle>
 				</DialogHeader>
 
-				<div className={classes.dialogContent}>
+				<div className={classes.contentContainer}>
 					<h2 className={classes.title}>{t('Profile.unlockSuccess')}</h2>
 					<span className={classes.amountValue}>{formattedUnlockedAmount}</span>
 					{nextUnlockData && (

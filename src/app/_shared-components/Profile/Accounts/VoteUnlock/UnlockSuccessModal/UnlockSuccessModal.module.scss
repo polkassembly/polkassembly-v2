@@ -1,5 +1,5 @@
 .dialog {
-	@apply border-4 border-border_blue;
+	@apply border-4 border-gold_balance;
 }
 
 .unlockBalanceButton {
@@ -7,11 +7,15 @@
 }
 
 .dialogContent {
-	@apply mt-4 flex w-full max-w-[500px] flex-col items-center gap-4 p-4;
+	@apply w-full max-w-[500px];
+}
+
+.contentContainer {
+	@apply mt-4 flex w-full flex-col items-center gap-4 p-4;
 }
 
 .dialogTitle {
-	@apply absolute -top-[40px] left-1/2 flex -translate-x-1/2 items-center justify-center text-lg font-semibold text-text_primary;
+	@apply absolute -top-[75px] left-1/2 flex -translate-x-1/2 items-center justify-center text-lg font-semibold text-text_primary;
 }
 
 .title {
@@ -19,7 +23,7 @@
 }
 
 .amountValue {
-	@apply text-center text-lg font-bold text-text_primary;
+	@apply text-center text-2xl font-bold text-text_pink;
 }
 
 .card {

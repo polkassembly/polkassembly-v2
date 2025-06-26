@@ -99,7 +99,7 @@ function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnloc
 			open={open}
 			onOpenChange={handleOpenChange}
 		>
-			<DialogContent className={classes.dialogContent}>
+			<DialogContent className={`${classes.dialogContent} ${classes.dialog}`}>
 				<DialogHeader className='border-0 p-4'>
 					<DialogTitle className={classes.dialogTitle}>
 						<Image
