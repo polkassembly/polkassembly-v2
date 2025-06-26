@@ -11,6 +11,7 @@ import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
 import {
 	ENetwork,
+	EProposalType,
 	IContentSummary,
 	IDelegateDetails,
 	IDelegationStats,
@@ -88,8 +89,8 @@ export class RedisService {
 		},
 		[ERedisKeys.REFRESH_TOKEN_SET]: (userId: number): string => `${ERedisKeys.REFRESH_TOKEN_SET}-${userId}`,
 		[ERedisKeys.REFRESH_TOKEN_ITEM]: (userId: number, tokenId: string): string => `${ERedisKeys.REFRESH_TOKEN_ITEM}-${userId}-${tokenId}`,
-		[ERedisKeys.POST_DATA]: (network: string, proposalType: string, indexOrHash: string): string => `${ERedisKeys.POST_DATA}-${network}-${proposalType}-${indexOrHash}`,
-		[ERedisKeys.POSTS_LISTING]: (network: string, proposalType: string, page: number, limit: number, statuses?: string[], origins?: string[], tags?: string[]): string => {
+		[ERedisKeys.POST_DATA]: (network: string, proposalType: EProposalType, indexOrHash: string): string => `${ERedisKeys.POST_DATA}-${network}-${proposalType}-${indexOrHash}`,
+		[ERedisKeys.POSTS_LISTING]: (network: string, proposalType: EProposalType, page: number, limit: number, statuses?: string[], origins?: string[], tags?: string[]): string => {
 			const baseKey = `${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-${page}-${limit}`;
 			const statusesPart = statuses?.length ? `-s:${statuses.sort().join(',')}` : '';
 			const originsPart = origins?.length ? `-o:${origins.sort().join(',')}` : '';
@@ -106,7 +107,7 @@ export class RedisService {
 			return `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-${userId}-${page}-${limit}`;
 		},
 		[ERedisKeys.QR_SESSION]: (sessionId: string): string => `${ERedisKeys.QR_SESSION}-${sessionId}`,
-		[ERedisKeys.CONTENT_SUMMARY]: ({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): string =>
+		[ERedisKeys.CONTENT_SUMMARY]: ({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: EProposalType }): string =>
 			`${ERedisKeys.CONTENT_SUMMARY}-${network}-${proposalType}-${indexOrHash}`,
 		[ERedisKeys.DELEGATION_STATS]: (network: string): string => `${ERedisKeys.DELEGATION_STATS}-${network}`,
 		[ERedisKeys.DELEGATE_DETAILS]: (network: string): string => `${ERedisKeys.DELEGATE_DETAILS}-${network}`,
@@ -319,12 +320,12 @@ export class RedisService {
 	}
 
 	// Posts caching methods
-	static async GetPostData({ network, proposalType, indexOrHash }: { network: string; proposalType: string; indexOrHash: string }): Promise<IPost | null> {
+	static async GetPostData({ network, proposalType, indexOrHash }: { network: string; proposalType: EProposalType; indexOrHash: string }): Promise<IPost | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash) });
 		return data ? (deepParseJson(data) as IPost) : null;
 	}
 
-	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: string; indexOrHash: string; data: IPost }): Promise<void> {
+	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: EProposalType; indexOrHash: string; data: IPost }): Promise<void> {
 		const isActivePost = data.onChainInfo?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.onChainInfo?.status);
 
 		await this.Set({
@@ -334,7 +335,7 @@ export class RedisService {
 		});
 	}
 
-	static async DeletePostData({ network, proposalType, indexOrHash }: { network: string; proposalType: string; indexOrHash: string }): Promise<void> {
+	static async DeletePostData({ network, proposalType, indexOrHash }: { network: string; proposalType: EProposalType; indexOrHash: string }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash) });
 	}
 
@@ -348,7 +349,7 @@ export class RedisService {
 		tags
 	}: {
 		network: string;
-		proposalType: string;
+		proposalType: EProposalType;
 		page: number;
 		limit: number;
 		statuses?: string[];
@@ -370,7 +371,7 @@ export class RedisService {
 		tags
 	}: {
 		network: string;
-		proposalType: string;
+		proposalType: EProposalType;
 		page: number;
 		limit: number;
 		data: IGenericListingResponse<IPostListing>;
@@ -385,11 +386,11 @@ export class RedisService {
 		});
 	}
 
-	static async DeletePostsListing({ network, proposalType }: { network: string; proposalType: string }): Promise<void> {
+	static async DeletePostsListing({ network, proposalType }: { network: string; proposalType: EProposalType }): Promise<void> {
 		await this.DeleteKeys({ pattern: `${ERedisKeys.POSTS_LISTING}-${network}-${proposalType}-*` });
 	}
 
-	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<IContentSummary | null> {
+	static async GetContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: EProposalType }): Promise<IContentSummary | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY]({ network, indexOrHash, proposalType }) });
 		return data ? (deepParseJson(data) as IContentSummary) : null;
 	}
@@ -402,13 +403,13 @@ export class RedisService {
 	}: {
 		network: string;
 		indexOrHash: string;
-		proposalType: string;
+		proposalType: EProposalType;
 		data: IContentSummary;
 	}): Promise<void> {
 		await this.Set({ key: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY]({ network, indexOrHash, proposalType }), value: JSON.stringify(data), ttlSeconds: ONE_DAY_IN_SECONDS });
 	}
 
-	static async DeleteContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: string }): Promise<void> {
+	static async DeleteContentSummary({ network, indexOrHash, proposalType }: { network: string; indexOrHash: string; proposalType: EProposalType }): Promise<void> {
 		await this.DeleteKeys({ pattern: this.redisKeysMap[ERedisKeys.CONTENT_SUMMARY]({ network, indexOrHash, proposalType }) });
 	}
 
