@@ -18,7 +18,7 @@ export default function NotFound() {
 			/>
 
 			<h2 className='text-xl font-semibold'>Page Not Found</h2>
-			<p className='text-text_secondary py-4'>The page you&apos;re looking for doesn&apos;t exist or has been moved.</p>
+			<p className='text-text_secondary py-4'>The page you&apos;re looking for doesn&apos;t exist or has been moved or the resource has been deleted.</p>
 			<small>
 				Please check the URL or navigate back to continue browsing.{' '}
 				<a
