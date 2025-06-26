@@ -2234,7 +2234,11 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		assethubDetails: ASSETHUB_DETAILS[ENetwork.KUSAMA],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.KUSAMA],
 		socialLinks: networkSocialLinks[ENetwork.KUSAMA],
-		convictionVotingPeriodInBlocks: new BN('100800')
+		convictionVotingPeriodInBlocks: new BN('100800'),
+		openGraphImage: {
+			large: 'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fkusama.png?alt=media&token=82219f8f-c3bb-4c87-950c-7fcecfdca883',
+			small: 'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fkusama-small.png?alt=media&token=a268b1d7-ea0c-4b03-a423-db93ac1f0d4e'
+		}
 	},
 	[ENetwork.WESTEND]: {
 		key: ENetwork.WESTEND,
