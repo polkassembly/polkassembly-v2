@@ -11,7 +11,7 @@ import DelegationVotesByConvictions from './DelegationVotesByConviction';
 import { Separator } from '../../Separator';
 import VotesTiles from '../VotesTiles/VotesTiles';
 
-function VotesAnalytics({ votesAnalytics, index, proposalType }: { votesAnalytics: IAnalytics; index: number; proposalType: EProposalType }) {
+function VotesAnalytics({ votesAnalytics, index, proposalType }: { votesAnalytics: IAnalytics; index: string; proposalType: EProposalType }) {
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex gap-4 max-lg:flex-col'>

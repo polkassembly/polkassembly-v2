@@ -1263,6 +1263,8 @@ export interface IParachain {
 }
 
 export enum EHttpHeaderKey {
+	CONTENT_TYPE = 'content-type',
+	API_KEY = 'x-api-key',
 	SKIP_CACHE = 'x-skip-cache',
 	TOOLS_PASSPHRASE = 'x-tools-passphrase',
 	NETWORK = 'x-network'

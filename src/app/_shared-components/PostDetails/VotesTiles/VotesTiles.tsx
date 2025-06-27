@@ -191,7 +191,7 @@ const useChartData = ({ allVotes, votesType }: { allVotes: IVoteDistribution[]; 
 };
 
 // Component
-function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EProposalType; index: number; analyticsType: EAnalyticsType }) {
+function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EProposalType; index: string; analyticsType: EAnalyticsType }) {
 	const t = useTranslations('PostDetails.VotesTiles');
 	const network = getCurrentNetwork();
 	const [votesType, setVotesType] = useState<EPostTileVotesType>(EPostTileVotesType.FLATTENED);

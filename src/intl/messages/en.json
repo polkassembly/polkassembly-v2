@@ -527,6 +527,8 @@
 			"accountAnalyticsDes": "Accounts are the number of unique addresses casting a vote",
 			"votesAnalyticsDes": "Vote amount is the number of tokens used for voting"
 		},
+		"commentsDisabled": "Comments have been disabled for this post.",
+		"commentsDisabledForNonVerifiedUsers": "Comments have been disabled for non verified users.",
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",
@@ -728,6 +730,7 @@
 		"edit": "Edit",
 		"title": "Title",
 		"content": "Content",
+		"whoCanComment": "Who can comment?",
 		"save": "Save",
 		"editPostButton": "Edit",
 		"success": "Post updated successfully",

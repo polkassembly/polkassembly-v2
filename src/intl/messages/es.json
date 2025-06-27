@@ -581,7 +581,9 @@
 			"payoutClaimFailed": "Error al reclamar el pago",
 			"payoutClaimedSuccessfullyDescription": "Su pago ha sido reclamado con éxito",
 			"payoutClaimFailedDescription": "Por favor, inténtelo de nuevo"
-		}
+		},
+		"commentsDisabled": "Los comentarios han sido desactivados para esta publicación.",
+		"commentsDisabledForNonVerifiedUsers": "Los comentarios han sido desactivados para usuarios no verificados."
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",
@@ -697,7 +699,8 @@
 		"success": "Publicación actualizada con éxito",
 		"successDescription": "Tu publicación ha sido actualizada con éxito",
 		"error": "Error al actualizar la publicación",
-		"errorDescription": "Hubo un error al actualizar tu publicación"
+		"errorDescription": "Hubo un error al actualizar tu publicación",
+		"whoCanComment": "¿Quién puede comentar?"
 	},
 	"Footer": {
 		"helpCenter": "Centro de Ayuda",

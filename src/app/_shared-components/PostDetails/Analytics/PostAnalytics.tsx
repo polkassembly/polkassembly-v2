@@ -14,7 +14,7 @@ import ConvictionsAnalytics from './ConvictionsAnalytics';
 import { Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from '../../Select/Select';
 import VotesAnalytics from './VotesAnalytics';
 
-function PostAnalytics({ analytics, isFetching, proposalType, index }: { analytics?: IPostAnalytics; isFetching: boolean; proposalType: EProposalType; index: number }) {
+function PostAnalytics({ analytics, isFetching, proposalType, index }: { analytics?: IPostAnalytics; isFetching: boolean; proposalType: EProposalType; index: string }) {
 	const t = useTranslations('PostDetails');
 	const { userPreferences } = useUserPreferences();
 	const { theme } = userPreferences;
