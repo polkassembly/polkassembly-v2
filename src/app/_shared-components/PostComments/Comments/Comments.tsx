@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EProposalType, EReactQueryKeys, ICommentResponse } from '@/_shared/types';
+import { EAllowedCommentor, EProposalType, EReactQueryKeys, ICommentResponse } from '@/_shared/types';
 import { useMemo, useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
@@ -15,12 +15,26 @@ import { FaChevronDown } from '@react-icons/all-files/fa/FaChevronDown';
 import { FaChevronUp } from '@react-icons/all-files/fa/FaChevronUp';
 
 import { useTranslations } from 'next-intl';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useIdentityService } from '@/hooks/useIdentityService';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import SingleComment from '../SingleComment/SingleComment';
 import AddComment from '../AddComment/AddComment';
 import classes from './Comments.module.scss';
 
-function Comments({ comments, proposalType, index }: { comments: ICommentResponse[]; proposalType: EProposalType; index: string }) {
+function Comments({
+	comments,
+	proposalType,
+	index,
+	allowedCommentor,
+	postUserId
+}: {
+	comments: ICommentResponse[];
+	proposalType: EProposalType;
+	index: string;
+	allowedCommentor: EAllowedCommentor;
+	postUserId?: number;
+}) {
 	const t = useTranslations();
 	const user = useAtomValue(userAtom);
 	const [showMore, setShowMore] = useState(false);
@@ -39,6 +53,34 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 	const handleShowLess = () => {
 		setShowMore(false);
 	};
+
+	const { getOnChainIdentity, identityService } = useIdentityService();
+
+	const fetchOnChainIdentity = async () => {
+		if (!user?.addresses?.length || !user?.id) return [];
+
+		return Promise.all(user.addresses.map((address) => getOnChainIdentity(address)));
+	};
+
+	const { data: onchainIdentities } = useQuery({
+		queryKey: ['onchainIdentities', user?.id],
+		queryFn: fetchOnChainIdentity,
+		enabled: !!user?.id && !!identityService,
+		staleTime: FIVE_MIN_IN_MILLI,
+		retry: true,
+		refetchOnWindowFocus: true,
+		refetchOnMount: true
+	});
+
+	const { canComment, commentDisabledMessage } = useMemo(() => {
+		if (user && postUserId && user.id === postUserId) return { canComment: true, commentDisabledMessage: '' };
+		if (allowedCommentor === EAllowedCommentor.ALL) return { canComment: true, commentDisabledMessage: '' };
+		if (allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED) {
+			return { canComment: onchainIdentities?.some((identity) => identity?.isVerified), commentDisabledMessage: t('PostDetails.commentsDisabledForNonVerifiedUsers') };
+		}
+		return { canComment: !(allowedCommentor === EAllowedCommentor.NONE), commentDisabledMessage: t('PostDetails.commentsDisabled') };
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [allowedCommentor, onchainIdentities]);
 
 	return (
 		<div className={classes.wrapper}>
@@ -103,25 +145,29 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 			</div>
 
 			{user ? (
-				<div className='w-full px-6 py-6'>
-					<AddComment
-						id='commentForm'
-						proposalType={proposalType}
-						proposalIndex={index}
-						onConfirm={(newComment, publicUser) => {
-							queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [...(prev || []), { ...newComment, user: publicUser }]);
-						}}
-					/>
-				</div>
+				canComment ? (
+					<div className='w-full px-6 py-6'>
+						<AddComment
+							id='commentForm'
+							proposalType={proposalType}
+							proposalIndex={index}
+							onConfirm={(newComment, publicUser) => {
+								queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [...(prev || []), { ...newComment, user: publicUser }]);
+							}}
+						/>
+					</div>
+				) : (
+					<div className={classes.loginToComment}>
+						<p className='text-sm text-text_primary'>{commentDisabledMessage}</p>
+					</div>
+				)
 			) : (
-				<div
-					className={classes.loginToComment}
-					id='commentLoginPrompt'
-				>
+				<div className={classes.loginToComment}>
 					{t('PostDetails.please')}
 					<Link
 						className='text-text_pink'
 						href='/login'
+						id='commentLoginPrompt'
 					>
 						{t('PostDetails.login')}
 					</Link>{' '}
