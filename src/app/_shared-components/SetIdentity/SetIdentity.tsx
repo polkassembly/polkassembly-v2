@@ -31,6 +31,7 @@ import SetIdentityFees from './SetIdentityFees/SetIdentityFees';
 import SocialVerifications from './SocialVerifications/SocialVerifications';
 import IdentitySuccessScreen from './IdentitySuccessScreen/IdentitySuccessScreen';
 import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
+import IdentityFeeCollaps from './IdentityFeeCollaps/IdentityFeeCollaps';
 
 interface ISetIdentityFormFields {
 	displayName: string;
@@ -98,6 +99,29 @@ function SetIdentity() {
 		refetchOnWindowFocus: false
 	});
 
+	const fetchGasFee = async () => {
+		if (!identityService) return null;
+
+		const gasFee = await identityService.getGasFee({
+			address: userPreferences.selectedAccount?.address || '',
+			registrarFee: registrarFee || BN_ZERO,
+			displayName: formData.getValues('displayName'),
+			email: formData.getValues('email'),
+			legalName: formData.getValues('legalName'),
+			twitter: formData.getValues('twitter'),
+			matrix: formData.getValues('matrix')
+		});
+
+		return gasFee ? new BN(gasFee) : BN_ZERO;
+	};
+	const { data: gasFee } = useQuery({
+		queryKey: ['gasFee', user?.id, userPreferences.selectedAccount?.address, formData.getValues('displayName'), formData.getValues('email')],
+		queryFn: () => fetchGasFee(),
+		placeholderData: (previousData) => previousData,
+		staleTime: FIVE_MIN_IN_MILLI,
+		retry: false
+	});
+
 	useEffect(() => {
 		const setDefaultIdentityValues = async () => {
 			if (!identityService || !network || !userPreferences.selectedAccount?.address) return;
@@ -140,12 +164,12 @@ function SetIdentity() {
 				});
 				setStep(ESetIdentityStep.IDENTITY_SUCCESS);
 			},
-			onFailed: () => {
+			onFailed: (errorMessageFallback?: string) => {
 				setLoading(false);
 				toast({
 					status: ENotificationStatus.ERROR,
 					title: t('SetIdentity.failed'),
-					description: t('SetIdentity.failedDescription')
+					description: errorMessageFallback || t('SetIdentity.failedDescription')
 				});
 			}
 		});
@@ -350,6 +374,11 @@ function SetIdentity() {
 						)}
 					/>
 				</div>
+				<IdentityFeeCollaps
+					className='mt-4'
+					registrarFee={registrarFee || BN_ZERO}
+					gasFee={gasFee || BN_ZERO}
+				/>
 				<Separator className='my-4' />
 				<div className='flex justify-end'>
 					<Button

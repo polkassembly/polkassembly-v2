@@ -121,12 +121,14 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								/>
 							</TabsContent>
 						</div>
-						<div className={classes.commentsBox}>
+						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
 							<PostComments
 								proposalType={post.proposalType}
 								index={index}
 								contentSummary={post.contentSummary}
 								comments={post.comments}
+								allowedCommentor={post.allowedCommentor}
+								postUserId={post.userId}
 							/>
 						</div>
 						{isModalOpen && !isOffchainPost && (
@@ -223,6 +225,19 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							<Poll poll={post.poll} />
 						</div>
 					)}
+
+					<div className={cn(classes.leftWrapper, 'xl:hidden')}>
+						<div className={classes.commentsBox}>
+							<PostComments
+								proposalType={post.proposalType}
+								index={index}
+								contentSummary={post.contentSummary}
+								comments={post.comments}
+								allowedCommentor={post.allowedCommentor}
+								postUserId={post.userId}
+							/>
+						</div>
+					</div>
 				</div>
 			</Tabs>
 		</>

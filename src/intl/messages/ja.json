@@ -548,7 +548,9 @@
 			"payoutClaimFailed": "支払いの請求に失敗しました",
 			"payoutClaimedSuccessfullyDescription": "支払いが正常に請求されました",
 			"payoutClaimFailedDescription": "もう一度お試しください"
-		}
+		},
+		"commentsDisabled": "この投稿のコメントは無効になっています。",
+		"commentsDisabledForNonVerifiedUsers": "未認証ユーザーのコメントは無効になっています。"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",
@@ -664,7 +666,8 @@
 		"success": "投稿が正常に更新されました",
 		"successDescription": "あなたの投稿は正常に更新されました",
 		"error": "投稿の更新に失敗しました",
-		"errorDescription": "投稿の更新中にエラーが発生しました"
+		"errorDescription": "投稿の更新中にエラーが発生しました",
+		"whoCanComment": "誰がコメントできますか？"
 	},
 	"Footer": {
 		"helpCenter": "ヘルプセンター",
@@ -719,6 +722,17 @@
 		"titleTooShort": "有効なタイトルを入力してください。",
 		"titlePlaceholder": "タイトルを入力",
 		"descriptionRequired": "有効な説明を入力してください。",
+		"UploadImage": {
+			"uploadImage": "画像をアップロード",
+			"uploadFromDevice": "デバイスからアップロード",
+			"addFromURL": "URLから追加",
+			"alt": "代替テキスト",
+			"title": "タイトル",
+			"save": "保存",
+			"cancel": "キャンセル",
+			"insertImage": "画像を挿入",
+			"failedToUploadImage": "画像のアップロードに失敗しました"
+		},
 		"AllowedCommentors": {
 			"advanced": "詳細",
 			"title": "誰がコメントできますか？",
@@ -821,9 +835,10 @@
 		"identityDescription1": "Polkadotは、任命された登録機関を通じてユーザーの資格情報を検証するオンチェーンアイデンティティを提供し、より大きな信頼とサポートを生み出します。",
 		"identityDescription2": "検証が成功すると、ユーザーは信頼できるステータスを象徴する緑のチェックマークを受け取ります。この検証済みステータスシンボルは、財務部からの資金要請や議論・提案への参加時の信頼性を高めます。",
 		"letBegin": "始めましょう",
-		"requestJudgement": "判断を要請",
-		"minimumDeposit": "最低デポジット",
-		"registrarFee": "登録機関手数料",
+		"requestJudgement": "判定をリクエスト",
+		"minimumDeposit": "最低預入額",
+		"registrarFee": "レジストラ料金",
+		"gasFee": "ガス料金",
 		"totalAmountRequired": "必要総額",
 		"viewAmountBreakup": "金額の内訳を表示",
 		"registrarFees": "登録機関手数料",

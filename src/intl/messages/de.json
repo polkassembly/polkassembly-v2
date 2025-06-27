@@ -547,7 +547,9 @@
 			"payoutClaimFailed": "Auszahlung konnte nicht beansprucht werden",
 			"payoutClaimedSuccessfullyDescription": "Ihre Auszahlung wurde erfolgreich beansprucht",
 			"payoutClaimFailedDescription": "Bitte versuchen Sie es erneut"
-		}
+		},
+		"commentsDisabled": "Die Kommentare wurden für diesen Beitrag deaktiviert.",
+		"commentsDisabledForNonVerifiedUsers": "Kommentare wurden für nicht verifizierte Benutzer deaktiviert."
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",
@@ -663,7 +665,8 @@
 		"success": "Beitrag erfolgreich aktualisiert",
 		"successDescription": "Ihr Beitrag wurde erfolgreich aktualisiert",
 		"error": "Beitrag konnte nicht aktualisiert werden",
-		"errorDescription": "Beim Aktualisieren Ihres Beitrags ist ein Fehler aufgetreten"
+		"errorDescription": "Beim Aktualisieren Ihres Beitrags ist ein Fehler aufgetreten",
+		"whoCanComment": "Wer kann kommentieren?"
 	},
 	"Footer": {
 		"helpCenter": "Hilfezentrum",
@@ -718,6 +721,17 @@
 		"titleTooShort": "Bitte geben Sie einen gültigen Titel ein.",
 		"titlePlaceholder": "Titel eingeben",
 		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung ein.",
+		"UploadImage": {
+			"uploadImage": "Bild hochladen",
+			"uploadFromDevice": "Vom Gerät hochladen",
+			"addFromURL": "Von URL hinzufügen",
+			"alt": "Alt",
+			"title": "Titel",
+			"save": "Speichern",
+			"cancel": "Abbrechen",
+			"insertImage": "Bild einfügen",
+			"failedToUploadImage": "Bild konnte nicht hochgeladen werden"
+		},	
 		"AllowedCommentors": {
 			"advanced": "Erweitert",
 			"title": "Wer kann kommentieren?",
@@ -823,8 +837,9 @@
 		"requestJudgement": "Beurteilung anfordern",
 		"minimumDeposit": "Mindesteinzahlung",
 		"registrarFee": "Registrierungsgebühr",
-		"totalAmountRequired": "Erforderlicher Gesamtbetrag",
-		"viewAmountBreakup": "Aufschlüsselung des Betrags anzeigen",
+		"gasFee": "Gebühr",
+		"totalAmountRequired": "Gesamtbetrag erforderlich",
+		"viewAmountBreakup": "Betragsaufschlüsselung anzeigen",
 		"registrarFees": "Registrierungsgebühren",
 		"success": "Identität erfolgreich festgelegt",
 		"successDescription": "Ihre Identität wurde erfolgreich festgelegt",

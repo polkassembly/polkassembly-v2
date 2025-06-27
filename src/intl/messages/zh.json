@@ -548,7 +548,9 @@
 			"payoutClaimFailed": "支付认领失败",
 			"payoutClaimedSuccessfullyDescription": "您的支付已成功认领",
 			"payoutClaimFailedDescription": "请再试一次"
-		}
+		},
+		"commentsDisabled": "此帖子的评论功能已被禁用。",
+		"commentsDisabledForNonVerifiedUsers": "未验证用户的评论功能已被禁用。"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "已取消",
@@ -664,7 +666,8 @@
 		"success": "帖子更新成功",
 		"successDescription": "您的帖子已成功更新",
 		"error": "更新帖子失败",
-		"errorDescription": "更新帖子时发生错误"
+		"errorDescription": "更新帖子时发生错误",
+		"whoCanComment": "谁可以评论？"
 	},
 	"Footer": {
 		"helpCenter": "帮助中心",
@@ -719,6 +722,17 @@
 		"titleTooShort": "请提供有效的标题。",
 		"titlePlaceholder": "输入标题",
 		"descriptionRequired": "请提供有效的描述。",
+		"UploadImage": {
+			"uploadImage": "上传图片",
+			"uploadFromDevice": "从设备上传",
+			"addFromURL": "从URL添加",
+			"alt": "替代文本",
+			"title": "标题",
+			"save": "保存",
+			"cancel": "取消",
+			"insertImage": "插入图片",
+			"failedToUploadImage": "上传图片失败"
+		},
 		"AllowedCommentors": {
 			"advanced": "高级",
 			"title": "谁可以评论？",
@@ -824,6 +838,7 @@
 		"requestJudgement": "请求判断",
 		"minimumDeposit": "最低存款",
 		"registrarFee": "注册商费用",
+		"gasFee": "Gas 费用",
 		"totalAmountRequired": "所需总金额",
 		"viewAmountBreakup": "查看金额明细",
 		"registrarFees": "注册商费用",
