@@ -502,6 +502,13 @@
 		"aiSummary": "Resumen de IA",
 		"showLikelySpam": "Mostrar spam probable",
 		"hideLikelySpam": "Ocultar spam probable",
+		"HighlightMenu": {
+			"quote": "Citar",
+			"share": "Compartir",
+			"copy": "Copiar",
+			"textCopiedToClipboard": "Texto copiado al portapapeles",
+			"failedToCopyText": "Error al copiar el texto"
+		},
 		"voted": "Votado",
 		"votes": "Votos",
 		"vote": "Voto",

@@ -17,6 +17,7 @@ import type { Components } from 'react-markdown';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import Image from 'next/image';
 import Link from 'next/link';
+import HighlightMenu from '../HighlightMenu/HighlightMenu';
 
 const extractUrlsAndEmails = (text: string): string[] => {
 	const words = text.split(/\s+/);
@@ -330,6 +331,7 @@ export function MarkdownViewer(props: ReactMarkdownProps) {
 				ref={editorRef}
 				className={cn('markdown-body', truncate && !showMore ? `line-clamp-${maxLines}` : 'line-clamp-none', 'w-full', className)}
 			>
+				<HighlightMenu markdownRef={editorRef} />
 				<ReactMarkdownLib
 					components={markdownComponents}
 					remarkPlugins={[remarkGfm, remarkBreaks]}
