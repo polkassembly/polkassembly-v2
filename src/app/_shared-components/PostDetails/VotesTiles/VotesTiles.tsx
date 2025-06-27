@@ -187,7 +187,7 @@ const useChartData = ({ allVotes, votesType }: { allVotes: IVoteDistribution[]; 
 		}
 		return payload;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [allVotes, t, network, votesType]);
+	}, [allVotes, network, t, votesType]);
 };
 
 // Component
@@ -212,7 +212,10 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 	const { data: votesTilesData, isFetching } = useQuery({
 		queryKey: ['postTilesVotes', proposalType, index, analyticsType, votesType],
 		queryFn: getPostAnalytics,
-		enabled: !!proposalType && !!index
+		enabled: !!proposalType && !!index,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+		retry: false
 	});
 
 	const allVotes = useVotesDistribution({ votesTilesData: votesTilesData?.votes || { aye: [], nay: [], abstain: [] } });

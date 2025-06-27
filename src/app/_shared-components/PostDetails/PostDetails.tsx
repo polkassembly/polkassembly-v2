@@ -79,7 +79,10 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	const { data: analytics, isFetching: isAnalyticsFetching } = useQuery({
 		queryKey: ['postAnalytics', post?.proposalType, index],
 		queryFn: getPostAnalytics,
-		enabled: POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(post?.proposalType as EProposalType) && !!index
+		enabled: POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(post?.proposalType as EProposalType) && !!index,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+		retry: false
 	});
 
 	useEffect(() => {
