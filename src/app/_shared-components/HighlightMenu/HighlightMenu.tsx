@@ -12,12 +12,9 @@ import { useQuoteCommentText } from '@/hooks/useQuoteCommentText';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
-import LoginComponent from '@/app/login/Components/Login';
-import Image from 'next/image';
-import LoginToPaIcon from '@assets/icons/login-to-pa-icon.svg';
+import Link from 'next/link';
 import { Button } from '../Button';
 import classes from './HighlightMenu.module.scss';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../Dialog/Dialog';
 
 const SELECTION_DELAY = 150;
 const MENU_OFFSET_Y = 60;
@@ -31,7 +28,6 @@ function HighlightMenu({ markdownRef }: { markdownRef: React.RefObject<HTMLDivEl
 	const [selectedText, setSelectedText] = useState('');
 	const [menuPosition, setMenuPosition] = useState({ left: 0, top: 0 });
 	const [isVisible, setIsVisible] = useState(false);
-	const [openLoginModal, setOpenLoginModal] = useState(false);
 
 	const menuRef = useRef<HTMLDivElement>(null);
 	const selectionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -134,19 +130,18 @@ function HighlightMenu({ markdownRef }: { markdownRef: React.RefObject<HTMLDivEl
 
 	const handleQuote = useCallback(
 		(event: React.MouseEvent) => {
-			event.stopPropagation();
-			event.preventDefault();
 			setQuoteCommentText(selectedText || '');
 
 			if (user) {
 				// Scroll to comment form if user is logged in
+				event.preventDefault();
+				event.stopPropagation();
 				const commentForm = document.getElementById('commentForm');
 				commentForm?.scrollIntoView({ behavior: 'smooth', block: 'center' });
 			} else {
 				// Scroll to login prompt if user is not logged in
 				const loginPrompt = document.getElementById('commentLoginPrompt');
 				loginPrompt?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-				setOpenLoginModal(true);
 			}
 
 			clearSelection();
@@ -214,66 +209,55 @@ function HighlightMenu({ markdownRef }: { markdownRef: React.RefObject<HTMLDivEl
 	}
 
 	return (
-		<>
-			<div
-				ref={menuRef}
-				className={classes.container}
-				style={{
-					left: `${menuPosition.left}px`,
-					top: `${menuPosition.top - MENU_VISUAL_ADJUSTMENT}px`,
-					transform: 'translateX(-50%)'
-				}}
+		<div
+			ref={menuRef}
+			className={classes.container}
+			style={{
+				left: `${menuPosition.left}px`,
+				top: `${menuPosition.top - MENU_VISUAL_ADJUSTMENT}px`,
+				transform: 'translateX(-50%)'
+			}}
+		>
+			<Button
+				variant='ghost'
+				size='sm'
+				className={cn(classes.button, 'h-6')}
+				onClick={handleQuote}
 			>
-				<Button
-					variant='ghost'
-					size='sm'
-					className={cn(classes.button, 'h-6')}
-					onClick={handleQuote}
-				>
-					<TextQuote className='w-3 text-basic_text' />
-					<span className={classes.buttonText}>{t('PostDetails.HighlightMenu.quote')}</span>
-				</Button>
-				<Button
-					variant='ghost'
-					size='sm'
-					className={cn(classes.button, 'h-6')}
-					onClick={shareSelection}
-				>
-					<FaTwitter className='w-3 text-basic_text' />
-					<span className={classes.buttonText}>{t('PostDetails.HighlightMenu.share')}</span>
-				</Button>
-				<Button
-					variant='ghost'
-					size='sm'
-					className={cn(classes.button, 'h-6')}
-					onClick={handleCopy}
-				>
-					<FaCopy className='w-3 text-basic_text' />
-					<span className={classes.buttonText}>{t('PostDetails.HighlightMenu.copy')}</span>
-				</Button>
-			</div>
-			<Dialog
-				open={openLoginModal}
-				onOpenChange={setOpenLoginModal}
+				{user ? (
+					<div className='flex cursor-pointer items-center gap-x-1'>
+						<TextQuote className='w-3 text-basic_text' />
+						<span className={classes.buttonText}>{t('PostDetails.HighlightMenu.quote')}</span>
+					</div>
+				) : (
+					<Link
+						href='/login'
+						className='flex items-center gap-x-1 hover:no-underline'
+					>
+						<TextQuote className='w-3 text-basic_text' />
+						<span className={classes.buttonText}>{t('PostDetails.HighlightMenu.quote')}</span>
+					</Link>
+				)}
+			</Button>
+			<Button
+				variant='ghost'
+				size='sm'
+				className={cn(classes.button, 'h-6')}
+				onClick={shareSelection}
 			>
-				<DialogContent className='@apply max-w-xl overflow-y-auto p-3 sm:p-6'>
-					<DialogHeader>
-						<DialogTitle>
-							<p className='flex items-center gap-x-2 text-lg font-semibold text-text_primary sm:text-xl'>
-								<Image
-									src={LoginToPaIcon}
-									alt='login to polkassembly'
-									height={24}
-									width={24}
-								/>
-								{t('Profile.loginToPolkassembly')}
-							</p>
-						</DialogTitle>
-					</DialogHeader>
-					<LoginComponent isModal />
-				</DialogContent>
-			</Dialog>
-		</>
+				<FaTwitter className='w-3 text-basic_text' />
+				<span className={classes.buttonText}>{t('PostDetails.HighlightMenu.share')}</span>
+			</Button>
+			<Button
+				variant='ghost'
+				size='sm'
+				className={cn(classes.button, 'h-6')}
+				onClick={handleCopy}
+			>
+				<FaCopy className='w-3 text-basic_text' />
+				<span className={classes.buttonText}>{t('PostDetails.HighlightMenu.copy')}</span>
+			</Button>
+		</div>
 	);
 }
 
