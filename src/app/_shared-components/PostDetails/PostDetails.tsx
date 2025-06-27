@@ -29,6 +29,7 @@ import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
 import PlaceDecisionDeposit from './PlaceDecisionDeposit/PlaceDecisionDeposit';
 import ClaimPayout from './ClaimPayout/ClaimPayout';
+import Poll from './Poll/Poll';
 
 const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), { ssr: false });
 
@@ -217,6 +218,13 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							<div className={classes.parentBountyCardWrapper}>
 								<ParentBountyCard parentBountyIndex={post.onChainInfo?.parentBountyIndex} />
 							</div>
+						</div>
+					)}
+
+					{/* Poll */}
+					{isOffchainPost && post?.poll && (
+						<div className={classes.rightWrapper}>
+							<Poll poll={post.poll} />
 						</div>
 					)}
 

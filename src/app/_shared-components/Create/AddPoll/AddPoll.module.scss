@@ -1,0 +1,36 @@
+.container {
+	@apply mt-2 flex-col items-center gap-2 rounded-md bg-info_bg p-4 text-sm font-medium text-basic_text;
+}
+.addPollText {
+	@apply text-sm font-medium;
+}
+.addPollHeader {
+	@apply flex w-full items-center justify-between gap-2;
+}
+.addPollSeparator {
+	@apply bg-border_grey;
+}
+.addPollContent {
+	@apply mt-3 flex flex-col gap-4;
+}
+.addPollLabel {
+	@apply text-sm font-medium;
+}
+.addPollCheckboxLabel {
+	@apply text-sm font-medium leading-none text-placeholder;
+}
+.pollOptionsContainer {
+	@apply flex flex-col gap-1;
+}
+.pollOptionInput {
+	@apply h-8 flex-1 rounded-md;
+}
+.pollOptionInputError {
+	@apply border-toast_error_border focus:border-toast_error_border;
+}
+.pollOptionInputErrorText {
+	@apply text-xs text-toast_error_text;
+}
+.addPollCheckbox {
+	@apply flex items-center space-x-2;
+}

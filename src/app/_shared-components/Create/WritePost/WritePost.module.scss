@@ -21,3 +21,7 @@
 .editor {
 	@apply text-sm;
 }
+
+.advancedContainer {
+	@apply flex flex-col items-center gap-2 rounded-md bg-info_bg p-4 text-sm font-medium text-basic_text;
+}
