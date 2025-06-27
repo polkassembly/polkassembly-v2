@@ -545,7 +545,9 @@
 			"payoutClaimFailed": "支付认领失败",
 			"payoutClaimedSuccessfullyDescription": "您的支付已成功认领",
 			"payoutClaimFailedDescription": "请再试一次"
-		}
+		},
+		"commentsDisabled": "此帖子的评论功能已被禁用。",
+		"commentsDisabledForNonVerifiedUsers": "未验证用户的评论功能已被禁用。"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "已取消",
@@ -661,7 +663,8 @@
 		"success": "帖子更新成功",
 		"successDescription": "您的帖子已成功更新",
 		"error": "更新帖子失败",
-		"errorDescription": "更新帖子时发生错误"
+		"errorDescription": "更新帖子时发生错误",
+		"whoCanComment": "谁可以评论？"
 	},
 	"Footer": {
 		"helpCenter": "帮助中心",

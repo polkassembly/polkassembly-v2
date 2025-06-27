@@ -693,6 +693,7 @@
 		"edit": "Edit",
 		"title": "Title",
 		"content": "Content",
+		"whoCanComment": "Who can comment?",
 		"save": "Save",
 		"editPostButton": "Edit",
 		"success": "Post updated successfully",

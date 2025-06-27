@@ -11,6 +11,59 @@ import classes from './ProposalPeriods.module.scss';
 
 const TOTAL_PERIODS = 3;
 
+function RenderPeriodProgress({
+	confirmationPeriodEnded,
+	proposalHasFailed,
+	preparePeriodEnded,
+	decisionPeriodEndsAt,
+	confirmationPeriodEndsAt,
+	preparePeriodEndsAt,
+	trackName
+}: {
+	confirmationPeriodEnded: boolean;
+	proposalHasFailed: boolean;
+	preparePeriodEnded: boolean;
+	decisionPeriodEndsAt?: Date;
+	confirmationPeriodEndsAt?: Date;
+	preparePeriodEndsAt?: Date;
+	trackName: EPostOrigin;
+}) {
+	const t = useTranslations();
+	if (confirmationPeriodEnded || proposalHasFailed) {
+		return null;
+	}
+
+	if (preparePeriodEnded) {
+		return (
+			<div className='flex flex-col gap-y-6'>
+				<PeriodProgress
+					periodEndsAt={decisionPeriodEndsAt}
+					periodName={t('PostDetails.decisionPeriod')}
+					trackName={trackName}
+					periodType={EPeriodType.DECISION}
+				/>
+				<PeriodProgress
+					periodEndsAt={confirmationPeriodEndsAt}
+					periodName={t('PostDetails.confirmationPeriod')}
+					trackName={trackName}
+					periodType={EPeriodType.CONFIRM}
+				/>
+			</div>
+		);
+	}
+
+	return (
+		<div>
+			<PeriodProgress
+				periodEndsAt={preparePeriodEndsAt}
+				periodName={t('PostDetails.preparePeriod')}
+				trackName={trackName}
+				periodType={EPeriodType.PREPARE}
+			/>
+		</div>
+	);
+}
+
 function ProposalPeriods({
 	confirmationPeriodEndsAt,
 	decisionPeriodEndsAt,
@@ -53,42 +106,6 @@ function ProposalPeriods({
 		return t('PostDetails.preparePeriod');
 	};
 
-	const renderPeriodProgress = () => {
-		if (confirmationPeriodEnded || proposalHasFailed) {
-			return null;
-		}
-
-		if (preparePeriodEnded) {
-			return (
-				<div className='flex flex-col gap-y-6'>
-					<PeriodProgress
-						periodEndsAt={decisionPeriodEndsAt}
-						periodName={t('PostDetails.decisionPeriod')}
-						trackName={trackName}
-						periodType={EPeriodType.DECISION}
-					/>
-					<PeriodProgress
-						periodEndsAt={confirmationPeriodEndsAt}
-						periodName={t('PostDetails.confirmationPeriod')}
-						trackName={trackName}
-						periodType={EPeriodType.CONFIRM}
-					/>
-				</div>
-			);
-		}
-
-		return (
-			<div>
-				<PeriodProgress
-					periodEndsAt={preparePeriodEndsAt}
-					periodName={t('PostDetails.preparePeriod')}
-					trackName={trackName}
-					periodType={EPeriodType.PREPARE}
-				/>
-			</div>
-		);
-	};
-
 	return (
 		<div className={classes.proposalPeriodsWrapper}>
 			<div className={classes.proposalPeriodsHeader}>
@@ -98,7 +115,15 @@ function ProposalPeriods({
 					<span className='pl-1 pr-2'>of {TOTAL_PERIODS}</span>
 				</div>
 			</div>
-			{renderPeriodProgress()}
+			<RenderPeriodProgress
+				confirmationPeriodEnded={confirmationPeriodEnded}
+				proposalHasFailed={proposalHasFailed}
+				preparePeriodEnded={preparePeriodEnded}
+				decisionPeriodEndsAt={decisionPeriodEndsAt}
+				confirmationPeriodEndsAt={confirmationPeriodEndsAt}
+				preparePeriodEndsAt={preparePeriodEndsAt}
+				trackName={trackName}
+			/>
 		</div>
 	);
 }

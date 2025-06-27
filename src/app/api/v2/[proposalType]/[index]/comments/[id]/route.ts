@@ -16,12 +16,13 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { AIService } from '@/app/api/_api-services/ai_service';
+import { EProposalType } from '@/_shared/types';
 
 const SET_COOKIE = 'Set-Cookie';
 
 const zodParamsSchema = z.object({
 	id: z.string(),
-	proposalType: z.string(),
+	proposalType: z.nativeEnum(EProposalType),
 	index: z.string()
 });
 
