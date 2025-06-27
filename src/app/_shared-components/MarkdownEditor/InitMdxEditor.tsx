@@ -53,6 +53,7 @@ import { ImagePlus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useQuoteCommentText } from '@/hooks/useQuoteCommentText';
+import { useUser } from '@/hooks/useUser';
 import ImageUploadDialog from './ImageUploadDialog';
 
 const { NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY, NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
@@ -65,10 +66,11 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 	const [openImageUploadDialog, setOpenImageUploadDialog] = useState(false);
 	const { quoteCommentText, setQuoteCommentText } = useQuoteCommentText();
 	const { theme } = useTheme();
+	const user = useUser();
 
 	// Handle quoted text insertion
 	useEffect(() => {
-		if (!quoteCommentText || !editorRef || typeof editorRef === 'function') {
+		if (!quoteCommentText || !editorRef || typeof editorRef === 'function' || !user) {
 			return;
 		}
 
@@ -95,7 +97,8 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 		if (props?.onChange) {
 			props.onChange(newContent, false);
 		}
-	}, [quoteCommentText, editorRef, setQuoteCommentText, props]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [quoteCommentText, editorRef, setQuoteCommentText, props?.onChange, user]);
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
 	const preprocessMarkdown = (markdown: string): string => {
