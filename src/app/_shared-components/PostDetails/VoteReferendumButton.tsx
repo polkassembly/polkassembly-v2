@@ -5,6 +5,8 @@
 'use client';
 
 import { useUser } from '@/hooks/useUser';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import VoteIcon from '@assets/activityfeed/vote.svg';
@@ -15,6 +17,7 @@ import { useState } from 'react';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../Dialog/Dialog';
 import VoteReferendum from './VoteReferendum/VoteReferendum';
+import UserVoteCard from './UserVoteCard';
 
 interface VoteReferendumButtonProps {
 	index: string;
@@ -29,35 +32,39 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 	const { user } = useUser();
 	const t = useTranslations();
 	const [openModal, setOpenModal] = useState(false);
-	return !user ? (
-		<Link href='/login'>
-			<Button
-				className={cn('w-full', btnClassName)}
-				size={size}
-			>
-				<div className='flex items-center gap-1.5'>
-					<Image
-						src={VoteIcon}
-						alt='Vote Icon'
-						width={20}
-						height={20}
-						className={iconClassName}
-					/>
-					<span>{t('PostDetails.loginToVote')}</span>
-				</div>
-			</Button>
-		</Link>
-	) : (
-		<Dialog
-			open={openModal}
-			onOpenChange={setOpenModal}
-		>
-			<DialogTrigger asChild>
+
+	const {
+		data: voteData,
+		isLoading,
+		isError
+	} = useQuery({
+		queryKey: ['userVotes', proposalType, index, user?.addresses[0]],
+		queryFn: async () => {
+			if (!user) return null;
+			const { data, error } = await NextApiClientService.getPostVotesByAddress({
+				proposalType,
+				index,
+				address: user?.addresses[0]
+			});
+			if (error) throw new Error(error.message || 'Failed to fetch vote data');
+			if (!data) return null;
+			return data;
+		},
+		enabled: !!user?.addresses[0],
+		retry: 1,
+		staleTime: 30000
+	});
+
+	const hasVoted = Array.isArray(voteData?.votes) && voteData.votes.length > 0;
+
+	if (!user)
+		return (
+			<Link href='/login'>
 				<Button
 					className={cn('w-full', btnClassName)}
 					size={size}
 				>
-					<div className='flex items-center gap-1'>
+					<div className='flex items-center gap-1.5'>
 						<Image
 							src={VoteIcon}
 							alt='Vote Icon'
@@ -65,9 +72,47 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 							height={20}
 							className={iconClassName}
 						/>
-						{t('PostDetails.castVote')}
+						<span>{t('PostDetails.loginToVote')}</span>
 					</div>
 				</Button>
+			</Link>
+		);
+
+	return (
+		<Dialog
+			open={openModal}
+			onOpenChange={setOpenModal}
+		>
+			<DialogTrigger asChild>
+				{hasVoted ? (
+					<UserVoteCard
+						index={index}
+						iconClassName={iconClassName}
+						size={size}
+						proposalType={proposalType}
+						voteData={voteData}
+						isLoading={isLoading}
+						isError={isError}
+						btnClassName={btnClassName}
+						setOpenModal={setOpenModal}
+					/>
+				) : (
+					<Button
+						className={cn('w-full', btnClassName)}
+						size={size}
+					>
+						<div className='flex items-center gap-1'>
+							<Image
+								src={VoteIcon}
+								alt='Vote Icon'
+								width={20}
+								height={20}
+								className={iconClassName}
+							/>
+							{t('PostDetails.castVote')}
+						</div>
+					</Button>
+				)}
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-3 sm:p-6'>
 				<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
@@ -76,6 +121,7 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 					track={track}
 					onClose={() => setOpenModal(false)}
 					proposalType={proposalType}
+					existingVote={hasVoted ? voteData?.votes[0] : undefined}
 				/>
 			</DialogContent>
 		</Dialog>
