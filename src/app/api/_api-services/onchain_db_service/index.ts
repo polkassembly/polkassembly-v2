@@ -17,7 +17,12 @@ import {
 	IBountyUserActivity,
 	IDelegationStats,
 	EBountyStatus,
-	EVoteSortOptions
+	EVoteSortOptions,
+	ITurnoutPercentageData,
+	ITrackAnalyticsStats,
+	IGovAnalyticsStats,
+	IGovAnalyticsReferendumOutcome,
+	IGovAnalyticsDelegationStats
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -308,5 +313,30 @@ export class OnChainDbService {
 		proposalType: EProposalType;
 	}) {
 		return SubsquidService.GetOnChainPostsByProposer({ network, proposer, page, limit, proposalType });
+	}
+
+	// Gov Analytics Methods
+	static async GetTurnoutPercentageData({ network }: { network: ENetwork }): Promise<ITurnoutPercentageData> {
+		return SubsquidService.GetTurnoutPercentageData({ network });
+	}
+
+	static async GetGovAnalyticsStats({ network }: { network: ENetwork }): Promise<IGovAnalyticsStats> {
+		return SubsquidService.GetGovAnalyticsStats({ network });
+	}
+
+	static async GetGovAnalyticsReferendumOutcome({ network, trackNo }: { network: ENetwork; trackNo?: number }): Promise<IGovAnalyticsReferendumOutcome> {
+		return SubsquidService.GetGovAnalyticsReferendumOutcome({ network, trackNo });
+	}
+
+	static async GetGovAnalyticsReferendumCount({ network }: { network: ENetwork }) {
+		return SubsquidService.GetGovAnalyticsReferendumCount({ network });
+	}
+
+	static async GetTrackDelegationAnalyticsStats({ network }: { network: ENetwork }): Promise<Record<string, IGovAnalyticsDelegationStats>> {
+		return SubsquidService.GetTrackDelegationAnalyticsStats({ network });
+	}
+
+	static async GetTrackLevelAnalyticsStats({ network, trackId }: { network: ENetwork; trackId?: number }): Promise<ITrackAnalyticsStats> {
+		return SubsquidService.GetTrackAnalyticsStats({ network, trackId });
 	}
 }

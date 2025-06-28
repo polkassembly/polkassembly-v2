@@ -1278,5 +1278,17 @@
 		"pasteURLorEnterPostID": "Pega la URL o ingresa el ID de la publicación",
 		"yourDiscussions": "Tus Discusiones",
 		"confirm": "Confirmar"
+	},
+	"GovAnalytics": {
+		"overview": "Resumen",
+		"voting": "Votación",
+		"totalProposals": "Propuestas Totales",
+		"approvedProposals": "Propuestas Aprobadas",
+		"monitoredTracks": "Tracks Monitoreados",
+		"referendumCount": "Cantidad de Referendos",
+		"referendumCountByStatus": "Cantidad de Referendos por Estado",
+		"referendumCountByCategory": "Cantidad de Referendos por Categoría",
+		"monthlySpend": "Gasto Mensual de DOT",
+		"averageTurnoutPercentage": "Porcentaje de Asistencia Promedio"
 	}
 }

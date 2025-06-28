@@ -721,7 +721,7 @@
 			"cancel": "Abbrechen",
 			"insertImage": "Bild einfügen",
 			"failedToUploadImage": "Bild konnte nicht hochgeladen werden"
-		},	
+		},
 		"AllowedCommentors": {
 			"title": "Wer kann kommentieren?",
 			"all": "Alle",
@@ -1277,5 +1277,17 @@
 		"pasteURLorEnterPostID": "URL einfügen oder Beitrags-ID eingeben",
 		"yourDiscussions": "Ihre Diskussionen",
 		"confirm": "Bestätigen"
+	},
+	"GovAnalytics": {
+		"overview": "Übersicht",
+		"voting": "Abstimmung",
+		"totalProposals": "Gesamte Vorschläge",
+		"approvedProposals": "Genehmigte Vorschläge",
+		"monitoredTracks": "Überwachte Tracks",
+		"referendumCount": "Referendum-Anzahl",
+		"referendumCountByStatus": "Referendum-Anzahl nach Status",
+		"referendumCountByCategory": "Referendum-Anzahl nach Kategorie",
+		"monthlySpend": "Monatliche DOT-Ausgaben",
+		"averageTurnoutPercentage": "Durchschnittliche Abstimmungsrate"
 	}
 }

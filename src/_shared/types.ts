@@ -1301,3 +1301,27 @@ export interface IPayout {
 		generalIndex: string;
 	};
 }
+
+export interface IGovAnalyticsStats {
+	totalProposals: number;
+	approvedProposals: number;
+}
+
+export interface IGovAnalyticsReferendumOutcome {
+	approved: number;
+	rejected: number;
+	timeout: number;
+	ongoing: number;
+	cancelled: number;
+}
+
+export interface ITurnoutPercentageData {
+	averageSupportPercentages: Record<string, number>;
+}
+
+export interface IGovAnalyticsDelegationStats {
+	totalCapital: string;
+	totalVotesBalance: string;
+	totalDelegates: number;
+	totalDelegators: number;
+}

@@ -21,7 +21,11 @@ import {
 	IPostListing,
 	ITrackAnalyticsDelegations,
 	ITrackAnalyticsStats,
-	ITreasuryStats
+	ITreasuryStats,
+	IGovAnalyticsStats,
+	IGovAnalyticsReferendumOutcome,
+	ITurnoutPercentageData,
+	IGovAnalyticsDelegationStats
 } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
@@ -58,7 +62,10 @@ enum ERedisKeys {
 	TRACK_ANALYTICS_DELEGATION = 'TAD',
 	TRACK_ANALYTICS_STATS = 'TAS',
 	TREASURY_STATS = 'TRS',
-	OVERVIEW_PAGE_DATA = 'OPD'
+	OVERVIEW_PAGE_DATA = 'OPD',
+	GOV_ANALYTICS_STATS = 'GAS',
+	GOV_ANALYTICS_REFERENDUM_OUTCOME = 'GAR',
+	GOV_ANALYTICS_REFERENDUM_COUNT = 'GAC'
 }
 
 export class RedisService {
@@ -123,7 +130,10 @@ export class RedisService {
 		[ERedisKeys.TRACK_ANALYTICS_DELEGATION]: (network: string, origin: EPostOrigin | 'all'): string => `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-${origin}`,
 		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: EPostOrigin | 'all'): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
 		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
-		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`
+		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
+		[ERedisKeys.GOV_ANALYTICS_STATS]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_STATS}-${network}`,
+		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME}-${network}`,
+		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT}-${network}`
 	} as const;
 
 	// helper methods
@@ -627,5 +637,95 @@ export class RedisService {
 
 	static async DeleteOverviewPageData({ network }: { network: ENetwork }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
+	}
+
+	// Network governance analytics stats caching methods
+	static async GetGovAnalyticsStats(network: string): Promise<IGovAnalyticsStats | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_STATS](network) });
+		return data ? (deepParseJson(data) as IGovAnalyticsStats) : null;
+	}
+
+	static async SetGovAnalyticsStats({ network, data }: { network: string; data: IGovAnalyticsStats }): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_STATS](network),
+			value: JSON.stringify(data),
+			ttlSeconds: ONE_DAY_IN_SECONDS
+		});
+	}
+
+	static async DeleteGovAnalyticsStats(network: string): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_STATS](network) });
+	}
+
+	// Referendum outcome caching methods
+	static async GetGovAnalyticsReferendumOutcome(network: string): Promise<IGovAnalyticsReferendumOutcome | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME](network) });
+		return data ? (deepParseJson(data) as IGovAnalyticsReferendumOutcome) : null;
+	}
+
+	static async SetGovAnalyticsReferendumOutcome({ network, data }: { network: string; data: IGovAnalyticsReferendumOutcome }): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME](network),
+			value: JSON.stringify(data),
+			ttlSeconds: ONE_DAY_IN_SECONDS
+		});
+	}
+
+	static async DeleteGovAnalyticsReferendumOutcome(network: string): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME](network) });
+	}
+
+	static async GetGovAnalyticsReferendumCount(
+		network: string
+	): Promise<{ categoryCounts: { governance: number | null; main: number | null; treasury: number | null; whiteList: number | null } } | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT](network) });
+		return data ? (deepParseJson(data) as { categoryCounts: { governance: number | null; main: number | null; treasury: number | null; whiteList: number | null } }) : null;
+	}
+
+	static async SetGovAnalyticsReferendumCount({
+		network,
+		data
+	}: {
+		network: string;
+		data: { categoryCounts: { governance: number | null; main: number | null; treasury: number | null; whiteList: number | null } };
+	}): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT](network),
+			value: JSON.stringify(data),
+			ttlSeconds: ONE_DAY_IN_SECONDS
+		});
+	}
+
+	static async GetTrackLevelProposalsAnalytics(network: ENetwork) {
+		const key = `track_level_proposals_analytics:${network}`;
+		const data = await this.client.get(key);
+		return data ? JSON.parse(data) : null;
+	}
+
+	static async SetTrackLevelProposalsAnalytics({ network, data }: { network: ENetwork; data: { data: Record<number, number>; totalProposals: number } }) {
+		const key = `track_level_proposals_analytics:${network}`;
+		await this.client.set(key, JSON.stringify(data), 'EX', SIX_HOURS_IN_SECONDS);
+	}
+
+	static async GetTurnoutPercentageAnalytics(network: ENetwork): Promise<ITurnoutPercentageData | null> {
+		const key = `turnout_percentage_analytics:${network}`;
+		const cachedData = await this.client.get(key);
+		return cachedData ? JSON.parse(cachedData) : null;
+	}
+
+	static async SetTurnoutPercentageAnalytics({ network, data }: { network: ENetwork; data: ITurnoutPercentageData }): Promise<void> {
+		const key = `turnout_percentage_analytics:${network}`;
+		await this.client.set(key, JSON.stringify(data), 'EX', 21600); // Cache for 6 hours
+	}
+
+	static async GetTrackDelegationAnalytics({ network }: { network: ENetwork }) {
+		const key = `track-delegation-analytics-${network}`;
+		const data = await this.client.get(key);
+		return data ? JSON.parse(data) : null;
+	}
+
+	static async SetTrackDelegationAnalytics({ network, data }: { network: ENetwork; data: Record<string, IGovAnalyticsDelegationStats> }) {
+		const key = `track-delegation-analytics-${network}`;
+		await this.client.set(key, JSON.stringify(data), 'EX', 3600); // Cache for 1 hour
 	}
 }
