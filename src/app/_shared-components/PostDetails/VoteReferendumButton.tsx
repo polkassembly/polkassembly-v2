@@ -78,39 +78,41 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 			</Link>
 		);
 
-	return hasVoted ? (
-		<UserVoteCard
-			index={index}
-			iconClassName={iconClassName}
-			size={size}
-			track={track}
-			proposalType={proposalType}
-			voteData={voteData}
-			isLoading={isLoading}
-			isError={isError}
-			btnClassName={btnClassName}
-		/>
-	) : (
+	return (
 		<Dialog
 			open={openModal}
 			onOpenChange={setOpenModal}
 		>
 			<DialogTrigger asChild>
-				<Button
-					className={cn('w-full', btnClassName)}
-					size={size}
-				>
-					<div className='flex items-center gap-1'>
-						<Image
-							src={VoteIcon}
-							alt='Vote Icon'
-							width={20}
-							height={20}
-							className={iconClassName}
-						/>
-						{t('PostDetails.castVote')}
-					</div>
-				</Button>
+				{hasVoted ? (
+					<UserVoteCard
+						index={index}
+						iconClassName={iconClassName}
+						size={size}
+						proposalType={proposalType}
+						voteData={voteData}
+						isLoading={isLoading}
+						isError={isError}
+						btnClassName={btnClassName}
+						setOpenModal={setOpenModal}
+					/>
+				) : (
+					<Button
+						className={cn('w-full', btnClassName)}
+						size={size}
+					>
+						<div className='flex items-center gap-1'>
+							<Image
+								src={VoteIcon}
+								alt='Vote Icon'
+								width={20}
+								height={20}
+								className={iconClassName}
+							/>
+							{t('PostDetails.castVote')}
+						</div>
+					</Button>
+				)}
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-3 sm:p-6'>
 				<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
@@ -119,6 +121,7 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 					track={track}
 					onClose={() => setOpenModal(false)}
 					proposalType={proposalType}
+					existingVote={hasVoted ? voteData?.votes[0] : undefined}
 				/>
 			</DialogContent>
 		</Dialog>

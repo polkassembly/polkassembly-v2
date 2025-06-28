@@ -12,16 +12,15 @@ import { ThumbsDown, ThumbsUp, Ban } from 'lucide-react';
 import VoteIcon from '@assets/activityfeed/vote.svg';
 import DelegateIcon from '@assets/icons/delegate_plus.svg';
 import { cn } from '@/lib/utils';
-import { EPostOrigin, EProposalType, IVoteHistoryData, ENotificationStatus } from '@/_shared/types';
+import { EProposalType, IVoteHistoryData, ENotificationStatus } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useToast } from '@/hooks/useToast';
 import { Button } from '../Button';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle } from '../Dialog/Dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../Dialog/Dialog';
 import { Separator } from '../Separator';
-import VoteReferendum from './VoteReferendum/VoteReferendum';
 import classes from './PostDetails.module.scss';
 
 interface VoteReferendumButtonProps {
@@ -29,16 +28,15 @@ interface VoteReferendumButtonProps {
 	btnClassName?: string;
 	iconClassName?: string;
 	size?: 'sm' | 'lg';
-	track?: EPostOrigin;
 	proposalType: EProposalType;
 	voteData: IVoteHistoryData;
 	isLoading: boolean;
 	isError: boolean;
+	setOpenModal: (open: boolean) => void;
 }
 
-function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', track, proposalType, voteData, isLoading, isError }: VoteReferendumButtonProps) {
+function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposalType, voteData, isLoading, isError, setOpenModal }: VoteReferendumButtonProps) {
 	const t = useTranslations();
-	const [openModal, setOpenModal] = useState(false);
 	const [openRemoveConfirmModal, setOpenRemoveConfirmModal] = useState(false);
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
@@ -97,14 +95,15 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', track, 
 		<div className={classes.userVoteCard}>
 			<div className={classes.userVoteCardLayout}>
 				<h2 className={classes.userVoteCardTitle}>{t('PostDetails.myVote')}</h2>
-				<button
+				<Button
 					type='button'
 					className={classes.userVoteCardRemoveButton}
 					onClick={() => setOpenRemoveConfirmModal(true)}
 					disabled={isRemoving}
+					isLoading={isRemoving}
 				>
 					{isRemoving ? t('PostDetails.removing') : t('PostDetails.remove')}
-				</button>
+				</Button>
 			</div>
 			<div className={classes.userVoteCardLayout}>
 				<h3 className={classes.userVoteCardTitleIcon}>
@@ -136,42 +135,24 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', track, 
 				<p className='text-sm text-basic_text'>{formatBnBalance(myVote.delegatedVotingPower || '0', formatBalanceOptions, network)}</p>
 			</div>
 
-			<Dialog
-				open={openModal}
-				onOpenChange={setOpenModal}
+			<Button
+				className={cn('w-full', btnClassName)}
+				size={size}
+				disabled={isLoading || isError}
+				isLoading={isLoading}
+				onClick={() => setOpenModal(true)}
 			>
-				<DialogTrigger asChild>
-					<Button
-						className={cn('w-full', btnClassName)}
-						size={size}
-						disabled={isLoading || isError}
-						isLoading={isLoading}
-					>
-						<div className='flex items-center gap-1'>
-							<Image
-								src={VoteIcon}
-								alt='Vote Icon'
-								width={20}
-								height={20}
-								className={iconClassName}
-							/>
-							{t('PostDetails.changeVote')}
-						</div>
-					</Button>
-				</DialogTrigger>
-				<DialogContent className='max-w-xl p-3 sm:p-6'>
-					<DialogHeader>
-						<DialogTitle className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogTitle>
-					</DialogHeader>
-					<VoteReferendum
-						index={index}
-						track={track}
-						onClose={() => setOpenModal(false)}
-						proposalType={proposalType}
-						existingVote={myVote}
+				<div className='flex items-center gap-1'>
+					<Image
+						src={VoteIcon}
+						alt='Vote Icon'
+						width={20}
+						height={20}
+						className={iconClassName}
 					/>
-				</DialogContent>
-			</Dialog>
+					{t('PostDetails.changeVote')}
+				</div>
+			</Button>
 
 			<Dialog
 				open={openRemoveConfirmModal}
