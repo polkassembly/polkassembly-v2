@@ -65,7 +65,10 @@ enum ERedisKeys {
 	OVERVIEW_PAGE_DATA = 'OPD',
 	GOV_ANALYTICS_STATS = 'GAS',
 	GOV_ANALYTICS_REFERENDUM_OUTCOME = 'GAR',
-	GOV_ANALYTICS_REFERENDUM_COUNT = 'GAC'
+	GOV_ANALYTICS_REFERENDUM_COUNT = 'GAC',
+	TRACK_LEVEL_PROPOSALS_ANALYTICS = 'TLP',
+	TURNOUT_PERCENTAGE_ANALYTICS = 'TPA',
+	TRACK_DELEGATION_ANALYTICS = 'TDA'
 }
 
 export class RedisService {
@@ -133,7 +136,10 @@ export class RedisService {
 		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
 		[ERedisKeys.GOV_ANALYTICS_STATS]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_STATS}-${network}`,
 		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME}-${network}`,
-		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT}-${network}`
+		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT}-${network}`,
+		[ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS]: (network: string): string => `${ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS}-${network}`,
+		[ERedisKeys.TURNOUT_PERCENTAGE_ANALYTICS]: (network: string): string => `${ERedisKeys.TURNOUT_PERCENTAGE_ANALYTICS}-${network}`,
+		[ERedisKeys.TRACK_DELEGATION_ANALYTICS]: (network: string): string => `${ERedisKeys.TRACK_DELEGATION_ANALYTICS}-${network}`
 	} as const;
 
 	// helper methods
@@ -233,7 +239,13 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` }),
-			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}-*` })
+			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_STATS}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.TURNOUT_PERCENTAGE_ANALYTICS}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_DELEGATION_ANALYTICS}-${network}-*` })
 		]);
 	}
 
@@ -697,35 +709,29 @@ export class RedisService {
 	}
 
 	static async GetTrackLevelProposalsAnalytics(network: ENetwork) {
-		const key = `track_level_proposals_analytics:${network}`;
-		const data = await this.client.get(key);
-		return data ? JSON.parse(data) : null;
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS](network) });
+		return data ? (deepParseJson(data) as { data: Record<number, number>; totalProposals: number }) : null;
 	}
 
 	static async SetTrackLevelProposalsAnalytics({ network, data }: { network: ENetwork; data: { data: Record<number, number>; totalProposals: number } }) {
-		const key = `track_level_proposals_analytics:${network}`;
-		await this.client.set(key, JSON.stringify(data), 'EX', SIX_HOURS_IN_SECONDS);
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS](network), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
 	}
 
 	static async GetTurnoutPercentageAnalytics(network: ENetwork): Promise<ITurnoutPercentageData | null> {
-		const key = `turnout_percentage_analytics:${network}`;
-		const cachedData = await this.client.get(key);
-		return cachedData ? JSON.parse(cachedData) : null;
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TURNOUT_PERCENTAGE_ANALYTICS](network) });
+		return data ? (deepParseJson(data) as ITurnoutPercentageData) : null;
 	}
 
 	static async SetTurnoutPercentageAnalytics({ network, data }: { network: ENetwork; data: ITurnoutPercentageData }): Promise<void> {
-		const key = `turnout_percentage_analytics:${network}`;
-		await this.client.set(key, JSON.stringify(data), 'EX', 21600); // Cache for 6 hours
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TURNOUT_PERCENTAGE_ANALYTICS](network), value: JSON.stringify(data), ttlSeconds: 21600 }); // Cache for 6 hours
 	}
 
 	static async GetTrackDelegationAnalytics({ network }: { network: ENetwork }) {
-		const key = `track-delegation-analytics-${network}`;
-		const data = await this.client.get(key);
-		return data ? JSON.parse(data) : null;
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TRACK_DELEGATION_ANALYTICS](network) });
+		return data ? (deepParseJson(data) as Record<string, IGovAnalyticsDelegationStats>) : null;
 	}
 
 	static async SetTrackDelegationAnalytics({ network, data }: { network: ENetwork; data: Record<string, IGovAnalyticsDelegationStats> }) {
-		const key = `track-delegation-analytics-${network}`;
-		await this.client.set(key, JSON.stringify(data), 'EX', 3600); // Cache for 1 hour
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TRACK_DELEGATION_ANALYTICS](network), value: JSON.stringify(data), ttlSeconds: 3600 }); // Cache for 1 hour
 	}
 }
