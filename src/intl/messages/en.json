@@ -1313,5 +1313,17 @@
 		"votes": "Votes",
 		"voteDetails": "Vote Details",
 		"target": "Target"
+	},
+	"GovAnalytics": {
+		"overview": "Overview",
+		"voting": "Voting",
+		"totalProposals": "Total Proposals",
+		"approvedProposals": "Approved Proposals",
+		"monitoredTracks": "Monitored Tracks",
+		"referendumCount": "Referendum Count",
+		"referendumCountByStatus": "Referendum Count by Status",
+		"referendumCountByCategory": "Referendum Count by Category",
+		"monthlySpend": "Monthly DOT Spent",
+		"averageTurnoutPercentage": "Average Turnout Percentage"
 	}
 }
