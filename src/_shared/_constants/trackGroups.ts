@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ENetwork } from '@shared/types';
+import { ENetwork, EPostOrigin } from '@shared/types';
 import { NETWORKS_DETAILS } from './networks';
 
 export type TrackGroup = 'Main' | 'Treasury' | 'Whitelist' | 'Governance' | 'Origin';
@@ -40,40 +40,30 @@ export function getTrackGroups(network: ENetwork): Record<TrackGroup, number[]> 
 			const trackName = track.name;
 			const groupFromConstants = track.group;
 
-			// Treasury tracks - tracks that involve spending from treasury
-			if (track.maxSpend || trackName.includes('spender') || trackName.includes('tipper') || trackName === 'treasurer') {
-				groups.Treasury.push(trackId);
-			}
 			// Whitelist tracks - tracks for whitelisting and fellowship administration
-			else if (trackName === 'whitelisted_caller' || trackName === 'fellowship_admin') {
+			if (trackName === trackDetails[EPostOrigin.WHITELISTED_CALLER]?.name || trackName === trackDetails[EPostOrigin.FELLOWSHIP_ADMIN]?.name) {
 				groups.Whitelist.push(trackId);
 			}
 			// Governance tracks - tracks for referendum management and governance operations
-			else if (trackName === 'referendum_canceller' || trackName === 'referendum_killer') {
+			else if (trackName === trackDetails[EPostOrigin.REFERENDUM_CANCELLER]?.name || trackName === trackDetails[EPostOrigin.REFERENDUM_KILLER]?.name) {
 				groups.Governance.push(trackId);
 			}
 			// Main tracks - administrative and operational tracks
-			else if (trackName === 'staking_admin' || trackName === 'root' || trackName === 'wish_for_change' || trackName === 'auction_admin') {
+			else if (
+				trackName === trackDetails[EPostOrigin.STAKING_ADMIN]?.name ||
+				trackName === trackDetails[EPostOrigin.ROOT]?.name ||
+				trackName === trackDetails[EPostOrigin.WISH_FOR_CHANGE]?.name ||
+				trackName === trackDetails[EPostOrigin.AUCTION_ADMIN]?.name
+			) {
 				groups.Main.push(trackId);
 			}
 			// Governance tracks - tracks for governance operations
-			else if (trackName === 'lease_admin' || trackName === 'general_admin') {
+			else if (trackName === trackDetails[EPostOrigin.LEASE_ADMIN]?.name || trackName === trackDetails[EPostOrigin.GENERAL_ADMIN]?.name) {
 				groups.Governance.push(trackId);
 			}
 			// Fallback: use the group from network constants if it matches our types
 			else if (groupFromConstants && groups[groupFromConstants as TrackGroup]) {
 				groups[groupFromConstants as TrackGroup].push(trackId);
-			}
-			// Final fallback: classify unknown tracks based on common patterns
-			else if (trackName.includes('treasury') || trackName.includes('spend')) {
-				groups.Treasury.push(trackId);
-			} else if (trackName.includes('admin')) {
-				groups.Main.push(trackId);
-			} else if (trackName.includes('governance') || trackName.includes('referendum')) {
-				groups.Governance.push(trackId);
-			} else {
-				// Default to Origin for unclassified tracks
-				groups.Origin.push(trackId);
 			}
 		}
 	});
