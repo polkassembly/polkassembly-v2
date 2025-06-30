@@ -18,9 +18,11 @@ import { useTranslations } from 'next-intl';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import dynamic from 'next/dynamic';
 import SingleComment from '../SingleComment/SingleComment';
-import AddComment from '../AddComment/AddComment';
 import classes from './Comments.module.scss';
+
+const AddComment = dynamic(() => import('../AddComment/AddComment'), { ssr: false });
 
 function Comments({
 	comments,
