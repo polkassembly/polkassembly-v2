@@ -59,6 +59,7 @@ import ImageUploadDialog from './ImageUploadDialog';
 const { NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY, NEXT_PUBLIC_IMBB_KEY } = getSharedEnvVars();
 const algoliaClient = algoliasearch(NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY);
 const MAX_MENTION_SUGGESTIONS = 5;
+const RECT_ELLIPSIS_WIDTH = 25;
 
 // Only import this to the next file
 export default function InitializedMDXEditor({ editorRef, ...props }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
@@ -81,8 +82,13 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 
 		const currentContent = editor.getMarkdown();
 
-		// Format the quoted text
-		const quotedText = `\n\n> ${quoteCommentText}\n\n`;
+		// Format the quoted text - ensure each line starts with >
+		const quotedLines = quoteCommentText
+			.split('\n')
+			.map((line) => `> ${line} \n`)
+			.join('\n');
+
+		const quotedText = `\n\n${quotedLines}\n\n`;
 
 		// Append to existing content
 		const newContent = currentContent + quotedText;
@@ -284,8 +290,8 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 						if (selection && selection.rangeCount > 0) {
 							const range = selection.getRangeAt(0);
 							const rect = range.getBoundingClientRect();
-							popover.style.top = `${rect.bottom + window.scrollY + 5}px`;
-							popover.style.left = `${rect.left + window.scrollX}px`;
+							popover.style.top = `${rect.bottom + window.scrollY + RECT_ELLIPSIS_WIDTH}px`;
+							popover.style.left = `${rect.left + window.scrollX + RECT_ELLIPSIS_WIDTH}px`;
 
 							// Add click outside handler
 							const handleClickOutside = (e: MouseEvent) => {
