@@ -5,26 +5,16 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useQuery } from '@tanstack/react-query';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { useTurnoutPercentage } from '@/hooks/useTurnoutPercentage';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip);
 
 function AnalyticsTurnOutPercentage() {
 	const t = useTranslations('GovAnalytics');
-	const network = getCurrentNetwork();
-
-	const { data, isLoading } = useQuery({
-		queryKey: ['gov-analytics-turnout-percentage', network],
-		queryFn: async () => {
-			const response = await NextApiClientService.getGovAnalyticsTurnoutPercentage();
-			return response.data;
-		}
-	});
+	const { data, isLoading = true } = useTurnoutPercentage();
 
 	const chartData = {
 		labels: Object.keys(data?.averageSupportPercentages || {}),

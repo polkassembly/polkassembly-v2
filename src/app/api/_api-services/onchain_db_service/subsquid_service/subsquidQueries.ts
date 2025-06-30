@@ -1082,8 +1082,8 @@ export class SubsquidQueries {
 		}
 	`;
 
-	protected static GET_TURNOUT_PERCENTAGE_DATA = `
-		query GetTurnoutPercentageData {
+	protected static GET_TURNOUT_DATA = `
+		query GetTurnoutData {
 			proposals(where: {type_eq: ReferendumV2, status_in: [Executed, Approved, Confirmed, Rejected, Killed, ExecutionFailed, TimedOut, Cancelled]}, orderBy: createdAt_DESC) {
 				index
 				trackNumber

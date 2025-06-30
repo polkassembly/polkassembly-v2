@@ -52,7 +52,7 @@ import {
 	IPostLink,
 	IGovAnalyticsStats,
 	IGovAnalyticsReferendumOutcome,
-	ITurnoutPercentageData,
+	IRawTurnoutData,
 	IGovAnalyticsDelegationStats
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
@@ -1124,13 +1124,13 @@ export class NextApiClientService {
 		});
 	}
 
-	static async getGovAnalyticsTurnoutPercentage() {
+	static async getTurnoutData() {
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.GET_GOV_ANALYTICS,
 			routeSegments: ['turnout-percentage']
 		});
 
-		return this.nextApiClientFetch<ITurnoutPercentageData>({
+		return this.nextApiClientFetch<IRawTurnoutData>({
 			method,
 			url
 		});

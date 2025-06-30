@@ -18,7 +18,7 @@ import {
 	IDelegationStats,
 	EBountyStatus,
 	EVoteSortOptions,
-	ITurnoutPercentageData,
+	IRawTurnoutData,
 	ITrackAnalyticsStats,
 	IGovAnalyticsStats,
 	IGovAnalyticsReferendumOutcome,
@@ -316,8 +316,8 @@ export class OnChainDbService {
 	}
 
 	// Gov Analytics Methods
-	static async GetTurnoutPercentageData({ network }: { network: ENetwork }): Promise<ITurnoutPercentageData> {
-		return SubsquidService.GetTurnoutPercentageData({ network });
+	static async GetTurnoutData({ network }: { network: ENetwork }): Promise<IRawTurnoutData> {
+		return SubsquidService.GetTurnoutData({ network });
 	}
 
 	static async GetGovAnalyticsStats({ network }: { network: ENetwork }): Promise<IGovAnalyticsStats> {

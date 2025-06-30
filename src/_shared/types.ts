@@ -1319,6 +1319,22 @@ export interface ITurnoutPercentageData {
 	averageSupportPercentages: Record<string, number>;
 }
 
+export interface IRawTurnoutData {
+	proposals: {
+		index: number;
+		trackNumber?: number;
+		convictionVoting: {
+			balance: {
+				value?: string;
+				aye?: string;
+				nay?: string;
+				abstain?: string;
+			};
+			decision: 'yes' | 'no' | 'abstain' | 'split' | 'splitAbstain';
+		}[];
+	}[];
+}
+
 export interface IGovAnalyticsDelegationStats {
 	totalCapital: string;
 	totalVotesBalance: string;

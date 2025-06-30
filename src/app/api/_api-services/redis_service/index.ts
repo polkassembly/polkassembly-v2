@@ -24,7 +24,7 @@ import {
 	ITreasuryStats,
 	IGovAnalyticsStats,
 	IGovAnalyticsReferendumOutcome,
-	ITurnoutPercentageData,
+	IRawTurnoutData,
 	IGovAnalyticsDelegationStats
 } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
@@ -67,7 +67,7 @@ enum ERedisKeys {
 	GOV_ANALYTICS_REFERENDUM_OUTCOME = 'GAR',
 	GOV_ANALYTICS_REFERENDUM_COUNT = 'GAC',
 	TRACK_LEVEL_PROPOSALS_ANALYTICS = 'TLP',
-	TURNOUT_PERCENTAGE_ANALYTICS = 'TPA',
+	TURNOUT_DATA = 'TOD',
 	TRACK_DELEGATION_ANALYTICS = 'TDA'
 }
 
@@ -138,7 +138,7 @@ export class RedisService {
 		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME}-${network}`,
 		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT}-${network}`,
 		[ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS]: (network: string): string => `${ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS}-${network}`,
-		[ERedisKeys.TURNOUT_PERCENTAGE_ANALYTICS]: (network: string): string => `${ERedisKeys.TURNOUT_PERCENTAGE_ANALYTICS}-${network}`,
+		[ERedisKeys.TURNOUT_DATA]: (network: string): string => `${ERedisKeys.TURNOUT_DATA}-${network}`,
 		[ERedisKeys.TRACK_DELEGATION_ANALYTICS]: (network: string): string => `${ERedisKeys.TRACK_DELEGATION_ANALYTICS}-${network}`
 	} as const;
 
@@ -244,7 +244,7 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS}-${network}-*` }),
-			this.DeleteKeys({ pattern: `${ERedisKeys.TURNOUT_PERCENTAGE_ANALYTICS}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.TURNOUT_DATA}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_DELEGATION_ANALYTICS}-${network}-*` })
 		]);
 	}
@@ -717,15 +717,6 @@ export class RedisService {
 		await this.Set({ key: this.redisKeysMap[ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS](network), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
 	}
 
-	static async GetTurnoutPercentageAnalytics(network: ENetwork): Promise<ITurnoutPercentageData | null> {
-		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TURNOUT_PERCENTAGE_ANALYTICS](network) });
-		return data ? (deepParseJson(data) as ITurnoutPercentageData) : null;
-	}
-
-	static async SetTurnoutPercentageAnalytics({ network, data }: { network: ENetwork; data: ITurnoutPercentageData }): Promise<void> {
-		await this.Set({ key: this.redisKeysMap[ERedisKeys.TURNOUT_PERCENTAGE_ANALYTICS](network), value: JSON.stringify(data), ttlSeconds: 21600 }); // Cache for 6 hours
-	}
-
 	static async GetTrackDelegationAnalytics({ network }: { network: ENetwork }) {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TRACK_DELEGATION_ANALYTICS](network) });
 		return data ? (deepParseJson(data) as Record<string, IGovAnalyticsDelegationStats>) : null;
@@ -733,5 +724,23 @@ export class RedisService {
 
 	static async SetTrackDelegationAnalytics({ network, data }: { network: ENetwork; data: Record<string, IGovAnalyticsDelegationStats> }) {
 		await this.Set({ key: this.redisKeysMap[ERedisKeys.TRACK_DELEGATION_ANALYTICS](network), value: JSON.stringify(data), ttlSeconds: 3600 }); // Cache for 1 hour
+	}
+
+	// Turnout data caching methods
+	static async GetTurnoutData(network: ENetwork): Promise<IRawTurnoutData | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TURNOUT_DATA](network) });
+		return data ? (deepParseJson(data) as IRawTurnoutData) : null;
+	}
+
+	static async SetTurnoutData({ network, data }: { network: ENetwork; data: IRawTurnoutData }): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.TURNOUT_DATA](network),
+			value: JSON.stringify(data),
+			ttlSeconds: 21600 // Cache for 6 hours - turnout data is historical and doesn't change frequently
+		});
+	}
+
+	static async DeleteTurnoutData(network: ENetwork): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TURNOUT_DATA](network) });
 	}
 }

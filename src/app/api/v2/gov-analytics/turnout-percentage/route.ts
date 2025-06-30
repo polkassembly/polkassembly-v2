@@ -15,17 +15,17 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 
 	// Try to get from cache first
 	if (!skipCache) {
-		const cachedData = await RedisService.GetTurnoutPercentageAnalytics(network);
+		const cachedData = await RedisService.GetTurnoutData(network);
 		if (cachedData) {
 			return NextResponse.json(cachedData);
 		}
 	}
 
 	// If not in cache or skipCache is true, fetch from OnChainDbService
-	const data = await OnChainDbService.GetTurnoutPercentageData({ network });
+	const data = await OnChainDbService.GetTurnoutData({ network });
 
 	// Cache the data
-	await RedisService.SetTurnoutPercentageAnalytics({ network, data });
+	await RedisService.SetTurnoutData({ network, data });
 
 	return NextResponse.json(data);
 });
