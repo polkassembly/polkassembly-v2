@@ -8,6 +8,7 @@ import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 import govAnalyticsIcon from '@/_assets/sidebar/gov-analytics-icon.svg';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import GovStats from './components/GovStats';
 import GovOverview from './components/GovOverview';
 import GovVoting from './components/GovVoting';
@@ -25,7 +26,18 @@ export async function generateMetadata(): Promise<Metadata> {
 	});
 }
 
+async function fetchGovAnalyticsData() {
+	try {
+		return await NextApiClientService.getGovAnalyticsStats();
+	} catch (error) {
+		console.error('Error fetching governance analytics data:', error);
+		return null;
+	}
+}
+
 async function GovAnalyticsPage() {
+	const analyticsData = await fetchGovAnalyticsData();
+
 	return (
 		<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 p-5 sm:p-10'>
 			<h1 className='flex items-center gap-2 text-2xl font-semibold text-text_primary'>
@@ -40,7 +52,7 @@ async function GovAnalyticsPage() {
 			</h1>
 			<div className='flex w-full flex-col gap-y-6 rounded-xl bg-bg_modal p-6 shadow-lg'>All active and history referenda of various tracks.</div>
 			<div className='flex w-full flex-col gap-y-6 rounded-xl bg-bg_modal p-6 shadow-lg'>
-				<GovStats />
+				<GovStats data={analyticsData?.data || null} />
 				<GovOverview />
 				<GovVoting />
 			</div>
