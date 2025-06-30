@@ -13,12 +13,19 @@ import { cn } from '@/lib/utils';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import { useDebounce } from '@/hooks/useDebounce';
 import { Button } from '../Button';
 import classes from './HighlightMenu.module.scss';
 
 const SELECTION_DELAY = 150;
 const MENU_OFFSET_Y = 60;
 const MENU_VISUAL_ADJUSTMENT = 40;
+
+interface SelectionData {
+	text: string;
+	rect: DOMRect | null;
+	timestamp: number;
+}
 
 function HighlightMenu({ markdownRef }: { markdownRef: React.RefObject<HTMLDivElement | null> }) {
 	const t = useTranslations();
@@ -30,7 +37,16 @@ function HighlightMenu({ markdownRef }: { markdownRef: React.RefObject<HTMLDivEl
 	const [isVisible, setIsVisible] = useState(false);
 
 	const menuRef = useRef<HTMLDivElement>(null);
-	const selectionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	// Use debounce for selection processing
+	const { debouncedValue: debouncedSelectionTrigger, setValue: setSelectionTrigger } = useDebounce<SelectionData>(
+		{
+			text: '',
+			rect: null,
+			timestamp: 0
+		},
+		SELECTION_DELAY
+	);
 
 	const copyToClipboard = useCallback(
 		async (text: string) => {
@@ -47,63 +63,81 @@ function HighlightMenu({ markdownRef }: { markdownRef: React.RefObject<HTMLDivEl
 				});
 			}
 		},
-		[toast]
+		[toast, t]
 	);
 
-	const handleSelection = useCallback(() => {
-		// Clear any existing timeout
-		if (selectionTimeoutRef.current) {
-			clearTimeout(selectionTimeoutRef.current);
-		}
-
-		// Small delay to ensure selection is stable
-		selectionTimeoutRef.current = setTimeout(() => {
-			const selection = window.getSelection();
-			if (!selection || selection.rangeCount === 0) {
-				setSelectedText('');
-
-				setIsVisible(false);
-				return;
-			}
-
-			const text = selection.toString().trim();
-
-			if (text && text.length > 0) {
-				const range = selection.getRangeAt(0);
-				const rect = range.getBoundingClientRect();
-
-				// Only show menu if the selection is within our markdown container
-				const markdown = markdownRef?.current;
-				if (markdown && rect) {
-					const markdownRect = markdown.getBoundingClientRect();
-
-					// Check if selection is within the markdown area
-					if (rect.left >= markdownRect.left && rect.right <= markdownRect.right && rect.top >= markdownRect.top && rect.bottom <= markdownRect.bottom) {
-						// Use fixed positioning relative to viewport
-						setMenuPosition({
-							left: rect.left + rect.width / 2,
-							top: rect.top - MENU_OFFSET_Y // Position 60px above the selection
-						});
-
-						setSelectedText(text);
-						setIsVisible(true);
-						return;
-					}
-				}
-			}
-
+	// Process the debounced selection
+	useEffect(() => {
+		if (!debouncedSelectionTrigger.text || !debouncedSelectionTrigger.rect) {
 			setSelectedText('');
 			setIsVisible(false);
-		}, SELECTION_DELAY); // Slightly longer delay to ensure selection is complete
-	}, [markdownRef]);
-
-	const clearSelection = useCallback(() => {
-		if (selectionTimeoutRef.current) {
-			clearTimeout(selectionTimeoutRef.current);
+			return;
 		}
+
+		const { text, rect } = debouncedSelectionTrigger;
+		const markdown = markdownRef?.current;
+
+		if (markdown && rect) {
+			const markdownRect = markdown.getBoundingClientRect();
+
+			// Check if selection is within the markdown area
+			if (rect.left >= markdownRect.left && rect.right <= markdownRect.right && rect.top >= markdownRect.top && rect.bottom <= markdownRect.bottom) {
+				// Use fixed positioning relative to viewport
+				setMenuPosition({
+					left: rect.left + rect.width / 2,
+					top: rect.top - MENU_OFFSET_Y // Position 60px above the selection
+				});
+
+				setSelectedText(text);
+				setIsVisible(true);
+				return;
+			}
+		}
+
 		setSelectedText('');
 		setIsVisible(false);
-	}, []);
+	}, [debouncedSelectionTrigger, markdownRef]);
+
+	const handleSelection = useCallback(() => {
+		const selection = window.getSelection();
+		if (!selection || selection.rangeCount === 0) {
+			setSelectionTrigger({
+				text: '',
+				rect: null,
+				timestamp: Date.now()
+			});
+			return;
+		}
+
+		const text = selection.toString().trim();
+
+		if (text && text.length > 0) {
+			const range = selection.getRangeAt(0);
+			const rect = range.getBoundingClientRect();
+
+			setSelectionTrigger({
+				text,
+				rect,
+				timestamp: Date.now()
+			});
+		} else {
+			setSelectionTrigger({
+				text: '',
+				rect: null,
+				timestamp: Date.now()
+			});
+		}
+	}, [setSelectionTrigger]);
+
+	const clearSelection = useCallback(() => {
+		setSelectionTrigger({
+			text: '',
+			rect: null,
+			timestamp: Date.now()
+		});
+		setSelectedText('');
+		setIsVisible(false);
+	}, [setSelectionTrigger]);
 
 	const shareSelection = useCallback(
 		(event: React.MouseEvent) => {
@@ -198,9 +232,6 @@ function HighlightMenu({ markdownRef }: { markdownRef: React.RefObject<HTMLDivEl
 		return () => {
 			document.removeEventListener('selectionchange', handleSelectionChange);
 			document.removeEventListener('click', handleDocumentClick);
-			if (selectionTimeoutRef.current) {
-				clearTimeout(selectionTimeoutRef.current);
-			}
 		};
 	}, [markdownRef, handleSelection, clearSelection]);
 
