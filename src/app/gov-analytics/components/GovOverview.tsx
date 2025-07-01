@@ -24,7 +24,7 @@ function GovOverview() {
 			defaultOpen
 			className='rounded-lg border border-border_grey'
 		>
-			<CollapsibleTrigger className='flex w-full items-center gap-x-4 p-4'>
+			<CollapsibleTrigger className='flex w-full items-center gap-x-4 p-3 lg:p-4'>
 				<Image
 					src={TimeLineIcon}
 					alt='Delegation Green Icon'
@@ -38,7 +38,7 @@ function GovOverview() {
 			</CollapsibleTrigger>
 			<CollapsibleContent>
 				<Separator className='my-0' />
-				<div className='p-4'>
+				<div className='p-3 lg:p-4'>
 					<div className='mb-4 flex flex-col gap-4 md:grid md:grid-cols-2'>
 						<AnalyticsReferendumOutcome />
 						<AnalyticsReferendumCount />

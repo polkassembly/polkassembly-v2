@@ -26,14 +26,14 @@ function GovStats({ data }: GovStatsProps) {
 	const trackInfo = NETWORKS_DETAILS[network as ENetwork].trackDetails;
 
 	return (
-		<div className='flex w-full flex-col gap-12 sm:flex-row sm:items-center sm:justify-between'>
+		<div className='flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6 lg:gap-12'>
 			<div className='flex items-center gap-x-2'>
 				<Image
 					src={ProposalsCreated}
 					alt='Proposals Created'
 					width={70}
 					height={70}
-					className='h-[70px] w-[70px]'
+					className='h-[50px] w-[50px] lg:h-[70px] lg:w-[70px]'
 				/>
 				<div className='flex flex-col gap-y-1'>
 					<p className='text-xs text-wallet_btn_text'>{t('totalProposals')}</p>
@@ -41,17 +41,17 @@ function GovStats({ data }: GovStatsProps) {
 				</div>
 			</div>
 			<Separator
-				className='hidden h-20 sm:block'
+				className='hidden h-20 md:block'
 				orientation='vertical'
 			/>
-			<Separator className='w-full sm:hidden' />
+			<Separator className='w-full md:hidden' />
 			<div className='flex items-center gap-x-2'>
 				<Image
 					src={ApprovedProposals}
 					alt='Active Proposals'
 					width={70}
 					height={70}
-					className='h-[70px] w-[70px]'
+					className='h-[50px] w-[50px] lg:h-[70px] lg:w-[70px]'
 				/>
 				<div className='flex flex-col'>
 					<p className='text-xs text-wallet_btn_text'>{t('approvedProposals')}</p>
@@ -59,17 +59,17 @@ function GovStats({ data }: GovStatsProps) {
 				</div>
 			</div>
 			<Separator
-				className='hidden h-20 sm:block'
+				className='hidden h-20 md:block'
 				orientation='vertical'
 			/>
-			<Separator className='w-full sm:hidden' />
+			<Separator className='w-full md:hidden' />
 			<div className='flex items-center gap-x-2'>
 				<Image
 					src={ActiveProposals}
 					alt='Active Proposals'
 					width={70}
 					height={70}
-					className='h-[70px] w-[70px]'
+					className='h-[50px] w-[50px] lg:h-[70px] lg:w-[70px]'
 				/>
 				<div className='flex flex-col'>
 					<p className='text-xs text-wallet_btn_text'>{t('monitoredTracks')}</p>

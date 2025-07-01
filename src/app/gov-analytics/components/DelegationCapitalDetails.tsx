@@ -103,8 +103,8 @@ function DelegationCapitalDetails({ delegationData }: { delegationData: IDelegat
 	};
 
 	return (
-		<div className='max-h-[500px] w-full flex-1 rounded-lg border border-border_grey p-5'>
-			<div className='flex items-center justify-between'>
+		<div className='max-h-[500px] w-full flex-1 rounded-lg border border-border_grey p-3 lg:p-4'>
+			<div className='flex flex-col items-start justify-between lg:flex-row lg:items-center'>
 				<h2 className='text-base font-semibold sm:text-xl'>Track Delegation</h2>
 				<div className='flex gap-x-4'>
 					<div className='flex items-center gap-x-1'>

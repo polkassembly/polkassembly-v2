@@ -114,7 +114,7 @@ function ReferendumCount() {
 	const thirdRowData = legendData.slice(11);
 
 	const renderLegendRow = (items: typeof legendData) => (
-		<div className='flex w-full flex-wrap gap-x-4 gap-y-2'>
+		<div className='flex flex-wrap justify-between gap-x-10 gap-y-2 lg:w-full lg:gap-x-4'>
 			{items.map((item) => (
 				<div
 					key={`${item.label}`}
@@ -146,18 +146,20 @@ function ReferendumCount() {
 	}
 
 	return (
-		<div className='flex flex-col gap-4 rounded-lg border border-border_grey p-4'>
+		<div className='flex flex-col gap-4 rounded-lg border border-border_grey p-3 lg:p-4'>
 			<h3 className='text-blue-light-high dark:text-blue-dark-high text-base font-semibold'>{t('referendumCount')}</h3>
-			<div className='flex flex-col items-center justify-center gap-x-10 sm:flex-row sm:justify-around'>
+			<div className='flex flex-col items-center justify-center gap-x-10 xl:flex-row xl:justify-around'>
 				<div className='mx-10 my-5 h-[200px] w-full max-w-[400px]'>
 					<Doughnut
 						data={chartData}
 						options={chartOptions}
 					/>
 				</div>
-				{renderLegendRow(firstRowData)}
-				{renderLegendRow(secondRowData)}
-				{renderLegendRow(thirdRowData)}
+				<div className='flex flex-col gap-x-10 lg:flex-row'>
+					<div className='flex flex-col gap-y-2'>{renderLegendRow(firstRowData)}</div>
+					<div className='flex flex-col gap-y-2'>{renderLegendRow(secondRowData)}</div>
+					<div className='flex flex-col gap-y-2'>{renderLegendRow(thirdRowData)}</div>
+				</div>
 			</div>
 		</div>
 	);

@@ -66,7 +66,7 @@ function GovVoting() {
 
 	return (
 		<Collapsible className='rounded-lg border border-border_grey'>
-			<CollapsibleTrigger className='flex w-full items-center gap-x-4 p-4'>
+			<CollapsibleTrigger className='flex w-full items-center gap-x-4 p-3 lg:p-4'>
 				<Image
 					src={TimeLineIcon}
 					alt='Delegation Green Icon'
@@ -80,7 +80,7 @@ function GovVoting() {
 			</CollapsibleTrigger>
 			<CollapsibleContent>
 				<Separator className='my-0' />
-				<div className='flex flex-col gap-y-4 p-4'>
+				<div className='flex flex-col gap-y-4 p-3 lg:p-4'>
 					<div className='flex flex-col gap-y-4'>
 						{isFetching ? (
 							<>

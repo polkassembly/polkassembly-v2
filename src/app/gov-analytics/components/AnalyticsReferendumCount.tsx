@@ -121,9 +121,9 @@ function AnalyticsReferendumCount() {
 	}
 
 	return (
-		<div className='flex flex-col gap-4 rounded-lg border border-border_grey p-4'>
+		<div className='flex flex-col gap-4 rounded-lg border border-border_grey p-3 lg:p-4'>
 			<h3 className='text-blue-light-high dark:text-blue-dark-high text-base font-semibold'>{t('referendumCountByCategory')}</h3>
-			<div className='flex flex-col items-center justify-center gap-10 sm:flex-row sm:justify-around'>
+			<div className='flex flex-col items-center justify-center gap-10 xl:flex-row xl:justify-around'>
 				<div className='h-[200px] w-full max-w-[400px]'>
 					<Doughnut
 						data={chartData}
@@ -134,7 +134,7 @@ function AnalyticsReferendumCount() {
 					{legendData.map((item) => (
 						<div
 							key={item.title}
-							className='mb-2 flex w-full items-center justify-between text-xs sm:mr-10'
+							className='mb-2 flex w-full items-center justify-between text-xs lg:mr-10'
 						>
 							<div className='flex items-center gap-x-2'>
 								<div

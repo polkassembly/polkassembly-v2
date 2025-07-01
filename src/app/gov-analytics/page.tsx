@@ -50,8 +50,8 @@ async function GovAnalyticsPage() {
 				/>
 				Governance Analytics
 			</h1>
-			<div className='flex w-full flex-col gap-y-6 rounded-xl bg-bg_modal p-6 shadow-lg'>All active and history referenda of various tracks.</div>
-			<div className='flex w-full flex-col gap-y-6 rounded-xl bg-bg_modal p-6 shadow-lg'>
+			<div className='flex w-full flex-col gap-y-6 rounded-xl bg-bg_modal p-3 shadow-lg lg:p-6'>All active and history referenda of various tracks.</div>
+			<div className='flex w-full flex-col gap-y-6 rounded-xl bg-bg_modal p-3 shadow-lg lg:p-6'>
 				<GovStats data={analyticsData?.data || null} />
 				<GovOverview />
 				<GovVoting />

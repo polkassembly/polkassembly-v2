@@ -114,8 +114,8 @@ function AnalyticsReferendumOutcome() {
 	}
 
 	return (
-		<div className='flex flex-col gap-4 rounded-lg border border-border_grey p-4'>
-			<div className='flex items-center justify-between'>
+		<div className='flex flex-col gap-4 rounded-lg border border-border_grey p-3 lg:p-4'>
+			<div className='flex flex-col items-start justify-between lg:flex-row lg:items-center'>
 				<h3 className='text-blue-light-high dark:text-blue-dark-high text-base font-semibold'>{t('referendumCountByStatus')}</h3>
 				<div className='relative'>
 					<select
@@ -140,7 +140,7 @@ function AnalyticsReferendumOutcome() {
 					<ChevronDown className='absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 transform text-lg font-semibold text-text_primary' />
 				</div>
 			</div>
-			<div className='flex flex-col items-center justify-center gap-10 sm:flex-row sm:justify-around'>
+			<div className='flex flex-col items-center justify-center gap-10 xl:flex-row xl:justify-around'>
 				<div className='h-[200px] w-full max-w-[400px]'>
 					<Doughnut
 						data={chartData}
@@ -151,7 +151,7 @@ function AnalyticsReferendumOutcome() {
 					{legendData.map((item) => (
 						<div
 							key={item.title}
-							className='mb-2 flex w-full items-center justify-between text-xs sm:mr-10'
+							className='mb-2 flex w-full items-center justify-between text-xs lg:mr-10'
 						>
 							<div className='flex items-center gap-x-2'>
 								<div
