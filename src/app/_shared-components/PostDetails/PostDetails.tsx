@@ -26,11 +26,11 @@ import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
-import PlaceDecisionDeposit from './PlaceDecisionDeposit/PlaceDecisionDeposit';
-import ClaimPayout from './ClaimPayout/ClaimPayout';
 
 const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), { ssr: false });
 const Timeline = dynamic(() => import('./Timeline/Timeline'), { ssr: false });
+const PlaceDecisionDeposit = dynamic(() => import('./PlaceDecisionDeposit/PlaceDecisionDeposit'), { ssr: false });
+const ClaimPayout = dynamic(() => import('./ClaimPayout/ClaimPayout'), { ssr: false });
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
