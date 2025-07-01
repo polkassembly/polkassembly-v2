@@ -481,7 +481,8 @@
 			"votes": "Abstimmungen",
 			"aye": "Ja",
 			"nay": "Nein",
-			"abstain": "Enthaltung"
+			"abstain": "Enthaltung",
+			"noVotesFound": "Keine Abstimmungen gefunden"
 		},
 		"Analytics": {
 			"totalVotesCasted": "Gesamte Abstimmungen",

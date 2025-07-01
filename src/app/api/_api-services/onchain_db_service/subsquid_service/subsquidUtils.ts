@@ -386,8 +386,9 @@ export class SubsquidUtils extends SubsquidQueries {
 		return lockPeriod ? new BN(balance).mul(new BN(lockPeriod)) : new BN(balance).div(DEFAULT_LOCK_PERIOD_DIVISOR);
 	}
 
-	protected static getNestedVoteVotingPower(delegatedVotingPower: string, selfVotingPower: string): BN {
-		return new BN(selfVotingPower || BN_ZERO?.toString()).add(new BN(delegatedVotingPower || BN_ZERO?.toString()));
+	protected static getNestedVoteVotingPower(delegatedVotingPower: string, selfVotingPower: string): BN | null {
+		const value = new BN(selfVotingPower || BN_ZERO?.toString()).add(new BN(delegatedVotingPower || BN_ZERO?.toString()));
+		return value.gt(BN_ZERO) ? value : null;
 	}
 
 	protected static getVotesAnalytics({ votes, type }: { votes: IFlattenedConvictionVote[]; type: Exclude<EAnalyticsType, EAnalyticsType.ACCOUNTS> }): IAnalytics {

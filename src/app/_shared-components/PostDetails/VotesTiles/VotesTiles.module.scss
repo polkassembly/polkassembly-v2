@@ -1,5 +1,5 @@
 .heading {
-	@apply text-base font-bold text-text_primary xl:text-sm 2xl:text-base;
+	@apply text-base font-bold text-text_primary xl:text-sm 2xl:text-lg;
 }
 
 .chartWrapper {
@@ -142,7 +142,7 @@
 	@apply flex items-center justify-center gap-1 text-xs text-text_primary;
 }
 .decisionContainer {
-	@apply flex items-center gap-2 rounded-lg border-[1px] border-solid px-4 py-2 text-sm;
+	@apply flex items-center gap-2 rounded-lg border-[1px] border-solid px-4 py-2 text-sm text-text_primary dark:text-white;
 }
 .decisionsContainer {
 	@apply mt-6 flex items-center justify-center gap-2;

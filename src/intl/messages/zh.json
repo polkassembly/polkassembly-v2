@@ -481,7 +481,8 @@
 			"votes": "投票",
 			"aye": "赞成",
 			"nay": "反对",
-			"abstain": "弃权"
+			"abstain": "弃权",
+			"noVotesFound": "未找到投票"
 		},
 		"Analytics": {
 			"totalVotesCasted": "总投票数",

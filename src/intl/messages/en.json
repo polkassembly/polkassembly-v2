@@ -495,7 +495,8 @@
 			"votes": "Votes",
 			"aye": "Aye",
 			"nay": "Nay",
-			"abstain": "Abstain"
+			"abstain": "Abstain",
+			"noVotesFound": "No votes found"
 		},
 		"Analytics": {
 			"totalVotesCasted": "Total Votes Casted",

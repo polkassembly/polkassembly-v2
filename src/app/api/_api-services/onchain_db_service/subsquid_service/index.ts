@@ -1131,7 +1131,7 @@ export class SubsquidService extends SubsquidUtils {
 		data?.forEach(
 			(vote: {
 				decision: string;
-				balance: { value: string; abstain: string };
+				balance: { value?: string; abstain?: string; aye?: string; nay?: string };
 				voter: string;
 				isDelegated?: boolean;
 				delegatedVotingPower?: string;
@@ -1141,7 +1141,7 @@ export class SubsquidService extends SubsquidUtils {
 				lockPeriod: number;
 			}) => {
 				const decision = this.convertSubsquidVoteDecisionToVoteDecision({ decision: vote.decision });
-				const balance = new BN(vote.balance.value || vote.balance.abstain || BN_ZERO.toString());
+				const balance = new BN(vote.balance?.value || vote.balance?.abstain || vote.balance?.aye || vote.balance?.nay || BN_ZERO.toString());
 				const votingPower =
 					analyticsType === EAnalyticsType.CONVICTIONS
 						? votesType === EPostTileVotesType.FLATTENED

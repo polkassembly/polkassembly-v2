@@ -483,7 +483,8 @@
 			"votes": "Votos",
 			"aye": "Sí",
 			"nay": "No",
-			"abstain": "Abstención"
+			"abstain": "Abstención",
+			"noVotesFound": "No se encontraron votos"
 		},
 		"Analytics": {
 			"totalVotesCasted": "Total de votos emitidos",

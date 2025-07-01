@@ -482,7 +482,8 @@
 			"votes": "投票",
 			"aye": "賛成",
 			"nay": "反対",
-			"abstain": "棄権"
+			"abstain": "棄権",
+			"noVotesFound": "投票が見つかりません"
 		},
 		"Analytics": {
 			"totalVotesCasted": "総投票数",

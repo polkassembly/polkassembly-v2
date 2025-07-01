@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useMemo, useCallback, useState } from 'react';
-import { EAnalyticsType, EPostTileVotesType, EProposalType, EVoteDecision, IPostTilesVotes } from '@/_shared/types';
+import { EAnalyticsType, EPostTileVotesType, EProposalType, ETheme, EVoteDecision, IPostTilesVotes } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { ResponsiveTreeMap } from '@nivo/treemap';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -17,6 +17,8 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import Image from 'next/image';
+import noData from '@/_assets/activityfeed/gifs/noactivity.gif';
 import Address from '../../Profile/Address/Address';
 import classes from './VotesTiles.module.scss';
 import { Skeleton } from '../../Skeleton';
@@ -369,74 +371,89 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 					))}
 				</div>
 			</div>
+
 			{isFetching ? (
 				<Skeleton className='mt-4 h-[280px] w-full' />
+			) : allVotes.length > 0 ? (
+				<>
+					<div className={classes.chartWrapper}>
+						<ResponsiveTreeMap
+							data={chartData}
+							tile='squarify'
+							colorBy='color'
+							identity='name'
+							colors={(bar) => {
+								return bar.data.color;
+							}}
+							leavesOnly
+							value='value'
+							valueFormat={(value) => formatUSDWithUnits(value?.toString(), 1)}
+							innerPadding={4}
+							outerPadding={2}
+							borderWidth={1}
+							borderColor={(node) => {
+								return getBorderColor(node.data.decision);
+							}}
+							enableParentLabel
+							nodeOpacity={1}
+							labelTextColor={theme === ETheme.DARK ? '#fff' : THEME_COLORS.light.text_primary}
+							label={(node) => {
+								const vote = allVotes.find((v) => v.voter === node.id);
+								const percentage = vote?.percentage || 0;
+								// Use original value from the vote data, not the adjusted chart value
+								const originalValue = vote
+									? Number(formatBnBalance(vote.votingPower || vote.balance, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: false }, network).replace(/,/g, ''))
+									: node.value;
+								return `${formatUSDWithUnits(originalValue?.toString(), 1)} ${percentage}%`;
+							}}
+							tooltip={renderTooltip}
+							theme={{
+								text: {
+									fontSize: 12,
+									fontWeight: 500,
+									fill: THEME_COLORS.light.text_primary
+								}
+							}}
+							margin={{ top: 2, right: 2, bottom: 2, left: 2 }}
+							labelSkipSize={30}
+							parentLabelPosition='left'
+							motionConfig='gentle'
+						/>
+					</div>
+					<div className={classes.decisionsContainer}>
+						{[EVoteDecision.AYE, EVoteDecision.NAY, EVoteDecision.ABSTAIN].map((decision) => {
+							const bgColor = getDecisionColor(decision);
+							const borderColor = getBorderColor(decision);
+
+							return (
+								<div
+									key={decision}
+									className={cn(classes.decisionContainer, `border-${borderColor} bg-${bgColor}`)}
+									style={{ backgroundColor: bgColor, borderColor }}
+								>
+									<div
+										className='h-3 w-3 rounded-full'
+										style={{ backgroundColor: borderColor }}
+									/>
+									<span className='text-sm font-medium text-text_primary dark:text-white'>{t(decision)}</span>
+								</div>
+							);
+						})}
+					</div>
+				</>
 			) : (
-				<div className={classes.chartWrapper}>
-					<ResponsiveTreeMap
-						data={chartData}
-						tile='squarify'
-						colorBy='color'
-						identity='name'
-						colors={(bar) => {
-							return bar.data.color;
-						}}
-						leavesOnly
-						value='value'
-						valueFormat={(value) => formatUSDWithUnits(value?.toString(), 1)}
-						innerPadding={4}
-						outerPadding={2}
-						borderWidth={1}
-						borderColor={(node) => {
-							return getBorderColor(node.data.decision);
-						}}
-						enableParentLabel
-						nodeOpacity={1}
-						labelTextColor={THEME_COLORS[`${theme}`].text_primary}
-						label={(node) => {
-							const vote = allVotes.find((v) => v.voter === node.id);
-							const percentage = vote?.percentage || 0;
-							// Use original value from the vote data, not the adjusted chart value
-							const originalValue = vote
-								? Number(formatBnBalance(vote.votingPower || vote.balance, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: false }, network).replace(/,/g, ''))
-								: node.value;
-							return `${formatUSDWithUnits(originalValue?.toString(), 1)} ${percentage}%`;
-						}}
-						tooltip={renderTooltip}
-						theme={{
-							text: {
-								fontSize: 12,
-								fontWeight: 500,
-								fill: THEME_COLORS.light.text_primary
-							}
-						}}
-						margin={{ top: 2, right: 2, bottom: 2, left: 2 }}
-						labelSkipSize={30}
-						parentLabelPosition='left'
-						motionConfig='gentle'
+				// No votes found
+				<div className='flex flex-col items-center justify-center gap-5'>
+					<Image
+						src={noData}
+						alt='no data'
+						width={100}
+						height={100}
+						className='my-4'
 					/>
+					<p className='text-sm'>{t('noVotesFound')}</p>
 				</div>
 			)}
-			<div className={classes.decisionsContainer}>
-				{[EVoteDecision.AYE, EVoteDecision.NAY, EVoteDecision.ABSTAIN].map((decision) => {
-					const bgColor = getDecisionColor(decision);
-					const borderColor = getBorderColor(decision);
-
-					return (
-						<div
-							key={decision}
-							className={cn(classes.decisionContainer, `border-${borderColor} bg-${bgColor}`)}
-							style={{ backgroundColor: bgColor, borderColor }}
-						>
-							<div
-								className='h-2 w-2 rounded-full'
-								style={{ backgroundColor: borderColor }}
-							/>
-							<h3>{t(decision)}</h3>
-						</div>
-					);
-				})}
-			</div>
 		</div>
 	);
 }
