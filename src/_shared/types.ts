@@ -8,6 +8,7 @@ import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { TypeDef } from '@polkadot/types/types';
+import { BN } from '@polkadot/util';
 import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
@@ -1300,4 +1301,33 @@ export interface IPayout {
 		expiresAt: Date;
 		generalIndex: string;
 	};
+}
+
+export enum EVoteSource {
+	CONVICTION_VOTING = 'conviction_voting',
+	REFERENDA = 'referenda'
+}
+
+export interface IVoteLock {
+	refId: string;
+	track: string;
+	balance: BN;
+	conviction: number;
+	endBlock: BN;
+	status: string;
+	voteSource: EVoteSource;
+	locked: string;
+	lockedAtBlock?: BN;
+}
+
+export interface IVotingLocks {
+	lockedVotes: IVoteLock[];
+	unlockableVotes: IVoteLock[];
+	ongoingVotes: IVoteLock[];
+}
+
+export interface IRelativeTime {
+	days: number;
+	hours: number;
+	minutes: number;
 }
