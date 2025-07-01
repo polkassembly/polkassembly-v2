@@ -13,21 +13,31 @@ import { cn } from '@/lib/utils';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useDebounce } from '@/hooks/useDebounce';
 import { Button } from '../Button';
 import classes from './HighlightMenu.module.scss';
 
-const SELECTION_DELAY = 150;
-const MENU_OFFSET_Y = 60;
-const MENU_VISUAL_ADJUSTMENT = 40;
-
-interface SelectionData {
-	text: string;
-	rect: DOMRect | null;
-	timestamp: number;
+interface HighlightMenuProps {
+	markdownRef: React.RefObject<HTMLDivElement | null>;
 }
 
-function HighlightMenu({ markdownRef }: { markdownRef: React.RefObject<HTMLDivElement | null> }) {
+// Optimized debounce hook for performance
+function useOptimizedDebounce<T>(value: T, delay: number): T {
+	const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+	useEffect(() => {
+		const handler = setTimeout(() => {
+			setDebouncedValue(value);
+		}, delay);
+
+		return () => {
+			clearTimeout(handler);
+		};
+	}, [value, delay]);
+
+	return debouncedValue;
+}
+
+function HighlightMenu({ markdownRef }: HighlightMenuProps) {
 	const t = useTranslations();
 	const { toast } = useToast();
 	const { user } = useUser();
@@ -35,18 +45,21 @@ function HighlightMenu({ markdownRef }: { markdownRef: React.RefObject<HTMLDivEl
 	const [selectedText, setSelectedText] = useState('');
 	const [menuPosition, setMenuPosition] = useState({ left: 0, top: 0 });
 	const [isVisible, setIsVisible] = useState(false);
+	const [selectionData, setSelectionData] = useState<{
+		text: string;
+		rect: DOMRect | null;
+	}>({ text: '', rect: null });
 
 	const menuRef = useRef<HTMLDivElement>(null);
 
-	// Use debounce for selection processing
-	const { debouncedValue: debouncedSelectionTrigger, setValue: setSelectionTrigger } = useDebounce<SelectionData>(
-		{
-			text: '',
-			rect: null,
-			timestamp: 0
-		},
-		SELECTION_DELAY
-	);
+	// Optimized debounce for selection changes
+	const debouncedSelection = useOptimizedDebounce(selectionData, 100);
+
+	const clearSelection = useCallback(() => {
+		setSelectedText('');
+		setIsVisible(false);
+		setSelectionData({ text: '', rect: null });
+	}, []);
 
 	const copyToClipboard = useCallback(
 		async (text: string) => {
@@ -66,26 +79,96 @@ function HighlightMenu({ markdownRef }: { markdownRef: React.RefObject<HTMLDivEl
 		[toast, t]
 	);
 
-	// Process the debounced selection
+	const handleQuote = useCallback(
+		(event: React.MouseEvent) => {
+			event.preventDefault();
+			event.stopPropagation();
+			setQuoteCommentText(selectedText || '');
+
+			if (user) {
+				const commentForm = document.getElementById('commentForm');
+				commentForm?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			} else {
+				const loginPrompt = document.getElementById('commentLoginPrompt');
+				loginPrompt?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			}
+			clearSelection();
+		},
+		[selectedText, setQuoteCommentText, user, clearSelection]
+	);
+
+	const handleCopy = useCallback(
+		(event: React.MouseEvent) => {
+			event.preventDefault();
+			event.stopPropagation();
+			copyToClipboard(selectedText || '');
+			clearSelection();
+		},
+		[selectedText, copyToClipboard, clearSelection]
+	);
+
+	const handleShare = useCallback(
+		(event: React.MouseEvent) => {
+			event.preventDefault();
+			event.stopPropagation();
+			const twitterText = `"${selectedText}" ${window.location.href}`;
+			const twitterLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}`;
+			window.open(twitterLink, '_blank');
+			clearSelection();
+		},
+		[selectedText, clearSelection]
+	);
+
+	// Optimized selection handler with performance improvements
+	const handleSelectionChange = useCallback(() => {
+		const selection = window.getSelection();
+		const markdown = markdownRef.current;
+
+		if (!selection || !markdown || selection.rangeCount === 0) {
+			setSelectionData({ text: '', rect: null });
+			return;
+		}
+
+		const text = selection.toString().trim();
+
+		if (!text) {
+			setSelectionData({ text: '', rect: null });
+			return;
+		}
+
+		// Check if selection is within markdown container
+		const range = selection.getRangeAt(0);
+		const container = range.commonAncestorContainer;
+		const element = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
+
+		if (!element || !markdown.contains(element)) {
+			setSelectionData({ text: '', rect: null });
+			return;
+		}
+
+		const rect = range.getBoundingClientRect();
+		setSelectionData({ text, rect });
+	}, [markdownRef]);
+
+	// Process debounced selection for optimal performance
 	useEffect(() => {
-		if (!debouncedSelectionTrigger.text || !debouncedSelectionTrigger.rect) {
+		if (!debouncedSelection.text || !debouncedSelection.rect) {
 			setSelectedText('');
 			setIsVisible(false);
 			return;
 		}
 
-		const { text, rect } = debouncedSelectionTrigger;
+		const { text, rect } = debouncedSelection;
 		const markdown = markdownRef?.current;
 
 		if (markdown && rect) {
 			const markdownRect = markdown.getBoundingClientRect();
 
-			// Check if selection is within the markdown area
+			// Enhanced bounds checking
 			if (rect.left >= markdownRect.left && rect.right <= markdownRect.right && rect.top >= markdownRect.top && rect.bottom <= markdownRect.bottom) {
-				// Use fixed positioning relative to viewport
 				setMenuPosition({
 					left: rect.left + rect.width / 2,
-					top: rect.top - MENU_OFFSET_Y // Position 60px above the selection
+					top: rect.top - 60 // Position 60px above selection
 				});
 
 				setSelectedText(text);
@@ -96,144 +179,28 @@ function HighlightMenu({ markdownRef }: { markdownRef: React.RefObject<HTMLDivEl
 
 		setSelectedText('');
 		setIsVisible(false);
-	}, [debouncedSelectionTrigger, markdownRef]);
+	}, [debouncedSelection, markdownRef]);
 
-	const handleSelection = useCallback(() => {
-		const selection = window.getSelection();
-		if (!selection || selection.rangeCount === 0) {
-			setSelectionTrigger({
-				text: '',
-				rect: null,
-				timestamp: Date.now()
-			});
-			return;
-		}
-
-		const text = selection.toString().trim();
-
-		if (text && text.length > 0) {
-			const range = selection.getRangeAt(0);
-			const rect = range.getBoundingClientRect();
-
-			setSelectionTrigger({
-				text,
-				rect,
-				timestamp: Date.now()
-			});
-		} else {
-			setSelectionTrigger({
-				text: '',
-				rect: null,
-				timestamp: Date.now()
-			});
-		}
-	}, [setSelectionTrigger]);
-
-	const clearSelection = useCallback(() => {
-		setSelectionTrigger({
-			text: '',
-			rect: null,
-			timestamp: Date.now()
-		});
-		setSelectedText('');
-		setIsVisible(false);
-	}, [setSelectionTrigger]);
-
-	const shareSelection = useCallback(
-		(event: React.MouseEvent) => {
-			event.stopPropagation();
-			event.preventDefault();
-			const twitterText = `"${selectedText}" ${window.location.href}`;
-			const twitterLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}`;
-
-			window.open(twitterLink, '_blank');
-			clearSelection();
-		},
-		[selectedText, clearSelection]
-	);
-
-	const handleCopy = useCallback(
-		(event: React.MouseEvent) => {
-			event.stopPropagation();
-			event.preventDefault();
-			copyToClipboard(selectedText || '');
-			clearSelection();
-		},
-		[selectedText, copyToClipboard, clearSelection]
-	);
-
-	const handleQuote = useCallback(
-		(event: React.MouseEvent) => {
-			setQuoteCommentText(selectedText || '');
-
-			if (user) {
-				// Scroll to comment form if user is logged in
-				event.preventDefault();
-				event.stopPropagation();
-				const commentForm = document.getElementById('commentForm');
-				commentForm?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-			} else {
-				// Scroll to login prompt if user is not logged in
-				const loginPrompt = document.getElementById('commentLoginPrompt');
-				loginPrompt?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-			}
-
-			clearSelection();
-		},
-		[selectedText, setQuoteCommentText, user, clearSelection]
-	);
-
+	// Optimized event listeners with proper cleanup
 	useEffect(() => {
 		const markdown = markdownRef.current;
 		if (!markdown) return undefined;
 
-		// Handle selection change globally
-		const handleSelectionChange = () => {
-			const selection = window.getSelection();
-			if (!selection || selection.toString().trim() === '') {
-				clearSelection();
-				return;
-			}
-
-			// Check if the selection is within our markdown container
-			if (selection.rangeCount > 0) {
-				const range = selection.getRangeAt(0);
-				const container = range.commonAncestorContainer;
-				const element = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
-
-				if (element && markdown.contains(element)) {
-					handleSelection();
-				} else {
-					clearSelection();
-				}
-			}
-		};
-
-		// Handle clicks outside to clear selection
 		const handleDocumentClick = (event: MouseEvent) => {
-			// Don't clear if clicking on the menu
-			if (menuRef.current && menuRef.current.contains(event.target as Node)) {
-				return;
-			}
-
-			// Don't clear if clicking within markdown (let selectionchange handle it)
-			if (markdown.contains(event.target as Node)) {
-				return;
-			}
-
-			// Clear if clicking completely outside
+			if (menuRef.current?.contains(event.target as Node)) return;
+			if (markdown.contains(event.target as Node)) return;
 			clearSelection();
 		};
 
-		// Use selectionchange instead of mouseup for better accuracy
+		// Use passive listeners for better performance
 		document.addEventListener('selectionchange', handleSelectionChange);
-		document.addEventListener('click', handleDocumentClick);
+		document.addEventListener('click', handleDocumentClick, { passive: true });
 
 		return () => {
 			document.removeEventListener('selectionchange', handleSelectionChange);
 			document.removeEventListener('click', handleDocumentClick);
 		};
-	}, [markdownRef, handleSelection, clearSelection]);
+	}, [markdownRef, handleSelectionChange, clearSelection]);
 
 	if (!isVisible || !selectedText) {
 		return null;
@@ -245,8 +212,11 @@ function HighlightMenu({ markdownRef }: { markdownRef: React.RefObject<HTMLDivEl
 			className={classes.container}
 			style={{
 				left: `${menuPosition.left}px`,
-				top: `${menuPosition.top - MENU_VISUAL_ADJUSTMENT}px`,
-				transform: 'translateX(-50%)'
+				top: `${menuPosition.top - 40}px`,
+				transform: 'translateX(-50%)',
+				// Performance optimizations
+				willChange: 'transform',
+				contain: 'layout style paint'
 			}}
 		>
 			<Button
@@ -274,7 +244,7 @@ function HighlightMenu({ markdownRef }: { markdownRef: React.RefObject<HTMLDivEl
 				variant='ghost'
 				size='sm'
 				className={cn(classes.button, 'h-6')}
-				onClick={shareSelection}
+				onClick={handleShare}
 			>
 				<FaTwitter className='w-3 text-basic_text' />
 				<span className={classes.buttonText}>{t('PostDetails.HighlightMenu.share')}</span>
