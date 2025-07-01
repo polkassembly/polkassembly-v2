@@ -1,5 +1,5 @@
 .heading {
-	@apply mb-2 text-lg font-semibold text-text_primary;
+	@apply text-base font-bold text-text_primary xl:text-sm 2xl:text-base;
 }
 .card {
 	@apply mx-auto max-h-[500px] w-full flex-1 rounded-2xl border-[1px] border-solid border-border_grey bg-transparent p-4 text-basic_text lg:max-w-[512px];

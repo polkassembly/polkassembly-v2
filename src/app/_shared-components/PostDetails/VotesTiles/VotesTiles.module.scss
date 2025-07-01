@@ -1,5 +1,5 @@
 .heading {
-	@apply mb-2 text-lg font-semibold text-text_primary;
+	@apply text-base font-bold text-text_primary xl:text-sm 2xl:text-base;
 }
 
 .chartWrapper {
@@ -9,13 +9,14 @@
 	min-height: 280px;
 
 	rect {
-		rx: 3 !important;
-		ry: 3 !important;
+		rx: 8 !important;
+		ry: 8 !important;
 		min-width: 15px !important;
 		min-height: 12px !important;
 	}
 
 	// More aggressive minimum sizes for very small rectangles
+	rect[width='0'],
 	rect[width='1'],
 	rect[height='1'],
 	rect[width='2'],
@@ -31,20 +32,17 @@
 	// Ensure text is visible on small elements
 	text {
 		font-size: 11px !important;
-		font-weight: 700 !important;
-		text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+		font-weight: 500 !important;
 		pointer-events: none; // Prevent text from interfering with hover
 
 		@media (max-width: 768px) {
 			font-size: 10px !important;
-			font-weight: 800 !important;
-			text-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
+			font-weight: 500 !important;
 		}
 
 		@media (max-width: 480px) {
 			font-size: 9px !important;
-			font-weight: 800 !important;
-			text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+			font-weight: 500 !important;
 		}
 	}
 
@@ -121,4 +119,38 @@
 
 .description {
 	@apply my-4 flex items-center gap-2 rounded-lg border-[1px] border-solid border-turnout_color bg-analytics_description_bg px-4 py-2 text-sm font-medium text-text_primary dark:text-white;
+}
+
+.header {
+	@apply flex flex-col items-start;
+}
+
+.buttonContainer {
+	@apply my-4 flex w-full items-center justify-between rounded-lg bg-bg_code p-1.5;
+}
+
+.tooltip {
+	@apply flex flex-col items-center justify-center rounded-md bg-bg_code p-4;
+}
+.tooltipContent {
+	@apply flex flex-col items-center justify-center gap-1 text-xs text-text_primary;
+}
+.tooltipTitle {
+	@apply text-sm font-bold text-text_primary dark:text-white;
+}
+.tooltipValue {
+	@apply flex items-center justify-center gap-1 text-xs text-text_primary;
+}
+.decisionContainer {
+	@apply flex items-center gap-2 rounded-lg border-[1px] border-solid px-4 py-2 text-sm;
+}
+.decisionsContainer {
+	@apply mt-6 flex items-center justify-center gap-2;
+}
+
+.tooltipContentValue {
+	@apply flex flex-col items-center gap-1 font-bold text-basic_text;
+}
+.tooltipText {
+	@apply text-basic_text;
 }
