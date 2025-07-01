@@ -677,6 +677,10 @@
 	"Preimages": {
 		"hash": "哈希",
 		"author": "作者",
+		"all": "全部",
+		"myPreimages": "我的预映像",
+		"noUserPreimages": "您没有预映像！",
+		"createOneNow": "现在创建一个！",
 		"deposit": "押金",
 		"arguments": "参数",
 		"size": "大小",

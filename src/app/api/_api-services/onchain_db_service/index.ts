@@ -145,6 +145,16 @@ export class OnChainDbService {
 		};
 	}
 
+	static async GetUserPreimageListing({ network, page, limit, addresses }: { network: ENetwork; page: number; limit: number; addresses: string[] }) {
+		const userPreimageListing = await SubsquidService.GetUserPreimageListing({ network, page, limit, addresses });
+		if (userPreimageListing) return userPreimageListing;
+
+		return {
+			items: [],
+			totalCount: 0
+		};
+	}
+
 	static async GetPreimageByHash({ network, hash }: { network: ENetwork; hash: string }): Promise<IPreimage | null> {
 		const preimage = await SubsquidService.GetPreimageByHash({ network, hash });
 		if (preimage) return preimage;

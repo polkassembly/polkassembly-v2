@@ -677,6 +677,10 @@
 	"Preimages": {
 		"hash": "ハッシュ",
 		"author": "作成者",
+		"all": "すべて",
+		"myPreimages": "マイプレイメージ",
+		"noUserPreimages": "プレイメージがありません！",
+		"createOneNow": "今すぐ作成！",
 		"deposit": "デポジット",
 		"arguments": "引数",
 		"size": "サイズ",

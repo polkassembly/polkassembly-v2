@@ -725,6 +725,10 @@
 	"Preimages": {
 		"hash": "Hash",
 		"author": "Author",
+		"all": "All",
+		"myPreimages": "My Preimages",
+		"noUserPreimages": "You have no preimages!",
+		"createOneNow": "Create one now!",
 		"deposit": "Deposit",
 		"arguments": "Arguments",
 		"size": "Size",

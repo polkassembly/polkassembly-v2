@@ -10,6 +10,10 @@ import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { Tabs, TabsContent } from '@/app/_shared-components/Tabs';
+import { EPreImageTabs } from '@/_shared/types';
+import SearchBar from '@ui/Preimages/SearchBar/SearchBar';
+import UserPreimageCheck from '@ui/Preimages/UserPreimagesTab/UserPreimageCheck';
 
 export async function generateMetadata({ params }: { params: Promise<{ hash: string }> }): Promise<Metadata> {
 	const { hash } = await params;
@@ -62,12 +66,25 @@ async function Preimages({ params }: { params: Promise<{ hash: string }> }) {
 	const { data } = await NextApiClientService.fetchPreimageByHash({ hash });
 
 	return (
-		<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
-			<Header data={{ totalCount: data ? 1 : 0 }} />
-			<ListingTable
-				data={data ? [data] : []}
-				totalCount={data ? 1 : 0}
-			/>
+		<div className='w-full'>
+			<Tabs
+				className=''
+				defaultValue={EPreImageTabs.ALL}
+			>
+				<Header data={{ totalCount: data ? 1 : 0 }} />
+				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
+					<SearchBar />
+					<TabsContent value={EPreImageTabs.ALL}>
+						<ListingTable
+							data={data ? [data] : []}
+							totalCount={data ? 1 : 0}
+						/>
+					</TabsContent>
+					<TabsContent value={EPreImageTabs.USER}>
+						<UserPreimageCheck preimage={data} />
+					</TabsContent>
+				</div>
+			</Tabs>
 		</div>
 	);
 }

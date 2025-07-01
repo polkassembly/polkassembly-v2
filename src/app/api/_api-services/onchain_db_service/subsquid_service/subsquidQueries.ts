@@ -697,6 +697,34 @@ export class SubsquidQueries {
 		}
 	`;
 
+	protected static GET_USER_PREIMAGES_LISTING = `
+		query GetUserPreimagesListing($limit: Int!, $offset: Int!, $proposer_in: [String!]!) {
+			preimagesConnection(orderBy: createdAtBlock_DESC, where: {proposer_in: $proposer_in}) {
+				totalCount
+			}
+			preimages(limit: $limit, offset: $offset, orderBy: createdAtBlock_DESC, where: {proposer_in: $proposer_in}) {
+				hash
+				id
+				length
+				method
+				section
+				deposit
+				proposedCall {
+					args
+					description
+					method
+					section
+				}
+				proposer
+				status
+				updatedAt
+				updatedAtBlock
+				createdAtBlock
+				createdAt
+			}
+		}
+	`;
+
 	protected static GET_PREIMAGE_BY_HASH = `
 		query GetPreimageByHash($hash_eq: String!) {
 			preimages(where: {hash_eq: $hash_eq}) {

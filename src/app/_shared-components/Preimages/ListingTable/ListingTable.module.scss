@@ -19,15 +19,15 @@
 }
 
 .tableRow {
-	@apply overflow-hidden rounded-t-lg bg-page_background px-6;
+	@apply overflow-hidden rounded-lg bg-page_background px-6 text-center;
 }
 
 .tableCell_1 {
-	@apply p-6 first:rounded-tl-lg last:rounded-tr-lg;
+	@apply p-6 text-center first:rounded-l-lg last:rounded-r-lg;
 }
 
 .tableCell_last {
-	@apply p-6 last:rounded-tr-lg;
+	@apply p-6 text-center last:rounded-r-lg;
 }
 
 .tableCell_2 {
@@ -52,4 +52,12 @@
 
 .table_content_cell_2_content {
 	@apply rounded-lg bg-wallet_disabled_bg px-2 py-1;
+}
+
+.noPreimage {
+	@apply mx-auto flex w-full max-w-lg flex-col items-center justify-center gap-4 py-2 text-center;
+}
+
+.no_data {
+	@apply flex flex-col items-center justify-center py-2 text-center text-lg font-semibold text-text_primary;
 }
