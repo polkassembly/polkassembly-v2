@@ -799,6 +799,8 @@
 		"searchUsername": "ユーザー名を検索"
 	},
 	"SetIdentity": {
+		"TeleportFundsToPeopleChain": "People Chainに資金をテレポート",
+		"Teleport": "テレポート",
 		"displayName": "表示名",
 		"legalName": "法的名称",
 		"email": "メールアドレス",
@@ -1281,5 +1283,14 @@
 		"pasteURLorEnterPostID": "URLを貼り付けるか投稿IDを入力してください",
 		"yourDiscussions": "あなたのディスカッション",
 		"confirm": "確認"
+	},
+	"TeleportToPeopleChain": {
+		"teleport": "テレポート",
+		"teleportFundsToPeopleChainSuccess": "People Chainへの資金テレポートが成功しました",
+		"teleportFundsToPeopleChainSuccessDescription": "資金がPeople Chainへ正常にテレポートされました",
+		"teleportFundsToPeopleChainFailed": "People Chainへの資金テレポートに失敗しました",
+		"teleportFundsToPeopleChainFailedDescription": "People Chainへの資金テレポート中にエラーが発生しました",
+		"BeneficiaryAddress": "受益者アドレス",
+		"Amount": "金額"
 	}
 }

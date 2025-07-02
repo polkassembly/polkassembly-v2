@@ -798,6 +798,8 @@
 		"searchUsername": "Benutzername suchen"
 	},
 	"SetIdentity": {
+		"TeleportFundsToPeopleChain": "Mittel zur People Chain teleportieren",
+		"Teleport": "Teleportieren",
 		"displayName": "Anzeigename",
 		"legalName": "Rechtlicher Name",
 		"email": "E-Mail",
@@ -1281,5 +1283,14 @@
 		"pasteURLorEnterPostID": "URL einfügen oder Beitrags-ID eingeben",
 		"yourDiscussions": "Ihre Diskussionen",
 		"confirm": "Bestätigen"
+	},
+	"TeleportToPeopleChain": {
+		"teleport": "Teleportieren",
+		"teleportFundsToPeopleChainSuccess": "Mittel wurden erfolgreich zur People Chain teleportiert",
+		"teleportFundsToPeopleChainSuccessDescription": "Die Mittel wurden erfolgreich zur People Chain teleportiert",
+		"teleportFundsToPeopleChainFailed": "Teleport der Mittel zur People Chain fehlgeschlagen",
+		"teleportFundsToPeopleChainFailedDescription": "Beim Teleportieren der Mittel zur People Chain ist ein Fehler aufgetreten",
+		"BeneficiaryAddress": "Begünstigten-Adresse",
+		"Amount": "Betrag"
 	}
 }
