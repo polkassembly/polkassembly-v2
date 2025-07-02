@@ -587,7 +587,9 @@
 			"payoutClaimFailed": "支払いの請求に失敗しました",
 			"payoutClaimedSuccessfullyDescription": "支払いが正常に請求されました",
 			"payoutClaimFailedDescription": "もう一度お試しください"
-		}
+		},
+		"commentsDisabled": "この投稿のコメントは無効になっています。",
+		"commentsDisabledForNonVerifiedUsers": "未認証ユーザーのコメントは無効になっています。"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",
@@ -703,7 +705,8 @@
 		"success": "投稿が正常に更新されました",
 		"successDescription": "あなたの投稿は正常に更新されました",
 		"error": "投稿の更新に失敗しました",
-		"errorDescription": "投稿の更新中にエラーが発生しました"
+		"errorDescription": "投稿の更新中にエラーが発生しました",
+		"whoCanComment": "誰がコメントできますか？"
 	},
 	"Footer": {
 		"helpCenter": "ヘルプセンター",

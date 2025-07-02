@@ -5,6 +5,7 @@
 // TODO: standardize naming convention for time constants
 
 export const ONE_DAY_IN_SECONDS = 24 * 60 * 60;
+export const THREE_DAYS_IN_SECONDS = 24 * 3 * 60 * 60;
 export const FIVE_MIN = 5 * 60; // (expressed in seconds)
 export const FIVE_MIN_IN_MILLI = 5 * 60 * 1000; // (expressed in milliseconds)
 export const ADDRESS_LOGIN_TTL = 5 * 60; // 5 min (expressed in seconds)
