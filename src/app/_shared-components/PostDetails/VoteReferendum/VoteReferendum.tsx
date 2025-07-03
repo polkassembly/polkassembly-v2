@@ -147,6 +147,7 @@ function VoteReferendum({
 	const { userPreferences } = useUserPreferences();
 	const [voteDecision, setVoteDecision] = useState(EVoteDecision.AYE);
 	const t = useTranslations();
+	const queryClient = useQueryClient();
 	const [balance, setBalance] = useState<BN>(BN_ZERO);
 	const [ayeVoteValue, setAyeVoteValue] = useState<BN>(BN_ZERO);
 	const [nayVoteValue, setNayVoteValue] = useState<BN>(BN_ZERO);
@@ -207,14 +208,18 @@ function VoteReferendum({
 
 		if (isInvalidAmount) return;
 
+		const getRegularAddress = (selectedAccount: ISelectedAccount): string => {
+			if (selectedAccount.parent) {
+				return getRegularAddress(selectedAccount.parent);
+			}
+			return selectedAccount.address;
+		};
+
+		const userAddress = getRegularAddress(userPreferences.selectedAccount);
+
 		try {
-			const getRegularAddress = (selectedAccount: ISelectedAccount): string => {
-				if (selectedAccount.parent) {
-					return getRegularAddress(selectedAccount.parent);
-				}
-				return selectedAccount.address;
-			};
 			setIsLoading(true);
+
 			await apiService.voteReferendum({
 				selectedAccount: userPreferences.selectedAccount,
 				address: getRegularAddress(userPreferences.selectedAccount),
@@ -225,13 +230,35 @@ function VoteReferendum({
 						status: ENotificationStatus.SUCCESS
 					});
 					setIsLoading(false);
+
+					// Optimistic update - immediately update cache with new vote on success
+					const optimisticVoteData = {
+						decision: voteDecision,
+						balanceValue: balance.toString(),
+						voterAddress: userAddress,
+						lockPeriod: conviction,
+						createdAt: new Date(),
+						selfVotingPower: balance.toString(),
+						totalVotingPower: balance.toString(),
+						delegatedVotingPower: '0'
+					};
+
+					queryClient.setQueryData(['userVotes', proposalType, index, userAddress], {
+						votes: [optimisticVoteData]
+					});
+
+					// Also invalidate to ensure fresh data in the background
+					queryClient.invalidateQueries({
+						queryKey: ['userVotes', proposalType, index, userAddress]
+					});
+
 					onClose();
 					setOpenSuccessModal(true);
 					setSuccessModalContent(
 						<VoteSuccessContent
 							decision={voteDecision}
 							balance={balance}
-							address={userPreferences.selectedAccount ? getRegularAddress(userPreferences.selectedAccount) : ''}
+							address={userAddress}
 							conviction={conviction}
 							proposalType={proposalType}
 							index={index}

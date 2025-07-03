@@ -53,7 +53,9 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 		},
 		enabled: !!user?.addresses[0],
 		retry: 1,
-		staleTime: 30000
+		staleTime: 0, // Always refetch user votes to ensure fresh data
+		refetchOnWindowFocus: true,
+		refetchOnMount: true
 	});
 
 	const hasVoted = Array.isArray(voteData?.votes) && voteData.votes.length > 0;
