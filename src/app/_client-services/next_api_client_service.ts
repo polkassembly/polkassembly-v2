@@ -53,7 +53,7 @@ import {
 	IPostAnalytics,
 	IPostTilesVotes,
 	EAnalyticsType,
-	EPostTilesVotesType
+	EPostTileVotesType
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -1106,7 +1106,7 @@ export class NextApiClientService {
 		proposalType: EProposalType;
 		index: string;
 		analyticsType?: EAnalyticsType;
-		votesType: EPostTilesVotesType;
+		votesType: EPostTileVotesType;
 	}) {
 		const queryParams = new URLSearchParams({
 			analyticsType: analyticsType ? analyticsType.toString() : '',

@@ -140,7 +140,7 @@ function TurnoutOrSupportCard({ turnout, support }: IVotesTurnoutProps) {
 					height={20}
 					className={theme === ETheme.DARK ? 'darkIcon' : ''}
 				/>
-				<h2 className='text-base font-bold text-text_primary'>
+				<h2 className='text-base font-semibold text-text_primary xl:text-sm 2xl:text-base'>
 					{turnout ? t('turnout') : t('support')} {t('percentage')}
 				</h2>
 			</div>
@@ -148,7 +148,7 @@ function TurnoutOrSupportCard({ turnout, support }: IVotesTurnoutProps) {
 				<Doughnut
 					data={chartData}
 					options={chartOptions}
-					className='h-[170px] w-[180px]'
+					className='h-[170px] w-full max-lg:mt-2'
 				/>
 				<p className='absolute mt-4 block gap-2 text-base font-bold dark:text-white'>{percentage ? `${percentage.toFixed(1)}%` : ''}</p>
 			</div>

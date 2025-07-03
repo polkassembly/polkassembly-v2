@@ -6,7 +6,7 @@ import {
 	EAnalyticsType,
 	ENetwork,
 	EPostOrigin,
-	EPostTilesVotesType,
+	EPostTileVotesType,
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
@@ -1058,7 +1058,7 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async getPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics> {
+	static async GetPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_ALL_FLATTENED_VOTES_FOR_POST;
@@ -1067,7 +1067,7 @@ export class SubsquidService extends SubsquidUtils {
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain post analytics from Subsquid: ${subsquidErr}`);
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post analytics from Subsquid');
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, subsquidErr?.message || 'Error fetching on-chain post analytics from Subsquid');
 		}
 
 		const votes = subsquidData.flattenedConvictionVotes?.map((vote: { decision: string }) => {
@@ -1092,7 +1092,7 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async getPostTilesVotes({
+	static async GetPostTillesVotes({
 		network,
 		proposalType,
 		index,
@@ -1103,11 +1103,11 @@ export class SubsquidService extends SubsquidUtils {
 		proposalType: EProposalType;
 		index: number;
 		analyticsType?: EAnalyticsType;
-		votesType: EPostTilesVotesType;
+		votesType: EPostTileVotesType;
 	}): Promise<IPostTilesVotes> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = votesType === EPostTilesVotesType.FLATTENED ? this.GET_ALL_FLATTENED_VOTES_FOR_POST : this.GET_ALL_NESTED_VOTES;
+		const query = votesType === EPostTileVotesType.FLATTENED ? this.GET_ALL_FLATTENED_VOTES_FOR_POST : this.GET_ALL_NESTED_VOTES;
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { type_eq: proposalType, index_eq: index }).toPromise();
 
 		if (subsquidErr || !subsquidData) {
@@ -1115,7 +1115,7 @@ export class SubsquidService extends SubsquidUtils {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post analytics from Subsquid');
 		}
 
-		const data = votesType === EPostTilesVotesType.FLATTENED ? subsquidData.flattenedConvictionVotes : subsquidData.convictionVotes;
+		const data = votesType === EPostTileVotesType.FLATTENED ? subsquidData.flattenedConvictionVotes : subsquidData.convictionVotes;
 
 		const votesData: IPostTilesVotes = {
 			votes: {
@@ -1124,14 +1124,14 @@ export class SubsquidService extends SubsquidUtils {
 				[EVoteDecision.ABSTAIN]: []
 			},
 			proposal: {
-				status: data?.[0]?.proposal?.status as EProposalStatus
+				status: (data?.[0]?.proposal?.status as EProposalStatus) || EProposalStatus.Unknown
 			}
 		};
 
 		data?.forEach(
 			(vote: {
 				decision: string;
-				balance: { value: string; abstain: string };
+				balance: { value?: string; abstain?: string; aye?: string; nay?: string };
 				voter: string;
 				isDelegated?: boolean;
 				delegatedVotingPower?: string;
@@ -1141,10 +1141,10 @@ export class SubsquidService extends SubsquidUtils {
 				lockPeriod: number;
 			}) => {
 				const decision = this.convertSubsquidVoteDecisionToVoteDecision({ decision: vote.decision });
-				const balance = new BN(vote.balance.value || vote.balance.abstain || BN_ZERO.toString());
+				const balance = new BN(vote.balance?.value || vote.balance?.abstain || vote.balance?.aye || vote.balance?.nay || BN_ZERO.toString());
 				const votingPower =
 					analyticsType === EAnalyticsType.CONVICTIONS
-						? votesType === EPostTilesVotesType.FLATTENED
+						? votesType === EPostTileVotesType.FLATTENED
 							? this.getVotingPower(balance?.toString(), vote?.lockPeriod)
 							: this.getNestedVoteVotingPower(
 									vote?.parentVote?.delegatedVotingPower || vote?.delegatedVotingPower || BN_ZERO.toString(),

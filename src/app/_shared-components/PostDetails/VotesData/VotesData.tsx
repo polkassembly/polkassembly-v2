@@ -6,13 +6,18 @@ import { ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { ClientError } from '@/app/_client-utils/clientError';
+import { useQuery } from '@tanstack/react-query';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import { Button } from '../../Button';
 import VoteHistory from '../VoteSummary/VoteHistory/VoteHistory';
 import VoteCurvesData from '../VoteCurvesData/VoteCurvesData';
-import VotesDistributionTiles from '../VotesDistributionTiles/VotesDistributionTiles';
+import VotesTiles from '../VotesTiles/VotesTiles';
 import { Tabs, TabsContent } from '../../Tabs';
 import classes from './VotesData.module.scss';
+import VotesDataDialog from './VotesDataDialog';
 
 interface IVotesDataProps {
 	proposalType: EProposalType;
@@ -32,9 +37,50 @@ enum EProposalVoteType {
 function VotesData({ proposalType, index, trackName, createdAt, timeline, setThresholdValues, thresholdValues }: IVotesDataProps) {
 	const t = useTranslations('PostDetails.VotesData');
 	const [activeTab, setActiveTab] = useState<EProposalVoteType>(EProposalVoteType.Tile);
+	const fetchVoteCurves = async () => {
+		const { data, error } = await NextApiClientService.getVoteCurves({
+			proposalType,
+			indexOrHash: index
+		});
+
+		if (error || !data) {
+			throw new ClientError(error?.message || 'Failed to fetch API data');
+		}
+
+		return data;
+	};
+
+	const { data: voteCurveData, isFetching } = useQuery({
+		queryKey: ['vote-curves', proposalType, index],
+		queryFn: () => fetchVoteCurves(),
+		placeholderData: [],
+		staleTime: FIVE_MIN_IN_MILLI,
+		retry: false,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false
+	});
+
+	const latestApproval = Array.isArray(voteCurveData) && voteCurveData.length > 0 ? voteCurveData[voteCurveData.length - 1].approvalPercent : null;
+	const latestSupport = Array.isArray(voteCurveData) && voteCurveData.length > 0 ? voteCurveData[voteCurveData.length - 1].supportPercent : null;
+
 	return (
 		<div className={classes.card}>
-			<h1 className={classes.header}>{t('votes')}</h1>
+			<div className='flex w-full items-center justify-between'>
+				<h1 className={classes.header}>{t('votes')}</h1>
+				<VotesDataDialog
+					index={index}
+					voteCurveData={voteCurveData || []}
+					trackName={trackName}
+					timeline={timeline || []}
+					createdAt={createdAt || new Date()}
+					setThresholdValues={setThresholdValues || (() => {})}
+					thresholdValues={thresholdValues || { approvalThreshold: 0, supportThreshold: 0 }}
+					latestApproval={latestApproval}
+					latestSupport={latestSupport}
+					isFetching={isFetching}
+					proposalType={proposalType}
+				/>
+			</div>
 			<Tabs
 				value={activeTab}
 				defaultValue={activeTab}
@@ -64,7 +110,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 						value={EProposalVoteType.Tile}
 						className='px-6'
 					>
-						<VotesDistributionTiles
+						<VotesTiles
 							proposalType={proposalType}
 							index={index}
 							analyticsType={EAnalyticsType.CONVICTIONS}
@@ -74,8 +120,10 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 				{activeTab === EProposalVoteType.Graph && !!trackName && timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced) && (
 					<TabsContent value={EProposalVoteType.Graph}>
 						<VoteCurvesData
-							proposalType={proposalType}
-							index={index}
+							latestApproval={latestApproval}
+							latestSupport={latestSupport}
+							isFetching={isFetching}
+							voteCurveData={voteCurveData || []}
 							createdAt={createdAt}
 							trackName={trackName}
 							timeline={timeline}

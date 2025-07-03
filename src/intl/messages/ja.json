@@ -476,7 +476,9 @@
 			"tile": "タイル",
 			"graph": "グラフ",
 			"voteHistory": "投票履歴 (フラット, ネスト, 呼び出し)",
-			"votes": "投票"
+			"votes": "投票",
+			"voteGraph": "投票グラフ",
+			"voteTiles": "投票タイル"
 		},
 		"VotesTiles": {
 			"nested": "ネスト",
@@ -489,7 +491,8 @@
 			"votes": "投票",
 			"aye": "賛成",
 			"nay": "反対",
-			"abstain": "棄権"
+			"abstain": "棄権",
+			"noVotesFound": "投票が見つかりません"
 		},
 		"Analytics": {
 			"totalVotesCasted": "総投票数",
@@ -564,8 +567,7 @@
 		"VoteCurves": {
 			"approval": "承認",
 			"support": "サポート",
-			"threshold": "閾値",
-			"votingData": "投票データ"
+			"threshold": "閾値"
 		},
 		"threshold": "しきい値",
 		"DecisionDeposit": {

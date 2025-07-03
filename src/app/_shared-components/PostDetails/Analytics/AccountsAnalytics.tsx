@@ -13,7 +13,7 @@ import { Separator } from '../../Separator';
 function AccountsAnalytics({ accountsAnalytics }: { accountsAnalytics: IAccountAnalytics }) {
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='flex gap-4'>
+			<div className='flex gap-4 max-lg:flex-col'>
 				<TotalVotesCard
 					analytics={accountsAnalytics}
 					isAccountsAnalytics
@@ -32,7 +32,7 @@ function AccountsAnalytics({ accountsAnalytics }: { accountsAnalytics: IAccountA
 				/>
 			</div>
 			<Separator className='dashed my-4' />
-			<div className='flex gap-4'>
+			<div className='flex gap-4 max-lg:flex-col'>
 				<VotesByConvictions
 					votesByConviction={accountsAnalytics?.votesByConviction || []}
 					isAccountsAnalytics

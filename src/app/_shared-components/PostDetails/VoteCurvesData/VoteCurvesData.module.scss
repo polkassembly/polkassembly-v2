@@ -11,7 +11,7 @@
 }
 
 .errorText {
-	@apply mt-2 text-red-500;
+	@apply mt-2 text-toast_error_text;
 }
 
 .voteCurvesDetailsWrapper {
@@ -31,16 +31,4 @@
 }
 .voteCurvesDetailsWrapperItemTitleTextValue {
 	@apply font-medium text-text_primary;
-}
-.dialogTitle {
-	@apply text-lg font-semibold text-text_primary dark:text-white;
-}
-.dialogContent {
-	@apply w-[500px] max-lg:w-full;
-}
-.dialogHeader {
-	@apply p-4;
-}
-.dialogTitle {
-	@apply flex items-center gap-x-1;
 }

@@ -495,14 +495,17 @@
 			"votes": "Votes",
 			"aye": "Aye",
 			"nay": "Nay",
-			"abstain": "Abstain"
+			"abstain": "Abstain",
+			"noVotesFound": "No votes found"
 		},
 		"VotesData": {
 			"Votes": "Votes",
 			"tile": "Tile",
 			"graph": "Graph",
 			"voteHistory": "Vote History (Flattened, Nested, Calls)",
-			"votes": "Votes"
+			"votes": "Votes",
+			"voteGraph": "Vote Graph",
+			"voteTiles": "Vote Tiles"
 		},
 		"Analytics": {
 			"totalVotesCasted": "Total Votes Casted",
@@ -598,8 +601,7 @@
 		"VoteCurves": {
 			"approval": "Approval",
 			"support": "Support",
-			"threshold": "Threshold",
-			"votingData": "Voting Data"
+			"threshold": "Threshold"
 		},
 		"DecisionDeposit": {
 			"description": "Place refundable deposit within 14 days to prevent proposal from timing out.",

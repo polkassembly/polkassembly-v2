@@ -9,12 +9,12 @@ import TimeSplitCard from './TimeSplitCard';
 import VotesByConvictions from './VotesByConviction';
 import DelegationVotesByConvictions from './DelegationVotesByConviction';
 import { Separator } from '../../Separator';
-import VotesDistributionTiles from '../VotesDistributionTiles/VotesDistributionTiles';
+import VotesTiles from '../VotesTiles/VotesTiles';
 
 function VotesAnalytics({ votesAnalytics, index, proposalType }: { votesAnalytics: IAnalytics; index: string; proposalType: EProposalType }) {
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='flex gap-4'>
+			<div className='flex gap-4 max-lg:flex-col'>
 				<TotalVotesCard analytics={votesAnalytics} />
 				<DelegatedVsSoloCard
 					delegatedValue={votesAnalytics.delegated}
@@ -24,15 +24,16 @@ function VotesAnalytics({ votesAnalytics, index, proposalType }: { votesAnalytic
 			</div>
 			<div className='flex w-full flex-col gap-4'>
 				<TimeSplitCard timeSplitVotes={votesAnalytics?.timeSplitVotes || []} />
-				<VotesDistributionTiles
+				<VotesTiles
 					proposalType={proposalType}
 					analyticsType={EAnalyticsType.VOTES}
-					usedInPostAnalytics
+					enableTitle
+					enableFilter
 					index={index}
 				/>
 			</div>
 			<Separator className='dashed my-4' />
-			<div className='flex gap-4'>
+			<div className='flex gap-4 max-lg:flex-col'>
 				<VotesByConvictions votesByConviction={votesAnalytics?.votesByConviction || []} />
 				<DelegationVotesByConvictions delegationVotesByConviction={votesAnalytics?.delegationVotesByConviction || []} />
 			</div>

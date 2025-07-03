@@ -475,7 +475,9 @@
 			"tile": "Eben",
 			"graph": "Diagramm",
 			"voteHistory": "Abstimmungsverlauf (Eben, Verschachtelt, Aufrufe)",
-			"votes": "Abstimmungen"
+			"votes": "Abstimmungen",
+			"voteGraph": "Abstimmungsgraph",
+			"voteTiles": "Abstimmungsebenen"
 		},
 		"VotesTiles": {
 			"nested": "Verschachtelt",
@@ -488,7 +490,8 @@
 			"votes": "Abstimmungen",
 			"aye": "Ja",
 			"nay": "Nein",
-			"abstain": "Enthaltung"
+			"abstain": "Enthaltung",
+			"noVotesFound": "Keine Abstimmungen gefunden"
 		},
 		"Analytics": {
 			"totalVotesCasted": "Gesamte Abstimmungen",
@@ -563,8 +566,7 @@
 		"VoteCurves": {
 			"approval": "Zustimmung",
 			"support": "Unterstützung",
-			"threshold": "Schwellenwert",
-			"votingData": "Abstimmungsdaten"
+			"threshold": "Schwellenwert"
 		},
 		"threshold": "Schwelle",
 		"DecisionDeposit": {

@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EAnalyticsType, EHttpHeaderKey, EPostTilesVotesType, EProposalType, IPostTilesVotes } from '@/_shared/types';
+import { EAnalyticsType, EHttpHeaderKey, EPostTileVotesType, EProposalType, IPostTilesVotes } from '@/_shared/types';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { NextRequest, NextResponse } from 'next/server';
@@ -21,7 +21,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const zodQuerySchema = z.object({
 		analyticsType: z.nativeEnum(EAnalyticsType).optional().default(EAnalyticsType.CONVICTIONS),
-		votesType: z.nativeEnum(EPostTilesVotesType).default(EPostTilesVotesType.NESTED)
+		votesType: z.nativeEnum(EPostTileVotesType).default(EPostTileVotesType.NESTED)
 	});
 
 	const { analyticsType, votesType } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
@@ -35,7 +35,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		}
 	}
 
-	const analytics = await OnChainDbService.getPostTilesVotes({ network, proposalType, index: Number(index), analyticsType, votesType });
+	const analytics = await OnChainDbService.GetPostTillesVotes({ network, proposalType, index: Number(index), analyticsType, votesType });
 
 	await RedisService.SetPostTilesVotesData({ network, proposalType, indexOrHash: index, data: analytics, votesType, analyticsType });
 

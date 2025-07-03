@@ -27,5 +27,18 @@
 	@apply -mt-1 px-6 pb-6;
 }
 .voteHistoryDialogContent {
-	@apply max-w-2xl p-3 sm:p-6;
+	@apply min-h-[50vh] max-w-2xl p-3 max-lg:w-full sm:p-6;
+}
+
+.dialogTitle {
+	@apply text-lg font-semibold text-text_primary dark:text-white;
+}
+.dialogContent {
+	@apply w-[500px] max-lg:w-full lg:w-[700px] xl:w-[800px] 2xl:w-[900px];
+}
+.dialogHeader {
+	@apply p-4;
+}
+.dialogTitle {
+	@apply flex items-center gap-x-1;
 }

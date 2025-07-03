@@ -1,5 +1,5 @@
 .heading {
-	@apply mb-2 text-lg font-semibold text-text_primary;
+	@apply text-base font-bold text-text_primary xl:text-sm 2xl:text-lg;
 }
 .card {
 	@apply mx-auto max-h-[500px] w-full flex-1 rounded-2xl border-[1px] border-solid border-border_grey bg-transparent p-4 text-basic_text lg:max-w-[512px];
@@ -8,7 +8,7 @@
 	@apply relative flex h-[180px] items-center justify-center;
 }
 .barChartWrapper {
-	@apply relative mt-2 flex h-[250px] items-center justify-center;
+	@apply relative mt-2 flex h-[250px] w-full items-center justify-center;
 }
 .timeSplitChartWrapper {
 	@apply relative mt-4 flex h-[250px] items-center justify-center;

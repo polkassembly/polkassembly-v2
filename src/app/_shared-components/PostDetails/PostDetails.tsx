@@ -14,6 +14,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { ClientError } from '@/app/_client-utils/clientError';
+import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import dynamic from 'next/dynamic';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
@@ -81,7 +82,10 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	const { data: analytics, isFetching: isAnalyticsFetching } = useQuery({
 		queryKey: ['postAnalytics', post?.proposalType, index],
 		queryFn: getPostAnalytics,
-		enabled: !!post?.proposalType && !!index
+		enabled: POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(post?.proposalType as EProposalType) && !!index,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+		retry: false
 	});
 
 	useEffect(() => {
@@ -138,25 +142,18 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									onchainInfo={post.onChainInfo}
 								/>
 							</TabsContent>
-							<TabsContent value={EPostDetailsTab.POST_ANALYTICS}>
-								<PostAnalytics
-									analytics={analytics}
-									isFetching={isAnalyticsFetching}
-									proposalType={post.proposalType}
-									index={index}
-								/>
-							</TabsContent>
+							{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(post.proposalType) && (
+								<TabsContent value={EPostDetailsTab.POST_ANALYTICS}>
+									<PostAnalytics
+										analytics={analytics}
+										isFetching={isAnalyticsFetching}
+										proposalType={post.proposalType}
+										index={index}
+									/>
+								</TabsContent>
+							)}
 						</div>
-						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
-							<PostComments
-								proposalType={post.proposalType}
-								index={index}
-								contentSummary={post.contentSummary}
-								comments={post.comments}
-								allowedCommentor={post.allowedCommentor}
-								postUserId={post.userId}
-							/>
-						</div>
+
 						{isModalOpen && !isOffchainPost && (
 							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
 								{canVote(post.onChainInfo?.status) && (
@@ -169,6 +166,16 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								)}
 							</div>
 						)}
+						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
+							<PostComments
+								proposalType={post.proposalType}
+								index={index}
+								contentSummary={post.contentSummary}
+								comments={post.comments}
+								allowedCommentor={post.allowedCommentor}
+								postUserId={post.userId}
+							/>
+						</div>
 					</div>
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>

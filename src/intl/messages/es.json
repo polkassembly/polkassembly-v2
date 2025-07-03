@@ -477,7 +477,9 @@
 			"tile": "Eben",
 			"graph": "Gráfico",
 			"voteHistory": "Historial de votos (Aplanado, Anidado, Llamadas)",
-			"votes": "Votos"
+			"votes": "Votos",
+			"voteGraph": "Gráfico de votación",
+			"voteTiles": "Ebenes de votación"
 		},
 		"VotesTiles": {
 			"nested": "Anidado",
@@ -490,7 +492,8 @@
 			"votes": "Votos",
 			"aye": "Sí",
 			"nay": "No",
-			"abstain": "Abstención"
+			"abstain": "Abstención",
+			"noVotesFound": "No se encontraron votos"
 		},
 		"Analytics": {
 			"totalVotesCasted": "Total de votos emitidos",
@@ -565,8 +568,7 @@
 		"VoteCurves": {
 			"approval": "Aprobación",
 			"support": "Apoyo",
-			"threshold": "Umbral",
-			"votingData": "Datos de Votación"
+			"threshold": "Umbral"
 		},
 		"threshold": "Umbral",
 		"DecisionDeposit": {

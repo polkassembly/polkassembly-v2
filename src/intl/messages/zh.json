@@ -475,7 +475,9 @@
 			"tile": "平铺",
 			"graph": "图表",
 			"voteHistory": "投票历史 (平铺, 嵌套, 调用)",
-			"votes": "投票"
+			"votes": "投票",
+			"voteGraph": "投票图表",
+			"voteTiles": "投票平铺"
 		},
 		"VotesTiles": {
 			"nested": "嵌套",
@@ -488,7 +490,8 @@
 			"votes": "投票",
 			"aye": "赞成",
 			"nay": "反对",
-			"abstain": "弃权"
+			"abstain": "弃权",
+			"noVotesFound": "未找到投票"
 		},
 		"Analytics": {
 			"totalVotesCasted": "总投票数",
@@ -564,8 +567,7 @@
 		"VoteCurves": {
 			"approval": "批准",
 			"support": "支持",
-			"threshold": "阈值",
-			"votingData": "投票数据"
+			"threshold": "阈值"
 		},
 		"threshold": "阈值",
 		"DecisionDeposit": {
