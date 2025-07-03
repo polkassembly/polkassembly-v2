@@ -558,7 +558,9 @@
 			"payoutClaimFailed": "支払いの請求に失敗しました",
 			"payoutClaimedSuccessfullyDescription": "支払いが正常に請求されました",
 			"payoutClaimFailedDescription": "もう一度お試しください"
-		}
+		},
+		"commentsDisabled": "この投稿のコメントは無効になっています。",
+		"commentsDisabledForNonVerifiedUsers": "未認証ユーザーのコメントは無効になっています。"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",
@@ -674,7 +676,8 @@
 		"success": "投稿が正常に更新されました",
 		"successDescription": "あなたの投稿は正常に更新されました",
 		"error": "投稿の更新に失敗しました",
-		"errorDescription": "投稿の更新中にエラーが発生しました"
+		"errorDescription": "投稿の更新中にエラーが発生しました",
+		"whoCanComment": "誰がコメントできますか？"
 	},
 	"Footer": {
 		"helpCenter": "ヘルプセンター",
@@ -812,6 +815,8 @@
 		"searchUsername": "ユーザー名を検索"
 	},
 	"SetIdentity": {
+		"TeleportFundsToPeopleChain": "People Chainに資金をテレポート",
+		"Teleport": "テレポート",
 		"displayName": "表示名",
 		"legalName": "法的名称",
 		"email": "メールアドレス",
@@ -1294,5 +1299,14 @@
 		"pasteURLorEnterPostID": "URLを貼り付けるか投稿IDを入力してください",
 		"yourDiscussions": "あなたのディスカッション",
 		"confirm": "確認"
+	},
+	"TeleportToPeopleChain": {
+		"teleport": "テレポート",
+		"teleportFundsToPeopleChainSuccess": "People Chainへの資金テレポートが成功しました",
+		"teleportFundsToPeopleChainSuccessDescription": "資金がPeople Chainへ正常にテレポートされました",
+		"teleportFundsToPeopleChainFailed": "People Chainへの資金テレポートに失敗しました",
+		"teleportFundsToPeopleChainFailedDescription": "People Chainへの資金テレポート中にエラーが発生しました",
+		"BeneficiaryAddress": "受益者アドレス",
+		"Amount": "金額"
 	}
 }
