@@ -126,7 +126,7 @@ const CallsDisplay = memo(({ args, isFetching }: { args?: IProposalArguments; is
 							{t('PostDetails.OnchainInfo.details')}
 							<ChevronRightIcon className='h-3.5 w-3.5' />
 						</DialogTrigger>
-						<DialogContent className='max-h-[80vh] w-[500px] p-6 max-lg:w-full'>
+						<DialogContent className='max-h-[80vh] min-h-[50vh] w-[500px] p-6 max-lg:w-full'>
 							<div className='max-h-[80vh] overflow-x-auto overflow-y-auto'>
 								<ArgumentsTableJSONView postArguments={args} />
 							</div>

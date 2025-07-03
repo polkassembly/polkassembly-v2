@@ -77,7 +77,10 @@ function OnchainInfo({
 
 	return (
 		<div className='flex flex-col gap-y-4'>
-			<Collapsible className={cn(classes.onchainInfoBox)}>
+			<Collapsible
+				className={cn(classes.onchainInfoBox)}
+				defaultOpen
+			>
 				<CollapsibleTrigger className='flex w-full items-center justify-between'>
 					<p className={classes.metadataHeading}>{t('PostDetails.OnchainInfo.metadata')}</p>
 					<Image
@@ -247,7 +250,10 @@ function OnchainInfo({
 				</CollapsibleContent>
 			</Collapsible>
 
-			<Collapsible className={cn(classes.onchainInfoBox)}>
+			<Collapsible
+				className={cn(classes.onchainInfoBox)}
+				defaultOpen
+			>
 				<CollapsibleTrigger className='flex w-full items-center justify-between'>
 					<p className={classes.metadataHeading}>{t('PostDetails.OnchainInfo.calls')}</p>
 					<Image
@@ -268,7 +274,10 @@ function OnchainInfo({
 				</CollapsibleContent>
 			</Collapsible>
 
-			<Collapsible className={cn(classes.onchainInfoBox)}>
+			<Collapsible
+				className={cn(classes.onchainInfoBox)}
+				defaultOpen
+			>
 				<CollapsibleTrigger className='flex w-full items-center justify-between'>
 					<p className={classes.metadataHeading}>{t('PostDetails.OnchainInfo.timeline')}</p>
 					<Image

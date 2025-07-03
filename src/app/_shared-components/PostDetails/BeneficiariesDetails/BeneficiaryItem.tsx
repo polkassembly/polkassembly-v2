@@ -23,7 +23,7 @@ interface BeneficiaryItemProps {
 }
 
 const DISPLAY_LIMIT = 5;
-const SHOW_ONLY_IDENTICON_LIMIT = 3;
+const SHOW_ONLY_IDENTICON_LIMIT = 1;
 
 function BeneficiaryItem({ assetId, amount, addresses, index, totalLength }: BeneficiaryItemProps) {
 	const t = useTranslations('PostDetails.BeneficiariesDetails');
