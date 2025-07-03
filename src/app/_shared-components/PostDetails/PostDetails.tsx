@@ -20,7 +20,6 @@ import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
 import { Tabs, TabsContent } from '../Tabs';
-import Timeline from './Timeline/Timeline';
 import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
 import PostContent from './PostContent';
@@ -29,11 +28,12 @@ import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
-import PlaceDecisionDeposit from './PlaceDecisionDeposit/PlaceDecisionDeposit';
-import ClaimPayout from './ClaimPayout/ClaimPayout';
 import PostAnalytics from './Analytics/PostAnalytics';
 
 const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), { ssr: false });
+const Timeline = dynamic(() => import('./Timeline/Timeline'), { ssr: false });
+const PlaceDecisionDeposit = dynamic(() => import('./PlaceDecisionDeposit/PlaceDecisionDeposit'), { ssr: false });
+const ClaimPayout = dynamic(() => import('./ClaimPayout/ClaimPayout'), { ssr: false });
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
