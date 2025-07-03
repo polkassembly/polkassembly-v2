@@ -26,9 +26,10 @@ interface VoteReferendumButtonProps {
 	size?: 'sm' | 'lg';
 	track?: EPostOrigin;
 	proposalType: EProposalType;
+	isUsedInPostDetails?: boolean;
 }
 
-function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg', track, proposalType }: VoteReferendumButtonProps) {
+function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg', track, proposalType, isUsedInPostDetails = false }: VoteReferendumButtonProps) {
 	const { user } = useUser();
 	const t = useTranslations();
 	const [openModal, setOpenModal] = useState(false);
@@ -84,7 +85,7 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 			onOpenChange={setOpenModal}
 		>
 			<DialogTrigger asChild>
-				{hasVoted ? (
+				{isUsedInPostDetails && hasVoted ? (
 					<UserVoteCard
 						index={index}
 						iconClassName={iconClassName}
@@ -109,7 +110,7 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 								height={20}
 								className={iconClassName}
 							/>
-							{t('PostDetails.castVote')}
+							{hasVoted ? t('PostDetails.changeVote') : t('PostDetails.castVote')}
 						</div>
 					</Button>
 				)}
