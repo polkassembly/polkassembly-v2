@@ -26,9 +26,10 @@ import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
+import BeneficiariesDetails from './BeneficiariesDetails/BeneficiariesDetails';
+import AISummary from '../AISummary/AISummary';
 
 const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), { ssr: false });
-const Timeline = dynamic(() => import('./Timeline/Timeline'), { ssr: false });
 const PlaceDecisionDeposit = dynamic(() => import('./PlaceDecisionDeposit/PlaceDecisionDeposit'), { ssr: false });
 const ClaimPayout = dynamic(() => import('./ClaimPayout/ClaimPayout'), { ssr: false });
 
@@ -90,7 +91,10 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 				setOpen={setShowSpamModal}
 				proposalType={post.proposalType}
 			/>
-			<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
+			<Tabs
+				defaultValue={EPostDetailsTab.DESCRIPTION}
+				className='mt-0'
+			>
 				<div className={classes.headerWrapper}>
 					<PostHeader
 						isModalOpen={isModalOpen ?? false}
@@ -99,29 +103,41 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 				</div>
 				<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-7xl')}>
 					<div className={classes.leftWrapper}>
-						<div className={classes.descBox}>
-							<TabsContent value={EPostDetailsTab.DESCRIPTION}>
+						<TabsContent
+							value={EPostDetailsTab.DESCRIPTION}
+							className='mt-0'
+						>
+							<div className={classes.descBox}>
 								<PostContent
 									postData={post}
 									isModalOpen={isModalOpen ?? false}
 								/>
-							</TabsContent>
-							<TabsContent value={EPostDetailsTab.TIMELINE}>
-								<Timeline
-									proposalType={post.proposalType}
-									timeline={post.onChainInfo?.timeline}
-									createdAt={post.createdAt}
-									linkedPost={post.linkedPost}
+							</div>
+						</TabsContent>
+						<TabsContent
+							value={EPostDetailsTab.ONCHAIN_INFO}
+							className='mt-0'
+						>
+							<OnchainInfo
+								proposalType={post.proposalType}
+								index={index}
+								onchainInfo={post.onChainInfo}
+								createdAt={post.createdAt}
+								linkedPost={post.linkedPost}
+							/>
+						</TabsContent>
+						<TabsContent
+							value={EPostDetailsTab.SUMMARISE}
+							className='mt-0'
+						>
+							<div className={classes.descBox}>
+								<AISummary
+									indexOrHash={String(postData?.index ?? postData?.hash)}
+									proposalType={postData.proposalType}
+									initialData={postData?.contentSummary}
 								/>
-							</TabsContent>
-							<TabsContent value={EPostDetailsTab.ONCHAIN_INFO}>
-								<OnchainInfo
-									proposalType={post.proposalType}
-									index={index}
-									onchainInfo={post.onChainInfo}
-								/>
-							</TabsContent>
-						</div>
+							</div>
+						</TabsContent>
 						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
 							<PostComments
 								proposalType={post.proposalType}
@@ -178,6 +194,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									proposalType={post.proposalType}
 								/>
 							)}
+							<BeneficiariesDetails beneficiaries={post.onChainInfo?.beneficiaries || []} />
 							<ClaimPayout beneficiaries={post.onChainInfo?.beneficiaries || []} />
 							<ProposalPeriods
 								confirmationPeriodEndsAt={post.onChainInfo?.confirmationPeriodEndsAt}
