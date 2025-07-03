@@ -51,7 +51,7 @@ function PostAnalytics({ analytics, isFetching, proposalType, index }: { analyti
 						value={selectedAnalytics}
 						onValueChange={(value) => setSelectedAnalytics(value as EAnalyticsType)}
 					>
-						<SelectTrigger className='mb-4 w-fit'>
+						<SelectTrigger className='mb-4 flex w-fit items-center gap-2'>
 							<SelectValue placeholder='Select page size'>{options?.find((option) => option.value === selectedAnalytics)?.label || ''}</SelectValue>
 						</SelectTrigger>
 						<SelectContent>

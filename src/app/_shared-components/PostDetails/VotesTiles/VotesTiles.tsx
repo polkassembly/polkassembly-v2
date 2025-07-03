@@ -89,16 +89,10 @@ const calculatePerVotePercentage = ({
 };
 
 // Custom hooks
-const useVotesDistribution = ({
-	votesTilesData,
-	usedInPostAnalytics = false
-}: {
-	votesTilesData: IPostTilesVotes['votes'];
-	usedInPostAnalytics?: boolean;
-}): IVoteDistribution[] => {
+const useVotesDistribution = ({ votesTilesData, enableMaxTiles }: { votesTilesData: IPostTilesVotes['votes']; enableMaxTiles: boolean }): IVoteDistribution[] => {
 	return useMemo(() => {
 		const votes: IVoteDistribution[] = [];
-		const MIN_VOTING_POWER_PERCENTAGE = usedInPostAnalytics ? 1 : 3;
+		const MIN_VOTING_POWER_PERCENTAGE = enableMaxTiles ? 1 : 3;
 		const decisions: Array<Exclude<EVoteDecision, EVoteDecision.SPLIT | EVoteDecision.SPLIT_ABSTAIN>> = [EVoteDecision.AYE, EVoteDecision.NAY, EVoteDecision.ABSTAIN];
 
 		decisions.forEach((decision) => {
@@ -149,7 +143,7 @@ const useVotesDistribution = ({
 		});
 
 		return votes;
-	}, [votesTilesData, usedInPostAnalytics]);
+	}, [votesTilesData, enableMaxTiles]);
 };
 
 const useChartData = ({ allVotes, votesType }: { allVotes: IVoteDistribution[]; votesType: EPostTileVotesType }) => {
@@ -246,13 +240,15 @@ function VotesTiles({
 	index,
 	analyticsType,
 	enableTitle = false,
-	enableFilter = false
+	enableFilter = false,
+	enableMaxTiles = true
 }: {
 	proposalType: EProposalType;
 	index: string;
 	analyticsType: EAnalyticsType;
 	enableTitle?: boolean;
 	enableFilter?: boolean;
+	enableMaxTiles?: boolean;
 }) {
 	const t = useTranslations('PostDetails.VotesTiles');
 	const network = getCurrentNetwork();
@@ -289,7 +285,7 @@ function VotesTiles({
 		retry: false
 	});
 
-	const allVotes = useVotesDistribution({ votesTilesData: votesTilesData?.votes || { aye: [], nay: [], abstain: [] } });
+	const allVotes = useVotesDistribution({ votesTilesData: votesTilesData?.votes || { aye: [], nay: [], abstain: [] }, enableMaxTiles });
 	const chartData = useChartData({ allVotes, votesType });
 
 	const renderTooltip = useCallback(
@@ -396,7 +392,7 @@ function VotesTiles({
 			{isFetching ? (
 				<Skeleton className='mt-4 h-[280px] w-full' />
 			) : allVotes.length > 0 ? (
-				<div className={enableTitle ? 'mt-6' : ''}>
+				<div className={enableFilter ? 'mt-6' : ''}>
 					<div className={classes.chartWrapper}>
 						<ResponsiveTreeMap
 							data={chartData}

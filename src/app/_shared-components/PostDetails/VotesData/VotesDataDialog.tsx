@@ -85,12 +85,12 @@ function VotesDataDialog({
 						</div>
 					</DialogTitle>
 				</DialogHeader>
-				<div className='min-h-[50vh] px-8 pb-8'>
+				<div className='px-8 pb-8'>
 					{isFetching && <LoadingLayover />}
 
 					{/* Conditional Rendering based on Active Tab */}
 					{activeTab === EProposalVoteType.Graph ? (
-						<div className='h-full'>
+						<div className='mt-4 h-full'>
 							<VoteCurves
 								voteCurveData={voteCurveData || []}
 								trackName={trackName}

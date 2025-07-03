@@ -126,7 +126,7 @@
 }
 
 .buttonContainer {
-	@apply mb-4 flex w-full items-center justify-between rounded-lg bg-bg_code p-1.5;
+	@apply mt-4 flex w-full items-center justify-between rounded-lg bg-bg_code p-1.5;
 }
 
 .tooltip {
@@ -145,7 +145,7 @@
 	@apply flex items-center gap-2 rounded-lg border-[1px] border-solid px-4 py-2 text-sm text-text_primary dark:text-white;
 }
 .decisionsContainer {
-	@apply mt-4 flex items-center justify-center gap-2;
+	@apply mt-4 flex items-center justify-center gap-2 pb-4;
 }
 
 .tooltipContentValue {

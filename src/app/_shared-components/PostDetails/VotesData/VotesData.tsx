@@ -114,6 +114,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 							proposalType={proposalType}
 							index={index}
 							analyticsType={EAnalyticsType.CONVICTIONS}
+							enableMaxTiles={false}
 						/>
 					</TabsContent>
 				)}
