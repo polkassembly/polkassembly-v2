@@ -102,7 +102,10 @@ function Calls({ proposalHash, beneficiaries, args, isFetching }: { proposalHash
 							{calls?.length > 0 && (
 								<div className='relative ml-4 mt-2 flex flex-col gap-y-1 border-l-2 border-dashed border-border_grey pl-4 dark:border-gray-600'>
 									{calls.slice(0, showAllCalls ? undefined : MAX_CALLS_TO_SHOW).map((call) => (
-										<div className='flex gap-x-1'>
+										<div
+											className='flex gap-x-1'
+											key={`${call.section}-${call.method}`}
+										>
 											<span className={classes.argsLabel}>{call.section}</span>
 											<span className={classes.argsLabel}>{call.method}</span>
 										</div>

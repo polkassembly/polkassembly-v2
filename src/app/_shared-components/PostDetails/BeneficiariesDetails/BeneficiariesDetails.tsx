@@ -44,6 +44,7 @@ function BeneficiariesDetails({ beneficiaries }: { beneficiaries: IBeneficiary[]
 			<div className={classes.beneficiariesList}>
 				{Object.entries(groupedBeneficiaries).map(([assetId, { amount, addresses }], index) => (
 					<BeneficiaryItem
+						key={`${assetId}-${amount}`}
 						assetId={assetId}
 						amount={amount}
 						addresses={addresses}

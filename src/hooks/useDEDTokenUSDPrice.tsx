@@ -22,7 +22,7 @@ export const useDEDTokenUSDPrice = () => {
 	const network = getCurrentNetwork();
 
 	const fetchNativeTokenPriceInUsd = async () => {
-		const response = await (await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`)).json();
+		const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`).then((res) => res.json());
 		// check if data is of type CoinGeckoResponse
 		if (!response || typeof response !== 'object' || !(ids in response) || !('usd' in response[String(ids)]) || typeof response[String(ids)]?.usd !== 'number') {
 			return null;

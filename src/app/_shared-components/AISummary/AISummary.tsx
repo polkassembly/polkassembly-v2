@@ -35,7 +35,7 @@ function AISummary({ proposalType, indexOrHash, initialData }: Props) {
 				/>
 				{t('PostDetails.aiSummary')}
 			</div>
-			{data?.postSummary && !error ? (
+			{!!data?.postSummary && !error ? (
 				<MarkdownViewer
 					markdown={data?.postSummary || ''}
 					className='text-text_primary'
