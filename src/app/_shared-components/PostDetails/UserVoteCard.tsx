@@ -97,6 +97,7 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 				<h2 className={classes.userVoteCardTitle}>{t('PostDetails.myVote')}</h2>
 				<Button
 					type='button'
+					variant='ghost'
 					className={classes.userVoteCardRemoveButton}
 					onClick={() => setOpenRemoveConfirmModal(true)}
 					disabled={isRemoving}
