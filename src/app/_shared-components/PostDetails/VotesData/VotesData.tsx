@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '../../Button';
 import VoteHistory from '../VoteSummary/VoteHistory/VoteHistory';
 import VoteCurvesData from '../VoteCurvesData/VoteCurvesData';
-import VotesTiles from '../VotesTiles/VotesTiles';
+import VotesBubbleChart from '../VotesBubbleChart/VotesBubbleChart';
 import { Tabs, TabsContent } from '../../Tabs';
 import classes from './VotesData.module.scss';
 import VotesDataDialog from './VotesDataDialog';
@@ -30,13 +30,13 @@ interface IVotesDataProps {
 }
 
 enum EProposalVoteType {
-	Tile = 'tile',
+	Bubble = 'bubble',
 	Graph = 'graph'
 }
 
 function VotesData({ proposalType, index, trackName, createdAt, timeline, setThresholdValues, thresholdValues }: IVotesDataProps) {
 	const t = useTranslations('PostDetails.VotesData');
-	const [activeTab, setActiveTab] = useState<EProposalVoteType>(EProposalVoteType.Tile);
+	const [activeTab, setActiveTab] = useState<EProposalVoteType>(EProposalVoteType.Bubble);
 	const fetchVoteCurves = async () => {
 		const { data, error } = await NextApiClientService.getVoteCurves({
 			proposalType,
@@ -89,10 +89,10 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 					<Button
 						variant='ghost'
 						size='sm'
-						onClick={() => setActiveTab(EProposalVoteType.Tile)}
-						className={cn(classes.tab, 'h-7', activeTab === EProposalVoteType.Tile ? classes.activeTab : classes.inactiveTab)}
+						onClick={() => setActiveTab(EProposalVoteType.Bubble)}
+						className={cn(classes.tab, 'h-7', activeTab === EProposalVoteType.Bubble ? classes.activeTab : classes.inactiveTab)}
 					>
-						{t('tile')}
+						{t('bubble')}
 					</Button>
 					{!!trackName && timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced) && (
 						<Button
@@ -105,16 +105,16 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 						</Button>
 					)}
 				</div>
-				{activeTab === EProposalVoteType.Tile && (
+				{activeTab === EProposalVoteType.Bubble && (
 					<TabsContent
-						value={EProposalVoteType.Tile}
+						value={EProposalVoteType.Bubble}
 						className='px-6'
 					>
-						<VotesTiles
+						<VotesBubbleChart
 							proposalType={proposalType}
 							index={index}
 							analyticsType={EAnalyticsType.CONVICTIONS}
-							enableMaxTiles={false}
+							enableFullHeight={false}
 						/>
 					</TabsContent>
 				)}

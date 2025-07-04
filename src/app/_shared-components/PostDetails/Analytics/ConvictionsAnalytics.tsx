@@ -9,7 +9,7 @@ import TimeSplitCard from './TimeSplitCard';
 import VotesByConvictions from './VotesByConviction';
 import DelegationVotesByConvictions from './DelegationVotesByConviction';
 import { Separator } from '../../Separator';
-import VotesTiles from '../VotesTiles/VotesTiles';
+import VotesBubbleChart from '../VotesBubbleChart/VotesBubbleChart';
 
 function ConvictionsAnalytics({ convictionsAnalytics, proposalType, index }: { convictionsAnalytics: IAnalytics; proposalType: EProposalType; index: string }) {
 	return (
@@ -24,7 +24,7 @@ function ConvictionsAnalytics({ convictionsAnalytics, proposalType, index }: { c
 			</div>
 			<div className='flex w-full flex-col gap-4'>
 				<TimeSplitCard timeSplitVotes={convictionsAnalytics?.timeSplitVotes || []} />
-				<VotesTiles
+				<VotesBubbleChart
 					proposalType={proposalType}
 					analyticsType={EAnalyticsType.CONVICTIONS}
 					index={index}

@@ -484,7 +484,7 @@
 		"aiSummary": "AI Summary",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
-		"VotesTiles": {
+		"VotesBubble": {
 			"nested": "Nested",
 			"flattened": "Flattened",
 			"votesDistribution": "Voter Distribution",
@@ -500,12 +500,12 @@
 		},
 		"VotesData": {
 			"Votes": "Votes",
-			"tile": "Tile",
+			"bubble": "Bubble",
 			"graph": "Graph",
 			"voteHistory": "Vote History (Flattened, Nested, Calls)",
 			"votes": "Votes",
 			"voteGraph": "Vote Graph",
-			"voteTiles": "Vote Tiles"
+			"voteBubble": "Vote Bubble"
 		},
 		"Analytics": {
 			"totalVotesCasted": "Total Votes Casted",
@@ -897,6 +897,8 @@
 		"searchUsername": "Enter username to search"
 	},
 	"SetIdentity": {
+		"TeleportFundsToPeopleChain": "Teleport Funds to People Chain",
+		"Teleport": "Teleport",
 		"displayName": "Display Name",
 		"legalName": "Legal Name",
 		"email": "Email",
@@ -1366,5 +1368,14 @@
 		"votes": "Votes",
 		"voteDetails": "Vote Details",
 		"target": "Target"
+	},
+	"TeleportToPeopleChain": {
+		"teleport": "Teleport",
+		"teleportFundsToPeopleChainSuccess": "Funds teleported to people chain successfully",
+		"teleportFundsToPeopleChainSuccessDescription": "The funds have been teleported to people chain successfully",
+		"teleportFundsToPeopleChainFailed": "Failed to teleport funds to people chain",
+		"teleportFundsToPeopleChainFailedDescription": "There was an error while teleporting the funds to people chain",
+		"BeneficiaryAddress": "Beneficiary Address",
+		"Amount": "Amount"
 	}
 }

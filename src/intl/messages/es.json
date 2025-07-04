@@ -474,14 +474,14 @@
 		"onchainInfo": "Información en cadena",
 		"VotesData": {
 			"Votes": "Votos",
-			"tile": "Eben",
+			"bubble": "Burbuja",
 			"graph": "Gráfico",
 			"voteHistory": "Historial de votos (Aplanado, Anidado, Llamadas)",
 			"votes": "Votos",
 			"voteGraph": "Gráfico de votación",
-			"voteTiles": "Ebenes de votación"
+			"voteBubble": "Ebenes de votación"
 		},
-		"VotesTiles": {
+		"VotesBubble": {
 			"nested": "Anidado",
 			"flattened": "Aplanado",
 			"votesDistribution": "Distribución de votantes",
@@ -847,6 +847,8 @@
 		"searchUsername": "Buscar nombre de usuario"
 	},
 	"SetIdentity": {
+		"TeleportFundsToPeopleChain": "Teleportar Fondos a People Chain",
+		"Teleport": "Teleportar",
 		"displayName": "Nombre para mostrar",
 		"legalName": "Nombre legal",
 		"email": "Correo electrónico",
@@ -1329,5 +1331,14 @@
 		"pasteURLorEnterPostID": "Pega la URL o ingresa el ID de la publicación",
 		"yourDiscussions": "Tus Discusiones",
 		"confirm": "Confirmar"
+	},
+	"TeleportToPeopleChain": {
+		"teleport": "Teleportar",
+		"teleportFundsToPeopleChainSuccess": "Fondos teleportados exitosamente a People Chain",
+		"teleportFundsToPeopleChainSuccessDescription": "Los fondos han sido teleportados exitosamente a People Chain",
+		"teleportFundsToPeopleChainFailed": "Error al teleportar fondos a People Chain",
+		"teleportFundsToPeopleChainFailedDescription": "Hubo un error al teleportar los fondos a People Chain",
+		"BeneficiaryAddress": "Dirección del Beneficiario",
+		"Amount": "Cantidad"
 	}
 }

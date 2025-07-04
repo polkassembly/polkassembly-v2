@@ -51,9 +51,9 @@ import {
 	EHttpHeaderKey,
 	IPostLink,
 	IPostAnalytics,
-	IPostTilesVotes,
+	IPostBubbleVotes,
 	EAnalyticsType,
-	EPostTileVotesType
+	EPostBubbleVotesType
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -135,7 +135,7 @@ enum EApiRoute {
 	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
 	GET_USER_POSTS = 'GET_USER_POSTS',
 	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
-	GET_POST_TILES_VOTES = 'GET_POST_TILES_VOTES'
+	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES'
 }
 
 export class NextApiClientService {
@@ -233,7 +233,7 @@ export class NextApiClientService {
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 			case EApiRoute.GET_VOTE_CURVES:
 			case EApiRoute.GET_POST_ANALYTICS:
-			case EApiRoute.GET_POST_TILES_VOTES:
+			case EApiRoute.GET_POST_BUBBLE_VOTES:
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
 				path = '/track-analytics';
@@ -1097,7 +1097,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPostAnalytics>({ url, method });
 	}
 
-	static async getPostTilesVotes({
+	static async getPostBubbleVotes({
 		proposalType,
 		index,
 		analyticsType,
@@ -1106,13 +1106,13 @@ export class NextApiClientService {
 		proposalType: EProposalType;
 		index: string;
 		analyticsType?: EAnalyticsType;
-		votesType: EPostTileVotesType;
+		votesType: EPostBubbleVotesType;
 	}) {
 		const queryParams = new URLSearchParams({
 			analyticsType: analyticsType ? analyticsType.toString() : '',
 			votesType: votesType.toString()
 		});
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_TILES_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-tiles'], queryParams });
-		return this.nextApiClientFetch<IPostTilesVotes>({ url, method });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_BUBBLE_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-bubble'], queryParams });
+		return this.nextApiClientFetch<IPostBubbleVotes>({ url, method });
 	}
 }

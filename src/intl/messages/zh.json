@@ -472,14 +472,14 @@
 		"abstain": "弃权",
 		"VotesData": {
 			"Votes": "投票",
-			"tile": "平铺",
+			"bubble": "气泡",
 			"graph": "图表",
 			"voteHistory": "投票历史 (平铺, 嵌套, 调用)",
 			"votes": "投票",
 			"voteGraph": "投票图表",
-			"voteTiles": "投票平铺"
+			"voteBubble": "投票气泡"
 		},
-		"VotesTiles": {
+		"VotesBubble": {
 			"nested": "嵌套",
 			"flattened": "扁平",
 			"votesDistribution": "投票者分布",
@@ -846,6 +846,8 @@
 		"searchUsername": "搜索用户名"
 	},
 	"SetIdentity": {
+		"TeleportFundsToPeopleChain": "传送资金至People Chain",
+		"Teleport": "传送",
 		"displayName": "显示名称",
 		"legalName": "法定名称",
 		"email": "电子邮箱",
@@ -1328,5 +1330,14 @@
 		"pasteURLorEnterPostID": "粘贴URL或输入帖子ID",
 		"yourDiscussions": "您的讨论",
 		"confirm": "确认"
+	},
+	"TeleportToPeopleChain": {
+		"teleport": "传送",
+		"teleportFundsToPeopleChainSuccess": "资金成功传送至People Chain",
+		"teleportFundsToPeopleChainSuccessDescription": "资金已成功传送至People Chain",
+		"teleportFundsToPeopleChainFailed": "资金传送至People Chain失败",
+		"teleportFundsToPeopleChainFailedDescription": "传送资金至People Chain时发生错误",
+		"BeneficiaryAddress": "受益人地址",
+		"Amount": "金额"
 	}
 }

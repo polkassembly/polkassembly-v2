@@ -22,8 +22,8 @@ import {
 	IPost,
 	IPostAnalytics,
 	IPostListing,
-	EPostTileVotesType,
-	IPostTilesVotes,
+	EPostBubbleVotesType,
+	IPostBubbleVotes,
 	ITrackAnalyticsDelegations,
 	ITrackAnalyticsStats,
 	ITreasuryStats
@@ -66,7 +66,7 @@ enum ERedisKeys {
 	TREASURY_STATS = 'TRS',
 	OVERVIEW_PAGE_DATA = 'OPD',
 	POST_ANALYTICS_DATA = 'PAD',
-	POST_TILES_VOTES_DATA = 'PTVD'
+	POST_BUBBLE_VOTES_DATA = 'PTVD'
 }
 
 export class RedisService {
@@ -134,8 +134,8 @@ export class RedisService {
 		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
 		[ERedisKeys.POST_ANALYTICS_DATA]: (network: string, proposalType: string, indexOrHash: string): string =>
 			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${indexOrHash}`,
-		[ERedisKeys.POST_TILES_VOTES_DATA]: (network: string, proposalType: string, indexOrHash: string, votesType: EPostTileVotesType, analyticsType?: EAnalyticsType): string =>
-			`${ERedisKeys.POST_TILES_VOTES_DATA}-${network}-${proposalType}-${indexOrHash}-${votesType}-${analyticsType || ''}`
+		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: string, proposalType: string, indexOrHash: string, votesType: EPostBubbleVotesType, analyticsType?: EAnalyticsType): string =>
+			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${indexOrHash}-${votesType}-${analyticsType || ''}`
 	} as const;
 
 	// helper methods
@@ -668,7 +668,7 @@ export class RedisService {
 		return data ? (deepParseJson(data) as IPostAnalytics) : null;
 	}
 
-	static async SetPostTilesVotesData({
+	static async SetPostBubbleVotesData({
 		network,
 		proposalType,
 		indexOrHash,
@@ -679,20 +679,20 @@ export class RedisService {
 		network: string;
 		proposalType: string;
 		indexOrHash: string;
-		data: IPostTilesVotes;
-		votesType: EPostTileVotesType;
+		data: IPostBubbleVotes;
+		votesType: EPostBubbleVotesType;
 		analyticsType?: EAnalyticsType;
 	}): Promise<void> {
 		const isActivePost = data.proposal?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.proposal.status as EProposalStatus);
 
 		await this.Set({
-			key: this.redisKeysMap[ERedisKeys.POST_TILES_VOTES_DATA](network, proposalType, indexOrHash, votesType, analyticsType),
+			key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, indexOrHash, votesType, analyticsType),
 			value: JSON.stringify(data),
 			ttlSeconds: isActivePost ? HALF_HOUR_IN_SECONDS : TEN_DAYS_IN_SECONDS
 		});
 	}
 
-	static async GetPostTilesVotesData({
+	static async GetPostBubbleVotesData({
 		network,
 		proposalType,
 		indexOrHash,
@@ -702,10 +702,10 @@ export class RedisService {
 		network: string;
 		proposalType: string;
 		indexOrHash: string;
-		votesType: EPostTileVotesType;
+		votesType: EPostBubbleVotesType;
 		analyticsType?: EAnalyticsType;
-	}): Promise<IPostTilesVotes | null> {
-		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_TILES_VOTES_DATA](network, proposalType, indexOrHash, votesType, analyticsType) });
-		return data ? (deepParseJson(data) as IPostTilesVotes) : null;
+	}): Promise<IPostBubbleVotes | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, indexOrHash, votesType, analyticsType) });
+		return data ? (deepParseJson(data) as IPostBubbleVotes) : null;
 	}
 }

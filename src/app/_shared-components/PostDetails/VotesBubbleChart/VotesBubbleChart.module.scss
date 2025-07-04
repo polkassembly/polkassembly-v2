@@ -3,11 +3,7 @@
 }
 
 .chartWrapper {
-	@apply h-[300px];
-
 	width: 100% !important;
-	min-height: 280px;
-
 	rect {
 		rx: 8 !important;
 		ry: 8 !important;
@@ -104,7 +100,7 @@
 }
 
 .card {
-	@apply mx-auto max-h-[500px] w-full flex-1 rounded-2xl border-[1px] border-solid border-border_grey bg-transparent p-4 text-basic_text;
+	@apply mx-auto h-full w-full flex-1 rounded-2xl border-[1px] border-solid border-border_grey bg-transparent p-4 text-basic_text;
 
 	@media (max-width: 768px) {
 		max-height: 520px;

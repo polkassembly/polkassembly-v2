@@ -473,14 +473,14 @@
 		"onchainInfo": "オンチェーン情報",
 		"VotesData": {
 			"Votes": "投票",
-			"tile": "タイル",
+			"bubble": "バブル",
 			"graph": "グラフ",
 			"voteHistory": "投票履歴 (フラット, ネスト, 呼び出し)",
 			"votes": "投票",
 			"voteGraph": "投票グラフ",
-			"voteTiles": "投票タイル"
+			"voteBubble": "投票バブル"
 		},
-		"VotesTiles": {
+		"VotesBubble": {
 			"nested": "ネスト",
 			"flattened": "フラット",
 			"votesDistribution": "投票者分布",
@@ -846,6 +846,8 @@
 		"searchUsername": "ユーザー名を検索"
 	},
 	"SetIdentity": {
+		"TeleportFundsToPeopleChain": "People Chainに資金をテレポート",
+		"Teleport": "テレポート",
 		"displayName": "表示名",
 		"legalName": "法的名称",
 		"email": "メールアドレス",
@@ -1328,5 +1330,14 @@
 		"pasteURLorEnterPostID": "URLを貼り付けるか投稿IDを入力してください",
 		"yourDiscussions": "あなたのディスカッション",
 		"confirm": "確認"
+	},
+	"TeleportToPeopleChain": {
+		"teleport": "テレポート",
+		"teleportFundsToPeopleChainSuccess": "People Chainへの資金テレポートが成功しました",
+		"teleportFundsToPeopleChainSuccessDescription": "資金がPeople Chainへ正常にテレポートされました",
+		"teleportFundsToPeopleChainFailed": "People Chainへの資金テレポートに失敗しました",
+		"teleportFundsToPeopleChainFailedDescription": "People Chainへの資金テレポート中にエラーが発生しました",
+		"BeneficiaryAddress": "受益者アドレス",
+		"Amount": "金額"
 	}
 }

@@ -254,7 +254,7 @@ function AddressSwitchButton() {
 	);
 }
 
-export default function AddressRelationsPicker({ withBalance = false }: { withBalance?: boolean }) {
+export default function AddressRelationsPicker({ withBalance = false, showPeopleChainBalance = false }: { withBalance?: boolean; showPeopleChainBalance?: boolean }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const walletService = useWalletService();
 	const [accountsLoading, setAccountsLoading] = useState(true);
@@ -301,6 +301,7 @@ export default function AddressRelationsPicker({ withBalance = false }: { withBa
 				<Balance
 					address={userPreferences?.selectedAccount?.address || ''}
 					classname='ml-auto'
+					showPeopleChainBalance={showPeopleChainBalance}
 				/>
 			)}
 

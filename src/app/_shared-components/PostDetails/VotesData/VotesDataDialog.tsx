@@ -13,10 +13,10 @@ import LoadingLayover from '../../LoadingLayover';
 import VoteCurves from '../VoteCurvesData/VoteCurves';
 import VoteCurvesDetails from '../VoteCurvesData/VoteCurvesDetails';
 import classes from './VotesData.module.scss';
-import VotesTiles from '../VotesTiles/VotesTiles';
+import VotesBubbleChart from '../VotesBubbleChart/VotesBubbleChart';
 
 enum EProposalVoteType {
-	Tile = 'tile',
+	Bubble = 'bubble',
 	Graph = 'graph'
 }
 
@@ -47,7 +47,7 @@ function VotesDataDialog({
 }) {
 	const t = useTranslations('PostDetails.VotesData');
 	const [isExpanded, setIsExpanded] = useState(false);
-	const [activeTab, setActiveTab] = useState(EProposalVoteType.Tile);
+	const [activeTab, setActiveTab] = useState(EProposalVoteType.Bubble);
 
 	return (
 		<Dialog
@@ -78,7 +78,7 @@ function VotesDataDialog({
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
-									<SelectItem value={EProposalVoteType.Tile}>{t('voteTiles')}</SelectItem>
+									<SelectItem value={EProposalVoteType.Bubble}>{t('voteBubble')}</SelectItem>
 									<SelectItem value={EProposalVoteType.Graph}>{t('voteGraph')}</SelectItem>
 								</SelectContent>
 							</Select>
@@ -108,7 +108,7 @@ function VotesDataDialog({
 						</div>
 					) : (
 						<div className='-mt-3 pb-6 text-center'>
-							<VotesTiles
+							<VotesBubbleChart
 								proposalType={proposalType}
 								analyticsType={EAnalyticsType.CONVICTIONS}
 								index={index}
