@@ -14,13 +14,14 @@ interface Props {
 }
 
 const TOTAL_SEGMENTS = 30;
-function calculatePercentage(progress: number) {
-	return Math.floor((progress * TOTAL_SEGMENTS) / 100);
+function calculateFilledSegments(progress: number): number {
+	const clampedProgress = Math.max(0, Math.min(100, progress));
+	return Math.floor((clampedProgress * TOTAL_SEGMENTS) / 100);
 }
 function PeriodProgress({ periodEndsAt, periodName, trackName, periodType }: Props) {
 	const progress = calculatePeriodProgress({ endAt: periodEndsAt, trackName, periodType });
 	const label = getPeriodProgressLabel({ endAt: periodEndsAt, trackName, periodType });
-	const percentage = calculatePercentage(progress);
+	const percentage = calculateFilledSegments(progress);
 
 	return (
 		<div className='flex w-full flex-col gap-y-2'>
