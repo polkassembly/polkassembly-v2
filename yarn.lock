@@ -1723,6 +1723,20 @@
   dependencies:
     third-party-capital "1.0.20"
 
+"@nivo/circle-packing@^0.99.0":
+  version "0.99.0"
+  resolved "https://registry.yarnpkg.com/@nivo/circle-packing/-/circle-packing-0.99.0.tgz#3bceeeb0f8fb552c960c625607f15b917803fd86"
+  integrity sha512-UbSY1MR3YSMwwJBY877+XAzKLMmJKHf4KJNCroJrG4VrsgkMzcb3Mnni2FZO/oVV8/IsVKSvrUBD24vU5yD6Uw==
+  dependencies:
+    "@nivo/colors" "0.99.0"
+    "@nivo/core" "0.99.0"
+    "@nivo/theming" "0.99.0"
+    "@nivo/tooltip" "0.99.0"
+    "@react-spring/web" "9.4.5 || ^9.7.2 || ^10.0"
+    "@types/d3-hierarchy" "^3.1.7"
+    d3-hierarchy "^3.1.2"
+    lodash "^4.17.21"
+
 "@nivo/colors@0.99.0":
   version "0.99.0"
   resolved "https://registry.yarnpkg.com/@nivo/colors/-/colors-0.99.0.tgz#f844a0f0de0597b35829405541e145f6db50c830"

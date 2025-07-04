@@ -3,9 +3,9 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useMemo, useCallback, useState } from 'react';
-import { EAnalyticsType, EPostTileVotesType, EProposalType, ETheme, EVoteDecision, IPostTilesVotes } from '@/_shared/types';
+import { EAnalyticsType, ENetwork, EPostTileVotesType, EProposalType, ETheme, EVoteDecision, IPostTilesVotes } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
-import { ResponsiveTreeMap } from '@nivo/treemap';
+import { ResponsiveCirclePacking } from '@nivo/circle-packing';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -24,19 +24,10 @@ import classes from './VotesTiles.module.scss';
 import { Skeleton } from '../../Skeleton';
 import { Button } from '../../Button';
 
-// Types
-enum EVoteType {
-	AYE = 'aye',
-	NAY = 'nay',
-	ABSTAIN = 'abstain',
-	OTHERS = 'others'
-}
-
 interface IVoteDistribution {
 	voter: string;
 	balance: string;
 	decision: EVoteDecision;
-	voteType: EVoteType;
 	votingPower: string | null;
 	percentage: number;
 	delegatorsCount?: number;
@@ -44,20 +35,19 @@ interface IVoteDistribution {
 	lockPeriod: number;
 }
 
-interface IChartNode {
+interface INodeData {
 	id: string;
 	name: string;
 	value: number;
 	color: string;
 	percentage: number;
+	delegatorsCount: number;
+	isDelegated: boolean;
+	lockPeriod: number;
 	decision: EVoteDecision;
-	originalValue?: number;
 }
 
 // Constants
-const MIN_VOTING_POWER_PERCENTAGE = 1;
-const CHART_WIDTH = 280;
-const MIN_WIDTH_PX = 10;
 const DEFAULT_LOCK_PERIOD = 0.1;
 
 // Utility functions
@@ -85,7 +75,7 @@ const calculatePerVotePercentage = ({
 		new BN(vote.votingPower || vote.balance).gt(BN_ZERO) && !!totalPercentage
 			? new BN(vote.votingPower || vote.balance).mul(new BN(100)).div(new BN(totalPercentage))?.toString()
 			: '0';
-	return Number(percentage);
+	return Math.round(Number(percentage));
 };
 
 // Custom hooks
@@ -97,140 +87,40 @@ const useVotesDistribution = ({ votesTilesData }: { votesTilesData: IPostTilesVo
 		decisions.forEach((decision) => {
 			const distributionKey = decision;
 			const votesList = votesTilesData?.[`${distributionKey}`];
+			if (votesList?.length === 0) return;
 
-			if (votesList?.length > 0) {
-				const otherVotes: IVoteDistribution = {
-					voter: '',
-					balance: '0',
+			votesList.forEach((vote) => {
+				const payload = {
+					voter: vote.voter,
+					balance: vote.balance,
+					votingPower: vote.votingPower || null,
 					decision,
-					voteType: EVoteType.OTHERS,
-					votingPower: null,
-					percentage: 0,
-					isDelegated: false,
-					lockPeriod: 0
+					percentage: calculatePerVotePercentage({ vote, decision, votesTilesData }),
+					delegatorsCount: vote.delegatorsCount,
+					isDelegated: vote.isDelegated,
+					lockPeriod: vote.lockPeriod
 				};
 
-				const totalVotes = calculateTotalDecisionVotes({ votesTilesData, decision });
-				const minVoteThreshold = totalVotes.mul(new BN(MIN_VOTING_POWER_PERCENTAGE)).div(new BN('100'));
-
-				votesList.forEach((vote) => {
-					const payload = {
-						voter: vote.voter,
-						balance: vote.balance,
-						votingPower: vote.votingPower || null,
-						voteType: EVoteType[decision.toUpperCase() as keyof typeof EVoteType],
-						decision,
-						percentage: calculatePerVotePercentage({ vote, decision, votesTilesData }),
-						delegatorsCount: vote.delegatorsCount,
-						isDelegated: vote.isDelegated,
-						lockPeriod: vote.lockPeriod
-					};
-
-					if (new BN(vote.votingPower || vote.balance).lt(minVoteThreshold)) {
-						otherVotes.balance = new BN(otherVotes.balance).add(new BN(vote.balance)).toString();
-						otherVotes.votingPower = new BN(otherVotes.votingPower || '0').add(new BN(vote.votingPower || '0')).toString();
-					} else {
-						votes.push(payload);
-					}
-				});
-
-				if (new BN(otherVotes.balance).gt(BN_ZERO)) {
-					otherVotes.percentage = calculatePerVotePercentage({ vote: otherVotes, decision, votesTilesData });
-					votes.push(otherVotes);
-				}
-			}
+				votes.push(payload);
+			});
 		});
 
 		return votes;
 	}, [votesTilesData]);
 };
 
-const useChartData = ({ allVotes, votesType }: { allVotes: IVoteDistribution[]; votesType: EPostTileVotesType }) => {
-	const t = useTranslations('PostDetails.VotesTiles');
-	const network = getCurrentNetwork();
-	const {
-		userPreferences: { theme }
-	} = useUserPreferences();
-	return useMemo(() => {
-		// Calculate all vote values first
-		const allRawValues = allVotes
-			.map((vote) => Number(formatBnBalance(vote.votingPower || vote.balance, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: false }, network).replace(/,/g, '')))
-			.filter((value) => value > 0);
-
-		// Calculate minimum value needed for ~20px width
-		// Treemap typically uses sqrt of values for sizing, so we need to calculate accordingly
-		const totalValue = allRawValues.reduce((sum, val) => sum + val, 0);
-		const chartWidth = CHART_WIDTH; // Approximate chart width based on container height
-		const minWidthPx = MIN_WIDTH_PX;
-		const minValueForVisibility = totalValue > 0 ? Math.max((minWidthPx / chartWidth) * totalValue, 1) : 1;
-
-		const createChildren = (decision: EVoteDecision, color: string): IChartNode[] => {
-			return allVotes
-				.filter((vote) => vote.decision === decision)
-				.sort((a, b) => Number(new BN(b.votingPower || b.balance).sub(new BN(a.votingPower || a.balance))))
-				.map((vote) => {
-					const rawValue = Number(
-						formatBnBalance(vote.votingPower || vote.balance, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: false }, network).replace(/,/g, '')
-					);
-					// Ensure minimum visible value for any vote > 0
-					const adjustedValue = rawValue > 0 ? Math.max(rawValue, minValueForVisibility) : rawValue;
-
-					return {
-						id: vote.voter,
-						name: vote.voter,
-						value: adjustedValue,
-						color,
-						percentage: vote.percentage,
-						delegatorsCount: vote.delegatorsCount,
-						isDelegated: vote.isDelegated,
-						lockPeriod: vote.lockPeriod,
-						decision: vote.decision,
-						// Store original value for tooltip display
-						originalValue: rawValue
-					};
-				});
-		};
-		const payload: {
-			id: string;
-			children: { id: string; name: string; children: IChartNode[]; color: string; decision: EVoteDecision }[];
-			color: string;
-			decision: EVoteDecision;
-		} = {
-			id: t('votesDistribution'),
-			children: [],
-			color: THEME_COLORS.light.bg_code,
-			decision: EVoteDecision.AYE
-		};
-		if (createChildren(EVoteDecision.AYE, THEME_COLORS[`${theme}`].aye_tile_bg).length > 0) {
-			payload.children.push({
-				id: t('aye'),
-				name: t('aye'),
-				children: createChildren(EVoteDecision.AYE, THEME_COLORS[`${theme}`].aye_tile_bg),
-				color: THEME_COLORS[`${theme}`].aye_tile_bg,
-				decision: EVoteDecision.AYE
-			});
-		}
-		if (createChildren(EVoteDecision.NAY, THEME_COLORS[`${theme}`].nay_tile_bg).length > 0) {
-			payload.children.push({
-				id: t('nay'),
-				name: t('nay'),
-				children: createChildren(EVoteDecision.NAY, THEME_COLORS[`${theme}`].nay_tile_bg),
-				color: THEME_COLORS[`${theme}`].nay_tile_bg,
-				decision: EVoteDecision.NAY
-			});
-		}
-		if (createChildren(EVoteDecision.ABSTAIN, THEME_COLORS[`${theme}`].abstain_tile_bg).length > 0) {
-			payload.children.push({
-				id: t('abstain'),
-				name: t('abstain'),
-				children: createChildren(EVoteDecision.ABSTAIN, THEME_COLORS[`${theme}`].abstain_tile_bg),
-				color: THEME_COLORS[`${theme}`].abstain_tile_bg,
-				decision: EVoteDecision.ABSTAIN
-			});
-		}
-		return payload;
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [allVotes, network, t, votesType, theme]);
+const getChartData = (allVotes: IVoteDistribution[], network: ENetwork, getDecisionColor: (decision: EVoteDecision) => string): INodeData[] => {
+	return allVotes.map((vote: IVoteDistribution) => ({
+		id: vote.voter,
+		name: vote.voter,
+		value: Number(formatBnBalance(vote.votingPower || vote.balance, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: false }, network).replace(/,/g, '')),
+		color: getDecisionColor(vote.decision),
+		percentage: vote.percentage,
+		delegatorsCount: vote.delegatorsCount || 0,
+		isDelegated: vote.isDelegated,
+		lockPeriod: vote.lockPeriod,
+		decision: vote.decision
+	}));
 };
 
 // Component
@@ -271,25 +161,19 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 	});
 
 	const allVotes = useVotesDistribution({ votesTilesData: votesTilesData?.votes || { aye: [], nay: [], abstain: [] } });
-	const chartData = useChartData({ allVotes, votesType });
+	const chartData = useMemo(() => {
+		return getChartData(allVotes, network, getDecisionColor);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [allVotes, network, votesType]);
 
 	const renderTooltip = useCallback(
-		// eslint-disable-next-line react/no-unused-prop-types
-		({ node: { id, formattedValue } }: { node: { id: string; formattedValue: string | number } }) => {
+		(node: { id: string; formattedValue: string; percentage: number }) => {
+			const { id, formattedValue } = node;
 			const vote = allVotes.find((value) => value.voter === id);
-			const voteType = vote?.voteType;
 			const percentage = vote?.percentage || 0;
 			const delegatorsCount = vote?.delegatorsCount;
 			const isDelegated = vote?.isDelegated;
 			const lockPeriod = vote?.lockPeriod || DEFAULT_LOCK_PERIOD;
-
-			// Use original vote value for display, not adjusted chart value
-			const originalVoteValue = vote
-				? formatUSDWithUnits(
-						formatBnBalance(vote.votingPower || vote.balance, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: false }, network).replace(/,/g, ''),
-						1
-					)
-				: formattedValue;
 
 			const formattedBalance = formatUSDWithUnits(
 				formatBnBalance(vote?.balance || BN_ZERO, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: true }, network).replace(/,/g, ''),
@@ -298,51 +182,39 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 
 			return (
 				<div className={classes.tooltip}>
-					{voteType === EVoteType.OTHERS ? (
-						<div className={classes.tooltipContent}>
-							<span className={classes.tooltipTitle}>{t('others')}</span>
+					<div className={classes.tooltipContent}>
+						<Address
+							address={id}
+							textClassName='text-sm'
+						/>
+						{votesType === EPostTileVotesType.NESTED ? (
 							<div className={classes.tooltipContent}>
-								<span className='font-bold text-basic_text'>
-									{originalVoteValue} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-								</span>
+								<div className={classes.tooltipContentValue}>
+									<span className={classes.tooltipText}>
+										{t('votes')}: {formattedValue} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+									</span>
+									<span className={classes.tooltipText}>
+										{t('delegators')}: {delegatorsCount}
+									</span>
+								</div>
 								<span className={classes.tooltipText}>{percentage}%</span>
 							</div>
-						</div>
-					) : (
-						<div className={classes.tooltipContent}>
-							<Address
-								address={id}
-								textClassName='text-sm'
-							/>
-							{votesType === EPostTileVotesType.NESTED ? (
-								<div className={classes.tooltipContent}>
-									<div className={classes.tooltipContentValue}>
-										<span className={classes.tooltipText}>
-											{t('votes')}: {originalVoteValue} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-										</span>
-										<span className={classes.tooltipText}>
-											{t('delegators')}: {delegatorsCount}
-										</span>
+						) : (
+							<div className={classes.tooltipContent}>
+								<div className={classes.tooltipContentValue}>
+									<div className='flex items-center gap-1'>
+										<span className={classes.tooltipText}>{t('capital')}:</span>
+										<span className='font-bold text-basic_text'>{formattedBalance}</span>
+										<span className={classes.tooltipText}>{isDelegated ? `(${lockPeriod}x/d) ` : `(${lockPeriod}x)`}</span>
 									</div>
-									<span className={classes.tooltipText}>{percentage}%</span>
+									<span className={classes.tooltipText}>
+										{t('votes')}: {formattedValue} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
+									</span>
 								</div>
-							) : (
-								<div className={classes.tooltipContent}>
-									<div className={classes.tooltipContentValue}>
-										<div className='flex items-center gap-1'>
-											<span className={classes.tooltipText}>{t('capital')}:</span>
-											<span className='font-bold text-basic_text'>{formattedBalance}</span>
-											<span className={classes.tooltipText}>{isDelegated ? `(${lockPeriod}x/d) ` : `(${lockPeriod}x)`}</span>
-										</div>
-										<span className={classes.tooltipText}>
-											{t('votes')}: {originalVoteValue} {NETWORKS_DETAILS[`${network}`].tokenSymbol}
-										</span>
-									</div>
-									<span className={classes.tooltipText}>{percentage}%</span>
-								</div>
-							)}
-						</div>
-					)}
+								<span className={classes.tooltipText}>{percentage}%</span>
+							</div>
+						)}
+					</div>
 				</div>
 			);
 		},
@@ -373,50 +245,33 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 			</div>
 
 			{isFetching ? (
-				<Skeleton className='mt-4 h-[280px] w-full' />
+				<Skeleton className='mt-4 h-[500px] w-full' />
 			) : allVotes.length > 0 ? (
 				<>
 					<div className={classes.chartWrapper}>
-						<ResponsiveTreeMap
-							data={chartData}
-							tile='squarify'
-							colorBy='color'
-							identity='name'
-							colors={(bar) => {
-								return bar.data.color;
+						<ResponsiveCirclePacking
+							data={{ name: t('votesDistribution'), children: chartData, color: 'transparent' }}
+							colors={(node) => {
+								const chartItem = chartData.find((item) => item.id === node.id);
+								return chartItem ? getDecisionColor(chartItem.decision) : '#000';
 							}}
 							leavesOnly
 							value='value'
 							valueFormat={(value) => formatUSDWithUnits(value?.toString(), 1)}
-							innerPadding={4}
-							outerPadding={2}
+							padding={4}
 							borderWidth={1}
 							borderColor={(node) => {
-								return getBorderColor(node.data.decision);
+								const chartItem = chartData.find((item) => item.id === node.id);
+								return chartItem ? getBorderColor(chartItem.decision) : '#000';
 							}}
-							enableParentLabel
-							nodeOpacity={1}
+							enableLabels
 							labelTextColor={theme === ETheme.DARK ? '#fff' : THEME_COLORS.light.text_primary}
+							labelsSkipRadius={20}
 							label={(node) => {
-								const vote = allVotes.find((v) => v.voter === node.id);
-								const percentage = vote?.percentage || 0;
-								// Use original value from the vote data, not the adjusted chart value
-								const originalValue = vote
-									? Number(formatBnBalance(vote.votingPower || vote.balance, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: false }, network).replace(/,/g, ''))
-									: node.value;
-								return `${formatUSDWithUnits(originalValue?.toString(), 1)} ${percentage}%`;
+								return `${node.formattedValue} ${Math.round(node.percentage)}%`;
 							}}
 							tooltip={renderTooltip}
-							theme={{
-								text: {
-									fontSize: 12,
-									fontWeight: 500,
-									fill: THEME_COLORS.light.text_primary
-								}
-							}}
-							margin={{ top: 2, right: 2, bottom: 2, left: 2 }}
-							labelSkipSize={30}
-							parentLabelPosition='left'
+							margin={{ bottom: 10, left: 10, right: 10, top: 10 }}
 							motionConfig='gentle'
 						/>
 					</div>
