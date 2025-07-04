@@ -822,6 +822,8 @@
 		"searchUsername": "搜索用户名"
 	},
 	"SetIdentity": {
+		"TeleportFundsToPeopleChain": "传送资金至People Chain",
+		"Teleport": "传送",
 		"displayName": "显示名称",
 		"legalName": "法定名称",
 		"email": "电子邮箱",
@@ -1304,5 +1306,14 @@
 		"pasteURLorEnterPostID": "粘贴URL或输入帖子ID",
 		"yourDiscussions": "您的讨论",
 		"confirm": "确认"
+	},
+	"TeleportToPeopleChain": {
+		"teleport": "传送",
+		"teleportFundsToPeopleChainSuccess": "资金成功传送至People Chain",
+		"teleportFundsToPeopleChainSuccessDescription": "资金已成功传送至People Chain",
+		"teleportFundsToPeopleChainFailed": "资金传送至People Chain失败",
+		"teleportFundsToPeopleChainFailedDescription": "传送资金至People Chain时发生错误",
+		"BeneficiaryAddress": "受益人地址",
+		"Amount": "金额"
 	}
 }

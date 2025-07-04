@@ -24,6 +24,7 @@ import RiotIcon from '@assets/icons/riot-icon.svg';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useQuery } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { Separator } from '../Separator';
 import { Button } from '../Button';
 import { Input } from '../Input';
@@ -32,6 +33,9 @@ import SocialVerifications from './SocialVerifications/SocialVerifications';
 import IdentitySuccessScreen from './IdentitySuccessScreen/IdentitySuccessScreen';
 import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
 import IdentityFeeCollaps from './IdentityFeeCollaps/IdentityFeeCollaps';
+import AddressRelationsPicker from '../AddressRelationsPicker/AddressRelationsPicker';
+import { Alert, AlertDescription } from '../Alert';
+import TeleportToPeopleChain from '../TeleportFunds/TeleportToPeopleChain';
 
 interface ISetIdentityFormFields {
 	displayName: string;
@@ -45,7 +49,8 @@ enum ESetIdentityStep {
 	GAS_FEE,
 	SET_IDENTITY_FORM,
 	IDENTITY_SUCCESS,
-	SOCIAL_VERIFICATION
+	SOCIAL_VERIFICATION,
+	TELEPORT_TO_PEOPLE_CHAIN
 }
 
 function SocialIcon({ icon }: { icon: string }) {
@@ -209,6 +214,25 @@ function SetIdentity() {
 		/>
 	) : step === ESetIdentityStep.SOCIAL_VERIFICATION ? (
 		<SocialVerifications />
+	) : step === ESetIdentityStep.TELEPORT_TO_PEOPLE_CHAIN ? (
+		<div className='flex flex-1 flex-col gap-y-4'>
+			<div>
+				<Button
+					variant='ghost'
+					size='sm'
+					className='text-sm text-text_primary'
+					leftIcon={<ArrowLeft />}
+					onClick={() => setStep(ESetIdentityStep.SET_IDENTITY_FORM)}
+				>
+					{t('SetIdentity.setIdentity')}
+				</Button>
+			</div>
+			<TeleportToPeopleChain
+				onSuccess={() => {
+					setStep(ESetIdentityStep.SET_IDENTITY_FORM);
+				}}
+			/>
+		</div>
 	) : (
 		<Form {...formData}>
 			<form
@@ -216,11 +240,32 @@ function SetIdentity() {
 				onSubmit={formData.handleSubmit(handleSetIdentity)}
 			>
 				<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
+					<Alert
+						variant='info'
+						className='flex items-center gap-x-3'
+					>
+						<AlertCircle className='h-4 w-4' />
+						<AlertDescription className='flex w-full items-center justify-between'>
+							<h2 className='text-sm font-medium'>{t('SetIdentity.TeleportFundsToPeopleChain')}</h2>
+							<Button
+								onClick={() => setStep(ESetIdentityStep.TELEPORT_TO_PEOPLE_CHAIN)}
+								size='sm'
+								className='h-6'
+							>
+								{t('SetIdentity.Teleport')}
+							</Button>
+						</AlertDescription>
+					</Alert>
+
 					<SwitchWalletOrAddress
 						small
-						withBalance
+						customAddressSelector={
+							<AddressRelationsPicker
+								withBalance
+								showPeopleChainBalance
+							/>
+						}
 						disabled={identityLoading}
-						showPeopleChainBalance
 					/>
 
 					{/* Display Name */}

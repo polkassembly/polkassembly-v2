@@ -50,6 +50,8 @@ function Poll({ poll }: { poll: IPoll | null }) {
 	const calculateOptionPercentage = useCallback(
 		(option: string) => {
 			const totalVotes = (votes || []).length;
+			if (totalVotes === 0) return 0;
+
 			const optionVotes = (votes || []).filter((vote) => vote.selectedOption === option).length;
 			return Number(((optionVotes / totalVotes) * 100).toFixed(0));
 		},
@@ -117,7 +119,7 @@ function Poll({ poll }: { poll: IPoll | null }) {
 			setLoading(false);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[user?.id, votes, isPollEnded]
+		[user?.id, votes, isPollEnded, poll]
 	);
 
 	if (!poll) {

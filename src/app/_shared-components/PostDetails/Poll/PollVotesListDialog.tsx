@@ -21,7 +21,7 @@ import { Skeleton } from '../../Skeleton';
 function PollVotesListDialog({ votes, poll, loading }: { votes: IPollVote[]; poll: IPoll; loading: boolean }) {
 	const t = useTranslations('PostDetails.Poll');
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedOption, setSelectedOption] = useState<string>(poll.options[0]);
+	const [selectedOption, setSelectedOption] = useState<string>(poll.options[0] || '');
 
 	const voteStats = useMemo(() => {
 		const stats: Record<string, { count: number; votes: IPollVote[] }> = {};
@@ -96,7 +96,7 @@ function PollVotesListDialog({ votes, poll, loading }: { votes: IPollVote[]; pol
 						) : voteStats[`${selectedOption}`]?.count > 0 ? (
 							<div className={classes.votesList}>
 								{voteStats[`${selectedOption}`]?.votes.map((vote) => {
-									const address = vote?.publicUser?.addresses[0];
+									const address = vote?.publicUser?.addresses?.[0];
 									return (
 										<div
 											key={vote.id}

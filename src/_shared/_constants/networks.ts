@@ -125,6 +125,7 @@ interface INetworkDetails {
 	socialLinks?: ISocialLink[];
 	palletInstance?: string;
 	assetHubParaId?: string;
+	peopleChainParaId?: string;
 	convictionVotingPeriodInBlocks: BN;
 	openGraphImage?: {
 		large: string;
@@ -2108,6 +2109,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		name: 'Polkadot',
 		govtype: EGovType.OPENGOV,
 		assetHubParaId: '1000',
+		peopleChainParaId: '1004',
 		palletInstance: '50',
 		blockTime: 6000,
 		ss58Format: 0,

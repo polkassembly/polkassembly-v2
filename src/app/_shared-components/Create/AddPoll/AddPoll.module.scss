@@ -1,5 +1,5 @@
 .container {
-	@apply mt-2 flex-col items-center gap-2 rounded-md bg-info_bg p-4 text-sm font-medium text-basic_text;
+	@apply mt-2 flex flex-col items-center gap-2 rounded-md bg-info_bg p-4 text-sm font-medium text-basic_text;
 }
 .addPollText {
 	@apply text-sm font-medium;
