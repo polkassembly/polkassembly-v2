@@ -17,6 +17,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useUser } from '@/hooks/useUser';
 import { useToast } from '@/hooks/useToast';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../Dialog/Dialog';
@@ -41,6 +42,7 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
+	const { user } = useUser();
 	const { toast } = useToast();
 	const queryClient = useQueryClient();
 	const [isRemoving, setIsRemoving] = useState(false);
@@ -68,7 +70,7 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 						description: t('PostDetails.voteRemoved'),
 						status: ENotificationStatus.SUCCESS
 					});
-					queryClient.invalidateQueries({ queryKey: ['userVotes', proposalType, index, userPreferences.selectedAccount?.address] });
+					queryClient.invalidateQueries({ queryKey: ['userVotes', proposalType, index, user?.loginAddress || user?.addresses[0]] });
 					setOpenRemoveConfirmModal(false);
 				},
 				onFailed: (errorMessage) => {

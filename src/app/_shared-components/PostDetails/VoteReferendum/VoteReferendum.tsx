@@ -17,6 +17,7 @@ import {
 	EReactQueryKeys
 } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useUser } from '@/hooks/useUser';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
@@ -145,6 +146,7 @@ function VoteReferendum({
 	existingVote?: IVoteData;
 }) {
 	const { userPreferences } = useUserPreferences();
+	const { user } = useUser();
 	const [voteDecision, setVoteDecision] = useState(EVoteDecision.AYE);
 	const t = useTranslations();
 	const queryClient = useQueryClient();
@@ -243,13 +245,13 @@ function VoteReferendum({
 						delegatedVotingPower: '0'
 					};
 
-					queryClient.setQueryData(['userVotes', proposalType, index, userAddress], {
+					queryClient.setQueryData(['userVotes', proposalType, index, user?.loginAddress || user?.addresses[0]], {
 						votes: [optimisticVoteData]
 					});
 
 					// Also invalidate to ensure fresh data in the background
 					queryClient.invalidateQueries({
-						queryKey: ['userVotes', proposalType, index, userAddress]
+						queryKey: ['userVotes', proposalType, index, user?.loginAddress || user?.addresses[0]]
 					});
 
 					onClose();

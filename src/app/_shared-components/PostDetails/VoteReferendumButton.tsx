@@ -39,19 +39,19 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 		isLoading,
 		isError
 	} = useQuery({
-		queryKey: ['userVotes', proposalType, index, user?.addresses[0]],
+		queryKey: ['userVotes', proposalType, index, user?.loginAddress || user?.addresses[0]],
 		queryFn: async () => {
-			if (!user) return null;
+			if (!user?.loginAddress || !user?.addresses[0]) return null;
 			const { data, error } = await NextApiClientService.getPostVotesByAddress({
 				proposalType,
 				index,
-				address: user?.addresses[0]
+				address: user.loginAddress || user.addresses[0]
 			});
 			if (error) throw new Error(error.message || 'Failed to fetch vote data');
 			if (!data) return null;
 			return data;
 		},
-		enabled: !!user?.addresses[0],
+		enabled: !!user?.loginAddress || !!user?.addresses[0],
 		retry: 1,
 		staleTime: 0, // Always refetch user votes to ensure fresh data
 		refetchOnWindowFocus: true,
@@ -103,6 +103,8 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 					<Button
 						className={cn('w-full', btnClassName)}
 						size={size}
+						isLoading={isLoading}
+						disabled={isLoading}
 					>
 						<div className='flex items-center gap-1'>
 							<Image
