@@ -18,6 +18,7 @@ import { IoMdClose } from '@react-icons/all-files/io/IoMdClose';
 import { useState } from 'react';
 import TranslateIcon from '@assets/icons/translate.svg';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import classes from './Navbar.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import Address from '../../Profile/Address/Address';
@@ -25,7 +26,8 @@ import NetworkDropdown from '../../NetworkDropdown/NetworkDropdown';
 import RPCSwitchDropdown from '../RpcSwitch/RPCSwitchDropdown';
 import PaLogo from '../PaLogo';
 import ThemeToggleButton from '../../ThemeToggleButton';
-import Search from '../Search/Search';
+
+const Search = dynamic(() => import('../Search/Search'), { ssr: false });
 
 const LANGUAGES = {
 	[ELocales.ENGLISH]: '🇺🇸 English',

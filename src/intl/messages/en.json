@@ -483,6 +483,8 @@
 		"aiSummary": "AI Summary",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
+		"commentsDisabled": "Comments have been disabled for this post.",
+		"commentsDisabledForNonVerifiedUsers": "Comments have been disabled for non verified users.",
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",
@@ -684,6 +686,7 @@
 		"edit": "Edit",
 		"title": "Title",
 		"content": "Content",
+		"whoCanComment": "Who can comment?",
 		"save": "Save",
 		"editPostButton": "Edit",
 		"success": "Post updated successfully",
@@ -841,6 +844,8 @@
 		"searchUsername": "Enter username to search"
 	},
 	"SetIdentity": {
+		"TeleportFundsToPeopleChain": "Teleport Funds to People Chain",
+		"Teleport": "Teleport",
 		"displayName": "Display Name",
 		"legalName": "Legal Name",
 		"email": "Email",
@@ -1310,5 +1315,14 @@
 		"votes": "Votes",
 		"voteDetails": "Vote Details",
 		"target": "Target"
+	},
+	"TeleportToPeopleChain": {
+		"teleport": "Teleport",
+		"teleportFundsToPeopleChainSuccess": "Funds teleported to people chain successfully",
+		"teleportFundsToPeopleChainSuccessDescription": "The funds have been teleported to people chain successfully",
+		"teleportFundsToPeopleChainFailed": "Failed to teleport funds to people chain",
+		"teleportFundsToPeopleChainFailedDescription": "There was an error while teleporting the funds to people chain",
+		"BeneficiaryAddress": "Beneficiary Address",
+		"Amount": "Amount"
 	}
 }

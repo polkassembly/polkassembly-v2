@@ -5,7 +5,7 @@
 'use client';
 
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ENotificationStatus, EProposalType, EReactQueryKeys, IOffChainPost, IPost, IPostListing } from '@/_shared/types';
+import { EAllowedCommentor, ENotificationStatus, EProposalType, EReactQueryKeys, IOffChainPost, IPost, IPostListing } from '@/_shared/types';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
@@ -125,6 +125,7 @@ function LinkDiscussionPost({ postData, onClose }: { postData: IPostListing | IP
 			data: {
 				title: selectedDiscussionPost.title,
 				content: selectedDiscussionPost.content,
+				allowedCommentor: selectedDiscussionPost.allowedCommentor || EAllowedCommentor.ALL,
 				linkedPost: {
 					proposalType: EProposalType.DISCUSSION,
 					indexOrHash: selectedDiscussionPost.index!.toString()
