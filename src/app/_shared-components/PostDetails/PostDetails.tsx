@@ -13,6 +13,8 @@ import { useAISummary } from '@/hooks/useAISummary';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
+import { ClientError } from '@/app/_client-utils/clientError';
+import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import dynamic from 'next/dynamic';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
@@ -25,7 +27,9 @@ import OnchainInfo from './OnchainInfo/OnchainInfo';
 import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
-import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
+import PostAnalytics from './Analytics/PostAnalytics';
+import VotesData from './VotesData/VotesData';
+// import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
 
 const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), { ssr: false });
 const Timeline = dynamic(() => import('./Timeline/Timeline'), { ssr: false });
@@ -65,6 +69,23 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 		initialData: post?.contentSummary,
 		proposalType: post?.proposalType || postData.proposalType,
 		indexOrHash: String(post?.index ?? postData.index ?? post?.hash ?? postData.hash)
+	});
+
+	const getPostAnalytics = async () => {
+		const { data, error } = await NextApiClientService.getPostAnalytics({ proposalType: post?.proposalType as EProposalType, index: index.toString() });
+		if (error || !data) {
+			throw new ClientError(error?.message || 'Failed to fetch data');
+		}
+		return data;
+	};
+
+	const { data: analytics, isFetching: isAnalyticsFetching } = useQuery({
+		queryKey: ['postAnalytics', post?.proposalType, index],
+		queryFn: getPostAnalytics,
+		enabled: POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(post?.proposalType as EProposalType) && !!index,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+		retry: false
 	});
 
 	useEffect(() => {
@@ -121,17 +142,18 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									onchainInfo={post.onChainInfo}
 								/>
 							</TabsContent>
+							{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(post.proposalType) && (
+								<TabsContent value={EPostDetailsTab.POST_ANALYTICS}>
+									<PostAnalytics
+										analytics={analytics}
+										isFetching={isAnalyticsFetching}
+										proposalType={post.proposalType}
+										index={index}
+									/>
+								</TabsContent>
+							)}
 						</div>
-						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
-							<PostComments
-								proposalType={post.proposalType}
-								index={index}
-								contentSummary={post.contentSummary}
-								comments={post.comments}
-								allowedCommentor={post.allowedCommentor}
-								postUserId={post.userId}
-							/>
-						</div>
+
 						{isModalOpen && !isOffchainPost && (
 							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
 								{canVote(post.onChainInfo?.status) && (
@@ -144,6 +166,16 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								)}
 							</div>
 						)}
+						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
+							<PostComments
+								proposalType={post.proposalType}
+								index={index}
+								contentSummary={post.contentSummary}
+								comments={post.comments}
+								allowedCommentor={post.allowedCommentor}
+								postUserId={post.userId}
+							/>
+						</div>
 					</div>
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
@@ -187,22 +219,20 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								trackName={post.onChainInfo?.origin || EPostOrigin.ROOT}
 							/>
 							<VoteSummary
-								proposalType={post.proposalType}
 								index={index}
 								voteMetrics={post.onChainInfo?.voteMetrics}
 								approvalThreshold={thresholdValues.approvalThreshold}
 							/>
-							{post.onChainInfo?.origin && post.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced) && (
-								<VoteCurvesData
-									proposalType={post.proposalType}
-									index={index}
-									createdAt={post.createdAt}
-									trackName={post.onChainInfo?.origin}
-									timeline={post.onChainInfo?.timeline}
-									setThresholdValues={setThresholdValues}
-									thresholdValues={thresholdValues}
-								/>
-							)}
+
+							<VotesData
+								proposalType={post.proposalType}
+								index={index}
+								trackName={post.onChainInfo?.origin || EPostOrigin.ROOT}
+								createdAt={post.createdAt}
+								timeline={post.onChainInfo?.timeline}
+								setThresholdValues={setThresholdValues}
+								thresholdValues={thresholdValues}
+							/>
 						</div>
 					)}
 
