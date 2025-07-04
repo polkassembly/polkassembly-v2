@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useMemo, useCallback, useState } from 'react';
-import { EAnalyticsType, ENetwork, EPostTileVotesType, EProposalType, ETheme, EVoteDecision, IPostTilesVotes } from '@/_shared/types';
+import { EAnalyticsType, ENetwork, EPostBubbleVotesType, EProposalType, ETheme, EVoteDecision, IPostBubbleVotes } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { ResponsiveCirclePacking } from '@nivo/circle-packing';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -20,7 +20,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import Image from 'next/image';
 import noData from '@/_assets/activityfeed/gifs/noactivity.gif';
 import Address from '../../Profile/Address/Address';
-import classes from './VotesTiles.module.scss';
+import classes from './VotesBubbleChart.module.scss';
 import { Skeleton } from '../../Skeleton';
 import { Button } from '../../Button';
 
@@ -52,25 +52,25 @@ const DEFAULT_LOCK_PERIOD = 0.1;
 
 // Utility functions
 const calculateTotalDecisionVotes = ({
-	votesTilesData,
+	votesBubbleData,
 	decision
 }: {
-	votesTilesData: IPostTilesVotes['votes'];
+	votesBubbleData: IPostBubbleVotes['votes'];
 	decision: Exclude<EVoteDecision, EVoteDecision.SPLIT | EVoteDecision.SPLIT_ABSTAIN>;
 }): BN => {
-	return new BN(votesTilesData?.[`${decision}`]?.reduce((acc, curr) => new BN(acc).add(new BN(curr.votingPower || curr.balance)), BN_ZERO));
+	return new BN(votesBubbleData?.[`${decision}`]?.reduce((acc, curr) => new BN(acc).add(new BN(curr.votingPower || curr.balance)), BN_ZERO));
 };
 
 const calculatePerVotePercentage = ({
 	vote,
 	decision,
-	votesTilesData
+	votesBubbleData
 }: {
 	vote: { balance: string; votingPower: string | null };
 	decision: Exclude<EVoteDecision, EVoteDecision.SPLIT | EVoteDecision.SPLIT_ABSTAIN>;
-	votesTilesData: IPostTilesVotes['votes'];
+	votesBubbleData: IPostBubbleVotes['votes'];
 }): number => {
-	const totalPercentage = calculateTotalDecisionVotes({ votesTilesData, decision });
+	const totalPercentage = calculateTotalDecisionVotes({ votesBubbleData, decision });
 	const percentage =
 		new BN(vote.votingPower || vote.balance).gt(BN_ZERO) && !!totalPercentage
 			? new BN(vote.votingPower || vote.balance).mul(new BN(100)).div(new BN(totalPercentage))?.toString()
@@ -79,14 +79,14 @@ const calculatePerVotePercentage = ({
 };
 
 // Custom hooks
-const useVotesDistribution = ({ votesTilesData }: { votesTilesData: IPostTilesVotes['votes'] }): IVoteDistribution[] => {
+const useVotesDistribution = ({ votesBubbleData }: { votesBubbleData: IPostBubbleVotes['votes'] }): IVoteDistribution[] => {
 	return useMemo(() => {
 		const votes: IVoteDistribution[] = [];
 		const decisions: Array<Exclude<EVoteDecision, EVoteDecision.SPLIT | EVoteDecision.SPLIT_ABSTAIN>> = [EVoteDecision.AYE, EVoteDecision.NAY, EVoteDecision.ABSTAIN];
 
 		decisions.forEach((decision) => {
 			const distributionKey = decision;
-			const votesList = votesTilesData?.[`${distributionKey}`];
+			const votesList = votesBubbleData?.[`${distributionKey}`];
 			if (votesList?.length === 0) return;
 
 			votesList.forEach((vote) => {
@@ -95,7 +95,7 @@ const useVotesDistribution = ({ votesTilesData }: { votesTilesData: IPostTilesVo
 					balance: vote.balance,
 					votingPower: vote.votingPower || null,
 					decision,
-					percentage: calculatePerVotePercentage({ vote, decision, votesTilesData }),
+					percentage: calculatePerVotePercentage({ vote, decision, votesBubbleData }),
 					delegatorsCount: vote.delegatorsCount,
 					isDelegated: vote.isDelegated,
 					lockPeriod: vote.lockPeriod
@@ -106,7 +106,7 @@ const useVotesDistribution = ({ votesTilesData }: { votesTilesData: IPostTilesVo
 		});
 
 		return votes;
-	}, [votesTilesData]);
+	}, [votesBubbleData]);
 };
 
 const getChartData = (allVotes: IVoteDistribution[], network: ENetwork, getDecisionColor: (decision: EVoteDecision) => string): INodeData[] => {
@@ -124,22 +124,22 @@ const getChartData = (allVotes: IVoteDistribution[], network: ENetwork, getDecis
 };
 
 // Component
-function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EProposalType; index: string; analyticsType: EAnalyticsType }) {
-	const t = useTranslations('PostDetails.VotesTiles');
+function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType: EProposalType; index: string; analyticsType: EAnalyticsType }) {
+	const t = useTranslations('PostDetails.VotesBubble');
 	const network = getCurrentNetwork();
 	const {
 		userPreferences: { theme }
 	} = useUserPreferences();
-	const [votesType, setVotesType] = useState<EPostTileVotesType>(EPostTileVotesType.FLATTENED);
+	const [votesType, setVotesType] = useState<EPostBubbleVotesType>(EPostBubbleVotesType.FLATTENED);
 
 	const getBorderColor = (decision: EVoteDecision) => {
 		return THEME_COLORS.light[`${decision}_color` as keyof typeof THEME_COLORS.light];
 	};
 	const getDecisionColor = (decision: EVoteDecision) => {
-		return THEME_COLORS[`${theme}`][`${decision}_tile_bg` as keyof (typeof THEME_COLORS)[typeof theme]];
+		return THEME_COLORS[`${theme}`][`${decision}_bubble_bg` as keyof (typeof THEME_COLORS)[typeof theme]];
 	};
 	const getPostAnalytics = async () => {
-		const { data, error } = await NextApiClientService.getPostTilesVotes({
+		const { data, error } = await NextApiClientService.getPostBubbleVotes({
 			proposalType: proposalType as EProposalType,
 			index: index.toString(),
 			analyticsType,
@@ -151,8 +151,8 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 		return data;
 	};
 
-	const { data: votesTilesData, isFetching } = useQuery({
-		queryKey: ['postTilesVotes', proposalType, index, analyticsType, votesType],
+	const { data: votesBubbleData, isFetching } = useQuery({
+		queryKey: ['postBubbleVotes', proposalType, index, analyticsType, votesType],
 		queryFn: getPostAnalytics,
 		enabled: !!proposalType && !!index,
 		refetchOnWindowFocus: false,
@@ -160,7 +160,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 		retry: false
 	});
 
-	const allVotes = useVotesDistribution({ votesTilesData: votesTilesData?.votes || { aye: [], nay: [], abstain: [] } });
+	const allVotes = useVotesDistribution({ votesBubbleData: votesBubbleData?.votes || { aye: [], nay: [], abstain: [] } });
 	const chartData = useMemo(() => {
 		return getChartData(allVotes, network, getDecisionColor);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -187,7 +187,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 							address={id}
 							textClassName='text-sm'
 						/>
-						{votesType === EPostTileVotesType.NESTED ? (
+						{votesType === EPostBubbleVotesType.NESTED ? (
 							<div className={classes.tooltipContent}>
 								<div className={classes.tooltipContentValue}>
 									<span className={classes.tooltipText}>
@@ -227,7 +227,7 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 			<div className={classes.header}>
 				<h2 className={classes.heading}>{t('votesDistribution')}</h2>
 				<div className={classes.buttonContainer}>
-					{[EPostTileVotesType.FLATTENED, EPostTileVotesType.NESTED].map((type) => (
+					{[EPostBubbleVotesType.FLATTENED, EPostBubbleVotesType.NESTED].map((type) => (
 						<Button
 							key={type}
 							variant='ghost'
@@ -313,4 +313,4 @@ function VotesTiles({ proposalType, index, analyticsType }: { proposalType: EPro
 	);
 }
 
-export default VotesTiles;
+export default VotesBubbleChart;

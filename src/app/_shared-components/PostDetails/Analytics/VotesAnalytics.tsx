@@ -9,7 +9,7 @@ import TimeSplitCard from './TimeSplitCard';
 import VotesByConvictions from './VotesByConviction';
 import DelegationVotesByConvictions from './DelegationVotesByConviction';
 import { Separator } from '../../Separator';
-import VotesTiles from '../VotesTiles/VotesTiles';
+import VotesBubbleChart from '../VotesBubbleChart/VotesBubbleChart';
 
 function VotesAnalytics({ votesAnalytics, index, proposalType }: { votesAnalytics: IAnalytics; index: string; proposalType: EProposalType }) {
 	return (
@@ -24,7 +24,7 @@ function VotesAnalytics({ votesAnalytics, index, proposalType }: { votesAnalytic
 			</div>
 			<div className='flex w-full flex-col gap-4'>
 				<TimeSplitCard timeSplitVotes={votesAnalytics?.timeSplitVotes || []} />
-				<VotesTiles
+				<VotesBubbleChart
 					proposalType={proposalType}
 					analyticsType={EAnalyticsType.VOTES}
 					index={index}

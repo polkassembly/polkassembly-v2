@@ -470,7 +470,7 @@
 		"capital": "资本",
 		"account": "账户",
 		"abstain": "弃权",
-		"VotesTiles": {
+		"VotesBubble": {
 			"nested": "嵌套",
 			"flattened": "扁平",
 			"votesDistribution": "投票者分布",

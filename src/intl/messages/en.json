@@ -484,7 +484,7 @@
 		"aiSummary": "AI Summary",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
-		"VotesTiles": {
+		"VotesBubble": {
 			"nested": "Nested",
 			"flattened": "Flattened",
 			"votesDistribution": "Voter Distribution",

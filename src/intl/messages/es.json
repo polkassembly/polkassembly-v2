@@ -472,7 +472,7 @@
 		"account": "Cuenta",
 		"abstain": "Abstención",
 		"onchainInfo": "Información en cadena",
-		"VotesTiles": {
+		"VotesBubble": {
 			"nested": "Anidado",
 			"flattened": "Aplanado",
 			"votesDistribution": "Distribución de votantes",

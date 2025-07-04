@@ -1387,7 +1387,7 @@ export interface IVotesDistribution {
 	lockPeriod: number;
 }
 
-export type IPostTilesVotes = {
+export type IPostBubbleVotes = {
 	votes: {
 		[K in Exclude<EVoteDecision, EVoteDecision.SPLIT_ABSTAIN | EVoteDecision.SPLIT>]: IVotesDistribution[];
 	};
@@ -1396,7 +1396,7 @@ export type IPostTilesVotes = {
 	};
 };
 
-export enum EPostTileVotesType {
+export enum EPostBubbleVotesType {
 	NESTED = 'nested',
 	FLATTENED = 'flattened'
 }

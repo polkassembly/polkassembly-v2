@@ -19,7 +19,7 @@ import {
 	EBountyStatus,
 	EVoteSortOptions,
 	EAnalyticsType,
-	EPostTileVotesType
+	EPostBubbleVotesType
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -316,7 +316,7 @@ export class OnChainDbService {
 		return SubsquidService.GetPostAnalytics({ network, proposalType, index });
 	}
 
-	static async GetPostTillesVotes({
+	static async GetPostBubbleVotes({
 		network,
 		proposalType,
 		index,
@@ -327,8 +327,8 @@ export class OnChainDbService {
 		proposalType: EProposalType;
 		index: number;
 		analyticsType?: EAnalyticsType;
-		votesType: EPostTileVotesType;
+		votesType: EPostBubbleVotesType;
 	}) {
-		return SubsquidService.GetPostTillesVotes({ network, proposalType, index, analyticsType, votesType });
+		return SubsquidService.GetPostBubbleVotes({ network, proposalType, index, analyticsType, votesType });
 	}
 }

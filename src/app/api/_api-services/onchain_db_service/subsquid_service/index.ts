@@ -6,7 +6,7 @@ import {
 	EAnalyticsType,
 	ENetwork,
 	EPostOrigin,
-	EPostTileVotesType,
+	EPostBubbleVotesType,
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
@@ -19,7 +19,7 @@ import {
 	IOnChainPostInfo,
 	IOnChainPostListing,
 	IPostAnalytics,
-	IPostTilesVotes,
+	IPostBubbleVotes,
 	IPreimage,
 	IStatusHistoryItem,
 	ITrackAnalyticsDelegations,
@@ -1092,7 +1092,7 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async GetPostTillesVotes({
+	static async GetPostBubbleVotes({
 		network,
 		proposalType,
 		index,
@@ -1103,11 +1103,11 @@ export class SubsquidService extends SubsquidUtils {
 		proposalType: EProposalType;
 		index: number;
 		analyticsType?: EAnalyticsType;
-		votesType: EPostTileVotesType;
-	}): Promise<IPostTilesVotes> {
+		votesType: EPostBubbleVotesType;
+	}): Promise<IPostBubbleVotes> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = votesType === EPostTileVotesType.FLATTENED ? this.GET_ALL_FLATTENED_VOTES_FOR_POST : this.GET_ALL_NESTED_VOTES;
+		const query = votesType === EPostBubbleVotesType.FLATTENED ? this.GET_ALL_FLATTENED_VOTES_FOR_POST : this.GET_ALL_NESTED_VOTES;
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { type_eq: proposalType, index_eq: index }).toPromise();
 
 		if (subsquidErr || !subsquidData) {
@@ -1115,9 +1115,9 @@ export class SubsquidService extends SubsquidUtils {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post analytics from Subsquid');
 		}
 
-		const data = votesType === EPostTileVotesType.FLATTENED ? subsquidData.flattenedConvictionVotes : subsquidData.convictionVotes;
+		const data = votesType === EPostBubbleVotesType.FLATTENED ? subsquidData.flattenedConvictionVotes : subsquidData.convictionVotes;
 
-		const votesData: IPostTilesVotes = {
+		const votesData: IPostBubbleVotes = {
 			votes: {
 				[EVoteDecision.AYE]: [],
 				[EVoteDecision.NAY]: [],
@@ -1144,7 +1144,7 @@ export class SubsquidService extends SubsquidUtils {
 				const balance = new BN(vote.balance?.value || vote.balance?.abstain || vote.balance?.aye || vote.balance?.nay || BN_ZERO.toString());
 				const votingPower =
 					analyticsType === EAnalyticsType.CONVICTIONS
-						? votesType === EPostTileVotesType.FLATTENED
+						? votesType === EPostBubbleVotesType.FLATTENED
 							? this.getVotingPower(balance?.toString(), vote?.lockPeriod)
 							: this.getNestedVoteVotingPower(
 									vote?.parentVote?.delegatedVotingPower || vote?.delegatedVotingPower || BN_ZERO.toString(),

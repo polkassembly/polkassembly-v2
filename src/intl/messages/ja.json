@@ -471,7 +471,7 @@
 		"account": "アカウント",
 		"abstain": "棄権",
 		"onchainInfo": "オンチェーン情報",
-		"VotesTiles": {
+		"VotesBubble": {
 			"nested": "ネスト",
 			"flattened": "フラット",
 			"votesDistribution": "投票者分布",
