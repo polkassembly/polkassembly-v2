@@ -7,7 +7,7 @@
 import React from 'react';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
 import { Separator } from '@ui/Separator';
-import { EAssets, EPostDetailsTab, IPost, IPostListing } from '@/_shared/types';
+import { EAssets, EPostDetailsTab, EProposalType, IPost } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import Image from 'next/image';
@@ -27,11 +27,12 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import Link from 'next/link';
 import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
-import { ArrowLeftIcon } from 'lucide-react';
+import { ArrowLeftIcon, ChevronsRight } from 'lucide-react';
+import { getPostDetailsUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import classes from './PostHeader.module.scss';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 
-function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost; isModalOpen: boolean }) {
+function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: boolean }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 
@@ -58,18 +59,41 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 
 	return (
 		<div className='mx-auto max-w-[100vw] lg:max-w-7xl'>
-			<Link
-				href={
-					postData.onChainInfo?.origin
-						? `/${postData.onChainInfo?.origin?.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}`
-						: `/${postData.proposalType?.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}s`
-				}
-				className='mb-4 flex items-center gap-x-1 text-xs text-listing_page_btn hover:underline'
-			>
+			<div className='mb-4 flex items-center gap-x-1'>
 				<ArrowLeftIcon className='h-3 w-4' />
-				View All {postData.onChainInfo?.origin ? `${convertCamelCaseToTitleCase(postData.onChainInfo?.origin || '')}` : `${postData.proposalType}`}
-			</Link>
+				<Link
+					href={
+						postData.onChainInfo?.origin
+							? `/${postData.onChainInfo?.origin?.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}`
+							: `/${postData.proposalType?.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}s`
+					}
+					className='flex items-center gap-x-1 text-xs text-listing_page_btn hover:underline'
+				>
+					View All {postData.onChainInfo?.origin ? `${convertCamelCaseToTitleCase(postData.onChainInfo?.origin || '')}` : `${postData.proposalType}`}
+				</Link>
+				{postData?.linkedPost && (
+					<>
+						<Separator
+							orientation='vertical'
+							className='mx-1 h-3 w-[2px]'
+						/>
+						<Link
+							href={getPostDetailsUrl({ proposalType: postData.linkedPost?.proposalType as EProposalType, proposalId: Number(postData.linkedPost?.indexOrHash), network })}
+							className='flex items-center gap-x-1 text-xs text-listing_page_btn hover:underline'
+						>
+							<span className='text-text_secondary'>{t(`PostDetails.ProposalType.${(postData.linkedPost?.proposalType || EProposalType.DISCUSSION).toLowerCase()}`)}</span>
+							<span className='text-text_primary'>#{postData.linkedPost?.indexOrHash}</span>
+						</Link>
 
+						<ChevronsRight className='h-3.5 w-3.5 text-lg text-basic_text' />
+
+						<div className='flex items-center gap-x-1 text-xs text-text_pink'>
+							<span className='capitalize'>{t(`PostDetails.ProposalType.${(postData.proposalType || EProposalType.DISCUSSION).toLowerCase()}`)}</span>
+							<span>#{postData?.index}</span>
+						</div>
+					</>
+				)}
+			</div>
 			<div className='mb-4'>
 				<div className={classes.requestedWrapper}>
 					{postData.onChainInfo?.beneficiaries && postData.onChainInfo?.beneficiaries.length > 0 && groupedByAsset && (
