@@ -130,7 +130,7 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 	const {
 		userPreferences: { theme }
 	} = useUserPreferences();
-	const [votesType, setVotesType] = useState<EPostBubbleVotesType>(EPostBubbleVotesType.FLATTENED);
+	const [votesType, setVotesType] = useState<EPostBubbleVotesType>(EPostBubbleVotesType.NESTED);
 
 	const getBorderColor = (decision: EVoteDecision) => {
 		return THEME_COLORS.light[`${decision}_color` as keyof typeof THEME_COLORS.light];
@@ -227,7 +227,7 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 			<div className={classes.header}>
 				<h2 className={classes.heading}>{t('votesDistribution')}</h2>
 				<div className={classes.buttonContainer}>
-					{[EPostBubbleVotesType.FLATTENED, EPostBubbleVotesType.NESTED].map((type) => (
+					{[EPostBubbleVotesType.NESTED, EPostBubbleVotesType.FLATTENED].map((type) => (
 						<Button
 							key={type}
 							variant='ghost'

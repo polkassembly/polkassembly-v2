@@ -23,13 +23,13 @@ import { Tabs, TabsContent } from '../Tabs';
 import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
 import PostContent from './PostContent';
-import OnchainInfo from './OnchainInfo/OnchainInfo';
 import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
-import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
-import PostAnalytics from './Analytics/PostAnalytics';
 
+const OnchainInfo = dynamic(() => import('./OnchainInfo/OnchainInfo'), { ssr: false });
+const VoteCurvesData = dynamic(() => import('./VoteCurvesData/VoteCurvesData'), { ssr: false });
+const PostAnalytics = dynamic(() => import('./Analytics/PostAnalytics'), { ssr: false });
 const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), { ssr: false });
 const Timeline = dynamic(() => import('./Timeline/Timeline'), { ssr: false });
 const PlaceDecisionDeposit = dynamic(() => import('./PlaceDecisionDeposit/PlaceDecisionDeposit'), { ssr: false });
