@@ -26,11 +26,50 @@ import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
+import { Skeleton } from '../Skeleton';
 
-const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), { ssr: false });
-const Timeline = dynamic(() => import('./Timeline/Timeline'), { ssr: false });
-const PlaceDecisionDeposit = dynamic(() => import('./PlaceDecisionDeposit/PlaceDecisionDeposit'), { ssr: false });
-const ClaimPayout = dynamic(() => import('./ClaimPayout/ClaimPayout'), { ssr: false });
+const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), {
+	ssr: false,
+	loading: () => <Skeleton className='h-12 w-full rounded-lg' />
+});
+
+const Timeline = dynamic(() => import('./Timeline/Timeline'), {
+	ssr: false,
+	loading: () => (
+		<div className='flex flex-col gap-4'>
+			<Skeleton className='h-8 w-48' />
+			<div className='flex flex-col gap-3'>
+				<Skeleton className='h-6 w-full' />
+				<Skeleton className='h-6 w-full' />
+				<Skeleton className='h-6 w-full' />
+				<Skeleton className='h-6 w-3/4' />
+			</div>
+		</div>
+	)
+});
+
+const PlaceDecisionDeposit = dynamic(() => import('./PlaceDecisionDeposit/PlaceDecisionDeposit'), {
+	ssr: false,
+	loading: () => (
+		<div className='rounded-lg border border-border_grey bg-bg_modal p-4'>
+			<Skeleton className='mb-4 h-6 w-40' />
+			<Skeleton className='mb-2 h-4 w-full' />
+			<Skeleton className='mb-4 h-4 w-3/4' />
+			<Skeleton className='h-10 w-full rounded-md' />
+		</div>
+	)
+});
+
+const ClaimPayout = dynamic(() => import('./ClaimPayout/ClaimPayout'), {
+	ssr: false,
+	loading: () => (
+		<div className='rounded-lg border border-border_grey bg-bg_modal p-4'>
+			<Skeleton className='mb-4 h-6 w-32' />
+			<Skeleton className='mb-2 h-4 w-full' />
+			<Skeleton className='h-10 w-full rounded-md' />
+		</div>
+	)
+});
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
 	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
