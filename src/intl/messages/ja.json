@@ -501,6 +501,13 @@
 		"aiSummary": "AI要約",
 		"showLikelySpam": "疑わしいスパムを表示",
 		"hideLikelySpam": "疑わしいスパムを非表示",
+		"HighlightMenu": {
+			"quote": "引用",
+			"share": "共有",
+			"copy": "コピー",
+			"textCopiedToClipboard": "テキストがクリップボードにコピーされました",
+			"failedToCopyText": "テキストのコピーに失敗しました"
+		},
 		"voted": "投票済み",
 		"votes": "投票",
 		"vote": "投票",

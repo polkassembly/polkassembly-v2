@@ -27,7 +27,8 @@ function AddComment({
 	onConfirm,
 	onCancel,
 	isReply,
-	replyTo
+	replyTo,
+	id
 }: {
 	proposalType: EProposalType;
 	proposalIndex: string;
@@ -36,6 +37,7 @@ function AddComment({
 	onCancel?: () => void;
 	isReply?: boolean;
 	replyTo?: Omit<IPublicUser, 'rank'>;
+	id?: string;
 }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
@@ -114,7 +116,10 @@ function AddComment({
 
 	return (
 		<div>
-			<div className='mb-2'>
+			<div
+				className='mb-2'
+				id={id}
+			>
 				<MarkdownEditor
 					markdown={content || ''}
 					onChange={(data) => {
