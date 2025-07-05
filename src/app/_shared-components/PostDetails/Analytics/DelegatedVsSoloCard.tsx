@@ -14,7 +14,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image from 'next/image';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import Icon from '@/_assets/analytics/delegated-vs-solo.svg';
-import { ETheme } from '@/_shared/types';
+import { ENetwork, ETheme } from '@/_shared/types';
 import classes from './PostAnalytics.module.scss';
 
 // Register Chart.js components
@@ -94,7 +94,7 @@ function DelegatedVsSoloCard({
 					label(context: TooltipItem<'doughnut'>) {
 						const value = context.parsed;
 						const { label } = context;
-						return `${label}: ${isAccountsAnalytics ? value : formatUSDWithUnits(value?.toString(), 1)} ${isAccountsAnalytics ? t('users') : NETWORKS_DETAILS[network].tokenSymbol}`;
+						return `${label}: ${isAccountsAnalytics ? value : formatUSDWithUnits(value?.toString(), 1)} ${isAccountsAnalytics ? t('users') : NETWORKS_DETAILS[network as ENetwork].tokenSymbol}`;
 					}
 				}
 			}
