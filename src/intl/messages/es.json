@@ -678,6 +678,10 @@
 	"Preimages": {
 		"hash": "Hash",
 		"author": "Autor",
+		"all": "Todos",
+		"myPreimages": "Mis preimages",
+		"noUserPreimages": "No tienes preimages!",
+		"createOneNow": "Crea uno ahora!",
 		"deposit": "Depósito",
 		"arguments": "Argumentos",
 		"size": "Tamaño",

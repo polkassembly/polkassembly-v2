@@ -676,6 +676,10 @@
 	"Preimages": {
 		"hash": "Hash",
 		"author": "Autor",
+		"all": "Alle",
+		"myPreimages": "Meine Preimages",
+		"noUserPreimages": "Sie haben keine Preimages!",
+		"createOneNow": "Erstellen Sie jetzt einen!",
 		"deposit": "Einzahlung",
 		"arguments": "Argumente",
 		"size": "Größe",
