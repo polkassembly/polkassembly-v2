@@ -72,15 +72,15 @@ function BalanceInput({
 
 	const [valueString, setValueString] = useState('');
 
-	const onBalanceChange = (value: string | null, id?: string | null): void => {
-		const { bnValue, isValid } = inputToBn(value || '', network, false, id || assetId);
+	const onBalanceChange = (v: string | null, id?: string | null): void => {
+		const { bnValue, isValid } = inputToBn(v || '', network, false, id);
 
-		if (isValid && ValidatorService.isValidNumber(value)) {
+		if (isValid && ValidatorService.isValidNumber(v)) {
 			setError('');
-			onChange?.({ value: bnValue, assetId: id || assetId });
+			onChange?.({ value: bnValue, assetId: id || null });
 		} else {
 			setError('Invalid Amount');
-			onChange?.({ value: BN_ZERO, assetId: id || assetId });
+			onChange?.({ value: BN_ZERO, assetId: id || null });
 		}
 	};
 
