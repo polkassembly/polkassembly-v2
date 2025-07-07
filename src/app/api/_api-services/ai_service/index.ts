@@ -28,6 +28,8 @@ if (IS_AI_ENABLED && !AI_SERVICE_URL.trim()) {
 export class AIService {
 	private static AI_SERVICE_URL = AI_SERVICE_URL;
 
+	private static MIN_COMMENTS_FOR_SUMMARY = 3;
+
 	private static BASE_PROMPTS = {
 		POST_SUMMARY: `
     You are a helpful assistant that summarizes Polkadot governance posts.
@@ -294,7 +296,8 @@ export class AIService {
 		postIndexOrHash: string;
 		comments: ICommentResponse[];
 	}): Promise<string | null> {
-		if (!comments?.length) {
+		// Require minimum comments before generating summary
+		if (!comments?.length || comments.length < this.MIN_COMMENTS_FOR_SUMMARY) {
 			return null;
 		}
 

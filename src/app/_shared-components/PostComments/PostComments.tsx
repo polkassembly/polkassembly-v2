@@ -13,6 +13,8 @@ import classes from './PostComments.module.scss';
 import { Skeleton } from '../Skeleton';
 import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 
+const MIN_COMMENTS_FOR_SUMMARY = 3;
+
 function PostComments({
 	proposalType,
 	index,
@@ -54,15 +56,17 @@ function PostComments({
 				{t('PostDetails.comments')} <span className='text-base font-normal'>{data ? `(${data?.length})` : ''}</span>
 			</p>
 
-			<div className={classes.summaryComponent}>
-				<AISummaryCollapsible
-					indexOrHash={index}
-					proposalType={proposalType}
-					summaryType='allComments'
-					initialData={contentSummary}
-					className='mb-8'
-				/>
-			</div>
+			{data && data?.length >= MIN_COMMENTS_FOR_SUMMARY && (
+				<div className={classes.summaryComponent}>
+					<AISummaryCollapsible
+						indexOrHash={index}
+						proposalType={proposalType}
+						summaryType='allComments'
+						initialData={contentSummary}
+						className='mb-8'
+					/>
+				</div>
+			)}
 
 			{isLoading ? (
 				<div className='flex flex-col gap-2 px-8'>
