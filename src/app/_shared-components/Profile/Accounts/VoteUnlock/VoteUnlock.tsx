@@ -58,7 +58,18 @@ function VoteUnlock({ lockedBalance, hasUnlockAccess }: VoteUnlockProps) {
 	}
 
 	// Get display text for the button
-	const buttonText = nextUnlockData?.endBlock.eq(BN_MAX_INTEGER) ? `${t('Profile.ProposalOngoing')}: #${nextUnlockData.refId}` : t('Profile.NoUnlocks');
+	const buttonText = (() => {
+		// First priority: if there are unlockable votes
+		if (votingLocks.unlockableVotes.length > 0) {
+			return t('Profile.UnlockYourTokens');
+		}
+		// Second priority: if there are ongoing votes
+		if (nextUnlockData?.endBlock.eq(BN_MAX_INTEGER)) {
+			return `${t('Profile.ProposalOngoing')}: #${nextUnlockData.refId}`;
+		}
+		// Default: no unlocks available
+		return t('Profile.NoUnlocks');
+	})();
 
 	return (
 		<>
