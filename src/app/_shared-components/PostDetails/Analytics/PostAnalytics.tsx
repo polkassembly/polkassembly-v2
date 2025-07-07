@@ -58,7 +58,7 @@ function PostAnalytics({ proposalType, index }: { proposalType: EProposalType; i
 						<Skeleton className='h-[180px] w-full rounded-lg' />
 					</div>
 					<Skeleton className='h-[250px] w-full rounded-lg' />
-					<Skeleton className='h-[300px] w-full rounded-lg' />
+					<Skeleton className='h-[500px] w-full rounded-lg' />
 					<div className='flex gap-4 max-lg:flex-col'>
 						<Skeleton className='h-[250px] w-full rounded-lg' />
 						<Skeleton className='h-[250px] w-full rounded-lg' />

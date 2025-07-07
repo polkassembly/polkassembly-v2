@@ -13,7 +13,7 @@ import { RedisService } from '@/app/api/_api-services/redis_service';
 
 const zodParamsSchema = z.object({
 	proposalType: z.enum([EProposalType.REFERENDUM_V2, EProposalType.REFERENDUM]),
-	index: z.string()
+	index: z.coerce.number()
 });
 
 export const GET = withErrorHandling(
@@ -30,15 +30,15 @@ export const GET = withErrorHandling(
 		const [network, headersList] = await Promise.all([getNetworkFromHeaders(), headers()]);
 		const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
 		if (!skipCache) {
-			const analytics = await RedisService.GetPostBubbleVotesData({ network, proposalType, indexOrHash: index, votesType, analyticsType });
+			const analytics = await RedisService.GetPostBubbleVotesData({ network, proposalType, index, votesType, analyticsType });
 			if (analytics) {
 				return NextResponse.json(analytics);
 			}
 		}
 
-		const analytics = await OnChainDbService.GetPostBubbleVotes({ network, proposalType, index: Number(index), analyticsType, votesType });
+		const analytics = await OnChainDbService.GetPostBubbleVotes({ network, proposalType, index, analyticsType, votesType });
 
-		await RedisService.SetPostBubbleVotesData({ network, proposalType, indexOrHash: index, data: analytics, votesType, analyticsType });
+		await RedisService.SetPostBubbleVotesData({ network, proposalType, index, data: analytics, votesType, analyticsType });
 
 		return NextResponse.json(analytics);
 	}

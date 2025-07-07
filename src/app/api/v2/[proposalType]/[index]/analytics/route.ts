@@ -13,7 +13,7 @@ import { RedisService } from '@/app/api/_api-services/redis_service';
 
 const zodParamsSchema = z.object({
 	proposalType: z.enum([EProposalType.REFERENDUM_V2, EProposalType.REFERENDUM]),
-	index: z.string()
+	index: z.coerce.number()
 });
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse<IPostAnalytics>> => {
@@ -23,15 +23,15 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
 
 	if (!skipCache) {
-		const analytics = await RedisService.GetPostAnalyticsData({ network, proposalType, indexOrHash: index });
+		const analytics = await RedisService.GetPostAnalyticsData({ network, proposalType, index });
 		if (analytics) {
 			return NextResponse.json(analytics);
 		}
 	}
 
-	const analytics = await OnChainDbService.GetPostAnalytics({ network, proposalType, index: Number(index) });
+	const analytics = await OnChainDbService.GetPostAnalytics({ network, proposalType, index });
 
-	await RedisService.SetPostAnalyticsData({ network, proposalType, indexOrHash: index, data: analytics });
+	await RedisService.SetPostAnalyticsData({ network, proposalType, index, data: analytics });
 
 	return NextResponse.json(analytics);
 });

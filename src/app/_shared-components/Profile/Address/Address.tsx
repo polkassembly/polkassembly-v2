@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { cn } from '@/lib/utils';
 import AddressInline from './AddressInline/AddressInline';
 import classes from './AddressInline/AddressInline.module.scss';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../Tooltip';
@@ -28,6 +29,7 @@ interface AddressProps {
 	textClassName?: string;
 	redirectToProfile?: boolean;
 	disableTooltip?: boolean;
+	wrapperClassName?: string;
 }
 
 function Address({
@@ -39,7 +41,8 @@ function Address({
 	walletAddressName,
 	textClassName,
 	redirectToProfile,
-	disableTooltip = false
+	disableTooltip = false,
+	wrapperClassName
 }: AddressProps) {
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
@@ -106,7 +109,7 @@ function Address({
 	}
 
 	return (
-		<div className={classes.tooltipWrapper}>
+		<div className={cn(classes.tooltipWrapper, wrapperClassName)}>
 			<TooltipProvider>
 				<Tooltip>
 					<TooltipTrigger asChild>

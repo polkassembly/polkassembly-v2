@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import Image from 'next/image';
 import noData from '@/_assets/activityfeed/gifs/noactivity.gif';
+import { animated } from '@react-spring/web';
 import Address from '../../Profile/Address/Address';
 import classes from './VotesBubbleChart.module.scss';
 import { Skeleton } from '../../Skeleton';
@@ -138,6 +139,7 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 	const getDecisionColor = (decision: EVoteDecision) => {
 		return THEME_COLORS[`${theme}`][`${decision}_bubble_bg` as keyof (typeof THEME_COLORS)[typeof theme]];
 	};
+
 	const getPostAnalytics = async () => {
 		const { data, error } = await NextApiClientService.getPostBubbleVotes({
 			proposalType: proposalType as EProposalType,
@@ -222,6 +224,81 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 		[allVotes, t, network]
 	);
 
+	// Custom label component for circle packing chart
+	const CirclePackingLabel = useCallback(
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		(props: any) => {
+			const radius = props.node.radius || 20;
+
+			// Only show labels for bubbles with sufficient size
+			if (radius < 30) {
+				return <div />;
+			}
+
+			// Calculate dimensions that fit WITHIN the circle - be more conservative
+			// Use 80% of diameter to ensure text fits comfortably within circle bounds
+			const availableWidth = radius * 1.6; // 80% of diameter
+			const availableHeight = radius * 1.2; // 60% of diameter for height
+
+			// Get the exact center coordinates from the node
+			const centerX = props.node.x || props.style.x;
+			const centerY = props.node.y || props.style.y;
+
+			return (
+				<animated.foreignObject
+					key={props.node.id}
+					x={centerX - availableWidth / 2}
+					y={centerY - availableHeight / 2}
+					width={availableWidth}
+					height={availableHeight}
+					style={{
+						pointerEvents: 'none',
+						overflow: 'visible'
+					}}
+				>
+					<div
+						style={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							width: '100%',
+							height: '100%',
+							fontWeight: 600,
+							color: theme === ETheme.DARK ? '#fff' : '#000',
+							textAlign: 'center',
+							lineHeight: '1.1',
+							padding: '2px',
+							boxSizing: 'border-box',
+							position: 'relative'
+						}}
+					>
+						<div
+							style={{
+								width: '100%',
+								display: 'flex',
+								justifyContent: 'center',
+								alignItems: 'center'
+							}}
+						>
+							<Address
+								address={props.node.data.name}
+								truncateCharLen={3}
+								textClassName='text-xs font-semibold lg:text-xs'
+								className='text-center text-xs font-semibold leading-none lg:text-xs'
+								wrapperClassName='w-full'
+								showIdenticon={false}
+								redirectToProfile
+								disableTooltip
+							/>
+						</div>
+					</div>
+				</animated.foreignObject>
+			);
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[theme]
+	);
+
 	return (
 		<div className={classes.card}>
 			<div className={classes.header}>
@@ -258,7 +335,7 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 							leavesOnly
 							value='value'
 							valueFormat={(value) => formatUSDWithUnits(value?.toString(), 1)}
-							padding={4}
+							padding={6}
 							borderWidth={1}
 							borderColor={(node) => {
 								const chartItem = chartData.find((item) => item.id === node.id);
@@ -266,12 +343,10 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 							}}
 							enableLabels
 							labelTextColor={theme === ETheme.DARK ? '#fff' : THEME_COLORS.light.text_primary}
-							labelsSkipRadius={20}
-							label={(node) => {
-								return `${node.formattedValue} ${Math.round(node.percentage)}%`;
-							}}
+							labelsSkipRadius={30}
+							labelComponent={CirclePackingLabel}
 							tooltip={renderTooltip}
-							margin={{ bottom: 10, left: 10, right: 10, top: 10 }}
+							margin={{ bottom: 20, left: 20, right: 20, top: 20 }}
 							motionConfig='gentle'
 						/>
 					</div>
