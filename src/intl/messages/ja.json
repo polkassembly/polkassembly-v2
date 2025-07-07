@@ -180,7 +180,9 @@
 		"NextUnlock": "次のロック解除",
 		"LockedOn": "ロックされた日時",
 		"NoUnlocks": "ロック解除可能なトークンがありません",
+		"unlockFailed": "トークンのロック解除に失敗しました",
 		"unlockSuccess": "トークンが正常にロック解除されました",
+		"unlockSuccessDescription": "トークンが正常にロック解除されました",
 		"Delegations": {
 			"noDelegations": "委任が見つかりません",
 			"delegation": "委任",

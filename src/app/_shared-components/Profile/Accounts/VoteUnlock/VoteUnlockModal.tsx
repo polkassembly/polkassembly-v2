@@ -15,6 +15,8 @@ import { UnlockKeyhole } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Separator } from '@/app/_shared-components/Separator';
 import { combineLockedVotes } from '@/app/_client-utils/voteUnlockUtils';
+import { useWalletService } from '@/hooks/useWalletService';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import classes from './VoteUnlock.module.scss';
 import LockVotesList from './LockVotesList/LockVotesList';
 import UnlockVotesList from './UnlockVotesList/UnlockVotesList';
@@ -31,6 +33,8 @@ interface VoteUnlockModalProps {
 
 function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnlockableBalance, onUnlock, loading }: VoteUnlockModalProps) {
 	const t = useTranslations();
+	const walletService = useWalletService();
+	const { userPreferences } = useUserPreferences();
 
 	// Create a unique key for each vote to track selection
 	const getVoteKey = (vote: IVoteLock) => `${vote.refId}-${vote.track}`;
@@ -73,10 +77,26 @@ function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnloc
 		});
 	}, []);
 
-	// Handle unlock action
-	const handleUnlock = () => {
-		onUnlock(selectedVotesList);
-	};
+	// Handle unlock action with wallet connection check
+	const handleUnlock = useCallback(async () => {
+		// Ensure wallet is connected before unlocking
+		if (!walletService || !userPreferences?.wallet || !userPreferences?.selectedAccount?.address) {
+			return;
+		}
+
+		// Connect wallet and set up signer
+		try {
+			await walletService.getAddressesFromWallet(userPreferences.wallet);
+			// The getAddressesFromWallet method sets up the signer automatically
+
+			// Now call the actual unlock function and await its result
+			await onUnlock(selectedVotesList);
+			// Note: Don't close the modal here - let the parent component handle success/failure
+			// The parent component will close this modal and show success modal if the unlock succeeds
+		} catch (error) {
+			console.error('Error setting up wallet connection or unlocking tokens:', error);
+		}
+	}, [walletService, userPreferences?.wallet, userPreferences?.selectedAccount?.address, onUnlock, selectedVotesList]);
 
 	// Reset selection when modal opens
 	const handleOpenChange = (isOpen: boolean) => {
@@ -93,6 +113,9 @@ function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnloc
 
 	// Use utility to combine locked and ongoing votes for display
 	const combinedLockedVotes = combineLockedVotes(votingLocks);
+
+	// Check if wallet is connected and ready
+	const isWalletReady = walletService && userPreferences?.wallet && userPreferences?.selectedAccount?.address;
 
 	return (
 		<Dialog
@@ -130,7 +153,7 @@ function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnloc
 						variant='default'
 						onClick={handleUnlock}
 						isLoading={loading}
-						disabled={totalUnlockableBalance.isZero() || selectedVotesList.length === 0}
+						disabled={!isWalletReady || totalUnlockableBalance.isZero() || selectedVotesList.length === 0}
 					>
 						<UnlockKeyhole className='h-4 w-4 text-white' />
 						{t('Profile.UnlockTokens')}

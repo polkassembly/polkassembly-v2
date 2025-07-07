@@ -78,36 +78,49 @@ export const useVoteUnlock = (address: string): IUseVoteUnlockReturn => {
 			const unlockedAmount = selectedVotes.reduce((total, vote) => total.add(vote.balance), new BN(0));
 
 			setLoading(true);
-			try {
-				await apiService.unlockVotingTokens({
-					address,
-					unlockableVotes: selectedVotes,
-					onSuccess: () => {
-						toast({
-							title: t('Profile.success'),
-							description: t('Profile.tokensUnlockedSuccessfully'),
-							status: ENotificationStatus.SUCCESS
-						});
-						// Refresh data after successful unlock
-						fetchVotingLocks();
-					},
-					onFailed: (errorMessage: string) => {
-						toast({
-							title: t('Profile.error'),
-							description: errorMessage,
-							status: ENotificationStatus.ERROR
-						});
-					}
-				});
 
-				return { success: true, unlockedAmount };
+			try {
+				// Wrap the unlock operation in a Promise that waits for the actual transaction result
+				return await new Promise<{ success: boolean; unlockedAmount: BN }>((resolve, reject) => {
+					apiService.unlockVotingTokens({
+						address,
+						unlockableVotes: selectedVotes,
+						onSuccess: () => {
+							toast({
+								title: t('Profile.unlockSuccess'),
+								description: t('Profile.unlockSuccessDescription'),
+								status: ENotificationStatus.SUCCESS
+							});
+							// Refresh data after successful unlock
+							fetchVotingLocks();
+							// Resolve with success only when transaction is actually successful
+							resolve({ success: true, unlockedAmount });
+						},
+						onFailed: (errorMessage: string) => {
+							toast({
+								// eslint-disable-next-line sonarjs/no-duplicate-string
+								title: t('Profile.unlockFailed'),
+								description: errorMessage,
+								status: ENotificationStatus.ERROR
+							});
+							// Reject when transaction fails
+							reject(new Error(errorMessage));
+						}
+					});
+				});
 			} catch (err) {
 				console.error('Error unlocking tokens:', err);
-				toast({
-					title: t('Profile.error'),
-					description: t('Profile.failedToUnlockTokens'),
-					status: ENotificationStatus.ERROR
-				});
+				const errorMessage = err instanceof Error ? err.message : t('Profile.unlockFailed');
+
+				// Only show toast if it wasn't already shown in onFailed callback
+				if (!(err instanceof Error && err.message !== t('Profile.unlockFailed'))) {
+					toast({
+						title: t('Profile.unlockFailed'),
+						description: errorMessage,
+						status: ENotificationStatus.ERROR
+					});
+				}
+
 				return { success: false, unlockedAmount: new BN(0) };
 			} finally {
 				setLoading(false);

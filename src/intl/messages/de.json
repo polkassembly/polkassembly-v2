@@ -178,7 +178,9 @@
 		"NextUnlock": "Nächster Entsperrung",
 		"LockedOn": "Gesperrt am",
 		"NoUnlocks": "Keine Entsperrungen verfügbar",
+		"unlockFailed": "Tokens nicht entsperrbar",
 		"unlockSuccess": "Tokens erfolgreich entsperrt",
+		"unlockSuccessDescription": "Deine Tokens wurden erfolgreich entsperrt",
 		"Delegations": {
 			"noDelegations": "Keine Delegationen gefunden",
 			"delegation": "Delegation",

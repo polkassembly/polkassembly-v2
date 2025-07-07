@@ -178,7 +178,9 @@
 		"NextUnlock": "Próximo desbloqueo",
 		"LockedOn": "Bloqueado el",
 		"NoUnlocks": "No hay desbloqueos disponibles",
+		"unlockFailed": "Error al desbloquear tokens",
 		"unlockSuccess": "Tokens desbloqueados correctamente",
+		"unlockSuccessDescription": "Tus tokens han sido desbloqueados correctamente",
 		"Delegations": {
 			"noDelegations": "No se encontraron delegaciones",
 			"index": "Índice",
