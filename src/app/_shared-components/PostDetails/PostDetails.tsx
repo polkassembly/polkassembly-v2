@@ -61,6 +61,7 @@ const PostAnalytics = dynamic(() => import('./Analytics/PostAnalytics'), {
 		</div>
 	)
 });
+
 const VoteCurvesData = dynamic(() => import('./VoteCurvesData/VoteCurvesData'), {
 	ssr: false,
 	loading: () => <Skeleton className='h-32 w-full rounded-lg' />

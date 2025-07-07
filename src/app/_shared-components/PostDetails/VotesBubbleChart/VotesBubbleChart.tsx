@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useMemo, useCallback, useState } from 'react';
-import { EAnalyticsType, ENetwork, EPostBubbleVotesType, EProposalType, ETheme, EVoteDecision, IPostBubbleVotes } from '@/_shared/types';
+import { EAnalyticsType, ENetwork, EPostBubbleVotesType, EProposalType, ETheme, EVoteDecision, IPostBubbleVotes, IVoteDistribution } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { ResponsiveCirclePacking } from '@nivo/circle-packing';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -24,17 +24,6 @@ import Address from '../../Profile/Address/Address';
 import classes from './VotesBubbleChart.module.scss';
 import { Skeleton } from '../../Skeleton';
 import { Button } from '../../Button';
-
-interface IVoteDistribution {
-	voter: string;
-	balance: string;
-	decision: EVoteDecision;
-	votingPower: string | null;
-	percentage: number;
-	delegatorsCount?: number;
-	isDelegated: boolean;
-	lockPeriod: number;
-}
 
 interface INodeData {
 	id: string;
@@ -59,7 +48,7 @@ const calculateTotalDecisionVotes = ({
 	votesBubbleData: IPostBubbleVotes['votes'];
 	decision: Exclude<EVoteDecision, EVoteDecision.SPLIT | EVoteDecision.SPLIT_ABSTAIN>;
 }): BN => {
-	return new BN(votesBubbleData?.[`${decision}`]?.reduce((acc, curr) => new BN(acc).add(new BN(curr.votingPower || curr.balance)), BN_ZERO));
+	return new BN(votesBubbleData?.[`${decision}`]?.reduce((acc, curr) => new BN(acc).add(new BN(curr.votingPower || curr.balanceValue)), BN_ZERO));
 };
 
 const calculatePerVotePercentage = ({
@@ -67,14 +56,14 @@ const calculatePerVotePercentage = ({
 	decision,
 	votesBubbleData
 }: {
-	vote: { balance: string; votingPower: string | null };
+	vote: { balanceValue: string; votingPower: string | null };
 	decision: Exclude<EVoteDecision, EVoteDecision.SPLIT | EVoteDecision.SPLIT_ABSTAIN>;
 	votesBubbleData: IPostBubbleVotes['votes'];
 }): number => {
 	const totalPercentage = calculateTotalDecisionVotes({ votesBubbleData, decision });
 	const percentage =
-		new BN(vote.votingPower || vote.balance).gt(BN_ZERO) && !!totalPercentage
-			? new BN(vote.votingPower || vote.balance).mul(new BN(100)).div(new BN(totalPercentage))?.toString()
+		new BN(vote.votingPower || vote.balanceValue).gt(BN_ZERO) && !!totalPercentage
+			? new BN(vote.votingPower || vote.balanceValue).mul(new BN(100)).div(new BN(totalPercentage))?.toString()
 			: '0';
 	return Math.round(Number(percentage));
 };
@@ -92,8 +81,8 @@ const useVotesDistribution = ({ votesBubbleData }: { votesBubbleData: IPostBubbl
 
 			votesList.forEach((vote) => {
 				const payload = {
-					voter: vote.voter,
-					balance: vote.balance,
+					voterAddress: vote.voterAddress,
+					balanceValue: vote.balanceValue,
 					votingPower: vote.votingPower || null,
 					decision,
 					percentage: calculatePerVotePercentage({ vote, decision, votesBubbleData }),
@@ -112,11 +101,11 @@ const useVotesDistribution = ({ votesBubbleData }: { votesBubbleData: IPostBubbl
 
 const getChartData = (allVotes: IVoteDistribution[], network: ENetwork, getDecisionColor: (decision: EVoteDecision) => string): INodeData[] => {
 	return allVotes.map((vote: IVoteDistribution) => ({
-		id: vote.voter,
-		name: vote.voter,
-		value: Number(formatBnBalance(vote.votingPower || vote.balance, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: false }, network).replace(/,/g, '')),
+		id: vote.voterAddress,
+		name: vote.voterAddress,
+		value: Number(formatBnBalance(vote.votingPower || vote.balanceValue, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: false }, network).replace(/,/g, '')),
 		color: getDecisionColor(vote.decision),
-		percentage: vote.percentage,
+		percentage: vote.percentage || 0,
 		delegatorsCount: vote.delegatorsCount || 0,
 		isDelegated: vote.isDelegated,
 		lockPeriod: vote.lockPeriod,
@@ -171,14 +160,14 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 	const renderTooltip = useCallback(
 		(node: { id: string; formattedValue: string; percentage: number }) => {
 			const { id, formattedValue } = node;
-			const vote = allVotes.find((value) => value.voter === id);
+			const vote = allVotes.find((value) => value.voterAddress === id);
 			const percentage = vote?.percentage || 0;
 			const delegatorsCount = vote?.delegatorsCount;
 			const isDelegated = vote?.isDelegated;
 			const lockPeriod = vote?.lockPeriod || DEFAULT_LOCK_PERIOD;
 
 			const formattedBalance = formatUSDWithUnits(
-				formatBnBalance(vote?.balance || BN_ZERO, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: true }, network).replace(/,/g, ''),
+				formatBnBalance(vote?.balanceValue || BN_ZERO, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: true }, network).replace(/,/g, ''),
 				1
 			);
 

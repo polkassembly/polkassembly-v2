@@ -1152,12 +1152,13 @@ export class SubsquidService extends SubsquidUtils {
 								)
 						: null;
 				votesData.votes[decision as keyof typeof votesData.votes]?.push({
-					balance: balance.toString(),
-					voter: vote.voter,
+					balanceValue: balance.toString(),
+					voterAddress: vote.voter,
 					lockPeriod: vote?.lockPeriod || 0,
 					votingPower: votingPower?.toString() || null,
 					isDelegated: vote?.isDelegated || false,
-					delegatorsCount: vote?.delegatedVotes?.length || 0
+					delegatorsCount: vote?.delegatedVotes?.length || 0,
+					decision
 				});
 			}
 		);
