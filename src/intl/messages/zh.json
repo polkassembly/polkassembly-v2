@@ -179,6 +179,7 @@
 		"LockedOn": "已锁定",
 		"NoUnlocks": "无可解锁代币",
 		"unlockFailed": "解锁代币失败",
+		"unlockFailedDescription": "我们无法解锁您的代币。请重试。",
 		"unlockSuccess": "代币解锁成功",
 		"unlockSuccessDescription": "您的代币已成功解锁",
 		"Delegations": {

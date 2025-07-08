@@ -183,6 +183,7 @@
 		"LockedOn": "Locked on",
 		"NoUnlocks": "No Unlocks Available",
 		"unlockFailed": "Failed to unlock tokens",
+		"unlockFailedDescription": "We couldn't unlock your tokens. Please try again.",
 		"unlockSuccess": "Tokens unlocked successfully",
 		"unlockSuccessDescription": "Your tokens have been unlocked successfully",
 		"Delegations": {

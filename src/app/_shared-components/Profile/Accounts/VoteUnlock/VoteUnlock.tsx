@@ -44,7 +44,6 @@ function VoteUnlock({ lockedBalance, hasUnlockAccess }: VoteUnlockProps) {
 				setUnlockedAmount(result.unlockedAmount);
 				setOpen(false);
 				setOpenSuccessModal(true);
-				// Data will be refetched automatically by the hook
 			}
 			// Error handling is already done in the hook
 		} catch (error) {
@@ -95,8 +94,8 @@ function VoteUnlock({ lockedBalance, hasUnlockAccess }: VoteUnlockProps) {
 			<UnlockSuccessModal
 				open={openSuccessModal}
 				setOpen={setOpenSuccessModal}
-				address={currentAddress}
 				unlockedAmount={unlockedAmount}
+				nextUnlockData={nextUnlockData}
 			/>
 		</>
 	);

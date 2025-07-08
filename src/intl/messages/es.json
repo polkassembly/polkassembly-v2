@@ -179,6 +179,7 @@
 		"LockedOn": "Bloqueado el",
 		"NoUnlocks": "No hay desbloqueos disponibles",
 		"unlockFailed": "Error al desbloquear tokens",
+		"unlockFailedDescription": "No pudimos desbloquear tus tokens. Por favor, inténtalo de nuevo.",
 		"unlockSuccess": "Tokens desbloqueados correctamente",
 		"unlockSuccessDescription": "Tus tokens han sido desbloqueados correctamente",
 		"Delegations": {

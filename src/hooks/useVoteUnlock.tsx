@@ -85,20 +85,19 @@ export const useVoteUnlock = (address: string): IUseVoteUnlockReturn => {
 					apiService.unlockVotingTokens({
 						address,
 						unlockableVotes: selectedVotes,
-						onSuccess: () => {
+						onSuccess: async () => {
 							toast({
 								title: t('Profile.unlockSuccess'),
 								description: t('Profile.unlockSuccessDescription'),
 								status: ENotificationStatus.SUCCESS
 							});
-							// Refresh data after successful unlock
-							fetchVotingLocks();
-							// Resolve with success only when transaction is actually successful
+							// Refresh data after successful unlock and wait for it to complete
+							await fetchVotingLocks();
+							// Resolve with success only when data refresh is complete
 							resolve({ success: true, unlockedAmount });
 						},
 						onFailed: (errorMessage: string) => {
 							toast({
-								// eslint-disable-next-line sonarjs/no-duplicate-string
 								title: t('Profile.unlockFailed'),
 								description: errorMessage,
 								status: ENotificationStatus.ERROR
@@ -110,10 +109,10 @@ export const useVoteUnlock = (address: string): IUseVoteUnlockReturn => {
 				});
 			} catch (err) {
 				console.error('Error unlocking tokens:', err);
-				const errorMessage = err instanceof Error ? err.message : t('Profile.unlockFailed');
+				const errorMessage = err instanceof Error ? err.message : t('Profile.unlockFailedDescription');
 
 				// Only show toast if it wasn't already shown in onFailed callback
-				if (!(err instanceof Error && err.message !== t('Profile.unlockFailed'))) {
+				if (!(err instanceof Error && err.message !== t('Profile.unlockFailedDescription'))) {
 					toast({
 						title: t('Profile.unlockFailed'),
 						description: errorMessage,

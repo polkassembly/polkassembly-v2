@@ -181,6 +181,7 @@
 		"LockedOn": "ロックされた日時",
 		"NoUnlocks": "ロック解除可能なトークンがありません",
 		"unlockFailed": "トークンのロック解除に失敗しました",
+		"unlockFailedDescription": "トークンのロック解除に失敗しました。再度お試しください。",
 		"unlockSuccess": "トークンが正常にロック解除されました",
 		"unlockSuccessDescription": "トークンが正常にロック解除されました",
 		"Delegations": {

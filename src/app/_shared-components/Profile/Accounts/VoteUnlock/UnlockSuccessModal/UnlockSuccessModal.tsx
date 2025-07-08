@@ -9,23 +9,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-
 import Image from 'next/image';
 import TreasureChestOpenIcon from '@assets/icons/treasure-chest-open.svg';
 import { useTranslations } from 'next-intl';
-import { useVoteUnlock } from '@/hooks/useVoteUnlock';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { IVoteLock } from '@/_shared/types';
 import classes from './UnlockSuccessModal.module.scss';
 import LockVoteDetailCard from '../LockVoteDetailCard/LockVoteDetailCard';
 
 interface UnlockSuccessModalProps {
 	open: boolean;
 	setOpen: (open: boolean) => void;
-	address: string;
 	unlockedAmount: BN;
+	nextUnlockData: IVoteLock | null;
 }
 
-function UnlockSuccessModal({ open, setOpen, address, unlockedAmount }: UnlockSuccessModalProps) {
+function UnlockSuccessModal({ open, setOpen, unlockedAmount, nextUnlockData }: UnlockSuccessModalProps) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
-	const { nextUnlockData } = useVoteUnlock(address);
 
 	const formattedUnlockedAmount = formatBnBalance(unlockedAmount.toString(), { numberAfterComma: 2, withUnit: true }, network);
 

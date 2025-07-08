@@ -179,6 +179,7 @@
 		"LockedOn": "Gesperrt am",
 		"NoUnlocks": "Keine Entsperrungen verfügbar",
 		"unlockFailed": "Tokens nicht entsperrbar",
+		"unlockFailedDescription": "Wir konnten deine Tokens nicht entsperren. Bitte versuche es erneut.",
 		"unlockSuccess": "Tokens erfolgreich entsperrt",
 		"unlockSuccessDescription": "Deine Tokens wurden erfolgreich entsperrt",
 		"Delegations": {
