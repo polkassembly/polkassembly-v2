@@ -470,6 +470,8 @@
 		"account": "アカウント",
 		"abstain": "棄権",
 		"onchainInfo": "オンチェーン情報",
+		"nestedVotes": "ネストされた投票",
+		"flattenedVotes": "フラット化された投票",
 		"OnchainInfo": {
 			"metadata": "メタデータ",
 			"table": "テーブル",

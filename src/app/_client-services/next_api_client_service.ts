@@ -49,7 +49,8 @@ import {
 	IOnChainMetadata,
 	EVoteSortOptions,
 	EHttpHeaderKey,
-	IPostLink
+	IPostLink,
+	EVotesType
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -603,19 +604,22 @@ export class NextApiClientService {
 		index,
 		page,
 		decision,
-		orderBy
+		orderBy,
+		votesType
 	}: {
 		proposalType: EProposalType;
 		index: string;
 		page: number;
 		decision: EVoteDecision;
 		orderBy: EVoteSortOptions;
+		votesType: EVotesType;
 	}) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: DEFAULT_LISTING_LIMIT.toString(),
 			decision,
-			orderBy
+			orderBy,
+			votesType
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_HISTORY, routeSegments: [proposalType, index, 'votes'], queryParams });
 		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });

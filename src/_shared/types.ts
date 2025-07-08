@@ -663,6 +663,7 @@ export interface IVoteData {
 	selfVotingPower?: string;
 	totalVotingPower?: string;
 	delegatedVotingPower?: string;
+	votingPower?: string;
 	delegatedVotes?: IVoteData[];
 }
 
@@ -1300,4 +1301,9 @@ export interface IPayout {
 		expiresAt: Date;
 		generalIndex: string;
 	};
+}
+
+export enum EVotesType {
+	NESTED = 'nested',
+	FLATTENED = 'flattened'
 }

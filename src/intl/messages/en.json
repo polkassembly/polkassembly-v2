@@ -485,6 +485,8 @@
 		"hideLikelySpam": "Hide Likely Spam",
 		"commentsDisabled": "Comments have been disabled for this post.",
 		"commentsDisabledForNonVerifiedUsers": "Comments have been disabled for non verified users.",
+		"nestedVotes": "Nested Votes",
+		"flattenedVotes": "Flattened Votes",
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",

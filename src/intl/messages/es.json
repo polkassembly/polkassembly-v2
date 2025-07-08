@@ -471,6 +471,8 @@
 		"account": "Cuenta",
 		"abstain": "Abstención",
 		"onchainInfo": "Información en cadena",
+		"nestedVotes": "Votos Anidados",
+		"flattenedVotes": "Votos Aplanados",
 		"OnchainInfo": {
 			"metadata": "Metadatos",
 			"table": "Tabla",

@@ -6,13 +6,13 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { EProposalType, EVoteDecision, IVoteMetrics } from '@/_shared/types';
+import { EProposalType, EVoteDecision, EVotesType, IVoteMetrics } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { PieChart } from 'react-minimal-pie-chart';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@ui/Dialog/Dialog';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -23,6 +23,7 @@ import { Button } from '../../Button';
 import VoteHistory from './VoteHistory/VoteHistory';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '../../Tooltip';
 import LoadingLayover from '../../LoadingLayover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../Select/Select';
 
 const NONE_CHART_VALUE = 0;
 
@@ -84,6 +85,7 @@ function VoteSummary({
 	const { apiService } = usePolkadotApiService();
 	const [loading, setLoading] = useState(false);
 	const [issuance, setIssuance] = useState<BN | null>(null);
+	const [votesType, setVotesType] = useState<EVotesType>(EVotesType.NESTED);
 
 	const { userPreferences } = useUserPreferences();
 
@@ -226,12 +228,33 @@ function VoteSummary({
 					</Button>
 				</DialogTrigger>
 				<DialogContent className='max-w-2xl p-3 sm:p-6'>
-					<DialogHeader className='text-xl font-semibold text-text_primary'>
-						<DialogTitle>{t('PostDetails.voteHistory')}</DialogTitle>
+					<DialogHeader>
+						<DialogTitle>
+							<Select
+								value={votesType}
+								onValueChange={(value) => setVotesType(value as EVotesType)}
+							>
+								<SelectTrigger
+									className='m-0 flex w-fit items-center gap-x-2 border-none p-0 text-xl text-text_primary shadow-none'
+									hideChevron
+								>
+									<SelectValue
+										placeholder={t('PostDetails.voteHistory')}
+										className='text-xl font-semibold text-text_primary'
+									/>
+									<ChevronDown className='h-5 w-5 text-xs font-semibold' />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value={EVotesType.NESTED}>{t('PostDetails.nestedVotes')}</SelectItem>
+									<SelectItem value={EVotesType.FLATTENED}>{t('PostDetails.flattenedVotes')}</SelectItem>
+								</SelectContent>
+							</Select>
+						</DialogTitle>
 					</DialogHeader>
 					<VoteHistory
 						proposalType={proposalType}
 						index={index}
+						votesType={votesType}
 					/>
 				</DialogContent>
 			</Dialog>

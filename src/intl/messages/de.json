@@ -469,6 +469,8 @@
 		"account": "Konto",
 		"abstain": "Enthaltung",
 		"onchainInfo": "Onchain-Informationen",
+		"nestedVotes": "Verschachtelte Abstimmungen",
+		"flattenedVotes": "Ebene Abstimmungen",
 		"OnchainInfo": {
 			"metadata": "Metadaten",
 			"table": "Tabelle",

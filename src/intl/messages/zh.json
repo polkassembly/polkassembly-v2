@@ -469,6 +469,8 @@
 		"capital": "资本",
 		"account": "账户",
 		"abstain": "弃权",
+		"nestedVotes": "嵌套投票",
+		"flattenedVotes": "扁平化投票",
 		"OnchainInfo": {
 			"metadata": "元数据",
 			"table": "表格",

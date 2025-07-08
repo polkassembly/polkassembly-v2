@@ -9,6 +9,7 @@ import {
 	EProposalType,
 	EVoteDecision,
 	EVoteSortOptions,
+	EVotesType,
 	IBountyProposal,
 	IDelegationStats,
 	IGenericListingResponse,
@@ -312,7 +313,8 @@ export class SubsquidService extends SubsquidUtils {
 		limit,
 		decision,
 		voterAddress: address,
-		orderBy
+		orderBy,
+		votesType
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -322,6 +324,7 @@ export class SubsquidService extends SubsquidUtils {
 		decision?: EVoteDecision;
 		voterAddress?: string;
 		orderBy?: EVoteSortOptions;
+		votesType?: EVotesType;
 	}) {
 		const voterAddress = address ? (getEncodedAddress(address, network) ?? undefined) : undefined;
 
@@ -337,8 +340,12 @@ export class SubsquidService extends SubsquidUtils {
 					: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH({ voter: voterAddress })
 				: [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
 					? subsquidDecision
-						? this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
-						: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress })
+						? votesType === EVotesType.FLATTENED
+							? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
+							: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
+						: votesType === EVotesType.FLATTENED
+							? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress })
+							: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress })
 					: subsquidDecision
 						? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
 						: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress });
@@ -400,6 +407,7 @@ export class SubsquidService extends SubsquidUtils {
 					selfVotingPower: this.getSelfVotingPower({ balance: balanceValue, selfVotingPower: vote.selfVotingPower || null, lockPeriod: vote.lockPeriod }),
 					totalVotingPower: vote.totalVotingPower,
 					delegatedVotingPower: vote.delegatedVotingPower,
+					...(votesType === EVotesType.FLATTENED && { votingPower: this.getVotingPower(balanceValue, vote.lockPeriod) }),
 					delegatedVotes: vote.delegatedVotes?.map((delegatedVote) => ({
 						voterAddress: delegatedVote.voter,
 						totalVotingPower: delegatedVote.votingPower,
