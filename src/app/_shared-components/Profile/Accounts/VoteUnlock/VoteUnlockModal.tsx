@@ -17,6 +17,7 @@ import { Separator } from '@/app/_shared-components/Separator';
 import { combineLockedVotes } from '@/app/_client-utils/voteUnlockUtils';
 import { useWalletService } from '@/hooks/useWalletService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import classes from './VoteUnlock.module.scss';
 import LockVotesList from './LockVotesList/LockVotesList';
 import UnlockVotesList from './UnlockVotesList/UnlockVotesList';
@@ -135,6 +136,11 @@ function VoteUnlockModal({ open, setOpen, votingLocks, lockedBalance, totalUnloc
 				</DialogHeader>
 
 				<div className={classes.contentContainer}>
+					{/* Wallet Connection UI */}
+					<div className='mb-4'>
+						<SwitchWalletOrAddress small />
+					</div>
+
 					<UnlockVotesList
 						votingLocks={votingLocks.unlockableVotes}
 						balance={totalUnlockableBalance}
