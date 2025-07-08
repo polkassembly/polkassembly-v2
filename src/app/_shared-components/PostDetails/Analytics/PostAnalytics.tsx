@@ -17,23 +17,27 @@ import ConvictionsAnalytics from './ConvictionsAnalytics';
 import { Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from '../../Select/Select';
 import VotesAnalytics from './VotesAnalytics';
 
+const getPostAnalytics = async ({ proposalType, index }: { proposalType: EProposalType; index: string }) => {
+	const { data, error } = await NextApiClientService.getPostAnalytics({ proposalType, index });
+	if (error || !data) {
+		throw new Error(error?.message || 'Failed to fetch data');
+	}
+	return data;
+};
+
 function PostAnalytics({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 	const t = useTranslations('PostDetails');
 	const { userPreferences } = useUserPreferences();
 	const { theme } = userPreferences;
 	const [selectedAnalytics, setSelectedAnalytics] = useState<EAnalyticsType>(EAnalyticsType.CONVICTIONS);
 
-	const getPostAnalytics = async () => {
-		const { data, error } = await NextApiClientService.getPostAnalytics({ proposalType, index });
-		if (error || !data) {
-			throw new Error(error?.message || 'Failed to fetch data');
-		}
-		return data;
-	};
-
-	const { data: analytics, isFetching } = useQuery({
+	const {
+		data: analytics,
+		isFetching,
+		error
+	} = useQuery({
 		queryKey: ['postAnalytics', proposalType, index],
-		queryFn: getPostAnalytics,
+		queryFn: () => getPostAnalytics({ proposalType, index }),
 		enabled: POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(proposalType) && !!index,
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
@@ -45,6 +49,10 @@ function PostAnalytics({ proposalType, index }: { proposalType: EProposalType; i
 		{ label: t('Analytics.votesAnalytics'), value: EAnalyticsType.VOTES },
 		{ label: t('Analytics.accountsAnalytics'), value: EAnalyticsType.ACCOUNTS }
 	];
+
+	if (error && !analytics && !isFetching) {
+		return <div>Error: {error.message}</div>;
+	}
 
 	return (
 		<div>
@@ -72,7 +80,7 @@ function PostAnalytics({ proposalType, index }: { proposalType: EProposalType; i
 						onValueChange={(value) => setSelectedAnalytics(value as EAnalyticsType)}
 					>
 						<SelectTrigger className='mb-4 flex w-fit items-center gap-2'>
-							<SelectValue placeholder='Select page size'>{options?.find((option) => option.value === selectedAnalytics)?.label || ''}</SelectValue>
+							<SelectValue placeholder='Select analytics type'>{options?.find((option) => option.value === selectedAnalytics)?.label || ''}</SelectValue>
 						</SelectTrigger>
 						<SelectContent>
 							{options.map((option) => (

@@ -1061,18 +1061,19 @@ export class SubsquidService extends SubsquidUtils {
 	static async GetPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = this.GET_ALL_FLATTENED_VOTES_FOR_POST;
+		const query = this.GET_ALL_FLATTENED_VOTES_WITH_POST_INDEX;
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { type_eq: proposalType, index_eq: index }).toPromise();
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { vote_type: proposalType, index_eq: index, type_eq: proposalType }).toPromise();
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain post analytics from Subsquid: ${subsquidErr}`);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, subsquidErr?.message || 'Error fetching on-chain post analytics from Subsquid');
 		}
 
-		const votes = subsquidData.flattenedConvictionVotes?.map((vote: { decision: string }) => {
+		const votes = subsquidData.votes?.map((vote: { decision: string }) => {
 			return {
 				...vote,
+				proposal: subsquidData.proposal[0],
 				decision: this.convertSubsquidVoteDecisionToVoteDecision({ decision: vote.decision })
 			};
 		});
@@ -1087,7 +1088,7 @@ export class SubsquidService extends SubsquidUtils {
 			accountsAnalytics,
 			proposal: {
 				index,
-				status: subsquidData?.flattenedConvictionVotes?.[0]?.proposal.status as EProposalStatus
+				status: subsquidData?.proposal?.[0]?.status as EProposalStatus
 			}
 		};
 	}
@@ -1102,20 +1103,20 @@ export class SubsquidService extends SubsquidUtils {
 		network: ENetwork;
 		proposalType: EProposalType;
 		index: number;
-		analyticsType?: EAnalyticsType;
+		analyticsType: EAnalyticsType;
 		votesType: EPostBubbleVotesType;
 	}): Promise<IPostBubbleVotes> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = votesType === EPostBubbleVotesType.FLATTENED ? this.GET_ALL_FLATTENED_VOTES_FOR_POST : this.GET_ALL_NESTED_VOTES;
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { type_eq: proposalType, index_eq: index }).toPromise();
+		const query = votesType === EPostBubbleVotesType.FLATTENED ? this.GET_ALL_FLATTENED_VOTES_WITH_POST_INDEX : this.GET_ALL_NESTED_VOTES_WITH_POST_INDEX;
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { vote_type: proposalType, index_eq: index, type_eq: proposalType }).toPromise();
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain post analytics from Subsquid: ${subsquidErr}`);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post analytics from Subsquid');
 		}
 
-		const data = votesType === EPostBubbleVotesType.FLATTENED ? subsquidData.flattenedConvictionVotes : subsquidData.convictionVotes;
+		const data = subsquidData.votes;
 
 		const votesData: IPostBubbleVotes = {
 			votes: {
@@ -1124,7 +1125,7 @@ export class SubsquidService extends SubsquidUtils {
 				[EVoteDecision.ABSTAIN]: []
 			},
 			proposal: {
-				status: (data?.[0]?.proposal?.status as EProposalStatus) || EProposalStatus.Unknown
+				status: (subsquidData?.proposal?.[0]?.status as EProposalStatus) || EProposalStatus.Unknown
 			}
 		};
 
@@ -1151,6 +1152,7 @@ export class SubsquidService extends SubsquidUtils {
 									vote?.parentVote?.selfVotingPower || vote?.selfVotingPower || BN_ZERO.toString()
 								)
 						: null;
+
 				votesData.votes[decision as keyof typeof votesData.votes]?.push({
 					balanceValue: balance.toString(),
 					voterAddress: vote.voter,

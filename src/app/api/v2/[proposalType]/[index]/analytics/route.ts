@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EHttpHeaderKey, EProposalType, IPostAnalytics } from '@/_shared/types';
+import { EHttpHeaderKey, EProposalStatus, EProposalType, IPostAnalytics } from '@/_shared/types';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { NextRequest, NextResponse } from 'next/server';
@@ -31,7 +31,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const analytics = await OnChainDbService.GetPostAnalytics({ network, proposalType, index });
 
-	await RedisService.SetPostAnalyticsData({ network, proposalType, index, data: analytics });
+	if (analytics) {
+		await RedisService.SetPostAnalyticsData({ network, proposalType, index, data: analytics, proposalStatus: analytics.proposal.status as EProposalStatus });
+	}
 
 	return NextResponse.json(analytics);
 });

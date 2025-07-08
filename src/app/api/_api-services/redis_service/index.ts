@@ -37,7 +37,6 @@ import {
 	ONE_DAY_IN_SECONDS,
 	REFRESH_TOKEN_LIFE_IN_SECONDS,
 	SIX_HOURS_IN_SECONDS,
-	TEN_DAYS_IN_SECONDS,
 	THIRTY_DAYS_IN_SECONDS,
 	THREE_DAYS_IN_SECONDS
 } from '../../_api-constants/timeConstants';
@@ -132,9 +131,10 @@ export class RedisService {
 		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: EPostOrigin | 'all'): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
 		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
 		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
-		[ERedisKeys.POST_ANALYTICS_DATA]: (network: string, proposalType: string, index: number): string => `${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${index}`,
-		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: string, proposalType: string, index: number, votesType: EPostBubbleVotesType, analyticsType?: EAnalyticsType): string =>
-			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${index}-${votesType}-${analyticsType || ''}`
+		[ERedisKeys.POST_ANALYTICS_DATA]: (network: ENetwork, proposalType: EProposalType, index: number): string =>
+			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${index}`,
+		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: ENetwork, proposalType: EProposalType, index: number, votesType: EPostBubbleVotesType, analyticsType: EAnalyticsType): string =>
+			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${index}-${votesType}-${analyticsType}`
 	} as const;
 
 	// helper methods
@@ -641,18 +641,30 @@ export class RedisService {
 	}
 
 	// Post analytics caching methods
-	static async SetPostAnalyticsData({ network, proposalType, index, data }: { network: string; proposalType: string; index: number; data: IPostAnalytics }): Promise<void> {
-		const isActivePost = data.proposal.status && ACTIVE_PROPOSAL_STATUSES.includes(data.proposal.status as EProposalStatus);
+	static async SetPostAnalyticsData({
+		network,
+		proposalType,
+		index,
+		data,
+		proposalStatus
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		data: IPostAnalytics;
+		proposalStatus: EProposalStatus;
+	}): Promise<void> {
+		const isActivePost = ACTIVE_PROPOSAL_STATUSES.includes(proposalStatus);
 
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index),
 			value: JSON.stringify(data),
-			ttlSeconds: isActivePost ? HALF_HOUR_IN_SECONDS : TEN_DAYS_IN_SECONDS
+			ttlSeconds: isActivePost ? FIVE_MIN : THIRTY_DAYS_IN_SECONDS
 		});
 	}
 
 	// Posts caching methods
-	static async GetPostAnalyticsData({ network, proposalType, index }: { network: string; proposalType: string; index: number }): Promise<IPostAnalytics | null> {
+	static async GetPostAnalyticsData({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index) });
 		return data ? (deepParseJson(data) as IPostAnalytics) : null;
 	}
@@ -663,21 +675,22 @@ export class RedisService {
 		index,
 		data,
 		votesType,
-		analyticsType
+		analyticsType,
+		proposalStatus
 	}: {
-		network: string;
-		proposalType: string;
+		network: ENetwork;
+		proposalType: EProposalType;
 		index: number;
 		data: IPostBubbleVotes;
 		votesType: EPostBubbleVotesType;
-		analyticsType?: EAnalyticsType;
+		analyticsType: EAnalyticsType;
+		proposalStatus: EProposalStatus;
 	}): Promise<void> {
-		const isActivePost = data.proposal?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.proposal.status as EProposalStatus);
-
+		const isActivePost = ACTIVE_PROPOSAL_STATUSES.includes(proposalStatus);
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType),
 			value: JSON.stringify(data),
-			ttlSeconds: isActivePost ? HALF_HOUR_IN_SECONDS : TEN_DAYS_IN_SECONDS
+			ttlSeconds: isActivePost ? FIVE_MIN : THIRTY_DAYS_IN_SECONDS
 		});
 	}
 
@@ -688,11 +701,11 @@ export class RedisService {
 		votesType,
 		analyticsType
 	}: {
-		network: string;
-		proposalType: string;
+		network: ENetwork;
+		proposalType: EProposalType;
 		index: number;
 		votesType: EPostBubbleVotesType;
-		analyticsType?: EAnalyticsType;
+		analyticsType: EAnalyticsType;
 	}): Promise<IPostBubbleVotes | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });
 		return data ? (deepParseJson(data) as IPostBubbleVotes) : null;

@@ -1105,7 +1105,7 @@ export class NextApiClientService {
 	}: {
 		proposalType: EProposalType;
 		index: string;
-		analyticsType?: EAnalyticsType;
+		analyticsType: EAnalyticsType;
 		votesType: EPostBubbleVotesType;
 	}) {
 		const queryParams = new URLSearchParams({

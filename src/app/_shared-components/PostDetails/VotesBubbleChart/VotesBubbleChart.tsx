@@ -112,6 +112,29 @@ const getChartData = (allVotes: IVoteDistribution[], network: ENetwork, getDecis
 	}));
 };
 
+const getPostAnalytics = async ({
+	proposalType,
+	index,
+	analyticsType,
+	votesType
+}: {
+	proposalType: EProposalType;
+	index: string;
+	analyticsType: EAnalyticsType;
+	votesType: EPostBubbleVotesType;
+}) => {
+	const { data, error } = await NextApiClientService.getPostBubbleVotes({
+		proposalType: proposalType as EProposalType,
+		index: index.toString(),
+		analyticsType,
+		votesType
+	});
+	if (error || !data) {
+		throw new Error(error?.message || 'Failed to fetch data');
+	}
+	return data;
+};
+
 // Component
 function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType: EProposalType; index: string; analyticsType: EAnalyticsType }) {
 	const t = useTranslations('PostDetails.VotesBubble');
@@ -128,22 +151,9 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 		return THEME_COLORS[`${theme}`][`${decision}_bubble_bg` as keyof (typeof THEME_COLORS)[typeof theme]];
 	};
 
-	const getPostAnalytics = async () => {
-		const { data, error } = await NextApiClientService.getPostBubbleVotes({
-			proposalType: proposalType as EProposalType,
-			index: index.toString(),
-			analyticsType,
-			votesType
-		});
-		if (error || !data) {
-			throw new Error(error?.message || 'Failed to fetch data');
-		}
-		return data;
-	};
-
 	const { data: votesBubbleData, isFetching } = useQuery({
 		queryKey: ['postBubbleVotes', proposalType, index, analyticsType, votesType],
-		queryFn: getPostAnalytics,
+		queryFn: () => getPostAnalytics({ proposalType, index, analyticsType, votesType }),
 		enabled: !!proposalType && !!index,
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
