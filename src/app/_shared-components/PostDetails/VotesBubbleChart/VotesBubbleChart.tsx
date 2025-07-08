@@ -13,7 +13,6 @@ import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ClientError } from '@/app/_client-utils/clientError';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -137,7 +136,7 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 			votesType
 		});
 		if (error || !data) {
-			throw new ClientError(error?.message || 'Failed to fetch data');
+			throw new Error(error?.message || 'Failed to fetch data');
 		}
 		return data;
 	};
