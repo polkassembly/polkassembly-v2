@@ -89,6 +89,7 @@ enum EApiRoute {
 	FETCH_USER_ACTIVITY = 'FETCH_USER_ACTIVITY',
 	GET_ON_CHAIN_METADATA_FOR_POST = 'GET_ON_CHAIN_METADATA_FOR_POST',
 	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
+	FETCH_USER_PREIMAGES = 'FETCH_USER_PREIMAGES',
 	DELETE_COMMENT = 'DELETE_COMMENT',
 	EDIT_COMMENT = 'EDIT_COMMENT',
 	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
@@ -181,6 +182,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.FETCH_PREIMAGES:
 				path = '/preimages';
+				break;
+			case EApiRoute.FETCH_USER_PREIMAGES:
+				path = '/preimages/user';
 				break;
 			case EApiRoute.FETCH_ALL_TAGS:
 				path = '/meta/tags';
@@ -812,6 +816,17 @@ export class NextApiClientService {
 	static async fetchPreimageByHash({ hash }: { hash: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: [hash] });
 		return this.nextApiClientFetch<IPreimage>({ url, method });
+	}
+
+	static async fetchUserPreimages({ page, addresses }: { page: number; addresses: string[] }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: PREIMAGES_LISTING_LIMIT.toString(),
+			addresses: addresses.join(',')
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_USER_PREIMAGES, queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IPreimage>>({ url, method });
 	}
 
 	protected static async generateQRSessionApi() {
