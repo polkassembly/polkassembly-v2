@@ -552,16 +552,6 @@ export class SubsquidQueries {
 		query GetFlattenedVotesListingByProposalTypeAndIndexAndDecision($type_eq: VoteType, $index_eq: Int, $decision_in: [VoteDecision!]) {
 			votes: flattenedConvictionVotes(where: {type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true, decision_in: $decision_in${voter ? `, voter_eq: "${voter}"` : ''}}, orderBy: voter_DESC)
 			{
-				proposal {
-					tally {
-						ayes
-						nays
-						support
-						bareAyes
-					}
-					createdAt
-					status
-				}
 				type
 				voter
 				lockPeriod
@@ -622,16 +612,6 @@ export class SubsquidQueries {
 	protected static GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX = ({ voter }: { voter?: string }) => `
 		query GetFlattenedVotesListingByProposalTypeAndIndex($type_eq: VoteType, $index_eq: Int) {
 			votes: flattenedConvictionVotes(where: {type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true${voter ? `, voter_eq: "${voter}"` : ''}}, orderBy: voter_DESC) {
-			proposal {
-					tally {
-						ayes
-						nays
-						support
-						bareAyes
-					}
-					createdAt
-					status
-				}
 				type
 				voter
 				lockPeriod

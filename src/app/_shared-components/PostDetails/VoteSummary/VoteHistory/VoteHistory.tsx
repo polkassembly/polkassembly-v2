@@ -5,7 +5,7 @@
 import { EProposalType, EVoteDecision, EVoteSortOptions, EVotesType } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThumbsDown, ThumbsUp, Ban } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/Tabs';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -23,6 +23,13 @@ function VoteHistory({ proposalType, index, votesType }: { proposalType: EPropos
 	const [page, setPage] = useState(1);
 	const [sortBy, setSortBy] = useState<EVoteSortOptions>(EVoteSortOptions.CreatedAtBlockDESC);
 
+	// Reset all state variables to initial values when votesType changes
+	useEffect(() => {
+		setTab(EVoteDecision.AYE);
+		setPage(1);
+		setSortBy(EVoteSortOptions.CreatedAtBlockDESC);
+	}, [votesType]);
+
 	const fetchVoteHistory = async (pageNumber: number, decision: EVoteDecision, orderBy: EVoteSortOptions, selectedVotesType: EVotesType) => {
 		const { data, error } = await NextApiClientService.getVotesHistory({ proposalType, index, page: pageNumber, decision, orderBy, votesType: selectedVotesType });
 
@@ -32,7 +39,7 @@ function VoteHistory({ proposalType, index, votesType }: { proposalType: EPropos
 		return data;
 	};
 
-	const { data, isLoading } = useQuery({
+	const { data, isFetching } = useQuery({
 		queryKey: ['voteHistory', proposalType, index, page, tab, sortBy, votesType],
 		queryFn: ({ queryKey }) => fetchVoteHistory(queryKey[3] as number, queryKey[4] as EVoteDecision, queryKey[5] as EVoteSortOptions, queryKey[6] as EVotesType),
 		placeholderData: (previousData) => previousData,
@@ -92,7 +99,7 @@ function VoteHistory({ proposalType, index, votesType }: { proposalType: EPropos
 				<TabsContent value={EVoteDecision.AYE}>
 					<VoteHistoryTable
 						votes={data?.votes || []}
-						loading={isLoading}
+						loading={isFetching}
 						orderBy={sortBy}
 						onOrderByChange={(newSortBy) => setSortBy(newSortBy)}
 						votesType={votesType}
@@ -101,7 +108,7 @@ function VoteHistory({ proposalType, index, votesType }: { proposalType: EPropos
 				<TabsContent value={EVoteDecision.NAY}>
 					<VoteHistoryTable
 						votes={data?.votes || []}
-						loading={isLoading}
+						loading={isFetching}
 						orderBy={sortBy}
 						onOrderByChange={(newSortBy) => setSortBy(newSortBy)}
 						votesType={votesType}
@@ -110,7 +117,7 @@ function VoteHistory({ proposalType, index, votesType }: { proposalType: EPropos
 				<TabsContent value={EVoteDecision.SPLIT_ABSTAIN}>
 					<VoteHistoryTable
 						votes={data?.votes || []}
-						loading={isLoading}
+						loading={isFetching}
 						orderBy={sortBy}
 						onOrderByChange={(newSortBy) => setSortBy(newSortBy)}
 						votesType={votesType}

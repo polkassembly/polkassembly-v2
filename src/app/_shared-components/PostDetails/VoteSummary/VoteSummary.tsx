@@ -235,12 +235,12 @@ function VoteSummary({
 								onValueChange={(value) => setVotesType(value as EVotesType)}
 							>
 								<SelectTrigger
-									className='m-0 flex w-fit items-center gap-x-2 border-none p-0 text-xl text-text_primary shadow-none'
+									className='m-0 mb-0 flex w-fit items-center gap-x-2 border-none p-0 text-lg text-text_primary shadow-none'
 									hideChevron
 								>
 									<SelectValue
 										placeholder={t('PostDetails.voteHistory')}
-										className='text-xl font-semibold text-text_primary'
+										className='-mt-2 text-lg font-semibold text-text_primary'
 									/>
 									<ChevronDown className='h-5 w-5 text-xs font-semibold' />
 								</SelectTrigger>
