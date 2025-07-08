@@ -8,12 +8,11 @@ import { EAllowedCommentor, EProposalType, EReactQueryKeys, ICommentResponse, IC
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
+import { MIN_COMMENTS_FOR_SUMMARY } from '@/_shared/_constants/commentSummaryConstants';
 import Comments from './Comments/Comments';
 import classes from './PostComments.module.scss';
 import { Skeleton } from '../Skeleton';
 import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
-
-const MIN_COMMENTS_FOR_SUMMARY = 3;
 
 function PostComments({
 	proposalType,
