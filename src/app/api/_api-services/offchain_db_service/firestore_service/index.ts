@@ -419,7 +419,17 @@ export class FirestoreService extends FirestoreUtils {
 		return commentsCount.data().count || 0;
 	}
 
-	static async GetPostMetrics({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IPostOffChainMetrics> {
+	static async GetPostMetrics({
+		network,
+		indexOrHash,
+		proposalType,
+		linkedPost
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		linkedPost?: IPostLink;
+	}): Promise<IPostOffChainMetrics> {
 		const postReactionsCount = (await this.GetPostReactionsCount({ network, indexOrHash, proposalType })).reduce(
 			(acc, curr) => {
 				acc[curr.reaction] = curr.count;
@@ -430,9 +440,16 @@ export class FirestoreService extends FirestoreUtils {
 
 		const commentsCount = await this.GetPostCommentsCount({ network, indexOrHash, proposalType });
 
+		let linkedPostCommentsCount = 0;
+		if (linkedPost && linkedPost.indexOrHash) {
+			linkedPostCommentsCount = await this.GetPostCommentsCount({ network, indexOrHash: linkedPost.indexOrHash, proposalType: linkedPost.proposalType });
+		}
+
+		const totalCommentsCount = commentsCount + linkedPostCommentsCount;
+
 		return {
 			reactions: postReactionsCount,
-			comments: commentsCount
+			comments: totalCommentsCount
 		} as IPostOffChainMetrics;
 	}
 
