@@ -665,7 +665,7 @@ export class RedisService {
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index),
 			value: JSON.stringify(data),
-			ttlSeconds: isActivePost ? FIVE_MIN : THIRTY_DAYS_IN_SECONDS
+			ttlSeconds: isActivePost ? ONE_DAY_IN_SECONDS : THIRTY_DAYS_IN_SECONDS
 		});
 	}
 
@@ -699,7 +699,7 @@ export class RedisService {
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType),
 			value: JSON.stringify(data),
-			ttlSeconds: isActivePost ? FIVE_MIN : THIRTY_DAYS_IN_SECONDS
+			ttlSeconds: isActivePost ? ONE_DAY_IN_SECONDS : THIRTY_DAYS_IN_SECONDS
 		});
 	}
 
