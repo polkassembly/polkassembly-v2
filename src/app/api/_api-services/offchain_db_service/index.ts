@@ -220,8 +220,8 @@ export class OffChainDbService {
 		const postData = await FirestoreService.GetOffChainPostData({ network, indexOrHash, proposalType });
 		if (postData && postData.linkedPost) {
 			const [linkedPostFirestoreComments, linkedPostSubsquareComments] = await Promise.all([
-				FirestoreService.GetPostComments({ network, indexOrHash: postData.linkedPost.indexOrHash, proposalType: postData.linkedPost.proposalType as EProposalType }),
-				SubsquareOffChainService.GetPostComments({ network, indexOrHash: postData.linkedPost.indexOrHash, proposalType: postData.linkedPost.proposalType as EProposalType })
+				FirestoreService.GetPostComments({ network, indexOrHash: postData.linkedPost.indexOrHash, proposalType: postData.linkedPost.proposalType }),
+				SubsquareOffChainService.GetPostComments({ network, indexOrHash: postData.linkedPost.indexOrHash, proposalType: postData.linkedPost.proposalType })
 			]);
 
 			allComments.push(...linkedPostFirestoreComments, ...linkedPostSubsquareComments);
