@@ -217,6 +217,16 @@ export class OffChainDbService {
 		// Combine all comments from both sources
 		const allComments = [...firestoreComments, ...subsquareComments];
 
+		const postData = await FirestoreService.GetOffChainPostData({ network, indexOrHash, proposalType });
+		if (postData && postData.linkedPost) {
+			const [linkedPostFirestoreComments, linkedPostSubsquareComments] = await Promise.all([
+				FirestoreService.GetPostComments({ network, indexOrHash: postData.linkedPost.indexOrHash, proposalType: postData.linkedPost.proposalType as EProposalType }),
+				SubsquareOffChainService.GetPostComments({ network, indexOrHash: postData.linkedPost.indexOrHash, proposalType: postData.linkedPost.proposalType as EProposalType })
+			]);
+
+			allComments.push(...linkedPostFirestoreComments, ...linkedPostSubsquareComments);
+		}
+
 		// get reactions for each comment
 		const allCommentsWithReactions: ICommentResponse[] = await Promise.all(
 			allComments.map(async (comment) => {
