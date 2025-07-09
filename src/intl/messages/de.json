@@ -800,6 +800,7 @@
 		"legalName": "Rechtlicher Name",
 		"email": "E-Mail",
 		"twitter": "Twitter",
+		"socials": "Soziale Medien",
 		"riot": "Riot",
 		"emailPlaceholder": "Geben Sie Ihre E-Mail-Adresse ein",
 		"twitterPlaceholder": "@IhrTwitterName",
@@ -830,11 +831,15 @@
 		"verifying": "Überprüfung läuft...",
 		"verificationSuccessful": "Überprüfung erfolgreich",
 		"verificationFailed": "Überprüfung fehlgeschlagen",
-		"goToHome": "Zur Startseite",
+		"goToRequestJudgement": "Zur Beurteilungsanfrage gehen",
 		"verificationEmailSent": "Verifizierungs-E-Mail gesendet",
 		"verificationEmailSentDescription": "Bitte überprüfen Sie Ihre E-Mail zur Verifizierung",
 		"emailNotSent": "E-Mail nicht gesendet",
-		"emailNotSentDescription": "Beim Senden der Verifizierungs-E-Mail ist ein Fehler aufgetreten"
+		"emailNotSentDescription": "Beim Senden der Verifizierungs-E-Mail ist ein Fehler aufgetreten",
+		"IdentityNotSet": "Identität nicht festgelegt",
+		"IdentityNotSetDescription": "Um eine Beurteilung anzufordern, müssen Sie zuerst Ihre On-Chain-Identität festlegen.",
+		"IdentityNotSetDescription2": "Eine Beurteilung ist eine Möglichkeit für Registrare, Ihr Profil zu überprüfen und basierend auf Ihren Identitätsinformationen (wie Anzeigename, E-Mail, Website, rechtlicher Name usw.) ein Maß an Vertrauenswürdigkeit zu bieten.",
+		"IdentityNotSetDescription3": "Sobald Sie Ihre Identität festgelegt haben, können Sie eine Beurteilung von einem Registrar anfordern. Diese Beurteilung wird anderen sichtbar sein und hilft Ihnen, Glaubwürdigkeit on-chain aufzubauen."
 	},
 	"Bounties": {
 		"onchainBounties": "Onchain-Prämien",

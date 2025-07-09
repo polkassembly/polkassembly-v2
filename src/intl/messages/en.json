@@ -850,6 +850,7 @@
 		"legalName": "Legal Name",
 		"email": "Email",
 		"twitter": "Twitter",
+		"socials": "Socials",
 		"riot": "Riot",
 		"emailPlaceholder": "Enter your email address",
 		"twitterPlaceholder": "@YourTwitterName",
@@ -880,11 +881,15 @@
 		"verifying": "Verifying...",
 		"verificationSuccessful": "Verification successful",
 		"verificationFailed": "Verification failed",
-		"goToHome": "Go to home",
+		"goToRequestJudgement": "Go to Request Judgement",
 		"verificationEmailSent": "Verification email sent",
 		"verificationEmailSentDescription": "Please check your email for verification",
 		"emailNotSent": "Email not sent",
-		"emailNotSentDescription": "There was an error while sending the verification email"
+		"emailNotSentDescription": "There was an error while sending the verification email",
+		"IdentityNotSet": "Identity Not Set",
+		"IdentityNotSetDescription": "To request a judgment, you need to have your on-chain identity set first.",
+		"IdentityNotSetDescription2": "Judgment is a way for registrars to verify your profile and provide a level of trustworthiness based on your identity information (such as display name, email, website, legal name, etc.).",
+		"IdentityNotSetDescription3": "Once you’ve set your identity, you can request a judgment from a registrar. This judgment will be visible to others and helps you build credibility on-chain."
 	},
 	"Bounties": {
 		"onchainBounties": "On-chain Bounties",

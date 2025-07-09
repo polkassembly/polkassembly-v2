@@ -1301,3 +1301,11 @@ export interface IPayout {
 		generalIndex: string;
 	};
 }
+
+export enum ESetIdentityStep {
+	GAS_FEE,
+	SET_IDENTITY_FORM,
+	REQUEST_JUDGEMENT,
+	IDENTITY_SUCCESS,
+	TELEPORT_TO_PEOPLE_CHAIN
+}

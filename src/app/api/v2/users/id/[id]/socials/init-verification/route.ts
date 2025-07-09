@@ -82,7 +82,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	if (social === ESocial.EMAIL) {
 		const verifyToken = createCuid();
-		await NotificationService.SendVerificationEmail(user, verifyToken, handle);
+		await NotificationService.SendVerificationEmail(user, network, verifyToken, handle);
 
 		updatedSocialHandle = await OffChainDbService.UpdateUserSocialHandle({
 			userId,
