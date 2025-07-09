@@ -138,8 +138,8 @@ export class OffChainDbService {
 			post = await SubsquareOffChainService.GetOffChainPostData({ network, indexOrHash, proposalType });
 		}
 
-		const firestorePostMetricsPromise = FirestoreService.GetPostMetrics({ network, indexOrHash, proposalType });
-		const subsquarePostMetricsPromise = SubsquareOffChainService.GetPostMetrics({ network, indexOrHash, proposalType });
+		const firestorePostMetricsPromise = FirestoreService.GetPostMetrics({ network, indexOrHash, proposalType, linkedPost: post?.linkedPost });
+		const subsquarePostMetricsPromise = SubsquareOffChainService.GetPostMetrics({ network, indexOrHash, proposalType, linkedPost: post?.linkedPost });
 
 		const [firestorePostMetrics, subsquarePostMetrics] = await Promise.all([firestorePostMetricsPromise, subsquarePostMetricsPromise]);
 
@@ -230,7 +230,7 @@ export class OffChainDbService {
 		// get reactions for each comment
 		const allCommentsWithReactions: ICommentResponse[] = await Promise.all(
 			allComments.map(async (comment) => {
-				const reactions = await this.GetCommentReactions({ network, indexOrHash, proposalType, id: comment.id });
+				const reactions = await this.GetCommentReactions({ network, indexOrHash: comment.indexOrHash, proposalType: comment.proposalType, id: comment.id });
 				return { ...comment, reactions };
 			})
 		);
