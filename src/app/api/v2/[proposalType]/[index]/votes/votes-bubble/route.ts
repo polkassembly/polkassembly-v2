@@ -17,7 +17,7 @@ const zodParamsSchema = z.object({
 });
 
 export const GET = withErrorHandling(
-	async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse<IPostBubbleVotes>> => {
+	async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse<IPostBubbleVotes | null>> => {
 		const { proposalType, index } = zodParamsSchema.parse(await params);
 
 		const zodQuerySchema = z.object({
@@ -38,7 +38,7 @@ export const GET = withErrorHandling(
 
 		const votes = await OnChainDbService.GetPostBubbleVotes({ network, proposalType, index, analyticsType, votesType });
 
-		if (votes) {
+		if (votes !== null) {
 			await RedisService.SetPostBubbleVotesData({
 				network,
 				proposalType,

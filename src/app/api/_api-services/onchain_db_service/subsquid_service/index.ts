@@ -1058,7 +1058,7 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async GetPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics> {
+	static async GetPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics | null> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_ALL_FLATTENED_VOTES_WITH_POST_INDEX;
@@ -1068,6 +1068,10 @@ export class SubsquidService extends SubsquidUtils {
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain post analytics from Subsquid: ${subsquidErr}`);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, subsquidErr?.message || 'Error fetching on-chain post analytics from Subsquid');
+		}
+
+		if (subsquidData?.votes?.length === 0) {
+			return null;
 		}
 
 		const votes = subsquidData.votes?.map((vote: { decision: string }) => {
@@ -1105,7 +1109,7 @@ export class SubsquidService extends SubsquidUtils {
 		index: number;
 		analyticsType: EAnalyticsType;
 		votesType: EPostBubbleVotesType;
-	}): Promise<IPostBubbleVotes> {
+	}): Promise<IPostBubbleVotes | null> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = votesType === EPostBubbleVotesType.FLATTENED ? this.GET_ALL_FLATTENED_VOTES_WITH_POST_INDEX : this.GET_ALL_NESTED_VOTES_WITH_POST_INDEX;
@@ -1117,6 +1121,9 @@ export class SubsquidService extends SubsquidUtils {
 		}
 
 		const data = subsquidData.votes;
+		if (data?.length === 0) {
+			return null;
+		}
 
 		const votesData: IPostBubbleVotes = {
 			votes: {

@@ -234,7 +234,9 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` }),
-			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}-*` })
+			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_ANALYTICS_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-*` })
 		]);
 	}
 
@@ -523,6 +525,11 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` }),
+
+			// clear post analytics data
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_ANALYTICS_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-*` }),
+
 			// clear overview page data
 			this.DeleteOverviewPageData({ network }),
 
@@ -640,7 +647,6 @@ export class RedisService {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
 	}
 
-	// Post analytics caching methods
 	static async SetPostAnalyticsData({
 		network,
 		proposalType,
@@ -663,10 +669,13 @@ export class RedisService {
 		});
 	}
 
-	// Posts caching methods
 	static async GetPostAnalyticsData({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index) });
 		return data ? (deepParseJson(data) as IPostAnalytics) : null;
+	}
+
+	static async DeletePostAnalyticsData({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index) });
 	}
 
 	static async SetPostBubbleVotesData({
@@ -709,5 +718,21 @@ export class RedisService {
 	}): Promise<IPostBubbleVotes | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });
 		return data ? (deepParseJson(data) as IPostBubbleVotes) : null;
+	}
+
+	static async DeletePostBubbleVotesData({
+		network,
+		proposalType,
+		index,
+		votesType,
+		analyticsType
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		votesType: EPostBubbleVotesType;
+		analyticsType: EAnalyticsType;
+	}): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });
 	}
 }

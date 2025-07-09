@@ -16,24 +16,26 @@ const zodParamsSchema = z.object({
 	index: z.coerce.number()
 });
 
-export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse<IPostAnalytics>> => {
-	const { proposalType, index } = zodParamsSchema.parse(await params);
+export const GET = withErrorHandling(
+	async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse<IPostAnalytics | null>> => {
+		const { proposalType, index } = zodParamsSchema.parse(await params);
 
-	const [network, headersList] = await Promise.all([getNetworkFromHeaders(), headers()]);
-	const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
+		const [network, headersList] = await Promise.all([getNetworkFromHeaders(), headers()]);
+		const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
 
-	if (!skipCache) {
-		const analytics = await RedisService.GetPostAnalyticsData({ network, proposalType, index });
-		if (analytics) {
-			return NextResponse.json(analytics);
+		if (!skipCache) {
+			const analytics = await RedisService.GetPostAnalyticsData({ network, proposalType, index });
+			if (analytics) {
+				return NextResponse.json(analytics);
+			}
 		}
+
+		const analytics = await OnChainDbService.GetPostAnalytics({ network, proposalType, index });
+
+		if (analytics?.proposal?.index === index) {
+			await RedisService.SetPostAnalyticsData({ network, proposalType, index, data: analytics, proposalStatus: analytics.proposal.status as EProposalStatus });
+		}
+
+		return NextResponse.json(analytics);
 	}
-
-	const analytics = await OnChainDbService.GetPostAnalytics({ network, proposalType, index });
-
-	if (analytics) {
-		await RedisService.SetPostAnalyticsData({ network, proposalType, index, data: analytics, proposalStatus: analytics.proposal.status as EProposalStatus });
-	}
-
-	return NextResponse.json(analytics);
-});
+);
