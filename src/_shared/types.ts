@@ -722,7 +722,8 @@ export enum EAssets {
 export enum EPostDetailsTab {
 	DESCRIPTION = 'description',
 	TIMELINE = 'timeline',
-	ONCHAIN_INFO = 'onchain info'
+	ONCHAIN_INFO = 'onchain info',
+	POST_ANALYTICS = 'post_analytics'
 }
 
 export enum EActivityName {
@@ -1300,4 +1301,100 @@ export interface IPayout {
 		expiresAt: Date;
 		generalIndex: string;
 	};
+}
+export interface IAnalytics {
+	[EVoteDecision.ABSTAIN]: string;
+	[EVoteDecision.AYE]: string;
+	[EVoteDecision.NAY]: string;
+	delegated: string;
+	solo: string;
+	support: string;
+	turnout?: string;
+	timeSplitVotes: Array<{ index: number; value: string }>;
+	votesByConviction: Array<{ [key in Exclude<EVoteDecision, EVoteDecision.SPLIT_ABSTAIN | EVoteDecision.SPLIT>]: string } & { lockPeriod: number }>;
+	delegationVotesByConviction: Array<{ delegated: string; solo: string; lockPeriod: number }>;
+}
+
+export interface IAccountAnalytics {
+	[EVoteDecision.ABSTAIN]: number;
+	[EVoteDecision.AYE]: number;
+	[EVoteDecision.NAY]: number;
+	delegated: number;
+	solo: number;
+	support: string;
+	turnout?: string;
+	timeSplitVotes: Array<{ index: number; value: number }>;
+	votesByConviction: Array<{ [key in Exclude<EVoteDecision, EVoteDecision.SPLIT_ABSTAIN | EVoteDecision.SPLIT>]: number } & { lockPeriod: number }>;
+	delegationVotesByConviction: Array<{ delegated: number; solo: number; lockPeriod: number }>;
+}
+
+export interface IPostAnalytics {
+	convictionsAnalytics: IAnalytics;
+	votesAnalytics: IAnalytics;
+	accountsAnalytics: IAccountAnalytics;
+	proposal: {
+		index: number;
+		status: string;
+	};
+}
+
+export interface IFlattenedConvictionVote {
+	proposal: {
+		createdAt: string;
+		tally: {
+			ayes: string;
+			nays: string;
+			support: string;
+			bareAyes: string | null;
+		};
+	};
+	type: EProposalType;
+	voter: string;
+	lockPeriod: number;
+	decision: EVoteDecision;
+	balance: {
+		value?: string;
+		abstain?: string;
+	};
+	createdAt: string;
+	createdAtBlock: number;
+	proposalIndex: number;
+	delegatedTo: string | null;
+	isDelegated: boolean;
+	parentVote: {
+		extrinsicIndex: string;
+		selfVotingPower: string;
+		type: EProposalType;
+		voter: string;
+		lockPeriod: number;
+		delegatedVotingPower: string;
+		delegatedVotes: IFlattenedConvictionVote[];
+	};
+}
+
+export enum EAnalyticsType {
+	ACCOUNTS = 'accounts',
+	CONVICTIONS = 'convictions',
+	VOTES = 'votes'
+}
+
+export interface IVoteDistribution extends Omit<IVoteData, 'createdAt' | 'createdAtBlock' | 'proposalIndex' | 'delegatedTo'> {
+	votingPower: string | null;
+	delegatorsCount?: number;
+	isDelegated: boolean;
+	percentage?: number;
+}
+
+export type IPostBubbleVotes = {
+	votes: {
+		[K in Exclude<EVoteDecision, EVoteDecision.SPLIT_ABSTAIN | EVoteDecision.SPLIT>]: IVoteDistribution[];
+	};
+	proposal?: {
+		status: EProposalStatus;
+	};
+};
+
+export enum EPostBubbleVotesType {
+	NESTED = 'nested',
+	FLATTENED = 'flattened'
 }

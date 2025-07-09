@@ -13,6 +13,7 @@ import { useAISummary } from '@/hooks/useAISummary';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
+import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import dynamic from 'next/dynamic';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
@@ -21,12 +22,50 @@ import { Tabs, TabsContent } from '../Tabs';
 import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
 import VoteSummary from './VoteSummary/VoteSummary';
 import PostContent from './PostContent';
-import OnchainInfo from './OnchainInfo/OnchainInfo';
 import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
-import VoteCurvesData from './VoteCurvesData/VoteCurvesData';
 import { Skeleton } from '../Skeleton';
+
+const OnchainInfo = dynamic(() => import('./OnchainInfo/OnchainInfo'), {
+	ssr: false,
+	loading: () => (
+		<div className='flex flex-col gap-4'>
+			<Skeleton className='h-8 w-48' />
+			<div className='flex flex-col gap-6'>
+				<Skeleton className='h-10 w-full' />
+				<Skeleton className='h-10 w-full' />
+				<Skeleton className='h-10 w-full' />
+				<Skeleton className='h-10 w-full' />
+			</div>
+		</div>
+	)
+});
+const PostAnalytics = dynamic(() => import('./Analytics/PostAnalytics'), {
+	ssr: false,
+	loading: () => (
+		<div className='flex flex-col gap-4'>
+			<Skeleton className='h-10 w-[150px] rounded-lg' />
+			<Skeleton className='h-[50px] w-full rounded-lg' />
+			<div className='flex gap-4 max-lg:flex-col'>
+				<Skeleton className='h-44 w-full rounded-lg' />
+				<Skeleton className='h-44 w-full rounded-lg' />
+				<Skeleton className='h-44 w-full rounded-lg' />
+			</div>
+			<Skeleton className='h-[250px] w-full rounded-lg' />
+			<Skeleton className='h-[500px] w-full rounded-lg' />
+			<div className='flex gap-4 max-lg:flex-col'>
+				<Skeleton className='h-[250px] w-full rounded-lg' />
+				<Skeleton className='h-[250px] w-full rounded-lg' />
+			</div>
+		</div>
+	)
+});
+
+const VoteCurvesData = dynamic(() => import('./VoteCurvesData/VoteCurvesData'), {
+	ssr: false,
+	loading: () => <Skeleton className='h-32 w-full rounded-lg' />
+});
 
 const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), {
 	ssr: false,
@@ -160,17 +199,16 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									onchainInfo={post.onChainInfo}
 								/>
 							</TabsContent>
+							{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(post.proposalType) && (
+								<TabsContent value={EPostDetailsTab.POST_ANALYTICS}>
+									<PostAnalytics
+										proposalType={post.proposalType}
+										index={index}
+									/>
+								</TabsContent>
+							)}
 						</div>
-						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
-							<PostComments
-								proposalType={post.proposalType}
-								index={index}
-								contentSummary={post.contentSummary}
-								comments={post.comments}
-								allowedCommentor={post.allowedCommentor}
-								postUserId={post.userId}
-							/>
-						</div>
+
 						{isModalOpen && !isOffchainPost && (
 							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
 								{canVote(post.onChainInfo?.status) && (
@@ -183,6 +221,17 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								)}
 							</div>
 						)}
+
+						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
+							<PostComments
+								proposalType={post.proposalType}
+								index={index}
+								contentSummary={post.contentSummary}
+								comments={post.comments}
+								allowedCommentor={post.allowedCommentor}
+								postUserId={post.userId}
+							/>
+						</div>
 					</div>
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
