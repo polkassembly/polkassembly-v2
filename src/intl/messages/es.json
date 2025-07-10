@@ -1289,5 +1289,13 @@
 		"teleportFundsToPeopleChainFailedDescription": "Hubo un error al teleportar los fondos a People Chain",
 		"BeneficiaryAddress": "Dirección del Beneficiario",
 		"Amount": "Cantidad"
+	},
+	"Judgements": {
+		"judgement": "Juicio",
+		"requestJudgement": "Solicitar Juicio",
+		"becomeARegistrar": "Convertirse en Registrador",
+		"dashboard": "Panel de control",
+		"registrars": "Registradores",
+		"registrarDescription": "Una entidad o individuo autorizado para verificar y validar la identidad de cuentas. Los registradores pueden establecer un cargo por sus servicios y limitar su atestación a ciertos campos."
 	}
 }

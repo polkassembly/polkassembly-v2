@@ -1288,5 +1288,13 @@
 		"teleportFundsToPeopleChainFailedDescription": "Beim Teleportieren der Mittel zur People Chain ist ein Fehler aufgetreten",
 		"BeneficiaryAddress": "Begünstigten-Adresse",
 		"Amount": "Betrag"
+	},
+	"Judgements": {
+		"judgement": "Urteil",
+		"requestJudgement": "Urteil anfordern",
+		"becomeARegistrar": "Registrar werden",
+		"dashboard": "Dashboard",
+		"registrars": "Registrars",
+		"registrarDescription": "Eine Entität oder ein Individuum, die/der autorisiert ist, die Identität von Konten zu verifizieren und zu validieren. Registrars können einen Gebührensatz für ihre Dienstleistungen festlegen und ihre Attestation auf bestimmte Felder beschränken."
 	}
 }

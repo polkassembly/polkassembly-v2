@@ -1301,3 +1301,8 @@ export interface IPayout {
 		generalIndex: string;
 	};
 }
+
+export enum EJudgementDashboardTabs {
+	DASHBOARD = 'dashboard',
+	REGISTRARS = 'registrars'
+}

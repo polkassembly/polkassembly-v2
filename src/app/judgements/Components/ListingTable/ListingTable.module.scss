@@ -1,0 +1,63 @@
+.popoverContent {
+	@apply max-w-lg border-none bg-[var(--sidebar-primary-foreground)] p-6 shadow-lg !important;
+}
+
+.closeButton {
+	@apply cursor-pointer text-base font-medium text-text_pink;
+}
+
+.modalContent {
+	@apply max-h-[60vh] w-full overflow-auto;
+}
+
+.modalContent_title {
+	@apply text-xl font-semibold text-navbar_title;
+}
+
+.mdlisticon {
+	@apply cursor-pointer text-lg text-wallet_btn_text hover:text-text_pink;
+}
+
+.tableRow {
+	@apply overflow-hidden rounded-lg bg-page_background px-6 text-center;
+}
+
+.tableCell_1 {
+	@apply p-6 text-center first:rounded-l-lg last:rounded-r-lg;
+}
+
+.tableCell_last {
+	@apply p-6 text-center last:rounded-r-lg;
+}
+
+.tableCell_2 {
+	@apply w-1/4 px-6 py-5;
+}
+
+.tableCell {
+	@apply p-6;
+}
+
+.table_content_cell {
+	@apply mt-3 flex min-w-44 items-center gap-3;
+}
+
+.table_content_cell_1 {
+	@apply cursor-pointer text-base text-wallet_btn_text;
+}
+
+.table_content_cell_2 {
+	@apply mt-3 flex items-center gap-3;
+}
+
+.table_content_cell_2_content {
+	@apply rounded-lg bg-wallet_disabled_bg px-2 py-1;
+}
+
+.noPreimage {
+	@apply mx-auto flex w-full max-w-lg flex-col items-center justify-center gap-4 py-2 text-center;
+}
+
+.no_data {
+	@apply flex flex-col items-center justify-center py-2 text-center text-lg font-semibold text-text_primary;
+}

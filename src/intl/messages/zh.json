@@ -1288,5 +1288,13 @@
 		"teleportFundsToPeopleChainFailedDescription": "传送资金至People Chain时发生错误",
 		"BeneficiaryAddress": "受益人地址",
 		"Amount": "金额"
+	},
+	"Judgements": {
+		"judgement": "判断",
+		"requestJudgement": "判断请求",
+		"becomeARegistrar": "成为注册者",
+		"dashboard": "仪表板",
+		"registrars": "注册者",
+		"registrarDescription": "一个被授权验证和验证账户身份的实体或个人。注册者可以设置服务费用并限制其认证到特定字段。"
 	}
 }
