@@ -30,7 +30,7 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 	const network = getCurrentNetwork();
 	const { userPreferences } = useUserPreferences();
 
-	const [beneficiaries, setBeneficiaries] = useState<IBeneficiaryInput[]>([{ address: '', amount: BN_ZERO.toString(), assetId: null, id: dayjs().get('milliseconds').toString() }]);
+	const [beneficiaries, setBeneficiaries] = useState<IBeneficiaryInput[]>([{ address: '', amount: BN_ZERO.toString(), id: dayjs().get('milliseconds').toString() }]);
 	const [selectedTrack, setSelectedTrack] = useState<{ name: EPostOrigin; trackId: number }>();
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });

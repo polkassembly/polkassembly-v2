@@ -520,7 +520,7 @@ export interface IVoteMetrics {
 export interface IBeneficiary {
 	address: string;
 	amount: string;
-	assetId: string | null;
+	assetId?: string | null;
 	validFromBlock?: string;
 }
 
