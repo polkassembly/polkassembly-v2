@@ -59,7 +59,9 @@ function BalanceInput({
 	const networkDetails = NETWORKS_DETAILS[`${network}`];
 	const { supportedAssets } = networkDetails;
 
-	const [assetId, setAssetId] = useState<string | null>(supportedAssets[EAssets.USDC]?.index || null);
+	const initialAssetId = Object.values(supportedAssets).find((asset) => asset.symbol === EAssets.USDC)?.index;
+
+	const [assetId, setAssetId] = useState<string | null>(initialAssetId || null);
 
 	const [userBalance, setUserBalance] = useState<string | null>(null);
 
@@ -95,14 +97,14 @@ function BalanceInput({
 	useEffect(() => {
 		if (!defaultValue || defaultValue.isZero()) {
 			if (value) {
-				setValueString(bnToInput(value, network, defaultAssetId));
-				setAssetId(defaultAssetId || null);
+				setValueString(bnToInput(value, network, defaultAssetId || initialAssetId));
+				setAssetId(defaultAssetId || initialAssetId || null);
 			}
 			return;
 		}
 
-		setValueString(bnToInput(defaultValue, network, defaultAssetId));
-		setAssetId(defaultAssetId || null);
+		setValueString(bnToInput(defaultValue, network, defaultAssetId || initialAssetId));
+		setAssetId(defaultAssetId || initialAssetId || null);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [network, value]);
 
@@ -169,7 +171,7 @@ function BalanceInput({
 								{assetId ? networkDetails.supportedAssets[`${assetId}`].symbol : networkDetails.tokenSymbol}
 							</DropdownMenuTrigger>
 							<DropdownMenuContent>
-								{[{ label: networkDetails.tokenSymbol, value: null }, ...reorderedAssetOptions].map((option) => (
+								{[...reorderedAssetOptions, { label: networkDetails.tokenSymbol, value: null }].map((option) => (
 									<DropdownMenuItem
 										key={option.value}
 										onClick={() => {
