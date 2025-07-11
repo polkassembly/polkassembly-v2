@@ -977,4 +977,49 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	// Judgement-related queries
+	protected static GET_IDENTITY_JUDGEMENTS = `
+		query GetIdentityJudgements($limit: Int!, $offset: Int!) {
+			identities(limit: $limit, offset: $offset, where: { judgements_some: {} }) {
+				id
+				account {
+					id
+				}
+				info {
+					display {
+						Raw
+					}
+					email {
+						Raw
+					}
+					twitter {
+						Raw
+					}
+				}
+				judgements {
+					registrarIndex
+					judgement
+					blockNumber
+					timestamp
+				}
+			}
+		}
+	`;
+
+	protected static GET_REGISTRARS = `
+		query GetRegistrars {
+			registrars {
+				id
+				account {
+					id
+				}
+				fee
+				fields {
+					field
+					value
+				}
+			}
+		}
+	`;
 }

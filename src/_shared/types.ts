@@ -1314,6 +1314,14 @@ export enum EJudgementStatus {
 	PENDING = 'Pending'
 }
 
+export enum EJudgementStatusType {
+	REASONABLE = 'Reasonable',
+	KNOWN_GOOD = 'KnownGood',
+	OUT_OF_DATE = 'OutOfDate',
+	LOW_QUALITY = 'LowQuality',
+	ERRONEOUS = 'Erroneous'
+}
+
 export interface IJudgementRequest {
 	id: string;
 	address: string;

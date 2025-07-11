@@ -13,8 +13,8 @@ import { BN, BN_ZERO, hexToString, isHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { ENetwork, IOnChainIdentity, IJudgementStats, EJudgementStatus, IJudgementRequest, IJudgementListingResponse, IRegistrarInfo } from '@shared/types';
-import { SubsquidService } from './subsquid_service';
+import { ENetwork, IOnChainIdentity, IJudgementStats, EJudgementStatus, EJudgementStatusType, IJudgementRequest, IJudgementListingResponse, IRegistrarInfo } from '@shared/types';
+import { SubsquidService } from '../api/_api-services/onchain_db_service/subsquid_service';
 
 // Usage:
 // const identityService = await IdentityService.Init(ENetwork.POLKADOT, api);
@@ -471,8 +471,7 @@ export class IdentityService {
 
 			// Fallback to Subsquid
 			try {
-				const subsquidService = new SubsquidService(this.network);
-				return await subsquidService.getJudgementStats();
+				return await SubsquidService.GetJudgementStats({ network: this.network });
 			} catch (subsquidError) {
 				console.error('Error fetching stats from Subsquid fallback:', subsquidError);
 				return {
@@ -486,12 +485,12 @@ export class IdentityService {
 
 	private static mapJudgementStatus(judgementData: string): EJudgementStatus {
 		switch (judgementData) {
-			case 'Reasonable':
-			case 'KnownGood':
+			case EJudgementStatusType.REASONABLE:
+			case EJudgementStatusType.KNOWN_GOOD:
 				return EJudgementStatus.APPROVED;
-			case 'OutOfDate':
-			case 'LowQuality':
-			case 'Erroneous':
+			case EJudgementStatusType.OUT_OF_DATE:
+			case EJudgementStatusType.LOW_QUALITY:
+			case EJudgementStatusType.ERRONEOUS:
 				return EJudgementStatus.REJECTED;
 			default:
 				return EJudgementStatus.PENDING;
@@ -553,12 +552,11 @@ export class IdentityService {
 
 			// Fallback to Subsquid
 			try {
-				const subsquidService = new SubsquidService(this.network);
-				const subsquidJudgements = await subsquidService.getIdentityJudgements();
+				const subsquidJudgements = await SubsquidService.GetIdentityJudgements({ network: this.network, limit: 1000, offset: 0 });
 
 				// Map registrar addresses to judgements
 				const registrars = await this.getRegistrars();
-				return subsquidJudgements.map((judgement) => ({
+				return subsquidJudgements.map((judgement: IJudgementRequest) => ({
 					...judgement,
 					registrarAddress: registrars[judgement.registrarIndex]?.account || ''
 				}));
@@ -607,8 +605,7 @@ export class IdentityService {
 
 			// Fallback to Subsquid
 			try {
-				const subsquidService = new SubsquidService(this.network);
-				return await subsquidService.getRegistrars();
+				return await SubsquidService.GetRegistrars({ network: this.network });
 			} catch (subsquidError) {
 				console.error('Error fetching registrars from Subsquid fallback:', subsquidError);
 				return [];

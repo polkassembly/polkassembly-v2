@@ -22,7 +22,12 @@ import {
 	ITrackAnalyticsStats,
 	IVoteCurve,
 	IVoteData,
-	IVoteMetrics
+	IVoteMetrics,
+	EJudgementStatus,
+	EJudgementStatusType,
+	IJudgementRequest,
+	IJudgementStats,
+	IRegistrarInfo
 } from '@shared/types';
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
@@ -1056,5 +1061,137 @@ export class SubsquidService extends SubsquidUtils {
 			items: postsResult.map((post) => (post.status === 'fulfilled' ? post.value : null))?.filter((post) => post !== null),
 			totalCount: subsquidData.proposalsConnection.totalCount || 0
 		};
+	}
+
+	// Judgement-related methods
+	private static mapJudgementStatus(judgement: string): EJudgementStatus {
+		switch (judgement) {
+			case EJudgementStatusType.REASONABLE:
+			case EJudgementStatusType.KNOWN_GOOD:
+				return EJudgementStatus.APPROVED;
+			case EJudgementStatusType.OUT_OF_DATE:
+			case EJudgementStatusType.LOW_QUALITY:
+			case EJudgementStatusType.ERRONEOUS:
+				return EJudgementStatus.REJECTED;
+			default:
+				return EJudgementStatus.PENDING;
+		}
+	}
+
+	static async GetIdentityJudgements({ network, limit, offset }: { network: ENetwork; limit: number; offset: number }): Promise<IJudgementRequest[]> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		try {
+			const { data: subsquidData, error: subsquidErr } = await gqlClient.query(this.GET_IDENTITY_JUDGEMENTS, { limit, offset }).toPromise();
+
+			if (subsquidErr || !subsquidData) {
+				console.error(`Error fetching identity judgements from Subsquid: ${subsquidErr}`);
+				return [];
+			}
+
+			const judgements: IJudgementRequest[] = [];
+
+			subsquidData.identities?.forEach(
+				(identity: {
+					account: { id: string };
+					info: { display?: { Raw?: string }; email?: { Raw?: string }; twitter?: { Raw?: string } };
+					judgements?: Array<{ registrarIndex: number; judgement: string; blockNumber: number; timestamp: string }>;
+				}) => {
+					identity.judgements?.forEach((judgement: { registrarIndex: number; judgement: string; blockNumber: number; timestamp: string }) => {
+						const judgementRequest: IJudgementRequest = {
+							id: `${identity.account.id}-${judgement.registrarIndex}-${judgement.blockNumber}`,
+							address: identity.account.id,
+							displayName: identity.info.display?.Raw || '',
+							email: identity.info.email?.Raw || '',
+							twitter: identity.info.twitter?.Raw || '',
+							status: this.mapJudgementStatus(judgement.judgement),
+							dateInitiated: new Date(judgement.timestamp),
+							registrarIndex: judgement.registrarIndex,
+							registrarAddress: '', // Will be filled by registrar lookup
+							judgementHash: `${judgement.blockNumber}`
+						};
+
+						judgements.push(judgementRequest);
+					});
+				}
+			);
+
+			return judgements.sort((a, b) => b.dateInitiated.getTime() - a.dateInitiated.getTime());
+		} catch (error) {
+			console.error('Error fetching judgements from Subsquid:', error);
+			return [];
+		}
+	}
+
+	static async GetRegistrars({ network }: { network: ENetwork }): Promise<IRegistrarInfo[]> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		try {
+			const { data: subsquidData, error: subsquidErr } = await gqlClient.query(this.GET_REGISTRARS, {}).toPromise();
+
+			if (subsquidErr || !subsquidData) {
+				console.error(`Error fetching registrars from Subsquid: ${subsquidErr}`);
+				return [];
+			}
+
+			return (
+				subsquidData.registrars?.map((registrar: { account: { id: string }; fee: string }, index: number) => ({
+					address: registrar.account.id,
+					registrarFee: registrar.fee,
+					registrarIndex: index,
+					totalReceivedRequests: 0, // TODO: Calculate from judgements
+					totalJudgementsGiven: 0, // TODO: Calculate from judgements
+					latestJudgementDate: undefined // TODO: Calculate from judgements
+				})) || []
+			);
+		} catch (error) {
+			console.error('Error fetching registrars from Subsquid:', error);
+			return [];
+		}
+	}
+
+	static async GetJudgementStats({ network }: { network: ENetwork }): Promise<IJudgementStats> {
+		const currentDate = new Date();
+		const currentMonth = currentDate.getMonth();
+		const currentYear = currentDate.getFullYear();
+
+		try {
+			const judgements = await this.GetIdentityJudgements({ network, limit: 1000, offset: 0 });
+
+			const currentMonthRequests = judgements.filter((judgement) => {
+				const judgementDate = new Date(judgement.dateInitiated);
+				return judgementDate.getMonth() === currentMonth && judgementDate.getFullYear() === currentYear;
+			});
+
+			const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+			const previousYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+			const previousMonthRequests = judgements.filter((judgement) => {
+				const judgementDate = new Date(judgement.dateInitiated);
+				return judgementDate.getMonth() === previousMonth && judgementDate.getFullYear() === previousYear;
+			});
+
+			const totalRequestedThisMonth = currentMonthRequests.length;
+			const totalRequestedLastMonth = previousMonthRequests.length;
+			const percentageIncreaseFromLastMonth = totalRequestedLastMonth === 0 ? 100 : ((totalRequestedThisMonth - totalRequestedLastMonth) / totalRequestedLastMonth) * 100;
+
+			const completedThisMonth = currentMonthRequests.filter(
+				(judgement) => judgement.status === EJudgementStatus.APPROVED || judgement.status === EJudgementStatus.REJECTED
+			).length;
+
+			const percentageCompletedThisMonth = totalRequestedThisMonth === 0 ? 0 : (completedThisMonth / totalRequestedThisMonth) * 100;
+
+			return {
+				totalRequestedThisMonth,
+				percentageIncreaseFromLastMonth,
+				percentageCompletedThisMonth
+			};
+		} catch (error) {
+			console.error('Error calculating judgement stats from Subsquid:', error);
+			return {
+				totalRequestedThisMonth: 0,
+				percentageIncreaseFromLastMonth: 0,
+				percentageCompletedThisMonth: 0
+			};
+		}
 	}
 }

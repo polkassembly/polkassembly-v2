@@ -10,7 +10,7 @@ import { EJudgementDashboardTabs } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import styles from './Header.module.scss';
 
-function Header({ data }: { data: { totalCount: number } }) {
+function Header({ data }: { data: { registrarsCount: number } }) {
 	const t = useTranslations();
 
 	return (
@@ -28,13 +28,13 @@ function Header({ data }: { data: { totalCount: number } }) {
 						className={styles.header_tab}
 						value={EJudgementDashboardTabs.DASHBOARD}
 					>
-						{t('Judgements.dashboard')} ({data?.totalCount})
+						{t('Judgements.dashboard')}
 					</TabsTrigger>
 					<TabsTrigger
 						className={styles.header_tab}
 						value={EJudgementDashboardTabs.REGISTRARS}
 					>
-						{t('Judgements.registrars')}
+						{t('Judgements.registrars')} ({data?.registrarsCount})
 					</TabsTrigger>
 				</TabsList>
 			</div>

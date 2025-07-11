@@ -52,7 +52,7 @@ async function Judgements({ searchParams }: { searchParams: Promise<{ page?: str
 	return (
 		<div className='w-full'>
 			<Tabs defaultValue={EJudgementDashboardTabs.DASHBOARD}>
-				<Header data={{ totalCount: judgementRequestsResponse.data.totalCount }} />
+				<Header data={{ registrarsCount: registrarsResponse.data.totalCount }} />
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 					<TabsContent value={EJudgementDashboardTabs.DASHBOARD}>
 						<div className='flex flex-col gap-y-4'>
