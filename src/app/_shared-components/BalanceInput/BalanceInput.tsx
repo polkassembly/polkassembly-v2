@@ -150,7 +150,7 @@ function BalanceInput({
 					className={cn('w-full', className)}
 					placeholder={placeholder || t('BalanceInput.enterAmount')}
 					onChange={(e) => {
-						onBalanceChange(e.target.value);
+						onBalanceChange(e.target.value, assetId);
 						setValueString(e.target.value);
 					}}
 					name={name || 'balance'}
