@@ -10,11 +10,18 @@ import JudgementCompletedIcon from '@assets/icons/judgements-completed.svg';
 import GreenArrowTop from '@assets/icons/green-arrow-top.svg';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { useJudgementStats } from '@/hooks/useJudgementData';
 import styles from './TabSummary.module.scss';
 import SearchBar from '../SearchBar/SearchBar';
 
 function DashboardSummary() {
 	const t = useTranslations();
+	const { data: stats, isLoading } = useJudgementStats();
+
+	// Default values if data is not available
+	const totalRequested = stats?.totalRequestedThisMonth || 0;
+	const percentageIncrease = stats?.percentageIncreaseFromLastMonth || 0;
+	const percentageCompleted = stats?.percentageCompletedThisMonth || 0;
 
 	return (
 		<div className={styles.container}>
@@ -29,14 +36,18 @@ function DashboardSummary() {
 					<div className={styles.statsContent}>
 						<p className={styles.statsLabel}>{t('Judgements.judgementsRequested')}</p>
 						<p className={styles.statsValue}>
-							<span className={styles.statsNumber}>124</span>
-							<Image
-								src={GreenArrowTop}
-								alt='Green Arrow Top'
-								width={20}
-								height={20}
-							/>
-							<span className={styles.statsPercentage}>12.8%</span>
+							<span className={styles.statsNumber}>{isLoading ? '...' : totalRequested}</span>
+							{!isLoading && percentageIncrease > 0 && (
+								<>
+									<Image
+										src={GreenArrowTop}
+										alt='Green Arrow Top'
+										width={20}
+										height={20}
+									/>
+									<span className={styles.statsPercentage}>{percentageIncrease.toFixed(1)}%</span>
+								</>
+							)}
 							<span className={styles.statsPeriod}>{t('Judgements.thisMonth')}</span>
 						</p>
 					</div>
@@ -54,7 +65,7 @@ function DashboardSummary() {
 					/>
 					<div className={styles.statsContent}>
 						<p className={styles.statsLabel}>{t('Judgements.judgementsCompleted')}</p>
-						<p className={styles.completedValue}>98%</p>
+						<p className={styles.completedValue}>{isLoading ? '...' : `${percentageCompleted.toFixed(1)}%`}</p>
 					</div>
 				</div>
 			</div>

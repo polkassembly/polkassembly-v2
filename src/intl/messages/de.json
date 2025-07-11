@@ -1298,6 +1298,19 @@
 		"judgementsRequested": "Urteile angefordert",
 		"judgementsCompleted": "Urteile abgeschlossen",
 		"thisMonth": "dieser Monat",
-		"registrarDescription": "Eine Entität oder ein Individuum, die/der autorisiert ist, die Identität von Konten zu verifizieren und zu validieren. Registrars können einen Gebührensatz für ihre Dienstleistungen festlegen und ihre Attestation auf bestimmte Felder beschränken."
+		"registrarDescription": "Eine Entität oder ein Individuum, die/der autorisiert ist, die Identität von Konten zu verifizieren und zu validieren. Registrars können einen Gebührensatz für ihre Dienstleistungen festlegen und ihre Attestation auf bestimmte Felder beschränken.",
+		"index": "Index",
+		"address": "Adresse",
+		"displayName": "Anzeigename",
+		"email": "E-Mail",
+		"twitter": "Twitter",
+		"status": "Status",
+		"initiatedOn": "Initiiert am",
+		"latestJudgement": "Letztes Urteil",
+		"receivedRequests": "Empfangene Anfragen",
+		"totalGiven": "Gesamt gegeben",
+		"fee": "Gebühr",
+		"noJudgementsFound": "Keine Urteile gefunden",
+		"noRegistrarsFound": "Keine Registrars gefunden"
 	}
 }

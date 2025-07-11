@@ -1306,3 +1306,42 @@ export enum EJudgementDashboardTabs {
 	DASHBOARD = 'dashboard',
 	REGISTRARS = 'registrars'
 }
+
+export enum EJudgementStatus {
+	REQUESTED = 'Requested',
+	APPROVED = 'Approved',
+	REJECTED = 'Rejected',
+	PENDING = 'Pending'
+}
+
+export interface IJudgementRequest {
+	id: string;
+	address: string;
+	displayName: string;
+	email: string;
+	twitter: string;
+	status: EJudgementStatus;
+	dateInitiated: Date;
+	registrarIndex: number;
+	registrarAddress: string;
+	judgementHash?: string;
+}
+
+export interface IJudgementStats {
+	totalRequestedThisMonth: number;
+	percentageIncreaseFromLastMonth: number;
+	percentageCompletedThisMonth: number;
+}
+
+export interface IRegistrarInfo {
+	address: string;
+	latestJudgementDate?: Date;
+	totalReceivedRequests: number;
+	totalJudgementsGiven: number;
+	registrarFee: string;
+	registrarIndex: number;
+}
+
+export type IJudgementListingResponse = IGenericListingResponse<IJudgementRequest>;
+
+export type IRegistrarsListingResponse = IGenericListingResponse<IRegistrarInfo>;

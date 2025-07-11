@@ -1299,6 +1299,19 @@
 		"judgementsRequested": "Juicios solicitados",
 		"judgementsCompleted": "Juicios completados",
 		"thisMonth": "este mes",
-		"registrarDescription": "Una entidad o individuo autorizado para verificar y validar la identidad de cuentas. Los registradores pueden establecer un cargo por sus servicios y limitar su atestación a ciertos campos."
+		"registrarDescription": "Una entidad o individuo autorizado para verificar y validar la identidad de cuentas. Los registradores pueden establecer un cargo por sus servicios y limitar su atestación a ciertos campos.",
+		"index": "Índice",
+		"address": "Dirección",
+		"displayName": "Nombre de visualización",
+		"email": "Correo electrónico",
+		"twitter": "Twitter",
+		"status": "Estado",
+		"initiatedOn": "Iniciado el",
+		"latestJudgement": "Último juicio",
+		"receivedRequests": "Solicitudes recibidas",
+		"totalGiven": "Total dado",
+		"fee": "Tarifa",
+		"noJudgementsFound": "No se encontraron juicios",
+		"noRegistrarsFound": "No se encontraron registradores"
 	}
 }

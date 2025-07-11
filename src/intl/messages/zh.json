@@ -1298,6 +1298,19 @@
 		"judgementsRequested": "判断请求",
 		"judgementsCompleted": "判断完成",
 		"thisMonth": "本月",
-		"registrarDescription": "一个被授权验证和验证账户身份的实体或个人。注册者可以设置服务费用并限制其认证到特定字段。"
+		"registrarDescription": "一个被授权验证和验证账户身份的实体或个人。注册者可以设置服务费用并限制其认证到特定字段。",
+		"index": "索引",
+		"address": "地址",
+		"displayName": "显示名称",
+		"email": "电子邮件",
+		"twitter": "Twitter",
+		"status": "状态",
+		"initiatedOn": "发起于",
+		"latestJudgement": "最新判断",
+		"receivedRequests": "接收请求",
+		"totalGiven": "总计",
+		"fee": "费用",
+		"noJudgementsFound": "未找到判断",
+		"noRegistrarsFound": "未找到注册者"
 	}
 }

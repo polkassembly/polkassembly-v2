@@ -4,7 +4,6 @@
 
 import React from 'react';
 import Header from '@/app/judgements/Components/Header/Header';
-import ListingTable from '@/app/judgements/Components/ListingTable/ListingTable';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
@@ -12,11 +11,12 @@ import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeader
 import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 import { Tabs, TabsContent } from '@ui/Tabs';
 import { EJudgementDashboardTabs } from '@/_shared/types';
-// import UserPreimagesTab from '@/app/_shared-components/Preimages/UserPreimagesTab/UserPreimagesTab';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
 import { ClientError } from '../_client-utils/clientError';
 import RegistrarsSummary from './Components/TabSummary/RegistrarsSummary';
 import DashboardSummary from './Components/TabSummary/DashboardSummary';
+import JudgementListingTable from './Components/ListingTable/JudgementListingTable';
+import RegistrarsListingTable from './Components/ListingTable/RegistrarsListingTable';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 		description: 'Explore Polkassembly Judgements',
 		network,
 		url: `https://${network}.polkassembly.io/judgements`,
-		imageAlt: 'Polkassembly Preimages'
+		imageAlt: 'Polkassembly Judgements'
 	});
 }
 
@@ -35,29 +35,38 @@ async function Judgements({ searchParams }: { searchParams: Promise<{ page?: str
 	const searchParamsValue = await searchParams;
 	const page = parseInt(searchParamsValue.page || '1', 10);
 
-	const { data, error } = await NextApiClientService.fetchPreimages({ page: Number(page) });
-	if (error || !data) {
-		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+	// Fetch judgement data
+	const [judgementRequestsResponse, registrarsResponse] = await Promise.all([
+		NextApiClientService.fetchJudgementRequests({ page: Number(page), limit: 10 }),
+		NextApiClientService.fetchRegistrars()
+	]);
+
+	if (judgementRequestsResponse.error || !judgementRequestsResponse.data) {
+		throw new ClientError(ERROR_CODES.CLIENT_ERROR, judgementRequestsResponse.error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+	}
+
+	if (registrarsResponse.error || !registrarsResponse.data) {
+		throw new ClientError(ERROR_CODES.CLIENT_ERROR, registrarsResponse.error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 	}
 
 	return (
 		<div className='w-full'>
 			<Tabs defaultValue={EJudgementDashboardTabs.DASHBOARD}>
-				<Header data={{ totalCount: data.totalCount }} />
+				<Header data={{ totalCount: judgementRequestsResponse.data.totalCount }} />
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 					<TabsContent value={EJudgementDashboardTabs.DASHBOARD}>
 						<div className='flex flex-col gap-y-4'>
 							<DashboardSummary />
-							<ListingTable
-								data={data.items}
-								totalCount={data.totalCount}
+							<JudgementListingTable
+								data={judgementRequestsResponse.data.items}
+								totalCount={judgementRequestsResponse.data.totalCount}
 							/>
 						</div>
 					</TabsContent>
 					<TabsContent value={EJudgementDashboardTabs.REGISTRARS}>
 						<div className='flex flex-col gap-y-4'>
 							<RegistrarsSummary />
-							Hello registrars
+							<RegistrarsListingTable data={registrarsResponse.data.items} />
 						</div>
 					</TabsContent>
 				</div>

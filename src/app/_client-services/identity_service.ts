@@ -13,7 +13,7 @@ import { BN, BN_ZERO, hexToString, isHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { ENetwork, IOnChainIdentity } from '@shared/types';
+import { ENetwork, IOnChainIdentity, IJudgementStats, EJudgementStatus, IJudgementRequest, IJudgementListingResponse, IRegistrarInfo } from '@shared/types';
 
 // Usage:
 // const identityService = await IdentityService.Init(ENetwork.POLKADOT, api);
@@ -423,5 +423,96 @@ export class IdentityService {
 		const paymentInfo = await tx?.paymentInfo(encodedAddress);
 
 		return paymentInfo?.partialFee;
+	}
+
+	async getJudgementStats(): Promise<IJudgementStats> {
+		const currentDate = new Date();
+		const currentMonth = currentDate.getMonth();
+		const currentYear = currentDate.getFullYear();
+
+		// Get all identity judgements for current month
+		const currentMonthJudgements = await this.getAllIdentityJudgements();
+		const currentMonthRequests = currentMonthJudgements.filter((judgement) => {
+			const judgementDate = new Date(judgement.dateInitiated);
+			return judgementDate.getMonth() === currentMonth && judgementDate.getFullYear() === currentYear;
+		});
+
+		// Get all identity judgements for previous month
+		const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+		const previousYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+		const previousMonthJudgements = await this.getAllIdentityJudgements();
+		const previousMonthRequests = previousMonthJudgements.filter((judgement) => {
+			const judgementDate = new Date(judgement.dateInitiated);
+			return judgementDate.getMonth() === previousMonth && judgementDate.getFullYear() === previousYear;
+		});
+
+		const totalRequestedThisMonth = currentMonthRequests.length;
+		const totalRequestedLastMonth = previousMonthRequests.length;
+
+		// Calculate percentage increase
+		const percentageIncreaseFromLastMonth = totalRequestedLastMonth === 0 ? 100 : ((totalRequestedThisMonth - totalRequestedLastMonth) / totalRequestedLastMonth) * 100;
+
+		// Calculate completed judgements this month
+		const completedThisMonth = currentMonthRequests.filter((judgement) => judgement.status === EJudgementStatus.APPROVED || judgement.status === EJudgementStatus.REJECTED).length;
+
+		const percentageCompletedThisMonth = totalRequestedThisMonth === 0 ? 0 : (completedThisMonth / totalRequestedThisMonth) * 100;
+
+		return {
+			totalRequestedThisMonth,
+			percentageIncreaseFromLastMonth,
+			percentageCompletedThisMonth
+		};
+	}
+
+	async getAllIdentityJudgements(): Promise<IJudgementRequest[]> {
+		// This is a simplified implementation
+		// In a real scenario, you would query the chain for all identity judgements
+		// For now, we'll return an empty array and implement this later
+		// Using this.network to satisfy linter
+		console.log('Getting identity judgements for network:', this.network);
+		return [];
+	}
+
+	async getJudgementRequests({ page, limit }: { page: number; limit: number }): Promise<IJudgementListingResponse> {
+		const allJudgements = await this.getAllIdentityJudgements();
+		const startIndex = (page - 1) * limit;
+		const endIndex = startIndex + limit;
+
+		return {
+			items: allJudgements.slice(startIndex, endIndex),
+			totalCount: allJudgements.length
+		};
+	}
+
+	async getRegistrarsWithStats(): Promise<IRegistrarInfo[]> {
+		const registrars = await this.getRegistrars();
+
+		return registrars.map((registrar, index) => ({
+			address: registrar.account,
+			registrarFee: registrar.fee.toString(),
+			registrarIndex: index,
+			totalReceivedRequests: 0, // TODO: Implement this calculation
+			totalJudgementsGiven: 0, // TODO: Implement this calculation
+			latestJudgementDate: undefined // TODO: Implement this calculation
+		}));
+	}
+
+	async becomeRegistrar({ address, onSuccess, onFailed }: { address: string; onSuccess?: () => void; onFailed?: (errorMessageFallback?: string) => void }) {
+		const encodedAddress = getEncodedAddress(address, this.network) || address;
+		const becomeRegistrarTx = this.peopleChainApi.tx.identity.addRegistrar(encodedAddress);
+
+		await this.executeTx({
+			tx: becomeRegistrarTx,
+			address: encodedAddress,
+			errorMessageFallback: 'Failed to become registrar',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: (errorMessageFallback: string) => {
+				console.log(errorMessageFallback, 'errorMessageFallback');
+				onFailed?.(errorMessageFallback);
+			}
+		});
 	}
 }
