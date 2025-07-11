@@ -93,7 +93,7 @@ function BalanceInput({
 	};
 
 	useEffect(() => {
-		const initialAssetId = defaultAssetId === undefined ? Object.values(supportedAssets).find((asset) => asset.symbol === EAssets.USDC)?.index : defaultAssetId;
+		const initialAssetId = defaultAssetId === undefined && multiAsset ? Object.values(supportedAssets).find((asset) => asset.symbol === EAssets.USDC)?.index : defaultAssetId;
 		setAssetId(initialAssetId || null);
 
 		if (!defaultValue || defaultValue.isZero()) {
