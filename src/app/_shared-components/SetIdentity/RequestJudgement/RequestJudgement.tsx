@@ -13,7 +13,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'nextjs-toploader/app';
 import Image from 'next/image';
 import MechanicGIF from '@assets/gifs/mechanic.gif';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Pencil } from 'lucide-react';
 import EmailVerification from './EmailVerification';
 import TwitterVerification from './TwitterVerification';
 import RiotVerification from './RiotVerification';
@@ -125,7 +125,7 @@ function RequestJudgement({ onSetIdentity }: { onSetIdentity: () => void }) {
 					</div>
 				</div>
 			) : !identityValues?.display ? (
-				<div className='flex flex-1 flex-col items-center gap-y-6'>
+				<div className='flex flex-1 flex-col items-center gap-y-6 overflow-y-hidden'>
 					<div className='flex flex-1 flex-col gap-y-6 overflow-y-auto'>
 						<div className='flex flex-col items-center gap-y-2'>
 							<Image
@@ -156,36 +156,37 @@ function RequestJudgement({ onSetIdentity }: { onSetIdentity: () => void }) {
 					</Button>
 				</div>
 			) : (
-				<div className='flex flex-1 flex-col gap-y-6'>
-					{identityValues.isVerified && (
-						<>
-							<Alert
-								variant='info'
-								className='flex items-center gap-x-3'
-							>
-								<AlertCircle className='h-4 w-4' />
-								<AlertDescription className='flex w-full items-center justify-between'>
-									<p className='text-sm font-medium'>{t('SetIdentity.IdentityVerified')}</p>
-								</AlertDescription>
-							</Alert>
-							<div className='flex w-full items-center justify-between rounded-lg bg-grey_bg px-4 py-2'>
-								<span className='text-sm'>{t('SetIdentity.CurrentJudgement')}</span>
-								<span className='text-bold text-base text-text_primary'>{identityValues.judgements.length > 0 && identityValues.judgements[0][1].toString()}</span>
-							</div>
-						</>
-					)}
-					<div className='flex items-center justify-between'>
-						<p className='text-base font-semibold text-wallet_btn_text'>{t('SetIdentity.socials')}</p>
-						<Button
-							onClick={onSetIdentity}
-							size='sm'
-							variant='ghost'
-							className='text-text_pink'
-						>
-							{t('SetIdentity.edit')}
-						</Button>
-					</div>
+				<div className='flex flex-1 flex-col gap-y-6 overflow-y-hidden'>
 					<div className='flex flex-1 flex-col gap-y-6 overflow-y-auto'>
+						{identityValues.isVerified && (
+							<>
+								<Alert
+									variant='info'
+									className='flex items-center gap-x-3'
+								>
+									<AlertCircle className='h-4 w-4' />
+									<AlertDescription className='flex w-full items-center justify-between'>
+										<p className='text-sm font-medium'>{t('SetIdentity.IdentityVerified')}</p>
+									</AlertDescription>
+								</Alert>
+								<div className='flex w-full items-center justify-between rounded-lg bg-grey_bg px-4 py-2'>
+									<span className='text-sm'>{t('SetIdentity.CurrentJudgement')}</span>
+									<span className='text-base font-bold text-text_primary'>{identityValues.judgements.length > 0 && identityValues.judgements[0][1].toString()}</span>
+								</div>
+							</>
+						)}
+						<div className='flex items-center justify-between'>
+							<p className='text-base font-semibold text-wallet_btn_text'>{t('SetIdentity.socials')}</p>
+							<Button
+								onClick={onSetIdentity}
+								size='sm'
+								variant='ghost'
+								className='text-text_pink'
+								leftIcon={<Pencil className='h-3 w-3 text-text_pink' />}
+							>
+								{t('SetIdentity.edit')}
+							</Button>
+						</div>
 						{identityValues?.email && (
 							<EmailVerification
 								identityEmail={identityValues.email}
