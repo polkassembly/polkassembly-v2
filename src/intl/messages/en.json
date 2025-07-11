@@ -1331,6 +1331,9 @@
 		"becomeARegistrar": "Become a Registrar",
 		"dashboard": "Dashboard",
 		"registrars": "Registrars",
+		"judgementsRequested": "Judgements Requested",
+		"judgementsCompleted": "Judgements Completed",
+		"thisMonth": "this month",
 		"registrarDescription": "An entity or individual authorized to verify and validate the identity of accounts. Registrars can set a fee for their services and limit their attestation to certain fields."
 	}
 }

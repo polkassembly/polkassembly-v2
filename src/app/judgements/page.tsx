@@ -11,11 +11,12 @@ import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 import { Tabs, TabsContent } from '@ui/Tabs';
-import SearchBar from '@/app/judgements/Components/SearchBar/SearchBar';
 import { EJudgementDashboardTabs } from '@/_shared/types';
 // import UserPreimagesTab from '@/app/_shared-components/Preimages/UserPreimagesTab/UserPreimagesTab';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
 import { ClientError } from '../_client-utils/clientError';
+import RegistrarsSummary from './Components/TabSummary/RegistrarsSummary';
+import DashboardSummary from './Components/TabSummary/DashboardSummary';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
@@ -30,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 	});
 }
 
-async function Preimages({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+async function Judgements({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
 	const searchParamsValue = await searchParams;
 	const page = parseInt(searchParamsValue.page || '1', 10);
 
@@ -41,24 +42,28 @@ async function Preimages({ searchParams }: { searchParams: Promise<{ page?: stri
 
 	return (
 		<div className='w-full'>
-			<Tabs
-				className=''
-				defaultValue={EJudgementDashboardTabs.DASHBOARD}
-			>
+			<Tabs defaultValue={EJudgementDashboardTabs.DASHBOARD}>
 				<Header data={{ totalCount: data.totalCount }} />
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
-					<SearchBar />
 					<TabsContent value={EJudgementDashboardTabs.DASHBOARD}>
-						<ListingTable
-							data={data.items}
-							totalCount={data.totalCount}
-						/>
+						<div className='flex flex-col gap-y-4'>
+							<DashboardSummary />
+							<ListingTable
+								data={data.items}
+								totalCount={data.totalCount}
+							/>
+						</div>
 					</TabsContent>
-					<TabsContent value={EJudgementDashboardTabs.REGISTRARS}>Hello registrars</TabsContent>
+					<TabsContent value={EJudgementDashboardTabs.REGISTRARS}>
+						<div className='flex flex-col gap-y-4'>
+							<RegistrarsSummary />
+							Hello registrars
+						</div>
+					</TabsContent>
 				</div>
 			</Tabs>
 		</div>
 	);
 }
 
-export default Preimages;
+export default Judgements;

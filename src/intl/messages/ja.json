@@ -1295,6 +1295,9 @@
 		"becomeARegistrar": "登録者になる",
 		"dashboard": "ダッシュボード",
 		"registrars": "登録者",
+		"judgementsRequested": "判断要求",
+		"judgementsCompleted": "判断完了",
+		"thisMonth": "今月",
 		"registrarDescription": "アカウントの身元を検証および検証する権限を持つエンティティまたは個人。登録者はサービスの料金を設定し、特定のフィールドに対するアテステーションを制限できます。"
 	}
 }

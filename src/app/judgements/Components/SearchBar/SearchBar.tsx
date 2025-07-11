@@ -11,7 +11,6 @@ import { useRouter } from 'nextjs-toploader/app';
 import { Search } from 'lucide-react';
 import { Input } from '../../../_shared-components/Input';
 import { Button } from '../../../_shared-components/Button';
-import styles from './SearchBar.module.scss';
 
 function SearchBar() {
 	const t = useTranslations();
@@ -22,48 +21,36 @@ function SearchBar() {
 	const preImagePath = '/preimages';
 
 	return (
-		<div className={styles.container}>
-			<div className='relative w-full'>
-				<Input
-					className='h-9 w-full pr-12 sm:pr-12'
-					value={inputValue}
-					onKeyDown={(e) => {
-						if (e.key === 'Enter') {
-							if (pathname === preImagePath) {
-								router.push(`${preImagePath}/${inputValue}`);
-							} else if (pathname.startsWith(`${preImagePath}/`)) {
-								router.replace(`${preImagePath}/${inputValue}`);
-							}
-						}
-					}}
-					onChange={(e) => setInputValue(e.target.value)}
-					placeholder={t('Preimages.searchByHash')}
-				/>
-				<Button
-					variant='ghost'
-					size='icon'
-					className='absolute right-0 top-0 h-full rounded-l-none border-l border-border_grey px-2 text-2xl text-text_grey'
-					onClick={() => {
+		<div className='relative w-full sm:max-w-60 lg:max-w-xs'>
+			<Input
+				className='h-9 w-full pr-12 sm:pr-12'
+				value={inputValue}
+				onKeyDown={(e) => {
+					if (e.key === 'Enter') {
 						if (pathname === preImagePath) {
 							router.push(`${preImagePath}/${inputValue}`);
 						} else if (pathname.startsWith(`${preImagePath}/`)) {
 							router.replace(`${preImagePath}/${inputValue}`);
 						}
-					}}
-				>
-					<Search />
-				</Button>
-			</div>
-			{pathname.startsWith(`${preImagePath}/`) && (
-				<Button
-					onClick={() => {
-						setInputValue('');
-						router.push(preImagePath);
-					}}
-				>
-					{t('Preimages.showAll')}
-				</Button>
-			)}
+					}
+				}}
+				onChange={(e) => setInputValue(e.target.value)}
+				placeholder={t('Preimages.searchByHash')}
+			/>
+			<Button
+				variant='ghost'
+				size='icon'
+				className='absolute right-0 top-0 h-full rounded-l-none border-l border-border_grey px-2 text-2xl text-text_grey'
+				onClick={() => {
+					if (pathname === preImagePath) {
+						router.push(`${preImagePath}/${inputValue}`);
+					} else if (pathname.startsWith(`${preImagePath}/`)) {
+						router.replace(`${preImagePath}/${inputValue}`);
+					}
+				}}
+			>
+				<Search />
+			</Button>
 		</div>
 	);
 }

@@ -1295,6 +1295,9 @@
 		"becomeARegistrar": "Registrar werden",
 		"dashboard": "Dashboard",
 		"registrars": "Registrars",
+		"judgementsRequested": "Urteile angefordert",
+		"judgementsCompleted": "Urteile abgeschlossen",
+		"thisMonth": "dieser Monat",
 		"registrarDescription": "Eine Entität oder ein Individuum, die/der autorisiert ist, die Identität von Konten zu verifizieren und zu validieren. Registrars können einen Gebührensatz für ihre Dienstleistungen festlegen und ihre Attestation auf bestimmte Felder beschränken."
 	}
 }

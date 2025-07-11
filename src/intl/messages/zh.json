@@ -1295,6 +1295,9 @@
 		"becomeARegistrar": "成为注册者",
 		"dashboard": "仪表板",
 		"registrars": "注册者",
+		"judgementsRequested": "判断请求",
+		"judgementsCompleted": "判断完成",
+		"thisMonth": "本月",
 		"registrarDescription": "一个被授权验证和验证账户身份的实体或个人。注册者可以设置服务费用并限制其认证到特定字段。"
 	}
 }
