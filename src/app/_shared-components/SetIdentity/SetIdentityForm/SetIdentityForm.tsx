@@ -95,6 +95,7 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 
 			setIdentityLoading(true);
 			const identityInfo = await identityService.getOnChainIdentity(userPreferences.selectedAccount.address);
+			console.log({ identityInfo });
 
 			formData.setValue('displayName', identityInfo.display);
 			formData.setValue('legalName', identityInfo.legal);

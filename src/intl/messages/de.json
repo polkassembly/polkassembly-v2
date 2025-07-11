@@ -839,7 +839,15 @@
 		"IdentityNotSet": "Identität nicht festgelegt",
 		"IdentityNotSetDescription": "Um eine Beurteilung anzufordern, müssen Sie zuerst Ihre On-Chain-Identität festlegen.",
 		"IdentityNotSetDescription2": "Eine Beurteilung ist eine Möglichkeit für Registrare, Ihr Profil zu überprüfen und basierend auf Ihren Identitätsinformationen (wie Anzeigename, E-Mail, Website, rechtlicher Name usw.) ein Maß an Vertrauenswürdigkeit zu bieten.",
-		"IdentityNotSetDescription3": "Sobald Sie Ihre Identität festgelegt haben, können Sie eine Beurteilung von einem Registrar anfordern. Diese Beurteilung wird anderen sichtbar sein und hilft Ihnen, Glaubwürdigkeit on-chain aufzubauen."
+		"IdentityNotSetDescription3": "Sobald Sie Ihre Identität festgelegt haben, können Sie eine Beurteilung von einem Registrar anfordern. Diese Beurteilung wird anderen sichtbar sein und hilft Ihnen, Glaubwürdigkeit on-chain aufzubauen.",
+		"IdentityVerified": "Ihre Identität wurde verifiziert.",
+		"edit": "Bearbeiten",
+		"resend": "Erneut senden",
+		"resendIn": "Erneut senden in",
+		"verify": "Verifizieren",
+		"verified": "Verifiziert",
+		"pending": "Ausstehend",
+		"CurrentJudgement": "Aktuelle Beurteilung"
 	},
 	"Bounties": {
 		"onchainBounties": "Onchain-Prämien",

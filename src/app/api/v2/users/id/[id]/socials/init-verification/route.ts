@@ -80,7 +80,13 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	let updatedSocialHandle = {};
 
+	const socialHandle = await OffChainDbService.GetUserSocialHandles({ userId, address });
+
 	if (social === ESocial.EMAIL) {
+		if (socialHandle[ESocial.EMAIL] && dayjs().diff(socialHandle[ESocial.EMAIL].updatedAt, 'minutes') < 1) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'You can only request a new verification email once every 1 minute');
+		}
+
 		const verifyToken = createCuid();
 		await NotificationService.SendVerificationEmail(user, network, verifyToken, handle);
 
@@ -98,6 +104,10 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	}
 
 	if (social === ESocial.TWITTER) {
+		if (socialHandle[ESocial.TWITTER] && dayjs().diff(socialHandle[ESocial.TWITTER].updatedAt, 'minutes') < 1) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'You can only request a new verification for your twitter handle once every 1 minute');
+		}
+
 		const { oauthRequestToken, oauthRequestTokenSecret } = await getOAuthRequestToken(network);
 
 		const twitterHandle = handle.startsWith('@') ? handle.substring(1) : handle;

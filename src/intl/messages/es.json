@@ -841,7 +841,15 @@
 		"IdentityNotSet": "Identidad No Establecida",
 		"IdentityNotSetDescription": "Para solicitar un juicio, necesitas tener tu identidad en cadena establecida primero.",
 		"IdentityNotSetDescription2": "El juicio es una forma para que los registradores verifiquen tu perfil y proporcionen un nivel de confiabilidad basado en tu información de identidad (como nombre para mostrar, correo electrónico, sitio web, nombre legal, etc.).",
-		"IdentityNotSetDescription3": "Una vez que hayas establecido tu identidad, puedes solicitar un juicio de un registrador. Este juicio será visible para otros y te ayuda a construir credibilidad en cadena."
+		"IdentityNotSetDescription3": "Una vez que hayas establecido tu identidad, puedes solicitar un juicio de un registrador. Este juicio será visible para otros y te ayuda a construir credibilidad en cadena.",
+		"IdentityVerified": "Tu identidad ha sido verificada.",
+		"edit": "Editar",
+		"resend": "Reenviar",
+		"resendIn": "Reenviar en",
+		"verify": "Verificar",
+		"verified": "Verificado",
+		"pending": "Pendiente",
+		"CurrentJudgement": "Juicio Actual"
 	},
 	"Overview": {
 		"month": "Mes",

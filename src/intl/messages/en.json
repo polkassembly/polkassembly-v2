@@ -889,7 +889,15 @@
 		"IdentityNotSet": "Identity Not Set",
 		"IdentityNotSetDescription": "To request a judgment, you need to have your on-chain identity set first.",
 		"IdentityNotSetDescription2": "Judgment is a way for registrars to verify your profile and provide a level of trustworthiness based on your identity information (such as display name, email, website, legal name, etc.).",
-		"IdentityNotSetDescription3": "Once you’ve set your identity, you can request a judgment from a registrar. This judgment will be visible to others and helps you build credibility on-chain."
+		"IdentityNotSetDescription3": "Once you’ve set your identity, you can request a judgment from a registrar. This judgment will be visible to others and helps you build credibility on-chain.",
+		"IdentityVerified": "Your Identity has been verified.",
+		"edit": "Edit",
+		"resend": "Resend",
+		"resendIn": "Resend in",
+		"verify": "Verify",
+		"verified": "Verified",
+		"pending": "Pending",
+		"CurrentJudgement": "Current Judgement"
 	},
 	"Bounties": {
 		"onchainBounties": "On-chain Bounties",

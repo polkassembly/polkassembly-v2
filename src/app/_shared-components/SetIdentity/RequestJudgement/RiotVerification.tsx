@@ -92,7 +92,7 @@ function RiotVerification({ identityMatrix, matrixSocialHandle }: { identityMatr
 							width={20}
 							height={20}
 						/>
-						Verified
+						{t('SetIdentity.verified')}
 					</div>
 				) : (
 					<Button
@@ -101,7 +101,7 @@ function RiotVerification({ identityMatrix, matrixSocialHandle }: { identityMatr
 						isLoading={loading}
 						size='sm'
 					>
-						{riotStatus === ESocialVerificationStatus.PENDING ? 'Pending' : 'Verify'}
+						{riotStatus === ESocialVerificationStatus.PENDING ? t('SetIdentity.pending') : t('SetIdentity.verify')}
 					</Button>
 				)}
 			</div>

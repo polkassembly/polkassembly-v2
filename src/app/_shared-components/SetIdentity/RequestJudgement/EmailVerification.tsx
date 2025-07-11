@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import Image from 'next/image';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import EmailIcon from '@assets/icons/email-icon-dark.svg';
 import { useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import VerifiedCheckIcon from '@assets/icons/verified-check-green.svg';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useToast } from '@/hooks/useToast';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { Button } from '../../Button';
 
 function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail: string; emailSocialHandle?: ISocialHandle }) {
@@ -23,6 +24,7 @@ function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail
 	const { toast } = useToast();
 
 	const [loading, setLoading] = useState(false);
+	const [timeLeft, setTimeLeft] = useState(0);
 
 	const queryClient = useQueryClient();
 
@@ -33,6 +35,43 @@ function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail
 
 		return emailSocialHandle.status;
 	}, [emailSocialHandle, identityEmail]);
+
+	// Check if we need to start the timer based on updatedAt
+	useEffect(() => {
+		if (emailSocialHandle?.updatedAt && emailStatus === ESocialVerificationStatus.PENDING) {
+			const updatedAtTime = dayjs(emailSocialHandle.updatedAt);
+			const currentTime = dayjs();
+			const timeDifference = currentTime.diff(updatedAtTime, 'millisecond');
+			const oneMinuteInMs = 60 * 1000;
+
+			if (timeDifference < oneMinuteInMs) {
+				// Start timer with remaining time
+				const remainingTime = Math.ceil((oneMinuteInMs - timeDifference) / 1000);
+				setTimeLeft(remainingTime);
+			}
+		}
+	}, [emailSocialHandle?.updatedAt, emailStatus]);
+
+	// Timer countdown effect
+	useEffect(() => {
+		if (timeLeft <= 0) return () => {};
+
+		const timer = setTimeout(() => {
+			setTimeLeft(timeLeft - 1);
+		}, 1000);
+
+		return () => clearTimeout(timer);
+	}, [timeLeft]);
+
+	const canResendEmail = useMemo(() => {
+		if (emailStatus === ESocialVerificationStatus.VERIFIED) return false;
+		if (emailStatus === ESocialVerificationStatus.UNVERIFIED) return true;
+		if (emailStatus === ESocialVerificationStatus.PENDING) {
+			// Check if timer has expired
+			return timeLeft === 0;
+		}
+		return false;
+	}, [emailStatus, timeLeft]);
 
 	const verifyEmail = async () => {
 		if (!user || !identityEmail || !userPreferences.selectedAccount?.address) return;
@@ -56,6 +95,9 @@ function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail
 			return;
 		}
 
+		// Start 60 second timer
+		setTimeLeft(60);
+
 		queryClient.setQueryData(['socials', user.id, userPreferences.selectedAccount?.address], (old: Record<ESocial, ISocialHandle>) => ({
 			...old,
 			[ESocial.EMAIL]: {
@@ -63,7 +105,8 @@ function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail
 				handle: identityEmail,
 				status: ESocialVerificationStatus.PENDING,
 				userId: user.id,
-				address: userPreferences?.selectedAccount?.address
+				address: userPreferences?.selectedAccount?.address,
+				updatedAt: dayjs().toDate()
 			}
 		}));
 
@@ -75,6 +118,16 @@ function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail
 
 		setLoading(false);
 	};
+
+	const getButtonText = useMemo(() => {
+		if (emailStatus === ESocialVerificationStatus.PENDING) {
+			if (timeLeft > 0) {
+				return `${t('SetIdentity.resendIn')} ${timeLeft}s`;
+			}
+			return t('SetIdentity.resend');
+		}
+		return t('SetIdentity.verify');
+	}, [emailStatus, timeLeft]);
 
 	return (
 		<div className='flex items-center gap-x-2'>
@@ -106,16 +159,16 @@ function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail
 							width={20}
 							height={20}
 						/>
-						Verified
+						{t('SetIdentity.verified')}
 					</div>
 				) : (
 					<Button
-						disabled={emailStatus !== ESocialVerificationStatus.UNVERIFIED}
+						disabled={!canResendEmail}
 						onClick={verifyEmail}
 						isLoading={loading}
 						size='sm'
 					>
-						{emailStatus === ESocialVerificationStatus.PENDING ? 'Pending' : 'Verify'}
+						{getButtonText}
 					</Button>
 				)}
 			</div>
