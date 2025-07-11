@@ -14,6 +14,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { EAssets } from '@/_shared/types';
 import { Input } from '../Input';
 import classes from './BalanceInput.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../DropdownMenu';
@@ -69,6 +70,13 @@ function BalanceInput({
 		label: asset.symbol,
 		value: asset.index
 	}));
+
+	// Reorder to put USDC first if it exists
+	const reorderedAssetOptions = assetOptions.sort((a, b) => {
+		if (a.label === EAssets.USDC) return -1;
+		if (b.label === EAssets.USDC) return 1;
+		return 0;
+	});
 
 	const [valueString, setValueString] = useState('');
 
@@ -161,7 +169,7 @@ function BalanceInput({
 								{assetId ? networkDetails.supportedAssets[`${assetId}`].symbol : networkDetails.tokenSymbol}
 							</DropdownMenuTrigger>
 							<DropdownMenuContent>
-								{[{ label: networkDetails.tokenSymbol, value: null }, ...assetOptions].map((option) => (
+								{[{ label: networkDetails.tokenSymbol, value: null }, ...reorderedAssetOptions].map((option) => (
 									<DropdownMenuItem
 										key={option.value}
 										onClick={() => {
