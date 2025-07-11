@@ -49,7 +49,9 @@ function SetIdentity() {
 
 	const open = searchParams.get('open');
 
-	const [step, setStep] = useState<ESetIdentityStep>(open && Object.values(ESetIdentityStep).includes(open) ? (open as unknown as ESetIdentityStep) : ESetIdentityStep.GAS_FEE);
+	const [step, setStep] = useState<ESetIdentityStep>(
+		open && Object.values(ESetIdentityStep).includes(open as ESetIdentityStep) ? (open as unknown as ESetIdentityStep) : ESetIdentityStep.GAS_FEE
+	);
 
 	const fetchRegistrarFees = async () => {
 		if (!identityService) return null;

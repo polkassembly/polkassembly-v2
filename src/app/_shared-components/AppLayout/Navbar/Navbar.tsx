@@ -161,6 +161,14 @@ function Navbar() {
 									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+									<Link
+										className='w-full'
+										href={`/set-identity?open=${ESetIdentityStep.REQUEST_JUDGEMENT}`}
+									>
+										{t('SetIdentity.requestJudgement')}
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
 									<Button
 										variant='ghost'
 										className='flex w-full justify-start p-0 text-sm'
