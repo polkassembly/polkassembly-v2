@@ -50,7 +50,7 @@ function SocialIcon({ icon }: { icon: string }) {
 	);
 }
 
-function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee: BN; onTeleport: () => void; onSuccess: () => void }) {
+function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee: BN; onTeleport: () => void; onSuccess: (values: ISetIdentityFormFields) => void }) {
 	const t = useTranslations();
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
@@ -129,7 +129,13 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 					title: t('SetIdentity.success'),
 					description: t('SetIdentity.successDescription')
 				});
-				onSuccess();
+				onSuccess({
+					displayName: formData.getValues('displayName'),
+					legalName: formData.getValues('legalName'),
+					email: formData.getValues('email'),
+					twitter: formData.getValues('twitter'),
+					matrix: formData.getValues('matrix')
+				});
 			},
 			onFailed: (errorMessageFallback?: string) => {
 				setLoading(false);

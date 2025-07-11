@@ -7,7 +7,6 @@
 import { useState } from 'react';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
 import Link from 'next/link';
@@ -26,14 +25,6 @@ import IdentitySuccessScreen from './IdentitySuccessScreen/IdentitySuccessScreen
 import TeleportToPeopleChain from '../TeleportFunds/TeleportToPeopleChain';
 import SetIdentityForm from './SetIdentityForm/SetIdentityForm';
 
-interface ISetIdentityFormFields {
-	displayName: string;
-	legalName?: string;
-	email: string;
-	twitter?: string;
-	matrix?: string;
-}
-
 function SetIdentity() {
 	const t = useTranslations();
 	const { user } = useUser();
@@ -41,7 +32,13 @@ function SetIdentity() {
 
 	const network = getCurrentNetwork();
 
-	const formData = useForm<ISetIdentityFormFields>();
+	const [identitySuccessValues, setIdentitySuccessValues] = useState<{
+		email: string;
+		displayName: string;
+		legalName?: string;
+		twitter?: string;
+		matrix?: string;
+	} | null>(null);
 
 	const { identityService } = useIdentityService();
 
@@ -94,14 +91,14 @@ function SetIdentity() {
 			onRequestJudgement={() => setStep(ESetIdentityStep.REQUEST_JUDGEMENT)}
 			registrarFee={registrarFee || BN_ZERO}
 		/>
-	) : step === ESetIdentityStep.IDENTITY_SUCCESS && userPreferences.selectedAccount?.address ? (
+	) : step === ESetIdentityStep.IDENTITY_SUCCESS && userPreferences.selectedAccount?.address && identitySuccessValues ? (
 		<IdentitySuccessScreen
 			address={userPreferences.selectedAccount.address}
-			email={formData.getValues('email')}
-			displayName={formData.getValues('displayName')}
-			legalName={formData.getValues('legalName')}
-			twitter={formData.getValues('twitter')}
-			matrix={formData.getValues('matrix')}
+			email={identitySuccessValues.email}
+			displayName={identitySuccessValues.displayName}
+			legalName={identitySuccessValues.legalName}
+			twitter={identitySuccessValues.twitter}
+			matrix={identitySuccessValues.matrix}
 			onNext={() => setStep(ESetIdentityStep.REQUEST_JUDGEMENT)}
 		/>
 	) : step === ESetIdentityStep.REQUEST_JUDGEMENT ? (
@@ -129,7 +126,10 @@ function SetIdentity() {
 		<SetIdentityForm
 			registrarFee={registrarFee || BN_ZERO}
 			onTeleport={() => setStep(ESetIdentityStep.TELEPORT_TO_PEOPLE_CHAIN)}
-			onSuccess={() => setStep(ESetIdentityStep.IDENTITY_SUCCESS)}
+			onSuccess={(values) => {
+				setIdentitySuccessValues(values);
+				setStep(ESetIdentityStep.IDENTITY_SUCCESS);
+			}}
 		/>
 	);
 }
