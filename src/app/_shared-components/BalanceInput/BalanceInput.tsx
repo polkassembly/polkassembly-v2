@@ -83,14 +83,14 @@ function BalanceInput({
 	const [valueString, setValueString] = useState('');
 
 	const onBalanceChange = (v: string | null, id?: string | null): void => {
-		const { bnValue, isValid } = inputToBn(v || '', network, false, id);
+		const { bnValue, isValid } = inputToBn(v || '', network, false, id || initialAssetId);
 
 		if (isValid && ValidatorService.isValidNumber(v)) {
 			setError('');
-			onChange?.({ value: bnValue, assetId: id || null });
+			onChange?.({ value: bnValue, assetId: id || initialAssetId || null });
 		} else {
 			setError('Invalid Amount');
-			onChange?.({ value: BN_ZERO, assetId: id || null });
+			onChange?.({ value: BN_ZERO, assetId: id || initialAssetId || null });
 		}
 	};
 
