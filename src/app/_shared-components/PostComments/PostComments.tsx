@@ -8,6 +8,7 @@ import { EAllowedCommentor, EProposalType, EReactQueryKeys, ICommentResponse, IC
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
+import { MIN_COMMENTS_FOR_SUMMARY } from '@/_shared/_constants/commentSummaryConstants';
 import Comments from './Comments/Comments';
 import classes from './PostComments.module.scss';
 import { Skeleton } from '../Skeleton';
@@ -54,15 +55,17 @@ function PostComments({
 				{t('PostDetails.comments')} <span className='text-base font-normal'>{data ? `(${data?.length})` : ''}</span>
 			</p>
 
-			<div className={classes.summaryComponent}>
-				<AISummaryCollapsible
-					indexOrHash={index}
-					proposalType={proposalType}
-					summaryType='allComments'
-					initialData={contentSummary}
-					className='mb-8'
-				/>
-			</div>
+			{data && data?.length >= MIN_COMMENTS_FOR_SUMMARY && (
+				<div className={classes.summaryComponent}>
+					<AISummaryCollapsible
+						indexOrHash={index}
+						proposalType={proposalType}
+						summaryType='allComments'
+						initialData={contentSummary}
+						className='mb-8'
+					/>
+				</div>
+			)}
 
 			{isLoading ? (
 				<div className='flex flex-col gap-2 px-8'>
