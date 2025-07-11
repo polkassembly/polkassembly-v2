@@ -94,17 +94,16 @@ function BalanceInput({
 
 	useEffect(() => {
 		const initialAssetId = defaultAssetId === undefined ? Object.values(supportedAssets).find((asset) => asset.symbol === EAssets.USDC)?.index : defaultAssetId;
+		setAssetId(initialAssetId || null);
 
 		if (!defaultValue || defaultValue.isZero()) {
 			if (value) {
 				setValueString(bnToInput(value, network, initialAssetId));
-				setAssetId(initialAssetId || null);
 			}
 			return;
 		}
 
 		setValueString(bnToInput(defaultValue, network, initialAssetId));
-		setAssetId(initialAssetId || null);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [network, value]);
 
