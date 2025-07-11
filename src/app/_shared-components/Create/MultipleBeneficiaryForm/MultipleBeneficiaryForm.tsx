@@ -5,10 +5,8 @@ import { PlusCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { Button } from '@/app/_shared-components/Button';
-import { EAssets, IBeneficiaryInput } from '@/_shared/types';
+import { IBeneficiaryInput } from '@/_shared/types';
 import { dayjs } from '@shared/_utils/dayjsInit';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import BeneficiaryInputs from './BeneficiaryInputs';
 
 function MultipleBeneficiaryForm({
@@ -23,7 +21,6 @@ function MultipleBeneficiaryForm({
 	stagedPayment?: boolean;
 }) {
 	const t = useTranslations();
-	const network = getCurrentNetwork();
 
 	const handleBeneficiaryChange = ({ beneficiary, index }: { beneficiary: string; index: number }) => {
 		const newArray = [...beneficiaries];
@@ -46,8 +43,7 @@ function MultipleBeneficiaryForm({
 	};
 
 	const addBeneficiary = () => {
-		const initialAssetId = Object.values(NETWORKS_DETAILS[`${network}`].supportedAssets).find((asset) => asset.symbol === EAssets.USDC)?.index;
-		onChange([...beneficiaries, { address: '', amount: BN_ZERO.toString(), assetId: initialAssetId || null, id: dayjs().get('milliseconds').toString() }]);
+		onChange([...beneficiaries, { address: '', amount: BN_ZERO.toString(), assetId: null, id: dayjs().get('milliseconds').toString() }]);
 	};
 
 	const removeBeneficiary = (index: number) => {

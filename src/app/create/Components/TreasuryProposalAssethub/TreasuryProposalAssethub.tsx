@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EEnactment, EPostOrigin, IBeneficiaryInput, ENotificationStatus, EAssets } from '@/_shared/types';
+import { EEnactment, EPostOrigin, IBeneficiaryInput, ENotificationStatus } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -29,10 +29,8 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const { userPreferences } = useUserPreferences();
-	const initialAssetId = Object.values(NETWORKS_DETAILS[`${network}`].supportedAssets).find((asset) => asset.symbol === EAssets.USDC)?.index;
-	const [beneficiaries, setBeneficiaries] = useState<IBeneficiaryInput[]>([
-		{ address: '', amount: BN_ZERO.toString(), assetId: initialAssetId || null, id: dayjs().get('milliseconds').toString() }
-	]);
+
+	const [beneficiaries, setBeneficiaries] = useState<IBeneficiaryInput[]>([{ address: '', amount: BN_ZERO.toString(), assetId: null, id: dayjs().get('milliseconds').toString() }]);
 	const [selectedTrack, setSelectedTrack] = useState<{ name: EPostOrigin; trackId: number }>();
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });

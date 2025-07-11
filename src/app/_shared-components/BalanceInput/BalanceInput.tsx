@@ -59,9 +59,7 @@ function BalanceInput({
 	const networkDetails = NETWORKS_DETAILS[`${network}`];
 	const { supportedAssets } = networkDetails;
 
-	const initialAssetId = Object.values(supportedAssets).find((asset) => asset.symbol === EAssets.USDC)?.index;
-
-	const [assetId, setAssetId] = useState<string | null>(initialAssetId || null);
+	const [assetId, setAssetId] = useState<string | null>(null);
 
 	const [userBalance, setUserBalance] = useState<string | null>(null);
 
@@ -83,28 +81,30 @@ function BalanceInput({
 	const [valueString, setValueString] = useState('');
 
 	const onBalanceChange = (v: string | null, id?: string | null): void => {
-		const { bnValue, isValid } = inputToBn(v || '', network, false, id || initialAssetId);
+		const { bnValue, isValid } = inputToBn(v || '', network, false, id);
 
 		if (isValid && ValidatorService.isValidNumber(v)) {
 			setError('');
-			onChange?.({ value: bnValue, assetId: id || initialAssetId || null });
+			onChange?.({ value: bnValue, assetId: id || null });
 		} else {
 			setError('Invalid Amount');
-			onChange?.({ value: BN_ZERO, assetId: id || initialAssetId || null });
+			onChange?.({ value: BN_ZERO, assetId: id || null });
 		}
 	};
 
 	useEffect(() => {
+		const initialAssetId = defaultAssetId === undefined ? Object.values(supportedAssets).find((asset) => asset.symbol === EAssets.USDC)?.index : defaultAssetId;
+
 		if (!defaultValue || defaultValue.isZero()) {
 			if (value) {
-				setValueString(bnToInput(value, network, defaultAssetId || initialAssetId));
-				setAssetId(defaultAssetId || initialAssetId || null);
+				setValueString(bnToInput(value, network, initialAssetId));
+				setAssetId(initialAssetId || null);
 			}
 			return;
 		}
 
-		setValueString(bnToInput(defaultValue, network, defaultAssetId || initialAssetId));
-		setAssetId(defaultAssetId || initialAssetId || null);
+		setValueString(bnToInput(defaultValue, network, initialAssetId));
+		setAssetId(initialAssetId || null);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [network, value]);
 
