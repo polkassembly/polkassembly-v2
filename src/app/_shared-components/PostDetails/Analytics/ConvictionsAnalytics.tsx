@@ -6,8 +6,8 @@ import TotalVotesCard from './TotalVotesCard';
 import DelegatedVsSoloCard from './DelegatedVsSoloCard';
 import TurnoutOrSupportCard from './TurnoutOrSupportCard';
 import TimeSplitCard from './TimeSplitCard';
-import VotesByConvictions from './VotesByConviction';
-import DelegationVotesByConvictions from './DelegationVotesByConviction';
+import VotesByConviction from './VotesByConviction';
+import DelegationVotesByConviction from './DelegationVotesByConviction';
 import { Separator } from '../../Separator';
 import VotesBubbleChart from '../VotesBubbleChart/VotesBubbleChart';
 
@@ -34,8 +34,8 @@ function ConvictionsAnalytics({ convictionsAnalytics, proposalType, index }: { c
 			</div>
 			<Separator className='dashed my-4' />
 			<div className='flex gap-4 max-lg:flex-col'>
-				<VotesByConvictions votesByConviction={convictionsAnalytics?.votesByConviction || []} />
-				<DelegationVotesByConvictions delegationVotesByConviction={convictionsAnalytics?.delegationVotesByConviction || []} />
+				<VotesByConviction votesByConviction={convictionsAnalytics?.votesByConviction || []} />
+				<DelegationVotesByConviction delegationVotesByConviction={convictionsAnalytics?.delegationVotesByConviction || []} />
 			</div>
 		</div>
 	);

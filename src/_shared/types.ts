@@ -1378,18 +1378,16 @@ export enum EAnalyticsType {
 	VOTES = 'votes'
 }
 
-export interface IVotesDistribution {
-	balance: string;
-	voter: string;
+export interface IVoteDistribution extends Omit<IVoteData, 'createdAt' | 'createdAtBlock' | 'proposalIndex' | 'delegatedTo'> {
 	votingPower: string | null;
 	delegatorsCount?: number;
 	isDelegated: boolean;
-	lockPeriod: number;
+	percentage?: number;
 }
 
 export type IPostBubbleVotes = {
 	votes: {
-		[K in Exclude<EVoteDecision, EVoteDecision.SPLIT_ABSTAIN | EVoteDecision.SPLIT>]: IVotesDistribution[];
+		[K in Exclude<EVoteDecision, EVoteDecision.SPLIT_ABSTAIN | EVoteDecision.SPLIT>]: IVoteDistribution[];
 	};
 	proposal?: {
 		status: EProposalStatus;

@@ -37,7 +37,6 @@ import {
 	ONE_DAY_IN_SECONDS,
 	REFRESH_TOKEN_LIFE_IN_SECONDS,
 	SIX_HOURS_IN_SECONDS,
-	TEN_DAYS_IN_SECONDS,
 	THIRTY_DAYS_IN_SECONDS,
 	THREE_DAYS_IN_SECONDS
 } from '../../_api-constants/timeConstants';
@@ -66,7 +65,7 @@ enum ERedisKeys {
 	TREASURY_STATS = 'TRS',
 	OVERVIEW_PAGE_DATA = 'OPD',
 	POST_ANALYTICS_DATA = 'PAD',
-	POST_BUBBLE_VOTES_DATA = 'PTVD'
+	POST_BUBBLE_VOTES_DATA = 'PBVD'
 }
 
 export class RedisService {
@@ -132,10 +131,10 @@ export class RedisService {
 		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: EPostOrigin | 'all'): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
 		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
 		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
-		[ERedisKeys.POST_ANALYTICS_DATA]: (network: string, proposalType: string, indexOrHash: string): string =>
-			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${indexOrHash}`,
-		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: string, proposalType: string, indexOrHash: string, votesType: EPostBubbleVotesType, analyticsType?: EAnalyticsType): string =>
-			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${indexOrHash}-${votesType}-${analyticsType || ''}`
+		[ERedisKeys.POST_ANALYTICS_DATA]: (network: ENetwork, proposalType: EProposalType, index: number): string =>
+			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${index}`,
+		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: ENetwork, proposalType: EProposalType, index: number, votesType: EPostBubbleVotesType, analyticsType: EAnalyticsType): string =>
+			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${index}-${votesType}-${analyticsType}`
 	} as const;
 
 	// helper methods
@@ -235,7 +234,9 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` }),
-			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}-*` })
+			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_ANALYTICS_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-*` })
 		]);
 	}
 
@@ -524,6 +525,11 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` }),
+
+			// clear post analytics data
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_ANALYTICS_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-*` }),
+
 			// clear overview page data
 			this.DeleteOverviewPageData({ network }),
 
@@ -641,71 +647,92 @@ export class RedisService {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
 	}
 
-	// Post analytics caching methods
 	static async SetPostAnalyticsData({
 		network,
 		proposalType,
-		indexOrHash,
-		data
+		index,
+		data,
+		proposalStatus
 	}: {
-		network: string;
-		proposalType: string;
-		indexOrHash: string;
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
 		data: IPostAnalytics;
+		proposalStatus: EProposalStatus;
 	}): Promise<void> {
-		const isActivePost = data.proposal.status && ACTIVE_PROPOSAL_STATUSES.includes(data.proposal.status as EProposalStatus);
+		const isActivePost = ACTIVE_PROPOSAL_STATUSES.includes(proposalStatus);
 
 		await this.Set({
-			key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, indexOrHash),
+			key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index),
 			value: JSON.stringify(data),
-			ttlSeconds: isActivePost ? HALF_HOUR_IN_SECONDS : TEN_DAYS_IN_SECONDS
+			ttlSeconds: isActivePost ? ONE_DAY_IN_SECONDS : THIRTY_DAYS_IN_SECONDS
 		});
 	}
 
-	// Posts caching methods
-	static async GetPostAnalyticsData({ network, proposalType, indexOrHash }: { network: string; proposalType: string; indexOrHash: string }): Promise<IPostAnalytics | null> {
-		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, indexOrHash) });
+	static async GetPostAnalyticsData({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index) });
 		return data ? (deepParseJson(data) as IPostAnalytics) : null;
+	}
+
+	static async DeletePostAnalyticsData({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index) });
 	}
 
 	static async SetPostBubbleVotesData({
 		network,
 		proposalType,
-		indexOrHash,
+		index,
 		data,
 		votesType,
-		analyticsType
+		analyticsType,
+		proposalStatus
 	}: {
-		network: string;
-		proposalType: string;
-		indexOrHash: string;
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
 		data: IPostBubbleVotes;
 		votesType: EPostBubbleVotesType;
-		analyticsType?: EAnalyticsType;
+		analyticsType: EAnalyticsType;
+		proposalStatus: EProposalStatus;
 	}): Promise<void> {
-		const isActivePost = data.proposal?.status && ACTIVE_PROPOSAL_STATUSES.includes(data.proposal.status as EProposalStatus);
-
+		const isActivePost = ACTIVE_PROPOSAL_STATUSES.includes(proposalStatus);
 		await this.Set({
-			key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, indexOrHash, votesType, analyticsType),
+			key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType),
 			value: JSON.stringify(data),
-			ttlSeconds: isActivePost ? HALF_HOUR_IN_SECONDS : TEN_DAYS_IN_SECONDS
+			ttlSeconds: isActivePost ? ONE_DAY_IN_SECONDS : THIRTY_DAYS_IN_SECONDS
 		});
 	}
 
 	static async GetPostBubbleVotesData({
 		network,
 		proposalType,
-		indexOrHash,
+		index,
 		votesType,
 		analyticsType
 	}: {
-		network: string;
-		proposalType: string;
-		indexOrHash: string;
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
 		votesType: EPostBubbleVotesType;
-		analyticsType?: EAnalyticsType;
+		analyticsType: EAnalyticsType;
 	}): Promise<IPostBubbleVotes | null> {
-		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, indexOrHash, votesType, analyticsType) });
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });
 		return data ? (deepParseJson(data) as IPostBubbleVotes) : null;
+	}
+
+	static async DeletePostBubbleVotesData({
+		network,
+		proposalType,
+		index,
+		votesType,
+		analyticsType
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		votesType: EPostBubbleVotesType;
+		analyticsType: EAnalyticsType;
+	}): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });
 	}
 }

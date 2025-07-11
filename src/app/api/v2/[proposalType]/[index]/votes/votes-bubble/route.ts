@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EAnalyticsType, EHttpHeaderKey, EPostBubbleVotesType, EProposalType, IPostBubbleVotes } from '@/_shared/types';
+import { EAnalyticsType, EHttpHeaderKey, EPostBubbleVotesType, EProposalStatus, EProposalType, IPostBubbleVotes } from '@/_shared/types';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { NextRequest, NextResponse } from 'next/server';
@@ -13,15 +13,15 @@ import { RedisService } from '@/app/api/_api-services/redis_service';
 
 const zodParamsSchema = z.object({
 	proposalType: z.enum([EProposalType.REFERENDUM_V2, EProposalType.REFERENDUM]),
-	index: z.string()
+	index: z.coerce.number()
 });
 
 export const GET = withErrorHandling(
-	async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse<IPostBubbleVotes>> => {
+	async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse<IPostBubbleVotes | null>> => {
 		const { proposalType, index } = zodParamsSchema.parse(await params);
 
 		const zodQuerySchema = z.object({
-			analyticsType: z.nativeEnum(EAnalyticsType).optional().default(EAnalyticsType.CONVICTIONS),
+			analyticsType: z.nativeEnum(EAnalyticsType).default(EAnalyticsType.CONVICTIONS),
 			votesType: z.nativeEnum(EPostBubbleVotesType).default(EPostBubbleVotesType.NESTED)
 		});
 
@@ -30,16 +30,27 @@ export const GET = withErrorHandling(
 		const [network, headersList] = await Promise.all([getNetworkFromHeaders(), headers()]);
 		const skipCache = headersList.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
 		if (!skipCache) {
-			const analytics = await RedisService.GetPostBubbleVotesData({ network, proposalType, indexOrHash: index, votesType, analyticsType });
-			if (analytics) {
-				return NextResponse.json(analytics);
+			const votes = await RedisService.GetPostBubbleVotesData({ network, proposalType, index, votesType, analyticsType });
+			if (votes) {
+				return NextResponse.json(votes);
 			}
 		}
 
-		const analytics = await OnChainDbService.GetPostBubbleVotes({ network, proposalType, index: Number(index), analyticsType, votesType });
+		const votes = await OnChainDbService.GetPostBubbleVotes({ network, proposalType, index, analyticsType, votesType });
 
-		await RedisService.SetPostBubbleVotesData({ network, proposalType, indexOrHash: index, data: analytics, votesType, analyticsType });
+		if (votes !== null) {
+			await RedisService.SetPostBubbleVotesData({
+				network,
+				proposalType,
+				index,
+				data: votes,
+				votesType,
+				analyticsType,
+				proposalStatus: votes.proposal?.status as EProposalStatus
+			});
+			return NextResponse.json(votes);
+		}
 
-		return NextResponse.json(analytics);
+		return NextResponse.json(votes);
 	}
 );

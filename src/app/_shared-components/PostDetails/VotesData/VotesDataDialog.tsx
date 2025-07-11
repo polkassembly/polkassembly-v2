@@ -31,7 +31,8 @@ function VotesDataDialog({
 	latestSupport,
 	isFetching,
 	proposalType,
-	index
+	index,
+	enableGraph = false
 }: {
 	voteCurveData: IVoteCurve[];
 	trackName: EPostOrigin;
@@ -44,6 +45,7 @@ function VotesDataDialog({
 	isFetching: boolean;
 	proposalType: EProposalType;
 	index: string;
+	enableGraph: boolean;
 }) {
 	const t = useTranslations('PostDetails.VotesData');
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -69,20 +71,24 @@ function VotesDataDialog({
 			<DialogContent className={classes.dialogContent}>
 				<DialogHeader className={classes.dialogHeader}>
 					<DialogTitle className={classes.dialogTitle}>
-						<div className='flex items-center justify-between'>
-							<Select
-								value={activeTab}
-								onValueChange={(value: EProposalVoteType) => setActiveTab(value)}
-							>
-								<SelectTrigger className='flex items-center gap-2 border-none text-lg font-semibold text-text_primary shadow-none'>
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value={EProposalVoteType.Bubble}>{t('voteBubble')}</SelectItem>
-									<SelectItem value={EProposalVoteType.Graph}>{t('voteGraph')}</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
+						{enableGraph ? (
+							<div className='flex items-center justify-between'>
+								<Select
+									value={activeTab}
+									onValueChange={(value: EProposalVoteType) => setActiveTab(value)}
+								>
+									<SelectTrigger className='flex items-center gap-2 border-none text-lg font-semibold text-text_primary shadow-none'>
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value={EProposalVoteType.Bubble}>{t('voteBubble')}</SelectItem>
+										<SelectItem value={EProposalVoteType.Graph}>{t('voteGraph')}</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
+						) : (
+							<div className='flex items-center gap-2 border-none text-lg font-semibold text-text_primary shadow-none'>{t('voteBubble')}</div>
+						)}
 					</DialogTitle>
 				</DialogHeader>
 				<div className='px-8 pb-8'>

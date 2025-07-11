@@ -472,15 +472,6 @@
 		"account": "Cuenta",
 		"abstain": "Abstención",
 		"onchainInfo": "Información en cadena",
-		"VotesData": {
-			"Votes": "Votos",
-			"bubble": "Burbuja",
-			"graph": "Gráfico",
-			"voteHistory": "Historial de votos (Aplanado, Anidado, Llamadas)",
-			"votes": "Votos",
-			"voteGraph": "Gráfico de votación",
-			"voteBubble": "Ebenes de votación"
-		},
 		"VotesBubble": {
 			"nested": "Anidado",
 			"flattened": "Aplanado",

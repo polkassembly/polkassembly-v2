@@ -79,6 +79,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 					latestSupport={latestSupport}
 					isFetching={isFetching}
 					proposalType={proposalType}
+					enableGraph={!!trackName && !!timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced)}
 				/>
 			</div>
 			<Tabs
@@ -94,6 +95,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 					>
 						{t('bubble')}
 					</Button>
+
 					{!!trackName && timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced) && (
 						<Button
 							variant='ghost'

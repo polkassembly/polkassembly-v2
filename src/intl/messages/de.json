@@ -470,15 +470,6 @@
 		"account": "Konto",
 		"abstain": "Enthaltung",
 		"onchainInfo": "Onchain-Informationen",
-		"VotesData": {
-			"Votes": "Abstimmungen",
-			"bubble": "Bubble",
-			"graph": "Diagramm",
-			"voteHistory": "Abstimmungsverlauf (Eben, Verschachtelt, Aufrufe)",
-			"votes": "Abstimmungen",
-			"voteGraph": "Abstimmungsgraph",
-			"voteBubble": "Abstimmungsebenen"
-		},
 		"VotesBubble": {
 			"nested": "Verschachtelt",
 			"flattened": "Eben",

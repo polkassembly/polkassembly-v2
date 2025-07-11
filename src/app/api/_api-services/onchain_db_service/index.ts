@@ -326,7 +326,7 @@ export class OnChainDbService {
 		network: ENetwork;
 		proposalType: EProposalType;
 		index: number;
-		analyticsType?: EAnalyticsType;
+		analyticsType: EAnalyticsType;
 		votesType: EPostBubbleVotesType;
 	}) {
 		return SubsquidService.GetPostBubbleVotes({ network, proposalType, index, analyticsType, votesType });

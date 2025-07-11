@@ -2,11 +2,14 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { useTranslations } from 'next-intl';
-import { EAnalyticsType, EProposalType, ETheme, IPostAnalytics } from '@/_shared/types';
+import { EAnalyticsType, EProposalType, ETheme } from '@/_shared/types';
 import { useState } from 'react';
 import Image from 'next/image';
 import NudgeIcon from '@/_assets/analytics/nudge-icon.svg';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useQuery } from '@tanstack/react-query';
+import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import classes from './PostAnalytics.module.scss';
 import { Skeleton } from '../../Skeleton';
 import AccountsAnalytics from './AccountsAnalytics';
@@ -14,17 +17,42 @@ import ConvictionsAnalytics from './ConvictionsAnalytics';
 import { Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from '../../Select/Select';
 import VotesAnalytics from './VotesAnalytics';
 
-function PostAnalytics({ analytics, isFetching, proposalType, index }: { analytics?: IPostAnalytics; isFetching: boolean; proposalType: EProposalType; index: string }) {
+const getPostAnalytics = async ({ proposalType, index }: { proposalType: EProposalType; index: string }) => {
+	const { data, error } = await NextApiClientService.getPostAnalytics({ proposalType, index });
+	if (error || !data || data === null) {
+		throw new Error(error?.message || 'Failed to fetch data');
+	}
+	return data;
+};
+
+function PostAnalytics({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 	const t = useTranslations('PostDetails');
 	const { userPreferences } = useUserPreferences();
 	const { theme } = userPreferences;
 	const [selectedAnalytics, setSelectedAnalytics] = useState<EAnalyticsType>(EAnalyticsType.CONVICTIONS);
+
+	const {
+		data: analytics,
+		isFetching,
+		error
+	} = useQuery({
+		queryKey: ['postAnalytics', proposalType, index],
+		queryFn: () => getPostAnalytics({ proposalType, index }),
+		enabled: POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(proposalType) && !!index,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+		retry: false
+	});
 
 	const options = [
 		{ label: t('Analytics.convictionsAnalytics'), value: EAnalyticsType.CONVICTIONS },
 		{ label: t('Analytics.votesAnalytics'), value: EAnalyticsType.VOTES },
 		{ label: t('Analytics.accountsAnalytics'), value: EAnalyticsType.ACCOUNTS }
 	];
+
+	if (error && !analytics && !isFetching) {
+		return <div>Error: {error.message}</div>;
+	}
 
 	return (
 		<div>
@@ -38,7 +66,7 @@ function PostAnalytics({ analytics, isFetching, proposalType, index }: { analyti
 						<Skeleton className='h-[180px] w-full rounded-lg' />
 					</div>
 					<Skeleton className='h-[250px] w-full rounded-lg' />
-					<Skeleton className='h-[300px] w-full rounded-lg' />
+					<Skeleton className='h-[500px] w-full rounded-lg' />
 					<div className='flex gap-4 max-lg:flex-col'>
 						<Skeleton className='h-[250px] w-full rounded-lg' />
 						<Skeleton className='h-[250px] w-full rounded-lg' />
@@ -52,7 +80,7 @@ function PostAnalytics({ analytics, isFetching, proposalType, index }: { analyti
 						onValueChange={(value) => setSelectedAnalytics(value as EAnalyticsType)}
 					>
 						<SelectTrigger className='mb-4 flex w-fit items-center gap-2'>
-							<SelectValue placeholder='Select page size'>{options?.find((option) => option.value === selectedAnalytics)?.label || ''}</SelectValue>
+							<SelectValue placeholder='Select analytics type'>{options?.find((option) => option.value === selectedAnalytics)?.label || ''}</SelectValue>
 						</SelectTrigger>
 						<SelectContent>
 							{options.map((option) => (

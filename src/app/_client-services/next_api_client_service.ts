@@ -1094,7 +1094,7 @@ export class NextApiClientService {
 
 	static async getPostAnalytics({ proposalType, index }: { proposalType: EProposalType; index: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_ANALYTICS, routeSegments: [proposalType, index, 'analytics'] });
-		return this.nextApiClientFetch<IPostAnalytics>({ url, method });
+		return this.nextApiClientFetch<IPostAnalytics | null>({ url, method });
 	}
 
 	static async getPostBubbleVotes({
@@ -1105,7 +1105,7 @@ export class NextApiClientService {
 	}: {
 		proposalType: EProposalType;
 		index: string;
-		analyticsType?: EAnalyticsType;
+		analyticsType: EAnalyticsType;
 		votesType: EPostBubbleVotesType;
 	}) {
 		const queryParams = new URLSearchParams({
@@ -1113,6 +1113,6 @@ export class NextApiClientService {
 			votesType: votesType.toString()
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_BUBBLE_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-bubble'], queryParams });
-		return this.nextApiClientFetch<IPostBubbleVotes>({ url, method });
+		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method });
 	}
 }

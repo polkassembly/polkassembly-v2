@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useMemo, useCallback, useState } from 'react';
-import { EAnalyticsType, ENetwork, EPostBubbleVotesType, EProposalType, ETheme, EVoteDecision, IPostBubbleVotes } from '@/_shared/types';
+import { EAnalyticsType, ENetwork, EPostBubbleVotesType, EProposalType, ETheme, EVoteDecision, IPostBubbleVotes, IVoteDistribution } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { ResponsiveCirclePacking } from '@nivo/circle-packing';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -13,27 +13,16 @@ import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { BN, BN_ZERO } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ClientError } from '@/app/_client-utils/clientError';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import Image from 'next/image';
 import noData from '@/_assets/activityfeed/gifs/noactivity.gif';
+import { animated } from '@react-spring/web';
 import Address from '../../Profile/Address/Address';
 import classes from './VotesBubbleChart.module.scss';
 import { Skeleton } from '../../Skeleton';
 import { Button } from '../../Button';
-
-interface IVoteDistribution {
-	voter: string;
-	balance: string;
-	decision: EVoteDecision;
-	votingPower: string | null;
-	percentage: number;
-	delegatorsCount?: number;
-	isDelegated: boolean;
-	lockPeriod: number;
-}
 
 interface INodeData {
 	id: string;
@@ -58,7 +47,7 @@ const calculateTotalDecisionVotes = ({
 	votesBubbleData: IPostBubbleVotes['votes'];
 	decision: Exclude<EVoteDecision, EVoteDecision.SPLIT | EVoteDecision.SPLIT_ABSTAIN>;
 }): BN => {
-	return new BN(votesBubbleData?.[`${decision}`]?.reduce((acc, curr) => new BN(acc).add(new BN(curr.votingPower || curr.balance)), BN_ZERO));
+	return new BN(votesBubbleData?.[`${decision}`]?.reduce((acc, curr) => new BN(acc).add(new BN(curr.votingPower || curr.balanceValue)), BN_ZERO));
 };
 
 const calculatePerVotePercentage = ({
@@ -66,14 +55,14 @@ const calculatePerVotePercentage = ({
 	decision,
 	votesBubbleData
 }: {
-	vote: { balance: string; votingPower: string | null };
+	vote: { balanceValue: string; votingPower: string | null };
 	decision: Exclude<EVoteDecision, EVoteDecision.SPLIT | EVoteDecision.SPLIT_ABSTAIN>;
 	votesBubbleData: IPostBubbleVotes['votes'];
 }): number => {
 	const totalPercentage = calculateTotalDecisionVotes({ votesBubbleData, decision });
 	const percentage =
-		new BN(vote.votingPower || vote.balance).gt(BN_ZERO) && !!totalPercentage
-			? new BN(vote.votingPower || vote.balance).mul(new BN(100)).div(new BN(totalPercentage))?.toString()
+		new BN(vote.votingPower || vote.balanceValue).gt(BN_ZERO) && !!totalPercentage
+			? new BN(vote.votingPower || vote.balanceValue).mul(new BN(100)).div(new BN(totalPercentage))?.toString()
 			: '0';
 	return Math.round(Number(percentage));
 };
@@ -91,8 +80,8 @@ const useVotesDistribution = ({ votesBubbleData }: { votesBubbleData: IPostBubbl
 
 			votesList.forEach((vote) => {
 				const payload = {
-					voter: vote.voter,
-					balance: vote.balance,
+					voterAddress: vote.voterAddress,
+					balanceValue: vote.balanceValue,
 					votingPower: vote.votingPower || null,
 					decision,
 					percentage: calculatePerVotePercentage({ vote, decision, votesBubbleData }),
@@ -106,22 +95,44 @@ const useVotesDistribution = ({ votesBubbleData }: { votesBubbleData: IPostBubbl
 		});
 
 		return votes;
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [votesBubbleData]);
 };
 
 const getChartData = (allVotes: IVoteDistribution[], network: ENetwork, getDecisionColor: (decision: EVoteDecision) => string): INodeData[] => {
 	return allVotes.map((vote: IVoteDistribution) => ({
-		id: vote.voter,
-		name: vote.voter,
-		value: Number(formatBnBalance(vote.votingPower || vote.balance, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: false }, network).replace(/,/g, '')),
+		id: vote.voterAddress,
+		name: vote.voterAddress,
+		value: Number(formatBnBalance(vote.votingPower || vote.balanceValue, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: false }, network).replace(/,/g, '')),
 		color: getDecisionColor(vote.decision),
-		percentage: vote.percentage,
+		percentage: vote.percentage || 0,
 		delegatorsCount: vote.delegatorsCount || 0,
 		isDelegated: vote.isDelegated,
 		lockPeriod: vote.lockPeriod,
 		decision: vote.decision
 	}));
+};
+
+const getPostAnalytics = async ({
+	proposalType,
+	index,
+	analyticsType,
+	votesType
+}: {
+	proposalType: EProposalType;
+	index: string;
+	analyticsType: EAnalyticsType;
+	votesType: EPostBubbleVotesType;
+}) => {
+	const { data, error } = await NextApiClientService.getPostBubbleVotes({
+		proposalType: proposalType as EProposalType,
+		index: index.toString(),
+		analyticsType,
+		votesType
+	});
+	if (error && (!data || data === null)) {
+		throw new Error(error?.message || 'Failed to fetch data');
+	}
+	return data;
 };
 
 // Component
@@ -145,7 +156,7 @@ function VotesBubbleChart({
 	const {
 		userPreferences: { theme }
 	} = useUserPreferences();
-	const [votesType, setVotesType] = useState<EPostBubbleVotesType>(EPostBubbleVotesType.FLATTENED);
+	const [votesType, setVotesType] = useState<EPostBubbleVotesType>(EPostBubbleVotesType.NESTED);
 
 	const getBorderColor = (decision: EVoteDecision) => {
 		return THEME_COLORS.light[`${decision}_color` as keyof typeof THEME_COLORS.light];
@@ -153,22 +164,10 @@ function VotesBubbleChart({
 	const getDecisionColor = (decision: EVoteDecision) => {
 		return THEME_COLORS[`${theme}`][`${decision}_bubble_bg` as keyof (typeof THEME_COLORS)[typeof theme]];
 	};
-	const getPostAnalytics = async () => {
-		const { data, error } = await NextApiClientService.getPostBubbleVotes({
-			proposalType: proposalType as EProposalType,
-			index,
-			analyticsType,
-			votesType
-		});
-		if (error || !data) {
-			throw new ClientError(error?.message || 'Failed to fetch data');
-		}
-		return data;
-	};
 
 	const { data: votesBubbleData, isFetching } = useQuery({
 		queryKey: ['postBubbleVotes', proposalType, index, analyticsType, votesType],
-		queryFn: getPostAnalytics,
+		queryFn: () => getPostAnalytics({ proposalType, index, analyticsType, votesType }),
 		enabled: !!proposalType && !!index,
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
@@ -184,14 +183,14 @@ function VotesBubbleChart({
 	const renderTooltip = useCallback(
 		(node: { id: string; formattedValue: string; percentage: number }) => {
 			const { id, formattedValue } = node;
-			const vote = allVotes.find((value) => value.voter === id);
+			const vote = allVotes.find((value) => value.voterAddress === id);
 			const percentage = vote?.percentage || 0;
 			const delegatorsCount = vote?.delegatorsCount;
 			const isDelegated = vote?.isDelegated;
 			const lockPeriod = vote?.lockPeriod || DEFAULT_LOCK_PERIOD;
 
 			const formattedBalance = formatUSDWithUnits(
-				formatBnBalance(vote?.balance || BN_ZERO, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: true }, network).replace(/,/g, ''),
+				formatBnBalance(vote?.balanceValue || BN_ZERO, { numberAfterComma: 0, withThousandDelimitor: false, withUnit: true }, network).replace(/,/g, ''),
 				1
 			);
 
@@ -237,13 +236,88 @@ function VotesBubbleChart({
 		[allVotes, t, network]
 	);
 
+	// Custom label component for circle packing chart
+	const CirclePackingLabel = useCallback(
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		(props: any) => {
+			const radius = props.node.radius || 20;
+
+			// Only show labels for bubbles with sufficient size
+			if (radius < 30) {
+				return <div />;
+			}
+
+			// Calculate dimensions that fit WITHIN the circle - be more conservative
+			// Use 80% of diameter to ensure text fits comfortably within circle bounds
+			const availableWidth = radius * 1.6; // 80% of diameter
+			const availableHeight = radius * 1.2; // 60% of diameter for height
+
+			// Get the exact center coordinates from the node
+			const centerX = props.node.x || props.style.x;
+			const centerY = props.node.y || props.style.y;
+
+			return (
+				<animated.foreignObject
+					key={props.node.id}
+					x={centerX - availableWidth / 2}
+					y={centerY - availableHeight / 2}
+					width={availableWidth}
+					height={availableHeight}
+					style={{
+						pointerEvents: 'none',
+						overflow: 'visible'
+					}}
+				>
+					<div
+						style={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							width: '100%',
+							height: '100%',
+							fontWeight: 600,
+							color: theme === ETheme.DARK ? '#fff' : '#000',
+							textAlign: 'center',
+							lineHeight: '1.1',
+							padding: '2px',
+							boxSizing: 'border-box',
+							position: 'relative'
+						}}
+					>
+						<div
+							style={{
+								width: '100%',
+								display: 'flex',
+								justifyContent: 'center',
+								alignItems: 'center'
+							}}
+						>
+							<Address
+								address={props.node.data.name}
+								truncateCharLen={3}
+								textClassName='text-xs font-semibold lg:text-xs'
+								className='text-center text-xs font-semibold leading-none lg:text-xs'
+								wrapperClassName='w-full'
+								showIdenticon={false}
+								redirectToProfile
+								disableTooltip
+							/>
+						</div>
+					</div>
+				</animated.foreignObject>
+			);
+		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[theme]
+	);
+
 	return (
 		<div className={enableTitle ? classes.card : 'mt-4'}>
 			<div className={classes.header}>
 				{enableTitle && <h2 className={classes.heading}>{t('votesDistribution')}</h2>}
 				{enableFilter && (
 					<div className={classes.buttonContainer}>
-						{[EPostBubbleVotesType.FLATTENED, EPostBubbleVotesType.NESTED].map((type) => (
+						{[EPostBubbleVotesType.NESTED, EPostBubbleVotesType.FLATTENED].map((type) => (
 							<Button
 								key={type}
 								variant='ghost'
@@ -275,7 +349,7 @@ function VotesBubbleChart({
 							leavesOnly
 							value='value'
 							valueFormat={(value) => formatUSDWithUnits(value?.toString(), 1)}
-							padding={4}
+							padding={6}
 							borderWidth={1}
 							borderColor={(node) => {
 								const chartItem = chartData.find((item) => item.id === node.id);
@@ -283,12 +357,10 @@ function VotesBubbleChart({
 							}}
 							enableLabels
 							labelTextColor={theme === ETheme.DARK ? '#fff' : THEME_COLORS.light.text_primary}
-							labelsSkipRadius={20}
-							label={(node) => {
-								return `${node.formattedValue} ${Math.round(node.percentage)}%`;
-							}}
+							labelsSkipRadius={30}
+							labelComponent={CirclePackingLabel}
 							tooltip={renderTooltip}
-							margin={{ bottom: 10, left: 10, right: 10, top: 10 }}
+							margin={{ bottom: 20, left: 20, right: 20, top: 20 }}
 							motionConfig='gentle'
 						/>
 					</div>
