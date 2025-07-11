@@ -1312,5 +1312,10 @@
 		"fee": "Gebühr",
 		"noJudgementsFound": "Keine Urteile gefunden",
 		"noRegistrarsFound": "Keine Registrars gefunden"
+	},
+	"JudgementStatus": {
+		"pending": "Ausstehend",
+		"approved": "Genehmigt",
+		"rejected": "Abgelehnt"
 	}
 }

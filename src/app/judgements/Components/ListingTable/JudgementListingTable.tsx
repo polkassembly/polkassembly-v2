@@ -5,12 +5,13 @@
 'use client';
 
 import React from 'react';
-import { IJudgementRequest } from '@/_shared/types';
+import { EStatusTagType, IJudgementRequest } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '../../../_shared-components/Table';
 import { PaginationWithLinks } from '../../../_shared-components/PaginationWithLinks';
+import StatusTag from '../../../_shared-components/StatusTag/StatusTag';
 import styles from './ListingTable.module.scss';
 // TODO: Create JudgementRequestRow component
 
@@ -44,7 +45,12 @@ function JudgementListingTable({ data, totalCount }: { data: IJudgementRequest[]
 										<td className='px-6 py-5'>{judgement.displayName}</td>
 										<td className='px-6 py-5'>{judgement.email}</td>
 										<td className='px-6 py-5'>{judgement.twitter}</td>
-										<td className='px-6 py-5'>{judgement.status}</td>
+										<td className='px-6 py-5'>
+											<StatusTag
+												status={judgement.status}
+												type={EStatusTagType.JUDGEMENT}
+											/>
+										</td>
 										<td className='px-6 py-5'>{new Date(judgement.dateInitiated).toLocaleDateString()}</td>
 									</TableRow>
 								))}

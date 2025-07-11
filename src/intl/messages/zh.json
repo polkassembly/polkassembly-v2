@@ -1312,5 +1312,10 @@
 		"fee": "费用",
 		"noJudgementsFound": "未找到判断",
 		"noRegistrarsFound": "未找到注册者"
+	},
+	"JudgementStatus": {
+		"pending": "待定",
+		"approved": "已批准",
+		"rejected": "已拒绝"
 	}
 }

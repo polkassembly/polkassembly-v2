@@ -1342,6 +1342,11 @@ export interface IRegistrarInfo {
 	registrarIndex: number;
 }
 
+export enum EStatusTagType {
+	PROPOSAL = 'proposal',
+	JUDGEMENT = 'judgement'
+}
+
 export type IJudgementListingResponse = IGenericListingResponse<IJudgementRequest>;
 
 export type IRegistrarsListingResponse = IGenericListingResponse<IRegistrarInfo>;

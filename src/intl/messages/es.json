@@ -1313,5 +1313,10 @@
 		"fee": "Tarifa",
 		"noJudgementsFound": "No se encontraron juicios",
 		"noRegistrarsFound": "No se encontraron registradores"
+	},
+	"JudgementStatus": {
+		"pending": "Pendiente",
+		"approved": "Aprobado",
+		"rejected": "Rechazado"
 	}
 }

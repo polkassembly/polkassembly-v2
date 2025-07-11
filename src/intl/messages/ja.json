@@ -1312,5 +1312,10 @@
 		"fee": "料金",
 		"noJudgementsFound": "判断が見つかりません",
 		"noRegistrarsFound": "登録者が見つかりません"
+	},
+	"JudgementStatus": {
+		"pending": "保留中",
+		"approved": "承認済み",
+		"rejected": "拒否"
 	}
 }

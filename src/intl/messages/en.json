@@ -1348,5 +1348,10 @@
 		"fee": "Fee",
 		"noJudgementsFound": "No judgements found",
 		"noRegistrarsFound": "No registrars found"
+	},
+	"JudgementStatus": {
+		"pending": "Pending",
+		"approved": "Approved",
+		"rejected": "Rejected"
 	}
 }

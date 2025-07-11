@@ -14,6 +14,7 @@ import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
 import { ENetwork, IOnChainIdentity, IJudgementStats, EJudgementStatus, IJudgementRequest, IJudgementListingResponse, IRegistrarInfo } from '@shared/types';
+import { SubsquidService } from './subsquid_service';
 
 // Usage:
 // const identityService = await IdentityService.Init(ENetwork.POLKADOT, api);
@@ -426,51 +427,146 @@ export class IdentityService {
 	}
 
 	async getJudgementStats(): Promise<IJudgementStats> {
-		const currentDate = new Date();
-		const currentMonth = currentDate.getMonth();
-		const currentYear = currentDate.getFullYear();
+		try {
+			const currentDate = new Date();
+			const currentMonth = currentDate.getMonth();
+			const currentYear = currentDate.getFullYear();
 
-		// Get all identity judgements for current month
-		const currentMonthJudgements = await this.getAllIdentityJudgements();
-		const currentMonthRequests = currentMonthJudgements.filter((judgement) => {
-			const judgementDate = new Date(judgement.dateInitiated);
-			return judgementDate.getMonth() === currentMonth && judgementDate.getFullYear() === currentYear;
-		});
+			// Get all identity judgements for current month
+			const currentMonthJudgements = await this.getAllIdentityJudgements();
+			const currentMonthRequests = currentMonthJudgements.filter((judgement) => {
+				const judgementDate = new Date(judgement.dateInitiated);
+				return judgementDate.getMonth() === currentMonth && judgementDate.getFullYear() === currentYear;
+			});
 
-		// Get all identity judgements for previous month
-		const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-		const previousYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-		const previousMonthJudgements = await this.getAllIdentityJudgements();
-		const previousMonthRequests = previousMonthJudgements.filter((judgement) => {
-			const judgementDate = new Date(judgement.dateInitiated);
-			return judgementDate.getMonth() === previousMonth && judgementDate.getFullYear() === previousYear;
-		});
+			// Get all identity judgements for previous month
+			const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+			const previousYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+			const previousMonthJudgements = await this.getAllIdentityJudgements();
+			const previousMonthRequests = previousMonthJudgements.filter((judgement) => {
+				const judgementDate = new Date(judgement.dateInitiated);
+				return judgementDate.getMonth() === previousMonth && judgementDate.getFullYear() === previousYear;
+			});
 
-		const totalRequestedThisMonth = currentMonthRequests.length;
-		const totalRequestedLastMonth = previousMonthRequests.length;
+			const totalRequestedThisMonth = currentMonthRequests.length;
+			const totalRequestedLastMonth = previousMonthRequests.length;
 
-		// Calculate percentage increase
-		const percentageIncreaseFromLastMonth = totalRequestedLastMonth === 0 ? 100 : ((totalRequestedThisMonth - totalRequestedLastMonth) / totalRequestedLastMonth) * 100;
+			// Calculate percentage increase
+			const percentageIncreaseFromLastMonth = totalRequestedLastMonth === 0 ? 100 : ((totalRequestedThisMonth - totalRequestedLastMonth) / totalRequestedLastMonth) * 100;
 
-		// Calculate completed judgements this month
-		const completedThisMonth = currentMonthRequests.filter((judgement) => judgement.status === EJudgementStatus.APPROVED || judgement.status === EJudgementStatus.REJECTED).length;
+			// Calculate completed judgements this month
+			const completedThisMonth = currentMonthRequests.filter(
+				(judgement) => judgement.status === EJudgementStatus.APPROVED || judgement.status === EJudgementStatus.REJECTED
+			).length;
 
-		const percentageCompletedThisMonth = totalRequestedThisMonth === 0 ? 0 : (completedThisMonth / totalRequestedThisMonth) * 100;
+			const percentageCompletedThisMonth = totalRequestedThisMonth === 0 ? 0 : (completedThisMonth / totalRequestedThisMonth) * 100;
 
-		return {
-			totalRequestedThisMonth,
-			percentageIncreaseFromLastMonth,
-			percentageCompletedThisMonth
-		};
+			return {
+				totalRequestedThisMonth,
+				percentageIncreaseFromLastMonth,
+				percentageCompletedThisMonth
+			};
+		} catch (error) {
+			console.error('Error calculating judgement stats from People Chain, falling back to Subsquid:', error);
+
+			// Fallback to Subsquid
+			try {
+				const subsquidService = new SubsquidService(this.network);
+				return await subsquidService.getJudgementStats();
+			} catch (subsquidError) {
+				console.error('Error fetching stats from Subsquid fallback:', subsquidError);
+				return {
+					totalRequestedThisMonth: 0,
+					percentageIncreaseFromLastMonth: 0,
+					percentageCompletedThisMonth: 0
+				};
+			}
+		}
+	}
+
+	private static mapJudgementStatus(judgementData: string): EJudgementStatus {
+		switch (judgementData) {
+			case 'Reasonable':
+			case 'KnownGood':
+				return EJudgementStatus.APPROVED;
+			case 'OutOfDate':
+			case 'LowQuality':
+			case 'Erroneous':
+				return EJudgementStatus.REJECTED;
+			default:
+				return EJudgementStatus.PENDING;
+		}
 	}
 
 	async getAllIdentityJudgements(): Promise<IJudgementRequest[]> {
-		// This is a simplified implementation
-		// In a real scenario, you would query the chain for all identity judgements
-		// For now, we'll return an empty array and implement this later
-		// Using this.network to satisfy linter
 		console.log('Getting identity judgements for network:', this.network);
-		return [];
+
+		try {
+			const registrars = await this.getRegistrars();
+			const judgements: IJudgementRequest[] = [];
+
+			// Get all identity entries
+			const identityEntries = await this.peopleChainApi.query.identity.identityOf.entries();
+
+			// Process each identity entry
+			identityEntries.forEach(([key, value]) => {
+				const address = key.args[0].toString();
+				const identityInfo = value.toHuman() as any;
+
+				if (!identityInfo?.judgements || !Array.isArray(identityInfo.judgements)) {
+					return;
+				}
+
+				const identity = identityInfo.info || {};
+
+				// Process judgements for each registrar
+				identityInfo.judgements.forEach((judgement: any) => {
+					const [registrarIndex, judgementData] = judgement;
+
+					if (registrarIndex >= 0 && registrarIndex < registrars.length) {
+						const registrar = registrars[registrarIndex];
+						const status = IdentityService.mapJudgementStatus(judgementData);
+
+						// Create judgement request
+						const judgementRequest: IJudgementRequest = {
+							id: `${address}-${registrarIndex}-${Date.now()}`,
+							address,
+							displayName: identity.display?.Raw || identity.display || '',
+							email: identity.email?.Raw || identity.email || '',
+							twitter: identity.twitter?.Raw || identity.twitter || '',
+							status,
+							dateInitiated: new Date(), // We'll improve this with actual block data later
+							registrarIndex,
+							registrarAddress: registrar.account,
+							judgementHash: key.hash.toString()
+						};
+
+						judgements.push(judgementRequest);
+					}
+				});
+			});
+
+			// Sort by date (newest first)
+			return judgements.sort((a, b) => b.dateInitiated.getTime() - a.dateInitiated.getTime());
+		} catch (error) {
+			console.error('Error fetching identity judgements from People Chain, falling back to Subsquid:', error);
+
+			// Fallback to Subsquid
+			try {
+				const subsquidService = new SubsquidService(this.network);
+				const subsquidJudgements = await subsquidService.getIdentityJudgements();
+
+				// Map registrar addresses to judgements
+				const registrars = await this.getRegistrars();
+				return subsquidJudgements.map((judgement) => ({
+					...judgement,
+					registrarAddress: registrars[judgement.registrarIndex]?.account || ''
+				}));
+			} catch (subsquidError) {
+				console.error('Error fetching judgements from Subsquid fallback:', subsquidError);
+				return [];
+			}
+		}
 	}
 
 	async getJudgementRequests({ page, limit }: { page: number; limit: number }): Promise<IJudgementListingResponse> {
@@ -485,16 +581,39 @@ export class IdentityService {
 	}
 
 	async getRegistrarsWithStats(): Promise<IRegistrarInfo[]> {
-		const registrars = await this.getRegistrars();
+		try {
+			const registrars = await this.getRegistrars();
+			const judgements = await this.getAllIdentityJudgements();
 
-		return registrars.map((registrar, index) => ({
-			address: registrar.account,
-			registrarFee: registrar.fee.toString(),
-			registrarIndex: index,
-			totalReceivedRequests: 0, // TODO: Implement this calculation
-			totalJudgementsGiven: 0, // TODO: Implement this calculation
-			latestJudgementDate: undefined // TODO: Implement this calculation
-		}));
+			return registrars.map((registrar, index) => {
+				// Calculate stats for this registrar
+				const registrarJudgements = judgements.filter((j) => j.registrarIndex === index);
+				const totalReceivedRequests = registrarJudgements.length;
+				const totalJudgementsGiven = registrarJudgements.filter((j) => j.status === EJudgementStatus.APPROVED || j.status === EJudgementStatus.REJECTED).length;
+
+				const latestJudgement = registrarJudgements.sort((a, b) => b.dateInitiated.getTime() - a.dateInitiated.getTime())[0];
+
+				return {
+					address: registrar.account,
+					registrarFee: registrar.fee.toString(),
+					registrarIndex: index,
+					totalReceivedRequests,
+					totalJudgementsGiven,
+					latestJudgementDate: latestJudgement?.dateInitiated
+				};
+			});
+		} catch (error) {
+			console.error('Error fetching registrar stats from People Chain, falling back to Subsquid:', error);
+
+			// Fallback to Subsquid
+			try {
+				const subsquidService = new SubsquidService(this.network);
+				return await subsquidService.getRegistrars();
+			} catch (subsquidError) {
+				console.error('Error fetching registrars from Subsquid fallback:', subsquidError);
+				return [];
+			}
+		}
 	}
 
 	async becomeRegistrar({ address, onSuccess, onFailed }: { address: string; onSuccess?: () => void; onFailed?: (errorMessageFallback?: string) => void }) {
