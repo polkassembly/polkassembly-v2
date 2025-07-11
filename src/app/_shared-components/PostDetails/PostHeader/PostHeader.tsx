@@ -24,6 +24,7 @@ import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseTo
 import { ArrowLeftIcon } from 'lucide-react';
 import SummariseIcon from '@/_assets/icons/summarise.svg';
 import Image from 'next/image';
+import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import classes from './PostHeader.module.scss';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 
@@ -142,6 +143,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPostListing | IPost;
 					/>
 					<span>{t('PostDetails.summarise')}</span>
 				</TabsTrigger>
+				{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(postData.proposalType) && <TabsTrigger value={EPostDetailsTab.POST_ANALYTICS}>{t('PostDetails.analytics')}</TabsTrigger>}
 			</TabsList>
 		</div>
 	);
