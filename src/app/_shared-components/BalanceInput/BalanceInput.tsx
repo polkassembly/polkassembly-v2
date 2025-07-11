@@ -59,7 +59,7 @@ function BalanceInput({
 	const networkDetails = NETWORKS_DETAILS[`${network}`];
 	const { supportedAssets } = networkDetails;
 
-	const [assetId, setAssetId] = useState<string | null>(null);
+	const [assetId, setAssetId] = useState<string | null>(supportedAssets[EAssets.USDC]?.index || null);
 
 	const [userBalance, setUserBalance] = useState<string | null>(null);
 
