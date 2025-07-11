@@ -9,6 +9,7 @@ import { EStatusTagType, IJudgementRequest } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
+import Address from '@/app/_shared-components/Profile/Address/Address';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '../../../_shared-components/Table';
 import { PaginationWithLinks } from '../../../_shared-components/PaginationWithLinks';
 import StatusTag from '../../../_shared-components/StatusTag/StatusTag';
@@ -41,10 +42,21 @@ function JudgementListingTable({ data, totalCount }: { data: IJudgementRequest[]
 								{data.map((judgement: IJudgementRequest, index: number) => (
 									<TableRow key={judgement?.id}>
 										<td className={styles.table_content_cell}>{index + 1}</td>
-										<td className='px-6 py-5'>{judgement.address}</td>
-										<td className='px-6 py-5'>{judgement.displayName}</td>
-										<td className='px-6 py-5'>{judgement.email}</td>
-										<td className='px-6 py-5'>{judgement.twitter}</td>
+										<td className='px-6 py-5'>
+											<Address
+												truncateCharLen={5}
+												address={judgement.address}
+											/>
+										</td>
+										<td className='max-w-48 px-6 py-5'>
+											<div className='truncate'>{judgement.displayName || '-'}</div>
+										</td>
+										<td className='max-w-48 px-6 py-5'>
+											<div className='truncate'>{judgement.email || '-'}</div>
+										</td>
+										<td className='max-w-48 px-6 py-5'>
+											<div className='truncate'>{judgement.twitter || '-'}</div>
+										</td>
 										<td className='px-6 py-5'>
 											<StatusTag
 												status={judgement.status}

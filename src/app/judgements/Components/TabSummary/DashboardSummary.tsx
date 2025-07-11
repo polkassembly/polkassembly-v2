@@ -11,6 +11,7 @@ import GreenArrowTop from '@assets/icons/green-arrow-top.svg';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useJudgementStats } from '@/hooks/useJudgementData';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import styles from './TabSummary.module.scss';
 import SearchBar from '../SearchBar/SearchBar';
 
@@ -36,19 +37,25 @@ function DashboardSummary() {
 					<div className={styles.statsContent}>
 						<p className={styles.statsLabel}>{t('Judgements.judgementsRequested')}</p>
 						<p className={styles.statsValue}>
-							<span className={styles.statsNumber}>{isLoading ? '...' : totalRequested}</span>
-							{!isLoading && percentageIncrease > 0 && (
+							{isLoading ? (
+								<Skeleton className='h-6 w-20' />
+							) : (
 								<>
-									<Image
-										src={GreenArrowTop}
-										alt='Green Arrow Top'
-										width={20}
-										height={20}
-									/>
-									<span className={styles.statsPercentage}>{percentageIncrease.toFixed(1)}%</span>
+									<span className={styles.statsNumber}>{totalRequested}</span>
+									{percentageIncrease > 0 && (
+										<>
+											<Image
+												src={GreenArrowTop}
+												alt='Green Arrow Top'
+												width={20}
+												height={20}
+											/>
+											<span className={styles.statsPercentage}>{percentageIncrease.toFixed(1)}%</span>
+										</>
+									)}
+									<span className={styles.statsPeriod}>{t('Judgements.thisMonth')}</span>
 								</>
 							)}
-							<span className={styles.statsPeriod}>{t('Judgements.thisMonth')}</span>
 						</p>
 					</div>
 				</div>
@@ -65,7 +72,7 @@ function DashboardSummary() {
 					/>
 					<div className={styles.statsContent}>
 						<p className={styles.statsLabel}>{t('Judgements.judgementsCompleted')}</p>
-						<p className={styles.completedValue}>{isLoading ? '...' : `${percentageCompleted.toFixed(1)}%`}</p>
+						<p className={styles.completedValue}>{isLoading ? <Skeleton className='h-6 w-20' /> : `${percentageCompleted.toFixed(1)}%`}</p>
 					</div>
 				</div>
 			</div>
