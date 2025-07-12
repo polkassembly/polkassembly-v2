@@ -50,6 +50,10 @@ import {
 	EVoteSortOptions,
 	EHttpHeaderKey,
 	IPostLink,
+	IPostAnalytics,
+	IPostBubbleVotes,
+	EAnalyticsType,
+	EPostBubbleVotesType,
 	IJudgementStats,
 	IJudgementListingResponse,
 	IRegistrarsListingResponse
@@ -133,6 +137,8 @@ enum EApiRoute {
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
 	GET_USER_POSTS = 'GET_USER_POSTS',
+	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
+	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES',
 	FETCH_JUDGEMENT_STATS = 'FETCH_JUDGEMENT_STATS',
 	FETCH_JUDGEMENT_REQUESTS = 'FETCH_JUDGEMENT_REQUESTS',
 	FETCH_REGISTRARS = 'FETCH_REGISTRARS'
@@ -232,6 +238,8 @@ export class NextApiClientService {
 			case EApiRoute.GET_CONTENT_SUMMARY:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 			case EApiRoute.GET_VOTE_CURVES:
+			case EApiRoute.GET_POST_ANALYTICS:
+			case EApiRoute.GET_POST_BUBBLE_VOTES:
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
 				path = '/track-analytics';
@@ -1097,6 +1105,30 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS, routeSegments: [address, 'posts'], queryParams });
 		return this.nextApiClientFetch<IUserPosts>({ url, method });
+	}
+
+	static async getPostAnalytics({ proposalType, index }: { proposalType: EProposalType; index: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_ANALYTICS, routeSegments: [proposalType, index, 'analytics'] });
+		return this.nextApiClientFetch<IPostAnalytics | null>({ url, method });
+	}
+
+	static async getPostBubbleVotes({
+		proposalType,
+		index,
+		analyticsType,
+		votesType
+	}: {
+		proposalType: EProposalType;
+		index: string;
+		analyticsType: EAnalyticsType;
+		votesType: EPostBubbleVotesType;
+	}) {
+		const queryParams = new URLSearchParams({
+			analyticsType: analyticsType ? analyticsType.toString() : '',
+			votesType: votesType.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_BUBBLE_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-bubble'], queryParams });
+		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method });
 	}
 
 	static async fetchJudgementStats() {

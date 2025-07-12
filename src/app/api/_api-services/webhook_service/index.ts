@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { z } from 'zod';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EHttpHeaderKey, ENetwork, EPostOrigin, EProposalType, ERole, EWallet, IUser } from '@/_shared/types';
+import { EAnalyticsType, EHttpHeaderKey, ENetwork, EPostBubbleVotesType, EPostOrigin, EProposalType, ERole, EWallet, IUser } from '@/_shared/types';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -140,6 +140,7 @@ export class WebhookService {
 					params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_UPDATED]>
 				});
 			case EWebhookEvent.VOTED:
+				return this.handleVoted({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.VOTED]> });
 			case EWebhookEvent.REMOVED_VOTE:
 			case EWebhookEvent.TIPPED:
 			case EWebhookEvent.DELEGATED:
@@ -184,6 +185,30 @@ export class WebhookService {
 			console.error('Failed to clear cache for some networks:', error);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to clear cache completely');
 		}
+	}
+
+	private static async handleVoted({ network, params }: { network: ENetwork; params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.VOTED]> }) {
+		const { indexOrHash, proposalType } = params;
+
+		await Promise.all([
+			RedisService.DeletePostAnalyticsData({ network, proposalType, index: Number(indexOrHash) }),
+			RedisService.DeletePostBubbleVotesData({
+				network,
+				proposalType,
+				index: Number(indexOrHash),
+				votesType: EPostBubbleVotesType.FLATTENED,
+				analyticsType: EAnalyticsType.CONVICTIONS
+			}),
+			RedisService.DeletePostBubbleVotesData({
+				network,
+				proposalType,
+				index: Number(indexOrHash),
+				votesType: EPostBubbleVotesType.NESTED,
+				analyticsType: EAnalyticsType.CONVICTIONS
+			}),
+			RedisService.DeletePostBubbleVotesData({ network, proposalType, index: Number(indexOrHash), votesType: EPostBubbleVotesType.FLATTENED, analyticsType: EAnalyticsType.VOTES }),
+			RedisService.DeletePostBubbleVotesData({ network, proposalType, index: Number(indexOrHash), votesType: EPostBubbleVotesType.NESTED, analyticsType: EAnalyticsType.VOTES })
+		]);
 	}
 
 	private static async handleProposalStatusChanged({

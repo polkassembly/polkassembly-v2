@@ -44,13 +44,13 @@ if (!REFRESH_TOKEN_PRIVATE_KEY || !REFRESH_TOKEN_PUBLIC_KEY || !REFRESH_TOKEN_PA
 }
 
 export class AuthService {
-	private static async CreateAndSendEmailVerificationToken(user: IUser): Promise<void> {
+	private static async CreateAndSendEmailVerificationToken(user: IUser, network: ENetwork): Promise<void> {
 		if (user.email) {
 			const verifyToken = createCuid();
 			await RedisService.SetEmailVerificationToken({ token: verifyToken, email: user.email });
 
 			// send verification email in background
-			NotificationService.SendVerificationEmail(user, verifyToken);
+			NotificationService.SendVerificationEmail(user, network, verifyToken);
 		}
 	}
 
@@ -291,7 +291,7 @@ export class AuthService {
 			network
 		});
 
-		await this.CreateAndSendEmailVerificationToken(user);
+		await this.CreateAndSendEmailVerificationToken(user, network);
 
 		return {
 			refreshToken: await this.GetRefreshToken({ userId: user.id }),
@@ -438,7 +438,7 @@ export class AuthService {
 		await OffChainDbService.UpdateUserTfaDetails(userId, newTfaDetails);
 	}
 
-	static async UpdateUserEmail({ email, accessToken }: { email: string; accessToken: string }) {
+	static async UpdateUserEmail({ email, accessToken, network }: { email: string; accessToken: string; network: ENetwork }) {
 		const accessTokenPayload = this.GetAccessTokenPayload(accessToken);
 
 		if (!ValidatorService.isValidUserId(accessTokenPayload.id) || !ValidatorService.isValidEmail(email)) {
@@ -458,7 +458,7 @@ export class AuthService {
 		// send verification email
 		const verifyToken = createCuid();
 		await RedisService.SetEmailVerificationToken({ token: verifyToken, email: user.email });
-		await NotificationService.SendVerificationEmail(user, verifyToken);
+		await NotificationService.SendVerificationEmail(user, network, verifyToken);
 
 		// regenerate access and refresh tokens
 		return {
