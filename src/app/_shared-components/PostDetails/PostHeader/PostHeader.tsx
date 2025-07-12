@@ -29,6 +29,7 @@ import Link from 'next/link';
 import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
 import { ArrowLeftIcon, ChevronsRight } from 'lucide-react';
 import { getPostDetailsUrl } from '@/app/_client-utils/getPostDetailsUrl';
+import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import classes from './PostHeader.module.scss';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 
@@ -78,7 +79,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 							className='mx-1 h-3 w-[2px]'
 						/>
 						<Link
-							href={getPostDetailsUrl({ proposalType: postData.linkedPost?.proposalType as EProposalType, proposalId: Number(postData.linkedPost?.indexOrHash), network })}
+							href={getPostDetailsUrl({ proposalType: postData.linkedPost?.proposalType, proposalId: Number(postData.linkedPost?.indexOrHash), network })}
 							className='flex items-center gap-x-1 text-xs text-listing_page_btn hover:underline'
 						>
 							<span className='text-text_secondary'>{t(`PostDetails.ProposalType.${(postData.linkedPost?.proposalType || EProposalType.DISCUSSION).toLowerCase()}`)}</span>
@@ -249,6 +250,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 				<TabsTrigger value={EPostDetailsTab.DESCRIPTION}>{t('PostDetails.description')}</TabsTrigger>
 				<TabsTrigger value={EPostDetailsTab.TIMELINE}>{t('PostDetails.timeline')}</TabsTrigger>
 				{!isOffchainPost && <TabsTrigger value={EPostDetailsTab.ONCHAIN_INFO}>{t('PostDetails.onchainInfo')}</TabsTrigger>}
+				{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(postData.proposalType) && <TabsTrigger value={EPostDetailsTab.POST_ANALYTICS}>{t('PostDetails.analytics')}</TabsTrigger>}
 			</TabsList>
 		</div>
 	);

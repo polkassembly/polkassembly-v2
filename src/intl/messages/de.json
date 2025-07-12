@@ -442,6 +442,7 @@
 		"more": "mehr",
 		"referendum": "Referendum",
 		"comments": "Kommentare",
+		"analytics": "Analysen",
 		"please": "Bitte",
 		"login": "Anmelden",
 		"toComment": "zum Kommentieren",
@@ -469,6 +470,48 @@
 		"account": "Konto",
 		"abstain": "Enthaltung",
 		"onchainInfo": "Onchain-Informationen",
+		"VotesBubble": {
+			"nested": "Verschachtelt",
+			"flattened": "Eben",
+			"votesDistribution": "Wählerverteilung",
+			"others": "Andere",
+			"capital": "Kapital",
+			"delegators": "Delegierende",
+			"lockPeriod": "Sperrzeitraum",
+			"votes": "Abstimmungen",
+			"aye": "Ja",
+			"nay": "Nein",
+			"abstain": "Enthaltung",
+			"noVotesFound": "Keine Abstimmungen gefunden"
+		},
+		"Analytics": {
+			"totalVotesCasted": "Gesamte Abstimmungen",
+			"delegatedVsSolo": "Delegiert vs. Einzel",
+			"aye": "Ja",
+			"nay": "Nein",
+			"abstain": "Enthaltung",
+			"turnout": "Abstimmung",
+			"support": "Unterstützung",
+			"percentage": "Prozent",
+			"issuance": "Issuance",
+			"users": "Benutzer",
+			"delegated": "Delegiert",
+			"voters": "Abstimmende",
+			"votingPower": "Stimmgewicht",
+			"convictionsAnalytics": "Überzeugungsberechnungen",
+			"votesAnalytics": "Abstimmungsbetrag",
+			"accountsAnalytics": "Konten",
+			"votesByConviction": "Überzeugungsberechnungen",
+			"delegationVotesByConviction": "Delegiertenüberzeugungsberechnungen",
+			"solo": "Einzel",
+			"timeSplit": "Zeitaufteilung",
+			"day": "Tag",
+			"notEnoughData": "Nicht genügend Daten verfügbar, bitte überprüfen Sie später erneut.",
+			"votes": "Abstimmungen",
+			"convictionAnalyticsDes": "Überzeugung ist die Anzahl der Token, die für die Abstimmung verwendet werden, multipliziert mit der Überzeugung",
+			"accountAnalyticsDes": "Konten sind die Anzahl der eindeutigen Adressen, die eine Abstimmung abgeben",
+			"votesAnalyticsDes": "Abstimmungsbetrag ist die Anzahl der Token, die für die Abstimmung verwendet werden"
+		},
 		"OnchainInfo": {
 			"metadata": "Metadaten",
 			"table": "Tabelle",
@@ -537,7 +580,9 @@
 			"payoutClaimFailed": "Auszahlung konnte nicht beansprucht werden",
 			"payoutClaimedSuccessfullyDescription": "Ihre Auszahlung wurde erfolgreich beansprucht",
 			"payoutClaimFailedDescription": "Bitte versuchen Sie es erneut"
-		}
+		},
+		"commentsDisabled": "Die Kommentare wurden für diesen Beitrag deaktiviert.",
+		"commentsDisabledForNonVerifiedUsers": "Kommentare wurden für nicht verifizierte Benutzer deaktiviert."
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",
@@ -653,7 +698,8 @@
 		"success": "Beitrag erfolgreich aktualisiert",
 		"successDescription": "Ihr Beitrag wurde erfolgreich aktualisiert",
 		"error": "Beitrag konnte nicht aktualisiert werden",
-		"errorDescription": "Beim Aktualisieren Ihres Beitrags ist ein Fehler aufgetreten"
+		"errorDescription": "Beim Aktualisieren Ihres Beitrags ist ein Fehler aufgetreten",
+		"whoCanComment": "Wer kann kommentieren?"
 	},
 	"Footer": {
 		"helpCenter": "Hilfezentrum",
@@ -718,7 +764,7 @@
 			"cancel": "Abbrechen",
 			"insertImage": "Bild einfügen",
 			"failedToUploadImage": "Bild konnte nicht hochgeladen werden"
-		},	
+		},
 		"AllowedCommentors": {
 			"title": "Wer kann kommentieren?",
 			"all": "Alle",
@@ -791,6 +837,8 @@
 		"searchUsername": "Benutzername suchen"
 	},
 	"SetIdentity": {
+		"TeleportFundsToPeopleChain": "Mittel zur People Chain teleportieren",
+		"Teleport": "Teleportieren",
 		"displayName": "Anzeigename",
 		"legalName": "Rechtlicher Name",
 		"email": "E-Mail",
@@ -1274,5 +1322,14 @@
 		"pasteURLorEnterPostID": "URL einfügen oder Beitrags-ID eingeben",
 		"yourDiscussions": "Ihre Diskussionen",
 		"confirm": "Bestätigen"
+	},
+	"TeleportToPeopleChain": {
+		"teleport": "Teleportieren",
+		"teleportFundsToPeopleChainSuccess": "Mittel wurden erfolgreich zur People Chain teleportiert",
+		"teleportFundsToPeopleChainSuccessDescription": "Die Mittel wurden erfolgreich zur People Chain teleportiert",
+		"teleportFundsToPeopleChainFailed": "Teleport der Mittel zur People Chain fehlgeschlagen",
+		"teleportFundsToPeopleChainFailedDescription": "Beim Teleportieren der Mittel zur People Chain ist ein Fehler aufgetreten",
+		"BeneficiaryAddress": "Begünstigten-Adresse",
+		"Amount": "Betrag"
 	}
 }

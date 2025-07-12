@@ -49,7 +49,11 @@ import {
 	IOnChainMetadata,
 	EVoteSortOptions,
 	EHttpHeaderKey,
-	IPostLink
+	IPostLink,
+	IPostAnalytics,
+	IPostBubbleVotes,
+	EAnalyticsType,
+	EPostBubbleVotesType
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -129,7 +133,9 @@ enum EApiRoute {
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
-	GET_USER_POSTS = 'GET_USER_POSTS'
+	GET_USER_POSTS = 'GET_USER_POSTS',
+	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
+	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES'
 }
 
 export class NextApiClientService {
@@ -226,6 +232,8 @@ export class NextApiClientService {
 			case EApiRoute.GET_CONTENT_SUMMARY:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 			case EApiRoute.GET_VOTE_CURVES:
+			case EApiRoute.GET_POST_ANALYTICS:
+			case EApiRoute.GET_POST_BUBBLE_VOTES:
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
 				path = '/track-analytics';
@@ -374,9 +382,9 @@ export class NextApiClientService {
 			credentials: 'include',
 			headers: {
 				...(!global.window ? await getCookieHeadersServer() : {}),
-				'Content-Type': 'application/json',
-				'x-api-key': getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
-				'x-network': currentNetwork,
+				[EHttpHeaderKey.CONTENT_TYPE]: 'application/json',
+				[EHttpHeaderKey.API_KEY]: getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
+				[EHttpHeaderKey.NETWORK]: currentNetwork,
 				[EHttpHeaderKey.SKIP_CACHE]: skipCache.toString()
 			},
 			method
@@ -448,18 +456,20 @@ export class NextApiClientService {
 		origins = [],
 		tags = [],
 		limit = DEFAULT_LISTING_LIMIT,
-		userId
+		userId,
+		skipCache = false
 	}: {
-		proposalType: string;
+		proposalType: EProposalType;
 		page: number;
 		statuses?: string[];
 		origins?: EPostOrigin[];
 		tags?: string[];
 		limit?: number;
 		userId?: number;
+		skipCache?: boolean;
 	}): Promise<{ data: IGenericListingResponse<IPostListing> | null; error: IErrorResponse | null }> {
 		// try redis cache first if ssr
-		if (this.isServerSide() && !ValidatorService.isValidNumber(userId)) {
+		if (this.isServerSide() && !ValidatorService.isValidNumber(userId) && !skipCache) {
 			const currentNetwork = await this.getCurrentNetwork();
 
 			const cachedData = await redisServiceSSR('GetPostsListing', {
@@ -504,7 +514,7 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.POSTS_LISTING, routeSegments: [proposalType], queryParams });
 
-		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method });
+		return this.nextApiClientFetch<IGenericListingResponse<IPostListing>>({ url, method, skipCache });
 	}
 
 	// Post Reactions
@@ -546,7 +556,7 @@ export class NextApiClientService {
 	}: {
 		proposalType: EProposalType;
 		index: string;
-		data: { title: string; content: string; linkedPost?: IPostLink };
+		data: { title: string; content: string; allowedCommentor: EAllowedCommentor; linkedPost?: IPostLink };
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.EDIT_PROPOSAL_DETAILS, routeSegments: [proposalType, index] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data });
@@ -1080,5 +1090,29 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS, routeSegments: [address, 'posts'], queryParams });
 		return this.nextApiClientFetch<IUserPosts>({ url, method });
+	}
+
+	static async getPostAnalytics({ proposalType, index }: { proposalType: EProposalType; index: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_ANALYTICS, routeSegments: [proposalType, index, 'analytics'] });
+		return this.nextApiClientFetch<IPostAnalytics | null>({ url, method });
+	}
+
+	static async getPostBubbleVotes({
+		proposalType,
+		index,
+		analyticsType,
+		votesType
+	}: {
+		proposalType: EProposalType;
+		index: string;
+		analyticsType: EAnalyticsType;
+		votesType: EPostBubbleVotesType;
+	}) {
+		const queryParams = new URLSearchParams({
+			analyticsType: analyticsType ? analyticsType.toString() : '',
+			votesType: votesType.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_BUBBLE_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-bubble'], queryParams });
+		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method });
 	}
 }

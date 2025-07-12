@@ -10,12 +10,14 @@ import Image from 'next/image';
 import NoContextGIF from '@assets/gifs/no-context.gif';
 import { useUser } from '@/hooks/useUser';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import dynamic from 'next/dynamic';
 import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
-import PostActions from './PostActions/PostActions';
 import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 import { MarkdownViewer } from '../MarkdownViewer/MarkdownViewer';
 import LinkPostButton from './LinkDiscussionPost/LinkPostButton';
+
+const PostActions = dynamic(() => import('./PostActions/PostActions'), { ssr: false });
 
 function PostContent({ postData, isModalOpen }: { postData: IPost; isModalOpen: boolean }) {
 	const { content } = postData;

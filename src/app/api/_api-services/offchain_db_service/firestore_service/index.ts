@@ -292,6 +292,10 @@ export class FirestoreService extends FirestoreUtils {
 
 		const postData = postDocSnapshot.docs[0].data();
 
+		const isDefaultContent =
+			(!postData.title && !postData.content) ||
+			(postData.title === 'Untitled Post' && (!postData.content?.trim?.() || postData.content.includes('login and tell us more about your proposal')));
+
 		return {
 			...postData,
 			content: postData.content || '',
@@ -307,7 +311,8 @@ export class FirestoreService extends FirestoreUtils {
 			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate(),
-			allowedCommentor: postData.allowedCommentor || EAllowedCommentor.ALL
+			allowedCommentor: postData.allowedCommentor || EAllowedCommentor.ALL,
+			isDefaultContent
 		} as IOffChainPost;
 	}
 
@@ -414,7 +419,17 @@ export class FirestoreService extends FirestoreUtils {
 		return commentsCount.data().count || 0;
 	}
 
-	static async GetPostMetrics({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IPostOffChainMetrics> {
+	static async GetPostMetrics({
+		network,
+		indexOrHash,
+		proposalType,
+		linkedPost
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		linkedPost?: IPostLink;
+	}): Promise<IPostOffChainMetrics> {
 		const postReactionsCount = (await this.GetPostReactionsCount({ network, indexOrHash, proposalType })).reduce(
 			(acc, curr) => {
 				acc[curr.reaction] = curr.count;
@@ -425,9 +440,16 @@ export class FirestoreService extends FirestoreUtils {
 
 		const commentsCount = await this.GetPostCommentsCount({ network, indexOrHash, proposalType });
 
+		let linkedPostCommentsCount = 0;
+		if (linkedPost && linkedPost.indexOrHash) {
+			linkedPostCommentsCount = await this.GetPostCommentsCount({ network, indexOrHash: linkedPost.indexOrHash, proposalType: linkedPost.proposalType });
+		}
+
+		const totalCommentsCount = commentsCount + linkedPostCommentsCount;
+
 		return {
 			reactions: postReactionsCount,
-			comments: commentsCount
+			comments: totalCommentsCount
 		} as IPostOffChainMetrics;
 	}
 
