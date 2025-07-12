@@ -11,6 +11,8 @@ import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
 import {
 	ENetwork,
+	EProposalStatus,
+	EAnalyticsType,
 	EPostOrigin,
 	EProposalType,
 	IContentSummary,
@@ -18,7 +20,10 @@ import {
 	IDelegationStats,
 	IGenericListingResponse,
 	IPost,
+	IPostAnalytics,
 	IPostListing,
+	EVotesType,
+	IPostBubbleVotes,
 	ITrackAnalyticsDelegations,
 	ITrackAnalyticsStats,
 	ITreasuryStats
@@ -58,7 +63,9 @@ enum ERedisKeys {
 	TRACK_ANALYTICS_DELEGATION = 'TAD',
 	TRACK_ANALYTICS_STATS = 'TAS',
 	TREASURY_STATS = 'TRS',
-	OVERVIEW_PAGE_DATA = 'OPD'
+	OVERVIEW_PAGE_DATA = 'OPD',
+	POST_ANALYTICS_DATA = 'PAD',
+	POST_BUBBLE_VOTES_DATA = 'PBVD'
 }
 
 export class RedisService {
@@ -123,7 +130,11 @@ export class RedisService {
 		[ERedisKeys.TRACK_ANALYTICS_DELEGATION]: (network: string, origin: EPostOrigin | 'all'): string => `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-${origin}`,
 		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: EPostOrigin | 'all'): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
 		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
-		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`
+		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
+		[ERedisKeys.POST_ANALYTICS_DATA]: (network: ENetwork, proposalType: EProposalType, index: number): string =>
+			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${index}`,
+		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: ENetwork, proposalType: EProposalType, index: number, votesType: EVotesType, analyticsType: EAnalyticsType): string =>
+			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${index}-${votesType}-${analyticsType}`
 	} as const;
 
 	// helper methods
@@ -223,7 +234,9 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` }),
-			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}-*` })
+			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_ANALYTICS_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-*` })
 		]);
 	}
 
@@ -512,6 +525,11 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` }),
+
+			// clear post analytics data
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_ANALYTICS_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-*` }),
+
 			// clear overview page data
 			this.DeleteOverviewPageData({ network }),
 
@@ -627,5 +645,94 @@ export class RedisService {
 
 	static async DeleteOverviewPageData({ network }: { network: ENetwork }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
+	}
+
+	static async SetPostAnalyticsData({
+		network,
+		proposalType,
+		index,
+		data,
+		proposalStatus
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		data: IPostAnalytics;
+		proposalStatus: EProposalStatus;
+	}): Promise<void> {
+		const isActivePost = ACTIVE_PROPOSAL_STATUSES.includes(proposalStatus);
+
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index),
+			value: JSON.stringify(data),
+			ttlSeconds: isActivePost ? ONE_DAY_IN_SECONDS : THIRTY_DAYS_IN_SECONDS
+		});
+	}
+
+	static async GetPostAnalyticsData({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index) });
+		return data ? (deepParseJson(data) as IPostAnalytics) : null;
+	}
+
+	static async DeletePostAnalyticsData({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index) });
+	}
+
+	static async SetPostBubbleVotesData({
+		network,
+		proposalType,
+		index,
+		data,
+		votesType,
+		analyticsType,
+		proposalStatus
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		data: IPostBubbleVotes;
+		votesType: EVotesType;
+		analyticsType: EAnalyticsType;
+		proposalStatus: EProposalStatus;
+	}): Promise<void> {
+		const isActivePost = ACTIVE_PROPOSAL_STATUSES.includes(proposalStatus);
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType),
+			value: JSON.stringify(data),
+			ttlSeconds: isActivePost ? ONE_DAY_IN_SECONDS : THIRTY_DAYS_IN_SECONDS
+		});
+	}
+
+	static async GetPostBubbleVotesData({
+		network,
+		proposalType,
+		index,
+		votesType,
+		analyticsType
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		votesType: EVotesType;
+		analyticsType: EAnalyticsType;
+	}): Promise<IPostBubbleVotes | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });
+		return data ? (deepParseJson(data) as IPostBubbleVotes) : null;
+	}
+
+	static async DeletePostBubbleVotesData({
+		network,
+		proposalType,
+		index,
+		votesType,
+		analyticsType
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		votesType: EVotesType;
+		analyticsType: EAnalyticsType;
+	}): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });
 	}
 }

@@ -18,6 +18,7 @@ import {
 	IDelegationStats,
 	EBountyStatus,
 	EVoteSortOptions,
+	EAnalyticsType,
 	EVotesType
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
@@ -311,5 +312,25 @@ export class OnChainDbService {
 		proposalType: EProposalType;
 	}) {
 		return SubsquidService.GetOnChainPostsByProposer({ network, proposer, page, limit, proposalType });
+	}
+
+	static async GetPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }) {
+		return SubsquidService.GetPostAnalytics({ network, proposalType, index });
+	}
+
+	static async GetPostBubbleVotes({
+		network,
+		proposalType,
+		index,
+		analyticsType,
+		votesType
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		analyticsType: EAnalyticsType;
+		votesType: EVotesType;
+	}) {
+		return SubsquidService.GetPostBubbleVotes({ network, proposalType, index, analyticsType, votesType });
 	}
 }
