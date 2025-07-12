@@ -95,7 +95,6 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 
 			setIdentityLoading(true);
 			const identityInfo = await identityService.getOnChainIdentity(userPreferences.selectedAccount.address);
-			console.log({ identityInfo });
 
 			formData.setValue('displayName', identityInfo.display);
 			formData.setValue('legalName', identityInfo.legal);
@@ -219,7 +218,7 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 						rules={{
 							required: true,
 							validate: (value) => {
-								if (value?.length === 0) return 'Invalid Display Name';
+								if (value?.length === 0) return 'Invalid Legal Name';
 								return true;
 							}
 						}}

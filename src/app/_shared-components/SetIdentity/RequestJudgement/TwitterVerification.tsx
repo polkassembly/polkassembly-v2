@@ -14,6 +14,7 @@ import VerifiedCheckIcon from '@assets/icons/verified-check-green.svg';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useToast } from '@/hooks/useToast';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { ONE_MIN_IN_SECONDS } from '@/app/api/_api-constants/timeConstants';
 import { Button } from '../../Button';
 
 function TwitterVerification({ identityTwitter, twitterSocialHandle }: { identityTwitter: string; twitterSocialHandle?: ISocialHandle }) {
@@ -98,7 +99,7 @@ function TwitterVerification({ identityTwitter, twitterSocialHandle }: { identit
 		}
 
 		// Start 60 second timer
-		setTimeLeft(60);
+		setTimeLeft(ONE_MIN_IN_SECONDS);
 
 		queryClient.setQueryData(['socials', user?.id, userPreferences.selectedAccount?.address], (old: Record<ESocial, ISocialHandle>) => ({
 			...old,

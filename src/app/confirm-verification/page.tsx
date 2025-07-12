@@ -5,25 +5,19 @@
 /* eslint-disable camelcase */
 
 import { z } from 'zod';
-import { ESocial } from '@/_shared/types';
+import { ENetwork, ESocial } from '@/_shared/types';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { redirect } from 'next/navigation';
-import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ClientError } from '../_client-utils/clientError';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 import ConfirmVerfication from './Components/ConfirmVerfication';
 
 const searchParamsSchema = z.object({
-	token: z.string().optional(),
+	token: z.string().min(3).optional(),
 	social: z.enum([ESocial.EMAIL, ESocial.TWITTER, ESocial.RIOT] as const).optional(),
-	oauth_verifier: z.string().optional(),
-	oauth_token: z.string().optional(),
-	network: z
-		.string()
-		.optional()
-		.refine((val) => val && ValidatorService.isValidNetwork(val), {
-			message: 'Invalid network'
-		})
+	oauth_verifier: z.string().min(3).optional(),
+	oauth_token: z.string().min(3).optional(),
+	network: z.nativeEnum(ENetwork).optional()
 });
 
 interface PageProps {
@@ -37,9 +31,15 @@ async function ConfirmVerificationPage({ searchParams }: PageProps) {
 
 		const currentNetwork = await getNetworkFromHeaders();
 
-		if (network && ValidatorService.isValidNetwork(network) && currentNetwork !== network) {
+		if (network && currentNetwork !== network) {
 			// route to the correct network
-			redirect(`https://${network}.polkassembly.io/confirm-verification?social=${social}&token=${token}&oauth_verifier=${oauth_verifier}&oauth_token=${oauth_token}`);
+			const redirectSearchParams = new URLSearchParams();
+			if (social) redirectSearchParams.append('social', social);
+			if (token) redirectSearchParams.append('token', token);
+			if (oauth_verifier) redirectSearchParams.append('oauth_verifier', oauth_verifier);
+			if (oauth_token) redirectSearchParams.append('oauth_token', oauth_token);
+
+			redirect(`https://${network}.polkassembly.io/confirm-verification?${searchParams.toString()}`);
 		}
 
 		if (!social || (social === ESocial.TWITTER && !oauth_token) || (social === ESocial.EMAIL && !token)) {

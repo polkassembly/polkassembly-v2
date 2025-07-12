@@ -14,6 +14,7 @@ import VerifiedCheckIcon from '@assets/icons/verified-check-green.svg';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useToast } from '@/hooks/useToast';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { ONE_MIN_IN_SECONDS } from '@/app/api/_api-constants/timeConstants';
 import { Button } from '../../Button';
 
 function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail: string; emailSocialHandle?: ISocialHandle }) {
@@ -96,7 +97,7 @@ function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail
 		}
 
 		// Start 60 second timer
-		setTimeLeft(60);
+		setTimeLeft(ONE_MIN_IN_SECONDS);
 
 		queryClient.setQueryData(['socials', user.id, userPreferences.selectedAccount?.address], (old: Record<ESocial, ISocialHandle>) => ({
 			...old,
@@ -127,6 +128,7 @@ function EmailVerification({ identityEmail, emailSocialHandle }: { identityEmail
 			return t('SetIdentity.resend');
 		}
 		return t('SetIdentity.verify');
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [emailStatus, timeLeft]);
 
 	return (
