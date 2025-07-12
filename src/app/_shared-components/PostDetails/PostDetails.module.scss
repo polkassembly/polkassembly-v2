@@ -25,3 +25,7 @@
 .modalDescBox {
 	@apply flex max-h-96 w-96 overflow-y-auto border-none lg:w-full;
 }
+
+.analyticsBox {
+	@apply rounded-xl bg-bg_modal p-4 shadow-lg lg:p-6;
+}
