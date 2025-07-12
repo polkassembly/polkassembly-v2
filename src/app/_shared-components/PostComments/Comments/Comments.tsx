@@ -146,6 +146,7 @@ function Comments({
 				canComment ? (
 					<div className='w-full px-6 py-6'>
 						<AddComment
+							id='commentForm'
 							proposalType={proposalType}
 							proposalIndex={index}
 							onConfirm={(newComment, publicUser) => {
@@ -164,6 +165,7 @@ function Comments({
 					<Link
 						className='text-text_pink'
 						href='/login'
+						id='commentLoginPrompt'
 					>
 						{t('PostDetails.login')}
 					</Link>{' '}
