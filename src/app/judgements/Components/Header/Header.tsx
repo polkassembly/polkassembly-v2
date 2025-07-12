@@ -6,7 +6,8 @@
 
 import { useTranslations } from 'next-intl';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
-import { EJudgementDashboardTabs } from '@/_shared/types';
+import Link from 'next/link';
+import { EJudgementDashboardTabs, ESetIdentityStep } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import styles from './Header.module.scss';
 
@@ -19,7 +20,9 @@ function Header({ data }: { data: { registrarsCount: number } }) {
 				<div className={styles.header_title_container}>
 					<p className={styles.header_title}>{t('Judgements.judgement')}</p>
 					<div className={styles.header_button_container}>
-						<Button>{t('Judgements.requestJudgement')}</Button>
+						<Link href={`/set-identity?open=${ESetIdentityStep.REQUEST_JUDGEMENT}`}>
+							<Button>{t('Judgements.requestJudgement')}</Button>
+						</Link>
 						<Button variant='secondary'>{t('Judgements.becomeARegistrar')}</Button>
 					</div>
 				</div>
