@@ -558,8 +558,7 @@
 		"VoteCurves": {
 			"approval": "批准",
 			"support": "支持",
-			"threshold": "阈值",
-			"votingData": "投票数据"
+			"threshold": "阈值"
 		},
 		"threshold": "阈值",
 		"DecisionDeposit": {

@@ -558,8 +558,7 @@
 		"VoteCurves": {
 			"approval": "承認",
 			"support": "サポート",
-			"threshold": "閾値",
-			"votingData": "投票データ"
+			"threshold": "閾値"
 		},
 		"threshold": "しきい値",
 		"DecisionDeposit": {

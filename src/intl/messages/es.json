@@ -559,8 +559,7 @@
 		"VoteCurves": {
 			"approval": "Aprobación",
 			"support": "Apoyo",
-			"threshold": "Umbral",
-			"votingData": "Datos de Votación"
+			"threshold": "Umbral"
 		},
 		"threshold": "Umbral",
 		"DecisionDeposit": {

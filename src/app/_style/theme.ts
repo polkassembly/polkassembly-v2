@@ -334,6 +334,8 @@ export const THEME_COLORS = {
 		parachain_badge_bg: '#ea729d',
 		nivo_fill_color: '#fff',
 		analytics_description_bg: '#262535',
+		toggle_btn_inactive_bg: '#222222',
+		votes_tab_bg: '#222222',
 		toggle_btn_active_bg: '#000',
 		toggle_btn_active_text: '#E5007A',
 		toggle_btn_inactive_text: '#9E9E9E',
