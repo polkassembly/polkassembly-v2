@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useMemo, useCallback, useState } from 'react';
-import { EAnalyticsType, ENetwork, EPostBubbleVotesType, EProposalType, ETheme, EVoteDecision, IPostBubbleVotes, IVoteDistribution } from '@/_shared/types';
+import { EAnalyticsType, ENetwork, EVotesType, EProposalType, ETheme, EVoteDecision, IPostBubbleVotes, IVoteDistribution } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { ResponsiveCirclePacking } from '@nivo/circle-packing';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -121,7 +121,7 @@ const getPostAnalytics = async ({
 	proposalType: EProposalType;
 	index: string;
 	analyticsType: EAnalyticsType;
-	votesType: EPostBubbleVotesType;
+	votesType: EVotesType;
 }) => {
 	const { data, error } = await NextApiClientService.getPostBubbleVotes({
 		proposalType: proposalType as EProposalType,
@@ -142,7 +142,7 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 	const {
 		userPreferences: { theme }
 	} = useUserPreferences();
-	const [votesType, setVotesType] = useState<EPostBubbleVotesType>(EPostBubbleVotesType.NESTED);
+	const [votesType, setVotesType] = useState<EVotesType>(EVotesType.NESTED);
 
 	const getBorderColor = (decision: EVoteDecision) => {
 		return THEME_COLORS.light[`${decision}_color` as keyof typeof THEME_COLORS.light];
@@ -187,7 +187,7 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 							address={id}
 							textClassName='text-sm'
 						/>
-						{votesType === EPostBubbleVotesType.NESTED ? (
+						{votesType === EVotesType.NESTED ? (
 							<div className={classes.tooltipContent}>
 								<div className={classes.tooltipContentValue}>
 									<span className={classes.tooltipText}>
@@ -302,7 +302,7 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 			<div className={classes.header}>
 				<h2 className={classes.heading}>{t('votesDistribution')}</h2>
 				<div className={classes.buttonContainer}>
-					{[EPostBubbleVotesType.NESTED, EPostBubbleVotesType.FLATTENED].map((type) => (
+					{[EVotesType.NESTED, EVotesType.FLATTENED].map((type) => (
 						<Button
 							key={type}
 							variant='ghost'

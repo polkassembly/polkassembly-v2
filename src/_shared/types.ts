@@ -663,6 +663,7 @@ export interface IVoteData {
 	selfVotingPower?: string;
 	totalVotingPower?: string;
 	delegatedVotingPower?: string;
+	votingPower?: string | null;
 	delegatedVotes?: IVoteData[];
 }
 
@@ -1302,6 +1303,11 @@ export interface IPayout {
 		generalIndex: string;
 	};
 }
+
+export enum EVotesType {
+	NESTED = 'nested',
+	FLATTENED = 'flattened'
+}
 export interface IAnalytics {
 	[EVoteDecision.ABSTAIN]: string;
 	[EVoteDecision.AYE]: string;
@@ -1379,7 +1385,6 @@ export enum EAnalyticsType {
 }
 
 export interface IVoteDistribution extends Omit<IVoteData, 'createdAt' | 'createdAtBlock' | 'proposalIndex' | 'delegatedTo'> {
-	votingPower: string | null;
 	delegatorsCount?: number;
 	isDelegated: boolean;
 	percentage?: number;
@@ -1393,8 +1398,3 @@ export type IPostBubbleVotes = {
 		status: EProposalStatus;
 	};
 };
-
-export enum EPostBubbleVotesType {
-	NESTED = 'nested',
-	FLATTENED = 'flattened'
-}

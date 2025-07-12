@@ -470,6 +470,8 @@
 		"account": "Konto",
 		"abstain": "Enthaltung",
 		"onchainInfo": "Onchain-Informationen",
+		"nestedVotes": "Verschachtelte Abstimmungen",
+		"flattenedVotes": "Ebene Abstimmungen",
 		"VotesBubble": {
 			"nested": "Verschachtelt",
 			"flattened": "Eben",
