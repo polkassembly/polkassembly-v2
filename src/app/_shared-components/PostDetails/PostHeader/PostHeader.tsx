@@ -7,7 +7,7 @@
 import React from 'react';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
 import { Separator } from '@ui/Separator';
-import { EAssets, EPostDetailsTab, EProposalType, IPost } from '@/_shared/types';
+import { EAssets, EPostDetailsTab, IPost } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import Image from 'next/image';
@@ -72,7 +72,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 				>
 					View All {postData.onChainInfo?.origin ? `${convertCamelCaseToTitleCase(postData.onChainInfo?.origin || '')}` : `${postData.proposalType}`}
 				</Link>
-				{postData?.linkedPost && (
+				{!!postData?.linkedPost && !!postData?.linkedPost?.proposalType && !!postData.proposalType && (
 					<>
 						<Separator
 							orientation='vertical'
@@ -82,14 +82,14 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 							href={getPostDetailsUrl({ proposalType: postData.linkedPost?.proposalType, proposalId: Number(postData.linkedPost?.indexOrHash), network })}
 							className='flex items-center gap-x-1 text-xs text-listing_page_btn hover:underline'
 						>
-							<span className='text-text_secondary'>{t(`PostDetails.ProposalType.${(postData.linkedPost?.proposalType || EProposalType.DISCUSSION).toLowerCase()}`)}</span>
+							<span className='text-text_secondary'>{t(`PostDetails.ProposalType.${(postData.linkedPost?.proposalType || '').toLowerCase()}`)}</span>
 							<span className='text-text_primary'>#{postData.linkedPost?.indexOrHash}</span>
 						</Link>
 
 						<ChevronsRight className='h-3.5 w-3.5 text-lg text-basic_text' />
 
 						<div className='flex items-center gap-x-1 text-xs text-text_pink'>
-							<span className='capitalize'>{t(`PostDetails.ProposalType.${(postData.proposalType || EProposalType.DISCUSSION).toLowerCase()}`)}</span>
+							<span className='capitalize'>{t(`PostDetails.ProposalType.${(postData.proposalType || '').toLowerCase()}`)}</span>
 							<span>#{postData?.index}</span>
 						</div>
 					</>
