@@ -26,7 +26,8 @@ interface PageProps {
 
 async function ConfirmVerificationPage({ searchParams }: PageProps) {
 	try {
-		const validatedParams = searchParamsSchema.parse(searchParams);
+		const searchParamsBeforeValidations = await searchParams;
+		const validatedParams = searchParamsSchema.parse(searchParamsBeforeValidations);
 		const { token, social, oauth_verifier, oauth_token, network } = validatedParams;
 
 		const currentNetwork = await getNetworkFromHeaders();
