@@ -14,7 +14,6 @@ import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
 import { ENetwork, IOnChainIdentity, IJudgementStats, EJudgementStatus, EJudgementStatusType, IJudgementRequest, IJudgementListingResponse, IRegistrarInfo } from '@shared/types';
-import { SubsquidService } from '../api/_api-services/onchain_db_service/subsquid_service';
 
 // Usage:
 // const identityService = await IdentityService.Init(ENetwork.POLKADOT, api);
@@ -467,19 +466,12 @@ export class IdentityService {
 				percentageCompletedThisMonth
 			};
 		} catch (error) {
-			console.error('Error calculating judgement stats from People Chain, falling back to Subsquid:', error);
-
-			// Fallback to Subsquid
-			try {
-				return await SubsquidService.GetJudgementStats({ network: this.network });
-			} catch (subsquidError) {
-				console.error('Error fetching stats from Subsquid fallback:', subsquidError);
-				return {
-					totalRequestedThisMonth: 0,
-					percentageIncreaseFromLastMonth: 0,
-					percentageCompletedThisMonth: 0
-				};
-			}
+			console.error('Error calculating judgement stats:', error);
+			return {
+				totalRequestedThisMonth: 0,
+				percentageIncreaseFromLastMonth: 0,
+				percentageCompletedThisMonth: 0
+			};
 		}
 	}
 
@@ -549,22 +541,8 @@ export class IdentityService {
 			// Sort by date (newest first)
 			return judgements.sort((a, b) => b.dateInitiated.getTime() - a.dateInitiated.getTime());
 		} catch (error) {
-			console.error('Error fetching identity judgements from People Chain, falling back to Subsquid:', error);
-
-			// Fallback to Subsquid
-			try {
-				const subsquidJudgements = await SubsquidService.GetIdentityJudgements({ network: this.network, limit: 1000, offset: 0 });
-
-				// Map registrar addresses to judgements
-				const registrars = await this.getRegistrars();
-				return subsquidJudgements.map((judgement: IJudgementRequest) => ({
-					...judgement,
-					registrarAddress: registrars[judgement.registrarIndex]?.account || ''
-				}));
-			} catch (subsquidError) {
-				console.error('Error fetching judgements from Subsquid fallback:', subsquidError);
-				return [];
-			}
+			console.error('Error fetching identity judgements:', error);
+			return [];
 		}
 	}
 
@@ -602,15 +580,8 @@ export class IdentityService {
 				};
 			});
 		} catch (error) {
-			console.error('Error fetching registrar stats from People Chain, falling back to Subsquid:', error);
-
-			// Fallback to Subsquid
-			try {
-				return await SubsquidService.GetRegistrars({ network: this.network });
-			} catch (subsquidError) {
-				console.error('Error fetching registrars from Subsquid fallback:', subsquidError);
-				return [];
-			}
+			console.error('Error fetching registrar stats:', error);
+			return [];
 		}
 	}
 
