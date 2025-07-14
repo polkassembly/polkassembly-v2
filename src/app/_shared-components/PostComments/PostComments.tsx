@@ -17,6 +17,10 @@ import { Skeleton } from '../Skeleton';
 import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 import { Alert, AlertDescription } from '../Alert';
 
+interface ICommentWithIdentityStatus extends ICommentResponse {
+	isVerified?: boolean;
+}
+
 function PostComments({
 	proposalType,
 	index,
@@ -42,7 +46,7 @@ function PostComments({
 			throw new Error(error?.message || 'Failed to fetch data');
 		}
 
-		const commentsWithIdentities: ICommentResponse[] = await Promise.all(
+		const commentsWithIdentities: ICommentWithIdentityStatus[] = await Promise.all(
 			data.map(async (comment) => {
 				const identity = await getOnChainIdentity(comment?.publicUser?.addresses?.[0]);
 				const isVerified = identity?.isVerified;
