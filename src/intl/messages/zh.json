@@ -1350,6 +1350,7 @@
 		"requestJudgement": "判断请求",
 		"becomeARegistrar": "成为注册者",
 		"dashboard": "仪表板",
+		"registrar": "注册者",
 		"registrars": "注册者",
 		"judgementsRequested": "判断请求",
 		"judgementsCompleted": "判断完成",
@@ -1367,7 +1368,8 @@
 		"totalGiven": "总计",
 		"fee": "费用",
 		"noJudgementsFound": "未找到判断",
-		"noRegistrarsFound": "未找到注册者"
+		"noRegistrarsFound": "未找到注册者",
+		"searchByAddressOrName": "输入地址或名称进行搜索"
 	},
 	"JudgementStatus": {
 		"pending": "待定",

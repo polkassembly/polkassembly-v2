@@ -1388,6 +1388,7 @@
 		"requestJudgement": "Request Judgement",
 		"becomeARegistrar": "Become a Registrar",
 		"dashboard": "Dashboard",
+		"registrar": "Registrar",
 		"registrars": "Registrars",
 		"judgementsRequested": "Judgements Requested",
 		"judgementsCompleted": "Judgements Completed",
@@ -1405,7 +1406,8 @@
 		"totalGiven": "Total Given",
 		"fee": "Fee",
 		"noJudgementsFound": "No judgements found",
-		"noRegistrarsFound": "No registrars found"
+		"noRegistrarsFound": "No registrars found",
+		"searchByAddressOrName": "Enter address or name to search"
 	},
 	"JudgementStatus": {
 		"pending": "Pending",

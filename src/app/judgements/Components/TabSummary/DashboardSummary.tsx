@@ -7,7 +7,7 @@
 import { Separator } from '@/app/_shared-components/Separator';
 import JudgementRequestedIcon from '@assets/icons/judgement-requests.svg';
 import JudgementCompletedIcon from '@assets/icons/judgements-completed.svg';
-import GreenArrowTop from '@assets/icons/green-arrow-top.svg';
+// import GreenArrowTop from '@assets/icons/green-arrow-top.svg';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
@@ -37,7 +37,7 @@ function DashboardSummary() {
 
 	// Default values if data is not available
 	const totalRequested = stats?.totalRequestedThisMonth || 0;
-	const percentageIncrease = stats?.percentageIncreaseFromLastMonth || 0;
+	// const percentageIncrease = stats?.percentageIncreaseFromLastMonth || 0;
 	const percentageCompleted = stats?.percentageCompletedThisMonth || 0;
 
 	return (
@@ -58,7 +58,7 @@ function DashboardSummary() {
 							) : (
 								<>
 									<span className={styles.statsNumber}>{totalRequested}</span>
-									{percentageIncrease > 0 && (
+									{/* {percentageIncrease > 0 && (
 										<>
 											<Image
 												src={GreenArrowTop}
@@ -69,7 +69,7 @@ function DashboardSummary() {
 											<span className={styles.statsPercentage}>{percentageIncrease.toFixed(1)}%</span>
 										</>
 									)}
-									<span className={styles.statsPeriod}>{t('Judgements.thisMonth')}</span>
+									<span className={styles.statsPeriod}>{t('Judgements.thisMonth')}</span> */}
 								</>
 							)}
 						</p>

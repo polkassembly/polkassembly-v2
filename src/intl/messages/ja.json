@@ -1350,6 +1350,7 @@
 		"requestJudgement": "判断を要求",
 		"becomeARegistrar": "登録者になる",
 		"dashboard": "ダッシュボード",
+		"registrar": "登録者",
 		"registrars": "登録者",
 		"judgementsRequested": "判断要求",
 		"judgementsCompleted": "判断完了",
@@ -1367,7 +1368,8 @@
 		"totalGiven": "合計",
 		"fee": "料金",
 		"noJudgementsFound": "判断が見つかりません",
-		"noRegistrarsFound": "登録者が見つかりません"
+		"noRegistrarsFound": "登録者が見つかりません",
+		"searchByAddressOrName": "アドレスまたは名前で検索"
 	},
 	"JudgementStatus": {
 		"pending": "保留中",

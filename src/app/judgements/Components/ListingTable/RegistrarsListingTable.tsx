@@ -25,7 +25,7 @@ function RegistrarsListingTable({ data }: { data: IRegistrarInfo[] }) {
 						<TableHeader>
 							<TableRow className={styles.tableRow}>
 								<TableHead className={styles.tableCell_1}>{t('address')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('latestJudgement')}</TableHead>
+								{/* <TableHead className={styles.tableCell}>{t('latestJudgement')}</TableHead> */}
 								<TableHead className={styles.tableCell}>{t('receivedRequests')}</TableHead>
 								<TableHead className={styles.tableCell}>{t('totalGiven')}</TableHead>
 								<TableHead className={styles.tableCell_last}>{t('fee')}</TableHead>
@@ -40,7 +40,7 @@ function RegistrarsListingTable({ data }: { data: IRegistrarInfo[] }) {
 											address={registrar.address}
 										/>
 									</td>
-									<td className='px-6 py-5'>{registrar.latestJudgementDate ? new Date(registrar.latestJudgementDate).toLocaleDateString() : '-'}</td>
+									{/* <td className='px-6 py-5'>{registrar.latestJudgementDate ? new Date(registrar.latestJudgementDate).toLocaleDateString() : '-'}</td> */}
 									<td className='px-6 py-5'>{registrar.totalReceivedRequests}</td>
 									<td className='px-6 py-5'>{registrar.totalJudgementsGiven}</td>
 									<td className='px-6 py-5'>

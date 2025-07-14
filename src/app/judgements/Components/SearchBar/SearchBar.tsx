@@ -35,7 +35,7 @@ function SearchBar() {
 					}
 				}}
 				onChange={(e) => setInputValue(e.target.value)}
-				placeholder={t('Preimages.searchByHash')}
+				placeholder={t('Judgements.searchByAddressOrName')}
 			/>
 			<Button
 				variant='ghost'

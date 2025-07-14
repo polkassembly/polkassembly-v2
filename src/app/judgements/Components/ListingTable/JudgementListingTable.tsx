@@ -35,7 +35,7 @@ function JudgementListingTable({ data, totalCount }: { data: IJudgementRequest[]
 									<TableHead className={styles.tableCell}>{t('email')}</TableHead>
 									<TableHead className={styles.tableCell}>{t('twitter')}</TableHead>
 									<TableHead className={styles.tableCell}>{t('status')}</TableHead>
-									<TableHead className={styles.tableCell_last}>{t('initiatedOn')}</TableHead>
+									<TableHead className={styles.tableCell_last}>{t('registrar')}</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -63,7 +63,12 @@ function JudgementListingTable({ data, totalCount }: { data: IJudgementRequest[]
 												type={EStatusTagType.JUDGEMENT}
 											/>
 										</td>
-										<td className='px-6 py-5'>{new Date(judgement.dateInitiated).toLocaleDateString()}</td>
+										<td className='px-6 py-5'>
+											<Address
+												truncateCharLen={5}
+												address={judgement.registrarAddress}
+											/>
+										</td>
 									</TableRow>
 								))}
 							</TableBody>

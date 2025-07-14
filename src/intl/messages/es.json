@@ -1351,6 +1351,7 @@
 		"requestJudgement": "Solicitar Juicio",
 		"becomeARegistrar": "Convertirse en Registrador",
 		"dashboard": "Panel de control",
+		"registrar": "Registrador",
 		"registrars": "Registradores",
 		"judgementsRequested": "Juicios solicitados",
 		"judgementsCompleted": "Juicios completados",
@@ -1368,7 +1369,8 @@
 		"totalGiven": "Total dado",
 		"fee": "Tarifa",
 		"noJudgementsFound": "No se encontraron juicios",
-		"noRegistrarsFound": "No se encontraron registradores"
+		"noRegistrarsFound": "No se encontraron registradores",
+		"searchByAddressOrName": "Ingrese dirección o nombre para buscar"
 	},
 	"JudgementStatus": {
 		"pending": "Pendiente",

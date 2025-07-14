@@ -1350,6 +1350,7 @@
 		"requestJudgement": "Urteil anfordern",
 		"becomeARegistrar": "Registrar werden",
 		"dashboard": "Dashboard",
+		"registrar": "Registrar",
 		"registrars": "Registrars",
 		"judgementsRequested": "Urteile angefordert",
 		"judgementsCompleted": "Urteile abgeschlossen",
@@ -1367,7 +1368,8 @@
 		"totalGiven": "Gesamt gegeben",
 		"fee": "Gebühr",
 		"noJudgementsFound": "Keine Urteile gefunden",
-		"noRegistrarsFound": "Keine Registrars gefunden"
+		"noRegistrarsFound": "Keine Registrars gefunden",
+		"searchByAddressOrName": "Adresse oder Name eingeben, um zu suchen"
 	},
 	"JudgementStatus": {
 		"pending": "Ausstehend",
