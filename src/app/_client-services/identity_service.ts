@@ -521,21 +521,22 @@ export class IdentityService {
 				// Process judgements for each registrar
 				identityInfo.judgements.forEach((judgement: any) => {
 					const [registrarIndex, judgementData] = judgement;
+					const registrarIndexNum = Number(registrarIndex);
 
-					if (registrarIndex >= 0 && registrarIndex < registrars.length) {
-						const registrar = registrars[registrarIndex];
+					if (registrarIndexNum >= 0 && registrarIndexNum < registrars.length) {
+						const registrar = registrars[registrarIndexNum];
 						const status = IdentityService.mapJudgementStatus(judgementData);
 
 						// Create judgement request
 						const judgementRequest: IJudgementRequest = {
-							id: `${address}-${registrarIndex}-${Date.now()}`,
+							id: `${address}-${registrarIndexNum}-${Date.now()}`,
 							address,
 							displayName: identity.display?.Raw || identity.display || '',
 							email: identity.email?.Raw || identity.email || '',
 							twitter: identity.twitter?.Raw || identity.twitter || '',
 							status,
 							dateInitiated: new Date(), // We'll improve this with actual block data later
-							registrarIndex,
+							registrarIndex: registrarIndexNum,
 							registrarAddress: registrar.account,
 							judgementHash: key.hash.toString()
 						};
@@ -585,7 +586,7 @@ export class IdentityService {
 
 			return registrars.map((registrar, index) => {
 				// Calculate stats for this registrar
-				const registrarJudgements = judgements.filter((j) => j.registrarIndex === index);
+				const registrarJudgements = judgements.filter((j) => Number(j?.registrarIndex) === index);
 				const totalReceivedRequests = registrarJudgements.length;
 				const totalJudgementsGiven = registrarJudgements.filter((j) => j.status === EJudgementStatus.APPROVED || j.status === EJudgementStatus.REJECTED).length;
 
