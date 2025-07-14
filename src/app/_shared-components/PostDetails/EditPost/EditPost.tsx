@@ -57,7 +57,7 @@ function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClo
 	const editPost = async () => {
 		if (!title.trim() || !content || !ValidatorService.isValidNumber(postData?.index) || !postData?.proposalType || !user || !canEdit) return;
 
-		if (title === postData?.title && JSON.stringify(content) === JSON.stringify(postData?.content)) return;
+		if (title === postData?.title && JSON.stringify(content) === JSON.stringify(postData?.content) && allowedCommentor === postData?.allowedCommentor) return;
 
 		setIsLoading(true);
 
