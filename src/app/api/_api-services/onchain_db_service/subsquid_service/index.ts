@@ -330,7 +330,7 @@ export class SubsquidService extends SubsquidUtils {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const subsquidDecision = decision ? this.convertVoteDecisionToSubsquidFormat({ decision }) : null;
-		const subsquidDecisionIn = decision ? this.convertVoteDecisionToSubsquidFormatArray({ decision }) : null;
+		const subsquidDecisionIn = decision ? (votesType === EVotesType.NESTED ? this.convertVoteDecisionToSubsquidFormatArray({ decision }) : [subsquidDecision]) : null;
 
 		const query =
 			proposalType === EProposalType.TIP
@@ -365,8 +365,8 @@ export class SubsquidService extends SubsquidUtils {
 						offset: (page - 1) * limit,
 						orderBy: this.getOrderByForSubsquid({ orderBy }),
 						...(subsquidDecision && { decision_in: subsquidDecisionIn }),
-						...(subsquidDecision === 'yes' && { aye_not_eq: BN_ZERO.toString(), value_isNull: false }),
-						...(subsquidDecision === 'no' && { nay_not_eq: BN_ZERO.toString(), value_isNull: false })
+						...(subsquidDecision === 'yes' && votesType === EVotesType.NESTED && { aye_not_eq: BN_ZERO.toString(), value_isNull: false }),
+						...(subsquidDecision === 'no' && votesType === EVotesType.NESTED && { nay_not_eq: BN_ZERO.toString(), value_isNull: false })
 					};
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
