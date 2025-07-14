@@ -336,10 +336,10 @@ function VotesBubbleChart({
 			</div>
 
 			{isFetching ? (
-				<Skeleton className={cn('mt-4 w-full', enableFullHeight ? 'h-[500px]' : 'h-[300px]')} />
+				<Skeleton className={cn('mt-4 w-full', enableFullHeight ? 'h-full min-h-[50vh]' : 'h-[300px]')} />
 			) : allVotes.length > 0 ? (
 				<div className={enableFilter ? 'mt-6' : ''}>
-					<div className={cn(classes.chartWrapper, enableFullHeight ? 'h-[500px]' : 'h-[300px]')}>
+					<div className={cn(classes.chartWrapper, enableFullHeight ? 'h-full min-h-[50vh]' : 'h-[300px]')}>
 						<ResponsiveCirclePacking
 							data={{ name: t('votesDistribution'), children: chartData, color: 'transparent' }}
 							colors={(node) => {

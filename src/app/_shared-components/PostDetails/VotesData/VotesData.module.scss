@@ -27,14 +27,14 @@
 	@apply -mt-1 px-6 pb-6;
 }
 .voteHistoryDialogContent {
-	@apply w-[500px] p-3 max-lg:w-full sm:p-6 lg:w-[700px] xl:w-[800px] 2xl:w-[900px];
+	@apply w-[500px] p-3 max-lg:w-full sm:p-6 lg:w-[600px] xl:w-[700px] 2xl:w-[900px];
 }
 
 .dialogTitle {
 	@apply text-lg font-semibold text-text_primary dark:text-white;
 }
 .dialogContent {
-	@apply w-[500px] max-lg:w-full lg:w-[700px] xl:w-[800px] 2xl:w-[900px];
+	@apply w-[500px] max-lg:w-full lg:w-[600px] xl:w-[700px] 2xl:w-[900px];
 }
 .dialogHeader {
 	@apply p-4;
@@ -43,5 +43,5 @@
 	@apply flex items-center gap-x-1;
 }
 .dialogTabsContent {
-	@apply max-h-[80vh] min-h-[60vh] overflow-y-auto px-6 pb-6;
+	@apply px-6 pb-6;
 }
