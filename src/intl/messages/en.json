@@ -598,6 +598,7 @@
 		"delegatedVotingPower": "Delegated Voting Power",
 		"delegationList": "Delegation list",
 		"threshold": "Threshold",
+		"onlyVerifiedCommentsVisible": "Comments are restricted to accounts with an on-chain verified identity.",
 		"VoteCurves": {
 			"approval": "Approval",
 			"support": "Support",

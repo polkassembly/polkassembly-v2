@@ -555,12 +555,13 @@
 		"delegatedVotes": "委任された投票",
 		"delegatedVotingPower": "委任された投票力",
 		"delegationList": "委任リスト",
+		"threshold": "閾値",
+		"onlyVerifiedCommentsVisible": "コメントはオンチェーンで本人確認済みのアカウントに制限されています。",
 		"VoteCurves": {
 			"approval": "承認",
 			"support": "サポート",
 			"threshold": "閾値"
 		},
-		"threshold": "しきい値",
 		"DecisionDeposit": {
 			"description": "提案がタイムアウトするのを防ぐため、14日以内に返金可能なデポジットを配置してください。",
 			"details": "詳細",
