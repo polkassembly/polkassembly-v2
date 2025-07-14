@@ -79,6 +79,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 					latestSupport={latestSupport}
 					isFetching={isFetching}
 					proposalType={proposalType}
+					selectedTab={activeTab}
 					enableGraph={!!trackName && !!timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced)}
 				/>
 			</div>

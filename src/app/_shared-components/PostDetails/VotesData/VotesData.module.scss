@@ -42,3 +42,6 @@
 .dialogTitle {
 	@apply flex items-center gap-x-1;
 }
+.dialogTabsContent {
+	@apply max-h-[80vh] min-h-[60vh] overflow-y-auto px-6 pb-6;
+}

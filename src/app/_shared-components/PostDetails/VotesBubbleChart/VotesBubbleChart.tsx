@@ -129,7 +129,7 @@ const getPostAnalytics = async ({
 		analyticsType,
 		votesType
 	});
-	if (error && !data) {
+	if (error || !data) {
 		throw new Error(error?.message || 'Failed to fetch data');
 	}
 	return data;

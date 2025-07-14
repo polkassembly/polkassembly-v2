@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 import { Separator } from '../../Separator';
 import styles from './VoteCurvesData.module.scss';
 
@@ -29,7 +30,7 @@ function VoteCurvesDetails({
 				</p>
 				<p className={styles.voteCurvesDetailsWrapperItemTitle}>
 					<span className={styles.voteCurvesDetailsWrapperItemTitleText}>
-						<span className={styles.voteCurvesDetailsWrapperItemTitleTextIcon} />
+						<span className={cn(styles.voteCurvesDetailsWrapperItemTitleTextIcon, 'border-navbar_border')} />
 						{t('support')}
 					</span>
 					<span className={styles.voteCurvesDetailsWrapperItemTitleTextValue}>{latestSupport?.toFixed(2)}%</span>
@@ -49,7 +50,7 @@ function VoteCurvesDetails({
 				</p>
 				<p className={styles.voteCurvesDetailsWrapperItemTitle}>
 					<span className={styles.voteCurvesDetailsWrapperItemTitleText}>
-						<span className={styles.voteCurvesDetailsWrapperItemTitleTextIcon} />
+						<span className='h-4 rotate-45 border-l-2 border-navbar_border' />
 						{t('threshold')}
 					</span>
 					<span className={styles.voteCurvesDetailsWrapperItemTitleTextValue}>{thresholdValues?.supportThreshold?.toFixed(2)}%</span>

@@ -4,7 +4,7 @@
 
 import { Expand } from 'lucide-react';
 import { EPostOrigin, EProposalType, IVoteCurve, IStatusHistoryItem, EAnalyticsType } from '@/_shared/types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import { Button } from '../../Button';
@@ -32,7 +32,8 @@ function VotesDataDialog({
 	isFetching,
 	proposalType,
 	index,
-	enableGraph = false
+	enableGraph = false,
+	selectedTab
 }: {
 	voteCurveData: IVoteCurve[];
 	trackName: EPostOrigin;
@@ -46,10 +47,15 @@ function VotesDataDialog({
 	proposalType: EProposalType;
 	index: string;
 	enableGraph: boolean;
+	selectedTab: EProposalVoteType;
 }) {
 	const t = useTranslations('PostDetails.VotesData');
 	const [isExpanded, setIsExpanded] = useState(false);
-	const [activeTab, setActiveTab] = useState(EProposalVoteType.Bubble);
+	const [activeTab, setActiveTab] = useState(selectedTab || EProposalVoteType.Bubble);
+
+	useEffect(() => {
+		setActiveTab(selectedTab);
+	}, [selectedTab]);
 
 	return (
 		<Dialog
@@ -91,7 +97,7 @@ function VotesDataDialog({
 						)}
 					</DialogTitle>
 				</DialogHeader>
-				<div className='px-8 pb-8'>
+				<div className={classes.dialogTabsContent}>
 					{isFetching && <LoadingLayover />}
 
 					{/* Conditional Rendering based on Active Tab */}
