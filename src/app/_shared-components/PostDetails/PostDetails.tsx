@@ -269,6 +269,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									index={index}
 									track={post.onChainInfo?.origin}
 									proposalType={post.proposalType}
+									isUsedInPostDetails
 								/>
 							)}
 							<ClaimPayout beneficiaries={post.onChainInfo?.beneficiaries || []} />
