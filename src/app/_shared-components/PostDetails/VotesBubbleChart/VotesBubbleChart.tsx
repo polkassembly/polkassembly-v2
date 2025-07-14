@@ -55,7 +55,7 @@ const calculatePerVotePercentage = ({
 	decision,
 	votesBubbleData
 }: {
-	vote: { balanceValue: string; votingPower: string | null };
+	vote: { balanceValue: string; votingPower?: string | null };
 	decision: Exclude<EVoteDecision, EVoteDecision.SPLIT | EVoteDecision.SPLIT_ABSTAIN>;
 	votesBubbleData: IPostBubbleVotes['votes'];
 }): number => {
