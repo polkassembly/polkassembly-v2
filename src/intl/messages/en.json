@@ -502,7 +502,7 @@
 			"Votes": "Votes",
 			"bubble": "Bubble",
 			"graph": "Graph",
-			"voteHistory": "Vote History (Flattened, Nested, Calls)",
+			"voteHistory": "Vote History",
 			"votes": "Votes",
 			"voteGraph": "Vote Graph",
 			"voteBubble": "Vote Bubble"

@@ -465,7 +465,7 @@
 		"bareAyes": "Síes Simples",
 		"issuance": "Emisión",
 		"viewVoteHistory": "Ver Historial de Votos",
-		"voteHistory": "Historial de votos",
+		"voteHistory": "Historial de Votos",
 		"delegated": "Delegado",
 		"votingPower": "Poder de voto",
 		"capital": "Capital",
@@ -485,6 +485,15 @@
 			"nay": "No",
 			"abstain": "Abstención",
 			"noVotesFound": "No se encontraron votos"
+		},
+		"VotesData": {
+			"Votes": "Votos",
+			"bubble": "Burbuja",
+			"graph": "Gráfico",
+			"voteHistory": "Historial de Votos",
+			"votes": "Votos",
+			"voteGraph": "Gráfico de Votos",
+			"voteBubble": "Burbuja de Votos"
 		},
 		"Analytics": {
 			"totalVotesCasted": "Total de votos emitidos",
