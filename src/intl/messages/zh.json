@@ -555,13 +555,14 @@
 		"delegatedVotes": "委托投票",
 		"delegatedVotingPower": "委托投票权重",
 		"delegationList": "委托列表",
+		"threshold": "阈值",
+		"onlyVerifiedCommentsVisible": "评论仅限于具有链上已验证身份的账户。",
 		"VoteCurves": {
 			"approval": "批准",
 			"support": "支持",
 			"threshold": "阈值",
 			"votingData": "投票数据"
 		},
-		"threshold": "阈值",
 		"DecisionDeposit": {
 			"description": "在14天内存入可退还的保证金，以防止提案超时。",
 			"details": "详情",

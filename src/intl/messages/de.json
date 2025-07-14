@@ -554,13 +554,14 @@
 		"delegatedVotes": "Delegierende Abstimmungen",
 		"delegatedVotingPower": "Delegierende Stimmgewicht",
 		"delegationList": "Delegationsliste",
+		"threshold": "Schwelle",
+		"onlyVerifiedCommentsVisible": "Kommentare sind auf Konten mit einer On-Chain verifizierten Identität beschränkt.",
 		"VoteCurves": {
 			"approval": "Zustimmung",
 			"support": "Unterstützung",
 			"threshold": "Schwellenwert",
 			"votingData": "Abstimmungsdaten"
 		},
-		"threshold": "Schwelle",
 		"DecisionDeposit": {
 			"description": "Hinterlegen Sie innerhalb von 14 Tagen eine erstattungsfähige Kaution, um zu verhindern, dass der Vorschlag ausläuft.",
 			"details": "Details",

@@ -81,6 +81,7 @@ function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClo
 			...prev,
 			title,
 			content,
+			allowedCommentor,
 			isDefaultContent: false
 		}));
 

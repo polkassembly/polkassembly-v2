@@ -689,6 +689,7 @@ export interface ICommentResponse extends IComment {
 	children?: ICommentResponse[];
 	reactions?: IReaction[];
 	voteData?: IVoteData[];
+	isVerified?: boolean;
 }
 
 export interface IOnChainIdentity {
