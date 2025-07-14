@@ -154,7 +154,9 @@ function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClo
 			</div>
 			<div className='flex justify-end'>
 				<Button
-					disabled={!title.trim() || !content?.trim() || (title === postData?.title && content?.trim() === postData?.content?.trim())}
+					disabled={
+						!title.trim() || !content?.trim() || (title === postData?.title && content?.trim() === postData?.content?.trim() && postData?.allowedCommentor === allowedCommentor)
+					}
 					onClick={editPost}
 					isLoading={isLoading}
 				>
