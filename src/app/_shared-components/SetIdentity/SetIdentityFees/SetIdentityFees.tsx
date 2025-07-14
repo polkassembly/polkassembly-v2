@@ -10,17 +10,7 @@ import { useTranslations } from 'next-intl';
 import classes from './SetIdentityFees.module.scss';
 import IdentityFeeCollaps from '../IdentityFeeCollaps/IdentityFeeCollaps';
 
-function SetIdentityFees({
-	onNext,
-	onRequestJudgement,
-	disabledRequestJudgement,
-	registrarFee
-}: {
-	onNext: () => void;
-	onRequestJudgement: () => void;
-	disabledRequestJudgement: boolean;
-	registrarFee: BN;
-}) {
+function SetIdentityFees({ onNext, onRequestJudgement, registrarFee }: { onNext: () => void; onRequestJudgement: () => void; registrarFee: BN }) {
 	const t = useTranslations();
 
 	return (
@@ -68,7 +58,6 @@ function SetIdentityFees({
 			<Button
 				variant='secondary'
 				onClick={onRequestJudgement}
-				disabled={disabledRequestJudgement}
 			>
 				{t('SetIdentity.requestJudgement')}
 			</Button>
