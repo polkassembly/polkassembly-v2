@@ -485,6 +485,15 @@
 			"abstain": "棄権",
 			"noVotesFound": "投票が見つかりません"
 		},
+		"VotesData": {
+			"Votes": "投票",
+			"bubble": "バブル",
+			"graph": "グラフ",
+			"voteHistory": "投票履歴",
+			"votes": "投票",
+			"voteGraph": "投票グラフ",
+			"voteBubble": "投票バブル"	
+		},
 		"Analytics": {
 			"totalVotesCasted": "総投票数",
 			"delegatedVsSolo": "委任 vs. 単独",

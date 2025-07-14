@@ -484,6 +484,15 @@
 			"abstain": "Enthaltung",
 			"noVotesFound": "Keine Abstimmungen gefunden"
 		},
+		"VotesData": {
+			"Votes": "Abstimmungen",
+			"bubble": "Blase",
+			"graph": "Graph",
+			"voteHistory": "Abstimmungsverlauf",
+			"votes": "Abstimmungen",
+			"voteGraph": "Abstimmungsgraph",
+			"voteBubble": "Abstimmungsblase"
+		},
 		"Analytics": {
 			"totalVotesCasted": "Gesamte Abstimmungen",
 			"delegatedVsSolo": "Delegiert vs. Einzel",

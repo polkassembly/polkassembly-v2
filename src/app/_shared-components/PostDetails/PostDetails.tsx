@@ -66,7 +66,7 @@ const VotesData = dynamic(() => import('./VotesData/VotesData'), {
 	ssr: false,
 	loading: () => (
 		<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
-			<Skeleton className='h-10 w-20' />
+			<Skeleton className='h-8 w-20' />
 			<Skeleton className='h-10 w-full rounded-md' />
 			<Skeleton className='mt-2 h-36 w-full rounded-md' />
 		</div>
