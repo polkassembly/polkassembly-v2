@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react';
 import { ChevronRightIcon } from 'lucide-react';
 import { groupBeneficiariesByAssetWithAddress } from '@/app/_client-utils/beneficiaryUtils';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { cn } from '@/lib/utils';
 import classes from './BeneficiariesDetails.module.scss';
 import { Button } from '../../Button';
 import BeneficiariesDetailsDialog from './BeneficiariesDetailsDialog';
@@ -33,7 +34,7 @@ function BeneficiariesDetails({ beneficiaries }: { beneficiaries: IBeneficiary[]
 				<Button
 					variant='ghost'
 					size='sm'
-					className={classes.beneficiariesButton}
+					className={cn(classes.beneficiariesButton, 'p-0 px-0')}
 					onClick={() => setOpenDialog(true)}
 				>
 					{t('details')}
