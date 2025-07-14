@@ -1546,6 +1546,7 @@ export class FirestoreService extends FirestoreUtils {
 				.set(
 					{
 						...existingSocialHandle,
+						...(verificationToken && { verificationToken }),
 						status,
 						updatedAt: new Date()
 					},
@@ -1553,6 +1554,7 @@ export class FirestoreService extends FirestoreUtils {
 				);
 			return {
 				...existingSocialHandle,
+				...(verificationToken && { verificationToken: { token: verificationToken.token } }),
 				status,
 				updatedAt: new Date()
 			} as ISocialHandle;

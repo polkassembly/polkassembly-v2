@@ -19,14 +19,12 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import ExpandIcon from '@/_assets/icons/expand.svg';
 import Image from 'next/image';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import dynamic from 'next/dynamic';
 import { Skeleton } from '../../Skeleton';
 import classes from './OnchainInfo.module.scss';
 import Address from '../../Profile/Address/Address';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '../../Collapsible';
-
-const Timeline = dynamic(() => import('../Timeline/Timeline'), { ssr: false });
-const Calls = dynamic(() => import('../Calls/Calls'), { ssr: false });
+import Calls from '../Calls/Calls';
+import Timeline from '../Timeline/Timeline';
 
 // FIXME: reduce cognitive complexity
 // eslint-disable-next-line sonarjs/cognitive-complexity

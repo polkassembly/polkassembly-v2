@@ -181,7 +181,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 			post?.onChainInfo?.beneficiaries?.map((beneficiary) => ({
 				address: beneficiary.address,
 				amount: beneficiary.amount,
-				genralIndex: beneficiary.assetId
+				genralIndex: beneficiary.assetId || null
 			})) || [],
 		bond: postData?.bond,
 		title: post?.title || '',

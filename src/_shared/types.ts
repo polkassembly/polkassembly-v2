@@ -531,7 +531,7 @@ export interface IVoteMetrics {
 export interface IBeneficiary {
 	address: string;
 	amount: string;
-	assetId: string | null;
+	assetId?: string | null;
 	validFromBlock?: string;
 }
 
@@ -1321,6 +1321,15 @@ export interface TimeUnitOptions {
 	withUnitSpace?: boolean;
 	withPluralSuffix?: boolean;
 }
+
+export enum ESetIdentityStep {
+	GAS_FEE = 'GAS_FEE',
+	SET_IDENTITY_FORM = 'SET_IDENTITY_FORM',
+	REQUEST_JUDGEMENT = 'REQUEST_JUDGEMENT',
+	IDENTITY_SUCCESS = 'IDENTITY_SUCCESS',
+	TELEPORT_TO_PEOPLE_CHAIN = 'TELEPORT_TO_PEOPLE_CHAIN'
+}
+
 export interface IAnalytics {
 	[EVoteDecision.ABSTAIN]: string;
 	[EVoteDecision.AYE]: string;

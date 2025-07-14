@@ -2145,14 +2145,14 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				index: '1984',
 				tokenDecimal: 6
 			},
+			'30': {
+				...treasuryAssetsData[EAssets.DED],
+				index: '30'
+			},
 			'1337': {
 				...treasuryAssetsData[EAssets.USDC],
 				index: '1337',
 				tokenDecimal: 6
-			},
-			'30': {
-				...treasuryAssetsData[EAssets.DED],
-				index: '30'
 			}
 		},
 		foreignAssets: {

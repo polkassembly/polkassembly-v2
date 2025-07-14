@@ -4,7 +4,7 @@
 
 'use client';
 
-import { ENotificationStatus, ESocial } from '@/_shared/types';
+import { ENotificationStatus, ESetIdentityStep, ESocial } from '@/_shared/types';
 import { CookieClientService } from '@/app/_client-services/cookie_client_service';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
@@ -64,10 +64,10 @@ function ConfirmVerfication({ token, social, twitterOauthVerifier }: { token: st
 				<>
 					<p className='text-sm text-text_primary'>{t('SetIdentity.verificationSuccessful')}</p>
 					<Link
-						href='/'
+						href={`/set-identity?open=${ESetIdentityStep.REQUEST_JUDGEMENT}`}
 						className='text-sm text-text_pink'
 					>
-						{t('SetIdentity.goToHome')}
+						{t('SetIdentity.goToRequestJudgement')}
 					</Link>
 				</>
 			)}

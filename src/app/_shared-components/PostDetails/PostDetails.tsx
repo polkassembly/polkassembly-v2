@@ -26,13 +26,22 @@ import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import { Skeleton } from '../Skeleton';
-import AISummary from '../AISummary/AISummary';
 import BeneficiariesDetails from './BeneficiariesDetails/BeneficiariesDetails';
+
+const AISummary = dynamic(() => import('../AISummary/AISummary'), {
+	ssr: false,
+	loading: () => (
+		<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
+			<Skeleton className='h-8 w-48' />
+			<Skeleton className='h-20 w-full' />
+		</div>
+	)
+});
 
 const OnchainInfo = dynamic(() => import('./OnchainInfo/OnchainInfo'), {
 	ssr: false,
 	loading: () => (
-		<div className='flex flex-col gap-4'>
+		<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
 			<Skeleton className='h-8 w-48' />
 			<div className='flex flex-col gap-6'>
 				<Skeleton className='h-10 w-full' />
@@ -46,7 +55,7 @@ const OnchainInfo = dynamic(() => import('./OnchainInfo/OnchainInfo'), {
 const PostAnalytics = dynamic(() => import('./Analytics/PostAnalytics'), {
 	ssr: false,
 	loading: () => (
-		<div className='flex flex-col gap-4'>
+		<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
 			<Skeleton className='h-10 w-[150px] rounded-lg' />
 			<Skeleton className='h-[50px] w-full rounded-lg' />
 			<div className='flex gap-4 max-lg:flex-col'>

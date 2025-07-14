@@ -9,7 +9,7 @@ import { Button } from '@ui/Button';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
-import { ELocales } from '@/_shared/types';
+import { ELocales, ESetIdentityStep } from '@/_shared/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
 import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -161,6 +161,14 @@ function Navbar() {
 									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+									<Link
+										className='w-full'
+										href={`/set-identity?open=${ESetIdentityStep.REQUEST_JUDGEMENT}`}
+									>
+										{t('SetIdentity.requestJudgement')}
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
 									<Button
 										variant='ghost'
 										className='flex w-full justify-start p-0 text-sm'
@@ -266,6 +274,14 @@ function Navbar() {
 												href='/set-identity'
 											>
 												{t('SetIdentity.setIdentity')}
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem>
+											<Link
+												className='w-full'
+												href={`/set-identity?open=${ESetIdentityStep.REQUEST_JUDGEMENT}`}
+											>
+												{t('SetIdentity.requestJudgement')}
 											</Link>
 										</DropdownMenuItem>
 										<DropdownMenuItem>
