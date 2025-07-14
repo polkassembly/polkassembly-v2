@@ -27,6 +27,8 @@ function VotesAnalytics({ votesAnalytics, index, proposalType }: { votesAnalytic
 				<VotesBubbleChart
 					proposalType={proposalType}
 					analyticsType={EAnalyticsType.VOTES}
+					enableTitle
+					enableFilter
 					index={index}
 				/>
 			</div>

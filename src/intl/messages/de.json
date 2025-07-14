@@ -557,8 +557,7 @@
 		"VoteCurves": {
 			"approval": "Zustimmung",
 			"support": "Unterstützung",
-			"threshold": "Schwellenwert",
-			"votingData": "Abstimmungsdaten"
+			"threshold": "Schwellenwert"
 		},
 		"threshold": "Schwelle",
 		"DecisionDeposit": {

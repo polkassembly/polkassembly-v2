@@ -62,7 +62,7 @@ const PostAnalytics = dynamic(() => import('./Analytics/PostAnalytics'), {
 	)
 });
 
-const VoteCurvesData = dynamic(() => import('./VoteCurvesData/VoteCurvesData'), {
+const VotesData = dynamic(() => import('./VotesData/VotesData'), {
 	ssr: false,
 	loading: () => <Skeleton className='h-32 w-full rounded-lg' />
 });
@@ -221,7 +221,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								)}
 							</div>
 						)}
-
 						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
 							<PostComments
 								proposalType={post.proposalType}
@@ -275,22 +274,20 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								trackName={post.onChainInfo?.origin || EPostOrigin.ROOT}
 							/>
 							<VoteSummary
-								proposalType={post.proposalType}
 								index={index}
 								voteMetrics={post.onChainInfo?.voteMetrics}
 								approvalThreshold={thresholdValues.approvalThreshold}
 							/>
-							{post.onChainInfo?.origin && post.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced) && (
-								<VoteCurvesData
-									proposalType={post.proposalType}
-									index={index}
-									createdAt={post.createdAt}
-									trackName={post.onChainInfo?.origin}
-									timeline={post.onChainInfo?.timeline}
-									setThresholdValues={setThresholdValues}
-									thresholdValues={thresholdValues}
-								/>
-							)}
+
+							<VotesData
+								proposalType={post.proposalType}
+								index={index}
+								trackName={post.onChainInfo?.origin || EPostOrigin.ROOT}
+								createdAt={post.createdAt}
+								timeline={post.onChainInfo?.timeline}
+								setThresholdValues={setThresholdValues}
+								thresholdValues={thresholdValues}
+							/>
 						</div>
 					)}
 

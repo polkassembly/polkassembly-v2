@@ -722,7 +722,7 @@ export enum EAssets {
 export enum EPostDetailsTab {
 	DESCRIPTION = 'description',
 	TIMELINE = 'timeline',
-	ONCHAIN_INFO = 'onchain info',
+	ONCHAIN_INFO = 'onchain_info',
 	POST_ANALYTICS = 'post_analytics'
 }
 
