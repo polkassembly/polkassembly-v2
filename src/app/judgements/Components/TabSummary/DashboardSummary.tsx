@@ -10,14 +10,30 @@ import JudgementCompletedIcon from '@assets/icons/judgements-completed.svg';
 import GreenArrowTop from '@assets/icons/green-arrow-top.svg';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { useJudgementStats } from '@/hooks/useJudgementData';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { useQuery } from '@tanstack/react-query';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { IJudgementStats } from '@/_shared/types';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import styles from './TabSummary.module.scss';
 import SearchBar from '../SearchBar/SearchBar';
 
 function DashboardSummary() {
 	const t = useTranslations();
-	const { data: stats, isLoading } = useJudgementStats();
+
+	const { data: stats, isLoading } = useQuery<IJudgementStats>({
+		queryKey: ['judgementStats'],
+		queryFn: async () => {
+			const { data, error } = await NextApiClientService.fetchJudgementStats();
+			if (error || !data) {
+				throw new Error(error?.message || 'Failed to fetch judgement stats');
+			}
+			return data;
+		},
+		staleTime: FIVE_MIN_IN_MILLI,
+		retry: 3,
+		refetchOnWindowFocus: false
+	});
 
 	// Default values if data is not available
 	const totalRequested = stats?.totalRequestedThisMonth || 0;
