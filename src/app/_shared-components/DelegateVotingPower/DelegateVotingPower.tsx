@@ -246,7 +246,13 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 				<SwitchWalletOrAddress
 					small
 					withBalance
-					customAddressSelector={<AddressRelationsPicker withBalance />}
+					customAddressSelector={
+						<AddressRelationsPicker
+							withBalance
+							disabled={loading}
+						/>
+					}
+					disabled={loading}
 				/>
 
 				<div>
@@ -256,6 +262,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 						className='bg-network_dropdown_bg'
 						onChange={(a) => setDelegateAddress(a)}
 						placeholder={t('enterDelegateAddress')}
+						disabled={loading}
 					/>
 				</div>
 
@@ -265,10 +272,14 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 					label={t('balance')}
 					defaultValue={balance}
 					onChange={({ value }) => setBalance(value)}
+					disabled={loading}
 				/>
 				<div className='w-full'>
 					<p className='mb-3 text-sm text-wallet_btn_text'>{t('conviction')}</p>
-					<ConvictionSelector onConvictionChange={setConviction} />
+					<ConvictionSelector
+						onConvictionChange={setConviction}
+						disabled={loading}
+					/>
 				</div>
 				<div className={styles.convictionContainer}>
 					<div className={styles.convictionItem}>
@@ -296,8 +307,12 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 								<Checkbox
 									checked={isAllTracksSelected}
 									onCheckedChange={toggleAllTracks}
+									disabled={loading}
 								/>
-								<TooltipTrigger asChild>
+								<TooltipTrigger
+									asChild
+									disabled={loading}
+								>
 									<span className='text-sm text-wallet_btn_text'>{t('delegateToAllAvailableTracks')}</span>
 								</TooltipTrigger>
 							</div>
@@ -323,7 +338,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 											<Checkbox
 												checked={isChecked}
 												onCheckedChange={() => toggleTrack(track)}
-												disabled={isTrackDelegated}
+												disabled={isTrackDelegated || loading}
 												className={styles.checkbox}
 											/>
 											<span className={isTrackDelegated ? 'text-text_secondary' : ''}>
