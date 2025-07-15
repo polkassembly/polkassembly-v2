@@ -472,6 +472,8 @@
 		"account": "Cuenta",
 		"abstain": "Abstención",
 		"onchainInfo": "Información en cadena",
+		"nestedVotes": "Votos Anidados",
+		"flattenedVotes": "Votos Aplanados",
 		"VotesBubble": {
 			"nested": "Anidado",
 			"flattened": "Aplanado",
@@ -490,10 +492,12 @@
 			"Votes": "Votos",
 			"bubble": "Burbuja",
 			"graph": "Gráfico",
-			"voteHistory": "Historial de Votos",
+			"voteHistory": "Historial de Votos (Anidados y Aplanados)",
 			"votes": "Votos",
 			"voteGraph": "Gráfico de Votos",
-			"voteBubble": "Burbuja de Votos"
+			"voteBubble": "Burbuja de Votos",
+			"nestedVotes": "Votos Anidados",
+			"flattenedVotes": "Votos Aplanados"
 		},
 		"Analytics": {
 			"totalVotesCasted": "Total de votos emitidos",

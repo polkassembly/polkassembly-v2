@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useMemo, useCallback, useState } from 'react';
-import { EAnalyticsType, ENetwork, EPostBubbleVotesType, EProposalType, ETheme, EVoteDecision, IPostBubbleVotes, IVoteDistribution } from '@/_shared/types';
+import { EAnalyticsType, ENetwork, EVotesDisplayType, EProposalType, ETheme, EVoteDecision, IPostBubbleVotes, IVoteDistribution } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { ResponsiveCirclePacking } from '@nivo/circle-packing';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -55,7 +55,7 @@ const calculatePerVotePercentage = ({
 	decision,
 	votesBubbleData
 }: {
-	vote: { balanceValue: string; votingPower: string | null };
+	vote: { balanceValue: string; votingPower?: string | null };
 	decision: Exclude<EVoteDecision, EVoteDecision.SPLIT | EVoteDecision.SPLIT_ABSTAIN>;
 	votesBubbleData: IPostBubbleVotes['votes'];
 }): number => {
@@ -82,7 +82,7 @@ const useVotesDistribution = ({ votesBubbleData }: { votesBubbleData: IPostBubbl
 				const payload = {
 					voterAddress: vote.voterAddress,
 					balanceValue: vote.balanceValue,
-					votingPower: vote.votingPower || null,
+					votingPower: vote.votingPower,
 					decision,
 					percentage: calculatePerVotePercentage({ vote, decision, votesBubbleData }),
 					delegatorsCount: vote.delegatorsCount,
@@ -121,7 +121,7 @@ const getPostAnalytics = async ({
 	proposalType: EProposalType;
 	index: string;
 	analyticsType: EAnalyticsType;
-	votesType: EPostBubbleVotesType;
+	votesType: EVotesDisplayType;
 }) => {
 	const { data, error } = await NextApiClientService.getPostBubbleVotes({
 		proposalType: proposalType as EProposalType,
@@ -156,7 +156,7 @@ function VotesBubbleChart({
 	const {
 		userPreferences: { theme }
 	} = useUserPreferences();
-	const [votesType, setVotesType] = useState<EPostBubbleVotesType>(EPostBubbleVotesType.NESTED);
+	const [votesType, setVotesType] = useState<EVotesDisplayType>(EVotesDisplayType.NESTED);
 
 	const getBorderColor = (decision: EVoteDecision) => {
 		return THEME_COLORS.light[`${decision}_color` as keyof typeof THEME_COLORS.light];
@@ -201,7 +201,7 @@ function VotesBubbleChart({
 							address={id}
 							textClassName='text-sm'
 						/>
-						{votesType === EPostBubbleVotesType.NESTED ? (
+						{votesType === EVotesDisplayType.NESTED ? (
 							<div className={classes.tooltipContent}>
 								<div className={classes.tooltipContentValue}>
 									<span className={classes.tooltipText}>
@@ -317,7 +317,7 @@ function VotesBubbleChart({
 				{enableTitle && <h2 className={classes.heading}>{t('votesDistribution')}</h2>}
 				{enableFilter && (
 					<div className={classes.buttonContainer}>
-						{[EPostBubbleVotesType.NESTED, EPostBubbleVotesType.FLATTENED].map((type) => (
+						{[EVotesDisplayType.NESTED, EVotesDisplayType.FLATTENED].map((type) => (
 							<Button
 								key={type}
 								variant='ghost'

@@ -470,6 +470,8 @@
 		"capital": "资本",
 		"account": "账户",
 		"abstain": "弃权",
+		"nestedVotes": "嵌套投票",
+		"flattenedVotes": "扁平化投票",
 		"VotesBubble": {
 			"nested": "嵌套",
 			"flattened": "扁平",
@@ -488,10 +490,12 @@
 			"Votes": "投票",
 			"bubble": "气泡",
 			"graph": "图表",
-			"voteHistory": "投票历史",
+			"voteHistory": "投票历史 (嵌套和扁平化)",
 			"votes": "投票",
 			"voteGraph": "投票图表",
-			"voteBubble": "投票气泡"
+			"voteBubble": "投票气泡",
+			"nestedVotes": "嵌套投票",
+			"flattenedVotes": "扁平化投票"
 		},
 		"Analytics": {
 			"totalVotesCasted": "总投票数",

@@ -470,6 +470,8 @@
 		"account": "Konto",
 		"abstain": "Enthaltung",
 		"onchainInfo": "Onchain-Informationen",
+		"nestedVotes": "Verschachtelte Abstimmungen",
+		"flattenedVotes": "Ebene Abstimmungen",
 		"VotesBubble": {
 			"nested": "Verschachtelt",
 			"flattened": "Eben",
@@ -488,10 +490,12 @@
 			"Votes": "Abstimmungen",
 			"bubble": "Blase",
 			"graph": "Graph",
-			"voteHistory": "Abstimmungsverlauf",
+			"voteHistory": "Abstimmungsverlauf (Verschachtelt und Ebene)",
 			"votes": "Abstimmungen",
 			"voteGraph": "Abstimmungsgraph",
-			"voteBubble": "Abstimmungsblase"
+			"voteBubble": "Abstimmungsblase",
+			"nestedVotes": "Verschachtelte Abstimmungen",
+			"flattenedVotes": "Ebene Abstimmungen"
 		},
 		"Analytics": {
 			"totalVotesCasted": "Gesamte Abstimmungen",

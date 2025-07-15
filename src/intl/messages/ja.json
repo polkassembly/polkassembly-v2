@@ -471,6 +471,8 @@
 		"account": "アカウント",
 		"abstain": "棄権",
 		"onchainInfo": "オンチェーン情報",
+		"nestedVotes": "ネストされた投票",
+		"flattenedVotes": "フラット化された投票",
 		"VotesBubble": {
 			"nested": "ネスト",
 			"flattened": "フラット",
@@ -489,10 +491,12 @@
 			"Votes": "投票",
 			"bubble": "バブル",
 			"graph": "グラフ",
-			"voteHistory": "投票履歴",
+			"voteHistory": "投票履歴 (ネストされた投票とフラット化された投票)",
 			"votes": "投票",
 			"voteGraph": "投票グラフ",
-			"voteBubble": "投票バブル"	
+			"voteBubble": "投票バブル",
+			"nestedVotes": "ネストされた投票",
+			"flattenedVotes": "フラット化された投票"
 		},
 		"Analytics": {
 			"totalVotesCasted": "総投票数",

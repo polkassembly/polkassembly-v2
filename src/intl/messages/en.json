@@ -502,10 +502,12 @@
 			"Votes": "Votes",
 			"bubble": "Bubble",
 			"graph": "Graph",
-			"voteHistory": "Vote History",
+			"voteHistory": "Vote History (Nested and Flattened)",
 			"votes": "Votes",
 			"voteGraph": "Vote Graph",
-			"voteBubble": "Vote Bubble"
+			"voteBubble": "Vote Bubble",
+			"nestedVotes": "Nested Votes",
+			"flattenedVotes": "Flattened Votes"
 		},
 		"Analytics": {
 			"totalVotesCasted": "Total Votes Casted",
@@ -539,6 +541,8 @@
 		},
 		"commentsDisabled": "Comments have been disabled for this post.",
 		"commentsDisabledForNonVerifiedUsers": "Comments have been disabled for non verified users.",
+		"nestedVotes": "Nested Votes",
+		"flattenedVotes": "Flattened Votes",
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",

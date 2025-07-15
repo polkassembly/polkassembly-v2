@@ -1,8 +1,8 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { EAnalyticsType, EPostOrigin, EProposalStatus, EProposalType, IStatusHistoryItem } from '@/_shared/types';
-import { ChevronRight } from 'lucide-react';
+import { EAnalyticsType, EPostOrigin, EProposalStatus, EProposalType, EVotesDisplayType, IStatusHistoryItem } from '@/_shared/types';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -18,6 +18,7 @@ import VotesBubbleChart from '../VotesBubbleChart/VotesBubbleChart';
 import { Tabs, TabsContent } from '../../Tabs';
 import classes from './VotesData.module.scss';
 import VotesDataDialog from './VotesDataDialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../Select/Select';
 
 interface IVotesDataProps {
 	proposalType: EProposalType;
@@ -37,6 +38,7 @@ enum EProposalVoteType {
 function VotesData({ proposalType, index, trackName, createdAt, timeline, setThresholdValues, thresholdValues }: IVotesDataProps) {
 	const t = useTranslations('PostDetails.VotesData');
 	const [activeTab, setActiveTab] = useState<EProposalVoteType>(EProposalVoteType.Bubble);
+	const [votesDisplayType, setVotesDisplayType] = useState<EVotesDisplayType>(EVotesDisplayType.NESTED);
 	const fetchVoteCurves = async () => {
 		const { data, error } = await NextApiClientService.getVoteCurves({
 			proposalType,
@@ -145,19 +147,40 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 					>
 						<Button
 							variant='outline'
-							className='flex w-full justify-between rounded-sm px-2 text-xs font-normal text-text_pink'
+							className='flex w-full justify-between text-xs font-normal text-text_pink'
 						>
 							{t('voteHistory')}
-							<ChevronRight className={classes.voteHistoryButtonIcon} />
+							<ChevronRight className='h-4 w-4 text-xs text-text_pink' />
 						</Button>
 					</DialogTrigger>
-					<DialogContent className={classes.voteHistoryDialogContent}>
-						<DialogHeader className={classes.voteHistoryDialogHeader}>
-							<DialogTitle>{t('voteHistory')}</DialogTitle>
+					<DialogContent className='max-w-2xl p-3 sm:p-6'>
+						<DialogHeader>
+							<DialogTitle>
+								<Select
+									value={votesDisplayType}
+									onValueChange={(value) => setVotesDisplayType(value as EVotesDisplayType)}
+								>
+									<SelectTrigger
+										className='m-0 mb-0 flex w-fit items-center gap-x-2 border-none p-0 text-lg text-text_primary shadow-none'
+										hideChevron
+									>
+										<SelectValue
+											placeholder={t('voteHistory')}
+											className='-mt-2 text-lg font-semibold text-text_primary'
+										/>
+										<ChevronDown className='h-5 w-5 text-xs font-semibold' />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value={EVotesDisplayType.NESTED}>{t('nestedVotes')}</SelectItem>
+										<SelectItem value={EVotesDisplayType.FLATTENED}>{t('flattenedVotes')}</SelectItem>
+									</SelectContent>
+								</Select>
+							</DialogTitle>
 						</DialogHeader>
 						<VoteHistory
 							proposalType={proposalType}
 							index={index}
+							votesDisplayType={votesDisplayType}
 						/>
 					</DialogContent>
 				</Dialog>
