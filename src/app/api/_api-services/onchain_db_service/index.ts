@@ -19,7 +19,7 @@ import {
 	EBountyStatus,
 	EVoteSortOptions,
 	EAnalyticsType,
-	EVotesType
+	EVotesDisplayType
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -114,7 +114,7 @@ export class OnChainDbService {
 		decision?: EVoteDecision;
 		voterAddress?: string;
 		orderBy?: EVoteSortOptions;
-		votesType?: EVotesType;
+		votesType?: EVotesDisplayType;
 	}) {
 		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddress, orderBy, votesType });
 		if (postVoteData) return postVoteData;
@@ -329,7 +329,7 @@ export class OnChainDbService {
 		proposalType: EProposalType;
 		index: number;
 		analyticsType: EAnalyticsType;
-		votesType: EVotesType;
+		votesType: EVotesDisplayType;
 	}) {
 		return SubsquidService.GetPostBubbleVotes({ network, proposalType, index, analyticsType, votesType });
 	}

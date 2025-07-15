@@ -486,6 +486,17 @@
 			"abstain": "Enthaltung",
 			"noVotesFound": "Keine Abstimmungen gefunden"
 		},
+		"VotesData": {
+			"Votes": "Abstimmungen",
+			"bubble": "Blase",
+			"graph": "Graph",
+			"voteHistory": "Abstimmungsverlauf (Verschachtelt und Ebene)",
+			"votes": "Abstimmungen",
+			"voteGraph": "Abstimmungsgraph",
+			"voteBubble": "Abstimmungsblase",
+			"nestedVotes": "Verschachtelte Abstimmungen",
+			"flattenedVotes": "Ebene Abstimmungen"
+		},
 		"Analytics": {
 			"totalVotesCasted": "Gesamte Abstimmungen",
 			"delegatedVsSolo": "Delegiert vs. Einzel",
@@ -556,13 +567,13 @@
 		"delegatedVotes": "Delegierende Abstimmungen",
 		"delegatedVotingPower": "Delegierende Stimmgewicht",
 		"delegationList": "Delegationsliste",
+		"threshold": "Schwelle",
+		"onlyVerifiedCommentsVisible": "Kommentare sind auf Konten mit einer On-Chain verifizierten Identität beschränkt.",
 		"VoteCurves": {
 			"approval": "Zustimmung",
 			"support": "Unterstützung",
-			"threshold": "Schwellenwert",
-			"votingData": "Abstimmungsdaten"
+			"threshold": "Schwellenwert"
 		},
-		"threshold": "Schwelle",
 		"DecisionDeposit": {
 			"description": "Hinterlegen Sie innerhalb von 14 Tagen eine erstattungsfähige Kaution, um zu verhindern, dass der Vorschlag ausläuft.",
 			"details": "Details",

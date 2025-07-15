@@ -465,7 +465,7 @@
 		"bareAyes": "Síes Simples",
 		"issuance": "Emisión",
 		"viewVoteHistory": "Ver Historial de Votos",
-		"voteHistory": "Historial de votos",
+		"voteHistory": "Historial de Votos",
 		"delegated": "Delegado",
 		"votingPower": "Poder de voto",
 		"capital": "Capital",
@@ -487,6 +487,17 @@
 			"nay": "No",
 			"abstain": "Abstención",
 			"noVotesFound": "No se encontraron votos"
+		},
+		"VotesData": {
+			"Votes": "Votos",
+			"bubble": "Burbuja",
+			"graph": "Gráfico",
+			"voteHistory": "Historial de Votos (Anidados y Aplanados)",
+			"votes": "Votos",
+			"voteGraph": "Gráfico de Votos",
+			"voteBubble": "Burbuja de Votos",
+			"nestedVotes": "Votos Anidados",
+			"flattenedVotes": "Votos Aplanados"
 		},
 		"Analytics": {
 			"totalVotesCasted": "Total de votos emitidos",
@@ -557,14 +568,14 @@
 		"delegators": "Delegadores",
 		"delegatedVotes": "Votos Delegados",
 		"delegatedVotingPower": "Poder de Voto Delegado",
-		"delegationList": "Lista de Delegaciones",
+		"delegationList": "Lista de delegación",
+		"threshold": "Umbral",
+		"onlyVerifiedCommentsVisible": "Los comentarios están restringidos a cuentas con una identidad verificada en la cadena.",
 		"VoteCurves": {
 			"approval": "Aprobación",
 			"support": "Apoyo",
-			"threshold": "Umbral",
-			"votingData": "Datos de Votación"
+			"threshold": "Umbral"
 		},
-		"threshold": "Umbral",
 		"DecisionDeposit": {
 			"description": "Deposite una garantía reembolsable dentro de 14 días para evitar que la propuesta expire.",
 			"details": "Detalles",

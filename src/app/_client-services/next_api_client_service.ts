@@ -53,7 +53,7 @@ import {
 	IPostAnalytics,
 	IPostBubbleVotes,
 	EAnalyticsType,
-	EVotesType
+	EVotesDisplayType
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -619,7 +619,7 @@ export class NextApiClientService {
 		page: number;
 		decision: EVoteDecision;
 		orderBy: EVoteSortOptions;
-		votesType: EVotesType;
+		votesType: EVotesDisplayType;
 	}) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
@@ -1109,7 +1109,7 @@ export class NextApiClientService {
 		proposalType: EProposalType;
 		index: string;
 		analyticsType: EAnalyticsType;
-		votesType: EVotesType;
+		votesType: EVotesDisplayType;
 	}) {
 		const queryParams = new URLSearchParams({
 			analyticsType: analyticsType ? analyticsType.toString() : '',

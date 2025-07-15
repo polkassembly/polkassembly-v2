@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, EVoteDecision, EVoteSortOptions, EVotesType } from '@/_shared/types';
+import { EProposalType, EVoteDecision, EVoteSortOptions, EVotesDisplayType } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
 import React, { useState, useEffect } from 'react';
@@ -17,7 +17,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import VoteHistoryTable from './VoteHistoryTable';
 import classes from './VoteHistory.module.scss';
 
-function VoteHistory({ proposalType, index, votesType }: { proposalType: EProposalType; index: string; votesType: EVotesType }) {
+function VoteHistory({ proposalType, index, votesDisplayType }: { proposalType: EProposalType; index: string; votesDisplayType: EVotesDisplayType }) {
 	const t = useTranslations();
 	const [tab, setTab] = useState<EVoteDecision>(EVoteDecision.AYE);
 	const [page, setPage] = useState(1);
@@ -28,10 +28,10 @@ function VoteHistory({ proposalType, index, votesType }: { proposalType: EPropos
 		setTab(EVoteDecision.AYE);
 		setPage(1);
 		setSortBy(EVoteSortOptions.CreatedAtBlockDESC);
-	}, [votesType]);
+	}, [votesDisplayType]);
 
-	const fetchVoteHistory = async (pageNumber: number, decision: EVoteDecision, orderBy: EVoteSortOptions, selectedVotesType: EVotesType) => {
-		const { data, error } = await NextApiClientService.getVotesHistory({ proposalType, index, page: pageNumber, decision, orderBy, votesType: selectedVotesType });
+	const fetchVoteHistory = async (pageNumber: number, decision: EVoteDecision, orderBy: EVoteSortOptions, selectedVotesDisplayType: EVotesDisplayType) => {
+		const { data, error } = await NextApiClientService.getVotesHistory({ proposalType, index, page: pageNumber, decision, orderBy, votesType: selectedVotesDisplayType });
 
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
@@ -40,8 +40,8 @@ function VoteHistory({ proposalType, index, votesType }: { proposalType: EPropos
 	};
 
 	const { data, isFetching } = useQuery({
-		queryKey: ['voteHistory', proposalType, index, page, tab, sortBy, votesType],
-		queryFn: ({ queryKey }) => fetchVoteHistory(queryKey[3] as number, queryKey[4] as EVoteDecision, queryKey[5] as EVoteSortOptions, queryKey[6] as EVotesType),
+		queryKey: ['voteHistory', proposalType, index, page, tab, sortBy, votesDisplayType],
+		queryFn: ({ queryKey }) => fetchVoteHistory(queryKey[3] as number, queryKey[4] as EVoteDecision, queryKey[5] as EVoteSortOptions, queryKey[6] as EVotesDisplayType),
 		placeholderData: (previousData) => previousData,
 		retry: true,
 		refetchOnWindowFocus: true,
@@ -102,7 +102,7 @@ function VoteHistory({ proposalType, index, votesType }: { proposalType: EPropos
 						loading={isFetching}
 						orderBy={sortBy}
 						onOrderByChange={(newSortBy) => setSortBy(newSortBy)}
-						votesType={votesType}
+						votesType={votesDisplayType}
 					/>
 				</TabsContent>
 				<TabsContent value={EVoteDecision.NAY}>
@@ -111,7 +111,7 @@ function VoteHistory({ proposalType, index, votesType }: { proposalType: EPropos
 						loading={isFetching}
 						orderBy={sortBy}
 						onOrderByChange={(newSortBy) => setSortBy(newSortBy)}
-						votesType={votesType}
+						votesType={votesDisplayType}
 					/>
 				</TabsContent>
 				<TabsContent value={EVoteDecision.SPLIT_ABSTAIN}>
@@ -120,7 +120,7 @@ function VoteHistory({ proposalType, index, votesType }: { proposalType: EPropos
 						loading={isFetching}
 						orderBy={sortBy}
 						onOrderByChange={(newSortBy) => setSortBy(newSortBy)}
-						votesType={votesType}
+						votesType={votesDisplayType}
 					/>
 				</TabsContent>
 			</Tabs>

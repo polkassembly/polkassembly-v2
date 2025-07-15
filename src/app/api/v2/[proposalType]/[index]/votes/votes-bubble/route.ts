@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EAnalyticsType, EHttpHeaderKey, EVotesType, EProposalStatus, EProposalType, IPostBubbleVotes } from '@/_shared/types';
+import { EAnalyticsType, EHttpHeaderKey, EVotesDisplayType, EProposalStatus, EProposalType, IPostBubbleVotes } from '@/_shared/types';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
 import { NextRequest, NextResponse } from 'next/server';
@@ -22,7 +22,7 @@ export const GET = withErrorHandling(
 
 		const zodQuerySchema = z.object({
 			analyticsType: z.nativeEnum(EAnalyticsType).default(EAnalyticsType.CONVICTIONS),
-			votesType: z.nativeEnum(EVotesType).default(EVotesType.NESTED)
+			votesType: z.nativeEnum(EVotesDisplayType).default(EVotesDisplayType.NESTED)
 		});
 
 		const { analyticsType, votesType } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));

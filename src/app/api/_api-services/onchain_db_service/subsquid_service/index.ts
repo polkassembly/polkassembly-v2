@@ -6,7 +6,7 @@ import {
 	EAnalyticsType,
 	ENetwork,
 	EPostOrigin,
-	EVotesType,
+	EVotesDisplayType,
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
@@ -302,6 +302,47 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
+	private static getVotesQuery({
+		proposalType,
+		subsquidDecision,
+		votesType,
+		voterAddress
+	}: {
+		proposalType: EProposalType;
+		subsquidDecision: string | null;
+		votesType?: EVotesDisplayType;
+		voterAddress?: string;
+	}): string {
+		// Handle TIP proposal type
+		if (proposalType === EProposalType.TIP) {
+			return subsquidDecision
+				? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION({ voter: voterAddress })
+				: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH({ voter: voterAddress });
+		}
+
+		// Handle REFERENDUM_V2 and FELLOWSHIP_REFERENDUM
+		const isConvictionVoteType = [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType);
+
+		if (isConvictionVoteType) {
+			const isFlattened = votesType === EVotesDisplayType.FLATTENED;
+
+			if (subsquidDecision) {
+				return isFlattened
+					? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
+					: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress });
+			}
+
+			return isFlattened
+				? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress })
+				: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress });
+		}
+
+		// Handle other proposal types
+		return subsquidDecision
+			? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
+			: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress });
+	}
+
 	// FIXME: refactor this function
 	// eslint-disable-next-line sonarjs/cognitive-complexity
 	static async GetPostVoteData({
@@ -323,31 +364,21 @@ export class SubsquidService extends SubsquidUtils {
 		decision?: EVoteDecision;
 		voterAddress?: string;
 		orderBy?: EVoteSortOptions;
-		votesType?: EVotesType;
+		votesType?: EVotesDisplayType;
 	}) {
 		const voterAddress = address ? (getEncodedAddress(address, network) ?? undefined) : undefined;
 
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const subsquidDecision = decision ? this.convertVoteDecisionToSubsquidFormat({ decision }) : null;
-		const subsquidDecisionIn = decision ? (votesType === EVotesType.NESTED ? this.convertVoteDecisionToSubsquidFormatArray({ decision }) : [subsquidDecision]) : null;
+		const subsquidDecisionIn = decision ? (votesType === EVotesDisplayType.NESTED ? this.convertVoteDecisionToSubsquidFormatArray({ decision }) : [subsquidDecision]) : null;
 
-		const query =
-			proposalType === EProposalType.TIP
-				? subsquidDecision
-					? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION({ voter: voterAddress })
-					: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH({ voter: voterAddress })
-				: [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
-					? subsquidDecision
-						? votesType === EVotesType.FLATTENED
-							? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
-							: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
-						: votesType === EVotesType.FLATTENED
-							? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress })
-							: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress })
-					: subsquidDecision
-						? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
-						: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress });
+		const query = this.getVotesQuery({
+			proposalType,
+			subsquidDecision,
+			votesType,
+			voterAddress
+		});
 
 		const variables =
 			proposalType === EProposalType.TIP
@@ -365,8 +396,8 @@ export class SubsquidService extends SubsquidUtils {
 						offset: (page - 1) * limit,
 						orderBy: this.getOrderByForSubsquid({ orderBy }),
 						...(subsquidDecision && { decision_in: subsquidDecisionIn }),
-						...(subsquidDecision === 'yes' && votesType === EVotesType.NESTED && { aye_not_eq: BN_ZERO.toString(), value_isNull: false }),
-						...(subsquidDecision === 'no' && votesType === EVotesType.NESTED && { nay_not_eq: BN_ZERO.toString(), value_isNull: false })
+						...(subsquidDecision === 'yes' && votesType === EVotesDisplayType.NESTED && { aye_not_eq: BN_ZERO.toString(), value_isNull: false }),
+						...(subsquidDecision === 'no' && votesType === EVotesDisplayType.NESTED && { nay_not_eq: BN_ZERO.toString(), value_isNull: false })
 					};
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
@@ -406,7 +437,7 @@ export class SubsquidService extends SubsquidUtils {
 					selfVotingPower: this.getSelfVotingPower({ balance: balanceValue, selfVotingPower: vote.selfVotingPower || null, lockPeriod: vote.lockPeriod }),
 					totalVotingPower: vote.totalVotingPower,
 					delegatedVotingPower: vote.delegatedVotingPower,
-					...(votesType === EVotesType.FLATTENED && { votingPower: this.getVotingPower(balanceValue, vote.lockPeriod) }),
+					...(votesType === EVotesDisplayType.FLATTENED && { votingPower: this.getVotingPower(balanceValue, vote.lockPeriod) }),
 					delegatedVotes: vote.delegatedVotes?.map((delegatedVote) => ({
 						voterAddress: delegatedVote.voter,
 						totalVotingPower: delegatedVote.votingPower,
@@ -1115,11 +1146,11 @@ export class SubsquidService extends SubsquidUtils {
 		proposalType: EProposalType;
 		index: number;
 		analyticsType: EAnalyticsType;
-		votesType: EVotesType;
+		votesType: EVotesDisplayType;
 	}): Promise<IPostBubbleVotes | null> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = votesType === EVotesType.FLATTENED ? this.GET_ALL_FLATTENED_VOTES_WITH_POST_INDEX : this.GET_ALL_NESTED_VOTES_WITH_POST_INDEX;
+		const query = votesType === EVotesDisplayType.FLATTENED ? this.GET_ALL_FLATTENED_VOTES_WITH_POST_INDEX : this.GET_ALL_NESTED_VOTES_WITH_POST_INDEX;
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { vote_type: proposalType, index_eq: index, type_eq: proposalType }).toPromise();
 
 		if (subsquidErr || !subsquidData) {
@@ -1159,7 +1190,7 @@ export class SubsquidService extends SubsquidUtils {
 				const balance = new BN(vote.balance?.value || vote.balance?.abstain || vote.balance?.aye || vote.balance?.nay || BN_ZERO.toString());
 				const votingPower =
 					analyticsType === EAnalyticsType.CONVICTIONS
-						? votesType === EVotesType.FLATTENED
+						? votesType === EVotesDisplayType.FLATTENED
 							? this.getVotingPower(balance?.toString(), vote?.lockPeriod)
 							: this.getNestedVoteVotingPower(
 									vote?.parentVote?.delegatedVotingPower || vote?.delegatedVotingPower || BN_ZERO.toString(),
@@ -1171,7 +1202,7 @@ export class SubsquidService extends SubsquidUtils {
 					balanceValue: balance.toString(),
 					voterAddress: vote.voter,
 					lockPeriod: vote?.lockPeriod || 0,
-					votingPower: votingPower?.toString() || null,
+					votingPower: votingPower?.toString(),
 					isDelegated: vote?.isDelegated || false,
 					delegatorsCount: vote?.delegatedVotes?.length || 0,
 					decision

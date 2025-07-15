@@ -22,7 +22,7 @@ import {
 	IPost,
 	IPostAnalytics,
 	IPostListing,
-	EVotesType,
+	EVotesDisplayType,
 	IPostBubbleVotes,
 	ITrackAnalyticsDelegations,
 	ITrackAnalyticsStats,
@@ -133,7 +133,7 @@ export class RedisService {
 		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
 		[ERedisKeys.POST_ANALYTICS_DATA]: (network: ENetwork, proposalType: EProposalType, index: number): string =>
 			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${index}`,
-		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: ENetwork, proposalType: EProposalType, index: number, votesType: EVotesType, analyticsType: EAnalyticsType): string =>
+		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: ENetwork, proposalType: EProposalType, index: number, votesType: EVotesDisplayType, analyticsType: EAnalyticsType): string =>
 			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${index}-${votesType}-${analyticsType}`
 	} as const;
 
@@ -691,7 +691,7 @@ export class RedisService {
 		proposalType: EProposalType;
 		index: number;
 		data: IPostBubbleVotes;
-		votesType: EVotesType;
+		votesType: EVotesDisplayType;
 		analyticsType: EAnalyticsType;
 		proposalStatus: EProposalStatus;
 	}): Promise<void> {
@@ -713,7 +713,7 @@ export class RedisService {
 		network: ENetwork;
 		proposalType: EProposalType;
 		index: number;
-		votesType: EVotesType;
+		votesType: EVotesDisplayType;
 		analyticsType: EAnalyticsType;
 	}): Promise<IPostBubbleVotes | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });
@@ -730,7 +730,7 @@ export class RedisService {
 		network: ENetwork;
 		proposalType: EProposalType;
 		index: number;
-		votesType: EVotesType;
+		votesType: EVotesDisplayType;
 		analyticsType: EAnalyticsType;
 	}): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });

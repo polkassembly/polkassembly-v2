@@ -769,7 +769,7 @@ export class OffChainDbService {
 				indexOrHash
 			});
 		} else {
-			await FirestoreService.UpdatePost({ id: offChainPostData.id, content, title, allowedCommentor: offChainPostData.allowedCommentor, linkedPost });
+			await FirestoreService.UpdatePost({ id: offChainPostData.id, content, title, allowedCommentor: allowedCommentor || offChainPostData.allowedCommentor, linkedPost });
 		}
 	}
 

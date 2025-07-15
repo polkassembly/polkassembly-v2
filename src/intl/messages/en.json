@@ -498,6 +498,17 @@
 			"abstain": "Abstain",
 			"noVotesFound": "No votes found"
 		},
+		"VotesData": {
+			"Votes": "Votes",
+			"bubble": "Bubble",
+			"graph": "Graph",
+			"voteHistory": "Vote History (Nested and Flattened)",
+			"votes": "Votes",
+			"voteGraph": "Vote Graph",
+			"voteBubble": "Vote Bubble",
+			"nestedVotes": "Nested Votes",
+			"flattenedVotes": "Flattened Votes"
+		},
 		"Analytics": {
 			"totalVotesCasted": "Total Votes Casted",
 			"delegatedVsSolo": "Delegated Vs Solo",
@@ -591,11 +602,11 @@
 		"delegatedVotingPower": "Delegated Voting Power",
 		"delegationList": "Delegation list",
 		"threshold": "Threshold",
+		"onlyVerifiedCommentsVisible": "Comments are restricted to accounts with an on-chain verified identity.",
 		"VoteCurves": {
 			"approval": "Approval",
 			"support": "Support",
-			"threshold": "Threshold",
-			"votingData": "Voting Data"
+			"threshold": "Threshold"
 		},
 		"DecisionDeposit": {
 			"description": "Place refundable deposit within 14 days to prevent proposal from timing out.",
