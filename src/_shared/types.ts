@@ -663,7 +663,7 @@ export interface IVoteData {
 	selfVotingPower?: string;
 	totalVotingPower?: string;
 	delegatedVotingPower?: string;
-	votingPower?: string | null;
+	votingPower?: string;
 	delegatedVotes?: IVoteData[];
 }
 
