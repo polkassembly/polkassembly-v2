@@ -82,7 +82,7 @@ const useVotesDistribution = ({ votesBubbleData }: { votesBubbleData: IPostBubbl
 				const payload = {
 					voterAddress: vote.voterAddress,
 					balanceValue: vote.balanceValue,
-					votingPower: vote.votingPower || null,
+					votingPower: vote.votingPower,
 					decision,
 					percentage: calculatePerVotePercentage({ vote, decision, votesBubbleData }),
 					delegatorsCount: vote.delegatorsCount,
