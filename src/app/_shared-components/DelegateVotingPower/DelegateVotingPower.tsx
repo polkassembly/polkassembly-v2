@@ -30,11 +30,12 @@ import AddressRelationsPicker from '../AddressRelationsPicker/AddressRelationsPi
 interface DelegateDialogProps {
 	delegate: { address: string };
 	trackId?: number;
+	onClose?: () => void;
 }
 
 const LOCK_PERIODS = ['no lockup period', '7 days', '14 days', '28 days', '56 days', '112 days', '224 days'];
 
-function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDialogProps) {
+function DelegateVotingPower({ delegate: initialDelegate, trackId, onClose }: DelegateDialogProps) {
 	const { userPreferences } = useUserPreferences();
 	const t = useTranslations('Delegation');
 	const { apiService } = usePolkadotApiService();
@@ -183,6 +184,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 						status: ENotificationStatus.SUCCESS
 					});
 					setLoading(false);
+					onClose?.();
 				},
 				onFailed: (error) => {
 					toast({
@@ -190,6 +192,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 						status: ENotificationStatus.ERROR
 					});
 					setLoading(false);
+					onClose?.();
 				}
 			});
 		} catch (error) {
@@ -199,6 +202,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 				status: ENotificationStatus.ERROR
 			});
 			setLoading(false);
+			onClose?.();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [apiService, userPreferences?.selectedAccount?.address, selectedTrackIds, delegateAddress, balance, conviction]);
