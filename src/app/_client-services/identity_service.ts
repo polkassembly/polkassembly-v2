@@ -13,7 +13,7 @@ import { BN, BN_ZERO, hexToString, isHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { ENetwork, IOnChainIdentity } from '@shared/types';
+import { ENetwork, IOnChainIdentity, IJudgementStats, EJudgementStatus, EJudgementStatusType, IJudgementRequest, IJudgementListingResponse, IRegistrarInfo } from '@shared/types';
 
 // Usage:
 // const identityService = await IdentityService.Init(ENetwork.POLKADOT, api);
@@ -423,5 +423,184 @@ export class IdentityService {
 		const paymentInfo = await tx?.paymentInfo(encodedAddress);
 
 		return paymentInfo?.partialFee;
+	}
+
+	async getJudgementStats(): Promise<IJudgementStats> {
+		try {
+			const currentDate = new Date();
+			const currentMonth = currentDate.getMonth();
+			const currentYear = currentDate.getFullYear();
+
+			// Get all identity judgements for current month
+			const currentMonthJudgements = await this.getAllIdentityJudgements();
+			const currentMonthRequests = currentMonthJudgements.filter((judgement) => {
+				const judgementDate = new Date(judgement.dateInitiated);
+				return judgementDate.getMonth() === currentMonth && judgementDate.getFullYear() === currentYear;
+			});
+
+			// Get all identity judgements for previous month
+			const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+			const previousYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+			const previousMonthJudgements = await this.getAllIdentityJudgements();
+			const previousMonthRequests = previousMonthJudgements.filter((judgement) => {
+				const judgementDate = new Date(judgement.dateInitiated);
+				return judgementDate.getMonth() === previousMonth && judgementDate.getFullYear() === previousYear;
+			});
+
+			const totalRequestedThisMonth = currentMonthRequests.length;
+			const totalRequestedLastMonth = previousMonthRequests.length;
+
+			// Calculate percentage increase
+			const percentageIncreaseFromLastMonth = totalRequestedLastMonth === 0 ? 100 : ((totalRequestedThisMonth - totalRequestedLastMonth) / totalRequestedLastMonth) * 100;
+
+			// Calculate completed judgements this month
+			const completedThisMonth = currentMonthRequests.filter(
+				(judgement) => judgement.status === EJudgementStatus.APPROVED || judgement.status === EJudgementStatus.REJECTED
+			).length;
+
+			const percentageCompletedThisMonth = totalRequestedThisMonth === 0 ? 0 : (completedThisMonth / totalRequestedThisMonth) * 100;
+
+			return {
+				totalRequestedThisMonth,
+				percentageIncreaseFromLastMonth,
+				percentageCompletedThisMonth
+			};
+		} catch (error) {
+			console.error('Error calculating judgement stats:', error);
+			return {
+				totalRequestedThisMonth: 0,
+				percentageIncreaseFromLastMonth: 0,
+				percentageCompletedThisMonth: 0
+			};
+		}
+	}
+
+	private static mapJudgementStatus(judgementData: string): EJudgementStatus {
+		switch (judgementData) {
+			case EJudgementStatusType.REASONABLE:
+			case EJudgementStatusType.KNOWN_GOOD:
+				return EJudgementStatus.APPROVED;
+			case EJudgementStatusType.OUT_OF_DATE:
+			case EJudgementStatusType.LOW_QUALITY:
+			case EJudgementStatusType.ERRONEOUS:
+				return EJudgementStatus.REJECTED;
+			default:
+				return EJudgementStatus.PENDING;
+		}
+	}
+
+	async getAllIdentityJudgements(): Promise<IJudgementRequest[]> {
+		console.log('Getting identity judgements for network:', this.network);
+
+		try {
+			const registrars = await this.getRegistrars();
+			const judgements: IJudgementRequest[] = [];
+
+			// Get all identity entries
+			const identityEntries = await this.peopleChainApi.query.identity.identityOf.entries();
+
+			// Process each identity entry
+			identityEntries.forEach(([key, value]) => {
+				const address = key.args[0].toString();
+				const identityInfo = value.toHuman() as any;
+
+				if (!identityInfo?.judgements || !Array.isArray(identityInfo.judgements)) {
+					return;
+				}
+
+				const identity = identityInfo.info || {};
+
+				// Process judgements for each registrar
+				identityInfo.judgements.forEach((judgement: any) => {
+					const [registrarIndex, judgementData] = judgement;
+					const registrarIndexNum = Number(registrarIndex);
+
+					if (registrarIndexNum >= 0 && registrarIndexNum < registrars.length) {
+						const registrar = registrars[registrarIndexNum];
+						const status = IdentityService.mapJudgementStatus(judgementData);
+
+						// Create judgement request
+						const judgementRequest: IJudgementRequest = {
+							id: `${address}-${registrarIndexNum}-${Date.now()}`,
+							address,
+							displayName: identity.display?.Raw || identity.display || '',
+							email: identity.email?.Raw || identity.email || '',
+							twitter: identity.twitter?.Raw || identity.twitter || '',
+							status,
+							dateInitiated: new Date(), // We'll improve this with actual block data later
+							registrarIndex: registrarIndexNum,
+							registrarAddress: registrar.account,
+							judgementHash: key.hash.toString()
+						};
+
+						judgements.push(judgementRequest);
+					}
+				});
+			});
+
+			// Sort by date (newest first)
+			return judgements.sort((a, b) => b.dateInitiated.getTime() - a.dateInitiated.getTime());
+		} catch (error) {
+			console.error('Error fetching identity judgements:', error);
+			return [];
+		}
+	}
+
+	async getJudgementRequests({ page, limit }: { page: number; limit: number }): Promise<IJudgementListingResponse> {
+		const allJudgements = await this.getAllIdentityJudgements();
+		const startIndex = (page - 1) * limit;
+		const endIndex = startIndex + limit;
+
+		return {
+			items: allJudgements.slice(startIndex, endIndex),
+			totalCount: allJudgements.length
+		};
+	}
+
+	async getRegistrarsWithStats(): Promise<IRegistrarInfo[]> {
+		try {
+			const registrars = await this.getRegistrars();
+			const judgements = await this.getAllIdentityJudgements();
+
+			return registrars.map((registrar, index) => {
+				// Calculate stats for this registrar
+				const registrarJudgements = judgements.filter((j) => Number(j?.registrarIndex) === index);
+				const totalReceivedRequests = registrarJudgements.length;
+				const totalJudgementsGiven = registrarJudgements.filter((j) => j.status === EJudgementStatus.APPROVED || j.status === EJudgementStatus.REJECTED).length;
+
+				const latestJudgement = registrarJudgements.sort((a, b) => b.dateInitiated.getTime() - a.dateInitiated.getTime())[0];
+
+				return {
+					address: registrar.account,
+					registrarFee: registrar.fee.toString(),
+					registrarIndex: index,
+					totalReceivedRequests,
+					totalJudgementsGiven,
+					latestJudgementDate: latestJudgement?.dateInitiated
+				};
+			});
+		} catch (error) {
+			console.error('Error fetching registrar stats:', error);
+			return [];
+		}
+	}
+
+	async becomeRegistrar({ address, onSuccess, onFailed }: { address: string; onSuccess?: () => void; onFailed?: (errorMessageFallback?: string) => void }) {
+		const encodedAddress = getEncodedAddress(address, this.network) || address;
+		const becomeRegistrarTx = this.peopleChainApi.tx.identity.addRegistrar(encodedAddress);
+
+		await this.executeTx({
+			tx: becomeRegistrarTx,
+			address: encodedAddress,
+			errorMessageFallback: 'Failed to become registrar',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: (errorMessageFallback: string) => {
+				console.log(errorMessageFallback, 'errorMessageFallback');
+				onFailed?.(errorMessageFallback);
+			}
+		});
 	}
 }

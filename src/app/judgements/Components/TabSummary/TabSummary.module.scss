@@ -1,0 +1,43 @@
+.container {
+	@apply flex w-full flex-col gap-x-4 gap-y-4 rounded-lg border border-primary_border bg-bg_modal px-4 py-3 md:flex-row md:items-center;
+}
+
+.dashboardContainer {
+	@apply flex w-full flex-col gap-x-4 gap-y-4 md:flex-row md:items-center;
+}
+
+.statsContainer {
+	@apply flex items-center gap-x-4;
+}
+
+.statsContent {
+	@apply flex flex-col gap-y-1.5;
+}
+
+.statsLabel {
+	@apply text-sm font-normal text-basic_text;
+}
+
+.statsValue {
+	@apply flex flex-nowrap items-end gap-x-1 p-0;
+}
+
+.statsNumber {
+	@apply text-2xl font-semibold leading-none;
+}
+
+.statsPercentage {
+	@apply text-xs font-normal text-green-600;
+}
+
+.statsPeriod {
+	@apply text-xs font-normal text-basic_text;
+}
+
+.completedValue {
+	@apply text-2xl font-semibold;
+}
+
+.description {
+	@apply text-sm font-medium text-text_primary;
+}

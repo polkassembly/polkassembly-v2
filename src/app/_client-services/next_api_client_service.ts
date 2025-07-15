@@ -53,7 +53,10 @@ import {
 	IPostAnalytics,
 	IPostBubbleVotes,
 	EAnalyticsType,
-	EPostBubbleVotesType
+	EPostBubbleVotesType,
+	IJudgementStats,
+	IJudgementListingResponse,
+	IRegistrarsListingResponse
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -135,7 +138,10 @@ enum EApiRoute {
 	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
 	GET_USER_POSTS = 'GET_USER_POSTS',
 	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
-	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES'
+	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES',
+	FETCH_JUDGEMENT_STATS = 'FETCH_JUDGEMENT_STATS',
+	FETCH_JUDGEMENT_REQUESTS = 'FETCH_JUDGEMENT_REQUESTS',
+	FETCH_REGISTRARS = 'FETCH_REGISTRARS'
 }
 
 export class NextApiClientService {
@@ -237,6 +243,15 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
 				path = '/track-analytics';
+				break;
+			case EApiRoute.FETCH_JUDGEMENT_STATS:
+				path = '/judgements/stats';
+				break;
+			case EApiRoute.FETCH_JUDGEMENT_REQUESTS:
+				path = '/judgements/requests';
+				break;
+			case EApiRoute.FETCH_REGISTRARS:
+				path = '/judgements/registrars';
 				break;
 
 			// post routes
@@ -1114,5 +1129,24 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_BUBBLE_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-bubble'], queryParams });
 		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method });
+	}
+
+	static async fetchJudgementStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_JUDGEMENT_STATS });
+		return this.nextApiClientFetch<IJudgementStats>({ url, method });
+	}
+
+	static async fetchJudgementRequests({ page, limit }: { page: number; limit: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_JUDGEMENT_REQUESTS, queryParams });
+		return this.nextApiClientFetch<IJudgementListingResponse>({ url, method });
+	}
+
+	static async fetchRegistrars() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_REGISTRARS });
+		return this.nextApiClientFetch<IRegistrarsListingResponse>({ url, method });
 	}
 }
