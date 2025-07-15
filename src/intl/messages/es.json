@@ -1357,6 +1357,16 @@
 		"judgementsCompleted": "Juicios completados",
 		"thisMonth": "este mes",
 		"registrarDescription": "Una entidad o individuo autorizado para verificar y validar la identidad de cuentas. Los registradores pueden establecer un cargo por sus servicios y limitar su atestación a ciertos campos.",
+		"becomeRegistrarTitle": "Cómo Convertirse en Registrador",
+		"becomeRegistrarDescription": "Para convertirse en registrador en Polkadot, necesita enviar una propuesta de referéndum y obtener la aprobación de la comunidad. Aquí está cómo:",
+		"becomeRegistrarSteps": {
+			"step1": "Enviar una propuesta de referéndum solicitando convertirse en registrador",
+			"step2": "La propuesta será votada por la comunidad",
+			"step3": "Si es aprobada, será agregado a la lista de registradores",
+			"step4": "Podrá establecer su tarifa y comenzar a proporcionar servicios de verificación de identidad"
+		},
+		"continueToCreate": "Continuar a Crear Propuesta",
+		"cancel": "Cancelar",
 		"index": "Índice",
 		"address": "Dirección",
 		"displayName": "Nombre de visualización",

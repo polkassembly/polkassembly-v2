@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { EJudgementDashboardTabs, ESetIdentityStep } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import styles from './Header.module.scss';
+import BecomeRegistrarModal from '../BecomeRegistrarModal/BecomeRegistrarModal';
 
 function Header({ data }: { data: { registrarsCount: number } }) {
 	const t = useTranslations();
@@ -23,7 +24,7 @@ function Header({ data }: { data: { registrarsCount: number } }) {
 						<Link href={`/set-identity?open=${ESetIdentityStep.REQUEST_JUDGEMENT}`}>
 							<Button>{t('Judgements.requestJudgement')}</Button>
 						</Link>
-						<Button variant='secondary'>{t('Judgements.becomeARegistrar')}</Button>
+						<BecomeRegistrarModal />
 					</div>
 				</div>
 				<TabsList className={`w-fit max-w-full items-start overflow-auto pl-4 font-bold md:pl-0 ${styles.hideScrollbar}`}>

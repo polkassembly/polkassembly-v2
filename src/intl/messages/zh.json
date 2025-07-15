@@ -1356,6 +1356,16 @@
 		"judgementsCompleted": "判断完成",
 		"thisMonth": "本月",
 		"registrarDescription": "一个被授权验证和验证账户身份的实体或个人。注册者可以设置服务费用并限制其认证到特定字段。",
+		"becomeRegistrarTitle": "如何成为注册者",
+		"becomeRegistrarDescription": "要在Polkadot上成为注册者，您需要提交公投提案并获得社区批准。方法如下：",
+		"becomeRegistrarSteps": {
+			"step1": "提交请求成为注册者的公投提案",
+			"step2": "提案将由社区投票",
+			"step3": "如果获得批准，您将被添加到注册者列表",
+			"step4": "然后您可以设置费用并开始提供身份验证服务"
+		},
+		"continueToCreate": "继续创建提案",
+		"cancel": "取消",
 		"index": "索引",
 		"address": "地址",
 		"displayName": "显示名称",

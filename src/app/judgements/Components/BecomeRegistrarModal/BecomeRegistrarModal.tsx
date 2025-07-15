@@ -6,96 +6,77 @@
 
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { IdentityService } from '@/app/_client-services/identity_service';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { useToast } from '@/hooks/useToast';
-import { useUser } from '@/hooks/useUser';
-import { ENotificationStatus } from '@/_shared/types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../_shared-components/Dialog/Dialog';
+import Link from 'next/link';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../../_shared-components/Dialog/Dialog';
 import { Button } from '../../../_shared-components/Button';
 
-interface BecomeRegistrarModalProps {
-	isOpen: boolean;
-	onClose: () => void;
-}
-
-function BecomeRegistrarModal({ isOpen, onClose }: BecomeRegistrarModalProps) {
+function BecomeRegistrarModal() {
 	const t = useTranslations('Judgements');
-	const { user } = useUser();
-	const { toast } = useToast();
-	const [isLoading, setIsLoading] = useState(false);
-	const network = getCurrentNetwork();
-
-	const address = user?.loginAddress;
-
-	const handleBecomeRegistrar = async () => {
-		if (!address) {
-			toast({
-				status: ENotificationStatus.ERROR,
-				title: 'Error',
-				description: 'Please connect your wallet first'
-			});
-			return;
-		}
-
-		setIsLoading(true);
-		try {
-			const identityService = await IdentityService.Init(network);
-			await identityService.becomeRegistrar({
-				address,
-				onSuccess: () => {
-					toast({
-						status: ENotificationStatus.SUCCESS,
-						title: 'Success',
-						description: 'You have successfully become a registrar'
-					});
-					onClose();
-				},
-				onFailed: (errorMessage) => {
-					toast({
-						status: ENotificationStatus.ERROR,
-						title: 'Error',
-						description: errorMessage || 'Failed to become registrar'
-					});
-				}
-			});
-		} catch {
-			toast({
-				status: ENotificationStatus.ERROR,
-				title: 'Error',
-				description: 'Failed to become registrar'
-			});
-		} finally {
-			setIsLoading(false);
-		}
-	};
+	const [modalOpen, setModalOpen] = useState(false);
 
 	return (
 		<Dialog
-			open={isOpen}
-			onOpenChange={onClose}
+			open={modalOpen}
+			onOpenChange={setModalOpen}
 		>
-			<DialogContent className='sm:max-w-md'>
-				<DialogHeader>
-					<DialogTitle>{t('becomeARegistrar')}</DialogTitle>
+			<DialogTrigger asChild>
+				<Button
+					variant='secondary'
+					onClick={() => setModalOpen(true)}
+				>
+					{t('becomeARegistrar')}
+				</Button>
+			</DialogTrigger>
+			<DialogContent className='max-w-2xl p-3 sm:p-6'>
+				<DialogHeader className='text-xl font-semibold text-text_primary'>
+					<DialogTitle>{t('becomeRegistrarTitle')}</DialogTitle>
 				</DialogHeader>
 				<div className='flex flex-col gap-4'>
-					<p className='text-sm text-gray-600'>{t('registrarDescription')}</p>
-					<div className='flex justify-end gap-2'>
+					<p className='text-sm text-gray-600'>{t('becomeRegistrarDescription')}</p>
+
+					<div className='space-y-3'>
+						<div className='flex items-start gap-3'>
+							<div className='flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600'>1</div>
+							<p className='text-sm text-gray-700'>{t('becomeRegistrarSteps.step1')}</p>
+						</div>
+						<div className='flex items-start gap-3'>
+							<div className='flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600'>2</div>
+							<p className='text-sm text-gray-700'>{t('becomeRegistrarSteps.step2')}</p>
+						</div>
+						<div className='flex items-start gap-3'>
+							<div className='flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600'>3</div>
+							<p className='text-sm text-gray-700'>{t('becomeRegistrarSteps.step3')}</p>
+						</div>
+						<div className='flex items-start gap-3'>
+							<div className='flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600'>4</div>
+							<p className='text-sm text-gray-700'>{t('becomeRegistrarSteps.step4')}</p>
+						</div>
+					</div>
+
+					<div className='rounded-lg border border-blue-200 bg-blue-50 p-3'>
+						<p className='text-xs text-blue-800'>
+							<strong>Note:</strong> For more detailed information, visit the{' '}
+							<a
+								href='https://wiki.polkadot.network/learn/learn-guides-identity/#becoming-a-registrar'
+								target='_blank'
+								rel='noopener noreferrer'
+								className='underline hover:text-blue-600'
+							>
+								Polkadot Wiki
+							</a>
+						</p>
+					</div>
+
+					<div className='flex justify-end gap-2 pt-2'>
 						<Button
 							variant='outline'
-							onClick={onClose}
-							disabled={isLoading}
+							onClick={() => setModalOpen(false)}
 						>
-							Cancel
+							{t('cancel')}
 						</Button>
-						<Button
-							onClick={handleBecomeRegistrar}
-							isLoading={isLoading}
-							disabled={!address}
-						>
-							{address ? t('becomeARegistrar') : 'Connect Wallet'}
-						</Button>
+						<Link href='/create'>
+							<Button onClick={() => setModalOpen(false)}>{t('continueToCreate')}</Button>
+						</Link>
 					</div>
 				</div>
 			</DialogContent>

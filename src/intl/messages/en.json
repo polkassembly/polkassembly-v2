@@ -1394,6 +1394,16 @@
 		"judgementsCompleted": "Judgements Completed",
 		"thisMonth": "this month",
 		"registrarDescription": "An entity or individual authorized to verify and validate the identity of accounts. Registrars can set a fee for their services and limit their attestation to certain fields.",
+		"becomeRegistrarTitle": "How to Become a Registrar",
+		"becomeRegistrarDescription": "To become a registrar on Polkadot, you need to submit a referendum proposal and get it approved by the community. Here's how:",
+		"becomeRegistrarSteps": {
+			"step1": "Submit a referendum proposal requesting to become a registrar",
+			"step2": "The proposal will be voted on by the community",
+			"step3": "If approved, you'll be added to the registrar list",
+			"step4": "You can then set your fee and start providing identity verification services"
+		},
+		"continueToCreate": "Continue to Create Proposal",
+		"cancel": "Cancel",
 		"index": "Index",
 		"address": "Address",
 		"displayName": "Display Name",
