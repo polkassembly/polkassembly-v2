@@ -141,84 +141,120 @@ export class RedisService {
 
 	private static async Get({ key, forceCache = false }: { key: string; forceCache?: boolean }): Promise<string | null> {
 		if (!IS_CACHE_ENABLED && !forceCache) return null;
-		return this.client.get(key);
+
+		try {
+			return this.client.get(key);
+		} catch (error) {
+			console.error('Error getting key:', error);
+			return null;
+		}
 	}
 
 	private static async Set({ key, value, ttlSeconds, forceCache = false }: { key: string; value: string; ttlSeconds?: number; forceCache?: boolean }): Promise<string | null> {
 		if (!IS_CACHE_ENABLED && !forceCache) return null;
 
-		if (ttlSeconds) {
-			return this.client.set(key, value, 'EX', ttlSeconds);
-		}
+		try {
+			if (ttlSeconds) {
+				return this.client.set(key, value, 'EX', ttlSeconds);
+			}
 
-		return this.client.set(key, value);
+			return this.client.set(key, value);
+		} catch (error) {
+			console.error('Error setting key:', error);
+			return null;
+		}
 	}
 
 	private static async Delete({ key, forceCache = false }: { key: string; forceCache?: boolean }): Promise<number> {
 		if (!IS_CACHE_ENABLED && !forceCache) return 0;
 
-		return this.client.del(key);
+		try {
+			return this.client.del(key);
+		} catch (error) {
+			console.error('Error deleting key:', error);
+			return 0;
+		}
 	}
 
 	private static async DeleteKeys({ pattern, forceCache = false }: { pattern: string; forceCache?: boolean }): Promise<void> {
 		if (!IS_CACHE_ENABLED && !forceCache) return Promise.resolve();
 
-		return new Promise((resolve, reject) => {
-			const stream = this.client.scanStream({
-				count: 200,
-				match: pattern
-			});
+		try {
+			return new Promise((resolve, reject) => {
+				const stream = this.client.scanStream({
+					count: 200,
+					match: pattern
+				});
 
-			let hasError = false;
+				let hasError = false;
 
-			stream.on('data', async (keys) => {
-				if (keys.length && !hasError) {
-					try {
-						const pipeline = this.client.pipeline();
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						keys.forEach((key: any) => {
-							pipeline.del(key);
-						});
-						await pipeline.exec();
-					} catch (error) {
-						hasError = true;
-						console.error('Error deleting keys:', error);
-						reject(error);
+				stream.on('data', async (keys) => {
+					if (keys.length && !hasError) {
+						try {
+							const pipeline = this.client.pipeline();
+							// eslint-disable-next-line @typescript-eslint/no-explicit-any
+							keys.forEach((key: any) => {
+								pipeline.del(key);
+							});
+							await pipeline.exec();
+						} catch (error) {
+							hasError = true;
+							console.error('Error deleting keys:', error);
+							reject(error);
+						}
 					}
-				}
-			});
+				});
 
-			stream.on('end', () => {
-				if (!hasError) {
-					console.log(`All keys matching pattern ${pattern} deleted.`);
-					resolve();
-				}
-			});
+				stream.on('end', () => {
+					if (!hasError) {
+						console.log(`All keys matching pattern ${pattern} deleted.`);
+						resolve();
+					}
+				});
 
-			stream.on('error', (error) => {
-				hasError = true;
-				console.error('Stream error:', error);
-				reject(error);
+				stream.on('error', (error) => {
+					hasError = true;
+					console.error('Stream error:', error);
+					reject(error);
+				});
 			});
-		});
+		} catch (error) {
+			console.error('Error deleting keys:', error);
+			return Promise.reject(error);
+		}
 	}
 
 	private static async AddToSet({ key, value, forceCache = false }: { key: string; value: string; forceCache?: boolean }): Promise<number> {
 		if (!IS_CACHE_ENABLED && !forceCache) return 0;
 
-		return this.client.sadd(key, value);
+		try {
+			return this.client.sadd(key, value);
+		} catch (error) {
+			console.error('Error adding to set:', error);
+			return 0;
+		}
 	}
 
 	private static async RemoveFromSet({ key, value, forceCache = false }: { key: string; value: string; forceCache?: boolean }): Promise<number> {
 		if (!IS_CACHE_ENABLED && !forceCache) return 0;
 
-		return this.client.srem(key, value);
+		try {
+			return this.client.srem(key, value);
+		} catch (error) {
+			console.error('Error removing from set:', error);
+			return 0;
+		}
 	}
 
 	private static async GetSetMembers({ key, forceCache = false }: { key: string; forceCache?: boolean }): Promise<string[]> {
 		if (!IS_CACHE_ENABLED && !forceCache) return [];
 
-		return this.client.smembers(key);
+		try {
+			return this.client.smembers(key);
+		} catch (error) {
+			console.error('Error getting set members:', error);
+			return [];
+		}
 	}
 
 	static async DeleteAllCacheForNetwork(network: ENetwork): Promise<void> {

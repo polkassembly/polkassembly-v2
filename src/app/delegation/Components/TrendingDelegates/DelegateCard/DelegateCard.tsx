@@ -84,7 +84,7 @@ const DelegateCard = memo(({ delegate }: { delegate: IDelegateDetails }) => {
 	const { user } = useUser();
 
 	const [openModal, setOpenModal] = useState(false);
-
+	const [openDelegateDialog, setOpenDelegateDialog] = useState(false);
 	return (
 		<div className={styles.delegationCard}>
 			<div className={`flex gap-2 rounded-t-md border py-1 ${getPlatformStyles(delegate.sources)}`}>
@@ -96,7 +96,10 @@ const DelegateCard = memo(({ delegate }: { delegate: IDelegateDetails }) => {
 						<Address address={delegate.address} />
 					</div>
 					{user?.id ? (
-						<Dialog>
+						<Dialog
+							open={openDelegateDialog}
+							onOpenChange={setOpenDelegateDialog}
+						>
 							<DialogTrigger asChild>
 								<Button
 									variant='ghost'
@@ -113,7 +116,10 @@ const DelegateCard = memo(({ delegate }: { delegate: IDelegateDetails }) => {
 										<span>{t('delegate')}</span>
 									</DialogTitle>
 								</DialogHeader>
-								<DelegateVotingPower delegate={delegate} />
+								<DelegateVotingPower
+									delegate={delegate}
+									onClose={() => setOpenDelegateDialog(false)}
+								/>
 							</DialogContent>
 						</Dialog>
 					) : (

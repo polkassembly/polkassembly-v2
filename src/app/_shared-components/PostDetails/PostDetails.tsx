@@ -128,8 +128,9 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	const fetchPostDetails = async () => {
 		const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: postData.proposalType, indexOrHash: index, skipCache: true });
 
-		if (error || !data) {
-			throw new Error(error?.message || 'Failed to fetch post details');
+		if (error || !data || !data.id) {
+			console.log(error?.message || 'Failed to fetch post details');
+			return postData;
 		}
 
 		return data;
