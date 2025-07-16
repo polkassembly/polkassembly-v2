@@ -42,12 +42,15 @@ function PostComments({
 	const fetchComments = async () => {
 		const { data, error } = await CommentClientService.getCommentsOfPost({ proposalType, index });
 
-		if (error || !data) {
-			throw new Error(error?.message || 'Failed to fetch data');
+		if (error) {
+			console.log(error?.message || 'Failed to fetch data');
+			return comments;
 		}
 
+		const allComments = data && data.length ? data : comments || [];
+
 		const commentsWithIdentities: ICommentWithIdentityStatus[] = await Promise.all(
-			data.map(async (comment) => {
+			allComments.map(async (comment) => {
 				const identity = await getOnChainIdentity(comment?.publicUser?.addresses?.[0]);
 				const isVerified = identity?.isVerified;
 				return { ...comment, isVerified };
