@@ -14,7 +14,7 @@ function RegistrarsSummary() {
 	return (
 		<div className={styles.container}>
 			<p className={styles.description}>{t('Judgements.registrarDescription')}</p>
-			<SearchBar />
+			<SearchBar searchKey='registrarSearch' />
 		</div>
 	);
 }

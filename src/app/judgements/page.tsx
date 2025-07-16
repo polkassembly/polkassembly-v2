@@ -31,15 +31,16 @@ export async function generateMetadata(): Promise<Metadata> {
 	});
 }
 
-async function Judgements({ searchParams }: { searchParams: Promise<{ page?: string; search?: string }> }) {
+async function Judgements({ searchParams }: { searchParams: Promise<{ page?: string; dashboardSearch?: string; registrarSearch?: string }> }) {
 	const searchParamsValue = await searchParams;
 	const page = parseInt(searchParamsValue.page || '1', 10);
-	const search = searchParamsValue.search || '';
+	const dashboardSearch = searchParamsValue.dashboardSearch || '';
+	const registrarSearch = searchParamsValue.registrarSearch || '';
 
 	// Fetch judgement data
 	const [judgementRequestsResponse, registrarsResponse] = await Promise.all([
-		NextApiClientService.fetchJudgementRequests({ page: Number(page), limit: 10, search }),
-		NextApiClientService.fetchRegistrars()
+		NextApiClientService.fetchJudgementRequests({ page: Number(page), limit: 10, search: dashboardSearch }),
+		NextApiClientService.fetchRegistrars({ search: registrarSearch })
 	]);
 
 	if (judgementRequestsResponse.error || !judgementRequestsResponse.data) {

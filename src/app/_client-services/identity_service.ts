@@ -564,12 +564,20 @@ export class IdentityService {
 		};
 	}
 
-	async getRegistrarsWithStats(): Promise<IRegistrarInfo[]> {
+	async getRegistrarsWithStats({ search }: { search?: string } = {}): Promise<IRegistrarInfo[]> {
 		try {
 			const registrars = await this.getRegistrars();
 			const judgements = await this.getAllIdentityJudgements();
 
-			return registrars.map((registrar, index) => {
+			let filteredRegistrars = registrars;
+			if (search && search.trim().length > 0) {
+				const searchLower = search.trim().toLowerCase();
+				filteredRegistrars = registrars.filter(
+					(registrar, index) => (registrar.account && registrar.account.toLowerCase().includes(searchLower)) || index.toString() === searchLower
+				);
+			}
+
+			return filteredRegistrars.map((registrar, index) => {
 				// Calculate stats for this registrar
 				const registrarJudgements = judgements.filter((j) => Number(j?.registrarIndex) === index);
 				const totalReceivedRequests = registrarJudgements.length;

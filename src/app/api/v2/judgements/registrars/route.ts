@@ -2,14 +2,19 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { IdentityService } from '@/app/_client-services/identity_service';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork } from '@/_shared/types';
+import { z } from 'zod';
 
-export const GET = withErrorHandling(async () => {
+export const GET = withErrorHandling(async (req: NextRequest) => {
+	const zodQuerySchema = z.object({
+		search: z.string().optional().default('')
+	});
+	const { search } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 	const network = await getNetworkFromHeaders();
 
 	// Check if network supports People Chain
@@ -21,7 +26,7 @@ export const GET = withErrorHandling(async () => {
 	}
 
 	const identityService = await IdentityService.Init(network as ENetwork);
-	const registrars = await identityService.getRegistrarsWithStats();
+	const registrars = await identityService.getRegistrarsWithStats({ search });
 
 	return NextResponse.json({
 		items: registrars,

@@ -12,21 +12,24 @@ import { Search } from 'lucide-react';
 import { Input } from '../../../_shared-components/Input';
 import { Button } from '../../../_shared-components/Button';
 
-function SearchBar() {
+function SearchBar({ searchKey = 'dashboardSearch' }: { searchKey?: string }) {
 	const t = useTranslations();
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const pathname = usePathname();
-	const [inputValue, setInputValue] = useState(searchParams.get('search') || '');
+	const [inputValue, setInputValue] = useState(searchParams.get(searchKey) || '');
 
 	const handleSearch = () => {
 		const params = new URLSearchParams(Array.from(searchParams.entries()));
 		if (inputValue) {
-			params.set('search', inputValue);
+			params.set(searchKey, inputValue);
 			params.set('page', '1'); // Reset to first page on new search
 		} else {
-			params.delete('search');
+			params.delete(searchKey);
 		}
+		// Remove the other tab's search param to avoid cross-filtering
+		const otherKey = searchKey === 'dashboardSearch' ? 'registrarSearch' : 'dashboardSearch';
+		params.delete(otherKey);
 		router.push(`${pathname}?${params.toString()}`);
 	};
 

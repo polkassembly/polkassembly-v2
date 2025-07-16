@@ -1148,8 +1148,12 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IJudgementListingResponse>({ url, method });
 	}
 
-	static async fetchRegistrars() {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_REGISTRARS });
+	static async fetchRegistrars({ search }: { search?: string } = {}) {
+		const queryParams = new URLSearchParams();
+		if (search) {
+			queryParams.set('search', search);
+		}
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_REGISTRARS, queryParams });
 		return this.nextApiClientFetch<IRegistrarsListingResponse>({ url, method });
 	}
 }

@@ -92,7 +92,7 @@ function DashboardSummary() {
 					</div>
 				</div>
 			</div>
-			<SearchBar />
+			<SearchBar searchKey='dashboardSearch' />
 		</div>
 	);
 }
