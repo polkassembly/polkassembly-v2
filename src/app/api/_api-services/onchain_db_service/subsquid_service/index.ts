@@ -745,7 +745,9 @@ export class SubsquidService extends SubsquidUtils {
 		return subsquidData.convictionVotesConnection.totalCount;
 	}
 
-	static async GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(network: ENetwork): Promise<Record<string, { votingPower: string; receivedDelegationsCount: number }>> {
+	static async GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(
+		network: ENetwork
+	): Promise<Record<string, { votingPower: string; delegators: string[]; receivedDelegationsCount: number }>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_ALL_DELEGATES_CONVICTION_VOTING_POWER_AND_DELEGATIONS_COUNT;
@@ -761,13 +763,18 @@ export class SubsquidService extends SubsquidUtils {
 			);
 		}
 
-		const result: Record<string, { votingPower: string; receivedDelegationsCount: number }> = {};
+		const result: Record<string, { votingPower: string; delegators: string[]; receivedDelegationsCount: number }> = {};
 
-		subsquidData.votingDelegations.forEach((delegation: { to: string; balance: string; lockPeriod: number }) => {
+		subsquidData.votingDelegations.forEach((delegation: { to: string; balance: string; lockPeriod: number; from: string }) => {
+			const delegators = result[delegation.to]
+				? result[delegation.to].delegators
+				: (Array.from(new Set(subsquidData.votingDelegations.filter((d: { to: string }) => d.to === delegation.to)?.map((d: { from: string }) => d.from))) as string[]);
+
 			result[delegation.to] = {
 				votingPower: result[delegation.to]?.votingPower
 					? new BN(result[delegation.to].votingPower).add(this.getVotingPower(delegation.balance, delegation.lockPeriod)).toString()
 					: this.getVotingPower(delegation.balance, delegation.lockPeriod).toString(),
+				delegators,
 				receivedDelegationsCount: result[delegation.to]?.receivedDelegationsCount ? result[delegation.to].receivedDelegationsCount + 1 : 1
 			};
 		});
@@ -777,6 +784,7 @@ export class SubsquidService extends SubsquidUtils {
 
 	static async GetDelegateDetails({ network, address }: { network: ENetwork; address: string }): Promise<{
 		votingPower: string;
+		delegators: string[];
 		receivedDelegationsCount: number;
 		last30DaysVotedProposalsCount: number;
 	}> {
@@ -797,10 +805,13 @@ export class SubsquidService extends SubsquidUtils {
 			return new BN(acc).add(new BN(delegation.balance));
 		}, BN_ZERO);
 
+		const uniqueDelegates = new Set(subsquidData.votingDelegations.filter((d: { to: string }) => d.to === address)?.map((d: { from: string }) => d.from));
+
 		return {
 			votingPower: votingPower.toString(),
 			receivedDelegationsCount: subsquidData.votingDelegations.length,
-			last30DaysVotedProposalsCount: subsquidData.convictionVotesConnection.totalCount
+			last30DaysVotedProposalsCount: subsquidData.convictionVotesConnection.totalCount,
+			delegators: Array.from(uniqueDelegates) as string[]
 		};
 	}
 

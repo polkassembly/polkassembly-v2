@@ -955,6 +955,7 @@ export class SubsquidQueries {
 				to
 				balance
 				lockPeriod
+				from
 			}
 		}
 	`;
@@ -965,6 +966,7 @@ export class SubsquidQueries {
 				to
 				balance
 				lockPeriod
+				from
 			}
 			convictionVotesConnection(where: {voter_eq: $address_eq, proposal: {type_eq: ReferendumV2, createdAt_gte: $createdAt_gte}}) {
 				totalCount

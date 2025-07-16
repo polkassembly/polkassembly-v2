@@ -70,8 +70,8 @@ function DelegateStats({ delegate }: { delegate: IDelegateDetails }) {
 			</div>
 			<div className='p-5 text-center'>
 				<div>
-					<div className='font-semibold md:text-2xl'>{delegate?.receivedDelegationsCount}</div>
-					<span className={styles.delegationCardStatsItemText}>{t('receivedDelegations')}</span>
+					<div className='font-semibold md:text-2xl'>{delegate?.delegators?.length || 0}</div>
+					<span className={styles.delegationCardStatsItemText}>{t('delegators')}</span>
 				</div>
 			</div>
 		</div>

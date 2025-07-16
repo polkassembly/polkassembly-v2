@@ -64,6 +64,7 @@ export default function BecomeDelegateDialog() {
 				sources: [EDelegateSource.POLKASSEMBLY],
 				votingPower: '0',
 				last30DaysVotedProposalsCount: 0,
+				delegators: [],
 				receivedDelegationsCount: 0,
 				network: network as ENetwork
 			};

@@ -1113,7 +1113,7 @@
 		"readMore": "もっと読む",
 		"votingPower": "投票力",
 		"votedProposals": "投票された提案",
-		"receivedDelegations": "受け取った委任",
+		"delegators": "受け取った委任",
 		"past30Days": "過去30日間",
 		"trendingDelegates": "トレンディングな委任者",
 		"pleaseLoginToContinue": "続けるにはログインしてください",

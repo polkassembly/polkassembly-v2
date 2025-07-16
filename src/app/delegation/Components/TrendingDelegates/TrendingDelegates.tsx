@@ -158,7 +158,7 @@ function TrendingDelegates() {
 						<SelectContent className={styles.selectContent}>
 							<SelectItem value='VOTING_POWER'>{t('votingPower')}</SelectItem>
 							<SelectItem value='VOTED_PROPOSALS'>{t('votedProposals')}</SelectItem>
-							<SelectItem value='RECEIVED_DELEGATIONS'>{t('receivedDelegations')}</SelectItem>
+							<SelectItem value='DELEGATORS'>{t('delegators')}</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>
