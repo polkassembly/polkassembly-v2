@@ -4,7 +4,7 @@
 import { EAnalyticsType, EPostOrigin, EProposalStatus, EProposalType, EVotesDisplayType, IStatusHistoryItem } from '@/_shared/types';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
@@ -65,6 +65,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 	const latestApproval = Array.isArray(voteCurveData) && voteCurveData.length > 0 ? voteCurveData[voteCurveData.length - 1].approvalPercent : null;
 	const latestSupport = Array.isArray(voteCurveData) && voteCurveData.length > 0 ? voteCurveData[voteCurveData.length - 1].supportPercent : null;
 
+	const enableGraph = useMemo(() => !!trackName && !!timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced), [trackName, timeline]);
 	return (
 		<div className={classes.card}>
 			<div className='flex w-full items-center justify-between'>
@@ -82,35 +83,27 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 					isFetching={isFetching}
 					proposalType={proposalType}
 					selectedTab={activeTab}
-					enableGraph={!!trackName && !!timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced)}
+					enableGraph={enableGraph}
 				/>
 			</div>
-			<Tabs
-				value={activeTab}
-				defaultValue={activeTab}
-			>
-				<div className={classes.tabs}>
-					<Button
-						variant='ghost'
-						size='sm'
-						onClick={() => setActiveTab(EProposalVoteType.Bubble)}
-						className={cn(classes.tab, 'h-7', activeTab === EProposalVoteType.Bubble ? classes.activeTab : classes.inactiveTab)}
-					>
-						{t('bubble')}
-					</Button>
-
-					{!!trackName && timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced) && (
-						<Button
-							variant='ghost'
-							size='sm'
-							onClick={() => setActiveTab(EProposalVoteType.Graph)}
-							className={cn(classes.tab, 'h-7', activeTab === EProposalVoteType.Graph ? classes.activeTab : classes.inactiveTab)}
-						>
-							{t('graph')}
-						</Button>
-					)}
-				</div>
-				{activeTab === EProposalVoteType.Bubble && (
+			{enableGraph ? (
+				<Tabs
+					value={activeTab}
+					defaultValue={activeTab}
+				>
+					<div className={classes.tabs}>
+						{[EProposalVoteType.Bubble, EProposalVoteType.Graph].map((tab) => (
+							<Button
+								key={tab}
+								variant='ghost'
+								size='sm'
+								onClick={() => setActiveTab(tab)}
+								className={cn(classes.tab, 'h-7', activeTab === tab ? classes.activeTab : classes.inactiveTab)}
+							>
+								{t(tab)}
+							</Button>
+						))}
+					</div>
 					<TabsContent
 						value={EProposalVoteType.Bubble}
 						className='px-6'
@@ -122,8 +115,6 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 							enableFullHeight={false}
 						/>
 					</TabsContent>
-				)}
-				{activeTab === EProposalVoteType.Graph && !!trackName && timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced) && (
 					<TabsContent value={EProposalVoteType.Graph}>
 						<VoteCurvesData
 							latestApproval={latestApproval}
@@ -137,8 +128,18 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 							thresholdValues={thresholdValues}
 						/>
 					</TabsContent>
-				)}
-			</Tabs>
+				</Tabs>
+			) : (
+				<div className='px-6'>
+					<VotesBubbleChart
+						proposalType={proposalType}
+						index={index}
+						analyticsType={EAnalyticsType.CONVICTIONS}
+						enableFullHeight={false}
+					/>
+				</div>
+			)}
+
 			<div className={classes.voteHistoryContainer}>
 				<Dialog>
 					<DialogTrigger
