@@ -1133,8 +1133,7 @@ export interface IDelegate {
 
 export interface IDelegateDetails extends IDelegate {
 	publicUser?: IPublicUser;
-	maxDelegated: string;
-	delegators: string[];
+	votingPower: string;
 	receivedDelegationsCount: number;
 	last30DaysVotedProposalsCount: number;
 }
