@@ -6,9 +6,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
-import { EProposalType, IComment, IPublicUser } from '@/_shared/types';
-import { useAtomValue } from 'jotai';
-import { userAtom } from '@/app/_atoms/user/userAtom';
+import { EProposalType, IComment, IPublicUser, EDataSource } from '@/_shared/types';
 import { Button } from '@ui/Button';
 import { useTranslations } from 'next-intl';
 import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
@@ -17,6 +15,7 @@ import { MDXEditorMethods } from '@mdxeditor/editor';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { useUser } from '@/hooks/useUser';
 import classes from './AddComment.module.scss';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 
@@ -41,10 +40,9 @@ function AddComment({
 	const network = getCurrentNetwork();
 	const savedContent = LocalStorageClientService.getCommentData({ postId: proposalIndex, parentCommentId });
 	const [content, setContent] = useState<string | null>(savedContent);
-	const [loading, setLoading] = useState<boolean>(false);
 	const { getOnChainIdentity } = useIdentityService();
 
-	const user = useAtomValue(userAtom);
+	const { user } = useUser();
 
 	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 
@@ -75,8 +73,37 @@ function AddComment({
 
 	const addComment = async () => {
 		if (!content?.trim() || !user) return;
+
+		const now = new Date();
+		const optimisticComment: IComment = {
+			content: content.trim(),
+			createdAt: now,
+			id: `temp-${Date.now()}`,
+			updatedAt: now,
+			userId: user.id,
+			network,
+			proposalType,
+			indexOrHash: proposalIndex,
+			parentCommentId: parentCommentId || null,
+			isDeleted: false,
+			dataSource: EDataSource.POLKASSEMBLY
+		};
+
+		const publicUser = {
+			username: user.username,
+			id: user.id,
+			addresses: user.addresses,
+			profileScore: user.id,
+			profileDetails: user.publicUser?.profileDetails || DEFAULT_PROFILE_DETAILS
+		};
+
+		// Optimistically update UI
+		onConfirm?.(optimisticComment, publicUser);
+		setContent(null);
+		LocalStorageClientService.deleteCommentData({ postId: proposalIndex, parentCommentId });
+		markdownEditorRef.current?.setMarkdown('');
+
 		try {
-			setLoading(true);
 			const { data, error } = await CommentClientService.addCommentToPost({
 				proposalType,
 				index: proposalIndex,
@@ -85,30 +112,22 @@ function AddComment({
 			});
 
 			if (error) {
-				setLoading(false);
+				// Remove optimistic comment by marking it as deleted
+				onConfirm?.({ ...optimisticComment, isDeleted: true }, publicUser);
 				// TODO: show notification
+				console.log('error in addComment', error);
 				return;
 			}
 
 			if (data) {
-				const publicUser = {
-					username: user.username,
-					id: user.id,
-					addresses: user.addresses,
-					profileScore: user.id,
-					profileDetails: user.publicUser?.profileDetails || DEFAULT_PROFILE_DETAILS
-				};
-
+				// Update with real data
 				onConfirm?.({ ...data, content }, publicUser);
-
-				setContent(null);
-				LocalStorageClientService.deleteCommentData({ postId: proposalIndex, parentCommentId });
-				markdownEditorRef.current?.setMarkdown('');
 			}
-			setLoading(false);
-		} catch {
-			setLoading(false);
+		} catch (err) {
+			// Remove optimistic comment by marking it as deleted
+			onConfirm?.({ ...optimisticComment, isDeleted: true }, publicUser);
 			// TODO: show notification
+			console.error('Failed to add comment:', err);
 		}
 	};
 
@@ -130,7 +149,6 @@ function AddComment({
 					<Button
 						variant='secondary'
 						onClick={onCancel}
-						disabled={loading}
 					>
 						{t('PostDetails.cancel')}
 					</Button>
@@ -139,7 +157,6 @@ function AddComment({
 					className={classes.postBtn}
 					onClick={addComment}
 					disabled={!content?.trim()}
-					isLoading={loading}
 				>
 					{t('PostDetails.post')}
 				</Button>
