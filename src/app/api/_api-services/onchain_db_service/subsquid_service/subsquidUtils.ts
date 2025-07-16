@@ -503,4 +503,30 @@ export class SubsquidUtils extends SubsquidQueries {
 
 		return analytics;
 	}
+
+	/**
+	 * Calculates the maximum voting power across all tracks for a delegate
+	 * @param delegations - Array of voting delegation objects for a specific delegate
+	 * @returns Maximum voting power as string
+	 */
+	protected static calculateMaxTrackVotingPower(delegations: Array<{ balance: string; lockPeriod: number; track?: number; trackNumber?: number }>): string {
+		if (!delegations.length) return '0';
+
+		// Group delegations by track and calculate voting power per track
+		const trackPowerMap = new Map<number, BN>();
+
+		delegations.forEach((delegation) => {
+			const track = delegation.track ?? delegation.trackNumber ?? 0;
+			const votingPower = this.getVotingPower(delegation.balance, delegation.lockPeriod);
+
+			const currentPower = trackPowerMap.get(track) || BN_ZERO;
+			trackPowerMap.set(track, currentPower.add(votingPower));
+		});
+
+		// Find maximum voting power across all tracks
+		const trackPowers = Array.from(trackPowerMap.values());
+		const maxVotingPower = trackPowers.reduce((max, current) => (current.gt(max) ? current : max), BN_ZERO);
+
+		return maxVotingPower.toString();
+	}
 }

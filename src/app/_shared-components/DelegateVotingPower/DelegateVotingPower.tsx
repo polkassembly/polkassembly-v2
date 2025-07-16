@@ -171,7 +171,11 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId, onClose }: De
 							const updatedDelegates = [...prev];
 							updatedDelegates[`${delegateIndex}`] = {
 								...updatedDelegates[`${delegateIndex}`],
-								receivedDelegationsCount: (updatedDelegates[`${delegateIndex}`].receivedDelegationsCount || 0) + selectedTrackIds.length
+								receivedDelegationsCount: (updatedDelegates[`${delegateIndex}`].receivedDelegationsCount || 0) + selectedTrackIds.length,
+								delegators:
+									delegateAddress && updatedDelegates[`${delegateIndex}`].delegators?.includes(delegateAddress)
+										? updatedDelegates[`${delegateIndex}`].delegators
+										: [...(updatedDelegates[`${delegateIndex}`].delegators || []), delegateAddress]
 							};
 							return updatedDelegates;
 						}
