@@ -7,6 +7,7 @@
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import { InfoIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../../_shared-components/Dialog/Dialog';
 import { Button } from '../../../_shared-components/Button';
 
@@ -54,8 +55,8 @@ function BecomeRegistrarModal() {
 					</div>
 
 					<div className='rounded-lg border border-blue-200 bg-blue-50 p-3'>
-						<p className='text-xs text-blue-800'>
-							<strong>Note:</strong> For more detailed information, visit the{' '}
+						<p className='flex items-center gap-1 text-xs text-blue-800'>
+							<InfoIcon className='h-4 w-4' /> For more detailed information, visit the{' '}
 							<a
 								href='https://wiki.polkadot.network/learn/learn-guides-identity/#becoming-a-registrar'
 								target='_blank'
