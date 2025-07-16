@@ -1136,11 +1136,14 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IJudgementStats>({ url, method });
 	}
 
-	static async fetchJudgementRequests({ page, limit }: { page: number; limit: number }) {
+	static async fetchJudgementRequests({ page, limit, search }: { page: number; limit: number; search?: string }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: limit.toString()
 		});
+		if (search) {
+			queryParams.set('search', search);
+		}
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_JUDGEMENT_REQUESTS, queryParams });
 		return this.nextApiClientFetch<IJudgementListingResponse>({ url, method });
 	}

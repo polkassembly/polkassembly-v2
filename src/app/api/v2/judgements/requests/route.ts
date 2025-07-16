@@ -13,11 +13,12 @@ import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/l
 
 const zodQuerySchema = z.object({
 	page: z.coerce.number().optional().default(1),
-	limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)
+	limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
+	search: z.string().optional().default('')
 });
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
-	const { page, limit } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
+	const { page, limit, search } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 	const network = await getNetworkFromHeaders();
 
 	// Check if network supports People Chain
@@ -29,7 +30,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	}
 
 	const identityService = await IdentityService.Init(network as ENetwork);
-	const requests = await identityService.getJudgementRequests({ page, limit });
+	const requests = await identityService.getJudgementRequests({ page, limit, search });
 
 	return NextResponse.json(requests);
 });

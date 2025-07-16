@@ -31,13 +31,14 @@ export async function generateMetadata(): Promise<Metadata> {
 	});
 }
 
-async function Judgements({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+async function Judgements({ searchParams }: { searchParams: Promise<{ page?: string; search?: string }> }) {
 	const searchParamsValue = await searchParams;
 	const page = parseInt(searchParamsValue.page || '1', 10);
+	const search = searchParamsValue.search || '';
 
 	// Fetch judgement data
 	const [judgementRequestsResponse, registrarsResponse] = await Promise.all([
-		NextApiClientService.fetchJudgementRequests({ page: Number(page), limit: 10 }),
+		NextApiClientService.fetchJudgementRequests({ page: Number(page), limit: 10, search }),
 		NextApiClientService.fetchRegistrars()
 	]);
 

@@ -496,10 +496,8 @@ export class IdentityService {
 			const registrars = await this.getRegistrars();
 			const judgements: IJudgementRequest[] = [];
 
-			// Get all identity entries
 			const identityEntries = await this.peopleChainApi.query.identity.identityOf.entries();
 
-			// Process each identity entry
 			identityEntries.forEach(([key, value]) => {
 				const address = key.args[0].toString();
 				const identityInfo = value.toHuman() as any;
@@ -519,12 +517,16 @@ export class IdentityService {
 						const registrar = registrars[registrarIndexNum];
 						const status = IdentityService.mapJudgementStatus(judgementData);
 
-						// Create judgement request
+						const displayRaw = identity.display?.Raw ?? identity.display;
+						const displayName = isHex(displayRaw) ? hexToString(displayRaw) || displayRaw || '' : displayRaw || '';
+						const emailRaw = identity.email?.Raw ?? identity.email;
+						const email = isHex(emailRaw) ? hexToString(emailRaw) || emailRaw || '' : emailRaw || '';
+
 						const judgementRequest: IJudgementRequest = {
 							id: `${address}-${registrarIndexNum}-${Date.now()}`,
 							address,
-							displayName: identity.display?.Raw || identity.display || '',
-							email: identity.email?.Raw || identity.email || '',
+							displayName,
+							email,
 							twitter: identity.twitter?.Raw || identity.twitter || '',
 							status,
 							dateInitiated: new Date(), // We'll improve this with actual block data later
@@ -538,7 +540,6 @@ export class IdentityService {
 				});
 			});
 
-			// Sort by date (newest first)
 			return judgements.sort((a, b) => b.dateInitiated.getTime() - a.dateInitiated.getTime());
 		} catch (error) {
 			console.error('Error fetching identity judgements:', error);
@@ -546,14 +547,20 @@ export class IdentityService {
 		}
 	}
 
-	async getJudgementRequests({ page, limit }: { page: number; limit: number }): Promise<IJudgementListingResponse> {
+	async getJudgementRequests({ page, limit, search }: { page: number; limit: number; search?: string }): Promise<IJudgementListingResponse> {
 		const allJudgements = await this.getAllIdentityJudgements();
+		let filteredJudgements = allJudgements;
+		if (search && search.trim().length > 0) {
+			const searchLower = search.trim().toLowerCase();
+			filteredJudgements = allJudgements.filter(
+				(j) => (j.address && j.address.toLowerCase().includes(searchLower)) || (j.displayName && j.displayName.toLowerCase().includes(searchLower))
+			);
+		}
 		const startIndex = (page - 1) * limit;
 		const endIndex = startIndex + limit;
-
 		return {
-			items: allJudgements.slice(startIndex, endIndex),
-			totalCount: allJudgements.length
+			items: filteredJudgements.slice(startIndex, endIndex),
+			totalCount: filteredJudgements.length
 		};
 	}
 

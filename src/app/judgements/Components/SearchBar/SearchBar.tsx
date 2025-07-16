@@ -17,8 +17,18 @@ function SearchBar() {
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const pathname = usePathname();
-	const [inputValue, setInputValue] = useState(searchParams.get('hash') || '');
-	const preImagePath = '/preimages';
+	const [inputValue, setInputValue] = useState(searchParams.get('search') || '');
+
+	const handleSearch = () => {
+		const params = new URLSearchParams(Array.from(searchParams.entries()));
+		if (inputValue) {
+			params.set('search', inputValue);
+			params.set('page', '1'); // Reset to first page on new search
+		} else {
+			params.delete('search');
+		}
+		router.push(`${pathname}?${params.toString()}`);
+	};
 
 	return (
 		<div className='relative w-full sm:max-w-60 lg:max-w-xs'>
@@ -27,11 +37,7 @@ function SearchBar() {
 				value={inputValue}
 				onKeyDown={(e) => {
 					if (e.key === 'Enter') {
-						if (pathname === preImagePath) {
-							router.push(`${preImagePath}/${inputValue}`);
-						} else if (pathname.startsWith(`${preImagePath}/`)) {
-							router.replace(`${preImagePath}/${inputValue}`);
-						}
+						handleSearch();
 					}
 				}}
 				onChange={(e) => setInputValue(e.target.value)}
@@ -41,13 +47,7 @@ function SearchBar() {
 				variant='ghost'
 				size='icon'
 				className='absolute right-0 top-0 h-full rounded-l-none border-l border-border_grey px-2 text-2xl text-text_grey'
-				onClick={() => {
-					if (pathname === preImagePath) {
-						router.push(`${preImagePath}/${inputValue}`);
-					} else if (pathname.startsWith(`${preImagePath}/`)) {
-						router.replace(`${preImagePath}/${inputValue}`);
-					}
-				}}
+				onClick={handleSearch}
 			>
 				<Search />
 			</Button>
