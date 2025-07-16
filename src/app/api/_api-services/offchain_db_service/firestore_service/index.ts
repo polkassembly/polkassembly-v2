@@ -1627,7 +1627,14 @@ export class FirestoreService extends FirestoreUtils {
 			.get();
 
 		return {
-			items: posts.docs.map((doc) => doc.data() as IOffChainPost),
+			items: posts.docs.map((doc) => {
+				const data = doc.data();
+				return {
+					...data,
+					createdAt: data.createdAt?.toDate(),
+					updatedAt: data.updatedAt?.toDate()
+				} as IOffChainPost;
+			}),
 			totalCount: totalCount.data().count
 		};
 	}
