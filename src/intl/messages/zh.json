@@ -1134,7 +1134,7 @@
 		"delegate": "委托",
 		"noBio": "没有生物",
 		"readMore": "阅读更多",
-		"votingPower": "投票权力",
+		"maxDelegated": "最大委任",
 		"votedProposals": "已投票提案",
 		"delegators": "接收委任",
 		"past30Days": "过去30天",

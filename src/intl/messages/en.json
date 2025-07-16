@@ -1199,7 +1199,7 @@
 		"delegate": "Delegate",
 		"noBio": "No Bio",
 		"readMore": "Read more",
-		"votingPower": "Voting power",
+		"maxDelegated": "Max Delegated",
 		"votedProposals": "Voted proposals",
 		"delegators": "Delegators",
 		"past30Days": "Past 30 Days",

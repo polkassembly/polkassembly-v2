@@ -156,7 +156,7 @@ function TrendingDelegates() {
 							<MdSort className='text-xl text-text_pink' />
 						</SelectTrigger>
 						<SelectContent className={styles.selectContent}>
-							<SelectItem value='VOTING_POWER'>{t('votingPower')}</SelectItem>
+							<SelectItem value='MAX_DELEGATED'>{t('maxDelegated')}</SelectItem>
 							<SelectItem value='VOTED_PROPOSALS'>{t('votedProposals')}</SelectItem>
 							<SelectItem value='DELEGATORS'>{t('delegators')}</SelectItem>
 						</SelectContent>

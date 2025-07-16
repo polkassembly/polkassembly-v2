@@ -1111,7 +1111,7 @@
 		"delegate": "委任者",
 		"noBio": "バイオがありません",
 		"readMore": "もっと読む",
-		"votingPower": "投票力",
+		"maxDelegated": "最大委任",
 		"votedProposals": "投票された提案",
 		"delegators": "受け取った委任",
 		"past30Days": "過去30日間",

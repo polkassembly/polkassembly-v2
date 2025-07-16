@@ -55,10 +55,10 @@ function DelegateStats({ delegate }: { delegate: IDelegateDetails }) {
 					<div className='text-sm text-btn_secondary_text lg:whitespace-nowrap'>
 						<span className='font-semibold md:text-2xl'>
 							{' '}
-							{formatUSDWithUnits(formatBnBalance(delegate?.votingPower, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
+							{formatUSDWithUnits(formatBnBalance(delegate?.maxDelegated, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
 						</span>{' '}
 					</div>
-					<span className={styles.delegationCardStatsItemText}>{t('votingPower')}</span>
+					<span className={styles.delegationCardStatsItemText}>{t('maxDelegated')}</span>
 				</div>
 			</div>
 			<div className={styles.delegationCardStatsItem}>

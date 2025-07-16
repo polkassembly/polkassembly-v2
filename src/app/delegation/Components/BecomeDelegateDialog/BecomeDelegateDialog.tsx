@@ -62,7 +62,7 @@ export default function BecomeDelegateDialog() {
 				address: userPreferences.selectedAccount.address,
 				manifesto,
 				sources: [EDelegateSource.POLKASSEMBLY],
-				votingPower: '0',
+				maxDelegated: '0',
 				last30DaysVotedProposalsCount: 0,
 				delegators: [],
 				receivedDelegationsCount: 0,
