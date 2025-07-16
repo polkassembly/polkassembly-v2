@@ -188,7 +188,7 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 	);
 }
 
-function AddressSwitchButton() {
+function AddressSwitchButton({ disabled }: { disabled?: boolean }) {
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
 	const [isOpen, setisOpen] = useState(false);
@@ -210,6 +210,7 @@ function AddressSwitchButton() {
 				<Button
 					size='sm'
 					className='ml-auto flex items-center gap-1 text-xs'
+					disabled={disabled}
 				>
 					<IoMdSync /> {t('Switch')}
 				</Button>
@@ -254,7 +255,15 @@ function AddressSwitchButton() {
 	);
 }
 
-export default function AddressRelationsPicker({ withBalance = false, showPeopleChainBalance = false }: { withBalance?: boolean; showPeopleChainBalance?: boolean }) {
+export default function AddressRelationsPicker({
+	withBalance = false,
+	showPeopleChainBalance = false,
+	disabled
+}: {
+	withBalance?: boolean;
+	showPeopleChainBalance?: boolean;
+	disabled?: boolean;
+}) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const walletService = useWalletService();
 	const [accountsLoading, setAccountsLoading] = useState(true);
@@ -324,7 +333,7 @@ export default function AddressRelationsPicker({ withBalance = false, showPeople
 						</span>
 					</div>
 				)}
-				<AddressSwitchButton />
+				<AddressSwitchButton disabled={disabled} />
 			</div>
 		</div>
 	);
