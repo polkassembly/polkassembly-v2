@@ -5,46 +5,54 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { CommentClientService } from '@/app/_client-services/comment_client_service';
-import { EProposalType, IComment, IPublicUser } from '@/_shared/types';
-import { useAtomValue } from 'jotai';
-import { userAtom } from '@/app/_atoms/user/userAtom';
+import { EDataSource, ENotificationStatus, EProposalType, EReactQueryKeys, IComment, ICommentResponse, IPublicUser, IVoteData } from '@/_shared/types';
 import { Button } from '@ui/Button';
 import { useTranslations } from 'next-intl';
 import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
-import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { MDXEditorMethods } from '@mdxeditor/editor';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import classes from './AddComment.module.scss';
+import { useUser } from '@/hooks/useUser';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { CommentClientService } from '@/app/_client-services/comment_client_service';
+import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
+import { useToast } from '@/hooks/useToast';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
+import classes from './AddComment.module.scss';
 
 function AddComment({
 	proposalType,
 	proposalIndex,
 	parentCommentId,
-	onConfirm,
+	onSuccess,
+	onOptimisticUpdate,
 	onCancel,
 	isReply,
-	replyTo
+	replyTo,
+	voteData
 }: {
 	proposalType: EProposalType;
 	proposalIndex: string;
 	parentCommentId?: string;
-	onConfirm?: (newComment: IComment, user: Omit<IPublicUser, 'rank'>) => void;
+	onSuccess?: (newComment: IComment) => void;
+	onOptimisticUpdate?: (newComment: IComment, publicUser: IPublicUser) => void;
 	onCancel?: () => void;
 	isReply?: boolean;
 	replyTo?: Omit<IPublicUser, 'rank'>;
+	voteData?: IVoteData;
 }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const savedContent = LocalStorageClientService.getCommentData({ postId: proposalIndex, parentCommentId });
 	const [content, setContent] = useState<string | null>(savedContent);
-	const [loading, setLoading] = useState<boolean>(false);
 	const { getOnChainIdentity } = useIdentityService();
 
-	const user = useAtomValue(userAtom);
+	const queryClient = useQueryClient();
+
+	const { toast } = useToast();
+
+	const { user } = useUser();
 
 	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 
@@ -73,43 +81,176 @@ function AddComment({
 		handleReplyMention();
 	}, [isReply, handleReplyMention, replyTo]);
 
-	const addComment = async () => {
-		if (!content?.trim() || !user) return;
-		try {
-			setLoading(true);
+	const onCommentFailed = (originalContent: string) => {
+		setContent(originalContent);
+		LocalStorageClientService.setCommentData({ postId: proposalIndex, parentCommentId, data: originalContent });
+	};
+
+	const { mutate: addCommentMutation } = useMutation({
+		mutationFn: async (commentContent: string) => {
 			const { data, error } = await CommentClientService.addCommentToPost({
 				proposalType,
 				index: proposalIndex,
-				content,
+				content: commentContent,
 				parentCommentId
 			});
 
-			if (error) {
-				setLoading(false);
-				// TODO: show notification
-				return;
+			if (error || !data) {
+				throw new Error(error?.message || 'Failed to add comment');
 			}
 
-			if (data) {
-				const publicUser = {
-					username: user.username,
-					id: user.id,
-					addresses: user.addresses,
-					profileScore: user.id,
-					profileDetails: user.publicUser?.profileDetails || DEFAULT_PROFILE_DETAILS
-				};
+			return data;
+		},
+		onMutate: async (commentContent) => {
+			// Cancel any outgoing refetches
+			await queryClient.cancelQueries({ queryKey: [EReactQueryKeys.COMMENTS, proposalType, proposalIndex] });
 
-				onConfirm?.({ ...data, content }, publicUser);
+			// Snapshot the previous value
+			const previousComments = queryClient.getQueryData([EReactQueryKeys.COMMENTS, proposalType, proposalIndex]);
 
-				setContent(null);
-				LocalStorageClientService.deleteCommentData({ postId: proposalIndex, parentCommentId });
-				markdownEditorRef.current?.setMarkdown('');
+			if (!user) return { previousComments };
+
+			// Create optimistic comment
+			const now = new Date();
+			const optimisticComment: IComment = {
+				content: commentContent.trim(),
+				createdAt: now,
+				id: `temp-${Date.now()}`,
+				updatedAt: now,
+				userId: user.id,
+				network,
+				proposalType,
+				indexOrHash: proposalIndex,
+				parentCommentId: parentCommentId || null,
+				isDeleted: false,
+				dataSource: EDataSource.POLKASSEMBLY,
+				disabled: true
+			};
+
+			const publicUser = {
+				username: user.username,
+				id: user.id,
+				addresses: user.addresses,
+				profileScore: user.publicUser?.profileScore || 0,
+				profileDetails: user.publicUser?.profileDetails || DEFAULT_PROFILE_DETAILS
+			};
+
+			// Helper function to recursively find and update parent comment
+			const findAndUpdateParent = (comments: ICommentResponse[]): ICommentResponse[] => {
+				return comments.map((comment) => {
+					if (comment.id === parentCommentId) {
+						// Found the parent - add reply to its children
+						return {
+							...comment,
+							children: [
+								...(comment.children || []),
+								{
+									...optimisticComment,
+									publicUser,
+									...(voteData && { voteData: [voteData] })
+								}
+							]
+						};
+					}
+					if (comment.children && comment.children.length > 0) {
+						// Check children recursively
+						return {
+							...comment,
+							children: findAndUpdateParent(comment.children)
+						};
+					}
+					return comment;
+				});
+			};
+
+			// Optimistically update to the new value
+			if (parentCommentId) {
+				// This is a reply - find parent recursively and add to its children
+				queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, proposalIndex], (old: ICommentResponse[] = []) => findAndUpdateParent(old));
+			} else {
+				// This is a top-level comment
+				queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, proposalIndex], (old: ICommentResponse[] = []) => [
+					...old,
+					{ ...optimisticComment, publicUser, ...(voteData && { voteData: [voteData] }) }
+				]);
 			}
-			setLoading(false);
-		} catch {
-			setLoading(false);
-			// TODO: show notification
+
+			// Clear form immediately
+			setContent(null);
+			markdownEditorRef.current?.setMarkdown('');
+			LocalStorageClientService.deleteCommentData({ postId: proposalIndex, parentCommentId });
+
+			onOptimisticUpdate?.(optimisticComment, publicUser);
+
+			return { previousComments };
+		},
+		onError: (err, commentContent, context) => {
+			// If the mutation fails, use the context returned from onMutate to roll back
+			toast({
+				title: 'Failed to add comment',
+				description: err.message || 'Please try again later',
+				status: ENotificationStatus.ERROR
+			});
+			if (context?.previousComments) {
+				queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, proposalIndex], context.previousComments);
+			}
+			console.error('Failed to add comment:', err);
+			onCommentFailed(commentContent);
+		},
+		onSuccess: (data, commentContent) => {
+			// Helper function to recursively find and update optimistic comment with real data
+			const findAndReplaceOptimistic = (comments: ICommentResponse[]): ICommentResponse[] => {
+				return comments.map((comment) => {
+					if (comment.id === parentCommentId) {
+						// Found the parent - replace optimistic reply in its children
+						return {
+							...comment,
+							children: (comment.children || []).map((child) =>
+								child.id.startsWith('temp-') && child.content === commentContent
+									? { ...child, ...data, id: data.id, createdAt: data.createdAt, updatedAt: data.updatedAt, disabled: false }
+									: child
+							)
+						};
+					}
+					if (comment.children && comment.children.length > 0) {
+						// Check children recursively
+						return {
+							...comment,
+							children: findAndReplaceOptimistic(comment.children)
+						};
+					}
+					return comment;
+				});
+			};
+
+			// Update with real data from server
+			if (parentCommentId) {
+				// This is a reply - find parent recursively and update optimistic reply
+				queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, proposalIndex], (old: ICommentResponse[] = []) => findAndReplaceOptimistic(old));
+			} else {
+				// This is a top-level comment
+				queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, proposalIndex], (old: ICommentResponse[] = []) =>
+					old.map((comment) =>
+						comment.id.startsWith('temp-') && comment.content === commentContent
+							? { ...comment, ...data, id: data.id, createdAt: data.createdAt, updatedAt: data.updatedAt, disabled: false }
+							: comment
+					)
+				);
+			}
+
+			onSuccess?.(data);
+		},
+		onSettled: () => {
+			// Always refetch after error or success to ensure consistency
+			queryClient.invalidateQueries({ queryKey: [EReactQueryKeys.COMMENTS, proposalType, proposalIndex] });
 		}
+	});
+
+	const addCommentToPost = async () => {
+		if (!content?.trim() || !user) return;
+
+		// Trigger mutation
+		addCommentMutation(content.trim());
 	};
 
 	return (
@@ -130,16 +271,14 @@ function AddComment({
 					<Button
 						variant='secondary'
 						onClick={onCancel}
-						disabled={loading}
 					>
 						{t('PostDetails.cancel')}
 					</Button>
 				)}
 				<Button
 					className={classes.postBtn}
-					onClick={addComment}
+					onClick={addCommentToPost}
 					disabled={!content?.trim()}
-					isLoading={loading}
 				>
 					{t('PostDetails.post')}
 				</Button>
