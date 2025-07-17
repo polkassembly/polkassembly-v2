@@ -4,18 +4,7 @@
 
 'use client';
 
-import {
-	EVoteDecision,
-	ENotificationStatus,
-	ISelectedAccount,
-	EPostOrigin,
-	IComment,
-	IPublicUser,
-	EProposalType,
-	ICommentResponse,
-	IVoteData,
-	EReactQueryKeys
-} from '@/_shared/types';
+import { EVoteDecision, ENotificationStatus, ISelectedAccount, EPostOrigin, EProposalType } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -23,7 +12,7 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useToast } from '@/hooks/useToast';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -58,27 +47,13 @@ function VoteSuccessContent({
 }) {
 	const network = getCurrentNetwork();
 
-	const queryClient = useQueryClient();
-
 	const { toast } = useToast();
 
 	const t = useTranslations();
 
-	const onAddCommentAfterVoteSuccess = (newComment: IComment, publicUser: Omit<IPublicUser, 'rank'>) => {
+	const onAddCommentAfterVoteSuccess = () => {
 		if (!index || !proposalType) return;
 
-		const voteData: IVoteData = {
-			decision,
-			balanceValue: balance.toString(),
-			voterAddress: address,
-			lockPeriod: conviction,
-			createdAt: new Date()
-		};
-
-		queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [
-			...(prev || []),
-			{ ...newComment, user: publicUser, voteData: [voteData] }
-		]);
 		toast({
 			title: t('VoteReferendum.commentSuccessTitle'),
 			description: t('VoteReferendum.commentSuccess'),
@@ -122,6 +97,13 @@ function VoteSuccessContent({
 						proposalIndex={index}
 						proposalType={proposalType}
 						onConfirm={onAddCommentAfterVoteSuccess}
+						voteData={{
+							decision,
+							balanceValue: balance.toString(),
+							voterAddress: address,
+							lockPeriod: conviction,
+							createdAt: new Date()
+						}}
 					/>
 				</div>
 			</div>

@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EAllowedCommentor, EProposalType, EReactQueryKeys, ICommentResponse } from '@/_shared/types';
+import { EAllowedCommentor, EProposalType, ICommentResponse } from '@/_shared/types';
 import { useMemo, useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
@@ -15,7 +15,7 @@ import { FaChevronDown } from '@react-icons/all-files/fa/FaChevronDown';
 import { FaChevronUp } from '@react-icons/all-files/fa/FaChevronUp';
 
 import { useTranslations } from 'next-intl';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import dynamic from 'next/dynamic';
@@ -45,8 +45,6 @@ function Comments({
 	const regularComments = useMemo(() => comments.filter((comment) => !comment.isSpam), [comments]);
 	const spamComments = useMemo(() => comments.filter((comment) => comment.isSpam), [comments]);
 	const commentsToShow = showMore ? regularComments : regularComments.slice(0, 2);
-
-	const queryClient = useQueryClient();
 
 	const handleShowMore = () => {
 		setShowMore(true);
@@ -148,9 +146,6 @@ function Comments({
 						<AddComment
 							proposalType={proposalType}
 							proposalIndex={index}
-							onConfirm={(newComment, publicUser) => {
-								queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [...(prev || []), { ...newComment, user: publicUser }]);
-							}}
 						/>
 					</div>
 				) : (

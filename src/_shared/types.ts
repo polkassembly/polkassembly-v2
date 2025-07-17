@@ -682,6 +682,7 @@ export interface IComment {
 	sentiment?: ECommentSentiment;
 	aiSentiment?: ECommentSentiment;
 	history?: IOffChainContentHistoryItem[];
+	disabled?: boolean;
 }
 
 export interface ICommentResponse extends IComment {

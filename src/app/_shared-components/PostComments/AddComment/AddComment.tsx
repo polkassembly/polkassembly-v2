@@ -5,17 +5,16 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { CommentClientService } from '@/app/_client-services/comment_client_service';
-import { EProposalType, IComment, IPublicUser, EDataSource } from '@/_shared/types';
+import { EProposalType, IPublicUser, IVoteData } from '@/_shared/types';
 import { Button } from '@ui/Button';
 import { useTranslations } from 'next-intl';
 import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
-import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { MDXEditorMethods } from '@mdxeditor/editor';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '@/hooks/useUser';
+import { useComments } from '@/hooks/useComments';
 import classes from './AddComment.module.scss';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 
@@ -26,15 +25,17 @@ function AddComment({
 	onConfirm,
 	onCancel,
 	isReply,
-	replyTo
+	replyTo,
+	voteData
 }: {
 	proposalType: EProposalType;
 	proposalIndex: string;
 	parentCommentId?: string;
-	onConfirm?: (newComment: IComment, user: Omit<IPublicUser, 'rank'>) => void;
+	onConfirm?: () => void;
 	onCancel?: () => void;
 	isReply?: boolean;
 	replyTo?: Omit<IPublicUser, 'rank'>;
+	voteData?: IVoteData;
 }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
@@ -43,6 +44,8 @@ function AddComment({
 	const { getOnChainIdentity } = useIdentityService();
 
 	const { user } = useUser();
+
+	const { addComment } = useComments();
 
 	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 
@@ -71,64 +74,21 @@ function AddComment({
 		handleReplyMention();
 	}, [isReply, handleReplyMention, replyTo]);
 
-	const addComment = async () => {
+	const onCommentFailed = (originalContent: string) => {
+		setContent(originalContent);
+		LocalStorageClientService.setCommentData({ postId: proposalIndex, parentCommentId, data: originalContent });
+	};
+
+	const addCommentToPost = async () => {
 		if (!content?.trim() || !user) return;
 
-		const now = new Date();
-		const optimisticComment: IComment = {
-			content: content.trim(),
-			createdAt: now,
-			id: `temp-${Date.now()}`,
-			updatedAt: now,
-			userId: user.id,
-			network,
-			proposalType,
-			indexOrHash: proposalIndex,
-			parentCommentId: parentCommentId || null,
-			isDeleted: false,
-			dataSource: EDataSource.POLKASSEMBLY
-		};
-
-		const publicUser = {
-			username: user.username,
-			id: user.id,
-			addresses: user.addresses,
-			profileScore: user.id,
-			profileDetails: user.publicUser?.profileDetails || DEFAULT_PROFILE_DETAILS
-		};
-
-		// Optimistically update UI
-		onConfirm?.(optimisticComment, publicUser);
+		// Clear form immediately
 		setContent(null);
-		LocalStorageClientService.deleteCommentData({ postId: proposalIndex, parentCommentId });
 		markdownEditorRef.current?.setMarkdown('');
+		onConfirm?.();
 
-		try {
-			const { data, error } = await CommentClientService.addCommentToPost({
-				proposalType,
-				index: proposalIndex,
-				content,
-				parentCommentId
-			});
-
-			if (error) {
-				// Remove optimistic comment by marking it as deleted
-				onConfirm?.({ ...optimisticComment, isDeleted: true }, publicUser);
-				// TODO: show notification
-				console.log('error in addComment', error);
-				return;
-			}
-
-			if (data) {
-				// Update with real data
-				onConfirm?.({ ...data, content }, publicUser);
-			}
-		} catch (err) {
-			// Remove optimistic comment by marking it as deleted
-			onConfirm?.({ ...optimisticComment, isDeleted: true }, publicUser);
-			// TODO: show notification
-			console.error('Failed to add comment:', err);
-		}
+		// Trigger mutation
+		addComment({ proposalType, proposalIndex, parentCommentId, content: content.trim(), voteData, onFailed: onCommentFailed });
 	};
 
 	return (
@@ -155,7 +115,7 @@ function AddComment({
 				)}
 				<Button
 					className={classes.postBtn}
-					onClick={addComment}
+					onClick={addCommentToPost}
 					disabled={!content?.trim()}
 				>
 					{t('PostDetails.post')}

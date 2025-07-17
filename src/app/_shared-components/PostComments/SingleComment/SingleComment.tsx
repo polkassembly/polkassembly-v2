@@ -4,8 +4,8 @@
 
 'use client';
 
-import { ICommentResponse, IComment, IPublicUser, ENotificationStatus } from '@/_shared/types';
-import { Dispatch, SetStateAction, useCallback, memo, useState, useRef } from 'react';
+import { ICommentResponse, ENotificationStatus } from '@/_shared/types';
+import { Dispatch, SetStateAction, useCallback, memo, useState, useRef, useEffect } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
 import Image from 'next/image';
@@ -55,6 +55,10 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 	const user = useAtomValue(userAtom);
 
 	const { toast } = useToast();
+
+	useEffect(() => {
+		setComment(commentData);
+	}, [commentData]);
 
 	const toggleEditComment = useCallback(() => {
 		if (!user || !comment || user.id !== comment.userId) {
@@ -167,20 +171,7 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 
 	const handleCancelReply = useCallback(() => setReply(false), []);
 
-	const handleConfirmReply = useCallback((newComment: IComment, publicUser: IPublicUser) => {
-		setComment((prev) => {
-			if (!prev) return null;
-			return {
-				...prev,
-				children: [
-					...(prev.children || []),
-					{
-						...newComment,
-						publicUser
-					}
-				]
-			};
-		});
+	const handleConfirmReply = useCallback(() => {
 		setReply(false);
 		setShowReplies(true);
 	}, []);
@@ -314,6 +305,7 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 							className={classes.replyButton}
 							onClick={handleToggleReply}
 							size='sm'
+							disabled={comment.disabled}
 							leftIcon={
 								<Image
 									src={ReplyIcon}
@@ -341,7 +333,7 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 											<Button
 												variant='ghost'
 												className='h-auto p-0 text-sm text-text_primary'
-												disabled={comment.userId !== user.id}
+												disabled={comment.userId !== user.id || comment.disabled}
 												onClick={toggleEditComment}
 												size='sm'
 												isLoading={loading}
@@ -353,7 +345,7 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 											<Button
 												variant='ghost'
 												className='h-auto p-0 text-sm text-text_primary'
-												disabled={comment.userId !== user.id}
+												disabled={comment.userId !== user.id || comment.disabled}
 												onClick={handleOpenDeleteModal}
 												size='sm'
 												isLoading={loading}
