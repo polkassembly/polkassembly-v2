@@ -188,10 +188,12 @@ export const W3F_DELEGATES: IDelegate[] = [
 
 export const NOVA_DELEGATES: Record<string, URL> = {
 	[ENetwork.POLKADOT]: new URL('https://raw.githubusercontent.com/novasamatech/opengov-delegate-registry/refs/heads/master/registry/polkadot.json'),
-	[ENetwork.KUSAMA]: new URL('https://raw.githubusercontent.com/novasamatech/opengov-delegate-registry/refs/heads/master/registry/kusama.json')
+	[ENetwork.KUSAMA]: new URL('https://raw.githubusercontent.com/novasamatech/opengov-delegate-registry/refs/heads/master/registry/kusama.json'),
+	[ENetwork.CERE]: new URL('https://raw.githubusercontent.com/novasamatech/opengov-delegate-registry/refs/heads/master/registry/cere.json')
 };
 
 export const PARITY_DELEGATES: Record<string, URL> = {
 	[ENetwork.POLKADOT]: new URL('https://paritytech.github.io/governance-ui/data/polkadot/delegates.json'),
-	[ENetwork.KUSAMA]: new URL('https://paritytech.github.io/governance-ui/data/kusama/delegates.json')
+	[ENetwork.KUSAMA]: new URL('https://paritytech.github.io/governance-ui/data/kusama/delegates.json'),
+	[ENetwork.CERE]: new URL('https://paritytech.github.io/governance-ui/data/cere/delegates.json')
 };
