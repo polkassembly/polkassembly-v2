@@ -55,6 +55,7 @@ function DelegationStatusCollaps({
 		MULTIPLE: t('Delegations.multiple'),
 		INDEX: t('Delegations.index')
 	};
+
 	return (
 		<Collapsible
 			className={classes.collapsible}
@@ -71,7 +72,7 @@ function DelegationStatusCollaps({
 							height={30}
 						/>
 						<div className='flex flex-col items-start justify-start gap-0.5 font-normal'>
-							<p>{status === EDelegationStatus.RECEIVED ? t('Delegations.receivedDelegations') : t('Delegations.delegatedDelegations')}</p>
+							<p>{status === EDelegationStatus.RECEIVED ? t('Delegations.delegators') : t('Delegations.delegatedDelegations')}</p>
 							{ValidatorService.isValidNumber(data?.count) && <span className='text-text_secondary'>{data?.count}</span>}
 						</div>
 					</span>

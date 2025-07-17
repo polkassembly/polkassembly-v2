@@ -23,6 +23,7 @@ import { useAtom } from 'jotai';
 import { useToast } from '@/hooks/useToast';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import styles from './DelegateVotingPower.module.scss';
 import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
 import AddressRelationsPicker from '../AddressRelationsPicker/AddressRelationsPicker';
@@ -166,12 +167,17 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId, onClose }: De
 
 					setDelegates((prev) => {
 						const delegateIndex = prev.findIndex((d) => d.address === delegateAddress);
+						const encodedUserSelectedAccount = getEncodedAddress(userPreferences?.selectedAccount?.address || '', network);
 
 						if (delegateIndex >= 0) {
 							const updatedDelegates = [...prev];
 							updatedDelegates[`${delegateIndex}`] = {
 								...updatedDelegates[`${delegateIndex}`],
-								receivedDelegationsCount: (updatedDelegates[`${delegateIndex}`].receivedDelegationsCount || 0) + selectedTrackIds.length
+								receivedDelegationsCount: (updatedDelegates[`${delegateIndex}`].receivedDelegationsCount || 0) + selectedTrackIds.length,
+								delegators:
+									encodedUserSelectedAccount && !updatedDelegates[`${delegateIndex}`].delegators?.includes(encodedUserSelectedAccount)
+										? [...(updatedDelegates[`${delegateIndex}`].delegators || []), encodedUserSelectedAccount]
+										: updatedDelegates[`${delegateIndex}`].delegators
 							};
 							return updatedDelegates;
 						}
