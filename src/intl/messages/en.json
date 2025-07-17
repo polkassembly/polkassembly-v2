@@ -168,7 +168,7 @@
 		"Delegations": {
 			"noDelegations": "No Delegations Found",
 			"delegation": "Delegation",
-			"receivedDelegations": "Received Delegations",
+			"delegators": "Delegators",
 			"index": "Index",
 			"delegatedDelegations": "Delegated",
 			"delegatedBy": "Delegated By",

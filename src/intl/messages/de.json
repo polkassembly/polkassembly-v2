@@ -164,7 +164,7 @@
 		"Delegations": {
 			"noDelegations": "Keine Delegationen gefunden",
 			"delegation": "Delegation",
-			"receivedDelegations": "Empfangene Delegationen",
+			"delegators": "Delegierte",
 			"delegatedDelegations": "Delegierte Delegationen",
 			"delegatedBy": "Delegierte von",
 			"delegatedTo": "Delegierte an",
