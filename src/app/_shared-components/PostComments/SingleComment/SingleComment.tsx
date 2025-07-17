@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EProposalType, ICommentResponse, IComment, IPublicUser, ENotificationStatus } from '@/_shared/types';
+import { ICommentResponse, IComment, IPublicUser, ENotificationStatus } from '@/_shared/types';
 import { Dispatch, SetStateAction, useCallback, memo, useState, useRef } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
@@ -34,12 +34,12 @@ import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 
 interface SingleCommentProps {
 	commentData: ICommentResponse;
-	proposalType: EProposalType;
-	index: string;
 	setParentComment?: Dispatch<SetStateAction<ICommentResponse | null>>;
 }
 
-function SingleComment({ commentData, proposalType, index, setParentComment }: SingleCommentProps) {
+function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
+	const { proposalType, indexOrHash: index } = commentData;
+
 	const [reply, setReply] = useState<boolean>(false);
 	const t = useTranslations();
 	const [comment, setComment] = useState<ICommentResponse | null>(commentData);
@@ -397,8 +397,6 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 							comment.children.map((item) => (
 								<SingleComment
 									key={item.id}
-									proposalType={proposalType}
-									index={index}
 									commentData={item}
 									setParentComment={setComment}
 								/>

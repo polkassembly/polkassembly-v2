@@ -57,7 +57,7 @@ function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClo
 	const editPost = async () => {
 		if (!title.trim() || !content || !ValidatorService.isValidNumber(postData?.index) || !postData?.proposalType || !user || !canEdit) return;
 
-		if (title === postData?.title && JSON.stringify(content) === JSON.stringify(postData?.content)) return;
+		if (title === postData?.title && JSON.stringify(content) === JSON.stringify(postData?.content) && allowedCommentor === postData?.allowedCommentor) return;
 
 		setIsLoading(true);
 
@@ -81,6 +81,7 @@ function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClo
 			...prev,
 			title,
 			content,
+			allowedCommentor,
 			isDefaultContent: false
 		}));
 
@@ -154,7 +155,9 @@ function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClo
 			</div>
 			<div className='flex justify-end'>
 				<Button
-					disabled={!title.trim() || !content?.trim() || (title === postData?.title && content?.trim() === postData?.content?.trim())}
+					disabled={
+						!title.trim() || !content?.trim() || (title === postData?.title && content?.trim() === postData?.content?.trim() && postData?.allowedCommentor === allowedCommentor)
+					}
 					onClick={editPost}
 					isLoading={isLoading}
 				>

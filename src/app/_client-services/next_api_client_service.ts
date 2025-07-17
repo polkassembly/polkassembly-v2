@@ -50,7 +50,11 @@ import {
 	IPostLink,
 	ICreateOffChainPostPayload,
 	IPollVote,
-	EAllowedCommentor
+	EAllowedCommentor,
+	IPostAnalytics,
+	IPostBubbleVotes,
+	EAnalyticsType,
+	EVotesDisplayType
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -133,7 +137,9 @@ enum EApiRoute {
 	GET_USER_POSTS = 'GET_USER_POSTS',
 	GET_POLL_VOTES = 'GET_POLL_VOTES',
 	ADD_POLL_VOTE = 'ADD_POLL_VOTE',
-	REMOVE_POLL_VOTE = 'REMOVE_POLL_VOTE'
+	REMOVE_POLL_VOTE = 'REMOVE_POLL_VOTE',
+	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
+	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES'
 }
 
 export class NextApiClientService {
@@ -230,6 +236,8 @@ export class NextApiClientService {
 			case EApiRoute.GET_CONTENT_SUMMARY:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 			case EApiRoute.GET_VOTE_CURVES:
+			case EApiRoute.GET_POST_ANALYTICS:
+			case EApiRoute.GET_POST_BUBBLE_VOTES:
 				break;
 
 			case EApiRoute.GET_POLL_VOTES:
@@ -618,19 +626,22 @@ export class NextApiClientService {
 		index,
 		page,
 		decision,
-		orderBy
+		orderBy,
+		votesType
 	}: {
 		proposalType: EProposalType;
 		index: string;
 		page: number;
 		decision: EVoteDecision;
 		orderBy: EVoteSortOptions;
+		votesType: EVotesDisplayType;
 	}) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: DEFAULT_LISTING_LIMIT.toString(),
 			decision,
-			orderBy
+			orderBy,
+			votesType
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_HISTORY, routeSegments: [proposalType, index, 'votes'], queryParams });
 		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });
@@ -1102,5 +1113,29 @@ export class NextApiClientService {
 	static async getPollVotes({ proposalType, index, pollId }: { proposalType: EProposalType; index: string; pollId: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POLL_VOTES, routeSegments: [proposalType, index, 'poll', pollId, 'votes'] });
 		return this.nextApiClientFetch<{ votes: IPollVote[] }>({ url, method });
+	}
+
+	static async getPostAnalytics({ proposalType, index }: { proposalType: EProposalType; index: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_ANALYTICS, routeSegments: [proposalType, index, 'analytics'] });
+		return this.nextApiClientFetch<IPostAnalytics | null>({ url, method });
+	}
+
+	static async getPostBubbleVotes({
+		proposalType,
+		index,
+		analyticsType,
+		votesType
+	}: {
+		proposalType: EProposalType;
+		index: string;
+		analyticsType: EAnalyticsType;
+		votesType: EVotesDisplayType;
+	}) {
+		const queryParams = new URLSearchParams({
+			analyticsType: analyticsType ? analyticsType.toString() : '',
+			votesType: votesType.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_BUBBLE_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-bubble'], queryParams });
+		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method });
 	}
 }

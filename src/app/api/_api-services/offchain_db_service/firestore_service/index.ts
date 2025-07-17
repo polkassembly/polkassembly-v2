@@ -423,7 +423,17 @@ export class FirestoreService extends FirestoreUtils {
 		return commentsCount.data().count || 0;
 	}
 
-	static async GetPostMetrics({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IPostOffChainMetrics> {
+	static async GetPostMetrics({
+		network,
+		indexOrHash,
+		proposalType,
+		linkedPost
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		linkedPost?: IPostLink;
+	}): Promise<IPostOffChainMetrics> {
 		const postReactionsCount = (await this.GetPostReactionsCount({ network, indexOrHash, proposalType })).reduce(
 			(acc, curr) => {
 				acc[curr.reaction] = curr.count;
@@ -434,9 +444,16 @@ export class FirestoreService extends FirestoreUtils {
 
 		const commentsCount = await this.GetPostCommentsCount({ network, indexOrHash, proposalType });
 
+		let linkedPostCommentsCount = 0;
+		if (linkedPost && linkedPost.indexOrHash) {
+			linkedPostCommentsCount = await this.GetPostCommentsCount({ network, indexOrHash: linkedPost.indexOrHash, proposalType: linkedPost.proposalType });
+		}
+
+		const totalCommentsCount = commentsCount + linkedPostCommentsCount;
+
 		return {
 			reactions: postReactionsCount,
-			comments: commentsCount
+			comments: totalCommentsCount
 		} as IPostOffChainMetrics;
 	}
 
@@ -1533,6 +1550,7 @@ export class FirestoreService extends FirestoreUtils {
 				.set(
 					{
 						...existingSocialHandle,
+						...(verificationToken && { verificationToken }),
 						status,
 						updatedAt: new Date()
 					},
@@ -1540,6 +1558,7 @@ export class FirestoreService extends FirestoreUtils {
 				);
 			return {
 				...existingSocialHandle,
+				...(verificationToken && { verificationToken: { token: verificationToken.token } }),
 				status,
 				updatedAt: new Date()
 			} as ISocialHandle;
@@ -1612,7 +1631,14 @@ export class FirestoreService extends FirestoreUtils {
 			.get();
 
 		return {
-			items: posts.docs.map((doc) => doc.data() as IOffChainPost),
+			items: posts.docs.map((doc) => {
+				const data = doc.data();
+				return {
+					...data,
+					createdAt: data.createdAt?.toDate(),
+					updatedAt: data.updatedAt?.toDate()
+				} as IOffChainPost;
+			}),
 			totalCount: totalCount.data().count
 		};
 	}
