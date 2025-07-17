@@ -146,6 +146,7 @@ function Comments({
 						<AddComment
 							proposalType={proposalType}
 							proposalIndex={index}
+							onOptimisticUpdate={handleShowMore}
 						/>
 					</div>
 				) : (

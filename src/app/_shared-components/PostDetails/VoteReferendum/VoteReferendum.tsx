@@ -96,7 +96,7 @@ function VoteSuccessContent({
 					<AddComment
 						proposalIndex={index}
 						proposalType={proposalType}
-						onConfirm={onAddCommentAfterVoteSuccess}
+						onOptimisticUpdate={onAddCommentAfterVoteSuccess}
 						voteData={{
 							decision,
 							balanceValue: balance.toString(),

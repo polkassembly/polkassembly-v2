@@ -56,10 +56,6 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 
 	const { toast } = useToast();
 
-	useEffect(() => {
-		setComment(commentData);
-	}, [commentData]);
-
 	const toggleEditComment = useCallback(() => {
 		if (!user || !comment || user.id !== comment.userId) {
 			return;
@@ -171,10 +167,9 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 
 	const handleCancelReply = useCallback(() => setReply(false), []);
 
-	const handleConfirmReply = useCallback(() => {
-		setReply(false);
-		setShowReplies(true);
-	}, []);
+	useEffect(() => {
+		setComment(commentData);
+	}, [commentData]);
 
 	if (!comment) {
 		return null;
@@ -366,7 +361,10 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 						proposalType={proposalType}
 						parentCommentId={comment.id}
 						onCancel={handleCancelReply}
-						onConfirm={handleConfirmReply}
+						onOptimisticUpdate={() => {
+							setReply(false);
+							setShowReplies(true);
+						}}
 						isReply
 						replyTo={comment?.publicUser}
 					/>
