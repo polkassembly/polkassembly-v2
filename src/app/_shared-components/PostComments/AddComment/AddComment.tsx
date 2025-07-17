@@ -108,6 +108,8 @@ function AddComment({
 			// Snapshot the previous value
 			const previousComments = queryClient.getQueryData([EReactQueryKeys.COMMENTS, proposalType, proposalIndex]);
 
+			if (!user) return { previousComments };
+
 			// Create optimistic comment
 			const now = new Date();
 			const optimisticComment: IComment = {
@@ -115,7 +117,7 @@ function AddComment({
 				createdAt: now,
 				id: `temp-${Date.now()}`,
 				updatedAt: now,
-				userId: user?.id || 0,
+				userId: user.id,
 				network,
 				proposalType,
 				indexOrHash: proposalIndex,
@@ -126,11 +128,11 @@ function AddComment({
 			};
 
 			const publicUser = {
-				username: user?.username || '',
-				id: user?.id || 0,
-				addresses: user?.addresses || [],
-				profileScore: user?.id || 0,
-				profileDetails: user?.publicUser?.profileDetails || DEFAULT_PROFILE_DETAILS
+				username: user.username,
+				id: user.id,
+				addresses: user.addresses,
+				profileScore: user.publicUser?.profileScore || 0,
+				profileDetails: user.publicUser?.profileDetails || DEFAULT_PROFILE_DETAILS
 			};
 
 			// Helper function to recursively find and update parent comment
