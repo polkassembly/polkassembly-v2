@@ -14,7 +14,8 @@ export enum ENetwork {
 	KUSAMA = 'kusama',
 	POLKADOT = 'polkadot',
 	WESTEND = 'westend',
-	PASEO = 'paseo'
+	PASEO = 'paseo',
+	CERE = 'cere'
 }
 
 export enum ENetworkSocial {
@@ -488,6 +489,8 @@ export enum EPostOrigin {
 	BIG_SPENDER = 'BigSpender',
 	BIG_TIPPER = 'BigTipper',
 	CANDIDATES = 'Candidates',
+	CLUSTER_PROTOCOL_ACTIVATOR = 'ClusterProtocolActivator',
+	CLUSTER_PROTOCOL_UPDATER = 'ClusterProtocolUpdater',
 	EXPERTS = 'Experts',
 	FELLOWS = 'Fellows',
 	FELLOWSHIP_ADMIN = 'FellowshipAdmin',
@@ -674,6 +677,7 @@ export interface IVoteData {
 	selfVotingPower?: string;
 	totalVotingPower?: string;
 	delegatedVotingPower?: string;
+	votingPower?: string;
 	delegatedVotes?: IVoteData[];
 }
 
@@ -693,6 +697,7 @@ export interface IComment {
 	sentiment?: ECommentSentiment;
 	aiSentiment?: ECommentSentiment;
 	history?: IOffChainContentHistoryItem[];
+	disabled?: boolean;
 }
 
 export interface ICommentResponse extends IComment {
@@ -1140,7 +1145,8 @@ export interface IDelegate {
 
 export interface IDelegateDetails extends IDelegate {
 	publicUser?: IPublicUser;
-	votingPower: string;
+	maxDelegated: string;
+	delegators: string[];
 	receivedDelegationsCount: number;
 	last30DaysVotedProposalsCount: number;
 }
@@ -1322,6 +1328,10 @@ export interface TimeUnitOptions {
 	withPluralSuffix?: boolean;
 }
 
+export enum EVotesDisplayType {
+	NESTED = 'nested',
+	FLATTENED = 'flattened'
+}
 export enum ESetIdentityStep {
 	GAS_FEE = 'GAS_FEE',
 	SET_IDENTITY_FORM = 'SET_IDENTITY_FORM',
@@ -1407,7 +1417,6 @@ export enum EAnalyticsType {
 }
 
 export interface IVoteDistribution extends Omit<IVoteData, 'createdAt' | 'createdAtBlock' | 'proposalIndex' | 'delegatedTo'> {
-	votingPower: string | null;
 	delegatorsCount?: number;
 	isDelegated: boolean;
 	percentage?: number;
@@ -1421,8 +1430,3 @@ export type IPostBubbleVotes = {
 		status: EProposalStatus;
 	};
 };
-
-export enum EPostBubbleVotesType {
-	NESTED = 'nested',
-	FLATTENED = 'flattened'
-}

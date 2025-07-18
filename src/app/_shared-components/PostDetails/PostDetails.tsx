@@ -73,17 +73,13 @@ const PostAnalytics = dynamic(() => import('./Analytics/PostAnalytics'), {
 	)
 });
 
-const VoteCurvesData = dynamic(() => import('./VoteCurvesData/VoteCurvesData'), {
+const VotesData = dynamic(() => import('./VotesData/VotesData'), {
 	ssr: false,
 	loading: () => (
-		<div className='flex flex-col gap-4'>
-			<Skeleton className='h-8 w-48' />
-			<div className='flex flex-col gap-3'>
-				<Skeleton className='h-6 w-full' />
-				<Skeleton className='h-6 w-full' />
-				<Skeleton className='h-6 w-full' />
-				<Skeleton className='h-6 w-3/4' />
-			</div>
+		<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
+			<Skeleton className='h-8 w-20' />
+			<Skeleton className='h-10 w-full rounded-md' />
+			<Skeleton className='mt-2 h-36 w-full rounded-md' />
 		</div>
 	)
 });
@@ -128,8 +124,9 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	const fetchPostDetails = async () => {
 		const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: postData.proposalType, indexOrHash: index, skipCache: true });
 
-		if (error || !data) {
-			throw new Error(error?.message || 'Failed to fetch post details');
+		if (error || !data || !data.id) {
+			console.log(error?.message || 'Failed to fetch post details');
+			return postData;
 		}
 
 		return data;
@@ -302,22 +299,20 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								trackName={post.onChainInfo?.origin || EPostOrigin.ROOT}
 							/>
 							<VoteSummary
-								proposalType={post.proposalType}
 								index={index}
 								voteMetrics={post.onChainInfo?.voteMetrics}
 								approvalThreshold={thresholdValues.approvalThreshold}
 							/>
-							{post.onChainInfo?.origin && post.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced) && (
-								<VoteCurvesData
-									proposalType={post.proposalType}
-									index={index}
-									createdAt={post.createdAt}
-									trackName={post.onChainInfo?.origin}
-									timeline={post.onChainInfo?.timeline}
-									setThresholdValues={setThresholdValues}
-									thresholdValues={thresholdValues}
-								/>
-							)}
+
+							<VotesData
+								proposalType={post.proposalType}
+								index={index}
+								trackName={post.onChainInfo?.origin || EPostOrigin.ROOT}
+								createdAt={post.createdAt}
+								timeline={post.onChainInfo?.timeline}
+								setThresholdValues={setThresholdValues}
+								thresholdValues={thresholdValues}
+							/>
 						</div>
 					)}
 

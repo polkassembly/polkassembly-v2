@@ -166,7 +166,7 @@
 		"Delegations": {
 			"noDelegations": "委任が見つかりません",
 			"delegation": "委任",
-			"receivedDelegations": "受け取った委任",
+			"delegators": "委任者",
 			"delegatedDelegations": "委任した委任",
 			"delegatedBy": "委任した",
 			"delegatedTo": "委任された",
@@ -484,6 +484,8 @@
 			"showMore": "もっと表示",
 			"showLess": "もっと少なく表示"
 		},
+		"nestedVotes": "ネストされた投票",
+		"flattenedVotes": "フラット化された投票",
 		"VotesBubble": {
 			"nested": "ネスト",
 			"flattened": "フラット",
@@ -497,6 +499,17 @@
 			"nay": "反対",
 			"abstain": "棄権",
 			"noVotesFound": "投票が見つかりません"
+		},
+		"VotesData": {
+			"Votes": "投票",
+			"bubble": "バブル",
+			"graph": "グラフ",
+			"voteHistory": "投票履歴 (ネストされた投票とフラット化された投票)",
+			"votes": "投票",
+			"voteGraph": "投票グラフ",
+			"voteBubble": "投票バブル",
+			"nestedVotes": "ネストされた投票",
+			"flattenedVotes": "フラット化された投票"
 		},
 		"Analytics": {
 			"totalVotesCasted": "総投票数",
@@ -575,13 +588,13 @@
 		"delegatedVotes": "委任された投票",
 		"delegatedVotingPower": "委任された投票力",
 		"delegationList": "委任リスト",
+		"threshold": "閾値",
+		"onlyVerifiedCommentsVisible": "コメントはオンチェーンで本人確認済みのアカウントに制限されています。",
 		"VoteCurves": {
 			"approval": "承認",
 			"support": "サポート",
-			"threshold": "閾値",
-			"votingData": "投票データ"
+			"threshold": "閾値"
 		},
-		"threshold": "しきい値",
 		"DecisionDeposit": {
 			"description": "提案がタイムアウトするのを防ぐため、14日以内に返金可能なデポジットを配置してください。",
 			"details": "詳細",
@@ -1118,9 +1131,9 @@
 		"delegate": "委任者",
 		"noBio": "バイオがありません",
 		"readMore": "もっと読む",
-		"votingPower": "投票力",
+		"maxDelegated": "最大委任",
 		"votedProposals": "投票された提案",
-		"receivedDelegations": "受け取った委任",
+		"delegators": "受け取った委任",
 		"past30Days": "過去30日間",
 		"trendingDelegates": "トレンディングな委任者",
 		"pleaseLoginToContinue": "続けるにはログインしてください",

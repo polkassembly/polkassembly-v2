@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useMemo, useCallback, useState } from 'react';
-import { EAnalyticsType, ENetwork, EPostBubbleVotesType, EProposalType, ETheme, EVoteDecision, IPostBubbleVotes, IVoteDistribution } from '@/_shared/types';
+import { EAnalyticsType, ENetwork, EVotesDisplayType, EProposalType, ETheme, EVoteDecision, IPostBubbleVotes, IVoteDistribution } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { ResponsiveCirclePacking } from '@nivo/circle-packing';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -55,7 +55,7 @@ const calculatePerVotePercentage = ({
 	decision,
 	votesBubbleData
 }: {
-	vote: { balanceValue: string; votingPower: string | null };
+	vote: { balanceValue: string; votingPower?: string | null };
 	decision: Exclude<EVoteDecision, EVoteDecision.SPLIT | EVoteDecision.SPLIT_ABSTAIN>;
 	votesBubbleData: IPostBubbleVotes['votes'];
 }): number => {
@@ -82,7 +82,7 @@ const useVotesDistribution = ({ votesBubbleData }: { votesBubbleData: IPostBubbl
 				const payload = {
 					voterAddress: vote.voterAddress,
 					balanceValue: vote.balanceValue,
-					votingPower: vote.votingPower || null,
+					votingPower: vote.votingPower,
 					decision,
 					percentage: calculatePerVotePercentage({ vote, decision, votesBubbleData }),
 					delegatorsCount: vote.delegatorsCount,
@@ -121,7 +121,7 @@ const getPostAnalytics = async ({
 	proposalType: EProposalType;
 	index: string;
 	analyticsType: EAnalyticsType;
-	votesType: EPostBubbleVotesType;
+	votesType: EVotesDisplayType;
 }) => {
 	const { data, error } = await NextApiClientService.getPostBubbleVotes({
 		proposalType: proposalType as EProposalType,
@@ -136,13 +136,27 @@ const getPostAnalytics = async ({
 };
 
 // Component
-function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType: EProposalType; index: string; analyticsType: EAnalyticsType }) {
+function VotesBubbleChart({
+	proposalType,
+	index,
+	analyticsType,
+	enableTitle = false,
+	enableFilter = false,
+	enableFullHeight = true
+}: {
+	proposalType: EProposalType;
+	index: string;
+	analyticsType: EAnalyticsType;
+	enableTitle?: boolean;
+	enableFilter?: boolean;
+	enableFullHeight?: boolean;
+}) {
 	const t = useTranslations('PostDetails.VotesBubble');
 	const network = getCurrentNetwork();
 	const {
 		userPreferences: { theme }
 	} = useUserPreferences();
-	const [votesType, setVotesType] = useState<EPostBubbleVotesType>(EPostBubbleVotesType.NESTED);
+	const [votesType, setVotesType] = useState<EVotesDisplayType>(EVotesDisplayType.NESTED);
 
 	const getBorderColor = (decision: EVoteDecision) => {
 		return THEME_COLORS.light[`${decision}_color` as keyof typeof THEME_COLORS.light];
@@ -187,7 +201,7 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 							address={id}
 							textClassName='text-sm'
 						/>
-						{votesType === EPostBubbleVotesType.NESTED ? (
+						{votesType === EVotesDisplayType.NESTED ? (
 							<div className={classes.tooltipContent}>
 								<div className={classes.tooltipContentValue}>
 									<span className={classes.tooltipText}>
@@ -298,32 +312,34 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 	);
 
 	return (
-		<div className={classes.card}>
+		<div className={enableTitle ? classes.card : 'mt-4'}>
 			<div className={classes.header}>
-				<h2 className={classes.heading}>{t('votesDistribution')}</h2>
-				<div className={classes.buttonContainer}>
-					{[EPostBubbleVotesType.NESTED, EPostBubbleVotesType.FLATTENED].map((type) => (
-						<Button
-							key={type}
-							variant='ghost'
-							disabled={isFetching}
-							onClick={() => setVotesType(type)}
-							className={cn(
-								'h-7 w-full bg-transparent px-3 text-sm font-medium shadow-none transition-all hover:bg-transparent',
-								votesType === type ? 'bg-toggle_btn_active_bg font-semibold text-toggle_btn_active_text shadow-sm' : 'text-toggle_btn_inactive_text hover:bg-primary_border'
-							)}
-						>
-							{t(type)}
-						</Button>
-					))}
-				</div>
+				{enableTitle && <h2 className={classes.heading}>{t('votesDistribution')}</h2>}
+				{enableFilter && (
+					<div className={classes.buttonContainer}>
+						{[EVotesDisplayType.NESTED, EVotesDisplayType.FLATTENED].map((type) => (
+							<Button
+								key={type}
+								variant='ghost'
+								disabled={isFetching}
+								onClick={() => setVotesType(type)}
+								className={cn(
+									'h-7 w-full bg-transparent px-3 text-sm font-medium shadow-none transition-all hover:bg-transparent',
+									votesType === type ? 'bg-toggle_btn_active_bg font-semibold text-toggle_btn_active_text shadow-sm' : 'text-toggle_btn_inactive_text hover:bg-primary_border'
+								)}
+							>
+								{t(type)}
+							</Button>
+						))}
+					</div>
+				)}
 			</div>
 
 			{isFetching ? (
-				<Skeleton className='mt-4 h-[500px] w-full' />
+				<Skeleton className={cn('mt-4 w-full', enableFullHeight ? 'h-full min-h-[50vh]' : 'h-[300px]')} />
 			) : allVotes.length > 0 ? (
-				<>
-					<div className={classes.chartWrapper}>
+				<div className={enableFilter ? 'mt-6' : ''}>
+					<div className={cn(classes.chartWrapper, enableFullHeight ? 'h-full min-h-[50vh]' : 'h-[300px]')}>
 						<ResponsiveCirclePacking
 							data={{ name: t('votesDistribution'), children: chartData, color: 'transparent' }}
 							colors={(node) => {
@@ -348,27 +364,29 @@ function VotesBubbleChart({ proposalType, index, analyticsType }: { proposalType
 							motionConfig='gentle'
 						/>
 					</div>
-					<div className={classes.decisionsContainer}>
-						{[EVoteDecision.AYE, EVoteDecision.NAY, EVoteDecision.ABSTAIN].map((decision) => {
-							const bgColor = getDecisionColor(decision);
-							const borderColor = getBorderColor(decision);
+					{enableFilter && (
+						<div className={classes.decisionsContainer}>
+							{[EVoteDecision.AYE, EVoteDecision.NAY, EVoteDecision.ABSTAIN].map((decision) => {
+								const bgColor = getDecisionColor(decision);
+								const borderColor = getBorderColor(decision);
 
-							return (
-								<div
-									key={decision}
-									className={cn(classes.decisionContainer, `border-${borderColor} bg-${bgColor}`)}
-									style={{ backgroundColor: bgColor, borderColor }}
-								>
+								return (
 									<div
-										className='h-3 w-3 rounded-full'
-										style={{ backgroundColor: borderColor }}
-									/>
-									<span className='text-sm font-medium text-text_primary dark:text-white'>{t(decision)}</span>
-								</div>
-							);
-						})}
-					</div>
-				</>
+										key={decision}
+										className={cn(classes.decisionContainer, `border-${borderColor} bg-${bgColor}`)}
+										style={{ backgroundColor: bgColor, borderColor }}
+									>
+										<div
+											className='h-3 w-3 rounded-full'
+											style={{ backgroundColor: borderColor }}
+										/>
+										<span className='text-sm font-medium text-text_primary dark:text-white'>{t(decision)}</span>
+									</div>
+								);
+							})}
+						</div>
+					)}
+				</div>
 			) : (
 				// No votes found
 				<div className='flex flex-col items-center justify-center gap-5'>

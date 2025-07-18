@@ -99,6 +99,7 @@ export default function AddressInput({ placeholder, onChange, className, disable
 						}}
 						variant='ghost'
 						size='icon'
+						disabled={disabled}
 					>
 						<X className='h-4 w-4' />
 					</Button>

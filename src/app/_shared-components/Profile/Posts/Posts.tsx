@@ -115,7 +115,10 @@ function Posts({ addresses }: { addresses: string[] }) {
 					</Button>
 				</div>
 				{isFetching ? (
-					<Skeleton className={classes.postsHeaderSkeleton} />
+					<div className='mt-6 flex w-full flex-col gap-y-0.5'>
+						<Skeleton className={classes.postsHeaderSkeleton} />
+						<Skeleton className={classes.postsHeaderSkeleton} />
+					</div>
 				) : (
 					<div className='w-full'>
 						<div className='mt-6 w-full'>

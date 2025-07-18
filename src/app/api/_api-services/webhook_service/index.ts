@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { z } from 'zod';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EAnalyticsType, EHttpHeaderKey, ENetwork, EPostBubbleVotesType, EPostOrigin, EProposalType, ERole, EWallet, IUser } from '@/_shared/types';
+import { EAnalyticsType, EHttpHeaderKey, ENetwork, EVotesDisplayType, EPostOrigin, EProposalType, ERole, EWallet, IUser } from '@/_shared/types';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -137,7 +137,8 @@ export class WebhookService {
 			case EWebhookEvent.PROPOSAL_STATUS_UPDATED:
 				return this.handleProposalStatusChanged({
 					network,
-					params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_UPDATED]>
+					params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_UPDATED]>,
+					event: webhookEvent
 				});
 			case EWebhookEvent.VOTED:
 				return this.handleVoted({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.VOTED]> });
@@ -190,40 +191,42 @@ export class WebhookService {
 	private static async handleVoted({ network, params }: { network: ENetwork; params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.VOTED]> }) {
 		const { indexOrHash, proposalType } = params;
 
-		await Promise.all([
+		await Promise.allSettled([
 			RedisService.DeletePostAnalyticsData({ network, proposalType, index: Number(indexOrHash) }),
 			RedisService.DeletePostBubbleVotesData({
 				network,
 				proposalType,
 				index: Number(indexOrHash),
-				votesType: EPostBubbleVotesType.FLATTENED,
+				votesType: EVotesDisplayType.FLATTENED,
 				analyticsType: EAnalyticsType.CONVICTIONS
 			}),
 			RedisService.DeletePostBubbleVotesData({
 				network,
 				proposalType,
 				index: Number(indexOrHash),
-				votesType: EPostBubbleVotesType.NESTED,
+				votesType: EVotesDisplayType.NESTED,
 				analyticsType: EAnalyticsType.CONVICTIONS
 			}),
-			RedisService.DeletePostBubbleVotesData({ network, proposalType, index: Number(indexOrHash), votesType: EPostBubbleVotesType.FLATTENED, analyticsType: EAnalyticsType.VOTES }),
-			RedisService.DeletePostBubbleVotesData({ network, proposalType, index: Number(indexOrHash), votesType: EPostBubbleVotesType.NESTED, analyticsType: EAnalyticsType.VOTES })
+			RedisService.DeletePostBubbleVotesData({ network, proposalType, index: Number(indexOrHash), votesType: EVotesDisplayType.FLATTENED, analyticsType: EAnalyticsType.VOTES }),
+			RedisService.DeletePostBubbleVotesData({ network, proposalType, index: Number(indexOrHash), votesType: EVotesDisplayType.NESTED, analyticsType: EAnalyticsType.VOTES })
 		]);
 	}
 
 	private static async handleProposalStatusChanged({
 		network,
-		params
+		params,
+		event
 	}: {
 		network: ENetwork;
 		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_UPDATED]>;
+		event: EWebhookEvent;
 	}) {
 		// TODO: add origin and clear cache for origin page too
 		const { indexOrHash, proposalType } = params;
 
 		// Invalidate caches
-		await Promise.all([
-			RedisService.DeletePostData({ network, proposalType, indexOrHash }),
+		await Promise.allSettled([
+			event !== EWebhookEvent.PROPOSAL_CREATED ? RedisService.DeletePostData({ network, proposalType, indexOrHash }) : Promise.resolve(), // no need to delete if proposal was just created
 			RedisService.DeletePostsListing({ network, proposalType }),
 			RedisService.DeleteActivityFeed({ network }),
 			RedisService.DeleteAllSubscriptionFeedsForNetwork(network),
