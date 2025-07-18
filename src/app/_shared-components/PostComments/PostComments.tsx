@@ -37,7 +37,7 @@ function PostComments({
 	postUserId?: number;
 }) {
 	const t = useTranslations();
-	const { getOnChainIdentity } = useIdentityService();
+	const { getOnChainIdentity, identityService } = useIdentityService();
 
 	const fetchComments = async () => {
 		const { data, error } = await CommentClientService.getCommentsOfPost({ proposalType, index });
@@ -64,6 +64,7 @@ function PostComments({
 		queryKey: [EReactQueryKeys.COMMENTS, proposalType, index],
 		queryFn: () => fetchComments(),
 		placeholderData: (previousData) => previousData || comments,
+		enabled: !!identityService,
 		retry: true,
 		refetchOnMount: true,
 		refetchOnWindowFocus: true
