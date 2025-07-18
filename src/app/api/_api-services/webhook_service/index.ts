@@ -137,7 +137,8 @@ export class WebhookService {
 			case EWebhookEvent.PROPOSAL_STATUS_UPDATED:
 				return this.handleProposalStatusChanged({
 					network,
-					params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_UPDATED]>
+					params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_UPDATED]>,
+					event: webhookEvent
 				});
 			case EWebhookEvent.VOTED:
 				return this.handleVoted({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.VOTED]> });
@@ -190,7 +191,7 @@ export class WebhookService {
 	private static async handleVoted({ network, params }: { network: ENetwork; params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.VOTED]> }) {
 		const { indexOrHash, proposalType } = params;
 
-		await Promise.all([
+		await Promise.allSettled([
 			RedisService.DeletePostAnalyticsData({ network, proposalType, index: Number(indexOrHash) }),
 			RedisService.DeletePostBubbleVotesData({
 				network,
@@ -213,17 +214,19 @@ export class WebhookService {
 
 	private static async handleProposalStatusChanged({
 		network,
-		params
+		params,
+		event
 	}: {
 		network: ENetwork;
 		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_STATUS_UPDATED]>;
+		event: EWebhookEvent;
 	}) {
 		// TODO: add origin and clear cache for origin page too
 		const { indexOrHash, proposalType } = params;
 
 		// Invalidate caches
-		await Promise.all([
-			RedisService.DeletePostData({ network, proposalType, indexOrHash }),
+		await Promise.allSettled([
+			event !== EWebhookEvent.PROPOSAL_CREATED ? RedisService.DeletePostData({ network, proposalType, indexOrHash }) : Promise.resolve(), // no need to delete if proposal was just created
 			RedisService.DeletePostsListing({ network, proposalType }),
 			RedisService.DeleteActivityFeed({ network }),
 			RedisService.DeleteAllSubscriptionFeedsForNetwork(network),
