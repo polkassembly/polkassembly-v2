@@ -26,11 +26,22 @@ import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import { Skeleton } from '../Skeleton';
+import BeneficiariesDetails from './BeneficiariesDetails/BeneficiariesDetails';
+
+const AISummary = dynamic(() => import('../AISummary/AISummary'), {
+	ssr: false,
+	loading: () => (
+		<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
+			<Skeleton className='h-8 w-48' />
+			<Skeleton className='h-20 w-full' />
+		</div>
+	)
+});
 
 const OnchainInfo = dynamic(() => import('./OnchainInfo/OnchainInfo'), {
 	ssr: false,
 	loading: () => (
-		<div className='flex flex-col gap-4'>
+		<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
 			<Skeleton className='h-8 w-48' />
 			<div className='flex flex-col gap-6'>
 				<Skeleton className='h-10 w-full' />
@@ -44,7 +55,7 @@ const OnchainInfo = dynamic(() => import('./OnchainInfo/OnchainInfo'), {
 const PostAnalytics = dynamic(() => import('./Analytics/PostAnalytics'), {
 	ssr: false,
 	loading: () => (
-		<div className='flex flex-col gap-4'>
+		<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
 			<Skeleton className='h-10 w-[150px] rounded-lg' />
 			<Skeleton className='h-[50px] w-full rounded-lg' />
 			<div className='flex gap-4 max-lg:flex-col'>
@@ -76,21 +87,6 @@ const VotesData = dynamic(() => import('./VotesData/VotesData'), {
 const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), {
 	ssr: false,
 	loading: () => <Skeleton className='h-12 w-full rounded-lg' />
-});
-
-const Timeline = dynamic(() => import('./Timeline/Timeline'), {
-	ssr: false,
-	loading: () => (
-		<div className='flex flex-col gap-4'>
-			<Skeleton className='h-8 w-48' />
-			<div className='flex flex-col gap-3'>
-				<Skeleton className='h-6 w-full' />
-				<Skeleton className='h-6 w-full' />
-				<Skeleton className='h-6 w-full' />
-				<Skeleton className='h-6 w-3/4' />
-			</div>
-		</div>
-	)
 });
 
 const PlaceDecisionDeposit = dynamic(() => import('./PlaceDecisionDeposit/PlaceDecisionDeposit'), {
@@ -175,7 +171,10 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 				setOpen={setShowSpamModal}
 				proposalType={post.proposalType}
 			/>
-			<Tabs defaultValue={EPostDetailsTab.DESCRIPTION}>
+			<Tabs
+				defaultValue={EPostDetailsTab.DESCRIPTION}
+				className='mt-0'
+			>
 				<div className={classes.headerWrapper}>
 					<PostHeader
 						isModalOpen={isModalOpen ?? false}
@@ -184,49 +183,53 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 				</div>
 				<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-7xl')}>
 					<div className={classes.leftWrapper}>
-						<div className={classes.descBox}>
-							<TabsContent value={EPostDetailsTab.DESCRIPTION}>
+						<TabsContent
+							value={EPostDetailsTab.DESCRIPTION}
+							className='mt-0'
+						>
+							<div className={classes.descBox}>
 								<PostContent
 									postData={post}
 									isModalOpen={isModalOpen ?? false}
 								/>
-							</TabsContent>
-							<TabsContent value={EPostDetailsTab.TIMELINE}>
-								<Timeline
-									proposalType={post.proposalType}
-									timeline={post.onChainInfo?.timeline}
-									createdAt={post.createdAt}
-									linkedPost={post.linkedPost}
+							</div>
+						</TabsContent>
+						<TabsContent
+							value={EPostDetailsTab.ONCHAIN_INFO}
+							className='mt-0'
+						>
+							<OnchainInfo
+								proposalType={post.proposalType}
+								index={index}
+								onchainInfo={post.onChainInfo}
+								createdAt={post.createdAt}
+								linkedPost={post.linkedPost}
+							/>
+						</TabsContent>
+						<TabsContent
+							value={EPostDetailsTab.SUMMARISE}
+							className='mt-0'
+						>
+							<div className={classes.descBox}>
+								<AISummary
+									indexOrHash={String(postData?.index ?? postData?.hash)}
+									proposalType={postData.proposalType}
+									initialData={postData?.contentSummary}
 								/>
-							</TabsContent>
-							<TabsContent value={EPostDetailsTab.ONCHAIN_INFO}>
-								<OnchainInfo
-									proposalType={post.proposalType}
-									index={index}
-									onchainInfo={post.onChainInfo}
-								/>
-							</TabsContent>
-							{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(post.proposalType) && (
-								<TabsContent value={EPostDetailsTab.POST_ANALYTICS}>
+							</div>
+						</TabsContent>
+						{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(post.proposalType) && (
+							<TabsContent
+								value={EPostDetailsTab.POST_ANALYTICS}
+								className='mt-0'
+							>
+								<div className={classes.analyticsBox}>
 									<PostAnalytics
 										proposalType={post.proposalType}
 										index={index}
 									/>
-								</TabsContent>
-							)}
-						</div>
-
-						{isModalOpen && !isOffchainPost && (
-							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
-								{canVote(post.onChainInfo?.status) && (
-									<VoteReferendumButton
-										iconClassName='hidden'
-										index={index}
-										track={post.onChainInfo?.origin}
-										proposalType={post.proposalType}
-									/>
-								)}
-							</div>
+								</div>
+							</TabsContent>
 						)}
 						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
 							<PostComments
@@ -239,6 +242,20 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							/>
 						</div>
 					</div>
+
+					{isModalOpen && !isOffchainPost && (
+						<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
+							{canVote(post.onChainInfo?.status) && (
+								<VoteReferendumButton
+									iconClassName='hidden'
+									index={index}
+									track={post.onChainInfo?.origin}
+									proposalType={post.proposalType}
+								/>
+							)}
+						</div>
+					)}
+
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
 							{post.proposalType === EProposalType.REFERENDUM_V2 &&
@@ -272,6 +289,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									proposalType={post.proposalType}
 								/>
 							)}
+							<BeneficiariesDetails beneficiaries={post.onChainInfo?.beneficiaries || []} />
 							<ClaimPayout beneficiaries={post.onChainInfo?.beneficiaries || []} />
 							<ProposalPeriods
 								confirmationPeriodEndsAt={post.onChainInfo?.confirmationPeriodEndsAt}
