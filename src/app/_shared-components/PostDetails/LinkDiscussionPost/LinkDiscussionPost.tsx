@@ -183,7 +183,7 @@ function LinkDiscussionPost({ postData, onClose }: { postData: IPostListing | IP
 						className={cn('justify-start gap-x-2 truncate border-text_pink text-sm font-medium text-text_primary')}
 					>
 						<span>#{discussionPost.index}</span>
-						<span>{discussionPost.title}</span>
+						<span className='truncate'>{discussionPost.title}</span>
 					</Button>
 				) : null}
 
@@ -210,7 +210,7 @@ function LinkDiscussionPost({ postData, onClose }: { postData: IPostListing | IP
 										onClick={() => setSelectedDiscussionPost(post)}
 									>
 										<span>#{post.index}</span>
-										<span className='flex-1 truncate'>{post.title} fdsafadsf sefkdasfh aisdhfads fhdsi fhdsafhidsh fiusdhfiadiudsahfiu</span>
+										<span className='truncate'>{post.title}</span>
 									</Button>
 								))}
 							</div>
