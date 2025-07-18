@@ -19,6 +19,7 @@ import { useState } from 'react';
 import TranslateIcon from '@assets/icons/translate.svg';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import { isMimirDetected } from '@/app/_client-services/isMimirDetected';
 import classes from './Navbar.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import Address from '../../Profile/Address/Address';
@@ -60,6 +61,13 @@ function Navbar() {
 		setModalOpen(false);
 		handleModalClose();
 	};
+
+	const onLogout = async () => {
+		const isMimir = await isMimirDetected();
+
+		await AuthClientService.logout(!!isMimir, () => setUser(null));
+	};
+
 	return (
 		<nav className={classes.navbar}>
 			<div className='flex items-center pl-12 md:pl-0'>
@@ -172,7 +180,7 @@ function Navbar() {
 									<Button
 										variant='ghost'
 										className='flex w-full justify-start p-0 text-sm'
-										onClick={() => AuthClientService.logout(() => setUser(null))}
+										onClick={onLogout}
 									>
 										{t('Profile.logout')}
 									</Button>
@@ -288,7 +296,7 @@ function Navbar() {
 											<Button
 												variant='ghost'
 												className='flex w-full justify-start p-0 text-sm'
-												onClick={() => AuthClientService.logout(() => setUser(null))}
+												onClick={onLogout}
 											>
 												{t('Profile.logout')}
 											</Button>

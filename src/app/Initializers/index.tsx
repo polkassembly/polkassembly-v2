@@ -22,6 +22,7 @@ import { walletAtom } from '../_atoms/wallet/walletAtom';
 import { assethubApiAtom } from '../_atoms/polkadotJsApi/assethubApiAtom';
 import { AssethubApiService } from '../_client-services/assethub_api_service';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
+import { isMimirDetected } from '../_client-services/isMimirDetected';
 
 function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const network = getCurrentNetwork();
@@ -62,7 +63,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		}
 	}, [setUser]);
 
-	const restablishConnections = useCallback(() => {
+	const restablishConnections = useCallback(async () => {
 		if (document.visibilityState === 'hidden') return;
 
 		polkadotApi?.reconnect();
@@ -75,7 +76,9 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 				return;
 			}
 
-			AuthClientService.logout(() => setUser(null));
+			const isMimir = await isMimirDetected();
+
+			AuthClientService.logout(!!isMimir, () => setUser(null));
 		}
 	}, [assethubApi, identityApi, polkadotApi, refreshAccessToken, refreshTokenData, user, setUser]);
 

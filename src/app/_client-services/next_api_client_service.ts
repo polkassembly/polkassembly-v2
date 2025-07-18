@@ -65,6 +65,7 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { ClientError } from '../_client-utils/clientError';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 import { redisServiceSSR } from '../api/_api-utils/redisServiceSSR';
+import { isMimirDetected } from './isMimirDetected';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
@@ -387,32 +388,14 @@ export class NextApiClientService {
 		const currentNetwork = await this.getCurrentNetwork();
 
 		// Detect if we're in an iframe and specifically from Mimir
-		const isInIframe = typeof window !== 'undefined' && window !== window.top;
-		let isMimirIframe = false;
-
-		if (isInIframe) {
-			// Try ancestorOrigins first (Chrome/WebKit support)
-			if (window.location.ancestorOrigins) {
-				isMimirIframe = Array.from(window.location.ancestorOrigins).some((origin) => origin.includes('app.mimir.global'));
-			}
-			// Fallback to document.referrer for Safari/Firefox
-			else if (document.referrer) {
-				try {
-					const referrerUrl = new URL(document.referrer);
-					isMimirIframe = referrerUrl.hostname.includes('app.mimir.global');
-				} catch {
-					// If referrer URL parsing fails, check if referrer string contains mimir
-					isMimirIframe = document.referrer.includes('app.mimir.global');
-				}
-			}
-		}
+		const isMimir = await isMimirDetected();
 
 		const response = await fetch(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
 			headers: {
 				...(!global.window ? await getCookieHeadersServer() : {}),
-				...(isMimirIframe ? { 'x-iframe-context': 'mimir' } : {}),
+				...(isMimir ? { 'x-iframe-context': 'mimir' } : {}),
 				[EHttpHeaderKey.CONTENT_TYPE]: 'application/json',
 				[EHttpHeaderKey.API_KEY]: getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
 				[EHttpHeaderKey.NETWORK]: currentNetwork,

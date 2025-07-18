@@ -6,7 +6,6 @@ import { EWallet } from '@/_shared/types';
 import { NextApiClientService } from './next_api_client_service';
 import { CookieClientService } from './cookie_client_service';
 import { LocalStorageClientService } from './local_storage_client_service';
-import { isMimirDetected } from './isMimirDetected';
 
 export class AuthClientService extends NextApiClientService {
 	static async refreshAccessToken() {
@@ -74,13 +73,12 @@ export class AuthClientService extends NextApiClientService {
 		});
 	}
 
-	static async logout(onLogout?: () => void) {
+	static async logout(isIframe?: boolean, onLogout?: () => void) {
 		this.logoutApi();
-
 		onLogout?.();
-		const isMimir = await isMimirDetected();
-		CookieClientService.deleteAccessToken(!!isMimir);
-		CookieClientService.deleteRefreshToken(!!isMimir);
+
+		CookieClientService.deleteAccessToken(isIframe);
+		CookieClientService.deleteRefreshToken(isIframe);
 		LocalStorageClientService.logout();
 	}
 
