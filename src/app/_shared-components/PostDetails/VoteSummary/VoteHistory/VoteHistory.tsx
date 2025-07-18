@@ -25,7 +25,6 @@ function VoteHistory({ proposalType, index, votesDisplayType }: { proposalType: 
 
 	// Reset all state variables to initial values when votesType changes
 	useEffect(() => {
-		setTab(EVoteDecision.AYE);
 		setPage(1);
 		setSortBy(EVoteSortOptions.CreatedAtBlockDESC);
 	}, [votesDisplayType]);
