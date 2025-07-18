@@ -26,7 +26,16 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const network = await getNetworkFromHeaders();
 
-	const votes = await OffChainDbService.GetPollVotes({ network, proposalType, index, pollId });
+	// Try to get user ID if authenticated (optional for GET requests)
+	let userId: number | undefined;
+	try {
+		const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
+		userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
+	} catch {
+		// User not authenticated, continue without userId
+	}
+
+	const votes = await OffChainDbService.GetPollVotes({ network, proposalType, index, pollId, userId });
 
 	return NextResponse.json({ votes });
 });

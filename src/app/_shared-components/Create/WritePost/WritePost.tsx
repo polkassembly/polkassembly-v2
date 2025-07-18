@@ -172,7 +172,7 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 					<ChevronDown className={cn('text-text-grey h-5 w-5', isAdvanced ? 'rotate-180' : '')} />
 				</Button>
 				{isAdvanced && (
-					<div className='mt-2 flex flex-col gap-2'>
+					<div className='mt-2 flex w-full flex-col gap-2'>
 						<Separator
 							orientation='horizontal'
 							className='bg-border_grey'
@@ -185,7 +185,7 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 							defaultValue={EAllowedCommentor.ALL}
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel className='mt-2 flex items-center gap-1'>
+									<FormLabel className='mt-2 flex w-full items-center gap-1'>
 										<span>{t('Create.AllowedCommentors.title')} </span>
 										<TooltipProvider>
 											<Tooltip>

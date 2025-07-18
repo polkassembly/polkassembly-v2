@@ -1771,7 +1771,7 @@ export class FirestoreService extends FirestoreUtils {
 		return vote;
 	}
 
-	static async GetPollVotes({ network, proposalType, index, pollId }: { network: ENetwork; proposalType: EProposalType; index: string; pollId: string }) {
+	static async GetPollVotes({ network, proposalType, index, pollId, userId }: { network: ENetwork; proposalType: EProposalType; index: string; pollId: string; userId?: number }) {
 		const pollSnapshot = await this.pollsCollectionRef()
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
@@ -1785,10 +1785,19 @@ export class FirestoreService extends FirestoreUtils {
 
 		const pollDoc = pollSnapshot.docs[0];
 
-		// if poll is ended and vote type is masked, don't include public user
+		// Get poll data and check if poll ended
 		const pollData = pollDoc.data() as IPoll;
 		const isPollEnded = dayjs().isAfter(dayjs(pollData.endsAt));
-		const includePublicUser = !pollData?.voteTypes?.includes(EPollVotesType.ANONYMOUS) && (!pollData?.voteTypes?.includes(EPollVotesType.MASKED) || isPollEnded);
+
+		// Check if current user has voted (for MASKED polls)
+		let userHasVoted = false;
+		if (userId && pollData?.voteTypes?.includes(EPollVotesType.MASKED)) {
+			const userVoteDoc = await pollDoc.ref.collection('votes').where('isDeleted', '==', false).where('userId', '==', userId).limit(1).get();
+			userHasVoted = !userVoteDoc.empty;
+		}
+
+		// Updated logic: for MASKED polls, show public user info only if user has voted OR poll has ended
+		const includePublicUser = !pollData?.voteTypes?.includes(EPollVotesType.ANONYMOUS) && (!pollData?.voteTypes?.includes(EPollVotesType.MASKED) || isPollEnded || userHasVoted);
 
 		const votesDoc = await pollDoc.ref.collection('votes').where('isDeleted', '==', false).get();
 		if (votesDoc.empty) {

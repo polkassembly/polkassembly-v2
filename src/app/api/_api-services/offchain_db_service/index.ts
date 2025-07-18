@@ -964,7 +964,7 @@ export class OffChainDbService {
 		return FirestoreService.DeletePollVote({ network, proposalType, index, userId, pollId });
 	}
 
-	static async GetPollVotes({ network, proposalType, index, pollId }: { network: ENetwork; proposalType: EProposalType; index: string; pollId: string }) {
-		return FirestoreService.GetPollVotes({ network, proposalType, index, pollId });
+	static async GetPollVotes({ network, proposalType, index, pollId, userId }: { network: ENetwork; proposalType: EProposalType; index: string; pollId: string; userId?: number }) {
+		return FirestoreService.GetPollVotes({ network, proposalType, index, pollId, userId });
 	}
 }
