@@ -9,6 +9,9 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import PostDetails from '@/app/_shared-components/PostDetails/PostDetails';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { StatusCodes } from 'http-status-codes';
+import ServerComponentError from '@/app/_shared-components/ServerComponentError';
 
 export async function generateMetadata({ params }: { params: Promise<{ index: string }> }): Promise<Metadata> {
 	const { index } = await params;
@@ -30,7 +33,15 @@ async function Bounty({ params }: { params: Promise<{ index: string }> }) {
 	const { index } = await params;
 	const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.BOUNTY, indexOrHash: index });
 
-	if (error || !data) return <div className='text-center text-text_primary'>{error?.message || 'Failed to load proposal'}</div>;
+	if (error || !data) {
+		// Handle 404 errors properly by calling notFound()
+		if (error?.status === StatusCodes.NOT_FOUND) {
+			notFound();
+		}
+
+		// For other errors, show the error message.
+		return <ServerComponentError errorMsg={error?.message || 'Failed to load bounty.'} />;
+	}
 
 	return (
 		<div className='h-full w-full'>

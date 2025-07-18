@@ -14,7 +14,8 @@ export enum ENetwork {
 	KUSAMA = 'kusama',
 	POLKADOT = 'polkadot',
 	WESTEND = 'westend',
-	PASEO = 'paseo'
+	PASEO = 'paseo',
+	CERE = 'cere'
 }
 
 export enum EGovType {
@@ -478,6 +479,8 @@ export enum EPostOrigin {
 	BIG_SPENDER = 'BigSpender',
 	BIG_TIPPER = 'BigTipper',
 	CANDIDATES = 'Candidates',
+	CLUSTER_PROTOCOL_ACTIVATOR = 'ClusterProtocolActivator',
+	CLUSTER_PROTOCOL_UPDATER = 'ClusterProtocolUpdater',
 	EXPERTS = 'Experts',
 	FELLOWS = 'Fellows',
 	FELLOWSHIP_ADMIN = 'FellowshipAdmin',
@@ -521,7 +524,7 @@ export interface IVoteMetrics {
 export interface IBeneficiary {
 	address: string;
 	amount: string;
-	assetId: string | null;
+	assetId?: string | null;
 	validFromBlock?: string;
 }
 
@@ -664,6 +667,7 @@ export interface IVoteData {
 	selfVotingPower?: string;
 	totalVotingPower?: string;
 	delegatedVotingPower?: string;
+	votingPower?: string;
 	delegatedVotes?: IVoteData[];
 }
 
@@ -683,6 +687,7 @@ export interface IComment {
 	sentiment?: ECommentSentiment;
 	aiSentiment?: ECommentSentiment;
 	history?: IOffChainContentHistoryItem[];
+	disabled?: boolean;
 }
 
 export interface ICommentResponse extends IComment {
@@ -723,7 +728,8 @@ export enum EAssets {
 export enum EPostDetailsTab {
 	DESCRIPTION = 'description',
 	TIMELINE = 'timeline',
-	ONCHAIN_INFO = 'onchain info'
+	ONCHAIN_INFO = 'onchain_info',
+	POST_ANALYTICS = 'post_analytics'
 }
 
 export enum EActivityName {
@@ -1129,7 +1135,8 @@ export interface IDelegate {
 
 export interface IDelegateDetails extends IDelegate {
 	publicUser?: IPublicUser;
-	votingPower: string;
+	maxDelegated: string;
+	delegators: string[];
 	receivedDelegationsCount: number;
 	last30DaysVotedProposalsCount: number;
 }
@@ -1263,6 +1270,8 @@ export interface IParachain {
 }
 
 export enum EHttpHeaderKey {
+	CONTENT_TYPE = 'content-type',
+	API_KEY = 'x-api-key',
 	SKIP_CACHE = 'x-skip-cache',
 	TOOLS_PASSPHRASE = 'x-tools-passphrase',
 	NETWORK = 'x-network'
@@ -1300,3 +1309,106 @@ export interface IPayout {
 		generalIndex: string;
 	};
 }
+
+export enum EVotesDisplayType {
+	NESTED = 'nested',
+	FLATTENED = 'flattened'
+}
+export enum ESetIdentityStep {
+	GAS_FEE = 'GAS_FEE',
+	SET_IDENTITY_FORM = 'SET_IDENTITY_FORM',
+	REQUEST_JUDGEMENT = 'REQUEST_JUDGEMENT',
+	IDENTITY_SUCCESS = 'IDENTITY_SUCCESS',
+	TELEPORT_TO_PEOPLE_CHAIN = 'TELEPORT_TO_PEOPLE_CHAIN'
+}
+
+export interface IAnalytics {
+	[EVoteDecision.ABSTAIN]: string;
+	[EVoteDecision.AYE]: string;
+	[EVoteDecision.NAY]: string;
+	delegated: string;
+	solo: string;
+	support: string;
+	turnout?: string;
+	timeSplitVotes: Array<{ index: number; value: string }>;
+	votesByConviction: Array<{ [key in Exclude<EVoteDecision, EVoteDecision.SPLIT_ABSTAIN | EVoteDecision.SPLIT>]: string } & { lockPeriod: number }>;
+	delegationVotesByConviction: Array<{ delegated: string; solo: string; lockPeriod: number }>;
+}
+
+export interface IAccountAnalytics {
+	[EVoteDecision.ABSTAIN]: number;
+	[EVoteDecision.AYE]: number;
+	[EVoteDecision.NAY]: number;
+	delegated: number;
+	solo: number;
+	support: string;
+	turnout?: string;
+	timeSplitVotes: Array<{ index: number; value: number }>;
+	votesByConviction: Array<{ [key in Exclude<EVoteDecision, EVoteDecision.SPLIT_ABSTAIN | EVoteDecision.SPLIT>]: number } & { lockPeriod: number }>;
+	delegationVotesByConviction: Array<{ delegated: number; solo: number; lockPeriod: number }>;
+}
+
+export interface IPostAnalytics {
+	convictionsAnalytics: IAnalytics;
+	votesAnalytics: IAnalytics;
+	accountsAnalytics: IAccountAnalytics;
+	proposal: {
+		index: number;
+		status: string;
+	};
+}
+
+export interface IFlattenedConvictionVote {
+	proposal: {
+		createdAt: string;
+		tally: {
+			ayes: string;
+			nays: string;
+			support: string;
+			bareAyes: string | null;
+		};
+	};
+	type: EProposalType;
+	voter: string;
+	lockPeriod: number;
+	decision: EVoteDecision;
+	balance: {
+		value?: string;
+		abstain?: string;
+	};
+	createdAt: string;
+	createdAtBlock: number;
+	proposalIndex: number;
+	delegatedTo: string | null;
+	isDelegated: boolean;
+	parentVote: {
+		extrinsicIndex: string;
+		selfVotingPower: string;
+		type: EProposalType;
+		voter: string;
+		lockPeriod: number;
+		delegatedVotingPower: string;
+		delegatedVotes: IFlattenedConvictionVote[];
+	};
+}
+
+export enum EAnalyticsType {
+	ACCOUNTS = 'accounts',
+	CONVICTIONS = 'convictions',
+	VOTES = 'votes'
+}
+
+export interface IVoteDistribution extends Omit<IVoteData, 'createdAt' | 'createdAtBlock' | 'proposalIndex' | 'delegatedTo'> {
+	delegatorsCount?: number;
+	isDelegated: boolean;
+	percentage?: number;
+}
+
+export type IPostBubbleVotes = {
+	votes: {
+		[K in Exclude<EVoteDecision, EVoteDecision.SPLIT_ABSTAIN | EVoteDecision.SPLIT>]: IVoteDistribution[];
+	};
+	proposal?: {
+		status: EProposalStatus;
+	};
+};

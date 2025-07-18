@@ -8,6 +8,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { NON_SPAM_POSTS, SPAM_POSTS } from '@/_shared/_constants/spamDetectionExamples';
+import { MIN_COMMENTS_FOR_SUMMARY } from '@/_shared/_constants/commentSummaryConstants';
 import { AI_SERVICE_URL, IS_AI_ENABLED } from '../../_api-constants/apiEnvVars';
 import { OffChainDbService } from '../offchain_db_service';
 import { OnChainDbService } from '../onchain_db_service';
@@ -294,7 +295,8 @@ export class AIService {
 		postIndexOrHash: string;
 		comments: ICommentResponse[];
 	}): Promise<string | null> {
-		if (!comments?.length) {
+		// Require minimum comments before generating summary
+		if (!comments?.length || comments.length < MIN_COMMENTS_FOR_SUMMARY) {
 			return null;
 		}
 

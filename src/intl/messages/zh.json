@@ -164,7 +164,7 @@
 		"Delegations": {
 			"noDelegations": "未找到委托",
 			"delegation": "委托",
-			"receivedDelegations": "收到委托",
+			"delegators": "委托者",
 			"delegatedDelegations": "委托委托",
 			"delegatedBy": "委托给",
 			"delegatedTo": "委托给",
@@ -444,6 +444,7 @@
 		"referendum": "公投",
 		"comments": "评论",
 		"please": "请",
+		"analytics": "分析",
 		"login": "登录",
 		"toComment": "以评论",
 		"post": "发布",
@@ -469,6 +470,61 @@
 		"capital": "资本",
 		"account": "账户",
 		"abstain": "弃权",
+		"nestedVotes": "嵌套投票",
+		"flattenedVotes": "扁平化投票",
+		"VotesBubble": {
+			"nested": "嵌套",
+			"flattened": "扁平",
+			"votesDistribution": "投票者分布",
+			"others": "其他",
+			"capital": "资本",
+			"delegators": "委托者",
+			"lockPeriod": "锁定周期",
+			"votes": "投票",
+			"aye": "赞成",
+			"nay": "反对",
+			"abstain": "弃权",
+			"noVotesFound": "未找到投票"
+		},
+		"VotesData": {
+			"Votes": "投票",
+			"bubble": "气泡",
+			"graph": "图表",
+			"voteHistory": "投票历史 (嵌套和扁平化)",
+			"votes": "投票",
+			"voteGraph": "投票图表",
+			"voteBubble": "投票气泡",
+			"nestedVotes": "嵌套投票",
+			"flattenedVotes": "扁平化投票"
+		},
+		"Analytics": {
+			"totalVotesCasted": "总投票数",
+			"delegatedVsSolo": "委托 vs. 单人",
+			"aye": "赞成",
+			"nay": "反对",
+			"abstain": "弃权",
+			"turnout": "投票率",
+			"support": "支持",
+			"percentage": "百分比",
+			"issuance": "发行",
+			"users": "用户",
+			"delegated": "已委托",
+			"solo": "单人",
+			"voters": "投票者",
+			"votingPower": "投票权重",
+			"convictionsAnalytics": "确信度投票",
+			"votesAnalytics": "投票金额",
+			"accountsAnalytics": "账户",
+			"votesByConviction": "确信度投票",
+			"delegationVotesByConviction": "委托确信度投票",
+			"timeSplit": "时间分割",
+			"day": "天",
+			"notEnoughData": "没有足够的数据，请稍后再试。",
+			"votes": "投票",
+			"convictionAnalyticsDes": "确信度投票是投票中使用的代币数乘以确信度",
+			"accountAnalyticsDes": "账户是投票的唯一地址数",
+			"votesAnalyticsDes": "投票金额是投票中使用的代币数"
+		},
 		"OnchainInfo": {
 			"metadata": "元数据",
 			"table": "表格",
@@ -512,13 +568,13 @@
 		"delegatedVotes": "委托投票",
 		"delegatedVotingPower": "委托投票权重",
 		"delegationList": "委托列表",
+		"threshold": "阈值",
+		"onlyVerifiedCommentsVisible": "评论仅限于具有链上已验证身份的账户。",
 		"VoteCurves": {
 			"approval": "批准",
 			"support": "支持",
-			"threshold": "阈值",
-			"votingData": "投票数据"
+			"threshold": "阈值"
 		},
-		"threshold": "阈值",
 		"DecisionDeposit": {
 			"description": "在14天内存入可退还的保证金，以防止提案超时。",
 			"details": "详情",
@@ -538,7 +594,9 @@
 			"payoutClaimFailed": "支付认领失败",
 			"payoutClaimedSuccessfullyDescription": "您的支付已成功认领",
 			"payoutClaimFailedDescription": "请再试一次"
-		}
+		},
+		"commentsDisabled": "此帖子的评论功能已被禁用。",
+		"commentsDisabledForNonVerifiedUsers": "未验证用户的评论功能已被禁用。"
 	},
 	"ListingPage_Status": {
 		"Cancelled": "已取消",
@@ -654,7 +712,8 @@
 		"success": "帖子更新成功",
 		"successDescription": "您的帖子已成功更新",
 		"error": "更新帖子失败",
-		"errorDescription": "更新帖子时发生错误"
+		"errorDescription": "更新帖子时发生错误",
+		"whoCanComment": "谁可以评论？"
 	},
 	"Footer": {
 		"helpCenter": "帮助中心",
@@ -792,10 +851,13 @@
 		"searchUsername": "搜索用户名"
 	},
 	"SetIdentity": {
+		"TeleportFundsToPeopleChain": "传送资金至People Chain",
+		"Teleport": "传送",
 		"displayName": "显示名称",
 		"legalName": "法定名称",
 		"email": "电子邮箱",
 		"twitter": "Twitter",
+		"socials": "社交媒体",
 		"riot": "Riot",
 		"emailPlaceholder": "请输入您的电子邮箱地址",
 		"twitterPlaceholder": "@您的Twitter用户名",
@@ -826,11 +888,23 @@
 		"verifying": "验证中...",
 		"verificationSuccessful": "验证成功",
 		"verificationFailed": "验证失败",
-		"goToHome": "返回首页",
+		"goToRequestJudgement": "前往请求判断",
 		"verificationEmailSent": "验证邮件已发送",
 		"verificationEmailSentDescription": "请检查您的邮箱进行验证",
 		"emailNotSent": "邮件未发送",
-		"emailNotSentDescription": "发送验证邮件时出现错误"
+		"emailNotSentDescription": "发送验证邮件时出现错误",
+		"IdentityNotSet": "身份未设置",
+		"IdentityNotSetDescription": "要请求判断，您需要首先设置您的链上身份。",
+		"IdentityNotSetDescription2": "判断是注册商验证您的个人资料并根据您的身份信息（如显示名称、电子邮箱、网站、法定名称等）提供可信度级别的方式。",
+		"IdentityNotSetDescription3": "一旦您设置了身份，您就可以向注册商请求判断。这个判断将对其他人可见，并帮助您在链上建立可信度。",
+		"IdentityVerified": "您的身份已验证。",
+		"edit": "编辑",
+		"resend": "重新发送",
+		"resendIn": "重新发送倒计时",
+		"verify": "验证",
+		"verified": "已验证",
+		"pending": "待处理",
+		"CurrentJudgement": "当前判定"
 	},
 	"Bounties": {
 		"onchainBounties": "链上赏金",
@@ -1060,9 +1134,9 @@
 		"delegate": "委托",
 		"noBio": "没有生物",
 		"readMore": "阅读更多",
-		"votingPower": "投票权力",
+		"maxDelegated": "最大委任",
 		"votedProposals": "已投票提案",
-		"receivedDelegations": "接收委任",
+		"delegators": "接收委任",
 		"past30Days": "过去30天",
 		"trendingDelegates": "趋势委任者",
 		"pleaseLoginToContinue": "请登录继续",
@@ -1274,5 +1348,14 @@
 		"pasteURLorEnterPostID": "粘贴URL或输入帖子ID",
 		"yourDiscussions": "您的讨论",
 		"confirm": "确认"
+	},
+	"TeleportToPeopleChain": {
+		"teleport": "传送",
+		"teleportFundsToPeopleChainSuccess": "资金成功传送至People Chain",
+		"teleportFundsToPeopleChainSuccessDescription": "资金已成功传送至People Chain",
+		"teleportFundsToPeopleChainFailed": "资金传送至People Chain失败",
+		"teleportFundsToPeopleChainFailedDescription": "传送资金至People Chain时发生错误",
+		"BeneficiaryAddress": "受益人地址",
+		"Amount": "金额"
 	}
 }

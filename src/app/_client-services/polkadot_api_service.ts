@@ -1217,6 +1217,68 @@ export class PolkadotApiService {
 		});
 	}
 
+	getTeleportToPeopleChainTx({ beneficiaryAddress, amount }: { beneficiaryAddress: string; amount: BN }) {
+		if (!this.api) return null;
+
+		return this.api.tx.xcmPallet.limitedTeleportAssets(
+			{
+				V3: {
+					interior: {
+						X1: { Parachain: NETWORKS_DETAILS[this.network]?.peopleChainParaId }
+					},
+					parents: 0
+				}
+			},
+			{ V3: { interior: { X1: { AccountId32: { id: decodeAddress(beneficiaryAddress), network: null } } } } },
+			{
+				V3: [
+					{
+						fun: {
+							Fungible: amount.toString()
+						},
+						id: {
+							Concrete: {
+								interior: 'Here',
+								parents: '0'
+							}
+						}
+					}
+				]
+			},
+			'0',
+			'Unlimited'
+		);
+	}
+
+	async teleportToPeopleChain({
+		beneficiaryAddress,
+		amount,
+		address,
+		onSuccess,
+		onFailed
+	}: {
+		beneficiaryAddress: string;
+		amount: BN;
+		address: string;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+	}) {
+		if (!this.api) return;
+
+		const tx = this.getTeleportToPeopleChainTx({ beneficiaryAddress, amount });
+
+		if (!tx) return;
+
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to teleport to people chain',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true
+		});
+	}
+
 	async loginWithRemark({
 		address,
 		remarkLoginMessage,

@@ -5,7 +5,7 @@
 'use client';
 
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ENotificationStatus, EProposalType, EReactQueryKeys, IOffChainPost, IPost, IPostListing } from '@/_shared/types';
+import { EAllowedCommentor, ENotificationStatus, EProposalType, EReactQueryKeys, IOffChainPost, IPost, IPostListing } from '@/_shared/types';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
@@ -125,6 +125,7 @@ function LinkDiscussionPost({ postData, onClose }: { postData: IPostListing | IP
 			data: {
 				title: selectedDiscussionPost.title,
 				content: selectedDiscussionPost.content,
+				allowedCommentor: selectedDiscussionPost.allowedCommentor || EAllowedCommentor.ALL,
 				linkedPost: {
 					proposalType: EProposalType.DISCUSSION,
 					indexOrHash: selectedDiscussionPost.index!.toString()
@@ -162,79 +163,81 @@ function LinkDiscussionPost({ postData, onClose }: { postData: IPostListing | IP
 	};
 
 	return (
-		<div className='flex flex-col gap-y-4'>
-			<div className='flex flex-col gap-y-1'>
-				<p className='text-sm text-wallet_btn_text'>{t('LinkDiscussionPost.pasteURLorEnterPostID')}</p>
-				<Input
-					placeholder='Type Here'
-					className='w-full'
-					value={urlOrIndex}
-					onChange={(e) => setUrlOrIndex(e.target.value)}
-				/>
-			</div>
-			{isFetching && <Skeleton className='h-6 w-full' />}
-			{discussionPostError ? (
-				<p className='text-sm text-failure'>{discussionPostError.message}</p>
-			) : discussionPost ? (
-				<Button
-					variant='outline'
-					className={cn('justify-start gap-x-2 truncate border-text_pink text-sm font-medium text-text_primary')}
-				>
-					<span>#{discussionPost.index}</span>
-					<span>{discussionPost.title}</span>
-				</Button>
-			) : null}
+		<div className='w-full overflow-hidden'>
+			<div className='flex flex-col gap-y-4'>
+				<div className='flex flex-col gap-y-1'>
+					<p className='text-sm text-wallet_btn_text'>{t('LinkDiscussionPost.pasteURLorEnterPostID')}</p>
+					<Input
+						placeholder='Type Here'
+						className='w-full'
+						value={urlOrIndex}
+						onChange={(e) => setUrlOrIndex(e.target.value)}
+					/>
+				</div>
+				{isFetching && <Skeleton className='h-6 w-full' />}
+				{discussionPostError ? (
+					<p className='text-sm text-failure'>{discussionPostError.message}</p>
+				) : discussionPost ? (
+					<Button
+						variant='outline'
+						className={cn('justify-start gap-x-2 truncate border-text_pink text-sm font-medium text-text_primary')}
+					>
+						<span>#{discussionPost.index}</span>
+						<span className='truncate'>{discussionPost.title}</span>
+					</Button>
+				) : null}
 
-			{/* user discussions */}
-			<div className='flex flex-col gap-y-1'>
-				<p className='text-sm text-wallet_btn_text'>{t('LinkDiscussionPost.yourDiscussions')}</p>
-				{isFetchingUserDiscussionPosts ? (
-					<div className='flex flex-col gap-y-2'>
-						<Skeleton className='h-6 w-full' />
-						<Skeleton className='h-6 w-full' />
-						<Skeleton className='h-6 w-full' />
-					</div>
-				) : userDiscussionPosts && userDiscussionPosts?.length > 0 ? (
-					<div className='flex max-h-40 flex-col gap-y-2 overflow-y-auto'>
+				{/* user discussions */}
+				<div className='flex flex-col gap-y-1'>
+					<p className='text-sm text-wallet_btn_text'>{t('LinkDiscussionPost.yourDiscussions')}</p>
+					{isFetchingUserDiscussionPosts ? (
 						<div className='flex flex-col gap-y-2'>
-							{userDiscussionPosts?.map((post) => (
-								<Button
-									key={post.index}
-									variant='outline'
-									className={cn(
-										'justify-start gap-x-2 truncate text-sm font-medium text-text_primary',
-										selectedDiscussionPost && selectedDiscussionPost.index === post.index && 'border-text_pink'
-									)}
-									onClick={() => setSelectedDiscussionPost(post)}
-								>
-									<span>#{post.index}</span>
-									<span>{post.title}</span>
-								</Button>
-							))}
+							<Skeleton className='h-6 w-full' />
+							<Skeleton className='h-6 w-full' />
+							<Skeleton className='h-6 w-full' />
 						</div>
-					</div>
-				) : (
-					<div className='flex items-center gap-x-4'>
-						<Image
-							src={NoContextGIF}
-							alt='no-context'
-							width={100}
-							height={100}
-						/>
-						<p className='text-sm font-semibold text-text_primary'>{t('LinkDiscussionPost.noDiscussionsFound')}</p>
-					</div>
-				)}
-			</div>
-			<Separator />
+					) : userDiscussionPosts && userDiscussionPosts?.length > 0 ? (
+						<div className='flex max-h-40 flex-col gap-y-2 overflow-y-auto'>
+							<div className='flex flex-col gap-y-2'>
+								{userDiscussionPosts?.map((post) => (
+									<Button
+										key={post.index}
+										variant='outline'
+										className={cn(
+											'max-w-full justify-start gap-x-2 truncate text-sm font-medium text-text_primary',
+											selectedDiscussionPost && selectedDiscussionPost.index === post.index && 'border-text_pink'
+										)}
+										onClick={() => setSelectedDiscussionPost(post)}
+									>
+										<span>#{post.index}</span>
+										<span className='truncate'>{post.title}</span>
+									</Button>
+								))}
+							</div>
+						</div>
+					) : (
+						<div className='flex items-center gap-x-4'>
+							<Image
+								src={NoContextGIF}
+								alt='no-context'
+								width={100}
+								height={100}
+							/>
+							<p className='text-sm font-semibold text-text_primary'>{t('LinkDiscussionPost.noDiscussionsFound')}</p>
+						</div>
+					)}
+				</div>
+				<Separator />
 
-			<div className='flex items-center justify-end'>
-				<Button
-					onClick={handleLinkDiscussion}
-					isLoading={isLoading}
-					disabled={!selectedDiscussionPost || !user || user.id !== selectedDiscussionPost.userId}
-				>
-					{t('LinkDiscussionPost.confirm')}
-				</Button>
+				<div className='flex items-center justify-end'>
+					<Button
+						onClick={handleLinkDiscussion}
+						isLoading={isLoading}
+						disabled={!selectedDiscussionPost || !user || user.id !== selectedDiscussionPost.userId}
+					>
+						{t('LinkDiscussionPost.confirm')}
+					</Button>
+				</div>
 			</div>
 		</div>
 	);

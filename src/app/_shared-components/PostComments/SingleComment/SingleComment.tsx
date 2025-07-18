@@ -4,8 +4,8 @@
 
 'use client';
 
-import { EProposalType, ICommentResponse, IComment, IPublicUser, ENotificationStatus } from '@/_shared/types';
-import { Dispatch, SetStateAction, useCallback, memo, useState, useRef } from 'react';
+import { ICommentResponse, ENotificationStatus } from '@/_shared/types';
+import { Dispatch, SetStateAction, useCallback, memo, useState, useRef, useEffect } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
 import Image from 'next/image';
@@ -34,12 +34,12 @@ import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 
 interface SingleCommentProps {
 	commentData: ICommentResponse;
-	proposalType: EProposalType;
-	index: string;
 	setParentComment?: Dispatch<SetStateAction<ICommentResponse | null>>;
 }
 
-function SingleComment({ commentData, proposalType, index, setParentComment }: SingleCommentProps) {
+function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
+	const { proposalType, indexOrHash: index } = commentData;
+
 	const [reply, setReply] = useState<boolean>(false);
 	const t = useTranslations();
 	const [comment, setComment] = useState<ICommentResponse | null>(commentData);
@@ -167,23 +167,9 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 
 	const handleCancelReply = useCallback(() => setReply(false), []);
 
-	const handleConfirmReply = useCallback((newComment: IComment, publicUser: IPublicUser) => {
-		setComment((prev) => {
-			if (!prev) return null;
-			return {
-				...prev,
-				children: [
-					...(prev.children || []),
-					{
-						...newComment,
-						publicUser
-					}
-				]
-			};
-		});
-		setReply(false);
-		setShowReplies(true);
-	}, []);
+	useEffect(() => {
+		setComment(commentData);
+	}, [commentData]);
 
 	if (!comment) {
 		return null;
@@ -314,6 +300,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 							className={classes.replyButton}
 							onClick={handleToggleReply}
 							size='sm'
+							disabled={comment.disabled}
 							leftIcon={
 								<Image
 									src={ReplyIcon}
@@ -341,7 +328,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 											<Button
 												variant='ghost'
 												className='h-auto p-0 text-sm text-text_primary'
-												disabled={comment.userId !== user.id}
+												disabled={comment.userId !== user.id || comment.disabled}
 												onClick={toggleEditComment}
 												size='sm'
 												isLoading={loading}
@@ -353,7 +340,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 											<Button
 												variant='ghost'
 												className='h-auto p-0 text-sm text-text_primary'
-												disabled={comment.userId !== user.id}
+												disabled={comment.userId !== user.id || comment.disabled}
 												onClick={handleOpenDeleteModal}
 												size='sm'
 												isLoading={loading}
@@ -374,7 +361,10 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 						proposalType={proposalType}
 						parentCommentId={comment.id}
 						onCancel={handleCancelReply}
-						onConfirm={handleConfirmReply}
+						onOptimisticUpdate={() => {
+							setReply(false);
+							setShowReplies(true);
+						}}
 						isReply
 						replyTo={comment?.publicUser}
 					/>
@@ -397,8 +387,6 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 							comment.children.map((item) => (
 								<SingleComment
 									key={item.id}
-									proposalType={proposalType}
-									index={index}
 									commentData={item}
 									setParentComment={setComment}
 								/>
