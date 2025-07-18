@@ -27,6 +27,18 @@ import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import { Skeleton } from '../Skeleton';
 
+const Poll = dynamic(() => import('./Poll/Poll'), {
+	ssr: false,
+	loading: () => (
+		<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
+			<Skeleton className='h-8 w-24 rounded-lg' />
+			<Skeleton className='h-8 w-full rounded-lg' />
+			<Skeleton className='mt-2 h-12 w-full rounded-lg' />
+			<Skeleton className='h-12 w-full rounded-lg' />
+		</div>
+	)
+});
+
 const OnchainInfo = dynamic(() => import('./OnchainInfo/OnchainInfo'), {
 	ssr: false,
 	loading: () => (
@@ -309,6 +321,13 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							<div className={classes.parentBountyCardWrapper}>
 								<ParentBountyCard parentBountyIndex={post.onChainInfo?.parentBountyIndex} />
 							</div>
+						</div>
+					)}
+
+					{/* Poll */}
+					{isOffchainPost && post?.poll && (
+						<div className={classes.rightWrapper}>
+							<Poll poll={post.poll} />
 						</div>
 					)}
 
