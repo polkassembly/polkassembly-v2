@@ -4,7 +4,7 @@
 
 import { ENetwork } from './types';
 
-export const TREASURY_STATS_NETWORKS = [ENetwork.POLKADOT, ENetwork.KUSAMA];
+export const TREASURY_STATS_NETWORKS = [ENetwork.POLKADOT, ENetwork.KUSAMA, ENetwork.CERE];
 export const CACHE_REFRESH_NETWORKS = [ENetwork.POLKADOT, ENetwork.KUSAMA, ENetwork.CERE];
 
 export const ERROR_MESSAGES = {
