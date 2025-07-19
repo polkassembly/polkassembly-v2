@@ -311,6 +311,55 @@ export class AuthService {
 		return serialize(ECookieNames.ACCESS_TOKEN, accessToken, options);
 	}
 
+	private static async CreateWeb3UserAndTokenPayload({ loginAddress, loginWallet, network }: { loginAddress: string; loginWallet: EWallet; network: ENetwork }) {
+		// find if user exists
+		const user = await OffChainDbService.GetUserByAddress(loginAddress);
+
+		// if user exists, login
+		if (user) {
+			const isTFAEnabled = user.twoFactorAuth?.enabled || false;
+
+			if (isTFAEnabled) {
+				const tfaToken = createCuid();
+				await RedisService.SetTfaToken({ tfaToken, userId: user.id });
+
+				return {
+					isTFAEnabled,
+					tfaToken
+				};
+			}
+
+			return {
+				isTFAEnabled,
+				refreshToken: await this.GetRefreshToken({ userId: user.id, loginAddress, loginWallet }),
+				accessToken: await this.GetSignedAccessToken({
+					...user,
+					loginAddress,
+					loginWallet
+				})
+			};
+		}
+
+		// user does not exist, register
+		const username = `${loginAddress.substring(0, 6)}...${loginAddress.substring(loginAddress.length - 4)}`; // example: 5Grwva...KpZf3 or 0x0000...0001
+		const password = createCuid();
+
+		const newUser = await this.CreateUser({
+			email: '',
+			newPassword: password,
+			username,
+			isWeb3Signup: true,
+			network,
+			address: loginAddress,
+			wallet: loginWallet
+		});
+
+		return {
+			accessToken: await this.GetSignedAccessToken(newUser),
+			refreshToken: await this.GetRefreshToken({ userId: newUser.id })
+		};
+	}
+
 	static async Web3LoginOrRegister({ address, wallet, signature, network }: { address: string; wallet: EWallet; signature: string; network: ENetwork }): Promise<IAuthResponse> {
 		if (!ValidatorService.isValidNetwork(network)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network');
@@ -335,52 +384,7 @@ export class AuthService {
 
 		const formattedAddress = isEvmAddress ? address : getSubstrateAddress(address)!;
 
-		// find if user exists
-		const user = await OffChainDbService.GetUserByAddress(formattedAddress);
-
-		// if user exists, login
-		if (user) {
-			const isTFAEnabled = user.twoFactorAuth?.enabled || false;
-
-			if (isTFAEnabled) {
-				const tfaToken = createCuid();
-				await RedisService.SetTfaToken({ tfaToken, userId: user.id });
-
-				return {
-					isTFAEnabled,
-					tfaToken
-				};
-			}
-
-			return {
-				isTFAEnabled,
-				refreshToken: await this.GetRefreshToken({ userId: user.id, loginAddress: formattedAddress, loginWallet: wallet }),
-				accessToken: await this.GetSignedAccessToken({
-					...user,
-					loginAddress: formattedAddress,
-					loginWallet: wallet
-				})
-			};
-		}
-
-		// user does not exist, register
-		const username = `${formattedAddress.substring(0, 6)}...${formattedAddress.substring(formattedAddress.length - 4)}`; // example: 5Grwva...KpZf3 or 0x0000...0001
-		const password = createCuid();
-
-		const newUser = await this.CreateUser({
-			email: '',
-			newPassword: password,
-			username,
-			isWeb3Signup: true,
-			network,
-			address: formattedAddress,
-			wallet
-		});
-
-		return {
-			accessToken: await this.GetSignedAccessToken(newUser),
-			refreshToken: await this.GetRefreshToken({ userId: newUser.id })
-		};
+		return this.CreateWeb3UserAndTokenPayload({ loginAddress: formattedAddress, loginWallet: wallet, network });
 	}
 
 	static async Web3LoginOrRegisterWithRemark({
@@ -424,52 +428,7 @@ export class AuthService {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'The remark does not exist in this transaction hash. Please provide a different hash.');
 		}
 
-		// find if user exists
-		const user = await OffChainDbService.GetUserByAddress(formattedAddress);
-
-		// if user exists, login
-		if (user) {
-			const isTFAEnabled = user.twoFactorAuth?.enabled || false;
-
-			if (isTFAEnabled) {
-				const tfaToken = createCuid();
-				await RedisService.SetTfaToken({ tfaToken, userId: user.id });
-
-				return {
-					isTFAEnabled,
-					tfaToken
-				};
-			}
-
-			return {
-				isTFAEnabled,
-				refreshToken: await this.GetRefreshToken({ userId: user.id, loginAddress: formattedAddress, loginWallet: wallet }),
-				accessToken: await this.GetSignedAccessToken({
-					...user,
-					loginAddress: formattedAddress,
-					loginWallet: wallet
-				})
-			};
-		}
-
-		// user does not exist, register
-		const username = `${formattedAddress.substring(0, 6)}...${formattedAddress.substring(formattedAddress.length - 4)}`; // example: 5Grwva...KpZf3 or 0x0000...0001
-		const password = createCuid();
-
-		const newUser = await this.CreateUser({
-			email: '',
-			newPassword: password,
-			username,
-			isWeb3Signup: true,
-			network,
-			address: formattedAddress,
-			wallet
-		});
-
-		return {
-			accessToken: await this.GetSignedAccessToken(newUser),
-			refreshToken: await this.GetRefreshToken({ userId: newUser.id })
-		};
+		return this.CreateWeb3UserAndTokenPayload({ loginAddress: formattedAddress, loginWallet: wallet, network });
 	}
 
 	static async IsValidRefreshToken(token: string) {
