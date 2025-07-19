@@ -27,7 +27,7 @@ function DeleteAccount({ userId, onSuccess, onClose }: { userId: number; onSucce
 			onSuccess?.();
 			onClose?.();
 			const isMimir = await isMimirDetected();
-			AuthClientService.logout(!!isMimir);
+			AuthClientService.logout({ isIframe: !!isMimir });
 			router.replace('/');
 		}
 		setLoading(false);

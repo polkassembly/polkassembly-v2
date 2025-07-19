@@ -65,7 +65,7 @@ function Navbar() {
 	const onLogout = async () => {
 		const isMimir = await isMimirDetected();
 
-		await AuthClientService.logout(!!isMimir, () => setUser(null));
+		await AuthClientService.logout({ isIframe: !!isMimir, onLogout: () => setUser(null) });
 	};
 
 	return (

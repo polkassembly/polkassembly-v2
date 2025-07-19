@@ -73,7 +73,7 @@ export class AuthClientService extends NextApiClientService {
 		});
 	}
 
-	static async logout(isIframe?: boolean, onLogout?: () => void) {
+	static async logout({ isIframe, onLogout }: { isIframe?: boolean; onLogout?: () => void }) {
 		this.logoutApi();
 		onLogout?.();
 

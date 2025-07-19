@@ -78,7 +78,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 			const isMimir = await isMimirDetected();
 
-			AuthClientService.logout(!!isMimir, () => setUser(null));
+			AuthClientService.logout({ isIframe: !!isMimir, onLogout: () => setUser(null) });
 		}
 	}, [assethubApi, identityApi, polkadotApi, refreshAccessToken, refreshTokenData, user, setUser]);
 

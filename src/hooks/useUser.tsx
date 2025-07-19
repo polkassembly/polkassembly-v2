@@ -43,7 +43,7 @@ export const useUser = () => {
 				// TODO: show notification (user not found)
 				// logout user, remove cookies
 				const isMimir = await isMimirDetected();
-				AuthClientService.logout(!!isMimir, () => setUser(null));
+				AuthClientService.logout({ isIframe: !!isMimir, onLogout: () => setUser(null) });
 			}
 		},
 		[setUser]
