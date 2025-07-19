@@ -18,16 +18,11 @@ import { createId as createCuid } from '@paralleldrive/cuid2';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
-	const { searchParams } = new URL(req.url);
-	const address = searchParams.get('address');
+	const zodQuerySchema = z.object({
+		address: z.string().refine((addr) => ValidatorService.isValidWeb3Address(addr), 'Not a valid web3 address')
+	});
 
-	if (!address) {
-		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Address is required');
-	}
-
-	if (!ValidatorService.isValidWeb3Address(address)) {
-		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid web3 address');
-	}
+	const { address } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 
 	const substrateAddress = getSubstrateAddress(address) || address;
 
