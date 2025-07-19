@@ -65,6 +65,7 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { ClientError } from '../_client-utils/clientError';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 import { redisServiceSSR } from '../api/_api-utils/redisServiceSSR';
+import { isMimirDetected } from './isMimirDetected';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
@@ -72,6 +73,8 @@ enum EApiRoute {
 	WEB2_LOGIN = 'WEB2_LOGIN',
 	WEB2_SIGNUP = 'WEB2_SIGNUP',
 	WEB3_LOGIN = 'WEB3_LOGIN',
+	REMARK_LOGIN = 'REMARK_LOGIN',
+	GET_REMARK_LOGIN_MESSAGE = 'GET_REMARK_LOGIN_MESSAGE',
 	REFRESH_ACCESS_TOKEN = 'REFRESH_ACCESS_TOKEN',
 	USER_EXISTS = 'USER_EXISTS',
 	TFA_LOGIN = 'TFA_LOGIN',
@@ -173,6 +176,9 @@ export class NextApiClientService {
 			case EApiRoute.REFRESH_ACCESS_TOKEN:
 				path = '/auth/refresh-access-token';
 				break;
+			case EApiRoute.GET_REMARK_LOGIN_MESSAGE:
+				path = '/auth/web3-auth/remark';
+				break;
 			case EApiRoute.GENERATE_QR_SESSION:
 				path = '/auth/qr-session';
 				break;
@@ -266,6 +272,10 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.WEB2_SIGNUP:
 				path = '/auth/web2-auth/signup';
+				method = 'POST';
+				break;
+			case EApiRoute.REMARK_LOGIN:
+				path = '/auth/web3-auth/remark';
 				method = 'POST';
 				break;
 			case EApiRoute.WEB3_LOGIN:
@@ -377,11 +387,15 @@ export class NextApiClientService {
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
 		const currentNetwork = await this.getCurrentNetwork();
 
+		// Detect if we're in an iframe and specifically from Mimir
+		const isMimir = await isMimirDetected();
+
 		const response = await fetch(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
 			headers: {
 				...(!global.window ? await getCookieHeadersServer() : {}),
+				...(isMimir ? { 'x-iframe-context': 'mimir' } : {}),
 				[EHttpHeaderKey.CONTENT_TYPE]: 'application/json',
 				[EHttpHeaderKey.API_KEY]: getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
 				[EHttpHeaderKey.NETWORK]: currentNetwork,
@@ -417,6 +431,17 @@ export class NextApiClientService {
 	protected static async web3LoginOrSignupApi({ address, signature, wallet }: { address: string; signature: string; wallet: EWallet }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.WEB3_LOGIN });
 		return this.nextApiClientFetch<IAuthResponse>({ url, method, data: { address, signature, wallet } });
+	}
+
+	protected static async remarkLoginApi({ address, wallet, remarkHash }: { address: string; wallet: EWallet; remarkHash: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.REMARK_LOGIN });
+		return this.nextApiClientFetch<IAuthResponse>({ url, method, data: { address, wallet, remarkHash } });
+	}
+
+	protected static async getRemarkLoginMessageApi({ address }: { address: string }) {
+		const queryParams = new URLSearchParams({ address });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_REMARK_LOGIN_MESSAGE, queryParams });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
 	protected static async checkForUsernameAndEmailApi({ email, username }: { email: string; username: string }) {

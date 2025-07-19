@@ -10,6 +10,7 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
 import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
+import { isMimirDetected } from '@/app/_client-services/isMimirDetected';
 
 export const useUser = () => {
 	const [user, setUser] = useAtom(userAtom);
@@ -41,7 +42,8 @@ export const useUser = () => {
 			} catch {
 				// TODO: show notification (user not found)
 				// logout user, remove cookies
-				AuthClientService.logout(() => setUser(null));
+				const isMimir = await isMimirDetected();
+				AuthClientService.logout({ isIframe: !!isMimir, onLogout: () => setUser(null) });
 			}
 		},
 		[setUser]
