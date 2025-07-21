@@ -12,11 +12,10 @@ import Image from 'next/image';
 import { Button } from '@ui/Button';
 import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
 import { Separator } from '@ui/Separator';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useTranslations } from 'next-intl';
-import { CopyIcon, Ellipsis } from 'lucide-react';
+import { Ellipsis } from 'lucide-react';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
@@ -342,63 +341,60 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 								{t('PostDetails.reply')}
 							</Button>
 							<div>
-								{comment.userId === user.id && (
-									<DropdownMenu>
-										<DropdownMenuTrigger
-											noArrow
-											className='border-none'
-										>
-											<Ellipsis
-												className='text-text_primary/[0.8]'
-												size={14}
-											/>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent>
-											<DropdownMenuItem className='hover:bg-bg_pink/10'>
-												<Button
-													variant='ghost'
-													className='h-auto p-0 text-sm text-text_primary'
-													disabled={comment.userId !== user.id || comment.disabled}
-													onClick={toggleEditComment}
-													size='sm'
-													isLoading={loading}
-												>
-													{t('PostDetails.edit')}
-												</Button>
-											</DropdownMenuItem>
-											<DropdownMenuItem className='hover:bg-bg_pink/10'>
-												<Button
-													variant='ghost'
-													className='h-auto p-0 text-sm text-text_primary'
-													disabled={comment.userId !== user.id || comment.disabled}
-													onClick={handleOpenDeleteModal}
-													size='sm'
-													isLoading={loading}
-												>
-													{t('PostDetails.delete')}
-												</Button>
-											</DropdownMenuItem>
-										</DropdownMenuContent>
-									</DropdownMenu>
-								)}
+								<DropdownMenu>
+									<DropdownMenuTrigger
+										noArrow
+										className='border-none'
+									>
+										<Ellipsis
+											className='text-text_primary/[0.8]'
+											size={14}
+										/>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent>
+										<DropdownMenuItem className='hover:bg-bg_pink/10'>
+											<Button
+												variant='ghost'
+												className='h-auto p-0 text-sm text-text_primary'
+												onClick={handleCopyCommentLink}
+												size='sm'
+											>
+												{t('PostDetails.copyLink')}
+											</Button>
+										</DropdownMenuItem>
+										{comment.userId === user.id && (
+											<>
+												<DropdownMenuItem className='hover:bg-bg_pink/10'>
+													<Button
+														variant='ghost'
+														className='h-auto p-0 text-sm text-text_primary'
+														disabled={comment.userId !== user.id || comment.disabled}
+														onClick={toggleEditComment}
+														size='sm'
+														isLoading={loading}
+													>
+														{t('PostDetails.edit')}
+													</Button>
+												</DropdownMenuItem>
+												<DropdownMenuItem className='hover:bg-bg_pink/10'>
+													<Button
+														variant='ghost'
+														className='h-auto p-0 text-sm text-text_primary'
+														disabled={comment.userId !== user.id || comment.disabled}
+														onClick={handleOpenDeleteModal}
+														size='sm'
+														isLoading={loading}
+													>
+														{t('PostDetails.delete')}
+													</Button>
+												</DropdownMenuItem>
+											</>
+										)}
+									</DropdownMenuContent>
+								</DropdownMenu>
 							</div>
 						</div>
 					)}
-
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								variant='ghost'
-								className='ml-auto'
-								onClick={handleCopyCommentLink}
-								size='sm'
-								leftIcon={<CopyIcon className='darkIcon' />}
-							/>
-						</TooltipTrigger>
-						<TooltipContent className={classes.tooltipContent}>
-							<span>{t('PostDetails.copyLink')}</span>
-						</TooltipContent>
-					</Tooltip>
 				</div>
 
 				{reply && (
