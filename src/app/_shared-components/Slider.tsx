@@ -41,7 +41,7 @@ const Slider = forwardRef<ComponentRef<typeof SliderPrimitive.Root>, ComponentPr
 								}}
 								type='button'
 							>
-								{index}x
+								{index === 0 ? '0.1' : index}x
 							</button>
 						))}
 					</div>

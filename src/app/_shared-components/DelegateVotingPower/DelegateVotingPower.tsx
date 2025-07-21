@@ -10,7 +10,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import ConvictionSelector from '@/app/_shared-components/PostDetails/VoteReferendum/ConvictionSelector/ConvictionSelector';
 import { EConvictionAmount, EDelegationStatus, EPostOrigin, ENotificationStatus } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { BN } from '@polkadot/util';
+import { BN, BN_ZERO } from '@polkadot/util';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -33,8 +33,6 @@ interface DelegateDialogProps {
 	trackId?: number;
 	onClose?: () => void;
 }
-
-const LOCK_PERIODS = ['no lockup period', '7 days', '14 days', '28 days', '56 days', '112 days', '224 days'];
 
 function DelegateVotingPower({ delegate: initialDelegate, trackId, onClose }: DelegateDialogProps) {
 	const { userPreferences } = useUserPreferences();
@@ -59,11 +57,6 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId, onClose }: De
 		() => selectedTracks.map((track) => NETWORKS_DETAILS[`${network}`].trackDetails[track as EPostOrigin]?.trackId).filter((id): id is number => id !== undefined),
 		[selectedTracks, network]
 	);
-
-	const getConvictionMultiplier = (c: number) => {
-		if (c === 0) return 0.1;
-		return c;
-	};
 
 	const isBalanceValid = useMemo(() => {
 		if (!balance || balance.isZero() || !userBalance) return false;
@@ -289,24 +282,8 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId, onClose }: De
 					<ConvictionSelector
 						onConvictionChange={setConviction}
 						disabled={loading}
+						voteBalance={balance || BN_ZERO}
 					/>
-				</div>
-				<div className={styles.convictionContainer}>
-					<div className={styles.convictionItem}>
-						<p className={styles.convictionItemLabel}>{t('lockPeriod')}</p>
-						<p className={styles.convictionItemLabel}>
-							{conviction}
-							{t('xVotingBalanceForDuration')} ({LOCK_PERIODS[`${conviction}`]})
-						</p>
-					</div>
-					{balance && (
-						<div className={styles.convictionItem}>
-							<p className={styles.convictionItemLabel}>{t('votes')}</p>
-							<p className={styles.convictionItemLabel}>
-								{formatBnBalance(new BN(balance.toNumber() * getConvictionMultiplier(conviction)), { withUnit: true, numberAfterComma: 2 }, network)}
-							</p>
-						</div>
-					)}
 				</div>
 
 				<div className='flex flex-col gap-4'>

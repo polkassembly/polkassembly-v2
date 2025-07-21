@@ -678,30 +678,33 @@
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "选择您的投票",
-		"conviction": "确信度",
+		"conviction": "信念",
 		"lockBalance": "锁定余额",
-		"abstainVoteValue": "弃权票值",
-		"ayeVoteValue": "赞成票值",
-		"nayVoteValue": "反对票值",
+		"abstainVoteValue": "弃权投票值",
+		"ayeVoteValue": "赞成投票值",
+		"nayVoteValue": "反对投票值",
 		"confirm": "确认",
-		"voteSuccess": "您的投票已成功投出",
-		"voteFailed": "您的投票未成功投出",
+		"voteSuccess": "您的投票已成功提交",
+		"voteFailed": "您的投票未能成功提交",
 		"voteSuccessTitle": "投票成功",
 		"voteFailedTitle": "投票失败",
-		"delegatedPower": "委托权重",
+		"delegatedPower": "委托权力",
 		"commentSuccessTitle": "评论添加成功",
 		"commentSuccess": "您的评论已成功添加",
 		"voted": "已投票",
 		"successfully": "成功",
-		"with": "与",
-		"yourVoteIsIn": "您的投票已提交！愿意在评论中分享您支持的原因吗？",
+		"with": "使用",
+		"yourVoteIsIn": "您的投票已提交！要在评论中分享您支持的原因吗？",
 		"your": "您的",
-		"voteIsIn": "投票已提交！愿意在评论中分享您支持的原因吗？"
+		"voteIsIn": "投票已提交！要在评论中分享您支持的原因吗？",
+		"reuseGovernanceLock": "重用治理锁定",
+		"reuseAllLocks": "重用所有锁定"
 	},
 	"Balance": {
 		"voteBalance": "投票余额",
 		"Balance": "余额",
-		"PeopleChainBalance": "人民链余额"
+		"PeopleChainBalance": "人民链余额",
+		"VotingBalance": "投票余额"
 	},
 	"EditPost": {
 		"edit": "编辑",
@@ -1357,5 +1360,10 @@
 		"teleportFundsToPeopleChainFailedDescription": "传送资金至People Chain时发生错误",
 		"BeneficiaryAddress": "受益人地址",
 		"Amount": "金额"
+	},
+	"ConvictionSelector": {
+		"votes": "投票",
+		"lockingPeriod": "锁定期",
+		"lockingPeriodDescription": "根据您选择的乘数，您的{tokenSymbol}在投票后将继续锁定额外时间。"
 	}
 }

@@ -1208,4 +1208,14 @@ export class PolkadotApiService {
 			waitTillFinalizedHash: true
 		});
 	}
+
+	async getAddressGovernanceLock({ address }: { address: string }): Promise<BN | null> {
+		if (!this.api) return null;
+		const locks: any = await this.api.query?.convictionVoting?.classLocksFor(address);
+
+		return locks.reduce((max: BN, rawLock: any) => {
+			const locked = rawLock[1].toString();
+			return new BN(locked).gt(max) ? new BN(locked) : max;
+		}, BN_ZERO);
+	}
 }

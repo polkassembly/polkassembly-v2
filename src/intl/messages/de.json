@@ -683,8 +683,8 @@
 		"ayeVoteValue": "Ja-Stimmwert",
 		"nayVoteValue": "Nein-Stimmwert",
 		"confirm": "Bestätigen",
-		"voteSuccess": "Ihre Abstimmung wurde erfolgreich abgegeben",
-		"voteFailed": "Ihre Abstimmung wurde nicht erfolgreich abgegeben",
+		"voteSuccess": "Ihre Stimme wurde erfolgreich abgegeben",
+		"voteFailed": "Ihre Stimme wurde nicht erfolgreich abgegeben",
 		"voteSuccessTitle": "Abstimmung erfolgreich",
 		"voteFailedTitle": "Abstimmung fehlgeschlagen",
 		"delegatedPower": "Delegierte Macht",
@@ -693,14 +693,17 @@
 		"voted": "Abgestimmt",
 		"successfully": "erfolgreich",
 		"with": "mit",
-		"yourVoteIsIn": "Ihre Stimme ist abgegeben! Möchten Sie in einem Kommentar mitteilen, warum Sie dies unterstützen?",
+		"yourVoteIsIn": "Ihre Stimme ist eingegangen! Möchten Sie in einem Kommentar erklären, warum Sie dafür sind?",
 		"your": "Ihre",
-		"voteIsIn": "Stimme ist abgegeben! Möchten Sie in einem Kommentar mitteilen, warum Sie dies unterstützen?"
+		"voteIsIn": "Stimme ist eingegangen! Möchten Sie in einem Kommentar erklären, warum Sie dafür sind?",
+		"reuseGovernanceLock": "Governance-Sperre wiederverwenden",
+		"reuseAllLocks": "Alle Sperren wiederverwenden"
 	},
 	"Balance": {
 		"voteBalance": "Abstimmungsguthaben",
 		"Balance": "Guthaben",
-		"PeopleChainBalance": "People Chain Guthaben"
+		"PeopleChainBalance": "People Chain Guthaben",
+		"VotingBalance": "Abstimmungsguthaben"
 	},
 	"EditPost": {
 		"edit": "Bearbeiten",
@@ -1131,7 +1134,7 @@
 		"totalDelegators": "Gesamtdelegierende",
 		"clearAll": "Alle löschen",
 		"delegate": "Delegierte",
-		"noBio": "Keine Bio",	
+		"noBio": "Keine Bio",
 		"readMore": "Weiterlesen",
 		"maxDelegated": "Max Delegated",
 		"votedProposals": "Abgestimmte Vorschläge",
@@ -1357,5 +1360,10 @@
 		"teleportFundsToPeopleChainFailedDescription": "Beim Teleportieren der Mittel zur People Chain ist ein Fehler aufgetreten",
 		"BeneficiaryAddress": "Begünstigten-Adresse",
 		"Amount": "Betrag"
+	},
+	"ConvictionSelector": {
+		"votes": "Stimmen",
+		"lockingPeriod": "Sperrfrist",
+		"lockingPeriodDescription": "Ihre {tokenSymbol} bleiben nach der Abstimmung für zusätzliche Zeit gesperrt, abhängig vom gewählten Multiplikator."
 	}
 }
