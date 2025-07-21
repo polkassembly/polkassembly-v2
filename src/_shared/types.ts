@@ -155,6 +155,7 @@ export enum EWallet {
 	TALISMAN = 'talisman',
 	POLKAGATE = 'polkagate',
 	NOVAWALLET = 'nova',
+	MIMIR = 'mimir',
 	OTHER = ''
 	// METAMASK = 'metamask',
 	// WALLETCONNECT = 'walletconnect',
