@@ -743,12 +743,15 @@
 		"with": "with",
 		"yourVoteIsIn": "Your vote is in! Mind sharing why you support this in a comment?",
 		"your": "Your",
-		"voteIsIn": "vote is in! Mind sharing why you support this in a comment?"
+		"voteIsIn": "vote is in! Mind sharing why you support this in a comment?",
+		"reuseGovernanceLock": "Reuse Governance Lock",
+		"reuseAllLocks": "Reuse All Locks"
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance",
 		"Balance": "Balance",
-		"PeopleChainBalance": "People Chain Balance"
+		"PeopleChainBalance": "People Chain Balance",
+		"VotingBalance": "Voting Balance"
 	},
 	"EditPost": {
 		"edit": "Edit",
@@ -1425,5 +1428,10 @@
 		"teleportFundsToPeopleChainFailedDescription": "There was an error while teleporting the funds to people chain",
 		"BeneficiaryAddress": "Beneficiary Address",
 		"Amount": "Amount"
+	},
+	"ConvictionSelector": {
+		"votes": "Votes",
+		"lockingPeriod": "Locking period",
+		"lockingPeriodDescription": "Your {tokenSymbol} will stay locked for extra time after voting, depending on the multiplier you choose."
 	}
 }

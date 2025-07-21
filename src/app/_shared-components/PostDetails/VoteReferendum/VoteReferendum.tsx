@@ -232,56 +232,66 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 	};
 
 	return (
-		<div className='flex flex-col gap-y-6'>
+		<div className='flex max-h-[80vh] flex-col gap-y-6'>
 			<SwitchWalletOrAddress
 				small
-				customAddressSelector={<AddressRelationsPicker withBalance />}
-			/>
-			{delegatedVotingPower && delegatedVotingPower.gt(BN_ZERO) && (
-				<BalanceInput
-					defaultValue={new BN(delegatedVotingPower.toString())}
-					disabled
-					label={t('VoteReferendum.delegatedPower')}
-				/>
-			)}
-			<div>
-				<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.chooseYourVote')}</p>
-				<div className='flex flex-col gap-y-3'>
-					<ChooseVote
-						voteDecision={voteDecision}
-						onVoteDecisionChange={setVoteDecision}
+				customAddressSelector={
+					<AddressRelationsPicker
+						withBalance
+						showVotingBalance
 					/>
+				}
+			/>
+			<div className='flex flex-1 flex-col gap-y-6 overflow-y-auto'>
+				{delegatedVotingPower && delegatedVotingPower.gt(BN_ZERO) && (
+					<BalanceInput
+						defaultValue={new BN(delegatedVotingPower.toString())}
+						disabled
+						label={t('VoteReferendum.delegatedPower')}
+					/>
+				)}
+				<div>
+					<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.chooseYourVote')}</p>
 					<div className='flex flex-col gap-y-3'>
-						{[EVoteDecision.AYE, EVoteDecision.NAY].includes(voteDecision) ? (
-							<>
-								<BalanceInput
-									name={`${voteDecision}-balance`}
-									label={t('VoteReferendum.lockBalance')}
-									onChange={({ value }) => setBalance(value)}
-								/>
-								<div>
-									<p className='mb-3 text-sm text-wallet_btn_text'>{t('VoteReferendum.conviction')}</p>
-									<ConvictionSelector onConvictionChange={setConviction} />
-								</div>
-							</>
-						) : (
-							<>
-								{voteDecision === EVoteDecision.SPLIT_ABSTAIN && (
+						<ChooseVote
+							voteDecision={voteDecision}
+							onVoteDecisionChange={setVoteDecision}
+						/>
+						<div className='flex flex-col gap-y-3'>
+							{[EVoteDecision.AYE, EVoteDecision.NAY].includes(voteDecision) ? (
+								<>
 									<BalanceInput
-										label={t('VoteReferendum.abstainVoteValue')}
-										onChange={({ value }) => setAbstainVoteValue(value)}
+										name={`${voteDecision}-balance`}
+										label={t('VoteReferendum.lockBalance')}
+										onChange={({ value }) => setBalance(value)}
 									/>
-								)}
-								<BalanceInput
-									label={t('VoteReferendum.ayeVoteValue')}
-									onChange={({ value }) => setAyeVoteValue(value)}
-								/>
-								<BalanceInput
-									label={t('VoteReferendum.nayVoteValue')}
-									onChange={({ value }) => setNayVoteValue(value)}
-								/>
-							</>
-						)}
+									<div>
+										<p className='mb-3 text-sm text-wallet_btn_text'>{t('VoteReferendum.conviction')}</p>
+										<ConvictionSelector
+											onConvictionChange={setConviction}
+											voteBalance={balance}
+										/>
+									</div>
+								</>
+							) : (
+								<>
+									{voteDecision === EVoteDecision.SPLIT_ABSTAIN && (
+										<BalanceInput
+											label={t('VoteReferendum.abstainVoteValue')}
+											onChange={({ value }) => setAbstainVoteValue(value)}
+										/>
+									)}
+									<BalanceInput
+										label={t('VoteReferendum.ayeVoteValue')}
+										onChange={({ value }) => setAyeVoteValue(value)}
+									/>
+									<BalanceInput
+										label={t('VoteReferendum.nayVoteValue')}
+										onChange={({ value }) => setNayVoteValue(value)}
+									/>
+								</>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>

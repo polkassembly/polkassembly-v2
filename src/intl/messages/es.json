@@ -688,31 +688,34 @@
 		"treasuryBalance": "Balance de Tesorería"
 	},
 	"VoteReferendum": {
-		"chooseYourVote": "Elija su Voto",
+		"chooseYourVote": "Elige tu voto",
 		"conviction": "Convicción",
-		"lockBalance": "Bloquear Saldo",
-		"abstainVoteValue": "Valor de Voto de Abstención",
-		"ayeVoteValue": "Valor de Voto Sí",
-		"nayVoteValue": "Valor de Voto No",
+		"lockBalance": "Bloquear saldo",
+		"abstainVoteValue": "Valor de voto abstención",
+		"ayeVoteValue": "Valor de voto a favor",
+		"nayVoteValue": "Valor de voto en contra",
 		"confirm": "Confirmar",
-		"voteSuccess": "Su voto ha sido emitido correctamente",
-		"voteFailed": "Su voto no ha sido emitido correctamente",
+		"voteSuccess": "Tu voto ha sido emitido con éxito",
+		"voteFailed": "Tu voto no ha sido emitido con éxito",
 		"voteSuccessTitle": "Voto exitoso",
 		"voteFailedTitle": "Voto fallido",
 		"delegatedPower": "Poder delegado",
-		"commentSuccessTitle": "Comentario agregado con éxito",
-		"commentSuccess": "Su comentario ha sido agregado con éxito",
+		"commentSuccessTitle": "Comentario añadido con éxito",
+		"commentSuccess": "Tu comentario ha sido añadido con éxito",
 		"voted": "Votado",
 		"successfully": "exitosamente",
 		"with": "con",
-		"yourVoteIsIn": "¡Su voto está registrado! ¿Le gustaría compartir por qué apoya esto en un comentario?",
-		"your": "Su",
-		"voteIsIn": "voto está registrado! ¿Le gustaría compartir por qué apoya esto en un comentario?"
+		"yourVoteIsIn": "¡Tu voto está registrado! ¿Te gustaría compartir por qué lo apoyas en un comentario?",
+		"your": "Tu",
+		"voteIsIn": "voto está registrado! ¿Te gustaría compartir por qué lo apoyas en un comentario?",
+		"reuseGovernanceLock": "Reutilizar bloqueo de gobernanza",
+		"reuseAllLocks": "Reutilizar todos los bloqueos"
 	},
 	"Balance": {
-		"voteBalance": "Balance de Votos",
-		"Balance": "Balance",
-		"PeopleChainBalance": "Balance de People Chain"
+		"voteBalance": "Saldo de votación",
+		"Balance": "Saldo",
+		"PeopleChainBalance": "Saldo de People Chain",
+		"VotingBalance": "Saldo de votación"
 	},
 	"EditPost": {
 		"edit": "Editar",
@@ -1387,5 +1390,10 @@
 		"teleportFundsToPeopleChainFailedDescription": "Hubo un error al teleportar los fondos a People Chain",
 		"BeneficiaryAddress": "Dirección del Beneficiario",
 		"Amount": "Cantidad"
+	},
+	"ConvictionSelector": {
+		"votes": "Votos",
+		"lockingPeriod": "Período de bloqueo",
+		"lockingPeriodDescription": "Tus {tokenSymbol} permanecerán bloqueados por un tiempo adicional después de votar, dependiendo del multiplicador que elijas."
 	}
 }
