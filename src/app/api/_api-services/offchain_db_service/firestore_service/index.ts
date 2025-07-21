@@ -37,7 +37,11 @@ import {
 	ESocial,
 	ISocialHandle,
 	ESocialVerificationStatus,
-	IPostLink
+	IPostLink,
+	IPollVote,
+	IPoll,
+	EPollVotesType,
+	IOffChainPollPayload
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -292,6 +296,10 @@ export class FirestoreService extends FirestoreUtils {
 
 		const postData = postDocSnapshot.docs[0].data();
 
+		const isDefaultContent =
+			(!postData.title && !postData.content) ||
+			(postData.title === 'Untitled Post' && (!postData.content?.trim?.() || postData.content.includes('login and tell us more about your proposal')));
+
 		return {
 			...postData,
 			content: postData.content || '',
@@ -307,7 +315,8 @@ export class FirestoreService extends FirestoreUtils {
 			dataSource: EDataSource.POLKASSEMBLY,
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate(),
-			allowedCommentor: postData.allowedCommentor || EAllowedCommentor.ALL
+			allowedCommentor: postData.allowedCommentor || EAllowedCommentor.ALL,
+			isDefaultContent
 		} as IOffChainPost;
 	}
 
@@ -414,7 +423,17 @@ export class FirestoreService extends FirestoreUtils {
 		return commentsCount.data().count || 0;
 	}
 
-	static async GetPostMetrics({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IPostOffChainMetrics> {
+	static async GetPostMetrics({
+		network,
+		indexOrHash,
+		proposalType,
+		linkedPost
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		linkedPost?: IPostLink;
+	}): Promise<IPostOffChainMetrics> {
 		const postReactionsCount = (await this.GetPostReactionsCount({ network, indexOrHash, proposalType })).reduce(
 			(acc, curr) => {
 				acc[curr.reaction] = curr.count;
@@ -425,9 +444,16 @@ export class FirestoreService extends FirestoreUtils {
 
 		const commentsCount = await this.GetPostCommentsCount({ network, indexOrHash, proposalType });
 
+		let linkedPostCommentsCount = 0;
+		if (linkedPost && linkedPost.indexOrHash) {
+			linkedPostCommentsCount = await this.GetPostCommentsCount({ network, indexOrHash: linkedPost.indexOrHash, proposalType: linkedPost.proposalType });
+		}
+
+		const totalCommentsCount = commentsCount + linkedPostCommentsCount;
+
 		return {
 			reactions: postReactionsCount,
-			comments: commentsCount
+			comments: totalCommentsCount
 		} as IPostOffChainMetrics;
 	}
 
@@ -1524,6 +1550,7 @@ export class FirestoreService extends FirestoreUtils {
 				.set(
 					{
 						...existingSocialHandle,
+						...(verificationToken && { verificationToken }),
 						status,
 						updatedAt: new Date()
 					},
@@ -1531,6 +1558,7 @@ export class FirestoreService extends FirestoreUtils {
 				);
 			return {
 				...existingSocialHandle,
+				...(verificationToken && { verificationToken: { token: verificationToken.token } }),
 				status,
 				updatedAt: new Date()
 			} as ISocialHandle;
@@ -1603,7 +1631,14 @@ export class FirestoreService extends FirestoreUtils {
 			.get();
 
 		return {
-			items: posts.docs.map((doc) => doc.data() as IOffChainPost),
+			items: posts.docs.map((doc) => {
+				const data = doc.data();
+				return {
+					...data,
+					createdAt: data.createdAt?.toDate(),
+					updatedAt: data.updatedAt?.toDate()
+				} as IOffChainPost;
+			}),
 			totalCount: totalCount.data().count
 		};
 	}
@@ -1619,5 +1654,162 @@ export class FirestoreService extends FirestoreUtils {
 			// sometimes multiple content summaries are generated for the same post
 			await Promise.all(contentSummary.docs.map((doc) => doc.ref.delete()));
 		}
+	}
+
+	static async CreatePoll({ network, proposalType, index, poll }: { network: ENetwork; proposalType: EProposalType; index: number; poll: IOffChainPollPayload }) {
+		const pollDoc = this.pollsCollectionRef().doc();
+		await pollDoc.set({
+			network,
+			proposalType,
+			index,
+			title: poll.title,
+			options: poll.options,
+			voteTypes: poll.voteTypes || [],
+			endsAt: new Date(poll.endsAt),
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			id: pollDoc.id
+		});
+	}
+
+	static async GetPollForPost({ network, index, proposalType }: { network: ENetwork; index: number; proposalType: EProposalType }) {
+		const pollSnapshot = await this.pollsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('index', '==', index).limit(1).get();
+
+		if (!pollSnapshot.docs?.length) {
+			return null;
+		}
+
+		const pollDoc = pollSnapshot.docs[0];
+
+		const pollData = pollDoc.data();
+		if (!pollData) {
+			return null;
+		}
+		const payload: IPoll = {
+			createdAt: pollData?.createdAt?.toDate?.(),
+			updatedAt: pollData?.updatedAt?.toDate?.(),
+			title: pollData?.title,
+			options: pollData?.options || [],
+			voteTypes: pollData?.voteTypes || [],
+			endsAt: pollData?.endsAt?.toDate?.(),
+			index: pollData?.index,
+			network: pollData?.network,
+			proposalType: pollData?.proposalType,
+			id: pollData?.id,
+			votes: [] // initially empty, will be fetched from the votes collection client side
+		};
+		return payload;
+	}
+
+	static async DeletePollVote({ userId, pollId }: { userId: number; pollId: string }) {
+		const votesSnapshot = await this.pollsCollectionRef().doc(pollId).collection('votes').where('isDeleted', '==', false).where('userId', '==', userId).limit(1).get();
+
+		if (votesSnapshot.empty) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Invalid vote or user not found');
+		}
+		// soft delete the vote
+		await votesSnapshot.docs[0].ref.set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
+	}
+
+	static async CreatePollVote({
+		network,
+		proposalType,
+		index,
+		userId,
+		pollId,
+		selectedOption
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		userId: number;
+		pollId: string;
+		selectedOption: string;
+	}) {
+		const pollSnapshot = await this.pollsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('index', '==', index)
+			.where('id', '==', pollId)
+			.limit(1)
+			.get();
+
+		if (!pollSnapshot.docs?.length) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Poll not found');
+		}
+
+		const pollDoc = pollSnapshot.docs[0];
+
+		const pollData = pollDoc.data() as IPoll;
+		if (!pollData.options.includes(selectedOption)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid option');
+		}
+
+		// if user has already voted, delete the vote
+		const pollVoteDoc = await pollDoc.ref.collection('votes').where('isDeleted', '==', false).where('userId', '==', userId).limit(1).get();
+		if (pollVoteDoc.docs.length) {
+			await this.DeletePollVote({ userId, pollId });
+		}
+
+		const newPollVoteDoc = pollDoc.ref.collection('votes').doc();
+		const vote = { network, proposalType, index, userId, selectedOption, createdAt: new Date(), id: newPollVoteDoc.id, isDeleted: false, updatedAt: new Date() };
+
+		await newPollVoteDoc.set(vote, { merge: true });
+
+		return vote;
+	}
+
+	static async GetPollVotes({ network, proposalType, index, pollId }: { network: ENetwork; proposalType: EProposalType; index: number; pollId: string }) {
+		const pollSnapshot = await this.pollsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('index', '==', index)
+			.where('id', '==', pollId)
+			.get();
+
+		if (!pollSnapshot.docs?.length) {
+			return [];
+		}
+
+		const pollDoc = pollSnapshot.docs[0];
+
+		// Get poll data and check if poll ended
+		const pollData = pollDoc.data() as IPoll;
+		if (!pollData) {
+			return [];
+		}
+
+		const includePublicUser = !pollData?.voteTypes?.includes(EPollVotesType.ANONYMOUS);
+
+		const votesDoc = await pollDoc.ref.collection('votes').where('isDeleted', '==', false).get();
+
+		if (votesDoc.empty) {
+			return [];
+		}
+
+		const votesPromises = votesDoc.docs.map(async (doc) => {
+			const data = doc.data();
+			const publicUser = includePublicUser ? await this.GetPublicUserById(data.userId) : null;
+			if (!doc.exists) {
+				return null;
+			}
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate?.(),
+				updatedAt: data.updatedAt?.toDate?.(),
+				...(publicUser && { publicUser })
+			} as IPollVote;
+		});
+
+		return Promise.allSettled(votesPromises).then((results) => {
+			return results
+				.map((result) => {
+					if (result.status === 'fulfilled') {
+						return result.value;
+					}
+					return null;
+				})
+				.filter((vote): vote is IPollVote => vote !== null);
+		});
 	}
 }

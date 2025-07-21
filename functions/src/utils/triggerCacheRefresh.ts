@@ -11,7 +11,7 @@ export async function triggerCacheRefresh({ toolsPassphrase, cacheRefreshType }:
 	return Promise.all(
 		CACHE_REFRESH_NETWORKS.map(async (network) => {
 			try {
-				logger.info(`Triggering cache refresh for network: ${network}`);
+				logger.info(`Triggering cache refresh for network: ${network} with cacheRefreshType: ${cacheRefreshType}`);
 
 				// Use the network variable in the URL
 				const response = await axios.post(

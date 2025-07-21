@@ -23,6 +23,7 @@ import { useAtom } from 'jotai';
 import { useToast } from '@/hooks/useToast';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import styles from './DelegateVotingPower.module.scss';
 import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
 import AddressRelationsPicker from '../AddressRelationsPicker/AddressRelationsPicker';
@@ -30,11 +31,12 @@ import AddressRelationsPicker from '../AddressRelationsPicker/AddressRelationsPi
 interface DelegateDialogProps {
 	delegate: { address: string };
 	trackId?: number;
+	onClose?: () => void;
 }
 
 const LOCK_PERIODS = ['no lockup period', '7 days', '14 days', '28 days', '56 days', '112 days', '224 days'];
 
-function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDialogProps) {
+function DelegateVotingPower({ delegate: initialDelegate, trackId, onClose }: DelegateDialogProps) {
 	const { userPreferences } = useUserPreferences();
 	const t = useTranslations('Delegation');
 	const { apiService } = usePolkadotApiService();
@@ -165,12 +167,17 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 
 					setDelegates((prev) => {
 						const delegateIndex = prev.findIndex((d) => d.address === delegateAddress);
+						const encodedUserSelectedAccount = getEncodedAddress(userPreferences?.selectedAccount?.address || '', network);
 
 						if (delegateIndex >= 0) {
 							const updatedDelegates = [...prev];
 							updatedDelegates[`${delegateIndex}`] = {
 								...updatedDelegates[`${delegateIndex}`],
-								receivedDelegationsCount: (updatedDelegates[`${delegateIndex}`].receivedDelegationsCount || 0) + selectedTrackIds.length
+								receivedDelegationsCount: (updatedDelegates[`${delegateIndex}`].receivedDelegationsCount || 0) + selectedTrackIds.length,
+								delegators:
+									encodedUserSelectedAccount && !updatedDelegates[`${delegateIndex}`].delegators?.includes(encodedUserSelectedAccount)
+										? [...(updatedDelegates[`${delegateIndex}`].delegators || []), encodedUserSelectedAccount]
+										: updatedDelegates[`${delegateIndex}`].delegators
 							};
 							return updatedDelegates;
 						}
@@ -183,6 +190,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 						status: ENotificationStatus.SUCCESS
 					});
 					setLoading(false);
+					onClose?.();
 				},
 				onFailed: (error) => {
 					toast({
@@ -190,6 +198,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 						status: ENotificationStatus.ERROR
 					});
 					setLoading(false);
+					onClose?.();
 				}
 			});
 		} catch (error) {
@@ -199,6 +208,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 				status: ENotificationStatus.ERROR
 			});
 			setLoading(false);
+			onClose?.();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [apiService, userPreferences?.selectedAccount?.address, selectedTrackIds, delegateAddress, balance, conviction]);
@@ -246,7 +256,13 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 				<SwitchWalletOrAddress
 					small
 					withBalance
-					customAddressSelector={<AddressRelationsPicker withBalance />}
+					customAddressSelector={
+						<AddressRelationsPicker
+							withBalance
+							disabled={loading}
+						/>
+					}
+					disabled={loading}
 				/>
 
 				<div>
@@ -256,6 +272,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 						className='bg-network_dropdown_bg'
 						onChange={(a) => setDelegateAddress(a)}
 						placeholder={t('enterDelegateAddress')}
+						disabled={loading}
 					/>
 				</div>
 
@@ -265,10 +282,14 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 					label={t('balance')}
 					defaultValue={balance}
 					onChange={({ value }) => setBalance(value)}
+					disabled={loading}
 				/>
 				<div className='w-full'>
 					<p className='mb-3 text-sm text-wallet_btn_text'>{t('conviction')}</p>
-					<ConvictionSelector onConvictionChange={setConviction} />
+					<ConvictionSelector
+						onConvictionChange={setConviction}
+						disabled={loading}
+					/>
 				</div>
 				<div className={styles.convictionContainer}>
 					<div className={styles.convictionItem}>
@@ -296,8 +317,12 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 								<Checkbox
 									checked={isAllTracksSelected}
 									onCheckedChange={toggleAllTracks}
+									disabled={loading}
 								/>
-								<TooltipTrigger asChild>
+								<TooltipTrigger
+									asChild
+									disabled={loading}
+								>
 									<span className='text-sm text-wallet_btn_text'>{t('delegateToAllAvailableTracks')}</span>
 								</TooltipTrigger>
 							</div>
@@ -323,7 +348,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 											<Checkbox
 												checked={isChecked}
 												onCheckedChange={() => toggleTrack(track)}
-												disabled={isTrackDelegated}
+												disabled={isTrackDelegated || loading}
 												className={styles.checkbox}
 											/>
 											<span className={isTrackDelegated ? 'text-text_secondary' : ''}>

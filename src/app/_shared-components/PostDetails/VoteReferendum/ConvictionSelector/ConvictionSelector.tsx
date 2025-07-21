@@ -7,7 +7,15 @@
 import { EConvictionAmount } from '@/_shared/types';
 import { Slider } from '@/app/_shared-components/Slider';
 
-function ConvictionSelector({ onConvictionChange, defaultConviction }: { onConvictionChange: (value: EConvictionAmount) => void; defaultConviction?: EConvictionAmount }) {
+function ConvictionSelector({
+	onConvictionChange,
+	defaultConviction,
+	disabled
+}: {
+	onConvictionChange: (value: EConvictionAmount) => void;
+	defaultConviction?: EConvictionAmount;
+	disabled?: boolean;
+}) {
 	return (
 		<div className='w-full'>
 			<Slider
@@ -16,6 +24,7 @@ function ConvictionSelector({ onConvictionChange, defaultConviction }: { onConvi
 				defaultValue={[defaultConviction || EConvictionAmount.ZERO]}
 				onValueChange={(value) => onConvictionChange(value[0] as EConvictionAmount)}
 				withBottomIndicator
+				disabled={disabled}
 			/>
 		</div>
 	);

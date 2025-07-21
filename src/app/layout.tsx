@@ -11,6 +11,8 @@ import { getMessages } from 'next-intl/server';
 import NextTopLoader from 'nextjs-toploader';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
+import { GoogleAnalytics } from '@next/third-parties/google';
+import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { Providers } from './_shared-components/Providers';
 import Initializers from './Initializers';
 import AppLayout from './_shared-components/AppLayout/AppLayout';
@@ -48,6 +50,7 @@ export default async function RootLayout({
 }>) {
 	const user = await CookieService.getUserFromCookie();
 	const userPreferences = await CookieService.getUserPreferencesFromCookie();
+	const { NEXT_PUBLIC_GA_ID } = getSharedEnvVars();
 
 	const messages = await getMessages({
 		locale: userPreferences.locale
@@ -81,6 +84,7 @@ export default async function RootLayout({
 					{modal}
 					<AppLayout>{children}</AppLayout>
 				</Providers>
+				{NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={NEXT_PUBLIC_GA_ID} />}
 			</body>
 		</html>
 	);
