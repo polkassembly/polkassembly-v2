@@ -1673,12 +1673,7 @@ export class FirestoreService extends FirestoreUtils {
 	}
 
 	static async GetPollForPost({ network, index, proposalType }: { network: ENetwork; index: number; proposalType: EProposalType }) {
-		const pollSnapshot = await this.pollsCollectionRef()
-			.where('network', '==', network)
-			.where('proposalType', '==', proposalType)
-			.where('index', '==', String(index))
-			.limit(1)
-			.get();
+		const pollSnapshot = await this.pollsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('index', '==', index).limit(1).get();
 
 		if (!pollSnapshot.docs?.length) {
 			return null;
@@ -1734,7 +1729,7 @@ export class FirestoreService extends FirestoreUtils {
 		const pollSnapshot = await this.pollsCollectionRef()
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
-			.where('index', '==', String(index))
+			.where('index', '==', index)
 			.where('id', '==', pollId)
 			.limit(1)
 			.get();
@@ -1768,7 +1763,7 @@ export class FirestoreService extends FirestoreUtils {
 		const pollSnapshot = await this.pollsCollectionRef()
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
-			.where('index', '==', String(index))
+			.where('index', '==', index)
 			.where('id', '==', pollId)
 			.get();
 
