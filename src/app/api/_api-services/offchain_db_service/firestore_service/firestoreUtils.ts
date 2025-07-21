@@ -61,4 +61,6 @@ export class FirestoreUtils {
 	protected static delegatesCollectionRef = () => this.firestoreDb.collection('delegates');
 
 	protected static userSocialsCollectionRef = () => this.firestoreDb.collection('user_socials');
+
+	protected static pollsCollectionRef = () => this.firestoreDb.collection('polls');
 }

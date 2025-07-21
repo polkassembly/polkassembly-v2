@@ -166,6 +166,7 @@ export enum EWallet {
 	TALISMAN = 'talisman',
 	POLKAGATE = 'polkagate',
 	NOVAWALLET = 'nova',
+	MIMIR = 'mimir',
 	OTHER = ''
 	// METAMASK = 'metamask',
 	// WALLETCONNECT = 'walletconnect',
@@ -414,6 +415,33 @@ export interface IOffChainContentHistoryItem {
 	title?: string;
 	createdAt: Date;
 }
+export interface IPollVote {
+	id: string;
+	userId: number;
+	createdAt: Date;
+	selectedOption: string;
+	updatedAt?: Date;
+	publicUser?: IPublicUser;
+}
+
+export enum EPollVotesType {
+	ANONYMOUS = 'anonymous',
+	MASKED = 'masked'
+}
+
+export interface IPoll {
+	id: string;
+	network: ENetwork;
+	proposalType: EProposalType;
+	index: number;
+	endsAt: Date;
+	createdAt: Date;
+	updatedAt: Date;
+	title: string;
+	options: string[];
+	votes: IPollVote[];
+	voteTypes: EPollVotesType[];
+}
 
 export interface IOffChainPost {
 	id?: string;
@@ -438,6 +466,7 @@ export interface IOffChainPost {
 	topic?: EOffChainPostTopic;
 	history?: IOffChainContentHistoryItem[];
 	isDefaultContent?: boolean;
+	poll?: IPoll;
 }
 
 export enum EProposalStatus {
@@ -1016,6 +1045,11 @@ export interface IWritePostFormFields {
 	tags: ITag[];
 	topic: EOffChainPostTopic;
 	allowedCommentor: EAllowedCommentor;
+	pollTitle?: string;
+	pollOptions?: string[];
+	pollEndDate?: Date;
+	pollVoteTypes?: EPollVotesType[];
+	isAddingPoll?: boolean;
 }
 
 export enum ENotificationStatus {
@@ -1328,6 +1362,22 @@ export interface TimeUnitOptions {
 	withPluralSuffix?: boolean;
 }
 
+export interface IOffChainPollPayload extends Omit<IPoll, 'id' | 'createdAt' | 'updatedAt' | 'proposalType' | 'updatedBy' | 'network' | 'votes' | 'index'> {
+	title: string;
+	options: string[];
+	voteTypes: EPollVotesType[];
+	endsAt: Date;
+}
+
+export interface ICreateOffChainPostPayload {
+	proposalType: EProposalType;
+	content: string;
+	title: string;
+	allowedCommentor: EAllowedCommentor;
+	tags?: ITag[];
+	topic?: EOffChainPostTopic;
+	poll?: IOffChainPollPayload;
+}
 export enum EVotesDisplayType {
 	NESTED = 'nested',
 	FLATTENED = 'flattened'

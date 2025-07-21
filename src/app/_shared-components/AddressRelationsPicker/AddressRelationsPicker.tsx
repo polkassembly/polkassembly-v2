@@ -258,10 +258,12 @@ function AddressSwitchButton({ disabled }: { disabled?: boolean }) {
 export default function AddressRelationsPicker({
 	withBalance = false,
 	showPeopleChainBalance = false,
+	showVotingBalance = false,
 	disabled
 }: {
 	withBalance?: boolean;
 	showPeopleChainBalance?: boolean;
+	showVotingBalance?: boolean;
 	disabled?: boolean;
 }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
@@ -311,6 +313,7 @@ export default function AddressRelationsPicker({
 					address={userPreferences?.selectedAccount?.address || ''}
 					classname='ml-auto'
 					showPeopleChainBalance={showPeopleChainBalance}
+					showVotingBalance={showVotingBalance}
 				/>
 			)}
 

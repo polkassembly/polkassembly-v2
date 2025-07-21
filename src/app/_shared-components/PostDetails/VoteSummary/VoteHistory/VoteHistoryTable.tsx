@@ -132,7 +132,7 @@ function VoteHistoryTable({
 					{t('PostDetails.noVotes')}
 				</div>
 			) : (
-				<Table className={classes.table}>
+				<Table>
 					<TableHeader className='w-full'>
 						{table.getHeaderGroups().map((headerGroup) => (
 							<TableRow key={headerGroup.id}>
