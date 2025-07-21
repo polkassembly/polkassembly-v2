@@ -852,6 +852,8 @@
 			"pollEndsIn": "Poll ends in",
 			"optionDuplicated": "This option is duplicated",
 			"optionsDuplicated": "Poll options cannot be duplicated",
+			"optionsRequired": "At least {min} options must be filled",
+			"maxOptions": "Maximum {max} options allowed",
 			"endDateRequired": "Please select an end date for the poll",
 			"endDateInFuture": "Poll end date must be in the future",
 			"titlePlaceholder": "Enter poll title"

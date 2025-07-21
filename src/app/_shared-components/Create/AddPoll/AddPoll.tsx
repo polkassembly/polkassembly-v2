@@ -216,10 +216,10 @@ function AddPoll({ formData, disabled }: { formData: UseFormReturn<IWritePostFor
 						rules={{
 							required: true,
 							validate: (value) => {
-								if (!value?.length || value.length < MIN_POLL_OPTIONS_COUNT) return t('AddPoll.optionsRequired');
+								if (!value?.length || value.length < MIN_POLL_OPTIONS_COUNT) return t('AddPoll.optionsRequired', { min: MIN_POLL_OPTIONS_COUNT });
 								const filledOptions = value.filter((option) => option.trim() !== '');
-								if (filledOptions.length < MIN_POLL_OPTIONS_COUNT) return `At least ${MIN_POLL_OPTIONS_COUNT} options must be filled`;
-								if (value.length > MAX_POLL_OPTIONS_COUNT) return `Maximum ${MAX_POLL_OPTIONS_COUNT} options allowed`;
+								if (filledOptions.length < MIN_POLL_OPTIONS_COUNT) return t('AddPoll.optionsRequired', { min: MIN_POLL_OPTIONS_COUNT });
+								if (value.length > MAX_POLL_OPTIONS_COUNT) return t('AddPoll.maxOptions', { max: MAX_POLL_OPTIONS_COUNT });
 
 								// Check for duplicates
 								const trimmedOptions = filledOptions.map((option) => option.trim().toLowerCase());

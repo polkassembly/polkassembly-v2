@@ -208,7 +208,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 					.array(z.string().max(MAX_POLL_OPTION_LENGTH, `Poll option must not exceed ${MAX_POLL_OPTION_LENGTH} characters`))
 					.min(MIN_POLL_OPTIONS_COUNT, `At least ${MIN_POLL_OPTIONS_COUNT} options are required`)
 					.max(MAX_POLL_OPTIONS_COUNT, `At most ${MAX_POLL_OPTIONS_COUNT} options are allowed`),
-				voteTypes: z.array(z.nativeEnum(EPollVotesType)).optional(),
+				voteTypes: z.array(z.nativeEnum(EPollVotesType)).optional().default([]),
 				endsAt: z.coerce.date()
 			})
 			.optional()
@@ -229,7 +229,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		tags: tags || [],
 		topic: topic || EOffChainPostTopic.GENERAL,
 		allowedCommentor,
-		poll: poll || null
+		poll
 	});
 
 	// Invalidate post listings since a new post was added

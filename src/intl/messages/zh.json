@@ -800,7 +800,7 @@
 		"AddPoll": {
 			"addPoll": "添加投票",
 			"title": "标题",
-			"options": "选项",
+			"options": "选项",	
 			"titleRequired": "请提供有效的标题。",
 			"settings": "设置",
 			"anonymousPolls": "匿名投票（投票者姓名将不可见）",
@@ -809,6 +809,8 @@
 			"pollEndsIn": "投票结束于",
 			"optionDuplicated": "此选项已重复",
 			"optionsDuplicated": "投票选项不能重复",
+			"optionsRequired": "至少 {min} 个选项必须填写",
+			"maxOptions": "最多 {max} 个选项",
 			"endDateRequired": "请选择投票结束日期",
 			"endDateInFuture": "投票结束日期必须在未来",
 			"titlePlaceholder": "输入投票标题"

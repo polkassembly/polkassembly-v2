@@ -15,6 +15,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import dynamic from 'next/dynamic';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -26,18 +27,7 @@ import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import { Skeleton } from '../Skeleton';
-
-const Poll = dynamic(() => import('./Poll/Poll'), {
-	ssr: false,
-	loading: () => (
-		<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
-			<Skeleton className='h-8 w-24 rounded-lg' />
-			<Skeleton className='h-8 w-full rounded-lg' />
-			<Skeleton className='mt-2 h-12 w-full rounded-lg' />
-			<Skeleton className='h-12 w-full rounded-lg' />
-		</div>
-	)
-});
+import Poll from './Poll/Poll';
 
 const OnchainInfo = dynamic(() => import('./OnchainInfo/OnchainInfo'), {
 	ssr: false,
@@ -129,6 +119,7 @@ const ClaimPayout = dynamic(() => import('./ClaimPayout/ClaimPayout'), {
 });
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
+	const network = getCurrentNetwork();
 	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
 
 	const [thresholdValues, setThresholdValues] = useState({ approvalThreshold: 0, supportThreshold: 0 });
@@ -325,7 +316,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					)}
 
 					{/* Poll */}
-					{isOffchainPost && post?.poll && (
+					{isOffchainPost && post?.poll && network === 'paseo' && (
 						<div className={classes.rightWrapper}>
 							<Poll poll={post.poll} />
 						</div>

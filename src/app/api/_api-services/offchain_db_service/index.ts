@@ -38,7 +38,7 @@ import {
 	ESocialVerificationStatus,
 	ESocial,
 	IPostLink,
-	EPollVotesType
+	IOffChainPollPayload
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -140,7 +140,7 @@ export class OffChainDbService {
 		}
 
 		// 3. get poll
-		const poll = await FirestoreService.GetPollForPost({ network, index: indexOrHash, proposalType });
+		const poll = await FirestoreService.GetPollForPost({ network, index: Number(indexOrHash), proposalType });
 
 		const firestorePostMetricsPromise = FirestoreService.GetPostMetrics({ network, indexOrHash, proposalType, linkedPost: post?.linkedPost });
 		const subsquarePostMetricsPromise = SubsquareOffChainService.GetPostMetrics({ network, indexOrHash, proposalType, linkedPost: post?.linkedPost });
@@ -159,7 +159,7 @@ export class OffChainDbService {
 			return {
 				...post,
 				metrics: postMetrics,
-				poll
+				...(poll && { poll })
 			};
 		}
 
@@ -673,7 +673,7 @@ export class OffChainDbService {
 		allowedCommentor: EAllowedCommentor;
 		tags?: ITag[];
 		topic?: EOffChainPostTopic;
-		poll?: { title: string; options: string[]; voteTypes?: EPollVotesType[]; endsAt: Date } | null;
+		poll?: IOffChainPollPayload;
 	}) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type for an off-chain post');
@@ -689,7 +689,7 @@ export class OffChainDbService {
 		}
 
 		if (poll) {
-			await FirestoreService.CreatePoll({ network, proposalType, index: String(index), poll });
+			await FirestoreService.CreatePoll({ network, proposalType, index, poll });
 		}
 
 		// create content summary
@@ -952,7 +952,7 @@ export class OffChainDbService {
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
-		index: string;
+		index: number;
 		userId: number;
 		pollId: string;
 		selectedOption: string;
@@ -960,11 +960,11 @@ export class OffChainDbService {
 		return FirestoreService.CreatePollVote({ network, proposalType, index, userId, pollId, selectedOption });
 	}
 
-	static async DeletePollVote({ network, proposalType, index, userId, pollId }: { network: ENetwork; proposalType: EProposalType; index: string; userId: number; pollId: string }) {
-		return FirestoreService.DeletePollVote({ network, proposalType, index, userId, pollId });
+	static async DeletePollVote({ userId, pollId }: { userId: number; pollId: string }) {
+		return FirestoreService.DeletePollVote({ userId, pollId });
 	}
 
-	static async GetPollVotes({ network, proposalType, index, pollId, userId }: { network: ENetwork; proposalType: EProposalType; index: string; pollId: string; userId?: number }) {
-		return FirestoreService.GetPollVotes({ network, proposalType, index, pollId, userId });
+	static async GetPollVotes({ network, proposalType, index, pollId }: { network: ENetwork; proposalType: EProposalType; index: number; pollId: string }) {
+		return FirestoreService.GetPollVotes({ network, proposalType, index, pollId });
 	}
 }

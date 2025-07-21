@@ -810,6 +810,8 @@
 			"pollEndsIn": "La encuesta termina en",
 			"optionDuplicated": "Esta opción está duplicada",
 			"optionsDuplicated": "Las opciones de la encuesta no pueden ser duplicadas",
+			"optionsRequired": "Al menos {min} opciones deben ser completadas",
+			"maxOptions": "Máximo {max} opciones permitidas",
 			"endDateRequired": "Por favor selecciona una fecha de finalización para la encuesta",
 			"endDateInFuture": "La fecha de finalización de la encuesta debe ser en el futuro",
 			"titlePlaceholder": "Ingrese el título de la encuesta"

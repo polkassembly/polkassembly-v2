@@ -409,7 +409,7 @@ export interface IPollVote {
 	createdAt: Date;
 	selectedOption: string;
 	updatedAt?: Date;
-	publicUser: IPublicUser | null;
+	publicUser?: IPublicUser;
 }
 
 export enum EPollVotesType {
@@ -424,6 +424,7 @@ export interface IPoll {
 	index: number;
 	endsAt: Date;
 	createdAt: Date;
+	updatedAt: Date;
 	title: string;
 	options: string[];
 	votes: IPollVote[];
@@ -453,7 +454,7 @@ export interface IOffChainPost {
 	topic?: EOffChainPostTopic;
 	history?: IOffChainContentHistoryItem[];
 	isDefaultContent?: boolean;
-	poll?: IPoll | null;
+	poll?: IPoll;
 }
 
 export enum EProposalStatus {
@@ -1341,6 +1342,13 @@ export interface IPayout {
 	};
 }
 
+export interface IOffChainPollPayload extends Omit<IPoll, 'id' | 'createdAt' | 'updatedAt' | 'proposalType' | 'updatedBy' | 'network' | 'votes' | 'index'> {
+	title: string;
+	options: string[];
+	voteTypes: EPollVotesType[];
+	endsAt: Date;
+}
+
 export interface ICreateOffChainPostPayload {
 	proposalType: EProposalType;
 	content: string;
@@ -1348,12 +1356,7 @@ export interface ICreateOffChainPostPayload {
 	allowedCommentor: EAllowedCommentor;
 	tags?: ITag[];
 	topic?: EOffChainPostTopic;
-	poll?: {
-		title: string;
-		options: string[];
-		voteTypes: EPollVotesType[];
-		endsAt: Date;
-	};
+	poll?: IOffChainPollPayload;
 }
 export enum EVotesDisplayType {
 	NESTED = 'nested',

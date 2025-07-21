@@ -809,6 +809,8 @@
 			"pollEndsIn": "投票は",
 			"optionDuplicated": "このオプションは重複しています",
 			"optionsDuplicated": "投票オプションは重複できません",
+			"optionsRequired": "少なくとも {min} 個のオプションを入力してください",
+			"maxOptions": "最大 {max} 個のオプションを入力できます",
 			"endDateRequired": "投票の終了日を選択してください",
 			"endDateInFuture": "投票の終了日は未来の日付にする必要があります",
 			"titlePlaceholder": "投票のタイトルを入力"

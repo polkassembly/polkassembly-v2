@@ -18,7 +18,7 @@ import { Separator } from '../../Separator';
 import { Button } from '../../Button';
 import PollVotesListDialog from './PollVotesListDialog';
 
-function Poll({ poll }: { poll: IPoll | null }) {
+function Poll({ poll }: { poll?: IPoll }) {
 	const t = useTranslations('PostDetails.Poll');
 	const { user } = useUser();
 	const router = useRouter();
@@ -42,7 +42,7 @@ function Poll({ poll }: { poll: IPoll | null }) {
 	const fetchPollVotes = useCallback(async () => {
 		const { data, error } = await NextApiClientService.getPollVotes({
 			proposalType: poll?.proposalType as EProposalType,
-			index: poll?.index.toString() as string,
+			index: poll?.index as number,
 			pollId: poll?.id as string
 		});
 		if (error) {
@@ -73,7 +73,7 @@ function Poll({ poll }: { poll: IPoll | null }) {
 	const handleVote = useCallback(
 		async (option: string) => {
 			setSelectedOption(option);
-			if (!option || isPollEnded) return;
+			if (!option || isPollEnded || !ValidatorService.isValidNumber(poll?.index)) return;
 			if (!user?.id) {
 				router.push('/login');
 				return;
@@ -81,9 +81,9 @@ function Poll({ poll }: { poll: IPoll | null }) {
 
 			if (votes?.find((vote) => vote.userId === user?.id && vote.selectedOption === option)) {
 				setLoading(true);
-				const { data, error } = await NextApiClientService.removePollVote({
+				const { data, error } = await NextApiClientService.deletePollVote({
 					proposalType: poll?.proposalType as EProposalType,
-					index: poll?.index.toString() as string,
+					index: poll?.index as number,
 					pollId: poll?.id as string
 				});
 
@@ -110,7 +110,7 @@ function Poll({ poll }: { poll: IPoll | null }) {
 			setLoading(true);
 			const { data, error } = await NextApiClientService.addPollVote({
 				proposalType: poll?.proposalType as EProposalType,
-				index: poll?.index.toString() as string,
+				index: poll?.index as number,
 				pollId: poll?.id as string,
 				decision: option
 			});

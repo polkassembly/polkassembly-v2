@@ -137,7 +137,7 @@ enum EApiRoute {
 	GET_USER_POSTS = 'GET_USER_POSTS',
 	GET_POLL_VOTES = 'GET_POLL_VOTES',
 	ADD_POLL_VOTE = 'ADD_POLL_VOTE',
-	REMOVE_POLL_VOTE = 'REMOVE_POLL_VOTE',
+	DELETE_POLL_VOTE = 'DELETE_POLL_VOTE',
 	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
 	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES'
 }
@@ -247,7 +247,7 @@ export class NextApiClientService {
 			case EApiRoute.ADD_POLL_VOTE:
 				method = 'POST';
 				break;
-			case EApiRoute.REMOVE_POLL_VOTE:
+			case EApiRoute.DELETE_POLL_VOTE:
 				method = 'DELETE';
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
@@ -1100,18 +1100,18 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IUserPosts>({ url, method });
 	}
 
-	static async addPollVote({ proposalType, index, pollId, decision }: { proposalType: EProposalType; index: string; pollId: string; decision: string }) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_POLL_VOTE, routeSegments: [proposalType, index, 'poll', pollId, 'votes'] });
+	static async addPollVote({ proposalType, index, pollId, decision }: { proposalType: EProposalType; index: number; pollId: string; decision: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_POLL_VOTE, routeSegments: [proposalType, index.toString(), 'poll', pollId, 'votes'] });
 		return this.nextApiClientFetch<{ vote: IPollVote }>({ url, method, data: { decision } });
 	}
 
-	static async removePollVote({ proposalType, index, pollId }: { proposalType: EProposalType; index: string; pollId: string }) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.REMOVE_POLL_VOTE, routeSegments: [proposalType, index, 'poll', pollId, 'votes'] });
+	static async deletePollVote({ proposalType, index, pollId }: { proposalType: EProposalType; index: number; pollId: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_POLL_VOTE, routeSegments: [proposalType, index.toString(), 'poll', pollId, 'votes'] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
-	static async getPollVotes({ proposalType, index, pollId }: { proposalType: EProposalType; index: string; pollId: string }) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POLL_VOTES, routeSegments: [proposalType, index, 'poll', pollId, 'votes'] });
+	static async getPollVotes({ proposalType, index, pollId }: { proposalType: EProposalType; index: number; pollId: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POLL_VOTES, routeSegments: [proposalType, index.toString(), 'poll', pollId, 'votes'] });
 		return this.nextApiClientFetch<{ votes: IPollVote[] }>({ url, method });
 	}
 

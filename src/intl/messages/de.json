@@ -805,6 +805,8 @@
 			"anonymousPolls": "Anonyme Abstimmungen (Name der Abstimmenden wird nicht sichtbar sein)",
 			"maskedPolls": "Maskierte Abstimmungen (Ergebnis wird nur angezeigt, wenn ein Benutzer auf die Abstimmung abgestimmt hat)",
 			"addAnotherOption": "Weitere Option hinzufügen..",
+			"optionsRequired": "Mindestens {min} Optionen müssen ausgefüllt werden",
+			"maxOptions": "Maximale {max} Optionen erlaubt",
 			"pollEndsIn": "Abstimmung endet in",
 			"optionDuplicated": "Diese Option ist doppelt",
 			"optionsDuplicated": "Abstimmungsoptionen können nicht doppelt sein",

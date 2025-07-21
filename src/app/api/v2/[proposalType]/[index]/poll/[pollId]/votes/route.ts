@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { OFF_CHAIN_PROPOSAL_TYPES } from '@/_shared/_constants/offChainProposalTypes';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { EProposalType } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
@@ -14,10 +15,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 const zodParamsSchema = z.object({
-	proposalType: z.nativeEnum(EProposalType).refine((val) => OFF_CHAIN_PROPOSAL_TYPES.includes(val), {
+	proposalType: z.nativeEnum(EProposalType).refine((val) => ValidatorService.isValidOffChainProposalType(val), {
 		message: `Invalid proposal type. Must be one of: ${OFF_CHAIN_PROPOSAL_TYPES.join(', ')}`
 	}),
-	index: z.string(),
+	index: z.coerce.number(),
 	pollId: z.string()
 });
 
@@ -26,16 +27,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const network = await getNetworkFromHeaders();
 
-	// Try to get user ID if authenticated (optional for GET requests)
-	let userId: number | undefined;
-	try {
-		const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
-		userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
-	} catch {
-		// User not authenticated, continue without userId
-	}
-
-	const votes = await OffChainDbService.GetPollVotes({ network, proposalType, index, pollId, userId });
+	const votes = await OffChainDbService.GetPollVotes({ network, proposalType, index, pollId });
 
 	return NextResponse.json({ votes });
 });
@@ -60,7 +52,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const vote = await OffChainDbService.CreatePollVote({ network, proposalType, index, userId, selectedOption: decision, pollId });
 
 	// 3. invalidate cache
-	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index.toString() });
 
 	return NextResponse.json({ vote });
 });
@@ -78,10 +70,10 @@ export const DELETE = withErrorHandling(
 		const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
 
 		// 3. delete poll vote
-		await OffChainDbService.DeletePollVote({ network, proposalType, index, userId, pollId });
+		await OffChainDbService.DeletePollVote({ userId, pollId });
 
 		// 4. invalidate cache
-		await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+		await RedisService.DeletePostData({ network, proposalType, indexOrHash: index.toString() });
 
 		return NextResponse.json({ message: 'Poll vote deleted successfully' });
 	}

@@ -40,7 +40,8 @@ import {
 	IPostLink,
 	IPollVote,
 	IPoll,
-	EPollVotesType
+	EPollVotesType,
+	IOffChainPollPayload
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -48,7 +49,6 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
-import dayjs from 'dayjs';
 import { FirestoreUtils } from './firestoreUtils';
 
 export class FirestoreService extends FirestoreUtils {
@@ -1656,17 +1656,7 @@ export class FirestoreService extends FirestoreUtils {
 		}
 	}
 
-	static async CreatePoll({
-		network,
-		proposalType,
-		index,
-		poll
-	}: {
-		network: ENetwork;
-		proposalType: EProposalType;
-		index: string;
-		poll: { title: string; options: string[]; voteTypes?: EPollVotesType[]; endsAt: Date };
-	}) {
+	static async CreatePoll({ network, proposalType, index, poll }: { network: ENetwork; proposalType: EProposalType; index: number; poll: IOffChainPollPayload }) {
 		const pollDoc = this.pollsCollectionRef().doc();
 		await pollDoc.set({
 			network,
@@ -1677,12 +1667,19 @@ export class FirestoreService extends FirestoreUtils {
 			voteTypes: poll.voteTypes || [],
 			endsAt: new Date(poll.endsAt),
 			createdAt: new Date(),
+			updatedAt: new Date(),
 			id: pollDoc.id
 		});
 	}
 
-	static async GetPollForPost({ network, index, proposalType }: { network: ENetwork; index: string; proposalType: EProposalType }) {
-		const pollSnapshot = await this.pollsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('index', '==', index).limit(1).get();
+	static async GetPollForPost({ network, index, proposalType }: { network: ENetwork; index: number; proposalType: EProposalType }) {
+		const pollSnapshot = await this.pollsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('index', '==', String(index))
+			.limit(1)
+			.get();
+
 		if (!pollSnapshot.docs?.length) {
 			return null;
 		}
@@ -1690,8 +1687,12 @@ export class FirestoreService extends FirestoreUtils {
 		const pollDoc = pollSnapshot.docs[0];
 
 		const pollData = pollDoc.data();
+		if (!pollData) {
+			return null;
+		}
 		const payload: IPoll = {
 			createdAt: pollData?.createdAt?.toDate?.(),
+			updatedAt: pollData?.updatedAt?.toDate?.(),
 			title: pollData?.title,
 			options: pollData?.options || [],
 			voteTypes: pollData?.voteTypes || [],
@@ -1705,28 +1706,14 @@ export class FirestoreService extends FirestoreUtils {
 		return payload;
 	}
 
-	static async DeletePollVote({ network, proposalType, index, userId, pollId }: { network: ENetwork; proposalType: EProposalType; index: string; userId: number; pollId: string }) {
-		const pollSnapshot = await this.pollsCollectionRef()
-			.where('network', '==', network)
-			.where('proposalType', '==', proposalType)
-			.where('index', '==', index)
-			.where('id', '==', pollId)
-			.limit(1)
-			.get();
+	static async DeletePollVote({ userId, pollId }: { userId: number; pollId: string }) {
+		const votesSnapshot = await this.pollsCollectionRef().doc(pollId).collection('votes').where('isDeleted', '==', false).where('userId', '==', userId).limit(1).get();
 
-		if (!pollSnapshot.docs?.length) {
-			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Poll not found');
-		}
-
-		const pollDoc = pollSnapshot.docs[0];
-		const pollVoteDoc = await pollDoc.ref.collection('votes').where('isDeleted', '==', false).where('userId', '==', userId).limit(1).get();
-
-		if (pollVoteDoc.empty) {
+		if (votesSnapshot.empty) {
 			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Invalid vote or user not found');
 		}
-
 		// soft delete the vote
-		await pollVoteDoc.docs[0].ref.set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
+		await votesSnapshot.docs[0].ref.set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
 	}
 
 	static async CreatePollVote({
@@ -1739,7 +1726,7 @@ export class FirestoreService extends FirestoreUtils {
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
-		index: string;
+		index: number;
 		userId: number;
 		pollId: string;
 		selectedOption: string;
@@ -1747,20 +1734,26 @@ export class FirestoreService extends FirestoreUtils {
 		const pollSnapshot = await this.pollsCollectionRef()
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
-			.where('index', '==', index)
+			.where('index', '==', String(index))
 			.where('id', '==', pollId)
 			.limit(1)
 			.get();
+
 		if (!pollSnapshot.docs?.length) {
 			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Poll not found');
 		}
 
 		const pollDoc = pollSnapshot.docs[0];
 
+		const pollData = pollDoc.data() as IPoll;
+		if (!pollData.options.includes(selectedOption)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid option');
+		}
+
 		// if user has already voted, delete the vote
 		const pollVoteDoc = await pollDoc.ref.collection('votes').where('isDeleted', '==', false).where('userId', '==', userId).limit(1).get();
 		if (pollVoteDoc.docs.length) {
-			await this.DeletePollVote({ network, proposalType, index, userId, pollId });
+			await this.DeletePollVote({ userId, pollId });
 		}
 
 		const newPollVoteDoc = pollDoc.ref.collection('votes').doc();
@@ -1771,11 +1764,11 @@ export class FirestoreService extends FirestoreUtils {
 		return vote;
 	}
 
-	static async GetPollVotes({ network, proposalType, index, pollId, userId }: { network: ENetwork; proposalType: EProposalType; index: string; pollId: string; userId?: number }) {
+	static async GetPollVotes({ network, proposalType, index, pollId }: { network: ENetwork; proposalType: EProposalType; index: number; pollId: string }) {
 		const pollSnapshot = await this.pollsCollectionRef()
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
-			.where('index', '==', index)
+			.where('index', '==', String(index))
 			.where('id', '==', pollId)
 			.get();
 
@@ -1787,22 +1780,18 @@ export class FirestoreService extends FirestoreUtils {
 
 		// Get poll data and check if poll ended
 		const pollData = pollDoc.data() as IPoll;
-		const isPollEnded = dayjs().isAfter(dayjs(pollData.endsAt));
-
-		// Check if current user has voted (for MASKED polls)
-		let userHasVoted = false;
-		if (userId && pollData?.voteTypes?.includes(EPollVotesType.MASKED)) {
-			const userVoteDoc = await pollDoc.ref.collection('votes').where('isDeleted', '==', false).where('userId', '==', userId).limit(1).get();
-			userHasVoted = !userVoteDoc.empty;
+		if (!pollData) {
+			return [];
 		}
 
-		// Updated logic: for MASKED polls, show public user info only if user has voted OR poll has ended
-		const includePublicUser = !pollData?.voteTypes?.includes(EPollVotesType.ANONYMOUS) && (!pollData?.voteTypes?.includes(EPollVotesType.MASKED) || isPollEnded || userHasVoted);
+		const includePublicUser = !pollData?.voteTypes?.includes(EPollVotesType.ANONYMOUS);
 
 		const votesDoc = await pollDoc.ref.collection('votes').where('isDeleted', '==', false).get();
+
 		if (votesDoc.empty) {
 			return [];
 		}
+
 		const votesPromises = votesDoc.docs.map(async (doc) => {
 			const data = doc.data();
 			const publicUser = includePublicUser ? await this.GetPublicUserById(data.userId) : null;
@@ -1813,7 +1802,7 @@ export class FirestoreService extends FirestoreUtils {
 				...data,
 				createdAt: data.createdAt?.toDate?.(),
 				updatedAt: data.updatedAt?.toDate?.(),
-				publicUser: publicUser || null
+				...(publicUser && { publicUser })
 			} as IPollVote;
 		});
 
