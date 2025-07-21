@@ -470,6 +470,16 @@
 		"capital": "资本",
 		"account": "账户",
 		"abstain": "弃权",
+		"Poll": {
+			"endsOn": "结束于",
+			"endedOn": "结束于",
+			"noVotes": "暂无投票",
+			"anonVotes": "匿名投票",
+			"viewPollVotes": "查看投票",
+			"pollVotesList": "投票列表",
+			"seeMore": "查看更多",
+			"seeLess": "查看更少"
+		},
 		"nestedVotes": "嵌套投票",
 		"flattenedVotes": "扁平化投票",
 		"VotesBubble": {
@@ -783,11 +793,30 @@
 			"failedToUploadImage": "上传图片失败"
 		},
 		"AllowedCommentors": {
+			"advanced": "高级",
 			"title": "谁可以评论？",
 			"all": "所有人",
 			"onchainVerified": "链上已验证",
 			"none": "无人",
 			"tooltip": "选择谁可以评论和回复此帖子"
+		},
+		"AddPoll": {
+			"addPoll": "添加投票",
+			"title": "标题",
+			"options": "选项",	
+			"titleRequired": "请提供有效的标题。",
+			"settings": "设置",
+			"anonymousPolls": "匿名投票（投票者姓名将不可见）",
+			"maskedPolls": "隐藏投票结果（仅在用户投票后显示结果）",
+			"addAnotherOption": "添加另一个选项..",
+			"pollEndsIn": "投票结束于",
+			"optionDuplicated": "此选项已重复",
+			"optionsDuplicated": "投票选项不能重复",
+			"optionsRequired": "至少 {min} 个选项必须填写",
+			"maxOptions": "最多 {max} 个选项",
+			"endDateRequired": "请选择投票结束日期",
+			"endDateInFuture": "投票结束日期必须在未来",
+			"titlePlaceholder": "输入投票标题"
 		},
 		"Topic": {
 			"general": "通用",

@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import { useRouter } from 'next/navigation';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
+import { isMimirDetected } from '@/app/_client-services/isMimirDetected';
 import { Button } from '../../Button';
 import { Input } from '../../Input';
 
@@ -25,7 +26,8 @@ function DeleteAccount({ userId, onSuccess, onClose }: { userId: number; onSucce
 		if (data && !error) {
 			onSuccess?.();
 			onClose?.();
-			AuthClientService.logout();
+			const isMimir = await isMimirDetected();
+			AuthClientService.logout({ isIframe: !!isMimir });
 			router.replace('/');
 		}
 		setLoading(false);

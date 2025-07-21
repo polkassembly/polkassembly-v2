@@ -541,6 +541,16 @@
 		},
 		"commentsDisabled": "Comments have been disabled for this post.",
 		"commentsDisabledForNonVerifiedUsers": "Comments have been disabled for non verified users.",
+		"Poll": {
+			"endsOn": "Ends on",
+			"endedOn": "Ended on",
+			"noVotes": "No votes yet",
+			"anonVotes": "Anon Votes",
+			"viewPollVotes": "View Poll Votes",
+			"pollVotesList": "Poll Votes List",
+			"seeMore": "See More",
+			"seeLess": "See Less"
+		},
 		"nestedVotes": "Nested Votes",
 		"flattenedVotes": "Flattened Votes",
 		"OnchainInfo": {
@@ -833,7 +843,27 @@
 			"insertImage": "Insert Image",
 			"failedToUploadImage": "Failed to upload image"
 		},
+		"AddPoll": {
+			"addPoll": "Add Poll",
+			"title": "Title",
+			"options": "Options",
+			"titleRequired": "Please provide a valid title.",
+			"settings": "Settings",
+			"anonymousPolls": "Anonymous polls (Voters’ name will not be visible)",
+			"maskedPolls": "Masked Polls (Result is only shown after a user has voted on the poll)",
+			"addAnotherOption": "Add Another Option..",
+			"pollEndsIn": "Poll ends in",
+			"optionDuplicated": "This option is duplicated",
+			"optionsDuplicated": "Poll options cannot be duplicated",
+			"optionsRequired": "At least {min} options must be filled",
+			"maxOptions": "Maximum {max} options allowed",
+			"endDateRequired": "Please select an end date for the poll",
+			"endDateInFuture": "Poll end date must be in the future",
+			"titlePlaceholder": "Enter poll title"
+		},
+
 		"AllowedCommentors": {
+			"advanced": "Advanced",
 			"title": "Who can comment ?",
 			"all": "All",
 			"onchainVerified": "Onchain Verified",
