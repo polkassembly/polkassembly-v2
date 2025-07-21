@@ -1754,9 +1754,15 @@ export class FirestoreService extends FirestoreUtils {
 		const newPollVoteDoc = pollDoc.ref.collection('votes').doc();
 		const vote = { network, proposalType, index, userId, selectedOption, createdAt: new Date(), id: newPollVoteDoc.id, isDeleted: false, updatedAt: new Date() };
 
+		const includePublicUser = !pollData?.voteTypes?.includes(EPollVotesType.ANONYMOUS);
+		const publicUser = includePublicUser ? await this.GetPublicUserById(userId) : null;
+
 		await newPollVoteDoc.set(vote, { merge: true });
 
-		return vote;
+		return {
+			...vote,
+			...(publicUser && { publicUser })
+		} as IPollVote;
 	}
 
 	static async GetPollVotes({ network, proposalType, index, pollId }: { network: ENetwork; proposalType: EProposalType; index: number; pollId: string }) {
