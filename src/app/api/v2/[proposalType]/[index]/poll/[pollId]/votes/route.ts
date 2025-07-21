@@ -14,6 +14,8 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
+const SET_COOKIE_HEADER = 'Set-Cookie';
+
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType).refine((val) => ValidatorService.isValidOffChainProposalType(val), {
 		message: `Invalid proposal type. Must be one of: ${OFF_CHAIN_PROPOSAL_TYPES.join(', ')}`
@@ -42,7 +44,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const { decision } = zodBodySchema.parse(await getReqBody(req));
 
 	// 1. check if user is authenticated
-	const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
+	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
 
@@ -54,7 +56,10 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	// 3. invalidate cache
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index.toString() });
 
-	return NextResponse.json({ vote });
+	const response = NextResponse.json({ vote });
+	response.headers.append(SET_COOKIE_HEADER, await AuthService.GetAccessTokenCookie(newAccessToken));
+	response.headers.append(SET_COOKIE_HEADER, await AuthService.GetRefreshTokenCookie(newRefreshToken));
+	return response;
 });
 
 export const DELETE = withErrorHandling(
@@ -64,7 +69,7 @@ export const DELETE = withErrorHandling(
 		const network = await getNetworkFromHeaders();
 
 		// 1. check if user is authenticated
-		const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
+		const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 		// 2. get user id
 		const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
@@ -75,6 +80,9 @@ export const DELETE = withErrorHandling(
 		// 4. invalidate cache
 		await RedisService.DeletePostData({ network, proposalType, indexOrHash: index.toString() });
 
-		return NextResponse.json({ message: 'Poll vote deleted successfully' });
+		const response = NextResponse.json({ message: 'Poll vote deleted successfully' });
+		response.headers.append(SET_COOKIE_HEADER, await AuthService.GetAccessTokenCookie(newAccessToken));
+		response.headers.append(SET_COOKIE_HEADER, await AuthService.GetRefreshTokenCookie(newRefreshToken));
+		return response;
 	}
 );
