@@ -6,7 +6,7 @@
 
 import { useForm } from 'react-hook-form';
 import WritePost from '@/app/_shared-components/Create/WritePost/WritePost';
-import { ENotificationStatus, EOffChainPostTopic, EProposalType, IWritePostFormFields } from '@/_shared/types';
+import { ENotificationStatus, EOffChainPostTopic, EProposalType, ICreateOffChainPostPayload, IWritePostFormFields } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
@@ -59,18 +59,29 @@ function CreateDiscussion() {
 	const { setOpenSuccessModal, setSuccessModalContent } = useSuccessModal();
 
 	const handleCreateDiscussionPost = async (values: IWritePostFormFields) => {
-		const { title, description, tags, topic, allowedCommentor } = values;
+		const { title, description, tags, topic, allowedCommentor, isAddingPoll, pollTitle, pollOptions, pollEndDate, pollVoteTypes } = values;
 		if (!title || !description) return;
 
-		setLoading(true);
-		const { data, error } = await NextApiClientService.createOffChainPost({
+		const payload: ICreateOffChainPostPayload = {
 			proposalType: EProposalType.DISCUSSION,
 			content: description,
 			title,
 			allowedCommentor,
 			tags,
 			topic: topic || EOffChainPostTopic.GENERAL
-		});
+		};
+
+		if (isAddingPoll && pollEndDate) {
+			payload.poll = {
+				title: pollTitle || '',
+				options: pollOptions || [],
+				voteTypes: pollVoteTypes || [],
+				endsAt: pollEndDate
+			};
+		}
+		setLoading(true);
+
+		const { data, error } = await NextApiClientService.createOffChainPost(payload);
 
 		if (error || !data || !data?.data?.index) {
 			setLoading(false);

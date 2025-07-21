@@ -472,6 +472,16 @@
 		"account": "Cuenta",
 		"abstain": "Abstención",
 		"onchainInfo": "Información en cadena",
+		"Poll": {
+			"endsOn": "Termina el",
+			"endedOn": "Terminó el",
+			"noVotes": "No hay votos todavía",
+			"anonVotes": "Votos anónimos",
+			"viewPollVotes": "Ver votos de la encuesta",
+			"pollVotesList": "Lista de votos de la encuesta",
+			"seeMore": "Ver más",
+			"seeLess": "Ver menos"
+		},
 		"nestedVotes": "Votos Anidados",
 		"flattenedVotes": "Votos Aplanados",
 		"VotesBubble": {
@@ -781,11 +791,30 @@
 			"failedToUploadImage": "Error al cargar la imagen"
 		},
 		"AllowedCommentors": {
+			"advanced": "Avanzado",
 			"title": "¿Quién puede comentar?",
 			"all": "Todos",
 			"onchainVerified": "Verificado en cadena",
 			"none": "Ninguno",
 			"tooltip": "Elige quién puede comentar y responder a esta publicación"
+		},
+		"AddPoll": {
+			"addPoll": "Añadir Encuesta",
+			"title": "Título",
+			"options": "Opciones",
+			"titleRequired": "Por favor proporciona un título válido.",
+			"settings": "Configuración",
+			"anonymousPolls": "Encuestas anónimas (El nombre del votante no será visible)",
+			"maskedPolls": "Encuestas enmascaradas (El resultado solo se muestra después de que un usuario haya votado en la encuesta)",
+			"addAnotherOption": "Agregar otra opción..",
+			"pollEndsIn": "La encuesta termina en",
+			"optionDuplicated": "Esta opción está duplicada",
+			"optionsDuplicated": "Las opciones de la encuesta no pueden ser duplicadas",
+			"optionsRequired": "Al menos {min} opciones deben ser completadas",
+			"maxOptions": "Máximo {max} opciones permitidas",
+			"endDateRequired": "Por favor selecciona una fecha de finalización para la encuesta",
+			"endDateInFuture": "La fecha de finalización de la encuesta debe ser en el futuro",
+			"titlePlaceholder": "Ingrese el título de la encuesta"
 		},
 		"Topic": {
 			"general": "General",
