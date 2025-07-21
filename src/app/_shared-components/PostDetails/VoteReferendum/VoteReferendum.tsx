@@ -124,6 +124,8 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 	const { toast } = useToast();
 	const network = getCurrentNetwork();
 
+	const [reuseLock, setReuseLock] = useState<BN | null>(null);
+
 	const { setOpenSuccessModal, setSuccessModalContent } = useSuccessModal();
 
 	const trackId = track ? NETWORKS_DETAILS[`${network}`].trackDetails[`${track}`]?.trackId : undefined;
@@ -161,6 +163,30 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 			return acc.add(curr.lockPeriod ? delegatedBalance.mul(new BN(curr.lockPeriod)) : delegatedBalance.div(new BN('10')));
 		}, BN_ZERO);
 	}, [receivedDelegations]);
+
+	const fetchAddressGovernanceLock = async () => {
+		if (!userPreferences.selectedAccount?.address || !apiService) return null;
+
+		return apiService.getAddressGovernanceLock({ address: userPreferences.selectedAccount.address });
+	};
+
+	const { data: governanceLock } = useQuery({
+		queryKey: ['governanceLock', userPreferences.selectedAccount?.address],
+		queryFn: fetchAddressGovernanceLock,
+		enabled: !!userPreferences.selectedAccount?.address && !!apiService
+	});
+
+	const fetchAddressLockedBalance = async () => {
+		if (!userPreferences.selectedAccount?.address || !apiService) return null;
+		const balances = await apiService.getUserBalances({ address: userPreferences.selectedAccount.address });
+		return balances.lockedBalance;
+	};
+
+	const { data: lockedBalance } = useQuery({
+		queryKey: ['lockedBalance', userPreferences.selectedAccount?.address],
+		queryFn: fetchAddressLockedBalance,
+		enabled: !!userPreferences.selectedAccount?.address && !!apiService
+	});
 
 	const isInvalidAmount = useMemo(() => {
 		return (
@@ -260,11 +286,47 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 						<div className='flex flex-col gap-y-3'>
 							{[EVoteDecision.AYE, EVoteDecision.NAY].includes(voteDecision) ? (
 								<>
-									<BalanceInput
-										name={`${voteDecision}-balance`}
-										label={t('VoteReferendum.lockBalance')}
-										onChange={({ value }) => setBalance(value)}
-									/>
+									<div className='flex flex-col gap-y-1'>
+										<BalanceInput
+											name={`${voteDecision}-balance`}
+											label={t('VoteReferendum.lockBalance')}
+											onChange={({ value }) => {
+												setBalance(value);
+												setReuseLock(null);
+											}}
+											value={reuseLock && reuseLock.gt(BN_ZERO) ? reuseLock : undefined}
+										/>
+										<div className='flex items-center gap-x-2'>
+											{governanceLock && governanceLock.gt(BN_ZERO) && (
+												<Button
+													variant='ghost'
+													size='sm'
+													className='flex items-center gap-x-1 rounded-md bg-page_background text-xs text-delegation_card_text'
+													onClick={() => {
+														setBalance(governanceLock);
+														setReuseLock(governanceLock);
+													}}
+												>
+													<span className='font-medium'>{t('VoteReferendum.reuseGovernanceLock')}</span>
+													<span className='font-bold'>{formatBnBalance(governanceLock, { withUnit: true, compactNotation: true }, network)}</span>
+												</Button>
+											)}
+											{lockedBalance && lockedBalance.gt(BN_ZERO) && (
+												<Button
+													variant='ghost'
+													size='sm'
+													className='flex items-center gap-x-1 rounded-md bg-page_background text-xs text-delegation_card_text'
+													onClick={() => {
+														setBalance(lockedBalance);
+														setReuseLock(lockedBalance);
+													}}
+												>
+													<span className='font-medium'>{t('VoteReferendum.reuseAllLocks')}</span>
+													<span className='font-bold'>{formatBnBalance(lockedBalance, { withUnit: true, compactNotation: true }, network)}</span>
+												</Button>
+											)}
+										</div>
+									</div>
 									<div>
 										<p className='mb-3 text-sm text-wallet_btn_text'>{t('VoteReferendum.conviction')}</p>
 										<ConvictionSelector
