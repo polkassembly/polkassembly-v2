@@ -59,17 +59,17 @@ export class WalletClientService {
 	}
 
 	async getAddressesFromWallet(selectedWallet: EWallet): Promise<InjectedAccount[]> {
-		const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
-		if (!wallet) {
-			return [];
-		}
-
 		let injected: Injected | undefined;
 		try {
 			if (selectedWallet === EWallet.MIMIR) {
 				await web3Enable(APPNAME);
 				injected = await web3FromSource('mimir');
 			} else {
+				const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
+
+				if (!wallet) {
+					return [];
+				}
 				injected = await new Promise((resolve, reject) => {
 					const timeoutId = setTimeout(() => {
 						reject(new Error('Wallet Timeout'));
