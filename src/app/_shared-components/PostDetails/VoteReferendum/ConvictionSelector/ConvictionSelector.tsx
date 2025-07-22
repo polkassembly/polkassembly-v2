@@ -12,7 +12,10 @@ import { Separator } from '@/app/_shared-components/Separator';
 import { Slider } from '@/app/_shared-components/Slider';
 import { BN } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { useState } from 'react';
+import VoteIcon from '@assets/delegation/votingPower.svg';
+import LockIcon from '@assets/icons/lock.svg';
 
 const LOCK_PERIODS = ['no lockup period', '≈ 7 days', '≈ 14 days', '≈ 28 days', '≈ 56 days', '≈ 112 days', '≈ 224 days'];
 
@@ -52,13 +55,29 @@ function ConvictionSelector({
 			/>
 			<Separator />
 			<div className='flex items-center justify-between text-sm'>
-				<span className='text-wallet_btn_text'>{t('ConvictionSelector.votes')}</span>
+				<div className='flex items-center gap-x-1 text-wallet_btn_text'>
+					<Image
+						src={VoteIcon}
+						alt='vote'
+						width={20}
+						height={20}
+					/>
+					{t('ConvictionSelector.votes')}
+				</div>
 				<span className='font-semibold text-text_primary'>
 					{formatBnBalance(new BN(voteBalance.toNumber() * getConvictionMultiplier(conviction)), { withUnit: true, numberAfterComma: 2 }, network)}
 				</span>
 			</div>
 			<div className='flex items-center justify-between text-sm'>
-				<span className='text-wallet_btn_text'>{t('ConvictionSelector.lockingPeriod')}</span>
+				<div className='flex items-center gap-x-1 text-wallet_btn_text'>
+					<Image
+						src={LockIcon}
+						alt='lock'
+						width={20}
+						height={20}
+					/>
+					{t('ConvictionSelector.lockingPeriod')}
+				</div>
 				<span className='font-semibold text-text_primary'>{LOCK_PERIODS[`${conviction}`]}</span>
 			</div>
 			<p className='text-sm text-wallet_btn_text'>{t('ConvictionSelector.lockingPeriodDescription', { tokenSymbol: NETWORKS_DETAILS[`${network}`].tokenSymbol })}</p>
