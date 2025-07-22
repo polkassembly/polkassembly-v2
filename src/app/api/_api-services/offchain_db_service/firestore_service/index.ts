@@ -1630,15 +1630,21 @@ export class FirestoreService extends FirestoreUtils {
 			.offset((page - 1) * limit)
 			.get();
 
-		return {
-			items: posts.docs.map((doc) => {
+		const postsWithMetrics = await Promise.all(
+			posts.docs.map(async (doc) => {
 				const data = doc.data();
+				const metrics = await this.GetPostMetrics({ network, indexOrHash: String(data.index), proposalType });
 				return {
 					...data,
+					metrics,
 					createdAt: data.createdAt?.toDate(),
 					updatedAt: data.updatedAt?.toDate()
 				} as IOffChainPost;
-			}),
+			})
+		);
+
+		return {
+			items: postsWithMetrics,
 			totalCount: totalCount.data().count
 		};
 	}
