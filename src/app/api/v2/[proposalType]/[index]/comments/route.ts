@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { AIService } from '@/app/api/_api-services/ai_service';
 import { fetchCommentsVoteData } from '@/app/api/_api-utils/fetchCommentsVoteData.server';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -44,10 +45,11 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const zodBodySchema = z.object({
 		content: z.string().min(1, 'Content is required'),
 		parentCommentId: z.string().optional(),
-		sentiment: z.nativeEnum(ECommentSentiment).optional()
+		sentiment: z.nativeEnum(ECommentSentiment).optional(),
+		autherAddress: z.string().optional()
 	});
 
-	const { content, parentCommentId, sentiment } = zodBodySchema.parse(await getReqBody(req));
+	const { content, parentCommentId, sentiment, autherAddress } = zodBodySchema.parse(await getReqBody(req));
 
 	const newComment = await OffChainDbService.AddNewComment({
 		network,
@@ -56,7 +58,8 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
 		content,
 		parentCommentId,
-		sentiment
+		sentiment,
+		autherAddress: getSubstrateAddress(autherAddress || '') || undefined
 	});
 
 	await AIService.UpdatePostCommentsSummary({ network, proposalType, indexOrHash: index, newCommentId: newComment.id });

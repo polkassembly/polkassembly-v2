@@ -408,7 +408,8 @@ export class OffChainDbService {
 		indexOrHash,
 		metadata,
 		subActivityName,
-		commentId
+		commentId,
+		autherAddress
 	}: {
 		userId?: number;
 		address?: string;
@@ -419,6 +420,7 @@ export class OffChainDbService {
 		metadata?: IActivityMetadata;
 		subActivityName?: EActivityName;
 		commentId?: string;
+		autherAddress?: string;
 	}): Promise<void> {
 		const activity: IUserActivity = {
 			id: '', // Firestore service class will generate this
@@ -432,6 +434,7 @@ export class OffChainDbService {
 			...(metadata && { metadata }),
 			...(subActivityName && { subActivityName }),
 			...(commentId && { commentId }),
+			...(autherAddress && { autherAddress }),
 			createdAt: new Date(),
 			updatedAt: new Date()
 		};
@@ -524,7 +527,8 @@ export class OffChainDbService {
 		userId,
 		content,
 		parentCommentId,
-		sentiment
+		sentiment,
+		autherAddress
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -533,6 +537,7 @@ export class OffChainDbService {
 		content: string;
 		parentCommentId?: string;
 		sentiment?: ECommentSentiment;
+		autherAddress?: string;
 	}) {
 		// check if the post is allowed to be commented on
 		const post = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
@@ -541,7 +546,7 @@ export class OffChainDbService {
 		}
 		// TODO: implement on-chain check
 
-		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, sentiment });
+		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, sentiment, autherAddress });
 
 		await this.saveUserActivity({
 			userId,
@@ -549,7 +554,8 @@ export class OffChainDbService {
 			network,
 			proposalType,
 			indexOrHash,
-			metadata: { commentId: comment.id, ...(parentCommentId && { parentCommentId }) }
+			metadata: { commentId: comment.id, ...(parentCommentId && { parentCommentId }) },
+			autherAddress
 		});
 
 		await FirestoreService.UpdateLastCommentAtPost({ network, indexOrHash, proposalType, lastCommentAt: comment.createdAt });

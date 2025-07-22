@@ -14,6 +14,7 @@ import { IoMdSync } from '@react-icons/all-files/io/IoMdSync';
 import { useTranslations } from 'next-intl';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { cn } from '@/lib/utils';
 import Address from '../Profile/Address/Address';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
@@ -188,7 +189,7 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 	);
 }
 
-function AddressSwitchButton({ disabled }: { disabled?: boolean }) {
+function AddressSwitchButton({ disabled, showLinkedAccountBadge = false }: { disabled?: boolean; showLinkedAccountBadge?: boolean }) {
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
 	const [isOpen, setisOpen] = useState(false);
@@ -224,6 +225,7 @@ function AddressSwitchButton({ disabled }: { disabled?: boolean }) {
 					small
 					withRadioSelect
 					withBalance
+					showLinkedAccountBadge={showLinkedAccountBadge}
 				/>
 
 				<div className='flex max-h-[60vh] flex-col gap-2 overflow-y-auto'>
@@ -259,12 +261,16 @@ export default function AddressRelationsPicker({
 	withBalance = false,
 	showPeopleChainBalance = false,
 	showVotingBalance = false,
-	disabled
+	disabled,
+	showLinkedAccountBadge = false,
+	className
 }: {
 	withBalance?: boolean;
 	showPeopleChainBalance?: boolean;
 	showVotingBalance?: boolean;
 	disabled?: boolean;
+	showLinkedAccountBadge?: boolean;
+	className?: string;
 }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const walletService = useWalletService();
@@ -317,7 +323,7 @@ export default function AddressRelationsPicker({
 				/>
 			)}
 
-			<div className='flex items-center gap-2 rounded border border-primary_border p-2'>
+			<div className={cn('flex items-center gap-2 rounded border border-primary_border p-2', className)}>
 				{accountsLoading || !selectedAddress ? (
 					<Skeleton className='h-6 w-32' />
 				) : (
@@ -336,7 +342,10 @@ export default function AddressRelationsPicker({
 						</span>
 					</div>
 				)}
-				<AddressSwitchButton disabled={disabled} />
+				<AddressSwitchButton
+					disabled={disabled}
+					showLinkedAccountBadge={showLinkedAccountBadge}
+				/>
 			</div>
 		</div>
 	);

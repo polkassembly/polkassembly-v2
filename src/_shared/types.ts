@@ -716,6 +716,7 @@ export interface IComment {
 	aiSentiment?: ECommentSentiment;
 	history?: IOffChainContentHistoryItem[];
 	disabled?: boolean;
+	autherAddress?: string;
 }
 
 export interface ICommentResponse extends IComment {

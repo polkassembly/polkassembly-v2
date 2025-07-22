@@ -106,7 +106,8 @@
 		"hidePassword": "Passwort verbergen",
 		"showPassword": "Passwort anzeigen",
 		"pleaseConnectWallet": "Bitte verbinden Sie Ihre Brieftasche mit Polkassembly.",
-		"pleaseCheckConnectedAccounts": "Bitte überprüfen Sie die verbundenen Konten in der Erweiterung."
+		"pleaseCheckConnectedAccounts": "Bitte überprüfen Sie die verbundenen Konten in der Erweiterung.",
+		"linkedAccount": "Verknüpftes Konto"
 	},
 	"AddressRelationsPicker": {
 		"Switch": "Wechseln",

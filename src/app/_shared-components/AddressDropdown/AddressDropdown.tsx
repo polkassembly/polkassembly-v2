@@ -13,6 +13,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { AlertCircle } from 'lucide-react';
 import { EAccountType, ISelectedAccount } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { useUser } from '@/hooks/useUser';
 import classes from './AddressDropdown.module.scss';
 import { Alert, AlertDescription } from '../Alert';
 import Balance from '../Balance';
@@ -28,7 +29,8 @@ function AddressDropdown({
 	disabled,
 	withRadioSelect,
 	onRadioSelect,
-	showPeopleChainBalance = false
+	showPeopleChainBalance = false,
+	showLinkedAccountBadge = false
 }: {
 	onChange?: (account: InjectedAccount) => void;
 	withBalance?: boolean;
@@ -36,8 +38,10 @@ function AddressDropdown({
 	withRadioSelect?: boolean;
 	onRadioSelect?: (address: string) => void;
 	showPeopleChainBalance?: boolean;
+	showLinkedAccountBadge?: boolean;
 }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
+	const { user } = useUser();
 	const t = useTranslations();
 	const walletService = useWalletService();
 
@@ -165,6 +169,12 @@ function AddressDropdown({
 								<AccountTypeBadge accountType={userPreferences?.selectedAccount?.accountType || EAccountType.REGULAR} />
 								{userPreferences?.selectedAccount?.parent && <AccountTypeBadge accountType={userPreferences?.selectedAccount?.parent?.accountType || EAccountType.REGULAR} />}
 							</div>
+							{/* Badge for the linked account */}
+							{showLinkedAccountBadge && user?.addresses.includes(userPreferences?.selectedAccount?.address || '') && (
+								<span className='inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium capitalize text-green-700 ring-1 ring-inset ring-green-700/10'>
+									{t('AddressDropdown.linkedAccount')}
+								</span>
+							)}
 						</div>
 					</DropdownMenuTrigger>
 				</div>
@@ -191,6 +201,11 @@ function AddressDropdown({
 										<div className='flex items-center gap-1'>
 											<AccountTypeBadge accountType={EAccountType.REGULAR} />
 										</div>
+										{showLinkedAccountBadge && user?.addresses.includes(item.address) && (
+											<span className='inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium capitalize text-green-700 ring-1 ring-inset ring-green-700/10'>
+												{t('AddressDropdown.linkedAccount')}
+											</span>
+										)}
 									</div>
 								</Label>
 							</div>

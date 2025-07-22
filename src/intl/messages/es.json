@@ -106,7 +106,8 @@
 		"hidePassword": "Ocultar contraseña",
 		"showPassword": "Mostrar contraseña",
 		"pleaseConnectWallet": "Por favor conecte su billetera a Polkassembly.",
-		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión."
+		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión.",
+		"linkedAccount": "Cuenta Vinculada"
 	},
 	"AddressRelationsPicker": {
 		"Switch": "Cambiar",

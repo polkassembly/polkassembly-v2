@@ -13,12 +13,25 @@ export class CommentClientService extends NextApiClientService {
 		});
 	}
 
-	static async addCommentToPost({ proposalType, index, content, parentCommentId }: { proposalType: EProposalType; index: string; content: string; parentCommentId?: string }) {
+	static async addCommentToPost({
+		proposalType,
+		index,
+		content,
+		parentCommentId,
+		autherAddress
+	}: {
+		proposalType: EProposalType;
+		index: string;
+		content: string;
+		parentCommentId?: string;
+		autherAddress?: string;
+	}) {
 		return this.addCommentToPostApi({
 			proposalType,
 			index,
 			content,
-			parentCommentId
+			parentCommentId,
+			autherAddress
 		});
 	}
 

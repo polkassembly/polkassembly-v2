@@ -106,7 +106,8 @@
 		"hidePassword": "隐藏密码",
 		"showPassword": "显示密码",
 		"pleaseConnectWallet": "请将您的钱包连接到Polkassembly。",
-		"pleaseCheckConnectedAccounts": "请检查扩展中的已连接账户。"
+		"pleaseCheckConnectedAccounts": "请检查扩展中的已连接账户。",
+		"linkedAccount": "链接的账户"
 	},
 	"AddressRelationsPicker": {
 		"Switch": "切换",
@@ -803,7 +804,7 @@
 		"AddPoll": {
 			"addPoll": "添加投票",
 			"title": "标题",
-			"options": "选项",	
+			"options": "选项",
 			"titleRequired": "请提供有效的标题。",
 			"settings": "设置",
 			"anonymousPolls": "匿名投票（投票者姓名将不可见）",
