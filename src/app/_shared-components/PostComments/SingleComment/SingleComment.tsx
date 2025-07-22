@@ -237,7 +237,7 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 					<span className={classes.username}>
 						{addressToDisplay ? (
 							<Address
-								address={comment.autherAddress || addressToDisplay}
+								address={comment.authorAddress || addressToDisplay}
 								showIdenticon={false}
 							/>
 						) : (

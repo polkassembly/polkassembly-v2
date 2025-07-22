@@ -95,7 +95,7 @@ function AddComment({
 				index: proposalIndex,
 				content: commentContent,
 				parentCommentId,
-				autherAddress: userPreferences?.selectedAccount?.address || undefined
+				authorAddress: userPreferences?.selectedAccount?.address || undefined
 			});
 
 			if (error || !data) {

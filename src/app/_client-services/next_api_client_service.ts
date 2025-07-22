@@ -618,13 +618,13 @@ export class NextApiClientService {
 		index,
 		content,
 		parentCommentId,
-		autherAddress
+		authorAddress
 	}: {
 		proposalType: EProposalType;
 		index: string;
 		content: string;
 		parentCommentId?: string;
-		autherAddress?: string;
+		authorAddress?: string;
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_COMMENT, routeSegments: [proposalType, index, 'comments'] });
 		return this.nextApiClientFetch<IComment>({
@@ -633,7 +633,7 @@ export class NextApiClientService {
 			data: {
 				content,
 				parentCommentId,
-				autherAddress
+				authorAddress
 			}
 		});
 	}

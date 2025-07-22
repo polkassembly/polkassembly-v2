@@ -46,10 +46,10 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		content: z.string().min(1, 'Content is required'),
 		parentCommentId: z.string().optional(),
 		sentiment: z.nativeEnum(ECommentSentiment).optional(),
-		autherAddress: z.string().optional()
+		authorAddress: z.string().optional()
 	});
 
-	const { content, parentCommentId, sentiment, autherAddress } = zodBodySchema.parse(await getReqBody(req));
+	const { content, parentCommentId, sentiment, authorAddress } = zodBodySchema.parse(await getReqBody(req));
 
 	const newComment = await OffChainDbService.AddNewComment({
 		network,
@@ -59,7 +59,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		content,
 		parentCommentId,
 		sentiment,
-		autherAddress: getSubstrateAddress(autherAddress || '') || undefined
+		authorAddress: getSubstrateAddress(authorAddress || '') || undefined
 	});
 
 	await AIService.UpdatePostCommentsSummary({ network, proposalType, indexOrHash: index, newCommentId: newComment.id });

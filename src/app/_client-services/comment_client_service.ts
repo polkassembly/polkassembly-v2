@@ -18,20 +18,20 @@ export class CommentClientService extends NextApiClientService {
 		index,
 		content,
 		parentCommentId,
-		autherAddress
+		authorAddress
 	}: {
 		proposalType: EProposalType;
 		index: string;
 		content: string;
 		parentCommentId?: string;
-		autherAddress?: string;
+		authorAddress?: string;
 	}) {
 		return this.addCommentToPostApi({
 			proposalType,
 			index,
 			content,
 			parentCommentId,
-			autherAddress
+			authorAddress
 		});
 	}
 
