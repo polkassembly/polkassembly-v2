@@ -33,7 +33,7 @@ function Posts({ addresses }: { addresses: string[] }) {
 	const [selectedPosts, setSelectedPosts] = useState<EPostsType>(EPostsType.OPEN_GOV);
 
 	const fetchUserPosts = async () => {
-		const { data: userPostsData, error: userPostsError } = await NextApiClientService.getUserPosts({
+		const { data: userPostsData, error: userPostsError } = await NextApiClientService.getUserPostsByAddress({
 			address: getEncodedAddress(selectedAddress, network) || '',
 			page,
 			limit: DEFAULT_LISTING_LIMIT
