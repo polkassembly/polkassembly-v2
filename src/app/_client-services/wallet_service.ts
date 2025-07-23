@@ -8,7 +8,7 @@ import { Signer } from '@polkadot/types/types';
 import { APPNAME } from '@/_shared/_constants/appName';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { stringToHex } from '@polkadot/util';
-import { isWeb3Injected, web3Enable, web3FromSource } from '@polkadot/extension-dapp';
+import { isWeb3Injected } from '@polkadot/extension-dapp';
 import { inject } from '@mimirdev/apps-inject';
 import { PolkadotApiService } from './polkadot_api_service';
 import { IdentityService } from './identity_service';
@@ -59,17 +59,19 @@ export class WalletClientService {
 	}
 
 	async getAddressesFromWallet(selectedWallet: EWallet): Promise<InjectedAccount[]> {
-		const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
-		if (!wallet) {
-			return [];
-		}
-
 		let injected: Injected | undefined;
 		try {
 			if (selectedWallet === EWallet.MIMIR) {
+				const { web3Enable, web3FromSource } = await import('@polkadot/extension-dapp');
+
 				await web3Enable(APPNAME);
 				injected = await web3FromSource('mimir');
 			} else {
+				const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
+
+				if (!wallet) {
+					return [];
+				}
 				injected = await new Promise((resolve, reject) => {
 					const timeoutId = setTimeout(() => {
 						reject(new Error('Wallet Timeout'));

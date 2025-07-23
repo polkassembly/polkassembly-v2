@@ -22,7 +22,6 @@ import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IPayout, ISelectedAccount, IVoteCartItem } from '@shared/types';
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
 import { APPNAME } from '@/_shared/_constants/appName';
-import { web3Enable, web3FromSource } from '@polkadot/extension-dapp';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
 import { BlockCalculationsService } from './block_calculations_service';
 import { isMimirDetected } from './isMimirDetected';
@@ -164,6 +163,8 @@ export class PolkadotApiService {
 		const isMimirIframe = await isMimirDetected();
 
 		if (isMimirIframe) {
+			const { web3Enable, web3FromSource } = await import('@polkadot/extension-dapp');
+
 			await web3Enable(APPNAME);
 			const injected = await web3FromSource('mimir');
 			const isMimir = injected.name === 'mimir';

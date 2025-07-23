@@ -239,10 +239,6 @@ function AddComment({
 			}
 
 			onSuccess?.(data);
-		},
-		onSettled: () => {
-			// Always refetch after error or success to ensure consistency
-			queryClient.invalidateQueries({ queryKey: [EReactQueryKeys.COMMENTS, proposalType, proposalIndex] });
 		}
 	});
 
