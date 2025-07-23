@@ -50,7 +50,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		sentiment: z.nativeEnum(ECommentSentiment).optional(),
 		authorAddress: z
 			.string()
-			.refine((address) => ValidatorService.isValidWeb3Address(address), ERROR_MESSAGES.INVALID_EVM_ADDRESS)
+			.refine((address) => ValidatorService.isValidSubstrateAddress(address), ERROR_MESSAGES.INVALID_SUBSTRATE_ADDRESS)
 			.optional()
 	});
 
