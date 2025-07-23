@@ -87,8 +87,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		post = { ...post, contentSummary };
 	}
 
-	// treasury stats
-
+	// beneficiaries stats
 	if (post?.onChainInfo && post.onChainInfo.beneficiaries && post.onChainInfo.beneficiaries.length > 0) {
 		const beneficiariesStats = await OffChainDbService.GetBeneficiariesStats({
 			network,
