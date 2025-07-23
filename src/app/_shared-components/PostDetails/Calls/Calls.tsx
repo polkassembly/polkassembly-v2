@@ -3,18 +3,14 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 /* eslint-disable no-underscore-dangle */
-import { EAssets, IBeneficiary, IProposalArguments } from '@/_shared/types';
+import { IBeneficiary, IProposalArguments } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { useTokenUSDPrice } from '@/hooks/useCurrentTokenUSDPrice';
-import { useDEDTokenUSDPrice } from '@/hooks/useDEDTokenUSDPrice';
-import { useEffect, useCallback, useState, useMemo, memo } from 'react';
-import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { useCallback, useState, useMemo, memo } from 'react';
 import { ChevronRightIcon } from 'lucide-react';
 import { Skeleton } from '../../Skeleton';
 import classes from './Call.module.scss';
-import BeneficiaryPaymentsList from '../BeneficiariesDetails/BeneficiaryPaymentsList';
+import BeneficiaryPayoutsList from '../BeneficiariesDetails/BeneficiaryPayoutsList';
 import { Dialog, DialogContent, DialogTrigger } from '../../Dialog/Dialog';
 import ArgumentsTableJSONView from '../OnchainInfo/ArgumentsTableJSONView';
 import { Button } from '../../Button';
@@ -31,46 +27,6 @@ const extractCallDetails = (args?: IProposalArguments): Array<{ section: string;
 		}
 		return acc;
 	}, []);
-};
-
-// Custom hook for token prices
-const useTokenPrices = (beneficiaries?: IBeneficiary[]) => {
-	const network = getCurrentNetwork();
-	const { getCachedTokenUSDPrice } = useTokenUSDPrice();
-	const { getCachedDEDTokenUSDPrice } = useDEDTokenUSDPrice();
-	const [currentTokenPrice, setCurrentTokenPrice] = useState<string | null>(null);
-	const [dedTokenUSDPrice, setDEDTokenUSDPrice] = useState<string | null>(null);
-
-	// Memoize conditions to prevent unnecessary re-renders
-	const needsTokenPrice = useMemo(() => beneficiaries?.some((beneficiary) => !beneficiary.assetId) ?? false, [beneficiaries]);
-
-	const needsDEDPrice = useMemo(
-		() =>
-			beneficiaries?.some((beneficiary) => beneficiary.assetId && getAssetDataByIndexForNetwork({ network, generalIndex: beneficiary.assetId })?.symbol === EAssets.DED) ?? false,
-		[beneficiaries, network]
-	);
-
-	const fetchTokenPrices = useCallback(async () => {
-		const promises: Promise<void>[] = [];
-
-		if (needsTokenPrice) {
-			promises.push(getCachedTokenUSDPrice().then(setCurrentTokenPrice));
-		}
-
-		if (needsDEDPrice) {
-			promises.push(getCachedDEDTokenUSDPrice().then(setDEDTokenUSDPrice));
-		}
-
-		await Promise.all(promises);
-	}, [needsTokenPrice, needsDEDPrice, getCachedTokenUSDPrice, getCachedDEDTokenUSDPrice]);
-
-	useEffect(() => {
-		if (needsTokenPrice || needsDEDPrice) {
-			fetchTokenPrices();
-		}
-	}, [fetchTokenPrices, needsTokenPrice, needsDEDPrice]);
-
-	return { currentTokenPrice, dedTokenUSDPrice };
 };
 
 // Separate component for proposal hash display
@@ -165,27 +121,23 @@ const CallsDisplay = memo(({ args, isFetching }: { args?: IProposalArguments; is
 CallsDisplay.displayName = 'CallsDisplay';
 
 // Separate component for beneficiaries display
-const BeneficiariesDisplay = memo(
-	({ beneficiaries, currentTokenPrice, dedTokenUSDPrice }: { beneficiaries?: IBeneficiary[]; currentTokenPrice: string | null; dedTokenUSDPrice: string | null }) => {
-		const t = useTranslations();
+const BeneficiariesDisplay = memo(({ beneficiaries }: { beneficiaries?: IBeneficiary[] }) => {
+	const t = useTranslations();
 
-		if (!beneficiaries?.length) return null;
+	if (!beneficiaries?.length) return null;
 
-		return (
-			<div className={classes.infoRow}>
-				<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.requested')}</p>
-				<p className={classes.infoRowValue}>
-					<BeneficiaryPaymentsList
-						currentTokenPrice={currentTokenPrice}
-						dedTokenUSDPrice={dedTokenUSDPrice}
-						beneficiaries={beneficiaries}
-						usedInOnchainInfo
-					/>
-				</p>
-			</div>
-		);
-	}
-);
+	return (
+		<div className={classes.infoRow}>
+			<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.requested')}</p>
+			<p className={classes.infoRowValue}>
+				<BeneficiaryPayoutsList
+					beneficiaries={beneficiaries}
+					usedInOnchainInfo
+				/>
+			</p>
+		</div>
+	);
+});
 
 BeneficiariesDisplay.displayName = 'BeneficiariesDisplay';
 
@@ -198,8 +150,6 @@ interface CallsProps {
 }
 
 const Calls = memo(({ proposalHash, beneficiaries, args, isFetching }: CallsProps) => {
-	const { currentTokenPrice, dedTokenUSDPrice } = useTokenPrices(beneficiaries);
-
 	return (
 		<div>
 			<ProposalHashDisplay proposalHash={proposalHash} />
@@ -207,11 +157,7 @@ const Calls = memo(({ proposalHash, beneficiaries, args, isFetching }: CallsProp
 				args={args}
 				isFetching={isFetching}
 			/>
-			<BeneficiariesDisplay
-				beneficiaries={beneficiaries}
-				currentTokenPrice={currentTokenPrice}
-				dedTokenUSDPrice={dedTokenUSDPrice}
-			/>
+			<BeneficiariesDisplay beneficiaries={beneficiaries} />
 		</div>
 	);
 });

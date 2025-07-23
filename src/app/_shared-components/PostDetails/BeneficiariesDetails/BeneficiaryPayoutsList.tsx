@@ -8,8 +8,6 @@ import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/netwo
 import Image from 'next/image';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
-import { calculateAssetUSDValue } from '@/app/_client-utils/calculateAssetUSDValue';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import Link from 'next/link';
@@ -25,10 +23,8 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '../../Tooltip';
 import classes from './BeneficiariesDetails.module.scss';
 import { Button } from '../../Button';
 
-interface BeneficiaryPaymentsListProps {
+interface BeneficiaryPayoutsListProps {
 	beneficiaries: IBeneficiary[];
-	currentTokenPrice: string | null;
-	dedTokenUSDPrice: string | null;
 	usedInOnchainInfo?: boolean;
 }
 
@@ -86,49 +82,19 @@ function PayoutExpiryDisplay({ validFromBlock, payoutExpiry }: PayoutExpiryProps
 	return <div className={classes.beneficiariesExpireIn}>{payoutExpiry}</div>;
 }
 
-interface PaymentItemProps {
+interface BeneficiaryPaymentItemProps {
 	beneficiary: IBeneficiaryPayoutDetails;
-	currentTokenPrice: string | null;
-	dedTokenUSDPrice: string | null;
 	usedInOnchainInfo?: boolean;
 	isLastItem: boolean;
 }
 
-function PaymentItem({ beneficiary, currentTokenPrice, dedTokenUSDPrice, usedInOnchainInfo, isLastItem }: PaymentItemProps) {
+function BeneficiaryPaymentItem({ beneficiary, usedInOnchainInfo, isLastItem }: BeneficiaryPaymentItemProps) {
 	const t = useTranslations('PostDetails.BeneficiariesDetails');
 	const network = getCurrentNetwork();
 
-	const assetUnit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${beneficiary.assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || beneficiary.assetId;
+	const assetUnit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${beneficiary.assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol;
 
 	const assetIcon = treasuryAssetsData[assetUnit as EAssets]?.icon || NETWORKS_DETAILS[`${network}`].logo;
-
-	const assetSymbol = beneficiary.assetId
-		? (getAssetDataByIndexForNetwork({
-				network,
-				generalIndex: beneficiary.assetId
-			}).symbol as unknown as Exclude<EAssets, EAssets.MYTH>)
-		: null;
-
-	const shouldShowUSDValue = ![EAssets.USDC, EAssets.USDT].includes(assetSymbol as EAssets);
-
-	const formattedAmount = formatUSDWithUnits(
-		formatBnBalance(
-			beneficiary.amount.toString(),
-			{ withUnit: true, numberAfterComma: 2 },
-			network,
-			beneficiary.assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : beneficiary.assetId
-		)
-	);
-
-	const usdValue = shouldShowUSDValue
-		? calculateAssetUSDValue({
-				amount: beneficiary.amount,
-				asset: assetSymbol,
-				currentTokenPrice,
-				dedTokenUSDPrice,
-				network
-			})?.toString()
-		: null;
 
 	return (
 		<div className='flex flex-col gap-3'>
@@ -142,8 +108,19 @@ function PaymentItem({ beneficiary, currentTokenPrice, dedTokenUSDPrice, usedInO
 							height={20}
 							className='rounded-full'
 						/>
-						<div className={cn(classes.beneficiariesDialogListItemAmount, usedInOnchainInfo ? 'text-sm font-medium' : '')}>{formattedAmount}</div>
-						{shouldShowUSDValue && usdValue && <div className={cn(classes.beneficiariesDialogListItemAmountUSD)}>${formatUSDWithUnits(usdValue, 1)}</div>}
+						<div className={cn(classes.beneficiariesDialogListItemAmount, usedInOnchainInfo ? 'text-sm font-medium' : '')}>
+							{formatUSDWithUnits(
+								formatBnBalance(
+									beneficiary.amount.toString(),
+									{ withUnit: true, numberAfterComma: 2 },
+									network,
+									beneficiary.assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : beneficiary.assetId
+								)
+							)}
+						</div>
+						{beneficiary.usdAmount && ![EAssets.USDC, EAssets.USDT].includes(assetUnit as EAssets) && (
+							<div className={cn(classes.beneficiariesDialogListItemAmountUSD)}>${formatUSDWithUnits(beneficiary.usdAmount, 1)}</div>
+						)}
 						<span className={classes.beneficiariesDialogListItemTo}>{t('to')}</span>
 						<Address
 							address={beneficiary.address}
@@ -166,7 +143,7 @@ function PaymentItem({ beneficiary, currentTokenPrice, dedTokenUSDPrice, usedInO
 }
 
 // main component
-function BeneficiaryPaymentsList({ beneficiaries, currentTokenPrice, dedTokenUSDPrice, usedInOnchainInfo }: BeneficiaryPaymentsListProps) {
+function BeneficiaryPayoutsList({ beneficiaries, usedInOnchainInfo }: BeneficiaryPayoutsListProps) {
 	const t = useTranslations('PostDetails.BeneficiariesDetails');
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
@@ -222,11 +199,9 @@ function BeneficiaryPaymentsList({ beneficiaries, currentTokenPrice, dedTokenUSD
 	return (
 		<div className={cn(classes.beneficiariesDetailsDialogContentList, usedInOnchainInfo ? 'gap-2' : 'mt-6')}>
 			{visibleBeneficiaries.map((beneficiary, index) => (
-				<PaymentItem
+				<BeneficiaryPaymentItem
 					key={`${beneficiary.address}-${beneficiary.validFromBlock || 'immediate'}`}
 					beneficiary={beneficiary}
-					currentTokenPrice={currentTokenPrice}
-					dedTokenUSDPrice={dedTokenUSDPrice}
 					usedInOnchainInfo={usedInOnchainInfo}
 					isLastItem={index === visibleBeneficiaries.length - 1}
 				/>
@@ -247,4 +222,4 @@ function BeneficiaryPaymentsList({ beneficiaries, currentTokenPrice, dedTokenUSD
 	);
 }
 
-export default BeneficiaryPaymentsList;
+export default BeneficiaryPayoutsList;

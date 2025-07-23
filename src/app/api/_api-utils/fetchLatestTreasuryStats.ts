@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import { EAssets, ENetwork, ITreasuryStats } from '@/_shared/types';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { BN, BN_ZERO } from '@polkadot/util';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/networks';
 import { decimalToBN } from '@/_shared/_utils/decimalToBN';
 import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 import { APIError } from './apiError';
@@ -464,6 +464,22 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 				...(data[String(network)].usd_24h_change && { nativeTokenUsdPrice24hChange: data[String(network)].usd_24h_change.toString() })
 			};
 		};
+		const fetchDEDTokenPriceInUsd = async () => {
+			const ids = treasuryAssetsData[EAssets.DED].name;
+
+			const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`).then((res) => res.json());
+			// check if data is of type CoinGeckoResponse
+			if (!response || typeof response !== 'object' || !(ids in response) || !('usd' in response[String(ids)]) || typeof response[String(ids)]?.usd !== 'number') {
+				return;
+			}
+
+			const data = response as CoinGeckoResponse;
+			treasuryStats = {
+				...treasuryStats,
+				dedTokenUsdPrice: data[String(ids)].usd.toString(),
+				...(data[String(ids)].usd_24h_change && { dedTokenUsdPrice24hChange: data[String(ids)].usd_24h_change.toString() })
+			};
+		};
 
 		// Fetch MYTH price from CoinGecko
 		const fetchMythPriceInUsd = async (): Promise<number | undefined> => {
@@ -478,7 +494,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 
 		// Execute all tasks
 		const mythPriceInUsd = await fetchMythPriceInUsd();
-		await Promise.all([Promise.all(relayChainTasks), Promise.all(assetHubTasks), fetchHydrationBalances(), fetchNativeTokenPriceInUsd()]);
+		await Promise.all([Promise.all(relayChainTasks), Promise.all(assetHubTasks), fetchHydrationBalances(), fetchNativeTokenPriceInUsd(), fetchDEDTokenPriceInUsd()]);
 
 		// Calculate totals after all data is fetched
 		const calculateTotal = (propertyName: 'nativeToken' | 'usdc' | 'usdt' | 'myth'): string => {

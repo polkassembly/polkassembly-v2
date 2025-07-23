@@ -565,11 +565,16 @@ export interface IBeneficiary {
 	amount: string;
 	assetId?: string | null;
 	validFromBlock?: string;
+	usdAmount?: string;
 }
 
 export interface IBeneficiaryInput extends IBeneficiary {
 	id?: string;
 	isInvalid?: boolean;
+}
+export interface IBeneficiariesStats {
+	beneficiaries: IBeneficiary[];
+	totalUsdAmount?: string;
 }
 
 export interface IStatusHistoryItem {
@@ -594,6 +599,7 @@ export interface IOnChainPostInfo {
 	description?: string;
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
+	beneficiariesStats?: IBeneficiariesStats;
 	preparePeriodEndsAt?: Date;
 	decisionPeriodEndsAt?: Date;
 	confirmationPeriodEndsAt?: Date;
@@ -1137,6 +1143,8 @@ export interface ITreasuryStats {
 	};
 	nativeTokenUsdPrice?: string;
 	nativeTokenUsdPrice24hChange?: string;
+	dedTokenUsdPrice?: string;
+	dedTokenUsdPrice24hChange?: string;
 	[key: string]: unknown;
 }
 

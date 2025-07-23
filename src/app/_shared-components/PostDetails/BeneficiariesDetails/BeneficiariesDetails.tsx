@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { IBeneficiary } from '@/_shared/types';
+import { IBeneficiariesStats, IBeneficiary } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { ChevronRightIcon } from 'lucide-react';
@@ -15,7 +15,7 @@ import BeneficiariesDetailsDialog from './BeneficiariesDetailsDialog';
 import BeneficiaryItem from './BeneficiaryItem';
 
 // Main component
-function BeneficiariesDetails({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
+function BeneficiariesDetails({ beneficiariesStats, beneficiaries }: { beneficiariesStats?: IBeneficiariesStats; beneficiaries: IBeneficiary[] }) {
 	const t = useTranslations('PostDetails.BeneficiariesDetails');
 	const [openDialog, setOpenDialog] = useState(false);
 	const network = getCurrentNetwork();
@@ -58,6 +58,7 @@ function BeneficiariesDetails({ beneficiaries }: { beneficiaries: IBeneficiary[]
 				open={openDialog}
 				onOpenChange={setOpenDialog}
 				beneficiaries={beneficiaries}
+				beneficiariesStats={beneficiariesStats}
 			/>
 		</div>
 	);

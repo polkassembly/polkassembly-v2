@@ -38,7 +38,8 @@ import {
 	ESocialVerificationStatus,
 	ESocial,
 	IPostLink,
-	IOffChainPollPayload
+	IOffChainPollPayload,
+	IBeneficiary
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -966,5 +967,9 @@ export class OffChainDbService {
 
 	static async GetPollVotes({ network, proposalType, index, pollId }: { network: ENetwork; proposalType: EProposalType; index: number; pollId: string }) {
 		return FirestoreService.GetPollVotes({ network, proposalType, index, pollId });
+	}
+
+	static async GetBeneficiariesStats({ network, beneficiaries }: { network: ENetwork; beneficiaries: IBeneficiary[] }) {
+		return FirestoreService.GetBeneficiariesStats({ network, beneficiaries });
 	}
 }
