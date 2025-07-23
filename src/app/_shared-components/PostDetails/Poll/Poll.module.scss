@@ -44,7 +44,7 @@
 	@apply absolute left-0 top-0 h-full bg-bg_pink text-white transition-all duration-300 ease-in-out;
 }
 .voteItem {
-	@apply grid w-full grid-cols-3 items-center justify-center rounded-lg bg-poll_option_bg p-2 text-center text-xs font-bold text-text_primary;
+	@apply grid w-full grid-cols-3 items-center justify-center gap-x-2 rounded-lg bg-poll_option_bg p-2 text-center text-xs font-bold text-text_primary;
 }
 .noVotesWrapper {
 	@apply flex flex-col items-center justify-center py-4 text-sm text-text_primary;
