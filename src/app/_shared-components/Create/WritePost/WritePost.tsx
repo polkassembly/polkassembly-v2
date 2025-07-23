@@ -5,7 +5,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { EAllowedCommentor, EOffChainPostTopic, IWritePostFormFields } from '@/_shared/types';
+import { EAllowedCommentor, ENetwork, EOffChainPostTopic, IWritePostFormFields } from '@/_shared/types';
 import { UseFormReturn } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
 import { Input } from '@ui/Input';
@@ -157,7 +157,7 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 					</FormItem>
 				)}
 			/>
-			{network === 'paseo' && (
+			{network === ENetwork.PASEO && (
 				<AddPoll
 					formData={formData}
 					disabled={disabled || false}
