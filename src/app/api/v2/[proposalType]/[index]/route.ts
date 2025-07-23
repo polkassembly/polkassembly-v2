@@ -95,7 +95,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 			beneficiaries: post.onChainInfo?.beneficiaries || []
 		});
 		if (beneficiariesStats) {
-			post = { ...post, onChainInfo: { ...post.onChainInfo, beneficiariesStats, beneficiaries: beneficiariesStats.beneficiaries || [] } };
+			post = { ...post, onChainInfo: { ...post.onChainInfo, beneficiariesStats, beneficiaries: beneficiariesStats.beneficiaries || post.onChainInfo.beneficiaries || [] } };
 		}
 	}
 

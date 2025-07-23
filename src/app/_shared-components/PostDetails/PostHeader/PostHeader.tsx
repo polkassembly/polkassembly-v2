@@ -27,6 +27,7 @@ import SummariseIcon from '@/_assets/icons/summarise.svg';
 import { ArrowLeftIcon, ChevronsRight } from 'lucide-react';
 import { getPostDetailsUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
+import { getPostListingUrl } from '@/app/_client-utils/getPostListingUrl';
 import classes from './PostHeader.module.scss';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 
@@ -53,11 +54,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 			<div className='mb-4 flex items-center gap-x-1'>
 				<ArrowLeftIcon className='h-3 w-4' />
 				<Link
-					href={
-						postData.onChainInfo?.origin
-							? `/${postData.onChainInfo?.origin?.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}`
-							: `/${postData.proposalType?.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}s`
-					}
+					href={getPostListingUrl({ proposalType: postData.proposalType, origin: postData.onChainInfo?.origin })}
 					className='flex items-center gap-x-1 text-xs text-listing_page_btn hover:underline'
 				>
 					View All {postData.onChainInfo?.origin ? `${convertCamelCaseToTitleCase(postData.onChainInfo?.origin || '')}` : `${postData.proposalType}`}
