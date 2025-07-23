@@ -1314,4 +1314,50 @@ export class PolkadotApiService {
 			return new BN(locked).gt(max) ? new BN(locked) : max;
 		}, BN_ZERO);
 	}
+
+	async getReferendaInfo({ postId }: { postId: number }) {
+		if (!this.api) return null;
+		const referendaInfo = await this.api.query.referenda.referendumInfoFor(postId);
+		return referendaInfo.toHuman() as { [key: string]: any[] };
+	}
+
+	async refundDeposits({
+		postId,
+		address,
+		canRefundDecisionDeposit,
+		canRefundSubmissionDeposit,
+		onSuccess,
+		onFailed
+	}: {
+		postId: number;
+		address: string;
+		canRefundDecisionDeposit: boolean;
+		canRefundSubmissionDeposit: boolean;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+	}) {
+		if (!this.api) return;
+
+		const refundDecisionDepositTx = this.api.tx.referenda.refundDecisionDeposit(postId);
+		const refundSubmissionDepositTx = this.api.tx.referenda.refundSubmissionDeposit(postId);
+
+		let tx: SubmittableExtrinsic<'promise', ISubmittableResult>;
+
+		if (canRefundDecisionDeposit && canRefundSubmissionDeposit) {
+			tx = this.api.tx.utility.batchAll([refundDecisionDepositTx, refundSubmissionDepositTx]);
+		} else if (canRefundSubmissionDeposit) {
+			tx = refundSubmissionDepositTx;
+		} else {
+			tx = refundDecisionDepositTx;
+		}
+
+		await this.executeTx({
+			tx,
+			address,
+			errorMessageFallback: 'Failed to refund deposits',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true
+		});
+	}
 }
