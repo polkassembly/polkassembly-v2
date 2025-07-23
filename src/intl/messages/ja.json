@@ -606,7 +606,14 @@
 			"payoutClaimFailedDescription": "もう一度お試しください"
 		},
 		"commentsDisabled": "この投稿のコメントは無効になっています。",
-		"commentsDisabledForNonVerifiedUsers": "未認証ユーザーのコメントは無効になっています。"
+		"commentsDisabledForNonVerifiedUsers": "未認証ユーザーのコメントは無効になっています。",
+		"RefundDeposits": {
+			"refund": "返金",
+			"refundDeposits": "デポジットの返金",
+			"description": "このプロポーザルのデポジットを返金するにはここをクリックしてください",
+			"decisionDeposit": "決定デポジット",
+			"submissionDeposit": "提出デポジット"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",

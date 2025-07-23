@@ -107,6 +107,10 @@ const PlaceDecisionDeposit = dynamic(() => import('./PlaceDecisionDeposit/PlaceD
 	)
 });
 
+const RefundDeposits = dynamic(() => import('./RefundDeposits/RefundDeposits'), {
+	ssr: false
+});
+
 const ClaimPayout = dynamic(() => import('./ClaimPayout/ClaimPayout'), {
 	ssr: false,
 	loading: () => (
@@ -244,6 +248,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					</div>
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
+							{/* Place Decision Deposit */}
 							{post.proposalType === EProposalType.REFERENDUM_V2 &&
 								post.onChainInfo?.status &&
 								post.onChainInfo?.status === EProposalStatus.Submitted &&
@@ -267,6 +272,14 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 										}}
 									/>
 								)}
+
+							{/* Refund Deposits */}
+							{post.onChainInfo?.status && post.index && post.onChainInfo?.origin && (
+								<RefundDeposits
+									postId={post.index}
+									track={post.onChainInfo?.origin}
+								/>
+							)}
 							{canVote(post.onChainInfo?.status) && (
 								<VoteReferendumButton
 									iconClassName='hidden'

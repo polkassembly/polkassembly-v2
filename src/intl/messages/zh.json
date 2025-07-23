@@ -606,7 +606,14 @@
 			"payoutClaimFailedDescription": "请再试一次"
 		},
 		"commentsDisabled": "此帖子的评论功能已被禁用。",
-		"commentsDisabledForNonVerifiedUsers": "未验证用户的评论功能已被禁用。"
+		"commentsDisabledForNonVerifiedUsers": "未验证用户的评论功能已被禁用。",
+		"RefundDeposits": {
+			"refund": "退款",
+			"refundDeposits": "退还押金",
+			"description": "点击此处退还此提案的押金",
+			"decisionDeposit": "决策押金",
+			"submissionDeposit": "提交押金"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "已取消",
@@ -803,7 +810,7 @@
 		"AddPoll": {
 			"addPoll": "添加投票",
 			"title": "标题",
-			"options": "选项",	
+			"options": "选项",
 			"titleRequired": "请提供有效的标题。",
 			"settings": "设置",
 			"anonymousPolls": "匿名投票（投票者姓名将不可见）",
