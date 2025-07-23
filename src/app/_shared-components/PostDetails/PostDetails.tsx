@@ -292,10 +292,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									proposalType={post.proposalType}
 								/>
 							)}
-							<BeneficiariesDetails
-								beneficiariesStats={post.onChainInfo?.beneficiariesStats}
-								beneficiaries={post.onChainInfo?.beneficiaries || []}
-							/>
+							<BeneficiariesDetails beneficiaries={post.onChainInfo?.beneficiaries || []} />
 							<ClaimPayout beneficiaries={post.onChainInfo?.beneficiaries || []} />
 							<ProposalPeriods
 								confirmationPeriodEndsAt={post.onChainInfo?.confirmationPeriodEndsAt}

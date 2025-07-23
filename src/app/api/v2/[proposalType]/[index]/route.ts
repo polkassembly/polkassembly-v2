@@ -89,12 +89,12 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	// beneficiaries stats
 	if (post?.onChainInfo && post.onChainInfo.beneficiaries && post.onChainInfo.beneficiaries.length > 0) {
-		const beneficiariesStats = await OffChainDbService.GetBeneficiariesStats({
+		const updatedBeneficiaries = await OffChainDbService.GetBeneficiariesStats({
 			network,
 			beneficiaries: post.onChainInfo?.beneficiaries || []
 		});
-		if (beneficiariesStats) {
-			post = { ...post, onChainInfo: { ...post.onChainInfo, beneficiariesStats, beneficiaries: beneficiariesStats.beneficiaries || post.onChainInfo.beneficiaries || [] } };
+		if (updatedBeneficiaries) {
+			post = { ...post, onChainInfo: { ...post.onChainInfo, beneficiaries: updatedBeneficiaries } };
 		}
 	}
 

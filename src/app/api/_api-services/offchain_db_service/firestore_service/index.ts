@@ -43,8 +43,7 @@ import {
 	EPollVotesType,
 	IOffChainPollPayload,
 	IBeneficiary,
-	EAssets,
-	IBeneficiariesStats
+	EAssets
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -55,7 +54,6 @@ import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDeta
 import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
 import { calculateAssetUSDValue } from '@/app/_client-utils/calculateAssetUSDValue';
 import dayjs from 'dayjs';
-import { BN, BN_ZERO } from '@polkadot/util';
 import { FirestoreUtils } from './firestoreUtils';
 
 export class FirestoreService extends FirestoreUtils {
@@ -1832,13 +1830,13 @@ export class FirestoreService extends FirestoreUtils {
 		});
 	}
 
-	static async GetBeneficiariesStats({ network, beneficiaries }: { network: ENetwork; beneficiaries: IBeneficiary[] }): Promise<IBeneficiariesStats> {
+	static async GetBeneficiariesStats({ network, beneficiaries }: { network: ENetwork; beneficiaries: IBeneficiary[] }): Promise<IBeneficiary[] | null> {
 		const treasuryStats = await this.GetTreasuryStats({ network, from: dayjs().subtract(1, 'hour').toDate(), to: dayjs().toDate(), limit: 1, page: 1 });
 
 		if (!treasuryStats) {
-			return { beneficiaries };
+			return beneficiaries;
 		}
-		const updatedBeneficiaries = beneficiaries?.map((beneficiary) => {
+		return beneficiaries?.map((beneficiary) => {
 			const assetSymbol = beneficiary.assetId
 				? (getAssetDataByIndexForNetwork({
 						network,
@@ -1858,10 +1856,5 @@ export class FirestoreService extends FirestoreUtils {
 
 			return { ...beneficiary, usdAmount };
 		});
-
-		return {
-			beneficiaries: updatedBeneficiaries,
-			totalUsdAmount: updatedBeneficiaries.reduce((acc, beneficiary) => new BN(acc).add(new BN(beneficiary.usdAmount || 0)), BN_ZERO).toString()
-		};
 	}
 }

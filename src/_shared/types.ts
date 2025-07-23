@@ -572,10 +572,6 @@ export interface IBeneficiaryInput extends IBeneficiary {
 	id?: string;
 	isInvalid?: boolean;
 }
-export interface IBeneficiariesStats {
-	beneficiaries: IBeneficiary[];
-	totalUsdAmount?: string;
-}
 
 export interface IStatusHistoryItem {
 	status: EProposalStatus;
@@ -599,7 +595,6 @@ export interface IOnChainPostInfo {
 	description?: string;
 	voteMetrics?: IVoteMetrics;
 	beneficiaries?: IBeneficiary[];
-	beneficiariesStats?: IBeneficiariesStats;
 	preparePeriodEndsAt?: Date;
 	decisionPeriodEndsAt?: Date;
 	confirmationPeriodEndsAt?: Date;

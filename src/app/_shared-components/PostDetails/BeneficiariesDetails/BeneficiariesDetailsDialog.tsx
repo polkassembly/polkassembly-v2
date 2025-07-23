@@ -2,9 +2,11 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { IBeneficiariesStats, IBeneficiary } from '@/_shared/types';
+import { useMemo } from 'react';
+import { IBeneficiary } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
+import { BN, BN_ZERO } from '@polkadot/util';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
 import BeneficiariesSkeleton from './BeneficiariesSkeleton';
 import classes from './BeneficiariesDetails.module.scss';
@@ -14,11 +16,11 @@ interface BeneficiariesDetailsDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	beneficiaries: IBeneficiary[];
-	beneficiariesStats?: IBeneficiariesStats;
 }
 
-function BeneficiariesDetailsDialog({ open, onOpenChange, beneficiaries, beneficiariesStats }: BeneficiariesDetailsDialogProps) {
+function BeneficiariesDetailsDialog({ open, onOpenChange, beneficiaries }: BeneficiariesDetailsDialogProps) {
 	const t = useTranslations('PostDetails.BeneficiariesDetails');
+	const totalUsdAmount = useMemo(() => beneficiaries.reduce((acc, beneficiary) => new BN(acc).add(new BN(beneficiary.usdAmount || 0)), BN_ZERO).toString(), [beneficiaries]);
 
 	return (
 		<Dialog
@@ -33,11 +35,11 @@ function BeneficiariesDetailsDialog({ open, onOpenChange, beneficiaries, benefic
 					<BeneficiariesSkeleton usedInDialog />
 				) : (
 					<div>
-						{!!beneficiariesStats?.totalUsdAmount && (
+						{!!beneficiaries.length && (
 							<div className={classes.beneficiariesDetailsDialogContentHeader}>
 								<div className={classes.beneficiariesDetailsDialogContentHeaderAmount}>
 									<span>~</span>
-									{formatUSDWithUnits(beneficiariesStats.totalUsdAmount, 1)}
+									{formatUSDWithUnits(totalUsdAmount, 1)}
 								</div>
 								<div className={classes.beneficiariesDialogTotalEstimatedUSD}>{t('totalEstimatedUSD')}</div>
 							</div>
