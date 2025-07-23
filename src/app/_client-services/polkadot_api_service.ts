@@ -1348,7 +1348,7 @@ export class PolkadotApiService {
 		} else if (canRefundSubmissionDeposit) {
 			tx = refundSubmissionDepositTx;
 		} else {
-			tx = refundSubmissionDepositTx;
+			tx = refundDecisionDepositTx;
 		}
 
 		await this.executeTx({
