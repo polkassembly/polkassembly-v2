@@ -178,7 +178,7 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 	const network = getCurrentNetwork();
 	const userAddresses = !EVM_NETWORKS.includes(network) ? comment?.publicUser?.addresses?.filter((address) => !address.startsWith('0x')) : comment?.publicUser?.addresses;
 
-	const addressToDisplay = userAddresses?.[0] || comment?.publicUser?.addresses?.[0];
+	const addressToDisplay = comment?.authorAddress || userAddresses?.[0] || comment?.publicUser?.addresses?.[0];
 
 	return (
 		<div className={classes.wrapper}>
@@ -237,7 +237,7 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 					<span className={classes.username}>
 						{addressToDisplay ? (
 							<Address
-								address={comment.authorAddress || addressToDisplay}
+								address={addressToDisplay}
 								showIdenticon={false}
 							/>
 						) : (

@@ -81,6 +81,8 @@ function AddressDropdown({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userPreferences?.wallet, walletService]);
 
+	const isUserAddressForAccount = useCallback((address: string) => user?.addresses.includes(getSubstrateAddress(address || '') || ''), [user]);
+
 	useEffect(() => {
 		getAccounts();
 	}, [getAccounts]);
@@ -170,7 +172,7 @@ function AddressDropdown({
 								{userPreferences?.selectedAccount?.parent && <AccountTypeBadge accountType={userPreferences?.selectedAccount?.parent?.accountType || EAccountType.REGULAR} />}
 							</div>
 							{/* Badge for the linked account */}
-							{showLinkedAccountBadge && user?.addresses.includes(getSubstrateAddress(userPreferences?.selectedAccount?.address || '') || '') && (
+							{showLinkedAccountBadge && isUserAddressForAccount(userPreferences?.selectedAccount?.address || '') && (
 								<span className='inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium capitalize text-green-700 ring-1 ring-inset ring-green-700/10'>
 									{t('AddressDropdown.linkedAccount')}
 								</span>
@@ -201,7 +203,7 @@ function AddressDropdown({
 										<div className='flex items-center gap-1'>
 											<AccountTypeBadge accountType={EAccountType.REGULAR} />
 										</div>
-										{showLinkedAccountBadge && user?.addresses.includes(getSubstrateAddress(item.address) || '') && (
+										{showLinkedAccountBadge && isUserAddressForAccount(item.address) && (
 											<span className='inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium capitalize text-green-700 ring-1 ring-inset ring-green-700/10'>
 												{t('AddressDropdown.linkedAccount')}
 											</span>

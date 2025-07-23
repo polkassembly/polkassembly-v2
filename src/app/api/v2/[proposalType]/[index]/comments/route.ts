@@ -14,6 +14,8 @@ import { RedisService } from '@/app/api/_api-services/redis_service';
 import { AIService } from '@/app/api/_api-services/ai_service';
 import { fetchCommentsVoteData } from '@/app/api/_api-utils/fetchCommentsVoteData.server';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import { ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -46,7 +48,10 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		content: z.string().min(1, 'Content is required'),
 		parentCommentId: z.string().optional(),
 		sentiment: z.nativeEnum(ECommentSentiment).optional(),
-		authorAddress: z.string().optional()
+		authorAddress: z
+			.string()
+			.refine((address) => ValidatorService.isValidWeb3Address(address), ERROR_MESSAGES.INVALID_EVM_ADDRESS)
+			.optional()
 	});
 
 	const { content, parentCommentId, sentiment, authorAddress } = zodBodySchema.parse(await getReqBody(req));
@@ -59,7 +64,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		content,
 		parentCommentId,
 		sentiment,
-		authorAddress: authorAddress ? getSubstrateAddress(authorAddress) || '' : undefined
+		authorAddress: authorAddress ? (getSubstrateAddress(authorAddress) ?? undefined) : undefined
 	});
 
 	await AIService.UpdatePostCommentsSummary({ network, proposalType, indexOrHash: index, newCommentId: newComment.id });
