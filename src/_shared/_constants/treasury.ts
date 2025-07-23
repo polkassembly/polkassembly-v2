@@ -133,6 +133,6 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 			numerator: new BN(0),
 			denominator: new BN(1)
 		}, // 0% of the treasury balance
-		spendPeriodInBlocks: new BN(100800) // Same as other networks
+		spendPeriodInBlocks: new BN(14, 400)
 	}
 };
