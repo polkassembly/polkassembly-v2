@@ -868,6 +868,9 @@ export interface IActivityMetadata {
 	// for posts
 	title?: string;
 	content?: string;
+
+	// for comments
+	authorAddress?: string;
 }
 
 export interface IUserActivity {

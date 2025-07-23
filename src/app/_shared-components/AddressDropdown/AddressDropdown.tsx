@@ -170,7 +170,7 @@ function AddressDropdown({
 								{userPreferences?.selectedAccount?.parent && <AccountTypeBadge accountType={userPreferences?.selectedAccount?.parent?.accountType || EAccountType.REGULAR} />}
 							</div>
 							{/* Badge for the linked account */}
-							{showLinkedAccountBadge && user?.addresses.includes(userPreferences?.selectedAccount?.address || '') && (
+							{showLinkedAccountBadge && user?.addresses.includes(getSubstrateAddress(userPreferences?.selectedAccount?.address || '') || '') && (
 								<span className='inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium capitalize text-green-700 ring-1 ring-inset ring-green-700/10'>
 									{t('AddressDropdown.linkedAccount')}
 								</span>
@@ -201,7 +201,7 @@ function AddressDropdown({
 										<div className='flex items-center gap-1'>
 											<AccountTypeBadge accountType={EAccountType.REGULAR} />
 										</div>
-										{showLinkedAccountBadge && user?.addresses.includes(item.address) && (
+										{showLinkedAccountBadge && user?.addresses.includes(getSubstrateAddress(item.address) || '') && (
 											<span className='inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium capitalize text-green-700 ring-1 ring-inset ring-green-700/10'>
 												{t('AddressDropdown.linkedAccount')}
 											</span>

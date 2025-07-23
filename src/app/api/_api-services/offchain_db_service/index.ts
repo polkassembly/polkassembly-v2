@@ -408,8 +408,7 @@ export class OffChainDbService {
 		indexOrHash,
 		metadata,
 		subActivityName,
-		commentId,
-		authorAddress
+		commentId
 	}: {
 		userId?: number;
 		address?: string;
@@ -434,7 +433,6 @@ export class OffChainDbService {
 			...(metadata && { metadata }),
 			...(subActivityName && { subActivityName }),
 			...(commentId && { commentId }),
-			...(authorAddress && { authorAddress }),
 			createdAt: new Date(),
 			updatedAt: new Date()
 		};
@@ -554,8 +552,7 @@ export class OffChainDbService {
 			network,
 			proposalType,
 			indexOrHash,
-			metadata: { commentId: comment.id, ...(parentCommentId && { parentCommentId }) },
-			authorAddress
+			metadata: { commentId: comment.id, ...(parentCommentId && { parentCommentId }), ...(authorAddress && { authorAddress }) }
 		});
 
 		await FirestoreService.UpdateLastCommentAtPost({ network, indexOrHash, proposalType, lastCommentAt: comment.createdAt });

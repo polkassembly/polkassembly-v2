@@ -59,7 +59,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		content,
 		parentCommentId,
 		sentiment,
-		authorAddress: getSubstrateAddress(authorAddress || '') || undefined
+		authorAddress: authorAddress ? getSubstrateAddress(authorAddress) || '' : undefined
 	});
 
 	await AIService.UpdatePostCommentsSummary({ network, proposalType, indexOrHash: index, newCommentId: newComment.id });
