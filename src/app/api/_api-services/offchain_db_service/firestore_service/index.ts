@@ -1830,7 +1830,7 @@ export class FirestoreService extends FirestoreUtils {
 		});
 	}
 
-	static async GetBeneficiariesStats({ network, beneficiaries }: { network: ENetwork; beneficiaries: IBeneficiary[] }): Promise<IBeneficiary[] | null> {
+	static async GetBeneficiariesWithUsdAmount({ network, beneficiaries }: { network: ENetwork; beneficiaries: IBeneficiary[] }): Promise<IBeneficiary[] | null> {
 		const treasuryStats = await this.GetTreasuryStats({ network, from: dayjs().subtract(1, 'hour').toDate(), to: dayjs().toDate(), limit: 1, page: 1 });
 
 		if (!treasuryStats) {

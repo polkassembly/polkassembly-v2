@@ -969,7 +969,7 @@ export class OffChainDbService {
 		return FirestoreService.GetPollVotes({ network, proposalType, index, pollId });
 	}
 
-	static async GetBeneficiariesStats({ network, beneficiaries }: { network: ENetwork; beneficiaries: IBeneficiary[] }) {
-		return FirestoreService.GetBeneficiariesStats({ network, beneficiaries });
+	static async GetBeneficiariesWithUsdAmount({ network, beneficiaries }: { network: ENetwork; beneficiaries: IBeneficiary[] }) {
+		return FirestoreService.GetBeneficiariesWithUsdAmount({ network, beneficiaries });
 	}
 }
