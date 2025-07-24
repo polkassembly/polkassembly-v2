@@ -51,6 +51,8 @@ export const DELETE = withErrorHandling(
 
 		// Invalidate caches since reaction metrics changed
 		await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
+		await RedisService.DeletePostsListing({ network, proposalType });
+		await RedisService.DeleteActivityFeed({ network });
 
 		const response = NextResponse.json({ message: 'Reaction deleted successfully' });
 		response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
