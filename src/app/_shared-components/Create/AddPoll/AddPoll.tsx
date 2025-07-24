@@ -6,9 +6,9 @@ import { useTranslations } from 'next-intl';
 import { IWritePostFormFields, EPollVotesType } from '@/_shared/types';
 import { UseFormReturn } from 'react-hook-form';
 import { useState, useCallback, useMemo } from 'react';
-import { Trash2, X } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { MIN_POLL_OPTIONS_COUNT, MAX_POLL_OPTIONS_COUNT, MAX_POLL_OPTION_LENGTH } from '@/_shared/_constants/pollLimits';
-import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { cn } from '@/lib/utils';
 import { Switch } from '../../Switch';
 import { Input } from '../../Input';
@@ -102,21 +102,23 @@ function PollOptions({
 	);
 }
 
-// Helper function to format relative time
+// Helper function to format relative time using getTimeRemaining
 const formatRelativeTime = (endDate: Date): string => {
-	const now = dayjs();
-	const end = dayjs(endDate);
-	const diffInDays = end.diff(now, 'day');
-	const diffInHours = end.diff(now, 'hour');
+	const timeRemaining = getTimeRemaining(endDate);
 
-	if (diffInDays >= 1) {
-		return `${diffInDays} ${diffInDays === 1 ? 'day' : 'days'}`;
+	if (!timeRemaining) {
+		return 'Poll has ended';
 	}
-	if (diffInHours >= 1) {
-		return `${diffInHours} ${diffInHours === 1 ? 'hour' : 'hours'}`;
+
+	const { days, hours, minutes } = timeRemaining;
+
+	if (days >= 1) {
+		return `${days} ${days === 1 ? 'day' : 'days'}`;
 	}
-	const diffInMinutes = end.diff(now, 'minute');
-	return `${Math.max(1, diffInMinutes)} ${diffInMinutes === 1 ? 'minute' : 'minutes'}`;
+	if (hours >= 1) {
+		return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
+	}
+	return `${Math.max(1, minutes)} ${minutes === 1 ? 'minute' : 'minutes'}`;
 };
 
 // main component
@@ -287,17 +289,7 @@ function AddPoll({ formData, disabled }: { formData: UseFormReturn<IWritePostFor
 												variant='outline'
 												className={`h-8 w-full justify-start gap-2 rounded-md border ${field.value ? 'text-basic_text' : 'text-placeholder'}`}
 											>
-												{/* <CalendarRange className='h-4 w-4' /> */}
-												<span className='flex-1 text-left text-sm font-medium'>{field.value ? formatRelativeTime(field.value) : 'Select end date'}</span>
-												{field.value && (
-													<X
-														className='h-4 w-4 cursor-pointer hover:text-toast_error_text'
-														onClick={(e) => {
-															e.stopPropagation();
-															field.onChange(undefined);
-														}}
-													/>
-												)}
+												<span className='flex-1 text-left text-sm font-medium'>in {field.value ? formatRelativeTime(field.value) : 'Select end date'}</span>
 											</Button>
 										</PopoverTrigger>
 										<PopoverContent className='w-auto p-0'>
