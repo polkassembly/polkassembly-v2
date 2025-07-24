@@ -173,7 +173,9 @@ export const THEME_COLORS = {
 		toggle_btn_inactive_text: '#485F7D',
 		aye_bubble_bg: '#34d1a666',
 		nay_bubble_bg: '#ff5c5c66',
-		abstain_bubble_bg: '#DDE7FF'
+		abstain_bubble_bg: '#DDE7FF',
+		switch_active_bg: '#E5007A',
+		switch_inactive_bg: '#B8C5D1'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -244,7 +246,7 @@ export const THEME_COLORS = {
 		navbar_title: '#fff',
 		yellow_primary: '#ffbf60',
 		wallet_disabled_bg: '#222222',
-		grey_bg: '#222222',
+		grey_bg: '#000',
 		footer_bg: '#222222',
 		activity_feed_active_proposal_bg: '#262626',
 		activity_comment: '#4a4a4a',
@@ -345,6 +347,8 @@ export const THEME_COLORS = {
 		toggle_btn_inactive_text: '#9E9E9E',
 		aye_bubble_bg: '#19483B',
 		nay_bubble_bg: '#562525',
-		abstain_bubble_bg: '#1C2E56'
+		abstain_bubble_bg: '#1C2E56',
+		switch_active_bg: '#E5007A',
+		switch_inactive_bg: '#000'
 	}
 };
