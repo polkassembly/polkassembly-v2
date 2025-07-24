@@ -8,8 +8,8 @@ import { UseFormReturn } from 'react-hook-form';
 import { useState, useCallback, useMemo } from 'react';
 import { Trash2 } from 'lucide-react';
 import { MIN_POLL_OPTIONS_COUNT, MAX_POLL_OPTIONS_COUNT, MAX_POLL_OPTION_LENGTH } from '@/_shared/_constants/pollLimits';
-import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { cn } from '@/lib/utils';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { Switch } from '../../Switch';
 import { Input } from '../../Input';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../../Form';
@@ -24,6 +24,10 @@ interface PollOption {
 	id: string;
 	value: string;
 }
+
+const formatRelativeTime = (endDate: Date): string => {
+	return dayjs().to(dayjs(endDate));
+};
 
 function PollOptions({
 	options,
@@ -101,25 +105,6 @@ function PollOptions({
 		</div>
 	);
 }
-
-// Helper function to format relative time using getTimeRemaining
-const formatRelativeTime = (endDate: Date): string => {
-	const timeRemaining = getTimeRemaining(endDate);
-
-	if (!timeRemaining) {
-		return 'Poll has ended';
-	}
-
-	const { days, hours, minutes } = timeRemaining;
-
-	if (days >= 1) {
-		return `${days} ${days === 1 ? 'day' : 'days'}`;
-	}
-	if (hours >= 1) {
-		return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
-	}
-	return `${Math.max(1, minutes)} ${minutes === 1 ? 'minute' : 'minutes'}`;
-};
 
 // main component
 function AddPoll({ formData, disabled }: { formData: UseFormReturn<IWritePostFormFields>; disabled: boolean }) {
