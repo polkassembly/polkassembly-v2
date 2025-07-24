@@ -41,7 +41,9 @@ import {
 	IPollVote,
 	IPoll,
 	EPollVotesType,
-	IOffChainPollPayload
+	IOffChainPollPayload,
+	IBeneficiary,
+	EAssets
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -49,6 +51,9 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
+import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
+import { calculateAssetUSDValue } from '@/app/_client-utils/calculateAssetUSDValue';
+import dayjs from 'dayjs';
 import { FirestoreUtils } from './firestoreUtils';
 
 export class FirestoreService extends FirestoreUtils {
@@ -1822,6 +1827,34 @@ export class FirestoreService extends FirestoreUtils {
 					return null;
 				})
 				.filter((vote): vote is IPollVote => vote !== null);
+		});
+	}
+
+	static async GetBeneficiariesWithUsdAmount({ network, beneficiaries }: { network: ENetwork; beneficiaries: IBeneficiary[] }): Promise<IBeneficiary[] | null> {
+		const treasuryStats = await this.GetTreasuryStats({ network, from: dayjs().subtract(1, 'hour').toDate(), to: dayjs().toDate(), limit: 1, page: 1 });
+
+		if (!treasuryStats) {
+			return beneficiaries;
+		}
+		return beneficiaries?.map((beneficiary) => {
+			const assetSymbol = beneficiary.assetId
+				? (getAssetDataByIndexForNetwork({
+						network,
+						generalIndex: beneficiary.assetId
+					}).symbol as unknown as Exclude<EAssets, EAssets.MYTH>)
+				: null;
+			if (!treasuryStats[0].nativeTokenUsdPrice && !treasuryStats[0].dedTokenUsdPrice) {
+				return beneficiary;
+			}
+			const usdAmount = calculateAssetUSDValue({
+				amount: beneficiary.amount,
+				asset: assetSymbol,
+				currentTokenPrice: treasuryStats[0].nativeTokenUsdPrice || null,
+				dedTokenUSDPrice: treasuryStats[0].dedTokenUsdPrice || null,
+				network
+			})?.toString();
+
+			return { ...beneficiary, usdAmount };
 		});
 	}
 }

@@ -15,7 +15,7 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
-import { decimalToBN } from '@/_shared/_utils/decimalToBN';
+import { calculateTotalUSDValue } from '@/app/_client-utils/calculateTotalUSDValue';
 import { Separator } from '../Separator';
 
 // Component for displaying a single asset row
@@ -24,37 +24,6 @@ type AssetRowProps = {
 	asset?: EAssets | null;
 	prefix?: string;
 	network: ENetwork;
-};
-
-// Convert amount to usd for all assets
-const formatedAmountWithUSD = ({
-	amountsDetails,
-	currentTokenPrice,
-	network
-}: {
-	amountsDetails: { amount: string | null; asset: Exclude<EAssets, EAssets.MYTH> | null }[];
-	currentTokenPrice: string;
-	network: ENetwork;
-}) => {
-	let totalUSD = BN_ZERO;
-	const nativeTokenPriceBN = decimalToBN(currentTokenPrice);
-
-	amountsDetails?.forEach(({ amount, asset }) => {
-		if (amount) {
-			if (!asset) {
-				totalUSD = totalUSD.add(
-					nativeTokenPriceBN.value
-						.mul(new BN(amount))
-						.div(new BN(10).pow(new BN(NETWORKS_DETAILS[`${network}`].tokenDecimals)))
-						.div(new BN(10).pow(new BN(nativeTokenPriceBN.decimals)))
-				);
-			} else {
-				totalUSD = totalUSD?.add(new BN(amount).div(new BN(10).pow(new BN(treasuryAssetsData[asset as EAssets]?.tokenDecimal))));
-			}
-		}
-	});
-
-	return formatUSDWithUnits(totalUSD.toString(), 2);
 };
 
 function AssetRow({ amount, asset, prefix, network }: AssetRowProps) {
@@ -109,7 +78,7 @@ function RelayChainSection({ data, network, currentTokenPrice, title }: { data: 
 			<div className='flex flex-col gap-1'>
 				<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 					~ $
-					{formatedAmountWithUSD({
+					{calculateTotalUSDValue({
 						amountsDetails: [{ amount: data.relayChain?.nativeToken || null, asset: null }],
 						currentTokenPrice,
 						network
@@ -146,7 +115,7 @@ function AssetHubSection({
 		<CategorySection title={title}>
 			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 				~ $
-				{formatedAmountWithUSD({
+				{calculateTotalUSDValue({
 					amountsDetails: [
 						{ amount: data.assetHub?.nativeToken || null, asset: null },
 						{ amount: data.assetHub?.usdc || null, asset: EAssets.USDC },
@@ -210,7 +179,7 @@ function HydrationSection({
 		<CategorySection title={title}>
 			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 				~ $
-				{formatedAmountWithUSD({
+				{calculateTotalUSDValue({
 					amountsDetails: [
 						{ amount: data.hydration?.nativeToken || null, asset: null },
 						{ amount: data.hydration?.usdc || null, asset: EAssets.USDC },
@@ -267,7 +236,7 @@ function BountiesSection({ data, network, currentTokenPrice, title }: { data: IT
 		<CategorySection title={title}>
 			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 				~ $
-				{formatedAmountWithUSD({
+				{calculateTotalUSDValue({
 					amountsDetails: [{ amount: data.bounties?.nativeToken || null, asset: null }],
 					currentTokenPrice,
 					network
@@ -312,7 +281,7 @@ function AmbassadorSection({
 		<CategorySection title={title}>
 			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 				~ $
-				{formatedAmountWithUSD({
+				{calculateTotalUSDValue({
 					amountsDetails: [{ amount: data.ambassador?.usdt || null, asset: EAssets.USDT }],
 					currentTokenPrice,
 					network
@@ -362,7 +331,7 @@ function FellowshipSection({
 		<CategorySection title={title}>
 			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 				~ $
-				{formatedAmountWithUSD({
+				{calculateTotalUSDValue({
 					amountsDetails: [
 						{ amount: data.fellowship?.nativeToken || null, asset: null },
 						{ amount: data.fellowship?.usdt || null, asset: EAssets.USDT }
@@ -445,7 +414,7 @@ function LoansSection({
 		<CategorySection title={title}>
 			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 				~ $
-				{formatedAmountWithUSD({
+				{calculateTotalUSDValue({
 					amountsDetails: [
 						{ amount: loanAmounts?.bifrost?.nativeToken || null, asset: null },
 						{ amount: loanAmounts?.centrifuge?.usdc || null, asset: EAssets.USDC },
