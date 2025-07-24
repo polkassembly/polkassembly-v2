@@ -4,7 +4,7 @@
 
 'use client';
 
-import { ICommentResponse, ENotificationStatus } from '@/_shared/types';
+import { ICommentResponse, ENotificationStatus, EProposalType } from '@/_shared/types';
 import { Dispatch, SetStateAction, useCallback, memo, useState, useRef, useEffect } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
@@ -171,6 +171,29 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 		setComment(commentData);
 	}, [commentData]);
 
+	const handleCopyCommentLink = useCallback(() => {
+		let url = '';
+		switch (proposalType) {
+			case EProposalType.DISCUSSION:
+				url = `${window?.location?.origin}/post/${index}#comment-${comment?.id}`;
+				break;
+			case EProposalType.BOUNTY:
+				url = `${window?.location?.origin}/bounty/${index}#comment-${comment?.id}`;
+				break;
+			case EProposalType.CHILD_BOUNTY:
+				url = `${window?.location?.origin}/child-bounty/${index}#comment-${comment?.id}`;
+				break;
+			default:
+				url = `${window?.location?.origin}/referenda/${index}#comment-${comment?.id}`;
+		}
+		navigator.clipboard.writeText(url);
+		toast({
+			title: 'Success!',
+			description: 'Comment link copied to clipboard',
+			status: ENotificationStatus.SUCCESS
+		});
+	}, [comment, index, proposalType, toast]);
+
 	if (!comment) {
 		return null;
 	}
@@ -179,9 +202,14 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 	const userAddresses = !EVM_NETWORKS.includes(network) ? comment?.publicUser?.addresses?.filter((address) => !address.startsWith('0x')) : comment?.publicUser?.addresses;
 
 	const addressToDisplay = userAddresses?.[0] || comment?.publicUser?.addresses?.[0];
+	const isHighlighted = typeof window !== 'undefined' && window?.location?.hash === `#comment-${comment.id}`;
+	const wrapperClassName = isHighlighted ? `${classes.wrapper} ${classes.highlighted}` : classes.wrapper;
 
 	return (
-		<div className={classes.wrapper}>
+		<div
+			id={`comment-${comment.id}`}
+			className={wrapperClassName}
+		>
 			<Dialog
 				open={openDeleteModal}
 				onOpenChange={setOpenDeleteModal}
@@ -293,26 +321,26 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 					/>
 				)}
 
-				{user && (
-					<div className={classes.tools}>
-						<Button
-							variant='ghost'
-							className={classes.replyButton}
-							onClick={handleToggleReply}
-							size='sm'
-							disabled={comment.disabled}
-							leftIcon={
-								<Image
-									src={ReplyIcon}
-									alt='reply'
-									className='darkIcon'
-								/>
-							}
-						>
-							{t('PostDetails.reply')}
-						</Button>
-						<div>
-							{comment.userId === user.id && (
+				<div className={classes.tools}>
+					{user && (
+						<div className={classes.tools}>
+							<Button
+								variant='ghost'
+								className={classes.replyButton}
+								onClick={handleToggleReply}
+								size='sm'
+								disabled={comment.disabled}
+								leftIcon={
+									<Image
+										src={ReplyIcon}
+										alt='reply'
+										className='darkIcon'
+									/>
+								}
+							>
+								{t('PostDetails.reply')}
+							</Button>
+							<div>
 								<DropdownMenu>
 									<DropdownMenuTrigger
 										noArrow
@@ -328,32 +356,46 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 											<Button
 												variant='ghost'
 												className='h-auto p-0 text-sm text-text_primary'
-												disabled={comment.userId !== user.id || comment.disabled}
-												onClick={toggleEditComment}
+												onClick={handleCopyCommentLink}
 												size='sm'
-												isLoading={loading}
 											>
-												{t('PostDetails.edit')}
+												{t('PostDetails.copyLink')}
 											</Button>
 										</DropdownMenuItem>
-										<DropdownMenuItem className='hover:bg-bg_pink/10'>
-											<Button
-												variant='ghost'
-												className='h-auto p-0 text-sm text-text_primary'
-												disabled={comment.userId !== user.id || comment.disabled}
-												onClick={handleOpenDeleteModal}
-												size='sm'
-												isLoading={loading}
-											>
-												{t('PostDetails.delete')}
-											</Button>
-										</DropdownMenuItem>
+										{comment.userId === user.id && (
+											<>
+												<DropdownMenuItem className='hover:bg-bg_pink/10'>
+													<Button
+														variant='ghost'
+														className='h-auto p-0 text-sm text-text_primary'
+														disabled={comment.userId !== user.id || comment.disabled}
+														onClick={toggleEditComment}
+														size='sm'
+														isLoading={loading}
+													>
+														{t('PostDetails.edit')}
+													</Button>
+												</DropdownMenuItem>
+												<DropdownMenuItem className='hover:bg-bg_pink/10'>
+													<Button
+														variant='ghost'
+														className='h-auto p-0 text-sm text-text_primary'
+														disabled={comment.userId !== user.id || comment.disabled}
+														onClick={handleOpenDeleteModal}
+														size='sm'
+														isLoading={loading}
+													>
+														{t('PostDetails.delete')}
+													</Button>
+												</DropdownMenuItem>
+											</>
+										)}
 									</DropdownMenuContent>
 								</DropdownMenu>
-							)}
+							</div>
 						</div>
-					</div>
-				)}
+					)}
+				</div>
 
 				{reply && (
 					<AddComment
