@@ -419,6 +419,7 @@ export class OffChainDbService {
 		metadata?: IActivityMetadata;
 		subActivityName?: EActivityName;
 		commentId?: string;
+		authorAddress?: string;
 	}): Promise<void> {
 		const activity: IUserActivity = {
 			id: '', // Firestore service class will generate this
@@ -524,7 +525,8 @@ export class OffChainDbService {
 		userId,
 		content,
 		parentCommentId,
-		sentiment
+		sentiment,
+		authorAddress
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -533,6 +535,7 @@ export class OffChainDbService {
 		content: string;
 		parentCommentId?: string;
 		sentiment?: ECommentSentiment;
+		authorAddress?: string;
 	}) {
 		// check if the post is allowed to be commented on
 		const post = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
@@ -541,7 +544,7 @@ export class OffChainDbService {
 		}
 		// TODO: implement on-chain check
 
-		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, sentiment });
+		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, sentiment, authorAddress });
 
 		await this.saveUserActivity({
 			userId,
@@ -549,7 +552,7 @@ export class OffChainDbService {
 			network,
 			proposalType,
 			indexOrHash,
-			metadata: { commentId: comment.id, ...(parentCommentId && { parentCommentId }) }
+			metadata: { commentId: comment.id, ...(parentCommentId && { parentCommentId }), ...(authorAddress && { authorAddress }) }
 		});
 
 		await FirestoreService.UpdateLastCommentAtPost({ network, indexOrHash, proposalType, lastCommentAt: comment.createdAt });

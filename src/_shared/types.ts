@@ -716,6 +716,7 @@ export interface IComment {
 	aiSentiment?: ECommentSentiment;
 	history?: IOffChainContentHistoryItem[];
 	disabled?: boolean;
+	authorAddress?: string;
 }
 
 export interface ICommentResponse extends IComment {
@@ -867,6 +868,9 @@ export interface IActivityMetadata {
 	// for posts
 	title?: string;
 	content?: string;
+
+	// for comments
+	authorAddress?: string;
 }
 
 export interface IUserActivity {

@@ -20,6 +20,7 @@ interface Props {
 	withRadioSelect?: boolean;
 	onRadioSelect?: (address: string) => void;
 	showPeopleChainBalance?: boolean;
+	showLinkedAccountBadge?: boolean;
 }
 
 function SwitchWalletOrAddress({
@@ -31,7 +32,8 @@ function SwitchWalletOrAddress({
 	customAddressSelector,
 	withRadioSelect,
 	showPeopleChainBalance = false,
-	onRadioSelect
+	onRadioSelect,
+	showLinkedAccountBadge = false
 }: Props) {
 	return (
 		<>
@@ -48,6 +50,7 @@ function SwitchWalletOrAddress({
 					withRadioSelect={withRadioSelect}
 					onRadioSelect={onRadioSelect}
 					showPeopleChainBalance={showPeopleChainBalance}
+					showLinkedAccountBadge={showLinkedAccountBadge}
 				/>
 			)}
 		</>

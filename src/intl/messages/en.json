@@ -106,7 +106,8 @@
 		"hidePassword": "Hide Password",
 		"showPassword": "Show Password",
 		"pleaseConnectWallet": "Please connect your wallet to Polkassembly.",
-		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension."
+		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension.",
+		"linkedAccount": "Linked Account"
 	},
 	"AddressRelationsPicker": {
 		"Switch": "Switch",
