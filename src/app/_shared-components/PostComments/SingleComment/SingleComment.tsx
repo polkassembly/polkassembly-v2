@@ -31,6 +31,7 @@ import Address from '../../Profile/Address/Address';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import VoteComments from '../VoteComments/VoteComments';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
+import CommentActions from '../CommentActions/CommentActions';
 
 interface SingleCommentProps {
 	commentData: ICommentResponse;
@@ -292,6 +293,8 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 						className={classes.editor}
 					/>
 				)}
+
+				<CommentActions commentData={comment} />
 
 				{user && (
 					<div className={classes.tools}>

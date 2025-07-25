@@ -515,10 +515,18 @@ export class FirestoreService extends FirestoreUtils {
 	}
 
 	static async GetPostReactions({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IReaction[]> {
+		// Query all reactions for the post - Firestore doesn't support "field doesn't exist" queries,
+		// so we'll filter client-side to exclude reactions that have a commentId
 		const reactionsQuery = this.reactionsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash);
 		const reactionsQuerySnapshot = await reactionsQuery.get();
 		const reactionPromises = reactionsQuerySnapshot.docs.map(async (doc) => {
 			const data = doc.data();
+
+			// Skip reactions that have a commentId (these are comment reactions)
+			if (data.commentId) {
+				return null;
+			}
+
 			const publicUser = await this.GetPublicUserById(data.userId);
 
 			return {
@@ -529,7 +537,9 @@ export class FirestoreService extends FirestoreUtils {
 			} as IReaction;
 		});
 
-		return Promise.all(reactionPromises);
+		const results = await Promise.all(reactionPromises);
+		// Filter out null values (comment reactions that were skipped)
+		return results.filter((reaction): reaction is IReaction => reaction !== null);
 	}
 
 	static async GetCommentReactions({
