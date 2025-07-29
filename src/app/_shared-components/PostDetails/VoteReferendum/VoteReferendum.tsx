@@ -19,6 +19,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { cn } from '@/lib/utils';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { Button } from '../../Button';
 import BalanceInput from '../../BalanceInput/BalanceInput';
 import ChooseVote from './ChooseVote/ChooseVote';
@@ -124,6 +125,8 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 	const { toast } = useToast();
 	const network = getCurrentNetwork();
 
+	const { setVaultQrState } = usePolkadotVault();
+
 	const [reuseLock, setReuseLock] = useState<BN | null>(null);
 
 	const { setOpenSuccessModal, setSuccessModalContent } = useSuccessModal();
@@ -197,7 +200,7 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 	}, [ayeVoteValue, balance, nayVoteValue, abstainVoteValue, voteDecision]);
 
 	const onVoteConfirm = async () => {
-		if (!apiService || !userPreferences.selectedAccount?.address) return;
+		if (!apiService || !userPreferences.selectedAccount?.address || !userPreferences.wallet) return;
 
 		if (isInvalidAmount) return;
 
@@ -211,6 +214,8 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 			setIsLoading(true);
 			await apiService.voteReferendum({
 				selectedAccount: userPreferences.selectedAccount,
+				wallet: userPreferences.wallet,
+				setVaultQrState,
 				address: getRegularAddress(userPreferences.selectedAccount),
 				onSuccess: () => {
 					toast({

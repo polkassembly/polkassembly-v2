@@ -46,7 +46,7 @@ function WalletButtons({
 				return (
 					<WalletButton
 						key={wallet}
-						disabled={!availableWallets?.[String(wallet)] || disabled}
+						disabled={(!availableWallets?.[String(wallet)] && wallet !== EWallet.POLKADOT_VAULT) || disabled}
 						wallet={wallet}
 						onClick={onWalletChange}
 						label={WalletClientService.getWalletNameLabel(wallet)}

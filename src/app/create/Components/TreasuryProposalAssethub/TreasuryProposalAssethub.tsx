@@ -22,6 +22,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 
 function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: number) => void }) {
 	const t = useTranslations();
@@ -37,6 +38,8 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
+
+	const { setVaultQrState } = usePolkadotVault();
 
 	const tx = useMemo(() => {
 		if (!apiService) return null;
@@ -69,7 +72,7 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 	);
 
 	const createProposal = async () => {
-		if (!apiService || !userPreferences.selectedAccount?.address || !tx || !selectedTrack) {
+		if (!apiService || !userPreferences.selectedAccount?.address || !userPreferences.wallet || !tx || !selectedTrack) {
 			return;
 		}
 
@@ -77,6 +80,8 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 
 		await apiService.createProposal({
 			address: userPreferences.selectedAccount?.address,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
 			extrinsicFn: tx,
 			track: selectedTrack.name,
 			enactment: selectedEnactment,

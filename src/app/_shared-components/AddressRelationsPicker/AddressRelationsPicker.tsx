@@ -7,13 +7,14 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useWalletService } from '@/hooks/useWalletService';
-import { EAccountType, IMultisigAddress, IProxyAddress, ISelectedAccount } from '@/_shared/types';
+import { EAccountType, EWallet, IMultisigAddress, IProxyAddress, ISelectedAccount } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
-import { ChevronDown } from 'lucide-react';
+import { AlertCircle, ChevronDown } from 'lucide-react';
 import { IoMdSync } from '@react-icons/all-files/io/IoMdSync';
 import { useTranslations } from 'next-intl';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Address from '../Profile/Address/Address';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
@@ -23,6 +24,7 @@ import { RadioGroup, RadioGroupItem } from '../RadioGroup/RadioGroup';
 import { Label } from '../Label';
 import AccountTypeBadge from '../AccountTypeBadge/AccountTypeBadge';
 import Balance from '../Balance';
+import { Alert, AlertDescription } from '../Alert';
 
 interface IAddressRadioGroupProps {
 	accountType: EAccountType;
@@ -268,6 +270,12 @@ export default function AddressRelationsPicker({
 }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const walletService = useWalletService();
+	const t = useTranslations();
+
+	const { user } = useUser();
+
+	const network = getCurrentNetwork();
+
 	const [accountsLoading, setAccountsLoading] = useState(true);
 
 	const selectedAddress = useMemo(() => userPreferences?.selectedAccount?.address, [userPreferences?.selectedAccount?.address]);
@@ -275,6 +283,20 @@ export default function AddressRelationsPicker({
 
 	const getAccounts = useCallback(async () => {
 		if (!walletService || !userPreferences?.wallet) return;
+
+		if (userPreferences.wallet === EWallet.POLKADOT_VAULT && user?.loginAddress) {
+			setAccountsLoading(false);
+			setUserPreferences({
+				...userPreferences,
+				selectedAccount: {
+					address: user.loginAddress,
+					accountType: EAccountType.REGULAR
+				}
+			});
+			return;
+		}
+
+		setAccountsLoading(true);
 
 		const injectedAccounts = await walletService?.getAddressesFromWallet(userPreferences.wallet);
 
@@ -318,8 +340,38 @@ export default function AddressRelationsPicker({
 			)}
 
 			<div className='flex items-center gap-2 rounded border border-primary_border p-2'>
-				{accountsLoading || !selectedAddress ? (
+				{accountsLoading ? (
 					<Skeleton className='h-6 w-32' />
+				) : !selectedAddress ? (
+					userPreferences.wallet === EWallet.POLKADOT_VAULT ? (
+						<Alert
+							variant='info'
+							className='flex items-center gap-x-3'
+						>
+							<AlertCircle className='h-4 w-4' />
+							<AlertDescription className=''>
+								<h2 className='mb-2 text-base font-medium'>{t('AddressDropdown.scanYourAddressQr')}</h2>
+								<ul className='list-disc pl-4'>
+									<li>{t('AddressDropdown.scanYourAddressQrDescription1')}</li>
+									<li>{t('AddressDropdown.scanYourAddressQrDescription2', { network })}</li>
+								</ul>
+							</AlertDescription>
+						</Alert>
+					) : (
+						<Alert
+							variant='info'
+							className='flex items-center gap-x-3'
+						>
+							<AlertCircle className='h-4 w-4' />
+							<AlertDescription className=''>
+								<h2 className='mb-2 text-base font-medium'>{t('AddressDropdown.noAccountsFound')}</h2>
+								<ul className='list-disc pl-4'>
+									<li>{t('AddressDropdown.pleaseConnectWallet')}</li>
+									<li>{t('AddressDropdown.pleaseCheckConnectedAccounts')}</li>
+								</ul>
+							</AlertDescription>
+						</Alert>
+					)
 				) : (
 					<div className='flex items-center justify-between gap-2'>
 						<Address
