@@ -9,12 +9,8 @@ import { blake2AsU8a } from '@polkadot/util-crypto';
 
 // eslint-disable-next-line import/prefer-default-export
 export class VaultQrSigner implements Signer {
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
 	readonly #registry: Registry;
 
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
 	readonly #setState: (state: IVaultQrState) => void;
 
 	constructor(registry: Registry, setState: (state: IVaultQrState) => void) {
