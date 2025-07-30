@@ -7,7 +7,7 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useWalletService } from '@/hooks/useWalletService';
-import { EAccountType, EWallet, IMultisigAddress, IProxyAddress, ISelectedAccount } from '@/_shared/types';
+import { EAccountType, EReactQueryKeys, EWallet, IMultisigAddress, IProxyAddress, ISelectedAccount, IVaultScannedAddress } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
 import { AlertCircle, ChevronDown } from 'lucide-react';
 import { IoMdSync } from '@react-icons/all-files/io/IoMdSync';
@@ -15,6 +15,8 @@ import { useTranslations } from 'next-intl';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { InjectedAccount } from '@polkadot/extension-inject/types';
+import { useQueryClient } from '@tanstack/react-query';
 import Address from '../Profile/Address/Address';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
@@ -25,6 +27,7 @@ import { Label } from '../Label';
 import AccountTypeBadge from '../AccountTypeBadge/AccountTypeBadge';
 import Balance from '../Balance';
 import { Alert, AlertDescription } from '../Alert';
+import AddVaultAddress from '../PolkadotVault/AddressVaultAddress/AddVaultAddress';
 
 interface IAddressRadioGroupProps {
 	accountType: EAccountType;
@@ -276,7 +279,11 @@ export default function AddressRelationsPicker({
 
 	const network = getCurrentNetwork();
 
+	const queryClient = useQueryClient();
+
 	const [accountsLoading, setAccountsLoading] = useState(true);
+
+	const [openVaultModal, setOpenVaultModal] = useState(false);
 
 	const selectedAddress = useMemo(() => userPreferences?.selectedAccount?.address, [userPreferences?.selectedAccount?.address]);
 	const walletAddressName = useMemo(() => userPreferences?.selectedAccount?.name, [userPreferences?.selectedAccount?.name]);
@@ -284,15 +291,19 @@ export default function AddressRelationsPicker({
 	const getAccounts = useCallback(async () => {
 		if (!walletService || !userPreferences?.wallet) return;
 
-		if (userPreferences.wallet === EWallet.POLKADOT_VAULT && user?.loginAddress) {
+		if (userPreferences.wallet === EWallet.POLKADOT_VAULT) {
 			setAccountsLoading(false);
-			setUserPreferences({
-				...userPreferences,
-				selectedAccount: {
-					address: user.loginAddress,
-					accountType: EAccountType.REGULAR
-				}
-			});
+			if (user?.loginAddress) {
+				setUserPreferences({
+					...userPreferences,
+					selectedAccount: {
+						address: user.loginAddress,
+						accountType: EAccountType.REGULAR
+					}
+				});
+			} else {
+				setOpenVaultModal(true);
+			}
 			return;
 		}
 
@@ -328,8 +339,49 @@ export default function AddressRelationsPicker({
 		getAccounts();
 	}, [getAccounts]);
 
+	const onVaultAddressScan = (scanned: IVaultScannedAddress): void => {
+		if (!scanned.isAddress) return;
+
+		queryClient.setQueryData([EReactQueryKeys.ACCOUNTS, userPreferences?.wallet], (oldData: InjectedAccount[] | undefined) => {
+			const newAccount = { address: scanned.content, name: scanned.name };
+			const isDuplicate = (oldData || []).some((account) => getSubstrateAddress(account.address) === getSubstrateAddress(newAccount.address));
+
+			if (isDuplicate) {
+				return oldData;
+			}
+
+			setUserPreferences({
+				...userPreferences,
+				selectedAccount: {
+					...newAccount,
+					accountType: EAccountType.REGULAR
+				}
+			});
+
+			return [newAccount, ...(oldData || [])];
+		});
+
+		setOpenVaultModal(false);
+	};
+
 	return (
 		<div className='flex flex-col gap-1'>
+			<Dialog
+				open={openVaultModal}
+				onOpenChange={setOpenVaultModal}
+			>
+				<DialogContent className='max-w-xl p-4 sm:p-6'>
+					<DialogHeader>
+						<DialogTitle>{t('PolkadotVault.addVaultAddress')}</DialogTitle>
+					</DialogHeader>
+					{openVaultModal && (
+						<AddVaultAddress
+							onScan={onVaultAddressScan}
+							onError={(err) => console.log(err)}
+						/>
+					)}
+				</DialogContent>
+			</Dialog>
 			{withBalance && (
 				<Balance
 					address={userPreferences?.selectedAccount?.address || ''}

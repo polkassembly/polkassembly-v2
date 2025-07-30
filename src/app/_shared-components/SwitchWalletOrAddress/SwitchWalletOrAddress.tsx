@@ -9,7 +9,6 @@ import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { ReactNode } from 'react';
 import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
 import AddressDropdown from '../AddressDropdown/AddressDropdown';
-import SignVaultTransaction from '../PolkadotVault/SignVaultTransaction/SignVaultTransaction';
 
 interface Props {
 	onWalletChange?: (wallet: EWallet | null) => void;
@@ -36,7 +35,6 @@ function SwitchWalletOrAddress({
 }: Props) {
 	return (
 		<>
-			<SignVaultTransaction />
 			<WalletButtons
 				small={small}
 				onWalletChange={onWalletChange}
