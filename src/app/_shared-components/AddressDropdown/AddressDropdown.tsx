@@ -8,7 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { useTranslations } from 'next-intl';
 import { useWalletService } from '@/hooks/useWalletService';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { AlertCircle } from 'lucide-react';
 import { EAccountType, EReactQueryKeys, EWallet, ISelectedAccount, IVaultScannedAddress } from '@/_shared/types';
@@ -56,8 +56,20 @@ function AddressDropdown({
 	const getAccounts = useCallback(async () => {
 		if (!walletService || !userPreferences?.wallet) return null;
 
-		if (userPreferences.wallet === EWallet.POLKADOT_VAULT && !user) {
+		if (userPreferences.wallet === EWallet.POLKADOT_VAULT) {
+			if (user?.loginWallet === EWallet.POLKADOT_VAULT && user?.loginAddress) {
+				setUserPreferences({
+					...userPreferences,
+					selectedAccount: {
+						address: user.loginAddress,
+						accountType: EAccountType.REGULAR
+					}
+				});
+
+				return [{ address: user.loginAddress, name: '' }];
+			}
 			setOpenVaultModal(true);
+
 			return null;
 		}
 
@@ -94,23 +106,6 @@ function AddressDropdown({
 		refetchOnMount: true,
 		refetchOnWindowFocus: false
 	});
-
-	// if user is logged in with Vault, add the logged in account to the accounts list
-	useEffect(() => {
-		if (userPreferences?.wallet === EWallet.POLKADOT_VAULT && user?.loginAddress && (!accounts || accounts.length === 0)) {
-			queryClient.setQueryData([EReactQueryKeys.ACCOUNTS, userPreferences?.wallet], (oldData: InjectedAccount[] | undefined) => {
-				return [...(oldData || []), { address: user.loginAddress, name: '' }];
-			});
-			setUserPreferences({
-				...userPreferences,
-				selectedAccount: {
-					address: user.loginAddress,
-					accountType: EAccountType.REGULAR
-				}
-			});
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [userPreferences?.wallet, user]);
 
 	const onVaultAddressScan = (scanned: IVaultScannedAddress): void => {
 		if (!scanned.isAddress) return;
