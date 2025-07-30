@@ -23,6 +23,7 @@ import { useToast } from '@/hooks/useToast';
 import { BN } from '@polkadot/util';
 import BalanceInput from '@/app/_shared-components/BalanceInput/BalanceInput';
 import { useTranslations } from 'next-intl';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 
 interface UndelegateDialogProps {
 	open: boolean;
@@ -45,7 +46,7 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 	const [delegateUserTracks, setDelegateUserTracks] = useAtom(delegateUserTracksAtom);
 	const [loading, setLoading] = useState(false);
 	const [txFee, setTxFee] = useState<BN | null>(null);
-
+	const { setVaultQrState } = usePolkadotVault();
 	const handleOpenChange = useCallback(
 		(isOpen: boolean) => {
 			if (disabled && isOpen) {
@@ -77,12 +78,14 @@ function UndelegateDialog({ open, setOpen, delegate, children, disabled, trackId
 	}, [apiService, user?.defaultAddress, trackId]);
 
 	const handleSubmit = useCallback(async () => {
-		if (!apiService || !user?.defaultAddress || trackId === undefined) return;
+		if (!apiService || !user?.defaultAddress || trackId === undefined || !user.loginWallet) return;
 
 		try {
 			setLoading(true);
 			await apiService.undelegate({
 				address: user.defaultAddress,
+				wallet: user.loginWallet,
+				setVaultQrState,
 				trackId,
 				onSuccess: () => {
 					if (delegateUserTracks) {

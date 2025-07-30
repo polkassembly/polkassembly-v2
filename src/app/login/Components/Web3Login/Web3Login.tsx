@@ -21,6 +21,7 @@ import { useToast } from '@/hooks/useToast';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import { useRouter } from 'nextjs-toploader/app';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import classes from './Web3Login.module.scss';
 
 function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; onTfaEnabled: (token: string) => void }) {
@@ -34,7 +35,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 	const { setUser } = useUser();
 
 	const [loading, setLoading] = useState(false);
-	const [pendingMimirAuth, setPendingMimirAuth] = useState(false);
+	const [remarkAuthLoading, setRemarkAuthLoading] = useState(false);
 
 	const [errorMessage, setErrorMessage] = useState<string>('');
 
@@ -44,15 +45,17 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 
 	const { apiService } = usePolkadotApiService();
 
+	const { setVaultQrState } = usePolkadotVault();
+
 	// Constants
 	const LOGIN_FAILED_MESSAGE = t('Profile.loginFailed');
 
-	// Handle Mimir login completion after remark transaction
-	const completeMimirLogin = async (remarkHash: string) => {
+	// Handle Remark/Vault login completion after remark transaction
+	const completeRemarkLogin = async (remarkHash: string) => {
 		try {
 			if (!userPreferences?.selectedAccount?.address) {
 				setLoading(false);
-				setPendingMimirAuth(false);
+				setRemarkAuthLoading(false);
 				return;
 			}
 
@@ -67,14 +70,14 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 			if (result.error || !result.data) {
 				setErrorMessage(result.error?.message || LOGIN_FAILED_MESSAGE);
 				setLoading(false);
-				setPendingMimirAuth(false);
+				setRemarkAuthLoading(false);
 				return;
 			}
 
 			if (result.data.isTFAEnabled && result.data.tfaToken) {
 				onTfaEnabled(result.data.tfaToken);
 				setLoading(false);
-				setPendingMimirAuth(false);
+				setRemarkAuthLoading(false);
 				return;
 			}
 
@@ -82,7 +85,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 
 			if (!accessTokenPayload) {
 				setLoading(false);
-				setPendingMimirAuth(false);
+				setRemarkAuthLoading(false);
 				setErrorMessage(t('Profile.noAccessTokenFound'));
 				return;
 			}
@@ -96,13 +99,13 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 				router.back();
 			}
 		} catch (error) {
-			console.log('mimir login error', error);
+			console.log('remark login error', error);
 			toast({
 				status: ENotificationStatus.ERROR,
 				title: LOGIN_FAILED_MESSAGE
 			});
 			setLoading(false);
-			setPendingMimirAuth(false);
+			setRemarkAuthLoading(false);
 		}
 	};
 
@@ -113,7 +116,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 
 			setLoading(true);
 
-			if (userPreferences.wallet === EWallet.MIMIR) {
+			if ([EWallet.MIMIR, EWallet.POLKADOT_VAULT].includes(userPreferences.wallet)) {
 				if (!apiService) {
 					setLoading(false);
 					return;
@@ -127,21 +130,23 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 					return;
 				}
 
-				setPendingMimirAuth(true);
+				setRemarkAuthLoading(true);
 
 				// Start the remark transaction
 				apiService.loginWithRemark({
 					address,
+					wallet: userPreferences.wallet,
+					setVaultQrState,
 					remarkLoginMessage: data.message,
 					onSuccess: (hash) => {
 						const remarkHash = hash?.toString() || '';
 
 						if (remarkHash) {
 							// Complete the login process in the success callback
-							completeMimirLogin(remarkHash);
+							completeRemarkLogin(remarkHash);
 						} else {
 							setLoading(false);
-							setPendingMimirAuth(false);
+							setRemarkAuthLoading(false);
 							setErrorMessage('Failed to get transaction hash');
 						}
 					},
@@ -149,7 +154,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 						console.log('remark failed:', e);
 						setErrorMessage(e);
 						setLoading(false);
-						setPendingMimirAuth(false);
+						setRemarkAuthLoading(false);
 					}
 				});
 
@@ -209,7 +214,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 				title: LOGIN_FAILED_MESSAGE
 			});
 			setLoading(false);
-			setPendingMimirAuth(false);
+			setRemarkAuthLoading(false);
 		}
 	};
 
@@ -229,7 +234,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 						isLoading={loading}
 						onClick={handleLogin}
 						size='lg'
-						disabled={!userPreferences?.selectedAccount?.address || !userPreferences.wallet || pendingMimirAuth}
+						disabled={!userPreferences?.selectedAccount?.address || !userPreferences.wallet || remarkAuthLoading}
 						className={classes.loginButton}
 					>
 						{t('Profile.login')}

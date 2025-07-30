@@ -18,6 +18,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { useMemo, useState } from 'react';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useToast } from '@/hooks/useToast';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import { TableRow, TableCell } from '../../Table';
 import styles from './ListingTable.module.scss';
@@ -43,6 +44,8 @@ function PreimageRow({ preimage, handleDialogOpen, onUnnotePreimage }: { preimag
 
 	const { apiService } = usePolkadotApiService();
 
+	const { setVaultQrState } = usePolkadotVault();
+
 	const { toast } = useToast();
 
 	const [openUnnoteDialog, setOpenUnnoteDialog] = useState(false);
@@ -60,13 +63,15 @@ function PreimageRow({ preimage, handleDialogOpen, onUnnotePreimage }: { preimag
 	);
 
 	const unnotePreimage = async () => {
-		if (!user || !substrateProposer || !user.addresses.includes(substrateProposer) || !apiService || !preimage.hash) return;
+		if (!user || !substrateProposer || !user.addresses.includes(substrateProposer) || !apiService || !preimage.hash || !user.loginWallet) return;
 		setLoading(true);
 
 		if (preimage.status === EPreimageStatus.Noted) {
 			await apiService.unnotePreimage({
 				address: substrateProposer,
 				preimageHash: preimage.hash,
+				wallet: user.loginWallet,
+				setVaultQrState,
 				onSuccess: () => {
 					setLoading(false);
 					onUnnotePreimage();
@@ -89,6 +94,8 @@ function PreimageRow({ preimage, handleDialogOpen, onUnnotePreimage }: { preimag
 			await apiService.unRequestPreimage({
 				address: substrateProposer,
 				preimageHash: preimage.hash,
+				wallet: user.loginWallet,
+				setVaultQrState,
 				onSuccess: () => {
 					setLoading(false);
 					onUnnotePreimage();

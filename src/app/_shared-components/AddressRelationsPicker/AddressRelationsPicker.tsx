@@ -4,16 +4,19 @@
 
 'use client';
 
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useWalletService } from '@/hooks/useWalletService';
-import { EAccountType, IMultisigAddress, IProxyAddress, ISelectedAccount } from '@/_shared/types';
+import { EAccountType, EWallet, IMultisigAddress, IProxyAddress, ISelectedAccount, IVaultScannedAddress } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
-import { ChevronDown } from 'lucide-react';
+import { AlertCircle, ChevronDown } from 'lucide-react';
 import { IoMdSync } from '@react-icons/all-files/io/IoMdSync';
 import { useTranslations } from 'next-intl';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { InjectedAccount } from '@polkadot/extension-inject/types';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Address from '../Profile/Address/Address';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
@@ -23,6 +26,8 @@ import { RadioGroup, RadioGroupItem } from '../RadioGroup/RadioGroup';
 import { Label } from '../Label';
 import AccountTypeBadge from '../AccountTypeBadge/AccountTypeBadge';
 import Balance from '../Balance';
+import { Alert, AlertDescription } from '../Alert';
+import AddVaultAddress from '../PolkadotVault/AddressVaultAddress/AddVaultAddress';
 
 interface IAddressRadioGroupProps {
 	accountType: EAccountType;
@@ -220,36 +225,40 @@ function AddressSwitchButton({ disabled }: { disabled?: boolean }) {
 					<DialogTitle>{t('switchWallet')}</DialogTitle>
 				</DialogHeader>
 
-				<SwitchWalletOrAddress
-					small
-					withRadioSelect
-					withBalance
-				/>
+				{isOpen && (
+					<>
+						<SwitchWalletOrAddress
+							small
+							withRadioSelect
+							withBalance
+						/>
 
-				<div className='flex max-h-[60vh] flex-col gap-2 overflow-y-auto'>
-					<AddressRadioGroup
-						accountType={EAccountType.MULTISIG}
-						isLoading={!relationsForSelectedAddress}
-						addresses={relationsForSelectedAddress?.multisigAddresses || []}
-						defaultOpen
-						closeDialog={closeDialog}
-					/>
-					<AddressRadioGroup
-						accountType={EAccountType.PROXY}
-						isLoading={!relationsForSelectedAddress}
-						addresses={relationsForSelectedAddress?.proxyAddresses || []}
-						closeDialog={closeDialog}
-					/>
-				</div>
+						<div className='flex max-h-[60vh] flex-col gap-2 overflow-y-auto'>
+							<AddressRadioGroup
+								accountType={EAccountType.MULTISIG}
+								isLoading={!relationsForSelectedAddress}
+								addresses={relationsForSelectedAddress?.multisigAddresses || []}
+								defaultOpen
+								closeDialog={closeDialog}
+							/>
+							<AddressRadioGroup
+								accountType={EAccountType.PROXY}
+								isLoading={!relationsForSelectedAddress}
+								addresses={relationsForSelectedAddress?.proxyAddresses || []}
+								closeDialog={closeDialog}
+							/>
+						</div>
 
-				<DialogFooter className='mt-6'>
-					<Button
-						onClick={closeDialog}
-						variant='default'
-					>
-						{t('confirm')}
-					</Button>
-				</DialogFooter>
+						<DialogFooter className='mt-6'>
+							<Button
+								onClick={closeDialog}
+								variant='default'
+							>
+								{t('confirm')}
+							</Button>
+						</DialogFooter>
+					</>
+				)}
 			</DialogContent>
 		</Dialog>
 	);
@@ -268,19 +277,41 @@ export default function AddressRelationsPicker({
 }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const walletService = useWalletService();
-	const [accountsLoading, setAccountsLoading] = useState(true);
+	const t = useTranslations();
+	const queryClient = useQueryClient();
+	const { user } = useUser();
+
+	const network = getCurrentNetwork();
+
+	const [openVaultModal, setOpenVaultModal] = useState(false);
 
 	const selectedAddress = useMemo(() => userPreferences?.selectedAccount?.address, [userPreferences?.selectedAccount?.address]);
 	const walletAddressName = useMemo(() => userPreferences?.selectedAccount?.name, [userPreferences?.selectedAccount?.name]);
 
 	const getAccounts = useCallback(async () => {
-		if (!walletService || !userPreferences?.wallet) return;
+		if (!walletService || !userPreferences?.wallet) return null;
+
+		if (userPreferences.wallet === EWallet.POLKADOT_VAULT) {
+			if (user?.loginWallet === EWallet.POLKADOT_VAULT && user?.loginAddress) {
+				setUserPreferences({
+					...userPreferences,
+					selectedAccount: {
+						address: user.loginAddress,
+						accountType: EAccountType.REGULAR
+					}
+				});
+
+				return [{ address: user.loginAddress, name: '' }];
+			}
+			setOpenVaultModal(true);
+
+			return null;
+		}
 
 		const injectedAccounts = await walletService?.getAddressesFromWallet(userPreferences.wallet);
 
 		if (injectedAccounts.length === 0) {
-			setAccountsLoading(false);
-			return;
+			return null;
 		}
 
 		const prevPreferredAccount = userPreferences.selectedAccount;
@@ -298,46 +329,137 @@ export default function AddressRelationsPicker({
 			}
 		});
 
-		setAccountsLoading(false);
+		return injectedAccounts;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userPreferences?.wallet, walletService]);
 
-	useEffect(() => {
-		getAccounts();
-	}, [getAccounts]);
+	const { data: accounts, isFetching: accountsLoading } = useQuery({
+		queryKey: ['account-relations', userPreferences?.wallet],
+		queryFn: getAccounts,
+		enabled: !!userPreferences?.wallet && !!walletService,
+		retry: true,
+		refetchOnMount: true,
+		refetchOnWindowFocus: false
+	});
+
+	const onVaultAddressScan = (scanned: IVaultScannedAddress): void => {
+		if (!scanned.isAddress) return;
+
+		queryClient.setQueryData(['account-relations', userPreferences?.wallet], (oldData: InjectedAccount[] | undefined) => {
+			const newAccount = { address: scanned.content, name: scanned.name };
+			const isDuplicate = (oldData || []).some((account) => getSubstrateAddress(account.address) === getSubstrateAddress(newAccount.address));
+
+			if (isDuplicate) {
+				return oldData;
+			}
+
+			setUserPreferences({
+				...userPreferences,
+				selectedAccount: {
+					...newAccount,
+					accountType: EAccountType.REGULAR
+				}
+			});
+
+			return [newAccount, ...(oldData || [])];
+		});
+
+		setOpenVaultModal(false);
+	};
 
 	return (
 		<div className='flex flex-col gap-1'>
-			{withBalance && (
-				<Balance
-					address={userPreferences?.selectedAccount?.address || ''}
-					classname='ml-auto'
-					showPeopleChainBalance={showPeopleChainBalance}
-					showVotingBalance={showVotingBalance}
-				/>
-			)}
-
-			<div className='flex items-center gap-2 rounded border border-primary_border p-2'>
-				{accountsLoading || !selectedAddress ? (
-					<Skeleton className='h-6 w-32' />
-				) : (
-					<div className='flex items-center justify-between gap-2'>
-						<Address
-							address={selectedAddress}
-							walletAddressName={walletAddressName}
-							iconSize={25}
-							redirectToProfile={false}
-							disableTooltip
-							className='w-full px-2'
+			<Dialog
+				open={openVaultModal}
+				onOpenChange={setOpenVaultModal}
+			>
+				<DialogContent className='max-w-xl p-4 sm:p-6'>
+					<DialogHeader>
+						<DialogTitle>{t('PolkadotVault.addVaultAddress')}</DialogTitle>
+					</DialogHeader>
+					{openVaultModal && (
+						<AddVaultAddress
+							onScan={onVaultAddressScan}
+							onError={(err) => console.log(err)}
 						/>
-						<span>
-							<AccountTypeBadge accountType={userPreferences?.selectedAccount?.accountType || EAccountType.REGULAR} />
-							{userPreferences?.selectedAccount?.parent && <AccountTypeBadge accountType={userPreferences?.selectedAccount?.parent?.accountType || EAccountType.REGULAR} />}
-						</span>
+					)}
+				</DialogContent>
+			</Dialog>
+			{!accountsLoading && !accounts?.length ? (
+				userPreferences.wallet === EWallet.POLKADOT_VAULT ? (
+					<>
+						<Alert
+							variant='info'
+							className='flex items-center gap-x-3'
+						>
+							<AlertCircle className='h-4 w-4' />
+							<AlertDescription className=''>
+								<h2 className='mb-2 text-base font-medium'>{t('AddressDropdown.scanYourAddressQr')}</h2>
+								<ul className='list-disc pl-4'>
+									<li>{t('AddressDropdown.scanYourAddressQrDescription1')}</li>
+									<li>{t('AddressDropdown.scanYourAddressQrDescription2', { network })}</li>
+								</ul>
+							</AlertDescription>
+						</Alert>
+						<div className='mt-1 flex justify-end'>
+							<Button
+								variant='secondary'
+								size='sm'
+								onClick={() => setOpenVaultModal(true)}
+							>
+								{t('PolkadotVault.scan')}
+							</Button>
+						</div>
+					</>
+				) : (
+					<Alert
+						variant='info'
+						className='flex items-center gap-x-3'
+					>
+						<AlertCircle className='h-4 w-4' />
+						<AlertDescription className=''>
+							<h2 className='mb-2 text-base font-medium'>{t('AddressDropdown.noAccountsFound')}</h2>
+							<ul className='list-disc pl-4'>
+								<li>{t('AddressDropdown.pleaseConnectWallet')}</li>
+								<li>{t('AddressDropdown.pleaseCheckConnectedAccounts')}</li>
+							</ul>
+						</AlertDescription>
+					</Alert>
+				)
+			) : (
+				<>
+					{withBalance && (
+						<Balance
+							address={userPreferences?.selectedAccount?.address || ''}
+							classname='ml-auto'
+							showPeopleChainBalance={showPeopleChainBalance}
+							showVotingBalance={showVotingBalance}
+						/>
+					)}
+
+					<div className='flex items-center gap-2 rounded border border-primary_border p-2'>
+						{accountsLoading ? (
+							<Skeleton className='h-6 w-32' />
+						) : (
+							<div className='flex items-center justify-between gap-2'>
+								<Address
+									address={selectedAddress || ''}
+									walletAddressName={walletAddressName}
+									iconSize={25}
+									redirectToProfile={false}
+									disableTooltip
+									className='w-full px-2'
+								/>
+								<span>
+									<AccountTypeBadge accountType={userPreferences?.selectedAccount?.accountType || EAccountType.REGULAR} />
+									{userPreferences?.selectedAccount?.parent && <AccountTypeBadge accountType={userPreferences?.selectedAccount?.parent?.accountType || EAccountType.REGULAR} />}
+								</span>
+							</div>
+						)}
+						<AddressSwitchButton disabled={disabled} />
 					</div>
-				)}
-				<AddressSwitchButton disabled={disabled} />
-			</div>
+				</>
+			)}
 		</div>
 	);
 }

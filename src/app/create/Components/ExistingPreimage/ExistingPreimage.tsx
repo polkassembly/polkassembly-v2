@@ -23,6 +23,7 @@ import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddres
 import Link from 'next/link';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 
 function ExistingPreimage({ createdPreimageHash, onSuccess }: { createdPreimageHash?: string; onSuccess: (proposalId: number) => void }) {
 	const t = useTranslations();
@@ -36,6 +37,8 @@ function ExistingPreimage({ createdPreimageHash, onSuccess }: { createdPreimageH
 	const { value: preimageHash, debouncedValue: debouncedPreimageHash, setValue: setPreimageHash } = useDebounce(createdPreimageHash || '', 500);
 	const [preimageLength, setPreimageLength] = useState(0);
 	const [isValidPreimageHash, setIsValidPreimageHash] = useState(false);
+
+	const { setVaultQrState } = usePolkadotVault();
 
 	const submitProposalTx = useMemo(() => {
 		if (!apiService || !selectedTrack || !debouncedPreimageHash || !preimageLength) return null;
@@ -72,6 +75,7 @@ function ExistingPreimage({ createdPreimageHash, onSuccess }: { createdPreimageH
 		if (
 			!apiService ||
 			!userPreferences.selectedAccount?.address ||
+			!userPreferences.wallet ||
 			!debouncedPreimageHash ||
 			!preimageLength ||
 			!selectedTrack ||
@@ -87,6 +91,8 @@ function ExistingPreimage({ createdPreimageHash, onSuccess }: { createdPreimageH
 
 		apiService.createProposal({
 			address: userPreferences.selectedAccount.address,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
 			track: selectedTrack.name,
 			preimageHash: debouncedPreimageHash,
 			preimageLength,

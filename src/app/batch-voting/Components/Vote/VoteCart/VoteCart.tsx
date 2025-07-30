@@ -10,12 +10,15 @@ import { useTranslations } from 'next-intl';
 import { BatchVotingClientService } from '@/app/_client-services/batch_voting_client_service';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@/hooks/useUser';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import CartItem from './CartItem';
 
 function VoteCart({ voteCart }: { voteCart: IVoteCartItem[] }) {
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
 	const t = useTranslations();
+
+	const { setVaultQrState } = usePolkadotVault();
 
 	const [loading, setLoading] = useState<boolean>(false);
 	const [clearCartLoading, setClearCartLoading] = useState<boolean>(false);
@@ -42,12 +45,14 @@ function VoteCart({ voteCart }: { voteCart: IVoteCartItem[] }) {
 	};
 
 	const confirmBatchVoting = async () => {
-		if (!userPreferences.selectedAccount?.address || voteCart.length === 0) return;
+		if (!userPreferences.wallet || !userPreferences.selectedAccount?.address || voteCart.length === 0) return;
 
 		setLoading(true);
 		await apiService?.batchVoteReferendum({
 			address: userPreferences.selectedAccount.address,
+			wallet: userPreferences.wallet,
 			voteCartItems: voteCart,
+			setVaultQrState,
 			onSuccess: () => {
 				setLoading(false);
 			},

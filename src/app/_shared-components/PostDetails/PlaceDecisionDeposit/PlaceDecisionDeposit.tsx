@@ -14,6 +14,7 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import Image from 'next/image';
 import CrystalIcon from '@assets/icons/crystalIcon.png';
 import Link from 'next/link';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import { Button } from '../../Button';
 import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelationsPicker';
@@ -27,7 +28,7 @@ function PlaceDecisionDeposit({ postId, track, status, onSuccess }: { postId: nu
 	const network = getCurrentNetwork();
 	const { toast } = useToast();
 	const t = useTranslations('');
-
+	const { setVaultQrState } = usePolkadotVault();
 	const [openDepositModal, setOpenDepositModal] = useState(false);
 
 	const [loading, setLoading] = useState(false);
@@ -37,11 +38,21 @@ function PlaceDecisionDeposit({ postId, track, status, onSuccess }: { postId: nu
 	const decisionDeposit = NETWORKS_DETAILS[`${network}`].trackDetails[`${track}`]?.decisionDeposit;
 
 	const handleSubmit = () => {
-		if (!apiService || !userPreferences.selectedAccount?.address || status !== EProposalStatus.Submitted || !decisionDeposit || userBalance.lt(decisionDeposit)) return;
+		if (
+			!apiService ||
+			!userPreferences.selectedAccount?.address ||
+			status !== EProposalStatus.Submitted ||
+			!decisionDeposit ||
+			userBalance.lt(decisionDeposit) ||
+			!userPreferences.wallet
+		)
+			return;
 		setLoading(true);
 		apiService.submitDecisionDeposit({
 			postId,
 			address: userPreferences.selectedAccount.address,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
 			onSuccess: () => {
 				toast({
 					title: 'Decision deposit submitted',
