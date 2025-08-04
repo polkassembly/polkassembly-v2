@@ -8,6 +8,7 @@ import { ECookieNames, ESocial, ENotificationChannel } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
+import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { StatusCodes } from 'http-status-codes';
@@ -105,6 +106,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
 
+	const network = await getNetworkFromHeaders();
+
 	let { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
 	const loggedInUserId = AuthService.GetUserIdFromAccessToken(newAccessToken);
@@ -130,7 +133,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	});
 
 	if (email) {
-		const result = await AuthService.UpdateUserEmail({ accessToken: newAccessToken, email });
+		const result = await AuthService.UpdateUserEmail({ accessToken: newAccessToken, email, network });
 		newAccessToken = result.newAccessToken;
 		newRefreshToken = result.newRefreshToken;
 	}

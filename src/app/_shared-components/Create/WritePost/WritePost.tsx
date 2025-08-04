@@ -4,27 +4,33 @@
 
 'use client';
 
-import { EAllowedCommentor, EOffChainPostTopic, IWritePostFormFields } from '@/_shared/types';
+import { useRef, useState } from 'react';
+import { EAllowedCommentor, ENetwork, EOffChainPostTopic, IWritePostFormFields } from '@/_shared/types';
 import { UseFormReturn } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@ui/Form';
 import { Input } from '@ui/Input';
 import { useTranslations } from 'next-intl';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/Tooltip';
-import { Info } from 'lucide-react';
+import { ChevronDown, Info } from 'lucide-react';
 import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
-import { useRef } from 'react';
 import { MDXEditorMethods } from '@mdxeditor/editor';
 import { cn } from '@/lib/utils';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { RadioGroup, RadioGroupItem } from '../../RadioGroup/RadioGroup';
 import { Label } from '../../Label';
 import SelectTopic from '../../TopicTag/SelectTopic/SelectTopic';
 import { AddTags } from '../AddTags/AddTags';
 import classes from './WritePost.module.scss';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
+import AddPoll from '../AddPoll/AddPoll';
+import { Separator } from '../../Separator';
+import { Button } from '../../Button';
 
 function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostFormFields>; disabled?: boolean }) {
 	const t = useTranslations();
+	const network = getCurrentNetwork();
 	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
+	const [isAdvanced, setIsAdvanced] = useState(false);
 
 	const allowedCommentorsOptions = [
 		{
@@ -151,63 +157,89 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 					</FormItem>
 				)}
 			/>
+			{network === ENetwork.PASEO && (
+				<AddPoll
+					formData={formData}
+					disabled={disabled || false}
+				/>
+			)}
 
-			<FormField
-				control={formData.control}
-				name='allowedCommentor'
-				key='allowedCommentor'
-				disabled={disabled}
-				defaultValue={EAllowedCommentor.ALL}
-				render={({ field }) => (
-					<FormItem>
-						<FormLabel className='mt-2 flex items-center gap-1'>
-							<span>{t('Create.AllowedCommentors.title')} </span>
-							<TooltipProvider>
-								<Tooltip>
-									<TooltipTrigger>
-										<Info className='text-text-grey h-4 w-4' />
-									</TooltipTrigger>
-									<TooltipContent className='bg-tooltip_background p-2 text-white'>
-										<p>{t('Create.AllowedCommentors.tooltip')}</p>
-									</TooltipContent>
-								</Tooltip>
-							</TooltipProvider>
-						</FormLabel>
-						<FormControl>
-							<RadioGroup
-								disabled={disabled}
-								defaultValue={EAllowedCommentor.ALL}
-								className={classes.radioGroup}
-								onValueChange={(e) => field.onChange(e)}
-							>
-								<div className='flex flex-row gap-2'>
-									{allowedCommentorsOptions?.map((option) => {
-										return (
-											<div
-												key={option.value}
-												className='flex items-center space-x-2'
-											>
-												<RadioGroupItem
-													value={option.value}
-													id={option.value}
-												/>
-												<Label
-													htmlFor={option.value}
-													className={classes.radioGroupItem}
-												>
-													{option.label}
-												</Label>
+			<div className={classes.advancedContainer}>
+				<Button
+					variant='ghost'
+					type='button'
+					aria-label={`${t('Create.AllowedCommentors.advanced')} - ${isAdvanced}`}
+					className='flex h-5 w-full items-center justify-between p-0'
+					onClick={() => setIsAdvanced(!isAdvanced)}
+				>
+					<span className='text-sm font-medium'>{t('Create.AllowedCommentors.advanced')}</span>
+					<ChevronDown className={cn('text-text-grey h-5 w-5', isAdvanced ? 'rotate-180' : '')} />
+				</Button>
+				{isAdvanced && (
+					<div className='mt-2 flex w-full flex-col gap-2'>
+						<Separator
+							orientation='horizontal'
+							className='bg-border_grey'
+						/>
+						<FormField
+							control={formData.control}
+							name='allowedCommentor'
+							key='allowedCommentor'
+							disabled={disabled}
+							defaultValue={EAllowedCommentor.ALL}
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className='mt-2 flex w-full items-center gap-1'>
+										<span>{t('Create.AllowedCommentors.title')} </span>
+										<TooltipProvider>
+											<Tooltip>
+												<TooltipTrigger>
+													<Info className='text-text-grey h-4 w-4' />
+												</TooltipTrigger>
+												<TooltipContent className='bg-tooltip_background p-2 text-white'>
+													<p>{t('Create.AllowedCommentors.tooltip')}</p>
+												</TooltipContent>
+											</Tooltip>
+										</TooltipProvider>
+									</FormLabel>
+									<FormControl>
+										<RadioGroup
+											disabled={disabled}
+											defaultValue={EAllowedCommentor.ALL}
+											className={classes.radioGroup}
+											onValueChange={(e) => field.onChange(e)}
+										>
+											<div className='flex flex-row gap-2'>
+												{allowedCommentorsOptions?.map((option) => {
+													return (
+														<div
+															key={option.value}
+															className='flex items-center space-x-2'
+														>
+															<RadioGroupItem
+																value={option.value}
+																id={option.value}
+															/>
+															<Label
+																htmlFor={option.value}
+																className={classes.radioGroupItem}
+															>
+																{option.label}
+															</Label>
+														</div>
+													);
+												})}
 											</div>
-										);
-									})}
-								</div>
-							</RadioGroup>
-						</FormControl>
+										</RadioGroup>
+									</FormControl>
 
-						<FormMessage />
-					</FormItem>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 				)}
-			/>
+			</div>
 		</div>
 	);
 }

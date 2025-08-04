@@ -9,8 +9,10 @@ import { APPNAME } from '@/_shared/_constants/appName';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { stringToHex } from '@polkadot/util';
 import { isWeb3Injected } from '@polkadot/extension-dapp';
+import { inject } from '@mimirdev/apps-inject';
 import { PolkadotApiService } from './polkadot_api_service';
 import { IdentityService } from './identity_service';
+import { isMimirDetected } from './isMimirDetected';
 
 export class WalletClientService {
 	private injectedWindow: Window & InjectedWindow;
@@ -38,6 +40,12 @@ export class WalletClientService {
 				await identityService.ready();
 			}
 
+			const isMimirIframe = await isMimirDetected();
+
+			if (isMimirIframe) {
+				inject();
+			}
+
 			return new WalletClientService(injectedWindow, apiService, network, identityService);
 		};
 
@@ -51,30 +59,37 @@ export class WalletClientService {
 	}
 
 	async getAddressesFromWallet(selectedWallet: EWallet): Promise<InjectedAccount[]> {
-		const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
-		if (!wallet) {
-			return [];
-		}
-
 		let injected: Injected | undefined;
 		try {
-			injected = await new Promise((resolve, reject) => {
-				const timeoutId = setTimeout(() => {
-					reject(new Error('Wallet Timeout'));
-				}, 60000); // wait 60 sec
+			if (selectedWallet === EWallet.MIMIR) {
+				const { web3Enable, web3FromSource } = await import('@polkadot/extension-dapp');
 
-				if (wallet && wallet.enable) {
-					wallet
-						.enable(APPNAME)
-						.then((value) => {
-							clearTimeout(timeoutId);
-							resolve(value);
-						})
-						.catch((error) => {
-							reject(error);
-						});
+				await web3Enable(APPNAME);
+				injected = await web3FromSource('mimir');
+			} else {
+				const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
+
+				if (!wallet) {
+					return [];
 				}
-			});
+				injected = await new Promise((resolve, reject) => {
+					const timeoutId = setTimeout(() => {
+						reject(new Error('Wallet Timeout'));
+					}, 60000); // wait 60 sec
+
+					if (wallet && wallet.enable) {
+						wallet
+							.enable(APPNAME)
+							.then((value) => {
+								clearTimeout(timeoutId);
+								resolve(value);
+							})
+							.catch((error) => {
+								reject(error);
+							});
+					}
+				});
+			}
 			if (!injected) {
 				return [];
 			}

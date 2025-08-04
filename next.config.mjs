@@ -8,6 +8,9 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./src/intl/intlRequest.ts');
 
+// Change src/_shared/_constants/allowedOutboundIFrameDomains.ts if you change this
+export const ALLOWED_OUTBOUND_IFRAME_DOMAINS = ['https://app.mimir.global'];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	async headers() {
@@ -23,10 +26,12 @@ const nextConfig = {
 						key: 'Access-Control-Allow-Headers',
 						value: '*'
 					},
-					{ key: 'X-Frame-Options', value: 'SAMEORIGIN' },
 					{ key: 'X-XSS-Protection', value: '1; mode=block' },
 					{ key: 'X-Content-Type-Options', value: 'nosniff' },
-					{ key: 'Content-Security-Policy', value: "default-src 'self'; img-src '*' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';" },
+					{
+						key: 'Content-Security-Policy',
+						value: `default-src 'self'; img-src '*' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; frame-src 'self'; frame-ancestors 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')};`
+					},
 					{ key: 'Cache-Control', value: 's-maxage=60, stale-while-revalidate=59' }
 				]
 			}

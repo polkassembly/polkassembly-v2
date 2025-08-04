@@ -35,6 +35,18 @@ export class AuthClientService extends NextApiClientService {
 		});
 	}
 
+	static async remarkLogin({ address, wallet, remarkHash }: { address: string; wallet: EWallet; remarkHash: string }) {
+		return this.remarkLoginApi({
+			address,
+			wallet,
+			remarkHash
+		});
+	}
+
+	static async getRemarkLoginMessage({ address }: { address: string }) {
+		return this.getRemarkLoginMessageApi({ address });
+	}
+
 	static async checkForUsernameAndEmail({ email, username }: { email: string; username: string }) {
 		return this.checkForUsernameAndEmailApi({
 			username,
@@ -61,12 +73,12 @@ export class AuthClientService extends NextApiClientService {
 		});
 	}
 
-	static async logout(onLogout?: () => void) {
+	static async logout({ isIframe, onLogout }: { isIframe?: boolean; onLogout?: () => void }) {
 		this.logoutApi();
-
 		onLogout?.();
-		CookieClientService.deleteAccessToken();
-		CookieClientService.deleteRefreshToken();
+
+		CookieClientService.deleteAccessToken(isIframe);
+		CookieClientService.deleteRefreshToken(isIframe);
 		LocalStorageClientService.logout();
 	}
 
