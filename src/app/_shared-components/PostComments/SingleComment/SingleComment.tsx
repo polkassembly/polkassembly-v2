@@ -335,11 +335,14 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 								{t('PostDetails.reply')}
 							</Button>
 						) : (
-							<Link href='/login'>
+							<Link
+								href='/login'
+								className='p-0'
+							>
 								<Button
 									variant='ghost'
-									className={classes.replyButton}
 									size='sm'
+									className={classes.replyButton}
 									leftIcon={
 										<Image
 											src={ReplyIcon}
