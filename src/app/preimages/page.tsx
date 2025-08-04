@@ -14,6 +14,7 @@ import { Tabs, TabsContent } from '@ui/Tabs';
 import SearchBar from '@ui/Preimages/SearchBar/SearchBar';
 import { EPreImageTabs } from '@/_shared/types';
 import UserPreimagesTab from '@/app/_shared-components/Preimages/UserPreimagesTab/UserPreimagesTab';
+import styles from '@ui/Preimages/SearchBar/SearchBar.module.scss';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
 import { ClientError } from '../_client-utils/clientError';
 
@@ -47,8 +48,10 @@ async function Preimages({ searchParams }: { searchParams: Promise<{ page?: stri
 			>
 				<Header data={{ totalCount: data.totalCount }} />
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
-					<SearchBar />
 					<TabsContent value={EPreImageTabs.ALL}>
+						<div className={`${styles.container} mb-4`}>
+							<SearchBar />
+						</div>
 						<ListingTable
 							data={data.items}
 							totalCount={data.totalCount}

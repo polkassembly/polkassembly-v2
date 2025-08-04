@@ -14,6 +14,7 @@ import { Tabs, TabsContent } from '@/app/_shared-components/Tabs';
 import { EPreImageTabs } from '@/_shared/types';
 import SearchBar from '@ui/Preimages/SearchBar/SearchBar';
 import UserPreimageCheck from '@ui/Preimages/UserPreimagesTab/UserPreimageCheck';
+import styles from '@ui/Preimages/SearchBar/SearchBar.module.scss';
 
 export async function generateMetadata({ params }: { params: Promise<{ hash: string }> }): Promise<Metadata> {
 	const { hash } = await params;
@@ -73,7 +74,9 @@ async function Preimages({ params }: { params: Promise<{ hash: string }> }) {
 			>
 				<Header data={{ totalCount: data ? 1 : 0 }} />
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
-					<SearchBar />
+					<div className={styles.container}>
+						<SearchBar />
+					</div>
 					<TabsContent value={EPreImageTabs.ALL}>
 						<ListingTable
 							data={data ? [data] : []}

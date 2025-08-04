@@ -11,7 +11,6 @@ import { useRouter } from 'nextjs-toploader/app';
 import { Search } from 'lucide-react';
 import { Input } from '../../Input';
 import { Button } from '../../Button';
-import styles from './SearchBar.module.scss';
 
 function SearchBar() {
 	const t = useTranslations();
@@ -22,7 +21,7 @@ function SearchBar() {
 	const preImagePath = '/preimages';
 
 	return (
-		<div className={styles.container}>
+		<>
 			<div className='relative w-full'>
 				<Input
 					className='h-9 w-full pr-12 sm:pr-12'
@@ -64,7 +63,7 @@ function SearchBar() {
 					{t('Preimages.showAll')}
 				</Button>
 			)}
-		</div>
+		</>
 	);
 }
 
