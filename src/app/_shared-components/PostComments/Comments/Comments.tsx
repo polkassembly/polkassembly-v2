@@ -85,7 +85,7 @@ function Comments({
 
 	// Handle comment link navigation
 	const handleCommentLink = useCallback(() => {
-		const { hash } = window?.location || {};
+		const { hash } = window?.location || { hash: '' };
 		if (!hash) return;
 
 		const commentId = hash.replace('#comment-', '');
