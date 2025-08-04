@@ -10,6 +10,7 @@ import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
 import Image from 'next/image';
 import { Button } from '@ui/Button';
+import Link from 'next/link';
 import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
 import { Separator } from '@ui/Separator';
 import { useAtomValue } from 'jotai';
@@ -315,8 +316,8 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 				)}
 
 				<div className={classes.tools}>
-					{user && (
-						<div className={classes.tools}>
+					<div className={classes.tools}>
+						{user ? (
 							<Button
 								variant='ghost'
 								className={classes.replyButton}
@@ -333,61 +334,78 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 							>
 								{t('PostDetails.reply')}
 							</Button>
-							<div>
-								<DropdownMenu>
-									<DropdownMenuTrigger
-										noArrow
-										className='border-none'
-									>
-										<Ellipsis
-											className='text-text_primary/[0.8]'
-											size={14}
+						) : (
+							<Link href='/login'>
+								<Button
+									variant='ghost'
+									className={classes.replyButton}
+									size='sm'
+									leftIcon={
+										<Image
+											src={ReplyIcon}
+											alt='reply'
+											className='darkIcon'
 										/>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent>
-										<DropdownMenuItem className='hover:bg-bg_pink/10'>
-											<Button
-												variant='ghost'
-												className='h-auto p-0 text-sm text-text_primary'
-												onClick={handleCopyCommentLink}
-												size='sm'
-											>
-												{t('PostDetails.copyLink')}
-											</Button>
-										</DropdownMenuItem>
-										{comment.userId === user.id && (
-											<>
-												<DropdownMenuItem className='hover:bg-bg_pink/10'>
-													<Button
-														variant='ghost'
-														className='h-auto p-0 text-sm text-text_primary'
-														disabled={comment.userId !== user.id || comment.disabled}
-														onClick={toggleEditComment}
-														size='sm'
-														isLoading={loading}
-													>
-														{t('PostDetails.edit')}
-													</Button>
-												</DropdownMenuItem>
-												<DropdownMenuItem className='hover:bg-bg_pink/10'>
-													<Button
-														variant='ghost'
-														className='h-auto p-0 text-sm text-text_primary'
-														disabled={comment.userId !== user.id || comment.disabled}
-														onClick={handleOpenDeleteModal}
-														size='sm'
-														isLoading={loading}
-													>
-														{t('PostDetails.delete')}
-													</Button>
-												</DropdownMenuItem>
-											</>
-										)}
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</div>
+									}
+								>
+									{t('PostDetails.reply')}
+								</Button>
+							</Link>
+						)}
+						<div className='ml-auto'>
+							<DropdownMenu>
+								<DropdownMenuTrigger
+									noArrow
+									className='border-none'
+								>
+									<Ellipsis
+										className='text-text_primary/[0.8]'
+										size={14}
+									/>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent>
+									<DropdownMenuItem className='hover:bg-bg_pink/10'>
+										<Button
+											variant='ghost'
+											className='h-auto p-0 text-sm text-text_primary'
+											onClick={handleCopyCommentLink}
+											size='sm'
+										>
+											{t('PostDetails.copyLink')}
+										</Button>
+									</DropdownMenuItem>
+									{user && comment.userId === user.id && (
+										<>
+											<DropdownMenuItem className='hover:bg-bg_pink/10'>
+												<Button
+													variant='ghost'
+													className='h-auto p-0 text-sm text-text_primary'
+													disabled={comment.userId !== user.id || comment.disabled}
+													onClick={toggleEditComment}
+													size='sm'
+													isLoading={loading}
+												>
+													{t('PostDetails.edit')}
+												</Button>
+											</DropdownMenuItem>
+											<DropdownMenuItem className='hover:bg-bg_pink/10'>
+												<Button
+													variant='ghost'
+													className='h-auto p-0 text-sm text-text_primary'
+													disabled={comment.userId !== user.id || comment.disabled}
+													onClick={handleOpenDeleteModal}
+													size='sm'
+													isLoading={loading}
+												>
+													{t('PostDetails.delete')}
+												</Button>
+											</DropdownMenuItem>
+										</>
+									)}
+								</DropdownMenuContent>
+							</DropdownMenu>
 						</div>
-					)}
+					</div>
 				</div>
 
 				{reply && (
