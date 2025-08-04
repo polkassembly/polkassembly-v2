@@ -4,7 +4,7 @@
 
 'use client';
 
-import { ICommentResponse, ENotificationStatus, EProposalType } from '@/_shared/types';
+import { ICommentResponse, ENotificationStatus } from '@/_shared/types';
 import { Dispatch, SetStateAction, useCallback, memo, useState, useRef, useEffect } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
@@ -18,6 +18,7 @@ import { useTranslations } from 'next-intl';
 import { Ellipsis } from 'lucide-react';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
+import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import UserIcon from '@assets/profile/user-icon.svg';
 import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
@@ -172,20 +173,12 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 	}, [commentData]);
 
 	const handleCopyCommentLink = useCallback(() => {
-		let url = '';
-		switch (proposalType) {
-			case EProposalType.DISCUSSION:
-				url = `${window?.location?.origin}/post/${index}#comment-${comment?.id}`;
-				break;
-			case EProposalType.BOUNTY:
-				url = `${window?.location?.origin}/bounty/${index}#comment-${comment?.id}`;
-				break;
-			case EProposalType.CHILD_BOUNTY:
-				url = `${window?.location?.origin}/child-bounty/${index}#comment-${comment?.id}`;
-				break;
-			default:
-				url = `${window?.location?.origin}/referenda/${index}#comment-${comment?.id}`;
-		}
+		const baseUrl = getPostTypeUrl({ proposalType, indexOrHash: index });
+
+		// Check if baseUrl is already an absolute URL (starts with http/https)
+		const isAbsoluteUrl = baseUrl.startsWith('http://') || baseUrl.startsWith('https://');
+		const url = isAbsoluteUrl ? `${baseUrl}#comment-${comment?.id}` : `${window?.location?.origin}${baseUrl}#comment-${comment?.id}`;
+
 		navigator.clipboard.writeText(url);
 		toast({
 			title: 'Success!',
