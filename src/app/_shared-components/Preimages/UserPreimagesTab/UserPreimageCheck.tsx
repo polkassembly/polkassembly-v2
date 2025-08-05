@@ -9,8 +9,16 @@ import { IPreimage } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { useTranslations } from 'next-intl';
+import { Button } from '@ui/Button';
+import { RefreshCcwIcon } from 'lucide-react';
 import ListingTable from '@/app/_shared-components/Preimages/ListingTable/ListingTable';
 import NoUserPreimage from '@/app/_shared-components/Preimages/ListingTable/NoUserPreimage';
+import SearchBar from '@/app/_shared-components/Preimages/SearchBar/SearchBar';
+import styles from '@ui/Preimages/SearchBar/SearchBar.module.scss';
+import Address from '../../Profile/Address/Address';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
+import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
 
 interface UserPreimageCheckProps {
 	preimage: IPreimage | null;
@@ -19,6 +27,7 @@ interface UserPreimageCheckProps {
 function UserPreimageCheck({ preimage }: UserPreimageCheckProps) {
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
+	const t = useTranslations('Preimages');
 
 	const selectedAddress = userPreferences?.selectedAccount?.address || user?.addresses?.[0] || '';
 
@@ -35,14 +44,86 @@ function UserPreimageCheck({ preimage }: UserPreimageCheckProps) {
 
 	if (userOwnsPreimage && preimage) {
 		return (
-			<ListingTable
-				data={[preimage]}
-				totalCount={1}
-			/>
+			<>
+				<div className={styles.container}>
+					<div className='flex w-full flex-col items-center gap-y-4 sm:flex-row sm:gap-x-4'>
+						<span className='flex items-center gap-x-2 text-sm'>
+							{t('showingPreimagesFor')}
+							<Address
+								address={selectedAddress}
+								truncateCharLen={5}
+								disableTooltip
+							/>
+						</span>
+						<Dialog>
+							<DialogTrigger asChild>
+								<Button
+									variant='secondary'
+									size='sm'
+									className='flex items-center gap-x-2 text-bg_pink'
+								>
+									{t('switchWallet')}
+									<RefreshCcwIcon className='h-4 w-4' />
+								</Button>
+							</DialogTrigger>
+							<DialogContent className='p-4 sm:max-w-md sm:p-6'>
+								<DialogHeader>
+									<DialogTitle>{t('switchWallet')}</DialogTitle>
+								</DialogHeader>
+								<div className='flex flex-col gap-y-4 py-4'>
+									<SwitchWalletOrAddress small />
+								</div>
+							</DialogContent>
+						</Dialog>
+					</div>
+					<SearchBar />
+				</div>
+				<ListingTable
+					data={[preimage]}
+					totalCount={1}
+				/>
+			</>
 		);
 	}
 
-	return <NoUserPreimage />;
+	return (
+		<>
+			<div className={styles.container}>
+				<div className='flex w-full flex-col items-center gap-y-4 sm:flex-row sm:gap-x-4'>
+					<span className='flex items-center gap-x-2 text-sm'>
+						{t('showingPreimagesFor')}
+						<Address
+							address={selectedAddress}
+							truncateCharLen={5}
+							disableTooltip
+						/>
+					</span>
+					<Dialog>
+						<DialogTrigger asChild>
+							<Button
+								variant='secondary'
+								size='sm'
+								className='flex items-center gap-x-2 text-bg_pink'
+							>
+								{t('switchWallet')}
+								<RefreshCcwIcon className='h-4 w-4' />
+							</Button>
+						</DialogTrigger>
+						<DialogContent className='p-4 sm:max-w-md sm:p-6'>
+							<DialogHeader>
+								<DialogTitle>{t('switchWallet')}</DialogTitle>
+							</DialogHeader>
+							<div className='flex flex-col gap-y-4 py-4'>
+								<SwitchWalletOrAddress small />
+							</div>
+						</DialogContent>
+					</Dialog>
+				</div>
+				<SearchBar />
+			</div>
+			<NoUserPreimage />
+		</>
+	);
 }
 
 export default UserPreimageCheck;

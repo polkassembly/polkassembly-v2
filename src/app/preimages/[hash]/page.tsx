@@ -74,10 +74,10 @@ async function Preimages({ params }: { params: Promise<{ hash: string }> }) {
 			>
 				<Header data={{ totalCount: data ? 1 : 0 }} />
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
-					<div className={styles.container}>
-						<SearchBar />
-					</div>
 					<TabsContent value={EPreImageTabs.ALL}>
+						<div className={`${styles.container} mb-4`}>
+							<SearchBar />
+						</div>
 						<ListingTable
 							data={data ? [data] : []}
 							totalCount={data ? 1 : 0}
