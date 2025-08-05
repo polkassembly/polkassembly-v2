@@ -7,6 +7,7 @@
 import React from 'react';
 import { IPreimage } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import ListingTable from '@/app/_shared-components/Preimages/ListingTable/ListingTable';
 import NoUserPreimage from '@/app/_shared-components/Preimages/ListingTable/NoUserPreimage';
@@ -17,17 +18,20 @@ interface UserPreimageCheckProps {
 
 function UserPreimageCheck({ preimage }: UserPreimageCheckProps) {
 	const { user } = useUser();
+	const { userPreferences } = useUserPreferences();
 
-	// Check if user owns this preimage
+	const selectedAddress = userPreferences?.selectedAccount?.address || user?.addresses?.[0] || '';
+
+	// Check if user owns this preimage using selected address
 	const userOwnsPreimage =
 		user &&
 		preimage &&
-		user.addresses &&
-		user.addresses.some((address) => {
-			const userSubstrateAddress = getSubstrateAddress(address);
+		selectedAddress &&
+		(() => {
+			const userSubstrateAddress = getSubstrateAddress(selectedAddress);
 			const preimageProposerSubstrateAddress = getSubstrateAddress(preimage.proposer);
 			return userSubstrateAddress === preimageProposerSubstrateAddress;
-		});
+		})();
 
 	if (userOwnsPreimage && preimage) {
 		return (
