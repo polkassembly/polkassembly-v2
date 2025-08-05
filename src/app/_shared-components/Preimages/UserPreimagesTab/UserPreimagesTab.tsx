@@ -36,12 +36,13 @@ function UserPreimagesTab() {
 	const {
 		data: userPreimagesData,
 		isLoading,
-		error
+		error,
+		refetch
 	} = useQuery({
 		queryKey: ['userPreimages', selectedAddress, page],
 		queryFn: async () => {
 			if (!selectedAddress) {
-				throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'No address selected');
+				return null;
 			}
 
 			const { data, error: fetchError } = await NextApiClientService.fetchUserPreimages({
@@ -77,14 +78,14 @@ function UserPreimagesTab() {
 			<div className='flex items-center justify-center py-12'>
 				<div className='text-center'>
 					<p className='text-text_secondary mb-4'>
-						{t('pleaseLogInToViewPreimages')}{' '}
+						{t('please')}{' '}
 						<Link
 							href='/login'
 							className='text-bg_pink'
 						>
 							{t('logIn')}
 						</Link>{' '}
-						{t('pleaseLogInToViewPreimages')}
+						{t('toViewPreimages')}
 					</p>
 				</div>
 			</div>
@@ -99,7 +100,7 @@ function UserPreimagesTab() {
 					<p>Error: {error instanceof Error ? error.message : t('failedToFetchUserPreimages')}</p>
 					<Button
 						variant='ghost'
-						onClick={() => window.location.reload()}
+						onClick={() => refetch()}
 						className='mt-2 text-sm underline hover:no-underline'
 					>
 						{t('tryAgain')}

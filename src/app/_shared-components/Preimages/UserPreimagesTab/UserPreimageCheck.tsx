@@ -4,7 +4,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { IPreimage } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -32,15 +32,15 @@ function UserPreimageCheck({ preimage }: UserPreimageCheckProps) {
 	const selectedAddress = userPreferences?.selectedAccount?.address || user?.addresses?.[0] || '';
 
 	// Check if user owns this preimage using selected address
-	const userOwnsPreimage =
-		user &&
-		preimage &&
-		selectedAddress &&
-		(() => {
-			const userSubstrateAddress = getSubstrateAddress(selectedAddress);
-			const preimageProposerSubstrateAddress = getSubstrateAddress(preimage.proposer);
-			return userSubstrateAddress === preimageProposerSubstrateAddress;
-		})();
+	const userOwnsPreimage = useMemo(() => {
+		if (!user || !preimage || !selectedAddress) {
+			return false;
+		}
+
+		const userSubstrateAddress = getSubstrateAddress(selectedAddress);
+		const preimageProposerSubstrateAddress = getSubstrateAddress(preimage.proposer);
+		return userSubstrateAddress === preimageProposerSubstrateAddress;
+	}, [user, preimage, selectedAddress]);
 
 	if (userOwnsPreimage && preimage) {
 		return (
