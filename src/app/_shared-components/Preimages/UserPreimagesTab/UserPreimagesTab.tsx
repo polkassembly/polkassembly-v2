@@ -4,14 +4,14 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { IGenericListingResponse, IPreimage } from '@/_shared/types';
+import React from 'react';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { useUser } from '@/hooks/useUser';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useSearchParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@ui/Button';
 import Link from 'next/link';
 import styles from '@ui/Preimages/SearchBar/SearchBar.module.scss';
@@ -29,45 +29,36 @@ function UserPreimagesTab() {
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
 
-	const [userPreimagesData, setUserPreimagesData] = useState<IGenericListingResponse<IPreimage> | null>(null);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const selectedAddress = userPreferences?.selectedAccount?.address || user?.addresses?.[0] || '';
 
-	const currentUserAddress = userPreferences?.selectedAccount?.address || user?.addresses?.[0] || '';
-
-	useEffect(() => {
-		const fetchUserPreimages = async () => {
-			if (!user?.addresses?.length) {
-				setUserPreimagesData(null);
-				setLoading(false);
-				return;
+	const {
+		data: userPreimagesData,
+		isLoading,
+		error
+	} = useQuery({
+		queryKey: ['userPreimages', selectedAddress, page],
+		queryFn: async () => {
+			if (!selectedAddress) {
+				throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'No address selected');
 			}
 
-			try {
-				setLoading(true);
-				setError(null);
-				const { data, error: fetchError } = await NextApiClientService.fetchUserPreimages({
-					page,
-					addresses: user.addresses
-				});
-				if (fetchError || !data) {
-					throw new ClientError(ERROR_CODES.CLIENT_ERROR, fetchError?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
-				}
-				setUserPreimagesData(data);
-			} catch (err) {
-				console.error('Failed to fetch user preimages:', err);
-				setError(err instanceof Error ? err.message : 'Failed to fetch user preimages');
-				setUserPreimagesData({ items: [], totalCount: 0 });
-			} finally {
-				setLoading(false);
-			}
-		};
+			const { data, error: fetchError } = await NextApiClientService.fetchUserPreimages({
+				page,
+				address: selectedAddress
+			});
 
-		fetchUserPreimages();
-	}, [user?.addresses, page]);
+			if (fetchError || !data) {
+				throw new ClientError(ERROR_CODES.CLIENT_ERROR, fetchError?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+			}
+
+			return data;
+		},
+		enabled: !!selectedAddress,
+		retry: 1
+	});
 
 	// Show loading state
-	if (loading) {
+	if (isLoading) {
 		return (
 			<div className='flex items-center justify-center py-12'>
 				<div className='text-center'>
@@ -103,7 +94,7 @@ function UserPreimagesTab() {
 		return (
 			<div className='flex items-center justify-center py-12'>
 				<div className='text-center text-red-500'>
-					<p>Error: {error}</p>
+					<p>Error: {error instanceof Error ? error.message : 'Failed to fetch user preimages'}</p>
 					<Button
 						variant='ghost'
 						onClick={() => window.location.reload()}
@@ -123,7 +114,7 @@ function UserPreimagesTab() {
 					<span className='flex items-center gap-x-2 text-sm'>
 						Showing preimages for:
 						<Address
-							address={currentUserAddress}
+							address={selectedAddress}
 							truncateCharLen={5}
 							disableTooltip
 						/>

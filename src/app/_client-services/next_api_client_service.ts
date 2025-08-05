@@ -200,7 +200,7 @@ export class NextApiClientService {
 				path = '/preimages';
 				break;
 			case EApiRoute.FETCH_USER_PREIMAGES:
-				path = '/preimages/user';
+				path = '/users/address';
 				break;
 			case EApiRoute.FETCH_ALL_TAGS:
 				path = '/meta/tags';
@@ -869,14 +869,17 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPreimage>({ url, method });
 	}
 
-	static async fetchUserPreimages({ page, addresses }: { page: number; addresses: string[] }) {
+	static async fetchUserPreimages({ page, address }: { page: number; address: string }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
-			limit: PREIMAGES_LISTING_LIMIT.toString(),
-			addresses: addresses.join(',')
+			limit: PREIMAGES_LISTING_LIMIT.toString()
 		});
 
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_USER_PREIMAGES, queryParams });
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.FETCH_USER_PREIMAGES,
+			routeSegments: [address, 'preimages'],
+			queryParams
+		});
 		return this.nextApiClientFetch<IGenericListingResponse<IPreimage>>({ url, method });
 	}
 
