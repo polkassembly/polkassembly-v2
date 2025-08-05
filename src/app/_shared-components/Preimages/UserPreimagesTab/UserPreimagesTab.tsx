@@ -39,7 +39,7 @@ function UserPreimagesTab() {
 		error,
 		refetch
 	} = useQuery({
-		queryKey: ['userPreimages', selectedAddress, page],
+		queryKey: ['userPreimages', selectedAddress, page, user?.id, userPreferences?.selectedAccount?.address],
 		queryFn: async () => {
 			if (!selectedAddress) {
 				return null;
@@ -56,7 +56,7 @@ function UserPreimagesTab() {
 
 			return data;
 		},
-		enabled: !!selectedAddress,
+		enabled: !!selectedAddress && !!user?.addresses?.length,
 		retry: 1
 	});
 
