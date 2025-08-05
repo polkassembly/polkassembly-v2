@@ -773,7 +773,15 @@
 		"unnoted_description": "プレイメージは記録されていません",
 		"failed": "失敗",
 		"unrequest": "リクエストを取り消す",
-		"unnote": "記録を削除"
+		"unnote": "記録を削除",
+		"unnoteOrUnrequestPreimageDescription": "このプレイメージの記録を削除またはリクエストを取り消してもよろしいですか？",
+		"loadingYourPreimages": "プレイメージを読み込み中...",
+		"pleaseLogInToViewPreimages": "プレイメージを表示するにはログインしてください",
+		"logIn": "ログイン",
+		"failedToFetchUserPreimages": "ユーザーのプレイメージの取得に失敗しました",
+		"tryAgain": "再試行",
+		"showingPreimagesFor": "プレイメージを表示中:",
+		"switchWallet": "ウォレットを切り替え"
 	},
 	"Create": {
 		"createDiscussionTitle": "ディスカッションを作成",

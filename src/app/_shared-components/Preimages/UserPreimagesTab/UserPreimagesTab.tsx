@@ -12,6 +12,7 @@ import { useUser } from '@/hooks/useUser';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { Button } from '@ui/Button';
 import Link from 'next/link';
 import styles from '@ui/Preimages/SearchBar/SearchBar.module.scss';
@@ -28,6 +29,7 @@ function UserPreimagesTab() {
 	const page = parseInt(searchParams?.get('page') || '1', 10);
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
+	const t = useTranslations('Preimages');
 
 	const selectedAddress = userPreferences?.selectedAccount?.address || user?.addresses?.[0] || '';
 
@@ -63,7 +65,7 @@ function UserPreimagesTab() {
 			<div className='flex items-center justify-center py-12'>
 				<div className='text-center'>
 					<div className='mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-bg_pink border-t-transparent' />
-					<p className='text-bg_pink'>Loading your preimages...</p>
+					<p className='text-bg_pink'>{t('loadingYourPreimages')}</p>
 				</div>
 			</div>
 		);
@@ -75,14 +77,14 @@ function UserPreimagesTab() {
 			<div className='flex items-center justify-center py-12'>
 				<div className='text-center'>
 					<p className='text-text_secondary mb-4'>
-						Please{' '}
+						{t('pleaseLogInToViewPreimages')}{' '}
 						<Link
 							href='/login'
 							className='text-bg_pink'
 						>
-							log in
+							{t('logIn')}
 						</Link>{' '}
-						to view your preimages
+						{t('pleaseLogInToViewPreimages')}
 					</p>
 				</div>
 			</div>
@@ -94,13 +96,13 @@ function UserPreimagesTab() {
 		return (
 			<div className='flex items-center justify-center py-12'>
 				<div className='text-center text-red-500'>
-					<p>Error: {error instanceof Error ? error.message : 'Failed to fetch user preimages'}</p>
+					<p>Error: {error instanceof Error ? error.message : t('failedToFetchUserPreimages')}</p>
 					<Button
 						variant='ghost'
 						onClick={() => window.location.reload()}
 						className='mt-2 text-sm underline hover:no-underline'
 					>
-						Try again
+						{t('tryAgain')}
 					</Button>
 				</div>
 			</div>
@@ -112,7 +114,7 @@ function UserPreimagesTab() {
 			<div className={styles.container}>
 				<div className='flex w-full flex-col items-center gap-y-4 sm:flex-row sm:gap-x-4'>
 					<span className='flex items-center gap-x-2 text-sm'>
-						Showing preimages for:
+						{t('showingPreimagesFor')}
 						<Address
 							address={selectedAddress}
 							truncateCharLen={5}
@@ -126,13 +128,13 @@ function UserPreimagesTab() {
 								size='sm'
 								className='flex items-center gap-x-2 text-bg_pink'
 							>
-								Switch Wallet
+								{t('switchWallet')}
 								<RefreshCcwIcon className='h-4 w-4' />
 							</Button>
 						</DialogTrigger>
 						<DialogContent className='p-4 sm:max-w-md sm:p-6'>
 							<DialogHeader>
-								<DialogTitle>Switch Wallet</DialogTitle>
+								<DialogTitle>{t('switchWallet')}</DialogTitle>
 							</DialogHeader>
 							<div className='flex flex-col gap-y-4 py-4'>
 								<SwitchWalletOrAddress small />

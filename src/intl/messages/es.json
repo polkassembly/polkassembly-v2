@@ -774,7 +774,15 @@
 		"unnoted_description": "El preimage no ha sido anotado",
 		"failed": "Fallido",
 		"unrequest": "Cancelar solicitud",
-		"unnote": "Eliminar anotación"
+		"unnote": "Eliminar anotación",
+		"unnoteOrUnrequestPreimageDescription": "¿Estás seguro de que quieres desnotar o desolicitar esta preimagen?",
+		"loadingYourPreimages": "Cargando tus preimágenes...",
+		"pleaseLogInToViewPreimages": "Por favor inicia sesión para ver tus preimágenes",
+		"logIn": "inicia sesión",
+		"failedToFetchUserPreimages": "Error al obtener las preimágenes del usuario",
+		"tryAgain": "Intentar de nuevo",
+		"showingPreimagesFor": "Mostrando preimágenes para:",
+		"switchWallet": "Cambiar Cartera"
 	},
 	"Create": {
 		"createDiscussionTitle": "Crear Discusión",

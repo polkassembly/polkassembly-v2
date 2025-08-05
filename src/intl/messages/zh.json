@@ -773,7 +773,15 @@
 		"unnoted_description": "原像未被记录",
 		"failed": "失败",
 		"unrequest": "取消请求",
-		"unnote": "删除记录"
+		"unnote": "删除记录",
+		"unnoteOrUnrequestPreimageDescription": "您确定要删除此预映像的记录或取消请求吗？",
+		"loadingYourPreimages": "正在加载您的预映像...",
+		"pleaseLogInToViewPreimages": "请登录以查看您的预映像",
+		"logIn": "登录",
+		"failedToFetchUserPreimages": "获取用户预映像失败",
+		"tryAgain": "重试",
+		"showingPreimagesFor": "显示预映像：",
+		"switchWallet": "切换钱包"
 	},
 	"Create": {
 		"createDiscussionTitle": "创建讨论",
