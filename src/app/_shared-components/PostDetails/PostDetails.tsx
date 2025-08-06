@@ -230,18 +230,18 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							)}
 						</div>
 
-						{isModalOpen && !isOffchainPost && (
-							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
-								{canVote(post.onChainInfo?.status) && (
-									<VoteReferendumButton
-										iconClassName='hidden'
-										index={index}
-										track={post.onChainInfo?.origin}
-										proposalType={post.proposalType}
-									/>
-								)}
-							</div>
-						)}
+						{/* {isModalOpen && !isOffchainPost && ( */}
+						<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
+							<VoteReferendumButton
+								iconClassName='hidden'
+								index={index}
+								track={post.onChainInfo?.origin}
+								proposalType={post.proposalType}
+							/>
+							{/* {canVote(post.onChainInfo?.status) && (
+								)} */}
+						</div>
+						{/* )} */}
 						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
 							<PostComments
 								proposalType={post.proposalType}

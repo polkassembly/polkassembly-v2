@@ -860,7 +860,7 @@ export class FirestoreService extends FirestoreUtils {
 	}
 
 	static async AddNewAddress(addressEntry: IUserAddress) {
-		const substrateAddress = getSubstrateAddress(addressEntry.address);
+		const substrateAddress = getSubstrateAddress(addressEntry.address) || addressEntry.address;
 
 		if (!substrateAddress) {
 			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST);

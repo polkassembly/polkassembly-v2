@@ -10,6 +10,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { stringToHex } from '@polkadot/util';
 import { isWeb3Injected } from '@polkadot/extension-dapp';
 import { inject } from '@mimirdev/apps-inject';
+import { isEthNetwork } from '@/_shared/_utils/getSupportedWallets';
 import { PolkadotApiService } from './polkadot_api_service';
 import { IdentityService } from './identity_service';
 import { isMimirDetected } from './isMimirDetected';
@@ -66,30 +67,82 @@ export class WalletClientService {
 
 				await web3Enable(APPNAME);
 				injected = await web3FromSource('mimir');
-			} else {
-				const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
-
-				if (!wallet) {
+			} else if (selectedWallet === EWallet.METAMASK && isEthNetwork(this.network)) {
+				const { ethereum } = this.injectedWindow;
+				if (!ethereum) {
 					return [];
 				}
-				injected = await new Promise((resolve, reject) => {
-					const timeoutId = setTimeout(() => {
-						reject(new Error('Wallet Timeout'));
-					}, 60000); // wait 60 sec
-
-					if (wallet && wallet.enable) {
-						wallet
-							.enable(APPNAME)
-							.then((value) => {
-								clearTimeout(timeoutId);
-								resolve(value);
-							})
-							.catch((error) => {
-								reject(error);
-							});
+				await ethereum.enable(APPNAME);
+				const addresses = (await ethereum.request({ method: 'eth_requestAccounts' })) as string[];
+				if (!addresses) {
+					return [];
+				}
+				return addresses.map((address) => ({
+					address,
+					meta: {
+						name: address,
+						source: EWallet.METAMASK
 					}
-				});
+				}));
 			}
+			if (selectedWallet === EWallet.TALISMAN && isEthNetwork(this.network)) {
+				const { talismanEth } = this.injectedWindow;
+				if (!talismanEth) {
+					return [];
+				}
+				await talismanEth.enable(APPNAME);
+				const addresses = (await talismanEth.request({
+					method: 'eth_accounts'
+				})) as string[];
+				return addresses.map((address) => ({
+					address,
+					meta: {
+						name: address,
+						source: EWallet.TALISMAN
+					}
+				}));
+			}
+			if (selectedWallet === EWallet.SUBWALLET && isEthNetwork(this.network)) {
+				const { SubWallet } = this.injectedWindow;
+				if (!SubWallet) {
+					return [];
+				}
+				await SubWallet.enable(APPNAME);
+				const addresses = (await SubWallet.request({
+					method: 'eth_accounts'
+				})) as string[];
+				return addresses.map((address) => ({
+					address,
+					meta: {
+						name: address,
+						source: EWallet.SUBWALLET
+					}
+				}));
+			}
+
+			const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
+
+			if (!wallet) {
+				return [];
+			}
+			injected = await new Promise((resolve, reject) => {
+				const timeoutId = setTimeout(() => {
+					reject(new Error('Wallet Timeout'));
+				}, 60000); // wait 60 sec
+
+				if (wallet && wallet.enable) {
+					wallet
+						.enable(APPNAME)
+						.then((value) => {
+							clearTimeout(timeoutId);
+							resolve(value);
+						})
+						.catch((error) => {
+							reject(error);
+						});
+				}
+			});
+
 			if (!injected) {
 				return [];
 			}
@@ -109,11 +162,56 @@ export class WalletClientService {
 		}
 	}
 
-	getInjectedWallets() {
+	getInjectedWallets(network: ENetwork) {
+		if (isEthNetwork(network)) {
+			return {
+				[EWallet.METAMASK]: this.injectedWindow.ethereum || null,
+				[EWallet.SUBWALLET]: this.injectedWindow.SubWallet || null,
+				[EWallet.TALISMAN]: this.injectedWindow.talismanEth || null
+			};
+		}
 		return this.injectedWindow.injectedWeb3 || {};
 	}
 
+	async signMessageEth({ data, address, selectedWallet }: { data: string; address: string; selectedWallet: EWallet }) {
+		if (selectedWallet === EWallet.METAMASK) {
+			const { ethereum } = this.injectedWindow;
+			if (!ethereum) {
+				return null;
+			}
+			return ethereum.request({
+				method: 'personal_sign',
+				params: [data, address]
+			});
+		}
+		if (selectedWallet === EWallet.SUBWALLET) {
+			const { SubWallet } = this.injectedWindow;
+			if (!SubWallet) {
+				return null;
+			}
+			return SubWallet.request({
+				method: 'personal_sign',
+				params: [data, address]
+			});
+		}
+		if (selectedWallet === EWallet.TALISMAN) {
+			const { talismanEth } = this.injectedWindow;
+			if (!talismanEth) {
+				return null;
+			}
+			return talismanEth.request({
+				method: 'personal_sign',
+				params: [data, address]
+			});
+		}
+		return null;
+	}
+
 	async signMessage({ data, address, selectedWallet }: { data: string; address: string; selectedWallet: EWallet }) {
+		if (isEthNetwork(this.network)) {
+			return this.signMessageEth({ data, address, selectedWallet });
+		}
+
 		const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
 
 		if (!wallet) {
