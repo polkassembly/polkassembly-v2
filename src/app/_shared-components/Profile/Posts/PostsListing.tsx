@@ -14,7 +14,7 @@ function PostsListing({ posts, totalCount, currentPage, onPageChange }: { posts:
 
 	return (
 		<div>
-			{posts?.length > 0 ? (
+			{!!posts && posts?.length > 0 ? (
 				<div>
 					{posts.map((post, idx) => {
 						const backgroundColor = idx % 2 === 0 ? 'bg-listing_card1' : 'bg-section_dark_overlay';
