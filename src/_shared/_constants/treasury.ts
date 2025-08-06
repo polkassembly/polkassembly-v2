@@ -134,5 +134,17 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 			denominator: new BN(1)
 		}, // 0% of the treasury balance
 		spendPeriodInBlocks: new BN(14400)
+	},
+	[ENetwork.MOONBEAM]: {
+		relayChainRpc: NETWORKS_DETAILS[ENetwork.MOONBEAM].rpcEndpoints[0].url,
+		treasuryAccount: '0x6d6F646c70632f74727372790000000000000000',
+		assetHubRpc: '',
+		assetHubTreasuryAddress: '',
+		loanAmounts: {},
+		burnPercentage: {
+			numerator: new BN(0),
+			denominator: new BN(1)
+		}, // 0% of the treasury balance
+		spendPeriodInBlocks: new BN(14400)
 	}
 };
