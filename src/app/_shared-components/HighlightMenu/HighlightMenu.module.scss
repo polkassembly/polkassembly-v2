@@ -1,0 +1,10 @@
+.container {
+	@apply fixed z-[199] flex flex-col items-center gap-1 rounded-lg border border-border_grey bg-bg_modal p-2 shadow-lg after:absolute after:left-1/2 after:top-full after:-translate-x-1/2 after:border-4 after:border-transparent after:border-t-bg_modal after:content-[""];
+}
+
+.button {
+	@apply flex h-4 cursor-pointer items-center gap-1 px-2 text-text_primary hover:bg-grey_bg;
+}
+.buttonText {
+	@apply text-xs text-basic_text;
+}
