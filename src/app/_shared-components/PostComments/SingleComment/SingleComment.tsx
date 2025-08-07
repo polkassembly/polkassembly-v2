@@ -294,69 +294,70 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 					/>
 				)}
 
-				<CommentActions commentData={comment} />
-
-				{user && (
-					<div className={classes.tools}>
-						<Button
-							variant='ghost'
-							className={classes.replyButton}
-							onClick={handleToggleReply}
-							size='sm'
-							disabled={comment.disabled}
-							leftIcon={
-								<Image
-									src={ReplyIcon}
-									alt='reply'
-									className='darkIcon'
-								/>
-							}
-						>
-							{t('PostDetails.reply')}
-						</Button>
-						<div>
-							{comment.userId === user.id && (
-								<DropdownMenu>
-									<DropdownMenuTrigger
-										noArrow
-										className='border-none'
-									>
-										<Ellipsis
-											className='text-text_primary/[0.8]'
-											size={14}
-										/>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent>
-										<DropdownMenuItem className='hover:bg-bg_pink/10'>
-											<Button
-												variant='ghost'
-												className='h-auto p-0 text-sm text-text_primary'
-												disabled={comment.userId !== user.id || comment.disabled}
-												onClick={toggleEditComment}
-												size='sm'
-												isLoading={loading}
-											>
-												{t('PostDetails.edit')}
-											</Button>
-										</DropdownMenuItem>
-										<DropdownMenuItem className='hover:bg-bg_pink/10'>
-											<Button
-												variant='ghost'
-												className='h-auto p-0 text-sm text-text_primary'
-												disabled={comment.userId !== user.id || comment.disabled}
-												onClick={handleOpenDeleteModal}
-												size='sm'
-												isLoading={loading}
-											>
-												{t('PostDetails.delete')}
-											</Button>
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							)}
+				<div className='flex items-center gap-x-1'>
+					<CommentActions commentData={comment} />
+					{user && (
+						<div className={classes.tools}>
+							<Button
+								variant='ghost'
+								className={classes.replyButton}
+								onClick={handleToggleReply}
+								size='sm'
+								disabled={comment.disabled}
+								leftIcon={
+									<Image
+										src={ReplyIcon}
+										alt='reply'
+										className='darkIcon'
+									/>
+								}
+							>
+								{t('PostDetails.reply')}
+							</Button>
+							<div>
+								{comment.userId === user.id && (
+									<DropdownMenu>
+										<DropdownMenuTrigger
+											noArrow
+											className='border-none'
+										>
+											<Ellipsis
+												className='text-text_primary/[0.8]'
+												size={14}
+											/>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent>
+											<DropdownMenuItem className='hover:bg-bg_pink/10'>
+												<Button
+													variant='ghost'
+													className='h-auto p-0 text-sm text-text_primary'
+													disabled={comment.userId !== user.id || comment.disabled}
+													onClick={toggleEditComment}
+													size='sm'
+													isLoading={loading}
+												>
+													{t('PostDetails.edit')}
+												</Button>
+											</DropdownMenuItem>
+											<DropdownMenuItem className='hover:bg-bg_pink/10'>
+												<Button
+													variant='ghost'
+													className='h-auto p-0 text-sm text-text_primary'
+													disabled={comment.userId !== user.id || comment.disabled}
+													onClick={handleOpenDeleteModal}
+													size='sm'
+													isLoading={loading}
+												>
+													{t('PostDetails.delete')}
+												</Button>
+											</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
+								)}
+							</div>
 						</div>
-					</div>
-				)}
+					)}
+				</div>
 
 				{reply && (
 					<AddComment
