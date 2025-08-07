@@ -4,8 +4,8 @@
 
 'use client';
 
-import { EProposalType, EReactQueryKeys, ICommentResponse } from '@/_shared/types';
-import { useMemo, useState } from 'react';
+import { EAllowedCommentor, EProposalType, ICommentResponse } from '@/_shared/types';
+import { useMemo, useState, useCallback, useLayoutEffect } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import Link from 'next/link';
@@ -15,12 +15,29 @@ import { FaChevronDown } from '@react-icons/all-files/fa/FaChevronDown';
 import { FaChevronUp } from '@react-icons/all-files/fa/FaChevronUp';
 
 import { useTranslations } from 'next-intl';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+import { useIdentityService } from '@/hooks/useIdentityService';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import dynamic from 'next/dynamic';
+import { Button } from '@ui/Button';
 import SingleComment from '../SingleComment/SingleComment';
-import AddComment from '../AddComment/AddComment';
 import classes from './Comments.module.scss';
 
-function Comments({ comments, proposalType, index }: { comments: ICommentResponse[]; proposalType: EProposalType; index: string }) {
+const AddComment = dynamic(() => import('../AddComment/AddComment'), { ssr: false });
+
+function Comments({
+	comments,
+	proposalType,
+	index,
+	allowedCommentor,
+	postUserId
+}: {
+	comments: ICommentResponse[];
+	proposalType: EProposalType;
+	index: string;
+	allowedCommentor: EAllowedCommentor;
+	postUserId?: number;
+}) {
 	const t = useTranslations();
 	const user = useAtomValue(userAtom);
 	const [showMore, setShowMore] = useState(false);
@@ -30,8 +47,6 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 	const spamComments = useMemo(() => comments.filter((comment) => comment.isSpam), [comments]);
 	const commentsToShow = showMore ? regularComments : regularComments.slice(0, 2);
 
-	const queryClient = useQueryClient();
-
 	const handleShowMore = () => {
 		setShowMore(true);
 	};
@@ -40,13 +55,65 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 		setShowMore(false);
 	};
 
+	const { getOnChainIdentity, identityService } = useIdentityService();
+
+	const fetchOnChainIdentity = async () => {
+		if (!user?.addresses?.length || !user?.id) return [];
+
+		return Promise.all(user.addresses.map((address) => getOnChainIdentity(address)));
+	};
+
+	const { data: onchainIdentities } = useQuery({
+		queryKey: ['onchainIdentities', user?.id],
+		queryFn: fetchOnChainIdentity,
+		enabled: !!user?.id && !!identityService,
+		staleTime: FIVE_MIN_IN_MILLI,
+		retry: true,
+		refetchOnWindowFocus: true,
+		refetchOnMount: true
+	});
+
+	const { canComment, commentDisabledMessage } = useMemo(() => {
+		if (user && postUserId && user.id === postUserId) return { canComment: true, commentDisabledMessage: '' };
+		if (allowedCommentor === EAllowedCommentor.ALL) return { canComment: true, commentDisabledMessage: '' };
+		if (allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED) {
+			return { canComment: onchainIdentities?.some((identity) => identity?.isVerified), commentDisabledMessage: t('PostDetails.commentsDisabledForNonVerifiedUsers') };
+		}
+		return { canComment: !(allowedCommentor === EAllowedCommentor.NONE), commentDisabledMessage: t('PostDetails.commentsDisabled') };
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [allowedCommentor, onchainIdentities]);
+
+	// Handle comment link navigation
+	const handleCommentLink = useCallback(() => {
+		const { hash } = window?.location || { hash: '' };
+		if (!hash) return;
+
+		const commentId = hash.replace('#comment-', '');
+		const comment = regularComments.find((c) => c.id === commentId);
+
+		if (comment && !showMore && regularComments.indexOf(comment) >= 2) {
+			handleShowMore();
+		}
+
+		// Use requestAnimationFrame to ensure the DOM is ready
+		requestAnimationFrame(() => {
+			const element = document.getElementById(hash.substring(1));
+			if (element) {
+				element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			}
+		});
+	}, [regularComments, showMore]);
+
+	// Call handleCommentLink when the component mounts
+	useLayoutEffect(() => {
+		handleCommentLink();
+	}, [handleCommentLink]);
+
 	return (
 		<div className={classes.wrapper}>
 			<div className='flex flex-col gap-y-4 px-4 lg:px-6'>
 				{commentsToShow.map((item) => (
 					<SingleComment
-						proposalType={proposalType}
-						index={index}
 						key={item.id}
 						commentData={item}
 					/>
@@ -75,8 +142,8 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 
 				{spamComments.length > 0 && (
 					<div className='mt-4 border-y border-border_grey py-4'>
-						<button
-							type='button'
+						<Button
+							variant='ghost'
 							onClick={() => setShowSpam(!showSpam)}
 							className='flex w-full items-center justify-center gap-x-2 text-sm font-medium text-pink-500'
 							aria-expanded={showSpam}
@@ -85,13 +152,11 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 							{showSpam ? t('PostDetails.hideLikelySpam') : t('PostDetails.showLikelySpam')}
 							<span className='text-pink-500'>({spamComments.length})</span>
 							{showSpam ? <FaChevronUp className='text-base' /> : <FaChevronDown className='text-base' />}
-						</button>
+						</Button>
 						{showSpam && (
 							<div className='mt-4 flex flex-col gap-y-4'>
 								{spamComments.map((item) => (
 									<SingleComment
-										proposalType={proposalType}
-										index={index}
 										key={item.id}
 										commentData={item}
 									/>
@@ -103,15 +168,19 @@ function Comments({ comments, proposalType, index }: { comments: ICommentRespons
 			</div>
 
 			{user ? (
-				<div className='w-full px-6 py-6'>
-					<AddComment
-						proposalType={proposalType}
-						proposalIndex={index}
-						onConfirm={(newComment, publicUser) => {
-							queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [...(prev || []), { ...newComment, user: publicUser }]);
-						}}
-					/>
-				</div>
+				canComment ? (
+					<div className='w-full px-6 py-6'>
+						<AddComment
+							proposalType={proposalType}
+							proposalIndex={index}
+							onOptimisticUpdate={handleShowMore}
+						/>
+					</div>
+				) : (
+					<div className={classes.loginToComment}>
+						<p className='text-sm text-text_primary'>{commentDisabledMessage}</p>
+					</div>
+				)
 			) : (
 				<div className={classes.loginToComment}>
 					{t('PostDetails.please')}

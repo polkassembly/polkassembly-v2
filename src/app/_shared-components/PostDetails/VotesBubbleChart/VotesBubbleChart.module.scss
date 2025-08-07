@@ -1,0 +1,156 @@
+.heading {
+	@apply text-base font-bold text-text_primary xl:text-sm 2xl:text-lg;
+}
+
+.chartWrapper {
+	width: 100% !important;
+	rect {
+		rx: 8 !important;
+		ry: 8 !important;
+		min-width: 15px !important;
+		min-height: 12px !important;
+	}
+
+	// More aggressive minimum sizes for very small rectangles
+	rect[width='0'],
+	rect[width='1'],
+	rect[height='1'],
+	rect[width='2'],
+	rect[height='2'],
+	rect[width='3'],
+	rect[height='3'] {
+		min-width: 8px !important;
+		min-height: 8px !important;
+		stroke-width: 1px !important;
+		stroke: rgba(255, 255, 255, 0.8) !important;
+	}
+
+	// Ensure text is visible on small elements
+	text {
+		font-size: 11px !important;
+		font-weight: 500 !important;
+		pointer-events: none; // Prevent text from interfering with hover
+
+		@media (max-width: 768px) {
+			font-size: 10px !important;
+			font-weight: 500 !important;
+		}
+
+		@media (max-width: 480px) {
+			font-size: 9px !important;
+			font-weight: 500 !important;
+		}
+	}
+
+	// Mobile-specific overrides for better visibility
+	@media (max-width: 768px) {
+		height: 350px !important;
+
+		rect {
+			min-width: 20px !important;
+			min-height: 15px !important;
+		}
+
+		// Force visibility of tiny elements on mobile
+		rect[width='1'],
+		rect[height='1'],
+		rect[width='2'],
+		rect[height='2'],
+		rect[width='3'],
+		rect[height='3'],
+		rect[width='4'],
+		rect[height='4'] {
+			min-width: 12px !important;
+			min-height: 12px !important;
+			stroke-width: 1.5px !important;
+			stroke: rgba(255, 255, 255, 0.9) !important;
+		}
+	}
+
+	@media (max-width: 480px) {
+		height: 380px !important;
+
+		rect {
+			min-width: 25px !important;
+			min-height: 18px !important;
+		}
+
+		// Very aggressive minimum sizes for very small screens
+		rect[width='1'],
+		rect[height='1'],
+		rect[width='2'],
+		rect[height='2'],
+		rect[width='3'],
+		rect[height='3'],
+		rect[width='4'],
+		rect[height='4'],
+		rect[width='5'],
+		rect[height='5'] {
+			min-width: 15px !important;
+			min-height: 15px !important;
+			stroke-width: 2px !important;
+			stroke: rgba(255, 255, 255, 1) !important;
+		}
+	}
+}
+
+.chartWrapper > div {
+	height: 100% !important;
+	width: 100% !important;
+}
+
+.card {
+	@apply mx-auto h-full w-full flex-1 rounded-2xl border-[1px] border-solid border-border_grey bg-transparent p-4 text-basic_text;
+
+	@media (max-width: 768px) {
+		max-height: 520px;
+		padding: 12px;
+	}
+
+	@media (max-width: 480px) {
+		max-height: 550px;
+		padding: 8px;
+	}
+}
+
+.description {
+	@apply my-4 flex items-center gap-2 rounded-lg border-[1px] border-solid border-turnout_color bg-analytics_description_bg px-4 py-2 text-sm font-medium text-text_primary dark:text-white;
+}
+
+.header {
+	@apply mt-0 flex flex-col items-start;
+}
+
+.buttonContainer {
+	@apply mt-4 flex w-full items-center justify-between rounded-lg bg-bg_code p-1.5;
+}
+
+.tooltip {
+	@apply flex flex-col items-center justify-center rounded-md bg-bg_code p-4;
+}
+.tooltipContent {
+	@apply flex flex-col items-center justify-center gap-1 text-xs text-text_primary;
+}
+.tooltipTitle {
+	@apply text-sm font-bold text-text_primary dark:text-white;
+}
+.tooltipValue {
+	@apply flex items-center justify-center gap-1 text-xs text-text_primary;
+}
+.decisionContainer {
+	@apply flex items-center gap-2 rounded-lg border-[1px] border-solid px-4 py-2 text-sm text-text_primary dark:text-white;
+}
+.decisionsContainer {
+	@apply mt-4 flex items-center justify-center gap-2 pb-4;
+}
+
+.tooltipContentValue {
+	@apply flex flex-col items-center gap-1 font-bold text-basic_text;
+}
+.tooltipText {
+	@apply text-basic_text;
+}
+
+.displaytext {
+	@apply text-xs;
+}

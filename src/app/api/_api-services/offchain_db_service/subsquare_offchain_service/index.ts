@@ -6,7 +6,7 @@
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
-import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, ICommentResponse, IContentSummary, IOffChainPost, IPostOffChainMetrics } from '@/_shared/types';
+import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, ICommentResponse, IContentSummary, IOffChainPost, IPostLink, IPostOffChainMetrics } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { htmlToMarkdown } from '@/_shared/_utils/htmlToMarkdown';
@@ -65,7 +65,11 @@ export class SubsquareOffChainService {
 
 			if (!content) {
 				content = getDefaultPostContent(proposalType, data?.proposer);
-				isDefaultContent = true;
+
+				// if content AND title are both empty, only then it is default content
+				if (!title) {
+					isDefaultContent = true;
+				}
 			} else {
 				content = data?.contentType === 'markdown' ? data.content : htmlToMarkdown(data.content);
 			}
@@ -202,13 +206,33 @@ export class SubsquareOffChainService {
 		}
 	}
 
-	static async GetPostMetrics({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IPostOffChainMetrics> {
+	static async GetPostMetrics({
+		network,
+		indexOrHash,
+		proposalType,
+		linkedPost
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		linkedPost?: IPostLink;
+	}): Promise<IPostOffChainMetrics> {
+		const commentsCount = await this.GetPostComments({ network, indexOrHash, proposalType }).then((comments) => comments.length);
+
+		let linkedPostCommentsCount = 0;
+		if (linkedPost && linkedPost.indexOrHash) {
+			linkedPostCommentsCount = await this.GetPostComments({ network, indexOrHash: linkedPost.indexOrHash, proposalType: linkedPost.proposalType }).then(
+				(comments) => comments.length
+			);
+		}
+
+		const totalCommentsCount = commentsCount + linkedPostCommentsCount;
 		return {
 			reactions: {
 				like: 0,
 				dislike: 0
 			},
-			comments: await this.GetPostComments({ network, indexOrHash, proposalType }).then((comments) => comments.length)
+			comments: totalCommentsCount
 		};
 	}
 

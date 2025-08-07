@@ -164,7 +164,7 @@
 		"Delegations": {
 			"noDelegations": "Keine Delegationen gefunden",
 			"delegation": "Delegation",
-			"receivedDelegations": "Empfangene Delegationen",
+			"delegators": "Delegierte",
 			"delegatedDelegations": "Delegierte Delegationen",
 			"delegatedBy": "Delegierte von",
 			"delegatedTo": "Delegierte an",
@@ -435,6 +435,7 @@
 		"changeVote": "Abstimmen ändern",
 		"myVote": "Meine Stimme",
 		"castYourVote": "Geben Sie Ihre Stimme ab",
+		"copyLink": "Link kopieren",
 		"loginToVote": "Zum Abstimmen anmelden",
 		"requested": "Angefordert",
 		"beneficiary": "Begünstigter",
@@ -444,6 +445,7 @@
 		"more": "mehr",
 		"referendum": "Referendum",
 		"comments": "Kommentare",
+		"analytics": "Analysen",
 		"please": "Bitte",
 		"login": "Anmelden",
 		"toComment": "zum Kommentieren",
@@ -480,6 +482,71 @@
 		"account": "Konto",
 		"abstain": "Enthaltung",
 		"onchainInfo": "Onchain-Informationen",
+		"nestedVotes": "Verschachtelte Abstimmungen",
+		"flattenedVotes": "Ebene Abstimmungen",
+		"Poll": {
+			"endsOn": "Endet am",
+			"endedOn": "Endet am",
+			"noVotes": "Keine Abstimmungen gefunden",
+			"anonVotes": "Anonyme Abstimmungen",
+			"viewPollVotes": "Abstimmungen anzeigen",
+			"pollVotesList": "Abstimmungsliste",
+			"seeMore": "Mehr anzeigen",
+			"seeLess": "Weniger anzeigen"
+		},
+		"VotesBubble": {
+			"nested": "Verschachtelt",
+			"flattened": "Eben",
+			"votesDistribution": "Wählerverteilung",
+			"others": "Andere",
+			"capital": "Kapital",
+			"delegators": "Delegierende",
+			"lockPeriod": "Sperrzeitraum",
+			"votes": "Abstimmungen",
+			"aye": "Ja",
+			"nay": "Nein",
+			"abstain": "Enthaltung",
+			"noVotesFound": "Keine Abstimmungen gefunden"
+		},
+		"VotesData": {
+			"Votes": "Abstimmungen",
+			"bubble": "Blase",
+			"graph": "Graph",
+			"voteHistory": "Abstimmungsverlauf (Verschachtelt und Ebene)",
+			"votes": "Abstimmungen",
+			"voteGraph": "Abstimmungsgraph",
+			"voteBubble": "Abstimmungsblase",
+			"nestedVotes": "Verschachtelte Abstimmungen",
+			"flattenedVotes": "Ebene Abstimmungen"
+		},
+		"Analytics": {
+			"totalVotesCasted": "Gesamte Abstimmungen",
+			"delegatedVsSolo": "Delegiert vs. Einzel",
+			"aye": "Ja",
+			"nay": "Nein",
+			"abstain": "Enthaltung",
+			"turnout": "Abstimmung",
+			"support": "Unterstützung",
+			"percentage": "Prozent",
+			"issuance": "Issuance",
+			"users": "Benutzer",
+			"delegated": "Delegiert",
+			"voters": "Abstimmende",
+			"votingPower": "Stimmgewicht",
+			"convictionsAnalytics": "Überzeugungsberechnungen",
+			"votesAnalytics": "Abstimmungsbetrag",
+			"accountsAnalytics": "Konten",
+			"votesByConviction": "Überzeugungsberechnungen",
+			"delegationVotesByConviction": "Delegiertenüberzeugungsberechnungen",
+			"solo": "Einzel",
+			"timeSplit": "Zeitaufteilung",
+			"day": "Tag",
+			"notEnoughData": "Nicht genügend Daten verfügbar, bitte überprüfen Sie später erneut.",
+			"votes": "Abstimmungen",
+			"convictionAnalyticsDes": "Überzeugung ist die Anzahl der Token, die für die Abstimmung verwendet werden, multipliziert mit der Überzeugung",
+			"accountAnalyticsDes": "Konten sind die Anzahl der eindeutigen Adressen, die eine Abstimmung abgeben",
+			"votesAnalyticsDes": "Abstimmungsbetrag ist die Anzahl der Token, die für die Abstimmung verwendet werden"
+		},
 		"OnchainInfo": {
 			"metadata": "Metadaten",
 			"table": "Tabelle",
@@ -522,13 +589,13 @@
 		"delegatedVotes": "Delegierende Abstimmungen",
 		"delegatedVotingPower": "Delegierende Stimmgewicht",
 		"delegationList": "Delegationsliste",
+		"threshold": "Schwelle",
+		"onlyVerifiedCommentsVisible": "Kommentare sind auf Konten mit einer On-Chain verifizierten Identität beschränkt.",
 		"VoteCurves": {
 			"approval": "Zustimmung",
 			"support": "Unterstützung",
-			"threshold": "Schwellenwert",
-			"votingData": "Abstimmungsdaten"
+			"threshold": "Schwellenwert"
 		},
-		"threshold": "Schwelle",
 		"DecisionDeposit": {
 			"description": "Hinterlegen Sie innerhalb von 14 Tagen eine erstattungsfähige Kaution, um zu verhindern, dass der Vorschlag ausläuft.",
 			"details": "Details",
@@ -548,6 +615,15 @@
 			"payoutClaimFailed": "Auszahlung konnte nicht beansprucht werden",
 			"payoutClaimedSuccessfullyDescription": "Ihre Auszahlung wurde erfolgreich beansprucht",
 			"payoutClaimFailedDescription": "Bitte versuchen Sie es erneut"
+		},
+		"commentsDisabled": "Die Kommentare wurden für diesen Beitrag deaktiviert.",
+		"commentsDisabledForNonVerifiedUsers": "Kommentare wurden für nicht verifizierte Benutzer deaktiviert.",
+		"RefundDeposits": {
+			"refund": "Rückerstattung",
+			"refundDeposits": "Einlagen zurückerstatten",
+			"description": "Klicken Sie hier, um die Einlage für diesen Vorschlag zurückzuerstatten",
+			"decisionDeposit": "Entscheidungskaution",
+			"submissionDeposit": "Einreichungskaution"
 		}
 	},
 	"ListingPage_Status": {
@@ -638,8 +714,8 @@
 		"confirm": "Bestätigen",
 		"existingVote": "Bestehende Stimme",
 		"existingVoteDescription": "Sie haben bereits auf diesen Vorschlag abgestimmt. Das erneute Abstimmen überschreibt die aktuelle Abstimmung.",
-		"voteSuccess": "Ihre Abstimmung wurde erfolgreich abgegeben",
-		"voteFailed": "Ihre Abstimmung wurde nicht erfolgreich abgegeben",
+		"voteSuccess": "Ihre Stimme wurde erfolgreich abgegeben",
+		"voteFailed": "Ihre Stimme wurde nicht erfolgreich abgegeben",
 		"voteSuccessTitle": "Abstimmung erfolgreich",
 		"voteFailedTitle": "Abstimmung fehlgeschlagen",
 		"delegatedPower": "Delegierte Macht",
@@ -648,14 +724,17 @@
 		"voted": "Abgestimmt",
 		"successfully": "erfolgreich",
 		"with": "mit",
-		"yourVoteIsIn": "Ihre Stimme ist abgegeben! Möchten Sie in einem Kommentar mitteilen, warum Sie dies unterstützen?",
+		"yourVoteIsIn": "Ihre Stimme ist eingegangen! Möchten Sie in einem Kommentar erklären, warum Sie dafür sind?",
 		"your": "Ihre",
-		"voteIsIn": "Stimme ist abgegeben! Möchten Sie in einem Kommentar mitteilen, warum Sie dies unterstützen?"
+		"voteIsIn": "Stimme ist eingegangen! Möchten Sie in einem Kommentar erklären, warum Sie dafür sind?",
+		"reuseGovernanceLock": "Governance-Sperre wiederverwenden",
+		"reuseAllLocks": "Alle Sperren wiederverwenden"
 	},
 	"Balance": {
 		"voteBalance": "Abstimmungsguthaben",
 		"Balance": "Guthaben",
-		"PeopleChainBalance": "People Chain Guthaben"
+		"PeopleChainBalance": "People Chain Guthaben",
+		"VotingBalance": "Abstimmungsguthaben"
 	},
 	"EditPost": {
 		"edit": "Bearbeiten",
@@ -666,7 +745,8 @@
 		"success": "Beitrag erfolgreich aktualisiert",
 		"successDescription": "Ihr Beitrag wurde erfolgreich aktualisiert",
 		"error": "Beitrag konnte nicht aktualisiert werden",
-		"errorDescription": "Beim Aktualisieren Ihres Beitrags ist ein Fehler aufgetreten"
+		"errorDescription": "Beim Aktualisieren Ihres Beitrags ist ein Fehler aufgetreten",
+		"whoCanComment": "Wer kann kommentieren?"
 	},
 	"Footer": {
 		"helpCenter": "Hilfezentrum",
@@ -721,12 +801,42 @@
 		"titleTooShort": "Bitte geben Sie einen gültigen Titel ein.",
 		"titlePlaceholder": "Titel eingeben",
 		"descriptionRequired": "Bitte geben Sie eine gültige Beschreibung ein.",
+		"UploadImage": {
+			"uploadImage": "Bild hochladen",
+			"uploadFromDevice": "Vom Gerät hochladen",
+			"addFromURL": "Von URL hinzufügen",
+			"alt": "Alt",
+			"title": "Titel",
+			"save": "Speichern",
+			"cancel": "Abbrechen",
+			"insertImage": "Bild einfügen",
+			"failedToUploadImage": "Bild konnte nicht hochgeladen werden"
+		},
 		"AllowedCommentors": {
+			"advanced": "Erweitert",
 			"title": "Wer kann kommentieren?",
 			"all": "Alle",
 			"onchainVerified": "Onchain verifiziert",
 			"none": "Niemand",
 			"tooltip": "Wählen Sie aus, wer diesen Beitrag kommentieren und beantworten kann"
+		},
+		"AddPoll": {
+			"addPoll": "Abstimmung hinzufügen",
+			"title": "Titel",
+			"options": "Optionen",
+			"titleRequired": "Bitte geben Sie einen gültigen Titel ein.",
+			"settings": "Einstellungen",
+			"anonymousPolls": "Anonyme Abstimmungen (Name der Abstimmenden wird nicht sichtbar sein)",
+			"maskedPolls": "Maskierte Abstimmungen (Ergebnis wird nur angezeigt, wenn ein Benutzer auf die Abstimmung abgestimmt hat)",
+			"addAnotherOption": "Weitere Option hinzufügen..",
+			"optionsRequired": "Mindestens {min} Optionen müssen ausgefüllt werden",
+			"maxOptions": "Maximale {max} Optionen erlaubt",
+			"pollEndsIn": "Abstimmung endet in",
+			"optionDuplicated": "Diese Option ist doppelt",
+			"optionsDuplicated": "Abstimmungsoptionen können nicht doppelt sein",
+			"endDateRequired": "Bitte wählen Sie ein Enddatum für die Abstimmung",
+			"endDateInFuture": "Das Enddatum der Abstimmung muss in der Zukunft liegen",
+			"titlePlaceholder": "Abstimmungstitel eingeben"
 		},
 		"Topic": {
 			"general": "Allgemein",
@@ -793,10 +903,13 @@
 		"searchUsername": "Benutzername suchen"
 	},
 	"SetIdentity": {
+		"TeleportFundsToPeopleChain": "Mittel zur People Chain teleportieren",
+		"Teleport": "Teleportieren",
 		"displayName": "Anzeigename",
 		"legalName": "Rechtlicher Name",
 		"email": "E-Mail",
 		"twitter": "Twitter",
+		"socials": "Soziale Medien",
 		"riot": "Riot",
 		"emailPlaceholder": "Geben Sie Ihre E-Mail-Adresse ein",
 		"twitterPlaceholder": "@IhrTwitterName",
@@ -809,8 +922,9 @@
 		"requestJudgement": "Beurteilung anfordern",
 		"minimumDeposit": "Mindesteinzahlung",
 		"registrarFee": "Registrierungsgebühr",
-		"totalAmountRequired": "Erforderlicher Gesamtbetrag",
-		"viewAmountBreakup": "Aufschlüsselung des Betrags anzeigen",
+		"gasFee": "Gebühr",
+		"totalAmountRequired": "Gesamtbetrag erforderlich",
+		"viewAmountBreakup": "Betragsaufschlüsselung anzeigen",
 		"registrarFees": "Registrierungsgebühren",
 		"success": "Identität erfolgreich festgelegt",
 		"successDescription": "Ihre Identität wurde erfolgreich festgelegt",
@@ -826,11 +940,23 @@
 		"verifying": "Überprüfung läuft...",
 		"verificationSuccessful": "Überprüfung erfolgreich",
 		"verificationFailed": "Überprüfung fehlgeschlagen",
-		"goToHome": "Zur Startseite",
+		"goToRequestJudgement": "Zur Beurteilungsanfrage gehen",
 		"verificationEmailSent": "Verifizierungs-E-Mail gesendet",
 		"verificationEmailSentDescription": "Bitte überprüfen Sie Ihre E-Mail zur Verifizierung",
 		"emailNotSent": "E-Mail nicht gesendet",
-		"emailNotSentDescription": "Beim Senden der Verifizierungs-E-Mail ist ein Fehler aufgetreten"
+		"emailNotSentDescription": "Beim Senden der Verifizierungs-E-Mail ist ein Fehler aufgetreten",
+		"IdentityNotSet": "Identität nicht festgelegt",
+		"IdentityNotSetDescription": "Um eine Beurteilung anzufordern, müssen Sie zuerst Ihre On-Chain-Identität festlegen.",
+		"IdentityNotSetDescription2": "Eine Beurteilung ist eine Möglichkeit für Registrare, Ihr Profil zu überprüfen und basierend auf Ihren Identitätsinformationen (wie Anzeigename, E-Mail, Website, rechtlicher Name usw.) ein Maß an Vertrauenswürdigkeit zu bieten.",
+		"IdentityNotSetDescription3": "Sobald Sie Ihre Identität festgelegt haben, können Sie eine Beurteilung von einem Registrar anfordern. Diese Beurteilung wird anderen sichtbar sein und hilft Ihnen, Glaubwürdigkeit on-chain aufzubauen.",
+		"IdentityVerified": "Ihre Identität wurde verifiziert.",
+		"edit": "Bearbeiten",
+		"resend": "Erneut senden",
+		"resendIn": "Erneut senden in",
+		"verify": "Verifizieren",
+		"verified": "Verifiziert",
+		"pending": "Ausstehend",
+		"CurrentJudgement": "Aktuelle Beurteilung"
 	},
 	"Bounties": {
 		"onchainBounties": "Onchain-Prämien",
@@ -1060,9 +1186,9 @@
 		"delegate": "Delegierte",
 		"noBio": "Keine Bio",
 		"readMore": "Weiterlesen",
-		"votingPower": "Stimmgewicht",
+		"maxDelegated": "Max Delegated",
 		"votedProposals": "Abgestimmte Vorschläge",
-		"receivedDelegations": "Empfangene Delegationen",
+		"delegators": "Delegierende",
 		"past30Days": "Letzte 30 Tage",
 		"trendingDelegates": "Trendende Delegierte",
 		"pleaseLoginToContinue": "Bitte melden Sie sich an, um fortzufahren",
@@ -1275,5 +1401,19 @@
 		"pasteURLorEnterPostID": "URL einfügen oder Beitrags-ID eingeben",
 		"yourDiscussions": "Ihre Diskussionen",
 		"confirm": "Bestätigen"
+	},
+	"TeleportToPeopleChain": {
+		"teleport": "Teleportieren",
+		"teleportFundsToPeopleChainSuccess": "Mittel wurden erfolgreich zur People Chain teleportiert",
+		"teleportFundsToPeopleChainSuccessDescription": "Die Mittel wurden erfolgreich zur People Chain teleportiert",
+		"teleportFundsToPeopleChainFailed": "Teleport der Mittel zur People Chain fehlgeschlagen",
+		"teleportFundsToPeopleChainFailedDescription": "Beim Teleportieren der Mittel zur People Chain ist ein Fehler aufgetreten",
+		"BeneficiaryAddress": "Begünstigten-Adresse",
+		"Amount": "Betrag"
+	},
+	"ConvictionSelector": {
+		"votes": "Stimmen",
+		"lockingPeriod": "Sperrfrist",
+		"lockingPeriodDescription": "Ihre {tokenSymbol} bleiben nach der Abstimmung für zusätzliche Zeit gesperrt, abhängig vom gewählten Multiplikator."
 	}
 }

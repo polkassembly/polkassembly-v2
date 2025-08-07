@@ -48,11 +48,11 @@ export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResp
 		method: 'POST'
 	});
 
-	const { hash } = (await res.json()) as { hash: string };
-
 	if (!res.ok) {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR);
 	}
+
+	const { hash } = (await res.json()) as { hash: string };
 
 	const response = NextResponse.json({ data: hash, message: 'Judgement call made successfully' });
 	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));

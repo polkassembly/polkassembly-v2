@@ -3,9 +3,5 @@
 }
 
 .tableContainer {
-	@apply relative flex max-h-[500px] flex-col;
-}
-
-.table {
-	@apply min-h-[200px];
+	@apply relative flex max-h-[400px] w-full flex-col sm:max-h-[500px];
 }

@@ -9,7 +9,7 @@ import { Button } from '@ui/Button';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
-import { ELocales } from '@/_shared/types';
+import { ELocales, ESetIdentityStep } from '@/_shared/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
 import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -18,6 +18,8 @@ import { IoMdClose } from '@react-icons/all-files/io/IoMdClose';
 import { useState } from 'react';
 import TranslateIcon from '@assets/icons/translate.svg';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
+import { isMimirDetected } from '@/app/_client-services/isMimirDetected';
 import classes from './Navbar.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import Address from '../../Profile/Address/Address';
@@ -25,7 +27,8 @@ import NetworkDropdown from '../../NetworkDropdown/NetworkDropdown';
 import RPCSwitchDropdown from '../RpcSwitch/RPCSwitchDropdown';
 import PaLogo from '../PaLogo';
 import ThemeToggleButton from '../../ThemeToggleButton';
-import Search from '../Search/Search';
+
+const Search = dynamic(() => import('../Search/Search'), { ssr: false });
 
 const LANGUAGES = {
 	[ELocales.ENGLISH]: '🇺🇸 English',
@@ -58,6 +61,13 @@ function Navbar() {
 		setModalOpen(false);
 		handleModalClose();
 	};
+
+	const onLogout = async () => {
+		const isMimir = await isMimirDetected();
+
+		await AuthClientService.logout({ isIframe: !!isMimir, onLogout: () => setUser(null) });
+	};
+
 	return (
 		<nav className={classes.navbar}>
 			<div className='flex items-center pl-12 md:pl-0'>
@@ -159,10 +169,18 @@ function Navbar() {
 									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+									<Link
+										className='w-full'
+										href={`/set-identity?open=${ESetIdentityStep.REQUEST_JUDGEMENT}`}
+									>
+										{t('SetIdentity.requestJudgement')}
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
 									<Button
 										variant='ghost'
 										className='flex w-full justify-start p-0 text-sm'
-										onClick={() => AuthClientService.logout(() => setUser(null))}
+										onClick={onLogout}
 									>
 										{t('Profile.logout')}
 									</Button>
@@ -267,10 +285,18 @@ function Navbar() {
 											</Link>
 										</DropdownMenuItem>
 										<DropdownMenuItem>
+											<Link
+												className='w-full'
+												href={`/set-identity?open=${ESetIdentityStep.REQUEST_JUDGEMENT}`}
+											>
+												{t('SetIdentity.requestJudgement')}
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem>
 											<Button
 												variant='ghost'
 												className='flex w-full justify-start p-0 text-sm'
-												onClick={() => AuthClientService.logout(() => setUser(null))}
+												onClick={onLogout}
 											>
 												{t('Profile.logout')}
 											</Button>

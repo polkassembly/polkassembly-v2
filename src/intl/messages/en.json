@@ -168,7 +168,7 @@
 		"Delegations": {
 			"noDelegations": "No Delegations Found",
 			"delegation": "Delegation",
-			"receivedDelegations": "Received Delegations",
+			"delegators": "Delegators",
 			"index": "Index",
 			"delegatedDelegations": "Delegated",
 			"delegatedBy": "Delegated By",
@@ -440,6 +440,7 @@
 		"changeVote": "Change Vote",
 		"myVote": "My Vote",
 		"castYourVote": "Cast Your Vote",
+		"copyLink": "Copy Link",
 		"loginToVote": "Login to Vote",
 		"requested": "Requested",
 		"beneficiary": "Beneficiary",
@@ -467,6 +468,7 @@
 		"preparePeriod": "Prepare Period",
 		"decisionPeriod": "Decision Period",
 		"summary": "Summary",
+		"analytics": "Analytics",
 		"aye": "Aye",
 		"nay": "Nay",
 		"split": "Split",
@@ -494,6 +496,75 @@
 		"aiSummary": "AI Summary",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
+		"VotesBubble": {
+			"nested": "Nested",
+			"flattened": "Flattened",
+			"votesDistribution": "Voter Distribution",
+			"others": "Others",
+			"capital": "Capital",
+			"delegators": "Delegators",
+			"lockPeriod": "Lock Period",
+			"votes": "Votes",
+			"aye": "Aye",
+			"nay": "Nay",
+			"abstain": "Abstain",
+			"noVotesFound": "No votes found"
+		},
+		"VotesData": {
+			"Votes": "Votes",
+			"bubble": "Bubble",
+			"graph": "Graph",
+			"voteHistory": "Vote History (Nested and Flattened)",
+			"votes": "Votes",
+			"voteGraph": "Vote Graph",
+			"voteBubble": "Vote Bubble",
+			"nestedVotes": "Nested Votes",
+			"flattenedVotes": "Flattened Votes"
+		},
+		"Analytics": {
+			"totalVotesCasted": "Total Votes Casted",
+			"delegatedVsSolo": "Delegated Vs Solo",
+			"aye": "Aye",
+			"nay": "Nay",
+			"abstain": "Abstain",
+			"turnout": "Turnout",
+			"support": "Support",
+			"percentage": "Percentage",
+			"issuance": "Issuance",
+			"others": "Others",
+			"users": "Users",
+			"delegated": "Delegated",
+			"solo": "Solo",
+			"timeSplit": "Time Split",
+			"votesByConviction": "Conviction used by Accounts",
+			"votesDistribution": "Votes Distribution",
+			"delegationVotesByConviction": "Conviction used by Delegators",
+			"voters": "Voters",
+			"votingPower": "Voting Power",
+			"convictionsAnalytics": "Convictions Votes",
+			"votesAnalytics": "Vote Amount",
+			"accountsAnalytics": "Accounts",
+			"day": "Day",
+			"notEnoughData": "Not enough data available, pls check back after 1 day.",
+			"votes": "Votes",
+			"convictionAnalyticsDes": "Conviction vote is the number of tokens used for voting multiplied by conviction",
+			"accountAnalyticsDes": "Accounts are the number of unique addresses casting a vote",
+			"votesAnalyticsDes": "Vote amount is the number of tokens used for voting"
+		},
+		"commentsDisabled": "Comments have been disabled for this post.",
+		"commentsDisabledForNonVerifiedUsers": "Comments have been disabled for non verified users.",
+		"Poll": {
+			"endsOn": "Ends on",
+			"endedOn": "Ended on",
+			"noVotes": "No votes yet",
+			"anonVotes": "Anon Votes",
+			"viewPollVotes": "View Poll Votes",
+			"pollVotesList": "Poll Votes List",
+			"seeMore": "See More",
+			"seeLess": "See Less"
+		},
+		"nestedVotes": "Nested Votes",
+		"flattenedVotes": "Flattened Votes",
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",
@@ -553,11 +624,11 @@
 		"delegatedVotingPower": "Delegated Voting Power",
 		"delegationList": "Delegation list",
 		"threshold": "Threshold",
+		"onlyVerifiedCommentsVisible": "Comments are restricted to accounts with an on-chain verified identity.",
 		"VoteCurves": {
 			"approval": "Approval",
 			"support": "Support",
-			"threshold": "Threshold",
-			"votingData": "Voting Data"
+			"threshold": "Threshold"
 		},
 		"DecisionDeposit": {
 			"description": "Place refundable deposit within 14 days to prevent proposal from timing out.",
@@ -578,6 +649,13 @@
 			"payoutClaimFailed": "Payout claim failed",
 			"payoutClaimedSuccessfullyDescription": "Your payout has been claimed successfully",
 			"payoutClaimFailedDescription": "Please try again"
+		},
+		"RefundDeposits": {
+			"refund": "Refund",
+			"refundDeposits": "Refund Deposits",
+			"description": "Click here to refund the deposit for this proposal",
+			"decisionDeposit": "Decision Deposit",
+			"submissionDeposit": "Submission Deposit"
 		}
 	},
 	"ListingPage_Status": {
@@ -686,17 +764,21 @@
 		"with": "with",
 		"yourVoteIsIn": "Your vote is in! Mind sharing why you support this in a comment?",
 		"your": "Your",
-		"voteIsIn": "vote is in! Mind sharing why you support this in a comment?"
+		"voteIsIn": "vote is in! Mind sharing why you support this in a comment?",
+		"reuseGovernanceLock": "Reuse Governance Lock",
+		"reuseAllLocks": "Reuse All Locks"
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance",
 		"Balance": "Balance",
-		"PeopleChainBalance": "People Chain Balance"
+		"PeopleChainBalance": "People Chain Balance",
+		"VotingBalance": "Voting Balance"
 	},
 	"EditPost": {
 		"edit": "Edit",
 		"title": "Title",
 		"content": "Content",
+		"whoCanComment": "Who can comment?",
 		"save": "Save",
 		"editPostButton": "Edit",
 		"success": "Post updated successfully",
@@ -771,7 +853,37 @@
 		"titleTooShort": "Please provide a valid title.",
 		"titlePlaceholder": "Enter title",
 		"descriptionRequired": "Please provide a valid description.",
+		"UploadImage": {
+			"uploadImage": "Upload Image",
+			"uploadFromDevice": "Upload from device",
+			"addFromURL": "Add from URL",
+			"alt": "Alt",
+			"title": "Title",
+			"save": "Save",
+			"cancel": "Cancel",
+			"insertImage": "Insert Image",
+			"failedToUploadImage": "Failed to upload image"
+		},
+		"AddPoll": {
+			"addPoll": "Add Poll",
+			"title": "Title",
+			"options": "Options",
+			"titleRequired": "Please provide a valid title.",
+			"settings": "Settings",
+			"anonymousPolls": "Anonymous polls (Voters’ name will not be visible)",
+			"maskedPolls": "Masked Polls (Result is only shown after a user has voted on the poll)",
+			"addAnotherOption": "Add Another Option..",
+			"pollEndsIn": "Poll ends in",
+			"optionDuplicated": "This option is duplicated",
+			"optionsDuplicated": "Poll options cannot be duplicated",
+			"optionsRequired": "At least {min} options must be filled",
+			"maxOptions": "Maximum {max} options allowed",
+			"endDateRequired": "Please select an end date for the poll",
+			"endDateInFuture": "Poll end date must be in the future",
+			"titlePlaceholder": "Enter poll title"
+		},
 		"AllowedCommentors": {
+			"advanced": "Advanced",
 			"title": "Who can comment ?",
 			"all": "All",
 			"onchainVerified": "Onchain Verified",
@@ -843,10 +955,13 @@
 		"searchUsername": "Enter username to search"
 	},
 	"SetIdentity": {
+		"TeleportFundsToPeopleChain": "Teleport Funds to People Chain",
+		"Teleport": "Teleport",
 		"displayName": "Display Name",
 		"legalName": "Legal Name",
 		"email": "Email",
 		"twitter": "Twitter",
+		"socials": "Socials",
 		"riot": "Riot",
 		"emailPlaceholder": "Enter your email address",
 		"twitterPlaceholder": "@YourTwitterName",
@@ -859,6 +974,7 @@
 		"requestJudgement": "Request Judgement",
 		"minimumDeposit": "Minimum Deposit",
 		"registrarFee": "Registrar Fee",
+		"gasFee": "Gas Fee",
 		"totalAmountRequired": "Total Amount Required",
 		"viewAmountBreakup": "View Amount Breakup",
 		"registrarFees": "Registrar Fees",
@@ -876,11 +992,23 @@
 		"verifying": "Verifying...",
 		"verificationSuccessful": "Verification successful",
 		"verificationFailed": "Verification failed",
-		"goToHome": "Go to home",
+		"goToRequestJudgement": "Go to Request Judgement",
 		"verificationEmailSent": "Verification email sent",
 		"verificationEmailSentDescription": "Please check your email for verification",
 		"emailNotSent": "Email not sent",
-		"emailNotSentDescription": "There was an error while sending the verification email"
+		"emailNotSentDescription": "There was an error while sending the verification email",
+		"IdentityNotSet": "Identity Not Set",
+		"IdentityNotSetDescription": "To request a judgment, you need to have your on-chain identity set first.",
+		"IdentityNotSetDescription2": "Judgment is a way for registrars to verify your profile and provide a level of trustworthiness based on your identity information (such as display name, email, website, legal name, etc.).",
+		"IdentityNotSetDescription3": "Once you’ve set your identity, you can request a judgment from a registrar. This judgment will be visible to others and helps you build credibility on-chain.",
+		"IdentityVerified": "Your Identity has been verified.",
+		"edit": "Edit",
+		"resend": "Resend",
+		"resendIn": "Resend in",
+		"verify": "Verify",
+		"verified": "Verified",
+		"pending": "Pending",
+		"CurrentJudgement": "Current Judgement"
 	},
 	"Bounties": {
 		"onchainBounties": "On-chain Bounties",
@@ -1124,9 +1252,9 @@
 		"delegate": "Delegate",
 		"noBio": "No Bio",
 		"readMore": "Read more",
-		"votingPower": "Voting power",
+		"maxDelegated": "Max Delegated",
 		"votedProposals": "Voted proposals",
-		"receivedDelegations": "Received Delegations",
+		"delegators": "Delegators",
 		"past30Days": "Past 30 Days",
 		"trendingDelegates": "Trending Delegates",
 		"pleaseLoginToContinue": "Please Login to continue",
@@ -1311,5 +1439,19 @@
 		"votes": "Votes",
 		"voteDetails": "Vote Details",
 		"target": "Target"
+	},
+	"TeleportToPeopleChain": {
+		"teleport": "Teleport",
+		"teleportFundsToPeopleChainSuccess": "Funds teleported to people chain successfully",
+		"teleportFundsToPeopleChainSuccessDescription": "The funds have been teleported to people chain successfully",
+		"teleportFundsToPeopleChainFailed": "Failed to teleport funds to people chain",
+		"teleportFundsToPeopleChainFailedDescription": "There was an error while teleporting the funds to people chain",
+		"BeneficiaryAddress": "Beneficiary Address",
+		"Amount": "Amount"
+	},
+	"ConvictionSelector": {
+		"votes": "Votes",
+		"lockingPeriod": "Locking period",
+		"lockingPeriodDescription": "Your {tokenSymbol} will stay locked for extra time after voting, depending on the multiplier you choose."
 	}
 }

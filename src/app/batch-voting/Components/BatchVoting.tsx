@@ -72,6 +72,7 @@ function BatchVoting({ proposals }: { proposals: IPostListing[] }) {
 							onDefaultAbstainAyeValueChange={setDefaultAbstainAyeValue}
 							onDefaultAbstainNayValueChange={setDefaultAbstainNayValue}
 							onNext={() => setTab(EBatchVotingTab.VOTE)}
+							defaultAyeNayValue={defaultAyeNayValue}
 						/>
 					</TabsContent>
 					<TabsContent value={EBatchVotingTab.VOTE}>

@@ -43,7 +43,7 @@ function MultipleBeneficiaryForm({
 	};
 
 	const addBeneficiary = () => {
-		onChange([...beneficiaries, { address: '', amount: BN_ZERO.toString(), assetId: null, id: dayjs().get('milliseconds').toString() }]);
+		onChange([...beneficiaries, { address: '', amount: BN_ZERO.toString(), id: dayjs().get('milliseconds').toString() }]);
 	};
 
 	const removeBeneficiary = (index: number) => {
