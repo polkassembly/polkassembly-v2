@@ -566,6 +566,7 @@ export class FirestoreService extends FirestoreUtils {
 
 			return {
 				...data,
+				id: doc.id,
 				createdAt: data.createdAt?.toDate(),
 				updatedAt: data.updatedAt?.toDate(),
 				publicUser
@@ -591,6 +592,7 @@ export class FirestoreService extends FirestoreUtils {
 
 		return {
 			...data,
+			id: reactionDocSnapshot.id,
 			createdAt: data.createdAt?.toDate(),
 			updatedAt: data.updatedAt?.toDate(),
 			publicUser

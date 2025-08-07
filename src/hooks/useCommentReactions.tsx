@@ -5,7 +5,6 @@
 import { EProposalType, EReaction, IReaction, ENotificationStatus } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { ClientError } from '@/app/_client-utils/clientError';
 import { useUser } from './useUser';
 import { useToast as useToastLib } from './useToast';
 
@@ -48,7 +47,7 @@ export const useCommentReactions = (commentData: ICommentData) => {
 	const handleReaction = useCallback(
 		async (type: EReaction) => {
 			if (!commentData?.indexOrHash || !commentData?.commentId) {
-				throw new ClientError('Index/hash and comment ID are required');
+				throw new Error('Index/hash and comment ID are required');
 			}
 			const isLikeAction = type === EReaction.like;
 			const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;

@@ -6,19 +6,18 @@ import { EReaction, ICommentResponse } from '@/_shared/types';
 import { useCommentReactions } from '@/hooks/useCommentReactions';
 import { useUser } from '@/hooks/useUser';
 import { cn } from '@/lib/utils';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import ReactionButton from '@/app/(home)/activity-feed/Components/ReactionButton/ReactionButton';
 import { useCallback, memo } from 'react';
-import styles from './CommentActions.module.scss';
+import styles from './CommentReactions.module.scss';
 
-interface CommentActionsProps {
+interface CommentReactionsProps {
 	commentData: ICommentResponse;
 }
 
-function CommentActions({ commentData }: CommentActionsProps) {
+function CommentReactions({ commentData }: CommentReactionsProps) {
 	const { user } = useUser();
 	const router = useRouter();
-	const pathname = usePathname();
 
 	const { handleReaction, reactionState, showLikeGif, showDislikeGif } = useCommentReactions({
 		reactions: commentData?.reactions,
@@ -30,12 +29,12 @@ function CommentActions({ commentData }: CommentActionsProps) {
 	const handleAuthenticatedAction = useCallback(
 		(action: () => void) => {
 			if (!user?.id) {
-				router.push(`/login?nextUrl=${pathname}`);
+				router.push('/login');
 				return;
 			}
 			action();
 		},
-		[user?.id, router, pathname]
+		[user?.id, router]
 	);
 
 	const handleLike = () => handleAuthenticatedAction(() => handleReaction(EReaction.like));
@@ -69,4 +68,4 @@ function CommentActions({ commentData }: CommentActionsProps) {
 	);
 }
 
-export default memo(CommentActions);
+export default memo(CommentReactions);
