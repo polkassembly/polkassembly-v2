@@ -87,6 +87,17 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		post = { ...post, contentSummary };
 	}
 
+	// beneficiaries stats
+	if (post?.onChainInfo && post.onChainInfo.beneficiaries && post.onChainInfo.beneficiaries.length > 0) {
+		const updatedBeneficiaries = await OffChainDbService.GetBeneficiariesWithUsdAmount({
+			network,
+			beneficiaries: post.onChainInfo?.beneficiaries || []
+		});
+		if (updatedBeneficiaries) {
+			post = { ...post, onChainInfo: { ...post.onChainInfo, beneficiaries: updatedBeneficiaries } };
+		}
+	}
+
 	// Cache the post data without user specific data
 	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: post });
 

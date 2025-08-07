@@ -18,6 +18,17 @@ export enum ENetwork {
 	CERE = 'cere'
 }
 
+export enum ENetworkSocial {
+	HOME = 'home',
+	TWITTER = 'twitter',
+	DISCORD = 'discord',
+	GITHUB = 'github',
+	YOUTUBE = 'youtube',
+	REDDIT = 'reddit',
+	TELEGRAM = 'telegram',
+	SUBSCAN = 'subscan'
+}
+
 export enum EGovType {
 	GOV_1 = 'gov_1',
 	OPENGOV = 'opengov'
@@ -554,6 +565,7 @@ export interface IBeneficiary {
 	amount: string;
 	assetId?: string | null;
 	validFromBlock?: string;
+	usdAmount?: string;
 }
 
 export interface IBeneficiaryInput extends IBeneficiary {
@@ -755,8 +767,8 @@ export enum EAssets {
 
 export enum EPostDetailsTab {
 	DESCRIPTION = 'description',
-	TIMELINE = 'timeline',
 	ONCHAIN_INFO = 'onchain_info',
+	SUMMARISE = 'summarise',
 	POST_ANALYTICS = 'post_analytics'
 }
 
@@ -1126,6 +1138,8 @@ export interface ITreasuryStats {
 	};
 	nativeTokenUsdPrice?: string;
 	nativeTokenUsdPrice24hChange?: string;
+	dedTokenUsdPrice?: string;
+	dedTokenUsdPrice24hChange?: string;
 	[key: string]: unknown;
 }
 
@@ -1341,6 +1355,14 @@ export interface IPayout {
 		expiresAt: Date;
 		generalIndex: string;
 	};
+}
+export interface IBeneficiaryPayoutDetails extends IBeneficiary {
+	payoutExpiry: string | null;
+}
+
+export interface TimeUnitOptions {
+	withUnitSpace?: boolean;
+	withPluralSuffix?: boolean;
 }
 
 export interface IOffChainPollPayload extends Omit<IPoll, 'id' | 'createdAt' | 'updatedAt' | 'proposalType' | 'updatedBy' | 'network' | 'votes' | 'index'> {
