@@ -821,11 +821,11 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_USER_PREIMAGES_LISTING = `
-		query GetUserPreimagesListing($limit: Int!, $offset: Int!, $proposer_in: [String!]!) {
-			preimagesConnection(orderBy: createdAtBlock_DESC, where: {proposer_in: $proposer_in}) {
+		query GetUserPreimagesListing($limit: Int!, $offset: Int!, $proposer_eq: String!) {
+			preimagesConnection(orderBy: createdAtBlock_DESC, where: {proposer_eq: $proposer_eq}) {
 				totalCount
 			}
-			preimages(limit: $limit, offset: $offset, orderBy: createdAtBlock_DESC, where: {proposer_in: $proposer_in}) {
+			preimages(limit: $limit, offset: $offset, orderBy: createdAtBlock_DESC, where: {proposer_eq: $proposer_eq}) {
 				hash
 				id
 				length

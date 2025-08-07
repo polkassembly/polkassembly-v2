@@ -538,25 +538,23 @@ export class SubsquidService extends SubsquidUtils {
 		network,
 		page,
 		limit,
-		addresses
+		address
 	}: {
 		network: ENetwork;
 		page: number;
 		limit: number;
-		addresses: string[];
+		address: string;
 	}): Promise<IGenericListingResponse<IPreimage>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		// Convert addresses to substrate format for querying
-		const formattedAddresses = addresses.map((address) =>
-			ValidatorService.isValidSubstrateAddress(address) ? encodeAddress(address, NETWORKS_DETAILS[network as ENetwork].ss58Format) : address
-		);
+		// Convert address to substrate format for querying
+		const formattedAddress = ValidatorService.isValidSubstrateAddress(address) ? encodeAddress(address, NETWORKS_DETAILS[network as ENetwork].ss58Format) : address;
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient
 			.query(this.GET_USER_PREIMAGES_LISTING, {
 				limit,
 				offset: (page - 1) * limit,
-				proposer_in: formattedAddresses
+				proposer_eq: formattedAddress
 			})
 			.toPromise();
 

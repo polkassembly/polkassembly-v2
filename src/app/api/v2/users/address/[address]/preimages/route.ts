@@ -24,7 +24,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		network,
 		page,
 		limit,
-		addresses: [address]
+		address
 	});
 
 	return NextResponse.json(userPreimageListing);
