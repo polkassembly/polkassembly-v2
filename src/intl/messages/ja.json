@@ -166,7 +166,7 @@
 		"Delegations": {
 			"noDelegations": "委任が見つかりません",
 			"delegation": "委任",
-			"receivedDelegations": "受け取った委任",
+			"delegators": "委任者",
 			"delegatedDelegations": "委任した委任",
 			"delegatedBy": "委任した",
 			"delegatedTo": "委任された",
@@ -434,6 +434,7 @@
 	"PostDetails": {
 		"castVote": "投票する",
 		"castYourVote": "投票してください",
+		"copyLink": "リンクをコピー",
 		"loginToVote": "投票するにはログイン",
 		"requested": "リクエスト済み",
 		"beneficiary": "受益者",
@@ -444,6 +445,7 @@
 		"referendum": "レファレンダム",
 		"comments": "コメント",
 		"please": "お願いします",
+		"analytics": "分析",
 		"login": "ログイン",
 		"toComment": "コメントするには",
 		"post": "投稿",
@@ -470,6 +472,71 @@
 		"account": "アカウント",
 		"abstain": "棄権",
 		"onchainInfo": "オンチェーン情報",
+		"Poll": {
+			"endsOn": "終了日",
+			"endedOn": "終了日",
+			"noVotes": "まだ投票がありません",
+			"anonVotes": "匿名投票",
+			"viewPollVotes": "投票を表示",
+			"pollVotesList": "投票リスト",
+			"seeMore": "もっと見る",
+			"seeLess": "もっと見る"
+		},
+		"nestedVotes": "ネストされた投票",
+		"flattenedVotes": "フラット化された投票",
+		"VotesBubble": {
+			"nested": "ネスト",
+			"flattened": "フラット",
+			"votesDistribution": "投票者分布",
+			"others": "その他",
+			"capital": "資本",
+			"delegators": "委任者",
+			"lockPeriod": "ロック期間",
+			"votes": "投票",
+			"aye": "賛成",
+			"nay": "反対",
+			"abstain": "棄権",
+			"noVotesFound": "投票が見つかりません"
+		},
+		"VotesData": {
+			"Votes": "投票",
+			"bubble": "バブル",
+			"graph": "グラフ",
+			"voteHistory": "投票履歴 (ネストされた投票とフラット化された投票)",
+			"votes": "投票",
+			"voteGraph": "投票グラフ",
+			"voteBubble": "投票バブル",
+			"nestedVotes": "ネストされた投票",
+			"flattenedVotes": "フラット化された投票"
+		},
+		"Analytics": {
+			"totalVotesCasted": "総投票数",
+			"delegatedVsSolo": "委任 vs. 単独",
+			"aye": "賛成",
+			"nay": "反対",
+			"abstain": "棄権",
+			"turnout": "投票率",
+			"support": "サポート",
+			"percentage": "パーセンテージ",
+			"issuance": "発行",
+			"users": "ユーザー",
+			"delegated": "委任済み",
+			"solo": "単独",
+			"timeSplit": "時間分割",
+			"voters": "投票者",
+			"votingPower": "投票力",
+			"convictionsAnalytics": "確信度投票",
+			"votesAnalytics": "投票金額",
+			"accountsAnalytics": "アカウント",
+			"votesByConviction": "確信度投票",
+			"delegationVotesByConviction": "委任確信度投票",
+			"day": "日",
+			"notEnoughData": "データが不足しています。後で再度確認してください。",
+			"votes": "投票",
+			"convictionAnalyticsDes": "確信度投票は、投票に使用されたトークン数に確信度を掛けたものです",
+			"accountAnalyticsDes": "アカウントは、投票を行った一意のアドレスの数です",
+			"votesAnalyticsDes": "投票金額は、投票に使用されたトークン数です"
+		},
 		"OnchainInfo": {
 			"metadata": "メタデータ",
 			"table": "テーブル",
@@ -519,13 +586,13 @@
 		"delegatedVotes": "委任された投票",
 		"delegatedVotingPower": "委任された投票力",
 		"delegationList": "委任リスト",
+		"threshold": "閾値",
+		"onlyVerifiedCommentsVisible": "コメントはオンチェーンで本人確認済みのアカウントに制限されています。",
 		"VoteCurves": {
 			"approval": "承認",
 			"support": "サポート",
-			"threshold": "閾値",
-			"votingData": "投票データ"
+			"threshold": "閾値"
 		},
-		"threshold": "しきい値",
 		"DecisionDeposit": {
 			"description": "提案がタイムアウトするのを防ぐため、14日以内に返金可能なデポジットを配置してください。",
 			"details": "詳細",
@@ -547,7 +614,14 @@
 			"payoutClaimFailedDescription": "もう一度お試しください"
 		},
 		"commentsDisabled": "この投稿のコメントは無効になっています。",
-		"commentsDisabledForNonVerifiedUsers": "未認証ユーザーのコメントは無効になっています。"
+		"commentsDisabledForNonVerifiedUsers": "未認証ユーザーのコメントは無効になっています。",
+		"RefundDeposits": {
+			"refund": "返金",
+			"refundDeposits": "デポジットの返金",
+			"description": "このプロポーザルのデポジットを返金するにはここをクリックしてください",
+			"decisionDeposit": "決定デポジット",
+			"submissionDeposit": "提出デポジット"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",
@@ -629,30 +703,33 @@
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "投票を選択",
-		"conviction": "確信度",
-		"lockBalance": "残高をロック",
+		"conviction": "コンビクション",
+		"lockBalance": "ロック残高",
 		"abstainVoteValue": "棄権票の値",
 		"ayeVoteValue": "賛成票の値",
 		"nayVoteValue": "反対票の値",
 		"confirm": "確認",
-		"voteSuccess": "投票が成功しました",
-		"voteFailed": "投票が失敗しました",
+		"voteSuccess": "投票が正常に行われました",
+		"voteFailed": "投票が正常に行われませんでした",
 		"voteSuccessTitle": "投票成功",
 		"voteFailedTitle": "投票失敗",
-		"delegatedPower": "委任された投票力",
+		"delegatedPower": "委任された権限",
 		"commentSuccessTitle": "コメントが正常に追加されました",
 		"commentSuccess": "コメントが正常に追加されました",
 		"voted": "投票済み",
 		"successfully": "正常に",
-		"with": "で",
-		"yourVoteIsIn": "あなたの投票が完了しました！なぜこれを支持するのかコメントで共有しませんか？",
+		"with": "と",
+		"yourVoteIsIn": "投票が完了しました！コメントでサポートする理由を共有しませんか？",
 		"your": "あなたの",
-		"voteIsIn": "投票が完了しました！なぜこれを支持するのかコメントで共有しませんか？"
+		"voteIsIn": "投票が完了しました！コメントでサポートする理由を共有しませんか？",
+		"reuseGovernanceLock": "ガバナンスロックを再利用",
+		"reuseAllLocks": "すべてのロックを再利用"
 	},
 	"Balance": {
 		"voteBalance": "投票残高",
 		"Balance": "残高",
-		"PeopleChainBalance": "ピープルチェーン残高"
+		"PeopleChainBalance": "ピープルチェーン残高",
+		"VotingBalance": "投票残高"
 	},
 	"EditPost": {
 		"edit": "編集",
@@ -731,11 +808,30 @@
 			"failedToUploadImage": "画像のアップロードに失敗しました"
 		},
 		"AllowedCommentors": {
+			"advanced": "詳細",
 			"title": "誰がコメントできますか？",
 			"all": "全員",
 			"onchainVerified": "オンチェーン認証済み",
 			"none": "なし",
 			"tooltip": "この投稿にコメントや返信ができる人を選択"
+		},
+		"AddPoll": {
+			"addPoll": "投票を追加",
+			"title": "タイトル",
+			"options": "オプション",
+			"titleRequired": "有効なタイトルを入力してください。",
+			"settings": "設定",
+			"anonymousPolls": "匿名投票（投票者の名前は表示されません）",
+			"maskedPolls": "マスクされた投票（投票が終了した後にのみ結果が表示されます）",
+			"addAnotherOption": "別のオプションを追加..",
+			"pollEndsIn": "投票は",
+			"optionDuplicated": "このオプションは重複しています",
+			"optionsDuplicated": "投票オプションは重複できません",
+			"optionsRequired": "少なくとも {min} 個のオプションを入力してください",
+			"maxOptions": "最大 {max} 個のオプションを入力できます",
+			"endDateRequired": "投票の終了日を選択してください",
+			"endDateInFuture": "投票の終了日は未来の日付にする必要があります",
+			"titlePlaceholder": "投票のタイトルを入力"
 		},
 		"Topic": {
 			"general": "一般",
@@ -802,10 +898,13 @@
 		"searchUsername": "ユーザー名を検索"
 	},
 	"SetIdentity": {
+		"TeleportFundsToPeopleChain": "People Chainに資金をテレポート",
+		"Teleport": "テレポート",
 		"displayName": "表示名",
 		"legalName": "法的名称",
 		"email": "メールアドレス",
 		"twitter": "Twitter",
+		"socials": "ソーシャルメディア",
 		"riot": "Riot",
 		"emailPlaceholder": "メールアドレスを入力してください",
 		"twitterPlaceholder": "@あなたのTwitter名",
@@ -836,11 +935,23 @@
 		"verifying": "検証中...",
 		"verificationSuccessful": "検証成功",
 		"verificationFailed": "検証失敗",
-		"goToHome": "ホームに戻る",
+		"goToRequestJudgement": "判定リクエストに移動",
 		"verificationEmailSent": "確認メールを送信しました",
 		"verificationEmailSentDescription": "確認のためメールをご確認ください",
 		"emailNotSent": "メール送信失敗",
-		"emailNotSentDescription": "確認メールの送信中にエラーが発生しました"
+		"emailNotSentDescription": "確認メールの送信中にエラーが発生しました",
+		"IdentityNotSet": "アイデンティティが設定されていません",
+		"IdentityNotSetDescription": "判定をリクエストするには、まずオンチェーンアイデンティティを設定する必要があります。",
+		"IdentityNotSetDescription2": "判定は、登録機関があなたのプロフィールを検証し、あなたのアイデンティティ情報（表示名、メール、ウェブサイト、法的名称など）に基づいて信頼性のレベルを提供する方法です。",
+		"IdentityNotSetDescription3": "アイデンティティを設定したら、登録機関に判定をリクエストできます。この判定は他の人に表示され、オンチェーンで信頼性を築くのに役立ちます。",
+		"IdentityVerified": "本人確認が完了しました。",
+		"edit": "編集",
+		"resend": "再送信",
+		"resendIn": "再送信まで",
+		"verify": "確認",
+		"verified": "確認済み",
+		"pending": "保留中",
+		"CurrentJudgement": "現在の判定"
 	},
 	"Overview": {
 		"month": "月",
@@ -1047,9 +1158,9 @@
 		"delegate": "委任者",
 		"noBio": "バイオがありません",
 		"readMore": "もっと読む",
-		"votingPower": "投票力",
+		"maxDelegated": "最大委任",
 		"votedProposals": "投票された提案",
-		"receivedDelegations": "受け取った委任",
+		"delegators": "受け取った委任",
 		"past30Days": "過去30日間",
 		"trendingDelegates": "トレンディングな委任者",
 		"pleaseLoginToContinue": "続けるにはログインしてください",
@@ -1284,5 +1395,19 @@
 		"pasteURLorEnterPostID": "URLを貼り付けるか投稿IDを入力してください",
 		"yourDiscussions": "あなたのディスカッション",
 		"confirm": "確認"
+	},
+	"TeleportToPeopleChain": {
+		"teleport": "テレポート",
+		"teleportFundsToPeopleChainSuccess": "People Chainへの資金テレポートが成功しました",
+		"teleportFundsToPeopleChainSuccessDescription": "資金がPeople Chainへ正常にテレポートされました",
+		"teleportFundsToPeopleChainFailed": "People Chainへの資金テレポートに失敗しました",
+		"teleportFundsToPeopleChainFailedDescription": "People Chainへの資金テレポート中にエラーが発生しました",
+		"BeneficiaryAddress": "受益者アドレス",
+		"Amount": "金額"
+	},
+	"ConvictionSelector": {
+		"votes": "投票数",
+		"lockingPeriod": "ロック期間",
+		"lockingPeriodDescription": "選択した乗数に応じて、投票後あなたの{tokenSymbol}は追加期間ロックされます。"
 	}
 }

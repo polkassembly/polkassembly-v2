@@ -5,7 +5,8 @@
 export enum ENetwork {
 	POLKADOT = 'polkadot',
 	KUSAMA = 'kusama',
-	PASEO = 'paseo'
+	PASEO = 'paseo',
+	CERE = 'cere'
 }
 
 export enum EWebhookEvent {
@@ -134,6 +135,8 @@ export enum EPostOrigin {
 	BIG_SPENDER = 'BigSpender',
 	BIG_TIPPER = 'BigTipper',
 	CANDIDATES = 'Candidates',
+	CLUSTER_PROTOCOL_ACTIVATOR = 'ClusterProtocolActivator',
+	CLUSTER_PROTOCOL_UPDATER = 'ClusterProtocolUpdater',
 	EXPERTS = 'Experts',
 	FELLOWS = 'Fellows',
 	FELLOWSHIP_ADMIN = 'FellowshipAdmin',

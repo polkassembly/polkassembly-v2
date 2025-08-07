@@ -12,6 +12,7 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { BN } from '@polkadot/util';
 import { IoPersonAdd } from '@react-icons/all-files/io5/IoPersonAdd';
 import { useUser } from '@/hooks/useUser';
+import { useState } from 'react';
 import classes from './Delegations.module.scss';
 import { Skeleton } from '../../Skeleton';
 import { MarkdownViewer } from '../../MarkdownViewer/MarkdownViewer';
@@ -79,6 +80,7 @@ function Delegations({ addresses }: { addresses: string[] }) {
 	const t = useTranslations('Profile');
 
 	const { user } = useUser();
+	const [openDialog, setOpenDialog] = useState(false);
 
 	const getDelegations = async () => {
 		if (!addresses) return getUpdatedDelegationData([]);
@@ -135,7 +137,10 @@ function Delegations({ addresses }: { addresses: string[] }) {
 							<p>{t('Delegations.delegation')}</p>
 						</div>
 						{ValidatorService.isValidNumber(user?.id) && (
-							<Dialog>
+							<Dialog
+								open={openDialog}
+								onOpenChange={setOpenDialog}
+							>
 								<DialogTrigger asChild>
 									<Button
 										variant='ghost'
@@ -152,7 +157,10 @@ function Delegations({ addresses }: { addresses: string[] }) {
 											<span>{t('delegate')}</span>
 										</DialogTitle>
 									</DialogHeader>
-									<DelegateVotingPower delegate={{ address: '' }} />
+									<DelegateVotingPower
+										delegate={{ address: '' }}
+										onClose={() => setOpenDialog(false)}
+									/>
 								</DialogContent>
 							</Dialog>
 						)}
