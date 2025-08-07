@@ -60,7 +60,7 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 
 		try {
 			setIsRemoving(true);
-			await apiService.removeVoteReferendum({
+			await apiService.removeReferendumVote({
 				address: userPreferences.selectedAccount.address,
 				referendumId: Number(index),
 				selectedAccount: userPreferences.selectedAccount,

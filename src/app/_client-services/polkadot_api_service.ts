@@ -348,7 +348,7 @@ export class PolkadotApiService {
 		}
 	}
 
-	async removeVoteReferendum({
+	async removeReferendumVote({
 		address,
 		referendumId,
 		onSuccess,
