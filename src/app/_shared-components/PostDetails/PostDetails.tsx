@@ -15,7 +15,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import dynamic from 'next/dynamic';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -130,7 +129,6 @@ const ClaimPayout = dynamic(() => import('./ClaimPayout/ClaimPayout'), {
 });
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
-	const network = getCurrentNetwork();
 	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
 
 	const [thresholdValues, setThresholdValues] = useState({ approvalThreshold: 0, supportThreshold: 0 });
@@ -336,7 +334,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					)}
 
 					{/* Poll */}
-					{isOffchainPost && post?.poll && network === 'paseo' && (
+					{isOffchainPost && post?.poll && (
 						<div className={classes.rightWrapper}>
 							<Poll poll={post.poll} />
 						</div>
