@@ -236,6 +236,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 										index={index}
 										track={post.onChainInfo?.origin}
 										proposalType={post.proposalType}
+										showUserVoteCard
 									/>
 								)}
 							</div>
@@ -291,6 +292,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									index={index}
 									track={post.onChainInfo?.origin}
 									proposalType={post.proposalType}
+									showUserVoteCard
 								/>
 							)}
 							<ClaimPayout beneficiaries={post.onChainInfo?.beneficiaries || []} />
