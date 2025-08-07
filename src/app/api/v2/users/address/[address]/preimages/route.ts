@@ -9,14 +9,14 @@ import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 
-export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: { address: string } }) => {
+export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ address: string }> }) => {
 	const zodQuerySchema = z.object({
 		page: z.coerce.number().optional().default(1),
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)
 	});
 
 	const { page, limit } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
-	const { address } = params;
+	const { address } = await params;
 
 	const network = await getNetworkFromHeaders();
 
