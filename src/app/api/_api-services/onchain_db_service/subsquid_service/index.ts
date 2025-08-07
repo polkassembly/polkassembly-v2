@@ -534,7 +534,7 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async GetUserPreimageListing({
+	static async GetPreimagesByAddress({
 		network,
 		page,
 		limit,

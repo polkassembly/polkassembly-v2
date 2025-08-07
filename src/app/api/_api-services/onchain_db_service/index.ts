@@ -149,8 +149,8 @@ export class OnChainDbService {
 		};
 	}
 
-	static async GetUserPreimageListing({ network, page, limit, address }: { network: ENetwork; page: number; limit: number; address: string }) {
-		const userPreimageListing = await SubsquidService.GetUserPreimageListing({ network, page, limit, address });
+	static async GetPreimagesByAddress({ network, page, limit, address }: { network: ENetwork; page: number; limit: number; address: string }) {
+		const userPreimageListing = await SubsquidService.GetPreimagesByAddress({ network, page, limit, address });
 		if (userPreimageListing) return userPreimageListing;
 
 		return {

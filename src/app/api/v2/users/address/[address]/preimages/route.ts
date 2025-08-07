@@ -25,7 +25,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const network = await getNetworkFromHeaders();
 
-	const userPreimageListing = await OnChainDbService.GetUserPreimageListing({
+	const userPreimageListing = await OnChainDbService.GetPreimagesByAddress({
 		network,
 		page,
 		limit,
