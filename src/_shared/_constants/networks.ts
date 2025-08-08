@@ -40,6 +40,10 @@ const VIA_IBP_GEODNS2 = 'via IBP-GeoDNS2';
 const VIA_RADIUMBLOCK = 'via RadiumBlock';
 const VIA_LUCKYFRIDAY = 'via LuckyFriday';
 const VIA_PINKNODE = 'via Pinknode';
+const VIA_AUTOMATA = 'via Automata 1RPC';
+const VIA_BLAST = 'via Blast';
+const VIA_MOONBEAM_FOUNDATION = 'via Moonbeam Foundation';
+const VIA_UNITEDBLOC = 'via UnitedBloc';
 
 interface ITreasuryAsset {
 	name: string;
@@ -2932,12 +2936,28 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		chainId: 1284,
 		rpcEndpoints: [
 			{
-				name: 'via Moonbeam Network',
+				name: VIA_AUTOMATA,
+				url: 'wss://1rpc.io/glmr'
+			},
+			{
+				name: VIA_BLAST,
+				url: 'wss://moonbeam.public.blastapi.io'
+			},
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://moonbeam-rpc.dwellir.com'
+			},
+			{
+				name: VIA_MOONBEAM_FOUNDATION,
 				url: 'wss://wss.api.moonbeam.network'
 			},
 			{
-				name: 'via Public Node',
-				url: 'wss://moonbeam-rpc.publicnode.com'
+				name: VIA_ONFINALITY,
+				url: 'wss://moonbeam.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_UNITEDBLOC,
+				url: 'wss://moonbeam.unitedbloc.com'
 			}
 		],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.MOONBEAM],
