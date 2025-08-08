@@ -4,7 +4,7 @@
 
 'use client';
 
-import { Jazzicon } from '@metamask/jazzicon';
+import Jazzicon from '@metamask/jazzicon';
 import { useEffect, useRef } from 'react';
 
 function EthIdenticon({ address, size, className }: { address: string; size: number; className?: string }) {

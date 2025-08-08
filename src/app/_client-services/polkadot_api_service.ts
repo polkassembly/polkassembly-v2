@@ -2,12 +2,9 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-/* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
+/* eslint-disable sonarjs/no-duplicate-string */
 
 import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -25,8 +22,8 @@ import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, EWallet
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
 import { APPNAME } from '@/_shared/_constants/appName';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
-import { Contract, ethers, formatUnits } from 'ethers';
-import moonbeamAbi from '@/app/_client-utils/moonbeamAbi.json';
+import { Contract, ethers } from 'ethers';
+import moonbeamConvictionVotingAbi from '@/app/_client-utils/moonbeamConvictionVoting.json';
 import { isEthNetwork } from '@/_shared/_utils/getSupportedWallets';
 import { BlockCalculationsService } from './block_calculations_service';
 import { isMimirDetected } from './isMimirDetected';
@@ -35,7 +32,7 @@ import { isMimirDetected } from './isMimirDetected';
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
 // const blockHeight = await apiService.getBlockHeight();
 
-const VOTE_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000';
+const VOTE_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000812';
 export class PolkadotApiService {
 	private readonly network: ENetwork;
 
@@ -376,7 +373,6 @@ export class PolkadotApiService {
 	}
 
 	async voteReferendumEth({
-		address,
 		onSuccess,
 		onFailed,
 		referendumId,
@@ -386,7 +382,6 @@ export class PolkadotApiService {
 		ayeVoteValue,
 		nayVoteValue,
 		abstainVoteValue,
-		selectedAccount,
 		selectedWallet
 	}: {
 		address: string;
@@ -413,19 +408,27 @@ export class PolkadotApiService {
 		}
 
 		const signer = await web3.getSigner();
-		const voteContract = new Contract(VOTE_CONTRACT_ADDRESS, moonbeamAbi, signer);
-		const gasPrice = await voteContract.standard_vote.estimateGas(referendumId, vote === EVoteDecision.AYE, lockedBalance?.toString() || '0', conviction);
-		const estimatedGasPriceInWei = new BN(formatUnits(gasPrice, 'wei'));
 
-		// increase gas by 15%
-		const gasLimit = estimatedGasPriceInWei.div(new BN(100)).mul(new BN(15)).add(estimatedGasPriceInWei).toString();
+		// Try the new contract first, fallback to old contract if it fails
+		const voteContract = new Contract(VOTE_CONTRACT_ADDRESS, moonbeamConvictionVotingAbi, signer);
+		let tx;
 
-		const tx = await voteContract.standard_vote(referendumId, vote === EVoteDecision.AYE, lockedBalance?.toString() || '0', conviction, {
-			gasLimit: gasLimit.toString()
-		});
+		try {
+			if (vote === EVoteDecision.AYE) {
+				tx = await voteContract.voteYes(referendumId, lockedBalance?.toString() || '0', conviction);
+			} else if (vote === EVoteDecision.NAY) {
+				tx = await voteContract.voteNo(referendumId, lockedBalance?.toString() || '0', conviction);
+			} else if (vote === EVoteDecision.SPLIT) {
+				tx = await voteContract.voteSplit(referendumId, ayeVoteValue?.toString() || '0', nayVoteValue?.toString() || '0');
+			} else if (vote === EVoteDecision.SPLIT_ABSTAIN) {
+				tx = await voteContract.voteSplitAbstain(referendumId, ayeVoteValue?.toString() || '0', nayVoteValue?.toString() || '0', abstainVoteValue?.toString() || '0');
+			}
 
-		await tx.wait();
-		onSuccess();
+			await tx.wait();
+			onSuccess();
+		} catch (error: unknown) {
+			onFailed((error as Error).message || 'Vote type not supported by old contract');
+		}
 	}
 
 	async voteReferendum({

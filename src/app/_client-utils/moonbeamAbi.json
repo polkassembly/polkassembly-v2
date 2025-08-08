@@ -2,14 +2,19 @@
 	{
 		"inputs": [
 			{
+				"internalType": "uint16",
+				"name": "trackId",
+				"type": "uint16"
+			},
+			{
 				"internalType": "address",
-				"name": "representative",
+				"name": "to",
 				"type": "address"
 			},
 			{
-				"internalType": "uint256",
+				"internalType": "enum ConvictionVoting.Conviction",
 				"name": "conviction",
-				"type": "uint256"
+				"type": "uint8"
 			},
 			{
 				"internalType": "uint256",
@@ -25,68 +30,12 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "prop_index",
-				"type": "uint256"
+				"internalType": "uint16",
+				"name": "trackId",
+				"type": "uint16"
 			}
 		],
-		"name": "deposit_of",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "ref_index",
-				"type": "uint256"
-			}
-		],
-		"name": "finished_referendum_info",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "lowest_unbaked",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bytes",
-				"name": "encoded_proposal",
-				"type": "bytes"
-			}
-		],
-		"name": "note_imminent_preimage",
+		"name": "undelegate",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -94,12 +43,17 @@
 	{
 		"inputs": [
 			{
-				"internalType": "bytes",
-				"name": "encoded_proposal",
-				"type": "bytes"
+				"internalType": "uint16",
+				"name": "trackId",
+				"type": "uint16"
+			},
+			{
+				"internalType": "address",
+				"name": "target",
+				"type": "address"
 			}
 		],
-		"name": "note_preimage",
+		"name": "unlock",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -107,145 +61,114 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "ref_index",
-				"type": "uint256"
-			}
-		],
-		"name": "ongoing_referendum_info",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "",
-				"type": "bytes32"
+				"internalType": "uint32",
+				"name": "pollIndex",
+				"type": "uint32"
 			},
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "voteAmount",
 				"type": "uint256"
 			},
 			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bytes32",
-				"name": "proposal_hash",
-				"type": "bytes32"
-			},
-			{
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "propose",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "public_prop_count",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "ref_index",
-				"type": "uint256"
-			}
-		],
-		"name": "remove_vote",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "prop_index",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "seconds_upper_bound",
-				"type": "uint256"
-			}
-		],
-		"name": "second",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "ref_index",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bool",
-				"name": "aye",
-				"type": "bool"
-			},
-			{
-				"internalType": "uint256",
-				"name": "vote_amount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
+				"internalType": "enum ConvictionVoting.Conviction",
 				"name": "conviction",
-				"type": "uint256"
+				"type": "uint8"
 			}
 		],
-		"name": "standard_vote",
+		"name": "voteYes",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "un_delegate",
+		"inputs": [
+			{
+				"internalType": "uint32",
+				"name": "pollIndex",
+				"type": "uint32"
+			},
+			{
+				"internalType": "uint256",
+				"name": "voteAmount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "enum ConvictionVoting.Conviction",
+				"name": "conviction",
+				"type": "uint8"
+			}
+		],
+		"name": "voteNo",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint32",
+				"name": "pollIndex",
+				"type": "uint32"
+			},
+			{
+				"internalType": "uint256",
+				"name": "aye",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "nay",
+				"type": "uint256"
+			}
+		],
+		"name": "voteSplit",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint32",
+				"name": "pollIndex",
+				"type": "uint32"
+			},
+			{
+				"internalType": "uint256",
+				"name": "aye",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "nay",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "abstain",
+				"type": "uint256"
+			}
+		],
+		"name": "voteSplitAbstain",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint16",
+				"name": "trackId",
+				"type": "uint16"
+			},
+			{
+				"internalType": "uint32",
+				"name": "pollIndex",
+				"type": "uint32"
+			}
+		],
+		"name": "removeVote",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -256,11 +179,239 @@
 				"internalType": "address",
 				"name": "target",
 				"type": "address"
+			},
+			{
+				"internalType": "uint16",
+				"name": "trackId",
+				"type": "uint16"
+			},
+			{
+				"internalType": "uint32",
+				"name": "pollIndex",
+				"type": "uint32"
 			}
 		],
-		"name": "unlock",
+		"name": "removeOtherVote",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "who",
+				"type": "address"
+			},
+			{
+				"internalType": "uint16",
+				"name": "trackId",
+				"type": "uint16"
+			}
+		],
+		"name": "votingFor",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "bool",
+						"name": "isDelegating",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isCasting",
+						"type": "bool"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "balance",
+								"type": "uint256"
+							},
+							{
+								"internalType": "address",
+								"name": "target",
+								"type": "address"
+							},
+							{
+								"internalType": "enum ConvictionVoting.Conviction",
+								"name": "conviction",
+								"type": "uint8"
+							},
+							{
+								"internalType": "uint256",
+								"name": "delegations",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "prior",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct ConvictionVoting.Delegating",
+						"name": "delegating",
+						"type": "tuple"
+					},
+					{
+						"components": [
+							{
+								"components": [
+									{
+										"internalType": "uint32",
+										"name": "pollIndex",
+										"type": "uint32"
+									},
+									{
+										"components": [
+											{
+												"internalType": "bool",
+												"name": "isStandard",
+												"type": "bool"
+											},
+											{
+												"internalType": "bool",
+												"name": "isSplit",
+												"type": "bool"
+											},
+											{
+												"internalType": "bool",
+												"name": "isSplitAbstain",
+												"type": "bool"
+											},
+											{
+												"components": [
+													{
+														"components": [
+															{
+																"internalType": "bool",
+																"name": "aye",
+																"type": "bool"
+															},
+															{
+																"internalType": "enum ConvictionVoting.Conviction",
+																"name": "conviction",
+																"type": "uint8"
+															}
+														],
+														"internalType": "struct ConvictionVoting.Vote",
+														"name": "vote",
+														"type": "tuple"
+													},
+													{
+														"internalType": "uint256",
+														"name": "balance",
+														"type": "uint256"
+													}
+												],
+												"internalType": "struct ConvictionVoting.StandardVote",
+												"name": "standard",
+												"type": "tuple"
+											},
+											{
+												"components": [
+													{
+														"internalType": "uint256",
+														"name": "aye",
+														"type": "uint256"
+													},
+													{
+														"internalType": "uint256",
+														"name": "nay",
+														"type": "uint256"
+													}
+												],
+												"internalType": "struct ConvictionVoting.SplitVote",
+												"name": "split",
+												"type": "tuple"
+											},
+											{
+												"components": [
+													{
+														"internalType": "uint256",
+														"name": "aye",
+														"type": "uint256"
+													},
+													{
+														"internalType": "uint256",
+														"name": "nay",
+														"type": "uint256"
+													},
+													{
+														"internalType": "uint256",
+														"name": "abstain",
+														"type": "uint256"
+													}
+												],
+												"internalType": "struct ConvictionVoting.SplitAbstainVote",
+												"name": "splitAbstain",
+												"type": "tuple"
+											}
+										],
+										"internalType": "struct ConvictionVoting.AccountVote",
+										"name": "accountVote",
+										"type": "tuple"
+									}
+								],
+								"internalType": "struct ConvictionVoting.PollAccountVote[]",
+								"name": "votes",
+								"type": "tuple[]"
+							},
+							{
+								"internalType": "uint256",
+								"name": "delegations",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "prior",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct ConvictionVoting.Casting",
+						"name": "casting",
+						"type": "tuple"
+					}
+				],
+				"internalType": "struct ConvictionVoting.Voting",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "who",
+				"type": "address"
+			}
+		],
+		"name": "classLocksFor",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint16",
+						"name": "trackId",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct ConvictionVoting.ClassLock[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	}
 ]

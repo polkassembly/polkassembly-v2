@@ -2,5 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 declare module '@metamask/jazzicon' {
-	export function Jazzicon(diameter: number, seed: number): HTMLElement;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any, import/no-default-export
+	export default function Jazzicon(diameter: number, seed: any): HTMLElement;
 }
