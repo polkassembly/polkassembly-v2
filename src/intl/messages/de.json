@@ -753,6 +753,10 @@
 	"Preimages": {
 		"hash": "Hash",
 		"author": "Autor",
+		"all": "Alle",
+		"myPreimages": "Meine Preimages",
+		"noUserPreimages": "Sie haben keine Preimages!",
+		"createOneNow": "Erstellen Sie jetzt einen!",
 		"deposit": "Einzahlung",
 		"arguments": "Argumente",
 		"size": "Größe",
@@ -769,7 +773,16 @@
 		"unnoted_description": "Das Preimage wurde nicht notiert",
 		"failed": "Fehlgeschlagen",
 		"unrequest": "Anforderung zurückziehen",
-		"unnote": "Notiz entfernen"
+		"unnote": "Notiz entfernen",
+		"unnoteOrUnrequestPreimageDescription": "Sind Sie sicher, dass Sie dieses Preimage unnotieren oder die Anfrage zurückziehen möchten?",
+		"loadingYourPreimages": "Lade Ihre Preimages...",
+		"please": "Bitte",
+		"toViewPreimages": "um Ihre Preimages zu sehen",
+		"logIn": "anmelden",
+		"failedToFetchUserPreimages": "Fehler beim Abrufen der Benutzer-Preimages",
+		"tryAgain": "Erneut versuchen",
+		"showingPreimagesFor": "Zeige Preimages für:",
+		"switchWallet": "Wallet wechseln"
 	},
 	"Create": {
 		"createDiscussionTitle": "Diskussion erstellen",

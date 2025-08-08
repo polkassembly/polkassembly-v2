@@ -804,6 +804,10 @@
 	"Preimages": {
 		"hash": "Hash",
 		"author": "Author",
+		"all": "All",
+		"myPreimages": "My Preimages",
+		"noUserPreimages": "You have no preimages!",
+		"createOneNow": "Create one now!",
 		"deposit": "Deposit",
 		"arguments": "Arguments",
 		"size": "Size",
@@ -821,7 +825,15 @@
 		"failed": "Failed",
 		"unrequest": "Unrequest",
 		"unnote": "Unnote",
-		"unnoteOrUnrequestPreimageDescription": "Are you sure you want to unnote or unrequest this preimage?"
+		"unnoteOrUnrequestPreimageDescription": "Are you sure you want to unnote or unrequest this preimage?",
+		"loadingYourPreimages": "Loading your preimages...",
+		"please": "Please",
+		"toViewPreimages": "to view your preimages",
+		"logIn": "log in",
+		"failedToFetchUserPreimages": "Failed to fetch user preimages",
+		"tryAgain": "Try again",
+		"showingPreimagesFor": "Showing preimages for:",
+		"switchWallet": "Switch Wallet"
 	},
 	"Create": {
 		"createDiscussionTitle": "Create Discussion",

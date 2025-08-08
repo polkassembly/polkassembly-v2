@@ -38,6 +38,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { BN, BN_ZERO } from '@polkadot/util';
+import { encodeAddress } from '@polkadot/util-crypto';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { SubsquidUtils } from './subsquidUtils';
@@ -522,6 +523,44 @@ export class SubsquidService extends SubsquidUtils {
 		if (subsquidErr || !subsquidData || !subsquidData.preimages) {
 			console.error(`Error fetching on-chain preimage listing from Subsquid: ${subsquidErr}`);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain preimage listing from Subsquid');
+		}
+
+		return {
+			items: subsquidData.preimages.map((preimage: IPreimage) => ({
+				...preimage,
+				...(preimage.proposer && { proposer: getSubstrateAddress(preimage.proposer) })
+			})),
+			totalCount: subsquidData.preimagesConnection.totalCount
+		};
+	}
+
+	static async GetPreimagesByAddress({
+		network,
+		page,
+		limit,
+		address
+	}: {
+		network: ENetwork;
+		page: number;
+		limit: number;
+		address: string;
+	}): Promise<IGenericListingResponse<IPreimage>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		// Convert address to substrate format for querying
+		const formattedAddress = ValidatorService.isValidSubstrateAddress(address) ? encodeAddress(address, NETWORKS_DETAILS[network as ENetwork].ss58Format) : address;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient
+			.query(this.GET_USER_PREIMAGES_LISTING, {
+				limit,
+				offset: (page - 1) * limit,
+				proposer_eq: formattedAddress
+			})
+			.toPromise();
+
+		if (subsquidErr || !subsquidData || !subsquidData.preimages) {
+			console.error(`Error fetching on-chain user preimage listing from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain user preimage listing from Subsquid');
 		}
 
 		return {

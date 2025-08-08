@@ -1343,6 +1343,11 @@ export interface IPayout {
 	};
 }
 
+export enum EPreImageTabs {
+	ALL = 'all',
+	USER = 'user'
+}
+
 export interface IOffChainPollPayload extends Omit<IPoll, 'id' | 'createdAt' | 'updatedAt' | 'proposalType' | 'updatedBy' | 'network' | 'votes' | 'index'> {
 	title: string;
 	options: string[];

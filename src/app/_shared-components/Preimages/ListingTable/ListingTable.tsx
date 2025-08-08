@@ -52,39 +52,41 @@ function ListingTable({ data, totalCount }: { data: IPreimage[]; totalCount: num
 	};
 
 	return (
-		<div className='mt-5 w-full rounded-lg bg-bg_modal p-6'>
+		<div className='w-full'>
 			{data && data.length > 0 ? (
 				<>
-					<Table>
-						<TableHeader>
-							<TableRow className={styles.tableRow}>
-								<TableHead className={styles.tableCell_1}>{t('hash')}</TableHead>
-								<TableHead className={styles.tableCell_2}>{t('author')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('deposit')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('arguments')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('size')}</TableHead>
-								<TableHead className={styles.tableCell_last}>{t('status')}</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{Array.isArray(preimages) ? (
-								preimages.map((preimage: IPreimage) => (
+					<div className='w-full rounded-lg border border-primary_border bg-bg_modal p-6'>
+						<Table>
+							<TableHeader>
+								<TableRow className={styles.tableRow}>
+									<TableHead className={styles.tableCell_1}>{t('hash')}</TableHead>
+									<TableHead className={styles.tableCell_2}>{t('author')}</TableHead>
+									<TableHead className={styles.tableCell}>{t('deposit')}</TableHead>
+									<TableHead className={styles.tableCell}>{t('arguments')}</TableHead>
+									<TableHead className={styles.tableCell}>{t('size')}</TableHead>
+									<TableHead className={styles.tableCell_last}>{t('status')}</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{Array.isArray(preimages) ? (
+									preimages.map((preimage: IPreimage) => (
+										<PreimageRow
+											key={preimage?.id}
+											preimage={preimage}
+											handleDialogOpen={() => hanldeDialogOpen(preimage)}
+											onUnnotePreimage={() => onUnnotePreimage(preimage)}
+										/>
+									))
+								) : (
 									<PreimageRow
-										key={preimage?.id}
-										preimage={preimage}
-										handleDialogOpen={() => hanldeDialogOpen(preimage)}
-										onUnnotePreimage={() => onUnnotePreimage(preimage)}
+										preimage={data as unknown as IPreimage}
+										handleDialogOpen={() => hanldeDialogOpen(data as unknown as IPreimage)}
+										onUnnotePreimage={() => onUnnotePreimage(data as unknown as IPreimage)}
 									/>
-								))
-							) : (
-								<PreimageRow
-									preimage={data as unknown as IPreimage}
-									handleDialogOpen={() => hanldeDialogOpen(data as unknown as IPreimage)}
-									onUnnotePreimage={() => onUnnotePreimage(data as unknown as IPreimage)}
-								/>
-							)}
-						</TableBody>
-					</Table>
+								)}
+							</TableBody>
+						</Table>
+					</div>
 					{totalCount && totalCount > PREIMAGES_LISTING_LIMIT && (
 						<div className='mt-5 flex w-full justify-end'>
 							<PaginationWithLinks

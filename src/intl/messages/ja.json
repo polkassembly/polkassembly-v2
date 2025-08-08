@@ -754,6 +754,10 @@
 	"Preimages": {
 		"hash": "ハッシュ",
 		"author": "作成者",
+		"all": "すべて",
+		"myPreimages": "マイプレイメージ",
+		"noUserPreimages": "プレイメージがありません！",
+		"createOneNow": "今すぐ作成！",
 		"deposit": "デポジット",
 		"arguments": "引数",
 		"size": "サイズ",
@@ -770,7 +774,16 @@
 		"unnoted_description": "プレイメージは記録されていません",
 		"failed": "失敗",
 		"unrequest": "リクエストを取り消す",
-		"unnote": "記録を削除"
+		"unnote": "記録を削除",
+		"unnoteOrUnrequestPreimageDescription": "このプレイメージの記録を削除またはリクエストを取り消してもよろしいですか？",
+		"loadingYourPreimages": "プレイメージを読み込み中...",
+		"please": "プレイメージを表示するには",
+		"toViewPreimages": "してください",
+		"logIn": "ログイン",
+		"failedToFetchUserPreimages": "ユーザーのプレイメージの取得に失敗しました",
+		"tryAgain": "再試行",
+		"showingPreimagesFor": "プレイメージを表示中:",
+		"switchWallet": "ウォレットを切り替え"
 	},
 	"Create": {
 		"createDiscussionTitle": "ディスカッションを作成",
