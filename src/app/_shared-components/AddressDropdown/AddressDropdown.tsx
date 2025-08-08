@@ -60,10 +60,17 @@ function AddressDropdown({
 
 		const prevPreferredAccount = userPreferences.selectedAccount;
 
-		const selectedAccount =
-			prevPreferredAccount?.address && injectedAccounts.some((account) => getSubstrateAddress(account.address) === getSubstrateAddress(prevPreferredAccount.address))
-				? prevPreferredAccount
-				: injectedAccounts[0];
+		const getSelectedAccount = () => {
+			if (prevPreferredAccount?.address) {
+				if (prevPreferredAccount.address.startsWith('0x')) {
+					return injectedAccounts.find((account) => account.address === prevPreferredAccount.address) || injectedAccounts[0];
+				}
+				return injectedAccounts.find((account) => getSubstrateAddress(account.address) === getSubstrateAddress(prevPreferredAccount.address)) || injectedAccounts[0];
+			}
+			return injectedAccounts[0];
+		};
+
+		const selectedAccount = getSelectedAccount();
 
 		setUserPreferences({
 			...userPreferences,

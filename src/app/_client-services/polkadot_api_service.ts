@@ -2,10 +2,9 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-/* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-console */
+/* eslint-disable sonarjs/no-duplicate-string */
 
 import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -19,10 +18,13 @@ import { getTypeDef } from '@polkadot/types';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IPayout, ISelectedAccount, IVoteCartItem } from '@shared/types';
+import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, EWallet, IBeneficiaryInput, IParamDef, IPayout, ISelectedAccount, IVoteCartItem } from '@shared/types';
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
 import { APPNAME } from '@/_shared/_constants/appName';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
+import { Contract, ethers } from 'ethers';
+import moonbeamConvictionVotingAbi from '@/app/_client-utils/moonbeamConvictionVoting.json';
+import { isEthNetwork } from '@/_shared/_utils/getSupportedWallets';
 import { BlockCalculationsService } from './block_calculations_service';
 import { isMimirDetected } from './isMimirDetected';
 
@@ -30,6 +32,7 @@ import { isMimirDetected } from './isMimirDetected';
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
 // const blockHeight = await apiService.getBlockHeight();
 
+const VOTE_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000812';
 export class PolkadotApiService {
 	private readonly network: ENetwork;
 
@@ -369,8 +372,7 @@ export class PolkadotApiService {
 		};
 	}
 
-	async voteReferendum({
-		address,
+	async voteReferendumEth({
 		onSuccess,
 		onFailed,
 		referendumId,
@@ -380,7 +382,7 @@ export class PolkadotApiService {
 		ayeVoteValue,
 		nayVoteValue,
 		abstainVoteValue,
-		selectedAccount
+		selectedWallet
 	}: {
 		address: string;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
@@ -393,7 +395,87 @@ export class PolkadotApiService {
 		nayVoteValue?: BN;
 		abstainVoteValue?: BN;
 		selectedAccount?: ISelectedAccount;
+		selectedWallet: EWallet;
 	}) {
+		const wallet = selectedWallet === EWallet.METAMASK ? window.ethereum : selectedWallet === EWallet.TALISMAN ? (window as any).talismanEth : window.SubWallet;
+		const web3 = new ethers.BrowserProvider(wallet);
+		const { chainId: id } = await web3.getNetwork();
+		const chainId = Number(id.toString());
+		const networkChainId = NETWORKS_DETAILS[this.network].chainId;
+
+		if (chainId !== networkChainId) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Invalid network');
+		}
+
+		const signer = await web3.getSigner();
+
+		// Try the new contract first, fallback to old contract if it fails
+		const voteContract = new Contract(VOTE_CONTRACT_ADDRESS, moonbeamConvictionVotingAbi, signer);
+		let tx;
+
+		try {
+			if (vote === EVoteDecision.AYE) {
+				tx = await voteContract.voteYes(referendumId, lockedBalance?.toString() || '0', conviction);
+			} else if (vote === EVoteDecision.NAY) {
+				tx = await voteContract.voteNo(referendumId, lockedBalance?.toString() || '0', conviction);
+			} else if (vote === EVoteDecision.SPLIT) {
+				tx = await voteContract.voteSplit(referendumId, ayeVoteValue?.toString() || '0', nayVoteValue?.toString() || '0');
+			} else if (vote === EVoteDecision.SPLIT_ABSTAIN) {
+				tx = await voteContract.voteSplitAbstain(referendumId, ayeVoteValue?.toString() || '0', nayVoteValue?.toString() || '0', abstainVoteValue?.toString() || '0');
+			}
+
+			await tx.wait();
+			onSuccess();
+		} catch (error: unknown) {
+			onFailed((error as Error).message || 'Vote type not supported by old contract');
+		}
+	}
+
+	async voteReferendum({
+		address,
+		onSuccess,
+		onFailed,
+		referendumId,
+		vote,
+		lockedBalance,
+		conviction,
+		ayeVoteValue,
+		nayVoteValue,
+		abstainVoteValue,
+		selectedAccount,
+		selectedWallet
+	}: {
+		address: string;
+		onSuccess: (pre?: unknown) => Promise<void> | void;
+		onFailed: (errorMessageFallback: string) => Promise<void> | void;
+		referendumId: number;
+		vote: EVoteDecision;
+		lockedBalance?: BN;
+		conviction?: number;
+		ayeVoteValue?: BN;
+		nayVoteValue?: BN;
+		abstainVoteValue?: BN;
+		selectedAccount?: ISelectedAccount;
+		selectedWallet?: EWallet;
+	}) {
+		if (isEthNetwork(this.network)) {
+			this.voteReferendumEth({
+				address,
+				onSuccess,
+				onFailed,
+				referendumId,
+				vote,
+				lockedBalance,
+				conviction,
+				ayeVoteValue,
+				nayVoteValue,
+				abstainVoteValue,
+				selectedAccount,
+				selectedWallet: selectedWallet || EWallet.METAMASK
+			});
+			return;
+		}
+
 		let voteTx: SubmittableExtrinsic<'promise'> | null = null;
 
 		if ([EVoteDecision.AYE, EVoteDecision.NAY].includes(vote) && lockedBalance) {
