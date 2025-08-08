@@ -35,10 +35,17 @@ export const useCommentReactions = (commentData: ICommentData) => {
 	const [reactionState, setReactionState] = useState({ isLiked, isDisliked, likesCount, dislikesCount });
 	const [showLikeGif, setShowLikeGif] = useState(false);
 	const [showDislikeGif, setShowDislikeGif] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
-	const [currentReactionId, setCurrentReactionId] = useState<string | null>(
-		useMemo(() => commentData?.reactions?.find((reaction) => reaction.userId === user?.id)?.id || null, [commentData?.reactions, user?.id])
-	);
+	const currentReactionIdFromData = useMemo(() => {
+		return commentData?.reactions?.find((reaction) => reaction.userId === user?.id)?.id || null;
+	}, [commentData?.reactions, user?.id]);
+
+	const [currentReactionId, setCurrentReactionId] = useState<string | null>(currentReactionIdFromData);
+
+	useEffect(() => {
+		setCurrentReactionId(currentReactionIdFromData);
+	}, [currentReactionIdFromData]);
 
 	useEffect(() => {
 		setReactionState({ isLiked, isDisliked, likesCount, dislikesCount });
@@ -49,8 +56,11 @@ export const useCommentReactions = (commentData: ICommentData) => {
 			if (!commentData?.indexOrHash || !commentData?.commentId) {
 				throw new Error('Index/hash and comment ID are required');
 			}
+
+			setIsLoading(true);
 			const isLikeAction = type === EReaction.like;
 			const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
+
 			try {
 				const isDeleteAction = currentReactionId && ((isLikeAction && reactionState.isLiked) || (!isLikeAction && reactionState.isDisliked));
 				if (!isDeleteAction) {
@@ -94,6 +104,8 @@ export const useCommentReactions = (commentData: ICommentData) => {
 					status: ENotificationStatus.ERROR
 				});
 				console.error('Failed to update comment reaction:', error);
+			} finally {
+				setIsLoading(false);
 			}
 		},
 		[currentReactionId, reactionState, commentData.proposalType, commentData.indexOrHash, commentData.commentId, toast]
@@ -103,6 +115,7 @@ export const useCommentReactions = (commentData: ICommentData) => {
 		reactionState,
 		showLikeGif,
 		showDislikeGif,
-		handleReaction
+		handleReaction,
+		isLoading
 	};
 };

@@ -19,7 +19,7 @@ function CommentReactions({ commentData }: CommentReactionsProps) {
 	const { user } = useUser();
 	const router = useRouter();
 
-	const { handleReaction, reactionState, showLikeGif, showDislikeGif } = useCommentReactions({
+	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isLoading } = useCommentReactions({
 		reactions: commentData?.reactions,
 		proposalType: commentData?.proposalType,
 		indexOrHash: commentData?.indexOrHash,
@@ -51,6 +51,7 @@ function CommentReactions({ commentData }: CommentReactionsProps) {
 					className='text-xs'
 					count={reactionState.likesCount}
 					onClick={handleLike}
+					isLoading={isLoading}
 				/>
 			</div>
 			<div className={cn(reactionState.isDisliked ? styles.selected_text : 'text-basic_text', styles.comment_actions_container)}>
@@ -62,6 +63,7 @@ function CommentReactions({ commentData }: CommentReactionsProps) {
 					className='text-xs'
 					count={reactionState.dislikesCount}
 					onClick={handleDislike}
+					isLoading={isLoading}
 				/>
 			</div>
 		</div>

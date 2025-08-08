@@ -112,7 +112,7 @@ function Comments({
 	return (
 		<div className={classes.wrapper}>
 			<div className='flex flex-col gap-y-4 px-4 lg:px-6'>
-				{commentsToShow.map((item) => (
+				{commentsToShow?.slice(0, 1).map((item) => (
 					<SingleComment
 						key={item.id}
 						commentData={item}
