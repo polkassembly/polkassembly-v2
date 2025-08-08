@@ -21,7 +21,8 @@ function ReactionButton({
 	onClick,
 	count,
 	showText = true,
-	className = 'text-bg_pink text-lg'
+	className = 'text-bg_pink text-lg',
+	isLoading = false
 }: {
 	type: EReaction;
 	isActive: boolean;
@@ -30,17 +31,19 @@ function ReactionButton({
 	showText?: boolean;
 	count?: number;
 	className?: string;
+	isLoading?: boolean;
 }) {
 	const Icon = type === EReaction.like ? (isActive ? AiFillLike : AiOutlineLike) : isActive ? AiFillDislike : AiOutlineDislike;
 	const t = useTranslations();
 
 	return (
 		<button
-			className='relative flex cursor-pointer items-center transition-all duration-300 hover:scale-110'
+			className={cn('relative flex cursor-pointer items-center transition-all duration-300 hover:scale-110', isLoading ? 'opacity-50' : '')}
 			onClick={onClick}
 			type='button'
+			disabled={isLoading}
 		>
-			<div className='relative w-[24px]'>
+			<div className='relative w-6'>
 				{showGif ? (
 					<div className={type === EReaction.like ? styles.likeGifContainer : styles.dislikeGifContainer}>
 						<Image
