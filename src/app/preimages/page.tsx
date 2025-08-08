@@ -49,7 +49,7 @@ async function Preimages({ searchParams }: { searchParams: Promise<{ page?: stri
 				<Header data={{ totalCount: data.totalCount }} />
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 					<TabsContent value={EPreImageTabs.ALL}>
-						<div className={`${styles.container} mb-4`}>
+						<div className={styles.container}>
 							<SearchBar />
 						</div>
 						<ListingTable
