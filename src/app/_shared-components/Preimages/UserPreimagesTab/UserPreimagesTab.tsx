@@ -7,7 +7,7 @@
 import React from 'react';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ClientError } from '@/app/_client-utils/clientError';
+
 import { useUser } from '@/hooks/useUser';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useSearchParams } from 'next/navigation';
@@ -23,6 +23,7 @@ import SearchBar from '../SearchBar/SearchBar';
 import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
 import Address from '../../Profile/Address/Address';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
+import LoadingLayover from '../../LoadingLayover';
 
 function UserPreimagesTab() {
 	const searchParams = useSearchParams();
@@ -39,7 +40,7 @@ function UserPreimagesTab() {
 		error,
 		refetch
 	} = useQuery({
-		queryKey: ['userPreimages', selectedAddress, page, user?.id, userPreferences?.selectedAccount?.address],
+		queryKey: ['userPreimages', selectedAddress, page, user?.id],
 		queryFn: async () => {
 			if (!selectedAddress) {
 				return null;
@@ -51,26 +52,16 @@ function UserPreimagesTab() {
 			});
 
 			if (fetchError || !data) {
-				throw new ClientError(ERROR_CODES.CLIENT_ERROR, fetchError?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+				return { error: fetchError?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR] };
 			}
 
 			return data;
 		},
 		enabled: !!selectedAddress && !!user?.addresses?.length,
-		retry: 1
+		retry: true,
+		refetchOnMount: true,
+		refetchOnWindowFocus: true
 	});
-
-	// Show loading state
-	if (isLoading) {
-		return (
-			<div className='flex items-center justify-center py-12'>
-				<div className='text-center'>
-					<div className='mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-bg_pink border-t-transparent' />
-					<p className='text-bg_pink'>{t('loadingYourPreimages')}</p>
-				</div>
-			</div>
-		);
-	}
 
 	// Show not authenticated message
 	if (!user?.addresses?.length) {
@@ -93,11 +84,13 @@ function UserPreimagesTab() {
 	}
 
 	// Show error state
-	if (error) {
+	if (error || (userPreimagesData && 'error' in userPreimagesData)) {
+		const errorMessage = error instanceof Error ? error.message : userPreimagesData && 'error' in userPreimagesData ? userPreimagesData.error : t('failedToFetchUserPreimages');
+
 		return (
 			<div className='flex items-center justify-center py-12'>
 				<div className='text-center text-red-500'>
-					<p>Error: {error instanceof Error ? error.message : t('failedToFetchUserPreimages')}</p>
+					<p>Error: {errorMessage}</p>
 					<Button
 						variant='ghost'
 						onClick={() => refetch()}
@@ -145,14 +138,17 @@ function UserPreimagesTab() {
 				</div>
 				<SearchBar />
 			</div>
-			{userPreimagesData?.items?.length ? (
-				<ListingTable
-					data={userPreimagesData.items}
-					totalCount={userPreimagesData.totalCount}
-				/>
-			) : (
-				<NoUserPreimage />
-			)}
+			<div className='relative'>
+				{isLoading && <LoadingLayover />}
+				{userPreimagesData && !('error' in userPreimagesData) && userPreimagesData.items?.length ? (
+					<ListingTable
+						data={userPreimagesData.items}
+						totalCount={userPreimagesData.totalCount}
+					/>
+				) : (
+					<NoUserPreimage />
+				)}
+			</div>
 		</>
 	);
 }
