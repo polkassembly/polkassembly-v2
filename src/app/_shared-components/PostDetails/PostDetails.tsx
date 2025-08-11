@@ -15,7 +15,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import dynamic from 'next/dynamic';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -107,6 +106,17 @@ const PlaceDecisionDeposit = dynamic(() => import('./PlaceDecisionDeposit/PlaceD
 	)
 });
 
+const RefundDeposits = dynamic(() => import('./RefundDeposits/RefundDeposits'), {
+	ssr: false,
+	loading: () => (
+		<div className='rounded-lg border border-border_grey bg-bg_modal p-4'>
+			<Skeleton className='mb-4 h-6 w-32' />
+			<Skeleton className='mb-2 h-4 w-full' />
+			<Skeleton className='h-10 w-full rounded-md' />
+		</div>
+	)
+});
+
 const ClaimPayout = dynamic(() => import('./ClaimPayout/ClaimPayout'), {
 	ssr: false,
 	loading: () => (
@@ -119,7 +129,6 @@ const ClaimPayout = dynamic(() => import('./ClaimPayout/ClaimPayout'), {
 });
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
-	const network = getCurrentNetwork();
 	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
 
 	const [thresholdValues, setThresholdValues] = useState({ approvalThreshold: 0, supportThreshold: 0 });
@@ -244,6 +253,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					</div>
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
+							{/* Place Decision Deposit */}
 							{post.proposalType === EProposalType.REFERENDUM_V2 &&
 								post.onChainInfo?.status &&
 								post.onChainInfo?.status === EProposalStatus.Submitted &&
@@ -267,6 +277,14 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 										}}
 									/>
 								)}
+
+							{/* Refund Deposits */}
+							{post.onChainInfo?.status && post.index !== undefined && ValidatorService.isValidNumber(post.index) && post.onChainInfo?.origin && (
+								<RefundDeposits
+									postId={post.index}
+									track={post.onChainInfo?.origin}
+								/>
+							)}
 							{canVote(post.onChainInfo?.status) && (
 								<VoteReferendumButton
 									iconClassName='hidden'
@@ -316,7 +334,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					)}
 
 					{/* Poll */}
-					{isOffchainPost && post?.poll && network === 'paseo' && (
+					{isOffchainPost && post?.poll && (
 						<div className={classes.rightWrapper}>
 							<Poll poll={post.poll} />
 						</div>

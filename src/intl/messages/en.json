@@ -439,6 +439,7 @@
 		"edit": "Edit",
 		"castVote": "Cast Vote",
 		"castYourVote": "Cast Your Vote",
+		"copyLink": "Copy Link",
 		"loginToVote": "Login to Vote",
 		"requested": "Requested",
 		"beneficiary": "Beneficiary",
@@ -638,6 +639,13 @@
 			"payoutClaimFailed": "Payout claim failed",
 			"payoutClaimedSuccessfullyDescription": "Your payout has been claimed successfully",
 			"payoutClaimFailedDescription": "Please try again"
+		},
+		"RefundDeposits": {
+			"refund": "Refund",
+			"refundDeposits": "Refund Deposits",
+			"description": "Click here to refund the deposit for this proposal",
+			"decisionDeposit": "Decision Deposit",
+			"submissionDeposit": "Submission Deposit"
 		}
 	},
 	"ListingPage_Status": {
@@ -862,7 +870,6 @@
 			"endDateInFuture": "Poll end date must be in the future",
 			"titlePlaceholder": "Enter poll title"
 		},
-
 		"AllowedCommentors": {
 			"advanced": "Advanced",
 			"title": "Who can comment ?",

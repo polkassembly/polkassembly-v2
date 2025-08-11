@@ -15,7 +15,6 @@ import { ChevronDown, Info } from 'lucide-react';
 import { MAX_POST_TAGS } from '@/_shared/_constants/maxPostTags';
 import { MDXEditorMethods } from '@mdxeditor/editor';
 import { cn } from '@/lib/utils';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { RadioGroup, RadioGroupItem } from '../../RadioGroup/RadioGroup';
 import { Label } from '../../Label';
 import SelectTopic from '../../TopicTag/SelectTopic/SelectTopic';
@@ -28,7 +27,6 @@ import { Button } from '../../Button';
 
 function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostFormFields>; disabled?: boolean }) {
 	const t = useTranslations();
-	const network = getCurrentNetwork();
 	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 	const [isAdvanced, setIsAdvanced] = useState(false);
 
@@ -157,12 +155,10 @@ function WritePost({ formData, disabled }: { formData: UseFormReturn<IWritePostF
 					</FormItem>
 				)}
 			/>
-			{network === 'paseo' && (
-				<AddPoll
-					formData={formData}
-					disabled={disabled || false}
-				/>
-			)}
+			<AddPoll
+				formData={formData}
+				disabled={disabled || false}
+			/>
 
 			<div className={classes.advancedContainer}>
 				<Button

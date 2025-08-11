@@ -434,6 +434,7 @@
 	"PostDetails": {
 		"castVote": "Abstimmen",
 		"castYourVote": "Geben Sie Ihre Stimme ab",
+		"copyLink": "Link kopieren",
 		"loginToVote": "Zum Abstimmen anmelden",
 		"requested": "Angefordert",
 		"beneficiary": "Begünstigter",
@@ -606,7 +607,14 @@
 			"payoutClaimFailedDescription": "Bitte versuchen Sie es erneut"
 		},
 		"commentsDisabled": "Die Kommentare wurden für diesen Beitrag deaktiviert.",
-		"commentsDisabledForNonVerifiedUsers": "Kommentare wurden für nicht verifizierte Benutzer deaktiviert."
+		"commentsDisabledForNonVerifiedUsers": "Kommentare wurden für nicht verifizierte Benutzer deaktiviert.",
+		"RefundDeposits": {
+			"refund": "Rückerstattung",
+			"refundDeposits": "Einlagen zurückerstatten",
+			"description": "Klicken Sie hier, um die Einlage für diesen Vorschlag zurückzuerstatten",
+			"decisionDeposit": "Entscheidungskaution",
+			"submissionDeposit": "Einreichungskaution"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",

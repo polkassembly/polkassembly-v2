@@ -436,6 +436,7 @@
 	"PostDetails": {
 		"castVote": "Emitir Voto",
 		"castYourVote": "Emita su Voto",
+		"copyLink": "Copiar Enlace",
 		"loginToVote": "Inicie sesión para Votar",
 		"requested": "Solicitado",
 		"beneficiary": "Beneficiario",
@@ -608,7 +609,14 @@
 			"payoutClaimFailedDescription": "Por favor, inténtelo de nuevo"
 		},
 		"commentsDisabled": "Los comentarios han sido desactivados para esta publicación.",
-		"commentsDisabledForNonVerifiedUsers": "Los comentarios han sido desactivados para usuarios no verificados."
+		"commentsDisabledForNonVerifiedUsers": "Los comentarios han sido desactivados para usuarios no verificados.",
+		"RefundDeposits": {
+			"refund": "Reembolso",
+			"refundDeposits": "Reembolsar Depósitos",
+			"description": "Haga clic aquí para reembolsar el depósito de esta propuesta",
+			"decisionDeposit": "Depósito de Decisión",
+			"submissionDeposit": "Depósito de Presentación"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",

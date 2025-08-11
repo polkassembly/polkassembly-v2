@@ -6,10 +6,10 @@ import { useTranslations } from 'next-intl';
 import { IWritePostFormFields, EPollVotesType } from '@/_shared/types';
 import { UseFormReturn } from 'react-hook-form';
 import { useState, useCallback, useMemo } from 'react';
-import { Trash2, CalendarRange, X } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { MIN_POLL_OPTIONS_COUNT, MAX_POLL_OPTIONS_COUNT, MAX_POLL_OPTION_LENGTH } from '@/_shared/_constants/pollLimits';
-import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { cn } from '@/lib/utils';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { Switch } from '../../Switch';
 import { Input } from '../../Input';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../../Form';
@@ -24,6 +24,10 @@ interface PollOption {
 	id: string;
 	value: string;
 }
+
+const formatRelativeTime = (endDate: Date): string => {
+	return dayjs().to(dayjs(endDate));
+};
 
 function PollOptions({
 	options,
@@ -195,7 +199,7 @@ function AddPoll({ formData, disabled }: { formData: UseFormReturn<IWritePostFor
 						}}
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className={classes.addPollLabel}>{t('AddPoll.title')}</FormLabel>
+								<FormLabel className={classes.addPollLabel}>{t('AddPoll.title')}*</FormLabel>
 								<FormControl>
 									<Input
 										value={field.value || ''}
@@ -233,7 +237,7 @@ function AddPoll({ formData, disabled }: { formData: UseFormReturn<IWritePostFor
 						}}
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className={classes.addPollLabel}>{t('AddPoll.options')}</FormLabel>
+								<FormLabel className={classes.addPollLabel}>{t('AddPoll.options')}*</FormLabel>
 								<FormControl>
 									<PollOptions
 										options={convertToPollOptions(field.value || [])}
@@ -262,25 +266,15 @@ function AddPoll({ formData, disabled }: { formData: UseFormReturn<IWritePostFor
 						}}
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className={classes.addPollLabel}>{t('AddPoll.pollEndsIn')}</FormLabel>
+								<FormLabel className={classes.addPollLabel}>{t('AddPoll.pollEndsIn')}*</FormLabel>
 								<FormControl>
 									<Popover>
 										<PopoverTrigger asChild>
 											<Button
 												variant='outline'
-												className={`h-8 w-full justify-start gap-2 rounded-md border ${field.value ? 'text-text_primary' : 'text-placeholder'}`}
+												className={`h-8 w-full justify-start gap-2 rounded-md border ${field.value ? 'text-basic_text' : 'text-placeholder'}`}
 											>
-												<CalendarRange className='h-4 w-4' />
-												<span className='flex-1 text-left'>{field.value ? dayjs(field.value).format("Do MMM 'YY") : 'Select end date'}</span>
-												{field.value && (
-													<X
-														className='h-4 w-4 cursor-pointer hover:text-red-500'
-														onClick={(e) => {
-															e.stopPropagation();
-															field.onChange(undefined);
-														}}
-													/>
-												)}
+												<span className='flex-1 text-left text-sm font-medium'>in {field.value ? formatRelativeTime(field.value) : 'Select end date'}</span>
 											</Button>
 										</PopoverTrigger>
 										<PopoverContent className='w-auto p-0'>
