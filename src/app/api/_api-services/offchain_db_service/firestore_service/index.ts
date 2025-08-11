@@ -1129,7 +1129,7 @@ export class FirestoreService extends FirestoreUtils {
 		reaction: EReaction;
 		commentId: string;
 	}): Promise<string> {
-		// if user has already reacted to this comment, replace the reaction
+		// if user has already reacted to this comment, delete the reaction and add a new one
 		const existingReaction = await this.reactionsCollectionRef()
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
@@ -1138,10 +1138,10 @@ export class FirestoreService extends FirestoreUtils {
 			.where('commentId', '==', commentId)
 			.get();
 
-		let reactionId = this.reactionsCollectionRef().doc().id;
+		const reactionId = this.reactionsCollectionRef().doc().id;
 
 		if (existingReaction.docs.length) {
-			reactionId = existingReaction.docs[0].id;
+			await this.DeleteReactionById(existingReaction.docs[0].id);
 		}
 
 		await this.reactionsCollectionRef()
@@ -1149,6 +1149,7 @@ export class FirestoreService extends FirestoreUtils {
 			.set(
 				{
 					network,
+					id: reactionId,
 					indexOrHash,
 					proposalType,
 					userId,

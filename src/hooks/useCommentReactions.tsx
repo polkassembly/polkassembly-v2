@@ -82,10 +82,6 @@ export const useCommentReactions = (commentData: ICommentData) => {
 						setCurrentReactionId(null);
 					}
 				} else {
-					if (currentReactionId) {
-						await NextApiClientService.deleteCommentReaction(commentData.proposalType as EProposalType, commentData.indexOrHash, commentData.commentId, currentReactionId);
-						setCurrentReactionId(null);
-					}
 					const response = await NextApiClientService.addCommentReaction(commentData.proposalType as EProposalType, commentData.indexOrHash, commentData.commentId, type);
 					setCurrentReactionId(response?.data?.reactionId || null);
 				}
