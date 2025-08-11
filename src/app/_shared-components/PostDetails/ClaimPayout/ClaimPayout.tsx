@@ -16,6 +16,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useToast } from '@/hooks/useToast';
 import { useTranslations } from 'next-intl';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import Address from '../../Profile/Address/Address';
 import { Separator } from '../../Separator';
 import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
@@ -29,6 +30,8 @@ function ClaimPayout({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
 	const { userPreferences } = useUserPreferences();
 
 	const { apiService } = usePolkadotApiService();
+
+	const { setVaultQrState } = usePolkadotVault();
 
 	const [loading, setLoading] = useState(false);
 
@@ -68,13 +71,15 @@ function ClaimPayout({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
 	if (pendingTreasurySpendsByBeneficiary.length === 0) return null;
 
 	const claimPayout = async () => {
-		if (!apiService || !userPreferences?.selectedAccount?.address || pendingTreasurySpendsByBeneficiary.length === 0) return;
+		if (!apiService || !userPreferences?.selectedAccount?.address || pendingTreasurySpendsByBeneficiary.length === 0 || !userPreferences.wallet) return;
 
 		setLoading(true);
 
 		await apiService.claimTreasuryPayout({
 			payouts: pendingTreasurySpendsByBeneficiary,
-			address: userPreferences?.selectedAccount?.address,
+			address: userPreferences.selectedAccount.address,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
 			onSuccess: () => {
 				setLoading(false);
 				toast({

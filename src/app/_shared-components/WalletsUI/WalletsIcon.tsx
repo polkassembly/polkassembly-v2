@@ -10,6 +10,7 @@ import PolkagateIcon from '@assets/wallet-icons/polkagate-icon.svg';
 import NovaIcon from '@assets/wallet-icons/nova-wallet-star.svg';
 import Image from 'next/image';
 import MimirIcon from '@assets/wallet-icons/mimir-logo.jpg';
+import PolkadotVaultIcon from '@assets/wallet-icons/polkadot-vault-icon.png';
 
 export function WalletIcon({ wallet, className }: { wallet: EWallet; className?: string }) {
 	switch (wallet) {
@@ -58,6 +59,14 @@ export function WalletIcon({ wallet, className }: { wallet: EWallet; className?:
 				<Image
 					alt=''
 					src={MimirIcon}
+					className={`h-6 w-6 sm:h-8 sm:w-8 ${className}`}
+				/>
+			);
+		case EWallet.POLKADOT_VAULT:
+			return (
+				<Image
+					alt=''
+					src={PolkadotVaultIcon}
 					className={`h-6 w-6 sm:h-8 sm:w-8 ${className}`}
 				/>
 			);

@@ -32,6 +32,7 @@
 		"@polkadot/extension-dapp": "^0.57.1",
 		"@polkadot/extension-inject": "^0.57.1",
 		"@polkadot/react-identicon": "^3.11.3",
+		"@polkadot/react-qr": "^3.15.2",
 		"@polkadot/types": "^13.0.1",
 		"@polkadot/util": "^13.0.2",
 		"@polkadot/util-crypto": "^13.0.2",

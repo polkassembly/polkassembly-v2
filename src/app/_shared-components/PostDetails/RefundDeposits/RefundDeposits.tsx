@@ -13,6 +13,7 @@ import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import CrystalIcon from '@assets/icons/crystalIcon.png';
 import { useQuery } from '@tanstack/react-query';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import { Button } from '../../Button';
 import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelationsPicker';
@@ -25,6 +26,7 @@ function RefundDeposits({ postId, track }: { postId: number; track: EPostOrigin 
 	const network = getCurrentNetwork();
 	const { toast } = useToast();
 	const t = useTranslations();
+	const { setVaultQrState } = usePolkadotVault();
 
 	const [openRefundModal, setOpenRefundModal] = useState(false);
 
@@ -55,11 +57,13 @@ function RefundDeposits({ postId, track }: { postId: number; track: EPostOrigin 
 	}, [referendaInfo]);
 
 	const handleSubmit = () => {
-		if (!apiService || !userPreferences.selectedAccount?.address || (!canRefundDecisionDeposit && !canRefundSubmissionDeposit)) return;
+		if (!apiService || !userPreferences.selectedAccount?.address || (!canRefundDecisionDeposit && !canRefundSubmissionDeposit) || !userPreferences.wallet) return;
 		setLoading(true);
 		apiService.refundDeposits({
 			postId,
 			address: userPreferences.selectedAccount.address,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
 			canRefundDecisionDeposit,
 			canRefundSubmissionDeposit,
 			onSuccess: () => {
