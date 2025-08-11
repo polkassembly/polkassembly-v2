@@ -14,6 +14,7 @@ import SubscanIcon from '@assets/icons/profile-subscan.svg';
 import Image from 'next/image';
 import { Trash } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { useMemo, useState } from 'react';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -38,6 +39,7 @@ function PreimageRow({ preimage, handleDialogOpen, onUnnotePreimage }: { preimag
 	const t = useTranslations('Preimages');
 
 	const { user } = useUser();
+	const { userPreferences } = useUserPreferences();
 
 	const [loading, setLoading] = useState(false);
 
@@ -47,25 +49,26 @@ function PreimageRow({ preimage, handleDialogOpen, onUnnotePreimage }: { preimag
 
 	const [openUnnoteDialog, setOpenUnnoteDialog] = useState(false);
 	const substrateProposer = preimage.proposer && getSubstrateAddress(preimage.proposer);
+	const selectedAddress = userPreferences?.selectedAccount?.address || user?.addresses?.[0] || '';
+	const selectedSubstrateAddress = selectedAddress && getSubstrateAddress(selectedAddress);
 
 	const canUnnotePreimage = useMemo(
 		() =>
-			user?.addresses &&
-			user?.addresses.length > 0 &&
+			selectedSubstrateAddress &&
 			preimage?.status &&
 			(preimage.status === 'Noted' || preimage.status === 'Requested') &&
 			substrateProposer &&
-			user.addresses.includes(substrateProposer),
-		[user, preimage, substrateProposer]
+			selectedSubstrateAddress === substrateProposer,
+		[selectedSubstrateAddress, preimage, substrateProposer]
 	);
 
 	const unnotePreimage = async () => {
-		if (!user || !substrateProposer || !user.addresses.includes(substrateProposer) || !apiService || !preimage.hash) return;
+		if (!selectedSubstrateAddress || !substrateProposer || selectedSubstrateAddress !== substrateProposer || !apiService || !preimage.hash) return;
 		setLoading(true);
 
 		if (preimage.status === EPreimageStatus.Noted) {
 			await apiService.unnotePreimage({
-				address: substrateProposer,
+				address: selectedSubstrateAddress,
 				preimageHash: preimage.hash,
 				onSuccess: () => {
 					setLoading(false);
@@ -87,7 +90,7 @@ function PreimageRow({ preimage, handleDialogOpen, onUnnotePreimage }: { preimag
 			});
 		} else if (preimage.status === EPreimageStatus.Requested) {
 			await apiService.unRequestPreimage({
-				address: substrateProposer,
+				address: selectedSubstrateAddress,
 				preimageHash: preimage.hash,
 				onSuccess: () => {
 					setLoading(false);
