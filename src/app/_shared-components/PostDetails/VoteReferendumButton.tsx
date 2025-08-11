@@ -27,31 +27,35 @@ interface VoteReferendumButtonProps {
 	track?: EPostOrigin;
 	proposalType: EProposalType;
 	showUserVoteCard?: boolean;
+	address?: string; // Optional address to use instead of user's login address
 }
 
-function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg', track, proposalType, showUserVoteCard = false }: VoteReferendumButtonProps) {
+function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg', track, proposalType, showUserVoteCard = false, address }: VoteReferendumButtonProps) {
 	const { user } = useUser();
 	const t = useTranslations();
 	const [openModal, setOpenModal] = useState(false);
+
+	// Use provided address or fall back to user's login address
+	const targetAddress = address || user?.loginAddress || user?.addresses[0];
 
 	const {
 		data: voteData,
 		isLoading,
 		isError
 	} = useQuery({
-		queryKey: ['userVotes', proposalType, index, user?.loginAddress || user?.addresses[0]],
+		queryKey: ['userVotes', proposalType, index, targetAddress],
 		queryFn: async () => {
-			if (!user?.loginAddress || !user?.addresses[0]) return null;
+			if (!targetAddress) return null;
 			const { data, error } = await NextApiClientService.getPostVotesByAddress({
 				proposalType,
 				index,
-				address: user.loginAddress || user.addresses[0]
+				address: targetAddress
 			});
 			if (error) throw new Error(error.message || 'Failed to fetch vote data');
 			if (!data) return null;
 			return data;
 		},
-		enabled: !!user?.loginAddress || !!user?.addresses[0],
+		enabled: !!targetAddress,
 		retry: 1,
 		staleTime: 0, // Always refetch user votes to ensure fresh data
 		refetchOnWindowFocus: true,

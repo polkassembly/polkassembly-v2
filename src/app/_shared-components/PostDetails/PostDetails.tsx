@@ -8,7 +8,6 @@ import { EPostDetailsTab, IPost, EProposalStatus, EPostOrigin, EProposalType, ER
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { canVote } from '@/_shared/_utils/canVote';
 import { useAISummary } from '@/hooks/useAISummary';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -27,6 +26,7 @@ import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import { Skeleton } from '../Skeleton';
 import Poll from './Poll/Poll';
+import AddressSwitchRow from './AddressSwitchRow/AddressSwitchRow';
 
 const OnchainInfo = dynamic(() => import('./OnchainInfo/OnchainInfo'), {
 	ssr: false,
@@ -72,11 +72,6 @@ const VotesData = dynamic(() => import('./VotesData/VotesData'), {
 			<Skeleton className='mt-2 h-36 w-full rounded-md' />
 		</div>
 	)
-});
-
-const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), {
-	ssr: false,
-	loading: () => <Skeleton className='h-12 w-full rounded-lg' />
 });
 
 const Timeline = dynamic(() => import('./Timeline/Timeline'), {
@@ -230,15 +225,12 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 
 						{isModalOpen && !isOffchainPost && (
 							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
-								{canVote(post.onChainInfo?.status) && (
-									<VoteReferendumButton
-										iconClassName='hidden'
-										index={index}
-										track={post.onChainInfo?.origin}
-										proposalType={post.proposalType}
-										showUserVoteCard
-									/>
-								)}
+								<AddressSwitchRow
+									index={index}
+									proposalType={post.proposalType}
+									showUserVoteCard
+									track={post.onChainInfo?.origin}
+								/>
 							</div>
 						)}
 						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
@@ -286,15 +278,13 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									track={post.onChainInfo?.origin}
 								/>
 							)}
-							{canVote(post.onChainInfo?.status) && (
-								<VoteReferendumButton
-									iconClassName='hidden'
-									index={index}
-									track={post.onChainInfo?.origin}
-									proposalType={post.proposalType}
-									showUserVoteCard
-								/>
-							)}
+							{/* Address Switch Row */}
+							<AddressSwitchRow
+								index={index}
+								proposalType={post.proposalType}
+								showUserVoteCard
+								track={post.onChainInfo?.origin}
+							/>
 							<ClaimPayout beneficiaries={post.onChainInfo?.beneficiaries || []} />
 							<ProposalPeriods
 								confirmationPeriodEndsAt={post.onChainInfo?.confirmationPeriodEndsAt}

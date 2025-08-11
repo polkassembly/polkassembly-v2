@@ -494,6 +494,10 @@
 		"voteRemovedTitle": "Vote Removed",
 		"commentSummary": "Comment Summary",
 		"aiSummary": "AI Summary",
+		"showingVotesFor": "Showing votes for",
+		"switchWallet": "Switch Wallet",
+		"errorLoadingVote": "Error loading vote data",
+		"noVoteForAddress": "No vote found for this address",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
 		"VotesBubble": {
