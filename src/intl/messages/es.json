@@ -433,6 +433,7 @@
 		}
 	},
 	"PostDetails": {
+		"address": "Dirección",
 		"castVote": "Emitir Voto",
 		"changeVote": "Cambiar Voto",
 		"myVote": "Mi Voto",

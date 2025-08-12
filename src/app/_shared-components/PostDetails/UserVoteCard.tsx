@@ -8,21 +8,22 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
-import { ThumbsDown, ThumbsUp, Ban } from 'lucide-react';
+import { ThumbsDown, ThumbsUp, Ban, User } from 'lucide-react';
 import VoteIcon from '@assets/activityfeed/vote.svg';
 import DelegateIcon from '@assets/icons/delegate_plus.svg';
 import { cn } from '@/lib/utils';
-import { EProposalType, IVoteHistoryData, ENotificationStatus } from '@/_shared/types';
+import { EProposalType, IVoteHistoryData, ENotificationStatus, EReactQueryKeys } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { useUser } from '@/hooks/useUser';
+
 import { useToast } from '@/hooks/useToast';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../Dialog/Dialog';
 import { Separator } from '../Separator';
 import classes from './PostDetails.module.scss';
+import Address from '../Profile/Address/Address';
 
 interface VoteReferendumButtonProps {
 	index: string;
@@ -42,7 +43,7 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
-	const { user } = useUser();
+
 	const { toast } = useToast();
 	const queryClient = useQueryClient();
 	const [isRemoving, setIsRemoving] = useState(false);
@@ -70,7 +71,7 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 						description: t('PostDetails.voteRemoved'),
 						status: ENotificationStatus.SUCCESS
 					});
-					queryClient.invalidateQueries({ queryKey: ['userVotes', proposalType, index, user?.loginAddress || user?.addresses[0]] });
+					queryClient.invalidateQueries({ queryKey: [EReactQueryKeys.USER_VOTES, proposalType, index, userPreferences.selectedAccount?.address] });
 					setOpenRemoveConfirmModal(false);
 				},
 				onFailed: (errorMessage) => {
@@ -95,7 +96,7 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 
 	return (
 		<div className={classes.userVoteCard}>
-			<div className={classes.userVoteCardLayout}>
+			<div className={`${classes.userVoteCardLayout} mb-2`}>
 				<h2 className={classes.userVoteCardTitle}>{t('PostDetails.myVote')}</h2>
 				<Button
 					type='button'
@@ -105,9 +106,26 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 					disabled={isRemoving}
 					isLoading={isRemoving}
 				>
-					{isRemoving ? t('PostDetails.removing') : t('PostDetails.remove')}
+					{isRemoving ? t('PostDetails.removing') : t('PostDetails.removeVote')}
 				</Button>
 			</div>
+			<div className={classes.userVoteCardLayout}>
+				<h3 className={classes.userVoteCardTitleIcon}>
+					<User className='h-4 w-4 text-basic_text' />
+					{t('PostDetails.address')}
+				</h3>
+
+				<p className='text-sm text-basic_text'>
+					<Address
+						address={myVote.voterAddress}
+						iconSize={18}
+					/>
+				</p>
+			</div>
+			<Separator
+				orientation='horizontal'
+				className='w-full'
+			/>
 			<div className={classes.userVoteCardLayout}>
 				<h3 className={classes.userVoteCardTitleIcon}>
 					{myVote.decision === 'abstain' && <Ban className='h-4 w-4 text-basic_text' />}

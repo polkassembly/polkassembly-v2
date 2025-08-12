@@ -432,6 +432,7 @@
 		}
 	},
 	"PostDetails": {
+		"address": "アドレス",
 		"castVote": "投票する",
 		"changeVote": "投票を変更する",
 		"myVote": "私の投票",

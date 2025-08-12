@@ -432,6 +432,7 @@
 		}
 	},
 	"PostDetails": {
+		"address": "地址",
 		"castVote": "投票",
 		"changeVote": "更改投票",
 		"myVote": "我的投票",

@@ -434,6 +434,7 @@
 		}
 	},
 	"PostDetails": {
+		"address": "Address",
 		"save": "Save",
 		"edit": "Edit",
 		"castVote": "Cast Vote",

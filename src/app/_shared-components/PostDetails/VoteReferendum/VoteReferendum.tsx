@@ -4,9 +4,8 @@
 
 'use client';
 
-import { EVoteDecision, ENotificationStatus, ISelectedAccount, EPostOrigin, EProposalType, IVoteData } from '@/_shared/types';
+import { EVoteDecision, ENotificationStatus, EPostOrigin, EProposalType, IVoteData, EReactQueryKeys } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { useUser } from '@/hooks/useUser';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
@@ -128,7 +127,6 @@ function VoteReferendum({
 	existingVote?: IVoteData;
 }) {
 	const { userPreferences } = useUserPreferences();
-	const { user } = useUser();
 	const [voteDecision, setVoteDecision] = useState(EVoteDecision.AYE);
 	const t = useTranslations();
 	const queryClient = useQueryClient();
@@ -218,21 +216,14 @@ function VoteReferendum({
 
 		if (isInvalidAmount) return;
 
-		const getRegularAddress = (selectedAccount: ISelectedAccount): string => {
-			if (selectedAccount.parent) {
-				return getRegularAddress(selectedAccount.parent);
-			}
-			return selectedAccount.address;
-		};
-
-		const userAddress = getRegularAddress(userPreferences.selectedAccount);
+		const userAddress = userPreferences.selectedAccount.address;
 
 		try {
 			setIsLoading(true);
 
 			await apiService.voteReferendum({
 				selectedAccount: userPreferences.selectedAccount,
-				address: getRegularAddress(userPreferences.selectedAccount),
+				address: userAddress,
 				onSuccess: () => {
 					toast({
 						title: t('VoteReferendum.voteSuccessTitle'),
@@ -253,13 +244,8 @@ function VoteReferendum({
 						delegatedVotingPower: '0'
 					};
 
-					queryClient.setQueryData(['userVotes', proposalType, index, user?.loginAddress || user?.addresses[0]], {
+					queryClient.setQueryData([EReactQueryKeys.USER_VOTES, proposalType, index, userPreferences.selectedAccount?.address], {
 						votes: [optimisticVoteData]
-					});
-
-					// Also invalidate to ensure fresh data in the background
-					queryClient.invalidateQueries({
-						queryKey: ['userVotes', proposalType, index, user?.loginAddress || user?.addresses[0]]
 					});
 
 					onClose();

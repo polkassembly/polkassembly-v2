@@ -431,6 +431,7 @@
 		}
 	},
 	"PostDetails": {
+		"address": "Adresse",
 		"castVote": "Abstimmen",
 		"changeVote": "Abstimmen ändern",
 		"myVote": "Meine Stimme",

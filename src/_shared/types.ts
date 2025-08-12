@@ -1006,7 +1006,8 @@ export interface IPostSubscription {
 export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart',
 	COMMENTS = 'comments',
-	POST_DETAILS = 'postDetails'
+	POST_DETAILS = 'postDetails',
+	USER_VOTES = 'userVotes'
 }
 
 export interface IParamDef {
