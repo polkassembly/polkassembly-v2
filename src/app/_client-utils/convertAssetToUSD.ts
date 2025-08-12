@@ -7,7 +7,7 @@ import { decimalToBN } from '@/_shared/_utils/decimalToBN';
 import { EAssets, ENetwork } from '@/_shared/types';
 import { BN, BN_ZERO } from '@polkadot/util';
 
-export const calculateAssetUSDValue = ({
+export const convertAssetToUSD = ({
 	amount,
 	asset,
 	currentTokenPrice,

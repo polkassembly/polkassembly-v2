@@ -451,7 +451,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 
 		// Fetch current price of native token in USD
 		const fetchNativeTokenPriceInUsd = async () => {
-			const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${network}&vs_currencies=usd&include_24hr_change=true`).then((res) => res.json());
+			const response = await (await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${network}&vs_currencies=usd&include_24hr_change=true`)).json();
 			// check if data is of type CoinGeckoResponse
 			if (!response || typeof response !== 'object' || !(network in response) || !('usd' in response[String(network)]) || typeof response[String(network)]?.usd !== 'number') {
 				return;
@@ -467,7 +467,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		const fetchDEDTokenPriceInUsd = async () => {
 			const ids = treasuryAssetsData[EAssets.DED].name;
 
-			const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`).then((res) => res.json());
+			const response = await (await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`)).json();
 			// check if data is of type CoinGeckoResponse
 			if (!response || typeof response !== 'object' || !(ids in response) || !('usd' in response[String(ids)]) || typeof response[String(ids)]?.usd !== 'number') {
 				return;

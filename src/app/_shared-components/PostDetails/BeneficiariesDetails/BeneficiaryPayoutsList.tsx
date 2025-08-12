@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EAssets, ENetworkSocial, IBeneficiary, IBeneficiaryPayoutDetails } from '@/_shared/types';
+import { EAssets, ENetwork, ENetworkSocial, IBeneficiary } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/networks';
 import Image from 'next/image';
@@ -12,10 +12,12 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { BN } from '@polkadot/util';
-import { calculatePayoutExpiry } from '@/app/_client-utils/calculatePayoutExpiry';
+import { useQuery } from '@tanstack/react-query';
+import dayjs from 'dayjs';
+import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 import { Separator } from '../../Separator';
 import Address from '../../Profile/Address/Address';
 import { Skeleton } from '../../Skeleton';
@@ -28,22 +30,78 @@ interface BeneficiaryPayoutsListProps {
 	usedInOnchainInfo?: boolean;
 }
 
+interface IBeneficiaryPayoutDetails extends IBeneficiary {
+	payoutExpiryMsg?: string;
+}
+
 const MAX_VISIBLE_BENEFICIARIES = 4;
 
 interface PayoutExpiryProps {
 	validFromBlock: number | null;
-	payoutExpiry: string | null;
+	payoutExpiryMsg?: string;
+}
+interface TimeUnitOptions {
+	withUnitSpace?: boolean;
+	withPluralSuffix?: boolean;
 }
 
-function PayoutExpiryDisplay({ validFromBlock, payoutExpiry }: PayoutExpiryProps) {
+// Utility functions
+export const formatDate = (timestamp: Date | string): string => {
+	return dayjs(timestamp).format('MMM DD, YYYY');
+};
+
+export const buildTimeUnit = (value: number, unit: string, options: TimeUnitOptions = {}): string | null => {
+	const { withUnitSpace = true, withPluralSuffix = true } = options;
+	const pluralSuffix = withPluralSuffix && value !== 1 ? 's' : '';
+	return value ? `${value}${withUnitSpace ? ' ' : ''}${unit}${pluralSuffix}` : null;
+};
+
+export const getTimeRemaining = (endDate: Date | string, withUnitSpace = true): string | null => {
+	const now = dayjs();
+	const end = dayjs(endDate);
+	const diff = end.diff(now);
+
+	if (diff <= 0) return null;
+
+	const duration = dayjs.duration(diff);
+	const timeUnits = [
+		buildTimeUnit(Math.floor(duration.years()), 'yr', { withUnitSpace }),
+		buildTimeUnit(Math.floor(duration.months()), 'mo', { withUnitSpace }),
+		buildTimeUnit(Math.floor(duration.days()), 'd', { withUnitSpace, withPluralSuffix: false }),
+		buildTimeUnit(duration.hours(), 'hr', { withUnitSpace }),
+		buildTimeUnit(duration.minutes(), 'min', { withUnitSpace })
+	];
+
+	return timeUnits.filter(Boolean).slice(0, 2).join(' ');
+};
+
+export const calculatePayoutExpiry = (currentBlockHeight: number, validFromBlockHeight: number | null, network: ENetwork): string | null => {
+	if (!currentBlockHeight || !validFromBlockHeight || !network) {
+		return null;
+	}
+
+	const date = BlockCalculationsService.getDateFromBlockNumber({
+		currentBlockNumber: new BN(currentBlockHeight),
+		targetBlockNumber: new BN(validFromBlockHeight),
+		network
+	});
+
+	if (dayjs().isAfter(date)) {
+		return formatDate(date);
+	}
+
+	return getTimeRemaining(date, false);
+};
+
+function PayoutExpiryDisplay({ validFromBlock, payoutExpiryMsg }: PayoutExpiryProps) {
 	const network = getCurrentNetwork();
 	const subscanUrl = NETWORKS_DETAILS[`${network}`].socialLinks?.find((link) => link.id === ENetworkSocial.SUBSCAN)?.href;
 
-	if (!payoutExpiry) {
+	if (!payoutExpiryMsg) {
 		return <Skeleton className='h-full w-[100px]' />;
 	}
 
-	const isPaid = payoutExpiry.includes('Paid');
+	const isPaid = payoutExpiryMsg.includes('Paid');
 	const hasValidBlock = validFromBlock && subscanUrl;
 
 	if (isPaid && hasValidBlock) {
@@ -55,7 +113,7 @@ function PayoutExpiryDisplay({ validFromBlock, payoutExpiry }: PayoutExpiryProps
 						target='_blank'
 						className={cn(classes.beneficiariesExpireIn, 'flex items-center gap-1')}
 					>
-						{payoutExpiry}
+						{payoutExpiryMsg}
 						<SquareArrowOutUpRight className='h-3.5 w-3.5 text-text_pink' />
 					</Link>
 				</TooltipTrigger>
@@ -70,7 +128,7 @@ function PayoutExpiryDisplay({ validFromBlock, payoutExpiry }: PayoutExpiryProps
 		return (
 			<Tooltip>
 				<TooltipTrigger>
-					<div className={classes.beneficiariesExpireIn}>{payoutExpiry}</div>
+					<div className={classes.beneficiariesExpireIn}>{payoutExpiryMsg}</div>
 				</TooltipTrigger>
 				<TooltipContent>
 					<div className='text-xs'>Block: #{validFromBlock}</div>
@@ -79,7 +137,7 @@ function PayoutExpiryDisplay({ validFromBlock, payoutExpiry }: PayoutExpiryProps
 		);
 	}
 
-	return <div className={classes.beneficiariesExpireIn}>{payoutExpiry}</div>;
+	return <div className={classes.beneficiariesExpireIn}>{payoutExpiryMsg}</div>;
 }
 
 interface BeneficiaryPaymentItemProps {
@@ -133,7 +191,7 @@ function BeneficiaryPaymentItem({ beneficiary, usedInOnchainInfo, isLastItem }: 
 				<div className='flex items-center gap-1'>
 					<PayoutExpiryDisplay
 						validFromBlock={beneficiary.validFromBlock ? Number(beneficiary.validFromBlock) : null}
-						payoutExpiry={beneficiary.payoutExpiry}
+						payoutExpiryMsg={beneficiary.payoutExpiryMsg}
 					/>
 				</div>
 			</div>
@@ -148,12 +206,7 @@ function BeneficiaryPayoutsList({ beneficiaries, usedInOnchainInfo }: Beneficiar
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
 	const [showAllBeneficiaries, setShowAllBeneficiaries] = useState(false);
-	const [beneficiariesWithDetails, setBeneficiariesWithDetails] = useState<IBeneficiaryPayoutDetails[]>(
-		beneficiaries.map((beneficiary) => ({
-			...beneficiary,
-			payoutExpiry: null
-		}))
-	);
+	const [beneficiariesWithDetails, setBeneficiariesWithDetails] = useState<IBeneficiaryPayoutDetails[]>(beneficiaries);
 
 	const calculatePayoutDetails = useCallback(async (): Promise<IBeneficiaryPayoutDetails[]> => {
 		if (!apiService || !network) return beneficiariesWithDetails || [];
@@ -163,7 +216,7 @@ function BeneficiaryPayoutsList({ beneficiaries, usedInOnchainInfo }: Beneficiar
 
 			return beneficiaries.map((beneficiary) => ({
 				...beneficiary,
-				payoutExpiry: beneficiary?.validFromBlock
+				payoutExpiryMsg: beneficiary?.validFromBlock
 					? `${new BN(beneficiary.validFromBlock).gt(new BN(currentBlockHeight)) ? 'in' : 'Paid'} ${calculatePayoutExpiry(currentBlockHeight, Number(beneficiary.validFromBlock), network)}`
 					: t('immediately')
 			}));
@@ -172,7 +225,7 @@ function BeneficiaryPayoutsList({ beneficiaries, usedInOnchainInfo }: Beneficiar
 			return [];
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [apiService, network]);
+	}, [apiService, network, beneficiaries, t]);
 
 	const fetchPayoutDetails = useCallback(async () => {
 		try {
@@ -183,24 +236,26 @@ function BeneficiaryPayoutsList({ beneficiaries, usedInOnchainInfo }: Beneficiar
 		}
 	}, [calculatePayoutDetails]);
 
-	useEffect(() => {
-		fetchPayoutDetails();
-	}, [fetchPayoutDetails]);
+	// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+	const { isLoading } = useQuery({
+		queryKey: ['beneficiaries-payout-details', beneficiaries, network],
+		queryFn: fetchPayoutDetails,
+		enabled: !!apiService && !!network
+	});
 
-	const getVisibleBeneficiaries = () => {
+	const visibleBeneficiaries = useMemo(() => {
 		if (!usedInOnchainInfo) return beneficiariesWithDetails;
 		return showAllBeneficiaries ? beneficiariesWithDetails : beneficiariesWithDetails.slice(0, MAX_VISIBLE_BENEFICIARIES);
-	};
+	}, [beneficiariesWithDetails, showAllBeneficiaries, usedInOnchainInfo]);
 
-	const visibleBeneficiaries = getVisibleBeneficiaries();
-	const hasMoreBeneficiaries = beneficiariesWithDetails.length > MAX_VISIBLE_BENEFICIARIES;
-	const shouldShowToggleButton = hasMoreBeneficiaries && usedInOnchainInfo;
+	const hasMoreBeneficiaries = useMemo(() => beneficiariesWithDetails.length > MAX_VISIBLE_BENEFICIARIES, [beneficiariesWithDetails]);
+	const shouldShowToggleButton = useMemo(() => hasMoreBeneficiaries && usedInOnchainInfo, [hasMoreBeneficiaries, usedInOnchainInfo]);
 
 	return (
 		<div className={cn(classes.beneficiariesDetailsDialogContentList, usedInOnchainInfo ? 'gap-2' : 'mt-6')}>
 			{visibleBeneficiaries.map((beneficiary, index) => (
 				<BeneficiaryPaymentItem
-					key={`${beneficiary.address}-${beneficiary.validFromBlock || 'immediate'}`}
+					key={`${beneficiary.address}-${beneficiary.validFromBlock}`}
 					beneficiary={beneficiary}
 					usedInOnchainInfo={usedInOnchainInfo}
 					isLastItem={index === visibleBeneficiaries.length - 1}

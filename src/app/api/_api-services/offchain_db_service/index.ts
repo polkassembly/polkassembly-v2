@@ -39,7 +39,8 @@ import {
 	ESocial,
 	IPostLink,
 	IOffChainPollPayload,
-	IBeneficiary
+	IBeneficiary,
+	EAssets
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -49,6 +50,9 @@ import { StatusCodes } from 'http-status-codes';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { ON_CHAIN_ACTIVITY_NAMES } from '@/_shared/_constants/onChainActivityNames';
 import { OFF_CHAIN_PROPOSAL_TYPES } from '@/_shared/_constants/offChainProposalTypes';
+import dayjs from 'dayjs';
+import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
+import { convertAssetToUSD } from '@/app/_client-utils/convertAssetToUSD';
 import { APIError } from '../../_api-utils/apiError';
 import { SubsquareOffChainService } from './subsquare_offchain_service';
 import { FirestoreService } from './firestore_service';
@@ -970,6 +974,30 @@ export class OffChainDbService {
 	}
 
 	static async GetBeneficiariesWithUsdAmount({ network, beneficiaries }: { network: ENetwork; beneficiaries: IBeneficiary[] }) {
-		return FirestoreService.GetBeneficiariesWithUsdAmount({ network, beneficiaries });
+		const treasuryStats = await FirestoreService.GetTreasuryStats({ network, from: dayjs().subtract(1, 'hour').toDate(), to: dayjs().toDate(), limit: 1, page: 1 });
+
+		if (!treasuryStats) {
+			return beneficiaries;
+		}
+		return beneficiaries?.map((beneficiary) => {
+			const assetSymbol = beneficiary.assetId
+				? (getAssetDataByIndexForNetwork({
+						network,
+						generalIndex: beneficiary.assetId
+					}).symbol as unknown as Exclude<EAssets, EAssets.MYTH>)
+				: null;
+			if (!treasuryStats[0].nativeTokenUsdPrice && !treasuryStats[0].dedTokenUsdPrice) {
+				return beneficiary;
+			}
+			const usdAmount = convertAssetToUSD({
+				amount: beneficiary.amount,
+				asset: assetSymbol,
+				currentTokenPrice: treasuryStats[0].nativeTokenUsdPrice || null,
+				dedTokenUSDPrice: treasuryStats[0].dedTokenUsdPrice || null,
+				network
+			})?.toString();
+
+			return { ...beneficiary, usdAmount };
+		});
 	}
 }

@@ -3,11 +3,12 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { IBeneficiaryInput, ENetwork } from '@/_shared/types';
 import { BN } from '@polkadot/util';
 
-export const groupBeneficiariesByAsset = (beneficiaries: IBeneficiaryInput[] | undefined | null, network: ENetwork): Record<string, BN> => {
-	if (!beneficiaries || !Array.isArray(beneficiaries) || !network || !NETWORKS_DETAILS[network as ENetwork]) {
+export const groupBeneficiariesByAssetIndex = ({ network, beneficiaries }: { beneficiaries?: IBeneficiaryInput[]; network: ENetwork }): Record<string, BN> => {
+	if (!beneficiaries || !Array.isArray(beneficiaries) || !ValidatorService.isValidNetwork(network)) {
 		return {};
 	}
 
@@ -25,39 +26,6 @@ export const groupBeneficiariesByAsset = (beneficiaries: IBeneficiaryInput[] | u
 		try {
 			const amount = new BN(curr.amount || '0');
 			acc[assetId as string] = acc[assetId as string].add(amount);
-		} catch (error) {
-			console.error(`Error processing beneficiary amount: ${error}`);
-		}
-
-		return acc;
-	}, {});
-};
-
-export const groupBeneficiariesByAssetWithAddress = (
-	beneficiaries: IBeneficiaryInput[] | undefined | null,
-	network: ENetwork
-): Record<string, { amount: BN; addresses: string[] }> => {
-	if (!beneficiaries || !Array.isArray(beneficiaries) || !network || !NETWORKS_DETAILS[network as ENetwork]) {
-		return {};
-	}
-
-	return beneficiaries.reduce((acc: Record<string, { amount: BN; addresses: string[] }>, curr: IBeneficiaryInput) => {
-		if (!curr) return acc;
-
-		const assetId = curr.assetId || NETWORKS_DETAILS[network as ENetwork].tokenSymbol;
-
-		if (!assetId) return acc;
-
-		if (!acc[assetId as string]) {
-			acc[assetId as string] = { amount: new BN(0), addresses: [] };
-		}
-
-		try {
-			const amount = new BN(curr.amount || '0');
-			acc[assetId as string] = {
-				amount: acc[assetId as string].amount.add(amount),
-				addresses: [...new Set([...acc[assetId as string].addresses, curr.address || ''])]
-			};
 		} catch (error) {
 			console.error(`Error processing beneficiary amount: ${error}`);
 		}

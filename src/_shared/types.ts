@@ -1356,14 +1356,6 @@ export interface IPayout {
 		generalIndex: string;
 	};
 }
-export interface IBeneficiaryPayoutDetails extends IBeneficiary {
-	payoutExpiry: string | null;
-}
-
-export interface TimeUnitOptions {
-	withUnitSpace?: boolean;
-	withPluralSuffix?: boolean;
-}
 
 export interface IOffChainPollPayload extends Omit<IPoll, 'id' | 'createdAt' | 'updatedAt' | 'proposalType' | 'updatedBy' | 'network' | 'votes' | 'index'> {
 	title: string;

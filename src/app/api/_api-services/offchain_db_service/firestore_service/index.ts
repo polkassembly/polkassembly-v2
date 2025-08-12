@@ -52,8 +52,8 @@ import { StatusCodes } from 'http-status-codes';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
-import { calculateAssetUSDValue } from '@/app/_client-utils/calculateAssetUSDValue';
 import dayjs from 'dayjs';
+import { convertAssetToUSD } from '@/app/_client-utils/convertAssetToUSD';
 import { FirestoreUtils } from './firestoreUtils';
 
 export class FirestoreService extends FirestoreUtils {
@@ -1846,7 +1846,7 @@ export class FirestoreService extends FirestoreUtils {
 			if (!treasuryStats[0].nativeTokenUsdPrice && !treasuryStats[0].dedTokenUsdPrice) {
 				return beneficiary;
 			}
-			const usdAmount = calculateAssetUSDValue({
+			const usdAmount = convertAssetToUSD({
 				amount: beneficiary.amount,
 				asset: assetSymbol,
 				currentTokenPrice: treasuryStats[0].nativeTokenUsdPrice || null,

@@ -7,6 +7,7 @@ import React, { ReactElement, ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { ITreasuryStats, EAssets, ENetwork } from '@/_shared/types';
 import Image from 'next/image';
+import { convertAssetToUSD } from '@/app/_client-utils/convertAssetToUSD';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/networks';
@@ -15,7 +16,6 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
-import { calculateTotalUSDValue } from '@/app/_client-utils/calculateTotalUSDValue';
 import { Separator } from '../Separator';
 
 // Component for displaying a single asset row
@@ -24,6 +24,35 @@ type AssetRowProps = {
 	asset?: EAssets | null;
 	prefix?: string;
 	network: ENetwork;
+};
+
+export const calculateTotalUSDValue = ({
+	amountsDetails,
+	currentTokenPrice,
+	dedTokenUSDPrice,
+	network
+}: {
+	amountsDetails: { amount: string | null; asset: Exclude<EAssets, EAssets.MYTH> | null }[];
+	currentTokenPrice: string | null;
+	dedTokenUSDPrice?: string | null;
+	network: ENetwork;
+}) => {
+	let totalUSD = BN_ZERO;
+
+	amountsDetails?.forEach(({ amount, asset }) => {
+		if (amount) {
+			const assetUSDValue = convertAssetToUSD({
+				amount,
+				asset,
+				currentTokenPrice,
+				dedTokenUSDPrice: dedTokenUSDPrice || null,
+				network
+			});
+			totalUSD = totalUSD.add(assetUSDValue);
+		}
+	});
+
+	return formatUSDWithUnits(totalUSD.toString(), 2);
 };
 
 function AssetRow({ amount, asset, prefix, network }: AssetRowProps) {
