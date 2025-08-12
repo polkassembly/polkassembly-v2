@@ -137,7 +137,7 @@ enum EApiRoute {
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
-	GET_USER_POSTS = 'GET_USER_POSTS',
+	GET_USER_POSTS_BY_ADDRESS = 'GET_USER_POSTS_BY_ADDRESS',
 	GET_POLL_VOTES = 'GET_POLL_VOTES',
 	ADD_POLL_VOTE = 'ADD_POLL_VOTE',
 	DELETE_POLL_VOTE = 'DELETE_POLL_VOTE',
@@ -214,7 +214,7 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_ADDRESS_RELATIONS:
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
-			case EApiRoute.GET_USER_POSTS:
+			case EApiRoute.GET_USER_POSTS_BY_ADDRESS:
 				path = '/users/address';
 				break;
 
@@ -1119,12 +1119,12 @@ export class NextApiClientService {
 		};
 	}
 
-	static async getUserPosts({ address, page, limit }: { address: string; page: number; limit: number }) {
+	static async getUserPostsByAddress({ address, page, limit }: { address: string; page: number; limit: number }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: limit.toString()
 		});
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS, routeSegments: [address, 'posts'], queryParams });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS_BY_ADDRESS, routeSegments: [address, 'posts'], queryParams });
 		return this.nextApiClientFetch<IUserPosts>({ url, method });
 	}
 
