@@ -189,7 +189,7 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 	);
 }
 
-function AddressSwitchButton({ disabled, showLinkedAccountBadge = false }: { disabled?: boolean; showLinkedAccountBadge?: boolean }) {
+function AddressSwitchButton({ disabled, showLinkedAccountBadge = false, className }: { disabled?: boolean; showLinkedAccountBadge?: boolean; className?: string }) {
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
 	const [isOpen, setisOpen] = useState(false);
@@ -210,7 +210,7 @@ function AddressSwitchButton({ disabled, showLinkedAccountBadge = false }: { dis
 			<DialogTrigger asChild>
 				<Button
 					size='sm'
-					className='ml-auto flex items-center gap-1 text-xs'
+					className={cn('ml-auto flex items-center gap-1 text-xs', className)}
 					disabled={disabled}
 				>
 					<IoMdSync /> {t('Switch')}
@@ -263,14 +263,18 @@ export default function AddressRelationsPicker({
 	showVotingBalance = false,
 	disabled,
 	showLinkedAccountBadge = false,
-	className
+	iconSize = 25,
+	className,
+	switchButtonClassName
 }: {
 	withBalance?: boolean;
 	showPeopleChainBalance?: boolean;
 	showVotingBalance?: boolean;
 	disabled?: boolean;
 	showLinkedAccountBadge?: boolean;
+	iconSize?: number;
 	className?: string;
+	switchButtonClassName?: string;
 }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const walletService = useWalletService();
@@ -331,10 +335,10 @@ export default function AddressRelationsPicker({
 						<Address
 							address={selectedAddress}
 							walletAddressName={walletAddressName}
-							iconSize={25}
+							iconSize={iconSize}
 							redirectToProfile={false}
 							disableTooltip
-							className='w-full px-2'
+							className='w-full gap-3 px-2'
 						/>
 						<span>
 							<AccountTypeBadge accountType={userPreferences?.selectedAccount?.accountType || EAccountType.REGULAR} />
@@ -345,6 +349,7 @@ export default function AddressRelationsPicker({
 				<AddressSwitchButton
 					disabled={disabled}
 					showLinkedAccountBadge={showLinkedAccountBadge}
+					className={switchButtonClassName}
 				/>
 			</div>
 		</div>

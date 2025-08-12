@@ -253,7 +253,17 @@ function AddComment({
 	};
 
 	return (
-		<div>
+		<div className='flex flex-col gap-2'>
+			<div className='-ml-2 flex w-12'>
+				<AddressSwitchButton
+					showLinkedAccountBadge
+					showPeopleChainBalance={false}
+					showVotingBalance={false}
+					className='w-full gap-0 border-none pl-0'
+					iconSize={30}
+					switchButtonClassName='px-2 text-[8px] h-6'
+				/>
+			</div>
 			<div className='mb-2'>
 				<MarkdownEditor
 					markdown={content || ''}
@@ -275,12 +285,6 @@ function AddComment({
 					</Button>
 				)}
 				<div className='flex flex-col items-end gap-2'>
-					<AddressSwitchButton
-						showLinkedAccountBadge
-						showPeopleChainBalance={false}
-						showVotingBalance={false}
-						className='w-full border-none'
-					/>
 					<Button
 						className={classes.postBtn}
 						onClick={addCommentToPost}
