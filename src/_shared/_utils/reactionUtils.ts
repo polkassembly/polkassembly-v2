@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { IReactionUser } from '@/_shared/types';
+import { IPublicUser } from '@/_shared/types';
 
 /**
  * Calculates updated user arrays for reactions (likes/dislikes) with optimistic updates
@@ -15,45 +15,38 @@ export const calculateUpdatedReactionUserArrays = ({
 	currentUsersWhoDisliked,
 	isDeleteAction,
 	isLikeAction,
-	currentUserUsername,
-	currentUserAddress,
+	currentPublicUser,
 	likedArrayKey = 'usersWhoLiked',
 	dislikedArrayKey = 'usersWhoDisliked'
 }: {
-	currentUsersWhoLiked: IReactionUser[];
-	currentUsersWhoDisliked: IReactionUser[];
-	currentUserUsername: string;
+	currentUsersWhoLiked: IPublicUser[];
+	currentUsersWhoDisliked: IPublicUser[];
 	isLikeAction: boolean;
 	isDeleteAction: boolean;
-	currentUserAddress?: string;
+	currentPublicUser?: IPublicUser;
 	likedArrayKey?: string;
 	dislikedArrayKey?: string;
 }) => {
-	if (!currentUserUsername) {
+	if (!currentPublicUser) {
 		return {
-			[likedArrayKey]: currentUsersWhoLiked as IReactionUser[],
-			[dislikedArrayKey]: currentUsersWhoDisliked as IReactionUser[]
+			[likedArrayKey]: currentUsersWhoLiked as IPublicUser[],
+			[dislikedArrayKey]: currentUsersWhoDisliked as IPublicUser[]
 		};
 	}
 
-	let updatedUsersWhoLiked = [...currentUsersWhoLiked] as IReactionUser[];
-	let updatedUsersWhoDisliked = [...currentUsersWhoDisliked] as IReactionUser[];
+	let updatedUsersWhoLiked = [...currentUsersWhoLiked] as IPublicUser[];
+	let updatedUsersWhoDisliked = [...currentUsersWhoDisliked] as IPublicUser[];
 
 	// Remove user from both arrays first to avoid duplicates
-	updatedUsersWhoLiked = updatedUsersWhoLiked.filter((userWhoReacted) => userWhoReacted.username !== currentUserUsername);
-	updatedUsersWhoDisliked = updatedUsersWhoDisliked.filter((userWhoReacted) => userWhoReacted.username !== currentUserUsername);
+	updatedUsersWhoLiked = updatedUsersWhoLiked.filter((userWhoReacted) => userWhoReacted.username !== currentPublicUser?.username);
+	updatedUsersWhoDisliked = updatedUsersWhoDisliked.filter((userWhoReacted) => userWhoReacted.username !== currentPublicUser?.username);
 
 	// If not a delete action, add user to appropriate array
 	if (!isDeleteAction) {
-		const newUserReaction: IReactionUser = {
-			...(currentUserAddress && { address: currentUserAddress }),
-			username: currentUserUsername
-		};
-
 		if (isLikeAction) {
-			updatedUsersWhoLiked.push(newUserReaction);
+			updatedUsersWhoLiked.push(currentPublicUser);
 		} else {
-			updatedUsersWhoDisliked.push(newUserReaction);
+			updatedUsersWhoDisliked.push(currentPublicUser);
 		}
 	}
 

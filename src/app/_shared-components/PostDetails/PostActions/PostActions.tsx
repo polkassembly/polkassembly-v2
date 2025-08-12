@@ -80,12 +80,13 @@ function PostActions({ postData }: { postData: IPost }) {
 							{reactionState.usersWhoLikedPost?.length > 0 && (
 								<TooltipContent
 									side='bottom'
-									className='shadow-lg; flex max-h-40 max-w-xs flex-col gap-2 overflow-y-auto border-none bg-bg_code px-4 py-4 text-sm text-basic_text'
+									className='flex max-h-40 max-w-xs flex-col gap-2 overflow-y-auto border-none bg-bg_code px-4 py-4 text-sm text-basic_text shadow-lg'
 								>
 									{reactionState.usersWhoLikedPost?.map((userWhoReacted) => {
-										return userWhoReacted?.address ? (
+										return userWhoReacted?.addresses?.[0] ? (
 											<Address
-												address={userWhoReacted.address}
+												key={userWhoReacted.addresses?.[0]}
+												address={userWhoReacted.addresses?.[0]}
 												redirectToProfile
 												disableTooltip
 											/>
@@ -95,6 +96,7 @@ function PostActions({ postData }: { postData: IPost }) {
 												className='text-xs font-medium hover:underline'
 												key={userWhoReacted.username}
 												target='_blank'
+												rel='noopener noreferrer'
 											>
 												{userWhoReacted.username}
 											</Link>
@@ -122,12 +124,13 @@ function PostActions({ postData }: { postData: IPost }) {
 							{reactionState.usersWhoDislikedPost?.length > 0 && (
 								<TooltipContent
 									side='bottom'
-									className='shadow-lg; flex max-h-40 max-w-xs flex-col gap-2 overflow-y-auto border-none bg-bg_code px-4 py-4 text-sm text-basic_text'
+									className='flex max-h-40 max-w-xs flex-col gap-2 overflow-y-auto border-none bg-bg_code px-4 py-4 text-sm text-basic_text shadow-lg'
 								>
 									{reactionState.usersWhoDislikedPost?.map((userWhoReacted) => {
-										return userWhoReacted?.address ? (
+										return userWhoReacted?.addresses?.[0] ? (
 											<Address
-												address={userWhoReacted.address}
+												key={userWhoReacted.addresses?.[0]}
+												address={userWhoReacted.addresses?.[0]}
 												redirectToProfile
 												disableTooltip
 											/>
@@ -137,6 +140,7 @@ function PostActions({ postData }: { postData: IPost }) {
 												className='text-xs font-medium hover:underline'
 												key={userWhoReacted.username}
 												target='_blank'
+												rel='noopener noreferrer'
 											>
 												{userWhoReacted.username}
 											</Link>

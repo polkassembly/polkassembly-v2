@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, EReaction, IReaction, ENotificationStatus, IReactionUser } from '@/_shared/types';
+import { EProposalType, EReaction, IReaction, ENotificationStatus, IPublicUser } from '@/_shared/types';
 import { calculateUpdatedReactionUserArrays } from '@/_shared/_utils/reactionUtils';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
@@ -15,8 +15,8 @@ interface IPostReactionState {
 	isDisliked: boolean;
 	likesCount: number;
 	dislikesCount: number;
-	usersWhoLikedPost: IReactionUser[];
-	usersWhoDislikedPost: IReactionUser[];
+	usersWhoLikedPost: IPublicUser[];
+	usersWhoDislikedPost: IPublicUser[];
 }
 
 interface IPostData {
@@ -55,11 +55,11 @@ export const usePostReactions = (postData: IPostData) => {
 			dislikesCount: postReactionsArray.filter((reaction) => reaction.reaction === EReaction.dislike).length,
 			usersWhoLikedPost: postReactionsArray
 				.filter((reaction) => reaction.reaction === EReaction.like)
-				.map((reaction) => ({ ...(reaction?.publicUser?.addresses?.[0] && { address: reaction?.publicUser?.addresses?.[0] }), username: reaction.publicUser?.username || '' }))
+				.map((reaction) => reaction.publicUser)
 				.filter(Boolean),
 			usersWhoDislikedPost: postReactionsArray
 				.filter((reaction) => reaction.reaction === EReaction.dislike)
-				.map((reaction) => ({ ...(reaction?.publicUser?.addresses?.[0] && { address: reaction?.publicUser?.addresses?.[0] }), username: reaction.publicUser?.username || '' }))
+				.map((reaction) => reaction.publicUser)
 				.filter(Boolean)
 		};
 	}, [postData?.reactions, user?.id]);
@@ -90,7 +90,6 @@ export const usePostReactions = (postData: IPostData) => {
 			}
 			const isLikeAction = type === EReaction.like;
 			const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
-			const currentUserUsername = user?.username || '';
 
 			try {
 				const isDeleteAction = Boolean(currentReactionId && ((isLikeAction && reactionState.isLiked) || (!isLikeAction && reactionState.isDisliked)));
@@ -103,10 +102,9 @@ export const usePostReactions = (postData: IPostData) => {
 					const updatedUserArrays = calculateUpdatedReactionUserArrays({
 						currentUsersWhoLiked: previousState.usersWhoLikedPost,
 						currentUsersWhoDisliked: previousState.usersWhoDislikedPost,
-						currentUserUsername,
 						isLikeAction,
 						isDeleteAction,
-						currentUserAddress: user?.defaultAddress,
+						currentPublicUser: user?.publicUser,
 						likedArrayKey: 'usersWhoLikedPost',
 						dislikedArrayKey: 'usersWhoDislikedPost'
 					});

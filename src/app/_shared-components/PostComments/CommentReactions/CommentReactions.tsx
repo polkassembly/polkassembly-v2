@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EReaction, ICommentResponse, IReactionUser } from '@/_shared/types';
+import { EReaction, ICommentResponse, IPublicUser } from '@/_shared/types';
 import { useCommentReactions } from '@/hooks/useCommentReactions';
 import { useUser } from '@/hooks/useUser';
 import { cn } from '@/lib/utils';
@@ -66,12 +66,13 @@ function CommentReactions({ commentData, disabled = false }: CommentReactionsPro
 						{reactionState.usersWhoLikedComment?.length > 0 && !disabled && (
 							<TooltipContent
 								side='top'
-								className='shadow-lg; flex max-h-40 max-w-xs flex-col gap-2 overflow-y-auto border-none bg-bg_code px-4 py-4 text-sm text-basic_text'
+								className='flex max-h-40 max-w-xs flex-col gap-2 overflow-y-auto border-none bg-bg_code px-4 py-4 text-sm text-basic_text shadow-lg'
 							>
-								{reactionState.usersWhoLikedComment?.map((userWhoReacted: IReactionUser) => {
-									return userWhoReacted?.address ? (
+								{reactionState.usersWhoLikedComment?.map((userWhoReacted: IPublicUser) => {
+									return userWhoReacted?.addresses?.[0] ? (
 										<Address
-											address={userWhoReacted.address}
+											key={userWhoReacted.addresses?.[0]}
+											address={userWhoReacted.addresses?.[0]}
 											redirectToProfile
 											disableTooltip
 										/>
@@ -79,8 +80,9 @@ function CommentReactions({ commentData, disabled = false }: CommentReactionsPro
 										<Link
 											href={`/user/${userWhoReacted.username}`}
 											className='text-xs font-medium hover:underline'
-											key={userWhoReacted.username}
+											key={userWhoReacted.addresses?.[0]}
 											target='_blank'
+											rel='noopener noreferrer'
 										>
 											{userWhoReacted.username}
 										</Link>
@@ -109,12 +111,13 @@ function CommentReactions({ commentData, disabled = false }: CommentReactionsPro
 						{reactionState.usersWhoDislikedComment?.length > 0 && !disabled && (
 							<TooltipContent
 								side='top'
-								className='shadow-lg; flex max-h-40 max-w-xs flex-col gap-2 overflow-y-auto border-none bg-bg_code px-4 py-4 text-sm text-basic_text'
+								className='flex max-h-40 max-w-xs flex-col gap-2 overflow-y-auto border-none bg-bg_code px-4 py-4 text-sm text-basic_text shadow-lg'
 							>
-								{reactionState.usersWhoDislikedComment?.map((userWhoReacted: IReactionUser) => {
-									return userWhoReacted?.address ? (
+								{reactionState.usersWhoDislikedComment?.map((userWhoReacted: IPublicUser) => {
+									return userWhoReacted?.addresses?.[0] ? (
 										<Address
-											address={userWhoReacted.address}
+											key={userWhoReacted.addresses?.[0]}
+											address={userWhoReacted.addresses?.[0]}
 											redirectToProfile
 											disableTooltip
 										/>
@@ -124,6 +127,7 @@ function CommentReactions({ commentData, disabled = false }: CommentReactionsPro
 											className='text-xs font-medium hover:underline'
 											key={userWhoReacted.username}
 											target='_blank'
+											rel='noopener noreferrer'
 										>
 											{userWhoReacted.username}
 										</Link>
