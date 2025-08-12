@@ -114,7 +114,8 @@
 		"switchWallet": "Switch Wallet",
 		"noData": "No",
 		"found": "found",
-		"confirm": "Confirm"
+		"confirm": "Confirm",
+		"noAccountSelected": "Select an account"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Treasury Proposal",

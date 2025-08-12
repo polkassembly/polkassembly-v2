@@ -114,7 +114,8 @@
 		"switchWallet": "ウォレットを切り替え",
 		"noData": "データがありません",
 		"found": "見つかりました",
-		"confirm": "確認"
+		"confirm": "確認",
+		"noAccountSelected": "アカウントを選択"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "財務提案",

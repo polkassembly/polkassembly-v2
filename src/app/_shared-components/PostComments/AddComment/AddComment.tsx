@@ -254,7 +254,7 @@ function AddComment({
 
 	return (
 		<div className='flex flex-col gap-2'>
-			<div className='-ml-2 flex w-12'>
+			<div className='-ml-2 flex w-full'>
 				<AddressSwitchButton
 					showLinkedAccountBadge
 					showPeopleChainBalance={false}
