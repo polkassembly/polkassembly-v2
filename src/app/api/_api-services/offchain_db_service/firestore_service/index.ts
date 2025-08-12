@@ -1012,7 +1012,8 @@ export class FirestoreService extends FirestoreUtils {
 		userId,
 		content,
 		parentCommentId,
-		sentiment
+		sentiment,
+		authorAddress
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -1022,6 +1023,7 @@ export class FirestoreService extends FirestoreUtils {
 		parentCommentId?: string;
 		address?: string;
 		sentiment?: ECommentSentiment;
+		authorAddress?: string;
 	}) {
 		const newCommentId = this.commentsCollectionRef().doc().id;
 
@@ -1037,7 +1039,8 @@ export class FirestoreService extends FirestoreUtils {
 			indexOrHash,
 			parentCommentId: parentCommentId || null,
 			dataSource: EDataSource.POLKASSEMBLY,
-			...(sentiment && { sentiment })
+			...(sentiment && { sentiment }),
+			...(authorAddress && { authorAddress })
 		};
 
 		await this.commentsCollectionRef().doc(newCommentId).set(newComment);

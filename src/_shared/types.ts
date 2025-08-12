@@ -728,6 +728,7 @@ export interface IComment {
 	aiSentiment?: ECommentSentiment;
 	history?: IOffChainContentHistoryItem[];
 	disabled?: boolean;
+	authorAddress?: string;
 }
 
 export interface ICommentResponse extends IComment {
@@ -879,6 +880,9 @@ export interface IActivityMetadata {
 	// for posts
 	title?: string;
 	content?: string;
+
+	// for comments
+	authorAddress?: string;
 }
 
 export interface IUserActivity {
@@ -1355,6 +1359,11 @@ export interface IPayout {
 		expiresAt: Date;
 		generalIndex: string;
 	};
+}
+
+export enum EPreImageTabs {
+	ALL = 'all',
+	USER = 'user'
 }
 
 export interface IOffChainPollPayload extends Omit<IPoll, 'id' | 'createdAt' | 'updatedAt' | 'proposalType' | 'updatedBy' | 'network' | 'votes' | 'index'> {

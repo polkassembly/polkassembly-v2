@@ -154,7 +154,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 							<ChevronRight className='h-4 w-4 text-xs text-text_pink' />
 						</Button>
 					</DialogTrigger>
-					<DialogContent className='max-w-2xl p-3 sm:p-6'>
+					<DialogContent className='max-w-[90vw] p-3 sm:max-w-2xl sm:p-6'>
 						<DialogHeader>
 							<DialogTitle>
 								<Select

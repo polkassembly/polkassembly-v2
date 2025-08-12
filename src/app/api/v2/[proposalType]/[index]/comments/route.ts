@@ -13,6 +13,9 @@ import { z } from 'zod';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { AIService } from '@/app/api/_api-services/ai_service';
 import { fetchCommentsVoteData } from '@/app/api/_api-utils/fetchCommentsVoteData.server';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import { ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -44,10 +47,14 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	const zodBodySchema = z.object({
 		content: z.string().min(1, 'Content is required'),
 		parentCommentId: z.string().optional(),
-		sentiment: z.nativeEnum(ECommentSentiment).optional()
+		sentiment: z.nativeEnum(ECommentSentiment).optional(),
+		authorAddress: z
+			.string()
+			.refine((address) => ValidatorService.isValidSubstrateAddress(address), ERROR_MESSAGES.INVALID_SUBSTRATE_ADDRESS)
+			.optional()
 	});
 
-	const { content, parentCommentId, sentiment } = zodBodySchema.parse(await getReqBody(req));
+	const { content, parentCommentId, sentiment, authorAddress } = zodBodySchema.parse(await getReqBody(req));
 
 	const newComment = await OffChainDbService.AddNewComment({
 		network,
@@ -56,7 +63,8 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
 		content,
 		parentCommentId,
-		sentiment
+		sentiment,
+		authorAddress: authorAddress ? (getSubstrateAddress(authorAddress) ?? undefined) : undefined
 	});
 
 	await AIService.UpdatePostCommentsSummary({ network, proposalType, indexOrHash: index, newCommentId: newComment.id });

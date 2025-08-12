@@ -48,7 +48,7 @@ function VoteHistory({ proposalType, index, votesDisplayType }: { proposalType: 
 	});
 
 	return (
-		<div>
+		<div className='overflow-x-hidden'>
 			<Tabs
 				defaultValue={tab}
 				onValueChange={(voteTab) => {
@@ -61,37 +61,37 @@ function VoteHistory({ proposalType, index, votesDisplayType }: { proposalType: 
 					<TabsTrigger
 						className={cn(
 							classes.tabs,
-							'w-full py-1.5 data-[state=active]:rounded-lg data-[state=active]:border-none data-[state=active]:bg-success data-[state=active]:text-white'
+							'w-full px-2 py-1.5 text-xs data-[state=active]:rounded-lg data-[state=active]:border-none data-[state=active]:bg-success data-[state=active]:text-white sm:px-5 sm:text-sm'
 						)}
 						value={EVoteDecision.AYE}
 					>
 						<ThumbsUp
 							fill={tab === EVoteDecision.AYE ? THEME_COLORS.light.btn_primary_text : THEME_COLORS.light.wallet_btn_text}
-							className='h-4 w-4'
+							className='h-3 w-3 sm:h-4 sm:w-4'
 						/>
 						{t('PostDetails.aye')} {ValidatorService.isValidNumber(data?.totalCounts?.[EVoteDecision.AYE]) && `(${data?.totalCounts?.[EVoteDecision.AYE]})`}
 					</TabsTrigger>
 					<TabsTrigger
 						className={cn(
 							classes.tabs,
-							'w-full py-1.5 data-[state=active]:rounded-lg data-[state=active]:border-none data-[state=active]:bg-failure data-[state=active]:text-white'
+							'w-full px-2 py-1.5 text-xs data-[state=active]:rounded-lg data-[state=active]:border-none data-[state=active]:bg-failure data-[state=active]:text-white sm:px-5 sm:text-sm'
 						)}
 						value={EVoteDecision.NAY}
 					>
 						<ThumbsDown
 							fill={tab === EVoteDecision.NAY ? THEME_COLORS.light.btn_primary_text : THEME_COLORS.light.wallet_btn_text}
-							className='h-4 w-4'
+							className='h-3 w-3 sm:h-4 sm:w-4'
 						/>
 						{t('PostDetails.nay')} {ValidatorService.isValidNumber(data?.totalCounts?.[EVoteDecision.NAY]) && `(${data?.totalCounts?.[EVoteDecision.NAY]})`}
 					</TabsTrigger>
 					<TabsTrigger
 						className={cn(
 							classes.tabs,
-							'w-full py-1.5 data-[state=active]:rounded-lg data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white'
+							'w-full px-2 py-1.5 text-xs data-[state=active]:rounded-lg data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white sm:px-5 sm:text-sm'
 						)}
 						value={EVoteDecision.SPLIT_ABSTAIN}
 					>
-						<Ban className='h-4 w-4' />
+						<Ban className='h-3 w-3 sm:h-4 sm:w-4' />
 						{t('PostDetails.abstain')} {ValidatorService.isValidNumber(data?.totalCounts?.[EVoteDecision.SPLIT_ABSTAIN]) && `(${data?.totalCounts?.[EVoteDecision.SPLIT_ABSTAIN]})`}
 					</TabsTrigger>
 				</TabsList>

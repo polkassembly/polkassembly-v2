@@ -24,7 +24,7 @@ import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import { BN } from '@polkadot/util';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
 import Link from 'next/link';
-import { getPostDetailsUrl } from '@/app/_client-utils/getPostDetailsUrl';
+import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ARCHIVE_PROPOSAL_TYPES } from '@/_shared/_constants/archiveProposalTypes';
@@ -62,7 +62,7 @@ function ListingCard({
 
 	const groupedByAsset = groupBeneficiariesByAssetIndex({ beneficiaries: data.onChainInfo?.beneficiaries || [], network });
 
-	const redirectUrl = getPostDetailsUrl({ proposalType, proposalId: index, network });
+	const redirectUrl = getPostTypeUrl({ proposalType, indexOrHash: index, network });
 
 	return (
 		<Link

@@ -106,14 +106,16 @@
 		"hidePassword": "Ocultar contraseña",
 		"showPassword": "Mostrar contraseña",
 		"pleaseConnectWallet": "Por favor conecte su billetera a Polkassembly.",
-		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión."
+		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión.",
+		"linkedAccount": "Cuenta Vinculada"
 	},
 	"AddressRelationsPicker": {
 		"Switch": "Cambiar",
 		"switchWallet": "Cambiar billetera",
 		"noData": "No",
 		"found": "encontrado",
-		"confirm": "Confirmar"
+		"confirm": "Confirmar",
+		"noAccountSelected": "Seleccionar cuenta"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Propuesta de Tesorería",
@@ -435,6 +437,7 @@
 	"PostDetails": {
 		"castVote": "Emitir Voto",
 		"castYourVote": "Emita su Voto",
+		"copyLink": "Copiar Enlace",
 		"loginToVote": "Inicie sesión para Votar",
 		"requested": "Solicitado",
 		"beneficiary": "Beneficiario",
@@ -627,7 +630,14 @@
 			"payoutClaimFailedDescription": "Por favor, inténtelo de nuevo"
 		},
 		"commentsDisabled": "Los comentarios han sido desactivados para esta publicación.",
-		"commentsDisabledForNonVerifiedUsers": "Los comentarios han sido desactivados para usuarios no verificados."
+		"commentsDisabledForNonVerifiedUsers": "Los comentarios han sido desactivados para usuarios no verificados.",
+		"RefundDeposits": {
+			"refund": "Reembolso",
+			"refundDeposits": "Reembolsar Depósitos",
+			"description": "Haga clic aquí para reembolsar el depósito de esta propuesta",
+			"decisionDeposit": "Depósito de Decisión",
+			"submissionDeposit": "Depósito de Presentación"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Cancelado",
@@ -767,6 +777,10 @@
 	"Preimages": {
 		"hash": "Hash",
 		"author": "Autor",
+		"all": "Todos",
+		"myPreimages": "Mis preimages",
+		"noUserPreimages": "No tienes preimages!",
+		"createOneNow": "Crea uno ahora!",
 		"deposit": "Depósito",
 		"arguments": "Argumentos",
 		"size": "Tamaño",
@@ -783,7 +797,16 @@
 		"unnoted_description": "El preimage no ha sido anotado",
 		"failed": "Fallido",
 		"unrequest": "Cancelar solicitud",
-		"unnote": "Eliminar anotación"
+		"unnote": "Eliminar anotación",
+		"unnoteOrUnrequestPreimageDescription": "¿Estás seguro de que quieres desnotar o desolicitar esta preimagen?",
+		"loadingYourPreimages": "Cargando tus preimágenes...",
+		"please": "Por favor",
+		"toViewPreimages": "para ver tus preimágenes",
+		"logIn": "inicia sesión",
+		"failedToFetchUserPreimages": "Error al obtener las preimágenes del usuario",
+		"tryAgain": "Intentar de nuevo",
+		"showingPreimagesFor": "Mostrando preimágenes para:",
+		"switchWallet": "Cambiar Cartera"
 	},
 	"Create": {
 		"createDiscussionTitle": "Crear Discusión",

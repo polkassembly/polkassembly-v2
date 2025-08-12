@@ -169,6 +169,7 @@ function Poll({ poll }: { poll?: IPoll }) {
 			<div className={classes.pollOptions}>
 				{poll?.options?.map((option) => {
 					const percentage = calculateOptionPercentage(option);
+					const userVote = votes.find((vote) => vote.userId === user?.id && vote.selectedOption === option);
 					return (
 						<Button
 							disabled={loading && selectedOption !== option}
@@ -178,11 +179,11 @@ function Poll({ poll }: { poll?: IPoll }) {
 							key={option}
 							className={cn(
 								'relative flex w-full flex-wrap items-center justify-between overflow-hidden break-all rounded-md bg-poll_option_bg px-3 py-2.5 text-xs font-semibold text-text_primary',
-								percentage > 0 && shouldShowVotes ? 'text-white' : '',
+								percentage > 0 && !!userVote && shouldShowVotes ? 'text-white' : '',
 								isPollEnded ? 'cursor-not-allowed' : ''
 							)}
 						>
-							{shouldShowVotes && (
+							{shouldShowVotes && !!userVote && (
 								<div
 									className={classes.votePercentageBar}
 									style={{ width: `${percentage}%` }}
