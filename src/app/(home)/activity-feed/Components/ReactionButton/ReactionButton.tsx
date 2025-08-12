@@ -22,7 +22,7 @@ function ReactionButton({
 	count,
 	showText = true,
 	className = 'text-bg_pink text-lg',
-	isLoading = false
+	disabled = false
 }: {
 	type: EReaction;
 	isActive: boolean;
@@ -31,17 +31,17 @@ function ReactionButton({
 	showText?: boolean;
 	count?: number;
 	className?: string;
-	isLoading?: boolean;
+	disabled?: boolean;
 }) {
 	const Icon = type === EReaction.like ? (isActive ? AiFillLike : AiOutlineLike) : isActive ? AiFillDislike : AiOutlineDislike;
 	const t = useTranslations();
 
 	return (
 		<button
-			className={cn('relative flex cursor-pointer items-center transition-all duration-300 hover:scale-110', isLoading ? 'opacity-50' : '')}
+			className={cn('relative flex cursor-pointer items-center transition-all duration-300 hover:scale-110', disabled ? 'opacity-50' : '')}
 			onClick={onClick}
 			type='button'
-			disabled={isLoading}
+			disabled={disabled}
 		>
 			<div className='relative w-6'>
 				{showGif ? (

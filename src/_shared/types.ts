@@ -1461,3 +1461,8 @@ export type IPostBubbleVotes = {
 		status: EProposalStatus;
 	};
 };
+
+export interface IReactionUser {
+	username: string;
+	address?: string;
+}

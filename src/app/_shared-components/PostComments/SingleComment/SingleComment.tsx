@@ -317,7 +317,10 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 				)}
 
 				<div className={classes.tools}>
-					<CommentReactions commentData={comment} />
+					<CommentReactions
+						commentData={comment}
+						disabled={comment.disabled}
+					/>
 					{user ? (
 						<Button
 							variant='ghost'
