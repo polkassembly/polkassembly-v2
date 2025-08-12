@@ -106,7 +106,8 @@
 		"hidePassword": "パスワードを隠す",
 		"showPassword": "パスワードを表示",
 		"pleaseConnectWallet": "Polkassemblyにウォレットを接続してください。",
-		"pleaseCheckConnectedAccounts": "拡張機能で接続されたアカウントを確認してください。"
+		"pleaseCheckConnectedAccounts": "拡張機能で接続されたアカウントを確認してください。",
+		"linkedAccount": "リンクされたアカウント"
 	},
 	"AddressRelationsPicker": {
 		"Switch": "切り替え",

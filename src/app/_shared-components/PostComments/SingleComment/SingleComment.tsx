@@ -195,7 +195,7 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 	const network = getCurrentNetwork();
 	const userAddresses = !EVM_NETWORKS.includes(network) ? comment?.publicUser?.addresses?.filter((address) => !address.startsWith('0x')) : comment?.publicUser?.addresses;
 
-	const addressToDisplay = userAddresses?.[0] || comment?.publicUser?.addresses?.[0];
+	const addressToDisplay = comment?.authorAddress || userAddresses?.[0] || comment?.publicUser?.addresses?.[0];
 	const isHighlighted = typeof window !== 'undefined' && window?.location?.hash === `#comment-${comment.id}`;
 	const wrapperClassName = isHighlighted ? `${classes.wrapper} ${classes.highlighted}` : classes.wrapper;
 
