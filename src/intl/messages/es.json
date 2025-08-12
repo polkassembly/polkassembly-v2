@@ -114,7 +114,8 @@
 		"switchWallet": "Cambiar billetera",
 		"noData": "No",
 		"found": "encontrado",
-		"confirm": "Confirmar"
+		"confirm": "Confirmar",
+		"noAccountSelected": "Seleccionar cuenta"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Propuesta de Tesorería",

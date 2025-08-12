@@ -114,7 +114,8 @@
 		"switchWallet": "切换钱包",
 		"noData": "没有数据",
 		"found": "找到",
-		"confirm": "确认"
+		"confirm": "确认",
+		"noAccountSelected": "选择账户"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "国库提案",

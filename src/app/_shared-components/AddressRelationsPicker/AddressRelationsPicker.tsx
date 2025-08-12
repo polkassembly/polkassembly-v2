@@ -279,7 +279,7 @@ export default function AddressRelationsPicker({
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const walletService = useWalletService();
 	const [accountsLoading, setAccountsLoading] = useState(true);
-
+	const t = useTranslations('AddressRelationsPicker');
 	const selectedAddress = useMemo(() => userPreferences?.selectedAccount?.address, [userPreferences?.selectedAccount?.address]);
 	const walletAddressName = useMemo(() => userPreferences?.selectedAccount?.name, [userPreferences?.selectedAccount?.name]);
 
@@ -328,8 +328,10 @@ export default function AddressRelationsPicker({
 			)}
 
 			<div className={cn('flex items-center gap-2 rounded border border-primary_border p-2', className)}>
-				{accountsLoading || !selectedAddress ? (
+				{accountsLoading ? (
 					<Skeleton className='h-6 w-32' />
+				) : !selectedAddress ? (
+					<p className='text-text_secondary w-full px-3 text-xs'>{t('noAccountSelected')}</p>
 				) : (
 					<div className='flex items-center justify-between gap-2'>
 						<Address

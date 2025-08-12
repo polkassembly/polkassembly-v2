@@ -114,7 +114,8 @@
 		"switchWallet": "Wallet wechseln",
 		"noData": "Keine",
 		"found": "gefunden",
-		"confirm": "Bestätigen"
+		"confirm": "Bestätigen",
+		"noAccountSelected": "Konto auswählen"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Finanzvorschlag",
