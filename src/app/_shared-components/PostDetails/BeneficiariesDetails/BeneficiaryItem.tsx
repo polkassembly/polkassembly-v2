@@ -55,7 +55,7 @@ function BeneficiaryItem({ assetId, amount, addresses, index, totalLength }: Ben
 							key={address}
 							address={address}
 							truncateCharLen={SHOW_ONLY_IDENTICON_LIMIT}
-							showOnlyIdenticon={addresses.length > SHOW_ONLY_IDENTICON_LIMIT}
+							showOnlyIdenticon
 							className='text-xs font-bold lg:text-sm'
 						/>
 					))}
