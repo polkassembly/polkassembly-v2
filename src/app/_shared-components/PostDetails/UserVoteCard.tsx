@@ -9,10 +9,9 @@ import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { ThumbsDown, ThumbsUp, Ban, User } from 'lucide-react';
-import VoteIcon from '@assets/activityfeed/vote.svg';
 import DelegateIcon from '@assets/icons/delegate_plus.svg';
 import { cn } from '@/lib/utils';
-import { EProposalType, IVoteHistoryData, ENotificationStatus, EReactQueryKeys } from '@/_shared/types';
+import { EProposalType, IVoteHistoryData, ENotificationStatus, EReactQueryKeys, EPostOrigin, IVoteData } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -24,20 +23,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../Dialog/Dial
 import { Separator } from '../Separator';
 import classes from './PostDetails.module.scss';
 import Address from '../Profile/Address/Address';
+import VoteReferendumButton from './VoteReferendumButton';
 
 interface VoteReferendumButtonProps {
 	index: string;
 	btnClassName?: string;
-	iconClassName?: string;
 	size?: 'sm' | 'lg';
 	proposalType: EProposalType;
 	voteData: IVoteHistoryData;
-	isLoading: boolean;
-	isError: boolean;
-	setOpenModal: (open: boolean) => void;
+	track?: EPostOrigin;
+	isLoading?: boolean;
+	isError?: boolean;
+	existingVote?: IVoteData;
 }
 
-function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposalType, voteData, isLoading, isError, setOpenModal }: VoteReferendumButtonProps) {
+function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData, track, isLoading, isError, existingVote }: VoteReferendumButtonProps) {
 	const t = useTranslations();
 	const [openRemoveConfirmModal, setOpenRemoveConfirmModal] = useState(false);
 	const network = getCurrentNetwork();
@@ -156,24 +156,18 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 				<p className='text-sm text-basic_text'>{formatBnBalance(myVote.delegatedVotingPower || '0', formatBalanceOptions, network)}</p>
 			</div>
 
-			<Button
-				className={cn('w-full', btnClassName)}
+			<VoteReferendumButton
+				index={index}
+				btnClassName={cn('w-full', btnClassName)}
 				size={size}
-				disabled={isLoading || isError}
+				iconClassName='hidden'
+				hasVoted
+				track={track}
+				proposalType={proposalType}
 				isLoading={isLoading}
-				onClick={() => setOpenModal(true)}
-			>
-				<div className='flex items-center gap-1'>
-					<Image
-						src={VoteIcon}
-						alt='Vote Icon'
-						width={20}
-						height={20}
-						className={iconClassName}
-					/>
-					{t('PostDetails.changeVote')}
-				</div>
-			</Button>
+				isError={isError}
+				existingVote={existingVote}
+			/>
 
 			<Dialog
 				open={openRemoveConfirmModal}

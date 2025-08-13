@@ -27,6 +27,7 @@ import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import { Skeleton } from '../Skeleton';
 import Poll from './Poll/Poll';
+import UserVoteStatus from './UserVoteStatus/UserVoteStatus';
 
 const OnchainInfo = dynamic(() => import('./OnchainInfo/OnchainInfo'), {
 	ssr: false,
@@ -72,11 +73,6 @@ const VotesData = dynamic(() => import('./VotesData/VotesData'), {
 			<Skeleton className='mt-2 h-36 w-full rounded-md' />
 		</div>
 	)
-});
-
-const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), {
-	ssr: false,
-	loading: () => <Skeleton className='h-12 w-full rounded-lg' />
 });
 
 const Timeline = dynamic(() => import('./Timeline/Timeline'), {
@@ -231,12 +227,10 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						{isModalOpen && !isOffchainPost && (
 							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
 								{canVote(post.onChainInfo?.status) && (
-									<VoteReferendumButton
-										iconClassName='hidden'
+									<UserVoteStatus
 										index={index}
 										track={post.onChainInfo?.origin}
 										proposalType={post.proposalType}
-										showUserVoteCard
 									/>
 								)}
 							</div>
@@ -287,12 +281,10 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								/>
 							)}
 							{canVote(post.onChainInfo?.status) && (
-								<VoteReferendumButton
-									iconClassName='hidden'
+								<UserVoteStatus
 									index={index}
 									track={post.onChainInfo?.origin}
 									proposalType={post.proposalType}
-									showUserVoteCard
 								/>
 							)}
 							<ClaimPayout beneficiaries={post.onChainInfo?.beneficiaries || []} />
