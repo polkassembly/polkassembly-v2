@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import Image from 'next/image';
 import { useMemo, useState } from 'react';
-import TwitterIcon from '@assets/icons/twitter-icon-dark.svg';
+import RiotIcon from '@assets/icons/riot-icon.svg';
 import { useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
 import { ESocial, ESocialVerificationStatus, ISocialHandle } from '@/_shared/types';
@@ -14,30 +14,32 @@ import VerifiedCheckIcon from '@assets/icons/verified-check-green.svg';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Button } from '../../Button';
 
-function TwitterVerification({ identityTwitter, twitterSocialHandle }: { identityTwitter: string; twitterSocialHandle?: ISocialHandle }) {
+function RiotVerification({ identityMatrix, matrixSocialHandle }: { identityMatrix: string; matrixSocialHandle?: ISocialHandle }) {
 	const t = useTranslations();
-	const queryClient = useQueryClient();
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
+
 	const [loading, setLoading] = useState(false);
 
-	const twitterStatus = useMemo(() => {
-		if (!twitterSocialHandle?.status) return ESocialVerificationStatus.UNVERIFIED;
+	const queryClient = useQueryClient();
 
-		if (twitterSocialHandle.status === ESocialVerificationStatus.VERIFIED && twitterSocialHandle.handle === identityTwitter) return ESocialVerificationStatus.VERIFIED;
+	const riotStatus = useMemo(() => {
+		if (!matrixSocialHandle || !matrixSocialHandle.status) return ESocialVerificationStatus.UNVERIFIED;
 
-		return twitterSocialHandle?.status;
-	}, [twitterSocialHandle, identityTwitter]);
+		if (matrixSocialHandle.status === ESocialVerificationStatus.VERIFIED && matrixSocialHandle.handle === identityMatrix) return ESocialVerificationStatus.VERIFIED;
 
-	const verifyTwitter = async () => {
-		if (!user || !identityTwitter || !userPreferences.selectedAccount?.address) return;
+		return matrixSocialHandle.status;
+	}, [matrixSocialHandle, identityMatrix]);
+
+	const verifyRiot = async () => {
+		if (!user || !identityMatrix || !userPreferences.selectedAccount?.address) return;
 
 		setLoading(true);
 		const { data, error } = await NextApiClientService.initSocialVerification({
 			userId: user.id,
 			address: userPreferences.selectedAccount.address,
-			social: ESocial.TWITTER,
-			handle: identityTwitter
+			social: ESocial.RIOT,
+			handle: identityMatrix
 		});
 
 		if (error || !data) {
@@ -46,16 +48,12 @@ function TwitterVerification({ identityTwitter, twitterSocialHandle }: { identit
 			return;
 		}
 
-		if (data.verificationToken?.token) {
-			window.open(`https://api.twitter.com/oauth/authenticate?oauth_token=${data.verificationToken.token}`, '_blank');
-		}
-
-		queryClient.setQueryData(['socials', user?.id, userPreferences.selectedAccount?.address], (old: Record<ESocial, ISocialHandle>) => ({
+		queryClient.setQueryData(['socials', user.id, userPreferences.selectedAccount?.address], (old: Record<ESocial, ISocialHandle>) => ({
 			...old,
-			[ESocial.TWITTER]: {
-				social: ESocial.TWITTER,
-				handle: identityTwitter,
-				status: ESocialVerificationStatus.PENDING,
+			[ESocial.RIOT]: {
+				social: ESocial.RIOT,
+				handle: identityMatrix,
+				status: data.status || ESocialVerificationStatus.PENDING,
 				userId: user.id,
 				address: userPreferences.selectedAccount?.address
 			}
@@ -70,23 +68,23 @@ function TwitterVerification({ identityTwitter, twitterSocialHandle }: { identit
 				<div className='z-30 rounded-full bg-bg_modal'>
 					<div className='flex h-10 w-10 items-center justify-center rounded-full bg-border_grey/40'>
 						<Image
-							src={TwitterIcon}
+							src={RiotIcon}
 							alt='social icon'
 							width={24}
 							height={24}
 						/>
 					</div>
 				</div>
-				<p className='text-sm text-wallet_btn_text'>{t('SetIdentity.twitter')}</p>
+				<p className='text-sm text-wallet_btn_text'>{t('SetIdentity.riot')}</p>
 			</div>
 			<div
 				className={cn(
 					'flex flex-1 items-center justify-between gap-x-2 rounded-md border border-border_grey px-3 py-2',
-					twitterStatus === ESocialVerificationStatus.VERIFIED && 'bg-page_background text-text_primary/60'
+					riotStatus === ESocialVerificationStatus.VERIFIED && 'bg-page_background text-text_primary/60'
 				)}
 			>
-				<p className='truncate font-medium'>{identityTwitter}</p>
-				{twitterStatus === ESocialVerificationStatus.VERIFIED ? (
+				<p className='truncate font-medium'>{identityMatrix}</p>
+				{riotStatus === ESocialVerificationStatus.VERIFIED ? (
 					<div className='flex items-center gap-x-1 text-xs'>
 						<Image
 							src={VerifiedCheckIcon}
@@ -94,16 +92,16 @@ function TwitterVerification({ identityTwitter, twitterSocialHandle }: { identit
 							width={20}
 							height={20}
 						/>
-						Verified
+						{t('SetIdentity.verified')}
 					</div>
 				) : (
 					<Button
-						disabled={twitterStatus !== ESocialVerificationStatus.UNVERIFIED}
-						onClick={verifyTwitter}
+						disabled={riotStatus !== ESocialVerificationStatus.UNVERIFIED}
+						onClick={verifyRiot}
 						isLoading={loading}
 						size='sm'
 					>
-						{twitterStatus === ESocialVerificationStatus.PENDING ? 'Pending' : 'Verify'}
+						{riotStatus === ESocialVerificationStatus.PENDING ? t('SetIdentity.pending') : t('SetIdentity.verify')}
 					</Button>
 				)}
 			</div>
@@ -111,4 +109,4 @@ function TwitterVerification({ identityTwitter, twitterSocialHandle }: { identit
 	);
 }
 
-export default TwitterVerification;
+export default RiotVerification;

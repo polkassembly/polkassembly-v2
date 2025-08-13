@@ -93,6 +93,7 @@ function EditCartItem({ voteCartItem, onClose }: { voteCartItem: IVoteCartItem; 
 					<ConvictionSelector
 						onConvictionChange={setConviction}
 						defaultConviction={voteCartItem.conviction}
+						voteBalance={ayeNayValue}
 					/>
 				</div>
 			</div>

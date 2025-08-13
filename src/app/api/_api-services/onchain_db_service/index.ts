@@ -17,7 +17,9 @@ import {
 	IBountyUserActivity,
 	IDelegationStats,
 	EBountyStatus,
-	EVoteSortOptions
+	EVoteSortOptions,
+	EAnalyticsType,
+	EVotesDisplayType
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -101,7 +103,8 @@ export class OnChainDbService {
 		limit,
 		decision,
 		voterAddress,
-		orderBy
+		orderBy,
+		votesType
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -111,8 +114,9 @@ export class OnChainDbService {
 		decision?: EVoteDecision;
 		voterAddress?: string;
 		orderBy?: EVoteSortOptions;
+		votesType?: EVotesDisplayType;
 	}) {
-		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddress, orderBy });
+		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddress, orderBy, votesType });
 		if (postVoteData) return postVoteData;
 
 		return {
@@ -138,6 +142,16 @@ export class OnChainDbService {
 	static async GetPreimageListing({ network, page, limit }: { network: ENetwork; page: number; limit: number }) {
 		const preimageListing = await SubsquidService.GetPreimageListing({ network, page, limit });
 		if (preimageListing) return preimageListing;
+
+		return {
+			items: [],
+			totalCount: 0
+		};
+	}
+
+	static async GetPreimagesByAddress({ network, page, limit, address }: { network: ENetwork; page: number; limit: number; address: string }) {
+		const userPreimageListing = await SubsquidService.GetPreimagesByAddress({ network, page, limit, address });
+		if (userPreimageListing) return userPreimageListing;
 
 		return {
 			items: [],
@@ -308,5 +322,35 @@ export class OnChainDbService {
 		proposalType: EProposalType;
 	}) {
 		return SubsquidService.GetOnChainPostsByProposer({ network, proposer, page, limit, proposalType });
+	}
+
+	static async GetExtrinsicDetails({
+		network,
+		hash
+	}: {
+		network: ENetwork;
+		hash: string;
+	}): Promise<{ message: string; data: { account_id: string; params: { name: string; value: string }[] } }> {
+		return SubscanOnChainService.GetExtrinsicDetails({ network, hash });
+	}
+
+	static async GetPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }) {
+		return SubsquidService.GetPostAnalytics({ network, proposalType, index });
+	}
+
+	static async GetPostBubbleVotes({
+		network,
+		proposalType,
+		index,
+		analyticsType,
+		votesType
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		analyticsType: EAnalyticsType;
+		votesType: EVotesDisplayType;
+	}) {
+		return SubsquidService.GetPostBubbleVotes({ network, proposalType, index, analyticsType, votesType });
 	}
 }

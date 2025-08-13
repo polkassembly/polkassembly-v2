@@ -122,5 +122,17 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 		spendPeriodInBlocks: new BN(86400)
 	}, // Add Kusama specific configuration when needed
 	[ENetwork.WESTEND]: undefined, // Add Westend specific configuration when needed
-	[ENetwork.PASEO]: undefined // Add Paseo specific configuration when needed
+	[ENetwork.PASEO]: undefined, // Add Paseo specific configuration when needed
+	[ENetwork.CERE]: {
+		relayChainRpc: NETWORKS_DETAILS[ENetwork.CERE].rpcEndpoints[0].url,
+		treasuryAccount: '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY', // Default treasury account for Cere
+		assetHubRpc: '',
+		assetHubTreasuryAddress: '',
+		loanAmounts: {},
+		burnPercentage: {
+			numerator: new BN(0),
+			denominator: new BN(1)
+		}, // 0% of the treasury balance
+		spendPeriodInBlocks: new BN(14400)
+	}
 };

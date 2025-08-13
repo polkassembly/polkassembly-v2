@@ -1,7 +1,24 @@
 .header {
-	@apply flex w-full items-center justify-between;
+	@apply flex w-full flex-col gap-y-4 bg-bg_modal;
+}
+
+.header_container {
+	@apply mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 pt-5 lg:px-16;
 }
 
 .header_title {
 	@apply text-2xl font-bold text-navbar_title;
+}
+
+.header_tab {
+	@apply uppercase;
+}
+
+.hideScrollbar {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+	&::-webkit-scrollbar {
+		/* Chrome, Safari and Opera */
+		display: none;
+	}
 }
