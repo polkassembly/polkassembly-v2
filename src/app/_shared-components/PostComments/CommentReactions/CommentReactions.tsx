@@ -71,8 +71,8 @@ function CommentReactions({ commentData, disabled = false }: CommentReactionsPro
 								{reactionState.usersWhoLikedComment?.map((userWhoReacted: IPublicUser) => {
 									return userWhoReacted?.addresses?.[0] ? (
 										<Address
-											key={userWhoReacted.addresses?.[0]}
-											address={userWhoReacted.addresses?.[0]}
+											key={userWhoReacted?.addresses?.[0]}
+											address={userWhoReacted?.addresses?.[0]}
 											redirectToProfile
 											disableTooltip
 										/>
@@ -80,7 +80,7 @@ function CommentReactions({ commentData, disabled = false }: CommentReactionsPro
 										<Link
 											href={`/user/${userWhoReacted.username}`}
 											className='text-xs font-medium hover:underline'
-											key={userWhoReacted.addresses?.[0]}
+											key={userWhoReacted?.username}
 											target='_blank'
 											rel='noopener noreferrer'
 										>
@@ -116,16 +116,16 @@ function CommentReactions({ commentData, disabled = false }: CommentReactionsPro
 								{reactionState.usersWhoDislikedComment?.map((userWhoReacted: IPublicUser) => {
 									return userWhoReacted?.addresses?.[0] ? (
 										<Address
-											key={userWhoReacted.addresses?.[0]}
-											address={userWhoReacted.addresses?.[0]}
+											key={userWhoReacted?.addresses?.[0]}
+											address={userWhoReacted?.addresses?.[0]}
 											redirectToProfile
 											disableTooltip
 										/>
 									) : (
 										<Link
-											href={`/user/${userWhoReacted.username}`}
+											href={`/user/${userWhoReacted?.username}`}
 											className='text-xs font-medium hover:underline'
-											key={userWhoReacted.username}
+											key={userWhoReacted?.username}
 											target='_blank'
 											rel='noopener noreferrer'
 										>

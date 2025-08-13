@@ -85,16 +85,16 @@ function PostActions({ postData }: { postData: IPost }) {
 									{reactionState.usersWhoLikedPost?.map((userWhoReacted) => {
 										return userWhoReacted?.addresses?.[0] ? (
 											<Address
-												key={userWhoReacted.addresses?.[0]}
-												address={userWhoReacted.addresses?.[0]}
+												key={userWhoReacted?.addresses?.[0]}
+												address={userWhoReacted?.addresses?.[0]}
 												redirectToProfile
 												disableTooltip
 											/>
 										) : (
 											<Link
-												href={`/user/${userWhoReacted.username}`}
+												href={`/user/${userWhoReacted?.username}`}
 												className='text-xs font-medium hover:underline'
-												key={userWhoReacted.username}
+												key={userWhoReacted?.username}
 												target='_blank'
 												rel='noopener noreferrer'
 											>
