@@ -3,11 +3,12 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { IBeneficiaryInput, ENetwork } from '@/_shared/types';
 import { BN } from '@polkadot/util';
 
-export const groupBeneficiariesByAsset = (beneficiaries: IBeneficiaryInput[] | undefined | null, network: ENetwork): Record<string, BN> => {
-	if (!beneficiaries || !Array.isArray(beneficiaries) || !network || !NETWORKS_DETAILS[network as ENetwork]) {
+export const groupBeneficiariesByAssetIndex = ({ network, beneficiaries }: { beneficiaries?: IBeneficiaryInput[]; network: ENetwork }): Record<string, BN> => {
+	if (!beneficiaries || !Array.isArray(beneficiaries) || !ValidatorService.isValidNetwork(network)) {
 		return {};
 	}
 
