@@ -32,7 +32,6 @@ import { isMimirDetected } from './isMimirDetected';
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
 // const blockHeight = await apiService.getBlockHeight();
 
-const VOTE_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000812';
 export class PolkadotApiService {
 	private readonly network: ENetwork;
 
@@ -372,6 +371,38 @@ export class PolkadotApiService {
 		};
 	}
 
+	async switchNetwork(provider: ethers.BrowserProvider, targetChainId: number) {
+		const chainIdHex = `0x${targetChainId.toString(16)}`;
+
+		try {
+			await provider.send('wallet_switchEthereumChain', [{ chainId: chainIdHex }]);
+		} catch (switchError: any) {
+			if (switchError.code === 4902) {
+				const networkDetails = NETWORKS_DETAILS[this.network];
+
+				try {
+					await provider.send('wallet_addEthereumChain', [
+						{
+							chainId: chainIdHex,
+							chainName: networkDetails.name,
+							nativeCurrency: {
+								name: networkDetails.tokenSymbol,
+								symbol: networkDetails.tokenSymbol,
+								decimals: networkDetails.tokenDecimals
+							},
+							rpcUrls: networkDetails.rpcEndpoints.map((rpcEndpoint) => rpcEndpoint.url),
+							blockExplorerUrls: networkDetails.socialLinks?.[0]?.href || null
+						}
+					]);
+				} catch (addError) {
+					throw new Error(`Failed to add network to wallet: ${(addError as Error).message}`);
+				}
+			} else {
+				throw new Error(`Failed to switch network: ${switchError.message}`);
+			}
+		}
+	}
+
 	async voteReferendumEth({
 		onSuccess,
 		onFailed,
@@ -398,19 +429,23 @@ export class PolkadotApiService {
 		selectedWallet: EWallet;
 	}) {
 		const wallet = selectedWallet === EWallet.METAMASK ? window.ethereum : selectedWallet === EWallet.TALISMAN ? (window as any).talismanEth : window.SubWallet;
-		const web3 = new ethers.BrowserProvider(wallet);
+		let web3 = new ethers.BrowserProvider(wallet);
 		const { chainId: id } = await web3.getNetwork();
 		const chainId = Number(id.toString());
 		const networkChainId = NETWORKS_DETAILS[this.network].chainId;
 
-		if (chainId !== networkChainId) {
-			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Invalid network');
+		if (networkChainId && chainId !== networkChainId) {
+			await this.switchNetwork(web3, networkChainId);
+			web3 = new ethers.BrowserProvider(wallet);
 		}
 
 		const signer = await web3.getSigner();
+		const { voteContractAddress } = NETWORKS_DETAILS[this.network];
+		if (!voteContractAddress) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Vote contract address not found');
+		}
 
-		// Try the new contract first, fallback to old contract if it fails
-		const voteContract = new Contract(VOTE_CONTRACT_ADDRESS, moonbeamConvictionVotingAbi, signer);
+		const voteContract = new Contract(voteContractAddress, moonbeamConvictionVotingAbi, signer);
 		let tx;
 
 		try {
@@ -427,7 +462,7 @@ export class PolkadotApiService {
 			await tx.wait();
 			onSuccess();
 		} catch (error: unknown) {
-			onFailed((error as Error).message || 'Vote type not supported by old contract');
+			onFailed((error as Error).message || String(error) || 'Vote type not supported by old contract');
 		}
 	}
 

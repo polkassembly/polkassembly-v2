@@ -37,13 +37,15 @@ const VIA_DWELLIR = 'via Dwellir';
 const VIA_ONFINALITY = 'via On-finality';
 const VIA_IBP_GEODNS1 = 'via IBP-GeoDNS1';
 const VIA_IBP_GEODNS2 = 'via IBP-GeoDNS2';
-const VIA_RADIUMBLOCK = 'via RadiumBlock';
 const VIA_LUCKYFRIDAY = 'via LuckyFriday';
 const VIA_PINKNODE = 'via Pinknode';
-const VIA_AUTOMATA = 'via Automata 1RPC';
 const VIA_BLAST = 'via Blast';
 const VIA_MOONBEAM_FOUNDATION = 'via Moonbeam Foundation';
 const VIA_UNITEDBLOC = 'via UnitedBloc';
+const VIA_RADIUMBLOCK = 'via RadiumBlock';
+const VIA_ALLNODES = 'via Allnodes';
+const VIA_IBP1 = 'via IBP1';
+const VIA_IBP2 = 'via IBP2';
 
 interface ITreasuryAsset {
 	name: string;
@@ -133,11 +135,12 @@ interface INetworkDetails {
 	assetHubParaId?: string;
 	peopleChainParaId?: string;
 	convictionVotingPeriodInBlocks: BN;
-	chainId: number;
+	chainId?: number;
 	openGraphImage?: {
 		large: string;
 		small: string;
 	};
+	voteContractAddress?: string;
 }
 
 enum ENetworkSocial {
@@ -254,28 +257,40 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 		identityMinDeposit: new BN('100000000000'),
 		rpcEndpoints: [
 			{
-				name: 'via Automata 1RPC',
-				url: 'wss://1rpc.io/glmr'
+				name: VIA_DWELLIR,
+				url: 'wss://moonbeam-rpc.n.dwellir.com'
 			},
 			{
-				name: 'via Blast',
+				name: VIA_BLAST,
 				url: 'wss://moonbeam.public.blastapi.io'
 			},
 			{
-				name: 'via Dwellir',
-				url: 'wss://moonbeam-rpc.dwellir.com'
-			},
-			{
-				name: 'via Moonbeam Foundation',
+				name: VIA_MOONBEAM_FOUNDATION,
 				url: 'wss://wss.api.moonbeam.network'
 			},
 			{
-				name: 'via OnFinality',
+				name: VIA_ONFINALITY,
 				url: 'wss://moonbeam.api.onfinality.io/public-ws'
 			},
 			{
-				name: 'via UnitedBloc',
+				name: VIA_UNITEDBLOC,
 				url: 'wss://moonbeam.unitedbloc.com'
+			},
+			{
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://moonbeam.public.curie.radiumblock.co/ws'
+			},
+			{
+				name: VIA_ALLNODES,
+				url: 'wss://moonbeam-rpc.publicnode.com'
+			},
+			{
+				name: VIA_IBP1,
+				url: 'wss://moonbeam.ibp.network/'
+			},
+			{
+				name: VIA_IBP2,
+				url: 'wss://moonbeam.dotters.network'
 			}
 		]
 	}
@@ -348,6 +363,7 @@ const AUCTION_ADMIN_DESCRIPTION = 'Origin for starting auctions.';
 const REFERENDUM_CANCELLER_DESCRIPTION = 'Origin able to cancel referenda.';
 const REFERENDUM_KILLER_DESCRIPTION = 'Origin able to kill referenda.';
 const TREASURER_DESCRIPTION = 'Origin for spending (any amount of) funds until the upper limit of  10,000,000 DOT';
+const FAST_GENERAL_ADMIN_DESCRIPTION = 'Origin for fast general administrative matters';
 
 const NETWORK_TOKEN_DECIMALS: Record<ENetwork, number> = {
 	[ENetwork.POLKADOT]: 10,
@@ -2398,15 +2414,15 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 	[ENetwork.MOONBEAM]: {
 		[EPostOrigin.ROOT]: {
 			trackId: 0,
-			description: 'Origin for General network-wide improvements',
+			description: ROOT_ORIGIN_DESCRIPTION,
 			group: 'Main',
 			name: 'root',
 			maxDeciding: 5,
-			decisionDeposit: new BN('100000000000000000000000'),
-			preparePeriod: 7200,
-			decisionPeriod: 100800,
-			confirmPeriod: 7200,
-			minEnactmentPeriod: 7200,
+			decisionDeposit: new BN('2000000000000000000000000'),
+			preparePeriod: 14400,
+			decisionPeriod: 201600,
+			confirmPeriod: 14400,
+			minEnactmentPeriod: 14400,
 			minApproval: {
 				reciprocal: {
 					factor: 999999999,
@@ -2424,15 +2440,15 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		},
 		[EPostOrigin.WHITELISTED_CALLER]: {
 			trackId: 1,
-			description: 'Origin able to dispatch a whitelisted call.',
+			description: WHITELISTED_CALLER_DESCRIPTION,
 			group: 'Whitelist',
 			name: 'whitelisted_caller',
 			maxDeciding: 100,
-			decisionDeposit: new BN('10000000000000000000000'),
-			preparePeriod: 50,
-			decisionPeriod: 100800,
-			confirmPeriod: 50,
-			minEnactmentPeriod: 150,
+			decisionDeposit: new BN('200000000000000000000000'),
+			preparePeriod: 100,
+			decisionPeriod: 201600,
+			confirmPeriod: 100,
+			minEnactmentPeriod: 300,
 			minApproval: {
 				reciprocal: {
 					factor: 999999999,
@@ -2450,15 +2466,15 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		},
 		[EPostOrigin.GENERAL_ADMIN]: {
 			trackId: 2,
-			description: 'Origin for managing the registrar.',
-			group: 'Governance',
+			description: GENERAL_ADMIN_DESCRIPTION,
+			group: 'Admin',
 			name: 'general_admin',
 			maxDeciding: 10,
-			decisionDeposit: new BN('500000000000000000000'),
-			preparePeriod: 300,
-			decisionPeriod: 100800,
-			confirmPeriod: 7200,
-			minEnactmentPeriod: 7200,
+			decisionDeposit: new BN('10000000000000000000000'),
+			preparePeriod: 600,
+			decisionPeriod: 201600,
+			confirmPeriod: 14400,
+			minEnactmentPeriod: 14400,
 			minApproval: {
 				reciprocal: {
 					factor: 999999999,
@@ -2476,41 +2492,15 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		},
 		[EPostOrigin.REFERENDUM_CANCELLER]: {
 			trackId: 3,
-			description: 'Origin able to cancel referenda.',
-			group: 'Governance',
+			description: REFERENDUM_CANCELLER_DESCRIPTION,
+			group: 'Admin',
 			name: 'referendum_canceller',
 			maxDeciding: 20,
-			decisionDeposit: new BN('10000000000000000000000'),
-			preparePeriod: 300,
-			decisionPeriod: 100800,
-			confirmPeriod: 900,
-			minEnactmentPeriod: 50,
-			minApproval: {
-				reciprocal: {
-					factor: 999999999,
-					xOffset: 999999999,
-					yOffset: 0
-				}
-			},
-			minSupport: {
-				reciprocal: {
-					factor: 787400,
-					xOffset: 1572327,
-					yOffset: -786164
-				}
-			}
-		},
-		[EPostOrigin.REFERENDUM_KILLER]: {
-			trackId: 4,
-			description: 'Origin able to kill referenda.',
-			group: 'Governance',
-			name: 'referendum_killer',
-			maxDeciding: 100,
-			decisionDeposit: new BN('20000000000000000000000'),
-			preparePeriod: 300,
-			decisionPeriod: 100800,
-			confirmPeriod: 900,
-			minEnactmentPeriod: 50,
+			decisionDeposit: new BN('200000000000000000000000'),
+			preparePeriod: 600,
+			decisionPeriod: 201600,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
 			minApproval: {
 				reciprocal: {
 					factor: 999999999,
@@ -2523,6 +2513,58 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 					factor: 869501,
 					xOffset: 8620680,
 					yOffset: -862069
+				}
+			}
+		},
+		[EPostOrigin.REFERENDUM_KILLER]: {
+			trackId: 4,
+			description: REFERENDUM_KILLER_DESCRIPTION,
+			group: 'Admin',
+			name: 'referendum_killer',
+			maxDeciding: 100,
+			decisionDeposit: new BN('400000000000000000000000'),
+			preparePeriod: 600,
+			decisionPeriod: 201600,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 999999999,
+					xOffset: 999999999,
+					yOffset: 0
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 869501,
+					xOffset: 8620680,
+					yOffset: -862069
+				}
+			}
+		},
+		[EPostOrigin.FAST_GENERAL_ADMIN]: {
+			trackId: 5,
+			description: FAST_GENERAL_ADMIN_DESCRIPTION,
+			group: 'Admin',
+			name: 'fast_general_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('10000000000000000000000'),
+			preparePeriod: 600,
+			decisionPeriod: 201600,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 999999999,
+					xOffset: 999999999,
+					yOffset: 0
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 5799702,
+					xOffset: 11467891,
+					yOffset: -5733946
 				}
 			}
 		}
@@ -2644,7 +2686,14 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 	[ENetwork.WESTEND]: [],
 	[ENetwork.PASEO]: [],
 	[ENetwork.CERE]: [],
-	[ENetwork.MOONBEAM]: []
+	[ENetwork.MOONBEAM]: [
+		{
+			id: ENetworkSocial.SUBSCAN,
+			icon: SocialIcons.Subscan,
+			href: 'https://moonbeam.subscan.io/',
+			label: 'Subscan'
+		}
+	]
 } as const;
 
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
@@ -2663,7 +2712,6 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		subsquidUrl: 'https://squid.subsquid.io/polkadot-polkassembly/graphql',
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.POLKADOT],
 		tokenSymbol: 'DOT',
-		chainId: 0,
 		rpcEndpoints: [
 			{
 				name: `${VIA_PARITY} (recommended)`,
@@ -2750,7 +2798,6 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		},
 		foreignAssets: {},
 		tokenSymbol: 'KSM',
-		chainId: 0,
 		rpcEndpoints: [
 			{
 				name: VIA_ONFINALITY,
@@ -2802,7 +2849,6 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		subsquidUrl: 'https://polkassembly.squids.live/westend-polkassembly/graphql',
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.WESTEND],
 		tokenSymbol: 'WND',
-		chainId: 0,
 		rpcEndpoints: [
 			{
 				name: VIA_DWELLIR,
@@ -2860,7 +2906,6 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		subsquidUrl: 'https://polkassembly.squids.live/paseo-polkassembly@v1/api/graphql',
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.PASEO],
 		tokenSymbol: 'PAS',
-		chainId: 0,
 		rpcEndpoints: [
 			{
 				name: VIA_DWELLIR,
@@ -2907,7 +2952,6 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		subsquidUrl: 'https://polkassembly.squids.live/cere-polkassembly/graphql',
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.CERE],
 		tokenSymbol: 'BCERE',
-		chainId: 0,
 		rpcEndpoints: [
 			{
 				name: 'via Cere Network',
@@ -2936,16 +2980,12 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		chainId: 1284,
 		rpcEndpoints: [
 			{
-				name: VIA_AUTOMATA,
-				url: 'wss://1rpc.io/glmr'
+				name: VIA_DWELLIR,
+				url: 'wss://moonbeam-rpc.n.dwellir.com'
 			},
 			{
 				name: VIA_BLAST,
 				url: 'wss://moonbeam.public.blastapi.io'
-			},
-			{
-				name: VIA_DWELLIR,
-				url: 'wss://moonbeam-rpc.dwellir.com'
 			},
 			{
 				name: VIA_MOONBEAM_FOUNDATION,
@@ -2958,6 +2998,22 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 			{
 				name: VIA_UNITEDBLOC,
 				url: 'wss://moonbeam.unitedbloc.com'
+			},
+			{
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://moonbeam.public.curie.radiumblock.co/ws'
+			},
+			{
+				name: VIA_ALLNODES,
+				url: 'wss://moonbeam-rpc.publicnode.com'
+			},
+			{
+				name: VIA_IBP1,
+				url: 'wss://moonbeam.ibp.network/'
+			},
+			{
+				name: VIA_IBP2,
+				url: 'wss://moonbeam.dotters.network'
 			}
 		],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.MOONBEAM],
@@ -2965,6 +3021,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		convictionVotingPeriodInBlocks: new BN('100800'),
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.MOONBEAM],
 		supportedAssets: {},
-		foreignAssets: {}
+		foreignAssets: {},
+		voteContractAddress: '0x0000000000000000000000000000000000000812'
 	}
 } as const;
