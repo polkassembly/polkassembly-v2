@@ -7,7 +7,8 @@
 import { useState, useEffect } from 'react';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { getDateFromBlock } from '@/_shared/_utils/blockToTime';
+import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -26,14 +27,17 @@ interface UnlockVoteDetailCardProps {
 function UnlockVoteDetailCard({ vote, isSelected = true, onSelectionChange }: UnlockVoteDetailCardProps) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
+	const { apiService } = usePolkadotApiService();
 	const [lockedDate, setLockedDate] = useState<string | null>(null);
 
 	// Get locked date if available
 	useEffect(() => {
 		const fetchLockedDate = async () => {
-			if (!vote.lockedAtBlock) return;
+			if (!vote.lockedAtBlock || !apiService) return;
 			try {
-				const date = await getDateFromBlock(vote.lockedAtBlock, network);
+				const currentBlock = await apiService.getCurrentBlockHeight();
+				if (!currentBlock) return;
+				const date = await BlockCalculationsService.getDateFromBlock(vote.lockedAtBlock, network, currentBlock);
 				setLockedDate(date);
 			} catch (error) {
 				console.error('Error getting locked date:', error);
@@ -41,7 +45,7 @@ function UnlockVoteDetailCard({ vote, isSelected = true, onSelectionChange }: Un
 		};
 
 		fetchLockedDate();
-	}, [vote.lockedAtBlock, network]);
+	}, [vote.lockedAtBlock, network, apiService]);
 
 	const handleCheckboxChange = (checked: boolean) => {
 		if (onSelectionChange) {

@@ -8,7 +8,8 @@ import { BN_MAX_INTEGER } from '@polkadot/util';
 import { useState, useEffect } from 'react';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { getDateFromBlock } from '@/_shared/_utils/blockToTime';
+import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import Link from 'next/link';
 import Image from 'next/image';
 import ProposalUnlockIcon from '@assets/icons/create-proposal.svg';
@@ -25,14 +26,17 @@ interface LockVoteDetailCardProps {
 function LockVoteDetailCard({ vote, isNextUnlock }: LockVoteDetailCardProps) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
+	const { apiService } = usePolkadotApiService();
 	const [lockedDate, setLockedDate] = useState<string | null>(null);
 
 	// Get locked date if available
 	useEffect(() => {
 		const fetchLockedDate = async () => {
-			if (!vote.lockedAtBlock) return;
+			if (!vote.lockedAtBlock || !apiService) return;
 			try {
-				const date = await getDateFromBlock(vote.lockedAtBlock, network);
+				const currentBlock = await apiService.getCurrentBlockHeight();
+				if (!currentBlock) return;
+				const date = await BlockCalculationsService.getDateFromBlock(vote.lockedAtBlock, network, currentBlock);
 				setLockedDate(date);
 			} catch (error) {
 				console.error('Error getting locked date:', error);
@@ -40,7 +44,7 @@ function LockVoteDetailCard({ vote, isNextUnlock }: LockVoteDetailCardProps) {
 		};
 
 		fetchLockedDate();
-	}, [vote.lockedAtBlock, network]);
+	}, [vote.lockedAtBlock, network, apiService]);
 
 	// Get display text - unique to this component
 	const getDisplayText = () => {

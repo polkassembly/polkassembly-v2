@@ -52,4 +52,19 @@ export class BlockCalculationsService {
 		// Add time difference to current time to get target date
 		return dayjs(now).add(timeDiffMs, 'milliseconds').toDate();
 	}
+
+	// Get current block-based date for a historical block
+	// This version requires currentBlock to be passed to avoid dependency cycles
+	static async getDateFromBlock(targetBlock: BN | number, network: ENetwork, currentBlock: BN | number): Promise<string> {
+		const targetBlockNum = typeof targetBlock === 'number' ? targetBlock : Number(targetBlock);
+		const currentBlockNum = typeof currentBlock === 'number' ? currentBlock : Number(currentBlock);
+
+		const blockDiff = targetBlockNum - currentBlockNum;
+		const { totalSeconds } = this.getTimeForBlocks({ network, blocks: Math.abs(blockDiff) });
+
+		const now = dayjs();
+		const targetDate = blockDiff >= 0 ? now.add(totalSeconds, 'seconds') : now.subtract(totalSeconds, 'seconds');
+
+		return targetDate.format("DD MMM 'YY");
+	}
 }

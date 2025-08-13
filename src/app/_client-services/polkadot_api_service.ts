@@ -20,6 +20,7 @@ import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IPayout, ISelectedAccount, IVoteCartItem } from '@shared/types';
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
+import { getAllLockData } from '@/app/_client-utils/voteLockCalculations';
 import { BlockCalculationsService } from './block_calculations_service';
 
 // Usage:
@@ -1179,9 +1180,12 @@ export class PolkadotApiService {
 			// Process votes to get referendum IDs
 			const customizeVotes = votes
 				.map((vote, index) => {
-					if (!(vote as any).isCasting) return null;
-					const casting = (vote as any).asCasting;
-					return [unlocks[index][1], casting.votes.map(([refId]: any) => refId), casting];
+					const voteObj = vote as unknown as Record<string, unknown>;
+					if (!voteObj.isCasting) return null;
+					const casting = voteObj.asCasting as Record<string, unknown>;
+					if (!casting || !Array.isArray(casting.votes)) return null;
+					const votesArray = casting.votes as unknown[][];
+					return [unlocks[index]?.[1], votesArray.map((voteItem) => (Array.isArray(voteItem) ? voteItem[0] : null)).filter(Boolean), casting];
 				})
 				.filter((vote) => !!vote);
 
@@ -1204,10 +1208,17 @@ export class PolkadotApiService {
 
 			// Get referendum info for all refs
 			const referendas = await this.api.query.referenda.referendumInfoFor.multi(refParams);
-			const customizeReferenda = referendas.map((ref, index) => ((ref as any).isSome ? [refParams[index], (ref as any).unwrapOr(null)] : null)).filter((ref) => !!ref);
+			const customizeReferenda = referendas
+				.map((ref, index) => {
+					const refObj = ref as unknown as Record<string, unknown>;
+					if (!refObj.isSome || typeof refObj.unwrapOr !== 'function') return null;
+					const unwrapped = (refObj.unwrapOr as (fallback: unknown) => unknown)(null);
+					return [refParams[index], unwrapped];
+				})
+				.filter((ref) => !!ref);
 
 			// Process all lock data using V1 logic
-			const allLockData = PolkadotApiService.getAllLockData(customizeVotes as any[], customizeReferenda as [BN, any][], lockPeriod, convictionMultipliers);
+			const allLockData = getAllLockData(customizeVotes as any[], customizeReferenda as [BN, any][], lockPeriod, convictionMultipliers);
 
 			// Categorize votes based on current block
 			const lockedVotes: any[] = [];
@@ -1249,90 +1260,6 @@ export class PolkadotApiService {
 		}
 	}
 
-	private static getAllLockData(
-		votes: [track: BN, refIds: BN[], casting: any][],
-		referendas: [BN, any][],
-		lockPeriod: BN,
-		convictionMultipliers: number[]
-	): { endBlock: BN; locked: string; refId: BN; total: BN; track: BN }[] {
-		const locks: { endBlock: BN; locked: string; refId: BN; total: BN; track: BN }[] = [];
-
-		votes.forEach(([track, , casting]) => {
-			casting.votes.forEach(([refId, accountVote]: [BN, any]) => {
-				const referendaInfo = referendas.find(([id]) => Number(id) === Number(refId));
-				if (referendaInfo) {
-					const lockData = this.processVoteLock(refId, track, accountVote, referendaInfo[1], lockPeriod, convictionMultipliers);
-					if (lockData) {
-						locks.push(lockData);
-					}
-				}
-			});
-		});
-
-		return locks;
-	}
-
-	private static processVoteLock(
-		refId: BN,
-		track: BN,
-		accountVote: any,
-		tally: any,
-		lockPeriod: BN,
-		convictionMultipliers: number[]
-	): { endBlock: BN; locked: string; refId: BN; total: BN; track: BN } | null {
-		const totalBalance = this.calculateVoteBalance(accountVote);
-		if (!totalBalance) return null;
-
-		const { conviction, locked } = this.getConvictionInfo(accountVote, tally);
-		const endBlock = this.calculateEndBlock(tally, lockPeriod, convictionMultipliers, conviction);
-		if (!endBlock) return null;
-
-		return { endBlock, locked, refId, total: totalBalance, track };
-	}
-
-	private static calculateVoteBalance(accountVote: any): BN | null {
-		if (accountVote.isStandard) {
-			return accountVote.asStandard.balance;
-		}
-		if (accountVote.isSplitAbstain) {
-			const { abstain, aye, nay } = accountVote.asSplitAbstain;
-			return aye.add(nay).add(abstain);
-		}
-		if (accountVote.isSplit) {
-			const { aye, nay } = accountVote.asSplit;
-			return aye.add(nay);
-		}
-		return null;
-	}
-
-	private static getConvictionInfo(accountVote: any, tally: any): { conviction: number; locked: string } {
-		if (accountVote.isStandard) {
-			const { vote } = accountVote.asStandard;
-			if ((tally.isApproved && vote.isAye) || (tally.isRejected && vote.isNay)) {
-				return { conviction: vote.conviction.index, locked: vote.conviction.type };
-			}
-		}
-		return { conviction: 0, locked: 'None' };
-	}
-
-	private static calculateEndBlock(tally: any, lockPeriod: BN, convictionMultipliers: number[], conviction: number): BN | null {
-		if (tally.isOngoing) {
-			return BN_MAX_INTEGER;
-		}
-		if (tally.isKilled) {
-			return tally.asKilled;
-		}
-		if (tally.isCancelled || tally.isTimedOut) {
-			return tally.isCancelled ? tally.asCancelled[0] : tally.asTimedOut[0];
-		}
-		if (tally.isApproved || tally.isRejected) {
-			const finishedAt = tally.isApproved ? tally.asApproved[0] : tally.asRejected[0];
-			const lockBlocks = lockPeriod.muln(convictionMultipliers[conviction]);
-			return lockBlocks.add(finishedAt);
-		}
-		return null;
-	}
-
 	async unlockVotingTokens({
 		address,
 		unlockableVotes,
@@ -1371,11 +1298,11 @@ export class PolkadotApiService {
 				txs.push(this.api.tx.convictionVoting.unlock(track, address));
 			});
 
-			// Batch all transactions
-			const batchTx = this.api.tx.utility.batch(txs);
+			// Batch only if multiple transactions, otherwise execute single transaction
+			const tx = txs.length > 1 ? this.api.tx.utility.batchAll(txs) : txs[0];
 
 			await this.executeTx({
-				tx: batchTx,
+				tx,
 				address,
 				errorMessageFallback: 'Failed to unlock voting tokens',
 				onSuccess,
