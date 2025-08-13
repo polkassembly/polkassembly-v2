@@ -34,8 +34,6 @@ interface IBeneficiaryPayoutDetails extends IBeneficiary {
 	payoutExpiryMsg?: string;
 }
 
-const MAX_VISIBLE_BENEFICIARIES = 4;
-
 interface PayoutExpiryProps {
 	validFromBlock: number | null;
 	payoutExpiryMsg?: string;
@@ -44,10 +42,11 @@ interface TimeUnitOptions {
 	withUnitSpace?: boolean;
 	withPluralSuffix?: boolean;
 }
+const MAX_VISIBLE_BENEFICIARIES = 4;
 
 // Utility functions
 export const formatDate = (timestamp: Date | string): string => {
-	return dayjs(timestamp).format('MMM DD, YYYY');
+	return dayjs(timestamp).format('YYYY-MM-DD');
 };
 
 export const buildTimeUnit = (value: number, unit: string, options: TimeUnitOptions = {}): string | null => {
@@ -101,7 +100,7 @@ function PayoutExpiryDisplay({ validFromBlock, payoutExpiryMsg }: PayoutExpiryPr
 		return <Skeleton className='h-full w-[100px]' />;
 	}
 
-	const isPaid = payoutExpiryMsg.includes('Paid');
+	const isPaid = payoutExpiryMsg && !payoutExpiryMsg.includes('in');
 	const hasValidBlock = validFromBlock && subscanUrl;
 
 	if (isPaid && hasValidBlock) {
@@ -114,7 +113,7 @@ function PayoutExpiryDisplay({ validFromBlock, payoutExpiryMsg }: PayoutExpiryPr
 						className={cn(classes.beneficiariesExpireIn, 'flex items-center gap-1')}
 					>
 						{payoutExpiryMsg}
-						<SquareArrowOutUpRight className='h-3.5 w-3.5 text-text_pink' />
+						<SquareArrowOutUpRight className='ml-0.5 h-3.5 w-3.5 text-text_pink' />
 					</Link>
 				</TooltipTrigger>
 				<TooltipContent>
@@ -217,7 +216,7 @@ function BeneficiaryPayoutsList({ beneficiaries, usedInOnchainInfo }: Beneficiar
 			return beneficiaries.map((beneficiary) => ({
 				...beneficiary,
 				payoutExpiryMsg: beneficiary?.validFromBlock
-					? `${new BN(beneficiary.validFromBlock).gt(new BN(currentBlockHeight)) ? 'in' : 'Paid'} ${calculatePayoutExpiry(currentBlockHeight, Number(beneficiary.validFromBlock), network)}`
+					? `${new BN(beneficiary.validFromBlock).gt(new BN(currentBlockHeight)) ? 'in' : ''} ${calculatePayoutExpiry(currentBlockHeight, Number(beneficiary.validFromBlock), network)}`
 					: t('immediately')
 			}));
 		} catch (error) {

@@ -982,6 +982,10 @@ export class OffChainDbService {
 		if (!treasuryStats) {
 			return beneficiaries;
 		}
+
+		if (!treasuryStats[0]?.nativeTokenUsdPrice && !treasuryStats[0]?.dedTokenUsdPrice) {
+			return beneficiaries;
+		}
 		return beneficiaries?.map((beneficiary) => {
 			const assetSymbol = beneficiary.assetId
 				? (getAssetDataByIndexForNetwork({
@@ -989,14 +993,12 @@ export class OffChainDbService {
 						generalIndex: beneficiary.assetId
 					}).symbol as unknown as Exclude<EAssets, EAssets.MYTH>)
 				: null;
-			if (!treasuryStats[0].nativeTokenUsdPrice && !treasuryStats[0].dedTokenUsdPrice) {
-				return beneficiary;
-			}
+
 			const usdAmount = convertAssetToUSD({
 				amount: beneficiary.amount,
 				asset: assetSymbol,
-				currentTokenPrice: treasuryStats[0].nativeTokenUsdPrice || null,
-				dedTokenUSDPrice: treasuryStats[0].dedTokenUsdPrice || null,
+				currentTokenPrice: treasuryStats[0]?.nativeTokenUsdPrice,
+				dedTokenUSDPrice: treasuryStats[0]?.dedTokenUsdPrice,
 				network
 			})?.toString();
 

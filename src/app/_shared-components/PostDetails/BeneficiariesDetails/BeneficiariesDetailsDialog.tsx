@@ -20,7 +20,10 @@ interface BeneficiariesDetailsDialogProps {
 
 function BeneficiariesDetailsDialog({ open, onOpenChange, beneficiaries }: BeneficiariesDetailsDialogProps) {
 	const t = useTranslations('PostDetails.BeneficiariesDetails');
-	const totalUsdAmount = useMemo(() => beneficiaries.reduce((acc, beneficiary) => new BN(acc).add(new BN(beneficiary.usdAmount || 0)), BN_ZERO).toString(), [beneficiaries]);
+	const totalUsdAmount = useMemo(
+		() => beneficiaries?.reduce((acc, beneficiary) => (beneficiary ? new BN(acc).add(new BN(beneficiary.usdAmount || 0)) : acc), BN_ZERO).toString() || '0',
+		[beneficiaries]
+	);
 
 	return (
 		<Dialog

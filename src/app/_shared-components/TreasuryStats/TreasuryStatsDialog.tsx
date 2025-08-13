@@ -33,8 +33,8 @@ export const calculateTotalUSDValue = ({
 	network
 }: {
 	amountsDetails: { amount: string | null; asset: Exclude<EAssets, EAssets.MYTH> | null }[];
-	currentTokenPrice: string | null;
-	dedTokenUSDPrice?: string | null;
+	currentTokenPrice?: string;
+	dedTokenUSDPrice?: string;
 	network: ENetwork;
 }) => {
 	let totalUSD = BN_ZERO;
@@ -45,7 +45,7 @@ export const calculateTotalUSDValue = ({
 				amount,
 				asset,
 				currentTokenPrice,
-				dedTokenUSDPrice: dedTokenUSDPrice || null,
+				dedTokenUSDPrice,
 				network
 			});
 			totalUSD = totalUSD.add(assetUSDValue);
@@ -56,6 +56,8 @@ export const calculateTotalUSDValue = ({
 };
 
 function AssetRow({ amount, asset, prefix, network }: AssetRowProps) {
+	const assetId = Object.values(NETWORKS_DETAILS[`${network}`]?.supportedAssets)?.find((supportedAsset) => supportedAsset.symbol === asset)?.index;
+
 	return (
 		<div className='flex items-center gap-1 text-sm font-medium dark:text-white max-md:text-xs'>
 			<Image
@@ -73,12 +75,7 @@ function AssetRow({ amount, asset, prefix, network }: AssetRowProps) {
 			) : (
 				<span className='font-medium text-muted-foreground'>
 					{prefix || ''}
-					{formatBnBalance(
-						amount,
-						{ withUnit: true, numberAfterComma: 2, compactNotation: true },
-						network,
-						Object.values(NETWORKS_DETAILS[`${network}`]?.supportedAssets)?.find((supportedAsset) => supportedAsset.symbol === asset)?.index
-					)}
+					{formatBnBalance(amount, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network, assetId)}
 				</span>
 			)}
 		</div>
@@ -549,7 +546,7 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 	const { fellowshipAddress } = treasuryConfig;
 	const { assetHubTreasuryAddress } = treasuryConfig;
 	const { hydrationAddresses } = treasuryConfig;
-	const currentTokenPrice = data.nativeTokenUsdPrice || BN_ZERO?.toString();
+	const currentTokenPrice = data?.nativeTokenUsdPrice || BN_ZERO?.toString();
 
 	return (
 		<Dialog

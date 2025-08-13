@@ -16,8 +16,8 @@ export const convertAssetToUSD = ({
 }: {
 	amount: string;
 	asset: Exclude<EAssets, EAssets.MYTH> | null;
-	currentTokenPrice: string | null;
-	dedTokenUSDPrice: string | null;
+	currentTokenPrice?: string;
+	dedTokenUSDPrice?: string;
 	network: ENetwork;
 }): BN => {
 	if (!asset) {
