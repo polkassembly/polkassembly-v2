@@ -59,7 +59,7 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 	const [content, setContent] = useState<string>(commentData.content);
 
 	const user = useAtomValue(userAtom);
-	const [history, setHistory] = useState<ICommentHistoryItem[]>(commentData.history || []);
+	const [history, setHistory] = useState<ICommentHistoryItem[]>(commentData?.history || []);
 
 	const { toast } = useToast();
 
@@ -282,11 +282,11 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 						className='h-3'
 					/>
 					<CreatedAtTime createdAt={comment.updatedAt || comment.createdAt} />
-					{comment?.history && comment?.history?.length > 0 && (
+					{history && history?.length > 0 && (
 						<CommentHistory
 							authorAddress={addressToDisplay}
 							authorUsername={comment?.publicUser?.username}
-							history={[...comment.history, { content: comment.content, createdAt: comment.updatedAt || comment.createdAt }]}
+							history={[...history, { content: comment.content, createdAt: comment.updatedAt || comment.createdAt }]}
 						/>
 					)}
 					{comment.voteData && comment.voteData.length > 0 && (
