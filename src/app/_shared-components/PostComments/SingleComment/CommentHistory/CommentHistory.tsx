@@ -65,14 +65,7 @@ function CommentHistory({ authorAddress, authorUsername, history }: { authorAddr
 								{/* Content */}
 								<div className={classes.timelineContent}>
 									<div className='flex items-center gap-x-2'>
-										{authorAddress ? (
-											<Address
-												address={authorAddress}
-												showIdenticon={false}
-											/>
-										) : (
-											<span className='text-text_primary'>{authorUsername}</span>
-										)}
+										{authorAddress ? <Address address={authorAddress} /> : <span className='text-text_primary'>{authorUsername}</span>}
 										<Separator
 											orientation='vertical'
 											className='h-3'
