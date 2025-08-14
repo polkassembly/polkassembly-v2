@@ -457,6 +457,8 @@
 		"post": "Post",
 		"cancel": "Cancel",
 		"reply": "Reply",
+		"edited": "Edited",
+		"commentHistory": "Comment History",
 		"proposalPassed": "Proposal Passed",
 		"proposalFailed": "Proposal Failed",
 		"confirmationPeriod": "Confirmation Period",

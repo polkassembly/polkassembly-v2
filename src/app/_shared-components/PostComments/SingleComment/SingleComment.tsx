@@ -4,8 +4,9 @@
 
 'use client';
 
-import { ICommentResponse, ENotificationStatus } from '@/_shared/types';
+import { ICommentResponse, ENotificationStatus, ICommentHistoryItem } from '@/_shared/types';
 import { Dispatch, SetStateAction, useCallback, memo, useState, useRef, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Identicon from '@polkadot/react-identicon';
 import ReplyIcon from '@assets/icons/Vote.svg';
 import Image from 'next/image';
@@ -33,6 +34,9 @@ import Address from '../../Profile/Address/Address';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import VoteComments from '../VoteComments/VoteComments';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
+import { Skeleton } from '../../Skeleton';
+
+const CommentHistory = dynamic(() => import('./CommentHistory/CommentHistory'), { ssr: false, loading: () => <Skeleton className='h-8 w-16' /> });
 
 interface SingleCommentProps {
 	commentData: ICommentResponse;
@@ -55,6 +59,7 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 	const [content, setContent] = useState<string>(commentData.content);
 
 	const user = useAtomValue(userAtom);
+	const [history, setHistory] = useState<ICommentHistoryItem[]>(commentData.history || []);
 
 	const { toast } = useToast();
 
@@ -130,6 +135,10 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 		});
 		setIsEditing(false);
 
+		// create a new comment history item with the new content
+		const newHistory = [...history, { content, createdAt: new Date() }];
+		setHistory(newHistory);
+
 		setLoading(true);
 
 		const { data, error } = await CommentClientService.editCommentFromPost({
@@ -157,6 +166,8 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 				description: error?.message || 'Failed to edit comment',
 				status: ENotificationStatus.ERROR
 			});
+			// remove the new history item from the comment history array
+			setHistory((prev) => prev?.filter((item) => item.createdAt !== newHistory[newHistory.length - 1].createdAt) || []);
 		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -271,6 +282,13 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 						className='h-3'
 					/>
 					<CreatedAtTime createdAt={comment.updatedAt || comment.createdAt} />
+					{comment?.history && comment?.history?.length > 0 && (
+						<CommentHistory
+							authorAddress={addressToDisplay}
+							authorUsername={comment?.publicUser?.username}
+							history={[...comment.history, { content: comment.content, createdAt: comment.updatedAt || comment.createdAt }]}
+						/>
+					)}
 					{comment.voteData && comment.voteData.length > 0 && (
 						<>
 							<Separator

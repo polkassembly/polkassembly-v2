@@ -453,6 +453,8 @@
 		"post": "投稿",
 		"cancel": "キャンセル",
 		"reply": "返信",
+		"edited": "編集",
+		"commentHistory": "コメント履歴",
 		"proposalPassed": "提案が可決されました",
 		"proposalFailed": "提案が否決されました",
 		"confirmationPeriod": "確認期間",
