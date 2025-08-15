@@ -1,0 +1,23 @@
+.container {
+	@apply flex flex-col rounded-lg bg-info_bg;
+}
+
+.sectionTitle {
+	@apply flex items-center justify-between rounded-lg bg-info_bg px-4 py-2;
+}
+
+.titleIcon {
+	@apply flex items-center gap-2;
+}
+
+.titleLabel {
+	@apply text-sm font-medium text-text_primary;
+}
+
+.balanceValue {
+	@apply text-lg font-semibold text-text_primary;
+}
+
+.collapsibleContent {
+	@apply px-4 pb-2 pt-0;
+}
