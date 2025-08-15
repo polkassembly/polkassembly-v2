@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EVoteDecision, ENotificationStatus, ISelectedAccount, EPostOrigin, EProposalType } from '@/_shared/types';
+import { EVoteDecision, ENotificationStatus, EPostOrigin, EProposalType, IVoteData, EReactQueryKeys } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -12,13 +12,14 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useToast } from '@/hooks/useToast';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { cn } from '@/lib/utils';
+import { Ban, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { Button } from '../../Button';
 import BalanceInput from '../../BalanceInput/BalanceInput';
 import ChooseVote from './ChooseVote/ChooseVote';
@@ -27,6 +28,7 @@ import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAdd
 import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelationsPicker';
 import Address from '../../Profile/Address/Address';
 import AddComment from '../../PostComments/AddComment/AddComment';
+import classes from '../PostDetails.module.scss';
 
 function VoteSuccessContent({
 	decision,
@@ -111,10 +113,23 @@ function VoteSuccessContent({
 	);
 }
 
-function VoteReferendum({ index, track, onClose, proposalType }: { index: string; track?: EPostOrigin; onClose: () => void; proposalType: EProposalType }) {
+function VoteReferendum({
+	index,
+	track,
+	onClose,
+	proposalType,
+	existingVote
+}: {
+	index: string;
+	track?: EPostOrigin;
+	onClose: () => void;
+	proposalType: EProposalType;
+	existingVote?: IVoteData;
+}) {
 	const { userPreferences } = useUserPreferences();
 	const [voteDecision, setVoteDecision] = useState(EVoteDecision.AYE);
 	const t = useTranslations();
+	const queryClient = useQueryClient();
 	const [balance, setBalance] = useState<BN>(BN_ZERO);
 	const [ayeVoteValue, setAyeVoteValue] = useState<BN>(BN_ZERO);
 	const [nayVoteValue, setNayVoteValue] = useState<BN>(BN_ZERO);
@@ -201,17 +216,14 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 
 		if (isInvalidAmount) return;
 
+		const userAddress = userPreferences.selectedAccount.address;
+
 		try {
-			const getRegularAddress = (selectedAccount: ISelectedAccount): string => {
-				if (selectedAccount.parent) {
-					return getRegularAddress(selectedAccount.parent);
-				}
-				return selectedAccount.address;
-			};
 			setIsLoading(true);
+
 			await apiService.voteReferendum({
 				selectedAccount: userPreferences.selectedAccount,
-				address: getRegularAddress(userPreferences.selectedAccount),
+				address: userAddress,
 				onSuccess: () => {
 					toast({
 						title: t('VoteReferendum.voteSuccessTitle'),
@@ -219,13 +231,30 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 						status: ENotificationStatus.SUCCESS
 					});
 					setIsLoading(false);
+
+					// Optimistic update - immediately update cache with new vote on success
+					const optimisticVoteData = {
+						decision: voteDecision,
+						balanceValue: balance.toString(),
+						voterAddress: userAddress,
+						lockPeriod: conviction,
+						createdAt: new Date(),
+						selfVotingPower: balance.toString(),
+						totalVotingPower: balance.toString(),
+						delegatedVotingPower: '0'
+					};
+
+					queryClient.setQueryData([EReactQueryKeys.USER_VOTES, proposalType, index, userPreferences.selectedAccount?.address], {
+						votes: [optimisticVoteData]
+					});
+
 					onClose();
 					setOpenSuccessModal(true);
 					setSuccessModalContent(
 						<VoteSuccessContent
 							decision={voteDecision}
 							balance={balance}
-							address={userPreferences.selectedAccount ? getRegularAddress(userPreferences.selectedAccount) : ''}
+							address={userAddress}
 							conviction={conviction}
 							proposalType={proposalType}
 							index={index}
@@ -357,6 +386,33 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 					</div>
 				</div>
 			</div>
+			{existingVote && (
+				<div className='flex flex-col gap-y-3 rounded-xl bg-info_bg p-4'>
+					<p className='text-sm font-semibold text-text_primary'>{t('VoteReferendum.existingVote')}</p>
+					<p className='text-sm text-basic_text'>{t('VoteReferendum.existingVoteDescription')}</p>
+					<div className={classes.userVoteCardLayout}>
+						<h3 className={classes.userVoteCardTitleIcon}>
+							{existingVote.decision === 'abstain' && <Ban className='h-4 w-4 text-basic_text' />}
+							{existingVote.decision === 'aye' && <ThumbsUp className='h-4 w-4 text-basic_text' />}
+							{existingVote.decision === 'nay' && <ThumbsDown className='h-4 w-4 text-basic_text' />}
+							{t(`PostDetails.${existingVote.decision}`)}
+						</h3>
+
+						<p className='text-sm text-basic_text'>
+							{formatBnBalance(
+								existingVote.selfVotingPower || '0',
+								{
+									withUnit: true,
+									numberAfterComma: 2,
+									compactNotation: true
+								},
+								network
+							)}{' '}
+							({!existingVote.lockPeriod || existingVote.lockPeriod === 0 ? 0.1 : existingVote.lockPeriod}x)
+						</p>
+					</div>
+				</div>
+			)}
 			<div className='flex items-center justify-end gap-x-4'>
 				<Button
 					disabled={isInvalidAmount}
