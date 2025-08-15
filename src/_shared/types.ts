@@ -16,7 +16,8 @@ export enum ENetwork {
 	WESTEND = 'westend',
 	PASEO = 'paseo',
 	CERE = 'cere',
-	MOONBEAM = 'moonbeam'
+	MOONBEAM = 'moonbeam',
+	MOONRIVER = 'moonriver'
 }
 
 export enum EGovType {

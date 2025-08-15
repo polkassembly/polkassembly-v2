@@ -24,6 +24,7 @@ import USDTIcon from '@/_assets/icons/usdt.svg';
 import MYTHIcon from '@/_assets/icons/myth.svg';
 import DEDIcon from '@/_assets/icons/ded.png';
 import MoonbeamLogo from '@assets/parachain-logos/moonbeam-logo.png';
+import MoonriverLogo from '@assets/parachain-logos/moonriver-logo.png';
 
 interface ISocialLink {
 	id: string;
@@ -293,6 +294,15 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 				url: 'wss://moonbeam.dotters.network'
 			}
 		]
+	},
+	[ENetwork.MOONRIVER]: {
+		identityMinDeposit: new BN('100000000000'),
+		rpcEndpoints: [
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://moonriver-rpc.n.dwellir.com'
+			}
+		]
 	}
 } as const;
 
@@ -371,7 +381,8 @@ const NETWORK_TOKEN_DECIMALS: Record<ENetwork, number> = {
 	[ENetwork.WESTEND]: 12,
 	[ENetwork.PASEO]: 10,
 	[ENetwork.CERE]: 10,
-	[ENetwork.MOONBEAM]: 18
+	[ENetwork.MOONBEAM]: 18,
+	[ENetwork.MOONRIVER]: 18
 } as const;
 
 // TODO: update for other networks than polkadot
@@ -2568,6 +2579,164 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 				}
 			}
 		}
+	},
+	[ENetwork.MOONRIVER]: {
+		[EPostOrigin.ROOT]: {
+			trackId: 0,
+			description: ROOT_ORIGIN_DESCRIPTION,
+			group: 'Main',
+			name: 'root',
+			maxDeciding: 5,
+			decisionDeposit: new BN('100000000000000000000000'),
+			preparePeriod: 14400,
+			decisionPeriod: 201600,
+			confirmPeriod: 14400,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				reciprocal: {
+					factor: 999999999,
+					xOffset: 999999999,
+					yOffset: 0
+				}
+			},
+			minSupport: {
+				linearDecreasing: {
+					length: 1000000000,
+					floor: 5000000,
+					ceil: 250000000
+				}
+			}
+		},
+		[EPostOrigin.WHITELISTED_CALLER]: {
+			trackId: 1,
+			description: WHITELISTED_CALLER_DESCRIPTION,
+			group: 'Privileged',
+			name: 'whitelisted_caller',
+			maxDeciding: 100,
+			decisionDeposit: new BN('10000000000000000000000'),
+			preparePeriod: 100,
+			decisionPeriod: 201600,
+			confirmPeriod: 100,
+			minEnactmentPeriod: 300,
+			minApproval: {
+				reciprocal: {
+					factor: 999999999,
+					xOffset: 999999999,
+					yOffset: 0
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 60061,
+					xOffset: 2994150,
+					yOffset: -59882
+				}
+			}
+		},
+		[EPostOrigin.GENERAL_ADMIN]: {
+			trackId: 2,
+			description: GENERAL_ADMIN_DESCRIPTION,
+			group: 'Admin',
+			name: 'general_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('500000000000000000000'),
+			preparePeriod: 600,
+			decisionPeriod: 201600,
+			confirmPeriod: 14400,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				reciprocal: {
+					factor: 999999999,
+					xOffset: 999999999,
+					yOffset: 0
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 222222224,
+					xOffset: 333333335,
+					yOffset: -166666668
+				}
+			}
+		},
+		[EPostOrigin.REFERENDUM_CANCELLER]: {
+			trackId: 3,
+			description: REFERENDUM_CANCELLER_DESCRIPTION,
+			group: 'Emergency',
+			name: 'referendum_canceller',
+			maxDeciding: 20,
+			decisionDeposit: new BN('10000000000000000000000'),
+			preparePeriod: 600,
+			decisionPeriod: 201600,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 999999999,
+					xOffset: 999999999,
+					yOffset: 0
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 869501,
+					xOffset: 8620680,
+					yOffset: -862069
+				}
+			}
+		},
+		[EPostOrigin.REFERENDUM_KILLER]: {
+			trackId: 4,
+			description: REFERENDUM_KILLER_DESCRIPTION,
+			group: 'Emergency',
+			name: 'referendum_killer',
+			maxDeciding: 100,
+			decisionDeposit: new BN('20000000000000000000000'),
+			preparePeriod: 600,
+			decisionPeriod: 201600,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 999999999,
+					xOffset: 999999999,
+					yOffset: 0
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 869501,
+					xOffset: 8620680,
+					yOffset: -862069
+				}
+			}
+		},
+		[EPostOrigin.FAST_GENERAL_ADMIN]: {
+			trackId: 5,
+			description: FAST_GENERAL_ADMIN_DESCRIPTION,
+			group: 'Admin',
+			name: 'fast_general_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('500000000000000000000'),
+			preparePeriod: 600,
+			decisionPeriod: 201600,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 999999999,
+					xOffset: 999999999,
+					yOffset: 0
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 5799702,
+					xOffset: 11467891,
+					yOffset: -5733946
+				}
+			}
+		}
 	}
 } as const;
 
@@ -2693,7 +2862,8 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 			href: 'https://moonbeam.subscan.io/',
 			label: 'Subscan'
 		}
-	]
+	],
+	[ENetwork.MOONRIVER]: []
 } as const;
 
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
@@ -3020,6 +3190,65 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		socialLinks: networkSocialLinks[ENetwork.MOONBEAM],
 		convictionVotingPeriodInBlocks: new BN('100800'),
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.MOONBEAM],
+		supportedAssets: {},
+		foreignAssets: {},
+		voteContractAddress: '0x0000000000000000000000000000000000000812'
+	},
+	[ENetwork.MOONRIVER]: {
+		key: ENetwork.MOONRIVER,
+		logo: MoonriverLogo,
+		submissionDeposit: new BN('10000000000'),
+		name: 'Moonriver',
+		govtype: EGovType.OPENGOV,
+		palletInstance: '50',
+		blockTime: 6000,
+		ss58Format: 1285,
+		subsquidUrl: 'https://polkassembly.squids.live/moonriver-polkassembly/graphql',
+		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.MOONRIVER],
+		tokenSymbol: 'MOVR',
+		chainId: 1285,
+		rpcEndpoints: [
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://moonriver-rpc.n.dwellir.com'
+			},
+			{
+				name: VIA_BLAST,
+				url: 'wss://moonriver.public.blastapi.io'
+			},
+			{
+				name: VIA_MOONBEAM_FOUNDATION,
+				url: 'wss://wss.api.moonriver.moonbeam.network'
+			},
+			{
+				name: VIA_ONFINALITY,
+				url: 'wss://moonriver.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_UNITEDBLOC,
+				url: 'wss://moonriver.unitedbloc.com'
+			},
+			{
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://moonriver.public.curie.radiumblock.co/ws'
+			},
+			{
+				name: VIA_ALLNODES,
+				url: 'wss://moonriver-rpc.publicnode.com'
+			},
+			{
+				name: VIA_IBP1,
+				url: 'wss://moonriver.ibp.network/'
+			},
+			{
+				name: VIA_IBP2,
+				url: 'wss://moonriver.dotters.network'
+			}
+		],
+		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.MOONRIVER],
+		socialLinks: networkSocialLinks[ENetwork.MOONRIVER],
+		convictionVotingPeriodInBlocks: new BN('100800'),
+		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.MOONRIVER],
 		supportedAssets: {},
 		foreignAssets: {},
 		voteContractAddress: '0x0000000000000000000000000000000000000812'
