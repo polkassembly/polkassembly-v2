@@ -37,9 +37,11 @@ import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 interface SingleCommentProps {
 	commentData: ICommentResponse;
 	setParentComment?: Dispatch<SetStateAction<ICommentResponse | null>>;
+	setComments?: Dispatch<SetStateAction<ICommentResponse[]>>;
+	parentCommentId?: string;
 }
 
-function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
+function SingleComment({ commentData, setParentComment, setComments, parentCommentId }: SingleCommentProps) {
 	const { proposalType, indexOrHash: index } = commentData;
 
 	const [reply, setReply] = useState<boolean>(false);
@@ -99,9 +101,21 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 					children: prev.children?.filter((child) => child.id !== comment.id)
 				};
 			});
+			setComments?.((prev) => {
+				if (!prev) return [];
+				const parentComment = prev.find((c) => c.id === parentCommentId);
+				if (!parentComment) return prev;
+				return [...prev.filter((c) => c.id !== parentCommentId), { ...parentComment, children: parentComment.children?.filter((c) => c.id !== comment.id) }];
+			});
 		} else {
 			setComment(null);
 		}
+		setComments?.((prev) => prev?.filter((c) => c.id !== comment.id));
+		toast({
+			title: 'Success!',
+			description: 'Comment deleted successfully',
+			status: ENotificationStatus.SUCCESS
+		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [comment, index, proposalType, setParentComment, user]);
 
@@ -157,7 +171,13 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 				description: error?.message || 'Failed to edit comment',
 				status: ENotificationStatus.ERROR
 			});
+			return;
 		}
+		toast({
+			title: 'Success!',
+			description: 'Comment edited successfully',
+			status: ENotificationStatus.SUCCESS
+		});
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [comment, content, index, proposalType, user]);
@@ -445,6 +465,8 @@ function SingleComment({ commentData, setParentComment }: SingleCommentProps) {
 									key={item.id}
 									commentData={item}
 									setParentComment={setComment}
+									setComments={setComments}
+									parentCommentId={parentCommentId || comment.id}
 								/>
 							))}
 					</div>
