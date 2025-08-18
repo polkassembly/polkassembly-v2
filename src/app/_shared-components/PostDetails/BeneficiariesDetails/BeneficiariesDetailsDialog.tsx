@@ -34,7 +34,7 @@ function BeneficiariesDetailsDialog({ open, onOpenChange, beneficiaries }: Benef
 				<DialogHeader>
 					<DialogTitle className='text-text_primary'>{t('requestedAmountDetails')}</DialogTitle>
 				</DialogHeader>
-				{!beneficiaries.length ? (
+				{!beneficiaries?.length ? (
 					<BeneficiariesSkeleton usedInDialog />
 				) : (
 					<div>
