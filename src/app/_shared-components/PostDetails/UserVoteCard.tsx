@@ -33,9 +33,10 @@ interface UserVoteCardProps {
 	voteData: IVoteHistoryData;
 	track?: EPostOrigin;
 	existingVote?: IVoteData;
+	loginAddress?: string;
 }
 
-function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData, track, existingVote }: UserVoteCardProps) {
+function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData, track, existingVote, loginAddress }: UserVoteCardProps) {
 	const t = useTranslations();
 	const [openRemoveConfirmModal, setOpenRemoveConfirmModal] = useState(false);
 	const network = getCurrentNetwork();
@@ -55,12 +56,12 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 	};
 
 	const handleRemoveVote = async () => {
-		if (!apiService || !userPreferences.selectedAccount?.address) return;
+		if (!apiService || !loginAddress) return;
 
 		try {
 			setIsRemoving(true);
 			await apiService.removeReferendumVote({
-				address: userPreferences.selectedAccount.address,
+				address: loginAddress,
 				referendumId: Number(index),
 				selectedAccount: userPreferences.selectedAccount,
 				onSuccess: () => {
@@ -69,7 +70,7 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 						description: t('PostDetails.voteRemoved'),
 						status: ENotificationStatus.SUCCESS
 					});
-					queryClient.invalidateQueries({ queryKey: [EReactQueryKeys.USER_VOTES, proposalType, index, userPreferences.selectedAccount?.address] });
+					queryClient.invalidateQueries({ queryKey: [EReactQueryKeys.USER_VOTES, proposalType, index, loginAddress] });
 					setOpenRemoveConfirmModal(false);
 				},
 				onFailed: (errorMessage) => {

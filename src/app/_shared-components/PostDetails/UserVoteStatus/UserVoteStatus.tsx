@@ -57,6 +57,7 @@ function UserVoteStatus({ index, btnClassName, size = 'lg', track, proposalType 
 			btnClassName={btnClassName}
 			track={track}
 			existingVote={hasVoted ? voteData?.votes[0] : undefined}
+			loginAddress={selectedAddress}
 		/>
 	) : (
 		<VoteReferendumButton
