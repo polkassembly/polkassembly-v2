@@ -28,7 +28,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import Link from 'next/link';
 import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
 import { ArrowLeftIcon, ChevronsRight } from 'lucide-react';
-import { getPostDetailsUrl } from '@/app/_client-utils/getPostDetailsUrl';
+import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import classes from './PostHeader.module.scss';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
@@ -80,7 +80,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 							className='mx-1 h-3 w-[2px]'
 						/>
 						<Link
-							href={getPostDetailsUrl({ proposalType: postData.linkedPost?.proposalType, proposalId: Number(postData.linkedPost?.indexOrHash), network })}
+							href={getPostTypeUrl({ proposalType: postData.linkedPost?.proposalType, indexOrHash: Number(postData.linkedPost?.indexOrHash), network })}
 							className='flex items-center gap-x-1 text-xs text-listing_page_btn hover:underline'
 						>
 							<span className='text-text_secondary'>{t(`PostDetails.ProposalType.${postData.linkedPost.proposalType.toLowerCase()}`)}</span>

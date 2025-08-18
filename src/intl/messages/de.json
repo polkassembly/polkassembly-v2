@@ -106,14 +106,16 @@
 		"hidePassword": "Passwort verbergen",
 		"showPassword": "Passwort anzeigen",
 		"pleaseConnectWallet": "Bitte verbinden Sie Ihre Brieftasche mit Polkassembly.",
-		"pleaseCheckConnectedAccounts": "Bitte überprüfen Sie die verbundenen Konten in der Erweiterung."
+		"pleaseCheckConnectedAccounts": "Bitte überprüfen Sie die verbundenen Konten in der Erweiterung.",
+		"linkedAccount": "Verknüpftes Konto"
 	},
 	"AddressRelationsPicker": {
 		"Switch": "Wechseln",
 		"switchWallet": "Wallet wechseln",
 		"noData": "Keine",
 		"found": "gefunden",
-		"confirm": "Bestätigen"
+		"confirm": "Bestätigen",
+		"noAccountSelected": "Konto auswählen"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Finanzvorschlag",
@@ -164,7 +166,7 @@
 		"Delegations": {
 			"noDelegations": "Keine Delegationen gefunden",
 			"delegation": "Delegation",
-			"receivedDelegations": "Empfangene Delegationen",
+			"delegators": "Delegierte",
 			"delegatedDelegations": "Delegierte Delegationen",
 			"delegatedBy": "Delegierte von",
 			"delegatedTo": "Delegierte an",
@@ -433,6 +435,7 @@
 	"PostDetails": {
 		"castVote": "Abstimmen",
 		"castYourVote": "Geben Sie Ihre Stimme ab",
+		"copyLink": "Link kopieren",
 		"loginToVote": "Zum Abstimmen anmelden",
 		"requested": "Angefordert",
 		"beneficiary": "Begünstigter",
@@ -470,6 +473,18 @@
 		"account": "Konto",
 		"abstain": "Enthaltung",
 		"onchainInfo": "Onchain-Informationen",
+		"nestedVotes": "Verschachtelte Abstimmungen",
+		"flattenedVotes": "Ebene Abstimmungen",
+		"Poll": {
+			"endsOn": "Endet am",
+			"endedOn": "Endet am",
+			"noVotes": "Keine Abstimmungen gefunden",
+			"anonVotes": "Anonyme Abstimmungen",
+			"viewPollVotes": "Abstimmungen anzeigen",
+			"pollVotesList": "Abstimmungsliste",
+			"seeMore": "Mehr anzeigen",
+			"seeLess": "Weniger anzeigen"
+		},
 		"VotesBubble": {
 			"nested": "Verschachtelt",
 			"flattened": "Eben",
@@ -483,6 +498,17 @@
 			"nay": "Nein",
 			"abstain": "Enthaltung",
 			"noVotesFound": "Keine Abstimmungen gefunden"
+		},
+		"VotesData": {
+			"Votes": "Abstimmungen",
+			"bubble": "Blase",
+			"graph": "Graph",
+			"voteHistory": "Abstimmungsverlauf (Verschachtelt und Ebene)",
+			"votes": "Abstimmungen",
+			"voteGraph": "Abstimmungsgraph",
+			"voteBubble": "Abstimmungsblase",
+			"nestedVotes": "Verschachtelte Abstimmungen",
+			"flattenedVotes": "Ebene Abstimmungen"
 		},
 		"Analytics": {
 			"totalVotesCasted": "Gesamte Abstimmungen",
@@ -554,13 +580,13 @@
 		"delegatedVotes": "Delegierende Abstimmungen",
 		"delegatedVotingPower": "Delegierende Stimmgewicht",
 		"delegationList": "Delegationsliste",
+		"threshold": "Schwelle",
+		"onlyVerifiedCommentsVisible": "Kommentare sind auf Konten mit einer On-Chain verifizierten Identität beschränkt.",
 		"VoteCurves": {
 			"approval": "Zustimmung",
 			"support": "Unterstützung",
-			"threshold": "Schwellenwert",
-			"votingData": "Abstimmungsdaten"
+			"threshold": "Schwellenwert"
 		},
-		"threshold": "Schwelle",
 		"DecisionDeposit": {
 			"description": "Hinterlegen Sie innerhalb von 14 Tagen eine erstattungsfähige Kaution, um zu verhindern, dass der Vorschlag ausläuft.",
 			"details": "Details",
@@ -582,7 +608,14 @@
 			"payoutClaimFailedDescription": "Bitte versuchen Sie es erneut"
 		},
 		"commentsDisabled": "Die Kommentare wurden für diesen Beitrag deaktiviert.",
-		"commentsDisabledForNonVerifiedUsers": "Kommentare wurden für nicht verifizierte Benutzer deaktiviert."
+		"commentsDisabledForNonVerifiedUsers": "Kommentare wurden für nicht verifizierte Benutzer deaktiviert.",
+		"RefundDeposits": {
+			"refund": "Rückerstattung",
+			"refundDeposits": "Einlagen zurückerstatten",
+			"description": "Klicken Sie hier, um die Einlage für diesen Vorschlag zurückzuerstatten",
+			"decisionDeposit": "Entscheidungskaution",
+			"submissionDeposit": "Einreichungskaution"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "Abgebrochen",
@@ -670,8 +703,8 @@
 		"ayeVoteValue": "Ja-Stimmwert",
 		"nayVoteValue": "Nein-Stimmwert",
 		"confirm": "Bestätigen",
-		"voteSuccess": "Ihre Abstimmung wurde erfolgreich abgegeben",
-		"voteFailed": "Ihre Abstimmung wurde nicht erfolgreich abgegeben",
+		"voteSuccess": "Ihre Stimme wurde erfolgreich abgegeben",
+		"voteFailed": "Ihre Stimme wurde nicht erfolgreich abgegeben",
 		"voteSuccessTitle": "Abstimmung erfolgreich",
 		"voteFailedTitle": "Abstimmung fehlgeschlagen",
 		"delegatedPower": "Delegierte Macht",
@@ -680,14 +713,17 @@
 		"voted": "Abgestimmt",
 		"successfully": "erfolgreich",
 		"with": "mit",
-		"yourVoteIsIn": "Ihre Stimme ist abgegeben! Möchten Sie in einem Kommentar mitteilen, warum Sie dies unterstützen?",
+		"yourVoteIsIn": "Ihre Stimme ist eingegangen! Möchten Sie in einem Kommentar erklären, warum Sie dafür sind?",
 		"your": "Ihre",
-		"voteIsIn": "Stimme ist abgegeben! Möchten Sie in einem Kommentar mitteilen, warum Sie dies unterstützen?"
+		"voteIsIn": "Stimme ist eingegangen! Möchten Sie in einem Kommentar erklären, warum Sie dafür sind?",
+		"reuseGovernanceLock": "Governance-Sperre wiederverwenden",
+		"reuseAllLocks": "Alle Sperren wiederverwenden"
 	},
 	"Balance": {
 		"voteBalance": "Abstimmungsguthaben",
 		"Balance": "Guthaben",
-		"PeopleChainBalance": "People Chain Guthaben"
+		"PeopleChainBalance": "People Chain Guthaben",
+		"VotingBalance": "Abstimmungsguthaben"
 	},
 	"EditPost": {
 		"edit": "Bearbeiten",
@@ -719,6 +755,10 @@
 	"Preimages": {
 		"hash": "Hash",
 		"author": "Autor",
+		"all": "Alle",
+		"myPreimages": "Meine Preimages",
+		"noUserPreimages": "Sie haben keine Preimages!",
+		"createOneNow": "Erstellen Sie jetzt einen!",
 		"deposit": "Einzahlung",
 		"arguments": "Argumente",
 		"size": "Größe",
@@ -735,7 +775,16 @@
 		"unnoted_description": "Das Preimage wurde nicht notiert",
 		"failed": "Fehlgeschlagen",
 		"unrequest": "Anforderung zurückziehen",
-		"unnote": "Notiz entfernen"
+		"unnote": "Notiz entfernen",
+		"unnoteOrUnrequestPreimageDescription": "Sind Sie sicher, dass Sie dieses Preimage unnotieren oder die Anfrage zurückziehen möchten?",
+		"loadingYourPreimages": "Lade Ihre Preimages...",
+		"please": "Bitte",
+		"toViewPreimages": "um Ihre Preimages zu sehen",
+		"logIn": "anmelden",
+		"failedToFetchUserPreimages": "Fehler beim Abrufen der Benutzer-Preimages",
+		"tryAgain": "Erneut versuchen",
+		"showingPreimagesFor": "Zeige Preimages für:",
+		"switchWallet": "Wallet wechseln"
 	},
 	"Create": {
 		"createDiscussionTitle": "Diskussion erstellen",
@@ -766,11 +815,30 @@
 			"failedToUploadImage": "Bild konnte nicht hochgeladen werden"
 		},
 		"AllowedCommentors": {
+			"advanced": "Erweitert",
 			"title": "Wer kann kommentieren?",
 			"all": "Alle",
 			"onchainVerified": "Onchain verifiziert",
 			"none": "Niemand",
 			"tooltip": "Wählen Sie aus, wer diesen Beitrag kommentieren und beantworten kann"
+		},
+		"AddPoll": {
+			"addPoll": "Abstimmung hinzufügen",
+			"title": "Titel",
+			"options": "Optionen",
+			"titleRequired": "Bitte geben Sie einen gültigen Titel ein.",
+			"settings": "Einstellungen",
+			"anonymousPolls": "Anonyme Abstimmungen (Name der Abstimmenden wird nicht sichtbar sein)",
+			"maskedPolls": "Maskierte Abstimmungen (Ergebnis wird nur angezeigt, wenn ein Benutzer auf die Abstimmung abgestimmt hat)",
+			"addAnotherOption": "Weitere Option hinzufügen..",
+			"optionsRequired": "Mindestens {min} Optionen müssen ausgefüllt werden",
+			"maxOptions": "Maximale {max} Optionen erlaubt",
+			"pollEndsIn": "Abstimmung endet in",
+			"optionDuplicated": "Diese Option ist doppelt",
+			"optionsDuplicated": "Abstimmungsoptionen können nicht doppelt sein",
+			"endDateRequired": "Bitte wählen Sie ein Enddatum für die Abstimmung",
+			"endDateInFuture": "Das Enddatum der Abstimmung muss in der Zukunft liegen",
+			"titlePlaceholder": "Abstimmungstitel eingeben"
 		},
 		"Topic": {
 			"general": "Allgemein",
@@ -1120,9 +1188,9 @@
 		"delegate": "Delegierte",
 		"noBio": "Keine Bio",
 		"readMore": "Weiterlesen",
-		"votingPower": "Stimmgewicht",
+		"maxDelegated": "Max Delegated",
 		"votedProposals": "Abgestimmte Vorschläge",
-		"receivedDelegations": "Empfangene Delegationen",
+		"delegators": "Delegierende",
 		"past30Days": "Letzte 30 Tage",
 		"trendingDelegates": "Trendende Delegierte",
 		"pleaseLoginToContinue": "Bitte melden Sie sich an, um fortzufahren",
@@ -1344,6 +1412,11 @@
 		"teleportFundsToPeopleChainFailedDescription": "Beim Teleportieren der Mittel zur People Chain ist ein Fehler aufgetreten",
 		"BeneficiaryAddress": "Begünstigten-Adresse",
 		"Amount": "Betrag"
+	},
+	"ConvictionSelector": {
+		"votes": "Stimmen",
+		"lockingPeriod": "Sperrfrist",
+		"lockingPeriodDescription": "Ihre {tokenSymbol} bleiben nach der Abstimmung für zusätzliche Zeit gesperrt, abhängig vom gewählten Multiplikator."
 	},
 	"Judgements": {
 		"judgement": "Urteil",

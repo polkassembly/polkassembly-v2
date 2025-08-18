@@ -27,8 +27,6 @@ import {
 	ESocial,
 	IFollowEntry,
 	ITag,
-	EAllowedCommentor,
-	EOffChainPostTopic,
 	IBountyStats,
 	IBountyUserActivity,
 	IVoteCartItem,
@@ -50,10 +48,13 @@ import {
 	EVoteSortOptions,
 	EHttpHeaderKey,
 	IPostLink,
+	ICreateOffChainPostPayload,
+	IPollVote,
+	EAllowedCommentor,
 	IPostAnalytics,
 	IPostBubbleVotes,
 	EAnalyticsType,
-	EPostBubbleVotesType,
+	EVotesDisplayType,
 	IJudgementStats,
 	IJudgementListingResponse,
 	IRegistrarsListingResponse
@@ -68,6 +69,7 @@ import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { ClientError } from '../_client-utils/clientError';
 import { getNetworkFromHeaders } from '../api/_api-utils/getNetworkFromHeaders';
 import { redisServiceSSR } from '../api/_api-utils/redisServiceSSR';
+import { isMimirDetected } from './isMimirDetected';
 
 type Method = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
@@ -75,6 +77,8 @@ enum EApiRoute {
 	WEB2_LOGIN = 'WEB2_LOGIN',
 	WEB2_SIGNUP = 'WEB2_SIGNUP',
 	WEB3_LOGIN = 'WEB3_LOGIN',
+	REMARK_LOGIN = 'REMARK_LOGIN',
+	GET_REMARK_LOGIN_MESSAGE = 'GET_REMARK_LOGIN_MESSAGE',
 	REFRESH_ACCESS_TOKEN = 'REFRESH_ACCESS_TOKEN',
 	USER_EXISTS = 'USER_EXISTS',
 	TFA_LOGIN = 'TFA_LOGIN',
@@ -96,6 +100,7 @@ enum EApiRoute {
 	FETCH_USER_ACTIVITY = 'FETCH_USER_ACTIVITY',
 	GET_ON_CHAIN_METADATA_FOR_POST = 'GET_ON_CHAIN_METADATA_FOR_POST',
 	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
+	FETCH_USER_PREIMAGES = 'FETCH_USER_PREIMAGES',
 	DELETE_COMMENT = 'DELETE_COMMENT',
 	EDIT_COMMENT = 'EDIT_COMMENT',
 	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
@@ -136,7 +141,10 @@ enum EApiRoute {
 	GET_VOTE_CURVES = 'GET_VOTE_CURVES',
 	GET_CONTENT_SUMMARY = 'GET_CONTENT_SUMMARY',
 	GET_TRACK_ANALYTICS = 'GET_TRACK_ANALYTICS',
-	GET_USER_POSTS = 'GET_USER_POSTS',
+	GET_USER_POSTS_BY_ADDRESS = 'GET_USER_POSTS_BY_ADDRESS',
+	GET_POLL_VOTES = 'GET_POLL_VOTES',
+	ADD_POLL_VOTE = 'ADD_POLL_VOTE',
+	DELETE_POLL_VOTE = 'DELETE_POLL_VOTE',
 	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
 	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES',
 	FETCH_JUDGEMENT_STATS = 'FETCH_JUDGEMENT_STATS',
@@ -179,6 +187,9 @@ export class NextApiClientService {
 			case EApiRoute.REFRESH_ACCESS_TOKEN:
 				path = '/auth/refresh-access-token';
 				break;
+			case EApiRoute.GET_REMARK_LOGIN_MESSAGE:
+				path = '/auth/web3-auth/remark';
+				break;
 			case EApiRoute.GENERATE_QR_SESSION:
 				path = '/auth/qr-session';
 				break;
@@ -193,6 +204,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.FETCH_PREIMAGES:
 				path = '/preimages';
+				break;
+			case EApiRoute.FETCH_USER_PREIMAGES:
+				path = '/users/address';
 				break;
 			case EApiRoute.FETCH_ALL_TAGS:
 				path = '/meta/tags';
@@ -210,7 +224,7 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_ADDRESS_RELATIONS:
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
-			case EApiRoute.GET_USER_POSTS:
+			case EApiRoute.GET_USER_POSTS_BY_ADDRESS:
 				path = '/users/address';
 				break;
 
@@ -240,6 +254,17 @@ export class NextApiClientService {
 			case EApiRoute.GET_VOTE_CURVES:
 			case EApiRoute.GET_POST_ANALYTICS:
 			case EApiRoute.GET_POST_BUBBLE_VOTES:
+				break;
+
+			case EApiRoute.GET_POLL_VOTES:
+				method = 'GET';
+				break;
+
+			case EApiRoute.ADD_POLL_VOTE:
+				method = 'POST';
+				break;
+			case EApiRoute.DELETE_POLL_VOTE:
+				method = 'DELETE';
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
 				path = '/track-analytics';
@@ -281,6 +306,10 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.WEB2_SIGNUP:
 				path = '/auth/web2-auth/signup';
+				method = 'POST';
+				break;
+			case EApiRoute.REMARK_LOGIN:
+				path = '/auth/web3-auth/remark';
 				method = 'POST';
 				break;
 			case EApiRoute.WEB3_LOGIN:
@@ -392,11 +421,15 @@ export class NextApiClientService {
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
 		const currentNetwork = await this.getCurrentNetwork();
 
+		// Detect if we're in an iframe and specifically from Mimir
+		const isMimir = await isMimirDetected();
+
 		const response = await fetch(url, {
 			body: JSON.stringify(data),
 			credentials: 'include',
 			headers: {
 				...(!global.window ? await getCookieHeadersServer() : {}),
+				...(isMimir ? { 'x-iframe-context': 'mimir' } : {}),
 				[EHttpHeaderKey.CONTENT_TYPE]: 'application/json',
 				[EHttpHeaderKey.API_KEY]: getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
 				[EHttpHeaderKey.NETWORK]: currentNetwork,
@@ -432,6 +465,17 @@ export class NextApiClientService {
 	protected static async web3LoginOrSignupApi({ address, signature, wallet }: { address: string; signature: string; wallet: EWallet }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.WEB3_LOGIN });
 		return this.nextApiClientFetch<IAuthResponse>({ url, method, data: { address, signature, wallet } });
+	}
+
+	protected static async remarkLoginApi({ address, wallet, remarkHash }: { address: string; wallet: EWallet; remarkHash: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.REMARK_LOGIN });
+		return this.nextApiClientFetch<IAuthResponse>({ url, method, data: { address, wallet, remarkHash } });
+	}
+
+	protected static async getRemarkLoginMessageApi({ address }: { address: string }) {
+		const queryParams = new URLSearchParams({ address });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_REMARK_LOGIN_MESSAGE, queryParams });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
 	protected static async checkForUsernameAndEmailApi({ email, username }: { email: string; username: string }) {
@@ -592,12 +636,14 @@ export class NextApiClientService {
 		proposalType,
 		index,
 		content,
-		parentCommentId
+		parentCommentId,
+		authorAddress
 	}: {
 		proposalType: EProposalType;
 		index: string;
 		content: string;
 		parentCommentId?: string;
+		authorAddress?: string;
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_COMMENT, routeSegments: [proposalType, index, 'comments'] });
 		return this.nextApiClientFetch<IComment>({
@@ -605,7 +651,8 @@ export class NextApiClientService {
 			method,
 			data: {
 				content,
-				parentCommentId
+				parentCommentId,
+				authorAddress
 			}
 		});
 	}
@@ -626,19 +673,22 @@ export class NextApiClientService {
 		index,
 		page,
 		decision,
-		orderBy
+		orderBy,
+		votesType
 	}: {
 		proposalType: EProposalType;
 		index: string;
 		page: number;
 		decision: EVoteDecision;
 		orderBy: EVoteSortOptions;
+		votesType: EVotesDisplayType;
 	}) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: DEFAULT_LISTING_LIMIT.toString(),
 			decision,
-			orderBy
+			orderBy,
+			votesType
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_HISTORY, routeSegments: [proposalType, index, 'votes'], queryParams });
 		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });
@@ -837,6 +887,20 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IPreimage>({ url, method });
 	}
 
+	static async fetchUserPreimages({ page, address }: { page: number; address: string }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: PREIMAGES_LISTING_LIMIT.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.FETCH_USER_PREIMAGES,
+			routeSegments: [address, 'preimages'],
+			queryParams
+		});
+		return this.nextApiClientFetch<IGenericListingResponse<IPreimage>>({ url, method });
+	}
+
 	protected static async generateQRSessionApi() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GENERATE_QR_SESSION });
 		return this.nextApiClientFetch<IQRSessionPayload>({ url, method });
@@ -855,26 +919,16 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { tags } });
 	}
 
-	static async createOffChainPost({
-		proposalType,
-		allowedCommentor,
-		content,
-		title,
-		tags,
-		topic
-	}: {
-		proposalType: EProposalType;
-		content: string;
-		title: string;
-		allowedCommentor: EAllowedCommentor;
-		tags?: ITag[];
-		topic?: EOffChainPostTopic;
-	}) {
+	static async createOffChainPost({ proposalType, allowedCommentor, content, title, tags, topic, poll }: ICreateOffChainPostPayload) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new ClientError(ERROR_CODES.CLIENT_ERROR, ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 		}
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_OFFCHAIN_POST, routeSegments: [proposalType] });
-		return this.nextApiClientFetch<{ message: string; data: { id: string; index: number } }>({ url, method, data: { content, title, allowedCommentor, tags, topic } });
+		return this.nextApiClientFetch<{ message: string; data: { id: string; index: number } }>({
+			url,
+			method,
+			data: { content, title, allowedCommentor, tags, topic, poll }
+		});
 	}
 
 	static async fetchLeaderboardApi({ page, limit }: { page: number; limit?: number }) {
@@ -1098,13 +1152,28 @@ export class NextApiClientService {
 		};
 	}
 
-	static async getUserPosts({ address, page, limit }: { address: string; page: number; limit: number }) {
+	static async getUserPostsByAddress({ address, page, limit }: { address: string; page: number; limit: number }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: limit.toString()
 		});
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS, routeSegments: [address, 'posts'], queryParams });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS_BY_ADDRESS, routeSegments: [address, 'posts'], queryParams });
 		return this.nextApiClientFetch<IUserPosts>({ url, method });
+	}
+
+	static async addPollVote({ proposalType, index, pollId, decision }: { proposalType: EProposalType; index: number; pollId: string; decision: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_POLL_VOTE, routeSegments: [proposalType, index.toString(), 'poll', pollId, 'votes'] });
+		return this.nextApiClientFetch<{ vote: IPollVote }>({ url, method, data: { decision } });
+	}
+
+	static async deletePollVote({ proposalType, index, pollId }: { proposalType: EProposalType; index: number; pollId: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.DELETE_POLL_VOTE, routeSegments: [proposalType, index.toString(), 'poll', pollId, 'votes'] });
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	static async getPollVotes({ proposalType, index, pollId }: { proposalType: EProposalType; index: number; pollId: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POLL_VOTES, routeSegments: [proposalType, index.toString(), 'poll', pollId, 'votes'] });
+		return this.nextApiClientFetch<{ votes: IPollVote[] }>({ url, method });
 	}
 
 	static async getPostAnalytics({ proposalType, index }: { proposalType: EProposalType; index: string }) {
@@ -1121,7 +1190,7 @@ export class NextApiClientService {
 		proposalType: EProposalType;
 		index: string;
 		analyticsType: EAnalyticsType;
-		votesType: EPostBubbleVotesType;
+		votesType: EVotesDisplayType;
 	}) {
 		const queryParams = new URLSearchParams({
 			analyticsType: analyticsType ? analyticsType.toString() : '',

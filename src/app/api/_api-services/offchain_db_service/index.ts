@@ -37,7 +37,8 @@ import {
 	IDelegate,
 	ESocialVerificationStatus,
 	ESocial,
-	IPostLink
+	IPostLink,
+	IOffChainPollPayload
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -138,6 +139,9 @@ export class OffChainDbService {
 			post = await SubsquareOffChainService.GetOffChainPostData({ network, indexOrHash, proposalType });
 		}
 
+		// 3. get poll
+		const poll = await FirestoreService.GetPollForPost({ network, index: Number(indexOrHash), proposalType });
+
 		const firestorePostMetricsPromise = FirestoreService.GetPostMetrics({ network, indexOrHash, proposalType, linkedPost: post?.linkedPost });
 		const subsquarePostMetricsPromise = SubsquareOffChainService.GetPostMetrics({ network, indexOrHash, proposalType, linkedPost: post?.linkedPost });
 
@@ -154,7 +158,8 @@ export class OffChainDbService {
 		if (post) {
 			return {
 				...post,
-				metrics: postMetrics
+				metrics: postMetrics,
+				...(poll && { poll })
 			};
 		}
 
@@ -172,7 +177,8 @@ export class OffChainDbService {
 			metrics: postMetrics,
 			allowedCommentor: EAllowedCommentor.ALL,
 			isDeleted: false,
-			isDefaultContent: true
+			isDefaultContent: true,
+			poll
 		} as IOffChainPost;
 	}
 
@@ -413,6 +419,7 @@ export class OffChainDbService {
 		metadata?: IActivityMetadata;
 		subActivityName?: EActivityName;
 		commentId?: string;
+		authorAddress?: string;
 	}): Promise<void> {
 		const activity: IUserActivity = {
 			id: '', // Firestore service class will generate this
@@ -518,7 +525,8 @@ export class OffChainDbService {
 		userId,
 		content,
 		parentCommentId,
-		sentiment
+		sentiment,
+		authorAddress
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -527,6 +535,7 @@ export class OffChainDbService {
 		content: string;
 		parentCommentId?: string;
 		sentiment?: ECommentSentiment;
+		authorAddress?: string;
 	}) {
 		// check if the post is allowed to be commented on
 		const post = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
@@ -535,7 +544,7 @@ export class OffChainDbService {
 		}
 		// TODO: implement on-chain check
 
-		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, sentiment });
+		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, sentiment, authorAddress });
 
 		await this.saveUserActivity({
 			userId,
@@ -543,7 +552,7 @@ export class OffChainDbService {
 			network,
 			proposalType,
 			indexOrHash,
-			metadata: { commentId: comment.id, ...(parentCommentId && { parentCommentId }) }
+			metadata: { commentId: comment.id, ...(parentCommentId && { parentCommentId }), ...(authorAddress && { authorAddress }) }
 		});
 
 		await FirestoreService.UpdateLastCommentAtPost({ network, indexOrHash, proposalType, lastCommentAt: comment.createdAt });
@@ -656,7 +665,8 @@ export class OffChainDbService {
 		title,
 		allowedCommentor,
 		tags,
-		topic
+		topic,
+		poll
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -666,6 +676,7 @@ export class OffChainDbService {
 		allowedCommentor: EAllowedCommentor;
 		tags?: ITag[];
 		topic?: EOffChainPostTopic;
+		poll?: IOffChainPollPayload;
 	}) {
 		if (!ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type for an off-chain post');
@@ -678,6 +689,10 @@ export class OffChainDbService {
 		// Create tags
 		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag.value))) {
 			await this.CreateTags(tags);
+		}
+
+		if (poll) {
+			await FirestoreService.CreatePoll({ network, proposalType, index, poll });
 		}
 
 		// create content summary
@@ -769,7 +784,7 @@ export class OffChainDbService {
 				indexOrHash
 			});
 		} else {
-			await FirestoreService.UpdatePost({ id: offChainPostData.id, content, title, allowedCommentor: offChainPostData.allowedCommentor, linkedPost });
+			await FirestoreService.UpdatePost({ id: offChainPostData.id, content, title, allowedCommentor: allowedCommentor || offChainPostData.allowedCommentor, linkedPost });
 		}
 	}
 
@@ -928,5 +943,31 @@ export class OffChainDbService {
 
 	static async DeleteContentSummary({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
 		return FirestoreService.DeleteContentSummary({ network, proposalType, indexOrHash });
+	}
+
+	static async CreatePollVote({
+		network,
+		proposalType,
+		index,
+		userId,
+		pollId,
+		selectedOption
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		userId: number;
+		pollId: string;
+		selectedOption: string;
+	}) {
+		return FirestoreService.CreatePollVote({ network, proposalType, index, userId, pollId, selectedOption });
+	}
+
+	static async DeletePollVote({ userId, pollId }: { userId: number; pollId: string }) {
+		return FirestoreService.DeletePollVote({ userId, pollId });
+	}
+
+	static async GetPollVotes({ network, proposalType, index, pollId }: { network: ENetwork; proposalType: EProposalType; index: number; pollId: string }) {
+		return FirestoreService.GetPollVotes({ network, proposalType, index, pollId });
 	}
 }

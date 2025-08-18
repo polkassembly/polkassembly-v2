@@ -33,7 +33,7 @@ function Posts({ addresses }: { addresses: string[] }) {
 	const [selectedPosts, setSelectedPosts] = useState<EPostsType>(EPostsType.OPEN_GOV);
 
 	const fetchUserPosts = async () => {
-		const { data: userPostsData, error: userPostsError } = await NextApiClientService.getUserPosts({
+		const { data: userPostsData, error: userPostsError } = await NextApiClientService.getUserPostsByAddress({
 			address: getEncodedAddress(selectedAddress, network) || '',
 			page,
 			limit: DEFAULT_LISTING_LIMIT
@@ -115,7 +115,10 @@ function Posts({ addresses }: { addresses: string[] }) {
 					</Button>
 				</div>
 				{isFetching ? (
-					<Skeleton className={classes.postsHeaderSkeleton} />
+					<div className='mt-6 flex w-full flex-col gap-y-0.5'>
+						<Skeleton className={classes.postsHeaderSkeleton} />
+						<Skeleton className={classes.postsHeaderSkeleton} />
+					</div>
 				) : (
 					<div className='w-full'>
 						<div className='mt-6 w-full'>

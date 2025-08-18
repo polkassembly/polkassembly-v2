@@ -106,14 +106,16 @@
 		"hidePassword": "Hide Password",
 		"showPassword": "Show Password",
 		"pleaseConnectWallet": "Please connect your wallet to Polkassembly.",
-		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension."
+		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension.",
+		"linkedAccount": "Linked Account"
 	},
 	"AddressRelationsPicker": {
 		"Switch": "Switch",
 		"switchWallet": "Switch Wallet",
 		"noData": "No",
 		"found": "found",
-		"confirm": "Confirm"
+		"confirm": "Confirm",
+		"noAccountSelected": "Select an account"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Treasury Proposal",
@@ -168,7 +170,7 @@
 		"Delegations": {
 			"noDelegations": "No Delegations Found",
 			"delegation": "Delegation",
-			"receivedDelegations": "Received Delegations",
+			"delegators": "Delegators",
 			"index": "Index",
 			"delegatedDelegations": "Delegated",
 			"delegatedBy": "Delegated By",
@@ -438,6 +440,7 @@
 		"edit": "Edit",
 		"castVote": "Cast Vote",
 		"castYourVote": "Cast Your Vote",
+		"copyLink": "Copy Link",
 		"loginToVote": "Login to Vote",
 		"requested": "Requested",
 		"beneficiary": "Beneficiary",
@@ -498,6 +501,17 @@
 			"abstain": "Abstain",
 			"noVotesFound": "No votes found"
 		},
+		"VotesData": {
+			"Votes": "Votes",
+			"bubble": "Bubble",
+			"graph": "Graph",
+			"voteHistory": "Vote History (Nested and Flattened)",
+			"votes": "Votes",
+			"voteGraph": "Vote Graph",
+			"voteBubble": "Vote Bubble",
+			"nestedVotes": "Nested Votes",
+			"flattenedVotes": "Flattened Votes"
+		},
 		"Analytics": {
 			"totalVotesCasted": "Total Votes Casted",
 			"delegatedVsSolo": "Delegated Vs Solo",
@@ -530,6 +544,18 @@
 		},
 		"commentsDisabled": "Comments have been disabled for this post.",
 		"commentsDisabledForNonVerifiedUsers": "Comments have been disabled for non verified users.",
+		"Poll": {
+			"endsOn": "Ends on",
+			"endedOn": "Ended on",
+			"noVotes": "No votes yet",
+			"anonVotes": "Anon Votes",
+			"viewPollVotes": "View Poll Votes",
+			"pollVotesList": "Poll Votes List",
+			"seeMore": "See More",
+			"seeLess": "See Less"
+		},
+		"nestedVotes": "Nested Votes",
+		"flattenedVotes": "Flattened Votes",
 		"OnchainInfo": {
 			"metadata": "Metadata",
 			"table": "Table",
@@ -589,11 +615,11 @@
 		"delegatedVotingPower": "Delegated Voting Power",
 		"delegationList": "Delegation list",
 		"threshold": "Threshold",
+		"onlyVerifiedCommentsVisible": "Comments are restricted to accounts with an on-chain verified identity.",
 		"VoteCurves": {
 			"approval": "Approval",
 			"support": "Support",
-			"threshold": "Threshold",
-			"votingData": "Voting Data"
+			"threshold": "Threshold"
 		},
 		"DecisionDeposit": {
 			"description": "Place refundable deposit within 14 days to prevent proposal from timing out.",
@@ -614,6 +640,13 @@
 			"payoutClaimFailed": "Payout claim failed",
 			"payoutClaimedSuccessfullyDescription": "Your payout has been claimed successfully",
 			"payoutClaimFailedDescription": "Please try again"
+		},
+		"RefundDeposits": {
+			"refund": "Refund",
+			"refundDeposits": "Refund Deposits",
+			"description": "Click here to refund the deposit for this proposal",
+			"decisionDeposit": "Decision Deposit",
+			"submissionDeposit": "Submission Deposit"
 		}
 	},
 	"ListingPage_Status": {
@@ -720,12 +753,15 @@
 		"with": "with",
 		"yourVoteIsIn": "Your vote is in! Mind sharing why you support this in a comment?",
 		"your": "Your",
-		"voteIsIn": "vote is in! Mind sharing why you support this in a comment?"
+		"voteIsIn": "vote is in! Mind sharing why you support this in a comment?",
+		"reuseGovernanceLock": "Reuse Governance Lock",
+		"reuseAllLocks": "Reuse All Locks"
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance",
 		"Balance": "Balance",
-		"PeopleChainBalance": "People Chain Balance"
+		"PeopleChainBalance": "People Chain Balance",
+		"VotingBalance": "Voting Balance"
 	},
 	"EditPost": {
 		"edit": "Edit",
@@ -770,6 +806,10 @@
 	"Preimages": {
 		"hash": "Hash",
 		"author": "Author",
+		"all": "All",
+		"myPreimages": "My Preimages",
+		"noUserPreimages": "You have no preimages!",
+		"createOneNow": "Create one now!",
 		"deposit": "Deposit",
 		"arguments": "Arguments",
 		"size": "Size",
@@ -787,7 +827,15 @@
 		"failed": "Failed",
 		"unrequest": "Unrequest",
 		"unnote": "Unnote",
-		"unnoteOrUnrequestPreimageDescription": "Are you sure you want to unnote or unrequest this preimage?"
+		"unnoteOrUnrequestPreimageDescription": "Are you sure you want to unnote or unrequest this preimage?",
+		"loadingYourPreimages": "Loading your preimages...",
+		"please": "Please",
+		"toViewPreimages": "to view your preimages",
+		"logIn": "log in",
+		"failedToFetchUserPreimages": "Failed to fetch user preimages",
+		"tryAgain": "Try again",
+		"showingPreimagesFor": "Showing preimages for:",
+		"switchWallet": "Switch Wallet"
 	},
 	"Create": {
 		"createDiscussionTitle": "Create Discussion",
@@ -817,7 +865,26 @@
 			"insertImage": "Insert Image",
 			"failedToUploadImage": "Failed to upload image"
 		},
+		"AddPoll": {
+			"addPoll": "Add Poll",
+			"title": "Title",
+			"options": "Options",
+			"titleRequired": "Please provide a valid title.",
+			"settings": "Settings",
+			"anonymousPolls": "Anonymous polls (Voters’ name will not be visible)",
+			"maskedPolls": "Masked Polls (Result is only shown after a user has voted on the poll)",
+			"addAnotherOption": "Add Another Option..",
+			"pollEndsIn": "Poll ends in",
+			"optionDuplicated": "This option is duplicated",
+			"optionsDuplicated": "Poll options cannot be duplicated",
+			"optionsRequired": "At least {min} options must be filled",
+			"maxOptions": "Maximum {max} options allowed",
+			"endDateRequired": "Please select an end date for the poll",
+			"endDateInFuture": "Poll end date must be in the future",
+			"titlePlaceholder": "Enter poll title"
+		},
 		"AllowedCommentors": {
+			"advanced": "Advanced",
 			"title": "Who can comment ?",
 			"all": "All",
 			"onchainVerified": "Onchain Verified",
@@ -1186,9 +1253,9 @@
 		"delegate": "Delegate",
 		"noBio": "No Bio",
 		"readMore": "Read more",
-		"votingPower": "Voting power",
+		"maxDelegated": "Max Delegated",
 		"votedProposals": "Voted proposals",
-		"receivedDelegations": "Received Delegations",
+		"delegators": "Delegators",
 		"past30Days": "Past 30 Days",
 		"trendingDelegates": "Trending Delegates",
 		"pleaseLoginToContinue": "Please Login to continue",
@@ -1382,6 +1449,11 @@
 		"teleportFundsToPeopleChainFailedDescription": "There was an error while teleporting the funds to people chain",
 		"BeneficiaryAddress": "Beneficiary Address",
 		"Amount": "Amount"
+	},
+	"ConvictionSelector": {
+		"votes": "Votes",
+		"lockingPeriod": "Locking period",
+		"lockingPeriodDescription": "Your {tokenSymbol} will stay locked for extra time after voting, depending on the multiplier you choose."
 	},
 	"Judgements": {
 		"judgement": "Judgement",

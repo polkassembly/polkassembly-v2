@@ -1650,6 +1650,20 @@
     semver "^7.5.4"
     uuid "^9.0.1"
 
+"@mimirdev/apps-inject@^3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@mimirdev/apps-inject/-/apps-inject-3.2.0.tgz#f1b9e2c6a73fb856e4fc4ab5f50c0ac2d6996794"
+  integrity sha512-yKWFaZsUgxaPIU/xM8OFvWRsNld6x8iCeqbQbt/LyUsikLGlkrHOZl29MwMfSQiYAWrYNqwhFpCU07sS2DTOLQ==
+  dependencies:
+    "@mimirdev/apps-sdk" "^3.1.0"
+
+"@mimirdev/apps-sdk@^3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@mimirdev/apps-sdk/-/apps-sdk-3.1.0.tgz#dffd86ac5a978000098ed2c6852004accf509c15"
+  integrity sha512-EevWZhaaP9gKcIJeEbokAugx5X0sd8jRae1CX1Uzg5KsVxODjeLLaAE1D90Lj6//JE1NPaEq3QKi9PliSMLVNg==
+  dependencies:
+    eventemitter3 "^5.0.1"
+
 "@mixmark-io/domino@^2.2.0":
   version "2.2.0"
   resolved "https://registry.npmjs.org/@mixmark-io/domino/-/domino-2.2.0.tgz"

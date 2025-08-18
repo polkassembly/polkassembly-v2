@@ -4,8 +4,8 @@
 
 'use client';
 
-import { EAllowedCommentor, EProposalType, EReactQueryKeys, ICommentResponse } from '@/_shared/types';
-import { useMemo, useState } from 'react';
+import { EAllowedCommentor, EProposalType, ICommentResponse } from '@/_shared/types';
+import { useMemo, useState, useCallback, useLayoutEffect, useEffect } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import Link from 'next/link';
@@ -15,17 +15,18 @@ import { FaChevronDown } from '@react-icons/all-files/fa/FaChevronDown';
 import { FaChevronUp } from '@react-icons/all-files/fa/FaChevronUp';
 
 import { useTranslations } from 'next-intl';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import dynamic from 'next/dynamic';
+import { Button } from '@ui/Button';
 import SingleComment from '../SingleComment/SingleComment';
 import classes from './Comments.module.scss';
 
 const AddComment = dynamic(() => import('../AddComment/AddComment'), { ssr: false });
 
 function Comments({
-	comments,
+	comments: commentsFromProps,
 	proposalType,
 	index,
 	allowedCommentor,
@@ -41,12 +42,11 @@ function Comments({
 	const user = useAtomValue(userAtom);
 	const [showMore, setShowMore] = useState(false);
 	const [showSpam, setShowSpam] = useState(false);
+	const [comments, setComments] = useState<ICommentResponse[]>(commentsFromProps);
 
 	const regularComments = useMemo(() => comments.filter((comment) => !comment.isSpam), [comments]);
 	const spamComments = useMemo(() => comments.filter((comment) => comment.isSpam), [comments]);
 	const commentsToShow = showMore ? regularComments : regularComments.slice(0, 2);
-
-	const queryClient = useQueryClient();
 
 	const handleShowMore = () => {
 		setShowMore(true);
@@ -84,6 +84,36 @@ function Comments({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [allowedCommentor, onchainIdentities]);
 
+	// Handle comment link navigation
+	const handleCommentLink = useCallback(() => {
+		const { hash } = window?.location || { hash: '' };
+		if (!hash) return;
+
+		const commentId = hash.replace('#comment-', '');
+		const comment = regularComments.find((c) => c.id === commentId);
+
+		if (comment && !showMore && regularComments.indexOf(comment) >= 2) {
+			handleShowMore();
+		}
+
+		// Use requestAnimationFrame to ensure the DOM is ready
+		requestAnimationFrame(() => {
+			const element = document.getElementById(hash.substring(1));
+			if (element) {
+				element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			}
+		});
+	}, [regularComments, showMore]);
+
+	// Call handleCommentLink when the component mounts
+	useLayoutEffect(() => {
+		handleCommentLink();
+	}, [handleCommentLink]);
+
+	useEffect(() => {
+		setComments(commentsFromProps);
+	}, [commentsFromProps]);
+
 	return (
 		<div className={classes.wrapper}>
 			<div className='flex flex-col gap-y-4 px-4 lg:px-6'>
@@ -91,6 +121,7 @@ function Comments({
 					<SingleComment
 						key={item.id}
 						commentData={item}
+						setComments={setComments}
 					/>
 				))}
 				{showMore && regularComments?.length > 2 ? (
@@ -117,8 +148,8 @@ function Comments({
 
 				{spamComments.length > 0 && (
 					<div className='mt-4 border-y border-border_grey py-4'>
-						<button
-							type='button'
+						<Button
+							variant='ghost'
 							onClick={() => setShowSpam(!showSpam)}
 							className='flex w-full items-center justify-center gap-x-2 text-sm font-medium text-pink-500'
 							aria-expanded={showSpam}
@@ -127,7 +158,7 @@ function Comments({
 							{showSpam ? t('PostDetails.hideLikelySpam') : t('PostDetails.showLikelySpam')}
 							<span className='text-pink-500'>({spamComments.length})</span>
 							{showSpam ? <FaChevronUp className='text-base' /> : <FaChevronDown className='text-base' />}
-						</button>
+						</Button>
 						{showSpam && (
 							<div className='mt-4 flex flex-col gap-y-4'>
 								{spamComments.map((item) => (
@@ -148,9 +179,7 @@ function Comments({
 						<AddComment
 							proposalType={proposalType}
 							proposalIndex={index}
-							onConfirm={(newComment, publicUser) => {
-								queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [...(prev || []), { ...newComment, user: publicUser }]);
-							}}
+							onOptimisticUpdate={handleShowMore}
 						/>
 					</div>
 				) : (

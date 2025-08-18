@@ -64,7 +64,7 @@ export function DelegationContent({ isReceived, delegateTrackResponse, trackId, 
 	const [openUndelegateAddresses, setOpenUndelegateAddresses] = useState<Record<string, boolean>>({});
 	const [delegateUserTracks] = useAtom(delegateUserTracksAtom);
 	const [trackData, setTrackData] = useState<ITrackDelegationDetails | null>(delegateTrackResponse);
-
+	const [openDialog, setOpenDialog] = useState(false);
 	const currentTrackStatus = delegateUserTracks?.find((track) => track.trackId === trackId)?.status;
 	const isDelegated = currentTrackStatus === EDelegationStatus.DELEGATED || trackData?.status === EDelegationStatus.DELEGATED;
 
@@ -176,7 +176,10 @@ export function DelegationContent({ isReceived, delegateTrackResponse, trackId, 
 				/>
 				<p className={styles.undelegatedMessage}>
 					{t('votingPowerForThisTrackHasNotBeenDelegatedYet')}
-					<Dialog>
+					<Dialog
+						open={openDialog}
+						onOpenChange={setOpenDialog}
+					>
 						<DialogTrigger asChild>
 							<Button
 								variant='ghost'
@@ -196,6 +199,7 @@ export function DelegationContent({ isReceived, delegateTrackResponse, trackId, 
 							<DelegateVotingPower
 								delegate={{ address: '' }}
 								trackId={trackId}
+								onClose={() => setOpenDialog(false)}
 							/>
 						</DialogContent>
 					</Dialog>

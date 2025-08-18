@@ -26,6 +26,7 @@ import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import { Skeleton } from '../Skeleton';
+import Poll from './Poll/Poll';
 
 const OnchainInfo = dynamic(() => import('./OnchainInfo/OnchainInfo'), {
 	ssr: false,
@@ -62,9 +63,15 @@ const PostAnalytics = dynamic(() => import('./Analytics/PostAnalytics'), {
 	)
 });
 
-const VoteCurvesData = dynamic(() => import('./VoteCurvesData/VoteCurvesData'), {
+const VotesData = dynamic(() => import('./VotesData/VotesData'), {
 	ssr: false,
-	loading: () => <Skeleton className='h-32 w-full rounded-lg' />
+	loading: () => (
+		<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
+			<Skeleton className='h-8 w-20' />
+			<Skeleton className='h-10 w-full rounded-md' />
+			<Skeleton className='mt-2 h-36 w-full rounded-md' />
+		</div>
+	)
 });
 
 const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), {
@@ -99,6 +106,17 @@ const PlaceDecisionDeposit = dynamic(() => import('./PlaceDecisionDeposit/PlaceD
 	)
 });
 
+const RefundDeposits = dynamic(() => import('./RefundDeposits/RefundDeposits'), {
+	ssr: false,
+	loading: () => (
+		<div className='rounded-lg border border-border_grey bg-bg_modal p-4'>
+			<Skeleton className='mb-4 h-6 w-32' />
+			<Skeleton className='mb-2 h-4 w-full' />
+			<Skeleton className='h-10 w-full rounded-md' />
+		</div>
+	)
+});
+
 const ClaimPayout = dynamic(() => import('./ClaimPayout/ClaimPayout'), {
 	ssr: false,
 	loading: () => (
@@ -122,8 +140,9 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	const fetchPostDetails = async () => {
 		const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: postData.proposalType, indexOrHash: index, skipCache: true });
 
-		if (error || !data) {
-			throw new Error(error?.message || 'Failed to fetch post details');
+		if (error || !data || !data.id) {
+			console.log(error?.message || 'Failed to fetch post details');
+			return postData;
 		}
 
 		return data;
@@ -175,7 +194,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						postData={post}
 					/>
 				</div>
-				<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-7xl')}>
+				<div className={cn(classes.detailsWrapper, 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-7xl', isModalOpen && classes.modalOpen)}>
 					<div className={classes.leftWrapper}>
 						<div className={classes.descBox}>
 							<TabsContent value={EPostDetailsTab.DESCRIPTION}>
@@ -221,8 +240,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								)}
 							</div>
 						)}
-
-						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
+						<div className={classes.commentsBox}>
 							<PostComments
 								proposalType={post.proposalType}
 								index={index}
@@ -235,6 +253,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					</div>
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
+							{/* Place Decision Deposit */}
 							{post.proposalType === EProposalType.REFERENDUM_V2 &&
 								post.onChainInfo?.status &&
 								post.onChainInfo?.status === EProposalStatus.Submitted &&
@@ -258,6 +277,14 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 										}}
 									/>
 								)}
+
+							{/* Refund Deposits */}
+							{post.onChainInfo?.status && post.index !== undefined && ValidatorService.isValidNumber(post.index) && post.onChainInfo?.origin && (
+								<RefundDeposits
+									postId={post.index}
+									track={post.onChainInfo?.origin}
+								/>
+							)}
 							{canVote(post.onChainInfo?.status) && (
 								<VoteReferendumButton
 									iconClassName='hidden'
@@ -275,22 +302,20 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								trackName={post.onChainInfo?.origin || EPostOrigin.ROOT}
 							/>
 							<VoteSummary
-								proposalType={post.proposalType}
 								index={index}
 								voteMetrics={post.onChainInfo?.voteMetrics}
 								approvalThreshold={thresholdValues.approvalThreshold}
 							/>
-							{post.onChainInfo?.origin && post.onChainInfo?.timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced) && (
-								<VoteCurvesData
-									proposalType={post.proposalType}
-									index={index}
-									createdAt={post.createdAt}
-									trackName={post.onChainInfo?.origin}
-									timeline={post.onChainInfo?.timeline}
-									setThresholdValues={setThresholdValues}
-									thresholdValues={thresholdValues}
-								/>
-							)}
+
+							<VotesData
+								proposalType={post.proposalType}
+								index={index}
+								trackName={post.onChainInfo?.origin || EPostOrigin.ROOT}
+								createdAt={post.createdAt}
+								timeline={post.onChainInfo?.timeline}
+								setThresholdValues={setThresholdValues}
+								thresholdValues={thresholdValues}
+							/>
 						</div>
 					)}
 
@@ -308,18 +333,12 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						</div>
 					)}
 
-					<div className={cn(classes.leftWrapper, 'xl:hidden')}>
-						<div className={classes.commentsBox}>
-							<PostComments
-								proposalType={post.proposalType}
-								index={index}
-								contentSummary={post.contentSummary}
-								comments={post.comments}
-								allowedCommentor={post.allowedCommentor}
-								postUserId={post.userId}
-							/>
+					{/* Poll */}
+					{isOffchainPost && post?.poll && (
+						<div className={classes.rightWrapper}>
+							<Poll poll={post.poll} />
 						</div>
-					</div>
+					)}
 				</div>
 			</Tabs>
 		</>

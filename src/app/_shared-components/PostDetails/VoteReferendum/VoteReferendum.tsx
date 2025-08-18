@@ -4,18 +4,7 @@
 
 'use client';
 
-import {
-	EVoteDecision,
-	ENotificationStatus,
-	ISelectedAccount,
-	EPostOrigin,
-	IComment,
-	IPublicUser,
-	EProposalType,
-	ICommentResponse,
-	IVoteData,
-	EReactQueryKeys
-} from '@/_shared/types';
+import { EVoteDecision, ENotificationStatus, ISelectedAccount, EPostOrigin, EProposalType } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -23,7 +12,7 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useToast } from '@/hooks/useToast';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -58,27 +47,13 @@ function VoteSuccessContent({
 }) {
 	const network = getCurrentNetwork();
 
-	const queryClient = useQueryClient();
-
 	const { toast } = useToast();
 
 	const t = useTranslations();
 
-	const onAddCommentAfterVoteSuccess = (newComment: IComment, publicUser: Omit<IPublicUser, 'rank'>) => {
+	const onAddCommentAfterVoteSuccess = () => {
 		if (!index || !proposalType) return;
 
-		const voteData: IVoteData = {
-			decision,
-			balanceValue: balance.toString(),
-			voterAddress: address,
-			lockPeriod: conviction,
-			createdAt: new Date()
-		};
-
-		queryClient.setQueryData([EReactQueryKeys.COMMENTS, proposalType, index], (prev: ICommentResponse[]) => [
-			...(prev || []),
-			{ ...newComment, user: publicUser, voteData: [voteData] }
-		]);
 		toast({
 			title: t('VoteReferendum.commentSuccessTitle'),
 			description: t('VoteReferendum.commentSuccess'),
@@ -121,7 +96,14 @@ function VoteSuccessContent({
 					<AddComment
 						proposalIndex={index}
 						proposalType={proposalType}
-						onConfirm={onAddCommentAfterVoteSuccess}
+						onOptimisticUpdate={onAddCommentAfterVoteSuccess}
+						voteData={{
+							decision,
+							balanceValue: balance.toString(),
+							voterAddress: address,
+							lockPeriod: conviction,
+							createdAt: new Date()
+						}}
 					/>
 				</div>
 			</div>
@@ -141,6 +123,8 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const { toast } = useToast();
 	const network = getCurrentNetwork();
+
+	const [reuseLock, setReuseLock] = useState<BN | null>(null);
 
 	const { setOpenSuccessModal, setSuccessModalContent } = useSuccessModal();
 
@@ -179,6 +163,30 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 			return acc.add(curr.lockPeriod ? delegatedBalance.mul(new BN(curr.lockPeriod)) : delegatedBalance.div(new BN('10')));
 		}, BN_ZERO);
 	}, [receivedDelegations]);
+
+	const fetchAddressGovernanceLock = async () => {
+		if (!userPreferences.selectedAccount?.address || !apiService) return null;
+
+		return apiService.getAddressGovernanceLock({ address: userPreferences.selectedAccount.address });
+	};
+
+	const { data: governanceLock } = useQuery({
+		queryKey: ['governanceLock', userPreferences.selectedAccount?.address],
+		queryFn: fetchAddressGovernanceLock,
+		enabled: !!userPreferences.selectedAccount?.address && !!apiService
+	});
+
+	const fetchAddressLockedBalance = async () => {
+		if (!userPreferences.selectedAccount?.address || !apiService) return null;
+		const balances = await apiService.getUserBalances({ address: userPreferences.selectedAccount.address });
+		return balances.lockedBalance;
+	};
+
+	const { data: lockedBalance } = useQuery({
+		queryKey: ['lockedBalance', userPreferences.selectedAccount?.address],
+		queryFn: fetchAddressLockedBalance,
+		enabled: !!userPreferences.selectedAccount?.address && !!apiService
+	});
 
 	const isInvalidAmount = useMemo(() => {
 		return (
@@ -250,56 +258,102 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 	};
 
 	return (
-		<div className='flex flex-col gap-y-6'>
+		<div className='flex max-h-[80vh] flex-col gap-y-6'>
 			<SwitchWalletOrAddress
 				small
-				customAddressSelector={<AddressRelationsPicker withBalance />}
-			/>
-			{delegatedVotingPower && delegatedVotingPower.gt(BN_ZERO) && (
-				<BalanceInput
-					defaultValue={new BN(delegatedVotingPower.toString())}
-					disabled
-					label={t('VoteReferendum.delegatedPower')}
-				/>
-			)}
-			<div>
-				<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.chooseYourVote')}</p>
-				<div className='flex flex-col gap-y-3'>
-					<ChooseVote
-						voteDecision={voteDecision}
-						onVoteDecisionChange={setVoteDecision}
+				customAddressSelector={
+					<AddressRelationsPicker
+						withBalance
+						showVotingBalance
 					/>
+				}
+			/>
+			<div className='flex flex-1 flex-col gap-y-6 overflow-y-auto'>
+				{delegatedVotingPower && delegatedVotingPower.gt(BN_ZERO) && (
+					<BalanceInput
+						defaultValue={new BN(delegatedVotingPower.toString())}
+						disabled
+						label={t('VoteReferendum.delegatedPower')}
+					/>
+				)}
+				<div>
+					<p className='mb-1 text-sm text-wallet_btn_text'>{t('VoteReferendum.chooseYourVote')}</p>
 					<div className='flex flex-col gap-y-3'>
-						{[EVoteDecision.AYE, EVoteDecision.NAY].includes(voteDecision) ? (
-							<>
-								<BalanceInput
-									name={`${voteDecision}-balance`}
-									label={t('VoteReferendum.lockBalance')}
-									onChange={({ value }) => setBalance(value)}
-								/>
-								<div>
-									<p className='mb-3 text-sm text-wallet_btn_text'>{t('VoteReferendum.conviction')}</p>
-									<ConvictionSelector onConvictionChange={setConviction} />
-								</div>
-							</>
-						) : (
-							<>
-								{voteDecision === EVoteDecision.SPLIT_ABSTAIN && (
+						<ChooseVote
+							voteDecision={voteDecision}
+							onVoteDecisionChange={setVoteDecision}
+						/>
+						<div className='flex flex-col gap-y-3'>
+							{[EVoteDecision.AYE, EVoteDecision.NAY].includes(voteDecision) ? (
+								<>
+									<div className='flex flex-col gap-y-1'>
+										<BalanceInput
+											name={`${voteDecision}-balance`}
+											label={t('VoteReferendum.lockBalance')}
+											onChange={({ value }) => {
+												setBalance(value);
+												setReuseLock(null);
+											}}
+											value={reuseLock && reuseLock.gt(BN_ZERO) ? reuseLock : undefined}
+										/>
+										<div className='flex items-center gap-x-2'>
+											{governanceLock && governanceLock.gt(BN_ZERO) && (
+												<Button
+													variant='ghost'
+													size='sm'
+													className='flex items-center gap-x-1 rounded-md bg-page_background text-xs text-delegation_card_text'
+													onClick={() => {
+														setBalance(governanceLock);
+														setReuseLock(governanceLock);
+													}}
+												>
+													<span className='font-medium'>{t('VoteReferendum.reuseGovernanceLock')}</span>
+													<span className='font-bold'>{formatBnBalance(governanceLock, { withUnit: true, compactNotation: true }, network)}</span>
+												</Button>
+											)}
+											{lockedBalance && lockedBalance.gt(BN_ZERO) && (
+												<Button
+													variant='ghost'
+													size='sm'
+													className='flex items-center gap-x-1 rounded-md bg-page_background text-xs text-delegation_card_text'
+													onClick={() => {
+														setBalance(lockedBalance);
+														setReuseLock(lockedBalance);
+													}}
+												>
+													<span className='font-medium'>{t('VoteReferendum.reuseAllLocks')}</span>
+													<span className='font-bold'>{formatBnBalance(lockedBalance, { withUnit: true, compactNotation: true }, network)}</span>
+												</Button>
+											)}
+										</div>
+									</div>
+									<div>
+										<p className='mb-3 text-sm text-wallet_btn_text'>{t('VoteReferendum.conviction')}</p>
+										<ConvictionSelector
+											onConvictionChange={setConviction}
+											voteBalance={balance}
+										/>
+									</div>
+								</>
+							) : (
+								<>
+									{voteDecision === EVoteDecision.SPLIT_ABSTAIN && (
+										<BalanceInput
+											label={t('VoteReferendum.abstainVoteValue')}
+											onChange={({ value }) => setAbstainVoteValue(value)}
+										/>
+									)}
 									<BalanceInput
-										label={t('VoteReferendum.abstainVoteValue')}
-										onChange={({ value }) => setAbstainVoteValue(value)}
+										label={t('VoteReferendum.ayeVoteValue')}
+										onChange={({ value }) => setAyeVoteValue(value)}
 									/>
-								)}
-								<BalanceInput
-									label={t('VoteReferendum.ayeVoteValue')}
-									onChange={({ value }) => setAyeVoteValue(value)}
-								/>
-								<BalanceInput
-									label={t('VoteReferendum.nayVoteValue')}
-									onChange={({ value }) => setNayVoteValue(value)}
-								/>
-							</>
-						)}
+									<BalanceInput
+										label={t('VoteReferendum.nayVoteValue')}
+										onChange={({ value }) => setNayVoteValue(value)}
+									/>
+								</>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>

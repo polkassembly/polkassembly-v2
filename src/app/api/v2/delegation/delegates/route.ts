@@ -108,7 +108,7 @@ export const GET = withErrorHandling(async () => {
 		chunk.forEach((address) => {
 			allChunkPromises.push(
 				(async () => {
-					const { receivedDelegationsCount = 0, votingPower = '0' } = allDelegatesWithVotingPowerAndDelegationsCount[String(address)] ?? {};
+					const { delegators = [], receivedDelegationsCount = 0, maxDelegated = '0' } = allDelegatesWithVotingPowerAndDelegationsCount[String(address)] ?? {};
 					const [last30DaysConvictionVoteCount, publicUser] = await Promise.all([
 						OnChainDbService.GetLast30DaysConvictionVoteCountByAddress({ network, address }),
 						OffChainDbService.GetPublicUserByAddress(address)
@@ -123,8 +123,9 @@ export const GET = withErrorHandling(async () => {
 						manifesto: delegatesWithSource[String(address)]?.manifesto,
 						name: delegatesWithSource[String(address)]?.name,
 						network,
+						delegators,
 						receivedDelegationsCount,
-						votingPower,
+						maxDelegated,
 						last30DaysVotedProposalsCount: last30DaysConvictionVoteCount,
 						publicUser: publicUser ?? undefined
 					};

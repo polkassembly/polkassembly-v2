@@ -74,7 +74,7 @@ function Address({
 	useEffect(() => {
 		const initializeIdentity = async () => {
 			if (!encodedAddress) return;
-			setDisplayText(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
+			setDisplayText(userData?.username || walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
 
 			try {
 				const identityInfo = await getOnChainIdentity(encodedAddress);
@@ -90,7 +90,7 @@ function Address({
 		};
 
 		initializeIdentity();
-	}, [encodedAddress, getOnChainIdentity, truncateCharLen, walletAddressName]);
+	}, [encodedAddress, getOnChainIdentity, truncateCharLen, walletAddressName, userData]);
 
 	if (disableTooltip) {
 		return (

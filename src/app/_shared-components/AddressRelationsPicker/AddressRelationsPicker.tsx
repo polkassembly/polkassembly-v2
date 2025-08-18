@@ -14,6 +14,7 @@ import { IoMdSync } from '@react-icons/all-files/io/IoMdSync';
 import { useTranslations } from 'next-intl';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { cn } from '@/lib/utils';
 import Address from '../Profile/Address/Address';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
@@ -188,7 +189,7 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 	);
 }
 
-function AddressSwitchButton() {
+function AddressSwitchButton({ disabled, showLinkedAccountBadge = false, className }: { disabled?: boolean; showLinkedAccountBadge?: boolean; className?: string }) {
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
 	const [isOpen, setisOpen] = useState(false);
@@ -209,7 +210,8 @@ function AddressSwitchButton() {
 			<DialogTrigger asChild>
 				<Button
 					size='sm'
-					className='ml-auto flex items-center gap-1 text-xs'
+					className={cn('ml-auto flex items-center gap-1 text-xs', className)}
+					disabled={disabled}
 				>
 					<IoMdSync /> {t('Switch')}
 				</Button>
@@ -223,6 +225,7 @@ function AddressSwitchButton() {
 					small
 					withRadioSelect
 					withBalance
+					showLinkedAccountBadge={showLinkedAccountBadge}
 				/>
 
 				<div className='flex max-h-[60vh] flex-col gap-2 overflow-y-auto'>
@@ -254,11 +257,29 @@ function AddressSwitchButton() {
 	);
 }
 
-export default function AddressRelationsPicker({ withBalance = false, showPeopleChainBalance = false }: { withBalance?: boolean; showPeopleChainBalance?: boolean }) {
+export default function AddressRelationsPicker({
+	withBalance = false,
+	showPeopleChainBalance = false,
+	showVotingBalance = false,
+	disabled,
+	showLinkedAccountBadge = false,
+	iconSize = 25,
+	className,
+	switchButtonClassName
+}: {
+	withBalance?: boolean;
+	showPeopleChainBalance?: boolean;
+	showVotingBalance?: boolean;
+	disabled?: boolean;
+	showLinkedAccountBadge?: boolean;
+	iconSize?: number;
+	className?: string;
+	switchButtonClassName?: string;
+}) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const walletService = useWalletService();
 	const [accountsLoading, setAccountsLoading] = useState(true);
-
+	const t = useTranslations('AddressRelationsPicker');
 	const selectedAddress = useMemo(() => userPreferences?.selectedAccount?.address, [userPreferences?.selectedAccount?.address]);
 	const walletAddressName = useMemo(() => userPreferences?.selectedAccount?.name, [userPreferences?.selectedAccount?.name]);
 
@@ -302,21 +323,24 @@ export default function AddressRelationsPicker({ withBalance = false, showPeople
 					address={userPreferences?.selectedAccount?.address || ''}
 					classname='ml-auto'
 					showPeopleChainBalance={showPeopleChainBalance}
+					showVotingBalance={showVotingBalance}
 				/>
 			)}
 
-			<div className='flex items-center gap-2 rounded border border-primary_border p-2'>
-				{accountsLoading || !selectedAddress ? (
+			<div className={cn('flex items-center gap-2 rounded border border-primary_border p-2', className)}>
+				{accountsLoading ? (
 					<Skeleton className='h-6 w-32' />
+				) : !selectedAddress ? (
+					<p className='text-text_secondary w-full px-3 text-xs'>{t('noAccountSelected')}</p>
 				) : (
 					<div className='flex items-center justify-between gap-2'>
 						<Address
 							address={selectedAddress}
 							walletAddressName={walletAddressName}
-							iconSize={25}
+							iconSize={iconSize}
 							redirectToProfile={false}
 							disableTooltip
-							className='w-full px-2'
+							className='w-full gap-3 px-2'
 						/>
 						<span>
 							<AccountTypeBadge accountType={userPreferences?.selectedAccount?.accountType || EAccountType.REGULAR} />
@@ -324,7 +348,11 @@ export default function AddressRelationsPicker({ withBalance = false, showPeople
 						</span>
 					</div>
 				)}
-				<AddressSwitchButton />
+				<AddressSwitchButton
+					disabled={disabled}
+					showLinkedAccountBadge={showLinkedAccountBadge}
+					className={switchButtonClassName}
+				/>
 			</div>
 		</div>
 	);
