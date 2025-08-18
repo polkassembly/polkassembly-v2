@@ -1,0 +1,43 @@
+.base {
+	@apply inline-flex h-min w-fit whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium tracking-tight lg:px-2 lg:py-0.5;
+}
+
+.governance {
+	@apply border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-300 dark:bg-blue-900/20 dark:text-blue-300;
+}
+
+.staking {
+	@apply border-[#FF6C1A3D] bg-[#FF6C1A3D] text-[#FA5A00] dark:border-[#FF6C1A3D] dark:bg-[#FF6C1A3D] dark:text-[#FA5A00];
+}
+
+.any {
+	@apply border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-300 dark:bg-purple-900/20 dark:text-purple-300;
+}
+
+.non_transfer {
+	@apply border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-300 dark:bg-orange-900/20 dark:text-orange-300;
+}
+
+.identity_judgement {
+	@apply border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-300 dark:bg-indigo-900/20 dark:text-indigo-300;
+}
+
+.auction {
+	@apply border-pink-200 bg-pink-50 text-pink-700 dark:border-pink-300 dark:bg-pink-900/20 dark:text-pink-300;
+}
+
+.cancel_proxy {
+	@apply border-red-200 bg-red-50 text-red-700 dark:border-red-300 dark:bg-red-900/20 dark:text-red-300;
+}
+
+.pararegistration {
+	@apply border-teal-200 bg-teal-50 text-teal-700 dark:border-teal-300 dark:bg-teal-900/20 dark:text-teal-300;
+}
+
+.nomination_pools {
+	@apply border-cyan-200 bg-cyan-50 text-cyan-700 dark:border-cyan-300 dark:bg-cyan-900/20 dark:text-cyan-300;
+}
+
+.sudo_balances {
+	@apply border-gray-200 bg-gray-50 text-gray-700 dark:border-gray-300 dark:bg-gray-900/20 dark:text-gray-300;
+}

@@ -1470,3 +1470,21 @@ export type IPostBubbleVotes = {
 		status: EProposalStatus;
 	};
 };
+
+export enum EProxyDashboardTabs {
+	ALL = 'all',
+	MY_PROXIES = 'my-proxies'
+}
+
+export interface IProxyRequest {
+	id: string;
+	delegator: string;
+	proxyType: EProxyType;
+	delay: number;
+	proxies: number;
+	proxyAddresses: string[];
+	individualProxies: IProxyAddress[];
+	dateCreated: Date;
+}
+
+export type IProxyListingResponse = IGenericListingResponse<IProxyRequest>;
