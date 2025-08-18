@@ -55,8 +55,6 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	// Invalidate caches since reaction metrics changed
 	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
-	await RedisService.DeletePostsListing({ network, proposalType });
-	await RedisService.DeleteActivityFeed({ network });
 
 	const response = NextResponse.json({ message: 'Reaction added successfully', reactionId });
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
