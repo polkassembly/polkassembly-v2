@@ -29,12 +29,12 @@ type AssetRowProps = {
 export const calculateTotalUSDValue = ({
 	amountsDetails,
 	currentTokenPrice,
-	dedTokenUSDPrice,
+	dedTokenUsdPrice,
 	network
 }: {
 	amountsDetails: { amount: string | null; asset: Exclude<EAssets, EAssets.MYTH> | null }[];
 	currentTokenPrice?: string;
-	dedTokenUSDPrice?: string;
+	dedTokenUsdPrice?: string;
 	network: ENetwork;
 }) => {
 	let totalUSD = BN_ZERO;
@@ -45,7 +45,7 @@ export const calculateTotalUSDValue = ({
 				amount,
 				asset,
 				currentTokenPrice,
-				dedTokenUSDPrice,
+				dedTokenUsdPrice,
 				network
 			});
 			totalUSD = totalUSD.add(assetUSDValue);
