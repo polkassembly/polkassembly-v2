@@ -385,34 +385,35 @@ function VoteReferendum({
 						</div>
 					</div>
 				</div>
-			</div>
-			{existingVote && (
-				<div className='flex flex-col gap-y-3 rounded-xl bg-info_bg p-4'>
-					<p className='text-sm font-semibold text-text_primary'>{t('VoteReferendum.existingVote')}</p>
-					<p className='text-sm text-basic_text'>{t('VoteReferendum.existingVoteDescription')}</p>
-					<div className={classes.userVoteCardLayout}>
-						<h3 className={classes.userVoteCardTitleIcon}>
-							{existingVote.decision === EVoteDecision.ABSTAIN && <Ban className='h-4 w-4 text-basic_text' />}
-							{existingVote.decision === EVoteDecision.AYE && <ThumbsUp className='h-4 w-4 text-basic_text' />}
-							{existingVote.decision === EVoteDecision.NAY && <ThumbsDown className='h-4 w-4 text-basic_text' />}
-							{t(`PostDetails.${existingVote.decision}`)}
-						</h3>
+				{existingVote && (
+					<div className='flex flex-col gap-y-3 rounded-xl bg-info_bg p-4'>
+						<p className='text-sm font-semibold text-text_primary'>{t('VoteReferendum.existingVote')}</p>
+						<p className='text-sm text-basic_text'>{t('VoteReferendum.existingVoteDescription')}</p>
+						<div className={classes.userVoteCardLayout}>
+							<h3 className={classes.userVoteCardTitleIcon}>
+								{existingVote.decision === EVoteDecision.ABSTAIN && <Ban className='h-4 w-4 text-basic_text' />}
+								{existingVote.decision === EVoteDecision.AYE && <ThumbsUp className='h-4 w-4 text-basic_text' />}
+								{existingVote.decision === EVoteDecision.NAY && <ThumbsDown className='h-4 w-4 text-basic_text' />}
+								{t(`PostDetails.${existingVote.decision}`)}
+							</h3>
 
-						<p className='text-sm text-basic_text'>
-							{formatBnBalance(
-								existingVote.selfVotingPower || '0',
-								{
-									withUnit: true,
-									numberAfterComma: 2,
-									compactNotation: true
-								},
-								network
-							)}{' '}
-							({!existingVote.lockPeriod || existingVote.lockPeriod === 0 ? 0.1 : existingVote.lockPeriod}x)
-						</p>
+							<p className='text-sm text-basic_text'>
+								{formatBnBalance(
+									existingVote.selfVotingPower || '0',
+									{
+										withUnit: true,
+										numberAfterComma: 2,
+										compactNotation: true
+									},
+									network
+								)}{' '}
+								({!existingVote.lockPeriod || existingVote.lockPeriod === 0 ? 0.1 : existingVote.lockPeriod}x)
+							</p>
+						</div>
 					</div>
-				</div>
-			)}
+				)}
+			</div>
+
 			<div className='flex items-center justify-end gap-x-4'>
 				<Button
 					disabled={isInvalidAmount}
