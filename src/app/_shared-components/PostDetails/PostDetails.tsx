@@ -224,7 +224,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							)}
 						</div>
 
-						{isModalOpen && !isOffchainPost && (
+						{isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
 								{canVote(post.onChainInfo?.status) && (
 									<UserVoteStatus

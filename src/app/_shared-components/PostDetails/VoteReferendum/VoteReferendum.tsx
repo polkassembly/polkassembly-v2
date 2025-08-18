@@ -392,9 +392,9 @@ function VoteReferendum({
 					<p className='text-sm text-basic_text'>{t('VoteReferendum.existingVoteDescription')}</p>
 					<div className={classes.userVoteCardLayout}>
 						<h3 className={classes.userVoteCardTitleIcon}>
-							{existingVote.decision === 'abstain' && <Ban className='h-4 w-4 text-basic_text' />}
-							{existingVote.decision === 'aye' && <ThumbsUp className='h-4 w-4 text-basic_text' />}
-							{existingVote.decision === 'nay' && <ThumbsDown className='h-4 w-4 text-basic_text' />}
+							{existingVote.decision === EVoteDecision.ABSTAIN && <Ban className='h-4 w-4 text-basic_text' />}
+							{existingVote.decision === EVoteDecision.AYE && <ThumbsUp className='h-4 w-4 text-basic_text' />}
+							{existingVote.decision === EVoteDecision.NAY && <ThumbsDown className='h-4 w-4 text-basic_text' />}
 							{t(`PostDetails.${existingVote.decision}`)}
 						</h3>
 

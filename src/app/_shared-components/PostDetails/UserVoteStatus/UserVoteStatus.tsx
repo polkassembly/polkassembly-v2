@@ -5,7 +5,6 @@
 'use client';
 
 import { useUser } from '@/hooks/useUser';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
@@ -23,16 +22,11 @@ interface UserVoteStatusProps {
 
 function UserVoteStatus({ index, btnClassName, size = 'lg', track, proposalType }: UserVoteStatusProps) {
 	const { user } = useUser();
-	const { userPreferences } = useUserPreferences();
 
-	// Use selected account address from userPreferences, fallback to login address or first address
-	const selectedAddress = userPreferences?.selectedAccount?.address || user?.loginAddress || user?.addresses[0];
+	// Use login address to fetch
+	const selectedAddress = user?.loginAddress;
 
-	const {
-		data: voteData,
-		isLoading,
-		isError
-	} = useQuery({
+	const { data: voteData } = useQuery({
 		queryKey: [EReactQueryKeys.USER_VOTES, proposalType, index, selectedAddress],
 		queryFn: async () => {
 			if (!selectedAddress) return null;
@@ -62,8 +56,6 @@ function UserVoteStatus({ index, btnClassName, size = 'lg', track, proposalType 
 			voteData={voteData}
 			btnClassName={btnClassName}
 			track={track}
-			isLoading={isLoading}
-			isError={isError}
 			existingVote={hasVoted ? voteData?.votes[0] : undefined}
 		/>
 	) : (
@@ -75,8 +67,6 @@ function UserVoteStatus({ index, btnClassName, size = 'lg', track, proposalType 
 			hasVoted={hasVoted}
 			track={track}
 			proposalType={proposalType}
-			isLoading={isLoading}
-			isError={isError}
 			existingVote={hasVoted ? voteData?.votes[0] : undefined}
 		/>
 	);

@@ -24,23 +24,10 @@ interface VoteReferendumButtonProps {
 	hasVoted?: boolean;
 	track?: EPostOrigin;
 	proposalType: EProposalType;
-	isLoading?: boolean;
-	isError?: boolean;
 	existingVote?: IVoteData;
 }
 
-function VoteReferendumButton({
-	index,
-	btnClassName,
-	iconClassName,
-	size = 'lg',
-	hasVoted = false,
-	track,
-	proposalType,
-	isLoading,
-	isError,
-	existingVote
-}: VoteReferendumButtonProps) {
+function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg', hasVoted = false, track, proposalType, existingVote }: VoteReferendumButtonProps) {
 	const { user } = useUser();
 	const t = useTranslations();
 	const [openModal, setOpenModal] = useState(false);
@@ -72,8 +59,6 @@ function VoteReferendumButton({
 				<Button
 					className={cn('w-full', btnClassName)}
 					size={size}
-					disabled={isLoading || isError}
-					isLoading={isLoading}
 				>
 					<div className='flex items-center gap-1'>
 						<Image

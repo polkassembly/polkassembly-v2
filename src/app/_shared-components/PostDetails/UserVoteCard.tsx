@@ -11,7 +11,7 @@ import Image from 'next/image';
 import { ThumbsDown, ThumbsUp, Ban, User } from 'lucide-react';
 import DelegateIcon from '@assets/icons/delegate_plus.svg';
 import { cn } from '@/lib/utils';
-import { EProposalType, IVoteHistoryData, ENotificationStatus, EReactQueryKeys, EPostOrigin, IVoteData } from '@/_shared/types';
+import { EProposalType, IVoteHistoryData, ENotificationStatus, EReactQueryKeys, EPostOrigin, IVoteData, EVoteDecision } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -25,19 +25,17 @@ import classes from './PostDetails.module.scss';
 import Address from '../Profile/Address/Address';
 import VoteReferendumButton from './VoteReferendumButton';
 
-interface VoteReferendumButtonProps {
+interface UserVoteCardProps {
 	index: string;
 	btnClassName?: string;
 	size?: 'sm' | 'lg';
 	proposalType: EProposalType;
 	voteData: IVoteHistoryData;
 	track?: EPostOrigin;
-	isLoading?: boolean;
-	isError?: boolean;
 	existingVote?: IVoteData;
 }
 
-function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData, track, isLoading, isError, existingVote }: VoteReferendumButtonProps) {
+function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData, track, existingVote }: UserVoteCardProps) {
 	const t = useTranslations();
 	const [openRemoveConfirmModal, setOpenRemoveConfirmModal] = useState(false);
 	const network = getCurrentNetwork();
@@ -128,9 +126,9 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 			/>
 			<div className={classes.userVoteCardLayout}>
 				<h3 className={classes.userVoteCardTitleIcon}>
-					{myVote.decision === 'abstain' && <Ban className='h-4 w-4 text-basic_text' />}
-					{myVote.decision === 'aye' && <ThumbsUp className='h-4 w-4 text-basic_text' />}
-					{myVote.decision === 'nay' && <ThumbsDown className='h-4 w-4 text-basic_text' />}
+					{myVote.decision === EVoteDecision.ABSTAIN && <Ban className='h-4 w-4 text-basic_text' />}
+					{myVote.decision === EVoteDecision.AYE && <ThumbsUp className='h-4 w-4 text-basic_text' />}
+					{myVote.decision === EVoteDecision.NAY && <ThumbsDown className='h-4 w-4 text-basic_text' />}
 					{t(`PostDetails.${myVote.decision}`)}
 				</h3>
 
@@ -164,8 +162,6 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 				hasVoted
 				track={track}
 				proposalType={proposalType}
-				isLoading={isLoading}
-				isError={isError}
 				existingVote={existingVote}
 			/>
 

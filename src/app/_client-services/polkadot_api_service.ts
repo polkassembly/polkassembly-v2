@@ -432,7 +432,10 @@ export class PolkadotApiService {
 		onFailed: (error: string) => void;
 		selectedAccount?: ISelectedAccount;
 	}) {
-		if (!this.api) return;
+		if (!this.api) {
+			onFailed('API not ready – unable to remove vote');
+			return;
+		}
 
 		try {
 			const tx: SubmittableExtrinsic<'promise'> = this.api.tx.convictionVoting.removeVote(null, referendumId);
