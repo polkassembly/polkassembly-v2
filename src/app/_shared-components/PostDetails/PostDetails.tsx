@@ -194,7 +194,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						postData={post}
 					/>
 				</div>
-				<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-7xl')}>
+				<div className={cn(classes.detailsWrapper, 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-7xl', isModalOpen && classes.modalOpen)}>
 					<div className={classes.leftWrapper}>
 						<div className={classes.descBox}>
 							<TabsContent value={EPostDetailsTab.DESCRIPTION}>
@@ -240,7 +240,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								)}
 							</div>
 						)}
-						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
+						<div className={classes.commentsBox}>
 							<PostComments
 								proposalType={post.proposalType}
 								index={index}
@@ -339,19 +339,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							<Poll poll={post.poll} />
 						</div>
 					)}
-
-					<div className={cn(classes.leftWrapper, 'xl:hidden')}>
-						<div className={classes.commentsBox}>
-							<PostComments
-								proposalType={post.proposalType}
-								index={index}
-								contentSummary={post.contentSummary}
-								comments={post.comments}
-								allowedCommentor={post.allowedCommentor}
-								postUserId={post.userId}
-							/>
-						</div>
-					</div>
 				</div>
 			</Tabs>
 		</>

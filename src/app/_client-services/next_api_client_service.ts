@@ -97,6 +97,7 @@ enum EApiRoute {
 	FETCH_USER_ACTIVITY = 'FETCH_USER_ACTIVITY',
 	GET_ON_CHAIN_METADATA_FOR_POST = 'GET_ON_CHAIN_METADATA_FOR_POST',
 	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
+	FETCH_USER_PREIMAGES = 'FETCH_USER_PREIMAGES',
 	DELETE_COMMENT = 'DELETE_COMMENT',
 	EDIT_COMMENT = 'EDIT_COMMENT',
 	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
@@ -199,6 +200,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.FETCH_PREIMAGES:
 				path = '/preimages';
+				break;
+			case EApiRoute.FETCH_USER_PREIMAGES:
+				path = '/users/address';
 				break;
 			case EApiRoute.FETCH_ALL_TAGS:
 				path = '/meta/tags';
@@ -621,12 +625,14 @@ export class NextApiClientService {
 		proposalType,
 		index,
 		content,
-		parentCommentId
+		parentCommentId,
+		authorAddress
 	}: {
 		proposalType: EProposalType;
 		index: string;
 		content: string;
 		parentCommentId?: string;
+		authorAddress?: string;
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_COMMENT, routeSegments: [proposalType, index, 'comments'] });
 		return this.nextApiClientFetch<IComment>({
@@ -634,7 +640,8 @@ export class NextApiClientService {
 			method,
 			data: {
 				content,
-				parentCommentId
+				parentCommentId,
+				authorAddress
 			}
 		});
 	}
@@ -867,6 +874,20 @@ export class NextApiClientService {
 	static async fetchPreimageByHash({ hash }: { hash: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: [hash] });
 		return this.nextApiClientFetch<IPreimage>({ url, method });
+	}
+
+	static async fetchUserPreimages({ page, address }: { page: number; address: string }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: PREIMAGES_LISTING_LIMIT.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.FETCH_USER_PREIMAGES,
+			routeSegments: [address, 'preimages'],
+			queryParams
+		});
+		return this.nextApiClientFetch<IGenericListingResponse<IPreimage>>({ url, method });
 	}
 
 	protected static async generateQRSessionApi() {
