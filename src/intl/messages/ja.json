@@ -1417,5 +1417,33 @@
 		"votes": "投票数",
 		"lockingPeriod": "ロック期間",
 		"lockingPeriodDescription": "選択した乗数に応じて、投票後あなたの{tokenSymbol}は追加期間ロックされます。"
+	},
+	"Proxies": {
+		"proxyExplorer": "プロキシエクスプローラー",
+		"createProxy": "プロキシを作成",
+		"all": "すべて",
+		"myProxies": "マイプロキシ",
+		"delegator": "委任者",
+		"proxyType": "プロキシタイプ",
+		"delay": "遅延",
+		"proxies": "プロキシ",
+		"noProxiesFound": "プロキシが見つかりません",
+		"searchByAddress": "検索するアドレスを入力",
+		"delayTooltip": "遅延はセキュリティ機能として機能します：プロキシが意図したアクションを発表した後、アクションが実行される前に制御アカウントによってアクションをレビューし、必要に応じてキャンセルできる24時間のウィンドウがあります。Polkadotの平均ブロック時間は約6秒であるため、14,400ブロックの遅延は約24時間に相当します。",
+		"please": "お願いします",
+		"logIn": "ログイン",
+		"toViewMyProxies": "プロキシを表示するには"
+	},
+	"ProxyType": {
+		"any": "任意",
+		"non_transfer": "非転送",
+		"governance": "ガバナンス",
+		"staking": "ステーキング",
+		"identity_judgement": "アイデンティティ判断",
+		"auction": "オークション",
+		"cancel_proxy": "プロキシキャンセル",
+		"pararegistration": "パラレジストレーション",
+		"nomination_pools": "ノミネーションプール",
+		"sudo_balances": "Sudoバランス"
 	}
 }

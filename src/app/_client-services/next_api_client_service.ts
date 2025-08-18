@@ -54,7 +54,8 @@ import {
 	IPostAnalytics,
 	IPostBubbleVotes,
 	EAnalyticsType,
-	EVotesDisplayType
+	EVotesDisplayType,
+	IProxyListingResponse
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -143,7 +144,9 @@ enum EApiRoute {
 	ADD_POLL_VOTE = 'ADD_POLL_VOTE',
 	DELETE_POLL_VOTE = 'DELETE_POLL_VOTE',
 	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
-	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES'
+	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES',
+	FETCH_PROXY_REQUESTS = 'FETCH_PROXY_REQUESTS',
+	FETCH_MY_PROXIES = 'FETCH_MY_PROXIES'
 }
 
 export class NextApiClientService {
@@ -262,6 +265,12 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
 				path = '/track-analytics';
+				break;
+			case EApiRoute.FETCH_PROXY_REQUESTS:
+				path = '/proxies/requests';
+				break;
+			case EApiRoute.FETCH_MY_PROXIES:
+				path = '/proxies/my-proxies';
 				break;
 
 			// post routes
@@ -1183,5 +1192,29 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_BUBBLE_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-bubble'], queryParams });
 		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method });
+	}
+
+	static async fetchProxyRequests({ page, limit, search }: { page: number; limit: number; search?: string }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+		if (search) {
+			queryParams.set('search', search);
+		}
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PROXY_REQUESTS, queryParams });
+		return this.nextApiClientFetch<IProxyListingResponse>({ url, method });
+	}
+
+	static async fetchMyProxies({ page, limit, search }: { page: number; limit: number; search?: string }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+		if (search) {
+			queryParams.set('search', search);
+		}
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_MY_PROXIES, queryParams });
+		return this.nextApiClientFetch<IProxyListingResponse>({ url, method });
 	}
 }

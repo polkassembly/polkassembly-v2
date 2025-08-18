@@ -19,7 +19,21 @@ import { getTypeDef } from '@polkadot/types';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IPayout, ISelectedAccount, IVoteCartItem } from '@shared/types';
+import {
+	EAccountType,
+	EEnactment,
+	ENetwork,
+	EPostOrigin,
+	EVoteDecision,
+	IBeneficiaryInput,
+	IParamDef,
+	IPayout,
+	ISelectedAccount,
+	IVoteCartItem,
+	EProxyType,
+	IProxyRequest,
+	IProxyAddress
+} from '@shared/types';
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
 import { APPNAME } from '@/_shared/_constants/appName';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
@@ -1359,5 +1373,124 @@ export class PolkadotApiService {
 			onFailed,
 			waitTillFinalizedHash: true
 		});
+	}
+
+	async getProxyRequests({ page, limit, search }: { page: number; limit: number; search?: string }) {
+		if (!this.api) return { items: [], totalCount: 0 };
+
+		try {
+			// Get all proxy entries from the chain
+			const proxyEntries = await this.api.query.proxy.proxies.entries();
+			const proxies: IProxyRequest[] = [];
+
+			proxyEntries.forEach(([key, value]) => {
+				const delegator = key.args[0].toString();
+				const proxyData = value.toHuman() as any;
+
+				// Filter by search if provided
+				if (search && !delegator.toLowerCase().includes(search.toLowerCase())) {
+					return;
+				}
+
+				if (proxyData && Array.isArray(proxyData)) {
+					// Log the first few entries to understand the data structure
+					if (proxies.length === 0) {
+						console.log('Sample proxy data:', JSON.stringify(proxyData.slice(0, 2), null, 2));
+					}
+
+					// Parse individual proxy details for accordion functionality
+					const individualProxies: IProxyAddress[] = proxyData.map((proxyEntry: any) => {
+						// Handle the data structure: [proxyDetails, balance]
+						const proxyDetails = Array.isArray(proxyEntry) ? proxyEntry[0] : proxyEntry;
+
+						return {
+							address: proxyDetails?.delegate || 'Unknown',
+							proxyType: (proxyDetails?.proxyType as EProxyType) || EProxyType.GOVERNANCE
+						};
+					});
+
+					const proxyRequest: IProxyRequest = {
+						id: `${delegator}-proxy-${Date.now()}`,
+						delegator,
+						proxyType: 'Governance' as EProxyType, // Default to Governance for now
+						delay: 0,
+						proxies: proxyData.length,
+						proxyAddresses: individualProxies.map((p) => p.address),
+						individualProxies,
+						dateCreated: new Date()
+					};
+					proxies.push(proxyRequest);
+				}
+			});
+
+			// Sort by date created (newest first)
+			proxies.sort((a, b) => b.dateCreated.getTime() - a.dateCreated.getTime());
+
+			// Apply pagination
+			const startIndex = (page - 1) * limit;
+			const endIndex = startIndex + limit;
+			const paginatedProxies = proxies.slice(startIndex, endIndex);
+
+			return {
+				items: paginatedProxies,
+				totalCount: proxies.length
+			};
+		} catch (error) {
+			console.error('Error fetching proxy requests:', error);
+			return { items: [], totalCount: 0 };
+		}
+	}
+
+	async getMyProxies({ page, limit, userAddress }: { page: number; limit: number; search?: string; userAddress: string }) {
+		if (!this.api) return { items: [], totalCount: 0 };
+
+		try {
+			// Get proxies for the specific user
+			const proxyData = await this.api.query.proxy.proxies(userAddress);
+			const proxies: IProxyRequest[] = [];
+
+			const proxyInfo = proxyData.toHuman() as any;
+
+			if (proxyInfo && Array.isArray(proxyInfo)) {
+				// Parse individual proxy details for accordion functionality
+				const individualProxies: IProxyAddress[] = proxyInfo.map((proxyEntry: any) => {
+					// Handle the data structure: [proxyDetails, balance]
+					const proxyDetails = Array.isArray(proxyEntry) ? proxyEntry[0] : proxyEntry;
+
+					return {
+						address: proxyDetails?.delegate || 'Unknown',
+						proxyType: (proxyDetails?.proxyType as EProxyType) || EProxyType.GOVERNANCE
+					};
+				});
+
+				const proxyRequest: IProxyRequest = {
+					id: `${userAddress}-proxy-${Date.now()}`,
+					delegator: userAddress,
+					proxyType: 'Governance' as EProxyType, // Default to Governance for now
+					delay: 0,
+					proxies: proxyInfo.length,
+					proxyAddresses: individualProxies.map((p) => p.address),
+					individualProxies,
+					dateCreated: new Date()
+				};
+				proxies.push(proxyRequest);
+			}
+
+			// Sort by date created (newest first)
+			proxies.sort((a, b) => b.dateCreated.getTime() - a.dateCreated.getTime());
+
+			// Apply pagination
+			const startIndex = (page - 1) * limit;
+			const endIndex = startIndex + limit;
+			const paginatedProxies = proxies.slice(startIndex, endIndex);
+
+			return {
+				items: paginatedProxies,
+				totalCount: proxies.length
+			};
+		} catch (error) {
+			console.error('Error fetching my proxies:', error);
+			return { items: [], totalCount: 0 };
+		}
 	}
 }
