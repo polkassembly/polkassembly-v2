@@ -515,19 +515,16 @@ export class FirestoreService extends FirestoreUtils {
 	}
 
 	static async GetPostReactions({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IReaction[]> {
-		// Query all reactions for the post - Firestore doesn't support "field doesn't exist" queries,
-		// so we'll filter client-side to exclude reactions that have a commentId
 		const reactionsQuery = this.reactionsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('indexOrHash', '==', indexOrHash);
 		const reactionsQuerySnapshot = await reactionsQuery.get();
 		const reactionPromises = reactionsQuerySnapshot.docs.map(async (doc) => {
 			const data = doc.data();
+			const publicUser = await this.GetPublicUserById(data.userId);
 
 			// Skip reactions that have a commentId (these are comment reactions)
 			if (data.commentId) {
 				return null;
 			}
-
-			const publicUser = await this.GetPublicUserById(data.userId);
 
 			return {
 				...data,
@@ -1132,7 +1129,7 @@ export class FirestoreService extends FirestoreUtils {
 		reaction: EReaction;
 		commentId: string;
 	}): Promise<string> {
-		// if user has already reacted to this comment, delete the reaction and add a new one
+		// if user has already reacted to this comment, replace the reaction
 		const existingReaction = await this.reactionsCollectionRef()
 			.where('network', '==', network)
 			.where('proposalType', '==', proposalType)
@@ -1141,18 +1138,18 @@ export class FirestoreService extends FirestoreUtils {
 			.where('commentId', '==', commentId)
 			.get();
 
-		const reactionId = this.reactionsCollectionRef().doc().id;
+		let reactionId = this.reactionsCollectionRef().doc().id;
 
 		if (existingReaction.docs.length) {
-			await this.DeleteReactionById(existingReaction.docs[0].id);
+			reactionId = existingReaction.docs[0].id;
 		}
 
 		await this.reactionsCollectionRef()
 			.doc(reactionId)
 			.set(
 				{
-					network,
 					id: reactionId,
+					network,
 					indexOrHash,
 					proposalType,
 					userId,
