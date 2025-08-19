@@ -11,9 +11,13 @@
 }
 
 .infoRowLabel {
-	@apply col-span-1
+	@apply col-span-1;
 }
 
 .infoRowValue {
 	@apply col-span-3;
+}
+
+.onchainInfoBox {
+	@apply rounded-none bg-bg_modal p-4 shadow-lg lg:rounded-xl lg:p-6;
 }
