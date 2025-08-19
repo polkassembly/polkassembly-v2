@@ -991,7 +991,7 @@ export class OffChainDbService {
 				? (getAssetDataByIndexForNetwork({
 						network,
 						generalIndex: beneficiary.assetId
-					}).symbol as unknown as Exclude<EAssets, EAssets.MYTH>)
+					}).symbol as Exclude<EAssets, EAssets.MYTH>)
 				: null;
 
 			const usdAmount = convertAssetToUSD({
