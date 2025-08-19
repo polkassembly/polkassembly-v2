@@ -45,7 +45,7 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 
 	const { toast } = useToast();
 	const queryClient = useQueryClient();
-	const [isRemoving, setIsRemoving] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const myVote = voteData.votes[0];
 
@@ -59,7 +59,7 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 		if (!apiService || !loginAddress) return;
 
 		try {
-			setIsRemoving(true);
+			setIsLoading(true);
 			await apiService.removeReferendumVote({
 				address: loginAddress,
 				referendumId: Number(index),
@@ -89,7 +89,7 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 				status: ENotificationStatus.ERROR
 			});
 		} finally {
-			setIsRemoving(false);
+			setIsLoading(false);
 		}
 	};
 
@@ -102,10 +102,10 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 					variant='ghost'
 					className={classes.userVoteCardRemoveButton}
 					onClick={() => setOpenRemoveConfirmModal(true)}
-					disabled={isRemoving}
-					isLoading={isRemoving}
+					disabled={isLoading}
+					isLoading={isLoading}
 				>
-					{isRemoving ? t('PostDetails.removing') : t('PostDetails.removeVote')}
+					{isLoading ? t('PostDetails.removing') : t('PostDetails.removeVote')}
 				</Button>
 			</div>
 			<div className={classes.userVoteCardLayout}>
@@ -180,16 +180,16 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 							<Button
 								variant='outline'
 								onClick={() => setOpenRemoveConfirmModal(false)}
-								disabled={isRemoving}
+								disabled={isLoading}
 							>
 								{t('PostDetails.cancel')}
 							</Button>
 							<Button
 								onClick={handleRemoveVote}
-								isLoading={isRemoving}
-								disabled={isRemoving}
+								isLoading={isLoading}
+								disabled={isLoading}
 							>
-								{isRemoving ? t('PostDetails.removing') : t('PostDetails.remove')}
+								{isLoading ? t('PostDetails.removing') : t('PostDetails.remove')}
 							</Button>
 						</div>
 					</div>
