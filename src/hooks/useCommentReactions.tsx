@@ -51,8 +51,6 @@ export const useCommentReactions = (commentData: ICommentData) => {
 	}, [commentData?.reactions, user?.id]);
 
 	const [reactionState, setReactionState] = useState<ICommentReactionState>({ isLiked, isDisliked, likesCount, dislikesCount, usersWhoLikedComment, usersWhoDislikedComment });
-	const [showLikeGif, setShowLikeGif] = useState(false);
-	const [showDislikeGif, setShowDislikeGif] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const currentReactionIdFromData = useMemo(() => {
@@ -77,14 +75,9 @@ export const useCommentReactions = (commentData: ICommentData) => {
 
 			setIsLoading(true);
 			const isLikeAction = type === EReaction.like;
-			const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
 
 			try {
 				const isDeleteAction = Boolean(currentReactionId && ((isLikeAction && reactionState.isLiked) || (!isLikeAction && reactionState.isDisliked)));
-				if (!isDeleteAction) {
-					showGifSetter(true);
-					setTimeout(() => showGifSetter(false), 1500);
-				}
 
 				setReactionState((previousState) => {
 					const updatedUserArrays = calculateUpdatedReactionUserArrays({
@@ -148,8 +141,6 @@ export const useCommentReactions = (commentData: ICommentData) => {
 
 	return {
 		reactionState,
-		showLikeGif,
-		showDislikeGif,
 		handleReaction,
 		isLoading
 	};

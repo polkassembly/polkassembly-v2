@@ -23,7 +23,7 @@ function CommentReactions({ commentData, disabled = false }: CommentReactionsPro
 	const { user } = useUser();
 	const router = useRouter();
 
-	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isLoading } = useCommentReactions({
+	const { handleReaction, reactionState, isLoading } = useCommentReactions({
 		reactions: commentData?.reactions,
 		proposalType: commentData?.proposalType,
 		indexOrHash: commentData?.indexOrHash,
@@ -54,9 +54,8 @@ function CommentReactions({ commentData, disabled = false }: CommentReactionsPro
 								<ReactionButton
 									type={EReaction.like}
 									isActive={reactionState.isLiked}
-									showGif={showLikeGif}
 									showText={false}
-									className='text-xs'
+									className='text-[10px]'
 									count={reactionState.likesCount}
 									onClick={handleLike}
 									disabled={isLoading || disabled}
@@ -99,9 +98,8 @@ function CommentReactions({ commentData, disabled = false }: CommentReactionsPro
 								<ReactionButton
 									type={EReaction.dislike}
 									isActive={reactionState.isDisliked}
-									showGif={showDislikeGif}
 									showText={false}
-									className='text-xs'
+									className='text-[10px]'
 									count={reactionState.dislikesCount}
 									onClick={handleDislike}
 									disabled={isLoading || disabled}

@@ -7,7 +7,6 @@
 import { ICommentResponse, ENotificationStatus } from '@/_shared/types';
 import { Dispatch, SetStateAction, useCallback, memo, useState, useRef, useEffect } from 'react';
 import Identicon from '@polkadot/react-identicon';
-import ReplyIcon from '@assets/icons/Vote.svg';
 import Image from 'next/image';
 import { Button } from '@ui/Button';
 import Link from 'next/link';
@@ -16,7 +15,7 @@ import { Separator } from '@ui/Separator';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useTranslations } from 'next-intl';
-import { Ellipsis } from 'lucide-react';
+import { CornerUpLeft, Ellipsis } from 'lucide-react';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
@@ -349,10 +348,9 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 							size='sm'
 							disabled={comment.disabled}
 							leftIcon={
-								<Image
-									src={ReplyIcon}
-									alt='reply'
-									className='darkIcon'
+								<CornerUpLeft
+									size={14}
+									className={classes.replyButton}
 								/>
 							}
 						>
@@ -368,10 +366,9 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 								size='sm'
 								className={classes.replyButton}
 								leftIcon={
-									<Image
-										src={ReplyIcon}
-										alt='reply'
-										className='darkIcon'
+									<CornerUpLeft
+										size={14}
+										className={classes.replyButton}
 									/>
 								}
 							>

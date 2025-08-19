@@ -72,8 +72,6 @@ export const usePostReactions = (postData: IPostData) => {
 		[postData.proposalType, postData.indexOrHash]
 	);
 	const [reactionState, setReactionState] = useState<IPostReactionState>({ isLiked, isDisliked, likesCount, dislikesCount, usersWhoLikedPost, usersWhoDislikedPost });
-	const [showLikeGif, setShowLikeGif] = useState(false);
-	const [showDislikeGif, setShowDislikeGif] = useState(false);
 
 	const [currentReactionId, setCurrentReactionId] = useState<string | null>(
 		useMemo(() => postData?.reactions?.find((reaction) => reaction.userId === user?.id)?.id || null, [postData?.reactions, user?.id])
@@ -89,14 +87,9 @@ export const usePostReactions = (postData: IPostData) => {
 				throw new ClientError('Index or hash is required');
 			}
 			const isLikeAction = type === EReaction.like;
-			const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
 
 			try {
 				const isDeleteAction = Boolean(currentReactionId && ((isLikeAction && reactionState.isLiked) || (!isLikeAction && reactionState.isDisliked)));
-				if (!isDeleteAction) {
-					showGifSetter(true);
-					setTimeout(() => showGifSetter(false), 1500);
-				}
 
 				setReactionState((previousState) => {
 					const updatedUserArrays = calculateUpdatedReactionUserArrays({
@@ -189,8 +182,6 @@ export const usePostReactions = (postData: IPostData) => {
 
 	return {
 		reactionState,
-		showLikeGif,
-		showDislikeGif,
 		handleReaction,
 		isSubscribed,
 		handleSubscribe,

@@ -24,7 +24,7 @@ function PostActions({ postData }: { postData: IPost }) {
 	const router = useRouter();
 	const pathname = usePathname();
 	// usememo
-	const { handleReaction, reactionState, showLikeGif, showDislikeGif, isSubscribed, handleSubscribe, subscriptionKey } = usePostReactions({
+	const { handleReaction, reactionState, isSubscribed, handleSubscribe, subscriptionKey } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
 		indexOrHash: ValidatorService.isValidNumber(postData?.index) ? postData?.index?.toString() : postData?.hash,
@@ -69,7 +69,6 @@ function PostActions({ postData }: { postData: IPost }) {
 									<ReactionButton
 										type={EReaction.like}
 										isActive={reactionState.isLiked}
-										showGif={showLikeGif}
 										showText={false}
 										className='text-sm'
 										count={reactionState.likesCount}
@@ -113,7 +112,6 @@ function PostActions({ postData }: { postData: IPost }) {
 									<ReactionButton
 										type={EReaction.dislike}
 										isActive={reactionState.isDisliked}
-										showGif={showDislikeGif}
 										showText={false}
 										className='text-sm'
 										count={reactionState.dislikesCount}
