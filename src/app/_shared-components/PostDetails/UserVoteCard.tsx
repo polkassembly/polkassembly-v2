@@ -72,6 +72,7 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 					});
 					queryClient.invalidateQueries({ queryKey: [EReactQueryKeys.USER_VOTES, proposalType, index, loginAddress] });
 					setOpenRemoveConfirmModal(false);
+					setIsLoading(false);
 				},
 				onFailed: (errorMessage) => {
 					toast({
@@ -79,6 +80,7 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 						description: errorMessage || t('PostDetails.voteRemoveFailed'),
 						status: ENotificationStatus.ERROR
 					});
+					setIsLoading(false);
 				}
 			});
 		} catch (error) {
@@ -88,7 +90,6 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 				description: t('PostDetails.voteRemoveFailed'),
 				status: ENotificationStatus.ERROR
 			});
-		} finally {
 			setIsLoading(false);
 		}
 	};
