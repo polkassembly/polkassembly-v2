@@ -4,7 +4,7 @@
 
 'use client';
 
-import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences, EAccountType, IAddressRelations } from '@/_shared/types';
+import { IRefreshTokenPayload, IUserPreferences, EAccountType, IAddressRelations } from '@/_shared/types';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -24,8 +24,10 @@ import { AssethubApiService } from '../_client-services/assethub_api_service';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
 import { isMimirDetected } from '../_client-services/isMimirDetected';
 
-function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
+function Initializers({ userPreferences }: { userPreferences: IUserPreferences }) {
 	const network = getCurrentNetwork();
+
+	const userData = CookieClientService.getAccessTokenPayload();
 
 	const { user, setUser, setUserAddressRelations } = useUser();
 	const { setUserPreferences } = useUserPreferences();
@@ -236,7 +238,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 		setUser(userData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [userData]);
+	}, []);
 
 	// set address relations
 	useEffect(() => {
@@ -263,7 +265,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 		fetchAddressRelations();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [userData]);
+	}, []);
 
 	return null;
 }

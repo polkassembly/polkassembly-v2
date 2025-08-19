@@ -48,7 +48,7 @@ export default async function RootLayout({
 	children: ReactNode;
 	modal: ReactNode;
 }>) {
-	const user = await CookieService.getUserFromCookie();
+	// const user = await CookieService.getUserFromCookie();
 	const userPreferences = await CookieService.getUserPreferencesFromCookie();
 	const { NEXT_PUBLIC_GA_ID } = getSharedEnvVars();
 
@@ -77,10 +77,7 @@ export default async function RootLayout({
 					locale={userPreferences.locale}
 					userPreferences={userPreferences}
 				>
-					<Initializers
-						userData={user || null}
-						userPreferences={userPreferences}
-					/>
+					<Initializers userPreferences={userPreferences} />
 					{modal}
 					<AppLayout>{children}</AppLayout>
 				</Providers>
