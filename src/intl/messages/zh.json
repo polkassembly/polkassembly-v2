@@ -106,14 +106,16 @@
 		"hidePassword": "隐藏密码",
 		"showPassword": "显示密码",
 		"pleaseConnectWallet": "请将您的钱包连接到Polkassembly。",
-		"pleaseCheckConnectedAccounts": "请检查扩展中的已连接账户。"
+		"pleaseCheckConnectedAccounts": "请检查扩展中的已连接账户。",
+		"linkedAccount": "链接的账户"
 	},
 	"AddressRelationsPicker": {
 		"Switch": "切换",
 		"switchWallet": "切换钱包",
 		"noData": "没有数据",
 		"found": "找到",
-		"confirm": "确认"
+		"confirm": "确认",
+		"noAccountSelected": "选择账户"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "国库提案",
@@ -434,6 +436,7 @@
 	"PostDetails": {
 		"castVote": "投票",
 		"castYourVote": "进行投票",
+		"copyLink": "复制链接",
 		"loginToVote": "登录以投票",
 		"requested": "已请求",
 		"beneficiary": "受益人",
@@ -753,6 +756,10 @@
 	"Preimages": {
 		"hash": "哈希",
 		"author": "作者",
+		"all": "全部",
+		"myPreimages": "我的预映像",
+		"noUserPreimages": "您没有预映像！",
+		"createOneNow": "现在创建一个！",
 		"deposit": "押金",
 		"arguments": "参数",
 		"size": "大小",
@@ -769,7 +776,16 @@
 		"unnoted_description": "原像未被记录",
 		"failed": "失败",
 		"unrequest": "取消请求",
-		"unnote": "删除记录"
+		"unnote": "删除记录",
+		"unnoteOrUnrequestPreimageDescription": "您确定要删除此预映像的记录或取消请求吗？",
+		"loadingYourPreimages": "正在加载您的预映像...",
+		"please": "请",
+		"toViewPreimages": "以查看您的预映像",
+		"logIn": "登录",
+		"failedToFetchUserPreimages": "获取用户预映像失败",
+		"tryAgain": "重试",
+		"showingPreimagesFor": "显示预映像：",
+		"switchWallet": "切换钱包"
 	},
 	"Create": {
 		"createDiscussionTitle": "创建讨论",

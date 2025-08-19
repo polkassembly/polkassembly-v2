@@ -15,7 +15,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import dynamic from 'next/dynamic';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -130,7 +129,6 @@ const ClaimPayout = dynamic(() => import('./ClaimPayout/ClaimPayout'), {
 });
 
 function PostDetails({ index, isModalOpen, postData }: { index: string; isModalOpen?: boolean; postData: IPost }) {
-	const network = getCurrentNetwork();
 	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
 
 	const [thresholdValues, setThresholdValues] = useState({ approvalThreshold: 0, supportThreshold: 0 });
@@ -196,7 +194,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						postData={post}
 					/>
 				</div>
-				<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-7xl')}>
+				<div className={cn(classes.detailsWrapper, 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-7xl', isModalOpen && classes.modalOpen)}>
 					<div className={classes.leftWrapper}>
 						<div className={classes.descBox}>
 							<TabsContent value={EPostDetailsTab.DESCRIPTION}>
@@ -242,7 +240,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								)}
 							</div>
 						)}
-						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
+						<div className={classes.commentsBox}>
 							<PostComments
 								proposalType={post.proposalType}
 								index={index}
@@ -336,24 +334,11 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					)}
 
 					{/* Poll */}
-					{isOffchainPost && post?.poll && network === 'paseo' && (
+					{isOffchainPost && post?.poll && (
 						<div className={classes.rightWrapper}>
 							<Poll poll={post.poll} />
 						</div>
 					)}
-
-					<div className={cn(classes.leftWrapper, 'xl:hidden')}>
-						<div className={classes.commentsBox}>
-							<PostComments
-								proposalType={post.proposalType}
-								index={index}
-								contentSummary={post.contentSummary}
-								comments={post.comments}
-								allowedCommentor={post.allowedCommentor}
-								postUserId={post.userId}
-							/>
-						</div>
-					</div>
 				</div>
 			</Tabs>
 		</>
