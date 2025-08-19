@@ -4,7 +4,7 @@
 
 'use client';
 
-import { IRefreshTokenPayload, IUserPreferences, EAccountType, IAddressRelations } from '@/_shared/types';
+import { IRefreshTokenPayload, IUserPreferences, EAccountType, IAddressRelations, IAccessTokenPayload } from '@/_shared/types';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -24,10 +24,10 @@ import { AssethubApiService } from '../_client-services/assethub_api_service';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
 import { isMimirDetected } from '../_client-services/isMimirDetected';
 
-function Initializers({ userPreferences }: { userPreferences: IUserPreferences }) {
+function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const network = getCurrentNetwork();
 
-	const userData = CookieClientService.getAccessTokenPayload();
+	const userDataClient = CookieClientService.getAccessTokenPayload();
 
 	const { user, setUser, setUserAddressRelations } = useUser();
 	const { setUserPreferences } = useUserPreferences();
@@ -232,7 +232,7 @@ function Initializers({ userPreferences }: { userPreferences: IUserPreferences }
 
 	// set user
 	useEffect(() => {
-		if (!userData) {
+		if (!userData || !userDataClient) {
 			return;
 		}
 
@@ -243,7 +243,7 @@ function Initializers({ userPreferences }: { userPreferences: IUserPreferences }
 	// set address relations
 	useEffect(() => {
 		const fetchAddressRelations = async () => {
-			const userAddresses = userData?.addresses;
+			const userAddresses = userDataClient?.addresses;
 			if (!userAddresses?.length) return;
 
 			const addressRelations: IAddressRelations[] = [];
@@ -265,7 +265,7 @@ function Initializers({ userPreferences }: { userPreferences: IUserPreferences }
 
 		fetchAddressRelations();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [userData]);
 
 	return null;
 }
