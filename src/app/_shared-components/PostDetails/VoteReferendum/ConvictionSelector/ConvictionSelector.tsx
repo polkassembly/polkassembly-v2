@@ -65,7 +65,7 @@ function ConvictionSelector({
 					{t('ConvictionSelector.votes')}
 				</div>
 				<span className='font-semibold text-text_primary'>
-					{formatBnBalance(new BN(voteBalance.toNumber() * getConvictionMultiplier(conviction)), { withUnit: true, numberAfterComma: 2 }, network)}
+					{formatBnBalance(voteBalance.mul(new BN(getConvictionMultiplier(conviction))), { withUnit: true, numberAfterComma: 2 }, network)}
 				</span>
 			</div>
 			<div className='flex items-center justify-between text-sm'>

@@ -15,7 +15,9 @@ export enum ENetwork {
 	POLKADOT = 'polkadot',
 	WESTEND = 'westend',
 	PASEO = 'paseo',
-	CERE = 'cere'
+	CERE = 'cere',
+	MOONBEAM = 'moonbeam',
+	MOONRIVER = 'moonriver'
 }
 
 export enum EGovType {
@@ -156,9 +158,9 @@ export enum EWallet {
 	POLKAGATE = 'polkagate',
 	NOVAWALLET = 'nova',
 	MIMIR = 'mimir',
-	OTHER = ''
-	// METAMASK = 'metamask',
-	// WALLETCONNECT = 'walletconnect',
+	OTHER = '',
+	METAMASK = 'metamask',
+	WALLETCONNECT = 'walletconnect'
 	// POLYWALLET = 'polywallet',
 	// POLKASAFE = 'polkasafe',
 }
