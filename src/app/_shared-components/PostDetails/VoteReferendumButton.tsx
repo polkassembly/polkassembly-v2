@@ -10,7 +10,7 @@ import { useTranslations } from 'next-intl';
 import VoteIcon from '@assets/activityfeed/vote.svg';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { EPostOrigin, EProposalType } from '@/_shared/types';
+import { EPostOrigin, EProposalType, IVoteData } from '@/_shared/types';
 import { useState } from 'react';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../Dialog/Dialog';
@@ -21,14 +21,17 @@ interface VoteReferendumButtonProps {
 	btnClassName?: string;
 	iconClassName?: string;
 	size?: 'sm' | 'lg';
+	hasVoted?: boolean;
 	track?: EPostOrigin;
 	proposalType: EProposalType;
+	existingVote?: IVoteData;
 }
 
-function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg', track, proposalType }: VoteReferendumButtonProps) {
+function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg', hasVoted = false, track, proposalType, existingVote }: VoteReferendumButtonProps) {
 	const { user } = useUser();
 	const t = useTranslations();
 	const [openModal, setOpenModal] = useState(false);
+
 	return !user ? (
 		<Link href='/login'>
 			<Button
@@ -65,7 +68,7 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 							height={20}
 							className={iconClassName}
 						/>
-						{t('PostDetails.castVote')}
+						{hasVoted ? t('PostDetails.changeVote') : t('PostDetails.castVote')}
 					</div>
 				</Button>
 			</DialogTrigger>
@@ -76,6 +79,7 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 					track={track}
 					onClose={() => setOpenModal(false)}
 					proposalType={proposalType}
+					existingVote={existingVote}
 				/>
 			</DialogContent>
 		</Dialog>
