@@ -39,6 +39,7 @@ const calculateNativeTokenEquivalent = ({
 	currentTokenPrice?: string;
 	dedTokenUsdPrice?: string;
 }) => {
+	if (!currentTokenPrice || !beneficiaries?.length || !network) return BN_ZERO;
 	const totalUsdAmount = beneficiaries.reduce((acc, beneficiary) => {
 		const assetSymbol = beneficiary.assetId
 			? (getAssetDataByIndexForNetwork({
@@ -53,10 +54,12 @@ const calculateNativeTokenEquivalent = ({
 	const tokenDecimal = NETWORKS_DETAILS[`${network}`].tokenDecimals;
 
 	const nativeTokenUsdPrice = currentTokenPrice ? decimalToBN(currentTokenPrice) : null;
-	return totalUsdAmount
-		.mul(new BN(10).pow(new BN(tokenDecimal)))
-		.mul(new BN(10).pow(new BN(nativeTokenUsdPrice?.decimals || BN_ZERO.toString())))
-		.div(nativeTokenUsdPrice?.value || BN_ZERO);
+	return nativeTokenUsdPrice
+		? totalUsdAmount
+				.mul(new BN(10).pow(new BN(tokenDecimal)))
+				.mul(new BN(10).pow(new BN(nativeTokenUsdPrice?.decimals || BN_ZERO.toString())))
+				.div(nativeTokenUsdPrice?.value || BN_ZERO)
+		: BN_ZERO;
 };
 
 function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: number) => void }) {
