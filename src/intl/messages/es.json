@@ -573,7 +573,7 @@
 			"parentBountyIndex": "Índice de recompensa principal",
 			"payee": "Beneficiario",
 			"curator": "Curador",
-			"requested":"Solicitado",
+			"requested": "Solicitado",
 			"calls": "Llamadas",
 			"showMore": "Mostrar más",
 			"showLess": "Mostrar menos",
@@ -980,7 +980,13 @@
 		"verify": "Verificar",
 		"verified": "Verificado",
 		"pending": "Pendiente",
-		"CurrentJudgement": "Juicio Actual"
+		"CurrentJudgement": "Juicio Actual",
+		"clearIdentity": "Borrar identidad",
+		"clearIdentitySuccess": "¡Identidad borrada!",
+		"clearIdentitySuccessDescription": "Su identidad ha sido borrada exitosamente",
+		"clearIdentityFailed": "Error al borrar la identidad",
+		"clearIdentityFailedDescription": "Hubo un error al borrar su identidad",
+		"clearIdentityDescription": "¿Está seguro de que desea borrar su identidad?"
 	},
 	"Overview": {
 		"month": "Mes",
