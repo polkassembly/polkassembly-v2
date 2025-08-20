@@ -4,8 +4,9 @@
 
 'use client';
 
-import { ICommentResponse, ENotificationStatus } from '@/_shared/types';
+import { ICommentResponse, ENotificationStatus, ICommentHistoryItem } from '@/_shared/types';
 import { Dispatch, SetStateAction, useCallback, memo, useState, useRef, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Identicon from '@polkadot/react-identicon';
 import Image from 'next/image';
 import { Button } from '@ui/Button';
@@ -32,7 +33,10 @@ import Address from '../../Profile/Address/Address';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import VoteComments from '../VoteComments/VoteComments';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
+import { Skeleton } from '../../Skeleton';
 import CommentReactions from '../CommentReactions/CommentReactions';
+
+const CommentHistory = dynamic(() => import('./CommentHistory/CommentHistory'), { ssr: false, loading: () => <Skeleton className='h-8 w-16' /> });
 
 interface SingleCommentProps {
 	commentData: ICommentResponse;
@@ -57,6 +61,7 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 	const [content, setContent] = useState<string>(commentData.content);
 
 	const user = useAtomValue(userAtom);
+	const [history, setHistory] = useState<ICommentHistoryItem[]>(commentData?.history || []);
 
 	const { toast } = useToast();
 
@@ -144,6 +149,9 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 		});
 		setIsEditing(false);
 
+		// create a new comment history item with the new content
+		setHistory((prev) => [...prev, { content: originalContent || '', createdAt: new Date() }]);
+
 		setLoading(true);
 
 		const { data, error } = await CommentClientService.editCommentFromPost({
@@ -171,6 +179,8 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 				description: error?.message || 'Failed to edit comment',
 				status: ENotificationStatus.ERROR
 			});
+			// remove the new history item from the comment history array
+			setHistory((prev) => (prev && prev.length ? prev.slice(0, -1) : []));
 			return;
 		}
 		toast({
@@ -291,6 +301,13 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 						className='h-3'
 					/>
 					<CreatedAtTime createdAt={comment.updatedAt || comment.createdAt} />
+					{history && history?.length > 0 && (
+						<CommentHistory
+							authorAddress={addressToDisplay}
+							authorUsername={comment?.publicUser?.username}
+							history={[...history, { content: comment.content, createdAt: comment.updatedAt || comment.createdAt }]}
+						/>
+					)}
 					{comment.voteData && comment.voteData.length > 0 && (
 						<>
 							<Separator
