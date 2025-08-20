@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/D
 import BeneficiariesSkeleton from './BeneficiariesSkeleton';
 import classes from './BeneficiariesDetails.module.scss';
 import BeneficiaryPayoutsList from './BeneficiaryPayoutsList';
+import { Skeleton } from '../../Skeleton';
 
 interface BeneficiariesDetailsDialogProps {
 	open: boolean;
@@ -40,10 +41,14 @@ function BeneficiariesDetailsDialog({ open, onOpenChange, beneficiaries }: Benef
 					<div>
 						{!!beneficiaries.length && (
 							<div className={classes.beneficiariesDetailsDialogContentHeader}>
-								<div className={classes.beneficiariesDetailsDialogContentHeaderAmount}>
-									<span>~</span>
-									{formatUSDWithUnits(totalUsdAmount, 1)}
-								</div>
+								{!totalUsdAmount ? (
+									<Skeleton className='h-10 w-full' />
+								) : (
+									<div className={classes.beneficiariesDetailsDialogContentHeaderAmount}>
+										<span>~</span>
+										{formatUSDWithUnits(totalUsdAmount, 1)}
+									</div>
+								)}
 								<div className={classes.beneficiariesDialogTotalEstimatedUSD}>{t('totalEstimatedUSD')}</div>
 							</div>
 						)}

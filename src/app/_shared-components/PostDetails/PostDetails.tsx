@@ -218,18 +218,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								linkedPost={post.linkedPost}
 							/>
 						</TabsContent>
-						<TabsContent
-							value={EPostDetailsTab.SUMMARISE}
-							className='mt-0'
-						>
-							<div className={classes.descBox}>
-								<AISummary
-									indexOrHash={String(postData?.index ?? postData?.hash)}
-									proposalType={postData.proposalType}
-									initialData={postData?.contentSummary}
-								/>
-							</div>
-						</TabsContent>
+
 						{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(post.proposalType) && (
 							<TabsContent
 								value={EPostDetailsTab.POST_ANALYTICS}
@@ -243,6 +232,18 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								</div>
 							</TabsContent>
 						)}
+						<TabsContent
+							value={EPostDetailsTab.SUMMARISE}
+							className='mt-0'
+						>
+							<div className={classes.descBox}>
+								<AISummary
+									indexOrHash={String(postData?.index ?? postData?.hash)}
+									proposalType={postData.proposalType}
+									initialData={postData?.contentSummary}
+								/>
+							</div>
+						</TabsContent>
 						<div className={classes.commentsBox}>
 							<PostComments
 								proposalType={post.proposalType}
