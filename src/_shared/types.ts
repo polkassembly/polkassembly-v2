@@ -1023,7 +1023,8 @@ export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart',
 	COMMENTS = 'comments',
 	POST_DETAILS = 'postDetails',
-	IDENTITY_INFO = 'identityInfo'
+	IDENTITY_INFO = 'identityInfo',
+	TOKENS_USD_PRICE = 'tokensUsdPrice'
 }
 
 export interface IParamDef {

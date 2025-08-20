@@ -998,7 +998,7 @@ export class OffChainDbService {
 				amount: beneficiary.amount,
 				asset: assetSymbol,
 				currentTokenPrice: treasuryStats[0]?.nativeTokenUsdPrice,
-				dedTokenUSDPrice: treasuryStats[0]?.dedTokenUsdPrice,
+				dedTokenUsdPrice: treasuryStats[0]?.dedTokenUsdPrice,
 				network
 			})?.toString();
 

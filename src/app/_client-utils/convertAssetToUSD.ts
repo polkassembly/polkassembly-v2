@@ -12,13 +12,13 @@ export const convertAssetToUSD = ({
 	amount,
 	asset,
 	currentTokenPrice,
-	dedTokenUSDPrice,
+	dedTokenUsdPrice,
 	network
 }: {
 	amount: string;
 	asset: Exclude<EAssets, EAssets.MYTH> | null;
 	currentTokenPrice?: string;
-	dedTokenUSDPrice?: string;
+	dedTokenUsdPrice?: string;
 	network: ENetwork;
 }): BN => {
 	if (!amount || !ValidatorService.isValidAmount(amount)) return BN_ZERO;
@@ -33,7 +33,7 @@ export const convertAssetToUSD = ({
 	}
 
 	if (asset === EAssets.DED) {
-		const dedTokenPriceBN = dedTokenUSDPrice ? decimalToBN(dedTokenUSDPrice) : null;
+		const dedTokenPriceBN = dedTokenUsdPrice ? decimalToBN(dedTokenUsdPrice) : null;
 		if (!dedTokenPriceBN) return BN_ZERO;
 		return dedTokenPriceBN.value
 			.mul(new BN(amount))
