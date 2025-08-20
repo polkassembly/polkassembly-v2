@@ -150,7 +150,7 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 		setIsEditing(false);
 
 		// create a new comment history item with the new content
-		setHistory((prev) => [...prev, { content, createdAt: new Date() }]);
+		setHistory((prev) => [...prev, { content: originalContent || '', createdAt: new Date() }]);
 
 		setLoading(true);
 
