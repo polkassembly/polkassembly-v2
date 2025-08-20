@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EEnactment, EPostOrigin, IBeneficiaryInput, ENotificationStatus, IBeneficiary, ENetwork, EAssets } from '@/_shared/types';
+import { EEnactment, EPostOrigin, IBeneficiaryInput, ENotificationStatus, IBeneficiary, ENetwork, EAssets, EReactQueryKeys } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -89,7 +89,7 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 	};
 
 	const { data: tokensUsdPrice } = useQuery({
-		queryKey: ['tokensUsdPrice'],
+		queryKey: [EReactQueryKeys.TOKENS_USD_PRICE],
 		queryFn: getTokensUsdPrice,
 		retry: false
 	});
