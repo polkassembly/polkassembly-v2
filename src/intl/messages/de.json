@@ -978,7 +978,13 @@
 		"verify": "Verifizieren",
 		"verified": "Verifiziert",
 		"pending": "Ausstehend",
-		"CurrentJudgement": "Aktuelle Beurteilung"
+		"CurrentJudgement": "Aktuelle Beurteilung",
+		"clearIdentity": "Identität löschen",
+		"clearIdentitySuccess": "Identität gelöscht!",
+		"clearIdentitySuccessDescription": "Ihre Identität wurde erfolgreich gelöscht",
+		"clearIdentityFailed": "Identitätslöschung fehlgeschlagen",
+		"clearIdentityFailedDescription": "Beim Löschen Ihrer Identität ist ein Fehler aufgetreten",
+		"clearIdentityDescription": "Sind Sie sicher, dass Sie Ihre Identität löschen möchten?"
 	},
 	"Bounties": {
 		"onchainBounties": "Onchain-Prämien",
