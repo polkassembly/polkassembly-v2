@@ -356,7 +356,7 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 							open={openClearIdentityModal}
 							onOpenChange={setOpenClearIdentityModal}
 						>
-							<DialogTrigger>
+							<DialogTrigger asChild>
 								<Button
 									disabled={loading || fetchingIdentityInfo}
 									variant='secondary'
