@@ -61,7 +61,7 @@ function ActivityFeedPostItem({
 	const network = getCurrentNetwork();
 	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments);
 
-	const { reactionState, showLikeGif, showDislikeGif, handleReaction, isSubscribed, handleSubscribe, subscriptionKey } = usePostReactions({
+	const { reactionState, handleReaction, isSubscribed, handleSubscribe, subscriptionKey } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
 		indexOrHash: postData?.index?.toString() || postData?.hash,
@@ -233,8 +233,6 @@ function ActivityFeedPostItem({
 						postData={postData}
 						isLiked={reactionState.isLiked}
 						isDisliked={reactionState.isDisliked}
-						showLikeGif={showLikeGif}
-						showDislikeGif={showDislikeGif}
 						handleReaction={handleReaction}
 						isSubscribed={isSubscribed}
 						handleSubscribe={handleSubscribeClick}
