@@ -150,8 +150,7 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 		setIsEditing(false);
 
 		// create a new comment history item with the new content
-		const newHistory = [...history, { content, createdAt: new Date() }];
-		setHistory(newHistory);
+		setHistory((prev) => [...prev, { content, createdAt: new Date() }]);
 
 		setLoading(true);
 
@@ -181,7 +180,7 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 				status: ENotificationStatus.ERROR
 			});
 			// remove the new history item from the comment history array
-			setHistory((prev) => prev?.filter((item) => item.createdAt !== newHistory[newHistory.length - 1].createdAt) || []);
+			setHistory((prev) => (prev && prev.length ? prev.slice(0, -1) : []));
 			return;
 		}
 		toast({

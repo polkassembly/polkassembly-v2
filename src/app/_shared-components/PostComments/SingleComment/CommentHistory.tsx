@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ICommentHistoryItem } from '@/_shared/types';
-import { GenerateDiffHtml, removeSymbols } from '@/_shared/_utils/htmlDiff';
+import { generateDiffHtml, removeSymbols } from '@/_shared/_utils/htmlDiff';
 import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { DialogHeader, DialogTitle, Dialog, DialogTrigger, DialogContent } from '../../Dialog/Dialog';
@@ -23,7 +23,7 @@ function CommentHistory({ authorAddress, authorUsername, history }: { authorAddr
 			const previousComment = index < (history?.length ? history.length - 1 : 0) ? history[index + 1]?.content : null;
 
 			const previousCommentStr = previousComment ? removeSymbols(previousComment) : '';
-			const diffHtml = previousCommentStr ? GenerateDiffHtml(currentCommentStr, previousCommentStr) : currentCommentStr;
+			const diffHtml = previousCommentStr ? generateDiffHtml(currentCommentStr, previousCommentStr) : currentCommentStr;
 
 			return {
 				...item,

@@ -11,7 +11,7 @@ export function removeSymbols(input: string | undefined): string {
 	return removeMd(striptags(String(input)));
 }
 
-export function GenerateDiffHtml(originalHtml: string, modifiedHtml: string) {
+export function generateDiffHtml(originalHtml: string, modifiedHtml: string) {
 	const diff = diffWords(originalHtml, modifiedHtml);
 
 	let diffHtml = '';
