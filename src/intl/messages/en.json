@@ -466,6 +466,7 @@
 		"preparePeriod": "Prepare Period",
 		"decisionPeriod": "Decision Period",
 		"summary": "Summary",
+		"summarise": "SUMMARISE",
 		"analytics": "Analytics",
 		"aye": "Aye",
 		"nay": "Nay",
@@ -489,6 +490,18 @@
 		"aiSummary": "AI Summary",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
+		"BeneficiariesDetails": {
+			"requested": "Requested",
+			"details": "Details",
+			"immediately": "immediately",
+			"in": "in",
+			"to": "to",
+			"totalEstimatedUSD": "Total estimated USD equivalent",
+			"more": "more",
+			"requestedAmountDetails": "Requested Amount Details",
+			"showMore": "Show More",
+			"showLess": "Show Less"
+		},
 		"VotesBubble": {
 			"nested": "Nested",
 			"flattened": "Flattened",
@@ -567,6 +580,7 @@
 			"proposalHash": "Proposal Hash",
 			"preimage": "Preimage",
 			"description": "Description",
+			"details": "Details",
 			"section": "Section",
 			"name": "Name",
 			"value": "Value",
@@ -583,7 +597,13 @@
 			"updatedAtBlock": "Updated At Block",
 			"enactmentAtBlock": "Enactment At Block",
 			"enactmentAfterBlock": "Enactment After Block",
-			"trackNumber": "Track Number"
+			"trackNumber": "Track Number",
+			"requested": "Requested",
+			"calls": "Calls",
+			"showMore": "Show More",
+			"showLess": "Show Less",
+			"call": "Call",
+			"timeline": "Timeline"
 		},
 		"ProposalType": {
 			"discussion": "Discussion",

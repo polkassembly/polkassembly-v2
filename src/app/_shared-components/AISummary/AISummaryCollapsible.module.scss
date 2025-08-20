@@ -47,3 +47,7 @@
 	padding: 0rem 1.5rem 1.5rem 1.5rem;
 	font-size: 14px;
 }
+
+.heading {
+	@apply mb-2 flex items-center gap-x-1 text-lg font-semibold text-text_primary;
+}

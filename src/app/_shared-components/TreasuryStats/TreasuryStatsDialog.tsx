@@ -7,6 +7,7 @@ import React, { ReactElement, ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { ITreasuryStats, EAssets, ENetwork } from '@/_shared/types';
 import Image from 'next/image';
+import { convertAssetToUSD } from '@/app/_client-utils/convertAssetToUSD';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/networks';
@@ -15,7 +16,6 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
-import { decimalToBN } from '@/_shared/_utils/decimalToBN';
 import { Separator } from '../Separator';
 
 // Component for displaying a single asset row
@@ -26,31 +26,29 @@ type AssetRowProps = {
 	network: ENetwork;
 };
 
-// Convert amount to usd for all assets
-const formatedAmountWithUSD = ({
+export const calculateTotalUSDValue = ({
 	amountsDetails,
 	currentTokenPrice,
+	dedTokenUSDPrice,
 	network
 }: {
 	amountsDetails: { amount: string | null; asset: Exclude<EAssets, EAssets.MYTH> | null }[];
-	currentTokenPrice: string;
+	currentTokenPrice?: string;
+	dedTokenUSDPrice?: string;
 	network: ENetwork;
 }) => {
 	let totalUSD = BN_ZERO;
-	const nativeTokenPriceBN = decimalToBN(currentTokenPrice);
 
 	amountsDetails?.forEach(({ amount, asset }) => {
 		if (amount) {
-			if (!asset) {
-				totalUSD = totalUSD.add(
-					nativeTokenPriceBN.value
-						.mul(new BN(amount))
-						.div(new BN(10).pow(new BN(NETWORKS_DETAILS[`${network}`].tokenDecimals)))
-						.div(new BN(10).pow(new BN(nativeTokenPriceBN.decimals)))
-				);
-			} else {
-				totalUSD = totalUSD?.add(new BN(amount).div(new BN(10).pow(new BN(treasuryAssetsData[asset as EAssets]?.tokenDecimal))));
-			}
+			const assetUSDValue = convertAssetToUSD({
+				amount,
+				asset,
+				currentTokenPrice,
+				dedTokenUSDPrice,
+				network
+			});
+			totalUSD = totalUSD.add(assetUSDValue);
 		}
 	});
 
@@ -58,6 +56,8 @@ const formatedAmountWithUSD = ({
 };
 
 function AssetRow({ amount, asset, prefix, network }: AssetRowProps) {
+	const assetId = Object.values(NETWORKS_DETAILS[`${network}`]?.supportedAssets)?.find((supportedAsset) => supportedAsset.symbol === asset)?.index;
+
 	return (
 		<div className='flex items-center gap-1 text-sm font-medium dark:text-white max-md:text-xs'>
 			<Image
@@ -75,12 +75,7 @@ function AssetRow({ amount, asset, prefix, network }: AssetRowProps) {
 			) : (
 				<span className='font-medium text-muted-foreground'>
 					{prefix || ''}
-					{formatBnBalance(
-						amount,
-						{ withUnit: true, numberAfterComma: 2, compactNotation: true },
-						network,
-						Object.values(NETWORKS_DETAILS[`${network}`]?.supportedAssets)?.find((supportedAsset) => supportedAsset.symbol === asset)?.index
-					)}
+					{formatBnBalance(amount, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network, assetId)}
 				</span>
 			)}
 		</div>
@@ -109,7 +104,7 @@ function RelayChainSection({ data, network, currentTokenPrice, title }: { data: 
 			<div className='flex flex-col gap-1'>
 				<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 					~ $
-					{formatedAmountWithUSD({
+					{calculateTotalUSDValue({
 						amountsDetails: [{ amount: data.relayChain?.nativeToken || null, asset: null }],
 						currentTokenPrice,
 						network
@@ -146,7 +141,7 @@ function AssetHubSection({
 		<CategorySection title={title}>
 			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 				~ $
-				{formatedAmountWithUSD({
+				{calculateTotalUSDValue({
 					amountsDetails: [
 						{ amount: data.assetHub?.nativeToken || null, asset: null },
 						{ amount: data.assetHub?.usdc || null, asset: EAssets.USDC },
@@ -210,7 +205,7 @@ function HydrationSection({
 		<CategorySection title={title}>
 			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 				~ $
-				{formatedAmountWithUSD({
+				{calculateTotalUSDValue({
 					amountsDetails: [
 						{ amount: data.hydration?.nativeToken || null, asset: null },
 						{ amount: data.hydration?.usdc || null, asset: EAssets.USDC },
@@ -267,7 +262,7 @@ function BountiesSection({ data, network, currentTokenPrice, title }: { data: IT
 		<CategorySection title={title}>
 			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 				~ $
-				{formatedAmountWithUSD({
+				{calculateTotalUSDValue({
 					amountsDetails: [{ amount: data.bounties?.nativeToken || null, asset: null }],
 					currentTokenPrice,
 					network
@@ -312,7 +307,7 @@ function AmbassadorSection({
 		<CategorySection title={title}>
 			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 				~ $
-				{formatedAmountWithUSD({
+				{calculateTotalUSDValue({
 					amountsDetails: [{ amount: data.ambassador?.usdt || null, asset: EAssets.USDT }],
 					currentTokenPrice,
 					network
@@ -362,7 +357,7 @@ function FellowshipSection({
 		<CategorySection title={title}>
 			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 				~ $
-				{formatedAmountWithUSD({
+				{calculateTotalUSDValue({
 					amountsDetails: [
 						{ amount: data.fellowship?.nativeToken || null, asset: null },
 						{ amount: data.fellowship?.usdt || null, asset: EAssets.USDT }
@@ -445,7 +440,7 @@ function LoansSection({
 		<CategorySection title={title}>
 			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
 				~ $
-				{formatedAmountWithUSD({
+				{calculateTotalUSDValue({
 					amountsDetails: [
 						{ amount: loanAmounts?.bifrost?.nativeToken || null, asset: null },
 						{ amount: loanAmounts?.centrifuge?.usdc || null, asset: EAssets.USDC },
@@ -551,7 +546,7 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 	const { fellowshipAddress } = treasuryConfig;
 	const { assetHubTreasuryAddress } = treasuryConfig;
 	const { hydrationAddresses } = treasuryConfig;
-	const currentTokenPrice = data.nativeTokenUsdPrice || BN_ZERO?.toString();
+	const currentTokenPrice = data?.nativeTokenUsdPrice || BN_ZERO?.toString();
 
 	return (
 		<Dialog
