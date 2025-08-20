@@ -17,7 +17,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useToast } from '@/hooks/useToast';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import Image from 'next/image';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ENotificationStatus, EReactQueryKeys } from '@/_shared/types';
@@ -28,8 +28,6 @@ import { Input } from '../../Input';
 import { Button } from '../../Button';
 import { Separator } from '../../Separator';
 import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
-import ClearIdentity from '../ClearIdentity/ClearIdentity';
 
 interface ISetIdentityFormFields {
 	displayName: string;
@@ -52,13 +50,20 @@ function SocialIcon({ icon }: { icon: string }) {
 	);
 }
 
-function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee: BN; onTeleport: () => void; onSuccess: (values: ISetIdentityFormFields) => void }) {
+function SetIdentityForm({
+	registrarFee,
+	onTeleport,
+	onSuccess
+}: {
+	registrarFee: BN;
+	onTeleport: () => void;
+	onClearIdentity: () => void;
+	onSuccess: (values: ISetIdentityFormFields) => void;
+}) {
 	const t = useTranslations();
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
 	const { toast } = useToast();
-
-	const queryClient = useQueryClient();
 
 	const network = getCurrentNetwork();
 
@@ -67,8 +72,6 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 	const formData = useForm<ISetIdentityFormFields>();
 
 	const [loading, setLoading] = useState(false);
-
-	const [openClearIdentityModal, setOpenClearIdentityModal] = useState(false);
 
 	const fetchGasFee = async () => {
 		if (!identityService) return null;
@@ -108,14 +111,14 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 		return identityInfo;
 	};
 
-	const { data: identityInfo, isFetching: fetchingIdentityInfo } = useQuery({
+	const { isFetching: fetchingIdentityInfo } = useQuery({
 		queryKey: [EReactQueryKeys.IDENTITY_INFO, user?.id, userPreferences.selectedAccount?.address],
 		queryFn: () => fetchIdentityInfo(),
 		enabled: !!user?.id && !!userPreferences.selectedAccount?.address && !!identityService,
 		placeholderData: (previousData) => previousData,
-		retry: false,
-		refetchOnMount: false,
-		refetchOnWindowFocus: false
+		retry: true,
+		refetchOnMount: true,
+		refetchOnWindowFocus: true
 	});
 
 	const handleSetIdentity = async (values: ISetIdentityFormFields) => {
@@ -350,34 +353,7 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 					gasFee={gasFee || BN_ZERO}
 				/>
 				<Separator className='my-4' />
-				<div className='flex items-center justify-end gap-x-2'>
-					{identityInfo && identityInfo.display && (
-						<Dialog
-							open={openClearIdentityModal}
-							onOpenChange={setOpenClearIdentityModal}
-						>
-							<DialogTrigger asChild>
-								<Button
-									disabled={loading || fetchingIdentityInfo}
-									variant='secondary'
-									type='button'
-								>
-									{t('SetIdentity.clearIdentity')}
-								</Button>
-							</DialogTrigger>
-							<DialogContent className='max-w-md p-3 sm:p-6'>
-								<DialogHeader>
-									<DialogTitle>{t('SetIdentity.clearIdentity')}</DialogTitle>
-								</DialogHeader>
-								<ClearIdentity
-									onSuccess={() => {
-										setOpenClearIdentityModal(false);
-										queryClient.invalidateQueries({ queryKey: [EReactQueryKeys.IDENTITY_INFO, user?.id, userPreferences.selectedAccount?.address] });
-									}}
-								/>
-							</DialogContent>
-						</Dialog>
-					)}
+				<div className='flex items-center justify-end'>
 					<Button
 						isLoading={loading}
 						type='submit'
