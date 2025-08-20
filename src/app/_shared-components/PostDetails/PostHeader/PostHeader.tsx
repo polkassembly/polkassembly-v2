@@ -158,15 +158,18 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 				{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(postData.proposalType) && <TabsTrigger value={EPostDetailsTab.POST_ANALYTICS}>{t('PostDetails.analytics')}</TabsTrigger>}
 				<TabsTrigger
 					value={EPostDetailsTab.SUMMARISE}
-					className='flex items-center gap-x-1 text-text_pink'
+					className={classes.tabTrigger}
 				>
-					<Image
-						src={SummariseIcon}
-						alt='summarise'
-						width={16}
-						height={16}
-					/>
-					<span>{t('PostDetails.summarise')}</span>
+					<div className={` ${classes.summariseTabContent}`}>
+						<Image
+							src={SummariseIcon}
+							alt='summarise'
+							width={16}
+							height={16}
+							className={classes.summariseTabIcon}
+						/>
+						<span>{t('PostDetails.summarise')}</span>
+					</div>
 				</TabsTrigger>
 			</TabsList>
 		</div>

@@ -42,7 +42,7 @@ function BeneficiariesDetailsDialog({ open, onOpenChange, beneficiaries }: Benef
 						{!!beneficiaries.length && (
 							<div className={classes.beneficiariesDetailsDialogContentHeader}>
 								{!totalUsdAmount ? (
-									<Skeleton className='h-10 w-full' />
+									<Skeleton className='h-10 w-32' />
 								) : (
 									<div className={classes.beneficiariesDetailsDialogContentHeaderAmount}>
 										<span>~</span>
