@@ -10,17 +10,17 @@ import TwitterIcon from '@assets/icons/twitter-icon-dark.svg';
 import RiotIcon from '@assets/icons/riot-icon.svg';
 import { AlertCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useToast } from '@/hooks/useToast';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import Image from 'next/image';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { ENotificationStatus } from '@/_shared/types';
+import { ENotificationStatus, EReactQueryKeys } from '@/_shared/types';
 import { Alert, AlertDescription } from '../../Alert';
 import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelationsPicker';
 import IdentityFeeCollaps from '../IdentityFeeCollaps/IdentityFeeCollaps';
@@ -28,6 +28,8 @@ import { Input } from '../../Input';
 import { Button } from '../../Button';
 import { Separator } from '../../Separator';
 import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
+import ClearIdentity from '../ClearIdentity/ClearIdentity';
 
 interface ISetIdentityFormFields {
 	displayName: string;
@@ -56,6 +58,8 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 	const { userPreferences } = useUserPreferences();
 	const { toast } = useToast();
 
+	const queryClient = useQueryClient();
+
 	const network = getCurrentNetwork();
 
 	const { identityService } = useIdentityService();
@@ -63,7 +67,8 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 	const formData = useForm<ISetIdentityFormFields>();
 
 	const [loading, setLoading] = useState(false);
-	const [identityLoading, setIdentityLoading] = useState(false);
+
+	const [openClearIdentityModal, setOpenClearIdentityModal] = useState(false);
 
 	const fetchGasFee = async () => {
 		if (!identityService) return null;
@@ -89,23 +94,29 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 		retry: false
 	});
 
-	useEffect(() => {
-		const setDefaultIdentityValues = async () => {
-			if (!identityService || !network || !userPreferences.selectedAccount?.address) return;
+	const fetchIdentityInfo = async () => {
+		if (!identityService || !network || !userPreferences.selectedAccount?.address) return null;
 
-			setIdentityLoading(true);
-			const identityInfo = await identityService.getOnChainIdentity(userPreferences.selectedAccount.address);
+		const identityInfo = await identityService.getOnChainIdentity(userPreferences.selectedAccount.address);
 
-			formData.setValue('displayName', identityInfo.display);
-			formData.setValue('legalName', identityInfo.legal);
-			formData.setValue('email', identityInfo.email);
-			formData.setValue('twitter', identityInfo.twitter);
-			formData.setValue('matrix', identityInfo.matrix);
+		formData.setValue('displayName', identityInfo.display);
+		formData.setValue('legalName', identityInfo.legal);
+		formData.setValue('email', identityInfo.email);
+		formData.setValue('twitter', identityInfo.twitter);
+		formData.setValue('matrix', identityInfo.matrix);
 
-			setIdentityLoading(false);
-		};
-		setDefaultIdentityValues();
-	}, [formData, identityService, network, userPreferences.selectedAccount?.address]);
+		return identityInfo;
+	};
+
+	const { data: identityInfo, isFetching: fetchingIdentityInfo } = useQuery({
+		queryKey: [EReactQueryKeys.IDENTITY_INFO, user?.id, userPreferences.selectedAccount?.address],
+		queryFn: () => fetchIdentityInfo(),
+		enabled: !!user?.id && !!userPreferences.selectedAccount?.address && !!identityService,
+		placeholderData: (previousData) => previousData,
+		retry: false,
+		refetchOnMount: false,
+		refetchOnWindowFocus: false
+	});
 
 	const handleSetIdentity = async (values: ISetIdentityFormFields) => {
 		if (!userPreferences.wallet || !userPreferences.selectedAccount?.address || !identityService) return;
@@ -179,7 +190,7 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 								showPeopleChainBalance
 							/>
 						}
-						disabled={identityLoading}
+						disabled={fetchingIdentityInfo}
 					/>
 
 					{/* Display Name */}
@@ -187,7 +198,7 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 						control={formData.control}
 						name='displayName'
 						key='displayName'
-						disabled={loading || identityLoading}
+						disabled={loading || fetchingIdentityInfo}
 						rules={{
 							required: true,
 							validate: (value) => {
@@ -339,7 +350,34 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 					gasFee={gasFee || BN_ZERO}
 				/>
 				<Separator className='my-4' />
-				<div className='flex justify-end'>
+				<div className='flex items-center justify-end gap-x-2'>
+					{identityInfo && identityInfo.display && (
+						<Dialog
+							open={openClearIdentityModal}
+							onOpenChange={setOpenClearIdentityModal}
+						>
+							<DialogTrigger>
+								<Button
+									disabled={loading || fetchingIdentityInfo}
+									variant='secondary'
+									type='button'
+								>
+									{t('SetIdentity.clearIdentity')}
+								</Button>
+							</DialogTrigger>
+							<DialogContent className='max-w-md p-3 sm:p-6'>
+								<DialogHeader>
+									<DialogTitle>{t('SetIdentity.clearIdentity')}</DialogTitle>
+								</DialogHeader>
+								<ClearIdentity
+									onSuccess={() => {
+										setOpenClearIdentityModal(false);
+										queryClient.invalidateQueries({ queryKey: [EReactQueryKeys.IDENTITY_INFO, user?.id, userPreferences.selectedAccount?.address] });
+									}}
+								/>
+							</DialogContent>
+						</Dialog>
+					)}
 					<Button
 						isLoading={loading}
 						type='submit'

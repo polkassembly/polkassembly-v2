@@ -483,7 +483,7 @@
 			"to": "に",
 			"totalEstimatedUSD": "合計推定USD相当",
 			"more": "もっと",
-			"requestedAmountDetails": "リクエストされた金額の詳細",	
+			"requestedAmountDetails": "リクエストされた金額の詳細",
 			"showMore": "もっと表示",
 			"showLess": "もっと少なく表示"
 		},
@@ -572,7 +572,7 @@
 			"parentBountyIndex": "親報奨金インデックス",
 			"payee": "受益者",
 			"curator": "クレジット",
-			"requested":"リクエスト済み",
+			"requested": "リクエスト済み",
 			"calls": "呼び出し",
 			"showMore": "もっと表示",
 			"showLess": "もっと少なく表示",
@@ -979,7 +979,13 @@
 		"verify": "確認",
 		"verified": "確認済み",
 		"pending": "保留中",
-		"CurrentJudgement": "現在の判定"
+		"CurrentJudgement": "現在の判定",
+		"clearIdentity": "アイデンティティをクリア",
+		"clearIdentitySuccess": "アイデンティティがクリアされました！",
+		"clearIdentitySuccessDescription": "アイデンティティが正常にクリアされました",
+		"clearIdentityFailed": "アイデンティティのクリアに失敗しました",
+		"clearIdentityFailedDescription": "アイデンティティのクリア中にエラーが発生しました",
+		"clearIdentityDescription": "アイデンティティをクリアしてもよろしいですか？"
 	},
 	"Overview": {
 		"month": "月",

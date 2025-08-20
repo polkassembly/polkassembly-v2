@@ -571,11 +571,11 @@
 			"parentBountyIndex": "父赏金索引",
 			"payee": "受益者",
 			"curator": " curator",
-			"requested":"已请求",
+			"requested": "已请求",
 			"calls": "调用",
 			"showMore": "显示更多",
 			"showLess": "显示更少",
-			"call": "调用",	
+			"call": "调用",
 			"timeline": "时间线"
 		},
 		"onchainInfo": "链上信息",
@@ -979,7 +979,13 @@
 		"verify": "验证",
 		"verified": "已验证",
 		"pending": "待处理",
-		"CurrentJudgement": "当前判定"
+		"CurrentJudgement": "当前判定",
+		"clearIdentity": "清除身份",
+		"clearIdentitySuccess": "身份已清除！",
+		"clearIdentitySuccessDescription": "您的身份已成功清除",
+		"clearIdentityFailed": "清除身份失败",
+		"clearIdentityFailedDescription": "清除您的身份时出现错误",
+		"clearIdentityDescription": "您确定要清除您的身份吗？"
 	},
 	"Bounties": {
 		"onchainBounties": "链上赏金",

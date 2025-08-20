@@ -1029,7 +1029,13 @@
 		"verify": "Verify",
 		"verified": "Verified",
 		"pending": "Pending",
-		"CurrentJudgement": "Current Judgement"
+		"CurrentJudgement": "Current Judgement",
+		"clearIdentity": "Clear Identity",
+		"clearIdentitySuccess": "Identity cleared!",
+		"clearIdentitySuccessDescription": "Your identity has been cleared successfully",
+		"clearIdentityFailed": "Failed to clear identity",
+		"clearIdentityFailedDescription": "There was an error while clearing your identity",
+		"clearIdentityDescription": "Are you sure you want to clear your identity?"
 	},
 	"Bounties": {
 		"onchainBounties": "On-chain Bounties",
