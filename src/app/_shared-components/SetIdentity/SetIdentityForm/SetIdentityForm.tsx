@@ -53,7 +53,6 @@ function SocialIcon({ icon }: { icon: string }) {
 function SetIdentityForm({
 	registrarFee,
 	onTeleport,
-	onClearIdentity,
 	onSuccess
 }: {
 	registrarFee: BN;
@@ -112,7 +111,7 @@ function SetIdentityForm({
 		return identityInfo;
 	};
 
-	const { data: identityInfo, isFetching: fetchingIdentityInfo } = useQuery({
+	const { isFetching: fetchingIdentityInfo } = useQuery({
 		queryKey: [EReactQueryKeys.IDENTITY_INFO, user?.id, userPreferences.selectedAccount?.address],
 		queryFn: () => fetchIdentityInfo(),
 		enabled: !!user?.id && !!userPreferences.selectedAccount?.address && !!identityService,
@@ -354,17 +353,7 @@ function SetIdentityForm({
 					gasFee={gasFee || BN_ZERO}
 				/>
 				<Separator className='my-4' />
-				<div className='flex items-center justify-end gap-x-2'>
-					{identityInfo && identityInfo.display && (
-						<Button
-							disabled={loading || fetchingIdentityInfo}
-							variant='secondary'
-							type='button'
-							onClick={onClearIdentity}
-						>
-							{t('SetIdentity.clearIdentity')}
-						</Button>
-					)}
+				<div className='flex items-center justify-end'>
 					<Button
 						isLoading={loading}
 						type='submit'
