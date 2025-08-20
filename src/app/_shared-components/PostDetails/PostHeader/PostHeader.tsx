@@ -155,19 +155,22 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 			<TabsList className={`mx-auto max-w-full overflow-auto pl-4 font-bold capitalize md:pl-0 ${classes.hideScrollbar}`}>
 				<TabsTrigger value={EPostDetailsTab.DESCRIPTION}>{t('PostDetails.description')}</TabsTrigger>
 				{!isOffchainPost && <TabsTrigger value={EPostDetailsTab.ONCHAIN_INFO}>{t('PostDetails.onchainInfo')}</TabsTrigger>}
+				{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(postData.proposalType) && <TabsTrigger value={EPostDetailsTab.POST_ANALYTICS}>{t('PostDetails.analytics')}</TabsTrigger>}
 				<TabsTrigger
 					value={EPostDetailsTab.SUMMARISE}
-					className='flex items-center gap-x-1 text-text_pink'
+					className={classes.tabTrigger}
 				>
-					<Image
-						src={SummariseIcon}
-						alt='summarise'
-						width={16}
-						height={16}
-					/>
-					<span>{t('PostDetails.summarise')}</span>
+					<div className={` ${classes.summariseTabContent}`}>
+						<Image
+							src={SummariseIcon}
+							alt='summarise'
+							width={16}
+							height={16}
+							className={classes.summariseTabIcon}
+						/>
+						<span>{t('PostDetails.summarise')}</span>
+					</div>
 				</TabsTrigger>
-				{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(postData.proposalType) && <TabsTrigger value={EPostDetailsTab.POST_ANALYTICS}>{t('PostDetails.analytics')}</TabsTrigger>}
 			</TabsList>
 		</div>
 	);
