@@ -11,7 +11,6 @@ import NovaIcon from '@assets/wallet-icons/nova-wallet-star.svg';
 import Image from 'next/image';
 import MimirIcon from '@assets/wallet-icons/mimir-logo.jpg';
 import MetamaskIcon from '@assets/wallet-icons/metamask-icon.svg';
-import WalletConnectIcon from '@assets/wallet-icons/walletConnect-icon.svg';
 
 export function WalletIcon({ wallet, className }: { wallet: EWallet; className?: string }) {
 	switch (wallet) {
@@ -68,14 +67,6 @@ export function WalletIcon({ wallet, className }: { wallet: EWallet; className?:
 				<Image
 					alt=''
 					src={MetamaskIcon}
-					className={`h-6 w-6 sm:h-8 sm:w-8 ${className}`}
-				/>
-			);
-		case EWallet.WALLETCONNECT:
-			return (
-				<Image
-					alt=''
-					src={WalletConnectIcon}
 					className={`h-6 w-6 sm:h-8 sm:w-8 ${className}`}
 				/>
 			);

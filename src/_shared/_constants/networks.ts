@@ -141,7 +141,7 @@ interface INetworkDetails {
 		large: string;
 		small: string;
 	};
-	voteContractAddress?: string;
+	contractAddress?: string;
 }
 
 enum ENetworkSocial {
@@ -153,6 +153,12 @@ enum ENetworkSocial {
 	REDDIT = 'reddit',
 	TELEGRAM = 'telegram',
 	SUBSCAN = 'subscan'
+}
+
+export enum EthereumNetwork {
+	MOONBEAM = 'moonbeam',
+	MOONRIVER = 'moonriver',
+	MOONBASE = 'moonbase'
 }
 
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
@@ -255,7 +261,7 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 		]
 	},
 	[ENetwork.MOONBEAM]: {
-		identityMinDeposit: new BN('100000000000'),
+		identityMinDeposit: new BN('1025800000000000000'),
 		rpcEndpoints: [
 			{
 				name: VIA_DWELLIR,
@@ -296,11 +302,27 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 		]
 	},
 	[ENetwork.MOONRIVER]: {
-		identityMinDeposit: new BN('100000000000'),
+		identityMinDeposit: new BN('1025800000000000000'),
 		rpcEndpoints: [
 			{
 				name: VIA_DWELLIR,
 				url: 'wss://moonriver-rpc.n.dwellir.com'
+			},
+			{
+				name: VIA_BLAST,
+				url: 'wss://moonriver.public.blastapi.io'
+			},
+			{
+				name: VIA_ONFINALITY,
+				url: 'wss://moonriver.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_UNITEDBLOC,
+				url: 'wss://moonriver.unitedbloc.com'
+			},
+			{
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://moonriver.public.curie.radiumblock.co/ws'
 			}
 		]
 	}
@@ -2857,13 +2879,105 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 	[ENetwork.CERE]: [],
 	[ENetwork.MOONBEAM]: [
 		{
+			id: ENetworkSocial.HOME,
+			icon: SocialIcons.Home,
+			href: 'https://moonbeam.network/',
+			label: 'Moonbeam Homepage'
+		},
+		{
+			id: ENetworkSocial.TWITTER,
+			icon: SocialIcons.Twitter,
+			href: 'https://x.com/MoonbeamNetwork',
+			label: 'Twitter'
+		},
+		{
+			id: ENetworkSocial.DISCORD,
+			icon: SocialIcons.Discord,
+			href: 'https://discord.gg/PfpUATX',
+			label: 'Discord'
+		},
+		{
+			id: ENetworkSocial.GITHUB,
+			icon: SocialIcons.Github,
+			href: 'https://github.com/PureStake',
+			label: 'GitHub'
+		},
+		{
+			id: ENetworkSocial.YOUTUBE,
+			icon: SocialIcons.Youtube,
+			href: 'https://www.youtube.com/c/moonbeamnetwork',
+			label: 'YouTube'
+		},
+		{
+			id: ENetworkSocial.REDDIT,
+			icon: SocialIcons.Reddit,
+			href: 'https://www.reddit.com/r/moonbeam/',
+			label: 'Reddit'
+		},
+		{
+			id: ENetworkSocial.TELEGRAM,
+			icon: SocialIcons.Telegram,
+			href: 'https://t.me/Moonbeam_Official',
+			label: 'Telegram'
+		},
+		{
 			id: ENetworkSocial.SUBSCAN,
 			icon: SocialIcons.Subscan,
 			href: 'https://moonbeam.subscan.io/',
 			label: 'Subscan'
 		}
 	],
-	[ENetwork.MOONRIVER]: []
+	[ENetwork.MOONRIVER]: [
+		// Add all links
+		{
+			id: ENetworkSocial.HOME,
+			icon: SocialIcons.Home,
+			href: 'https://moonbeam.network/networks/moonriver/',
+			label: 'Moonbeam Homepage'
+		},
+		{
+			id: ENetworkSocial.TWITTER,
+			icon: SocialIcons.Twitter,
+			href: 'http://x.com/MoonriverNW',
+			label: 'Twitter'
+		},
+		{
+			id: ENetworkSocial.DISCORD,
+			icon: SocialIcons.Discord,
+			href: 'https://discord.gg/PfpUATX',
+			label: 'Discord'
+		},
+		{
+			id: ENetworkSocial.GITHUB,
+			icon: SocialIcons.Github,
+			href: 'https://github.com/PureStake',
+			label: 'GitHub'
+		},
+		{
+			id: ENetworkSocial.YOUTUBE,
+			icon: SocialIcons.Youtube,
+			href: 'https://www.youtube.com/c/moonbeamnetwork',
+			label: 'YouTube'
+		},
+		{
+			id: ENetworkSocial.REDDIT,
+			icon: SocialIcons.Reddit,
+			href: 'https://www.reddit.com/r/moonbeam/',
+			label: 'Reddit'
+		},
+		{
+			id: ENetworkSocial.TELEGRAM,
+			icon: SocialIcons.Telegram,
+			href: 'https://t.me/Moonbeam_Official',
+			label: 'Telegram'
+		},
+		{
+			id: ENetworkSocial.SUBSCAN,
+			icon: SocialIcons.Subscan,
+			href: 'https://moonriver.subscan.io/',
+			label: 'Subscan'
+		}
+	]
 } as const;
 
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
@@ -3192,7 +3306,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.MOONBEAM],
 		supportedAssets: {},
 		foreignAssets: {},
-		voteContractAddress: '0x0000000000000000000000000000000000000812'
+		contractAddress: '0x0000000000000000000000000000000000000812'
 	},
 	[ENetwork.MOONRIVER]: {
 		key: ENetwork.MOONRIVER,
@@ -3251,6 +3365,6 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.MOONRIVER],
 		supportedAssets: {},
 		foreignAssets: {},
-		voteContractAddress: '0x0000000000000000000000000000000000000812'
+		contractAddress: '0x0000000000000000000000000000000000000812'
 	}
 } as const;

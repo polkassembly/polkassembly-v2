@@ -4,24 +4,14 @@
 
 'use client';
 
-import Jazzicon from '@metamask/jazzicon';
-import { useEffect, useRef } from 'react';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import Jazzicon from 'react-jazzicon';
 
-function EthIdenticon({ address, size, className }: { address: string; size: number; className?: string }) {
-	const ref = useRef<HTMLDivElement>(null);
-	const numericAddress = parseInt(address.slice(2, 10), 16);
-
-	useEffect(() => {
-		if (numericAddress && ref.current) {
-			ref.current.innerHTML = '';
-			ref.current.appendChild(Jazzicon(size > 18 ? size - 8 : size, numericAddress));
-		}
-	}, [numericAddress, size]);
-
+function EthIdenticon({ address, size }: { address: string; size: number }) {
 	return (
-		<div
-			className={className}
-			ref={ref}
+		<Jazzicon
+			diameter={size}
+			seed={parseInt(address.slice(2, 10), 16)}
 		/>
 	);
 }

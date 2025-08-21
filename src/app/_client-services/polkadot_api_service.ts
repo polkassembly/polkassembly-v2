@@ -22,11 +22,10 @@ import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, EWallet
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
 import { APPNAME } from '@/_shared/_constants/appName';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
-import { Contract, ethers } from 'ethers';
-import moonbeamConvictionVotingAbi from '@/app/_client-utils/moonbeamConvictionVoting.json';
-import { isEthNetwork } from '@/_shared/_utils/getSupportedWallets';
+import { ethers } from 'ethers';
 import { BlockCalculationsService } from './block_calculations_service';
 import { isMimirDetected } from './isMimirDetected';
+import { EthApiService } from './eth_api_service';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -201,6 +200,13 @@ export class PolkadotApiService {
 					console.error('ERROR:', error);
 					onFailed(error?.toString?.() || errorMessageFallback);
 				});
+		} else if (ValidatorService.isValidEthereumNetwork(this.network)) {
+			try {
+				(tx as unknown as any).wait();
+				onSuccess();
+			} catch (error) {
+				onFailed(error?.toString?.() || errorMessageFallback);
+			}
 		} else {
 			let extrinsic = tx;
 
@@ -403,69 +409,6 @@ export class PolkadotApiService {
 		}
 	}
 
-	async voteReferendumEth({
-		onSuccess,
-		onFailed,
-		referendumId,
-		vote,
-		lockedBalance,
-		conviction,
-		ayeVoteValue,
-		nayVoteValue,
-		abstainVoteValue,
-		selectedWallet
-	}: {
-		address: string;
-		onSuccess: (pre?: unknown) => Promise<void> | void;
-		onFailed: (errorMessageFallback: string) => Promise<void> | void;
-		referendumId: number;
-		vote: EVoteDecision;
-		lockedBalance?: BN;
-		conviction?: number;
-		ayeVoteValue?: BN;
-		nayVoteValue?: BN;
-		abstainVoteValue?: BN;
-		selectedAccount?: ISelectedAccount;
-		selectedWallet: EWallet;
-	}) {
-		const wallet = selectedWallet === EWallet.METAMASK ? window.ethereum : selectedWallet === EWallet.TALISMAN ? (window as any).talismanEth : window.SubWallet;
-		let web3 = new ethers.BrowserProvider(wallet);
-		const { chainId: id } = await web3.getNetwork();
-		const chainId = Number(id.toString());
-		const networkChainId = NETWORKS_DETAILS[this.network].chainId;
-
-		if (networkChainId && chainId !== networkChainId) {
-			await this.switchNetwork(web3, networkChainId);
-			web3 = new ethers.BrowserProvider(wallet);
-		}
-
-		const signer = await web3.getSigner();
-		const { voteContractAddress } = NETWORKS_DETAILS[this.network];
-		if (!voteContractAddress) {
-			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Vote contract address not found');
-		}
-
-		const voteContract = new Contract(voteContractAddress, moonbeamConvictionVotingAbi, signer);
-		let tx;
-
-		try {
-			if (vote === EVoteDecision.AYE) {
-				tx = await voteContract.voteYes(referendumId, lockedBalance?.toString() || '0', conviction);
-			} else if (vote === EVoteDecision.NAY) {
-				tx = await voteContract.voteNo(referendumId, lockedBalance?.toString() || '0', conviction);
-			} else if (vote === EVoteDecision.SPLIT) {
-				tx = await voteContract.voteSplit(referendumId, ayeVoteValue?.toString() || '0', nayVoteValue?.toString() || '0');
-			} else if (vote === EVoteDecision.SPLIT_ABSTAIN) {
-				tx = await voteContract.voteSplitAbstain(referendumId, ayeVoteValue?.toString() || '0', nayVoteValue?.toString() || '0', abstainVoteValue?.toString() || '0');
-			}
-
-			await tx.wait();
-			onSuccess();
-		} catch (error: unknown) {
-			onFailed((error as Error).message || String(error) || 'Vote type not supported by old contract');
-		}
-	}
-
 	async voteReferendum({
 		address,
 		onSuccess,
@@ -493,27 +436,21 @@ export class PolkadotApiService {
 		selectedAccount?: ISelectedAccount;
 		selectedWallet?: EWallet;
 	}) {
-		if (isEthNetwork(this.network)) {
-			this.voteReferendumEth({
-				address,
-				onSuccess,
-				onFailed,
-				referendumId,
-				vote,
-				lockedBalance,
-				conviction,
-				ayeVoteValue,
-				nayVoteValue,
-				abstainVoteValue,
-				selectedAccount,
-				selectedWallet: selectedWallet || EWallet.METAMASK
-			});
-			return;
-		}
-
 		let voteTx: SubmittableExtrinsic<'promise'> | null = null;
 
-		if ([EVoteDecision.AYE, EVoteDecision.NAY].includes(vote) && lockedBalance) {
+		if (ValidatorService.isValidEthereumNetwork(this.network)) {
+			voteTx = await EthApiService.vote(
+				vote,
+				referendumId,
+				conviction || 0,
+				selectedWallet || EWallet.METAMASK,
+				this.network,
+				lockedBalance,
+				ayeVoteValue,
+				nayVoteValue,
+				abstainVoteValue
+			);
+		} else if ([EVoteDecision.AYE, EVoteDecision.NAY].includes(vote) && lockedBalance) {
 			voteTx = this.api.tx.convictionVoting.vote(referendumId, { Standard: { balance: lockedBalance, vote: { aye: vote === EVoteDecision.AYE, conviction } } });
 		} else if (vote === EVoteDecision.SPLIT) {
 			voteTx = this.api.tx.convictionVoting.vote(referendumId, { Split: { aye: `${ayeVoteValue?.toString()}`, nay: `${nayVoteValue?.toString()}` } });

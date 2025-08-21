@@ -10,7 +10,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { stringToHex } from '@polkadot/util';
 import { isWeb3Injected } from '@polkadot/extension-dapp';
 import { inject } from '@mimirdev/apps-inject';
-import { isEthNetwork } from '@/_shared/_utils/getSupportedWallets';
+import { ValidatorService } from '@shared/_services/validator_service';
 import { PolkadotApiService } from './polkadot_api_service';
 import { IdentityService } from './identity_service';
 import { isMimirDetected } from './isMimirDetected';
@@ -67,7 +67,7 @@ export class WalletClientService {
 
 				await web3Enable(APPNAME);
 				injected = await web3FromSource('mimir');
-			} else if (selectedWallet === EWallet.METAMASK && isEthNetwork(this.network)) {
+			} else if (selectedWallet === EWallet.METAMASK && ValidatorService.isValidEthereumNetwork(this.network)) {
 				const { ethereum } = this.injectedWindow;
 				if (!ethereum) {
 					return [];
@@ -85,7 +85,7 @@ export class WalletClientService {
 					}
 				}));
 			}
-			if (selectedWallet === EWallet.TALISMAN && isEthNetwork(this.network)) {
+			if (selectedWallet === EWallet.TALISMAN && ValidatorService.isValidEthereumNetwork(this.network)) {
 				const { talismanEth } = this.injectedWindow;
 				if (!talismanEth) {
 					return [];
@@ -102,7 +102,7 @@ export class WalletClientService {
 					}
 				}));
 			}
-			if (selectedWallet === EWallet.SUBWALLET && isEthNetwork(this.network)) {
+			if (selectedWallet === EWallet.SUBWALLET && ValidatorService.isValidEthereumNetwork(this.network)) {
 				const { SubWallet } = this.injectedWindow;
 				if (!SubWallet) {
 					return [];
@@ -163,7 +163,7 @@ export class WalletClientService {
 	}
 
 	getInjectedWallets(network: ENetwork) {
-		if (isEthNetwork(network)) {
+		if (ValidatorService.isValidEthereumNetwork(network)) {
 			return {
 				[EWallet.METAMASK]: this.injectedWindow.ethereum || null,
 				[EWallet.SUBWALLET]: this.injectedWindow.SubWallet || null,
@@ -208,7 +208,7 @@ export class WalletClientService {
 	}
 
 	async signMessage({ data, address, selectedWallet }: { data: string; address: string; selectedWallet: EWallet }) {
-		if (isEthNetwork(this.network)) {
+		if (ValidatorService.isValidEthereumNetwork(this.network)) {
 			return this.signMessageEth({ data, address, selectedWallet });
 		}
 

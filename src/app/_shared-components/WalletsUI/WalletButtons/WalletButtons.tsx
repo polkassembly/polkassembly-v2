@@ -9,7 +9,8 @@ import { WalletClientService } from '@/app/_client-services/wallet_service';
 import { useWalletService } from '@/hooks/useWalletService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { getSupportedWallets, isEthNetwork } from '@/_shared/_utils/getSupportedWallets';
+import { getSupportedWallets } from '@/_shared/_utils/getSupportedWallets';
+import { ValidatorService } from '@shared/_services/validator_service';
 import classes from './WalletButtons.module.scss';
 
 function WalletButtons({
@@ -37,7 +38,7 @@ function WalletButtons({
 		if (userPreferences.wallet || !availableWallets || Object.keys(availableWallets).length === 0) return;
 
 		const walletKeys = Object.keys(availableWallets);
-		if (isEthNetwork(network)) {
+		if (ValidatorService.isValidEthereumNetwork(network)) {
 			const preferredWallet = walletKeys.includes(EWallet.METAMASK) ? EWallet.METAMASK : (walletKeys[0] as EWallet);
 			setUserPreferences({
 				...userPreferences,

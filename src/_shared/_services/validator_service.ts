@@ -13,7 +13,7 @@ import validator from 'validator';
 import { recoverPersonalSignature } from '@metamask/eth-sig-util';
 import { ON_CHAIN_PROPOSAL_TYPES } from '@shared/_constants/onChainProposalTypes';
 import { BN, isHex } from '@polkadot/util';
-import { NETWORKS_DETAILS } from '../_constants/networks';
+import { EthereumNetwork, NETWORKS_DETAILS } from '../_constants/networks';
 
 const TAG_MAX_LENGTH = 20;
 const TAG_MIN_LENGTH = 1;
@@ -342,5 +342,9 @@ export class ValidatorService {
 		const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]*(\.[a-zA-Z0-9][a-zA-Z0-9-]*)*\.[a-zA-Z]{2,}$/;
 
 		return usernameRegex.test(username) && domainRegex.test(domain);
+	}
+
+	static isValidEthereumNetwork(network: string): boolean {
+		return Object.values(EthereumNetwork).includes(network as EthereumNetwork);
 	}
 }

@@ -860,13 +860,13 @@ export class FirestoreService extends FirestoreUtils {
 	}
 
 	static async AddNewAddress(addressEntry: IUserAddress) {
-		const substrateAddress = getSubstrateAddress(addressEntry.address) || addressEntry.address;
+		const formattedAddress = getSubstrateAddress(addressEntry.address) || addressEntry.address;
 
-		if (!substrateAddress) {
+		if (!formattedAddress) {
 			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST);
 		}
 
-		await this.addressesCollectionRef().doc(substrateAddress).set(addressEntry);
+		await this.addressesCollectionRef().doc(formattedAddress).set(addressEntry);
 	}
 
 	static async UpdateUserTfaDetails(userId: number, newTfaDetails: IUserTFADetails) {
