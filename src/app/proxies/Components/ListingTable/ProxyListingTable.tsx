@@ -116,7 +116,7 @@ function ProxyListingTable({ data, totalCount }: { data: IProxyRequest[]; totalC
 															<ProxyTypeBadge proxyType={individualProxy.proxyType} />
 														</td>
 														<td className='px-6 py-3'>
-															<div className='truncate'>{proxy.delay || '-'}</div>
+															<div className='truncate'>{individualProxy.delay || '-'}</div>
 														</td>
 														<td className='px-6 py-3' />
 													</TableRow>

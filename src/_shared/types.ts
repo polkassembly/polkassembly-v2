@@ -216,6 +216,7 @@ export interface IMultisigAddress {
 export interface IProxyAddress {
 	address: string;
 	proxyType: EProxyType;
+	delay?: number;
 }
 
 export interface IAddressRelations {

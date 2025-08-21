@@ -1403,19 +1403,30 @@ export class PolkadotApiService {
 
 					// Only process if there are actual proxies
 					if (proxyArray && Array.isArray(proxyArray) && proxyArray.length > 0) {
+						// Log the first proxy entry to see the delay format
+						if (proxies.length === 0) {
+							console.log('Sample proxy entry:', JSON.stringify(proxyArray[0], null, 2));
+						}
+
 						// Parse individual proxy details for accordion functionality
 						const individualProxies: IProxyAddress[] = proxyArray.map((proxyEntry: any) => {
+							const delayValue = proxyEntry?.delay ? parseInt(proxyEntry.delay.replace(/,/g, ''), 10) : 0;
+
 							return {
 								address: proxyEntry?.delegate || 'Unknown',
-								proxyType: (proxyEntry?.proxyType as EProxyType) || EProxyType.GOVERNANCE
+								proxyType: (proxyEntry?.proxyType as EProxyType) || EProxyType.GOVERNANCE,
+								delay: delayValue
 							};
 						});
+
+						// Use the delay from the first proxy (they should all have the same delay for a delegator)
+						const firstProxyDelay = individualProxies[0]?.delay || 0;
 
 						const proxyRequest: IProxyRequest = {
 							id: `${delegator}-proxy-${Date.now()}`,
 							delegator,
 							proxyType: '-' as any, // Show '-' for parent row
-							delay: 0,
+							delay: firstProxyDelay,
 							proxies: proxyArray.length,
 							proxyAddresses: individualProxies.map((p) => p.address),
 							individualProxies,
@@ -1460,19 +1471,28 @@ export class PolkadotApiService {
 
 				// Only process if there are actual proxies
 				if (proxyArray && Array.isArray(proxyArray) && proxyArray.length > 0) {
+					// Log the first proxy entry to see the delay format
+					console.log('Sample my proxy entry:', JSON.stringify(proxyArray[0], null, 2));
+
 					// Parse individual proxy details for accordion functionality
 					const individualProxies: IProxyAddress[] = proxyArray.map((proxyEntry: any) => {
+						const delayValue = proxyEntry?.delay ? parseInt(proxyEntry.delay.replace(/,/g, ''), 10) : 0;
+
 						return {
 							address: proxyEntry?.delegate || 'Unknown',
-							proxyType: (proxyEntry?.proxyType as EProxyType) || EProxyType.GOVERNANCE
+							proxyType: (proxyEntry?.proxyType as EProxyType) || EProxyType.GOVERNANCE,
+							delay: delayValue
 						};
 					});
+
+					// Use the delay from the first proxy (they should all have the same delay for a delegator)
+					const firstProxyDelay = individualProxies[0]?.delay || 0;
 
 					const proxyRequest: IProxyRequest = {
 						id: `${userAddress}-proxy-${Date.now()}`,
 						delegator: userAddress,
 						proxyType: '-' as any, // Show '-' for parent row
-						delay: 0,
+						delay: firstProxyDelay,
 						proxies: proxyArray.length,
 						proxyAddresses: individualProxies.map((p) => p.address),
 						individualProxies,
