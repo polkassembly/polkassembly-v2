@@ -1392,34 +1392,37 @@ export class PolkadotApiService {
 					return;
 				}
 
-				if (proxyData && Array.isArray(proxyData)) {
+				if (proxyData && Array.isArray(proxyData) && proxyData.length >= 2) {
 					// Log the first few entries to understand the data structure
 					if (proxies.length === 0) {
 						console.log('Sample proxy data:', JSON.stringify(proxyData.slice(0, 2), null, 2));
 					}
 
-					// Parse individual proxy details for accordion functionality
-					const individualProxies: IProxyAddress[] = proxyData.map((proxyEntry: any) => {
-						// Handle the data structure: [proxyDetails, balance]
-						const proxyDetails = Array.isArray(proxyEntry) ? proxyEntry[0] : proxyEntry;
+					// Extract the proxy array and balance from the data structure
+					const proxyArray = proxyData[0]; // Array of proxy objects
 
-						return {
-							address: proxyDetails?.delegate || 'Unknown',
-							proxyType: (proxyDetails?.proxyType as EProxyType) || EProxyType.GOVERNANCE
+					// Only process if there are actual proxies
+					if (proxyArray && Array.isArray(proxyArray) && proxyArray.length > 0) {
+						// Parse individual proxy details for accordion functionality
+						const individualProxies: IProxyAddress[] = proxyArray.map((proxyEntry: any) => {
+							return {
+								address: proxyEntry?.delegate || 'Unknown',
+								proxyType: (proxyEntry?.proxyType as EProxyType) || EProxyType.GOVERNANCE
+							};
+						});
+
+						const proxyRequest: IProxyRequest = {
+							id: `${delegator}-proxy-${Date.now()}`,
+							delegator,
+							proxyType: '-' as any, // Show '-' for parent row
+							delay: 0,
+							proxies: proxyArray.length,
+							proxyAddresses: individualProxies.map((p) => p.address),
+							individualProxies,
+							dateCreated: new Date()
 						};
-					});
-
-					const proxyRequest: IProxyRequest = {
-						id: `${delegator}-proxy-${Date.now()}`,
-						delegator,
-						proxyType: 'Governance' as EProxyType, // Default to Governance for now
-						delay: 0,
-						proxies: proxyData.length,
-						proxyAddresses: individualProxies.map((p) => p.address),
-						individualProxies,
-						dateCreated: new Date()
-					};
-					proxies.push(proxyRequest);
+						proxies.push(proxyRequest);
+					}
 				}
 			});
 
@@ -1451,29 +1454,32 @@ export class PolkadotApiService {
 
 			const proxyInfo = proxyData.toHuman() as any;
 
-			if (proxyInfo && Array.isArray(proxyInfo)) {
-				// Parse individual proxy details for accordion functionality
-				const individualProxies: IProxyAddress[] = proxyInfo.map((proxyEntry: any) => {
-					// Handle the data structure: [proxyDetails, balance]
-					const proxyDetails = Array.isArray(proxyEntry) ? proxyEntry[0] : proxyEntry;
+			if (proxyInfo && Array.isArray(proxyInfo) && proxyInfo.length >= 2) {
+				// Extract the proxy array and balance from the data structure
+				const proxyArray = proxyInfo[0]; // Array of proxy objects
 
-					return {
-						address: proxyDetails?.delegate || 'Unknown',
-						proxyType: (proxyDetails?.proxyType as EProxyType) || EProxyType.GOVERNANCE
+				// Only process if there are actual proxies
+				if (proxyArray && Array.isArray(proxyArray) && proxyArray.length > 0) {
+					// Parse individual proxy details for accordion functionality
+					const individualProxies: IProxyAddress[] = proxyArray.map((proxyEntry: any) => {
+						return {
+							address: proxyEntry?.delegate || 'Unknown',
+							proxyType: (proxyEntry?.proxyType as EProxyType) || EProxyType.GOVERNANCE
+						};
+					});
+
+					const proxyRequest: IProxyRequest = {
+						id: `${userAddress}-proxy-${Date.now()}`,
+						delegator: userAddress,
+						proxyType: '-' as any, // Show '-' for parent row
+						delay: 0,
+						proxies: proxyArray.length,
+						proxyAddresses: individualProxies.map((p) => p.address),
+						individualProxies,
+						dateCreated: new Date()
 					};
-				});
-
-				const proxyRequest: IProxyRequest = {
-					id: `${userAddress}-proxy-${Date.now()}`,
-					delegator: userAddress,
-					proxyType: 'Governance' as EProxyType, // Default to Governance for now
-					delay: 0,
-					proxies: proxyInfo.length,
-					proxyAddresses: individualProxies.map((p) => p.address),
-					individualProxies,
-					dateCreated: new Date()
-				};
-				proxies.push(proxyRequest);
+					proxies.push(proxyRequest);
+				}
 			}
 
 			// Sort by date created (newest first)
