@@ -1487,3 +1487,16 @@ export type IPostBubbleVotes = {
 		status: EProposalStatus;
 	};
 };
+
+export interface ITip {
+	userId: number;
+	network: ENetwork;
+	userAddress: string;
+	amount: string;
+	createdAt: Date;
+	beneficiaryAddress: string;
+	beneficiaryUserId: number;
+	extrinsicHash: string;
+	remark: string;
+	id: string;
+}

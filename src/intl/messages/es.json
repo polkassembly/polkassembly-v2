@@ -163,6 +163,20 @@
 		"balance": "Saldo",
 		"locked": "Bloqueado",
 		"on": "el",
+		"Tipping": {
+			"giveATip": "Dar una propina",
+			"pleaseSelectATip": "Por favor seleccione una propina que le gustaría dar",
+			"orEnterTheCustomAmountYouWouldLikeToTip": "O ingrese la cantidad personalizada que le gustaría dar",
+			"tip": "Propina",
+			"back": "Atrás",
+			"tipSuccess": "Propina exitosa",
+			"tipSuccessDescription": "Su propina se ha enviado correctamente",
+			"tipFailed": "Propina fallida",
+			"tipFailedDescription": "Su propina no se pudo enviar",
+			"saySomething": "Diga algo agradable con su propina (opcional)",
+			"existentialDeposit": "Depósito de Existencia",
+			"existentialDepositTooltip": "Cantidad mínima para mantener la dirección activa"
+		},
 		"Delegations": {
 			"noDelegations": "No se encontraron delegaciones",
 			"index": "Índice",

@@ -2,6 +2,7 @@
 	"HomePage": {
 		"title": "Welcome to Home"
 	},
+
 	"TreasuryStats": {
 		"tooltip": "Funds collected through a portion of block production rewards, transaction fees, slashing, staking inefficiencies, etc.",
 		"treasury": "Treasury",
@@ -167,6 +168,20 @@
 		"balance": "Balance",
 		"locked": "Locked",
 		"on": "on",
+		"Tipping": {
+			"giveATip": "Give a Tip",
+			"pleaseSelectATip": "Please select a tip you would like to give",
+			"orEnterTheCustomAmountYouWouldLikeToTip": "Or enter the custom amount you would like to Tip",
+			"tip": "Tip",
+			"back": "Back",
+			"tipSuccess": "Tip Success",
+			"tipSuccessDescription": "Your tip has been sent successfully",
+			"tipFailed": "Tip Failed",
+			"tipFailedDescription": "Your tip has failed to send",
+			"saySomething": "Say something nice with your tip(optional)",
+			"existentialDeposit": "Existential Deposit",
+			"existentialDepositTooltip": "Minimum amount to keep address live"
+		},
 		"Delegations": {
 			"noDelegations": "No Delegations Found",
 			"delegation": "Delegation",

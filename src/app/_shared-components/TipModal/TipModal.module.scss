@@ -1,0 +1,34 @@
+.title {
+	@apply flex items-center gap-2 text-xl font-semibold text-text_primary;
+}
+.content {
+	@apply flex flex-1 flex-col gap-y-6;
+}
+.tipsContainer {
+	@apply flex flex-col justify-between gap-2;
+}
+.tipsContainerTitle {
+	@apply text-base font-medium text-wallet_btn_text;
+}
+
+.tipButtonText {
+	@apply text-sm font-medium text-text_primary;
+}
+.saySomethingIcon {
+	@apply pointer-events-none absolute inset-0 h-[100px] w-full object-fill;
+}
+.remarkInput {
+	@apply mt-1 h-10 w-full rounded-md bg-bg_modal focus:border-text_pink focus:ring-1 focus:ring-text_pink/20;
+}
+.existentialDepositContainer {
+	@apply flex items-center gap-2;
+}
+.existentialDepositTitle {
+	@apply flex gap-1 text-base font-semibold text-wallet_btn_text;
+}
+.existentialDepositAmount {
+	@apply rounded-md bg-bg_code px-3 py-1 text-base font-medium text-text_primary;
+}
+.tipFooter {
+	@apply flex justify-end border-0 border-t border-solid border-border_grey;
+}

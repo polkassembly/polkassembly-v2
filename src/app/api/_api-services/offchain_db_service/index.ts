@@ -1005,4 +1005,30 @@ export class OffChainDbService {
 			return { ...beneficiary, usdAmount };
 		});
 	}
+
+	static async GetTipsByUserId({ network, userId }: { network: ENetwork; userId: number }) {
+		return FirestoreService.GetTipsByUserId({ network, userId });
+	}
+
+	static async CreateTip({
+		network,
+		userAddress,
+		userId,
+		amount,
+		beneficiaryAddress,
+		beneficiaryUserId,
+		remark,
+		extrinsicHash
+	}: {
+		network: ENetwork;
+		userAddress: string;
+		userId: number;
+		amount: string;
+		beneficiaryAddress: string;
+		beneficiaryUserId: number;
+		remark: string;
+		extrinsicHash: string;
+	}) {
+		return FirestoreService.CreateTip({ network, userAddress, userId, amount, beneficiaryAddress, beneficiaryUserId, remark, extrinsicHash });
+	}
 }
