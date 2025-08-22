@@ -1408,6 +1408,9 @@
 	"PolkadotVault": {
 		"signTransaction": "签署交易",
 		"addVaultAddress": "添加Polkadot Vault地址",
-		"scan": "扫描"
+		"scan": "扫描",
+		"openVaultAppInYourPhone": "在您的手机上打开Vault应用",
+		"scanTheQRHere": "使用Vault应用扫描此处的二维码",
+		"scanTheSignatureQRInYourApp": "在您的应用中验证签名二维码并签署交易"
 	}
 }

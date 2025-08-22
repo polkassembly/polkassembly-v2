@@ -1446,6 +1446,9 @@
 	"PolkadotVault": {
 		"signTransaction": "Sign Transaction",
 		"addVaultAddress": "Add Polkadot Vault Address",
-		"scan": "Scan"
+		"scan": "Scan",
+		"openVaultAppInYourPhone": "Open the Vault app in your phone",
+		"scanTheQRHere": "Scan the QR here from the Vault app",
+		"scanTheSignatureQRInYourApp": "Verify the signature QR in your app and sign the transaction"
 	}
 }

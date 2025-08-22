@@ -303,7 +303,6 @@ export default function AddressRelationsPicker({
 
 				return [{ address: user.loginAddress, name: '' }];
 			}
-			setOpenVaultModal(true);
 
 			return null;
 		}
@@ -387,30 +386,14 @@ export default function AddressRelationsPicker({
 			</Dialog>
 			{!accountsLoading && !accounts?.length ? (
 				userPreferences.wallet === EWallet.POLKADOT_VAULT ? (
-					<>
-						<Alert
-							variant='info'
-							className='flex items-center gap-x-3'
-						>
-							<AlertCircle className='h-4 w-4' />
-							<AlertDescription className=''>
-								<h2 className='mb-2 text-base font-medium'>{t('AddressDropdown.scanYourAddressQr')}</h2>
-								<ul className='list-disc pl-4'>
-									<li>{t('AddressDropdown.scanYourAddressQrDescription1')}</li>
-									<li>{t('AddressDropdown.scanYourAddressQrDescription2', { network })}</li>
-								</ul>
-							</AlertDescription>
-						</Alert>
-						<div className='mt-1 flex justify-end'>
-							<Button
-								variant='secondary'
-								size='sm'
-								onClick={() => setOpenVaultModal(true)}
-							>
-								{t('PolkadotVault.scan')}
-							</Button>
-						</div>
-					</>
+					<div className='flex flex-col gap-y-3 rounded-lg bg-page_background p-3'>
+						<h2 className='text-sm font-medium text-text_primary'>{t('AddressDropdown.scanYourAddressQr')}</h2>
+						<ul className='list-disc pl-4 text-sm text-wallet_btn_text'>
+							<li>{t('AddressDropdown.scanYourAddressQrDescription1')}</li>
+							<li>{t('AddressDropdown.scanYourAddressQrDescription2', { network })}</li>
+						</ul>
+						<Button onClick={() => setOpenVaultModal(true)}>{t('PolkadotVault.scan')}</Button>
+					</div>
 				) : (
 					<Alert
 						variant='info'

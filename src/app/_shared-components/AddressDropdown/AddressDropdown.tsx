@@ -68,14 +68,21 @@ function AddressDropdown({
 
 				return [{ address: user.loginAddress, name: '' }];
 			}
-			setOpenVaultModal(true);
 
+			setUserPreferences({
+				...userPreferences,
+				selectedAccount: undefined
+			});
 			return null;
 		}
 
 		const injectedAccounts = await walletService?.getAddressesFromWallet(userPreferences.wallet);
 
 		if (injectedAccounts.length === 0) {
+			setUserPreferences({
+				...userPreferences,
+				selectedAccount: undefined
+			});
 			return null;
 		}
 
@@ -189,19 +196,14 @@ function AddressDropdown({
 			</Dialog>
 			{!accounts || accounts.length === 0 ? (
 				userPreferences.wallet === EWallet.POLKADOT_VAULT ? (
-					<Alert
-						variant='info'
-						className='flex items-center gap-x-3'
-					>
-						<AlertCircle className='h-4 w-4' />
-						<AlertDescription className=''>
-							<h2 className='mb-2 text-base font-medium'>{t('AddressDropdown.scanYourAddressQr')}</h2>
-							<ul className='list-disc pl-4'>
-								<li>{t('AddressDropdown.scanYourAddressQrDescription1')}</li>
-								<li>{t('AddressDropdown.scanYourAddressQrDescription2', { network })}</li>
-							</ul>
-						</AlertDescription>
-					</Alert>
+					<div className='flex flex-col gap-y-3 rounded-lg bg-page_background p-3'>
+						<h2 className='text-sm font-medium text-text_primary'>{t('AddressDropdown.scanYourAddressQr')}</h2>
+						<ul className='list-disc pl-4 text-sm text-wallet_btn_text'>
+							<li>{t('AddressDropdown.scanYourAddressQrDescription1')}</li>
+							<li>{t('AddressDropdown.scanYourAddressQrDescription2', { network })}</li>
+						</ul>
+						<Button onClick={() => setOpenVaultModal(true)}>{t('PolkadotVault.scan')}</Button>
+					</div>
 				) : (
 					<Alert
 						variant='info'
@@ -341,7 +343,7 @@ function AddressDropdown({
 					</DropdownMenuContent>
 				</DropdownMenu>
 			)}
-			{userPreferences.wallet === EWallet.POLKADOT_VAULT && (
+			{accounts && accounts.length > 0 && userPreferences.wallet === EWallet.POLKADOT_VAULT && (
 				<div className='mt-1 flex justify-end'>
 					<Button
 						variant='secondary'

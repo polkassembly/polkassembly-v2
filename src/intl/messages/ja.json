@@ -1408,6 +1408,9 @@
 	"PolkadotVault": {
 		"signTransaction": "トランザクションに署名",
 		"addVaultAddress": "Polkadot Vaultアドレスを追加",
-		"scan": "スキャン"
+		"scan": "スキャン",
+		"openVaultAppInYourPhone": "スマートフォンでVaultアプリを開いてください",
+		"scanTheQRHere": "VaultアプリでここのQRコードをスキャンしてください",
+		"scanTheSignatureQRInYourApp": "アプリで署名QRコードを確認し、トランザクションに署名してください"
 	}
 }
