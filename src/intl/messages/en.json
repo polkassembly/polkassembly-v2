@@ -107,6 +107,9 @@
 		"showPassword": "Show Password",
 		"pleaseConnectWallet": "Please connect your wallet to Polkassembly.",
 		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension.",
+		"scanYourAddressQr": "Scan Your Address QR",
+		"scanYourAddressQrDescription1": "Login to your Polkadot Vault App.",
+		"scanYourAddressQrDescription2": "Scan your {network} address QR.",
 		"linkedAccount": "Linked Account"
 	},
 	"AddressRelationsPicker": {
@@ -1480,5 +1483,13 @@
 		"votes": "Votes",
 		"lockingPeriod": "Locking period",
 		"lockingPeriodDescription": "Your {tokenSymbol} will stay locked for extra time after voting, depending on the multiplier you choose."
+	},
+	"PolkadotVault": {
+		"signTransaction": "Sign Transaction",
+		"addVaultAddress": "Add Polkadot Vault Address",
+		"scan": "Scan",
+		"openVaultAppInYourPhone": "Open the Vault app in your phone",
+		"scanTheQRHere": "Scan the QR here from the Vault app",
+		"scanTheSignatureQRInYourApp": "Verify the signature QR in your app and sign the transaction"
 	}
 }

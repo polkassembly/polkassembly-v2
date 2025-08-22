@@ -97,16 +97,19 @@
 	},
 	"AddressDropdown": {
 		"fallbackText": "请选择钱包",
-		"chooseLinkedAccount": "选择链接的账户",
+		"chooseLinkedAccount": "选择账户",
 		"noAccountsFound": "未找到账户",
 		"selectWallet": "请选择钱包",
 		"fetchingAddresses": "为了获取您的地址，Polkassembly需要访问您的钱包扩展。请授权此交易。",
 		"goBack": "返回",
-		"gotIt": "知道了",
+		"gotIt": "明白了",
 		"hidePassword": "隐藏密码",
 		"showPassword": "显示密码",
 		"pleaseConnectWallet": "请将您的钱包连接到Polkassembly。",
-		"pleaseCheckConnectedAccounts": "请检查扩展中的已连接账户。",
+		"pleaseCheckConnectedAccounts": "请检查扩展中已连接的账户。",
+		"scanYourAddressQr": "扫描您的地址二维码",
+		"scanYourAddressQrDescription1": "登录您的Polkadot Vault应用。",
+		"scanYourAddressQrDescription2": "扫描您的{network}地址二维码。",
 		"linkedAccount": "链接的账户"
 	},
 	"AddressRelationsPicker": {
@@ -1443,5 +1446,13 @@
 		"votes": "投票",
 		"lockingPeriod": "锁定期",
 		"lockingPeriodDescription": "根据您选择的乘数，您的{tokenSymbol}在投票后将继续锁定额外时间。"
+	},
+	"PolkadotVault": {
+		"signTransaction": "签署交易",
+		"addVaultAddress": "添加Polkadot Vault地址",
+		"scan": "扫描",
+		"openVaultAppInYourPhone": "在您的手机上打开Vault应用",
+		"scanTheQRHere": "使用Vault应用扫描此处的二维码",
+		"scanTheSignatureQRInYourApp": "在您的应用中验证签名二维码并签署交易"
 	}
 }

@@ -96,17 +96,20 @@
 		"NoRank": "para ver tu rango"
 	},
 	"AddressDropdown": {
-		"fallbackText": "Por favor seleccione billetera",
-		"chooseLinkedAccount": "Elegir cuenta vinculada",
+		"fallbackText": "Por favor seleccione una billetera",
+		"chooseLinkedAccount": "Elegir Cuenta",
 		"noAccountsFound": "No se encontraron cuentas",
-		"selectWallet": "Por favor seleccione billetera",
+		"selectWallet": "Por favor seleccione una billetera",
 		"fetchingAddresses": "Para obtener sus direcciones, Polkassembly necesita acceso a sus extensiones de billetera. Por favor autorice esta transacción.",
-		"goBack": "Regresar",
+		"goBack": "Volver",
 		"gotIt": "Entendido",
-		"hidePassword": "Ocultar contraseña",
-		"showPassword": "Mostrar contraseña",
+		"hidePassword": "Ocultar Contraseña",
+		"showPassword": "Mostrar Contraseña",
 		"pleaseConnectWallet": "Por favor conecte su billetera a Polkassembly.",
 		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión.",
+		"scanYourAddressQr": "Escanee su código QR de dirección",
+		"scanYourAddressQrDescription1": "Inicie sesión en su aplicación Polkadot Vault.",
+		"scanYourAddressQrDescription2": "Escanee su código QR de dirección de {network}.",
 		"linkedAccount": "Cuenta Vinculada"
 	},
 	"AddressRelationsPicker": {
@@ -1443,6 +1446,14 @@
 	"ConvictionSelector": {
 		"votes": "Votos",
 		"lockingPeriod": "Período de bloqueo",
-		"lockingPeriodDescription": "Tus {tokenSymbol} permanecerán bloqueados por un tiempo adicional después de votar, dependiendo del multiplicador que elijas."
+		"lockingPeriodDescription": "Sus {tokenSymbol} permanecerán bloqueados por tiempo adicional después de votar, dependiendo del multiplicador que elija."
+	},
+	"PolkadotVault": {
+		"signTransaction": "Firmar Transacción",
+		"addVaultAddress": "Agregar Dirección de Polkadot Vault",
+		"scan": "Escanear",
+		"openVaultAppInYourPhone": "Abra la aplicación Vault en su teléfono",
+		"scanTheQRHere": "Escanee el código QR aquí desde la aplicación Vault",
+		"scanTheSignatureQRInYourApp": "Verifique el código QR de firma en su aplicación y firme la transacción"
 	}
 }

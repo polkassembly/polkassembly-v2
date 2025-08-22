@@ -97,16 +97,19 @@
 	},
 	"AddressDropdown": {
 		"fallbackText": "ウォレットを選択してください",
-		"chooseLinkedAccount": "リンクされたアカウントを選択",
+		"chooseLinkedAccount": "アカウントを選択",
 		"noAccountsFound": "アカウントが見つかりません",
 		"selectWallet": "ウォレットを選択してください",
-		"fetchingAddresses": "アドレスを取得するには、Polkassemblyがウォレット拡張機能へのアクセスを必要とします。このトランザクションを承認してください。",
+		"fetchingAddresses": "アドレスを取得するには、Polkassemblyがウォレット拡張機能にアクセスする必要があります。このトランザクションを承認してください。",
 		"goBack": "戻る",
 		"gotIt": "了解",
-		"hidePassword": "パスワードを隠す",
+		"hidePassword": "パスワードを非表示",
 		"showPassword": "パスワードを表示",
-		"pleaseConnectWallet": "Polkassemblyにウォレットを接続してください。",
-		"pleaseCheckConnectedAccounts": "拡張機能で接続されたアカウントを確認してください。",
+		"pleaseConnectWallet": "ウォレットをPolkassemblyに接続してください。",
+		"pleaseCheckConnectedAccounts": "拡張機能で接続されているアカウントを確認してください。",
+		"scanYourAddressQr": "アドレスQRコードをスキャン",
+		"scanYourAddressQrDescription1": "Polkadot Vaultアプリにログインしてください。",
+		"scanYourAddressQrDescription2": "{network}のアドレスQRコードをスキャンしてください。",
 		"linkedAccount": "リンクされたアカウント"
 	},
 	"AddressRelationsPicker": {
@@ -1440,8 +1443,16 @@
 		"Amount": "金額"
 	},
 	"ConvictionSelector": {
-		"votes": "投票数",
+		"votes": "投票",
 		"lockingPeriod": "ロック期間",
-		"lockingPeriodDescription": "選択した乗数に応じて、投票後あなたの{tokenSymbol}は追加期間ロックされます。"
+		"lockingPeriodDescription": "選択した乗数に応じて、投票後も{tokenSymbol}は追加の期間ロックされます。"
+	},
+	"PolkadotVault": {
+		"signTransaction": "トランザクションに署名",
+		"addVaultAddress": "Polkadot Vaultアドレスを追加",
+		"scan": "スキャン",
+		"openVaultAppInYourPhone": "スマートフォンでVaultアプリを開いてください",
+		"scanTheQRHere": "VaultアプリでここのQRコードをスキャンしてください",
+		"scanTheSignatureQRInYourApp": "アプリで署名QRコードを確認し、トランザクションに署名してください"
 	}
 }
