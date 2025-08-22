@@ -109,14 +109,16 @@
 		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión.",
 		"scanYourAddressQr": "Escanee su código QR de dirección",
 		"scanYourAddressQrDescription1": "Inicie sesión en su aplicación Polkadot Vault.",
-		"scanYourAddressQrDescription2": "Escanee su código QR de dirección de {network}."
+		"scanYourAddressQrDescription2": "Escanee su código QR de dirección de {network}.",
+		"linkedAccount": "Cuenta Vinculada"
 	},
 	"AddressRelationsPicker": {
 		"Switch": "Cambiar",
 		"switchWallet": "Cambiar billetera",
 		"noData": "No",
 		"found": "encontrado",
-		"confirm": "Confirmar"
+		"confirm": "Confirmar",
+		"noAccountSelected": "Seleccionar cuenta"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Propuesta de Tesorería",
@@ -438,6 +440,7 @@
 	"PostDetails": {
 		"castVote": "Emitir Voto",
 		"castYourVote": "Emita su Voto",
+		"copyLink": "Copiar Enlace",
 		"loginToVote": "Inicie sesión para Votar",
 		"requested": "Solicitado",
 		"beneficiary": "Beneficiario",
@@ -461,6 +464,7 @@
 		"preparePeriod": "Período de Preparación",
 		"decisionPeriod": "Período de Decisión",
 		"summary": "Resumen",
+		"summarise": "Resumen",
 		"aye": "Sí",
 		"nay": "No",
 		"split": "Dividido",
@@ -475,6 +479,18 @@
 		"account": "Cuenta",
 		"abstain": "Abstención",
 		"onchainInfo": "Información en cadena",
+		"BeneficiariesDetails": {
+			"requested": "Solicitado",
+			"details": "Detalles",
+			"immediately": "inmediatamente",
+			"in": "en",
+			"to": "a",
+			"totalEstimatedUSD": "Total estimado en USD",
+			"more": "más",
+			"requestedAmountDetails": "Detalles del monto solicitado",
+			"showMore": "Mostrar más",
+			"showLess": "Mostrar menos"
+		},
 		"Poll": {
 			"endsOn": "Termina el",
 			"endedOn": "Terminó el",
@@ -547,6 +563,7 @@
 			"origin": "Origen",
 			"method": "Método",
 			"proposalHash": "Hash de propuesta",
+			"details": "Detalles",
 			"preimage": "Preimagen",
 			"description": "Descripción",
 			"section": "Sección",
@@ -558,7 +575,13 @@
 			"fee": "Gastos",
 			"parentBountyIndex": "Índice de recompensa principal",
 			"payee": "Beneficiario",
-			"curator": "Curador"
+			"curator": "Curador",
+			"requested": "Solicitado",
+			"calls": "Llamadas",
+			"showMore": "Mostrar más",
+			"showLess": "Mostrar menos",
+			"call": "Llamada",
+			"timeline": "Línea de Tiempo"
 		},
 		"deleteComment": "Eliminar comentario",
 		"deleteCommentConfirmation": "¿Está seguro de que desea eliminar este comentario?",
@@ -757,6 +780,10 @@
 	"Preimages": {
 		"hash": "Hash",
 		"author": "Autor",
+		"all": "Todos",
+		"myPreimages": "Mis preimages",
+		"noUserPreimages": "No tienes preimages!",
+		"createOneNow": "Crea uno ahora!",
 		"deposit": "Depósito",
 		"arguments": "Argumentos",
 		"size": "Tamaño",
@@ -773,7 +800,16 @@
 		"unnoted_description": "El preimage no ha sido anotado",
 		"failed": "Fallido",
 		"unrequest": "Cancelar solicitud",
-		"unnote": "Eliminar anotación"
+		"unnote": "Eliminar anotación",
+		"unnoteOrUnrequestPreimageDescription": "¿Estás seguro de que quieres desnotar o desolicitar esta preimagen?",
+		"loadingYourPreimages": "Cargando tus preimágenes...",
+		"please": "Por favor",
+		"toViewPreimages": "para ver tus preimágenes",
+		"logIn": "inicia sesión",
+		"failedToFetchUserPreimages": "Error al obtener las preimágenes del usuario",
+		"tryAgain": "Intentar de nuevo",
+		"showingPreimagesFor": "Mostrando preimágenes para:",
+		"switchWallet": "Cambiar Cartera"
 	},
 	"Create": {
 		"createDiscussionTitle": "Crear Discusión",
@@ -947,7 +983,13 @@
 		"verify": "Verificar",
 		"verified": "Verificado",
 		"pending": "Pendiente",
-		"CurrentJudgement": "Juicio Actual"
+		"CurrentJudgement": "Juicio Actual",
+		"clearIdentity": "Borrar identidad",
+		"clearIdentitySuccess": "¡Identidad borrada!",
+		"clearIdentitySuccessDescription": "Su identidad ha sido borrada exitosamente",
+		"clearIdentityFailed": "Error al borrar la identidad",
+		"clearIdentityFailedDescription": "Hubo un error al borrar su identidad",
+		"clearIdentityDescription": "¿Está seguro de que desea borrar su identidad?"
 	},
 	"Overview": {
 		"month": "Mes",

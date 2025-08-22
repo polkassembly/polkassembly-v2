@@ -19,6 +19,17 @@ export enum ENetwork {
 	CERE = 'cere'
 }
 
+export enum ENetworkSocial {
+	HOME = 'home',
+	TWITTER = 'twitter',
+	DISCORD = 'discord',
+	GITHUB = 'github',
+	YOUTUBE = 'youtube',
+	REDDIT = 'reddit',
+	TELEGRAM = 'telegram',
+	SUBSCAN = 'subscan'
+}
+
 export enum EGovType {
 	GOV_1 = 'gov_1',
 	OPENGOV = 'opengov'
@@ -556,6 +567,7 @@ export interface IBeneficiary {
 	amount: string;
 	assetId?: string | null;
 	validFromBlock?: string;
+	usdAmount?: string;
 }
 
 export interface IBeneficiaryInput extends IBeneficiary {
@@ -718,6 +730,7 @@ export interface IComment {
 	aiSentiment?: ECommentSentiment;
 	history?: IOffChainContentHistoryItem[];
 	disabled?: boolean;
+	authorAddress?: string;
 }
 
 export interface ICommentResponse extends IComment {
@@ -757,8 +770,8 @@ export enum EAssets {
 
 export enum EPostDetailsTab {
 	DESCRIPTION = 'description',
-	TIMELINE = 'timeline',
 	ONCHAIN_INFO = 'onchain_info',
+	SUMMARISE = 'summarise',
 	POST_ANALYTICS = 'post_analytics'
 }
 
@@ -869,6 +882,9 @@ export interface IActivityMetadata {
 	// for posts
 	title?: string;
 	content?: string;
+
+	// for comments
+	authorAddress?: string;
 }
 
 export interface IUserActivity {
@@ -1009,7 +1025,9 @@ export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart',
 	COMMENTS = 'comments',
 	POST_DETAILS = 'postDetails',
-	ACCOUNTS = 'accounts'
+	ACCOUNTS = 'accounts',
+	IDENTITY_INFO = 'identityInfo',
+	TOKENS_USD_PRICE = 'tokensUsdPrice'
 }
 
 export interface IParamDef {
@@ -1129,6 +1147,8 @@ export interface ITreasuryStats {
 	};
 	nativeTokenUsdPrice?: string;
 	nativeTokenUsdPrice24hChange?: string;
+	dedTokenUsdPrice?: string;
+	dedTokenUsdPrice24hChange?: string;
 	[key: string]: unknown;
 }
 
@@ -1346,6 +1366,11 @@ export interface IPayout {
 	};
 }
 
+export enum EPreImageTabs {
+	ALL = 'all',
+	USER = 'user'
+}
+
 export interface IOffChainPollPayload extends Omit<IPoll, 'id' | 'createdAt' | 'updatedAt' | 'proposalType' | 'updatedBy' | 'network' | 'votes' | 'index'> {
 	title: string;
 	options: string[];
@@ -1371,7 +1396,8 @@ export enum ESetIdentityStep {
 	SET_IDENTITY_FORM = 'SET_IDENTITY_FORM',
 	REQUEST_JUDGEMENT = 'REQUEST_JUDGEMENT',
 	IDENTITY_SUCCESS = 'IDENTITY_SUCCESS',
-	TELEPORT_TO_PEOPLE_CHAIN = 'TELEPORT_TO_PEOPLE_CHAIN'
+	TELEPORT_TO_PEOPLE_CHAIN = 'TELEPORT_TO_PEOPLE_CHAIN',
+	CLEAR_IDENTITY = 'CLEAR_IDENTITY'
 }
 
 export interface IAnalytics {

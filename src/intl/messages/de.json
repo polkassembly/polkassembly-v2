@@ -109,14 +109,16 @@
 		"pleaseCheckConnectedAccounts": "Bitte überprüfen Sie die verbundenen Konten in der Erweiterung.",
 		"scanYourAddressQr": "Scannen Sie Ihren Adress-QR-Code",
 		"scanYourAddressQrDescription1": "Melden Sie sich in Ihrer Polkadot Vault App an.",
-		"scanYourAddressQrDescription2": "Scannen Sie Ihren {network} Adress-QR-Code."
+		"scanYourAddressQrDescription2": "Scannen Sie Ihren {network} Adress-QR-Code.",
+		"linkedAccount": "Verknüpftes Konto"
 	},
 	"AddressRelationsPicker": {
 		"Switch": "Wechseln",
 		"switchWallet": "Wallet wechseln",
 		"noData": "Keine",
 		"found": "gefunden",
-		"confirm": "Bestätigen"
+		"confirm": "Bestätigen",
+		"noAccountSelected": "Konto auswählen"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "Finanzvorschlag",
@@ -436,6 +438,7 @@
 	"PostDetails": {
 		"castVote": "Abstimmen",
 		"castYourVote": "Geben Sie Ihre Stimme ab",
+		"copyLink": "Link kopieren",
 		"loginToVote": "Zum Abstimmen anmelden",
 		"requested": "Angefordert",
 		"beneficiary": "Begünstigter",
@@ -459,6 +462,7 @@
 		"preparePeriod": "Vorbereitungszeit",
 		"decisionPeriod": "Entscheidungszeit",
 		"summary": "Zusammenfassung",
+		"summarise": "Zusammenfassung",
 		"aye": "Ja",
 		"nay": "Nein",
 		"split": "Geteilt",
@@ -473,6 +477,18 @@
 		"account": "Konto",
 		"abstain": "Enthaltung",
 		"onchainInfo": "Onchain-Informationen",
+		"BeneficiariesDetails": {
+			"requested": "Angefordert",
+			"details": "Details",
+			"immediately": "sofort",
+			"in": "in",
+			"to": "zu",
+			"totalEstimatedUSD": "Geschätzter USD-Äquivalent",
+			"more": "mehr",
+			"requestedAmountDetails": "Angeforderter Betrag Details",
+			"showMore": "Mehr anzeigen",
+			"showLess": "Weniger anzeigen"
+		},
 		"nestedVotes": "Verschachtelte Abstimmungen",
 		"flattenedVotes": "Ebene Abstimmungen",
 		"Poll": {
@@ -543,6 +559,7 @@
 			"table": "Tabelle",
 			"json": "JSON",
 			"origin": "Ursprung",
+			"details": "Details",
 			"method": "Methode",
 			"proposalHash": "Vorschlag-Hash",
 			"preimage": "Vorabbild",
@@ -556,7 +573,13 @@
 			"fee": "Gebühr",
 			"parentBountyIndex": "Elterntreffen-Index",
 			"payee": "Begünstigter",
-			"curator": "Curator"
+			"curator": "Curator",
+			"requested": "Angefordert",
+			"calls": "Aufrufe",
+			"showMore": "Mehr anzeigen",
+			"showLess": "Weniger anzeigen",
+			"call": "Aufruf",
+			"timeline": "Zeitlinie"
 		},
 		"deleteComment": "Kommentar löschen",
 		"deleteCommentConfirmation": "Möchten Sie diesen Kommentar wirklich löschen?",
@@ -755,6 +778,10 @@
 	"Preimages": {
 		"hash": "Hash",
 		"author": "Autor",
+		"all": "Alle",
+		"myPreimages": "Meine Preimages",
+		"noUserPreimages": "Sie haben keine Preimages!",
+		"createOneNow": "Erstellen Sie jetzt einen!",
 		"deposit": "Einzahlung",
 		"arguments": "Argumente",
 		"size": "Größe",
@@ -771,7 +798,16 @@
 		"unnoted_description": "Das Preimage wurde nicht notiert",
 		"failed": "Fehlgeschlagen",
 		"unrequest": "Anforderung zurückziehen",
-		"unnote": "Notiz entfernen"
+		"unnote": "Notiz entfernen",
+		"unnoteOrUnrequestPreimageDescription": "Sind Sie sicher, dass Sie dieses Preimage unnotieren oder die Anfrage zurückziehen möchten?",
+		"loadingYourPreimages": "Lade Ihre Preimages...",
+		"please": "Bitte",
+		"toViewPreimages": "um Ihre Preimages zu sehen",
+		"logIn": "anmelden",
+		"failedToFetchUserPreimages": "Fehler beim Abrufen der Benutzer-Preimages",
+		"tryAgain": "Erneut versuchen",
+		"showingPreimagesFor": "Zeige Preimages für:",
+		"switchWallet": "Wallet wechseln"
 	},
 	"Create": {
 		"createDiscussionTitle": "Diskussion erstellen",
@@ -945,7 +981,13 @@
 		"verify": "Verifizieren",
 		"verified": "Verifiziert",
 		"pending": "Ausstehend",
-		"CurrentJudgement": "Aktuelle Beurteilung"
+		"CurrentJudgement": "Aktuelle Beurteilung",
+		"clearIdentity": "Identität löschen",
+		"clearIdentitySuccess": "Identität gelöscht!",
+		"clearIdentitySuccessDescription": "Ihre Identität wurde erfolgreich gelöscht",
+		"clearIdentityFailed": "Identitätslöschung fehlgeschlagen",
+		"clearIdentityFailedDescription": "Beim Löschen Ihrer Identität ist ein Fehler aufgetreten",
+		"clearIdentityDescription": "Sind Sie sicher, dass Sie Ihre Identität löschen möchten?"
 	},
 	"Bounties": {
 		"onchainBounties": "Onchain-Prämien",

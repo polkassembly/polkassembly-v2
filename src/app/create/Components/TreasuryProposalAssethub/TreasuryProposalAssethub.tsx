@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EEnactment, EPostOrigin, IBeneficiaryInput, ENotificationStatus } from '@/_shared/types';
+import { EEnactment, EPostOrigin, IBeneficiaryInput, ENotificationStatus, IBeneficiary, ENetwork, EAssets, EReactQueryKeys } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -23,6 +23,45 @@ import { dayjs } from '@shared/_utils/dayjsInit';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
 import { usePolkadotVault } from '@/hooks/usePolkadotVault';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useQuery } from '@tanstack/react-query';
+import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
+import { convertAssetToUSD } from '@/app/_client-utils/convertAssetToUSD';
+import { decimalToBN } from '@/_shared/_utils/decimalToBN';
+
+const calculateNativeTokenEquivalent = ({
+	beneficiaries,
+	network,
+	currentTokenPrice,
+	dedTokenUsdPrice
+}: {
+	beneficiaries: IBeneficiary[];
+	network: ENetwork;
+	currentTokenPrice?: string;
+	dedTokenUsdPrice?: string;
+}) => {
+	if (!currentTokenPrice || !beneficiaries?.length || !network) return BN_ZERO;
+	const totalUsdAmount = beneficiaries.reduce((acc, beneficiary) => {
+		const assetSymbol = beneficiary.assetId
+			? (getAssetDataByIndexForNetwork({
+					network,
+					generalIndex: beneficiary.assetId
+				}).symbol as unknown as Exclude<EAssets, EAssets.MYTH>)
+			: null;
+
+		const usdPrice = convertAssetToUSD({ amount: beneficiary.amount, asset: assetSymbol, network, currentTokenPrice, dedTokenUsdPrice });
+		return acc?.add(usdPrice || BN_ZERO);
+	}, BN_ZERO);
+	const tokenDecimal = NETWORKS_DETAILS[`${network}`].tokenDecimals;
+
+	const nativeTokenUsdPrice = currentTokenPrice ? decimalToBN(currentTokenPrice) : null;
+	return nativeTokenUsdPrice
+		? totalUsdAmount
+				.mul(new BN(10).pow(new BN(tokenDecimal)))
+				.mul(new BN(10).pow(new BN(nativeTokenUsdPrice?.decimals || BN_ZERO.toString())))
+				.div(nativeTokenUsdPrice?.value || BN_ZERO)
+		: BN_ZERO;
+};
 
 function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: number) => void }) {
 	const t = useTranslations();
@@ -40,12 +79,33 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 	const [loading, setLoading] = useState(false);
 
 	const { setVaultQrState } = usePolkadotVault();
+	const getTokensUsdPrice = async () => {
+		const to = new Date();
+		const from = new Date();
+		from.setHours(to.getHours() - 2);
+		const { data, error } = await NextApiClientService.getTreasuryStats({ from, to });
+		if (error) {
+			throw new Error(error.message);
+		}
+		return { nativeTokenUsdPrice: data?.[0]?.nativeTokenUsdPrice, dedTokenUsdPrice: data?.[0]?.dedTokenUsdPrice };
+	};
+
+	const { data: tokensUsdPrice } = useQuery({
+		queryKey: [EReactQueryKeys.TOKENS_USD_PRICE],
+		queryFn: getTokensUsdPrice,
+		retry: false
+	});
 
 	const tx = useMemo(() => {
 		if (!apiService) return null;
 
 		return apiService.getTreasurySpendExtrinsic({ beneficiaries });
 	}, [apiService, beneficiaries]);
+
+	const totalNativeTokenAmount = useMemo(() => {
+		if (!tokensUsdPrice) return undefined;
+		return calculateNativeTokenEquivalent({ beneficiaries, network, currentTokenPrice: tokensUsdPrice.nativeTokenUsdPrice, dedTokenUsdPrice: tokensUsdPrice.dedTokenUsdPrice });
+	}, [beneficiaries, network, tokensUsdPrice]);
 
 	const preimageDetails = useMemo(() => apiService && tx && apiService.getPreimageTxDetails({ extrinsicFn: tx }), [apiService, tx]);
 
@@ -124,6 +184,7 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 					selectedTrack={selectedTrack}
 					onChange={setSelectedTrack}
 					isTreasury
+					requestedAmount={totalNativeTokenAmount}
 				/>
 				<EnactmentForm
 					selectedEnactment={selectedEnactment}

@@ -34,7 +34,8 @@ function AddressDropdown({
 	disabled,
 	withRadioSelect,
 	onRadioSelect,
-	showPeopleChainBalance = false
+	showPeopleChainBalance = false,
+	showLinkedAccountBadge = false
 }: {
 	onChange?: (account: InjectedAccount) => void;
 	withBalance?: boolean;
@@ -42,14 +43,14 @@ function AddressDropdown({
 	withRadioSelect?: boolean;
 	onRadioSelect?: (address: string) => void;
 	showPeopleChainBalance?: boolean;
+	showLinkedAccountBadge?: boolean;
 }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
+	const { user } = useUser();
 	const t = useTranslations();
 	const walletService = useWalletService();
 	const queryClient = useQueryClient();
 	const [openVaultModal, setOpenVaultModal] = useState(false);
-
-	const { user } = useUser();
 
 	const network = getCurrentNetwork();
 
@@ -138,6 +139,7 @@ function AddressDropdown({
 
 		setOpenVaultModal(false);
 	};
+	const isLinkedAddress = useCallback((address: string) => user?.addresses.includes(getSubstrateAddress(address || '') || ''), [user]);
 
 	const onAccountChange = (a: InjectedAccount) => {
 		setUserPreferences({
@@ -252,6 +254,12 @@ function AddressDropdown({
 										<AccountTypeBadge accountType={userPreferences?.selectedAccount?.accountType || EAccountType.REGULAR} />
 										{userPreferences?.selectedAccount?.parent && <AccountTypeBadge accountType={userPreferences?.selectedAccount?.parent?.accountType || EAccountType.REGULAR} />}
 									</div>
+									{/* Badge for the linked account */}
+									{showLinkedAccountBadge && isLinkedAddress(userPreferences?.selectedAccount?.address || '') && (
+										<span className='inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium capitalize text-green-700 ring-1 ring-inset ring-green-700/10'>
+											{t('AddressDropdown.linkedAccount')}
+										</span>
+									)}
 								</div>
 							</DropdownMenuTrigger>
 						</div>
@@ -336,6 +344,11 @@ function AddressDropdown({
 										<div className='flex items-center gap-1'>
 											<AccountTypeBadge accountType={EAccountType.REGULAR} />
 										</div>
+										{showLinkedAccountBadge && isLinkedAddress(item.address) && (
+											<span className='inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium capitalize text-green-700 ring-1 ring-inset ring-green-700/10'>
+												{t('AddressDropdown.linkedAccount')}
+											</span>
+										)}
 									</div>
 								</button>
 							</DropdownMenuItem>

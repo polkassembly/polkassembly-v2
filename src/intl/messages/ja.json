@@ -109,14 +109,16 @@
 		"pleaseCheckConnectedAccounts": "拡張機能で接続されているアカウントを確認してください。",
 		"scanYourAddressQr": "アドレスQRコードをスキャン",
 		"scanYourAddressQrDescription1": "Polkadot Vaultアプリにログインしてください。",
-		"scanYourAddressQrDescription2": "{network}のアドレスQRコードをスキャンしてください。"
+		"scanYourAddressQrDescription2": "{network}のアドレスQRコードをスキャンしてください。",
+		"linkedAccount": "リンクされたアカウント"
 	},
 	"AddressRelationsPicker": {
 		"Switch": "切り替え",
 		"switchWallet": "ウォレットを切り替え",
 		"noData": "データがありません",
 		"found": "見つかりました",
-		"confirm": "確認"
+		"confirm": "確認",
+		"noAccountSelected": "アカウントを選択"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "財務提案",
@@ -437,6 +439,7 @@
 	"PostDetails": {
 		"castVote": "投票する",
 		"castYourVote": "投票してください",
+		"copyLink": "リンクをコピー",
 		"loginToVote": "投票するにはログイン",
 		"requested": "リクエスト済み",
 		"beneficiary": "受益者",
@@ -460,6 +463,7 @@
 		"preparePeriod": "準備期間",
 		"decisionPeriod": "決定期間",
 		"summary": "要約",
+		"summarise": "要約",
 		"aye": "賛成",
 		"nay": "反対",
 		"split": "分割",
@@ -474,6 +478,18 @@
 		"account": "アカウント",
 		"abstain": "棄権",
 		"onchainInfo": "オンチェーン情報",
+		"BeneficiariesDetails": {
+			"requested": "リクエスト済み",
+			"details": "詳細",
+			"immediately": "すぐに",
+			"in": "で",
+			"to": "に",
+			"totalEstimatedUSD": "合計推定USD相当",
+			"more": "もっと",
+			"requestedAmountDetails": "リクエストされた金額の詳細",
+			"showMore": "もっと表示",
+			"showLess": "もっと少なく表示"
+		},
 		"Poll": {
 			"endsOn": "終了日",
 			"endedOn": "終了日",
@@ -547,6 +563,7 @@
 			"method": "メソッド",
 			"proposalHash": "提案ハッシュ",
 			"preimage": "プレイメージ",
+			"details": "詳細",
 			"description": "説明",
 			"section": "セクション",
 			"name": "名前",
@@ -557,7 +574,13 @@
 			"fee": "料金",
 			"parentBountyIndex": "親報奨金インデックス",
 			"payee": "受益者",
-			"curator": "クレジット"
+			"curator": "クレジット",
+			"requested": "リクエスト済み",
+			"calls": "呼び出し",
+			"showMore": "もっと表示",
+			"showLess": "もっと少なく表示",
+			"call": "呼び出し",
+			"timeline": "タイムライン"
 		},
 		"deleteComment": "コメントを削除",
 		"deleteCommentConfirmation": "このコメントを削除してもよろしいですか？",
@@ -756,6 +779,10 @@
 	"Preimages": {
 		"hash": "ハッシュ",
 		"author": "作成者",
+		"all": "すべて",
+		"myPreimages": "マイプレイメージ",
+		"noUserPreimages": "プレイメージがありません！",
+		"createOneNow": "今すぐ作成！",
 		"deposit": "デポジット",
 		"arguments": "引数",
 		"size": "サイズ",
@@ -772,7 +799,16 @@
 		"unnoted_description": "プレイメージは記録されていません",
 		"failed": "失敗",
 		"unrequest": "リクエストを取り消す",
-		"unnote": "記録を削除"
+		"unnote": "記録を削除",
+		"unnoteOrUnrequestPreimageDescription": "このプレイメージの記録を削除またはリクエストを取り消してもよろしいですか？",
+		"loadingYourPreimages": "プレイメージを読み込み中...",
+		"please": "プレイメージを表示するには",
+		"toViewPreimages": "してください",
+		"logIn": "ログイン",
+		"failedToFetchUserPreimages": "ユーザーのプレイメージの取得に失敗しました",
+		"tryAgain": "再試行",
+		"showingPreimagesFor": "プレイメージを表示中:",
+		"switchWallet": "ウォレットを切り替え"
 	},
 	"Create": {
 		"createDiscussionTitle": "ディスカッションを作成",
@@ -946,7 +982,13 @@
 		"verify": "確認",
 		"verified": "確認済み",
 		"pending": "保留中",
-		"CurrentJudgement": "現在の判定"
+		"CurrentJudgement": "現在の判定",
+		"clearIdentity": "アイデンティティをクリア",
+		"clearIdentitySuccess": "アイデンティティがクリアされました！",
+		"clearIdentitySuccessDescription": "アイデンティティが正常にクリアされました",
+		"clearIdentityFailed": "アイデンティティのクリアに失敗しました",
+		"clearIdentityFailedDescription": "アイデンティティのクリア中にエラーが発生しました",
+		"clearIdentityDescription": "アイデンティティをクリアしてもよろしいですか？"
 	},
 	"Overview": {
 		"month": "月",

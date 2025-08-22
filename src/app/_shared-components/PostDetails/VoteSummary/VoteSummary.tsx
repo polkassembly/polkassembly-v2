@@ -68,7 +68,7 @@ function VoteSummary({ voteMetrics, index, approvalThreshold }: { voteMetrics?: 
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
-	const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(true);
 	const [issuance, setIssuance] = useState<BN | null>(null);
 
 	const { userPreferences } = useUserPreferences();

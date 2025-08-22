@@ -109,14 +109,16 @@
 		"pleaseCheckConnectedAccounts": "请检查扩展中已连接的账户。",
 		"scanYourAddressQr": "扫描您的地址二维码",
 		"scanYourAddressQrDescription1": "登录您的Polkadot Vault应用。",
-		"scanYourAddressQrDescription2": "扫描您的{network}地址二维码。"
+		"scanYourAddressQrDescription2": "扫描您的{network}地址二维码。",
+		"linkedAccount": "链接的账户"
 	},
 	"AddressRelationsPicker": {
 		"Switch": "切换",
 		"switchWallet": "切换钱包",
 		"noData": "没有数据",
 		"found": "找到",
-		"confirm": "确认"
+		"confirm": "确认",
+		"noAccountSelected": "选择账户"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "国库提案",
@@ -437,6 +439,7 @@
 	"PostDetails": {
 		"castVote": "投票",
 		"castYourVote": "进行投票",
+		"copyLink": "复制链接",
 		"loginToVote": "登录以投票",
 		"requested": "已请求",
 		"beneficiary": "受益人",
@@ -460,6 +463,7 @@
 		"preparePeriod": "准备期",
 		"decisionPeriod": "决策期",
 		"summary": "摘要",
+		"summarise": "摘要",
 		"aye": "赞成",
 		"nay": "反对",
 		"split": "分割",
@@ -473,6 +477,18 @@
 		"capital": "资本",
 		"account": "账户",
 		"abstain": "弃权",
+		"BeneficiariesDetails": {
+			"requested": "已请求",
+			"details": "详情",
+			"immediately": "立即",
+			"in": "在",
+			"to": "到",
+			"totalEstimatedUSD": "总计估计美元等值",
+			"more": "更多",
+			"requestedAmountDetails": "已请求金额详情",
+			"showMore": "显示更多",
+			"showLess": "显示更少"
+		},
 		"Poll": {
 			"endsOn": "结束于",
 			"endedOn": "结束于",
@@ -547,6 +563,7 @@
 			"proposalHash": "提案哈希",
 			"preimage": "预映像",
 			"description": "描述",
+			"details": "详情",
 			"section": "部分",
 			"name": "名称",
 			"value": "值",
@@ -556,7 +573,13 @@
 			"fee": "费用",
 			"parentBountyIndex": "父赏金索引",
 			"payee": "受益者",
-			"curator": " curator"
+			"curator": " curator",
+			"requested": "已请求",
+			"calls": "调用",
+			"showMore": "显示更多",
+			"showLess": "显示更少",
+			"call": "调用",
+			"timeline": "时间线"
 		},
 		"onchainInfo": "链上信息",
 		"deleteComment": "删除评论",
@@ -756,6 +779,10 @@
 	"Preimages": {
 		"hash": "哈希",
 		"author": "作者",
+		"all": "全部",
+		"myPreimages": "我的预映像",
+		"noUserPreimages": "您没有预映像！",
+		"createOneNow": "现在创建一个！",
 		"deposit": "押金",
 		"arguments": "参数",
 		"size": "大小",
@@ -772,7 +799,16 @@
 		"unnoted_description": "原像未被记录",
 		"failed": "失败",
 		"unrequest": "取消请求",
-		"unnote": "删除记录"
+		"unnote": "删除记录",
+		"unnoteOrUnrequestPreimageDescription": "您确定要删除此预映像的记录或取消请求吗？",
+		"loadingYourPreimages": "正在加载您的预映像...",
+		"please": "请",
+		"toViewPreimages": "以查看您的预映像",
+		"logIn": "登录",
+		"failedToFetchUserPreimages": "获取用户预映像失败",
+		"tryAgain": "重试",
+		"showingPreimagesFor": "显示预映像：",
+		"switchWallet": "切换钱包"
 	},
 	"Create": {
 		"createDiscussionTitle": "创建讨论",
@@ -946,7 +982,13 @@
 		"verify": "验证",
 		"verified": "已验证",
 		"pending": "待处理",
-		"CurrentJudgement": "当前判定"
+		"CurrentJudgement": "当前判定",
+		"clearIdentity": "清除身份",
+		"clearIdentitySuccess": "身份已清除！",
+		"clearIdentitySuccessDescription": "您的身份已成功清除",
+		"clearIdentityFailed": "清除身份失败",
+		"clearIdentityFailedDescription": "清除您的身份时出现错误",
+		"clearIdentityDescription": "您确定要清除您的身份吗？"
 	},
 	"Bounties": {
 		"onchainBounties": "链上赏金",

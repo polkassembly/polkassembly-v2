@@ -97,6 +97,7 @@ enum EApiRoute {
 	FETCH_USER_ACTIVITY = 'FETCH_USER_ACTIVITY',
 	GET_ON_CHAIN_METADATA_FOR_POST = 'GET_ON_CHAIN_METADATA_FOR_POST',
 	FETCH_PREIMAGES = 'FETCH_PREIMAGES',
+	FETCH_USER_PREIMAGES = 'FETCH_USER_PREIMAGES',
 	DELETE_COMMENT = 'DELETE_COMMENT',
 	EDIT_COMMENT = 'EDIT_COMMENT',
 	GENERATE_QR_SESSION = 'GENERATE_QR_SESSION',
@@ -142,7 +143,9 @@ enum EApiRoute {
 	ADD_POLL_VOTE = 'ADD_POLL_VOTE',
 	DELETE_POLL_VOTE = 'DELETE_POLL_VOTE',
 	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
-	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES'
+	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES',
+	ADD_COMMENT_REACTION = 'ADD_COMMENT_REACTION',
+	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION'
 }
 
 export class NextApiClientService {
@@ -197,6 +200,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.FETCH_PREIMAGES:
 				path = '/preimages';
+				break;
+			case EApiRoute.FETCH_USER_PREIMAGES:
+				path = '/users/address';
 				break;
 			case EApiRoute.FETCH_ALL_TAGS:
 				path = '/meta/tags';
@@ -320,6 +326,7 @@ export class NextApiClientService {
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.ADD_POST_SUBSCRIPTION:
 			case EApiRoute.ADD_POST_REACTION:
+			case EApiRoute.ADD_COMMENT_REACTION:
 				method = 'POST';
 				break;
 			case EApiRoute.JUDGEMENT_CALL:
@@ -353,6 +360,7 @@ export class NextApiClientService {
 			case EApiRoute.DELETE_REACTION:
 			case EApiRoute.DELETE_POST_SUBSCRIPTION:
 			case EApiRoute.DELETE_COMMENT:
+			case EApiRoute.DELETE_COMMENT_REACTION:
 				method = 'DELETE';
 				break;
 
@@ -617,12 +625,14 @@ export class NextApiClientService {
 		proposalType,
 		index,
 		content,
-		parentCommentId
+		parentCommentId,
+		authorAddress
 	}: {
 		proposalType: EProposalType;
 		index: string;
 		content: string;
 		parentCommentId?: string;
+		authorAddress?: string;
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_COMMENT, routeSegments: [proposalType, index, 'comments'] });
 		return this.nextApiClientFetch<IComment>({
@@ -630,7 +640,8 @@ export class NextApiClientService {
 			method,
 			data: {
 				content,
-				parentCommentId
+				parentCommentId,
+				authorAddress
 			}
 		});
 	}
@@ -863,6 +874,20 @@ export class NextApiClientService {
 	static async fetchPreimageByHash({ hash }: { hash: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PREIMAGES, routeSegments: [hash] });
 		return this.nextApiClientFetch<IPreimage>({ url, method });
+	}
+
+	static async fetchUserPreimages({ page, address }: { page: number; address: string }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: PREIMAGES_LISTING_LIMIT.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.FETCH_USER_PREIMAGES,
+			routeSegments: [address, 'preimages'],
+			queryParams
+		});
+		return this.nextApiClientFetch<IGenericListingResponse<IPreimage>>({ url, method });
 	}
 
 	protected static async generateQRSessionApi() {
@@ -1162,5 +1187,18 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_BUBBLE_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-bubble'], queryParams });
 		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method });
+	}
+
+	static async addCommentReaction(proposalType: EProposalType, index: string, commentId: string, reactionType: EReaction) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_COMMENT_REACTION, routeSegments: [proposalType, index, 'comments', commentId, 'reactions'] });
+		return this.nextApiClientFetch<{ message: string; reactionId: string }>({ url, method, data: { reaction: reactionType } });
+	}
+
+	static async deleteCommentReaction(proposalType: EProposalType, index: string, commentId: string, reactionId: string) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.DELETE_COMMENT_REACTION,
+			routeSegments: [proposalType, index, 'comments', commentId, 'reactions', reactionId]
+		});
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 }

@@ -25,3 +25,43 @@
 .modalDescBox {
 	@apply flex max-h-96 w-96 overflow-y-auto border-none lg:w-full;
 }
+
+.analyticsBox {
+	@apply rounded-xl bg-bg_modal p-4 shadow-lg lg:p-6;
+}
+
+.modalOpen {
+	grid-template-columns: 1fr !important;
+}
+
+.detailsWrapper {
+	@media (max-width: 1279px) {
+		display: grid !important;
+		grid-template-columns: 1fr !important;
+		gap: 16px;
+	}
+}
+
+.leftWrapper {
+	@media (max-width: 1279px) {
+		display: contents;
+	}
+}
+
+.descBox {
+	@media (max-width: 1279px) {
+		order: 1;
+	}
+}
+
+.rightWrapper {
+	@media (max-width: 1279px) {
+		order: 2;
+	}
+}
+
+.commentsBox {
+	@media (max-width: 1279px) {
+		order: 3;
+	}
+}

@@ -7,7 +7,7 @@ import { FaRegClock } from '@react-icons/all-files/fa/FaRegClock';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import { EActivityFeedTab, ENotificationStatus, IPostListing } from '@/_shared/types';
-import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
+import { groupBeneficiariesByAssetIndex } from '@/app/_client-utils/beneficiaryUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
@@ -61,7 +61,7 @@ function ActivityFeedPostItem({
 	const network = getCurrentNetwork();
 	const [commentCount, setCommentCount] = useState(postData?.metrics?.comments);
 
-	const { reactionState, showLikeGif, showDislikeGif, handleReaction, isSubscribed, handleSubscribe, subscriptionKey } = usePostReactions({
+	const { reactionState, handleReaction, isSubscribed, handleSubscribe, subscriptionKey } = usePostReactions({
 		reactions: postData?.reactions,
 		proposalType: postData?.proposalType,
 		indexOrHash: postData?.index?.toString() || postData?.hash,
@@ -124,7 +124,7 @@ function ActivityFeedPostItem({
 					<span className='text-xl font-semibold'>
 						{postData.onChainInfo?.beneficiaries && Array.isArray(postData.onChainInfo.beneficiaries) && postData.onChainInfo.beneficiaries.length > 0 && (
 							<div className={`${styles.beneficiaryContainer} mr-2`}>
-								{Object.entries(groupBeneficiariesByAsset(postData.onChainInfo.beneficiaries, postData.network))
+								{Object.entries(groupBeneficiariesByAssetIndex({ network: postData.network, beneficiaries: postData.onChainInfo.beneficiaries }))
 									.map(([assetId, amount]) =>
 										formatBnBalance(
 											amount.toString(),
@@ -233,8 +233,6 @@ function ActivityFeedPostItem({
 						postData={postData}
 						isLiked={reactionState.isLiked}
 						isDisliked={reactionState.isDisliked}
-						showLikeGif={showLikeGif}
-						showDislikeGif={showDislikeGif}
 						handleReaction={handleReaction}
 						isSubscribed={isSubscribed}
 						handleSubscribe={handleSubscribeClick}
