@@ -141,7 +141,10 @@ interface INetworkDetails {
 		large: string;
 		small: string;
 	};
-	contractAddress?: string;
+	contractAddresses?: {
+		votingAddress: string;
+		batchAddress: string;
+	};
 }
 
 enum ENetworkSocial {
@@ -3306,7 +3309,10 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.MOONBEAM],
 		supportedAssets: {},
 		foreignAssets: {},
-		contractAddress: '0x0000000000000000000000000000000000000812'
+		contractAddresses: {
+			votingAddress: '0x0000000000000000000000000000000000000812',
+			batchAddress: '0x0000000000000000000000000000000000000808'
+		}
 	},
 	[ENetwork.MOONRIVER]: {
 		key: ENetwork.MOONRIVER,
@@ -3365,6 +3371,9 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.MOONRIVER],
 		supportedAssets: {},
 		foreignAssets: {},
-		contractAddress: '0x0000000000000000000000000000000000000812'
+		contractAddresses: {
+			votingAddress: '0x0000000000000000000000000000000000000812',
+			batchAddress: '0x0000000000000000000000000000000000000808'
+		}
 	}
 } as const;

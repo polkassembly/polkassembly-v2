@@ -7,9 +7,34 @@ import { ENetwork, EVoteDecision, EWallet } from '@/_shared/types';
 import { Contract, ethers } from 'ethers';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import moonbeamConvictionVotingAbi from '@/app/_client-utils/moonbeamConvictionVoting.json';
-import { BN } from '@polkadot/util';
+import votingAbi from '@/app/_client-utils/abi/voting.json';
+import { BN, BN_ZERO } from '@polkadot/util';
 import { ClientError } from '../_client-utils/clientError';
+
+export enum EConviction {
+	NONE = 0,
+	LOCKED1X = 1,
+	LOCKED2X = 2,
+	LOCKED3X = 3,
+	LOCKED4X = 4,
+	LOCKED5X = 5,
+	LOCKED6X = 6
+}
+export interface IDelegateParams {
+	trackId: number;
+	representative: string;
+	conviction: EConviction;
+	amount: BN;
+	selectedWallet: EWallet;
+	network: ENetwork;
+}
+
+// Interface for undelegate parameters
+export interface IUndelegateParams {
+	trackId: number;
+	selectedWallet: EWallet;
+	network: ENetwork;
+}
 
 export class EthApiService {
 	// eslint-disable-next-line class-methods-use-this
@@ -45,7 +70,7 @@ export class EthApiService {
 		}
 	}
 
-	static async getContract(selectedWallet: EWallet, network: ENetwork) {
+	static async getContract(selectedWallet: EWallet, network: ENetwork, abi: any) {
 		const wallet = selectedWallet === EWallet.METAMASK ? window.ethereum : selectedWallet === EWallet.TALISMAN ? (window as any).talismanEth : window.SubWallet;
 		let web3 = new ethers.BrowserProvider(wallet);
 		const { chainId: id } = await web3.getNetwork();
@@ -57,15 +82,14 @@ export class EthApiService {
 			web3 = new ethers.BrowserProvider(wallet);
 		}
 		const signer = await web3.getSigner();
-		const { contractAddress } = NETWORKS_DETAILS[network];
-		if (!contractAddress) {
+		const { contractAddresses } = NETWORKS_DETAILS[network];
+		if (!contractAddresses?.votingAddress) {
 			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Vote contract address not found');
 		}
-		const abi = network === ENetwork.MOONBEAM ? moonbeamConvictionVotingAbi : null;
 		if (!abi) {
 			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Moonbeam Conviction Voting ABI not found');
 		}
-		return new Contract(contractAddress, abi, signer);
+		return new Contract(contractAddresses.votingAddress, abi, signer);
 	}
 
 	static async vote(
@@ -79,7 +103,7 @@ export class EthApiService {
 		nayVoteValue?: BN,
 		abstainVoteValue?: BN
 	) {
-		const contract = await this.getContract(selectedWallet, network);
+		const contract = await this.getContract(selectedWallet, network, votingAbi);
 		if (!contract) {
 			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'contract not found');
 		}
@@ -109,5 +133,28 @@ export class EthApiService {
 		}
 
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Invalid vote type');
+	}
+
+	static async delegate(params: IDelegateParams) {
+		const { trackId, representative, conviction, amount, selectedWallet, network } = params;
+
+		if (!representative || !ethers.isAddress(representative)) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Invalid representative address');
+		}
+
+		if (Number.isNaN(trackId)) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Invalid track ID');
+		}
+
+		if (amount.lte(BN_ZERO)) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Delegation amount must be greater than 0');
+		}
+
+		const contract = await this.getContract(selectedWallet, network, votingAbi);
+		if (!contract) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Contract not found');
+		}
+
+		return contract.delegate(trackId, representative, conviction, amount.toString());
 	}
 }
