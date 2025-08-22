@@ -16,6 +16,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '@/hooks/useUser';
+import dynamic from 'next/dynamic';
 import classes from './AddressDropdown.module.scss';
 import { Alert, AlertDescription } from '../Alert';
 import Balance from '../Balance';
@@ -25,8 +26,9 @@ import { RadioGroup, RadioGroupItem } from '../RadioGroup/RadioGroup';
 import { Label } from '../Label';
 import AccountTypeBadge from '../AccountTypeBadge/AccountTypeBadge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../Dialog/Dialog';
-import AddVaultAddress from '../PolkadotVault/AddressVaultAddress/AddVaultAddress';
 import { Button } from '../Button';
+
+const AddVaultAddress = dynamic(() => import('../PolkadotVault/AddressVaultAddress/AddVaultAddress'), { ssr: false });
 
 function AddressDropdown({
 	onChange,

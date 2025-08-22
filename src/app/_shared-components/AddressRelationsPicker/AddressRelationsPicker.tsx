@@ -18,6 +18,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
+import dynamic from 'next/dynamic';
 import Address from '../Profile/Address/Address';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
@@ -28,7 +29,8 @@ import { Label } from '../Label';
 import AccountTypeBadge from '../AccountTypeBadge/AccountTypeBadge';
 import Balance from '../Balance';
 import { Alert, AlertDescription } from '../Alert';
-import AddVaultAddress from '../PolkadotVault/AddressVaultAddress/AddVaultAddress';
+
+const AddVaultAddress = dynamic(() => import('../PolkadotVault/AddressVaultAddress/AddVaultAddress'), { ssr: false });
 
 interface IAddressRadioGroupProps {
 	accountType: EAccountType;

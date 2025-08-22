@@ -7,8 +7,10 @@ import WalletButton from '@ui/WalletsUI/WalletButton/WalletButton';
 import { WalletClientService } from '@/app/_client-services/wallet_service';
 import { useWalletService } from '@/hooks/useWalletService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import dynamic from 'next/dynamic';
 import classes from './WalletButtons.module.scss';
-import SignVaultTransaction from '../../PolkadotVault/SignVaultTransaction/SignVaultTransaction';
+
+const SignVaultTransaction = dynamic(() => import('../../PolkadotVault/SignVaultTransaction/SignVaultTransaction'), { ssr: false });
 
 function WalletButtons({
 	onWalletChange,
