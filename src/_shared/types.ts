@@ -661,6 +661,7 @@ export interface ISidebarMenuItem {
 	items?: ISidebarMenuItem[];
 	key?: string;
 	heading?: string;
+	renderAsParentItem?: boolean;
 }
 
 export interface IMessageResponse {

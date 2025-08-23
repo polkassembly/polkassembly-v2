@@ -431,6 +431,9 @@
 		"Treasury": "Treasury",
 		"LeaseAdmin": "Lease Admin",
 		"GeneralAdmin": "General Admin",
+		"more": "More",
+		"gov1": "Gov 1",
+		"analytics": "Analytics",
 		"Tag": {
 			"new": "New"
 		}

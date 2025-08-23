@@ -429,6 +429,9 @@
 		"Treasury": "国库",
 		"LeaseAdmin": "租赁管理员",
 		"GeneralAdmin": "总管理员",
+		"more": "更多",
+		"gov1": "Gov 1",
+		"analytics": "分析",
 		"Tag": {
 			"new": "新"
 		}
