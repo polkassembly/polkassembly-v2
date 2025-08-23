@@ -9,23 +9,12 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
 import PaLogo from '@ui/AppLayout/PaLogo';
-import Head1 from '@assets/sidebar/head1.svg';
-import Head2 from '@assets/sidebar/head2.svg';
-import Head3 from '@assets/sidebar/head3.svg';
-import Head4 from '@assets/sidebar/head4.svg';
-import Foot1 from '@assets/sidebar/foot1.svg';
-import Foot2 from '@assets/sidebar/foot2.svg';
-import Foot3 from '@assets/sidebar/foot3.svg';
-import Foot4 from '@assets/sidebar/foot4.svg';
 import { useTranslations } from 'next-intl';
 import CautionIcon from '@assets/sidebar/caution-icon.svg';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { useUser } from '@/hooks/useUser';
 import { ComponentProps } from 'react';
-import { LEADERBOARD_SUPPORTED_NETWORKS } from '@/_shared/_constants/leaderBoardSupportedNetworks';
-import DynamicImageGrid from '../DynamicImageGrid/DynamicImageGrid';
 import { NavMain } from '../NavItems/NavItems';
 import CreateButton from '../CreateButton/CreateButton';
 import styles from './AppSidebar.module.scss';
@@ -34,7 +23,6 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
 	const t = useTranslations();
 	const pathname = usePathname();
-	const { user } = useUser();
 
 	const network = getCurrentNetwork();
 
@@ -55,34 +43,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 		);
 	};
 
-	const generateGridData = (data: { src: string; alt: string; bgColor: string; tooltip: string }[], gridName: 'header' | 'footer') => (
-		<DynamicImageGrid
-			items={data}
-			rowSize={2}
-			tooltipPosition='top'
-			isExpanded={state === 'expanded'}
-			gridName={gridName}
-		/>
-	);
 	const data = getSidebarData(network, pathname, t);
-
-	const headerData = [
-		{ src: Head1, alt: 'Head 1', bgColor: 'bg-sidebar_head1', tooltip: t('Sidebar.onChainIdentity'), url: user?.id ? '/set-identity' : '/login?nextUrl=set-identity' },
-		{ src: Head3, alt: 'Head 3', bgColor: 'bg-sidebar_head3', tooltip: t('Sidebar.delegation'), url: '/delegation' },
-		{ src: Head4, alt: 'Head 4', bgColor: 'bg-sidebar_head4', tooltip: t('Sidebar.profile'), url: user?.id ? `/user/${user.username}` : '/login' }
-	];
-
-	if (LEADERBOARD_SUPPORTED_NETWORKS.includes(network)) {
-		headerData?.push({ src: Head2, alt: 'Head 2', bgColor: 'bg-sidebar_head2', tooltip: t('Sidebar.leaderboard'), url: '/leaderboard' });
-	}
-
-	const bgColor = 'bg-sidebar_footer';
-	const footerData = [
-		{ src: Foot1, alt: 'Foot 1', bgColor, tooltip: 'TownHall', url: 'https://townhallgov.com/' },
-		{ src: Foot2, alt: 'Foot 2', bgColor, tooltip: 'Polkasafe', url: 'https://polkasafe.xyz/' },
-		{ src: Foot3, alt: 'Foot 3', bgColor, tooltip: 'Fellowship', url: 'https://collectives.polkassembly.io/' },
-		{ src: Foot4, alt: 'Foot 4', bgColor, tooltip: 'Staking', url: 'https://staking.polkadot.cloud/#/overview' }
-	];
 
 	return (
 		<Sidebar
@@ -99,8 +60,6 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 			</SidebarHeader>
 
 			<hr className='text-border_grey' />
-
-			<div className='mt-5'>{generateGridData(headerData, 'header')}</div>
 
 			<div className='px-4'>
 				<CreateButton state={state} />
@@ -130,8 +89,6 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 						</div>
 					</Link>
 				)}
-
-				{generateGridData(footerData, 'footer')}
 			</SidebarFooter>
 		</Sidebar>
 	);

@@ -21,6 +21,7 @@ interface ISidebarMenuItem {
 	isActive?: boolean;
 	isNew?: boolean;
 	count?: number;
+	renderAsParentItem?: boolean;
 	items?: ISidebarMenuItem[];
 }
 
@@ -34,7 +35,7 @@ function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<div className={style.nestedTrigger}>
+				<div className={`${style.nestedTrigger} ${item.renderAsParentItem ? '!px-1.5' : ''}`}>
 					{item.icon && (
 						<div className={style.iconWrapper}>
 							<Image
@@ -100,7 +101,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 		>
 			<CollapsibleTrigger asChild>
 				<SidebarMenuSubButton className={style.nestedButton}>
-					<div className={style.nestedTrigger}>
+					<div className={`${style.nestedTrigger} ${item.renderAsParentItem ? '!px-1.5' : ''}`}>
 						{item.icon && (
 							<div className={style.iconWrapper}>
 								<Image
