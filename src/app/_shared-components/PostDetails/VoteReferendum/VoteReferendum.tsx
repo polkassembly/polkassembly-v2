@@ -4,9 +4,8 @@
 
 'use client';
 
-import { EVoteDecision, ENotificationStatus, ISelectedAccount, EPostOrigin, EProposalType, IVoteData } from '@/_shared/types';
+import { EVoteDecision, ENotificationStatus, EPostOrigin, EProposalType, IVoteData, EReactQueryKeys } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { useUser } from '@/hooks/useUser';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { BN, BN_ZERO } from '@polkadot/util';
@@ -128,7 +127,6 @@ function VoteReferendum({
 	existingVote?: IVoteData;
 }) {
 	const { userPreferences } = useUserPreferences();
-	const { user } = useUser();
 	const [voteDecision, setVoteDecision] = useState(EVoteDecision.AYE);
 	const t = useTranslations();
 	const queryClient = useQueryClient();
@@ -218,21 +216,14 @@ function VoteReferendum({
 
 		if (isInvalidAmount) return;
 
-		const getRegularAddress = (selectedAccount: ISelectedAccount): string => {
-			if (selectedAccount.parent) {
-				return getRegularAddress(selectedAccount.parent);
-			}
-			return selectedAccount.address;
-		};
-
-		const userAddress = getRegularAddress(userPreferences.selectedAccount);
+		const userAddress = userPreferences.selectedAccount.address;
 
 		try {
 			setIsLoading(true);
 
 			await apiService.voteReferendum({
 				selectedAccount: userPreferences.selectedAccount,
-				address: getRegularAddress(userPreferences.selectedAccount),
+				address: userAddress,
 				onSuccess: () => {
 					toast({
 						title: t('VoteReferendum.voteSuccessTitle'),
@@ -253,13 +244,8 @@ function VoteReferendum({
 						delegatedVotingPower: '0'
 					};
 
-					queryClient.setQueryData(['userVotes', proposalType, index, user?.loginAddress || user?.addresses[0]], {
+					queryClient.setQueryData([EReactQueryKeys.USER_VOTES, proposalType, index, userPreferences.selectedAccount?.address], {
 						votes: [optimisticVoteData]
-					});
-
-					// Also invalidate to ensure fresh data in the background
-					queryClient.invalidateQueries({
-						queryKey: ['userVotes', proposalType, index, user?.loginAddress || user?.addresses[0]]
 					});
 
 					onClose();
@@ -399,34 +385,35 @@ function VoteReferendum({
 						</div>
 					</div>
 				</div>
-			</div>
-			{existingVote && (
-				<div className='flex flex-col gap-y-3 rounded-xl bg-info_bg p-4'>
-					<p className='text-sm font-semibold text-text_primary'>{t('VoteReferendum.existingVote')}</p>
-					<p className='text-sm text-basic_text'>{t('VoteReferendum.existingVoteDescription')}</p>
-					<div className={classes.userVoteCardLayout}>
-						<h3 className={classes.userVoteCardTitleIcon}>
-							{existingVote.decision === 'abstain' && <Ban className='h-4 w-4 text-basic_text' />}
-							{existingVote.decision === 'aye' && <ThumbsUp className='h-4 w-4 text-basic_text' />}
-							{existingVote.decision === 'nay' && <ThumbsDown className='h-4 w-4 text-basic_text' />}
-							{t(`PostDetails.${existingVote.decision}`)}
-						</h3>
+				{existingVote && (
+					<div className='flex flex-col gap-y-3 rounded-xl bg-info_bg p-4'>
+						<p className='text-sm font-semibold text-text_primary'>{t('VoteReferendum.existingVote')}</p>
+						<p className='text-sm text-basic_text'>{t('VoteReferendum.existingVoteDescription')}</p>
+						<div className={classes.userVoteCardLayout}>
+							<h3 className={classes.userVoteCardTitleIcon}>
+								{existingVote.decision === EVoteDecision.ABSTAIN && <Ban className='h-4 w-4 text-basic_text' />}
+								{existingVote.decision === EVoteDecision.AYE && <ThumbsUp className='h-4 w-4 text-basic_text' />}
+								{existingVote.decision === EVoteDecision.NAY && <ThumbsDown className='h-4 w-4 text-basic_text' />}
+								{t(`PostDetails.${existingVote.decision}`)}
+							</h3>
 
-						<p className='text-sm text-basic_text'>
-							{formatBnBalance(
-								existingVote.selfVotingPower || '0',
-								{
-									withUnit: true,
-									numberAfterComma: 2,
-									compactNotation: true
-								},
-								network
-							)}{' '}
-							({!existingVote.lockPeriod || existingVote.lockPeriod === 0 ? 0.1 : existingVote.lockPeriod}x)
-						</p>
+							<p className='text-sm text-basic_text'>
+								{formatBnBalance(
+									existingVote.selfVotingPower || '0',
+									{
+										withUnit: true,
+										numberAfterComma: 2,
+										compactNotation: true
+									},
+									network
+								)}{' '}
+								({!existingVote.lockPeriod || existingVote.lockPeriod === 0 ? 0.1 : existingVote.lockPeriod}x)
+							</p>
+						</div>
 					</div>
-				</div>
-			)}
+				)}
+			</div>
+
 			<div className='flex items-center justify-end gap-x-4'>
 				<Button
 					disabled={isInvalidAmount}

@@ -716,6 +716,7 @@ export interface IComment {
 	aiSentiment?: ECommentSentiment;
 	history?: IOffChainContentHistoryItem[];
 	disabled?: boolean;
+	authorAddress?: string;
 }
 
 export interface ICommentResponse extends IComment {
@@ -867,6 +868,9 @@ export interface IActivityMetadata {
 	// for posts
 	title?: string;
 	content?: string;
+
+	// for comments
+	authorAddress?: string;
 }
 
 export interface IUserActivity {
@@ -1006,7 +1010,8 @@ export interface IPostSubscription {
 export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart',
 	COMMENTS = 'comments',
-	POST_DETAILS = 'postDetails'
+	POST_DETAILS = 'postDetails',
+	USER_VOTES = 'userVotes'
 }
 
 export interface IParamDef {
@@ -1341,6 +1346,11 @@ export interface IPayout {
 		expiresAt: Date;
 		generalIndex: string;
 	};
+}
+
+export enum EPreImageTabs {
+	ALL = 'all',
+	USER = 'user'
 }
 
 export interface IOffChainPollPayload extends Omit<IPoll, 'id' | 'createdAt' | 'updatedAt' | 'proposalType' | 'updatedBy' | 'network' | 'votes' | 'index'> {

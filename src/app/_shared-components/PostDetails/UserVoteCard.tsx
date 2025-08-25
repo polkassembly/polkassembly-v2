@@ -8,44 +8,44 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
-import { ThumbsDown, ThumbsUp, Ban } from 'lucide-react';
-import VoteIcon from '@assets/activityfeed/vote.svg';
+import { ThumbsDown, ThumbsUp, Ban, User } from 'lucide-react';
 import DelegateIcon from '@assets/icons/delegate_plus.svg';
 import { cn } from '@/lib/utils';
-import { EProposalType, IVoteHistoryData, ENotificationStatus } from '@/_shared/types';
+import { EProposalType, IVoteHistoryData, ENotificationStatus, EReactQueryKeys, EPostOrigin, IVoteData, EVoteDecision } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { useUser } from '@/hooks/useUser';
+
 import { useToast } from '@/hooks/useToast';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../Dialog/Dialog';
 import { Separator } from '../Separator';
 import classes from './PostDetails.module.scss';
+import Address from '../Profile/Address/Address';
+import VoteReferendumButton from './VoteReferendumButton';
 
-interface VoteReferendumButtonProps {
+interface UserVoteCardProps {
 	index: string;
 	btnClassName?: string;
-	iconClassName?: string;
 	size?: 'sm' | 'lg';
 	proposalType: EProposalType;
 	voteData: IVoteHistoryData;
-	isLoading: boolean;
-	isError: boolean;
-	setOpenModal: (open: boolean) => void;
+	track?: EPostOrigin;
+	existingVote?: IVoteData;
+	loginAddress?: string;
 }
 
-function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposalType, voteData, isLoading, isError, setOpenModal }: VoteReferendumButtonProps) {
+function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData, track, existingVote, loginAddress }: UserVoteCardProps) {
 	const t = useTranslations();
 	const [openRemoveConfirmModal, setOpenRemoveConfirmModal] = useState(false);
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
-	const { user } = useUser();
+
 	const { toast } = useToast();
 	const queryClient = useQueryClient();
-	const [isRemoving, setIsRemoving] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const myVote = voteData.votes[0];
 
@@ -56,12 +56,12 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 	};
 
 	const handleRemoveVote = async () => {
-		if (!apiService || !userPreferences.selectedAccount?.address) return;
+		if (!apiService || !loginAddress) return;
 
 		try {
-			setIsRemoving(true);
+			setIsLoading(true);
 			await apiService.removeReferendumVote({
-				address: userPreferences.selectedAccount.address,
+				address: loginAddress,
 				referendumId: Number(index),
 				selectedAccount: userPreferences.selectedAccount,
 				onSuccess: () => {
@@ -70,8 +70,9 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 						description: t('PostDetails.voteRemoved'),
 						status: ENotificationStatus.SUCCESS
 					});
-					queryClient.invalidateQueries({ queryKey: ['userVotes', proposalType, index, user?.loginAddress || user?.addresses[0]] });
+					queryClient.invalidateQueries({ queryKey: [EReactQueryKeys.USER_VOTES, proposalType, index, loginAddress] });
 					setOpenRemoveConfirmModal(false);
+					setIsLoading(false);
 				},
 				onFailed: (errorMessage) => {
 					toast({
@@ -79,6 +80,7 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 						description: errorMessage || t('PostDetails.voteRemoveFailed'),
 						status: ENotificationStatus.ERROR
 					});
+					setIsLoading(false);
 				}
 			});
 		} catch (error) {
@@ -88,31 +90,47 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 				description: t('PostDetails.voteRemoveFailed'),
 				status: ENotificationStatus.ERROR
 			});
-		} finally {
-			setIsRemoving(false);
+			setIsLoading(false);
 		}
 	};
 
 	return (
 		<div className={classes.userVoteCard}>
-			<div className={classes.userVoteCardLayout}>
+			<div className={`${classes.userVoteCardLayout} mb-2`}>
 				<h2 className={classes.userVoteCardTitle}>{t('PostDetails.myVote')}</h2>
 				<Button
 					type='button'
 					variant='ghost'
 					className={classes.userVoteCardRemoveButton}
 					onClick={() => setOpenRemoveConfirmModal(true)}
-					disabled={isRemoving}
-					isLoading={isRemoving}
+					disabled={isLoading}
+					isLoading={isLoading}
 				>
-					{isRemoving ? t('PostDetails.removing') : t('PostDetails.remove')}
+					{isLoading ? t('PostDetails.removing') : t('PostDetails.removeVote')}
 				</Button>
 			</div>
 			<div className={classes.userVoteCardLayout}>
 				<h3 className={classes.userVoteCardTitleIcon}>
-					{myVote.decision === 'abstain' && <Ban className='h-4 w-4 text-basic_text' />}
-					{myVote.decision === 'aye' && <ThumbsUp className='h-4 w-4 text-basic_text' />}
-					{myVote.decision === 'nay' && <ThumbsDown className='h-4 w-4 text-basic_text' />}
+					<User className='h-4 w-4 text-basic_text' />
+					{t('PostDetails.address')}
+				</h3>
+
+				<p className='text-sm text-basic_text'>
+					<Address
+						address={myVote.voterAddress}
+						iconSize={18}
+					/>
+				</p>
+			</div>
+			<Separator
+				orientation='horizontal'
+				className='w-full'
+			/>
+			<div className={classes.userVoteCardLayout}>
+				<h3 className={classes.userVoteCardTitleIcon}>
+					{myVote.decision === EVoteDecision.ABSTAIN && <Ban className='h-4 w-4 text-basic_text' />}
+					{myVote.decision === EVoteDecision.AYE && <ThumbsUp className='h-4 w-4 text-basic_text' />}
+					{myVote.decision === EVoteDecision.NAY && <ThumbsDown className='h-4 w-4 text-basic_text' />}
 					{t(`PostDetails.${myVote.decision}`)}
 				</h3>
 
@@ -138,24 +156,16 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 				<p className='text-sm text-basic_text'>{formatBnBalance(myVote.delegatedVotingPower || '0', formatBalanceOptions, network)}</p>
 			</div>
 
-			<Button
-				className={cn('w-full', btnClassName)}
+			<VoteReferendumButton
+				index={index}
+				btnClassName={cn('w-full', btnClassName)}
 				size={size}
-				disabled={isLoading || isError}
-				isLoading={isLoading}
-				onClick={() => setOpenModal(true)}
-			>
-				<div className='flex items-center gap-1'>
-					<Image
-						src={VoteIcon}
-						alt='Vote Icon'
-						width={20}
-						height={20}
-						className={iconClassName}
-					/>
-					{t('PostDetails.changeVote')}
-				</div>
-			</Button>
+				iconClassName='hidden'
+				hasVoted
+				track={track}
+				proposalType={proposalType}
+				existingVote={existingVote}
+			/>
 
 			<Dialog
 				open={openRemoveConfirmModal}
@@ -171,16 +181,16 @@ function UserVoteCard({ index, btnClassName, iconClassName, size = 'lg', proposa
 							<Button
 								variant='outline'
 								onClick={() => setOpenRemoveConfirmModal(false)}
-								disabled={isRemoving}
+								disabled={isLoading}
 							>
 								{t('PostDetails.cancel')}
 							</Button>
 							<Button
 								onClick={handleRemoveVote}
-								isLoading={isRemoving}
-								disabled={isRemoving}
+								isLoading={isLoading}
+								disabled={isLoading}
 							>
-								{isRemoving ? t('PostDetails.removing') : t('PostDetails.remove')}
+								{isLoading ? t('PostDetails.removing') : t('PostDetails.remove')}
 							</Button>
 						</div>
 					</div>

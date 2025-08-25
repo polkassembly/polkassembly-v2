@@ -14,6 +14,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import dynamic from 'next/dynamic';
+import { canVote } from '@/_shared/_utils/canVote';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -26,7 +27,7 @@ import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
 import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import { Skeleton } from '../Skeleton';
 import Poll from './Poll/Poll';
-import AddressSwitchRow from './AddressSwitchRow/AddressSwitchRow';
+import UserVoteStatus from './UserVoteStatus/UserVoteStatus';
 
 const OnchainInfo = dynamic(() => import('./OnchainInfo/OnchainInfo'), {
 	ssr: false,
@@ -189,7 +190,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						postData={post}
 					/>
 				</div>
-				<div className={cn(classes.detailsWrapper, isModalOpen ? 'grid-cols-1' : 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-7xl')}>
+				<div className={cn(classes.detailsWrapper, 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-7xl', isModalOpen && classes.modalOpen)}>
 					<div className={classes.leftWrapper}>
 						<div className={classes.descBox}>
 							<TabsContent value={EPostDetailsTab.DESCRIPTION}>
@@ -225,15 +226,16 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 
 						{isModalOpen && !isOffchainPost && (
 							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
-								<AddressSwitchRow
-									index={index}
-									proposalType={post.proposalType}
-									showUserVoteCard
-									track={post.onChainInfo?.origin}
-								/>
+								{canVote(post.onChainInfo?.status) && (
+									<UserVoteStatus
+										index={index}
+										track={post.onChainInfo?.origin}
+										proposalType={post.proposalType}
+									/>
+								)}
 							</div>
 						)}
-						<div className={cn(classes.commentsBox, 'max-xl:hidden')}>
+						<div className={classes.commentsBox}>
 							<PostComments
 								proposalType={post.proposalType}
 								index={index}
@@ -278,13 +280,13 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									track={post.onChainInfo?.origin}
 								/>
 							)}
-							{/* Address Switch Row */}
-							<AddressSwitchRow
-								index={index}
-								proposalType={post.proposalType}
-								showUserVoteCard
-								track={post.onChainInfo?.origin}
-							/>
+							{canVote(post.onChainInfo?.status) && (
+								<UserVoteStatus
+									index={index}
+									track={post.onChainInfo?.origin}
+									proposalType={post.proposalType}
+								/>
+							)}
 							<ClaimPayout beneficiaries={post.onChainInfo?.beneficiaries || []} />
 							<ProposalPeriods
 								confirmationPeriodEndsAt={post.onChainInfo?.confirmationPeriodEndsAt}
@@ -331,19 +333,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 							<Poll poll={post.poll} />
 						</div>
 					)}
-
-					<div className={cn(classes.leftWrapper, 'xl:hidden')}>
-						<div className={classes.commentsBox}>
-							<PostComments
-								proposalType={post.proposalType}
-								index={index}
-								contentSummary={post.contentSummary}
-								comments={post.comments}
-								allowedCommentor={post.allowedCommentor}
-								postUserId={post.userId}
-							/>
-						</div>
-					</div>
 				</div>
 			</Tabs>
 		</>
