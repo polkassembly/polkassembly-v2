@@ -4,8 +4,9 @@
 
 'use client';
 
-import { BarChart3 } from 'lucide-react';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import VotingPowerChart from '@assets/profile/voting-power-chart.svg';
 import classes from './VotingPowerCard.module.scss';
 
 interface VotingPowerData {
@@ -21,15 +22,18 @@ interface VotingPowerCardProps {
 function VotingPowerCard({ votingPowerData }: VotingPowerCardProps) {
 	return (
 		<div className={cn(classes.statCard, classes.votingPowerCard)}>
-			<div className={classes.statCardHeader}>
-				<BarChart3 className={classes.statCardIcon} />
-				<span className={classes.statCardTitle}>Voting Power</span>
-			</div>
+			<Image
+				src={VotingPowerChart}
+				alt='Voting Power'
+				width={89}
+				height={20}
+				className='mb-2'
+			/>
 			<div className={classes.votingPowerBreakdown}>
 				<div className={classes.votingPowerItem}>
 					<div className={classes.votingPowerLabel}>
 						<span>Voting Power</span>
-						<div className={classes.infoIcon}>i</div>
+						<div className={classes.infoIcon}>?</div>
 					</div>
 					<div className={classes.votingPowerValue}>
 						<span className={classes.value}>{votingPowerData.total.toFixed(1)}</span>
@@ -40,7 +44,7 @@ function VotingPowerCard({ votingPowerData }: VotingPowerCardProps) {
 				<div className={classes.votingPowerItem}>
 					<div className={classes.votingPowerLabel}>
 						<span>Self</span>
-						<div className={classes.infoIcon}>i</div>
+						<div className={classes.infoIcon}>?</div>
 					</div>
 					<div className={classes.votingPowerValue}>
 						<span className={classes.value}>{votingPowerData.self.toFixed(1)}</span>
@@ -51,7 +55,7 @@ function VotingPowerCard({ votingPowerData }: VotingPowerCardProps) {
 				<div className={classes.votingPowerItem}>
 					<div className={classes.votingPowerLabel}>
 						<span>Delegated</span>
-						<div className={classes.infoIcon}>i</div>
+						<div className={classes.infoIcon}>?</div>
 					</div>
 					<div className={classes.votingPowerValue}>
 						<span className={classes.value}>{votingPowerData.delegated.toFixed(1)}</span>

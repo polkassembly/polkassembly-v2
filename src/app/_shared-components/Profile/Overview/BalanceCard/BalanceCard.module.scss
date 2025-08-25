@@ -26,6 +26,10 @@
 	@apply mb-1 text-sm text-text_grey;
 }
 
+.infoIcon {
+	@apply flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#B5B6BA] text-xs font-medium text-white;
+}
+
 // Dark mode support
 @media (prefers-color-scheme: dark) {
 	.statCard {
