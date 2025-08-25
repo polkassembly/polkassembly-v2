@@ -11,7 +11,8 @@ import { UserProfileClientService } from '@/app/_client-services/user_profile_cl
 import { useUser } from '@/hooks/useUser';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { useToast } from '@/hooks/useToast';
-import { ShieldPlus } from 'lucide-react';
+import { ShieldPlus, CircleDollarSignIcon } from 'lucide-react';
+import { useTipModal } from '@/hooks/useTipModal';
 import ProfileImage from './ProfileImage';
 import UserStats from './UserStats';
 import SocialLinks from './SocialLinks';
@@ -34,6 +35,7 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 	const t = useTranslations();
 	const { user: currentUser } = useUser();
 	const queryClient = useQueryClient();
+	const { setBeneficiaryAddress, setOpenTipModal } = useTipModal();
 	const { toast } = useToast();
 
 	const queryOptions = useMemo(
@@ -184,23 +186,52 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 							{isUserDataLoading ? <Skeleton className='h-5 w-16' /> : userData && <SocialLinks socialLinks={userData.profileDetails?.publicSocialLinks || []} />}
 						</div>
 
-						{isUserDataLoading ? (
-							<Skeleton className='mt-2 h-10 w-full rounded-3xl' />
-						) : (
-							userData &&
-							userData.id !== currentUser?.id && (
-								<Button
-									size='lg'
-									className='mt-2 rounded-3xl'
-									leftIcon={<ShieldPlus />}
-									isLoading={isActionLoading}
-									onClick={handleButtonClick}
-									disabled={!userData.id || isActionLoading}
-								>
-									{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
-								</Button>
-							)
-						)}
+						<div className='flex justify-between gap-2'>
+							{isUserDataLoading ? (
+								<Skeleton className='mt-2 h-10 w-full rounded-3xl' />
+							) : (
+								userData &&
+								userData.id !== currentUser?.id && (
+									<Button
+										size='lg'
+										className='mt-2 w-full rounded-3xl'
+										leftIcon={<ShieldPlus />}
+										isLoading={isActionLoading}
+										onClick={handleButtonClick}
+										disabled={!userData.id || isActionLoading}
+									>
+										{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
+									</Button>
+								)
+							)}
+							{isUserDataLoading ? (
+								<Skeleton className='mt-2 h-10 w-full rounded-3xl' />
+							) : (
+								userData &&
+								userData.id !== currentUser?.id &&
+								!!address && (
+									<Button
+										size='lg'
+										className='mt-2 w-full rounded-3xl'
+										leftIcon={<CircleDollarSignIcon />}
+										isLoading={isActionLoading}
+										onClick={(e) => {
+											e.stopPropagation();
+											e.preventDefault();
+											if (!currentUser?.id) {
+												router.push('/login');
+											} else {
+												setBeneficiaryAddress(address);
+												setOpenTipModal(true);
+											}
+										}}
+										disabled={isActionLoading || !address}
+									>
+										{t('Profile.Tips.tip')}
+									</Button>
+								)
+							)}
+						</div>
 					</div>
 				</div>
 			</div>
