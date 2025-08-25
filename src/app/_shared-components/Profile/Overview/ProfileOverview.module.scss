@@ -1,0 +1,41 @@
+.profileOverview {
+	@apply rounded-3xl border border-border_grey bg-bg_modal p-6 shadow-lg;
+}
+
+.header {
+	@apply mb-5;
+}
+
+.headerContent {
+	@apply flex items-center gap-2;
+}
+
+.headerIcon {
+	@apply h-6 w-6 text-text_primary;
+}
+
+.headerTitle {
+	@apply text-2xl font-semibold text-text_primary;
+}
+
+.statsGrid {
+	@apply mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+	.statsGrid {
+		@apply grid-cols-1;
+	}
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+	.profileOverview {
+		@apply border-border_grey bg-bg_modal;
+	}
+
+	.headerTitle {
+		@apply text-text_primary;
+	}
+}

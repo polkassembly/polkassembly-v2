@@ -16,6 +16,7 @@ import Address from '../Address/Address';
 import LinkAddress from './LinkAddress/LinkAddress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
 import classes from './Overview.module.scss';
+import ProfileOverview from './ProfileOverview';
 import Delegations from '../Delegations/Delegations';
 
 function Overview({ address, profileData }: { address?: string; profileData?: IPublicUser }) {
@@ -33,12 +34,11 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 	return (
 		<div className={classes.overview}>
 			<div className={classes.overviewGrid}>
+				<ProfileOverview
+					profileData={profileData}
+					address={address}
+				/>
 				{address || profileData?.addresses?.length ? <Delegations addresses={address ? [address] : profileData?.addresses || []} /> : null}
-				{/* <div className={classes.overviewCard}>
-					<div className={classes.overviewCardHeader}>
-						<p className={classes.overviewCardHeaderTitle}>{t('Profile.overview')}</p>
-					</div>
-				</div> */}
 				<div className={classes.badgesCard}>
 					<div className={classes.badgesCardHeader}>
 						<p className={classes.badgesCardHeaderTitle}>
