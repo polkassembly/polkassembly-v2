@@ -55,7 +55,8 @@ import {
 	IPostBubbleVotes,
 	EAnalyticsType,
 	EVotesDisplayType,
-	ITip
+	ITip,
+	ETipsTab
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -1226,8 +1227,11 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<ITip>({ url, method, data: { userAddress, amount, beneficiaryAddress, remark, extrinsicHash } });
 	}
 
-	static async getUserTips({ userId }: { userId: number }) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_TIPS, routeSegments: [userId.toString(), 'tips'] });
+	static async getUserTips({ userId, tab }: { userId: number; tab: ETipsTab }) {
+		const queryParams = new URLSearchParams({
+			tab: tab.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_TIPS, routeSegments: [userId.toString(), 'tips'], queryParams });
 		return this.nextApiClientFetch<{ tips: ITip[] }>({ url, method });
 	}
 }

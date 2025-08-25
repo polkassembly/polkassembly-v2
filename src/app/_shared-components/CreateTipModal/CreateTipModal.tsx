@@ -37,7 +37,7 @@ import BalanceInput from '../BalanceInput/BalanceInput';
 import AddressRelationsPicker from '../AddressRelationsPicker/AddressRelationsPicker';
 import { Input } from '../Input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
-import classes from './TipModal.module.scss';
+import classes from './CreateTipModal.module.scss';
 
 interface IDefaultTip {
 	image: StaticImageData;
@@ -55,7 +55,7 @@ const DEFAULT_TIPS: IDefaultTip[] = [
 
 const DEFAULT_REMARK = 'Tipped via Polkassembly';
 
-function Tipping() {
+function CreateTipModal() {
 	const t = useTranslations('Profile');
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
@@ -141,8 +141,8 @@ function Tipping() {
 			remark: updatedRemark,
 			onSuccess: async (txHash?: string) => {
 				toast({
-					title: t('Tipping.tipSuccess'),
-					description: t('Tipping.tipSuccessDescription'),
+					title: t('Tips.tipSuccess'),
+					description: t('Tips.tipSuccessDescription'),
 					status: ENotificationStatus.SUCCESS
 				});
 				if (txHash) {
@@ -153,8 +153,8 @@ function Tipping() {
 			},
 			onFailed: (error: string) => {
 				toast({
-					title: t('Tipping.tipFailed'),
-					description: error || t('Tipping.tipFailedDescription'),
+					title: t('Tips.tipFailed'),
+					description: error || t('Tips.tipFailedDescription'),
 					status: ENotificationStatus.ERROR
 				});
 				setIsLoading(false);
@@ -188,7 +188,7 @@ function Tipping() {
 				<DialogHeader>
 					<DialogTitle className={classes.title}>
 						<CircleDollarSignIcon className='size-6' />
-						{t('Tipping.giveATip')}
+						{t('Tips.giveATip')}
 					</DialogTitle>
 				</DialogHeader>
 				<div className={classes.content}>
@@ -198,7 +198,7 @@ function Tipping() {
 						customAddressSelector={<AddressRelationsPicker withBalance />}
 					/>
 					<div className={classes.tipsContainer}>
-						<span className={classes.tipsContainerTitle}>{t('Tipping.pleaseSelectATip')}:</span>
+						<span className={classes.tipsContainerTitle}>{t('Tips.pleaseSelectATip')}:</span>
 						<div className='flex justify-between gap-4'>
 							{TipsWithNativeTokenAmount.map((tip) => (
 								<Button
@@ -225,7 +225,7 @@ function Tipping() {
 					<BalanceInput
 						value={tipAmount}
 						disabled={isLoading}
-						label={t('Tipping.orEnterTheCustomAmountYouWouldLikeToTip')}
+						label={t('Tips.orEnterTheCustomAmountYouWouldLikeToTip')}
 						onChange={({ value }) => setTipAmount(value)}
 						className='h-10 rounded-md bg-bg_modal'
 					/>
@@ -244,7 +244,7 @@ function Tipping() {
 									value={remark || ''}
 									onChange={(e) => setRemark(e.target.value)}
 									className={cn(classes.remarkInput, 'placeholder:text-text_secondary')}
-									placeholder={t('Tipping.saySomething')}
+									placeholder={t('Tips.saySomething')}
 								/>
 							</div>
 						</div>
@@ -254,14 +254,14 @@ function Tipping() {
 					{!!existentialDeposit && existentialDeposit.gt(BN_ZERO) && (
 						<div className={classes.existentialDepositContainer}>
 							<div className={classes.existentialDepositTitle}>
-								<span>{t('Tipping.existentialDeposit')}</span>
+								<span>{t('Tips.existentialDeposit')}</span>
 								<TooltipProvider>
 									<Tooltip>
 										<TooltipTrigger>
 											<Info className='text-text-grey h-4 w-4' />
 										</TooltipTrigger>
 										<TooltipContent className='bg-tooltip_background p-2 text-white'>
-											<p>{t('Tipping.existentialDepositTooltip')}</p>
+											<p>{t('Tips.existentialDepositTooltip')}</p>
 										</TooltipContent>
 									</Tooltip>
 								</TooltipProvider>
@@ -280,7 +280,7 @@ function Tipping() {
 							disabled={isLoading}
 							isLoading={isLoading}
 						>
-							{t('Tipping.tip')}
+							{t('Tips.tip')}
 						</Button>
 					</div>
 				</div>
@@ -289,4 +289,4 @@ function Tipping() {
 	);
 }
 
-export default Tipping;
+export default CreateTipModal;

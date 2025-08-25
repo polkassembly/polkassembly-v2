@@ -163,7 +163,7 @@
 		"balance": "余额",
 		"locked": "已锁定",
 		"on": "于",
-		"Tipping": {
+		"Tips": {
 			"giveATip": "打赏",
 			"pleaseSelectATip": "请选择您想打赏的金额",
 			"orEnterTheCustomAmountYouWouldLikeToTip": "或者输入您想打赏的金额",
@@ -175,7 +175,11 @@
 			"tipFailedDescription": "您的打赏发送失败",
 			"saySomething": "打赏时想说的话（可选）",
 			"existentialDeposit": "存在证明金",
-			"existentialDepositTooltip": "保持地址活跃的最小金额"
+			"existentialDepositTooltip": "保持地址活跃的最小金额",
+			"received": "收到",
+			"given": "打赏",
+			"tipUser": "打赏用户",
+			"noData": "未找到打赏"
 		},
 		"Delegations": {
 			"noDelegations": "未找到委托",

@@ -227,7 +227,7 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 										}}
 										disabled={isActionLoading || !address}
 									>
-										{t('Profile.Tipping.tip')}
+										{t('Profile.Tips.tip')}
 									</Button>
 								)
 							)}

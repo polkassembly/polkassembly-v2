@@ -163,7 +163,7 @@
 		"balance": "Guthaben",
 		"locked": "Gesperrt",
 		"on": "am",
-		"Tipping": {
+		"Tips": {
 			"giveATip": "Trinkgeld geben",
 			"pleaseSelectATip": "Bitte wählen Sie ein Trinkgeld, das Sie geben möchten",
 			"orEnterTheCustomAmountYouWouldLikeToTip": "Oder geben Sie das benutzerdefinierte Trinkgeld ein, das Sie geben möchten",
@@ -175,7 +175,11 @@
 			"tipFailedDescription": "Ihr Trinkgeld konnte nicht gesendet werden",
 			"saySomething": "Sag etwas nettes mit deinem Trinkgeld (optional)",
 			"existentialDeposit": "Existenzielle Einlage",
-			"existentialDepositTooltip": "Mindestbetrag, um die Adresse zu halten"
+			"existentialDepositTooltip": "Mindestbetrag, um die Adresse zu halten",
+			"received": "Erhalten",
+			"given": "Gegeben",
+			"tipUser": "Benutzer trinken",
+			"noData": "Keine Trinkgeld gefunden"
 		},
 		"Delegations": {
 			"noDelegations": "Keine Delegationen gefunden",

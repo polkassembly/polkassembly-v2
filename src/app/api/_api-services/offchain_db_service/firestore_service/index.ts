@@ -42,7 +42,8 @@ import {
 	IPoll,
 	EPollVotesType,
 	IOffChainPollPayload,
-	ITip
+	ITip,
+	ETipsTab
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -1839,9 +1840,16 @@ export class FirestoreService extends FirestoreUtils {
 		});
 	}
 
-	static async GetTipsByUserId({ network, userId }: { network: ENetwork; userId: number }) {
-		const tips = await this.tipsCollectionRef().where('network', '==', network).where('userId', '==', userId).get();
-		return tips.docs.map((doc) => {
+	static async GetTipsByUserId({ network, userId, tab }: { network: ENetwork; userId: number; tab: ETipsTab }) {
+		let tips;
+		if (tab === ETipsTab.Received) {
+			tips = this.tipsCollectionRef().where('network', '==', network).where('beneficiaryUserId', '==', userId);
+		} else {
+			tips = this.tipsCollectionRef().where('network', '==', network).where('userId', '==', userId);
+		}
+
+		const tipsSnapshot = await tips.get();
+		return tipsSnapshot.docs.map((doc) => {
 			const data = doc.data();
 			return {
 				...data,

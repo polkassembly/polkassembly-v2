@@ -165,7 +165,7 @@
 		"on": "日時",
 		"judgements": "判定",
 		"since": "日時",
-		"Tipping": {
+		"Tips": {
 			"giveATip": "チップを贈与",
 			"pleaseSelectATip": "チップを贈与するには、チップを選択してください",
 			"orEnterTheCustomAmountYouWouldLikeToTip": "または、カスタム金額を入力してください",
@@ -177,7 +177,11 @@
 			"tipFailedDescription": "チップの送信に失敗しました",
 			"saySomething": "チップに何か言いたいことがあれば入力してください（任意）",
 			"existentialDeposit": "存在証明金",
-			"existentialDepositTooltip": "アドレスを維持するための最小金額"
+			"existentialDepositTooltip": "アドレスを維持するための最小金額",
+			"received": "受信",
+			"given": "贈与",
+			"tipUser": "チップを贈与",
+			"noData": "チップが見つかりません"
 		},
 		"Delegations": {
 			"noDelegations": "委任が見つかりません",

@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
-import { ITip } from '@/_shared/types';
+import { ETipsTab, ITip } from '@/_shared/types';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -26,9 +26,14 @@ const zodParamsSchema = z.object({
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse<{ tips: ITip[] }>> => {
 	const { id } = zodParamsSchema.parse(await params);
 
+	const zodQuerySchema = z.object({
+		tab: z.nativeEnum(ETipsTab)
+	});
+	const { tab } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
+
 	const network = await getNetworkFromHeaders();
 
-	const tips = await OffChainDbService.GetTipsByUserId({ network, userId: id });
+	const tips = await OffChainDbService.GetTipsByUserId({ network, userId: id, tab });
 
 	return NextResponse.json({ tips });
 });

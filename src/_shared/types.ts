@@ -1500,3 +1500,8 @@ export interface ITip {
 	remark: string;
 	id: string;
 }
+
+export enum ETipsTab {
+	Received = 'received',
+	Given = 'given'
+}

@@ -163,7 +163,7 @@
 		"balance": "Saldo",
 		"locked": "Bloqueado",
 		"on": "el",
-		"Tipping": {
+		"Tips": {
 			"giveATip": "Dar una propina",
 			"pleaseSelectATip": "Por favor seleccione una propina que le gustaría dar",
 			"orEnterTheCustomAmountYouWouldLikeToTip": "O ingrese la cantidad personalizada que le gustaría dar",
@@ -175,7 +175,11 @@
 			"tipFailedDescription": "Su propina no se pudo enviar",
 			"saySomething": "Diga algo agradable con su propina (opcional)",
 			"existentialDeposit": "Depósito de Existencia",
-			"existentialDepositTooltip": "Cantidad mínima para mantener la dirección activa"
+			"existentialDepositTooltip": "Cantidad mínima para mantener la dirección activa",
+			"received": "Recibido",
+			"given": "Dado",
+			"tipUser": "Propinero",
+			"noData": "No se encontraron propinas"
 		},
 		"Delegations": {
 			"noDelegations": "No se encontraron delegaciones",

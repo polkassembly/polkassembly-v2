@@ -168,7 +168,7 @@
 		"balance": "Balance",
 		"locked": "Locked",
 		"on": "on",
-		"Tipping": {
+		"Tips": {
 			"giveATip": "Give a Tip",
 			"pleaseSelectATip": "Please select a tip you would like to give",
 			"orEnterTheCustomAmountYouWouldLikeToTip": "Or enter the custom amount you would like to Tip",
@@ -180,7 +180,11 @@
 			"tipFailedDescription": "Your tip has failed to send",
 			"saySomething": "Say something nice with your tip(optional)",
 			"existentialDeposit": "Existential Deposit",
-			"existentialDepositTooltip": "Minimum amount to keep address live"
+			"existentialDepositTooltip": "Minimum amount to keep address live",
+			"received": "Received",
+			"given": "Given",
+			"tipUser": "Tip User",
+			"noData": "No Tips Found"
 		},
 		"Delegations": {
 			"noDelegations": "No Delegations Found",

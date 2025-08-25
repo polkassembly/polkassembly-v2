@@ -40,7 +40,8 @@ import {
 	IPostLink,
 	IOffChainPollPayload,
 	IBeneficiary,
-	EAssets
+	EAssets,
+	ETipsTab
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -1006,8 +1007,8 @@ export class OffChainDbService {
 		});
 	}
 
-	static async GetTipsByUserId({ network, userId }: { network: ENetwork; userId: number }) {
-		return FirestoreService.GetTipsByUserId({ network, userId });
+	static async GetTipsByUserId({ network, userId, tab }: { network: ENetwork; userId: number; tab: ETipsTab }) {
+		return FirestoreService.GetTipsByUserId({ network, userId, tab });
 	}
 
 	static async CreateTip({
