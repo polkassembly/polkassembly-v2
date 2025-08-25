@@ -16,6 +16,7 @@ import { Separator } from '@/app/_shared-components/Separator';
 import TxFeesDetailsView from '@/app/_shared-components/Create/TxFeesDetailsView/TxFeesDetailsView';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import BalanceInput from '../BalanceInput/BalanceInput';
 import AddressInput from '../AddressInput/AddressInput';
 import Balance from '../Balance';
@@ -25,6 +26,7 @@ function TeleportToPeopleChain({ onSuccess }: { onSuccess?: () => void }) {
 
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
+	const { setVaultQrState } = usePolkadotVault();
 	const [totalAmount, setTotalAmount] = useState<BN>(BN_ZERO);
 	const [beneficiaryAddress, setBeneficiaryAddress] = useState<string>(userPreferences.selectedAccount?.address || '');
 
@@ -37,7 +39,7 @@ function TeleportToPeopleChain({ onSuccess }: { onSuccess?: () => void }) {
 	);
 
 	const teleportFundsToPeopleChain = async () => {
-		if (!apiService || !userPreferences.selectedAccount?.address || !tx || !beneficiaryAddress || totalAmount.isZero()) {
+		if (!apiService || !userPreferences.selectedAccount?.address || !tx || !beneficiaryAddress || totalAmount.isZero() || !userPreferences.wallet) {
 			return;
 		}
 
@@ -45,6 +47,8 @@ function TeleportToPeopleChain({ onSuccess }: { onSuccess?: () => void }) {
 
 		await apiService.teleportToPeopleChain({
 			address: userPreferences.selectedAccount.address,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
 			beneficiaryAddress,
 			amount: totalAmount,
 			onSuccess: () => {

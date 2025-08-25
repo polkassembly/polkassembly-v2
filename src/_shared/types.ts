@@ -7,7 +7,8 @@
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
-import { TypeDef } from '@polkadot/types/types';
+import { SignerResult, TypeDef } from '@polkadot/types/types';
+import { HexString } from '@polkadot/util/types';
 import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
@@ -167,6 +168,7 @@ export enum EWallet {
 	POLKAGATE = 'polkagate',
 	NOVAWALLET = 'nova',
 	MIMIR = 'mimir',
+	POLKADOT_VAULT = 'polkadot-vault',
 	OTHER = ''
 	// METAMASK = 'metamask',
 	// WALLETCONNECT = 'walletconnect',
@@ -1023,6 +1025,7 @@ export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart',
 	COMMENTS = 'comments',
 	POST_DETAILS = 'postDetails',
+	ACCOUNTS = 'accounts',
 	IDENTITY_INFO = 'identityInfo',
 	TOKENS_USD_PRICE = 'tokensUsdPrice'
 }
@@ -1504,4 +1507,20 @@ export interface ITip {
 export enum ETipsTab {
 	Received = 'received',
 	Given = 'given'
+}
+
+export interface IVaultScannedAddress {
+	content: string;
+	isAddress: boolean;
+	genesisHash: HexString | null;
+	name?: string;
+}
+
+export interface IVaultQrState {
+	open: boolean;
+	isQrHashed: boolean;
+	qrAddress: string;
+	qrPayload: Uint8Array;
+	qrResolve?: (result: SignerResult) => void;
+	qrReject?: (error: Error) => void;
 }

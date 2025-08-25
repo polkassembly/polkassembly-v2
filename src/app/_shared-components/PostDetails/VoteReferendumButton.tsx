@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { EPostOrigin, EProposalType } from '@/_shared/types';
 import { useState } from 'react';
 import { Button } from '../Button';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../Dialog/Dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
 import VoteReferendum from './VoteReferendum/VoteReferendum';
 
 interface VoteReferendumButtonProps {
@@ -70,7 +70,9 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 				</Button>
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-3 sm:p-6'>
-				<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
+				<DialogHeader className='text-xl font-semibold text-text_primary'>
+					<DialogTitle>{t('PostDetails.castYourVote')}</DialogTitle>
+				</DialogHeader>
 				<VoteReferendum
 					index={index}
 					track={track}
