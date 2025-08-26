@@ -688,7 +688,7 @@ export class NextApiClientService {
 	static async getPostVotesByAddresses({ proposalType, index, addresses }: { proposalType: EProposalType; index: string; addresses: string[] }) {
 		const queryParams = new URLSearchParams({
 			page: '1',
-			limit: '1',
+			limit: addresses.length.toString(),
 			addresses: addresses.join(',')
 		});
 		const { url, method } = await NextApiClientService.getRouteConfig({
