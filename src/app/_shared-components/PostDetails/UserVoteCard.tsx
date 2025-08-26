@@ -16,6 +16,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 
 import { useToast } from '@/hooks/useToast';
 import { Button } from '../Button';
@@ -42,6 +43,7 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
+	const { setVaultQrState } = usePolkadotVault();
 
 	const { toast } = useToast();
 	const queryClient = useQueryClient();
@@ -56,13 +58,15 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 	};
 
 	const handleRemoveVote = async () => {
-		if (!apiService || !loginAddress) return;
+		if (!apiService || !loginAddress || !userPreferences.wallet) return;
 
 		try {
 			setIsLoading(true);
 			await apiService.removeReferendumVote({
 				address: loginAddress,
 				referendumId: Number(index),
+				wallet: userPreferences.wallet,
+				setVaultQrState,
 				selectedAccount: userPreferences.selectedAccount,
 				onSuccess: () => {
 					toast({

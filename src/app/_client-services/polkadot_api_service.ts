@@ -471,12 +471,16 @@ export class PolkadotApiService {
 	async removeReferendumVote({
 		address,
 		referendumId,
+		wallet,
 		onSuccess,
 		onFailed,
-		selectedAccount
+		selectedAccount,
+		setVaultQrState
 	}: {
 		address: string;
 		referendumId: number;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 		onSuccess: () => void;
 		onFailed: (error: string) => void;
 		selectedAccount?: ISelectedAccount;
@@ -491,11 +495,13 @@ export class PolkadotApiService {
 			await this.executeTx({
 				tx,
 				address,
+				wallet,
 				errorMessageFallback: 'Failed to remove vote',
 				waitTillFinalizedHash: true,
 				onSuccess,
 				onFailed,
-				selectedAccount
+				selectedAccount,
+				setVaultQrState
 			});
 		} catch (error: unknown) {
 			onFailed((error as Error)?.message || 'Failed to remove vote');
