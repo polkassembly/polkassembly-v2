@@ -1507,7 +1507,7 @@ export interface IVaultQrState {
 	qrReject?: (error: Error) => void;
 }
 
-export enum EProposalVoteType {
+export enum EVoteBubbleTabs {
 	Bubble = 'bubble',
 	Graph = 'graph'
 }

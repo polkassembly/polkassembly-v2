@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EPostOrigin, EProposalType, IVoteCurve, IStatusHistoryItem, EAnalyticsType, EProposalVoteType } from '@/_shared/types';
+import { EPostOrigin, EProposalType, IVoteCurve, IStatusHistoryItem, EAnalyticsType, EVoteBubbleTabs } from '@/_shared/types';
 import React, { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
@@ -42,12 +42,12 @@ function VotesDataDialog({
 	proposalType: EProposalType;
 	index: string;
 	enableGraph: boolean;
-	selectedTab: EProposalVoteType;
+	selectedTab: EVoteBubbleTabs;
 	isExpanded: boolean;
 	setIsExpanded: (isExpanded: boolean) => void;
 }) {
 	const t = useTranslations('PostDetails.VotesData');
-	const [activeTab, setActiveTab] = useState(selectedTab || EProposalVoteType.Bubble);
+	const [activeTab, setActiveTab] = useState(selectedTab || EVoteBubbleTabs.Bubble);
 
 	useEffect(() => {
 		setActiveTab(selectedTab);
@@ -65,14 +65,14 @@ function VotesDataDialog({
 							<div className='flex items-center justify-between'>
 								<Select
 									value={activeTab}
-									onValueChange={(value: EProposalVoteType) => setActiveTab(value)}
+									onValueChange={(value: EVoteBubbleTabs) => setActiveTab(value)}
 								>
 									<SelectTrigger className='flex items-center gap-2 border-none text-lg font-semibold text-text_primary shadow-none'>
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value={EProposalVoteType.Bubble}>{t('voteBubble')}</SelectItem>
-										<SelectItem value={EProposalVoteType.Graph}>{t('voteGraph')}</SelectItem>
+										<SelectItem value={EVoteBubbleTabs.Bubble}>{t('voteBubble')}</SelectItem>
+										<SelectItem value={EVoteBubbleTabs.Graph}>{t('voteGraph')}</SelectItem>
 									</SelectContent>
 								</Select>
 							</div>
@@ -85,7 +85,7 @@ function VotesDataDialog({
 					{isFetching && <LoadingLayover />}
 
 					{/* Conditional Rendering based on Active Tab */}
-					{activeTab === EProposalVoteType.Graph ? (
+					{activeTab === EVoteBubbleTabs.Graph ? (
 						<div className='mt-4 h-full'>
 							<VoteCurves
 								voteCurveData={voteCurveData || []}

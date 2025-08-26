@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { EAnalyticsType, EPostOrigin, EProposalStatus, EProposalType, EProposalVoteType, EVotesDisplayType, IStatusHistoryItem } from '@/_shared/types';
+import { EAnalyticsType, EPostOrigin, EProposalStatus, EProposalType, EVoteBubbleTabs, EVotesDisplayType, IStatusHistoryItem } from '@/_shared/types';
 import { ChevronDown, ChevronRight, Expand } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
@@ -32,7 +32,7 @@ interface IVotesDataProps {
 
 function VotesData({ proposalType, index, trackName, createdAt, timeline, setThresholdValues, thresholdValues }: IVotesDataProps) {
 	const t = useTranslations('PostDetails.VotesData');
-	const [activeTab, setActiveTab] = useState<EProposalVoteType>(EProposalVoteType.Bubble);
+	const [activeTab, setActiveTab] = useState<EVoteBubbleTabs>(EVoteBubbleTabs.Bubble);
 	const [votesDisplayType, setVotesDisplayType] = useState<EVotesDisplayType>(EVotesDisplayType.NESTED);
 	const [isExpanded, setIsExpanded] = useState(false);
 	const fetchVoteCurves = async () => {
@@ -98,7 +98,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 					defaultValue={activeTab}
 				>
 					<div className={classes.tabs}>
-						{[EProposalVoteType.Bubble, EProposalVoteType.Graph].map((tab) => (
+						{[EVoteBubbleTabs.Bubble, EVoteBubbleTabs.Graph].map((tab) => (
 							<Button
 								key={tab}
 								variant='ghost'
@@ -111,7 +111,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 						))}
 					</div>
 					<TabsContent
-						value={EProposalVoteType.Bubble}
+						value={EVoteBubbleTabs.Bubble}
 						className='px-6'
 					>
 						<VotesBubbleChart
@@ -122,7 +122,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 							setIsExpanded={setIsExpanded}
 						/>
 					</TabsContent>
-					<TabsContent value={EProposalVoteType.Graph}>
+					<TabsContent value={EVoteBubbleTabs.Graph}>
 						<VoteCurvesData
 							latestApproval={latestApproval}
 							latestSupport={latestSupport}
