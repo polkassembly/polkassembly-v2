@@ -40,7 +40,8 @@ import {
 	IPostLink,
 	IOffChainPollPayload,
 	IBeneficiary,
-	EAssets
+	EAssets,
+	IInAppNotification
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -1004,5 +1005,21 @@ export class OffChainDbService {
 
 			return { ...beneficiary, usdAmount };
 		});
+	}
+
+	static async GetNotificationsByUserId({ userId, network, page, limit }: { userId: number; network: ENetwork; page: number; limit: number }): Promise<IInAppNotification[]> {
+		return FirestoreService.GetNotificationsByUserId({ userId, network, page, limit });
+	}
+
+	static async GetUnreadNotificationsCount({ userId, network }: { userId: number; network: ENetwork }): Promise<number> {
+		return FirestoreService.GetUnreadNotificationsCount({ userId, network });
+	}
+
+	static async MarkNotificationAsRead(notificationId: string): Promise<void> {
+		return FirestoreService.MarkNotificationAsRead(notificationId);
+	}
+
+	static async MarkAllNotificationsAsRead({ userId, network }: { userId: number; network: ENetwork }): Promise<void> {
+		return FirestoreService.MarkAllNotificationsAsRead({ userId, network });
 	}
 }

@@ -83,4 +83,170 @@ export class NotificationService {
 			}
 		});
 	}
+
+	static async SendProposalNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		proposalId,
+		proposalTitle,
+		proposalType,
+		userId
+	}: {
+		network?: ENetwork;
+		proposalId: string;
+		proposalTitle: string;
+		proposalType: string;
+		userId?: number;
+	}) {
+		await this.sendNotification({
+			network,
+			trigger: ENotificationTrigger.NEW_PROPOSAL,
+			args: {
+				proposalId,
+				proposalTitle,
+				proposalType,
+				...(userId && { userId: userId.toString() })
+			}
+		});
+	}
+
+	static async SendCommentNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		postId,
+		commentId,
+		commentContent,
+		userId
+	}: {
+		network?: ENetwork;
+		postId: string;
+		commentId: string;
+		commentContent: string;
+		userId?: number;
+	}) {
+		await this.sendNotification({
+			network,
+			trigger: ENotificationTrigger.NEW_COMMENT,
+			args: {
+				postId,
+				commentId,
+				commentContent: commentContent.substring(0, 200),
+				...(userId && { userId: userId.toString() })
+			}
+		});
+	}
+
+	static async SendStatusChangeNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		postId,
+		newStatus,
+		oldStatus,
+		userId
+	}: {
+		network?: ENetwork;
+		postId: string;
+		newStatus: string;
+		oldStatus: string;
+		userId?: number;
+	}) {
+		await this.sendNotification({
+			network,
+			trigger: ENotificationTrigger.STATUS_CHANGE,
+			args: {
+				postId,
+				newStatus,
+				oldStatus,
+				...(userId && { userId: userId.toString() })
+			}
+		});
+	}
+
+	static async SendReferendumNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		referendumId,
+		referendumTitle,
+		track,
+		userId
+	}: {
+		network?: ENetwork;
+		referendumId: string;
+		referendumTitle: string;
+		track?: string;
+		userId?: number;
+	}) {
+		await this.sendNotification({
+			network,
+			trigger: ENotificationTrigger.NEW_REFERENDUM,
+			args: {
+				referendumId,
+				referendumTitle,
+				...(track && { track }),
+				...(userId && { userId: userId.toString() })
+			}
+		});
+	}
+
+	static async SendBulkNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		trigger,
+		userIds,
+		commonArgs,
+		batchSize = 50
+	}: {
+		network?: ENetwork;
+		trigger: ENotificationTrigger;
+		userIds: number[];
+		commonArgs: Record<string, string>;
+		batchSize?: number;
+	}) {
+		const batches: number[][] = [];
+		let currentIndex = 0;
+		while (currentIndex < userIds.length) {
+			batches.push(userIds.slice(currentIndex, currentIndex + batchSize));
+			currentIndex += batchSize;
+		}
+
+		const processBatch = async (batch: number[], isLastBatch: boolean) => {
+			await Promise.all(
+				batch.map((userId) =>
+					this.sendNotification({
+						network,
+						trigger,
+						args: {
+							...commonArgs,
+							userId: userId.toString()
+						}
+					})
+				)
+			);
+
+			if (!isLastBatch) {
+				await new Promise((resolve) => {
+					setTimeout(resolve, 100);
+				});
+			}
+		};
+
+		await batches.reduce(async (previousPromise, batch, index) => {
+			await previousPromise;
+			return processBatch(batch, index === batches.length - 1);
+		}, Promise.resolve());
+	}
+
+	static async SendTestNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		userId,
+		message = 'Test notification from Polkassembly'
+	}: {
+		network?: ENetwork;
+		userId: number;
+		message?: string;
+	}) {
+		await this.sendNotification({
+			network,
+			trigger: ENotificationTrigger.TEST,
+			args: {
+				userId: userId.toString(),
+				message
+			}
+		});
+	}
 }

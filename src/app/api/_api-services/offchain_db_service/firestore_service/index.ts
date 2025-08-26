@@ -41,7 +41,8 @@ import {
 	IPollVote,
 	IPoll,
 	EPollVotesType,
-	IOffChainPollPayload
+	IOffChainPollPayload,
+	IInAppNotification
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -52,7 +53,6 @@ import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDeta
 import { FirestoreUtils } from './firestoreUtils';
 
 export class FirestoreService extends FirestoreUtils {
-	// Read methods
 	static async GetTotalUsersCount(): Promise<number> {
 		const userDocSnapshot = await this.usersCollectionRef().get();
 		return userDocSnapshot.docs.length;
@@ -1835,6 +1835,66 @@ export class FirestoreService extends FirestoreUtils {
 					return null;
 				})
 				.filter((vote): vote is IPollVote => vote !== null);
+		});
+	}
+
+	static async GetNotificationsByUserId({ userId, network, page, limit }: { userId: number; network: ENetwork; page: number; limit: number }): Promise<IInAppNotification[]> {
+		const notificationsQuery = this.notificationsCollectionRef()
+			.where('userId', '==', userId)
+			.where('network', '==', network)
+			.orderBy('createdAt', 'desc')
+			.limit(limit)
+			.offset((page - 1) * limit);
+
+		const notificationsQuerySnapshot = await notificationsQuery.get();
+
+		return notificationsQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				id: doc.id,
+				userId: data.userId,
+				title: data.title || '',
+				message: data.message || '',
+				url: data.url || '',
+				trigger: data.trigger,
+				network: data.network || network,
+				createdAt: data.createdAt?.toDate() || new Date(),
+				type: data.type
+			} as IInAppNotification;
+		});
+	}
+
+	static async GetUnreadNotificationsCount({ userId, network }: { userId: number; network: ENetwork }): Promise<number> {
+		const unreadNotificationsQuery = this.notificationsCollectionRef().where('userId', '==', userId).where('network', '==', network).where('isRead', '==', false).count();
+
+		const unreadNotificationsQuerySnapshot = await unreadNotificationsQuery.get();
+		return unreadNotificationsQuerySnapshot.data().count || 0;
+	}
+
+	static async MarkNotificationAsRead(notificationId: string): Promise<void> {
+		await this.notificationsCollectionRef().doc(notificationId).update({
+			isRead: true,
+			updatedAt: new Date()
+		});
+	}
+
+	static async MarkAllNotificationsAsRead({ userId, network }: { userId: number; network: ENetwork }): Promise<void> {
+		const notificationsQuery = this.notificationsCollectionRef().where('userId', '==', userId).where('network', '==', network).where('isRead', '==', false);
+
+		const notificationsQuerySnapshot = await notificationsQuery.get();
+
+		if (notificationsQuerySnapshot.empty) {
+			return;
+		}
+
+		await this.processBatch({
+			querySnapshot: notificationsQuerySnapshot,
+			batchOperation: (batch, doc) => {
+				batch.update(doc.ref, {
+					isRead: true,
+					updatedAt: new Date()
+				});
+			}
 		});
 	}
 }
