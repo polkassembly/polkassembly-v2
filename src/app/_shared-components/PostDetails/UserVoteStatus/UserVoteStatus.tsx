@@ -10,7 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { EPostOrigin, EProposalType, EReactQueryKeys } from '@/_shared/types';
 import VoteReferendumButton from '../VoteReferendumButton';
-import UserVoteCard from '../UserVoteCard';
+import UserVoteCard from './UserVoteCard/UserVoteCard';
 
 interface UserVoteStatusProps {
 	index: string;
@@ -23,25 +23,24 @@ interface UserVoteStatusProps {
 function UserVoteStatus({ index, btnClassName, size = 'lg', track, proposalType }: UserVoteStatusProps) {
 	const { user } = useUser();
 
-	// Use login address to fetch
-	const selectedAddress = user?.loginAddress;
+	const fetchVoteData = async () => {
+		if (!user || !user.addresses.length) return null;
+		const { data, error } = await NextApiClientService.getPostVotesByAddresses({
+			proposalType,
+			index,
+			addresses: user.addresses
+		});
+		if (error) throw new Error(error.message || 'Failed to fetch vote data');
+		if (!data) return null;
+		return data;
+	};
 
 	const { data: voteData } = useQuery({
-		queryKey: [EReactQueryKeys.USER_VOTES, proposalType, index, selectedAddress],
-		queryFn: async () => {
-			if (!selectedAddress) return null;
-			const { data, error } = await NextApiClientService.getPostVotesByAddress({
-				proposalType,
-				index,
-				address: selectedAddress
-			});
-			if (error) throw new Error(error.message || 'Failed to fetch vote data');
-			if (!data) return null;
-			return data;
-		},
-		enabled: !!selectedAddress,
-		retry: 1,
-		staleTime: 0,
+		queryKey: [EReactQueryKeys.USER_VOTES, proposalType, index, user?.id],
+		queryFn: fetchVoteData,
+		enabled: !!user && !!user.addresses.length,
+		placeholderData: (prev) => prev,
+		retry: true,
 		refetchOnWindowFocus: true,
 		refetchOnMount: true
 	});
@@ -56,8 +55,6 @@ function UserVoteStatus({ index, btnClassName, size = 'lg', track, proposalType 
 			voteData={voteData}
 			btnClassName={btnClassName}
 			track={track}
-			existingVote={hasVoted ? voteData?.votes[0] : undefined}
-			loginAddress={selectedAddress}
 		/>
 	) : (
 		<VoteReferendumButton
@@ -68,7 +65,6 @@ function UserVoteStatus({ index, btnClassName, size = 'lg', track, proposalType 
 			hasVoted={hasVoted}
 			track={track}
 			proposalType={proposalType}
-			existingVote={hasVoted ? voteData?.votes[0] : undefined}
 		/>
 	);
 }

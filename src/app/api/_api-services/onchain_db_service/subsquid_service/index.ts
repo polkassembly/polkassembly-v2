@@ -307,18 +307,18 @@ export class SubsquidService extends SubsquidUtils {
 		proposalType,
 		subsquidDecision,
 		votesType,
-		voterAddress
+		voterAddresses
 	}: {
 		proposalType: EProposalType;
 		subsquidDecision: string | null;
 		votesType?: EVotesDisplayType;
-		voterAddress?: string;
+		voterAddresses?: string[];
 	}): string {
 		// Handle TIP proposal type
 		if (proposalType === EProposalType.TIP) {
 			return subsquidDecision
-				? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION({ voter: voterAddress })
-				: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH({ voter: voterAddress });
+				? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION({ voters: voterAddresses })
+				: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH({ voters: voterAddresses });
 		}
 
 		// Handle REFERENDUM_V2 and FELLOWSHIP_REFERENDUM
@@ -329,19 +329,19 @@ export class SubsquidService extends SubsquidUtils {
 
 			if (subsquidDecision) {
 				return isFlattened
-					? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
-					: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress });
+					? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voters: voterAddresses })
+					: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voters: voterAddresses });
 			}
 
 			return isFlattened
-				? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress })
-				: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress });
+				? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voters: voterAddresses })
+				: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voters: voterAddresses });
 		}
 
 		// Handle other proposal types
 		return subsquidDecision
-			? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
-			: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress });
+			? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voters: voterAddresses })
+			: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voters: voterAddresses });
 	}
 
 	// FIXME: refactor this function
@@ -353,7 +353,7 @@ export class SubsquidService extends SubsquidUtils {
 		page,
 		limit,
 		decision,
-		voterAddress: address,
+		voterAddresses: addresses,
 		orderBy,
 		votesType
 	}: {
@@ -363,11 +363,11 @@ export class SubsquidService extends SubsquidUtils {
 		page: number;
 		limit: number;
 		decision?: EVoteDecision;
-		voterAddress?: string;
+		voterAddresses?: string[];
 		orderBy?: EVoteSortOptions;
 		votesType?: EVotesDisplayType;
 	}) {
-		const voterAddress = address ? (getEncodedAddress(address, network) ?? undefined) : undefined;
+		const voterAddresses = addresses ? addresses.map((address) => getEncodedAddress(address, network) ?? undefined) : undefined;
 
 		const gqlClient = this.subsquidGqlClient(network);
 
@@ -378,7 +378,7 @@ export class SubsquidService extends SubsquidUtils {
 			proposalType,
 			subsquidDecision,
 			votesType,
-			voterAddress
+			voterAddresses: voterAddresses?.filter((address) => address !== undefined)
 		});
 
 		const variables =

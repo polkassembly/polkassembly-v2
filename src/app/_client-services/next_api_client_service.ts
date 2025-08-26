@@ -685,14 +685,15 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });
 	}
 
-	static async getPostVotesByAddress({ proposalType, index, address }: { proposalType: EProposalType; index: string; address: string }) {
+	static async getPostVotesByAddresses({ proposalType, index, addresses }: { proposalType: EProposalType; index: string; addresses: string[] }) {
 		const queryParams = new URLSearchParams({
 			page: '1',
-			limit: '1'
+			limit: '1',
+			addresses: addresses.join(',')
 		});
 		const { url, method } = await NextApiClientService.getRouteConfig({
 			route: EApiRoute.GET_POST_VOTES_BY_ADDRESS,
-			routeSegments: [proposalType, index, 'votes', 'user', 'address', address],
+			routeSegments: [proposalType, index, 'votes', 'address'],
 			queryParams
 		});
 		return NextApiClientService.nextApiClientFetch<IVoteHistoryData>({ url, method });

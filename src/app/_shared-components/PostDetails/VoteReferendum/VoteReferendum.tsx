@@ -21,6 +21,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { cn } from '@/lib/utils';
 import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { Ban, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { useUser } from '@/hooks/useUser';
 import { Button } from '../../Button';
 import BalanceInput from '../../BalanceInput/BalanceInput';
 import ChooseVote from './ChooseVote/ChooseVote';
@@ -140,6 +141,8 @@ function VoteReferendum({
 	const { toast } = useToast();
 	const network = getCurrentNetwork();
 
+	const { user } = useUser();
+
 	const { setVaultQrState } = usePolkadotVault();
 
 	const [reuseLock, setReuseLock] = useState<BN | null>(null);
@@ -215,7 +218,7 @@ function VoteReferendum({
 	}, [ayeVoteValue, balance, nayVoteValue, abstainVoteValue, voteDecision]);
 
 	const onVoteConfirm = async () => {
-		if (!apiService || !userPreferences.selectedAccount?.address || !userPreferences.wallet) return;
+		if (!apiService || !userPreferences.selectedAccount?.address || !userPreferences.wallet || !user?.id) return;
 
 		if (isInvalidAmount) return;
 
@@ -237,21 +240,19 @@ function VoteReferendum({
 					});
 					setIsLoading(false);
 
-					// Optimistic update - immediately update cache with new vote on success
-					const optimisticVoteData = {
-						decision: voteDecision,
-						balanceValue: balance.toString(),
-						voterAddress: userAddress,
-						lockPeriod: conviction,
-						createdAt: new Date(),
-						selfVotingPower: balance.toString(),
-						totalVotingPower: balance.toString(),
-						delegatedVotingPower: '0'
-					};
+					// // Optimistic update - immediately update cache with new vote on success
+					// const optimisticVoteData = {
+					// decision: voteDecision,
+					// balanceValue: balance.toString(),
+					// voterAddress: userAddress,
+					// lockPeriod: conviction,
+					// createdAt: new Date(),
+					// selfVotingPower: balance.toString(),
+					// totalVotingPower: balance.toString(),
+					// delegatedVotingPower: '0'
+					// };
 
-					queryClient.setQueryData([EReactQueryKeys.USER_VOTES, proposalType, index, userPreferences.selectedAccount?.address], {
-						votes: [optimisticVoteData]
-					});
+					queryClient.invalidateQueries({ queryKey: [EReactQueryKeys.USER_VOTES, proposalType, index, user.id] });
 
 					onClose();
 					setOpenSuccessModal(true);

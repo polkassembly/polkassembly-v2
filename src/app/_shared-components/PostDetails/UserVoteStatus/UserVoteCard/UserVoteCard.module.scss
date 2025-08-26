@@ -1,0 +1,23 @@
+.userVoteCard {
+	@apply flex flex-col gap-y-3 rounded-xl bg-bg_modal p-4 shadow-lg lg:p-6;
+}
+
+.userVoteCard {
+	@apply flex flex-col gap-y-4;
+}
+
+.userVoteCardLayout {
+	@apply flex items-center justify-between;
+}
+
+.userVoteCardTitle {
+	@apply text-xl font-semibold text-text_primary;
+}
+
+.userVoteCardTitleIcon {
+	@apply flex items-center gap-1 text-base font-semibold text-text_primary;
+}
+
+.userVoteCardRemoveButton {
+	@apply m-0 !p-0 text-xs font-medium text-text_pink hover:text-text_pink/80;
+}
