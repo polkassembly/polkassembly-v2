@@ -29,8 +29,8 @@ import StatusTag from '../../StatusTag/StatusTag';
 import { PaginationWithLinks } from '../../PaginationWithLinks';
 import { Checkbox } from '../../Checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
-import Address from '../Address/Address';
 import RemoveVoteDialog from '../../RemoveVoteDialog/RemoveVoteDialog';
+import Address from '../Address/Address';
 
 const DEFAULT_VOTES_SHOW_COUNT = 3;
 
