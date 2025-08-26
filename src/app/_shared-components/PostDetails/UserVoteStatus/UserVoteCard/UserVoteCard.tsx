@@ -48,26 +48,28 @@ function VoteDetails({ voteData, showAddress = true }: { voteData: IVoteData; sh
 		compactNotation: true
 	};
 	return (
-		<div className='flex flex-col gap-y-2'>
+		<div className='flex flex-col gap-y-3'>
 			{showAddress && (
-				<div className={classes.userVoteCardLayout}>
-					<h3 className={classes.userVoteCardTitleIcon}>
-						<User className='h-4 w-4 text-basic_text' />
-						{t('PostDetails.address')}
-					</h3>
+				<>
+					<div className={classes.userVoteCardLayout}>
+						<h3 className={classes.userVoteCardTitleIcon}>
+							<User className='h-4 w-4 text-basic_text' />
+							{t('PostDetails.address')}
+						</h3>
 
-					<p className='text-sm text-basic_text'>
-						<Address
-							address={voteData.voterAddress}
-							iconSize={18}
-						/>
-					</p>
-				</div>
+						<p className='text-sm text-basic_text'>
+							<Address
+								address={voteData.voterAddress}
+								iconSize={18}
+							/>
+						</p>
+					</div>
+					<Separator
+						orientation='horizontal'
+						className='w-full'
+					/>
+				</>
 			)}
-			<Separator
-				orientation='horizontal'
-				className='w-full'
-			/>
 			<div className={classes.userVoteCardLayout}>
 				<h3 className={classes.userVoteCardTitleIcon}>
 					{voteData.decision === EVoteDecision.ABSTAIN && <Ban className='h-4 w-4 text-basic_text' />}
@@ -198,10 +200,8 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 								className='rounded-md bg-page_background p-2'
 							>
 								<div className='flex cursor-pointer items-center gap-x-2'>
-									<Address
-										address={vote.voterAddress}
-										className='flex-1'
-									/>
+									<Address address={vote.voterAddress} />
+									<div className='flex-1' />
 									<Button
 										type='button'
 										variant='ghost'
