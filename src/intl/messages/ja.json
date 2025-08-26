@@ -185,6 +185,18 @@
 			"CO": "CO",
 			"index": "インデックス"
 		},
+		"Votes": {
+			"noData": "投票が見つかりません",
+			"votes": "投票",
+			"proposal": "提案",
+			"voteFor": "投票する",
+			"voter": "投票者",
+			"action": "アクション",
+			"status": "ステータス",
+			"showMore": "もっと表示",
+			"showLess": "表示を減らす",
+			"selectAddresses": "アドレスを選択"
+		},
 		"Activity": {
 			"voted_on_proposal": "投票済み",
 			"created_proposal": "提案を作成",
@@ -437,6 +449,15 @@
 		}
 	},
 	"PostDetails": {
+		"remove": "削除",
+		"removing": "削除中",
+		"removeVote": "投票を削除",
+		"selectYourVoterAddress": "投票者アドレスを選択",
+		"voteRemovedTitle": "投票が削除されました",
+		"voteRemoved": "投票が削除されました",
+		"voteRemoveFailedTitle": "投票削除に失敗しました",
+		"voteRemoveFailed": "投票削除に失敗しました",
+		"removeVoteConfirmation": "本当に投票を削除しますか？",
 		"castVote": "投票する",
 		"castYourVote": "投票してください",
 		"copyLink": "リンクをコピー",

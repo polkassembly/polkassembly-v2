@@ -1549,4 +1549,43 @@ export class PolkadotApiService {
 			setVaultQrState
 		});
 	}
+
+	async removeReferendumVote({
+		address,
+		referendumId,
+		onSuccess,
+		onFailed,
+		selectedAccount,
+		wallet,
+		setVaultQrState
+	}: {
+		address: string;
+		referendumId: number;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		selectedAccount?: ISelectedAccount;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+		wallet: EWallet;
+	}) {
+		if (!this.api) {
+			return;
+		}
+
+		try {
+			const tx: SubmittableExtrinsic<'promise'> = this.api.tx.convictionVoting.removeVote(null, referendumId);
+			await this.executeTx({
+				tx,
+				address,
+				wallet,
+				errorMessageFallback: 'Failed to remove vote',
+				waitTillFinalizedHash: true,
+				onSuccess,
+				onFailed,
+				selectedAccount,
+				setVaultQrState
+			});
+		} catch (error: unknown) {
+			onFailed((error as Error)?.message || 'Failed to remove vote');
+		}
+	}
 }

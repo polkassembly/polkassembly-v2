@@ -183,6 +183,18 @@
 			"CO": "CO",
 			"index": "索引"
 		},
+		"Votes": {
+			"noData": "未找到投票",
+			"votes": "投票",
+			"proposal": "提案",
+			"voteFor": "投票支持",
+			"voter": "投票者",
+			"action": "操作",
+			"status": "状态",
+			"showMore": "显示更多",
+			"showLess": "显示更少",
+			"selectAddresses": "选择地址"
+		},
 		"Activity": {
 			"voted_on_proposal": "已投票",
 			"created_proposal": "创建提案",
@@ -437,6 +449,15 @@
 		}
 	},
 	"PostDetails": {
+		"remove": "删除",
+		"removing": "删除中",
+		"removeVote": "删除投票",
+		"selectYourVoterAddress": "选择您的投票地址",
+		"removeVoteConfirmation": "您确定要删除您的投票吗？",
+		"voteRemovedTitle": "投票已删除",
+		"voteRemoved": "您的投票已成功删除",
+		"voteRemoveFailedTitle": "投票删除失败",
+		"voteRemoveFailed": "投票删除失败",
 		"castVote": "投票",
 		"castYourVote": "进行投票",
 		"copyLink": "复制链接",

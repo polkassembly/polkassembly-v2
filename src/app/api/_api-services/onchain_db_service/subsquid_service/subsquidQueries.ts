@@ -1225,4 +1225,47 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_ALL_FLATTENED_VOTES_FOR_MULTIPLE_VOTERS = ({ voters }: { voters: string[] }) => `
+	query MyQuery($limit: Int!, $offset: Int!) {
+		votes: flattenedConvictionVotes(
+			where: {
+				voter_in: [${voters.map((voter) => `"${voter}"`).join(', ')}]
+				removedAtBlock_isNull: true
+			}
+			limit: $limit
+			offset: $offset
+			orderBy: createdAt_DESC
+		) {
+			proposalIndex
+			isDelegated
+			parentVote {
+				extrinsicIndex
+			}
+			type
+			voter
+			balance {
+				__typename
+				... on StandardVoteBalance {
+					value
+				}
+				... on SplitVoteBalance {
+					aye
+					nay
+					abstain
+				}
+			}
+			decision
+			createdAt
+		}
+		totalCount: flattenedConvictionVotesConnection(
+			where: {
+				voter_in: [${voters.map((voter) => `"${voter}"`).join(', ')}]
+				removedAtBlock_isNull: true
+			}
+			orderBy: createdAt_DESC
+		) {
+			totalCount
+		}
+	}`;
 }

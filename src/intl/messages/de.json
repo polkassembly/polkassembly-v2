@@ -182,6 +182,18 @@
 			"CA": "CA",
 			"CO": "CO"
 		},
+		"Votes": {
+			"noData": "Keine Stimmen gefunden",
+			"votes": "Stimmen",
+			"proposal": "Vorschlag",
+			"voteFor": "Stimme für",
+			"action": "Aktion",
+			"voter": "Stimmberechtigter",
+			"status": "Status",
+			"showMore": "Mehr anzeigen",
+			"showLess": "Weniger anzeigen",
+			"selectAddresses": "Adressen auswählen"
+		},
 		"Activity": {
 			"voted_on_proposal": "Abgestimmt",
 			"created_proposal": "Vorschlag erstellt",
@@ -436,6 +448,15 @@
 		}
 	},
 	"PostDetails": {
+		"remove": "Entfernen",
+		"removing": "Entfernen",
+		"removeVote": "Abstimmung entfernen",
+		"selectYourVoterAddress": "Wählen Sie Ihre Abstimmungsadresse",
+		"voteRemovedTitle": "Abstimmung entfernt",
+		"voteRemoved": "Ihre Abstimmung wurde erfolgreich entfernt",
+		"voteRemoveFailedTitle": "Abstimmung entfernen fehlgeschlagen",
+		"voteRemoveFailed": "Abstimmung entfernen fehlgeschlagen",
+		"removeVoteConfirmation": "Sind Sie sicher, dass Sie Ihre Abstimmung entfernen möchten?",
 		"castVote": "Abstimmen",
 		"castYourVote": "Geben Sie Ihre Stimme ab",
 		"copyLink": "Link kopieren",
