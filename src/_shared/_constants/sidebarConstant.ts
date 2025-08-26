@@ -57,6 +57,9 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 		throw new Error(`Network ${networkKey} not found`);
 	}
 
+	const TREASURY_KEY = 'Sidebar.treasury';
+	const REFERENDA_KEY = 'Sidebar.referenda';
+
 	const baseConfig = {
 		heading: t('Sidebar.main'),
 		initalItems: ActiveItems(
@@ -85,27 +88,37 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 				mainItems: ActiveItems(
 					[
 						{
-							title: t('Sidebar.treasury'),
+							heading: t(TREASURY_KEY),
+							title: t(TREASURY_KEY),
 							url: '',
 							icon: Bounty,
 							isNew: false,
 							items: [
 								{
-									title: t('Sidebar.bountyDashboard'),
-									url: '/bounty-dashboard',
-									count: trackCounts.bounty_dashboard || 0
+									title: t('Sidebar.bounty'),
+									url: '',
+									icon: Bounty,
+									isNew: false,
+									items: [
+										{
+											title: t('Sidebar.bountyDashboard'),
+											url: '/bounty-dashboard',
+											count: trackCounts.bounty_dashboard || 0
+										},
+										{ title: t('Sidebar.onChainBounties'), url: '/bounties' },
+										{ title: t('Sidebar.childBounties'), url: '/child-bounties' }
+									]
 								},
-								{ title: t('Sidebar.onChainBounties'), url: '/bounties' },
-								{ title: t('Sidebar.childBounties'), url: '/child-bounties' },
 								...getTrackItems(networkKey, 'Treasury', t, trackCounts)
 							]
 						},
 						{
-							title: t('Sidebar.referenda'),
+							heading: t(REFERENDA_KEY),
+							title: t(REFERENDA_KEY),
 							url: '',
 							icon: TreasuryIcon,
 							items: [...getTrackItems(networkKey, 'Main', t, trackCounts), ...getTrackItems(networkKey, 'Origin', t, trackCounts)]
-						},
+						}
 						// {
 						// title: t('Sidebar.analytics'),
 						// url: '#',
@@ -123,12 +136,12 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 						// { title: t('Sidebar.ecosystemProjects'), url: '#' }
 						// ]
 						// },
-						{ title: t('Sidebar.preimages'), url: '/preimages', icon: Preimages }
 					],
 					pathname
 				),
 				endItems: ActiveItems(
 					[
+						{ title: t('Sidebar.preimages'), url: '/preimages', icon: Preimages },
 						{
 							title: t('Sidebar.more'),
 							url: '#',
