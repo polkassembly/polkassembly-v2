@@ -1506,3 +1506,8 @@ export interface IVaultQrState {
 	qrResolve?: (result: SignerResult) => void;
 	qrReject?: (error: Error) => void;
 }
+
+export enum EVoteBubbleTabs {
+	Bubble = 'bubble',
+	Graph = 'graph'
+}
