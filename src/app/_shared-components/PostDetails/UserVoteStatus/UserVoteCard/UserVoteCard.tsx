@@ -218,7 +218,7 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 									<ChevronDown className='h-4 w-4' />
 								</div>
 							</CollapsibleTrigger>
-							<CollapsibleContent>
+							<CollapsibleContent className='p-2'>
 								<VoteDetails
 									voteData={vote}
 									showAddress={false}
