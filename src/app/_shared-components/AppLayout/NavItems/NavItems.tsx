@@ -107,7 +107,7 @@ export function NavMain({
 							{section.mainItems.map((mainItem, index) => (
 								<Collapsible
 									key={mainItem.heading || `mainItem-${index}`}
-									defaultOpen
+									defaultOpen={false}
 									className='group/collapsible mt-4'
 								>
 									<CollapsibleTrigger asChild>
