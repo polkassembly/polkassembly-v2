@@ -1507,6 +1507,11 @@ export interface IVaultQrState {
 	qrReject?: (error: Error) => void;
 }
 
+export enum EVoteBubbleTabs {
+	Bubble = 'bubble',
+	Graph = 'graph'
+}
+
 export interface IProfileVote extends Omit<IVoteData, 'createdAtBlock' | 'delegatedTo' | 'balanceValue'> {
 	balance: {
 		value: string;
