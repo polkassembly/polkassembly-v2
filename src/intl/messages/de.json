@@ -96,17 +96,20 @@
 		"NoRank": "um Ihren Rang zu sehen"
 	},
 	"AddressDropdown": {
-		"fallbackText": "Bitte wählen Sie eine Brieftasche",
-		"chooseLinkedAccount": "Verknüpftes Konto auswählen",
+		"fallbackText": "Bitte Wallet auswählen",
+		"chooseLinkedAccount": "Konto auswählen",
 		"noAccountsFound": "Keine Konten gefunden",
-		"selectWallet": "Bitte Brieftasche auswählen",
+		"selectWallet": "Bitte Wallet auswählen",
 		"fetchingAddresses": "Um Ihre Adressen abzurufen, benötigt Polkassembly Zugriff auf Ihre Wallet-Erweiterungen. Bitte autorisieren Sie diese Transaktion.",
 		"goBack": "Zurück",
 		"gotIt": "Verstanden",
-		"hidePassword": "Passwort verbergen",
+		"hidePassword": "Passwort ausblenden",
 		"showPassword": "Passwort anzeigen",
-		"pleaseConnectWallet": "Bitte verbinden Sie Ihre Brieftasche mit Polkassembly.",
+		"pleaseConnectWallet": "Bitte verbinden Sie Ihre Wallet mit Polkassembly.",
 		"pleaseCheckConnectedAccounts": "Bitte überprüfen Sie die verbundenen Konten in der Erweiterung.",
+		"scanYourAddressQr": "Scannen Sie Ihren Adress-QR-Code",
+		"scanYourAddressQrDescription1": "Melden Sie sich in Ihrer Polkadot Vault App an.",
+		"scanYourAddressQrDescription2": "Scannen Sie Ihren {network} Adress-QR-Code.",
 		"linkedAccount": "Verknüpftes Konto"
 	},
 	"AddressRelationsPicker": {
@@ -466,6 +469,7 @@
 		"preparePeriod": "Vorbereitungszeit",
 		"decisionPeriod": "Entscheidungszeit",
 		"summary": "Zusammenfassung",
+		"summarise": "Zusammenfassung",
 		"aye": "Ja",
 		"nay": "Nein",
 		"split": "Geteilt",
@@ -485,6 +489,18 @@
 		"account": "Konto",
 		"abstain": "Enthaltung",
 		"onchainInfo": "Onchain-Informationen",
+		"BeneficiariesDetails": {
+			"requested": "Angefordert",
+			"details": "Details",
+			"immediately": "sofort",
+			"in": "in",
+			"to": "zu",
+			"totalEstimatedUSD": "Geschätzter USD-Äquivalent",
+			"more": "mehr",
+			"requestedAmountDetails": "Angeforderter Betrag Details",
+			"showMore": "Mehr anzeigen",
+			"showLess": "Weniger anzeigen"
+		},
 		"nestedVotes": "Verschachtelte Abstimmungen",
 		"flattenedVotes": "Ebene Abstimmungen",
 		"Poll": {
@@ -555,6 +571,7 @@
 			"table": "Tabelle",
 			"json": "JSON",
 			"origin": "Ursprung",
+			"details": "Details",
 			"method": "Methode",
 			"proposalHash": "Vorschlag-Hash",
 			"preimage": "Vorabbild",
@@ -568,7 +585,13 @@
 			"fee": "Gebühr",
 			"parentBountyIndex": "Elterntreffen-Index",
 			"payee": "Begünstigter",
-			"curator": "Curator"
+			"curator": "Curator",
+			"requested": "Angefordert",
+			"calls": "Aufrufe",
+			"showMore": "Mehr anzeigen",
+			"showLess": "Weniger anzeigen",
+			"call": "Aufruf",
+			"timeline": "Zeitlinie"
 		},
 		"deleteComment": "Kommentar löschen",
 		"deleteCommentConfirmation": "Möchten Sie diesen Kommentar wirklich löschen?",
@@ -972,7 +995,13 @@
 		"verify": "Verifizieren",
 		"verified": "Verifiziert",
 		"pending": "Ausstehend",
-		"CurrentJudgement": "Aktuelle Beurteilung"
+		"CurrentJudgement": "Aktuelle Beurteilung",
+		"clearIdentity": "Identität löschen",
+		"clearIdentitySuccess": "Identität gelöscht!",
+		"clearIdentitySuccessDescription": "Ihre Identität wurde erfolgreich gelöscht",
+		"clearIdentityFailed": "Identitätslöschung fehlgeschlagen",
+		"clearIdentityFailedDescription": "Beim Löschen Ihrer Identität ist ein Fehler aufgetreten",
+		"clearIdentityDescription": "Sind Sie sicher, dass Sie Ihre Identität löschen möchten?"
 	},
 	"Bounties": {
 		"onchainBounties": "Onchain-Prämien",
@@ -1430,6 +1459,14 @@
 	"ConvictionSelector": {
 		"votes": "Stimmen",
 		"lockingPeriod": "Sperrfrist",
-		"lockingPeriodDescription": "Ihre {tokenSymbol} bleiben nach der Abstimmung für zusätzliche Zeit gesperrt, abhängig vom gewählten Multiplikator."
+		"lockingPeriodDescription": "Ihr {tokenSymbol} bleibt je nach gewähltem Multiplikator nach der Abstimmung zusätzlich gesperrt."
+	},
+	"PolkadotVault": {
+		"signTransaction": "Transaktion signieren",
+		"addVaultAddress": "Polkadot Vault-Adresse hinzufügen",
+		"scan": "Scannen",
+		"openVaultAppInYourPhone": "Öffnen Sie die Vault-App auf Ihrem Telefon",
+		"scanTheQRHere": "Scannen Sie den QR-Code hier von der Vault-App",
+		"scanTheSignatureQRInYourApp": "Überprüfen Sie den Signatur-QR in Ihrer App und signieren Sie die Transaktion"
 	}
 }

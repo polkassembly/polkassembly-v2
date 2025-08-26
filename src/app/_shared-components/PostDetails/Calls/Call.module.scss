@@ -1,0 +1,18 @@
+.title {
+	@apply mb-2 text-lg font-semibold capitalize text-text_primary;
+}
+.infoRow {
+	@apply grid grid-cols-4 gap-x-4 border-b border-border_grey py-4 text-sm text-text_primary;
+}
+
+.infoRowLabel {
+	@apply col-span-1;
+}
+
+.infoRowValue {
+	@apply col-span-3;
+}
+
+.argsLabel {
+	@apply rounded-md bg-call_args_bg px-2 py-1 text-xs font-medium capitalize text-text_primary;
+}

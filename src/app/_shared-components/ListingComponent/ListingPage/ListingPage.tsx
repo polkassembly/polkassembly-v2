@@ -18,6 +18,7 @@ import dynamic from 'next/dynamic';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import ListingTab from '../ListingTab/ListingTab';
 import styles from './ListingPage.module.scss';
+import LoadingLayover from '../../LoadingLayover';
 
 const TrackAnalytics = dynamic(() => import('../TrackAnalytics/TrackAnalytics'), { ssr: false });
 const ExternalTab = dynamic(() => import('../ExternalTab'), { ssr: false });
@@ -153,7 +154,7 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 		return data;
 	};
 
-	const { data: listingData } = useQuery({
+	const { data: listingData, isFetching: isFetchingListingData } = useQuery({
 		queryKey: ['listingData', proposalType, page, [...statuses].sort().join(','), origin],
 		queryFn: () => fetchListingData(),
 		placeholderData: (previousData) => previousData || initialData,
@@ -263,11 +264,14 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 			<div className={styles.content}>
 				<div>
 					{state.activeTab === EListingTabState.INTERNAL_PROPOSALS ? (
-						<ListingTab
-							data={listingData?.items || []}
-							totalCount={listingData?.totalCount || 0}
-							currentPage={state.currentPage}
-						/>
+						<div className='relative'>
+							{isFetchingListingData && <LoadingLayover />}
+							<ListingTab
+								data={listingData?.items || []}
+								totalCount={listingData?.totalCount || 0}
+								currentPage={state.currentPage}
+							/>
+						</div>
 					) : proposalType === EProposalType.REFERENDUM_V2 ? (
 						<TrackAnalytics origin={origin} />
 					) : (

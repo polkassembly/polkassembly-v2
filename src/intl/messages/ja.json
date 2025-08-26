@@ -97,16 +97,19 @@
 	},
 	"AddressDropdown": {
 		"fallbackText": "ウォレットを選択してください",
-		"chooseLinkedAccount": "リンクされたアカウントを選択",
+		"chooseLinkedAccount": "アカウントを選択",
 		"noAccountsFound": "アカウントが見つかりません",
 		"selectWallet": "ウォレットを選択してください",
-		"fetchingAddresses": "アドレスを取得するには、Polkassemblyがウォレット拡張機能へのアクセスを必要とします。このトランザクションを承認してください。",
+		"fetchingAddresses": "アドレスを取得するには、Polkassemblyがウォレット拡張機能にアクセスする必要があります。このトランザクションを承認してください。",
 		"goBack": "戻る",
 		"gotIt": "了解",
-		"hidePassword": "パスワードを隠す",
+		"hidePassword": "パスワードを非表示",
 		"showPassword": "パスワードを表示",
-		"pleaseConnectWallet": "Polkassemblyにウォレットを接続してください。",
-		"pleaseCheckConnectedAccounts": "拡張機能で接続されたアカウントを確認してください。",
+		"pleaseConnectWallet": "ウォレットをPolkassemblyに接続してください。",
+		"pleaseCheckConnectedAccounts": "拡張機能で接続されているアカウントを確認してください。",
+		"scanYourAddressQr": "アドレスQRコードをスキャン",
+		"scanYourAddressQrDescription1": "Polkadot Vaultアプリにログインしてください。",
+		"scanYourAddressQrDescription2": "{network}のアドレスQRコードをスキャンしてください。",
 		"linkedAccount": "リンクされたアカウント"
 	},
 	"AddressRelationsPicker": {
@@ -467,6 +470,7 @@
 		"preparePeriod": "準備期間",
 		"decisionPeriod": "決定期間",
 		"summary": "要約",
+		"summarise": "要約",
 		"aye": "賛成",
 		"nay": "反対",
 		"split": "分割",
@@ -486,6 +490,18 @@
 		"account": "アカウント",
 		"abstain": "棄権",
 		"onchainInfo": "オンチェーン情報",
+		"BeneficiariesDetails": {
+			"requested": "リクエスト済み",
+			"details": "詳細",
+			"immediately": "すぐに",
+			"in": "で",
+			"to": "に",
+			"totalEstimatedUSD": "合計推定USD相当",
+			"more": "もっと",
+			"requestedAmountDetails": "リクエストされた金額の詳細",
+			"showMore": "もっと表示",
+			"showLess": "もっと少なく表示"
+		},
 		"Poll": {
 			"endsOn": "終了日",
 			"endedOn": "終了日",
@@ -559,6 +575,7 @@
 			"method": "メソッド",
 			"proposalHash": "提案ハッシュ",
 			"preimage": "プレイメージ",
+			"details": "詳細",
 			"description": "説明",
 			"section": "セクション",
 			"name": "名前",
@@ -569,7 +586,13 @@
 			"fee": "料金",
 			"parentBountyIndex": "親報奨金インデックス",
 			"payee": "受益者",
-			"curator": "クレジット"
+			"curator": "クレジット",
+			"requested": "リクエスト済み",
+			"calls": "呼び出し",
+			"showMore": "もっと表示",
+			"showLess": "もっと少なく表示",
+			"call": "呼び出し",
+			"timeline": "タイムライン"
 		},
 		"deleteComment": "コメントを削除",
 		"deleteCommentConfirmation": "このコメントを削除してもよろしいですか？",
@@ -973,7 +996,13 @@
 		"verify": "確認",
 		"verified": "確認済み",
 		"pending": "保留中",
-		"CurrentJudgement": "現在の判定"
+		"CurrentJudgement": "現在の判定",
+		"clearIdentity": "アイデンティティをクリア",
+		"clearIdentitySuccess": "アイデンティティがクリアされました！",
+		"clearIdentitySuccessDescription": "アイデンティティが正常にクリアされました",
+		"clearIdentityFailed": "アイデンティティのクリアに失敗しました",
+		"clearIdentityFailedDescription": "アイデンティティのクリア中にエラーが発生しました",
+		"clearIdentityDescription": "アイデンティティをクリアしてもよろしいですか？"
 	},
 	"Overview": {
 		"month": "月",
@@ -1428,8 +1457,16 @@
 		"Amount": "金額"
 	},
 	"ConvictionSelector": {
-		"votes": "投票数",
+		"votes": "投票",
 		"lockingPeriod": "ロック期間",
-		"lockingPeriodDescription": "選択した乗数に応じて、投票後あなたの{tokenSymbol}は追加期間ロックされます。"
+		"lockingPeriodDescription": "選択した乗数に応じて、投票後も{tokenSymbol}は追加の期間ロックされます。"
+	},
+	"PolkadotVault": {
+		"signTransaction": "トランザクションに署名",
+		"addVaultAddress": "Polkadot Vaultアドレスを追加",
+		"scan": "スキャン",
+		"openVaultAppInYourPhone": "スマートフォンでVaultアプリを開いてください",
+		"scanTheQRHere": "VaultアプリでここのQRコードをスキャンしてください",
+		"scanTheSignatureQRInYourApp": "アプリで署名QRコードを確認し、トランザクションに署名してください"
 	}
 }
