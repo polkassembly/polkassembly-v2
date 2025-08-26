@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EVoteDecision, ENotificationStatus, EPostOrigin, EProposalType, IVoteData, EReactQueryKeys } from '@/_shared/types';
+import { EVoteDecision, ENotificationStatus, EPostOrigin, EProposalType, EReactQueryKeys } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -115,19 +115,7 @@ function VoteSuccessContent({
 	);
 }
 
-function VoteReferendum({
-	index,
-	track,
-	onClose,
-	proposalType,
-	existingVote
-}: {
-	index: string;
-	track?: EPostOrigin;
-	onClose: () => void;
-	proposalType: EProposalType;
-	existingVote?: IVoteData;
-}) {
+function VoteReferendum({ index, track, onClose, proposalType }: { index: string; track?: EPostOrigin; onClose: () => void; proposalType: EProposalType }) {
 	const { userPreferences } = useUserPreferences();
 	const [voteDecision, setVoteDecision] = useState(EVoteDecision.AYE);
 	const t = useTranslations();
@@ -208,6 +196,29 @@ function VoteReferendum({
 		queryFn: fetchAddressLockedBalance,
 		enabled: !!userPreferences.selectedAccount?.address && !!apiService
 	});
+
+	const fetchExistingVote = async () => {
+		if (!userPreferences.selectedAccount?.address) return null;
+		const { data, error } = await NextApiClientService.getPostVotesByAddresses({
+			proposalType,
+			index,
+			addresses: [userPreferences.selectedAccount.address]
+		});
+		if (error) throw new Error(error.message || 'Failed to fetch vote data');
+		if (!data) return null;
+		return data;
+	};
+
+	const { data: existingVoteData } = useQuery({
+		queryKey: ['existingVote', userPreferences.selectedAccount?.address, index],
+		queryFn: fetchExistingVote,
+		enabled: !!userPreferences.selectedAccount?.address
+	});
+
+	const existingVote = useMemo(() => {
+		if (!existingVoteData?.votes?.length) return null;
+		return existingVoteData.votes[0];
+	}, [existingVoteData]);
 
 	const isInvalidAmount = useMemo(() => {
 		return (
