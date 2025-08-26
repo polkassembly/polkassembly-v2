@@ -14,7 +14,7 @@ if (IS_NOTIFICATION_SERVICE_ENABLED && !NOTIFICATION_ENGINE_API_KEY) {
 }
 
 export class NotificationService {
-	private static NOTIFICATION_ENGINE_URL = 'https://us-central1-notification-engine-672e0.cloudfunctions.net/notify';
+	private static NOTIFICATION_ENGINE_URL = 'https://us-central1-notification-engine-672e0.cloudfunctions.net';
 
 	private static DEFAULT_NOTIFICATION_NETWORK = getSharedEnvVars().NEXT_PUBLIC_DEFAULT_NETWORK as ENetwork;
 
@@ -248,5 +248,40 @@ export class NotificationService {
 				message
 			}
 		});
+	}
+
+	static async GetChannelVerifyToken({ network = this.DEFAULT_NOTIFICATION_NETWORK, channel, userId }: { network?: ENetwork; channel: string; userId: string }): Promise<string> {
+		if (!IS_NOTIFICATION_SERVICE_ENABLED || !NOTIFICATION_ENGINE_API_KEY) {
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'IS_NOTIFICATION_SERVICE_ENABLED or NOTIFICATION_ENGINE_API_KEY not found');
+		}
+
+		try {
+			const res = await fetch(`${this.NOTIFICATION_ENGINE_URL}/getChannelVerifyToken`, {
+				body: JSON.stringify({
+					channel,
+					userId
+				}),
+				headers: this.firebaseFunctionsHeader(network),
+				method: 'POST'
+			});
+
+			const { data: verifyToken, error: verifyTokenError } = (await res.json()) as {
+				data: string;
+				error: string;
+			};
+
+			if (verifyTokenError) {
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, verifyTokenError);
+			}
+
+			if (!verifyToken) {
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'No verification token received');
+			}
+
+			return verifyToken;
+		} catch (error) {
+			console.error('Error generating verification token:', error);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error in generating token');
+		}
 	}
 }

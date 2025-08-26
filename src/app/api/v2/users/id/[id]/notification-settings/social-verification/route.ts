@@ -6,6 +6,7 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ENotificationChannel } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
+import { NotificationService } from '@/app/api/_api-services/notification_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { getReqBody } from '@/app/api/_api-utils/getReqBody';
@@ -13,7 +14,6 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import crypto from 'crypto';
 
 const zodParamsSchema = z.object({
 	id: z.coerce.number().refine((val) => ValidatorService.isValidUserId(val), 'Invalid user ID')
@@ -94,7 +94,10 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'User not found');
 	}
 
-	const verificationToken = crypto.randomBytes(16).toString('hex');
+	const verificationToken = await NotificationService.GetChannelVerifyToken({
+		channel: channel.toUpperCase(),
+		userId: user.username
+	});
 
 	const currentPreferences = user.notificationPreferences || {
 		channelPreferences: {},
