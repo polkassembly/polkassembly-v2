@@ -29,13 +29,15 @@ function VotingPowerCard({ votingPowerData }: VotingPowerCardProps) {
 
 	return (
 		<div className={cn(classes.statCard, classes.votingPowerCard)}>
-			<Image
-				src={VotingPowerChart}
-				alt='Voting Power'
-				width={89}
-				height={20}
-				className='mb-2'
-			/>
+			<div className='flex justify-center lg:justify-start'>
+				<Image
+					src={VotingPowerChart}
+					alt='Voting Power'
+					width={89}
+					height={20}
+					className='mb-2'
+				/>
+			</div>
 			<div className={classes.votingPowerBreakdown}>
 				<div className={classes.votingPowerItem}>
 					<div className={classes.votingPowerLabel}>

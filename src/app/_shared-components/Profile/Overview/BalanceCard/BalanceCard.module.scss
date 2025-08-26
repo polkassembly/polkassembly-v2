@@ -1,9 +1,9 @@
 .statCard {
-	@apply rounded-xl border border-border_grey bg-bg_modal p-3 shadow-sm;
+	@apply flex flex-col items-center rounded-xl border border-border_grey bg-bg_modal p-2 shadow-sm lg:items-start lg:p-3;
 }
 
 .statCardHeader {
-	@apply mb-2 flex items-center gap-2;
+	@apply mb-1 flex items-center gap-2;
 }
 
 .statCardIcon {
@@ -11,7 +11,7 @@
 }
 
 .statCardTitle {
-	@apply text-sm text-text_grey;
+	@apply text-xs text-text_grey;
 }
 
 .statCardValue {
@@ -19,15 +19,15 @@
 }
 
 .value {
-	@apply text-2xl font-semibold text-text_primary;
+	@apply text-xl font-semibold text-text_primary;
 }
 
 .unit {
-	@apply mb-1 text-sm text-text_grey;
+	@apply mb-1 text-xs text-text_grey;
 }
 
 .infoIcon {
-	@apply flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#B5B6BA] text-xs font-medium text-white;
+	@apply flex h-3 w-3 items-center justify-center rounded-full bg-[#B5B6BA] text-[10px] font-medium text-white;
 }
 
 // Dark mode support

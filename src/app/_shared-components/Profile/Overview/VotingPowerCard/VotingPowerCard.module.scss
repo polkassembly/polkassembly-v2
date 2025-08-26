@@ -1,9 +1,9 @@
 .statCard {
-	@apply rounded-xl border border-border_grey bg-bg_modal p-3 shadow-sm;
+	@apply rounded-xl border border-border_grey bg-bg_modal p-2 shadow-sm lg:p-3;
 }
 
 .votingPowerCard {
-	@apply md:col-span-2;
+	@apply md:col-span-3;
 }
 
 .statCardHeader {
@@ -19,7 +19,7 @@
 }
 
 .votingPowerBreakdown {
-	@apply flex items-center gap-4;
+	@apply flex items-center gap-3;
 }
 
 .votingPowerItem {
@@ -30,7 +30,7 @@
 	@apply flex items-center gap-1;
 
 	span {
-		@apply text-sm text-text_grey;
+		@apply text-xs text-text_grey;
 	}
 }
 
@@ -39,11 +39,11 @@
 }
 
 .value {
-	@apply text-2xl font-semibold text-text_primary;
+	@apply text-xl font-semibold text-text_primary;
 }
 
 .unit {
-	@apply mb-1 text-sm text-text_grey;
+	@apply mb-1 text-xs text-text_grey;
 }
 
 .divider {
@@ -51,7 +51,7 @@
 }
 
 .infoIcon {
-	@apply flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#B5B6BA] text-xs font-medium text-white;
+	@apply flex h-3 w-3 items-center justify-center rounded-full bg-[#B5B6BA] text-[10px] font-medium text-white;
 }
 
 // Responsive adjustments
