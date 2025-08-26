@@ -759,7 +759,8 @@
 		"your": "您的",
 		"voteIsIn": "投票已提交！要在评论中分享您支持的原因吗？",
 		"reuseGovernanceLock": "重用治理锁定",
-		"reuseAllLocks": "重用所有锁定"
+		"reuseAllLocks": "重用所有锁定",
+		"changeVote": "更改投票"
 	},
 	"Balance": {
 		"voteBalance": "投票余额",

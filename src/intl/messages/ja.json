@@ -759,7 +759,8 @@
 		"your": "あなたの",
 		"voteIsIn": "投票が完了しました！コメントでサポートする理由を共有しませんか？",
 		"reuseGovernanceLock": "ガバナンスロックを再利用",
-		"reuseAllLocks": "すべてのロックを再利用"
+		"reuseAllLocks": "すべてのロックを再利用",
+		"changeVote": "投票を変更"
 	},
 	"Balance": {
 		"voteBalance": "投票残高",

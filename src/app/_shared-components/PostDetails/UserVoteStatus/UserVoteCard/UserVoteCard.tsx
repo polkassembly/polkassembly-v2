@@ -21,6 +21,7 @@ import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { useToast } from '@/hooks/useToast';
 import { useUser } from '@/hooks/useUser';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { Button } from '../../../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../Dialog/Dialog';
 import { Separator } from '../../../Separator';
@@ -47,7 +48,7 @@ function VoteDetails({ voteData, showAddress = true }: { voteData: IVoteData; sh
 		compactNotation: true
 	};
 	return (
-		<div>
+		<div className='flex flex-col gap-y-2'>
 			{showAddress && (
 				<div className={classes.userVoteCardLayout}>
 					<h3 className={classes.userVoteCardTitleIcon}>
@@ -134,7 +135,12 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 						description: t('PostDetails.voteRemoved'),
 						status: ENotificationStatus.SUCCESS
 					});
-					queryClient.invalidateQueries({ queryKey: [EReactQueryKeys.USER_VOTES, proposalType, index, user.id] });
+					queryClient.setQueryData([EReactQueryKeys.USER_VOTES, proposalType, index, user.id], (oldData: IVoteHistoryData) => {
+						const existingVotes = [...(oldData?.votes || [])];
+						const filteredVotes = existingVotes.filter((vote) => getSubstrateAddress(vote.voterAddress) !== getSubstrateAddress(selectedAddress));
+						return { votes: filteredVotes };
+					});
+
 					setOpenRemoveConfirmModal(false);
 					setIsLoading(false);
 				},
@@ -160,7 +166,7 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 
 	return (
 		<div className={classes.userVoteCard}>
-			<div className={`${classes.userVoteCardLayout} mb-2`}>
+			<div className={`${classes.userVoteCardLayout}`}>
 				<h2 className={classes.userVoteCardTitle}>{t('PostDetails.myVote')}</h2>
 				{votes.length === 1 && (
 					<Button

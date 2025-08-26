@@ -45,9 +45,7 @@ function UserVoteStatus({ index, btnClassName, size = 'lg', track, proposalType 
 		refetchOnMount: true
 	});
 
-	const hasVoted = Array.isArray(voteData?.votes) && voteData.votes.length > 0;
-
-	return user && hasVoted ? (
+	return user && voteData && voteData.votes?.length > 0 ? (
 		<UserVoteCard
 			index={index}
 			size={size}
@@ -62,7 +60,6 @@ function UserVoteStatus({ index, btnClassName, size = 'lg', track, proposalType 
 			btnClassName={cn('w-full', btnClassName)}
 			size={size}
 			iconClassName='hidden'
-			hasVoted={hasVoted}
 			track={track}
 			proposalType={proposalType}
 		/>

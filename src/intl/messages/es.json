@@ -760,7 +760,8 @@
 		"your": "Tu",
 		"voteIsIn": "voto está registrado! ¿Te gustaría compartir por qué lo apoyas en un comentario?",
 		"reuseGovernanceLock": "Reutilizar bloqueo de gobernanza",
-		"reuseAllLocks": "Reutilizar todos los bloqueos"
+		"reuseAllLocks": "Reutilizar todos los bloqueos",
+		"changeVote": "Cambiar voto"
 	},
 	"Balance": {
 		"voteBalance": "Saldo de votación",

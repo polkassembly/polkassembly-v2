@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EVoteDecision, ENotificationStatus, EPostOrigin, EProposalType, EReactQueryKeys } from '@/_shared/types';
+import { EVoteDecision, ENotificationStatus, EPostOrigin, EProposalType, EReactQueryKeys, IVoteHistoryData } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils';
 import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { Ban, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { Button } from '../../Button';
 import BalanceInput from '../../BalanceInput/BalanceInput';
 import ChooseVote from './ChooseVote/ChooseVote';
@@ -30,7 +31,6 @@ import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAdd
 import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelationsPicker';
 import Address from '../../Profile/Address/Address';
 import AddComment from '../../PostComments/AddComment/AddComment';
-import classes from '../PostDetails.module.scss';
 
 function VoteSuccessContent({
 	decision,
@@ -251,19 +251,31 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 					});
 					setIsLoading(false);
 
-					// // Optimistic update - immediately update cache with new vote on success
-					// const optimisticVoteData = {
-					// decision: voteDecision,
-					// balanceValue: balance.toString(),
-					// voterAddress: userAddress,
-					// lockPeriod: conviction,
-					// createdAt: new Date(),
-					// selfVotingPower: balance.toString(),
-					// totalVotingPower: balance.toString(),
-					// delegatedVotingPower: '0'
-					// };
+					// Optimistic update - immediately update cache with new vote on success
+					const optimisticVoteData = {
+						decision: voteDecision,
+						balanceValue: balance.toString(),
+						voterAddress: userAddress,
+						lockPeriod: conviction,
+						createdAt: new Date(),
+						selfVotingPower: balance.toString(),
+						totalVotingPower: balance.toString(),
+						delegatedVotingPower: '0'
+					};
 
-					queryClient.invalidateQueries({ queryKey: [EReactQueryKeys.USER_VOTES, proposalType, index, user.id] });
+					queryClient.setQueryData([EReactQueryKeys.USER_VOTES, proposalType, index, user.id], (oldData: IVoteHistoryData) => {
+						const existingVotes = oldData?.votes || [];
+						const addressIndex = existingVotes.findIndex((vote) => getSubstrateAddress(vote.voterAddress) === getSubstrateAddress(userAddress));
+
+						if (addressIndex !== -1) {
+							// Replace existing vote for this address
+							const updatedVotes = [...existingVotes];
+							updatedVotes[`${addressIndex}`] = optimisticVoteData;
+							return { votes: updatedVotes };
+						}
+						// Add new vote
+						return { votes: [optimisticVoteData, ...existingVotes] };
+					});
 
 					onClose();
 					setOpenSuccessModal(true);
@@ -406,8 +418,8 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 					<div className='flex flex-col gap-y-3 rounded-xl bg-info_bg p-4'>
 						<p className='text-sm font-semibold text-text_primary'>{t('VoteReferendum.existingVote')}</p>
 						<p className='text-sm text-basic_text'>{t('VoteReferendum.existingVoteDescription')}</p>
-						<div className={classes.userVoteCardLayout}>
-							<h3 className={classes.userVoteCardTitleIcon}>
+						<div className='flex items-center justify-between'>
+							<h3 className='flex items-center gap-1 text-base font-semibold text-text_primary'>
 								{existingVote.decision === EVoteDecision.ABSTAIN && <Ban className='h-4 w-4 text-basic_text' />}
 								{existingVote.decision === EVoteDecision.AYE && <ThumbsUp className='h-4 w-4 text-basic_text' />}
 								{existingVote.decision === EVoteDecision.NAY && <ThumbsDown className='h-4 w-4 text-basic_text' />}
@@ -438,7 +450,7 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 					onClick={onVoteConfirm}
 					size='lg'
 				>
-					{t('VoteReferendum.confirm')}
+					{existingVote ? t('VoteReferendum.changeVote') : t('VoteReferendum.confirm')}
 				</Button>
 			</div>
 		</div>

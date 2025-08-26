@@ -796,7 +796,8 @@
 		"your": "Your",
 		"voteIsIn": "vote is in! Mind sharing why you support this in a comment?",
 		"reuseGovernanceLock": "Reuse Governance Lock",
-		"reuseAllLocks": "Reuse All Locks"
+		"reuseAllLocks": "Reuse All Locks",
+		"changeVote": "Change Vote"
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance",

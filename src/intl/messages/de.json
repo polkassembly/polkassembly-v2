@@ -758,7 +758,8 @@
 		"your": "Ihre",
 		"voteIsIn": "Stimme ist eingegangen! Möchten Sie in einem Kommentar erklären, warum Sie dafür sind?",
 		"reuseGovernanceLock": "Governance-Sperre wiederverwenden",
-		"reuseAllLocks": "Alle Sperren wiederverwenden"
+		"reuseAllLocks": "Alle Sperren wiederverwenden",
+		"changeVote": "Stimme ändern"
 	},
 	"Balance": {
 		"voteBalance": "Abstimmungsguthaben",
