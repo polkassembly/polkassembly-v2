@@ -459,6 +459,23 @@ export class OffChainDbService {
 		return FirestoreService.UpdateApiKeyUsage(apiKey, apiRoute);
 	}
 
+	// Profile Views methods
+	static async IncrementProfileView({ userId, viewerId, network, ipHash }: { userId: number; viewerId?: number; network: ENetwork; ipHash?: string }): Promise<void> {
+		return FirestoreService.IncrementProfileView({ userId, viewerId, network, ipHash });
+	}
+
+	static async GetProfileViews({
+		userId,
+		network,
+		timePeriod = 'all'
+	}: {
+		userId: number;
+		network: ENetwork;
+		timePeriod?: 'today' | 'week' | 'month' | 'all';
+	}): Promise<{ total: number; unique: number; period: string }> {
+		return FirestoreService.GetProfileViews({ userId, network, timePeriod });
+	}
+
 	static async AddNewUser(user: IUser) {
 		return FirestoreService.AddNewUser(user);
 	}

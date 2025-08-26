@@ -49,6 +49,7 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
+import dayjs from 'dayjs';
 import { FirestoreUtils } from './firestoreUtils';
 
 export class FirestoreService extends FirestoreUtils {
@@ -1836,5 +1837,77 @@ export class FirestoreService extends FirestoreUtils {
 				})
 				.filter((vote): vote is IPollVote => vote !== null);
 		});
+	}
+
+	// Profile Views methods
+	static async IncrementProfileView({ userId, viewerId, network, ipHash }: { userId: number; viewerId?: number; network: ENetwork; ipHash?: string }): Promise<void> {
+		const viewRecord = {
+			userId,
+			...(viewerId && { viewerId }),
+			...(ipHash && { ipHash }),
+			network,
+			timestamp: new Date(),
+			createdAt: new Date()
+		};
+
+		await this.profileViewsCollectionRef().add(viewRecord);
+	}
+
+	static async GetProfileViews({
+		userId,
+		network,
+		timePeriod = 'all'
+	}: {
+		userId: number;
+		network: ENetwork;
+		timePeriod?: 'today' | 'week' | 'month' | 'all';
+	}): Promise<{ total: number; unique: number; period: string }> {
+		let startDate: Date | null = null;
+
+		switch (timePeriod) {
+			case 'today':
+				startDate = dayjs().startOf('day').toDate();
+				break;
+			case 'week':
+				startDate = dayjs().subtract(7, 'day').toDate();
+				break;
+			case 'month':
+				startDate = dayjs().subtract(1, 'month').toDate();
+				break;
+			default:
+				startDate = null;
+		}
+
+		let query = this.profileViewsCollectionRef().where('userId', '==', userId).where('network', '==', network);
+
+		if (startDate) {
+			query = query.where('timestamp', '>=', startDate);
+		}
+
+		const snapshot = await query.get();
+		const views = snapshot.docs.map((doc) => doc.data());
+
+		// Calculate unique views (by viewerId or ipHash)
+		const uniqueViewers = new Set();
+		views.forEach((view) => {
+			if (view.viewerId) {
+				uniqueViewers.add(view.viewerId);
+			} else if (view.ipHash) {
+				uniqueViewers.add(view.ipHash);
+			}
+		});
+
+		const periodLabels = {
+			today: 'Today',
+			week: 'This Week',
+			month: 'This Month',
+			all: 'All Time'
+		};
+
+		return {
+			total: views.length,
+			unique: uniqueViewers.size,
+			period: periodLabels[timePeriod]
+		};
 	}
 }

@@ -11,6 +11,7 @@ import { Skeleton } from '../../Skeleton';
 import classes from './ProfileOverview.module.scss';
 import VotingPowerCard from './VotingPowerCard/VotingPowerCard';
 import BalanceCard from './BalanceCard/BalanceCard';
+import ProfileViewsTracker from './ProfileViewsTracker/ProfileViewsTracker';
 
 interface ProfileOverviewProps {
 	profileData?: IPublicUser;
@@ -63,6 +64,7 @@ function ProfileOverview({ profileData, address }: ProfileOverviewProps) {
 					availableBalance={userBalanceData.available}
 					delegatedBalance={userBalanceData.delegated}
 				/>
+				<ProfileViewsTracker userId={profileData?.id} />
 			</div>
 		</div>
 	);
