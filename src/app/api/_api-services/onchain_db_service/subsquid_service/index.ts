@@ -367,14 +367,14 @@ export class SubsquidService extends SubsquidUtils {
 		orderBy?: EVoteSortOptions;
 		votesType?: EVotesDisplayType;
 	}) {
-		const voterAddresses = addresses ? addresses.map((address) => getEncodedAddress(address, network) ?? undefined) : undefined;
+		const voterAddresses = addresses ? addresses.map((address) => getEncodedAddress(address, network)) : undefined;
 
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const subsquidDecision = decision ? this.convertVoteDecisionToSubsquidFormat({ decision }) : null;
 		const subsquidDecisionIn = decision ? (votesType === EVotesDisplayType.NESTED ? this.convertVoteDecisionToSubsquidFormatArray({ decision }) : [subsquidDecision]) : null;
 
-		const addressesWithoutUndefined = voterAddresses?.filter((address) => address !== undefined);
+		const addressesWithoutUndefined = voterAddresses?.filter((address) => address !== undefined && address !== null);
 
 		const query = this.getVotesQuery({
 			proposalType,
