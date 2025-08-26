@@ -24,6 +24,7 @@ import RequestJudgement from './RequestJudgement/RequestJudgement';
 import IdentitySuccessScreen from './IdentitySuccessScreen/IdentitySuccessScreen';
 import TeleportToPeopleChain from '../TeleportFunds/TeleportToPeopleChain';
 import SetIdentityForm from './SetIdentityForm/SetIdentityForm';
+import ClearIdentity from './ClearIdentity/ClearIdentity';
 
 function SetIdentity() {
 	const t = useTranslations();
@@ -122,10 +123,26 @@ function SetIdentity() {
 				}}
 			/>
 		</div>
+	) : step === ESetIdentityStep.CLEAR_IDENTITY ? (
+		<div className='flex flex-1 flex-col gap-y-4'>
+			<div>
+				<Button
+					variant='ghost'
+					size='sm'
+					className='text-sm text-text_primary'
+					leftIcon={<ArrowLeft />}
+					onClick={() => setStep(ESetIdentityStep.SET_IDENTITY_FORM)}
+				>
+					{t('SetIdentity.setIdentity')}
+				</Button>
+			</div>
+			<ClearIdentity />
+		</div>
 	) : (
 		<SetIdentityForm
 			registrarFee={registrarFee || BN_ZERO}
 			onTeleport={() => setStep(ESetIdentityStep.TELEPORT_TO_PEOPLE_CHAIN)}
+			onClearIdentity={() => setStep(ESetIdentityStep.CLEAR_IDENTITY)}
 			onSuccess={(values) => {
 				setIdentitySuccessValues(values);
 				setStep(ESetIdentityStep.IDENTITY_SUCCESS);

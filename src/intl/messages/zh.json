@@ -97,16 +97,19 @@
 	},
 	"AddressDropdown": {
 		"fallbackText": "请选择钱包",
-		"chooseLinkedAccount": "选择链接的账户",
+		"chooseLinkedAccount": "选择账户",
 		"noAccountsFound": "未找到账户",
 		"selectWallet": "请选择钱包",
 		"fetchingAddresses": "为了获取您的地址，Polkassembly需要访问您的钱包扩展。请授权此交易。",
 		"goBack": "返回",
-		"gotIt": "知道了",
+		"gotIt": "明白了",
 		"hidePassword": "隐藏密码",
 		"showPassword": "显示密码",
 		"pleaseConnectWallet": "请将您的钱包连接到Polkassembly。",
-		"pleaseCheckConnectedAccounts": "请检查扩展中的已连接账户。",
+		"pleaseCheckConnectedAccounts": "请检查扩展中已连接的账户。",
+		"scanYourAddressQr": "扫描您的地址二维码",
+		"scanYourAddressQrDescription1": "登录您的Polkadot Vault应用。",
+		"scanYourAddressQrDescription2": "扫描您的{network}地址二维码。",
 		"linkedAccount": "链接的账户"
 	},
 	"AddressRelationsPicker": {
@@ -467,6 +470,7 @@
 		"preparePeriod": "准备期",
 		"decisionPeriod": "决策期",
 		"summary": "摘要",
+		"summarise": "摘要",
 		"aye": "赞成",
 		"nay": "反对",
 		"split": "分割",
@@ -485,6 +489,18 @@
 		"capital": "资本",
 		"account": "账户",
 		"abstain": "弃权",
+		"BeneficiariesDetails": {
+			"requested": "已请求",
+			"details": "详情",
+			"immediately": "立即",
+			"in": "在",
+			"to": "到",
+			"totalEstimatedUSD": "总计估计美元等值",
+			"more": "更多",
+			"requestedAmountDetails": "已请求金额详情",
+			"showMore": "显示更多",
+			"showLess": "显示更少"
+		},
 		"Poll": {
 			"endsOn": "结束于",
 			"endedOn": "结束于",
@@ -559,6 +575,7 @@
 			"proposalHash": "提案哈希",
 			"preimage": "预映像",
 			"description": "描述",
+			"details": "详情",
 			"section": "部分",
 			"name": "名称",
 			"value": "值",
@@ -568,7 +585,13 @@
 			"fee": "费用",
 			"parentBountyIndex": "父赏金索引",
 			"payee": "受益者",
-			"curator": " curator"
+			"curator": " curator",
+			"requested": "已请求",
+			"calls": "调用",
+			"showMore": "显示更多",
+			"showLess": "显示更少",
+			"call": "调用",
+			"timeline": "时间线"
 		},
 		"onchainInfo": "链上信息",
 		"deleteComment": "删除评论",
@@ -977,7 +1000,13 @@
 		"verify": "验证",
 		"verified": "已验证",
 		"pending": "待处理",
-		"CurrentJudgement": "当前判定"
+		"CurrentJudgement": "当前判定",
+		"clearIdentity": "清除身份",
+		"clearIdentitySuccess": "身份已清除！",
+		"clearIdentitySuccessDescription": "您的身份已成功清除",
+		"clearIdentityFailed": "清除身份失败",
+		"clearIdentityFailedDescription": "清除您的身份时出现错误",
+		"clearIdentityDescription": "您确定要清除您的身份吗？"
 	},
 	"Bounties": {
 		"onchainBounties": "链上赏金",
@@ -1435,5 +1464,13 @@
 		"votes": "投票",
 		"lockingPeriod": "锁定期",
 		"lockingPeriodDescription": "根据您选择的乘数，您的{tokenSymbol}在投票后将继续锁定额外时间。"
+	},
+	"PolkadotVault": {
+		"signTransaction": "签署交易",
+		"addVaultAddress": "添加Polkadot Vault地址",
+		"scan": "扫描",
+		"openVaultAppInYourPhone": "在您的手机上打开Vault应用",
+		"scanTheQRHere": "使用Vault应用扫描此处的二维码",
+		"scanTheSignatureQRInYourApp": "在您的应用中验证签名二维码并签署交易"
 	}
 }

@@ -19,6 +19,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { cn } from '@/lib/utils';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { Ban, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { Button } from '../../Button';
 import BalanceInput from '../../BalanceInput/BalanceInput';
@@ -139,6 +140,8 @@ function VoteReferendum({
 	const { toast } = useToast();
 	const network = getCurrentNetwork();
 
+	const { setVaultQrState } = usePolkadotVault();
+
 	const [reuseLock, setReuseLock] = useState<BN | null>(null);
 
 	const { setOpenSuccessModal, setSuccessModalContent } = useSuccessModal();
@@ -212,7 +215,7 @@ function VoteReferendum({
 	}, [ayeVoteValue, balance, nayVoteValue, abstainVoteValue, voteDecision]);
 
 	const onVoteConfirm = async () => {
-		if (!apiService || !userPreferences.selectedAccount?.address) return;
+		if (!apiService || !userPreferences.selectedAccount?.address || !userPreferences.wallet) return;
 
 		if (isInvalidAmount) return;
 
@@ -223,6 +226,8 @@ function VoteReferendum({
 
 			await apiService.voteReferendum({
 				selectedAccount: userPreferences.selectedAccount,
+				wallet: userPreferences.wallet,
+				setVaultQrState,
 				address: userAddress,
 				onSuccess: () => {
 					toast({

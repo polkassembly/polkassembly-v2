@@ -29,6 +29,7 @@ interface AddressProps {
 	textClassName?: string;
 	redirectToProfile?: boolean;
 	disableTooltip?: boolean;
+	showOnlyIdenticon?: boolean;
 	wrapperClassName?: string;
 }
 
@@ -42,6 +43,7 @@ function Address({
 	textClassName,
 	redirectToProfile,
 	disableTooltip = false,
+	showOnlyIdenticon = false,
 	wrapperClassName
 }: AddressProps) {
 	const network = getCurrentNetwork();
@@ -104,6 +106,7 @@ function Address({
 				showIdenticon={showIdenticon}
 				textClassName={textClassName}
 				redirectToProfile={redirectToProfile}
+				showOnlyIdenticon={showOnlyIdenticon}
 			/>
 		);
 	}
@@ -124,6 +127,7 @@ function Address({
 								showIdenticon={showIdenticon}
 								textClassName={textClassName}
 								redirectToProfile={redirectToProfile}
+								showOnlyIdenticon={showOnlyIdenticon}
 							/>
 						</div>
 					</TooltipTrigger>

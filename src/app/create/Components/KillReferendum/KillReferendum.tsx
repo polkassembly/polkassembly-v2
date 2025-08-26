@@ -28,6 +28,7 @@ import { SquareArrowOutUpRight, TriangleAlert } from 'lucide-react';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 
 function KillReferendum({ onSuccess }: { onSuccess: (proposalId: number) => void }) {
 	const t = useTranslations();
@@ -42,6 +43,8 @@ function KillReferendum({ onSuccess }: { onSuccess: (proposalId: number) => void
 
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
+
+	const { setVaultQrState } = usePolkadotVault();
 
 	const fetchProposalDetails = async (refId?: number) => {
 		if (!refId) return null;
@@ -94,7 +97,7 @@ function KillReferendum({ onSuccess }: { onSuccess: (proposalId: number) => void
 	);
 
 	const createProposal = async () => {
-		if (!apiService || !userPreferences.selectedAccount?.address || !tx) {
+		if (!apiService || !userPreferences.selectedAccount?.address || !userPreferences.wallet || !tx) {
 			return;
 		}
 
@@ -102,6 +105,8 @@ function KillReferendum({ onSuccess }: { onSuccess: (proposalId: number) => void
 
 		apiService.createProposal({
 			address: userPreferences.selectedAccount.address,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
 			track: EPostOrigin.REFERENDUM_KILLER,
 			extrinsicFn: tx,
 			enactment: selectedEnactment,

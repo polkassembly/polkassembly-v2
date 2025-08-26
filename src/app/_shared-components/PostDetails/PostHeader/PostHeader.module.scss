@@ -42,3 +42,15 @@
 		display: none;
 	}
 }
+
+.tabTrigger {
+	.summariseTabContent {
+		@apply flex items-center gap-x-1 rounded-full bg-text_pink/10 px-4 py-1.5 text-text_pink;
+	}
+	&[data-state='active'] .summariseTabContent {
+		@apply bg-bg_pink text-white;
+	}
+	&[data-state='active'] .summariseTabIcon {
+		filter: brightness(0) invert(1);
+	}
+}

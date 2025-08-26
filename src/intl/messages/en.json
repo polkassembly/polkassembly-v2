@@ -107,6 +107,9 @@
 		"showPassword": "Show Password",
 		"pleaseConnectWallet": "Please connect your wallet to Polkassembly.",
 		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension.",
+		"scanYourAddressQr": "Scan Your Address QR",
+		"scanYourAddressQrDescription1": "Login to your Polkadot Vault App.",
+		"scanYourAddressQrDescription2": "Scan your {network} address QR.",
 		"linkedAccount": "Linked Account"
 	},
 	"AddressRelationsPicker": {
@@ -471,6 +474,7 @@
 		"preparePeriod": "Prepare Period",
 		"decisionPeriod": "Decision Period",
 		"summary": "Summary",
+		"summarise": "SUMMARISE",
 		"analytics": "Analytics",
 		"aye": "Aye",
 		"nay": "Nay",
@@ -503,6 +507,18 @@
 		"noVoteForAddress": "No vote found for this address",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
+		"BeneficiariesDetails": {
+			"requested": "Requested",
+			"details": "Details",
+			"immediately": "immediately",
+			"in": "in",
+			"to": "to",
+			"totalEstimatedUSD": "Total estimated USD equivalent",
+			"more": "more",
+			"requestedAmountDetails": "Requested Amount Details",
+			"showMore": "Show More",
+			"showLess": "Show Less"
+		},
 		"VotesBubble": {
 			"nested": "Nested",
 			"flattened": "Flattened",
@@ -581,6 +597,7 @@
 			"proposalHash": "Proposal Hash",
 			"preimage": "Preimage",
 			"description": "Description",
+			"details": "Details",
 			"section": "Section",
 			"name": "Name",
 			"value": "Value",
@@ -597,7 +614,13 @@
 			"updatedAtBlock": "Updated At Block",
 			"enactmentAtBlock": "Enactment At Block",
 			"enactmentAfterBlock": "Enactment After Block",
-			"trackNumber": "Track Number"
+			"trackNumber": "Track Number",
+			"requested": "Requested",
+			"calls": "Calls",
+			"showMore": "Show More",
+			"showLess": "Show Less",
+			"call": "Call",
+			"timeline": "Timeline"
 		},
 		"ProposalType": {
 			"discussion": "Discussion",
@@ -1027,7 +1050,13 @@
 		"verify": "Verify",
 		"verified": "Verified",
 		"pending": "Pending",
-		"CurrentJudgement": "Current Judgement"
+		"CurrentJudgement": "Current Judgement",
+		"clearIdentity": "Clear Identity",
+		"clearIdentitySuccess": "Identity cleared!",
+		"clearIdentitySuccessDescription": "Your identity has been cleared successfully",
+		"clearIdentityFailed": "Failed to clear identity",
+		"clearIdentityFailedDescription": "There was an error while clearing your identity",
+		"clearIdentityDescription": "Are you sure you want to clear your identity?"
 	},
 	"Bounties": {
 		"onchainBounties": "On-chain Bounties",
@@ -1472,5 +1501,13 @@
 		"votes": "Votes",
 		"lockingPeriod": "Locking period",
 		"lockingPeriodDescription": "Your {tokenSymbol} will stay locked for extra time after voting, depending on the multiplier you choose."
+	},
+	"PolkadotVault": {
+		"signTransaction": "Sign Transaction",
+		"addVaultAddress": "Add Polkadot Vault Address",
+		"scan": "Scan",
+		"openVaultAppInYourPhone": "Open the Vault app in your phone",
+		"scanTheQRHere": "Scan the QR here from the Vault app",
+		"scanTheSignatureQRInYourApp": "Verify the signature QR in your app and sign the transaction"
 	}
 }

@@ -1,0 +1,83 @@
+.beneficiariesWrapper {
+	@apply flex flex-col rounded-xl bg-bg_modal p-6 shadow-lg;
+}
+
+.beneficiariesTitle {
+	@apply text-xl font-semibold text-text_primary;
+}
+.beneficiariesHeader {
+	@apply flex items-center justify-between;
+}
+.beneficiariesButton {
+	@apply text-sm text-text_pink;
+}
+.beneficiariesList {
+	@apply mt-4 flex flex-col gap-2;
+}
+.beneficiariesSeeMore {
+	@apply flex items-center gap-1 text-sm text-basic_text;
+}
+.beneficiariesSeeMoreButton {
+	@apply p-0 text-sm text-text_pink;
+}
+.beneficiariesDetailsDialogContent {
+	@apply min-w-[500px] max-w-max p-6 max-lg:w-full max-lg:min-w-full lg:min-w-[700px] xl:min-w-[800px] 2xl:min-w-[900px];
+}
+.beneficiariesDetailsDialogContentHeader {
+	@apply mb-2 flex items-center justify-between text-xl font-bold text-text_primary dark:text-white max-sm:flex-col max-sm:gap-2;
+}
+.beneficiariesDetailsDialogContentHeaderAmount {
+	@apply flex items-center gap-1;
+}
+.beneficiariesDialogTotalEstimatedUSD {
+	@apply text-base font-bold text-basic_text;
+}
+.beneficiariesDetailsDialogContentList {
+	@apply flex max-h-[60vh] flex-col gap-3 overflow-y-auto;
+}
+.beneficiariesDialogListItem {
+	@apply flex justify-between gap-8 max-sm:flex-col max-sm:gap-2;
+}
+.beneficiariesDialogListItemAmount {
+	@apply text-base font-semibold text-text_primary dark:text-white;
+}
+.beneficiariesDialogListItemAmountUSD {
+	@apply rounded-sm bg-bg_code p-1 text-xs text-basic_text;
+}
+
+.beneficiariesExpireIn {
+	@apply text-sm text-basic_text;
+}
+
+.beneficiariesSkeleton {
+	@apply mt-6 flex flex-col gap-3;
+}
+
+.beneficiariesSkeletonItemAmount {
+	@apply h-8 w-full;
+}
+
+.beneficiariesSkeletonItemExpireIn {
+	@apply h-8 w-[100px];
+}
+.beneficiaryItem {
+	@apply flex flex-col gap-2;
+}
+.beneficiaryItemHeader {
+	@apply flex justify-between gap-2;
+}
+.beneficiaryItemHeaderAmount {
+	@apply flex items-center gap-2;
+}
+.beneficiaryItemHeaderAmountContent {
+	@apply flex items-center gap-2;
+}
+.beneficiaryItemHeaderAmountContentText {
+	@apply text-base font-bold text-text_primary dark:text-white;
+}
+.beneficiaryItemHeaderExpireIn {
+	@apply flex items-center gap-1;
+}
+.beneficiaryItemHeaderExpireInText {
+	@apply text-sm text-basic_text;
+}

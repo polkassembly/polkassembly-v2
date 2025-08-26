@@ -7,7 +7,8 @@
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
-import { TypeDef } from '@polkadot/types/types';
+import { SignerResult, TypeDef } from '@polkadot/types/types';
+import { HexString } from '@polkadot/util/types';
 import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
@@ -16,6 +17,17 @@ export enum ENetwork {
 	WESTEND = 'westend',
 	PASEO = 'paseo',
 	CERE = 'cere'
+}
+
+export enum ENetworkSocial {
+	HOME = 'home',
+	TWITTER = 'twitter',
+	DISCORD = 'discord',
+	GITHUB = 'github',
+	YOUTUBE = 'youtube',
+	REDDIT = 'reddit',
+	TELEGRAM = 'telegram',
+	SUBSCAN = 'subscan'
 }
 
 export enum EGovType {
@@ -156,6 +168,7 @@ export enum EWallet {
 	POLKAGATE = 'polkagate',
 	NOVAWALLET = 'nova',
 	MIMIR = 'mimir',
+	POLKADOT_VAULT = 'polkadot-vault',
 	OTHER = ''
 	// METAMASK = 'metamask',
 	// WALLETCONNECT = 'walletconnect',
@@ -554,6 +567,7 @@ export interface IBeneficiary {
 	amount: string;
 	assetId?: string | null;
 	validFromBlock?: string;
+	usdAmount?: string;
 }
 
 export interface IBeneficiaryInput extends IBeneficiary {
@@ -756,8 +770,8 @@ export enum EAssets {
 
 export enum EPostDetailsTab {
 	DESCRIPTION = 'description',
-	TIMELINE = 'timeline',
 	ONCHAIN_INFO = 'onchain_info',
+	SUMMARISE = 'summarise',
 	POST_ANALYTICS = 'post_analytics'
 }
 
@@ -1011,6 +1025,9 @@ export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart',
 	COMMENTS = 'comments',
 	POST_DETAILS = 'postDetails',
+	ACCOUNTS = 'accounts',
+	IDENTITY_INFO = 'identityInfo',
+	TOKENS_USD_PRICE = 'tokensUsdPrice',
 	USER_VOTES = 'userVotes'
 }
 
@@ -1131,6 +1148,8 @@ export interface ITreasuryStats {
 	};
 	nativeTokenUsdPrice?: string;
 	nativeTokenUsdPrice24hChange?: string;
+	dedTokenUsdPrice?: string;
+	dedTokenUsdPrice24hChange?: string;
 	[key: string]: unknown;
 }
 
@@ -1378,7 +1397,8 @@ export enum ESetIdentityStep {
 	SET_IDENTITY_FORM = 'SET_IDENTITY_FORM',
 	REQUEST_JUDGEMENT = 'REQUEST_JUDGEMENT',
 	IDENTITY_SUCCESS = 'IDENTITY_SUCCESS',
-	TELEPORT_TO_PEOPLE_CHAIN = 'TELEPORT_TO_PEOPLE_CHAIN'
+	TELEPORT_TO_PEOPLE_CHAIN = 'TELEPORT_TO_PEOPLE_CHAIN',
+	CLEAR_IDENTITY = 'CLEAR_IDENTITY'
 }
 
 export interface IAnalytics {
@@ -1471,3 +1491,24 @@ export type IPostBubbleVotes = {
 		status: EProposalStatus;
 	};
 };
+
+export interface IVaultScannedAddress {
+	content: string;
+	isAddress: boolean;
+	genesisHash: HexString | null;
+	name?: string;
+}
+
+export interface IVaultQrState {
+	open: boolean;
+	isQrHashed: boolean;
+	qrAddress: string;
+	qrPayload: Uint8Array;
+	qrResolve?: (result: SignerResult) => void;
+	qrReject?: (error: Error) => void;
+}
+
+export enum EVoteBubbleTabs {
+	Bubble = 'bubble',
+	Graph = 'graph'
+}
