@@ -162,12 +162,14 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid verification token');
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const { verification_token: _unusedToken, ...channelPreferenceWithoutToken } = channelPreference;
+
 	const updatedChannelPreference = {
-		...channelPreference,
+		...channelPreferenceWithoutToken,
 		enabled: true,
 		verified: true,
-		handle,
-		verification_token: undefined
+		handle
 	};
 
 	const updatedPreferences = {
