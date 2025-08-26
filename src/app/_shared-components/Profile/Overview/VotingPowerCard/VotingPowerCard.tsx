@@ -6,13 +6,17 @@
 
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { BN } from '@polkadot/util';
 import VotingPowerChart from '@assets/profile/voting-power-chart.svg';
 import classes from './VotingPowerCard.module.scss';
 
 interface VotingPowerData {
-	total: number;
-	self: number;
-	delegated: number;
+	total: BN;
+	self: BN;
+	delegated: BN;
 }
 
 interface VotingPowerCardProps {
@@ -20,6 +24,9 @@ interface VotingPowerCardProps {
 }
 
 function VotingPowerCard({ votingPowerData }: VotingPowerCardProps) {
+	const network = getCurrentNetwork();
+	const { tokenSymbol } = NETWORKS_DETAILS[network];
+
 	return (
 		<div className={cn(classes.statCard, classes.votingPowerCard)}>
 			<Image
@@ -36,8 +43,10 @@ function VotingPowerCard({ votingPowerData }: VotingPowerCardProps) {
 						<div className={classes.infoIcon}>?</div>
 					</div>
 					<div className={classes.votingPowerValue}>
-						<span className={classes.value}>{votingPowerData.total.toFixed(1)}</span>
-						<span className={classes.unit}>DOT</span>
+						<span className={classes.value}>
+							{formatBnBalance(votingPowerData.total, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 1, compactNotation: true }, network)}
+						</span>
+						<span className={classes.unit}>{tokenSymbol}</span>
 					</div>
 				</div>
 				<div className={classes.divider} />
@@ -47,8 +56,10 @@ function VotingPowerCard({ votingPowerData }: VotingPowerCardProps) {
 						<div className={classes.infoIcon}>?</div>
 					</div>
 					<div className={classes.votingPowerValue}>
-						<span className={classes.value}>{votingPowerData.self.toFixed(1)}</span>
-						<span className={classes.unit}>DOT</span>
+						<span className={classes.value}>
+							{formatBnBalance(votingPowerData.self, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 1, compactNotation: true }, network)}
+						</span>
+						<span className={classes.unit}>{tokenSymbol}</span>
 					</div>
 				</div>
 				<div className={classes.divider} />
@@ -58,8 +69,10 @@ function VotingPowerCard({ votingPowerData }: VotingPowerCardProps) {
 						<div className={classes.infoIcon}>?</div>
 					</div>
 					<div className={classes.votingPowerValue}>
-						<span className={classes.value}>{votingPowerData.delegated.toFixed(1)}</span>
-						<span className={classes.unit}>DOT</span>
+						<span className={classes.value}>
+							{formatBnBalance(votingPowerData.delegated, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 1, compactNotation: true }, network)}
+						</span>
+						<span className={classes.unit}>{tokenSymbol}</span>
 					</div>
 				</div>
 			</div>

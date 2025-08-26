@@ -11,12 +11,12 @@ import { usePolkadotApiService } from './usePolkadotApiService';
 
 interface UserBalanceData {
 	votingPower: {
-		total: number;
-		self: number;
-		delegated: number;
+		total: BN;
+		self: BN;
+		delegated: BN;
 	};
-	available: number;
-	delegated: number;
+	available: BN;
+	delegated: BN;
 }
 
 // Utility function to calculate voting power (similar to existing pattern in codebase)
@@ -25,11 +25,6 @@ const calculateVotingPower = (balance: string, lockPeriod: number): BN => {
 		return new BN(balance).mul(new BN(lockPeriod));
 	}
 	return new BN(balance).div(new BN('10'));
-};
-
-// Utility function to convert from planck to DOT
-const planckToDOT = (planckValue: BN): number => {
-	return parseFloat(planckValue.toString()) / 10 ** 10;
 };
 
 const getUpdatedDelegationData = (delegationData: ITrackDelegationStats[]) => {
@@ -97,12 +92,12 @@ export const useUserBalanceData = (address?: string) => {
 	// Calculate user balance data
 	const userBalanceData: UserBalanceData = {
 		votingPower: {
-			total: 0,
-			self: 0,
-			delegated: 0
+			total: new BN(0),
+			self: new BN(0),
+			delegated: new BN(0)
 		},
-		available: 0,
-		delegated: 0
+		available: new BN(0),
+		delegated: new BN(0)
 	};
 
 	if (balanceData && delegationData) {
@@ -112,19 +107,19 @@ export const useUserBalanceData = (address?: string) => {
 		const totalDelegated = new BN(delegationData.totalDelegated || '0');
 
 		// Self voting power is the locked balance
-		userBalanceData.votingPower.self = planckToDOT(lockedBalance);
+		userBalanceData.votingPower.self = lockedBalance;
 
 		// Delegated voting power is what others have delegated to this address
-		userBalanceData.votingPower.delegated = planckToDOT(totalReceived);
+		userBalanceData.votingPower.delegated = totalReceived;
 
 		// Total voting power is self + delegated
-		userBalanceData.votingPower.total = userBalanceData.votingPower.self + userBalanceData.votingPower.delegated;
+		userBalanceData.votingPower.total = lockedBalance.add(totalReceived);
 
 		// Available balance is free balance
-		userBalanceData.available = planckToDOT(freeBalance);
+		userBalanceData.available = freeBalance;
 
 		// Delegated balance is what this address has delegated to others
-		userBalanceData.delegated = planckToDOT(totalDelegated);
+		userBalanceData.delegated = totalDelegated;
 	}
 
 	return {
