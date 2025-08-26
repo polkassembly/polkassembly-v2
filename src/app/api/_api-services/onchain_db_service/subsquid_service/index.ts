@@ -374,11 +374,13 @@ export class SubsquidService extends SubsquidUtils {
 		const subsquidDecision = decision ? this.convertVoteDecisionToSubsquidFormat({ decision }) : null;
 		const subsquidDecisionIn = decision ? (votesType === EVotesDisplayType.NESTED ? this.convertVoteDecisionToSubsquidFormatArray({ decision }) : [subsquidDecision]) : null;
 
+		const addressesWithoutUndefined = voterAddresses?.filter((address) => address !== undefined);
+
 		const query = this.getVotesQuery({
 			proposalType,
 			subsquidDecision,
 			votesType,
-			voterAddresses: voterAddresses?.filter((address) => address !== undefined)
+			voterAddresses: addressesWithoutUndefined
 		});
 
 		const variables =
