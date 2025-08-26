@@ -360,9 +360,9 @@ export class SubsquidQueries {
 
 	// vote listing queries
 
-	protected static GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX = ({ voters }: { voters?: string[] }) => `
-		query GetVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!) {
-			votes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq} ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC, limit: $limit, offset: $offset) {
+	protected static GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX = () => `
+		query GetVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!, $voter_in: [String!]) {
+			votes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, voter_in: $voter_in}, orderBy: id_ASC, limit: $limit, offset: $offset) {
 				id
 				balance {
 					... on StandardVoteBalance {
@@ -380,18 +380,18 @@ export class SubsquidQueries {
 				voter
 			}
 
-			yesCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: yes, ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC) {
+			yesCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: yes, voter_in: $voter_in}, orderBy: id_ASC) {
 				totalCount
 			}
-				noCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: no, ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC) {
+				noCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: no, voter_in: $voter_in}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
 	`;
 
-	protected static GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX = ({ voters }: { voters?: string[] }) => `
-		query GetConvictionVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!, $orderBy: [ConvictionVoteOrderByInput!] = createdAtBlock_DESC) {
-			votes: convictionVotes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: $orderBy, limit: $limit, offset: $offset) {
+	protected static GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX = () => `
+		query GetConvictionVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!, $voter_in: [String!], $orderBy: [ConvictionVoteOrderByInput!] = createdAtBlock_DESC) {
+			votes: convictionVotes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, voter_in: $voter_in}, orderBy: $orderBy, limit: $limit, offset: $offset) {
 				id
 				balance {
 					... on StandardVoteBalance {
@@ -428,21 +428,21 @@ export class SubsquidQueries {
 					decision
 				}
 			}
-			yesCount:  convictionVotesConnection(where: {decision_eq: yes,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC) {
+			yesCount:  convictionVotesConnection(where: {decision_eq: yes,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, voter_in: $voter_in}, orderBy: id_ASC) {
 				totalCount
 			}
-			noCount:  convictionVotesConnection(where: {decision_eq: no,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC) {
+			noCount:  convictionVotesConnection(where: {decision_eq: no,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, voter_in: $voter_in}, orderBy: id_ASC) {
 				totalCount
 			}
-			abstainCount:  convictionVotesConnection(where: {decision_eq: abstain,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC) {
+			abstainCount:  convictionVotesConnection(where: {decision_eq: abstain,  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, voter_in: $voter_in}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
 	`;
 
-	protected static GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH = ({ voters }: { voters?: string[] }) => `
-		query GetVotesListingByProposalTypeAndHash($type_eq: ProposalType!, $hash_eq: String!, $limit: Int!, $offset: Int!) {
-			votes(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq} ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC, limit: $limit, offset: $offset) {
+	protected static GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH = () => `
+		query GetVotesListingByProposalTypeAndHash($type_eq: ProposalType!, $hash_eq: String!, $limit: Int!, $offset: Int!, $voter_in: [String!]) {
+			votes(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, voter_in: $voter_in}, orderBy: id_ASC, limit: $limit, offset: $offset) {
 				id
 				balance {
 					... on StandardVoteBalance {
@@ -460,18 +460,18 @@ export class SubsquidQueries {
 				voter
 			}
 
-			yesCount: votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: yes, ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC) {
+			yesCount: votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: yes, voter_in: $voter_in}, orderBy: id_ASC) {
 				totalCount
 			}
-			noCount: votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: no, ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC) {
+			noCount: votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: no, voter_in: $voter_in}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
 	`;
 
-	protected static GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION = ({ voters }: { voters?: string[] }) => `
-		query GetVotesListingByProposalTypeAndIndexAndDecision($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!, $decision_eq: VoteDecision!) {
-			votes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: $decision_eq ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC, limit: $limit, offset: $offset) {
+	protected static GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION = () => `
+		query GetVotesListingByProposalTypeAndIndexAndDecision($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!, $decision_eq: VoteDecision!, $voter_in: [String!]) {
+			votes(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: $decision_eq, voter_in: $voter_in}, orderBy: id_ASC, limit: $limit, offset: $offset) {
 				id
 				balance {
 					... on StandardVoteBalance {
@@ -488,18 +488,18 @@ export class SubsquidQueries {
 				timestamp
 				voter
 			}
-			yesCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: yes, ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC) {
+			yesCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: yes, voter_in: $voter_in}, orderBy: id_ASC) {
 				totalCount
 			}
-			noCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: no, ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC) {
+			noCount:votesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, decision_eq: no, voter_in: $voter_in}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
 	`;
 
-	protected static GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION = ({ voters }: { voters?: string[] }) => `
-		query GetConvictionVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!, $decision_in: [VoteDecision!], $aye_not_eq: BigInt, $nay_not_eq: BigInt, $value_isNull: Boolean, $orderBy: [ConvictionVoteOrderByInput!] = createdAtBlock_DESC) {
-			votes: convictionVotes(where: {AND:{balance:{aye_not_eq: $aye_not_eq}, OR:{balance: {nay_not_eq: $nay_not_eq}, OR:{balance:{value_isNull: $value_isNull}}}},  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: $decision_in ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: $orderBy, limit: $limit, offset: $offset) {
+	protected static GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION = () => `
+		query GetConvictionVotesListingByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!, $limit: Int!, $offset: Int!, $decision_in: [VoteDecision!], $aye_not_eq: BigInt, $nay_not_eq: BigInt, $value_isNull: Boolean, $orderBy: [ConvictionVoteOrderByInput!] = createdAtBlock_DESC, $voter_in: [String!]) {
+			votes: convictionVotes(where: {AND:{balance:{aye_not_eq: $aye_not_eq}, OR:{balance: {nay_not_eq: $nay_not_eq}, OR:{balance:{value_isNull: $value_isNull}}}},  proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: $decision_in, voter_in: $voter_in}, orderBy: $orderBy, limit: $limit, offset: $offset) {
 				id
 				balance {
 					... on StandardVoteBalance {
@@ -536,21 +536,21 @@ export class SubsquidQueries {
 					decision
 				}
 			}    
-			yesCount:  convictionVotesConnection(where: {AND:{balance:{aye_not_eq:"0"},OR:{balance:{value_isNull:false}}},proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: [yes, abstain], ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC) {
+			yesCount:  convictionVotesConnection(where: {AND:{balance:{aye_not_eq:"0"},OR:{balance:{value_isNull:false}}},proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: [yes, abstain], voter_in: $voter_in}, orderBy: id_ASC) {
 				totalCount
 			}
-			 noCount:  convictionVotesConnection(where: {AND:{balance:{nay_not_eq: "0"},OR:{balance:{value_isNull:false}}},proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: [no, abstain], ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC) {
+			 noCount:  convictionVotesConnection(where: {AND:{balance:{nay_not_eq: "0"},OR:{balance:{value_isNull:false}}},proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_in: [no, abstain], voter_in: $voter_in}, orderBy: id_ASC) {
 				totalCount
 			}
-			abstainCount: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_eq: abstain, ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC) {
+			abstainCount: convictionVotesConnection(where: {proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true, decision_eq: abstain, voter_in: $voter_in}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
 	`;
 
-	protected static GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION = ({ voters }: { voters?: string[] }) => `
-		query GetFlattenedVotesListingByProposalTypeAndIndexAndDecision($type_eq: VoteType,$limit: Int!, $offset: Int!, $index_eq: Int, $decision_in: [VoteDecision!]) {
-			votes: flattenedConvictionVotes(where: {type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true, decision_in: $decision_in${voters ? `, voter_in: ${voters}` : ''}}, orderBy: voter_DESC, limit: $limit, offset: $offset)
+	protected static GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION = () => `
+		query GetFlattenedVotesListingByProposalTypeAndIndexAndDecision($type_eq: VoteType,$limit: Int!, $offset: Int!, $index_eq: Int, $decision_in: [VoteDecision!], $voter_in: [String!]) {
+			votes: flattenedConvictionVotes(where: {type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true, decision_in: $decision_in, voter_in: $voter_in}, orderBy: voter_DESC, limit: $limit, offset: $offset)
 			{
 				type
 				voter
@@ -595,23 +595,23 @@ export class SubsquidQueries {
 					}
 				}
 			}
-			yesCount: flattenedConvictionVotesConnection(orderBy: id_ASC, where: { decision_eq: yes, type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true${voters ? `, voter_in: ${voters}` : ''}}
+			yesCount: flattenedConvictionVotesConnection(orderBy: id_ASC, where: { decision_eq: yes, type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true, voter_in: $voter_in}
 			) {
 				totalCount
 			}
-			noCount: flattenedConvictionVotesConnection(orderBy: id_ASC,where: {decision_eq: no, type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true${voters ? `, voter_in: ${voters}` : ''}}) {
+			noCount: flattenedConvictionVotesConnection(orderBy: id_ASC,where: {decision_eq: no, type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true, voter_in: $voter_in}) {
 				totalCount
 			}
-			abstainCount: flattenedConvictionVotesConnection(orderBy: id_ASC, where: {decision_eq: abstain, type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true${voters ? `, voter_in: ${voters}` : ''}}
+			abstainCount: flattenedConvictionVotesConnection(orderBy: id_ASC, where: {decision_eq: abstain, type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true, voter_in: $voter_in}
 			) {
 				totalCount
 			}
 		}
 	`;
 
-	protected static GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX = ({ voters }: { voters?: string[] }) => `
-		query GetFlattenedVotesListingByProposalTypeAndIndex($type_eq: VoteType, $index_eq: Int ,$limit: Int!, $offset: Int!) {
-			votes: flattenedConvictionVotes(where: {type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true${voters ? `, voter_in: ${voters}` : ''}}, orderBy: voter_DESC, limit: $limit, offset: $offset) {
+	protected static GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX = () => `
+			query GetFlattenedVotesListingByProposalTypeAndIndex($type_eq: VoteType, $index_eq: Int ,$limit: Int!, $offset: Int!, $voter_in: [String!]) {
+			votes: flattenedConvictionVotes(where: {type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true, voter_in: $voter_in}, orderBy: voter_DESC, limit: $limit, offset: $offset) {
 				type
 				voter
 				lockPeriod
@@ -655,15 +655,15 @@ export class SubsquidQueries {
 					}
 				}
 			}
-			yesCount: flattenedConvictionVotesConnection(orderBy: id_ASC,where: {decision_eq: yes, type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true${voters ? `, voter_in: ${voters}` : ''}}
+			yesCount: flattenedConvictionVotesConnection(orderBy: id_ASC,where: {decision_eq: yes, type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true, voter_in: $voter_in}
 			) {
 				totalCount
 			}
-			noCount: flattenedConvictionVotesConnection(orderBy: id_ASC,where: {decision_eq: no, type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true${voters ? `, voter_in: ${voters}` : ''}}
+			noCount: flattenedConvictionVotesConnection(orderBy: id_ASC,where: {decision_eq: no, type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true, voter_in: $voter_in}
 			) {
 				totalCount
 			}
-			abstainCount: flattenedConvictionVotesConnection(orderBy: id_ASC,where: {decision_eq: abstain, type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true${voters ? `, voter_in: ${voters}` : ''}}
+			abstainCount: flattenedConvictionVotesConnection(orderBy: id_ASC,where: {decision_eq: abstain, type_eq: $type_eq, proposalIndex_eq: $index_eq, removedAtBlock_isNull: true, voter_in: $voter_in}
 				}
 			) {
 				totalCount
@@ -671,9 +671,9 @@ export class SubsquidQueries {
 		}
 	`;
 
-	protected static GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION = ({ voters }: { voters?: string[] }) => `
-		query GetVotesListingByProposalTypeAndHashAndDecision($type_eq: ProposalType!, $hash_eq: String!, $limit: Int!, $offset: Int!, $decision_eq: VoteDecision!) {
-			votes(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: $decision_eq ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC, limit: $limit, offset: $offset) {
+	protected static GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION = () => `
+		query GetVotesListingByProposalTypeAndHashAndDecision($type_eq: ProposalType!, $hash_eq: String!, $limit: Int!, $offset: Int!, $decision_eq: VoteDecision!, $voter_in: [String!]) {
+			votes(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: $decision_eq, voter_in: $voter_in}, orderBy: id_ASC, limit: $limit, offset: $offset) {
 				id
 				balance {
 					... on StandardVoteBalance {
@@ -690,10 +690,10 @@ export class SubsquidQueries {
 				timestamp
 				voter
 			}
-			yesCount: votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: yes, ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC) {
+			yesCount: votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: yes, voter_in: $voter_in}, orderBy: id_ASC) {
 				totalCount
 			}
-			noCount: votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: no, ${voters ? `, voter_in: ${voters}` : ''}}, orderBy: id_ASC) {
+			noCount: votesConnection(where: {proposal: {hash_eq: $hash_eq, type_eq: $type_eq}, decision_eq: no, voter_in: $voter_in}, orderBy: id_ASC) {
 				totalCount
 			}
 		}
