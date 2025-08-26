@@ -66,7 +66,8 @@ enum ERedisKeys {
 	OVERVIEW_PAGE_DATA = 'OPD',
 	REMARK_LOGIN_MESSAGE = 'RLM',
 	POST_ANALYTICS_DATA = 'PAD',
-	POST_BUBBLE_VOTES_DATA = 'PBVD'
+	POST_BUBBLE_VOTES_DATA = 'PBVD',
+	PROFILE_VIEWS = 'PVW'
 }
 
 export class RedisService {
@@ -136,7 +137,8 @@ export class RedisService {
 		[ERedisKeys.POST_ANALYTICS_DATA]: (network: ENetwork, proposalType: EProposalType, index: number): string =>
 			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${index}`,
 		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: ENetwork, proposalType: EProposalType, index: number, votesType: EVotesDisplayType, analyticsType: EAnalyticsType): string =>
-			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${index}-${votesType}-${analyticsType}`
+			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${index}-${votesType}-${analyticsType}`,
+		[ERedisKeys.PROFILE_VIEWS]: (userId: string, network: string, timePeriod: string): string => `${ERedisKeys.PROFILE_VIEWS}-${userId}-${network}-${timePeriod}`
 	} as const;
 
 	// helper methods
@@ -274,7 +276,8 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.POST_ANALYTICS_DATA}-${network}-*` }),
-			this.DeleteKeys({ pattern: `${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-*` })
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.PROFILE_VIEWS}-${network}-*` })
 		]);
 	}
 
@@ -572,7 +575,8 @@ export class RedisService {
 			this.DeleteOverviewPageData({ network }),
 
 			// clear treasury stats
-			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` })
+			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.PROFILE_VIEWS}-${network}-*` })
 		]);
 	}
 
@@ -785,5 +789,40 @@ export class RedisService {
 		analyticsType: EAnalyticsType;
 	}): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });
+	}
+
+	static async GetProfileViews({
+		userId,
+		network,
+		timePeriod
+	}: {
+		userId: number;
+		network: ENetwork;
+		timePeriod: string;
+	}): Promise<{ total: number; unique: number; period: string } | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.PROFILE_VIEWS](userId.toString(), network, timePeriod) });
+		return data ? (deepParseJson(data) as { total: number; unique: number; period: string }) : null;
+	}
+
+	static async SetProfileViews({
+		userId,
+		network,
+		timePeriod,
+		data
+	}: {
+		userId: number;
+		network: ENetwork;
+		timePeriod: string;
+		data: { total: number; unique: number; period: string };
+	}): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.PROFILE_VIEWS](userId.toString(), network, timePeriod),
+			value: JSON.stringify(data),
+			ttlSeconds: 300 // Cache for 5 minutes
+		});
+	}
+
+	static async DeleteProfileViews({ userId, network }: { userId: number; network: ENetwork }): Promise<void> {
+		await this.DeleteKeys({ pattern: `${ERedisKeys.PROFILE_VIEWS}-${userId}-${network}-*` });
 	}
 }
