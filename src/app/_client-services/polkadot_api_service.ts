@@ -1557,7 +1557,9 @@ export class PolkadotApiService {
 		amount,
 		onSuccess,
 		onFailed,
-		remark
+		remark,
+		wallet,
+		setVaultQrState
 	}: {
 		selectedAccount: ISelectedAccount;
 		address: string;
@@ -1566,6 +1568,8 @@ export class PolkadotApiService {
 		onSuccess: () => void;
 		onFailed: (error: string) => void;
 		remark?: string;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 	}) {
 		if (!this.api) return;
 
@@ -1574,6 +1578,16 @@ export class PolkadotApiService {
 
 		const tx = this.api.tx.balances.transferKeepAlive(substrateBeneficiaryAddress, amount);
 		const batchTx = this.api.tx.utility.batch([tx, remarkTx]);
-		await this.executeTx({ selectedAccount, tx: batchTx, address, errorMessageFallback: 'Failed to transfer keep alive', onSuccess, onFailed, waitTillFinalizedHash: true });
+		await this.executeTx({
+			selectedAccount,
+			tx: batchTx,
+			address,
+			errorMessageFallback: 'Failed to transfer keep alive',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true,
+			wallet,
+			setVaultQrState
+		});
 	}
 }

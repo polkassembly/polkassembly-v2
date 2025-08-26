@@ -30,6 +30,7 @@ import SaySomethingIcon from '@assets/tipping/say-something.svg';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { useUser } from '@/hooks/useUser';
 import { useTipModal } from '@/hooks/useTipModal';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../Dialog/Dialog';
 import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
@@ -60,6 +61,7 @@ function CreateTipModal() {
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
 	const { apiService } = usePolkadotApiService();
+	const { setVaultQrState } = usePolkadotVault();
 	const { beneficiaryAddress, open: openModal, setOpenTipModal: setOpenModal, setBeneficiaryAddress } = useTipModal();
 	const { toast } = useToast();
 	const network = getCurrentNetwork();
@@ -121,7 +123,15 @@ function CreateTipModal() {
 	};
 
 	const onTip = async () => {
-		if (!apiService || !userPreferences.selectedAccount?.address || !user?.id || !beneficiaryAddress || !ValidatorService.isValidWeb3Address(beneficiaryAddress)) return;
+		if (
+			!apiService ||
+			!userPreferences.selectedAccount?.address ||
+			!user?.id ||
+			!beneficiaryAddress ||
+			!ValidatorService.isValidWeb3Address(beneficiaryAddress) ||
+			!userPreferences.wallet
+		)
+			return;
 
 		setIsLoading(true);
 
@@ -135,6 +145,8 @@ function CreateTipModal() {
 		};
 		await apiService.transferKeepAlive({
 			selectedAccount: userPreferences.selectedAccount,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
 			address: getRegularAddress(userPreferences.selectedAccount),
 			beneficiaryAddress,
 			amount: tipAmount,
