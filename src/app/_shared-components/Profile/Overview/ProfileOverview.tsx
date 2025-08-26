@@ -11,7 +11,6 @@ import { Skeleton } from '../../Skeleton';
 import classes from './ProfileOverview.module.scss';
 import VotingPowerCard from './VotingPowerCard/VotingPowerCard';
 import BalanceCard from './BalanceCard/BalanceCard';
-// import HistoricalBalanceChart from './HistoricalBalanceChart/HistoricalBalanceChart';
 import ProfileViewsTracker from './ProfileViewsTracker/ProfileViewsTracker';
 
 interface ProfileOverviewProps {
@@ -41,9 +40,6 @@ function ProfileOverview({ profileData, address }: ProfileOverviewProps) {
 					<Skeleton className='h-32 w-full' />
 					<Skeleton className='h-32 w-full' />
 				</div>
-				{/* <div className={classes.chartSection}>
-					<Skeleton className='h-[190px] w-full' />
-				</div> */}
 			</div>
 		);
 	}
@@ -67,13 +63,6 @@ function ProfileOverview({ profileData, address }: ProfileOverviewProps) {
 				/>
 				<ProfileViewsTracker userId={profileData?.id} />
 			</div>
-
-			{/* <div className={classes.chartSection}>
-				<HistoricalBalanceChart
-					historicalData={historicalBalanceData.data}
-					isLoading={historicalBalanceData.isLoading}
-				/>
-			</div> */}
 		</div>
 	);
 }
