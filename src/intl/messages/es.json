@@ -451,7 +451,6 @@
 	},
 	"PostDetails": {
 		"remove": "Eliminar",
-		"removing": "Eliminando",
 		"removeVote": "Eliminar Voto",
 		"selectYourVoterAddress": "Seleccione su dirección de votación",
 		"voteRemovedTitle": "Voto eliminado",

@@ -29,9 +29,13 @@ function RemoveVoteDialog({
 	onConfirm?: () => void;
 }) {
 	const t = useTranslations();
+
 	const { apiService } = usePolkadotApiService();
+
 	const { userPreferences } = useUserPreferences();
+
 	const { setVaultQrState } = usePolkadotVault();
+
 	const { toast } = useToast();
 
 	const handleRemoveVote = async () => {
@@ -105,7 +109,7 @@ function RemoveVoteDialog({
 								isLoading={isLoading}
 								disabled={isLoading}
 							>
-								{isLoading ? t('PostDetails.removing') : t('PostDetails.remove')}
+								{t('PostDetails.remove')}
 							</Button>
 						</div>
 					</div>

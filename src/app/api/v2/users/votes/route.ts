@@ -8,11 +8,12 @@ import { MAX_LISTING_LIMIT, DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/l
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
-import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { fetchPostData } from '@/app/api/_api-utils/fetchPostData';
 import { EProposalType } from '@/_shared/types';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { StatusCodes } from 'http-status-codes';
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
 	const network = await getNetworkFromHeaders();
@@ -27,7 +28,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	const { page, limit, address: addresses } = queryParamsSchema.parse(searchParamsObject);
 
 	if (!addresses?.length) {
-		throw new ClientError(ERROR_CODES.CLIENT_ERROR, ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, ERROR_MESSAGES.NOT_FOUND);
 	}
 	const encodedAddresses = addresses.map((address) => getEncodedAddress(address, network) || '').filter(Boolean);
 	const userVotesResult = await OnChainDbService.GetVotesForMultipleVoters({ network, voters: encodedAddresses, page, limit });

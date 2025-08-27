@@ -4,7 +4,7 @@
 
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, useMemo, useCallback, memo } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
@@ -14,6 +14,9 @@ import { IGenericListingResponse, IProfileVote } from '@/_shared/types';
 import { ChevronDown } from 'lucide-react';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { cn } from '@/lib/utils';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
+import { ONE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import classes from './Votes.module.scss';
 import { Separator } from '../../Separator';
 import { Skeleton } from '../../Skeleton';
@@ -122,7 +125,12 @@ const SelectAddresses = memo<SelectAddressesProps>(function SelectAddresses({ ad
 // Main Votes Component
 function Votes({ addresses, userId }: VotesProps) {
 	const t = useTranslations('Profile');
+
+	const { userPreferences } = useUserPreferences();
+
 	const network = getCurrentNetwork();
+
+	const queryClient = useQueryClient();
 
 	// State management
 	const [loading, setLoading] = useState(false);
@@ -131,13 +139,11 @@ function Votes({ addresses, userId }: VotesProps) {
 	const [selectedAddresses, setSelectedAddresses] = useState<string[]>([...addresses]);
 	const [openRemoveVoteDialog, setOpenRemoveVoteDialog] = useState(false);
 	const [proposalIndex, setProposalIndex] = useState<number | null>(null);
-	const [votes, setVotes] = useState<IGenericListingResponse<IProfileVote>>();
 
 	// Memoized fetch function to prevent unnecessary recreations
 	const fetchVotes = useCallback(async () => {
 		if (!selectedAddresses.length) {
-			setVotes({ items: [], totalCount: 0 });
-			return;
+			return { items: [], totalCount: 0 };
 		}
 
 		const { data, error } = await NextApiClientService.getVotesByAddresses({
@@ -150,14 +156,15 @@ function Votes({ addresses, userId }: VotesProps) {
 			throw new Error(error.message);
 		}
 
-		setVotes(data || undefined);
+		return data || { items: [], totalCount: 0 };
 	}, [selectedAddresses, page]);
 
-	const { isFetching } = useQuery({
+	const { data: votes, isFetching } = useQuery({
 		queryKey: ['votes', selectedAddresses, page] as const,
 		queryFn: fetchVotes,
 		enabled: selectedAddresses.length > 0,
-		refetchOnWindowFocus: false
+		refetchOnWindowFocus: false,
+		staleTime: ONE_MIN_IN_MILLI
 	});
 
 	// Memoized handlers to prevent unnecessary re-renders
@@ -177,17 +184,17 @@ function Votes({ addresses, userId }: VotesProps) {
 
 	const handleRemoveVoteConfirm = useCallback(() => {
 		if (proposalIndex === null) return;
-
-		setVotes((prev) => {
-			if (!prev) return prev;
+		queryClient.setQueryData(['votes', selectedAddresses, page] as const, (old: IGenericListingResponse<IProfileVote> | undefined) => {
+			if (!old) return old;
 			return {
-				...prev,
-				items: prev.items.filter((item) => item.proposalIndex !== proposalIndex),
-				totalCount: prev.totalCount - 1
+				...old,
+				items: old.items.filter((item) => item.proposalIndex !== proposalIndex && item.voterAddress !== getEncodedAddress(userPreferences.selectedAccount?.address || '', network)),
+				totalCount: old.totalCount - 1
 			};
 		});
+		setLoading(false);
 		setProposalIndex(null);
-	}, [proposalIndex, setVotes]);
+	}, [proposalIndex, queryClient, selectedAddresses, page, userPreferences.selectedAccount?.address, network]);
 
 	// Memoized vote items to prevent unnecessary re-renders
 	const visibleVotes = useMemo(() => {
@@ -288,7 +295,7 @@ function Votes({ addresses, userId }: VotesProps) {
 						<TableHeader>
 							<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
 								<TableHead className='py-4'>{t('Votes.proposal')}</TableHead>
-								<TableHead className='py-4'>{t('Votes.voteFor')}</TableHead>
+								<TableHead className='py-4 text-center'>{t('Votes.voteFor')}</TableHead>
 								<TableHead className='py-4 text-center'>{t('Votes.status')}</TableHead>
 								<TableHead className='py-4 text-center'>{t('Votes.voter')}</TableHead>
 								<TableHead className='py-4 text-right'>{t('Votes.action')}</TableHead>

@@ -452,7 +452,6 @@
 	},
 	"PostDetails": {
 		"remove": "Remove",
-		"removing": "Removing",
 		"removeVote": "Remove Vote",
 		"removeVoteConfirmation": "Are you sure you want to remove your vote?",
 		"selectYourVoterAddress": "Select Your Voter Address",

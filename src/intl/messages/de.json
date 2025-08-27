@@ -449,7 +449,6 @@
 	},
 	"PostDetails": {
 		"remove": "Entfernen",
-		"removing": "Entfernen",
 		"removeVote": "Abstimmung entfernen",
 		"selectYourVoterAddress": "Wählen Sie Ihre Abstimmungsadresse",
 		"voteRemovedTitle": "Abstimmung entfernt",

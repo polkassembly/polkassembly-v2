@@ -13,10 +13,12 @@ import { ThumbsUp, ThumbsDown, Ban, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import SubscanIcon from '@assets/profile/subscan-link.svg';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { cn } from '@/lib/utils';
 import StatusTag from '../../StatusTag/StatusTag';
 import Address from '../Address/Address';
 import { Button } from '../../Button';
 import { TableCell, TableRow } from '../../Table';
+import classes from './Votes.module.scss';
 
 interface VoteItemProps {
 	vote: IProfileVote;
@@ -50,6 +52,7 @@ const getVoteBalance = (vote: IProfileVote): VoteBalance => {
 
 function VoteItem({ vote, network, userId, onRemoveVote, isLoading }: VoteItemProps) {
 	const { user } = useUser();
+
 	const t = useTranslations();
 
 	// Memoize expensive calculations
@@ -84,63 +87,66 @@ function VoteItem({ vote, network, userId, onRemoveVote, isLoading }: VoteItemPr
 
 			{/* Vote For Column */}
 			<TableCell className='min-w-0 py-4'>
-				<div className='flex items-center gap-2 text-xs'>
-					{voteBalance.aye && (
-						<div className='flex items-center gap-2'>
-							<span className='flex shrink-0 items-center gap-1'>
-								<ThumbsUp
-									className='h-3.5 w-3.5'
-									aria-hidden='true'
-								/>
-								{t('PostDetails.aye')}
-							</span>
-							<span className='truncate font-medium'>{formatBnBalance(voteBalance.aye, { withUnit: true, numberAfterComma: 1, compactNotation: true }, network)}</span>
-						</div>
-					)}
-					{voteBalance.nay && (
-						<div className='flex items-center gap-2'>
-							<span className='flex shrink-0 items-center gap-1'>
-								<ThumbsDown
-									className='h-3.5 w-3.5'
-									aria-hidden='true'
-								/>
-								{t('PostDetails.nay')}
-							</span>
-							<span className='truncate font-medium'>{formatBnBalance(voteBalance.nay, { withUnit: true, numberAfterComma: 1, compactNotation: true }, network)}</span>
-						</div>
-					)}
-					{voteBalance.abstain && (
-						<div className='flex items-center gap-2'>
-							<span className='flex shrink-0 items-center gap-1'>
-								<Ban
-									className='h-3.5 w-3.5'
-									aria-hidden='true'
-								/>
-								{t('PostDetails.abstain')}
-							</span>
-							<span className='truncate font-medium'>{formatBnBalance(voteBalance.abstain, { withUnit: true, numberAfterComma: 1, compactNotation: true }, network)}</span>
-						</div>
-					)}
+				<div className={cn('flex items-center text-xs', voteBalance.abstain ? 'gap-x-4' : 'gap-x-2')}>
+					<div className='flex flex-col gap-y-3'>
+						{voteBalance.aye && (
+							<div className='flex items-center gap-2'>
+								<span className={cn(classes.voteItemBalanceItemValue, voteBalance.abstain ? 'w-16' : '')}>
+									<ThumbsUp
+										className='h-4 w-4 fill-basic_text'
+										aria-hidden='true'
+									/>
+									{t('PostDetails.aye')}
+								</span>
+								<span className='truncate font-medium'>{formatBnBalance(voteBalance.aye, { withUnit: true, numberAfterComma: 1, compactNotation: true }, network)}</span>
+							</div>
+						)}
+						{voteBalance.nay && (
+							<div className='flex items-center gap-2'>
+								<span className={cn(classes.voteItemBalanceItemValue, voteBalance.abstain ? 'w-16' : '')}>
+									<ThumbsDown
+										className='h-4 w-4 fill-basic_text'
+										aria-hidden='true'
+									/>
+									{t('PostDetails.nay')}
+								</span>
+								<span className='truncate font-medium'>{formatBnBalance(voteBalance.nay, { withUnit: true, numberAfterComma: 1, compactNotation: true }, network)}</span>
+							</div>
+						)}
+						{voteBalance.abstain && (
+							<div className='flex items-center gap-2'>
+								<span className={cn(classes.voteItemBalanceItemValue, voteBalance.abstain ? 'w-16' : '')}>
+									<Ban
+										className='h-4 w-4'
+										aria-hidden='true'
+									/>
+									{t('PostDetails.abstain')}
+								</span>
+								<span className='truncate font-medium'>{formatBnBalance(voteBalance.abstain, { withUnit: true, numberAfterComma: 1, compactNotation: true }, network)}</span>
+							</div>
+						)}
+					</div>
 					<div className='text-text_secondary text-xs'>{`${vote.lockPeriod || '0.1'}x${vote.isDelegated ? '/d' : ''}${vote.decision === EVoteDecision.ABSTAIN ? '/sa' : ''} `}</div>
 				</div>
 			</TableCell>
 
 			{/* Status Column */}
-			<TableCell className='flex items-center justify-center py-4'>
-				<StatusTag
-					status={vote.postDetails?.onChainInfo?.status}
-					className='w-max'
-				/>
+			<TableCell className='py-4'>
+				<div className='flex items-center justify-center'>
+					<StatusTag status={vote.postDetails?.onChainInfo?.status} />
+				</div>
 			</TableCell>
 
 			{/* Voter Column */}
 			<TableCell className='py-4 text-center'>
-				<Address
-					address={vote.voterAddress}
-					iconSize={16}
-					redirectToProfile={false}
-					disableTooltip
-				/>
+				<div className='flex items-center justify-center'>
+					<Address
+						address={vote.voterAddress}
+						redirectToProfile={false}
+						truncateCharLen={5}
+						disableTooltip
+					/>
+				</div>
 			</TableCell>
 
 			{/* Action Column */}

@@ -450,7 +450,6 @@
 	},
 	"PostDetails": {
 		"remove": "削除",
-		"removing": "削除中",
 		"removeVote": "投票を削除",
 		"selectYourVoterAddress": "投票者アドレスを選択",
 		"voteRemovedTitle": "投票が削除されました",
