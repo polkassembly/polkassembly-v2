@@ -202,8 +202,10 @@
 			"selectAddresses": "Select Addresses"
 		},
 		"Activity": {
+			"activity": "Activity",
 			"voted_on_proposal": "Voted",
 			"created_proposal": "Created Proposal",
+			"noData": "No activities found",
 			"created_tip": "Created Tip",
 			"gave_tip": "Gave Tip",
 			"created_bounty": "Created Bounty",
