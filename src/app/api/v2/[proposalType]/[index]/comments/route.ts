@@ -70,13 +70,14 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	await AIService.UpdatePostCommentsSummary({ network, proposalType, indexOrHash: index, newCommentId: newComment.id });
 
-	await NotificationService.SendCommentNotification({
+	NotificationService.SendCommentNotification({
 		network,
 		postId: index,
 		commentId: newComment.id,
 		commentContent: content,
-		userId: AuthService.GetUserIdFromAccessToken(newAccessToken)
-	});
+		userId: AuthService.GetUserIdFromAccessToken(newAccessToken),
+		proposalType: proposalType as EProposalType
+	}).catch((e) => console.error('SendCommentNotification failed', e));
 
 	// if sentiment is not provided, update the sentiment using AI
 	let updatedComment: IComment | null = null;

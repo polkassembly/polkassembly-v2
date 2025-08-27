@@ -6,7 +6,7 @@ import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { IS_NOTIFICATION_SERVICE_ENABLED, NOTIFICATION_ENGINE_API_KEY } from '@api/_api-constants/apiEnvVars';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
-import { ENetwork, ENotificationTrigger, ESocial, IUser } from '@shared/types';
+import { ENetwork, ENotificationTrigger, EProposalType, ESocial, IUser } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { OffChainDbService } from '@api/_api-services/offchain_db_service';
 
@@ -23,6 +23,8 @@ export class NotificationService {
 	private static NOTIFICATION_ENGINE_URL = 'https://us-central1-notification-engine-672e0.cloudfunctions.net';
 
 	private static DEFAULT_NOTIFICATION_NETWORK = getSharedEnvVars().NEXT_PUBLIC_DEFAULT_NETWORK as ENetwork;
+
+	private static NOTIFICATION_SERVICE_ERROR_MESSAGE = 'IS_NOTIFICATION_SERVICE_ENABLED or NOTIFICATION_ENGINE_API_KEY not found';
 
 	private static firebaseFunctionsHeader = (network: string) => ({
 		Accept: 'application/json',
@@ -119,7 +121,7 @@ export class NotificationService {
 		args: Record<string, string>;
 	}) {
 		if (!IS_NOTIFICATION_SERVICE_ENABLED || !NOTIFICATION_ENGINE_API_KEY) {
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'IS_NOTIFICATION_SERVICE_ENABLED or NOTIFICATION_ENGINE_API_KEY not found');
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, this.NOTIFICATION_SERVICE_ERROR_MESSAGE);
 		}
 
 		try {
@@ -177,28 +179,35 @@ export class NotificationService {
 		network?: ENetwork;
 		proposalId: string;
 		proposalTitle: string;
-		proposalType: string;
+		proposalType: EProposalType;
 		userId?: number;
 	}) {
+		if (!userId) {
+			console.log('No author userId provided for proposal notification');
+			return;
+		}
+
 		const enabledUserIds = await this.getUsersWithEnabledNotifications({
 			network,
-			trigger: ENotificationTrigger.NEW_PROPOSAL
+			trigger: ENotificationTrigger.OWN_PROPOSAL_CREATED
 		});
 
-		if (enabledUserIds.length === 0) {
-			console.log(`No users have enabled NEW_PROPOSAL notifications for ${network}`);
+		const authorNotificationIds = enabledUserIds.filter((id) => id === userId);
+
+		if (authorNotificationIds.length === 0) {
+			console.log(`Author ${userId} does not have OWN_PROPOSAL_CREATED notifications enabled for ${network}`);
 			return;
 		}
 
 		await this.SendBulkNotification({
 			network,
-			trigger: ENotificationTrigger.NEW_PROPOSAL,
-			userIds: enabledUserIds,
+			trigger: ENotificationTrigger.OWN_PROPOSAL_CREATED,
+			userIds: authorNotificationIds,
 			commonArgs: {
 				proposalId,
 				proposalTitle,
 				proposalType,
-				...(userId && { authorUserId: userId.toString() })
+				authorUserId: userId.toString()
 			}
 		});
 	}
@@ -208,35 +217,54 @@ export class NotificationService {
 		postId,
 		commentId,
 		commentContent,
-		userId
+		userId,
+		proposalType
 	}: {
 		network?: ENetwork;
 		postId: string;
 		commentId: string;
 		commentContent: string;
 		userId?: number;
+		proposalType: EProposalType;
 	}) {
-		const enabledUserIds = await this.getUsersWithEnabledNotifications({
-			network,
-			trigger: ENotificationTrigger.NEW_COMMENT
-		});
+		try {
+			const postSubscribers = await OffChainDbService.GetPostSubscribers({
+				network,
+				indexOrHash: postId,
+				proposalType
+			});
 
-		if (enabledUserIds.length === 0) {
-			console.log(`No users have enabled NEW_COMMENT notifications for ${network}`);
-			return;
-		}
-
-		await this.SendBulkNotification({
-			network,
-			trigger: ENotificationTrigger.NEW_COMMENT,
-			userIds: enabledUserIds,
-			commonArgs: {
-				postId,
-				commentId,
-				commentContent: commentContent.substring(0, 200),
-				...(userId && { authorUserId: userId.toString() })
+			if (postSubscribers.length === 0) {
+				console.log(`No subscribers found for post ${postId} on ${network}`);
+				return;
 			}
-		});
+
+			const enabledUserIds = await this.getUsersWithEnabledNotifications({
+				network,
+				trigger: ENotificationTrigger.SUBSCRIBED_POST_COMMENT
+			});
+
+			const targetUserIds = enabledUserIds.filter((id) => postSubscribers.includes(id) && id !== userId);
+
+			if (targetUserIds.length === 0) {
+				console.log(`No eligible subscribers for comment notification on post ${postId}`);
+				return;
+			}
+
+			await this.SendBulkNotification({
+				network,
+				trigger: ENotificationTrigger.SUBSCRIBED_POST_COMMENT,
+				userIds: targetUserIds,
+				commonArgs: {
+					postId,
+					commentId,
+					commentContent: commentContent.substring(0, 200),
+					...(userId && { authorUserId: userId.toString() })
+				}
+			});
+		} catch (error) {
+			console.error('Error sending comment notification:', error);
+		}
 	}
 
 	static async SendStatusChangeNotification({
@@ -626,7 +654,7 @@ export class NotificationService {
 
 	static async GetChannelVerifyToken({ network = this.DEFAULT_NOTIFICATION_NETWORK, channel, userId }: { network?: ENetwork; channel: string; userId: string }): Promise<string> {
 		if (!IS_NOTIFICATION_SERVICE_ENABLED || !NOTIFICATION_ENGINE_API_KEY) {
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'IS_NOTIFICATION_SERVICE_ENABLED or NOTIFICATION_ENGINE_API_KEY not found');
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, this.NOTIFICATION_SERVICE_ERROR_MESSAGE);
 		}
 
 		try {
@@ -673,7 +701,7 @@ export class NotificationService {
 		token: string;
 	}): Promise<boolean> {
 		if (!IS_NOTIFICATION_SERVICE_ENABLED || !NOTIFICATION_ENGINE_API_KEY) {
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'IS_NOTIFICATION_SERVICE_ENABLED or NOTIFICATION_ENGINE_API_KEY not found');
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, this.NOTIFICATION_SERVICE_ERROR_MESSAGE);
 		}
 
 		try {

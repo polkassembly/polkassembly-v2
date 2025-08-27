@@ -233,13 +233,13 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		poll
 	});
 
-	await NotificationService.SendProposalNotification({
+	NotificationService.SendProposalNotification({
 		network,
 		proposalId: indexOrHash,
 		proposalTitle: title,
 		proposalType,
 		userId: AuthService.GetUserIdFromAccessToken(newAccessToken)
-	});
+	}).catch((e) => console.error('SendProposalNotification failed', e));
 
 	// Invalidate post listings since a new post was added
 	await RedisService.DeletePostsListing({ network, proposalType });

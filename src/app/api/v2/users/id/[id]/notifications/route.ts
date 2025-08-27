@@ -37,7 +37,7 @@ const zodMarkAsReadSchema = z
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
 	const { searchParams } = new URL(req.url);
-	const { page, limit } = zodQuerySchema.parse({
+	const { page, limit, filterBy } = zodQuerySchema.parse({
 		page: searchParams.get('page'),
 		limit: searchParams.get('limit'),
 		filterBy: searchParams.get('filterBy')
@@ -55,7 +55,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		userId: id,
 		network,
 		page,
-		limit
+		limit,
+		filterBy
 	});
 
 	return NextResponse.json({
@@ -86,7 +87,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 	}
 
 	if (notificationId) {
-		await OffChainDbService.MarkNotificationAsRead(notificationId);
+		await OffChainDbService.MarkNotificationAsRead({ notificationId, userId: id });
 		return NextResponse.json({ message: 'Notification marked as read' });
 	}
 

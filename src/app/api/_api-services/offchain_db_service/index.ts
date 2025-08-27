@@ -22,6 +22,7 @@ import {
 	IActivityMetadata,
 	EAllowedCommentor,
 	IContentSummary,
+	ECustomNotificationFilters,
 	IProfileDetails,
 	IUserNotificationSettings,
 	IFollowEntry,
@@ -365,6 +366,10 @@ export class OffChainDbService {
 
 	static async GetPostSubscriptionsByUserId({ userId, page, limit, network }: { userId: number; page: number; limit: number; network: ENetwork }): Promise<IPostSubscription[]> {
 		return FirestoreService.GetPostSubscriptionsByUserId({ userId, page, limit, network });
+	}
+
+	static async GetPostSubscribers({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<number[]> {
+		return FirestoreService.GetPostSubscribers({ network, indexOrHash, proposalType });
 	}
 
 	static async GetPostSubscriptionCountByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<number> {
@@ -1011,16 +1016,28 @@ export class OffChainDbService {
 		});
 	}
 
-	static async GetNotificationsByUserId({ userId, network, page, limit }: { userId: number; network: ENetwork; page: number; limit: number }): Promise<IInAppNotification[]> {
-		return FirestoreService.GetNotificationsByUserId({ userId, network, page, limit });
+	static async GetNotificationsByUserId({
+		userId,
+		network,
+		page,
+		limit,
+		filterBy
+	}: {
+		userId: number;
+		network: ENetwork;
+		page: number;
+		limit: number;
+		filterBy?: ECustomNotificationFilters;
+	}): Promise<IInAppNotification[]> {
+		return FirestoreService.GetNotificationsByUserId({ userId, network, page, limit, filterBy });
 	}
 
 	static async GetUnreadNotificationsCount({ userId, network }: { userId: number; network: ENetwork }): Promise<number> {
 		return FirestoreService.GetUnreadNotificationsCount({ userId, network });
 	}
 
-	static async MarkNotificationAsRead(notificationId: string): Promise<void> {
-		return FirestoreService.MarkNotificationAsRead(notificationId);
+	static async MarkNotificationAsRead({ notificationId, userId }: { notificationId: string; userId: number }): Promise<void> {
+		return FirestoreService.MarkNotificationAsRead({ notificationId, userId });
 	}
 
 	static async MarkAllNotificationsAsRead({ userId, network }: { userId: number; network: ENetwork }): Promise<void> {

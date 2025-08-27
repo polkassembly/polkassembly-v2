@@ -1567,7 +1567,8 @@ export interface IInAppNotification {
 	url: string;
 	userId: number;
 	trigger: ENotificationFilters;
-	network: string;
+	network: ENetwork;
+	isRead: boolean;
 	type?: EInAppNotificationsType;
 }
 

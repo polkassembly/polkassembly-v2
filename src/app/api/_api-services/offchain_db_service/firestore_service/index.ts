@@ -31,6 +31,7 @@ import {
 	EConvictionAmount,
 	IPostSubscription,
 	ECommentSentiment,
+	ECustomNotificationFilters,
 	ITreasuryStats,
 	IDelegate,
 	EDelegateSource,
@@ -1467,6 +1468,20 @@ export class FirestoreService extends FirestoreUtils {
 		}
 	}
 
+	static async GetPostSubscribers({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<number[]> {
+		const postSubscriptionsQuery = this.postSubscriptionsCollectionRef()
+			.where('network', '==', network)
+			.where('indexOrHash', '==', indexOrHash)
+			.where('proposalType', '==', proposalType);
+
+		const postSubscriptionsQuerySnapshot = await postSubscriptionsQuery.get();
+
+		return postSubscriptionsQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return data.userId;
+		});
+	}
+
 	static async AddPostSubscription({ network, indexOrHash, proposalType, userId }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType; userId: number }) {
 		const newPostSubscriptionId = this.postSubscriptionsCollectionRef().doc().id;
 
@@ -1849,10 +1864,38 @@ export class FirestoreService extends FirestoreUtils {
 		});
 	}
 
-	static async GetNotificationsByUserId({ userId, network, page, limit }: { userId: number; network: ENetwork; page: number; limit: number }): Promise<IInAppNotification[]> {
-		const notificationsQuery = this.notificationsCollectionRef()
-			.where('userId', '==', userId)
-			.where('network', '==', network)
+	static async GetNotificationsByUserId({
+		userId,
+		network,
+		page,
+		limit,
+		filterBy
+	}: {
+		userId: number;
+		network: ENetwork;
+		page: number;
+		limit: number;
+		filterBy?: ECustomNotificationFilters;
+	}): Promise<IInAppNotification[]> {
+		let notificationsQuery = this.notificationsCollectionRef().where('userId', '==', userId).where('network', '==', network);
+
+		if (filterBy && filterBy !== 'all') {
+			switch (filterBy) {
+				case 'comments':
+					notificationsQuery = notificationsQuery.where('type', '==', 'comment');
+					break;
+				case 'mentions':
+					notificationsQuery = notificationsQuery.where('type', '==', 'mention');
+					break;
+				case 'proposals':
+					notificationsQuery = notificationsQuery.where('type', '==', 'proposal');
+					break;
+				default:
+					break;
+			}
+		}
+
+		notificationsQuery = notificationsQuery
 			.orderBy('createdAt', 'desc')
 			.limit(limit)
 			.offset((page - 1) * limit);
@@ -1868,7 +1911,8 @@ export class FirestoreService extends FirestoreUtils {
 				message: data.message || '',
 				url: data.url || '',
 				trigger: data.trigger,
-				network: data.network || network,
+				network: (data.network || network) as ENetwork,
+				isRead: Boolean(data.isRead),
 				createdAt: data.createdAt?.toDate() || new Date(),
 				type: data.type
 			} as IInAppNotification;
@@ -1882,11 +1926,20 @@ export class FirestoreService extends FirestoreUtils {
 		return unreadNotificationsQuerySnapshot.data().count || 0;
 	}
 
-	static async MarkNotificationAsRead(notificationId: string): Promise<void> {
-		await this.notificationsCollectionRef().doc(notificationId).update({
-			isRead: true,
-			updatedAt: new Date()
-		});
+	static async MarkNotificationAsRead({ notificationId, userId }: { notificationId: string; userId: number }): Promise<void> {
+		const docRef = this.notificationsCollectionRef().doc(notificationId);
+		const snap = await docRef.get();
+
+		if (!snap.exists) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Notification not found');
+		}
+
+		const data = snap.data() as { userId?: number };
+		if (data?.userId !== userId) {
+			throw new APIError(ERROR_CODES.FORBIDDEN, StatusCodes.FORBIDDEN, 'Not allowed to modify this notification');
+		}
+
+		await docRef.update({ isRead: true, updatedAt: new Date() });
 	}
 
 	static async MarkAllNotificationsAsRead({ userId, network }: { userId: number; network: ENetwork }): Promise<void> {
