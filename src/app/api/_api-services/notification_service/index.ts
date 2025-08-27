@@ -40,7 +40,7 @@ export class NotificationService {
 		}
 
 		try {
-			const res = await fetch(`${this.NOTIFICATION_ENGINE_URL}`, {
+			const res = await fetch(`${this.NOTIFICATION_ENGINE_URL}/notify`, {
 				body: JSON.stringify({
 					args,
 					trigger
