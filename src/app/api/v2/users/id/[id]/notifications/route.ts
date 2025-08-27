@@ -38,9 +38,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const { id } = zodParamsSchema.parse(await params);
 	const { searchParams } = new URL(req.url);
 	const { page, limit, filterBy } = zodQuerySchema.parse({
-		page: searchParams.get('page'),
-		limit: searchParams.get('limit'),
-		filterBy: searchParams.get('filterBy')
+		page: searchParams.get('page') ?? undefined,
+		limit: searchParams.get('limit') ?? undefined,
+		filterBy: searchParams.get('filterBy') ?? undefined
 	});
 
 	const network = await getNetworkFromHeaders();

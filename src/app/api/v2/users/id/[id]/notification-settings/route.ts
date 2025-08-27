@@ -23,8 +23,7 @@ const USER_NOT_FOUND = 'User not found';
 const zodChannelPreferencesSchema = z.object({
 	channel: z.nativeEnum(ENotificationChannel),
 	enabled: z.boolean(),
-	handle: z.string().optional(),
-	verified: z.boolean().optional()
+	handle: z.string().optional()
 });
 
 const zodTriggerPreferencesSchema = z.object({
@@ -67,7 +66,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
 	const { id } = zodParamsSchema.parse(await params);
-	const { channel, enabled, handle, verified } = zodChannelPreferencesSchema.parse(await getReqBody(req));
+	const { channel, enabled, handle } = zodChannelPreferencesSchema.parse(await getReqBody(req));
 
 	const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
 	const loggedInUserId = AuthService.GetUserIdFromAccessToken(newAccessToken);
@@ -86,11 +85,12 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 		triggerPreferences: {}
 	};
 
+	const existingChannelPref = currentPreferences.channelPreferences?.[channel];
 	let channelPreference = {
 		name: channel,
 		enabled,
 		handle: handle || user.username || '',
-		verified: verified ?? false
+		verified: existingChannelPref?.verified ?? false
 	};
 
 	if (channel === ENotificationChannel.IN_APP) {

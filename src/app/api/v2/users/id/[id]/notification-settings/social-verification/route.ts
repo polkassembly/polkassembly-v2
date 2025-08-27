@@ -96,7 +96,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	const verificationToken = await NotificationService.GetChannelVerifyToken({
 		channel: channel.toUpperCase(),
-		userId: user.username
+		userId: user.id.toString()
 	});
 
 	const currentPreferences = user.notificationPreferences || {
@@ -108,8 +108,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		name: channel,
 		enabled: false,
 		handle: '',
-		verified: false,
-		verification_token: verificationToken
+		verified: false
 	};
 
 	const updatedPreferences = {
@@ -156,17 +155,21 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 		triggerPreferences: {}
 	};
 
-	const channelPreference = currentPreferences.channelPreferences?.[channel];
+	const isVerified = await NotificationService.VerifyChannelToken({
+		channel: channel.toUpperCase(),
+		userId: user.id.toString(),
+		handle,
+		token
+	});
 
-	if (!channelPreference || channelPreference.verification_token !== token) {
-		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid verification token');
+	if (!isVerified) {
+		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid or expired verification token');
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const { verification_token: _unusedToken, ...channelPreferenceWithoutToken } = channelPreference;
-
+	const existingChannelPref = currentPreferences.channelPreferences?.[channel];
 	const updatedChannelPreference = {
-		...channelPreferenceWithoutToken,
+		...existingChannelPref,
+		name: channel,
 		enabled: true,
 		verified: true,
 		handle
