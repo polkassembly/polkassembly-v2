@@ -29,15 +29,15 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
 		addresses: z
 			.string()
-			.transform((val) =>
-				val
+			.transform((val) => {
+				const arr = val
 					.split(',')
 					.map((a) => a.trim())
-					.filter((a) => a.length > 0)
-			)
-			.refine((arr) => arr.every((a) => ValidatorService.isValidWeb3Address(a)), {
-				message: 'Please enter a valid address'
-			}),
+					.filter((a) => a.length > 0);
+				// dedupe while preserving case (EVM checksum)
+				return Array.from(new Set(arr));
+			})
+			.refine((arr) => arr.length > 0 && arr.every((a) => ValidatorService.isValidWeb3Address(a)), { message: 'Please provide at least one valid address' }),
 		decision: z
 			.string()
 			.transform((val) => {

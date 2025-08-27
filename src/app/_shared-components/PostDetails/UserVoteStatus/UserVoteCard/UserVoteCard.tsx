@@ -34,7 +34,7 @@ interface UserVoteCardProps {
 	btnClassName?: string;
 	size?: 'sm' | 'lg';
 	proposalType: EProposalType;
-	voteData: IVoteHistoryData;
+	votes: IVoteData[];
 	track?: EPostOrigin;
 }
 
@@ -103,7 +103,7 @@ function VoteDetails({ voteData, showAddress = true }: { voteData: IVoteData; sh
 	);
 }
 
-function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData, track }: UserVoteCardProps) {
+function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, votes, track }: UserVoteCardProps) {
 	const t = useTranslations();
 	const [openRemoveConfirmModal, setOpenRemoveConfirmModal] = useState(false);
 	const { apiService } = usePolkadotApiService();
@@ -116,9 +116,7 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, voteData
 	const queryClient = useQueryClient();
 	const [isLoading, setIsLoading] = useState(false);
 
-	const { votes } = voteData;
-
-	const [selectedAddress, setSelectedAddress] = useState<string>(votes[0].voterAddress);
+	const [selectedAddress, setSelectedAddress] = useState(votes.length > 0 ? votes[0]?.voterAddress : undefined);
 
 	const handleRemoveVote = async () => {
 		if (!apiService || !selectedAddress || !userPreferences.wallet || !user?.id) return;

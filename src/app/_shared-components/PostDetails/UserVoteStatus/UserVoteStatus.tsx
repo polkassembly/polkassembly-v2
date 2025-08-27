@@ -50,7 +50,7 @@ function UserVoteStatus({ index, btnClassName, size = 'lg', track, proposalType 
 			index={index}
 			size={size}
 			proposalType={proposalType}
-			voteData={voteData}
+			votes={voteData.votes}
 			btnClassName={btnClassName}
 			track={track}
 		/>
