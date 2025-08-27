@@ -38,7 +38,9 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 			.optional()
 	});
 
-	const { page, limit, decision, address: addresses } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
+	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
+
+	const { page, limit, decision, address: addresses } = zodQuerySchema.parse(searchParamsObject);
 
 	const voteData = await OnChainDbService.GetPostVoteData({ network, proposalType, indexOrHash: index, voterAddresses: addresses, page, limit, decision });
 
