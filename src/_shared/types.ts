@@ -343,7 +343,27 @@ export enum ENotificationTrigger {
 	NEW_COMMENT = 'newComment',
 	STATUS_CHANGE = 'statusChange',
 	NEW_REFERENDUM = 'newReferendum',
-	TEST = 'test'
+	REFERENDUM_VOTING = 'referendumVoting',
+	REFERENDUM_CLOSED = 'referendumClosed',
+	COUNCIL_MOTION_SUBMITTED = 'councilMotionSubmitted',
+	COUNCIL_MOTION_VOTING = 'councilMotionVoting',
+	COUNCIL_MOTION_CLOSED = 'councilMotionClosed',
+	TREASURY_PROPOSAL_SUBMITTED = 'treasuryProposalSubmitted',
+	TREASURY_PROPOSAL_VOTING = 'treasuryProposalVoting',
+	TREASURY_PROPOSAL_CLOSED = 'treasuryProposalClosed',
+	BOUNTY_SUBMITTED = 'bountySubmitted',
+	BOUNTY_CLOSED = 'bountyClosed',
+	BOUNTY_CLAIMED = 'bountyClaimed',
+	CHILD_BOUNTY_SUBMITTED = 'childBountySubmitted',
+	CHILD_BOUNTY_CLOSED = 'childBountyClosed',
+	TIP_SUBMITTED = 'tipSubmitted',
+	TIP_OPENED = 'tipOpened',
+	TIP_CLOSED = 'tipClosed',
+	TECH_COMMITTEE_SUBMITTED = 'techCommitteeSubmitted',
+	TECH_COMMITTEE_CLOSED = 'techCommitteeClosed',
+	MENTION = 'mention',
+	SUBSCRIBED_POST_COMMENT = 'subscribedPostComment',
+	OWN_PROPOSAL_CREATED = 'ownProposalCreated'
 }
 
 export enum EDataSource {

@@ -15,10 +15,6 @@ interface IChannelPreference {
 	verified: boolean;
 }
 
-interface ITrackPreference {
-	enabled: boolean;
-}
-
 if (IS_NOTIFICATION_SERVICE_ENABLED && !NOTIFICATION_ENGINE_API_KEY) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'IS_NOTIFICATION_SERVICE_ENABLED is true but NOTIFICATION_ENGINE_API_KEY is not set');
 }
@@ -62,15 +58,46 @@ export class NotificationService {
 
 					if (!hasEnabledChannels) return false;
 
+					const prefs = networkPrefs as Record<string, unknown>;
 					switch (trigger) {
 						case ENotificationTrigger.NEW_PROPOSAL:
-							return networkPrefs.myProposals?.enabled || false;
+						case ENotificationTrigger.OWN_PROPOSAL_CREATED:
+							return (prefs?.myProposals as { enabled?: boolean })?.enabled || false;
 						case ENotificationTrigger.NEW_COMMENT:
-							return networkPrefs.subscribedPosts?.enabled || false;
+						case ENotificationTrigger.SUBSCRIBED_POST_COMMENT:
+							return (prefs?.subscribedPosts as { enabled?: boolean })?.enabled || false;
 						case ENotificationTrigger.STATUS_CHANGE:
-							return networkPrefs.myProposals?.enabled || false;
+							return (prefs?.myProposals as { enabled?: boolean })?.enabled || false;
 						case ENotificationTrigger.NEW_REFERENDUM:
-							return networkPrefs.openGov?.tracks ? Object.values(networkPrefs.openGov.tracks).some((track: ITrackPreference) => track.enabled) : false;
+						case ENotificationTrigger.REFERENDUM_VOTING:
+						case ENotificationTrigger.REFERENDUM_CLOSED:
+							return (prefs?.openGov as { tracks?: Record<string, { enabled?: boolean }> })?.tracks
+								? Object.values((prefs.openGov as { tracks: Record<string, { enabled?: boolean }> }).tracks).some((track) => track.enabled)
+								: false;
+						case ENotificationTrigger.COUNCIL_MOTION_SUBMITTED:
+						case ENotificationTrigger.COUNCIL_MOTION_VOTING:
+						case ENotificationTrigger.COUNCIL_MOTION_CLOSED:
+							return (prefs?.gov1 as { councilMotions?: { enabled?: boolean } })?.councilMotions?.enabled || false;
+						case ENotificationTrigger.TREASURY_PROPOSAL_SUBMITTED:
+						case ENotificationTrigger.TREASURY_PROPOSAL_VOTING:
+						case ENotificationTrigger.TREASURY_PROPOSAL_CLOSED:
+							return (prefs?.gov1 as { treasuryProposals?: { enabled?: boolean } })?.treasuryProposals?.enabled || false;
+						case ENotificationTrigger.BOUNTY_SUBMITTED:
+						case ENotificationTrigger.BOUNTY_CLOSED:
+						case ENotificationTrigger.BOUNTY_CLAIMED:
+							return (prefs?.gov1 as { bounties?: { enabled?: boolean } })?.bounties?.enabled || false;
+						case ENotificationTrigger.CHILD_BOUNTY_SUBMITTED:
+						case ENotificationTrigger.CHILD_BOUNTY_CLOSED:
+							return (prefs?.gov1 as { childBounties?: { enabled?: boolean } })?.childBounties?.enabled || false;
+						case ENotificationTrigger.TIP_SUBMITTED:
+						case ENotificationTrigger.TIP_OPENED:
+						case ENotificationTrigger.TIP_CLOSED:
+							return (prefs?.gov1 as { tips?: { enabled?: boolean } })?.tips?.enabled || false;
+						case ENotificationTrigger.TECH_COMMITTEE_SUBMITTED:
+						case ENotificationTrigger.TECH_COMMITTEE_CLOSED:
+							return (prefs?.gov1 as { techCommittee?: { enabled?: boolean } })?.techCommittee?.enabled || false;
+						case ENotificationTrigger.MENTION:
+							return (prefs?.myProposals as { mentions?: { enabled?: boolean } })?.mentions?.enabled || false;
 						default:
 							return false;
 					}
@@ -331,21 +358,268 @@ export class NotificationService {
 		}, Promise.resolve());
 	}
 
-	static async SendTestNotification({
+	static async SendCouncilMotionNotification({
 		network = this.DEFAULT_NOTIFICATION_NETWORK,
-		userId,
-		message = 'Test notification from Polkassembly'
+		motionId,
+		motionTitle,
+		trigger,
+		userId
 	}: {
 		network?: ENetwork;
-		userId: number;
-		message?: string;
+		motionId: string;
+		motionTitle: string;
+		trigger: ENotificationTrigger.COUNCIL_MOTION_SUBMITTED | ENotificationTrigger.COUNCIL_MOTION_VOTING | ENotificationTrigger.COUNCIL_MOTION_CLOSED;
+		userId?: number;
+	}) {
+		const enabledUserIds = await this.getUsersWithEnabledNotifications({ network, trigger });
+		if (enabledUserIds.length === 0) return;
+
+		await this.SendBulkNotification({
+			network,
+			trigger,
+			userIds: enabledUserIds,
+			commonArgs: {
+				motionId,
+				motionTitle,
+				...(userId && { authorUserId: userId.toString() })
+			}
+		});
+	}
+
+	static async SendTreasuryProposalNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		proposalId,
+		proposalTitle,
+		trigger,
+		userId
+	}: {
+		network?: ENetwork;
+		proposalId: string;
+		proposalTitle: string;
+		trigger: ENotificationTrigger.TREASURY_PROPOSAL_SUBMITTED | ENotificationTrigger.TREASURY_PROPOSAL_VOTING | ENotificationTrigger.TREASURY_PROPOSAL_CLOSED;
+		userId?: number;
+	}) {
+		const enabledUserIds = await this.getUsersWithEnabledNotifications({ network, trigger });
+		if (enabledUserIds.length === 0) return;
+
+		await this.SendBulkNotification({
+			network,
+			trigger,
+			userIds: enabledUserIds,
+			commonArgs: {
+				proposalId,
+				proposalTitle,
+				...(userId && { authorUserId: userId.toString() })
+			}
+		});
+	}
+
+	static async SendBountyNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		bountyId,
+		bountyTitle,
+		trigger,
+		userId
+	}: {
+		network?: ENetwork;
+		bountyId: string;
+		bountyTitle: string;
+		trigger: ENotificationTrigger.BOUNTY_SUBMITTED | ENotificationTrigger.BOUNTY_CLOSED | ENotificationTrigger.BOUNTY_CLAIMED;
+		userId?: number;
+	}) {
+		const enabledUserIds = await this.getUsersWithEnabledNotifications({ network, trigger });
+		if (enabledUserIds.length === 0) return;
+
+		await this.SendBulkNotification({
+			network,
+			trigger,
+			userIds: enabledUserIds,
+			commonArgs: {
+				bountyId,
+				bountyTitle,
+				...(userId && { authorUserId: userId.toString() })
+			}
+		});
+	}
+
+	static async SendChildBountyNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		childBountyId,
+		childBountyTitle,
+		parentBountyId,
+		trigger,
+		userId
+	}: {
+		network?: ENetwork;
+		childBountyId: string;
+		childBountyTitle: string;
+		parentBountyId: string;
+		trigger: ENotificationTrigger.CHILD_BOUNTY_SUBMITTED | ENotificationTrigger.CHILD_BOUNTY_CLOSED;
+		userId?: number;
+	}) {
+		const enabledUserIds = await this.getUsersWithEnabledNotifications({ network, trigger });
+		if (enabledUserIds.length === 0) return;
+
+		await this.SendBulkNotification({
+			network,
+			trigger,
+			userIds: enabledUserIds,
+			commonArgs: {
+				childBountyId,
+				childBountyTitle,
+				parentBountyId,
+				...(userId && { authorUserId: userId.toString() })
+			}
+		});
+	}
+
+	static async SendTipNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		tipId,
+		tipTitle,
+		trigger,
+		userId
+	}: {
+		network?: ENetwork;
+		tipId: string;
+		tipTitle: string;
+		trigger: ENotificationTrigger.TIP_SUBMITTED | ENotificationTrigger.TIP_OPENED | ENotificationTrigger.TIP_CLOSED;
+		userId?: number;
+	}) {
+		const enabledUserIds = await this.getUsersWithEnabledNotifications({ network, trigger });
+		if (enabledUserIds.length === 0) return;
+
+		await this.SendBulkNotification({
+			network,
+			trigger,
+			userIds: enabledUserIds,
+			commonArgs: {
+				tipId,
+				tipTitle,
+				...(userId && { authorUserId: userId.toString() })
+			}
+		});
+	}
+
+	static async SendTechCommitteeNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		techCommitteeProposalId,
+		techCommitteeProposalTitle,
+		trigger,
+		userId
+	}: {
+		network?: ENetwork;
+		techCommitteeProposalId: string;
+		techCommitteeProposalTitle: string;
+		trigger: ENotificationTrigger.TECH_COMMITTEE_SUBMITTED | ENotificationTrigger.TECH_COMMITTEE_CLOSED;
+		userId?: number;
+	}) {
+		const enabledUserIds = await this.getUsersWithEnabledNotifications({ network, trigger });
+		if (enabledUserIds.length === 0) return;
+
+		await this.SendBulkNotification({
+			network,
+			trigger,
+			userIds: enabledUserIds,
+			commonArgs: {
+				techCommitteeProposalId,
+				techCommitteeProposalTitle,
+				...(userId && { authorUserId: userId.toString() })
+			}
+		});
+	}
+
+	static async SendReferendumVotingNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		referendumId,
+		referendumTitle,
+		track,
+		userId
+	}: {
+		network?: ENetwork;
+		referendumId: string;
+		referendumTitle: string;
+		track?: string;
+		userId?: number;
+	}) {
+		const enabledUserIds = await this.getUsersWithEnabledNotifications({
+			network,
+			trigger: ENotificationTrigger.REFERENDUM_VOTING
+		});
+		if (enabledUserIds.length === 0) return;
+
+		await this.SendBulkNotification({
+			network,
+			trigger: ENotificationTrigger.REFERENDUM_VOTING,
+			userIds: enabledUserIds,
+			commonArgs: {
+				referendumId,
+				referendumTitle,
+				...(track && { track }),
+				...(userId && { authorUserId: userId.toString() })
+			}
+		});
+	}
+
+	static async SendReferendumClosedNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		referendumId,
+		referendumTitle,
+		track,
+		result,
+		userId
+	}: {
+		network?: ENetwork;
+		referendumId: string;
+		referendumTitle: string;
+		track?: string;
+		result?: string;
+		userId?: number;
+	}) {
+		const enabledUserIds = await this.getUsersWithEnabledNotifications({
+			network,
+			trigger: ENotificationTrigger.REFERENDUM_CLOSED
+		});
+		if (enabledUserIds.length === 0) return;
+
+		await this.SendBulkNotification({
+			network,
+			trigger: ENotificationTrigger.REFERENDUM_CLOSED,
+			userIds: enabledUserIds,
+			commonArgs: {
+				referendumId,
+				referendumTitle,
+				...(track && { track }),
+				...(result && { result }),
+				...(userId && { authorUserId: userId.toString() })
+			}
+		});
+	}
+
+	static async SendMentionNotification({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		postId,
+		postTitle,
+		mentionedUserId,
+		mentionerUserId,
+		commentId
+	}: {
+		network?: ENetwork;
+		postId: string;
+		postTitle: string;
+		mentionedUserId: number;
+		mentionerUserId: number;
+		commentId?: string;
 	}) {
 		await this.sendNotification({
 			network,
-			trigger: ENotificationTrigger.TEST,
+			trigger: ENotificationTrigger.MENTION,
 			args: {
-				userId: userId.toString(),
-				message
+				userId: mentionedUserId.toString(),
+				postId,
+				postTitle,
+				mentionerUserId: mentionerUserId.toString(),
+				...(commentId && { commentId })
 			}
 		});
 	}
@@ -382,6 +656,43 @@ export class NotificationService {
 		} catch (error) {
 			console.error('Error generating verification token:', error);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error in generating token');
+		}
+	}
+
+	static async VerifyChannelToken({
+		network = this.DEFAULT_NOTIFICATION_NETWORK,
+		channel,
+		userId,
+		handle,
+		token
+	}: {
+		network?: ENetwork;
+		channel: string;
+		userId: string;
+		handle: string;
+		token: string;
+	}): Promise<boolean> {
+		if (!IS_NOTIFICATION_SERVICE_ENABLED || !NOTIFICATION_ENGINE_API_KEY) {
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'IS_NOTIFICATION_SERVICE_ENABLED or NOTIFICATION_ENGINE_API_KEY not found');
+		}
+
+		try {
+			const res = await fetch(`${this.NOTIFICATION_ENGINE_URL}/verifyChannelToken`, {
+				method: 'POST',
+				headers: this.firebaseFunctionsHeader(network),
+				body: JSON.stringify({ channel, userId, handle, token })
+			});
+
+			const { data, error } = (await res.json()) as { data?: { verified: boolean }; error?: string };
+
+			if (error || !data) {
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, error || 'Error in verifying token');
+			}
+
+			return !!data.verified;
+		} catch (error) {
+			console.error('Channel verification failed', error);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Channel verification failed');
 		}
 	}
 }

@@ -6,7 +6,21 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { z } from 'zod';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EAnalyticsType, EHttpHeaderKey, ENetwork, EVotesDisplayType, EPostOrigin, EProposalType, ERole, EWallet, IUser } from '@/_shared/types';
+import {
+	EAnalyticsType,
+	EHttpHeaderKey,
+	ENetwork,
+	ENotificationTrigger,
+	EVotesDisplayType,
+	EPostOrigin,
+	EProposalType,
+	EProposalStatus,
+	ERole,
+	EWallet,
+	IUser,
+	IOffChainPost,
+	IOnChainPostInfo
+} from '@/_shared/types';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -629,6 +643,309 @@ export class WebhookService {
 		});
 	}
 
+	private static async fetchProposalData({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }) {
+		try {
+			if (proposalType === EProposalType.DISCUSSION) {
+				return await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType });
+			}
+			return await OnChainDbService.GetOnChainPostInfo({ network, proposalType, indexOrHash });
+		} catch (error) {
+			console.error(`Failed to fetch proposal data for notifications: ${error}`);
+			return null;
+		}
+	}
+
+	private static async handleProposalCreated({
+		network,
+		indexOrHash,
+		proposalType,
+		proposalData
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		proposalData: IOffChainPost | IOnChainPostInfo | null;
+	}) {
+		if (!proposalData) {
+			console.log(`No proposal data available for ${proposalType}/${indexOrHash}`);
+			return;
+		}
+
+		const title = ('title' in proposalData ? proposalData.title : undefined) || `${proposalType} ${indexOrHash}`;
+		const track = 'track' in proposalData ? ((proposalData as Record<string, unknown>).track as string) : undefined;
+
+		switch (proposalType) {
+			case EProposalType.REFERENDUM_V2:
+				await NotificationService.SendReferendumNotification({
+					network,
+					referendumId: indexOrHash,
+					referendumTitle: title || `Referendum ${indexOrHash}`,
+					track
+				});
+				break;
+			case EProposalType.COUNCIL_MOTION:
+				await NotificationService.SendCouncilMotionNotification({
+					network,
+					motionId: indexOrHash,
+					motionTitle: title || `Council Motion ${indexOrHash}`,
+					trigger: ENotificationTrigger.COUNCIL_MOTION_SUBMITTED
+				});
+				break;
+			case EProposalType.TREASURY_PROPOSAL:
+				await NotificationService.SendTreasuryProposalNotification({
+					network,
+					proposalId: indexOrHash,
+					proposalTitle: title || `Treasury Proposal ${indexOrHash}`,
+					trigger: ENotificationTrigger.TREASURY_PROPOSAL_SUBMITTED
+				});
+				break;
+			case EProposalType.BOUNTY:
+				await NotificationService.SendBountyNotification({
+					network,
+					bountyId: indexOrHash,
+					bountyTitle: title || `Bounty ${indexOrHash}`,
+					trigger: ENotificationTrigger.BOUNTY_SUBMITTED
+				});
+				break;
+			case EProposalType.CHILD_BOUNTY:
+				await NotificationService.SendChildBountyNotification({
+					network,
+					childBountyId: indexOrHash,
+					childBountyTitle: title || `Child Bounty ${indexOrHash}`,
+					parentBountyId: 'parentBountyIndex' in proposalData ? String((proposalData as IOnChainPostInfo).parentBountyIndex) : '0',
+					trigger: ENotificationTrigger.CHILD_BOUNTY_SUBMITTED
+				});
+				break;
+			case EProposalType.TIP:
+				await NotificationService.SendTipNotification({
+					network,
+					tipId: indexOrHash,
+					tipTitle: title || `Tip ${indexOrHash}`,
+					trigger: ENotificationTrigger.TIP_SUBMITTED
+				});
+				break;
+			case EProposalType.TECH_COMMITTEE_PROPOSAL:
+				await NotificationService.SendTechCommitteeNotification({
+					network,
+					techCommitteeProposalId: indexOrHash,
+					techCommitteeProposalTitle: title || `Tech Committee Proposal ${indexOrHash}`,
+					trigger: ENotificationTrigger.TECH_COMMITTEE_SUBMITTED
+				});
+				break;
+			default:
+				await NotificationService.SendProposalNotification({
+					network,
+					proposalId: indexOrHash,
+					proposalTitle: title || `${proposalType} ${indexOrHash}`,
+					proposalType
+				});
+		}
+	}
+
+	private static async handleProposalStatusUpdated({
+		network,
+		indexOrHash,
+		proposalType,
+		proposalData
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		proposalData: IOffChainPost | IOnChainPostInfo | null;
+	}) {
+		if (!proposalData) {
+			console.log(`No proposal data available for ${proposalType}/${indexOrHash}`);
+			return;
+		}
+
+		const status = 'status' in proposalData ? (proposalData as IOnChainPostInfo).status : EProposalStatus.Unknown;
+		const title = ('title' in proposalData ? proposalData.title : undefined) || `${proposalType} ${indexOrHash}`;
+		const track = 'track' in proposalData ? ((proposalData as Record<string, unknown>).track as string) : undefined;
+
+		const previousStatus = await RedisService.GetPreviousProposalStatus({ network, proposalType, indexOrHash });
+
+		if (status !== EProposalStatus.Unknown) {
+			await RedisService.SetPreviousProposalStatus({ network, proposalType, indexOrHash, status });
+		}
+
+		if (status === EProposalStatus.Deciding || status === EProposalStatus.Active) {
+			switch (proposalType) {
+				case EProposalType.REFERENDUM_V2:
+					await NotificationService.SendReferendumVotingNotification({
+						network,
+						referendumId: indexOrHash,
+						referendumTitle: title || `Referendum ${indexOrHash}`,
+						track
+					});
+					break;
+				case EProposalType.COUNCIL_MOTION:
+					await NotificationService.SendCouncilMotionNotification({
+						network,
+						motionId: indexOrHash,
+						motionTitle: title || `Council Motion ${indexOrHash}`,
+						trigger: ENotificationTrigger.COUNCIL_MOTION_VOTING
+					});
+					break;
+				case EProposalType.TREASURY_PROPOSAL:
+					await NotificationService.SendTreasuryProposalNotification({
+						network,
+						proposalId: indexOrHash,
+						proposalTitle: title || `Treasury Proposal ${indexOrHash}`,
+						trigger: ENotificationTrigger.TREASURY_PROPOSAL_VOTING
+					});
+					break;
+				default:
+					console.warn(`Unhandled proposal type for voting notification: ${proposalType}`);
+			}
+		}
+
+		await NotificationService.SendStatusChangeNotification({
+			network,
+			postId: indexOrHash,
+			newStatus: status || EProposalStatus.Unknown,
+			oldStatus: previousStatus || EProposalStatus.Unknown
+		});
+	}
+
+	private static async handleProposalEnded({
+		network,
+		indexOrHash,
+		proposalType,
+		proposalData
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		proposalData: IOffChainPost | IOnChainPostInfo | null;
+	}) {
+		if (!proposalData) {
+			console.log(`No proposal data available for ${proposalType}/${indexOrHash}`);
+			return;
+		}
+
+		const status = 'status' in proposalData ? (proposalData as IOnChainPostInfo).status : 'Unknown';
+		const title = ('title' in proposalData ? proposalData.title : undefined) || `${proposalType} ${indexOrHash}`;
+		const track = 'track' in proposalData ? ((proposalData as Record<string, unknown>).track as string) : undefined;
+
+		switch (proposalType) {
+			case EProposalType.REFERENDUM_V2:
+				await NotificationService.SendReferendumClosedNotification({
+					network,
+					referendumId: indexOrHash,
+					referendumTitle: title || `Referendum ${indexOrHash}`,
+					track,
+					result: status
+				});
+				break;
+			case EProposalType.COUNCIL_MOTION:
+				await NotificationService.SendCouncilMotionNotification({
+					network,
+					motionId: indexOrHash,
+					motionTitle: title || `Council Motion ${indexOrHash}`,
+					trigger: ENotificationTrigger.COUNCIL_MOTION_CLOSED
+				});
+				break;
+			case EProposalType.TREASURY_PROPOSAL:
+				await NotificationService.SendTreasuryProposalNotification({
+					network,
+					proposalId: indexOrHash,
+					proposalTitle: title || `Treasury Proposal ${indexOrHash}`,
+					trigger: ENotificationTrigger.TREASURY_PROPOSAL_CLOSED
+				});
+				break;
+			case EProposalType.BOUNTY:
+				await NotificationService.SendBountyNotification({
+					network,
+					bountyId: indexOrHash,
+					bountyTitle: title || `Bounty ${indexOrHash}`,
+					trigger: ENotificationTrigger.BOUNTY_CLOSED
+				});
+				break;
+			case EProposalType.CHILD_BOUNTY:
+				await NotificationService.SendChildBountyNotification({
+					network,
+					childBountyId: indexOrHash,
+					childBountyTitle: title || `Child Bounty ${indexOrHash}`,
+					parentBountyId: 'parentBountyIndex' in proposalData ? String((proposalData as IOnChainPostInfo).parentBountyIndex) : '0',
+					trigger: ENotificationTrigger.CHILD_BOUNTY_CLOSED
+				});
+				break;
+			case EProposalType.TIP:
+				await NotificationService.SendTipNotification({
+					network,
+					tipId: indexOrHash,
+					tipTitle: title || `Tip ${indexOrHash}`,
+					trigger: ENotificationTrigger.TIP_CLOSED
+				});
+				break;
+			case EProposalType.TECH_COMMITTEE_PROPOSAL:
+				await NotificationService.SendTechCommitteeNotification({
+					network,
+					techCommitteeProposalId: indexOrHash,
+					techCommitteeProposalTitle: title || `Tech Committee Proposal ${indexOrHash}`,
+					trigger: ENotificationTrigger.TECH_COMMITTEE_CLOSED
+				});
+				break;
+			default:
+				console.warn(`Unhandled proposal type for ended notification: ${proposalType}`);
+		}
+	}
+
+	private static async handleBountyClaimed({
+		network,
+		indexOrHash,
+		proposalData
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalData: IOffChainPost | IOnChainPostInfo | null;
+	}) {
+		if (!proposalData) {
+			console.log(`No proposal data available for bounty ${indexOrHash}`);
+			return;
+		}
+
+		const title = ('title' in proposalData ? proposalData.title : undefined) || `Bounty ${indexOrHash}`;
+		await NotificationService.SendBountyNotification({
+			network,
+			bountyId: indexOrHash,
+			bountyTitle: title || `Bounty ${indexOrHash}`,
+			trigger: ENotificationTrigger.BOUNTY_CLAIMED
+		});
+	}
+
+	private static async handleDecisionDepositPlaced({
+		network,
+		indexOrHash,
+		proposalType,
+		proposalData
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		proposalData: IOffChainPost | IOnChainPostInfo | null;
+	}) {
+		if (!proposalData) {
+			console.log(`No proposal data available for ${indexOrHash}`);
+			return;
+		}
+
+		const status = 'status' in proposalData ? (proposalData as IOnChainPostInfo).status : EProposalStatus.Unknown;
+
+		const previousStatus = await RedisService.GetPreviousProposalStatus({ network, proposalType, indexOrHash });
+
+		if (status !== EProposalStatus.Unknown) {
+			await RedisService.SetPreviousProposalStatus({ network, proposalType, indexOrHash, status });
+		}
+
+		await NotificationService.SendStatusChangeNotification({
+			network,
+			postId: indexOrHash,
+			newStatus: status || EProposalStatus.Unknown,
+			oldStatus: previousStatus || EProposalStatus.Unknown
+		});
+	}
+
 	private static async handleNotificationsForProposalEvent({
 		network,
 		indexOrHash,
@@ -641,54 +958,26 @@ export class WebhookService {
 		event: EWebhookEvent;
 	}) {
 		try {
-			let proposalData;
-			try {
-				if (proposalType === EProposalType.DISCUSSION) {
-					proposalData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType });
-				} else {
-					proposalData = await OnChainDbService.GetOnChainPostInfo({ network, proposalType, indexOrHash });
-				}
-			} catch (error) {
-				console.error(`Failed to fetch proposal data for notifications: ${error}`);
-				return;
-			}
+			const proposalData = await this.fetchProposalData({ network, indexOrHash, proposalType });
 
 			if (!proposalData) {
 				console.log(`No proposal data found for ${proposalType}/${indexOrHash}`);
 				return;
 			}
 
-			switch (event) {
-				case EWebhookEvent.PROPOSAL_CREATED: {
-					if (proposalType === EProposalType.REFERENDUM_V2) {
-						const title = 'title' in proposalData ? proposalData.title : `Referendum ${indexOrHash}`;
-						const track = 'track' in proposalData ? (proposalData.track as string) : undefined;
-						await NotificationService.SendReferendumNotification({
-							network,
-							referendumId: indexOrHash,
-							referendumTitle: title || `Referendum ${indexOrHash}`,
-							track
-						});
-					}
-					break;
-				}
+			const eventHandlers: Partial<Record<EWebhookEvent, () => Promise<void>>> = {
+				[EWebhookEvent.PROPOSAL_CREATED]: () => this.handleProposalCreated({ network, indexOrHash, proposalType, proposalData }),
+				[EWebhookEvent.PROPOSAL_STATUS_UPDATED]: () => this.handleProposalStatusUpdated({ network, indexOrHash, proposalType, proposalData }),
+				[EWebhookEvent.PROPOSAL_ENDED]: () => this.handleProposalEnded({ network, indexOrHash, proposalType, proposalData }),
+				[EWebhookEvent.BOUNTY_CLAIMED]: () => this.handleBountyClaimed({ network, indexOrHash, proposalData }),
+				[EWebhookEvent.DECISION_DEPOSIT_PLACED]: () => this.handleDecisionDepositPlaced({ network, indexOrHash, proposalType, proposalData })
+			};
 
-				case EWebhookEvent.PROPOSAL_STATUS_UPDATED:
-				case EWebhookEvent.PROPOSAL_ENDED:
-				case EWebhookEvent.BOUNTY_CLAIMED:
-				case EWebhookEvent.DECISION_DEPOSIT_PLACED: {
-					const status = 'status' in proposalData ? proposalData.status : 'Unknown';
-					await NotificationService.SendStatusChangeNotification({
-						network,
-						postId: indexOrHash,
-						newStatus: status || 'Unknown',
-						oldStatus: 'Previous Status'
-					});
-					break;
-				}
-
-				default:
-					console.log(`No notification handler for event: ${event}`);
+			const handler = eventHandlers[event];
+			if (handler) {
+				await handler();
+			} else {
+				console.log(`No notification handler for event: ${event}`);
 			}
 		} catch (error) {
 			console.error(`Error sending notifications for ${event}:`, error);
