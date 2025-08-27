@@ -34,6 +34,7 @@ import { APIError } from '../../_api-utils/apiError';
 import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
 import { RedisService } from '../../_api-services/redis_service';
+import { NotificationService } from '../../_api-services/notification_service';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType)
@@ -230,6 +231,14 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		topic: topic || EOffChainPostTopic.GENERAL,
 		allowedCommentor,
 		poll
+	});
+
+	await NotificationService.SendProposalNotification({
+		network,
+		proposalId: indexOrHash,
+		proposalTitle: title,
+		proposalType,
+		userId: AuthService.GetUserIdFromAccessToken(newAccessToken)
 	});
 
 	// Invalidate post listings since a new post was added

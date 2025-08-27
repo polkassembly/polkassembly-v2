@@ -16,6 +16,7 @@ import { fetchCommentsVoteData } from '@/app/api/_api-utils/fetchCommentsVoteDat
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
+import { NotificationService } from '@/app/api/_api-services/notification_service';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -68,6 +69,14 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 	});
 
 	await AIService.UpdatePostCommentsSummary({ network, proposalType, indexOrHash: index, newCommentId: newComment.id });
+
+	await NotificationService.SendCommentNotification({
+		network,
+		postId: index,
+		commentId: newComment.id,
+		commentContent: content,
+		userId: AuthService.GetUserIdFromAccessToken(newAccessToken)
+	});
 
 	// if sentiment is not provided, update the sentiment using AI
 	let updatedComment: IComment | null = null;

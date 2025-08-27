@@ -504,6 +504,10 @@ export class OffChainDbService {
 		return FirestoreService.UpdateUserProfile({ userId, newProfileDetails, notificationPreferences });
 	}
 
+	static async GetUsersWithNotificationPreferences(): Promise<IUser[]> {
+		return FirestoreService.GetUsersWithNotificationPreferences();
+	}
+
 	static async DeleteUser(userId: number) {
 		return FirestoreService.DeleteUser(userId);
 	}

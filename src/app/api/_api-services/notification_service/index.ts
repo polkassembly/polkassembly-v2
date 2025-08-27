@@ -8,6 +8,16 @@ import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { ENetwork, ENotificationTrigger, ESocial, IUser } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
+import { OffChainDbService } from '@api/_api-services/offchain_db_service';
+
+interface IChannelPreference {
+	enabled: boolean;
+	verified: boolean;
+}
+
+interface ITrackPreference {
+	enabled: boolean;
+}
 
 if (IS_NOTIFICATION_SERVICE_ENABLED && !NOTIFICATION_ENGINE_API_KEY) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'IS_NOTIFICATION_SERVICE_ENABLED is true but NOTIFICATION_ENGINE_API_KEY is not set');
@@ -25,6 +35,52 @@ export class NotificationService {
 		'x-network': network,
 		'x-source': 'polkassembly_v2'
 	});
+
+	private static async getUsersWithEnabledNotifications({ network, trigger }: { network: ENetwork; trigger: ENotificationTrigger }): Promise<number[]> {
+		try {
+			if (!Object.values(ENetwork).includes(network)) {
+				console.error('Invalid network parameter:', network);
+				return [];
+			}
+
+			const users = await OffChainDbService.GetUsersWithNotificationPreferences();
+
+			return users
+				.filter((user: IUser) => {
+					if (!user.notificationPreferences) return false;
+
+					const { triggerPreferences } = user.notificationPreferences;
+					if (!triggerPreferences || !Object.prototype.hasOwnProperty.call(triggerPreferences, network)) {
+						return false;
+					}
+					const networkPrefs = Object.prototype.hasOwnProperty.call(triggerPreferences, network) ? triggerPreferences[network as keyof typeof triggerPreferences] : null;
+					if (!networkPrefs) return false;
+
+					const hasEnabledChannels = Object.values(user.notificationPreferences.channelPreferences || {}).some(
+						(channel: IChannelPreference) => channel.enabled && channel.verified
+					);
+
+					if (!hasEnabledChannels) return false;
+
+					switch (trigger) {
+						case ENotificationTrigger.NEW_PROPOSAL:
+							return networkPrefs.myProposals?.enabled || false;
+						case ENotificationTrigger.NEW_COMMENT:
+							return networkPrefs.subscribedPosts?.enabled || false;
+						case ENotificationTrigger.STATUS_CHANGE:
+							return networkPrefs.myProposals?.enabled || false;
+						case ENotificationTrigger.NEW_REFERENDUM:
+							return networkPrefs.openGov?.tracks ? Object.values(networkPrefs.openGov.tracks).some((track: ITrackPreference) => track.enabled) : false;
+						default:
+							return false;
+					}
+				})
+				.map((user: IUser) => user.id);
+		} catch (error) {
+			console.error('Error getting users with enabled notifications:', error);
+			return [];
+		}
+	}
 
 	private static async sendNotification({
 		network = this.DEFAULT_NOTIFICATION_NETWORK,
@@ -97,14 +153,25 @@ export class NotificationService {
 		proposalType: string;
 		userId?: number;
 	}) {
-		await this.sendNotification({
+		const enabledUserIds = await this.getUsersWithEnabledNotifications({
+			network,
+			trigger: ENotificationTrigger.NEW_PROPOSAL
+		});
+
+		if (enabledUserIds.length === 0) {
+			console.log(`No users have enabled NEW_PROPOSAL notifications for ${network}`);
+			return;
+		}
+
+		await this.SendBulkNotification({
 			network,
 			trigger: ENotificationTrigger.NEW_PROPOSAL,
-			args: {
+			userIds: enabledUserIds,
+			commonArgs: {
 				proposalId,
 				proposalTitle,
 				proposalType,
-				...(userId && { userId: userId.toString() })
+				...(userId && { authorUserId: userId.toString() })
 			}
 		});
 	}
@@ -122,14 +189,25 @@ export class NotificationService {
 		commentContent: string;
 		userId?: number;
 	}) {
-		await this.sendNotification({
+		const enabledUserIds = await this.getUsersWithEnabledNotifications({
+			network,
+			trigger: ENotificationTrigger.NEW_COMMENT
+		});
+
+		if (enabledUserIds.length === 0) {
+			console.log(`No users have enabled NEW_COMMENT notifications for ${network}`);
+			return;
+		}
+
+		await this.SendBulkNotification({
 			network,
 			trigger: ENotificationTrigger.NEW_COMMENT,
-			args: {
+			userIds: enabledUserIds,
+			commonArgs: {
 				postId,
 				commentId,
 				commentContent: commentContent.substring(0, 200),
-				...(userId && { userId: userId.toString() })
+				...(userId && { authorUserId: userId.toString() })
 			}
 		});
 	}
@@ -147,14 +225,25 @@ export class NotificationService {
 		oldStatus: string;
 		userId?: number;
 	}) {
-		await this.sendNotification({
+		const enabledUserIds = await this.getUsersWithEnabledNotifications({
+			network,
+			trigger: ENotificationTrigger.STATUS_CHANGE
+		});
+
+		if (enabledUserIds.length === 0) {
+			console.log(`No users have enabled STATUS_CHANGE notifications for ${network}`);
+			return;
+		}
+
+		await this.SendBulkNotification({
 			network,
 			trigger: ENotificationTrigger.STATUS_CHANGE,
-			args: {
+			userIds: enabledUserIds,
+			commonArgs: {
 				postId,
 				newStatus,
 				oldStatus,
-				...(userId && { userId: userId.toString() })
+				...(userId && { authorUserId: userId.toString() })
 			}
 		});
 	}
@@ -172,14 +261,25 @@ export class NotificationService {
 		track?: string;
 		userId?: number;
 	}) {
-		await this.sendNotification({
+		const enabledUserIds = await this.getUsersWithEnabledNotifications({
+			network,
+			trigger: ENotificationTrigger.NEW_REFERENDUM
+		});
+
+		if (enabledUserIds.length === 0) {
+			console.log(`No users have enabled NEW_REFERENDUM notifications for ${network}`);
+			return;
+		}
+
+		await this.SendBulkNotification({
 			network,
 			trigger: ENotificationTrigger.NEW_REFERENDUM,
-			args: {
+			userIds: enabledUserIds,
+			commonArgs: {
 				referendumId,
 				referendumTitle,
 				...(track && { track }),
-				...(userId && { userId: userId.toString() })
+				...(userId && { authorUserId: userId.toString() })
 			}
 		});
 	}

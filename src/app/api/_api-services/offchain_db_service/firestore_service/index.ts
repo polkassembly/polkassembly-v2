@@ -913,6 +913,17 @@ export class FirestoreService extends FirestoreUtils {
 		await this.usersCollectionRef().doc(userId.toString()).set(payload, { merge: true });
 	}
 
+	static async GetUsersWithNotificationPreferences(): Promise<IUser[]> {
+		const snapshot = await this.usersCollectionRef().where('notificationPreferences', '!=', null).get();
+		return snapshot.docs.map(
+			(doc) =>
+				({
+					id: Number(doc.id),
+					...doc.data()
+				}) as IUser
+		);
+	}
+
 	static async UpdateUserEmail(userId: number, email: string) {
 		// check if email is already in use
 		const user = await this.GetUserByEmail(email);
