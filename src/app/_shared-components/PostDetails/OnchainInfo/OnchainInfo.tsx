@@ -131,10 +131,10 @@ function OnchainInfo({
 							)
 						)}
 
-						{!ValidatorService.isValidNumber(trackNumber) && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-7' />
 						) : (
-							trackNumber && (
+							ValidatorService.isValidNumber(trackNumber) && (
 								<div className={classes.infoRow}>
 									<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.trackNumber')}</p>
 									<p className={classes.infoRowValue}>{trackNumber}</p>

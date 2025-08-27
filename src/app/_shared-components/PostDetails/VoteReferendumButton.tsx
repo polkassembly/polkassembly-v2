@@ -21,14 +21,16 @@ interface VoteReferendumButtonProps {
 	btnClassName?: string;
 	iconClassName?: string;
 	size?: 'sm' | 'lg';
+	hasVoted?: boolean;
 	track?: EPostOrigin;
 	proposalType: EProposalType;
 }
 
-function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg', track, proposalType }: VoteReferendumButtonProps) {
+function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg', hasVoted = false, track, proposalType }: VoteReferendumButtonProps) {
 	const { user } = useUser();
 	const t = useTranslations();
 	const [openModal, setOpenModal] = useState(false);
+
 	return !user ? (
 		<Link href='/login'>
 			<Button
@@ -65,7 +67,7 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 							height={20}
 							className={iconClassName}
 						/>
-						{t('PostDetails.castVote')}
+						{hasVoted ? t('PostDetails.changeVote') : t('PostDetails.castVote')}
 					</div>
 				</Button>
 			</DialogTrigger>

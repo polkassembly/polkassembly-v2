@@ -306,19 +306,15 @@ export class SubsquidService extends SubsquidUtils {
 	private static getVotesQuery({
 		proposalType,
 		subsquidDecision,
-		votesType,
-		voterAddress
+		votesType
 	}: {
 		proposalType: EProposalType;
 		subsquidDecision: string | null;
 		votesType?: EVotesDisplayType;
-		voterAddress?: string;
 	}): string {
 		// Handle TIP proposal type
 		if (proposalType === EProposalType.TIP) {
-			return subsquidDecision
-				? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION({ voter: voterAddress })
-				: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH({ voter: voterAddress });
+			return subsquidDecision ? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION() : this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH();
 		}
 
 		// Handle REFERENDUM_V2 and FELLOWSHIP_REFERENDUM
@@ -329,19 +325,15 @@ export class SubsquidService extends SubsquidUtils {
 
 			if (subsquidDecision) {
 				return isFlattened
-					? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
-					: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress });
+					? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION()
+					: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION();
 			}
 
-			return isFlattened
-				? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress })
-				: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress });
+			return isFlattened ? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX() : this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX();
 		}
 
 		// Handle other proposal types
-		return subsquidDecision
-			? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
-			: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress });
+		return subsquidDecision ? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION() : this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX();
 	}
 
 	// FIXME: refactor this function
@@ -353,7 +345,7 @@ export class SubsquidService extends SubsquidUtils {
 		page,
 		limit,
 		decision,
-		voterAddress: address,
+		voterAddresses: addresses,
 		orderBy,
 		votesType
 	}: {
@@ -363,22 +355,23 @@ export class SubsquidService extends SubsquidUtils {
 		page: number;
 		limit: number;
 		decision?: EVoteDecision;
-		voterAddress?: string;
+		voterAddresses?: string[];
 		orderBy?: EVoteSortOptions;
 		votesType?: EVotesDisplayType;
 	}) {
-		const voterAddress = address ? (getEncodedAddress(address, network) ?? undefined) : undefined;
+		const voterAddresses = addresses?.length ? addresses.map((address) => getEncodedAddress(address, network)) : undefined;
 
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const subsquidDecision = decision ? this.convertVoteDecisionToSubsquidFormat({ decision }) : null;
 		const subsquidDecisionIn = decision ? (votesType === EVotesDisplayType.NESTED ? this.convertVoteDecisionToSubsquidFormatArray({ decision }) : [subsquidDecision]) : null;
 
+		const addressesWithoutUndefined = voterAddresses?.filter((address) => address !== undefined && address !== null);
+
 		const query = this.getVotesQuery({
 			proposalType,
 			subsquidDecision,
-			votesType,
-			voterAddress
+			votesType
 		});
 
 		const variables =
@@ -388,6 +381,7 @@ export class SubsquidService extends SubsquidUtils {
 						type_eq: proposalType,
 						limit,
 						offset: (page - 1) * limit,
+						voter_in: addressesWithoutUndefined,
 						...(subsquidDecision && { decision_in: subsquidDecisionIn })
 					}
 				: {
@@ -395,6 +389,7 @@ export class SubsquidService extends SubsquidUtils {
 						type_eq: proposalType,
 						limit,
 						offset: (page - 1) * limit,
+						voter_in: addressesWithoutUndefined,
 						orderBy: this.getOrderByForSubsquid({ orderBy }),
 						...(subsquidDecision && { decision_in: subsquidDecisionIn }),
 						...(subsquidDecision === 'yes' && votesType === EVotesDisplayType.NESTED && { aye_not_eq: BN_ZERO.toString(), value_isNull: false }),
