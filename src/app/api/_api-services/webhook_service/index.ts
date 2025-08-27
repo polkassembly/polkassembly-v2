@@ -19,6 +19,7 @@ import { APIError } from '../../_api-utils/apiError';
 import { RedisService } from '../redis_service';
 import { OnChainDbService } from '../onchain_db_service';
 import { OffChainDbService } from '../offchain_db_service';
+import { NotificationService } from '../notification_service';
 
 if (!TOOLS_PASSPHRASE) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'TOOLS_PASSPHRASE is not set');
@@ -223,6 +224,8 @@ export class WebhookService {
 	}) {
 		// TODO: add origin and clear cache for origin page too
 		const { indexOrHash, proposalType } = params;
+
+		await this.handleNotificationsForProposalEvent({ network, indexOrHash, proposalType, event });
 
 		// Invalidate caches
 		await Promise.allSettled([
@@ -624,6 +627,72 @@ export class WebhookService {
 			userId,
 			wallet: Object.values(EWallet).includes(wallet as EWallet) ? (wallet as EWallet) : EWallet.OTHER
 		});
+	}
+
+	private static async handleNotificationsForProposalEvent({
+		network,
+		indexOrHash,
+		proposalType,
+		event
+	}: {
+		network: ENetwork;
+		indexOrHash: string;
+		proposalType: EProposalType;
+		event: EWebhookEvent;
+	}) {
+		try {
+			let proposalData;
+			try {
+				if (proposalType === EProposalType.DISCUSSION) {
+					proposalData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType });
+				} else {
+					proposalData = await OnChainDbService.GetOnChainPostInfo({ network, proposalType, indexOrHash });
+				}
+			} catch (error) {
+				console.error(`Failed to fetch proposal data for notifications: ${error}`);
+				return;
+			}
+
+			if (!proposalData) {
+				console.log(`No proposal data found for ${proposalType}/${indexOrHash}`);
+				return;
+			}
+
+			switch (event) {
+				case EWebhookEvent.PROPOSAL_CREATED: {
+					if (proposalType === EProposalType.REFERENDUM_V2) {
+						const title = 'title' in proposalData ? proposalData.title : `Referendum ${indexOrHash}`;
+						const track = 'track' in proposalData ? (proposalData.track as string) : undefined;
+						await NotificationService.SendReferendumNotification({
+							network,
+							referendumId: indexOrHash,
+							referendumTitle: title || `Referendum ${indexOrHash}`,
+							track
+						});
+					}
+					break;
+				}
+
+				case EWebhookEvent.PROPOSAL_STATUS_UPDATED:
+				case EWebhookEvent.PROPOSAL_ENDED:
+				case EWebhookEvent.BOUNTY_CLAIMED:
+				case EWebhookEvent.DECISION_DEPOSIT_PLACED: {
+					const status = 'status' in proposalData ? proposalData.status : 'Unknown';
+					await NotificationService.SendStatusChangeNotification({
+						network,
+						postId: indexOrHash,
+						newStatus: status || 'Unknown',
+						oldStatus: 'Previous Status'
+					});
+					break;
+				}
+
+				default:
+					console.log(`No notification handler for event: ${event}`);
+			}
+		} catch (error) {
+			console.error(`Error sending notifications for ${event}:`, error);
+		}
 	}
 
 	private static async handleOtherEvent({ network, params }: { network: ENetwork; params: unknown }) {
