@@ -61,7 +61,10 @@ function ProfileOverview({ profileData, address }: ProfileOverviewProps) {
 					availableBalance={userBalanceData.available}
 					delegatedBalance={userBalanceData.delegated}
 				/>
-				<ProfileViewsTracker userId={profileData?.id} />
+				<ProfileViewsTracker
+					userId={profileData?.id}
+					address={address}
+				/>
 			</div>
 		</div>
 	);

@@ -120,6 +120,7 @@ enum EApiRoute {
 	GET_BATCH_VOTE_CART = 'GET_BATCH_VOTE_CART',
 	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
+	GET_USER_BALANCE_HISTORY = 'GET_USER_BALANCE_HISTORY',
 	DELETE_BATCH_VOTE_CART = 'DELETE_BATCH_VOTE_CART',
 	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART',
 	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
@@ -147,7 +148,9 @@ enum EApiRoute {
 	ADD_COMMENT_REACTION = 'ADD_COMMENT_REACTION',
 	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
 	GET_PROFILE_VIEWS = 'GET_PROFILE_VIEWS',
-	INCREMENT_PROFILE_VIEW = 'INCREMENT_PROFILE_VIEW'
+	GET_PROFILE_VIEWS_BY_ADDRESS = 'GET_PROFILE_VIEWS_BY_ADDRESS',
+	INCREMENT_PROFILE_VIEW = 'INCREMENT_PROFILE_VIEW',
+	INCREMENT_PROFILE_VIEW_BY_ADDRESS = 'INCREMENT_PROFILE_VIEW_BY_ADDRESS'
 }
 
 export class NextApiClientService {
@@ -223,6 +226,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_ADDRESS_RELATIONS:
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
 			case EApiRoute.GET_USER_POSTS_BY_ADDRESS:
+			case EApiRoute.GET_USER_BALANCE_HISTORY:
 				path = '/users/address';
 				break;
 
@@ -269,6 +273,12 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_PROFILE_VIEWS:
 				path = '/users/id';
+				break;
+			case EApiRoute.GET_PROFILE_VIEWS_BY_ADDRESS:
+				path = '/users/address';
+				break;
+			case EApiRoute.INCREMENT_PROFILE_VIEW_BY_ADDRESS:
+				path = '/users/address';
 				break;
 
 			// post routes
@@ -991,6 +1001,26 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ delegationStats: ITrackDelegationStats[] }>({ url, method });
 	}
 
+	static async getUserBalanceHistory({ address, months = 6, granularity = 'monthly' }: { address: string; months?: number; granularity?: 'daily' | 'weekly' | 'monthly' }) {
+		const queryParams = new URLSearchParams({
+			months: months.toString(),
+			granularity
+		});
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_USER_BALANCE_HISTORY,
+			routeSegments: ['users', 'address', address, 'balance-history'],
+			queryParams
+		});
+		return this.nextApiClientFetch<
+			Array<{
+				date: string;
+				totalVotingPower: number;
+				availableBalance: number;
+				delegatedBalance: number;
+			}>
+		>({ url, method });
+	}
+
 	static async getProfileViews({ userId, timePeriod = 'month' }: { userId: number; timePeriod?: 'today' | 'week' | 'month' | 'all' }) {
 		const queryParams = new URLSearchParams({
 			timePeriod
@@ -1004,10 +1034,32 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ total: number; unique: number; period: string }>({ url, method });
 	}
 
+	static async getProfileViewsByAddress({ address, timePeriod = 'month' }: { address: string; timePeriod?: 'today' | 'week' | 'month' | 'all' }) {
+		const queryParams = new URLSearchParams({
+			timePeriod
+		});
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_PROFILE_VIEWS_BY_ADDRESS,
+			routeSegments: [address, 'profile-views'],
+			queryParams
+		});
+
+		return this.nextApiClientFetch<{ total: number; unique: number; period: string }>({ url, method });
+	}
+
 	static async incrementProfileView({ userId }: { userId: number }) {
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.INCREMENT_PROFILE_VIEW,
 			routeSegments: [userId.toString(), 'profile-views']
+		});
+
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	static async incrementProfileViewByAddress({ address }: { address: string }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.INCREMENT_PROFILE_VIEW_BY_ADDRESS,
+			routeSegments: [address, 'profile-views']
 		});
 
 		return this.nextApiClientFetch<{ message: string }>({ url, method });

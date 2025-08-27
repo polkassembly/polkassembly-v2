@@ -10,19 +10,20 @@ import ProfileViewsCard from './ProfileViewsCard';
 
 interface ProfileViewsTrackerProps {
 	userId?: number;
+	address?: string;
 	timePeriod?: 'today' | 'week' | 'month' | 'all';
 }
 
-function ProfileViewsTracker({ userId, timePeriod = 'month' }: ProfileViewsTrackerProps) {
-	const { profileViewsData, isProfileViewsLoading, incrementProfileView } = useProfileViews(userId, { timePeriod });
+function ProfileViewsTracker({ userId, address, timePeriod = 'month' }: ProfileViewsTrackerProps) {
+	const { profileViewsData, isProfileViewsLoading, incrementProfileView } = useProfileViews(userId, address, { timePeriod });
 
 	// Track profile view when component mounts
 	useEffect(() => {
-		if (userId) {
+		if (userId || address) {
 			// Increment profile view when the profile is viewed
 			incrementProfileView();
 		}
-	}, [userId]);
+	}, [userId, address]);
 
 	return (
 		<ProfileViewsCard

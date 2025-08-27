@@ -1840,9 +1840,22 @@ export class FirestoreService extends FirestoreUtils {
 	}
 
 	// Profile Views methods
-	static async IncrementProfileView({ userId, viewerId, network, ipHash }: { userId: number; viewerId?: number; network: ENetwork; ipHash?: string }): Promise<void> {
+	static async IncrementProfileView({
+		userId,
+		address,
+		viewerId,
+		network,
+		ipHash
+	}: {
+		userId?: number;
+		address?: string;
+		viewerId?: number;
+		network: ENetwork;
+		ipHash?: string;
+	}): Promise<void> {
 		const viewRecord = {
-			userId,
+			...(userId && { userId }),
+			...(address && { address }),
 			...(viewerId && { viewerId }),
 			...(ipHash && { ipHash }),
 			network,
@@ -1855,10 +1868,12 @@ export class FirestoreService extends FirestoreUtils {
 
 	static async GetProfileViews({
 		userId,
+		address,
 		network,
 		timePeriod = 'month'
 	}: {
-		userId: number;
+		userId?: number;
+		address?: string;
 		network: ENetwork;
 		timePeriod?: 'today' | 'week' | 'month' | 'all';
 	}): Promise<{ total: number; unique: number; period: string }> {
@@ -1878,7 +1893,16 @@ export class FirestoreService extends FirestoreUtils {
 				startDate = null;
 		}
 
-		let query = this.profileViewsCollectionRef().where('userId', '==', userId).where('network', '==', network);
+		let query = this.profileViewsCollectionRef().where('network', '==', network);
+
+		// Query by userId or address
+		if (userId) {
+			query = query.where('userId', '==', userId);
+		} else if (address) {
+			query = query.where('address', '==', address);
+		} else {
+			throw new Error('Either userId or address must be provided');
+		}
 
 		if (startDate) {
 			query = query.where('timestamp', '>=', startDate);

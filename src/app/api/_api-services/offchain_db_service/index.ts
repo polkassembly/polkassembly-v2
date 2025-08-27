@@ -460,20 +460,34 @@ export class OffChainDbService {
 	}
 
 	// Profile Views methods
-	static async IncrementProfileView({ userId, viewerId, network, ipHash }: { userId: number; viewerId?: number; network: ENetwork; ipHash?: string }): Promise<void> {
-		return FirestoreService.IncrementProfileView({ userId, viewerId, network, ipHash });
+	static async IncrementProfileView({
+		userId,
+		address,
+		viewerId,
+		network,
+		ipHash
+	}: {
+		userId?: number;
+		address?: string;
+		viewerId?: number;
+		network: ENetwork;
+		ipHash?: string;
+	}): Promise<void> {
+		return FirestoreService.IncrementProfileView({ userId, address, viewerId, network, ipHash });
 	}
 
 	static async GetProfileViews({
 		userId,
+		address,
 		network,
 		timePeriod = 'month'
 	}: {
-		userId: number;
+		userId?: number;
+		address?: string;
 		network: ENetwork;
 		timePeriod?: 'today' | 'week' | 'month' | 'all';
 	}): Promise<{ total: number; unique: number; period: string }> {
-		return FirestoreService.GetProfileViews({ userId, network, timePeriod });
+		return FirestoreService.GetProfileViews({ userId, address, network, timePeriod });
 	}
 
 	static async AddNewUser(user: IUser) {
