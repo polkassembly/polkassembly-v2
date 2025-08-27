@@ -23,7 +23,7 @@ function ProfileViewsTracker({ userId, address, timePeriod = 'month' }: ProfileV
 			// Increment profile view when the profile is viewed
 			incrementProfileView();
 		}
-	}, [userId, address]);
+	}, [userId, address, incrementProfileView]);
 
 	return (
 		<ProfileViewsCard

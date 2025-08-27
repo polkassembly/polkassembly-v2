@@ -277,9 +277,6 @@ export class NextApiClientService {
 			case EApiRoute.GET_PROFILE_VIEWS_BY_ADDRESS:
 				path = '/users/address';
 				break;
-			case EApiRoute.INCREMENT_PROFILE_VIEW_BY_ADDRESS:
-				path = '/users/address';
-				break;
 
 			// post routes
 			case EApiRoute.LOGOUT:
@@ -332,6 +329,10 @@ export class NextApiClientService {
 			case EApiRoute.CONFIRM_SOCIAL_VERIFICATION:
 			case EApiRoute.INCREMENT_PROFILE_VIEW:
 				path = '/users/id';
+				method = 'POST';
+				break;
+			case EApiRoute.INCREMENT_PROFILE_VIEW_BY_ADDRESS:
+				path = '/users/address';
 				method = 'POST';
 				break;
 			case EApiRoute.CREATE_PA_DELEGATE:
