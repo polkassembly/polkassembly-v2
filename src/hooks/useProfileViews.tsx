@@ -20,7 +20,7 @@ interface UseProfileViewsOptions {
 }
 
 export const useProfileViews = (userId?: number, options: UseProfileViewsOptions = {}) => {
-	const { timePeriod = 'all', enabled = true } = options;
+	const { timePeriod = 'month', enabled = true } = options;
 	const queryClient = useQueryClient();
 
 	// Fetch profile views data

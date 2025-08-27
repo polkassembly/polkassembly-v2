@@ -18,7 +18,7 @@ const zodParamsSchema = z.object({
 });
 
 const zodQuerySchema = z.object({
-	timePeriod: z.enum(['today', 'week', 'month', 'all']).optional().default('all')
+	timePeriod: z.enum(['today', 'week', 'month', 'all']).optional().default('month')
 });
 
 // GET - Retrieve profile views

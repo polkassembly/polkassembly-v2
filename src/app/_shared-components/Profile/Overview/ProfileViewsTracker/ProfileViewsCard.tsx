@@ -5,7 +5,6 @@
 'use client';
 
 import { Eye } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import classes from './ProfileViewsCard.module.scss';
 
@@ -30,7 +29,6 @@ function ProfileViewsCard({ profileViewsData, isLoading = false }: ProfileViewsC
 				</div>
 				<div className={classes.profileViewsValue}>
 					<Skeleton className='h-8 w-16' />
-					<Skeleton className='h-4 w-20' />
 				</div>
 			</div>
 		);
@@ -42,8 +40,8 @@ function ProfileViewsCard({ profileViewsData, isLoading = false }: ProfileViewsC
 				<Eye className={classes.statCardIcon} />
 				<span className={classes.statCardTitle}>Profile Views</span>
 				<div className={classes.profileViewsValue}>
-					<span className={cn(classes.value, classes.pinkValue)}>0</span>
-					<span className={classes.timePeriod}>All Time</span>
+					<span className={classes.value}>0</span>
+					<span className={classes.timePeriod}>Last 30 days</span>
 				</div>
 			</div>
 		);
@@ -54,7 +52,7 @@ function ProfileViewsCard({ profileViewsData, isLoading = false }: ProfileViewsC
 			<Eye className={classes.statCardIcon} />
 			<span className={classes.statCardTitle}>Profile Views</span>
 			<div className={classes.profileViewsValue}>
-				<span className={cn(classes.value, classes.pinkValue)}>{profileViewsData.unique}</span>
+				<span className={classes.value}>{profileViewsData.unique}</span>
 				<span className={classes.timePeriod}>{profileViewsData.period}</span>
 			</div>
 		</div>

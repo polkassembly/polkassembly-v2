@@ -1856,7 +1856,7 @@ export class FirestoreService extends FirestoreUtils {
 	static async GetProfileViews({
 		userId,
 		network,
-		timePeriod = 'all'
+		timePeriod = 'month'
 	}: {
 		userId: number;
 		network: ENetwork;
@@ -1899,8 +1899,8 @@ export class FirestoreService extends FirestoreUtils {
 
 		const periodLabels = {
 			today: 'Today',
-			week: 'This Week',
-			month: 'This Month',
+			week: 'Last 7 days',
+			month: 'Last 30 days',
 			all: 'All Time'
 		};
 

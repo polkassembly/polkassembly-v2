@@ -991,23 +991,25 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ delegationStats: ITrackDelegationStats[] }>({ url, method });
 	}
 
-	static async getProfileViews({ userId, timePeriod = 'all' }: { userId: number; timePeriod?: 'today' | 'week' | 'month' | 'all' }) {
+	static async getProfileViews({ userId, timePeriod = 'month' }: { userId: number; timePeriod?: 'today' | 'week' | 'month' | 'all' }) {
 		const queryParams = new URLSearchParams({
 			timePeriod
 		});
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.GET_PROFILE_VIEWS,
-			routeSegments: ['users', 'id', userId.toString(), 'profile-views'],
+			routeSegments: [userId.toString(), 'profile-views'],
 			queryParams
 		});
+
 		return this.nextApiClientFetch<{ total: number; unique: number; period: string }>({ url, method });
 	}
 
 	static async incrementProfileView({ userId }: { userId: number }) {
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.INCREMENT_PROFILE_VIEW,
-			routeSegments: ['users', 'id', userId.toString(), 'profile-views']
+			routeSegments: [userId.toString(), 'profile-views']
 		});
+
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 

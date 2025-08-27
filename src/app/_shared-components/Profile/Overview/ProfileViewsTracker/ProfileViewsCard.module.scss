@@ -19,11 +19,7 @@
 }
 
 .value {
-	@apply text-xl font-semibold text-text_primary;
-}
-
-.pinkValue {
-	@apply text-text_pink;
+	@apply text-xl font-semibold text-text_pink;
 }
 
 .timePeriod {
@@ -37,7 +33,7 @@
 	}
 
 	.value {
-		@apply text-text_primary;
+		@apply text-text_pink;
 	}
 
 	.statCardTitle,

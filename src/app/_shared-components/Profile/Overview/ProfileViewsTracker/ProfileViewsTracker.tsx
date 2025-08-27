@@ -13,7 +13,7 @@ interface ProfileViewsTrackerProps {
 	timePeriod?: 'today' | 'week' | 'month' | 'all';
 }
 
-function ProfileViewsTracker({ userId, timePeriod = 'all' }: ProfileViewsTrackerProps) {
+function ProfileViewsTracker({ userId, timePeriod = 'month' }: ProfileViewsTrackerProps) {
 	const { profileViewsData, isProfileViewsLoading, incrementProfileView } = useProfileViews(userId, { timePeriod });
 
 	// Track profile view when component mounts
@@ -22,7 +22,7 @@ function ProfileViewsTracker({ userId, timePeriod = 'all' }: ProfileViewsTracker
 			// Increment profile view when the profile is viewed
 			incrementProfileView();
 		}
-	}, [userId, incrementProfileView]);
+	}, [userId]);
 
 	return (
 		<ProfileViewsCard

@@ -467,7 +467,7 @@ export class OffChainDbService {
 	static async GetProfileViews({
 		userId,
 		network,
-		timePeriod = 'all'
+		timePeriod = 'month'
 	}: {
 		userId: number;
 		network: ENetwork;
