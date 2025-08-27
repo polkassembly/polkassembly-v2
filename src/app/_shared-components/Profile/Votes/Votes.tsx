@@ -5,161 +5,63 @@
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useMemo, useCallback, memo } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import noData from '@assets/activityfeed/gifs/noactivity.gif';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { ENetwork, ENetworkSocial, EProposalStatus, EVoteDecision, IGenericListingResponse, IProfileVote } from '@/_shared/types';
-import { Ban, ThumbsDown, ThumbsUp, Trash2, ChevronDown } from 'lucide-react';
-import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { IGenericListingResponse, IProfileVote } from '@/_shared/types';
+import { ChevronDown } from 'lucide-react';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import SubscanIcon from '@assets/profile/subscan-link.svg';
-import { useUser } from '@/hooks/useUser';
-import { CLOSED_PROPOSAL_STATUSES } from '@/_shared/_constants/closedProposalStatuses';
-import Link from 'next/link';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { cn } from '@/lib/utils';
-import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import classes from './Votes.module.scss';
 import { Separator } from '../../Separator';
 import { Skeleton } from '../../Skeleton';
 import { Button } from '../../Button';
-import StatusTag from '../../StatusTag/StatusTag';
 import { PaginationWithLinks } from '../../PaginationWithLinks';
 import { Checkbox } from '../../Checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
 import RemoveVoteDialog from '../../RemoveVoteDialog/RemoveVoteDialog';
 import Address from '../Address/Address';
+import VoteItem from './VoteItem';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../Table';
 
+// Constants
 const DEFAULT_VOTES_SHOW_COUNT = 3;
 
-const getVoteFor = (vote: IProfileVote) => {
-	switch (vote.decision) {
-		case EVoteDecision.ABSTAIN:
-			return { aye: vote.balance?.aye, nay: vote.balance?.nay, abstain: vote.balance?.abstain };
-		case EVoteDecision.AYE:
-			return { aye: vote.balance?.aye || vote.balance?.value };
-		default:
-			return { nay: vote.balance?.nay || vote.balance?.value };
-	}
-};
-
-function VoteItem({
-	vote,
-	network,
-	userId,
-	handleRemoveVote,
-	loading
-}: {
-	vote: IProfileVote;
-	network: ENetwork;
-	userId?: number;
-	handleRemoveVote: () => void;
-	loading: boolean;
-}) {
-	const voteFor = getVoteFor(vote);
-	const { user } = useUser();
-	const t = useTranslations();
-	const subScanLink = NETWORKS_DETAILS[`${network}`].socialLinks?.find((link) => link.id === ENetworkSocial.SUBSCAN)?.href;
-	const redirectUrl = getPostTypeUrl({ proposalType: vote?.proposalType, indexOrHash: vote.proposalIndex, network });
-
-	return (
-		<div className={classes.voteItem}>
-			<Link
-				href={redirectUrl}
-				className={cn(classes.voteItemTitle, 'hover:underline')}
-				target='_blank'
-				rel='noopener noreferrer'
-			>
-				#{vote.proposalIndex} {vote.postDetails?.title}
-			</Link>
-
-			<div className={classes.voteItemBalance}>
-				<div className={classes.voteItemBalanceContent}>
-					{voteFor.aye && (
-						<div className={classes.voteItemBalanceItem}>
-							<span className={classes.voteItemBalanceItemTitle}>
-								<ThumbsUp className='h-4 w-4' />
-								{t('PostDetails.aye')}
-							</span>
-							<span>{formatBnBalance(voteFor.aye, { withUnit: true, numberAfterComma: 1, compactNotation: true }, network)}</span>
-						</div>
-					)}
-					{voteFor.nay && (
-						<div className={classes.voteItemBalanceItem}>
-							<span className={classes.voteItemBalanceItemTitle}>
-								<ThumbsDown className='h-4 w-4' />
-								{t('PostDetails.nay')}
-							</span>
-							<span>{formatBnBalance(voteFor.nay, { withUnit: true, numberAfterComma: 1, compactNotation: true }, network)}</span>
-						</div>
-					)}
-					{voteFor.abstain && (
-						<div className={classes.voteItemBalanceItem}>
-							<span className={classes.voteItemBalanceItemTitle}>
-								<Ban className='h-4 w-4' />
-								{t('PostDetails.abstain')}
-							</span>
-							<span>{formatBnBalance(voteFor.abstain, { withUnit: true, numberAfterComma: 1, compactNotation: true }, network)}</span>
-						</div>
-					)}
-				</div>
-				<div className='flex items-center justify-center'>{`${vote.lockPeriod || '0.1'}x${vote.isDelegated ? '/d' : ''}${vote.decision === EVoteDecision.ABSTAIN ? '/sa' : ''} `}</div>
-			</div>
-			<div className='col-span-1 flex justify-center'>
-				<StatusTag status={vote.postDetails?.onChainInfo?.status} />
-			</div>
-			<div className='col-span-1 flex justify-center'>
-				<Address
-					address={vote.voterAddress}
-					iconSize={20}
-					redirectToProfile={false}
-					disableTooltip
-				/>
-			</div>
-			<div className='col-span-1 flex items-center justify-end gap-2 text-end'>
-				<Link
-					className='flex h-6 w-6 items-center rounded-full px-1 py-0'
-					target='_blank'
-					rel='noopener noreferrer'
-					href={`${subScanLink}/extrinsic/${vote.extrinsicIndex}`}
-				>
-					<Image
-						src={SubscanIcon}
-						alt='subscan'
-						width={24}
-						height={24}
-					/>
-				</Link>
-				{user?.id === userId && !CLOSED_PROPOSAL_STATUSES.includes(vote.postDetails?.onChainInfo?.status as EProposalStatus) && (
-					<Button
-						variant='ghost'
-						size='icon'
-						className='h-6 w-6 rounded-full px-1 py-0'
-						onClick={handleRemoveVote}
-						disabled={loading}
-					>
-						<Trash2 className='text-text_primary' />
-					</Button>
-				)}
-			</div>
-		</div>
-	);
-}
-
-function SelectAddresses({
-	addresses,
-	selectedAddresses,
-	setSelectedAddresses,
-	disabled
-}: {
+interface SelectAddressesProps {
 	addresses: string[];
 	selectedAddresses: string[];
-	setSelectedAddresses: (addresses: string[]) => void;
+	onSelectedAddressesChange: (addresses: string[]) => void;
 	disabled?: boolean;
-}) {
+}
+
+interface VotesProps {
+	addresses: string[];
+	userId?: number;
+}
+
+// Select Addresses Component
+const SelectAddresses = memo<SelectAddressesProps>(function SelectAddresses({ addresses, selectedAddresses, onSelectedAddressesChange, disabled = false }) {
 	const t = useTranslations('Profile');
+
+	// Early return for single address - moved hooks before this
+	const buttonText = useMemo(
+		() => (selectedAddresses.length > 0 ? `${t('Votes.selectAddresses')} (${selectedAddresses.length})` : t('Votes.selectAddresses')),
+		[selectedAddresses.length, t]
+	);
+
+	// Optimized checkbox change handler
+	const handleCheckboxChange = useCallback(
+		(address: string) => (checked: boolean) => {
+			if (checked) {
+				onSelectedAddressesChange([...selectedAddresses, address]);
+			} else {
+				onSelectedAddressesChange(selectedAddresses.filter((addr) => addr !== address));
+			}
+		},
+		[selectedAddresses, onSelectedAddressesChange]
+	);
 
 	if (addresses.length === 1) {
 		return null;
@@ -173,14 +75,20 @@ function SelectAddresses({
 						variant='outline'
 						className='flex w-fit items-center justify-between gap-2 px-4 py-2'
 						disabled={disabled}
+						aria-label={buttonText}
 					>
-						<span className='text-sm font-medium'>{selectedAddresses.length > 0 ? `${t('Votes.selectAddresses')} (${selectedAddresses.length})` : t('Votes.selectAddresses')}</span>
-						<ChevronDown className='h-4 w-4' />
+						<span className='text-sm font-medium'>{buttonText}</span>
+						<ChevronDown
+							className='h-4 w-4'
+							aria-hidden='true'
+						/>
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent
 					className='px-6 py-4'
 					align='start'
+					role='dialog'
+					aria-label='Select addresses'
 				>
 					<div className='flex flex-col gap-4'>
 						{addresses.map((address) => (
@@ -191,13 +99,8 @@ function SelectAddresses({
 								<Checkbox
 									id={`address-${address}`}
 									checked={selectedAddresses.includes(address)}
-									onCheckedChange={(checked) => {
-										if (checked) {
-											setSelectedAddresses([...selectedAddresses, address]);
-										} else {
-											setSelectedAddresses(selectedAddresses.filter((addr) => addr !== address));
-										}
-									}}
+									onCheckedChange={handleCheckboxChange(address)}
+									aria-label={`Select address ${address}`}
 								/>
 								<div className={classes.address}>
 									<Address
@@ -214,122 +117,219 @@ function SelectAddresses({
 			</Popover>
 		</div>
 	);
-}
+});
 
-function Votes({ addresses, userId }: { addresses: string[]; userId?: number }) {
+// Main Votes Component
+function Votes({ addresses, userId }: VotesProps) {
 	const t = useTranslations('Profile');
 	const network = getCurrentNetwork();
+
+	// State management
 	const [loading, setLoading] = useState(false);
-	const [votes, setVotes] = useState<IGenericListingResponse<IProfileVote>>();
 	const [page, setPage] = useState(1);
 	const [showMore, setShowMore] = useState(false);
-	const [selectedAddresses, setSelectedAddresses] = useState<string[]>(addresses);
+	const [selectedAddresses, setSelectedAddresses] = useState<string[]>([...addresses]);
 	const [openRemoveVoteDialog, setOpenRemoveVoteDialog] = useState(false);
 	const [proposalIndex, setProposalIndex] = useState<number | null>(null);
+	const [votes, setVotes] = useState<IGenericListingResponse<IProfileVote>>();
 
-	const getVotes = async () => {
+	// Memoized fetch function to prevent unnecessary recreations
+	const fetchVotes = useCallback(async () => {
 		if (!selectedAddresses.length) {
 			setVotes({ items: [], totalCount: 0 });
 			return;
 		}
-		const { data, error } = await NextApiClientService.getVotesByAddresses({ addresses: selectedAddresses, page, limit: DEFAULT_LISTING_LIMIT });
+
+		const { data, error } = await NextApiClientService.getVotesByAddresses({
+			addresses: [...selectedAddresses],
+			page,
+			limit: DEFAULT_LISTING_LIMIT
+		});
+
 		if (error) {
 			throw new Error(error.message);
 		}
+
 		setVotes(data || undefined);
-	};
+	}, [selectedAddresses, page]);
 
 	const { isFetching } = useQuery({
-		queryKey: ['votes', selectedAddresses, page],
-		queryFn: getVotes,
-		enabled: !!selectedAddresses.length,
+		queryKey: ['votes', selectedAddresses, page] as const,
+		queryFn: fetchVotes,
+		enabled: selectedAddresses.length > 0,
 		refetchOnWindowFocus: false
 	});
 
+	// Memoized handlers to prevent unnecessary re-renders
+	const handleSelectedAddressesChange = useCallback((newAddresses: string[]) => {
+		setSelectedAddresses(newAddresses);
+		setPage(1); // Reset to first page when addresses change
+	}, []);
+
+	const handleShowMoreToggle = useCallback(() => {
+		setShowMore((prev) => !prev);
+	}, []);
+
+	const handleRemoveVote = useCallback((voteProposalIndex: number) => {
+		setOpenRemoveVoteDialog(true);
+		setProposalIndex(voteProposalIndex);
+	}, []);
+
+	const handleRemoveVoteConfirm = useCallback(() => {
+		if (proposalIndex === null) return;
+
+		setVotes((prev) => {
+			if (!prev) return prev;
+			return {
+				...prev,
+				items: prev.items.filter((item) => item.proposalIndex !== proposalIndex),
+				totalCount: prev.totalCount - 1
+			};
+		});
+		setProposalIndex(null);
+	}, [proposalIndex, setVotes]);
+
+	// Memoized vote items to prevent unnecessary re-renders
+	const visibleVotes = useMemo(() => {
+		if (!votes?.items) return [];
+		return votes.items.slice(0, showMore ? DEFAULT_LISTING_LIMIT : DEFAULT_VOTES_SHOW_COUNT);
+	}, [votes?.items, showMore]);
+
+	// Memoized skeleton count
+	const skeletonCount = useMemo(() => (showMore ? DEFAULT_LISTING_LIMIT : DEFAULT_VOTES_SHOW_COUNT), [showMore]);
+
+	// Memoized conditions
+	const hasVotes = useMemo(() => Boolean(votes?.totalCount), [votes?.totalCount]);
+	const shouldShowToggleButton = useMemo(() => votes && !isFetching && votes.totalCount > DEFAULT_VOTES_SHOW_COUNT, [votes, isFetching]);
+	const shouldShowPagination = useMemo(() => showMore && votes && votes.totalCount > DEFAULT_VOTES_SHOW_COUNT, [showMore, votes]);
+
 	return (
-		<div className={classes.votesWrapper}>
-			<div className={classes.header}>
+		<div
+			className={classes.votesWrapper}
+			role='main'
+			aria-label='Votes section'
+		>
+			{/* Header Section */}
+			<header className={classes.header}>
 				<div className='flex items-center gap-2'>
 					<h2 className='text-2xl font-bold'>{t('Votes.votes')}</h2>
-					{!!votes?.totalCount && !!ValidatorService.isValidNumber(votes?.totalCount) && <p>({votes.totalCount})</p>}
+					{hasVotes && votes && ValidatorService.isValidNumber(votes.totalCount) && <p aria-label={`Total votes: ${votes.totalCount}`}>({votes.totalCount})</p>}
 				</div>
 				<SelectAddresses
 					addresses={addresses}
 					selectedAddresses={selectedAddresses}
-					setSelectedAddresses={setSelectedAddresses}
+					onSelectedAddressesChange={handleSelectedAddressesChange}
 					disabled={isFetching || loading}
 				/>
-			</div>
+			</header>
+
 			<Separator orientation='horizontal' />
+
+			{/* Content Section */}
 			{isFetching ? (
-				<div className={classes.votesItemWrapper}>
-					<Skeleton className='h-10 w-full' />
-					<Separator
-						orientation='horizontal'
-						className='my-2'
-					/>
-					{Array.from({ length: showMore ? DEFAULT_LISTING_LIMIT : DEFAULT_VOTES_SHOW_COUNT }).map(() => (
-						<Skeleton className='h-16 w-full' />
-					))}
+				// Loading State
+				<div
+					className={cn(classes.votesItemWrapper, 'overflow-x-auto')}
+					role='status'
+					aria-label='Loading votes'
+				>
+					<Table className='min-w-full text-sm text-text_primary'>
+						<TableHeader>
+							<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
+								<TableHead className='py-4'>{t('Votes.proposal')}</TableHead>
+								<TableHead className='py-4'>{t('Votes.voteFor')}</TableHead>
+								<TableHead className='py-4 text-center'>{t('Votes.status')}</TableHead>
+								<TableHead className='py-4 text-center'>{t('Votes.voter')}</TableHead>
+								<TableHead className='py-4 text-right'>{t('Votes.action')}</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{Array.from({ length: skeletonCount }, (_, index) => (
+								<TableRow key={index}>
+									<TableCell className='py-4'>
+										<Skeleton className='h-4 w-full' />
+									</TableCell>
+									<TableCell className='py-4'>
+										<Skeleton className='h-4 w-3/4' />
+									</TableCell>
+									<TableCell className='py-4'>
+										<Skeleton className='mx-auto h-4 w-16' />
+									</TableCell>
+									<TableCell className='py-4'>
+										<Skeleton className='mx-auto h-4 w-20' />
+									</TableCell>
+									<TableCell className='py-4'>
+										<Skeleton className='ml-auto h-4 w-8' />
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
 				</div>
-			) : !votes?.totalCount ? (
-				<div className='mt-0 flex w-full flex-col items-center justify-center'>
+			) : !hasVotes ? (
+				// Empty State
+				<div
+					className='mt-0 flex w-full flex-col items-center justify-center'
+					role='status'
+				>
 					<Image
 						src={noData}
-						alt='no data'
+						alt='No votes data available'
 						width={300}
 						height={300}
+						priority
 					/>
 					<p className='text-text_secondary mb-2 mt-0'>{t('Votes.noData')}</p>
 				</div>
 			) : (
+				// Votes Content
 				<div className={classes.votesItemWrapper}>
-					<div className={classes.votesItemHeader}>
-						<div className='col-span-4'>{t('Votes.proposal')}</div>
-						<div className='col-span-2 text-start'>{t('Votes.voteFor')}</div>
-						<div className='col-span-1 text-center'>{t('Votes.status')}</div>
-						<div className='col-span-1 text-center'>{t('Votes.voter')}</div>
-						<div className='col-span-1 text-end'>{t('Votes.action')}</div>
-					</div>
-					<Separator
-						orientation='horizontal'
-						className='my-2 max-md:hidden'
-					/>
-					{votes?.items.slice(0, showMore ? DEFAULT_LISTING_LIMIT : DEFAULT_VOTES_SHOW_COUNT).map((vote, index) => (
-						<>
-							<VoteItem
-								key={vote.proposalIndex}
-								vote={vote}
-								network={network}
-								userId={userId}
-								handleRemoveVote={() => {
-									setOpenRemoveVoteDialog(true);
-									setProposalIndex(vote.proposalIndex);
-								}}
-								loading={loading}
-							/>
-							{index !== (!showMore ? DEFAULT_LISTING_LIMIT : votes.items.length) - 1 && (
-								<Separator
-									orientation='horizontal'
-									className='my-1'
+					<Table className='min-w-full text-sm text-text_primary'>
+						<TableHeader>
+							<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
+								<TableHead className='py-4'>{t('Votes.proposal')}</TableHead>
+								<TableHead className='py-4'>{t('Votes.voteFor')}</TableHead>
+								<TableHead className='py-4 text-center'>{t('Votes.status')}</TableHead>
+								<TableHead className='py-4 text-center'>{t('Votes.voter')}</TableHead>
+								<TableHead className='py-4 text-right'>{t('Votes.action')}</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{visibleVotes.map((vote) => (
+								<VoteItem
+									key={`${vote.proposalIndex}-${vote.voterAddress}`}
+									vote={vote}
+									network={network}
+									userId={userId}
+									onRemoveVote={() => handleRemoveVote(vote.proposalIndex)}
+									isLoading={loading}
 								/>
-							)}
-						</>
-					))}
+							))}
+						</TableBody>
+					</Table>
 
+					{/* Show More/Less Button */}
 					<div className='flex w-full justify-start'>
-						{votes && !isFetching && votes?.totalCount > DEFAULT_VOTES_SHOW_COUNT && (
+						{shouldShowToggleButton && (
 							<Button
 								variant='ghost'
 								className='px-0 py-0 text-xs font-normal text-text_pink'
-								onClick={() => setShowMore(!showMore)}
+								onClick={handleShowMoreToggle}
+								aria-expanded={showMore}
+								aria-controls='votes-list'
 							>
 								{showMore ? t('Votes.showLess') : t('Votes.showMore')}
 							</Button>
 						)}
 					</div>
-					{showMore && votes?.totalCount > DEFAULT_VOTES_SHOW_COUNT && (
-						<div className='flex w-full justify-center'>
+
+					{/* Pagination */}
+					{shouldShowPagination && (
+						<div
+							className='flex w-full justify-center'
+							role='navigation'
+							aria-label='Votes pagination'
+						>
 							<PaginationWithLinks
 								page={page}
 								pageSize={DEFAULT_LISTING_LIMIT}
@@ -340,28 +340,20 @@ function Votes({ addresses, userId }: { addresses: string[]; userId?: number }) 
 					)}
 				</div>
 			)}
-			{proposalIndex && ValidatorService.isValidNumber(proposalIndex) && (
+
+			{/* Remove Vote Dialog */}
+			{proposalIndex !== null && ValidatorService.isValidNumber(proposalIndex) && (
 				<RemoveVoteDialog
 					open={openRemoveVoteDialog}
 					onOpenChange={setOpenRemoveVoteDialog}
 					setLoading={setLoading}
 					isLoading={loading}
 					proposalIndex={proposalIndex}
-					onConfirm={() => {
-						setVotes((prev) => {
-							if (!prev) return prev;
-							return {
-								...(prev || []),
-								items: prev.items.filter((item) => item.proposalIndex !== proposalIndex),
-								totalCount: prev.totalCount - 1
-							};
-						});
-						setProposalIndex(null);
-					}}
+					onConfirm={handleRemoveVoteConfirm}
 				/>
 			)}
 		</div>
 	);
 }
 
-export default Votes;
+export default memo(Votes);

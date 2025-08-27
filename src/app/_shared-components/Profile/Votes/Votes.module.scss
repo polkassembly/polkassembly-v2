@@ -1,5 +1,5 @@
 .votesWrapper {
-	@apply flex flex-col gap-y-4 rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal px-6 py-4 pb-6 shadow-lg;
+	@apply flex w-full flex-col gap-y-4 rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal px-6 py-4 pb-6 shadow-lg;
 }
 .votesItemWrapper {
 	@apply mt-4 flex w-full flex-col gap-y-4 rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal px-6 py-4 pb-6;
@@ -17,7 +17,7 @@
 	@apply col-span-2 flex justify-start gap-8 text-start text-xs font-medium text-text_primary;
 }
 .voteItemBalanceContent {
-	@apply flex flex-col gap-2 text-center;
+	@apply flex gap-2 text-center text-xs;
 }
 .voteItemBalanceItem {
 	@apply flex items-center gap-3;
