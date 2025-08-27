@@ -6,7 +6,7 @@ import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { IS_NOTIFICATION_SERVICE_ENABLED, NOTIFICATION_ENGINE_API_KEY } from '@api/_api-constants/apiEnvVars';
 import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
-import { ENetwork, ENotificationTrigger, EProposalType, ESocial, IUser } from '@shared/types';
+import { ENetwork, ENotificationChannel, ENotificationTrigger, EProposalType, ESocial, IUser } from '@shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { OffChainDbService } from '@api/_api-services/offchain_db_service';
 
@@ -54,8 +54,8 @@ export class NotificationService {
 					const networkPrefs = Object.prototype.hasOwnProperty.call(triggerPreferences, network) ? triggerPreferences[network as keyof typeof triggerPreferences] : null;
 					if (!networkPrefs) return false;
 
-					const hasEnabledChannels = Object.values(user.notificationPreferences.channelPreferences || {}).some(
-						(channel: IChannelPreference) => channel.enabled && channel.verified
+					const hasEnabledChannels = Object.entries(user.notificationPreferences.channelPreferences || {}).some(
+						([channelType, channel]: [string, IChannelPreference]) => channel.enabled && (channelType === ENotificationChannel.IN_APP || channel.verified)
 					);
 
 					if (!hasEnabledChannels) return false;
@@ -99,7 +99,7 @@ export class NotificationService {
 						case ENotificationTrigger.TECH_COMMITTEE_CLOSED:
 							return (prefs?.gov1 as { techCommittee?: { enabled?: boolean } })?.techCommittee?.enabled || false;
 						case ENotificationTrigger.MENTION:
-							return (prefs?.myProposals as { mentions?: { enabled?: boolean } })?.mentions?.enabled || false;
+							return (prefs?.mentions as { enabled?: boolean })?.enabled || false;
 						default:
 							return false;
 					}
@@ -639,6 +639,9 @@ export class NotificationService {
 		mentionerUserId: number;
 		commentId?: string;
 	}) {
+		const enabled = (await this.getUsersWithEnabledNotifications({ network, trigger: ENotificationTrigger.MENTION })).includes(mentionedUserId);
+		if (!enabled) return;
+
 		await this.sendNotification({
 			network,
 			trigger: ENotificationTrigger.MENTION,
