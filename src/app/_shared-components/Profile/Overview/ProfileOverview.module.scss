@@ -7,7 +7,7 @@
 }
 
 .headerContent {
-	@apply flex items-center gap-2;
+	@apply flex items-center gap-2 border-b border-border_grey pb-2;
 }
 
 .headerIcon {
