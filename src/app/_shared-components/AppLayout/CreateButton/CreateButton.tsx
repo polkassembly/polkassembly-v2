@@ -29,7 +29,7 @@ function CreateButton({ state }: { state: 'collapsed' | 'expanded' }) {
 					width={20}
 					height={20}
 				/>
-				{state !== 'collapsed' && <span className={style.triggerText}>{t('CreateProposal.quickActions')}</span>}
+				{state !== 'collapsed' && <span className={style.triggerText}>{t('CreateProposal.create')}</span>}
 			</Link>
 		</div>
 	);

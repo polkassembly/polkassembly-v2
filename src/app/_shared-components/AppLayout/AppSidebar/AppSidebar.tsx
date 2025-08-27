@@ -10,7 +10,7 @@ import Link from 'next/link';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
 import PaLogo from '@ui/AppLayout/PaLogo';
 import { useTranslations } from 'next-intl';
-import CautionIcon from '@assets/sidebar/caution-icon.svg';
+import MagicWandIcon from '@assets/sidebar/magic-wand.svg';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -71,20 +71,20 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 			<SidebarFooter className='mb-3'>
 				{state === 'expanded' && (
 					<Link
-						href='https://polkassembly.hellonext.co/'
+						href='https://klara.polkassembly.io/'
 						target='_blank'
 						rel='noreferrer'
 					>
 						<div className={styles.create_proposal_button}>
 							<Image
-								src={CautionIcon}
+								src={MagicWandIcon}
 								alt=''
 								width={30}
 								height={30}
 							/>
 							<div className='flex flex-col'>
-								<span className='text-blue-light-high dark:text-blue-dark-high text-sm font-semibold'>{t('Sidebar.ReportAnIssue')}</span>
-								<span className='text-blue-light-medium dark:text-blue-dark-medium text-[11px]'>{t('Sidebar.NeedHelp')}</span>
+								<span className='text-blue-light-high dark:text-blue-dark-high text-sm font-semibold'>{t('Sidebar.chatWithKlara')}</span>
+								<span className='text-blue-light-medium dark:text-blue-dark-medium text-[11px]'>{t('Bounty.comingSoon')}</span>
 							</div>
 						</div>
 					</Link>

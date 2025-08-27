@@ -117,7 +117,15 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 							title: t(REFERENDA_KEY),
 							url: '',
 							icon: TreasuryIcon,
-							items: [...getTrackItems(networkKey, 'Main', t, trackCounts), ...getTrackItems(networkKey, 'Origin', t, trackCounts)]
+							items: [
+								{
+									title: t('ActivityFeed.Navbar.All'),
+									url: '/all',
+									icon: undefined
+								},
+								...getTrackItems(networkKey, 'Main', t, trackCounts),
+								...getTrackItems(networkKey, 'Origin', t, trackCounts)
+							]
 						}
 						// {
 						// title: t('Sidebar.analytics'),
