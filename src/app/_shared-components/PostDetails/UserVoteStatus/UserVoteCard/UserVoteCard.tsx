@@ -205,7 +205,8 @@ function UserVoteCard({ index, btnClassName, size = 'lg', proposalType, votes, t
 										variant='ghost'
 										size='icon'
 										className='text-text_pink'
-										onClick={() => {
+										onClick={(e) => {
+											e.stopPropagation();
 											setSelectedAddress(vote.voterAddress);
 											setOpenRemoveConfirmModal(true);
 										}}

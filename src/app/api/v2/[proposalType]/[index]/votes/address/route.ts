@@ -27,16 +27,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const zodQuerySchema = z.object({
 		page: z.coerce.number().optional().default(1),
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
-		addresses: z
-			.string()
-			.transform((val) => {
-				const arr = val
-					.split(',')
-					.map((a) => a.trim())
-					.filter((a) => a.length > 0);
-				// dedupe while preserving case (EVM checksum)
-				return Array.from(new Set(arr));
-			})
+		address: z
+			.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.string()))
 			.refine((arr) => arr.length > 0 && arr.every((a) => ValidatorService.isValidWeb3Address(a)), { message: 'Please provide at least one valid address' }),
 		decision: z
 			.string()
@@ -46,7 +38,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 			.optional()
 	});
 
-	const { page, limit, decision, addresses } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
+	const { page, limit, decision, address: addresses } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 
 	const voteData = await OnChainDbService.GetPostVoteData({ network, proposalType, indexOrHash: index, voterAddresses: addresses, page, limit, decision });
 

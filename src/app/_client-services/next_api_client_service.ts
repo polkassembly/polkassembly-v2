@@ -688,9 +688,13 @@ export class NextApiClientService {
 	static async getPostVotesByAddresses({ proposalType, index, addresses }: { proposalType: EProposalType; index: string; addresses: string[] }) {
 		const queryParams = new URLSearchParams({
 			page: '1',
-			limit: addresses.length.toString(),
-			addresses: addresses.join(',')
+			limit: addresses.length.toString()
 		});
+
+		if (addresses.length) {
+			addresses.forEach((address) => queryParams.append('address', address));
+		}
+
 		const { url, method } = await NextApiClientService.getRouteConfig({
 			route: EApiRoute.GET_POST_VOTES_BY_ADDRESS,
 			routeSegments: [proposalType, index, 'votes', 'address'],

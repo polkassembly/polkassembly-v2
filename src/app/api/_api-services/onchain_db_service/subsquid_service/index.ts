@@ -359,7 +359,7 @@ export class SubsquidService extends SubsquidUtils {
 		orderBy?: EVoteSortOptions;
 		votesType?: EVotesDisplayType;
 	}) {
-		const voterAddresses = addresses ? addresses.map((address) => getEncodedAddress(address, network)) : undefined;
+		const voterAddresses = addresses?.length ? addresses.map((address) => getEncodedAddress(address, network)) : undefined;
 
 		const gqlClient = this.subsquidGqlClient(network);
 
