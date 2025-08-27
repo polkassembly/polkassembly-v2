@@ -44,7 +44,11 @@ function Activities({ userId }: { userId?: number }) {
 
 			<div className='mt-6 flex w-full flex-col justify-center'>
 				{isFetching ? (
-					Array.from({ length: 3 }).map(() => <Skeleton className='h-4 w-full' />)
+					<div className='flex w-full flex-col gap-y-4'>
+						{Array.from({ length: 3 }).map(() => (
+							<Skeleton className='h-4 w-full' />
+						))}
+					</div>
 				) : activities ? (
 					activities.map((activity) => (
 						<Activity
