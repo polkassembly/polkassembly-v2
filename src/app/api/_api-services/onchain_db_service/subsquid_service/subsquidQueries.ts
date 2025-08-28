@@ -1226,11 +1226,11 @@ export class SubsquidQueries {
 		}
 	`;
 
-	protected static GET_ALL_FLATTENED_VOTES_FOR_MULTIPLE_VOTERS = ({ voters }: { voters: string[] }) => `
-	query MyQuery($limit: Int!, $offset: Int!) {
+	protected static GET_ALL_FLATTENED_VOTES_FOR_MULTIPLE_VOTERS = `
+	query MyQuery($limit: Int!, $offset: Int!, $voter_in: [String!]!) {
 		votes: flattenedConvictionVotes(
 			where: {
-				voter_in: [${voters.map((voter) => `"${voter}"`).join(', ')}]
+				voter_in: $voter_in
 				removedAtBlock_isNull: true
 			}
 			limit: $limit
@@ -1260,7 +1260,7 @@ export class SubsquidQueries {
 		}
 		totalCount: flattenedConvictionVotesConnection(
 			where: {
-				voter_in: [${voters.map((voter) => `"${voter}"`).join(', ')}]
+				voter_in: $voter_in
 				removedAtBlock_isNull: true
 			}
 			orderBy: createdAt_DESC

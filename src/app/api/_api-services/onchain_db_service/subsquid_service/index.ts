@@ -1277,7 +1277,7 @@ export class SubsquidService extends SubsquidUtils {
 		return votesData;
 	}
 
-	static async GetVotesForMultipleVoters({
+	static async GetVotesForAddresses({
 		network,
 		voters,
 		page,
@@ -1290,9 +1290,9 @@ export class SubsquidService extends SubsquidUtils {
 	}): Promise<IGenericListingResponse<IProfileVote>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = this.GET_ALL_FLATTENED_VOTES_FOR_MULTIPLE_VOTERS({ voters });
+		const query = this.GET_ALL_FLATTENED_VOTES_FOR_MULTIPLE_VOTERS;
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { limit, offset: (page - 1) * limit }).toPromise();
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { limit, offset: (page - 1) * limit, voter_in: voters }).toPromise();
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain votes for multiple voters from Subsquid: ${subsquidErr}`);
