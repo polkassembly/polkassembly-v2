@@ -49,7 +49,6 @@ function AddressInline({
 						<EthIdenticon
 							address={address}
 							size={iconSize}
-							className='image identicon'
 						/>
 					) : (
 						<Identicon
