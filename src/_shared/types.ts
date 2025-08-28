@@ -1027,7 +1027,8 @@ export enum EReactQueryKeys {
 	POST_DETAILS = 'postDetails',
 	ACCOUNTS = 'accounts',
 	IDENTITY_INFO = 'identityInfo',
-	TOKENS_USD_PRICE = 'tokensUsdPrice'
+	TOKENS_USD_PRICE = 'tokensUsdPrice',
+	USER_VOTES = 'userVotes'
 }
 
 export interface IParamDef {
