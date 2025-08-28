@@ -19,6 +19,10 @@
 	@apply rounded bg-wallet_btn_text px-2 py-0.5 text-xs font-medium uppercase text-btn_primary_text;
 }
 
+.dropdownMenuContent {
+	@apply flex w-full items-center justify-start gap-2 text-nowrap p-0 text-sm text-basic_text;
+}
+
 .translateIconLocale {
 	@apply absolute -bottom-1 -left-1 z-50 rounded-md bg-bg_pink px-1 text-[8px] font-extrabold uppercase leading-3 text-white;
 }
