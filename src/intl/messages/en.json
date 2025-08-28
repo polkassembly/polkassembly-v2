@@ -189,6 +189,18 @@
 			"CA": "CA",
 			"CO": "CO"
 		},
+		"Votes": {
+			"noData": "No votes found",
+			"votes": "Votes",
+			"proposal": "Proposal",
+			"voter": "Voter",
+			"voteFor": "Vote For",
+			"action": "Action",
+			"status": "Status",
+			"showMore": "Show More",
+			"showLess": "Show Less",
+			"selectAddresses": "Select Addresses"
+		},
 		"Activity": {
 			"voted_on_proposal": "Voted",
 			"created_proposal": "Created Proposal",
@@ -439,6 +451,7 @@
 		}
 	},
 	"PostDetails": {
+		"selectYourVoterAddress": "Select Your Voter Address",
 		"address": "Address",
 		"save": "Save",
 		"edit": "Edit",

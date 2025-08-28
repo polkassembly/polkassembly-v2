@@ -183,6 +183,18 @@
 			"CO": "CO",
 			"index": "索引"
 		},
+		"Votes": {
+			"noData": "未找到投票",
+			"votes": "投票",
+			"proposal": "提案",
+			"voteFor": "投票支持",
+			"voter": "投票者",
+			"action": "操作",
+			"status": "状态",
+			"showMore": "显示更多",
+			"showLess": "显示更少",
+			"selectAddresses": "选择地址"
+		},
 		"Activity": {
 			"voted_on_proposal": "已投票",
 			"created_proposal": "创建提案",
@@ -437,6 +449,7 @@
 		}
 	},
 	"PostDetails": {
+		"selectYourVoterAddress": "选择您的投票地址",		
 		"address": "地址",
 		"castVote": "投票",
 		"changeVote": "更改投票",

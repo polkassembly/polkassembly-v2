@@ -1,0 +1,36 @@
+.votesWrapper {
+	@apply flex w-full flex-col gap-y-4 rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal px-6 py-4 pb-6 shadow-lg;
+}
+.votesItemWrapper {
+	@apply mt-4 flex w-full flex-col gap-y-4 rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal px-6 py-4 pb-6;
+}
+.header {
+	@apply flex items-center justify-between;
+}
+.voteItem {
+	@apply grid w-full grid-cols-9 items-center gap-4 text-sm;
+}
+.voteItemTitle {
+	@apply col-span-4 truncate font-medium text-text_primary;
+}
+.voteItemBalance {
+	@apply col-span-2 flex justify-start gap-8 text-start text-xs font-medium text-text_primary;
+}
+.voteItemBalanceContent {
+	@apply flex gap-2 text-center text-xs;
+}
+.voteItemBalanceItem {
+	@apply flex items-center gap-3;
+}
+.voteItemBalanceItemTitle {
+	@apply flex w-16 items-center gap-1;
+}
+.address {
+	@apply flex cursor-pointer items-center gap-2 text-sm;
+}
+.votesItemHeader {
+	@apply grid w-full grid-cols-9 items-center gap-1 text-sm font-semibold text-basic_text max-md:hidden;
+}
+.voteItemBalanceItemValue {
+	@apply flex shrink-0 items-center gap-1;
+}

@@ -185,6 +185,18 @@
 			"CO": "CO",
 			"index": "インデックス"
 		},
+		"Votes": {
+			"noData": "投票が見つかりません",
+			"votes": "投票",
+			"proposal": "提案",
+			"voteFor": "投票する",
+			"voter": "投票者",
+			"action": "アクション",
+			"status": "ステータス",
+			"showMore": "もっと表示",
+			"showLess": "表示を減らす",
+			"selectAddresses": "アドレスを選択"
+		},
 		"Activity": {
 			"voted_on_proposal": "投票済み",
 			"created_proposal": "提案を作成",
@@ -437,6 +449,7 @@
 		}
 	},
 	"PostDetails": {
+		"selectYourVoterAddress": "投票者アドレスを選択",
 		"address": "アドレス",
 		"castVote": "投票する",
 		"changeVote": "投票を変更する",

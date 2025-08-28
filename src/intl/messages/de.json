@@ -182,6 +182,18 @@
 			"CA": "CA",
 			"CO": "CO"
 		},
+		"Votes": {
+			"noData": "Keine Stimmen gefunden",
+			"votes": "Stimmen",
+			"proposal": "Vorschlag",
+			"voteFor": "Stimme für",
+			"action": "Aktion",
+			"voter": "Stimmberechtigter",
+			"status": "Status",
+			"showMore": "Mehr anzeigen",
+			"showLess": "Weniger anzeigen",
+			"selectAddresses": "Adressen auswählen"
+		},
 		"Activity": {
 			"voted_on_proposal": "Abgestimmt",
 			"created_proposal": "Vorschlag erstellt",
@@ -436,7 +448,10 @@
 		}
 	},
 	"PostDetails": {
-		"address": "Adresse",
+		"remove": "Entfernen",
+		"removeVote": "Abstimmung entfernen",
+		"selectYourVoterAddress": "Wählen Sie Ihre Abstimmungsadresse",
+		"removeVoteConfirmation": "Sind Sie sicher, dass Sie Ihre Abstimmung entfernen möchten?",
 		"castVote": "Abstimmen",
 		"changeVote": "Abstimmen ändern",
 		"myVote": "Meine Stimme",
@@ -458,10 +473,7 @@
 		"post": "Beitrag",
 		"cancel": "Abbrechen",
 		"reply": "Antworten",
-		"remove": "Entfernen",
 		"removing": "Entfernen",
-		"removeVote": "Abstimmung entfernen",
-		"removeVoteConfirmation": "Möchten Sie Ihre Abstimmung wirklich entfernen?",
 		"proposalPassed": "Vorschlag angenommen",
 		"proposalFailed": "Vorschlag abgelehnt",
 		"confirmationPeriod": "Bestätigungszeitraum",

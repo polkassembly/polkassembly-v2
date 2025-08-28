@@ -54,7 +54,8 @@ import {
 	IPostAnalytics,
 	IPostBubbleVotes,
 	EAnalyticsType,
-	EVotesDisplayType
+	EVotesDisplayType,
+	IProfileVote
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -146,7 +147,8 @@ enum EApiRoute {
 	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
 	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES',
 	ADD_COMMENT_REACTION = 'ADD_COMMENT_REACTION',
-	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION'
+	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
+	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES'
 }
 
 export class NextApiClientService {
@@ -198,6 +200,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.FETCH_LEADERBOARD:
 				path = '/users';
+				break;
+			case EApiRoute.GET_VOTES_BY_ADDRESSES:
+				path = '/users/votes';
 				break;
 			case EApiRoute.FETCH_PREIMAGES:
 				path = '/preimages';
@@ -1220,5 +1225,18 @@ export class NextApiClientService {
 			routeSegments: [proposalType, index, 'comments', commentId, 'reactions', reactionId]
 		});
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	static async getVotesByAddresses({ addresses, page, limit }: { addresses: string[]; page: number; limit: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+
+		if (addresses.length) {
+			addresses.forEach((address) => queryParams.append('address', address));
+		}
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_BY_ADDRESSES, queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IProfileVote>>({ url, method });
 	}
 }

@@ -184,6 +184,18 @@
 			"CA": "CA",
 			"CO": "CO"
 		},
+		"Votes": {
+			"noData": "No se encontraron votos",
+			"votes": "Votos",
+			"proposal": "Propuesta",
+			"voteFor": "Votar por",
+			"voter": "Votante",
+			"action": "Acción",
+			"status": "Estado",
+			"showMore": "Mostrar más",
+			"showLess": "Mostrar menos",
+			"selectAddresses": "Seleccionar direcciones"
+		},
 		"Activity": {
 			"voted_on_proposal": "Votó",
 			"created_proposal": "Creó propuesta",
@@ -438,6 +450,7 @@
 		}
 	},
 	"PostDetails": {
+		"selectYourVoterAddress": "Seleccione su dirección de votación",
 		"address": "Dirección",
 		"castVote": "Emitir Voto",
 		"changeVote": "Cambiar Voto",
