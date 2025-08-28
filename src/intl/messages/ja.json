@@ -37,9 +37,6 @@
 		"About": "概要",
 		"AboutDescription": "Polkadotは、Polkadotのオールインワンのデファイハブです。",
 		"KnowMore": "詳細を見る",
-		"VotedProposals": "投票済み提案",
-		"ActiveProposals": "アクティブな提案",
-		"Last15Days": "過去15日間",
 		"Rank": "ランク",
 		"BatchVoting": "一括投票",
 		"BatchVotingDescription": "単一のトランザクションでトップ提案に投票",
@@ -184,6 +181,21 @@
 			"CA": "CA",
 			"CO": "CO",
 			"index": "インデックス"
+		},
+		"Votes": {
+			"noData": "投票が見つかりません",
+			"votes": "投票",
+			"proposal": "提案",
+			"voteFor": "投票する",
+			"voter": "投票者",
+			"action": "アクション",
+			"status": "ステータス",
+			"showMore": "もっと表示",
+			"showLess": "表示を減らす",
+			"selectAddresses": "アドレスを選択",
+			"votedProposals": "投票済み提案",
+			"activeProposals": "アクティブな提案",
+			"last15Days": "過去15日間"
 		},
 		"Activity": {
 			"voted_on_proposal": "投票済み",

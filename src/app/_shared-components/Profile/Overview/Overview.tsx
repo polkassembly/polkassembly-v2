@@ -17,6 +17,7 @@ import LinkAddress from './LinkAddress/LinkAddress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
 import classes from './Overview.module.scss';
 import Delegations from '../Delegations/Delegations';
+import VotedActiveProposalCard from '../../VotedActiveProposalCard/VotedActiveProposalCard';
 
 function Overview({ address, profileData }: { address?: string; profileData?: IPublicUser }) {
 	const [userProfile, setUserProfile] = useState<IPublicUser | undefined>(profileData);
@@ -121,6 +122,10 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 						))}
 					</div>
 				</div>
+				<VotedActiveProposalCard
+					addresses={userProfile?.addresses || []}
+					last15days
+				/>
 			</div>
 		</div>
 	);

@@ -40,9 +40,6 @@
 		"About": "About",
 		"AboutDescription": "Polkadot is the all-in-one DeFi hub of Polkadot.",
 		"KnowMore": "Know More",
-		"VotedProposals": "Voted Proposals",
-		"ActiveProposals": "Active Proposals",
-		"Last15Days": "Last 15 days",
 		"Rank": "Rank",
 		"BatchVoting": "Batch Voting",
 		"BatchVotingDescription": "Vote on top proposals in a single transaction",
@@ -170,6 +167,7 @@
 		"balance": "Balance",
 		"locked": "Locked",
 		"on": "on",
+		
 		"Delegations": {
 			"noDelegations": "No Delegations Found",
 			"delegation": "Delegation",
@@ -188,6 +186,21 @@
 			"VP": "VP",
 			"CA": "CA",
 			"CO": "CO"
+		},
+		"Votes": {
+			"noData": "No votes found",
+			"votes": "Votes",
+			"proposal": "Proposal",
+			"voter": "Voter",
+			"voteFor": "Vote For",
+			"action": "Action",
+			"status": "Status",
+			"showMore": "Show More",
+			"showLess": "Show Less",
+			"selectAddresses": "Select Addresses",
+			"votedProposals": "Voted Proposals",
+			"activeProposals": "active proposals",
+			"last15Days": "Last 15 days"
 		},
 		"Activity": {
 			"voted_on_proposal": "Voted",

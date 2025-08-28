@@ -37,9 +37,6 @@
 		"About": "Über",
 		"AboutDescription": "Polkadot ist die All-in-One DeFi-Zentrale von Polkadot.",
 		"KnowMore": "Mehr erfahren",
-		"VotedProposals": "Abgestimmte Vorschläge",
-		"ActiveProposals": "Aktive Vorschläge",
-		"Last15Days": "Letzte 15 Tage",
 		"Rank": "Rang",
 		"BatchVoting": "Stapelabstimmung",
 		"BatchVotingDescription": "Stimmen Sie über Top-Vorschläge in einer einzigen Transaktion ab",
@@ -181,6 +178,21 @@
 			"VP": "VP",
 			"CA": "CA",
 			"CO": "CO"
+		},
+		"Votes": {
+			"noData": "Keine Stimmen gefunden",
+			"votes": "Stimmen",
+			"proposal": "Vorschlag",
+			"voteFor": "Stimme für",
+			"action": "Aktion",
+			"voter": "Stimmberechtigter",
+			"status": "Status",
+			"showMore": "Mehr anzeigen",
+			"showLess": "Weniger anzeigen",
+			"selectAddresses": "Adressen auswählen",
+			"votedProposals": "Abgestimmte Vorschläge",
+			"activeProposals": "aktive vorschläge",
+			"last15Days": "Letzte 15 Tage"
 		},
 		"Activity": {
 			"voted_on_proposal": "Abgestimmt",

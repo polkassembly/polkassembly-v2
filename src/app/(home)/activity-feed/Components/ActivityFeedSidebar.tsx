@@ -7,7 +7,7 @@ import { useUser } from '@/hooks/useUser';
 import TreasuryStats from '@/app/_shared-components/TreasuryStats/TreasuryStats';
 import { ITreasuryStats } from '@/_shared/types';
 import ActivityFeedAbout from './Sidebar/ActivityFeedAbout/ActivityFeedAbout';
-import ActivityFeedActiveProposal from './Sidebar/ActivityFeedActiveProposal/ActivityFeedActiveProposal';
+import VotedActiveProposalCard from '../../../_shared-components/VotedActiveProposalCard/VotedActiveProposalCard';
 import ActivityFeedRankCard from './Sidebar/ActivityFeedRankCard';
 import ActivityFeedFeaturesSection from './Sidebar/ActivityFeedFeaturesSection/ActivityFeedFeaturesSection';
 
@@ -17,7 +17,7 @@ function ActivityFeedSidebar({ treasuryStatsData }: { treasuryStatsData: ITreasu
 	return (
 		<div className='flex flex-col gap-5'>
 			<ActivityFeedAbout />
-			{user?.id && <ActivityFeedActiveProposal />}
+			{!!user?.id && <VotedActiveProposalCard addresses={user.addresses || []} />}
 			<TreasuryStats
 				data={treasuryStatsData}
 				isActivityFeed

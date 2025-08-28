@@ -582,16 +582,24 @@ export class SubsquidService extends SubsquidUtils {
 
 	static async GetActiveVotedProposalsCount({
 		addresses,
-		network
+		network,
+		last15days
 	}: {
 		addresses: string[];
 		network: ENetwork;
+		last15days?: boolean;
 	}): Promise<{ activeProposalsCount: number; votedProposalsCount: number }> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_ACTIVE_VOTED_PROPOSALS_COUNT;
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { status_in: ACTIVE_PROPOSAL_STATUSES, voter_in: addresses }).toPromise();
+		const variables: { status_in: EProposalStatus[]; voter_in: string[]; createdAt_gte?: string } = { status_in: ACTIVE_PROPOSAL_STATUSES, voter_in: addresses };
+
+		if (last15days) {
+			variables.createdAt_gte = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString();
+		}
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain active voted proposals count from Subsquid: ${subsquidErr}`);
