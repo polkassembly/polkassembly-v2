@@ -1472,3 +1472,18 @@ export type IPostBubbleVotes = {
 		status: EProposalStatus;
 	};
 };
+
+export enum EFeature {
+	VOTE_ON_PROPOSAL = 'vote_on_proposal',
+	LOGIN = 'login',
+	SIGNUP = 'signup',
+	CREATE_PROPOSAL = 'create_proposal',
+	SET_IDENTITY = 'set_identity',
+	DELEGATE = 'delegate',
+	BOUNTY = 'bounty',
+	TIP = 'tip',
+	CHILD_BOUNTY = 'child_bounty',
+	REFERENDUM = 'referendum',
+	FELLOWSHIP_REFERENDUM = 'fellowship_referendum',
+	COMMENT = 'comment'
+}

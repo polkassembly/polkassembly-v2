@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EVoteDecision, ENotificationStatus, ISelectedAccount, EPostOrigin, EProposalType } from '@/_shared/types';
+import { EVoteDecision, ENotificationStatus, ISelectedAccount, EPostOrigin, EProposalType, EFeature } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -249,7 +249,8 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 				conviction,
 				ayeVoteValue,
 				nayVoteValue,
-				abstainVoteValue
+				abstainVoteValue,
+				selectedWallet: userPreferences.wallet
 			});
 		} catch (error) {
 			console.error('Error voting', error);
@@ -265,8 +266,10 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 					<AddressRelationsPicker
 						withBalance
 						showVotingBalance
+						action={EFeature.VOTE_ON_PROPOSAL}
 					/>
 				}
+				action={EFeature.VOTE_ON_PROPOSAL}
 			/>
 			<div className='flex flex-1 flex-col gap-y-6 overflow-y-auto'>
 				{delegatedVotingPower && delegatedVotingPower.gt(BN_ZERO) && (

@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useEffect, useMemo } from 'react';
-import { EWallet } from '@/_shared/types';
+import { EWallet, EFeature } from '@/_shared/types';
 import WalletButton from '@ui/WalletsUI/WalletButton/WalletButton';
 import { WalletClientService } from '@/app/_client-services/wallet_service';
 import { useWalletService } from '@/hooks/useWalletService';
@@ -11,18 +11,21 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getSupportedWallets } from '@/_shared/_utils/getSupportedWallets';
 import { ValidatorService } from '@shared/_services/validator_service';
+import { METAMASK_SUPPORTED_FEATURES } from '@/_shared/_constants/featureFlags';
 import classes from './WalletButtons.module.scss';
 
 function WalletButtons({
 	onWalletChange,
 	small,
 	hidePreference,
-	disabled
+	disabled,
+	action
 }: {
 	onWalletChange?: (wallet: EWallet | null) => void;
 	small?: boolean;
 	hidePreference?: boolean;
 	disabled?: boolean;
+	action?: EFeature;
 }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const network = getCurrentNetwork();
@@ -31,15 +34,32 @@ function WalletButtons({
 	const availableWallets = walletService?.getInjectedWallets(network);
 
 	const supportedWallets = useMemo(() => {
-		return getSupportedWallets(network);
-	}, [network]);
+		return getSupportedWallets(network, action);
+	}, [network, action]);
 
 	useEffect(() => {
 		if (userPreferences.wallet || !availableWallets || Object.keys(availableWallets).length === 0) return;
 
 		const walletKeys = Object.keys(availableWallets);
 		if (ValidatorService.isValidEthereumNetwork(network)) {
-			const preferredWallet = walletKeys.includes(EWallet.METAMASK) ? EWallet.METAMASK : (walletKeys[0] as EWallet);
+			const getWallet = () => {
+				if (walletKeys.includes(EWallet.METAMASK) && METAMASK_SUPPORTED_FEATURES.includes(action!)) {
+					return EWallet.METAMASK;
+				}
+
+				if (walletKeys.includes(EWallet.SUBWALLET)) {
+					return EWallet.SUBWALLET;
+				}
+
+				if (walletKeys.includes(EWallet.TALISMAN)) {
+					return EWallet.TALISMAN;
+				}
+
+				return walletKeys[0] as EWallet;
+			};
+
+			const preferredWallet = getWallet();
+
 			setUserPreferences({
 				...userPreferences,
 				wallet: preferredWallet

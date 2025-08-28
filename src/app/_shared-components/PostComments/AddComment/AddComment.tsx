@@ -5,7 +5,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { EDataSource, ENotificationStatus, EProposalType, EReactQueryKeys, IComment, ICommentResponse, IPublicUser, IVoteData } from '@/_shared/types';
+import { EDataSource, EFeature, ENotificationStatus, EProposalType, EReactQueryKeys, IComment, ICommentResponse, IPublicUser, IVoteData } from '@/_shared/types';
 import { Button } from '@ui/Button';
 import { useTranslations } from 'next-intl';
 import { LocalStorageClientService } from '@/app/_client-services/local_storage_client_service';
@@ -262,6 +262,7 @@ function AddComment({
 					className='w-full gap-0 border-none pl-0'
 					iconSize={30}
 					switchButtonClassName='px-2 text-[8px] h-6'
+					action={EFeature.COMMENT}
 				/>
 			</div>
 			<div className='mb-2'>

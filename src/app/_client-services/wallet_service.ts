@@ -61,6 +61,7 @@ export class WalletClientService {
 
 	async getAddressesFromWallet(selectedWallet: EWallet): Promise<InjectedAccount[]> {
 		let injected: Injected | undefined;
+		let accounts: InjectedAccount[] | null = null;
 		try {
 			if (selectedWallet === EWallet.MIMIR) {
 				const { web3Enable, web3FromSource } = await import('@polkadot/extension-dapp');
@@ -84,8 +85,7 @@ export class WalletClientService {
 						source: EWallet.METAMASK
 					}
 				}));
-			}
-			if (selectedWallet === EWallet.TALISMAN && ValidatorService.isValidEthereumNetwork(this.network)) {
+			} else if (selectedWallet === EWallet.TALISMAN && ValidatorService.isValidEthereumNetwork(this.network)) {
 				const { talismanEth } = this.injectedWindow;
 				if (!talismanEth) {
 					return [];
@@ -94,15 +94,14 @@ export class WalletClientService {
 				const addresses = (await talismanEth.request({
 					method: 'eth_accounts'
 				})) as string[];
-				return addresses.map((address) => ({
+				accounts = addresses.map((address) => ({
 					address,
 					meta: {
 						name: address,
 						source: EWallet.TALISMAN
 					}
 				}));
-			}
-			if (selectedWallet === EWallet.SUBWALLET && ValidatorService.isValidEthereumNetwork(this.network)) {
+			} else if (selectedWallet === EWallet.SUBWALLET && ValidatorService.isValidEthereumNetwork(this.network)) {
 				const { SubWallet } = this.injectedWindow;
 				if (!SubWallet) {
 					return [];
@@ -111,7 +110,7 @@ export class WalletClientService {
 				const addresses = (await SubWallet.request({
 					method: 'eth_accounts'
 				})) as string[];
-				return addresses.map((address) => ({
+				accounts = addresses.map((address) => ({
 					address,
 					meta: {
 						name: address,
@@ -153,6 +152,12 @@ export class WalletClientService {
 
 			if (this.identityService) {
 				this.identityService.setSigner(injected.signer as Signer);
+			}
+
+			console.log('accounts', accounts);
+
+			if (accounts) {
+				return accounts;
 			}
 
 			return await injected.accounts.get();

@@ -145,7 +145,8 @@ export class PolkadotApiService {
 		setStatus,
 		setIsTxFinalized,
 		waitTillFinalizedHash = false,
-		selectedAccount
+		selectedAccount,
+		selectedWallet
 	}: {
 		tx: SubmittableExtrinsic<'promise'>;
 		address: string;
@@ -158,6 +159,7 @@ export class PolkadotApiService {
 		setIsTxFinalized?: (pre: string) => void;
 		waitTillFinalizedHash?: boolean;
 		selectedAccount?: ISelectedAccount;
+		selectedWallet?: EWallet;
 	}) {
 		if (!this.api || !tx) return;
 
@@ -200,7 +202,7 @@ export class PolkadotApiService {
 					console.error('ERROR:', error);
 					onFailed(error?.toString?.() || errorMessageFallback);
 				});
-		} else if (ValidatorService.isValidEthereumNetwork(this.network)) {
+		} else if (ValidatorService.isValidEthereumNetwork(this.network) && selectedWallet === EWallet.METAMASK) {
 			try {
 				(tx as unknown as any).wait();
 				onSuccess();
@@ -438,7 +440,7 @@ export class PolkadotApiService {
 	}) {
 		let voteTx: SubmittableExtrinsic<'promise'> | null = null;
 
-		if (ValidatorService.isValidEthereumNetwork(this.network)) {
+		if (ValidatorService.isValidEthereumNetwork(this.network) && selectedWallet === EWallet.METAMASK) {
 			voteTx = await EthApiService.vote(
 				vote,
 				referendumId,
@@ -468,7 +470,8 @@ export class PolkadotApiService {
 				waitTillFinalizedHash: true,
 				onSuccess,
 				onFailed,
-				selectedAccount
+				selectedAccount,
+				selectedWallet
 			});
 		}
 	}

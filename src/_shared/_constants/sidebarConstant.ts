@@ -30,6 +30,7 @@ import TreasuryTipIcon from '@assets/sidebar/tips-icon.svg';
 import CouncilMotionIcon from '@assets/sidebar/council-motion-icon.svg';
 import CouncilMemberIcon from '@assets/sidebar/council-members-icon.svg';
 import TechCommIcon from '@assets/sidebar/tech-comm-proposals-icon.svg';
+import { ValidatorService } from '../_services/validator_service';
 import { EGovType, ENetwork, EPostOrigin, ISidebarMenuItem, ITrackCounts } from '../types';
 import { NETWORKS_DETAILS } from './networks';
 
@@ -123,22 +124,26 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 						...baseConfig.initalItems,
 						{ title: t('Sidebar.preimages'), url: '/preimages', icon: Preimages },
 						{ title: t('Sidebar.delegation'), url: '/delegation', icon: Delegation },
-						{
-							title: t('Sidebar.bounty'),
-							url: '',
-							icon: Bounty,
-							isNew: false,
-							items: [
-								{
-									title: t('Sidebar.bountyDashboard'),
-									url: '/bounty-dashboard',
-									count: trackCounts.bounty_dashboard || 0
-								},
-								{ title: t('Sidebar.onChainBounties'), url: '/bounties' },
-								{ title: t('Sidebar.childBounties'), url: '/child-bounties' }
-							]
-						},
-						{ title: t('Sidebar.batchVoting'), url: '/batch-voting', icon: BatchVoting }
+						...(ValidatorService.isValidEthereumNetwork(networkKey)
+							? []
+							: [
+									{
+										title: t('Sidebar.bounty'),
+										url: '',
+										icon: Bounty,
+										isNew: false,
+										items: [
+											{
+												title: t('Sidebar.bountyDashboard'),
+												url: '/bounty-dashboard',
+												count: trackCounts.bounty_dashboard || 0
+											},
+											{ title: t('Sidebar.onChainBounties'), url: '/bounties' },
+											{ title: t('Sidebar.childBounties'), url: '/child-bounties' }
+										]
+									},
+									{ title: t('Sidebar.batchVoting'), url: '/batch-voting', icon: BatchVoting }
+								])
 					],
 					pathname
 				),

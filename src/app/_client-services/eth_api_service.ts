@@ -8,7 +8,7 @@ import { Contract, ethers } from 'ethers';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import votingAbi from '@/app/_client-utils/abi/voting.json';
-import { BN, BN_ZERO } from '@polkadot/util';
+import { BN } from '@polkadot/util';
 import { ClientError } from '../_client-utils/clientError';
 
 export enum EConviction {
@@ -19,21 +19,6 @@ export enum EConviction {
 	LOCKED4X = 4,
 	LOCKED5X = 5,
 	LOCKED6X = 6
-}
-export interface IDelegateParams {
-	trackId: number;
-	representative: string;
-	conviction: EConviction;
-	amount: BN;
-	selectedWallet: EWallet;
-	network: ENetwork;
-}
-
-// Interface for undelegate parameters
-export interface IUndelegateParams {
-	trackId: number;
-	selectedWallet: EWallet;
-	network: ENetwork;
 }
 
 export class EthApiService {
@@ -133,28 +118,5 @@ export class EthApiService {
 		}
 
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Invalid vote type');
-	}
-
-	static async delegate(params: IDelegateParams) {
-		const { trackId, representative, conviction, amount, selectedWallet, network } = params;
-
-		if (!representative || !ethers.isAddress(representative)) {
-			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Invalid representative address');
-		}
-
-		if (Number.isNaN(trackId)) {
-			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Invalid track ID');
-		}
-
-		if (amount.lte(BN_ZERO)) {
-			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Delegation amount must be greater than 0');
-		}
-
-		const contract = await this.getContract(selectedWallet, network, votingAbi);
-		if (!contract) {
-			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Contract not found');
-		}
-
-		return contract.delegate(trackId, representative, conviction, amount.toString());
 	}
 }
