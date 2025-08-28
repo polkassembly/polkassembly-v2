@@ -1257,6 +1257,7 @@ export class SubsquidQueries {
 			}
 			decision
 			createdAt
+			lockPeriod
 		}
 		totalCount: flattenedConvictionVotesConnection(
 			where: {

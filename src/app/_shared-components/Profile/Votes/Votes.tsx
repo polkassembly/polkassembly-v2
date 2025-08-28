@@ -139,6 +139,7 @@ function Votes({ addresses, userId }: VotesProps) {
 	const [selectedAddresses, setSelectedAddresses] = useState<string[]>([...addresses]);
 	const [openRemoveVoteDialog, setOpenRemoveVoteDialog] = useState(false);
 	const [proposalIndex, setProposalIndex] = useState<number | null>(null);
+	const [voterAddress, setVoterAddress] = useState<string>();
 
 	// Memoized fetch function to prevent unnecessary recreations
 	const fetchVotes = useCallback(async () => {
@@ -173,9 +174,10 @@ function Votes({ addresses, userId }: VotesProps) {
 		setPage(1); // Reset to first page when addresses change
 	}, []);
 
-	const handleRemoveVote = useCallback((voteProposalIndex: number) => {
+	const handleRemoveVote = useCallback((voteProposalIndex: number, removingAddress: string) => {
 		setOpenRemoveVoteDialog(true);
 		setProposalIndex(voteProposalIndex);
+		setVoterAddress(removingAddress);
 	}, []);
 
 	const handleRemoveVoteConfirm = useCallback(() => {
@@ -306,7 +308,7 @@ function Votes({ addresses, userId }: VotesProps) {
 									vote={vote}
 									network={network}
 									userId={userId}
-									onRemoveVote={() => handleRemoveVote(vote.proposalIndex)}
+									onRemoveVote={() => handleRemoveVote(vote.proposalIndex, vote.voterAddress)}
 									isLoading={loading}
 								/>
 							))}
@@ -347,7 +349,7 @@ function Votes({ addresses, userId }: VotesProps) {
 			)}
 
 			{/* Remove Vote Dialog */}
-			{proposalIndex !== null && ValidatorService.isValidNumber(proposalIndex) && (
+			{proposalIndex !== null && ValidatorService.isValidNumber(proposalIndex) && voterAddress && (
 				<RemoveVoteDialog
 					open={openRemoveVoteDialog}
 					onOpenChange={setOpenRemoveVoteDialog}
@@ -355,6 +357,7 @@ function Votes({ addresses, userId }: VotesProps) {
 					isLoading={loading}
 					proposalIndex={proposalIndex}
 					onConfirm={handleRemoveVoteConfirm}
+					voterAddress={voterAddress}
 				/>
 			)}
 		</div>
