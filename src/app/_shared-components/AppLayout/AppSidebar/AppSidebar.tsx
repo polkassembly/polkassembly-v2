@@ -74,6 +74,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 						href='https://klara.polkassembly.io/'
 						target='_blank'
 						rel='noreferrer'
+						className='pointer-events-none'
 					>
 						<div className={styles.create_proposal_button}>
 							<Image
