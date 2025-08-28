@@ -18,8 +18,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { useToast } from '@/hooks/useToast';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
 import classes from './AddComment.module.scss';
+import AddressSwitchButton from '../../AddressRelationsPicker/AddressRelationsPicker';
 
 function AddComment({
 	proposalType,
@@ -55,7 +57,7 @@ function AddComment({
 	const { toast } = useToast();
 
 	const { user } = useUser();
-
+	const { userPreferences } = useUserPreferences();
 	const markdownEditorRef = useRef<MDXEditorMethods | null>(null);
 
 	const handleReplyMention = useCallback(async () => {
@@ -94,7 +96,8 @@ function AddComment({
 				proposalType,
 				index: proposalIndex,
 				content: commentContent,
-				parentCommentId
+				parentCommentId,
+				authorAddress: userPreferences?.selectedAccount?.address || undefined
 			});
 
 			if (error || !data) {
@@ -252,11 +255,21 @@ function AddComment({
 	};
 
 	return (
-		<div>
+		<div className='flex flex-col gap-2'>
 			<div
-				className='mb-2'
+				className='-ml-2 flex w-full'
 				id={id}
 			>
+				<AddressSwitchButton
+					showLinkedAccountBadge
+					showPeopleChainBalance={false}
+					showVotingBalance={false}
+					className='w-full gap-0 border-none pl-0'
+					iconSize={30}
+					switchButtonClassName='px-2 text-[8px] h-6'
+				/>
+			</div>
+			<div className='mb-2'>
 				<MarkdownEditor
 					markdown={content || ''}
 					onChange={(data) => {
@@ -276,13 +289,15 @@ function AddComment({
 						{t('PostDetails.cancel')}
 					</Button>
 				)}
-				<Button
-					className={classes.postBtn}
-					onClick={addCommentToPost}
-					disabled={!content?.trim()}
-				>
-					{t('PostDetails.post')}
-				</Button>
+				<div className='flex flex-col items-end gap-2'>
+					<Button
+						className={classes.postBtn}
+						onClick={addCommentToPost}
+						disabled={!content?.trim()}
+					>
+						{t('PostDetails.post')}
+					</Button>
+				</div>
 			</div>
 		</div>
 	);

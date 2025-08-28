@@ -78,7 +78,7 @@ export default async function RootLayout({
 					userPreferences={userPreferences}
 				>
 					<Initializers
-						userData={user || null}
+						userData={user}
 						userPreferences={userPreferences}
 					/>
 					{modal}

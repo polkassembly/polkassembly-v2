@@ -5,7 +5,7 @@
 'use client';
 
 import { EAllowedCommentor, EProposalType, ICommentResponse } from '@/_shared/types';
-import { useMemo, useState, useCallback, useLayoutEffect } from 'react';
+import { useMemo, useState, useCallback, useLayoutEffect, useEffect } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import Link from 'next/link';
@@ -26,7 +26,7 @@ import classes from './Comments.module.scss';
 const AddComment = dynamic(() => import('../AddComment/AddComment'), { ssr: false });
 
 function Comments({
-	comments,
+	comments: commentsFromProps,
 	proposalType,
 	index,
 	allowedCommentor,
@@ -42,6 +42,7 @@ function Comments({
 	const user = useAtomValue(userAtom);
 	const [showMore, setShowMore] = useState(false);
 	const [showSpam, setShowSpam] = useState(false);
+	const [comments, setComments] = useState<ICommentResponse[]>(commentsFromProps);
 
 	const regularComments = useMemo(() => comments.filter((comment) => !comment.isSpam), [comments]);
 	const spamComments = useMemo(() => comments.filter((comment) => comment.isSpam), [comments]);
@@ -108,13 +109,18 @@ function Comments({
 		handleCommentLink();
 	}, [handleCommentLink]);
 
+	useEffect(() => {
+		setComments(commentsFromProps);
+	}, [commentsFromProps]);
+
 	return (
 		<div className={classes.wrapper}>
 			<div className='flex flex-col gap-y-4 px-4 lg:px-6'>
-				{commentsToShow.map((item) => (
+				{commentsToShow?.map((item) => (
 					<SingleComment
 						key={item.id}
 						commentData={item}
+						setComments={setComments}
 					/>
 				))}
 				{showMore && regularComments?.length > 2 ? (

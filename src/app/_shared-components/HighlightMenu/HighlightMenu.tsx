@@ -9,6 +9,7 @@ import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
 import { FaCopy } from '@react-icons/all-files/fa/FaCopy';
 import { TextQuote } from 'lucide-react';
 import { useQuoteCommentText } from '@/hooks/useQuoteCommentText';
+import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
@@ -16,25 +17,10 @@ import Link from 'next/link';
 import { Button } from '../Button';
 import classes from './HighlightMenu.module.scss';
 
+const DEBOUNCE_DELAY = 100;
+
 interface HighlightMenuProps {
 	markdownRef: React.RefObject<HTMLDivElement | null>;
-}
-
-// Optimized debounce hook for performance
-function useOptimizedDebounce<T>(value: T, delay: number): T {
-	const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-	useEffect(() => {
-		const handler = setTimeout(() => {
-			setDebouncedValue(value);
-		}, delay);
-
-		return () => {
-			clearTimeout(handler);
-		};
-	}, [value, delay]);
-
-	return debouncedValue;
 }
 
 function HighlightMenu({ markdownRef }: HighlightMenuProps) {
@@ -45,21 +31,20 @@ function HighlightMenu({ markdownRef }: HighlightMenuProps) {
 	const [selectedText, setSelectedText] = useState('');
 	const [menuPosition, setMenuPosition] = useState({ left: 0, top: 0 });
 	const [isVisible, setIsVisible] = useState(false);
-	const [selectionData, setSelectionData] = useState<{
-		text: string;
-		rect: DOMRect | null;
-	}>({ text: '', rect: null });
 
 	const menuRef = useRef<HTMLDivElement>(null);
 
-	// Optimized debounce for selection changes
-	const debouncedSelection = useOptimizedDebounce(selectionData, 100);
+	// Optimized debounce for selection changes using the codebase hook
+	const { debouncedValue: debouncedSelection, setValue: setSelectionData } = useDebounce<{
+		text: string;
+		rect: DOMRect | null;
+	}>({ text: '', rect: null }, DEBOUNCE_DELAY);
 
 	const clearSelection = useCallback(() => {
 		setSelectedText('');
 		setIsVisible(false);
 		setSelectionData({ text: '', rect: null });
-	}, []);
+	}, [setSelectionData]);
 
 	const copyToClipboard = useCallback(
 		async (text: string) => {
@@ -111,9 +96,12 @@ function HighlightMenu({ markdownRef }: HighlightMenuProps) {
 		(event: React.MouseEvent) => {
 			event.preventDefault();
 			event.stopPropagation();
-			const twitterText = `"${selectedText}" ${window.location.href}`;
+			const cleanUrl = new URL(window.location.href);
+			cleanUrl.search = ''; // Remove query parameters
+			cleanUrl.hash = ''; // Remove hash
+			const twitterText = `"${selectedText}" ${cleanUrl.toString()}`;
 			const twitterLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}`;
-			window.open(twitterLink, '_blank');
+			window.open(twitterLink, '_blank', 'noopener,noreferrer');
 			clearSelection();
 		},
 		[selectedText, clearSelection]
@@ -148,7 +136,7 @@ function HighlightMenu({ markdownRef }: HighlightMenuProps) {
 
 		const rect = range.getBoundingClientRect();
 		setSelectionData({ text, rect });
-	}, [markdownRef]);
+	}, [markdownRef, setSelectionData]);
 
 	// Process debounced selection for optimal performance
 	useEffect(() => {
@@ -219,27 +207,28 @@ function HighlightMenu({ markdownRef }: HighlightMenuProps) {
 				contain: 'layout style paint'
 			}}
 		>
-			<Button
-				variant='ghost'
-				size='sm'
-				className={cn(classes.button, 'h-6')}
-				onClick={handleQuote}
-			>
-				{user ? (
+			{user ? (
+				<Button
+					variant='ghost'
+					size='sm'
+					className={cn(classes.button, 'h-6')}
+					onClick={handleQuote}
+					aria-label={t('quote')}
+				>
 					<div className='flex cursor-pointer items-center gap-x-1'>
 						<TextQuote className='w-3 text-basic_text' />
 						<span className={classes.buttonText}>{t('PostDetails.HighlightMenu.quote')}</span>
 					</div>
-				) : (
-					<Link
-						href='/login'
-						className='flex items-center gap-x-1 hover:no-underline'
-					>
-						<TextQuote className='w-3 text-basic_text' />
-						<span className={classes.buttonText}>{t('PostDetails.HighlightMenu.quote')}</span>
-					</Link>
-				)}
-			</Button>
+				</Button>
+			) : (
+				<Link
+					href='/login'
+					className={cn(classes.button, 'h-6', 'flex items-center gap-x-1 hover:no-underline')}
+				>
+					<TextQuote className='w-3 text-basic_text' />
+					<span className={classes.buttonText}>{t('PostDetails.HighlightMenu.quote')}</span>
+				</Link>
+			)}
 			<Button
 				variant='ghost'
 				size='sm'

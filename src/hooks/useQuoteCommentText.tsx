@@ -12,7 +12,7 @@ export function useQuoteCommentText() {
 	const [state, setState] = useAtom(quoteCommentTextAtom);
 
 	const setQuoteCommentText = useCallback(
-		(value: string) => {
+		(value: string | null) => {
 			setState(value);
 		},
 		[setState]

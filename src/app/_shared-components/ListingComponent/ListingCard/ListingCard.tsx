@@ -19,7 +19,7 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
 import { Progress } from '@/app/_shared-components/Progress/Progress';
-import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
+import { groupBeneficiariesByAssetIndex } from '@/app/_client-utils/beneficiaryUtils';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import { BN } from '@polkadot/util';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
@@ -60,7 +60,7 @@ function ListingCard({
 	const timeRemaining = data.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(data.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
 
-	const groupedByAsset = groupBeneficiariesByAsset(data.onChainInfo?.beneficiaries || [], network);
+	const groupedByAsset = groupBeneficiariesByAssetIndex({ beneficiaries: data.onChainInfo?.beneficiaries || [], network });
 
 	const redirectUrl = getPostTypeUrl({ proposalType, indexOrHash: index, network });
 
@@ -197,76 +197,78 @@ function ListingCard({
 				</div>
 
 				<div className={styles.tagContainer}>
-					{data.onChainInfo?.beneficiaries && data.onChainInfo?.beneficiaries.length > 0 && groupBeneficiariesByAsset(data.onChainInfo?.beneficiaries, network) && (
-						<div className={styles.beneficiaryContainer}>
-							{Object.keys(groupedByAsset).length > 1 ? (
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<div className='flex items-center gap-1'>
-											<div className='flex items-center -space-x-1.5'>
-												{Object.entries(groupedByAsset).map(([assetId]) => {
-													const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
-													const icon = treasuryAssetsData[unit as EAssets]?.icon || NETWORKS_DETAILS[`${network}`].logo;
+					{data.onChainInfo?.beneficiaries &&
+						data.onChainInfo?.beneficiaries.length > 0 &&
+						groupBeneficiariesByAssetIndex({ beneficiaries: data.onChainInfo?.beneficiaries, network }) && (
+							<div className={styles.beneficiaryContainer}>
+								{Object.keys(groupedByAsset).length > 1 ? (
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<div className='flex items-center gap-1'>
+												<div className='flex items-center -space-x-1.5'>
+													{Object.entries(groupedByAsset).map(([assetId]) => {
+														const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
+														const icon = treasuryAssetsData[unit as EAssets]?.icon || NETWORKS_DETAILS[`${network}`].logo;
+														return (
+															<Image
+																key={assetId}
+																className='rounded-full'
+																src={icon}
+																alt={unit}
+																width={18}
+																height={18}
+															/>
+														);
+													})}
+												</div>
+												<span className='block lg:hidden'>|</span>
+											</div>
+										</TooltipTrigger>
+										<TooltipContent
+											side='top'
+											align='center'
+										>
+											<div className={styles.assetContainer}>
+												{Object.entries(groupedByAsset).map(([assetId, amount]) => {
 													return (
-														<Image
-															key={assetId}
-															className='rounded-full'
-															src={icon}
-															alt={unit}
-															width={18}
-															height={18}
-														/>
+														<div key={assetId}>
+															~{' '}
+															{formatUSDWithUnits(
+																formatBnBalance(
+																	amount.toString(),
+																	{ withUnit: true, numberAfterComma: 2 },
+																	network,
+																	assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
+																)
+															)}{' '}
+														</div>
 													);
 												})}
 											</div>
+										</TooltipContent>
+									</Tooltip>
+								) : (
+									Object.entries(groupedByAsset).map(([assetId, amount]) => (
+										<div
+											className={styles.requestedAmount}
+											key={assetId}
+										>
+											<span className='whitespace-nowrap'>
+												{formatUSDWithUnits(
+													formatBnBalance(
+														amount.toString(),
+														{ withUnit: true, numberAfterComma: 2 },
+														network,
+														assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
+													)
+												)}
+											</span>
 											<span className='block lg:hidden'>|</span>
 										</div>
-									</TooltipTrigger>
-									<TooltipContent
-										side='top'
-										align='center'
-									>
-										<div className={styles.assetContainer}>
-											{Object.entries(groupedByAsset).map(([assetId, amount]) => {
-												return (
-													<div key={assetId}>
-														~{' '}
-														{formatUSDWithUnits(
-															formatBnBalance(
-																amount.toString(),
-																{ withUnit: true, numberAfterComma: 2 },
-																network,
-																assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
-															)
-														)}{' '}
-													</div>
-												);
-											})}
-										</div>
-									</TooltipContent>
-								</Tooltip>
-							) : (
-								Object.entries(groupedByAsset).map(([assetId, amount]) => (
-									<div
-										className={styles.requestedAmount}
-										key={assetId}
-									>
-										<span className='whitespace-nowrap'>
-											{formatUSDWithUnits(
-												formatBnBalance(
-													amount.toString(),
-													{ withUnit: true, numberAfterComma: 2 },
-													network,
-													assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
-												)
-											)}
-										</span>
-										<span className='block lg:hidden'>|</span>
-									</div>
-								))
-							)}
-						</div>
-					)}
+									))
+								)}
+							</div>
+						)}
 
 					{data.onChainInfo?.status && (
 						<div className='flex'>

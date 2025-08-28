@@ -17,7 +17,9 @@ import type { Components } from 'react-markdown';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import Image from 'next/image';
 import Link from 'next/link';
-import HighlightMenu from '../HighlightMenu/HighlightMenu';
+import dynamic from 'next/dynamic';
+
+const HighlightMenu = dynamic(() => import('../HighlightMenu/HighlightMenu'), { ssr: false });
 
 const extractUrlsAndEmails = (text: string): string[] => {
 	const words = text.split(/\s+/);
