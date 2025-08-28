@@ -446,6 +446,10 @@
 		"Treasury": "Treasury",
 		"LeaseAdmin": "Lease Admin",
 		"GeneralAdmin": "General Admin",
+		"chatWithKlara": "Chat with Klara",
+		"more": "More",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "Analytics",
 		"Tag": {
 			"new": "New"
 		}

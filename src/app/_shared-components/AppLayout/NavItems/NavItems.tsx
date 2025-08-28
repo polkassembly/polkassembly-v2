@@ -4,12 +4,10 @@
 
 'use client';
 
-import { ChevronRight } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/Collapsible';
 import { SidebarGroup, SidebarMenu, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import React from 'react';
 import CollapsibleItem from '../CollapsibleItem/CollapsibleItem';
-import styles from './NavItems.module.scss';
+import { CollapsedMainItem, ExpandedMainItem } from './MainItemsComponents';
 
 export function NavMain({
 	sections
@@ -79,7 +77,7 @@ export function NavMain({
 		}[];
 	}[];
 }) {
-	const { state } = useSidebar();
+	const { state: sidebarState } = useSidebar();
 
 	return (
 		<SidebarGroup>
@@ -95,45 +93,31 @@ export function NavMain({
 									<CollapsibleItem
 										key={item.title}
 										item={item}
-										state={state}
+										state={sidebarState}
 									/>
 								))}
 							</SidebarMenu>
 						</div>
 					)}
+
 					{section.mainItems && (
 						<div>
-							{section.mainItems.map((mainItem, index) => (
-								<Collapsible
-									key={mainItem.heading || `mainItem-${index}`}
-									defaultOpen
-									className='group/collapsible mt-4'
-								>
-									<CollapsibleTrigger asChild>
-										<div>
-											<div className='flex cursor-pointer items-center border-t-2 border-dotted border-border_grey pb-2 pt-4'>
-												<span className={`text-text_primary ${state === 'collapsed' ? 'pl-2' : 'pl-4'} dark:text-icon-dark-inactive text-xs font-medium uppercase`}>
-													{mainItem.heading}
-												</span>
-												<ChevronRight className={`${styles.chevron} group-data-[state=open]/collapsible:rotate-90`} />
-											</div>
-										</div>
-									</CollapsibleTrigger>
-									<CollapsibleContent>
-										<SidebarMenu>
-											{mainItem.items &&
-												mainItem.items.map((item) => (
-													<div key={item.title}>
-														<CollapsibleItem
-															item={item}
-															state={state}
-														/>
-													</div>
-												))}
-										</SidebarMenu>
-									</CollapsibleContent>
-								</Collapsible>
-							))}
+							{section.mainItems.map((mainItem, index) =>
+								sidebarState === 'collapsed' ? (
+									<CollapsedMainItem
+										key={mainItem.heading || `mainItem-${index}`}
+										mainItem={mainItem}
+										index={index}
+									/>
+								) : (
+									<ExpandedMainItem
+										key={mainItem.heading || `mainItem-${index}`}
+										mainItem={mainItem}
+										index={index}
+										sidebarState={sidebarState}
+									/>
+								)
+							)}
 						</div>
 					)}
 
@@ -145,7 +129,7 @@ export function NavMain({
 										<CollapsibleItem
 											key={item.title}
 											item={item}
-											state={state}
+											state={sidebarState}
 										/>
 									))}
 								</SidebarMenu>
