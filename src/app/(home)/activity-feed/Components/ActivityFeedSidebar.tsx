@@ -17,12 +17,7 @@ function ActivityFeedSidebar({ treasuryStatsData }: { treasuryStatsData: ITreasu
 	return (
 		<div className='flex flex-col gap-5'>
 			<ActivityFeedAbout />
-			{user && user.id && user.addresses?.length && (
-				<VotedActiveProposalCard
-					userId={user.id}
-					addresses={user.addresses}
-				/>
-			)}
+			{user && user.addresses?.length && <VotedActiveProposalCard addresses={user.addresses} />}
 			<TreasuryStats
 				data={treasuryStatsData}
 				isActivityFeed

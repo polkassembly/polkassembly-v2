@@ -71,12 +71,7 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 					setUserProfile={setUserProfile}
 					addresses={profileData?.addresses?.length ? profileData?.addresses : address ? [address] : []}
 				/>
-				{profileData?.id && profileData.addresses?.length && (
-					<VotedActiveProposalCard
-						userId={profileData.id}
-						addresses={profileData.addresses}
-					/>
-				)}
+				{profileData?.addresses?.length && <VotedActiveProposalCard addresses={profileData?.addresses} />}
 			</div>
 		</div>
 	);

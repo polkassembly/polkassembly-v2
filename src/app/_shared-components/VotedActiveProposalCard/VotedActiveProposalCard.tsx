@@ -12,7 +12,7 @@ import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalSta
 import { EProposalType } from '@/_shared/types';
 import classes from './VotedActiveProposalCard.module.scss';
 
-function VotedActiveProposalCard({ userId, addresses }: { userId: number; addresses: string[] }) {
+function VotedActiveProposalCard({ addresses }: { addresses: string[] }) {
 	const t = useTranslations('Profile');
 
 	const getVotesAndActiveProposals = async () => {
@@ -25,7 +25,7 @@ function VotedActiveProposalCard({ userId, addresses }: { userId: number; addres
 	};
 
 	const { data, isFetching } = useQuery({
-		queryKey: ['votedActiveProposals', userId],
+		queryKey: ['votedActiveProposals', addresses.join(',')],
 		queryFn: getVotesAndActiveProposals,
 		enabled: !!addresses?.length,
 		staleTime: FIVE_MIN_IN_MILLI
