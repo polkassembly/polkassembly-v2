@@ -9,6 +9,7 @@ import CustomSidebarTrigger from './AppSidebar/CustomSidebarTrigger';
 import Footer from './Footer/Footer';
 import AppSidebar from './AppSidebar/AppSidebar';
 import SuccessModal from '../SuccessModal/SuccessModal';
+import CreateTipModal from '../CreateTipModal/CreateTipModal';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
 	return (
@@ -18,6 +19,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 			<CustomSidebarTrigger />
 
 			<SuccessModal />
+			<CreateTipModal />
 
 			<SidebarInset>
 				<Navbar />

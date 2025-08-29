@@ -55,6 +55,8 @@ import {
 	IPostBubbleVotes,
 	EAnalyticsType,
 	EVotesDisplayType,
+	ITip,
+	ETipsTab,
 	IProfileVote
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
@@ -148,6 +150,8 @@ enum EApiRoute {
 	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES',
 	ADD_COMMENT_REACTION = 'ADD_COMMENT_REACTION',
 	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
+	CREATE_TIP = 'CREATE_TIP',
+	GET_USER_TIPS = 'GET_USER_TIPS',
 	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES'
 }
 
@@ -222,6 +226,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_FOLLOWERS:
 			case EApiRoute.GET_BATCH_VOTE_CART:
 			case EApiRoute.GET_USER_SOCIAL_HANDLES:
+			case EApiRoute.GET_USER_TIPS:
 				path = '/users/id';
 				break;
 			case EApiRoute.GET_ADDRESS_RELATIONS:
@@ -322,6 +327,7 @@ export class NextApiClientService {
 			case EApiRoute.FOLLOW_USER:
 			case EApiRoute.INIT_SOCIAL_VERIFICATION:
 			case EApiRoute.CONFIRM_SOCIAL_VERIFICATION:
+			case EApiRoute.CREATE_TIP:
 				path = '/users/id';
 				method = 'POST';
 				break;
@@ -1225,6 +1231,33 @@ export class NextApiClientService {
 			routeSegments: [proposalType, index, 'comments', commentId, 'reactions', reactionId]
 		});
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	static async createTip({
+		userId,
+		userAddress,
+		amount,
+		beneficiaryAddress,
+		remark,
+		extrinsicHash
+	}: {
+		userId: number;
+		userAddress: string;
+		amount: string;
+		beneficiaryAddress: string;
+		remark: string;
+		extrinsicHash: string;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_TIP, routeSegments: [userId.toString(), 'tips'] });
+		return this.nextApiClientFetch<ITip>({ url, method, data: { userAddress, amount, beneficiaryAddress, remark, extrinsicHash } });
+	}
+
+	static async getUserTips({ userId, tab }: { userId: number; tab: ETipsTab }) {
+		const queryParams = new URLSearchParams({
+			tab: tab.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_TIPS, routeSegments: [userId.toString(), 'tips'], queryParams });
+		return this.nextApiClientFetch<{ tips: ITip[] }>({ url, method });
 	}
 
 	static async getVotesByAddresses({ addresses, page, limit }: { addresses: string[]; page: number; limit: number }) {

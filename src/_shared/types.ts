@@ -1492,6 +1492,24 @@ export type IPostBubbleVotes = {
 	};
 };
 
+export interface ITip {
+	userId: number;
+	network: ENetwork;
+	userAddress: string;
+	amount: string;
+	createdAt: Date;
+	beneficiaryAddress: string;
+	beneficiaryUserId: number;
+	extrinsicHash: string;
+	remark: string;
+	id: string;
+}
+
+export enum ETipsTab {
+	Received = 'received',
+	Given = 'given'
+}
+
 export interface IVaultScannedAddress {
 	content: string;
 	isAddress: boolean;

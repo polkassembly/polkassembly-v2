@@ -41,7 +41,9 @@ import {
 	IPollVote,
 	IPoll,
 	EPollVotesType,
-	IOffChainPollPayload
+	IOffChainPollPayload,
+	ITip,
+	ETipsTab
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -1836,5 +1838,59 @@ export class FirestoreService extends FirestoreUtils {
 				})
 				.filter((vote): vote is IPollVote => vote !== null);
 		});
+	}
+
+	static async GetTipsByUserId({ network, userId, tab }: { network: ENetwork; userId: number; tab: ETipsTab }) {
+		let tips;
+		if (tab === ETipsTab.Received) {
+			tips = this.tipsCollectionRef().where('network', '==', network).where('beneficiaryUserId', '==', userId);
+		} else {
+			tips = this.tipsCollectionRef().where('network', '==', network).where('userId', '==', userId);
+		}
+
+		const tipsSnapshot = await tips.get();
+		return tipsSnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate?.()
+			} as ITip;
+		});
+	}
+
+	static async CreateTip({
+		network,
+		userAddress,
+		userId,
+		amount,
+		beneficiaryAddress,
+		beneficiaryUserId,
+		extrinsicHash,
+		remark
+	}: {
+		network: ENetwork;
+		userAddress: string;
+		userId: number;
+		amount: string;
+		beneficiaryAddress: string;
+		beneficiaryUserId: number;
+		remark: string;
+		extrinsicHash: string;
+	}) {
+		const tipDoc = this.tipsCollectionRef().doc();
+		const tip: ITip = {
+			network,
+			userAddress,
+			userId,
+			amount,
+			beneficiaryAddress,
+			beneficiaryUserId,
+			extrinsicHash,
+			remark,
+			createdAt: new Date(),
+			id: tipDoc.id
+		};
+		await tipDoc.set(tip, { merge: true });
+		return tip;
 	}
 }

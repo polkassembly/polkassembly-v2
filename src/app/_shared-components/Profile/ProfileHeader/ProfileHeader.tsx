@@ -4,7 +4,7 @@
 
 import { EProfileTabs, ESocial, IFollowEntry, IOnChainIdentity, IPublicUser } from '@/_shared/types';
 import Identicon from '@polkadot/react-identicon';
-import { Pencil, ShieldPlus } from 'lucide-react';
+import { CircleDollarSignIcon, Pencil, ShieldPlus } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { useTranslations } from 'next-intl';
 import { dayjs } from '@shared/_utils/dayjsInit';
@@ -21,6 +21,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { cn } from '@/lib/utils';
 import { useIdentityService } from '@/hooks/useIdentityService';
+import { useTipModal } from '@/hooks/useTipModal';
 import { TabsList, TabsTrigger } from '../../Tabs';
 import { Button } from '../../Button';
 import classes from './ProfileHeader.module.scss';
@@ -54,6 +55,7 @@ function ProfileHeader({
 	const [loading, setLoading] = useState(false);
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
 	const { identityService, getOnChainIdentity } = useIdentityService();
+	const { setBeneficiaryAddress, setOpenTipModal } = useTipModal();
 
 	useEffect(() => {
 		if (!address) return;
@@ -301,16 +303,30 @@ function ProfileHeader({
 								</Dialog>
 							) : (
 								user?.id && (
-									<Button
-										size='lg'
-										className='w-full rounded-3xl sm:w-auto'
-										leftIcon={<ShieldPlus />}
-										isLoading={loading}
-										onClick={isFollowing ? unfollowUser : followUser}
-										disabled={!user?.id}
-									>
-										{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
-									</Button>
+									<div className='flex items-center gap-x-3'>
+										<Button
+											size='lg'
+											className='w-full rounded-3xl sm:w-auto'
+											leftIcon={<ShieldPlus />}
+											isLoading={loading}
+											onClick={isFollowing ? unfollowUser : followUser}
+											disabled={!user?.id}
+										>
+											{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
+										</Button>
+										<Button
+											size='lg'
+											className='w-full rounded-3xl'
+											leftIcon={<CircleDollarSignIcon />}
+											onClick={() => {
+												setBeneficiaryAddress(address || '');
+												setOpenTipModal(true);
+											}}
+											disabled={!address}
+										>
+											{t('Profile.Tips.tip')}
+										</Button>
+									</div>
 								)
 							)}
 						</div>

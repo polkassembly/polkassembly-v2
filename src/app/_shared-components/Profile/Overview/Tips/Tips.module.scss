@@ -1,0 +1,21 @@
+.header {
+	@apply mb-4 flex items-center justify-between;
+}
+.headerTitle {
+	@apply flex items-center gap-2 text-base font-semibold text-text_primary;
+}
+.tabs {
+	@apply mt-2 flex items-center gap-0 rounded-lg bg-bg_code p-1.5;
+}
+.tab {
+	@apply h-7 w-full rounded-sm px-3 text-sm font-bold tracking-wide transition-all;
+}
+.activeTab {
+	@apply bg-bg_modal font-bold text-text_pink shadow-sm;
+}
+.inactiveTab {
+	@apply bg-transparent text-toggle_btn_inactive_text hover:bg-primary_border;
+}
+.noData {
+	@apply flex flex-col items-center justify-center gap-2;
+}
