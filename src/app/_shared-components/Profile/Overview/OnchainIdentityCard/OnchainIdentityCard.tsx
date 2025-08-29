@@ -91,7 +91,7 @@ function OnchainIdentityCard({ userProfile, setUserProfile, addresses }: { userP
 			<div className={classes.onchainIdentityCardContent}>
 				<TooltipProvider>
 					{displayedAddresses.map((a) => {
-						const identity = identities?.find((i) => i.address === a);
+						const identity = identities?.find((i) => i && i.address === a);
 						const judgementText = identity?.judgements?.[0]?.[1]?.toString() || t('Profile.noJudgements');
 						const judgementCount = identity?.judgements?.length || 0;
 
