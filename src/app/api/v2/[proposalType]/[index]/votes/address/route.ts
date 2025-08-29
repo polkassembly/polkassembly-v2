@@ -16,18 +16,20 @@ const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType).refine((val) => ON_CHAIN_PROPOSAL_TYPES.includes(val), {
 		message: `Invalid proposal type. Must be one of: ${ON_CHAIN_PROPOSAL_TYPES.join(', ')}`
 	}),
-	index: z.string(),
-	address: z.string().refine((val) => ValidatorService.isValidWeb3Address(val), { message: 'Please enter a valid address' })
+	index: z.string()
 });
 
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string; address: string }> }): Promise<NextResponse> => {
-	const { proposalType, index, address } = zodParamsSchema.parse(await params);
+	const { proposalType, index } = zodParamsSchema.parse(await params);
 
 	const network = await getNetworkFromHeaders();
 
 	const zodQuerySchema = z.object({
 		page: z.coerce.number().optional().default(1),
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
+		address: z
+			.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.string()))
+			.refine((arr) => arr.length > 0 && arr.every((a) => ValidatorService.isValidWeb3Address(a)), { message: 'Please provide at least one valid address' }),
 		decision: z
 			.string()
 			.transform((val) => {
@@ -36,9 +38,11 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 			.optional()
 	});
 
-	const { page, limit, decision } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
+	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
 
-	const voteData = await OnChainDbService.GetPostVoteData({ network, proposalType, indexOrHash: index, voterAddresses: [address], page, limit, decision });
+	const { page, limit, decision, address: addresses } = zodQuerySchema.parse(searchParamsObject);
+
+	const voteData = await OnChainDbService.GetPostVoteData({ network, proposalType, indexOrHash: index, voterAddresses: addresses, page, limit, decision });
 
 	return NextResponse.json(voteData);
 });

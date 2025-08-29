@@ -65,7 +65,7 @@ function CreateTipModal() {
 	const { beneficiaryAddress, open: openModal, setOpenTipModal: setOpenModal, setBeneficiaryAddress } = useTipModal();
 	const { toast } = useToast();
 	const network = getCurrentNetwork();
-	const [tipAmount, setTipAmount] = useState<BN>(BN_ZERO);
+	const [tipAmount, setTipAmount] = useState<BN | null>(null);
 	const [remark, setRemark] = useState<string>('');
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -104,7 +104,7 @@ function CreateTipModal() {
 	});
 
 	const createTipInDb = async (txHash: string, updatedRemark: string) => {
-		if (!user?.id || !beneficiaryAddress) return null;
+		if (!user?.id || !beneficiaryAddress || !tipAmount) return null;
 		const { data, error } = await NextApiClientService.createTip({
 			userId: user?.id,
 			userAddress: userPreferences.selectedAccount?.address || '',
@@ -129,7 +129,8 @@ function CreateTipModal() {
 			!user?.id ||
 			!beneficiaryAddress ||
 			!ValidatorService.isValidWeb3Address(beneficiaryAddress) ||
-			!userPreferences.wallet
+			!userPreferences.wallet ||
+			!tipAmount
 		)
 			return;
 
@@ -217,8 +218,8 @@ function CreateTipModal() {
 									key={tip.value}
 									disabled={isLoading}
 									className={cn(
-										tipAmount.eq(tip.nativeTokenAmount || BN_ZERO) ? 'bg-selected_tip_bg' : '',
-										'flex h-[36px] w-[102px] items-center gap-1 rounded-3xl border-[1px] border-solid border-text_pink'
+										!!tip?.nativeTokenAmount && tipAmount?.eq(tip.nativeTokenAmount) ? 'bg-selected_tip_bg' : '',
+										'flex h-9 w-[102px] items-center gap-1 rounded-3xl border-[1px] border-solid border-text_pink'
 									)}
 									variant='ghost'
 									onClick={() => setTipAmount(tip.nativeTokenAmount || BN_ZERO)}
@@ -235,7 +236,7 @@ function CreateTipModal() {
 						</div>
 					</div>
 					<BalanceInput
-						value={tipAmount}
+						value={tipAmount || BN_ZERO}
 						disabled={isLoading}
 						label={t('Tips.orEnterTheCustomAmountYouWouldLikeToTip')}
 						onChange={({ value }) => setTipAmount(value)}

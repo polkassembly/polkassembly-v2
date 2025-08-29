@@ -15,6 +15,7 @@ import Accounts from './Accounts/Accounts';
 import Overview from './Overview/Overview';
 import Settings from './Settings/Settings';
 import Posts from './Posts/Posts';
+import UserActivity from './UserActivity/UserActivity';
 
 function Profile({ profileData, address }: { profileData?: IPublicUser; address?: string }) {
 	const [userProfileData, setUserProfileData] = useState<IPublicUser | undefined>(profileData);
@@ -50,9 +51,12 @@ function Profile({ profileData, address }: { profileData?: IPublicUser; address?
 				<TabsContent value={EProfileTabs.POSTS}>
 					<Posts addresses={address ? [address] : profileData?.addresses || []} />
 				</TabsContent>
-				{/* <TabsContent value={EProfileTabs.ACTIVITY}>
-					<UserActivity userId={profileData.id} />
-				</TabsContent> */}
+				<TabsContent value={EProfileTabs.ACTIVITY}>
+					<UserActivity
+						addresses={address ? [address] : profileData?.addresses || []}
+						userId={userProfileData?.id}
+					/>
+				</TabsContent>
 				<TabsContent value={EProfileTabs.ACCOUNTS}>
 					<Accounts addresses={profileData?.addresses.length ? profileData.addresses : address ? [address] : []} />
 				</TabsContent>

@@ -64,6 +64,7 @@ function Tips({ userProfile }: { userProfile?: IPublicUser }) {
 		queryFn: getUserTips,
 		enabled: !!userProfile?.id
 	});
+
 	return (
 		<div>
 			<div className={classes.header}>
@@ -115,7 +116,7 @@ function Tips({ userProfile }: { userProfile?: IPublicUser }) {
 								{index !== data.length - 1 && (
 									<Separator
 										orientation='horizontal'
-										className='h-4'
+										className='my-3'
 									/>
 								)}
 							</>

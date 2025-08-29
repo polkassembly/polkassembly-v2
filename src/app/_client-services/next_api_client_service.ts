@@ -56,7 +56,8 @@ import {
 	EAnalyticsType,
 	EVotesDisplayType,
 	ITip,
-	ETipsTab
+	ETipsTab,
+	IProfileVote
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -90,6 +91,7 @@ enum EApiRoute {
 	ADD_COMMENT = 'ADD_COMMENT',
 	GET_ACTIVITY_FEED = 'GET_ACTIVITY_FEED',
 	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
+	GET_POST_VOTES_BY_ADDRESS = 'GET_POST_VOTES_BY_ADDRESS',
 	ADD_POST_REACTION = 'ADD_POST_REACTION',
 	DELETE_REACTION = 'DELETE_REACTION',
 	PUBLIC_USER_DATA_BY_ID = 'PUBLIC_USER_DATA_BY_ID',
@@ -149,7 +151,8 @@ enum EApiRoute {
 	ADD_COMMENT_REACTION = 'ADD_COMMENT_REACTION',
 	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
 	CREATE_TIP = 'CREATE_TIP',
-	GET_USER_TIPS = 'GET_USER_TIPS'
+	GET_USER_TIPS = 'GET_USER_TIPS',
+	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES'
 }
 
 export class NextApiClientService {
@@ -202,6 +205,9 @@ export class NextApiClientService {
 			case EApiRoute.FETCH_LEADERBOARD:
 				path = '/users';
 				break;
+			case EApiRoute.GET_VOTES_BY_ADDRESSES:
+				path = '/users/votes';
+				break;
 			case EApiRoute.FETCH_PREIMAGES:
 				path = '/preimages';
 				break;
@@ -250,6 +256,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_ON_CHAIN_METADATA_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.GET_POST_VOTES_BY_ADDRESS:
 			case EApiRoute.GET_CONTENT_SUMMARY:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 			case EApiRoute.GET_VOTE_CURVES:
@@ -687,6 +694,24 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_HISTORY, routeSegments: [proposalType, index, 'votes'], queryParams });
 		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });
+	}
+
+	static async getPostVotesByAddresses({ proposalType, index, addresses }: { proposalType: EProposalType; index: string; addresses: string[] }) {
+		const queryParams = new URLSearchParams({
+			page: '1',
+			limit: addresses.length.toString()
+		});
+
+		if (addresses.length) {
+			addresses.forEach((address) => queryParams.append('address', address));
+		}
+
+		const { url, method } = await NextApiClientService.getRouteConfig({
+			route: EApiRoute.GET_POST_VOTES_BY_ADDRESS,
+			routeSegments: [proposalType, index, 'votes', 'address'],
+			queryParams
+		});
+		return NextApiClientService.nextApiClientFetch<IVoteHistoryData>({ url, method });
 	}
 
 	// activity feed
@@ -1233,5 +1258,18 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_TIPS, routeSegments: [userId.toString(), 'tips'], queryParams });
 		return this.nextApiClientFetch<{ tips: ITip[] }>({ url, method });
+	}
+
+	static async getVotesByAddresses({ addresses, page, limit }: { addresses: string[]; page: number; limit: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+
+		if (addresses.length) {
+			addresses.forEach((address) => queryParams.append('address', address));
+		}
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_BY_ADDRESSES, queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IProfileVote>>({ url, method });
 	}
 }

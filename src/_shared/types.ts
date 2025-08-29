@@ -1027,7 +1027,8 @@ export enum EReactQueryKeys {
 	POST_DETAILS = 'postDetails',
 	ACCOUNTS = 'accounts',
 	IDENTITY_INFO = 'identityInfo',
-	TOKENS_USD_PRICE = 'tokensUsdPrice'
+	TOKENS_USD_PRICE = 'tokensUsdPrice',
+	USER_VOTES = 'userVotes'
 }
 
 export interface IParamDef {
@@ -1528,4 +1529,18 @@ export interface IVaultQrState {
 export enum EVoteBubbleTabs {
 	Bubble = 'bubble',
 	Graph = 'graph'
+}
+
+export interface IProfileVote extends Omit<IVoteData, 'createdAtBlock' | 'delegatedTo' | 'balanceValue'> {
+	balance: {
+		value: string;
+		abstain: string;
+		aye: string;
+		nay: string;
+	};
+	proposalIndex: number;
+	proposalType: EProposalType;
+	postDetails?: IPostListing;
+	isDelegated: boolean;
+	extrinsicIndex: string;
 }
