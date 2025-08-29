@@ -1236,7 +1236,10 @@ export class SubsquidQueries {
 			votes: flattenedConvictionVotes(
 				where: {
 					voter_in: $voter_in,
-					removedAtBlock_isNull: true
+					removedAtBlock_isNull: true,
+					proposal: {
+						status_in: $status_in
+					}
 				},
 				limit: $limit,
 				offset: $offset,
@@ -1273,13 +1276,13 @@ export class SubsquidQueries {
 					removedAtBlock_isNull: true,
 					proposal: {
 						status_in: $status_in
-					},
-					createdAt_gte: $createdAt_gte
+					}
 				},
 				orderBy: createdAt_DESC
 			) {
 				totalCount
 			}
 		}
+
 	`;
 }
