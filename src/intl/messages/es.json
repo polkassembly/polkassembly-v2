@@ -450,6 +450,7 @@
 		}
 	},
 	"PostDetails": {
+		"selectYourVoterAddress": "Seleccione su dirección de votación",
 		"address": "Dirección",
 		"castVote": "Emitir Voto",
 		"changeVote": "Cambiar Voto",
@@ -622,6 +623,13 @@
 		"noVoteForAddress": "No se encontró voto para esta dirección",
 		"showLikelySpam": "Mostrar spam probable",
 		"hideLikelySpam": "Ocultar spam probable",
+		"HighlightMenu": {
+			"quote": "Citar",
+			"share": "Compartir",
+			"copy": "Copiar",
+			"textCopiedToClipboard": "Texto copiado al portapapeles",
+			"failedToCopyText": "Error al copiar el texto"
+		},
 		"voted": "Votado",
 		"votes": "Votos",
 		"vote": "Voto",

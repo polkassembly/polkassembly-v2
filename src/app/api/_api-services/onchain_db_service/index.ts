@@ -355,4 +355,8 @@ export class OnChainDbService {
 	}) {
 		return SubsquidService.GetPostBubbleVotes({ network, proposalType, index, analyticsType, votesType });
 	}
+
+	static async GetVotesForAddresses({ network, voters, page, limit }: { network: ENetwork; voters: string[]; page: number; limit: number }) {
+		return SubsquidService.GetVotesForAddresses({ network, voters, page, limit });
+	}
 }

@@ -189,10 +189,10 @@
 			"status": "Status",
 			"showMore": "Mehr anzeigen",
 			"showLess": "Weniger anzeigen",
-			"selectAddresses": "Adressen auswählen",
 			"votedProposals": "Abgestimmte Vorschläge",
 			"activeProposals": "aktive vorschläge",
-			"last15Days": "Letzte 15 Tage"
+			"last15Days": "Letzte 15 Tage",
+			"selectAddresses": "Adressen auswählen"
 		},
 		"Activity": {
 			"voted_on_proposal": "Abgestimmt",
@@ -448,7 +448,10 @@
 		}
 	},
 	"PostDetails": {
-		"address": "Adresse",
+		"remove": "Entfernen",
+		"removeVote": "Abstimmung entfernen",
+		"selectYourVoterAddress": "Wählen Sie Ihre Abstimmungsadresse",
+		"removeVoteConfirmation": "Sind Sie sicher, dass Sie Ihre Abstimmung entfernen möchten?",
 		"castVote": "Abstimmen",
 		"changeVote": "Abstimmen ändern",
 		"myVote": "Meine Stimme",
@@ -470,10 +473,7 @@
 		"post": "Beitrag",
 		"cancel": "Abbrechen",
 		"reply": "Antworten",
-		"remove": "Entfernen",
 		"removing": "Entfernen",
-		"removeVote": "Abstimmung entfernen",
-		"removeVoteConfirmation": "Möchten Sie Ihre Abstimmung wirklich entfernen?",
 		"proposalPassed": "Vorschlag angenommen",
 		"proposalFailed": "Vorschlag abgelehnt",
 		"confirmationPeriod": "Bestätigungszeitraum",
@@ -620,6 +620,13 @@
 		"noVoteForAddress": "Keine Abstimmung für diese Adresse gefunden",
 		"showLikelySpam": "Wahrscheinlichen Spam anzeigen",
 		"hideLikelySpam": "Wahrscheinlichen Spam ausblenden",
+		"HighlightMenu": {
+			"quote": "Zitieren",
+			"share": "Teilen",
+			"copy": "Kopieren",
+			"textCopiedToClipboard": "Text in die Zwischenablage kopiert",
+			"failedToCopyText": "Text konnte nicht kopiert werden"
+		},
 		"voted": "Abgestimmt",
 		"votes": "Abstimmungen",
 		"vote": "Abstimmung",

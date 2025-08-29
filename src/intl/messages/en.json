@@ -452,6 +452,7 @@
 		}
 	},
 	"PostDetails": {
+		"selectYourVoterAddress": "Select Your Voter Address",
 		"address": "Address",
 		"save": "Save",
 		"edit": "Edit",
@@ -589,6 +590,13 @@
 		},
 		"commentsDisabled": "Comments have been disabled for this post.",
 		"commentsDisabledForNonVerifiedUsers": "Comments have been disabled for non verified users.",
+		"HighlightMenu": {
+			"quote": "Quote",
+			"share": "Share",
+			"copy": "Copy",
+			"textCopiedToClipboard": "Text copied to clipboard",
+			"failedToCopyText": "Failed to copy text"
+		},
 		"Poll": {
 			"endsOn": "Ends on",
 			"endedOn": "Ended on",

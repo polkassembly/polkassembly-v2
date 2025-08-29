@@ -96,6 +96,7 @@
 		"react-chartjs-2": "^5.3.0",
 		"react-day-picker": "^9.6.3",
 		"react-dom": "19.0.0",
+
 		"react-hook-form": "^7.53.2",
 		"react-instantsearch": "^7.15.4",
 		"react-json-view": "^1.21.3",
@@ -150,13 +151,8 @@
 		"typescript": "5.4.5"
 	},
 	"lint-staged": {
-		"**/*.(ts|tsx|js|jsx)": [
-			"yarn eslint --fix",
-			"yarn prettier --write"
-		],
-		"**/*.(md|css|scss|html)": [
-			"yarn prettier --write"
-		]
+		"**/*.(ts|tsx|js|jsx)": ["yarn eslint --fix", "yarn prettier --write"],
+		"**/*.(md|css|scss|html)": ["yarn prettier --write"]
 	},
 	"resolutions": {
 		"@types/react": "npm:types-react@19.0.0-rc.1",

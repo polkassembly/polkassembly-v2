@@ -449,6 +449,7 @@
 		}
 	},
 	"PostDetails": {
+		"selectYourVoterAddress": "选择您的投票地址",		
 		"address": "地址",
 		"castVote": "投票",
 		"changeVote": "更改投票",
@@ -621,6 +622,13 @@
 		"noVoteForAddress": "未找到此地址的投票",
 		"showLikelySpam": "显示疑似垃圾评论",
 		"hideLikelySpam": "隐藏疑似垃圾评论",
+		"HighlightMenu": {
+			"quote": "引用",
+			"share": "分享",
+			"copy": "复制",
+			"textCopiedToClipboard": "文本已复制到剪贴板",
+			"failedToCopyText": "复制文本失败"
+		},
 		"voted": "已投票",
 		"votes": "投票",
 		"vote": "投票",

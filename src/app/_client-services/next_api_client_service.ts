@@ -54,7 +54,8 @@ import {
 	IPostAnalytics,
 	IPostBubbleVotes,
 	EAnalyticsType,
-	EVotesDisplayType
+	EVotesDisplayType,
+	IProfileVote
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -1230,6 +1231,19 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
+	static async getVotesByAddresses({ addresses, page, limit }: { addresses: string[]; page: number; limit: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+
+		if (addresses.length) {
+			addresses.forEach((address) => queryParams.append('address', address));
+		}
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_BY_ADDRESSES, queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IProfileVote>>({ url, method });
+	}
+
 	static async getActiveVotedProposalsCount({ addresses, last15days }: { addresses: string[]; last15days?: boolean }) {
 		const queryParams = new URLSearchParams({
 			last15days: last15days?.toString() || 'false'
@@ -1238,11 +1252,8 @@ export class NextApiClientService {
 		if (addresses.length) {
 			addresses.forEach((address) => queryParams.append('address', address));
 		}
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.GET_ACTIVE_VOTED_PROPOSALS_COUNT,
-			queryParams
-		});
 
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ACTIVE_VOTED_PROPOSALS_COUNT, queryParams });
 		return this.nextApiClientFetch<{ activeProposalsCount: number; votedProposalsCount: number }>({ url, method });
 	}
 }
