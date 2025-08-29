@@ -1228,10 +1228,10 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
-	static async getVotesByAddresses({ addresses, page, limit, proposalStatuses }: { addresses: string[]; page?: number; limit?: number; proposalStatuses?: EProposalStatus[] }) {
+	static async getVotesByAddresses({ addresses, page, limit, proposalStatuses }: { addresses: string[]; page: number; limit: number; proposalStatuses?: EProposalStatus[] }) {
 		const queryParams = new URLSearchParams({
-			...(page && { page: page.toString() }),
-			...(limit && { limit: limit.toString() })
+			page: page.toString(),
+			limit: limit.toString()
 		});
 
 		if (addresses.length) {

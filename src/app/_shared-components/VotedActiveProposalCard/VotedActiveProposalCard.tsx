@@ -17,7 +17,7 @@ function VotedActiveProposalCard({ userId, addresses }: { userId: number; addres
 
 	const getVotesAndActiveProposals = async () => {
 		const [{ data: votesData }, { data: activeProposalsData }] = await Promise.all([
-			NextApiClientService.getVotesByAddresses({ addresses: addresses || [], proposalStatuses: ACTIVE_PROPOSAL_STATUSES }),
+			NextApiClientService.getVotesByAddresses({ addresses: addresses || [], page: 1, limit: 100, proposalStatuses: ACTIVE_PROPOSAL_STATUSES }),
 			NextApiClientService.fetchListingData({ proposalType: EProposalType.REFERENDUM_V2, page: 1, statuses: ACTIVE_PROPOSAL_STATUSES, limit: 100 })
 		]);
 

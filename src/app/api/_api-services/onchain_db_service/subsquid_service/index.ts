@@ -1294,8 +1294,8 @@ export class SubsquidService extends SubsquidUtils {
 	}: {
 		network: ENetwork;
 		voters: string[];
-		page?: number;
-		limit?: number;
+		page: number;
+		limit: number;
 		proposalStatuses?: EProposalStatus[];
 	}): Promise<IGenericListingResponse<IProfileVote>> {
 		const gqlClient = this.subsquidGqlClient(network);
@@ -1303,8 +1303,8 @@ export class SubsquidService extends SubsquidUtils {
 		const query = this.GET_ALL_FLATTENED_VOTES_FOR_MULTIPLE_VOTERS;
 
 		const variables = {
-			...(limit && { limit }),
-			...(page && limit && { offset: (page - 1) * limit }),
+			limit,
+			offset: (page - 1) * limit,
 			voter_in: voters,
 			...(proposalStatuses && { status_in: proposalStatuses })
 		};

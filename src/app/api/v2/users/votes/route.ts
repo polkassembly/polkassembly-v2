@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
@@ -19,8 +19,8 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 export const GET = withErrorHandling(async (req: NextRequest) => {
 	const network = await getNetworkFromHeaders();
 	const queryParamsSchema = z.object({
-		page: z.coerce.number().optional(),
-		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional(),
+		page: z.coerce.number().optional().default(1),
+		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
 		address: z.preprocess(
 			(val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined),
 			z.array(

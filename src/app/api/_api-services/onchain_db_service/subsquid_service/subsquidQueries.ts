@@ -1228,8 +1228,8 @@ export class SubsquidQueries {
 
 	protected static GET_ALL_FLATTENED_VOTES_FOR_MULTIPLE_VOTERS = `
 		query MyQuery(
-			$limit: Int,
-			$offset: Int,
+			$limit: Int!,
+			$offset: Int!,
 			$voter_in: [String!]!,
 			$status_in: [ProposalStatus!]
 		) {

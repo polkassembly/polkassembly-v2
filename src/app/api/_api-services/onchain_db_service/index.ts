@@ -365,8 +365,8 @@ export class OnChainDbService {
 	}: {
 		network: ENetwork;
 		voters: string[];
-		page?: number;
-		limit?: number;
+		page: number;
+		limit: number;
 		proposalStatuses?: EProposalStatus[];
 	}) {
 		return SubsquidService.GetVotesForAddresses({ network, voters, page, limit, proposalStatuses });
