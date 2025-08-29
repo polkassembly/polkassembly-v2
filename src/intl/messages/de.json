@@ -163,6 +163,8 @@
 		"balance": "Guthaben",
 		"locked": "Gesperrt",
 		"on": "am",
+		"noJudgements": "Keine Beurteilungen",
+		"judgement": "Beurteilung",
 		"Delegations": {
 			"noDelegations": "Keine Delegationen gefunden",
 			"delegation": "Delegation",

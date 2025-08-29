@@ -167,7 +167,8 @@
 		"balance": "Balance",
 		"locked": "Locked",
 		"on": "on",
-		
+		"noJudgements": "No Judgements",
+		"judgement": "Judgement",
 		"Delegations": {
 			"noDelegations": "No Delegations Found",
 			"delegation": "Delegation",

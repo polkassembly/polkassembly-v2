@@ -14,26 +14,6 @@
 	@apply text-2xl font-semibold;
 }
 
-.onchainIdentityCard {
-	@apply rounded-xl border-[1px] border-primary_border bg-bg_modal px-5 py-6;
-}
-
-.onchainIdentityCardHeader {
-	@apply mb-4 flex items-center justify-between;
-}
-
-.onchainIdentityCardHeaderTitle {
-	@apply text-lg font-semibold text-text_primary;
-}
-
-.modal {
-	@apply max-w-xl p-6;
-}
-
-.onchainIdentityCardContent {
-	@apply flex flex-col gap-y-2;
-}
-
 .overviewGrid {
 	@apply col-span-2 flex flex-col gap-y-4;
 }

@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@ui/Skeleton';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
-import styles from './VotedActiveProposalCard.module.scss';
+import classes from './VotedActiveProposalCard.module.scss';
 
 function VotedActiveProposalCard({ last15days, addresses }: { last15days?: boolean; addresses: string[] }) {
 	const t = useTranslations('Profile');
@@ -33,11 +33,11 @@ function VotedActiveProposalCard({ last15days, addresses }: { last15days?: boole
 	}
 
 	return (
-		<div className={styles.activeProposalContainer}>
-			<div className={styles.activeProposalTitle}>
-				<div className={`${styles.activeProposalTitleText} dark:text-white`}>
+		<div className={classes.activeProposalContainer}>
+			<div className={classes.activeProposalTitle}>
+				<div className={classes.activeProposalTitleText}>
 					<span>{t('Votes.votedProposals')}</span>
-					{last15days && <span className={styles.activeProposalTitleDate}>{t('Votes.last15Days')}</span>}
+					{last15days && <span className={classes.activeProposalTitleDate}>{t('Votes.last15Days')}</span>}
 				</div>
 			</div>
 			{isFetching ? (
@@ -45,8 +45,8 @@ function VotedActiveProposalCard({ last15days, addresses }: { last15days?: boole
 			) : (
 				<div className='text-xs'>
 					<span className='text-xs text-wallet_btn_text'>
-						<span className='text-3xl font-semibold text-text_pink'>{data?.votedProposalsCount}</span> out of{' '}
-						<span className='text-xl font-semibold'>{data?.activeProposalsCount}</span> {t('Votes.activeProposals')}
+						<span className='text-2xl font-semibold text-text_pink'>{data?.votedProposalsCount}</span> out of{' '}
+						<span className='text-base font-semibold'>{data?.activeProposalsCount}</span> {t('Votes.activeProposals')}
 					</span>
 				</div>
 			)}

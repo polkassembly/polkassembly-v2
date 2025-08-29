@@ -163,6 +163,8 @@
 		"balance": "Saldo",
 		"locked": "Bloqueado",
 		"on": "el",
+		"noJudgements": "No hay juicios",
+		"judgement": "Juicio",
 		"Delegations": {
 			"noDelegations": "No se encontraron delegaciones",
 			"index": "Índice",

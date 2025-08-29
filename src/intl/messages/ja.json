@@ -165,6 +165,8 @@
 		"on": "日時",
 		"judgements": "判定",
 		"since": "日時",
+		"noJudgements": "判定がありません",
+		"judgement": "判定",
 		"Delegations": {
 			"noDelegations": "委任が見つかりません",
 			"delegation": "委任",
