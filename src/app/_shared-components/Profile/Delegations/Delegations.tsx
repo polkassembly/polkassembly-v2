@@ -128,7 +128,7 @@ function Delegations({ addresses }: { addresses: string[] }) {
 				<Skeleton className='h-[100px] w-full' />
 			) : (
 				<div className={classes.delegationsCardHeader}>
-					<div className='flex justify-between border-b border-border_grey pb-4'>
+					<div className='flex justify-between border-b border-border_grey pb-2'>
 						<div className={classes.delegationsCardHeaderTitle}>
 							<Image
 								src={DelegationIcon}

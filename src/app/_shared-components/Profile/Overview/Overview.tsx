@@ -53,8 +53,8 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 								({userProfile?.profileDetails.achievementBadges?.length || 0} / {Object.keys(achievementBadges).length})
 							</span>
 						</p>
-						<p className='text-sm'>{t('Profile.badgesDescription')}</p>
 					</div>
+					<p className='mb-4 text-sm'>{t('Profile.badgesDescription')}</p>
 					<div className={classes.badgesCardContent}>
 						{Object.keys(achievementBadges || []).map((badge) => {
 							const badgeDetails = achievementBadges[`${badge}` as EUserBadge];
