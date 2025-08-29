@@ -168,12 +168,14 @@ export class OnChainDbService {
 
 	static async GetActiveVotedProposalsCount({
 		addresses,
-		network
+		network,
+		last15days
 	}: {
 		addresses: string[];
 		network: ENetwork;
+		last15days?: boolean;
 	}): Promise<{ activeProposalsCount: number; votedProposalsCount: number }> {
-		return SubsquidService.GetActiveVotedProposalsCount({ addresses, network });
+		return SubsquidService.GetActiveVotedProposalsCount({ addresses, network, last15days });
 	}
 
 	static async GetBountyStats(network: ENetwork): Promise<IBountyStats> {

@@ -49,7 +49,7 @@ function Profile({ profileData, address }: { profileData?: IPublicUser; address?
 					/>
 				</TabsContent>
 				<TabsContent value={EProfileTabs.POSTS}>
-					<Posts addresses={address ? [address] : profileData?.addresses || []} />
+					<Posts addresses={profileData?.addresses?.length ? profileData?.addresses : address ? [address] : []} />
 				</TabsContent>
 				<TabsContent value={EProfileTabs.ACTIVITY}>
 					<UserActivity
