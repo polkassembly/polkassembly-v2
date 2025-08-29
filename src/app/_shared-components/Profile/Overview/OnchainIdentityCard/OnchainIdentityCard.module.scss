@@ -1,0 +1,67 @@
+.onchainIdentityCard {
+	@apply rounded-xl border-[1px] border-primary_border bg-bg_modal px-5 py-5;
+}
+
+.onchainIdentityCardHeader {
+	@apply mb-4 flex items-center justify-between;
+}
+
+.onchainIdentityCardHeaderTitle {
+	@apply text-xl font-semibold text-text_primary;
+}
+
+.modal {
+	@apply max-w-xl p-6;
+}
+
+.onchainIdentityCardContent {
+	@apply flex flex-col gap-y-3;
+}
+
+.identityRow {
+	@apply flex items-center justify-between;
+}
+
+.identityInfo {
+	@apply flex w-full items-center justify-between;
+}
+
+.addressInfo {
+	@apply flex gap-1.5;
+}
+
+.addressComponent {
+	@apply text-sm font-medium text-text_primary;
+}
+
+.statusContainer {
+	@apply flex items-center gap-2;
+}
+
+.judgementText {
+	@apply flex gap-1 text-sm text-basic_text;
+}
+
+.judgementCounter {
+	@apply flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-[1px] border-primary_border bg-activity_feed_active_proposal_bg text-xs font-semibold text-text_primary transition-colors;
+}
+
+.showMoreContainer {
+	@apply flex w-full justify-start;
+}
+
+.showMoreButton {
+	@apply text-sm font-medium text-text_pink;
+}
+
+.tooltipContent {
+	@apply flex flex-col gap-y-1.5 rounded-md bg-tooltip_background p-6 text-sm font-medium text-white;
+}
+
+.tooltipHeader {
+	@apply text-sm font-semibold text-text_primary;
+}
+
+.tooltipSubtext {
+	@apply mt-1 text-xs text-basic_text;
+}

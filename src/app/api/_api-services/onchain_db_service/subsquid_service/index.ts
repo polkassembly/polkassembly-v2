@@ -583,16 +583,24 @@ export class SubsquidService extends SubsquidUtils {
 
 	static async GetActiveVotedProposalsCount({
 		addresses,
-		network
+		network,
+		last15days
 	}: {
 		addresses: string[];
 		network: ENetwork;
+		last15days?: boolean;
 	}): Promise<{ activeProposalsCount: number; votedProposalsCount: number }> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_ACTIVE_VOTED_PROPOSALS_COUNT;
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { status_in: ACTIVE_PROPOSAL_STATUSES, voter_in: addresses }).toPromise();
+		const variables: { status_in: EProposalStatus[]; voter_in: string[]; createdAt_gte?: string } = { status_in: ACTIVE_PROPOSAL_STATUSES, voter_in: addresses };
+
+		if (last15days) {
+			variables.createdAt_gte = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString();
+		}
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain active voted proposals count from Subsquid: ${subsquidErr}`);
@@ -1281,18 +1289,27 @@ export class SubsquidService extends SubsquidUtils {
 		network,
 		voters,
 		page,
-		limit
+		limit,
+		proposalStatuses
 	}: {
 		network: ENetwork;
 		voters: string[];
 		page: number;
 		limit: number;
+		proposalStatuses?: EProposalStatus[];
 	}): Promise<IGenericListingResponse<IProfileVote>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_ALL_FLATTENED_VOTES_FOR_MULTIPLE_VOTERS;
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { limit, offset: (page - 1) * limit, voter_in: voters }).toPromise();
+		const variables = {
+			limit,
+			offset: (page - 1) * limit,
+			voter_in: voters,
+			...(proposalStatuses && { status_in: proposalStatuses })
+		};
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain votes for multiple voters from Subsquid: ${subsquidErr}`);

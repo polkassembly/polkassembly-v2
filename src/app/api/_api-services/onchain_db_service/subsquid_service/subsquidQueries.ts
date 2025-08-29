@@ -874,15 +874,15 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_ACTIVE_VOTED_PROPOSALS_COUNT = `
-		query GetActiveVotedProposalsCount($status_in: [ProposalStatus!]!, $voter_in: [String!]!) {
-			votedProposalsCount: convictionVotesConnection(orderBy: id_ASC, where: {proposal: {status_in: $status_in}, voter_in: $voter_in}) {
+		query GetActiveVotedProposalsCount($status_in: [ProposalStatus!]!, $voter_in: [String!]!, $createdAt_gte:DateTime) {
+			votedProposalsCount: flattenedConvictionVotesConnection(orderBy: id_ASC, where: {proposal: {status_in: $status_in}, voter_in: $voter_in, removedAtBlock_isNull: true, createdAt_gte: $createdAt_gte}) {
 				totalCount
 			}
 
-			activeProposalsCount: proposalsConnection(orderBy: id_ASC, where: {status_in: $status_in}) {
+			activeProposalsCount: proposalsConnection(orderBy: id_ASC, where: {status_in: $status_in, createdAt_gte: $createdAt_gte}) {
 				totalCount
 			}
-		}
+	}
 	`;
 
 	protected static GET_CHILD_BOUNTIES_REWARDS = `
@@ -1227,46 +1227,62 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_ALL_FLATTENED_VOTES_FOR_MULTIPLE_VOTERS = `
-	query MyQuery($limit: Int!, $offset: Int!, $voter_in: [String!]!) {
-		votes: flattenedConvictionVotes(
-			where: {
-				voter_in: $voter_in
-				removedAtBlock_isNull: true
-			}
-			limit: $limit
-			offset: $offset
-			orderBy: createdAt_DESC
+		query MyQuery(
+			$limit: Int!,
+			$offset: Int!,
+			$voter_in: [String!]!,
+			$status_in: [ProposalStatus!]
 		) {
-			proposalIndex
-			isDelegated
-			parentVote {
-				extrinsicIndex
-			}
-			type
-			voter
-			balance {
-				__typename
-				... on StandardVoteBalance {
-					value
+			votes: flattenedConvictionVotes(
+				where: {
+					voter_in: $voter_in,
+					removedAtBlock_isNull: true,
+					proposal: {
+						status_in: $status_in
+					}
+				},
+				limit: $limit,
+				offset: $offset,
+				orderBy: createdAt_DESC
+			) {
+				proposalIndex
+				isDelegated
+				parentVote {
+					extrinsicIndex
 				}
-				... on SplitVoteBalance {
-					aye
-					nay
-					abstain
+				type
+				voter
+				balance {
+					__typename
+					... on StandardVoteBalance {
+						value
+					}
+					... on SplitVoteBalance {
+						aye
+						nay
+						abstain
+					}
+				}
+				decision
+				createdAt
+				lockPeriod
+				proposal {
+					status
 				}
 			}
-			decision
-			createdAt
-			lockPeriod
-		}
-		totalCount: flattenedConvictionVotesConnection(
-			where: {
-				voter_in: $voter_in
-				removedAtBlock_isNull: true
+			totalCount: flattenedConvictionVotesConnection(
+				where: {
+					voter_in: $voter_in,
+					removedAtBlock_isNull: true,
+					proposal: {
+						status_in: $status_in
+					}
+				},
+				orderBy: createdAt_DESC
+			) {
+				totalCount
 			}
-			orderBy: createdAt_DESC
-		) {
-			totalCount
 		}
-	}`;
+
+	`;
 }

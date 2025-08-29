@@ -7,11 +7,11 @@
 }
 
 .activeProposalTitleText {
-	@apply flex items-center gap-1 text-sm font-semibold;
+	@apply flex w-full items-center justify-between text-xl font-semibold text-text_primary;
 }
 
 .activeProposalTitleDate {
-	@apply rounded-full bg-activity_feed_active_proposal_bg px-2 py-1 text-[10px] text-wallet_btn_text text-opacity-[80%];
+	@apply rounded-xl bg-activity_feed_active_proposal_bg px-2 text-[10px] text-basic_text text-opacity-[80%];
 }
 
 .activeProposalTitleDateNumber {

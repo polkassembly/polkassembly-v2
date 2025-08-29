@@ -3,26 +3,19 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { EUserBadge, IPublicUser, IUserBadgeDetails } from '@/_shared/types';
 import React, { useState } from 'react';
-import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useUser } from '@/hooks/useUser';
-import { DialogTrigger } from '@radix-ui/react-dialog';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import MedalIcon from '@assets/icons/medal-icon.svg';
 import { achievementBadges } from '@/_shared/_constants/achievementBadges';
-import { Button } from '../../Button';
-import Address from '../Address/Address';
-import LinkAddress from './LinkAddress/LinkAddress';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
 import classes from './Overview.module.scss';
 import Delegations from '../Delegations/Delegations';
+import VotedActiveProposalCard from '../../VotedActiveProposalCard/VotedActiveProposalCard';
+import OnchainIdentityCard from './OnchainIdentityCard/OnchainIdentityCard';
 
 function Overview({ address, profileData }: { address?: string; profileData?: IPublicUser }) {
 	const [userProfile, setUserProfile] = useState<IPublicUser | undefined>(profileData);
-	const [isModalOpen, setIsModalOpen] = useState(false);
 	const t = useTranslations();
-	const { user } = useUser();
 
 	const userBadges = {} as Record<EUserBadge, IUserBadgeDetails>;
 
@@ -30,15 +23,12 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 		userBadges[badge.name] = badge;
 	});
 
+	const profileAddresses = profileData?.addresses?.length ? profileData?.addresses : address ? [address] : [];
+
 	return (
 		<div className={classes.overview}>
 			<div className={classes.overviewGrid}>
 				{address || profileData?.addresses?.length ? <Delegations addresses={address ? [address] : profileData?.addresses || []} /> : null}
-				{/* <div className={classes.overviewCard}>
-					<div className={classes.overviewCardHeader}>
-						<p className={classes.overviewCardHeaderTitle}>{t('Profile.overview')}</p>
-					</div>
-				</div> */}
 				<div className={classes.badgesCard}>
 					<div className={classes.badgesCardHeader}>
 						<p className={classes.badgesCardHeaderTitle}>
@@ -78,49 +68,14 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 				</div>
 			</div>
 			<div className={classes.rightGrid}>
-				<div className={classes.onchainIdentityCard}>
-					<div className={classes.onchainIdentityCardHeader}>
-						<p className={classes.onchainIdentityCardHeaderTitle}>{t('Profile.onchainIdentity')}</p>
-						{user && userProfile && userProfile?.id === user.id && (
-							<Dialog
-								open={isModalOpen}
-								onOpenChange={setIsModalOpen}
-							>
-								<DialogTrigger>
-									<Button
-										variant='secondary'
-										leftIcon={<Plus />}
-										size='sm'
-									>
-										{t('Profile.linkAddress')}
-									</Button>
-								</DialogTrigger>
-								<DialogContent className={classes.modal}>
-									<DialogHeader>
-										<DialogTitle>{t('Profile.linkAddress')}</DialogTitle>
-									</DialogHeader>
-									<LinkAddress
-										onSuccess={(a) => {
-											setIsModalOpen(false);
-											setUserProfile({
-												...userProfile,
-												addresses: [...userProfile.addresses, a]
-											});
-										}}
-									/>
-								</DialogContent>
-							</Dialog>
-						)}
-					</div>
-					<div className={classes.onchainIdentityCardContent}>
-						{userProfile?.addresses.map((a) => (
-							<Address
-								key={a}
-								address={a}
-							/>
-						))}
-					</div>
-				</div>
+				{profileAddresses.length && (
+					<OnchainIdentityCard
+						userProfile={userProfile}
+						setUserProfile={setUserProfile}
+						addresses={profileAddresses}
+					/>
+				)}
+				{profileAddresses.length && <VotedActiveProposalCard addresses={profileAddresses} />}
 			</div>
 		</div>
 	);
