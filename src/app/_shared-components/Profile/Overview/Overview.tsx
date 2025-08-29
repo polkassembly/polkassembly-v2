@@ -23,6 +23,8 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 		userBadges[badge.name] = badge;
 	});
 
+	const profileAddresses = profileData?.addresses?.length ? profileData?.addresses : address ? [address] : [];
+
 	return (
 		<div className={classes.overview}>
 			<div className={classes.overviewGrid}>
@@ -66,12 +68,14 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 				</div>
 			</div>
 			<div className={classes.rightGrid}>
-				<OnchainIdentityCard
-					userProfile={userProfile}
-					setUserProfile={setUserProfile}
-					addresses={profileData?.addresses?.length ? profileData?.addresses : address ? [address] : []}
-				/>
-				{profileData?.addresses?.length && <VotedActiveProposalCard addresses={profileData?.addresses} />}
+				{profileAddresses.length && (
+					<OnchainIdentityCard
+						userProfile={userProfile}
+						setUserProfile={setUserProfile}
+						addresses={profileAddresses}
+					/>
+				)}
+				{profileAddresses.length && <VotedActiveProposalCard addresses={profileAddresses} />}
 			</div>
 		</div>
 	);
