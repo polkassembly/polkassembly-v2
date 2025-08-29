@@ -8,36 +8,34 @@ import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@ui/Skeleton';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
+import { EProposalType } from '@/_shared/types';
 import classes from './VotedActiveProposalCard.module.scss';
 
-function VotedActiveProposalCard({ last15days, addresses }: { last15days?: boolean; addresses: string[] }) {
+function VotedActiveProposalCard({ userId, addresses }: { userId: number; addresses: string[] }) {
 	const t = useTranslations('Profile');
 
-	const getVotes = async () => {
-		const { data, error } = await NextApiClientService.getActiveVotedProposalsCount({ addresses: addresses || [], last15days });
-		if (error) {
-			throw new Error(error.message);
-		}
-		return data;
+	const getVotesAndActiveProposals = async () => {
+		const [{ data: votesData }, { data: activeProposalsData }] = await Promise.all([
+			NextApiClientService.getVotesByAddresses({ addresses: addresses || [], proposalStatuses: ACTIVE_PROPOSAL_STATUSES }),
+			NextApiClientService.fetchListingData({ proposalType: EProposalType.REFERENDUM_V2, page: 1, statuses: ACTIVE_PROPOSAL_STATUSES, limit: 100 })
+		]);
+
+		return { votesData, activeProposalsData };
 	};
 
 	const { data, isFetching } = useQuery({
-		queryKey: ['votedActiveProposalsCount', addresses, last15days],
-		queryFn: getVotes,
+		queryKey: ['votedActiveProposals', userId],
+		queryFn: getVotesAndActiveProposals,
 		enabled: !!addresses?.length,
 		staleTime: FIVE_MIN_IN_MILLI
 	});
-
-	if (!addresses?.length) {
-		return null;
-	}
 
 	return (
 		<div className={classes.activeProposalContainer}>
 			<div className={classes.activeProposalTitle}>
 				<div className={classes.activeProposalTitleText}>
 					<span>{t('Votes.votedProposals')}</span>
-					{last15days && <span className={classes.activeProposalTitleDate}>{t('Votes.last15Days')}</span>}
 				</div>
 			</div>
 			{isFetching ? (
@@ -45,8 +43,8 @@ function VotedActiveProposalCard({ last15days, addresses }: { last15days?: boole
 			) : (
 				<div className='text-xs'>
 					<span className='text-xs text-wallet_btn_text'>
-						<span className='text-2xl font-semibold text-text_pink'>{data?.votedProposalsCount}</span> out of{' '}
-						<span className='text-base font-semibold'>{data?.activeProposalsCount}</span> {t('Votes.activeProposals')}
+						<span className='text-2xl font-semibold text-text_pink'>{data?.votesData?.totalCount || 0}</span> out of{' '}
+						<span className='text-base font-semibold'>{data?.activeProposalsData?.totalCount || 0}</span> {t('Votes.activeProposals')}
 					</span>
 				</div>
 			)}

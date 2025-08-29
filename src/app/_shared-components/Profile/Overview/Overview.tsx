@@ -27,11 +27,6 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 		<div className={classes.overview}>
 			<div className={classes.overviewGrid}>
 				{address || profileData?.addresses?.length ? <Delegations addresses={address ? [address] : profileData?.addresses || []} /> : null}
-				{/* <div className={classes.overviewCard}>
-					<div className={classes.overviewCardHeader}>
-						<p className={classes.overviewCardHeaderTitle}>{t('Profile.overview')}</p>
-					</div>
-				</div> */}
 				<div className={classes.badgesCard}>
 					<div className={classes.badgesCardHeader}>
 						<p className={classes.badgesCardHeaderTitle}>
@@ -76,10 +71,12 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 					setUserProfile={setUserProfile}
 					addresses={profileData?.addresses?.length ? profileData?.addresses : address ? [address] : []}
 				/>
-				<VotedActiveProposalCard
-					addresses={profileData?.addresses?.length ? profileData?.addresses : address ? [address] : []}
-					last15days
-				/>
+				{profileData?.id && profileData.addresses?.length && (
+					<VotedActiveProposalCard
+						userId={profileData.id}
+						addresses={profileData.addresses}
+					/>
+				)}
 			</div>
 		</div>
 	);

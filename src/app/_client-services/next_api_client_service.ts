@@ -55,7 +55,8 @@ import {
 	IPostBubbleVotes,
 	EAnalyticsType,
 	EVotesDisplayType,
-	IProfileVote
+	IProfileVote,
+	EProposalStatus
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -148,8 +149,7 @@ enum EApiRoute {
 	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES',
 	ADD_COMMENT_REACTION = 'ADD_COMMENT_REACTION',
 	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
-	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES',
-	GET_ACTIVE_VOTED_PROPOSALS_COUNT = 'GET_ACTIVE_VOTED_PROPOSALS_COUNT'
+	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES'
 }
 
 export class NextApiClientService {
@@ -204,9 +204,6 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_VOTES_BY_ADDRESSES:
 				path = '/users/votes';
-				break;
-			case EApiRoute.GET_ACTIVE_VOTED_PROPOSALS_COUNT:
-				path = '/users/votes/voted-active-proposals';
 				break;
 			case EApiRoute.FETCH_PREIMAGES:
 				path = '/preimages';
@@ -1231,29 +1228,21 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
-	static async getVotesByAddresses({ addresses, page, limit }: { addresses: string[]; page: number; limit: number }) {
+	static async getVotesByAddresses({ addresses, page, limit, proposalStatuses }: { addresses: string[]; page?: number; limit?: number; proposalStatuses?: EProposalStatus[] }) {
 		const queryParams = new URLSearchParams({
-			page: page.toString(),
-			limit: limit.toString()
+			...(page && { page: page.toString() }),
+			...(limit && { limit: limit.toString() })
 		});
 
 		if (addresses.length) {
 			addresses.forEach((address) => queryParams.append('address', address));
 		}
+
+		if (proposalStatuses?.length) {
+			proposalStatuses.forEach((status) => queryParams.append('proposalStatus', status));
+		}
+
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_BY_ADDRESSES, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IProfileVote>>({ url, method });
-	}
-
-	static async getActiveVotedProposalsCount({ addresses, last15days }: { addresses: string[]; last15days?: boolean }) {
-		const queryParams = new URLSearchParams({
-			last15days: last15days?.toString() || 'false'
-		});
-
-		if (addresses.length) {
-			addresses.forEach((address) => queryParams.append('address', address));
-		}
-
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_ACTIVE_VOTED_PROPOSALS_COUNT, queryParams });
-		return this.nextApiClientFetch<{ activeProposalsCount: number; votedProposalsCount: number }>({ url, method });
 	}
 }

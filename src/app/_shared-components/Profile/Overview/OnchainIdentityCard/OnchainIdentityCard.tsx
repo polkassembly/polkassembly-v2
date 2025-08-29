@@ -5,7 +5,7 @@
 import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/app/_shared-components/Dialog/Dialog';
 import { useUser } from '@/hooks/useUser';
-import { IPublicUser } from '@/_shared/types';
+import { EReactQueryKeys, IPublicUser } from '@/_shared/types';
 import { useCallback, useState } from 'react';
 import { Button } from '@/app/_shared-components/Button';
 import { Plus } from 'lucide-react';
@@ -34,23 +34,24 @@ function OnchainIdentityCard({ userProfile, setUserProfile, addresses }: { userP
 		if (!identityService || !addresses.length) return undefined;
 		const identities = await Promise.all(
 			addresses.map(async (a) => {
-				return { ...(await identityService.getOnChainIdentity(a)), address: a };
+				const identity = await identityService.getOnChainIdentity(a);
+				if (identity) {
+					return { ...identity, address: a };
+				}
+				return null;
 			})
 		);
-		return identities.filter(Boolean);
+		return identities.filter((i) => i !== null);
 	}, [identityService, addresses]);
 
 	const { data: identities, isFetching } = useQuery({
-		queryKey: ['addresses-identities', addresses],
+		queryKey: [EReactQueryKeys.PROFILE_IDENTITIES, userProfile?.id],
 		queryFn: getIdentityOfAddresses,
-		enabled: !!addresses.length || !!identityService,
+		enabled: !!addresses.length && !!identityService,
 		staleTime: FIVE_MIN_IN_MILLI
 	});
 
-	console.log({ identities, isFetching });
-
 	const displayedAddresses = showAll ? addresses : addresses.slice(0, 2);
-	const hasMoreAddresses = addresses.length > 2;
 
 	return (
 		<div className={classes.onchainIdentityCard}>
@@ -148,7 +149,7 @@ function OnchainIdentityCard({ userProfile, setUserProfile, addresses }: { userP
 							</div>
 						);
 					})}
-					{hasMoreAddresses && (
+					{addresses.length > 2 && (
 						<div className={classes.showMoreContainer}>
 							<Button
 								variant='ghost'
