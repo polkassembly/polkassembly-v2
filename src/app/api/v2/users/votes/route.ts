@@ -14,13 +14,21 @@ import { EProposalType } from '@/_shared/types';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { StatusCodes } from 'http-status-codes';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
 	const network = await getNetworkFromHeaders();
 	const queryParamsSchema = z.object({
 		page: z.coerce.number().optional().default(1),
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
-		address: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.string()))
+		address: z.preprocess(
+			(val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined),
+			z.array(
+				z.string().refine((val) => ValidatorService.isValidWeb3Address(val), {
+					message: ERROR_MESSAGES.INVALID_INPUTS
+				})
+			)
+		)
 	});
 
 	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
@@ -31,7 +39,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, ERROR_MESSAGES.NOT_FOUND);
 	}
 	const encodedAddresses = addresses.map((address) => getEncodedAddress(address, network) || '').filter(Boolean);
-	const userVotesResult = await OnChainDbService.GetVotesForMultipleVoters({ network, voters: encodedAddresses, page, limit });
+	const userVotesResult = await OnChainDbService.GetVotesForAddresses({ network, voters: encodedAddresses, page, limit });
 	const votesPromises = userVotesResult.items.map(async (vote) => {
 		const postData = await fetchPostData({ network, indexOrHash: vote.proposalIndex.toString(), proposalType: vote.proposalType as EProposalType });
 		return {

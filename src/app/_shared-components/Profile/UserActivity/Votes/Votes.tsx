@@ -139,6 +139,7 @@ function Votes({ addresses, userId }: VotesProps) {
 	const [selectedAddresses, setSelectedAddresses] = useState<string[]>([...addresses]);
 	const [openRemoveVoteDialog, setOpenRemoveVoteDialog] = useState(false);
 	const [proposalIndex, setProposalIndex] = useState<number | null>(null);
+	const [voterAddress, setVoterAddress] = useState<string>();
 
 	// Memoized fetch function to prevent unnecessary recreations
 	const fetchVotes = useCallback(async () => {
@@ -160,7 +161,7 @@ function Votes({ addresses, userId }: VotesProps) {
 	}, [selectedAddresses, page]);
 
 	const { data: votes, isFetching } = useQuery({
-		queryKey: ['votes', selectedAddresses, page] as const,
+		queryKey: ['profileVotes', selectedAddresses, page] as const,
 		queryFn: fetchVotes,
 		enabled: selectedAddresses.length > 0,
 		refetchOnWindowFocus: false,
@@ -173,22 +174,21 @@ function Votes({ addresses, userId }: VotesProps) {
 		setPage(1); // Reset to first page when addresses change
 	}, []);
 
-	const handleShowMoreToggle = useCallback(() => {
-		setShowMore((prev) => !prev);
-	}, []);
-
-	const handleRemoveVote = useCallback((voteProposalIndex: number) => {
+	const handleRemoveVote = useCallback((voteProposalIndex: number, removingAddress: string) => {
 		setOpenRemoveVoteDialog(true);
 		setProposalIndex(voteProposalIndex);
+		setVoterAddress(removingAddress);
 	}, []);
 
 	const handleRemoveVoteConfirm = useCallback(() => {
 		if (proposalIndex === null) return;
-		queryClient.setQueryData(['votes', selectedAddresses, page] as const, (old: IGenericListingResponse<IProfileVote> | undefined) => {
+		queryClient.setQueryData(['profileVotes', selectedAddresses, page] as const, (old: IGenericListingResponse<IProfileVote> | undefined) => {
 			if (!old) return old;
 			return {
 				...old,
-				items: old.items.filter((item) => item.proposalIndex !== proposalIndex && item.voterAddress !== getEncodedAddress(userPreferences.selectedAccount?.address || '', network)),
+				items: old.items.filter(
+					(item) => !(item.proposalIndex === proposalIndex && item.voterAddress === getEncodedAddress(userPreferences.selectedAccount?.address || '', network))
+				),
 				totalCount: old.totalCount - 1
 			};
 		});
@@ -244,7 +244,7 @@ function Votes({ addresses, userId }: VotesProps) {
 						<TableHeader>
 							<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
 								<TableHead className='py-4'>{t('Votes.proposal')}</TableHead>
-								<TableHead className='py-4'>{t('Votes.voteFor')}</TableHead>
+								<TableHead className='py-4 text-start'>{t('Votes.voteFor')}</TableHead>
 								<TableHead className='py-4 text-center'>{t('Votes.status')}</TableHead>
 								<TableHead className='py-4 text-center'>{t('Votes.voter')}</TableHead>
 								<TableHead className='py-4 text-right'>{t('Votes.action')}</TableHead>
@@ -295,7 +295,7 @@ function Votes({ addresses, userId }: VotesProps) {
 						<TableHeader>
 							<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
 								<TableHead className='py-4'>{t('Votes.proposal')}</TableHead>
-								<TableHead className='py-4 text-center'>{t('Votes.voteFor')}</TableHead>
+								<TableHead className='py-4 text-start'>{t('Votes.voteFor')}</TableHead>
 								<TableHead className='py-4 text-center'>{t('Votes.status')}</TableHead>
 								<TableHead className='py-4 text-center'>{t('Votes.voter')}</TableHead>
 								<TableHead className='py-4 text-right'>{t('Votes.action')}</TableHead>
@@ -308,7 +308,7 @@ function Votes({ addresses, userId }: VotesProps) {
 									vote={vote}
 									network={network}
 									userId={userId}
-									onRemoveVote={() => handleRemoveVote(vote.proposalIndex)}
+									onRemoveVote={() => handleRemoveVote(vote.proposalIndex, vote.voterAddress)}
 									isLoading={loading}
 								/>
 							))}
@@ -321,7 +321,7 @@ function Votes({ addresses, userId }: VotesProps) {
 							<Button
 								variant='ghost'
 								className='px-0 py-0 text-xs font-normal text-text_pink'
-								onClick={handleShowMoreToggle}
+								onClick={() => setShowMore(!showMore)}
 								aria-expanded={showMore}
 								aria-controls='votes-list'
 							>
@@ -349,7 +349,7 @@ function Votes({ addresses, userId }: VotesProps) {
 			)}
 
 			{/* Remove Vote Dialog */}
-			{proposalIndex !== null && ValidatorService.isValidNumber(proposalIndex) && (
+			{proposalIndex !== null && ValidatorService.isValidNumber(proposalIndex) && voterAddress && (
 				<RemoveVoteDialog
 					open={openRemoveVoteDialog}
 					onOpenChange={setOpenRemoveVoteDialog}
@@ -357,6 +357,7 @@ function Votes({ addresses, userId }: VotesProps) {
 					isLoading={loading}
 					proposalIndex={proposalIndex}
 					onConfirm={handleRemoveVoteConfirm}
+					voterAddress={voterAddress}
 				/>
 			)}
 		</div>

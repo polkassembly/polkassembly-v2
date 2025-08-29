@@ -7,6 +7,8 @@ import { useToast } from '@/hooks/useToast';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { ENotificationStatus } from '@/_shared/types';
+import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Button } from '../Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../Dialog/Dialog';
 import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
@@ -19,7 +21,8 @@ function RemoveVoteDialog({
 	setLoading,
 	isLoading,
 	proposalIndex,
-	onConfirm
+	onConfirm,
+	voterAddress
 }: {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -27,6 +30,7 @@ function RemoveVoteDialog({
 	isLoading?: boolean;
 	proposalIndex: number;
 	onConfirm?: () => void;
+	voterAddress: string;
 }) {
 	const t = useTranslations();
 
@@ -37,6 +41,8 @@ function RemoveVoteDialog({
 	const { setVaultQrState } = usePolkadotVault();
 
 	const { toast } = useToast();
+
+	const network = getCurrentNetwork();
 
 	const handleRemoveVote = async () => {
 		if (!apiService || !userPreferences.wallet || !userPreferences.selectedAccount) return;
@@ -107,7 +113,9 @@ function RemoveVoteDialog({
 							<Button
 								onClick={handleRemoveVote}
 								isLoading={isLoading}
-								disabled={isLoading}
+								disabled={
+									!userPreferences.selectedAccount?.address || getEncodedAddress(userPreferences.selectedAccount.address, network) !== getEncodedAddress(voterAddress, network)
+								}
 							>
 								{t('PostDetails.remove')}
 							</Button>

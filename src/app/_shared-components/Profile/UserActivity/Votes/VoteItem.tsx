@@ -67,8 +67,8 @@ function VoteItem({ vote, network, userId, onRemoveVote, isLoading }: VoteItemPr
 
 	// Memoize conditional rendering checks
 	const canRemoveVote = useMemo(
-		() => user?.id === userId && !CLOSED_PROPOSAL_STATUSES.includes(vote.postDetails?.onChainInfo?.status as EProposalStatus),
-		[user?.id, userId, vote.postDetails?.onChainInfo?.status]
+		() => user && user.id === userId && !CLOSED_PROPOSAL_STATUSES.includes(vote.postDetails?.onChainInfo?.status as EProposalStatus),
+		[user, userId, vote.postDetails?.onChainInfo?.status]
 	);
 
 	return (

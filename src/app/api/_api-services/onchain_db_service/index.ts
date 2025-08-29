@@ -102,7 +102,7 @@ export class OnChainDbService {
 		page,
 		limit,
 		decision,
-		voterAddress,
+		voterAddresses,
 		orderBy,
 		votesType
 	}: {
@@ -112,11 +112,11 @@ export class OnChainDbService {
 		page: number;
 		limit: number;
 		decision?: EVoteDecision;
-		voterAddress?: string;
+		voterAddresses?: string[];
 		orderBy?: EVoteSortOptions;
 		votesType?: EVotesDisplayType;
 	}) {
-		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddress, orderBy, votesType });
+		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddresses, orderBy, votesType });
 		if (postVoteData) return postVoteData;
 
 		return {
@@ -354,7 +354,7 @@ export class OnChainDbService {
 		return SubsquidService.GetPostBubbleVotes({ network, proposalType, index, analyticsType, votesType });
 	}
 
-	static async GetVotesForMultipleVoters({ network, voters, page, limit }: { network: ENetwork; voters: string[]; page: number; limit: number }) {
-		return SubsquidService.GetVotesForMultipleVoters({ network, voters, page, limit });
+	static async GetVotesForAddresses({ network, voters, page, limit }: { network: ENetwork; voters: string[]; page: number; limit: number }) {
+		return SubsquidService.GetVotesForAddresses({ network, voters, page, limit });
 	}
 }
