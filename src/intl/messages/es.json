@@ -182,7 +182,10 @@
 			"multiple": "Múltiples",
 			"VP": "VP",
 			"CA": "CA",
-			"CO": "CO"
+			"CO": "CO",
+			"delegationMandate": "Mandato de delegación",
+			"delegationMandateDescription": "La delegación en Polkadot OpenGov le permite asignar su poder de voto a otros por pista, con convicción y cantidad elegidos. Los delegados votan en su nombre, pero no pueden acceder a sus fondos ni delegar más. Puede actualizar o eliminar en cualquier momento.",
+			"readMore": "Leer más"
 		},
 		"Activity": {
 			"voted_on_proposal": "Votó",

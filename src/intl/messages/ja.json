@@ -183,7 +183,10 @@
 			"VP": "VP",
 			"CA": "CA",
 			"CO": "CO",
-			"index": "インデックス"
+			"index": "インデックス",
+			"delegationMandate": "委任マンデート",
+			"delegationMandateDescription": "Polkadot OpenGovでは、トラックごとに投票権を他の人に委任できます。委任者はあなたの代わりに投票しますが、あなたの資金にアクセスしたり、さらに委任することはできません。いつでも更新または削除できます。",
+			"readMore": "詳細を見る"
 		},
 		"Activity": {
 			"voted_on_proposal": "投票済み",

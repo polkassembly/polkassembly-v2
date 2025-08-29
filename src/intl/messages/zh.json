@@ -181,7 +181,10 @@
 			"VP": "VP",
 			"CA": "CA",
 			"CO": "CO",
-			"index": "索引"
+			"index": "索引",
+			"delegationMandate": "委任令",
+			"delegationMandateDescription": "Polkadot OpenGov 允许您将投票权按 track 分配给其他人，并选择置信度与数量。受委托者可以代表您投票，但不能访问您的资金或进行更多委托。您可以随时更新或移除。",
+			"readMore": "阅读更多"
 		},
 		"Activity": {
 			"voted_on_proposal": "已投票",

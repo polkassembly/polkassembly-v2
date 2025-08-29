@@ -187,7 +187,10 @@
 			"multiple": "Multiple",
 			"VP": "VP",
 			"CA": "CA",
-			"CO": "CO"
+			"CO": "CO",
+			"delegationMandate": "Delegation Mandate",
+			"delegationMandateDescription": "Delegation in Polkadot OpenGov lets you assign your voting power to others per track, with chosen conviction and amount. Delegates vote on your behalf, but can’t access your funds or delegate further. You can update or remove anytime.",
+			"readMore": "Read More"
 		},
 		"Activity": {
 			"voted_on_proposal": "Voted",

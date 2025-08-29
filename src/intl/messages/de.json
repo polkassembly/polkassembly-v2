@@ -180,7 +180,10 @@
 			"multiple": "Mehrere",
 			"VP": "VP",
 			"CA": "CA",
-			"CO": "CO"
+			"CO": "CO",
+			"delegationMandate": "Delegationsmandat",
+			"delegationMandateDescription": "Delegation in Polkadot OpenGov ermöglicht es Ihnen, Ihre Stimme an andere pro Track zu delegieren, mit gewähltem Überzeugungssatz und Betrag. Delegierte stimmen für Sie ab, können aber nicht auf Ihre Mittel zugreifen oder weitere delegieren. Sie können dies jederzeit aktualisieren oder entfernen.",
+			"readMore": "Weiterlesen"
 		},
 		"Activity": {
 			"voted_on_proposal": "Abgestimmt",
