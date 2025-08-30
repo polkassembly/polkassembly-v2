@@ -55,16 +55,16 @@ export class BlockCalculationsService {
 
 	// Get current block-based date for a historical block
 	// This version requires currentBlock to be passed to avoid dependency cycles
-	static async getDateFromBlock(targetBlock: BN | number, network: ENetwork, currentBlock: BN | number): Promise<string> {
-		const targetBlockNum = typeof targetBlock === 'number' ? targetBlock : Number(targetBlock);
-		const currentBlockNum = typeof currentBlock === 'number' ? currentBlock : Number(currentBlock);
 
-		const blockDiff = targetBlockNum - currentBlockNum;
-		const { totalSeconds } = this.getTimeForBlocks({ network, blocks: Math.abs(blockDiff) });
+	static getDateFromBlock(targetBlock: BN | number, network: ENetwork, currentBlock: BN | number): string {
+		const targetBN = typeof targetBlock === 'number' ? new BN(targetBlock) : targetBlock;
+		const currentBN = typeof currentBlock === 'number' ? new BN(currentBlock) : currentBlock;
 
-		const now = dayjs();
-		const targetDate = blockDiff >= 0 ? now.add(totalSeconds, 'seconds') : now.subtract(totalSeconds, 'seconds');
-
-		return targetDate.format("DD MMM 'YY");
+		const date = this.getDateFromBlockNumber({
+			currentBlockNumber: currentBN,
+			targetBlockNumber: targetBN,
+			network
+		});
+		return dayjs(date).format("DD MMM 'YY");
 	}
 }
