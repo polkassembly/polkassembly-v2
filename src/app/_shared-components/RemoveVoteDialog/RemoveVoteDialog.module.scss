@@ -1,0 +1,15 @@
+.title {
+	@apply text-xl font-semibold text-text_primary;
+}
+
+.selectVoterAddressWrapper {
+	@apply flex flex-col justify-center gap-y-4;
+}
+
+.selectVoterAddressTitle {
+	@apply mb-1 text-center text-base font-medium text-text_primary;
+}
+
+.removeVoteConfirmation {
+	@apply mt-6 text-base text-basic_text;
+}

@@ -189,6 +189,18 @@
 			"CA": "CA",
 			"CO": "CO"
 		},
+		"Votes": {
+			"noData": "No votes found",
+			"votes": "Votes",
+			"proposal": "Proposal",
+			"voter": "Voter",
+			"voteFor": "Vote For",
+			"action": "Action",
+			"status": "Status",
+			"showMore": "Show More",
+			"showLess": "Show Less",
+			"selectAddresses": "Select Addresses"
+		},
 		"Activity": {
 			"voted_on_proposal": "Voted",
 			"created_proposal": "Created Proposal",
@@ -439,9 +451,13 @@
 		}
 	},
 	"PostDetails": {
+		"selectYourVoterAddress": "Select Your Voter Address",
+		"address": "Address",
 		"save": "Save",
 		"edit": "Edit",
 		"castVote": "Cast Vote",
+		"changeVote": "Change Vote",
+		"myVote": "My Votes",
 		"castYourVote": "Cast Your Vote",
 		"copyLink": "Copy Link",
 		"loginToVote": "Login to Vote",
@@ -460,6 +476,10 @@
 		"post": "Post",
 		"cancel": "Cancel",
 		"reply": "Reply",
+		"remove": "Remove",
+		"removing": "Removing",
+		"removeVote": "Remove Vote",
+		"removeVoteConfirmation": "Are you sure you want to remove your vote?",
 		"proposalPassed": "Proposal Passed",
 		"proposalFailed": "Proposal Failed",
 		"confirmationPeriod": "Confirmation Period",
@@ -477,6 +497,7 @@
 		"issuance": "Issuance",
 		"viewVoteHistory": "View Vote History",
 		"voteHistory": "Vote History",
+		"delegations": "Delegations",
 		"delegated": "Delegated",
 		"votingPower": "Voting Power",
 		"capital": "Capital",
@@ -487,8 +508,16 @@
 		"delete": "Delete",
 		"hideReplies": "Hide Replies",
 		"viewReplies": "View Replies",
+		"voteRemoved": "Your vote has been removed successfully",
+		"voteRemoveFailed": "Remove vote request failed",
+		"voteRemoveFailedTitle": "Vote Removal Failed",
+		"voteRemovedTitle": "Vote Removed",
 		"commentSummary": "Comment Summary",
 		"aiSummary": "AI Summary",
+		"showingVotesFor": "Showing votes for",
+		"switchWallet": "Switch Wallet",
+		"errorLoadingVote": "Error loading vote data",
+		"noVoteForAddress": "No vote found for this address",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
 		"BeneficiariesDetails": {
@@ -560,6 +589,13 @@
 		},
 		"commentsDisabled": "Comments have been disabled for this post.",
 		"commentsDisabledForNonVerifiedUsers": "Comments have been disabled for non verified users.",
+		"HighlightMenu": {
+			"quote": "Quote",
+			"share": "Share",
+			"copy": "Copy",
+			"textCopiedToClipboard": "Text copied to clipboard",
+			"failedToCopyText": "Failed to copy text"
+		},
 		"Poll": {
 			"endsOn": "Ends on",
 			"endedOn": "Ended on",
@@ -764,6 +800,8 @@
 		"ayeVoteValue": "Aye vote value",
 		"nayVoteValue": "Nay vote value",
 		"confirm": "Confirm",
+		"existingVote": "Existing Vote",
+		"existingVoteDescription": "You have already voted on this proposal, Resubmitting the vote will override the current voting record",
 		"voteSuccess": "Your vote has been cast successfully",
 		"voteFailed": "Your vote has not been cast successfully",
 		"voteSuccessTitle": "Vote Successful",
@@ -778,7 +816,8 @@
 		"your": "Your",
 		"voteIsIn": "vote is in! Mind sharing why you support this in a comment?",
 		"reuseGovernanceLock": "Reuse Governance Lock",
-		"reuseAllLocks": "Reuse All Locks"
+		"reuseAllLocks": "Reuse All Locks",
+		"changeVote": "Change Vote"
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance",
