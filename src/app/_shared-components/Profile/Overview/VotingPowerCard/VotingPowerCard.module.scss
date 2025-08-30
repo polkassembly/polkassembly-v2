@@ -51,7 +51,7 @@
 }
 
 .infoIcon {
-	@apply flex h-3 w-3 items-center justify-center rounded-full bg-[#B5B6BA] text-[10px] font-medium text-white;
+	@apply flex h-3 w-3 cursor-pointer items-center justify-center rounded-full bg-[#B5B6BA] text-[10px] font-medium text-white;
 }
 
 // Responsive adjustments

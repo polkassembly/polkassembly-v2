@@ -11,6 +11,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { BN } from '@polkadot/util';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import classes from './BalanceCard.module.scss';
 
 interface BalanceCardProps {
@@ -34,7 +35,14 @@ function BalanceCard({ availableBalance, delegatedBalance }: BalanceCardProps) {
 				/>
 				<div className={classes.statCardHeader}>
 					<span className={classes.statCardTitle}>Available</span>
-					<div className={classes.infoIcon}>?</div>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<div className={classes.infoIcon}>?</div>
+						</TooltipTrigger>
+						<TooltipContent className='max-w-xs bg-tooltip_background p-2 text-white'>
+							<p>The DOT in your wallet that&apos;s currently not locked or delegated — it&apos;s free to be used for voting or staking.</p>
+						</TooltipContent>
+					</Tooltip>
 				</div>
 				<div className={classes.statCardValue}>
 					<span className={classes.value}>
@@ -53,7 +61,14 @@ function BalanceCard({ availableBalance, delegatedBalance }: BalanceCardProps) {
 				/>
 				<div className={classes.statCardHeader}>
 					<span className={classes.statCardTitle}>Delegated</span>
-					<div className={classes.infoIcon}>?</div>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<div className={classes.infoIcon}>?</div>
+						</TooltipTrigger>
+						<TooltipContent className='max-w-xs bg-tooltip_background p-2 text-white'>
+							<p>The amount of DOT you&apos;ve delegated to someone else to vote on your behalf.</p>
+						</TooltipContent>
+					</Tooltip>
 				</div>
 				<div className={classes.statCardValue}>
 					<span className={classes.value}>
