@@ -1706,13 +1706,19 @@ export class PolkadotApiService {
 	async unlockVotingTokens({
 		address,
 		unlockableVotes,
+		wallet,
 		onSuccess,
-		onFailed
+		onFailed,
+		selectedAccount,
+		setVaultQrState
 	}: {
 		address: string;
 		unlockableVotes: any[];
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 		onSuccess: () => void;
 		onFailed: (error: string) => void;
+		selectedAccount?: ISelectedAccount;
 	}) {
 		if (!this.api || !this.api.isReady || !unlockableVotes.length) return;
 
@@ -1747,10 +1753,13 @@ export class PolkadotApiService {
 			await this.executeTx({
 				tx,
 				address,
+				wallet,
 				errorMessageFallback: 'Failed to unlock voting tokens',
 				onSuccess,
 				onFailed,
-				waitTillFinalizedHash: true
+				waitTillFinalizedHash: true,
+				selectedAccount,
+				setVaultQrState
 			});
 		} catch (error) {
 			console.error('Error unlocking voting tokens:', error);

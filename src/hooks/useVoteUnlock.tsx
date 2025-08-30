@@ -5,10 +5,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BN } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
-import { IVotingLocks, ENotificationStatus, IVoteLock } from '@/_shared/types';
+import { IVotingLocks, ENotificationStatus, IVoteLock, EWallet } from '@/_shared/types';
 import { getNextUnlockData, calculateTotalUnlockableBalance } from '@/app/_client-utils/voteUnlockUtils';
 import { useToast } from './useToast';
 import { usePolkadotApiService } from './usePolkadotApiService';
+import { useUserPreferences } from './useUserPreferences';
+import { usePolkadotVault } from './usePolkadotVault';
 
 export interface IUseVoteUnlockReturn {
 	votingLocks: IVotingLocks;
@@ -24,6 +26,8 @@ export const useVoteUnlock = (address: string): IUseVoteUnlockReturn => {
 	const { apiService } = usePolkadotApiService();
 	const { toast } = useToast();
 	const t = useTranslations();
+	const { userPreferences } = useUserPreferences();
+	const { setVaultQrState } = usePolkadotVault();
 
 	const [votingLocks, setVotingLocks] = useState<IVotingLocks>({
 		lockedVotes: [],
@@ -70,7 +74,7 @@ export const useVoteUnlock = (address: string): IUseVoteUnlockReturn => {
 
 	const unlockSelectedVotes = useCallback(
 		async (selectedVotes: IVoteLock[]) => {
-			if (!apiService || !address || !selectedVotes.length) {
+			if (!apiService || !address || !selectedVotes.length || !userPreferences?.wallet) {
 				return { success: false, unlockedAmount: new BN(0) };
 			}
 
@@ -85,6 +89,8 @@ export const useVoteUnlock = (address: string): IUseVoteUnlockReturn => {
 					apiService.unlockVotingTokens({
 						address,
 						unlockableVotes: selectedVotes,
+						wallet: userPreferences.wallet as EWallet,
+						setVaultQrState,
 						onSuccess: async () => {
 							toast({
 								title: t('Profile.unlockSuccess'),
@@ -104,7 +110,8 @@ export const useVoteUnlock = (address: string): IUseVoteUnlockReturn => {
 							});
 							// Reject when transaction fails
 							reject(new Error(errorMessage));
-						}
+						},
+						selectedAccount: userPreferences?.selectedAccount
 					});
 				});
 			} catch (err) {
