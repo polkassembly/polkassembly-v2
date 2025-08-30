@@ -66,7 +66,8 @@ enum ERedisKeys {
 	OVERVIEW_PAGE_DATA = 'OPD',
 	REMARK_LOGIN_MESSAGE = 'RLM',
 	POST_ANALYTICS_DATA = 'PAD',
-	POST_BUBBLE_VOTES_DATA = 'PBVD'
+	POST_BUBBLE_VOTES_DATA = 'PBVD',
+	PREVIOUS_PROPOSAL_STATUS = 'PPS'
 }
 
 export class RedisService {
@@ -136,7 +137,9 @@ export class RedisService {
 		[ERedisKeys.POST_ANALYTICS_DATA]: (network: ENetwork, proposalType: EProposalType, index: number): string =>
 			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${index}`,
 		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: ENetwork, proposalType: EProposalType, index: number, votesType: EVotesDisplayType, analyticsType: EAnalyticsType): string =>
-			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${index}-${votesType}-${analyticsType}`
+			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${index}-${votesType}-${analyticsType}`,
+		[ERedisKeys.PREVIOUS_PROPOSAL_STATUS]: (network: ENetwork, proposalType: EProposalType, indexOrHash: string): string =>
+			`${ERedisKeys.PREVIOUS_PROPOSAL_STATUS}-${network}-${proposalType}-${indexOrHash}`
 	} as const;
 
 	// helper methods
@@ -785,5 +788,36 @@ export class RedisService {
 		analyticsType: EAnalyticsType;
 	}): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });
+	}
+
+	static async GetPreviousProposalStatus({
+		network,
+		proposalType,
+		indexOrHash
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		indexOrHash: string;
+	}): Promise<EProposalStatus | null> {
+		const status = await this.Get({ key: this.redisKeysMap[ERedisKeys.PREVIOUS_PROPOSAL_STATUS](network, proposalType, indexOrHash) });
+		return status ? (status as EProposalStatus) : null;
+	}
+
+	static async SetPreviousProposalStatus({
+		network,
+		proposalType,
+		indexOrHash,
+		status
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		indexOrHash: string;
+		status: EProposalStatus;
+	}): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.PREVIOUS_PROPOSAL_STATUS](network, proposalType, indexOrHash),
+			value: status,
+			ttlSeconds: THIRTY_DAYS_IN_SECONDS
+		});
 	}
 }

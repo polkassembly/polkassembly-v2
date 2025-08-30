@@ -31,6 +31,7 @@ import {
 	EConvictionAmount,
 	IPostSubscription,
 	ECommentSentiment,
+	ECustomNotificationFilters,
 	ITreasuryStats,
 	IDelegate,
 	EDelegateSource,
@@ -41,7 +42,8 @@ import {
 	IPollVote,
 	IPoll,
 	EPollVotesType,
-	IOffChainPollPayload
+	IOffChainPollPayload,
+	IInAppNotification
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -52,7 +54,6 @@ import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDeta
 import { FirestoreUtils } from './firestoreUtils';
 
 export class FirestoreService extends FirestoreUtils {
-	// Read methods
 	static async GetTotalUsersCount(): Promise<number> {
 		const userDocSnapshot = await this.usersCollectionRef().get();
 		return userDocSnapshot.docs.length;
@@ -913,6 +914,17 @@ export class FirestoreService extends FirestoreUtils {
 		await this.usersCollectionRef().doc(userId.toString()).set(payload, { merge: true });
 	}
 
+	static async GetUsersWithNotificationPreferences(): Promise<IUser[]> {
+		const snapshot = await this.usersCollectionRef().where('notificationPreferences', '!=', null).get();
+		return snapshot.docs.map(
+			(doc) =>
+				({
+					id: Number(doc.id),
+					...doc.data()
+				}) as IUser
+		);
+	}
+
 	static async UpdateUserEmail(userId: number, email: string) {
 		// check if email is already in use
 		const user = await this.GetUserByEmail(email);
@@ -1456,6 +1468,20 @@ export class FirestoreService extends FirestoreUtils {
 		}
 	}
 
+	static async GetPostSubscribers({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<number[]> {
+		const postSubscriptionsQuery = this.postSubscriptionsCollectionRef()
+			.where('network', '==', network)
+			.where('indexOrHash', '==', indexOrHash)
+			.where('proposalType', '==', proposalType);
+
+		const postSubscriptionsQuerySnapshot = await postSubscriptionsQuery.get();
+
+		return postSubscriptionsQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return data.userId;
+		});
+	}
+
 	static async AddPostSubscription({ network, indexOrHash, proposalType, userId }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType; userId: number }) {
 		const newPostSubscriptionId = this.postSubscriptionsCollectionRef().doc().id;
 
@@ -1835,6 +1861,99 @@ export class FirestoreService extends FirestoreUtils {
 					return null;
 				})
 				.filter((vote): vote is IPollVote => vote !== null);
+		});
+	}
+
+	static async GetNotificationsByUserId({
+		userId,
+		network,
+		page,
+		limit,
+		filterBy
+	}: {
+		userId: number;
+		network: ENetwork;
+		page: number;
+		limit: number;
+		filterBy?: ECustomNotificationFilters;
+	}): Promise<IInAppNotification[]> {
+		let notificationsQuery = this.notificationsCollectionRef().where('userId', '==', userId).where('network', '==', network);
+
+		if (filterBy && filterBy !== 'all') {
+			switch (filterBy) {
+				case 'comments':
+					notificationsQuery = notificationsQuery.where('type', '==', 'comment');
+					break;
+				case 'mentions':
+					notificationsQuery = notificationsQuery.where('type', '==', 'mention');
+					break;
+				case 'proposals':
+					notificationsQuery = notificationsQuery.where('type', '==', 'proposal');
+					break;
+				default:
+					break;
+			}
+		}
+
+		notificationsQuery = notificationsQuery
+			.orderBy('createdAt', 'desc')
+			.limit(limit)
+			.offset((page - 1) * limit);
+
+		const notificationsQuerySnapshot = await notificationsQuery.get();
+
+		return notificationsQuerySnapshot.docs.map((doc) => {
+			const data = doc.data();
+			return {
+				id: doc.id,
+				userId: data.userId,
+				title: data.title || '',
+				message: data.message || '',
+				url: data.url || '',
+				trigger: data.trigger,
+				network: (data.network || network) as ENetwork,
+				isRead: Boolean(data.isRead),
+				createdAt: data.createdAt?.toDate() || new Date(),
+				type: data.type
+			} as IInAppNotification;
+		});
+	}
+
+	static async GetUnreadNotificationsCount({ userId, network }: { userId: number; network: ENetwork }): Promise<number> {
+		const unreadNotificationsQuery = this.notificationsCollectionRef().where('userId', '==', userId).where('network', '==', network).where('isRead', '==', false).count();
+
+		const unreadNotificationsQuerySnapshot = await unreadNotificationsQuery.get();
+		return unreadNotificationsQuerySnapshot.data().count || 0;
+	}
+
+	static async MarkNotificationAsRead({ notificationId, userId }: { notificationId: string; userId: number }): Promise<void> {
+		const docRef = this.notificationsCollectionRef().doc(notificationId);
+		const snap = await docRef.get();
+
+		if (!snap.exists || snap.data()?.userId !== userId) {
+			throw new APIError(ERROR_CODES.FORBIDDEN, StatusCodes.FORBIDDEN);
+		}
+
+		await docRef.update({ isRead: true, updatedAt: new Date() });
+	}
+
+	static async MarkAllNotificationsAsRead({ userId, network }: { userId: number; network: ENetwork }): Promise<void> {
+		const notificationsQuery = this.notificationsCollectionRef().where('userId', '==', userId).where('network', '==', network).where('isRead', '==', false);
+
+		const notificationsQuerySnapshot = await notificationsQuery.get();
+
+		if (notificationsQuerySnapshot.empty) {
+			return;
+		}
+
+		await this.processBatch({
+			querySnapshot: notificationsQuerySnapshot,
+			batchOperation: (batch, doc) => {
+				batch.update(doc.ref, {
+					isRead: true,
+					updatedAt: new Date()
+				});
+			}
 		});
 	}
 }
