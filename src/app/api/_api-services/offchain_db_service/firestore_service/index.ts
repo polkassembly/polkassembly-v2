@@ -1930,13 +1930,8 @@ export class FirestoreService extends FirestoreUtils {
 		const docRef = this.notificationsCollectionRef().doc(notificationId);
 		const snap = await docRef.get();
 
-		if (!snap.exists) {
-			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Notification not found');
-		}
-
-		const data = snap.data() as { userId?: number };
-		if (data?.userId !== userId) {
-			throw new APIError(ERROR_CODES.FORBIDDEN, StatusCodes.FORBIDDEN, 'Not allowed to modify this notification');
+		if (!snap.exists || snap.data()?.userId !== userId) {
+			throw new APIError(ERROR_CODES.FORBIDDEN, StatusCodes.FORBIDDEN);
 		}
 
 		await docRef.update({ isRead: true, updatedAt: new Date() });
