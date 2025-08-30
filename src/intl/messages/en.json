@@ -301,6 +301,8 @@
 			"oldEmail": "Old Email",
 			"newEmail": "New Email",
 			"type": "Type",
+			"general": "General",
+			"notifications": "Notifications",
 			"belowToConfirm": "below to confirm",
 			"appQrLogin": "App QR Login",
 			"scanToLoginInApp": "Scan to Login",
