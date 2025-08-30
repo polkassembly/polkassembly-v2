@@ -7,54 +7,40 @@ import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
 import { AiOutlineLike } from '@react-icons/all-files/ai/AiOutlineLike';
 import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
 import { AiOutlineDislike } from '@react-icons/all-files/ai/AiOutlineDislike';
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { EReaction } from '@/_shared/types';
-import LikeGif from '@assets/reactions/Liked-Colored.gif';
 import { useTranslations } from 'next-intl';
 import styles from './ReactionButton.module.scss';
 
 function ReactionButton({
 	type,
 	isActive,
-	showGif,
 	onClick,
 	count,
 	showText = true,
-	className = 'text-bg_pink text-lg'
+	className = 'text-bg_pink text-lg',
+	disabled = false
 }: {
 	type: EReaction;
 	isActive: boolean;
-	showGif: boolean;
 	onClick?: () => void;
 	showText?: boolean;
 	count?: number;
 	className?: string;
+	disabled?: boolean;
 }) {
 	const Icon = type === EReaction.like ? (isActive ? AiFillLike : AiOutlineLike) : isActive ? AiFillDislike : AiOutlineDislike;
 	const t = useTranslations();
 
 	return (
 		<button
-			className='relative flex cursor-pointer items-center transition-all duration-300 hover:scale-110'
+			className={cn('relative flex cursor-pointer items-center transition-all duration-300 hover:scale-110', disabled ? 'opacity-50' : '')}
 			onClick={onClick}
 			type='button'
+			disabled={disabled}
 		>
-			<div className='relative w-[24px]'>
-				{showGif ? (
-					<div className={type === EReaction.like ? styles.likeGifContainer : styles.dislikeGifContainer}>
-						<Image
-							src={LikeGif}
-							alt={`${type} Animation`}
-							width={24}
-							className='h-10 w-10'
-							height={24}
-							style={type === EReaction.dislike ? { transform: 'scaleY(-1)' } : undefined}
-						/>
-					</div>
-				) : (
-					<Icon className={cn(`${styles.activity_icons} ${className}`)} />
-				)}
+			<div className='relative w-6'>
+				<Icon className={cn(`${styles.activity_icons} ${className}`)} />
 			</div>
 			{showText && (
 				<span className={`${isActive ? 'ml-1 font-bold text-bg_pink' : ''}`}>{isActive ? t(`ActivityFeed.PostItem.${type}d`) : t(`ActivityFeed.PostItem.${type}`)}</span>

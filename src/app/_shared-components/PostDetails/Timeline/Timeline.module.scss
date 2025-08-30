@@ -1,5 +1,5 @@
 .timelineWrapper {
-	@apply flex flex-col gap-y-4 py-4 lg:px-10;
+	@apply flex flex-col gap-y-4 py-4;
 }
 
 .timelineHeader {
@@ -32,4 +32,8 @@
 
 .timelineItem {
 	@apply flex w-full items-center justify-between;
+}
+
+.title {
+	@apply mb-2 text-lg font-semibold capitalize text-text_primary;
 }

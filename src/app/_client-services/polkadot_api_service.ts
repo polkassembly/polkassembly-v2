@@ -19,13 +19,28 @@ import { getTypeDef } from '@polkadot/types';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IPayout, ISelectedAccount, IVoteCartItem } from '@shared/types';
+import {
+	EAccountType,
+	EEnactment,
+	ENetwork,
+	EPostOrigin,
+	EVoteDecision,
+	EWallet,
+	IBeneficiaryInput,
+	IParamDef,
+	IPayout,
+	ISelectedAccount,
+	IVaultQrState,
+	IVoteCartItem
+} from '@shared/types';
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
 import { APPNAME } from '@/_shared/_constants/appName';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
+import { Dispatch, SetStateAction } from 'react';
 import { getAllLockData } from '@/app/_client-utils/voteLockCalculations';
 import { BlockCalculationsService } from './block_calculations_service';
 import { isMimirDetected } from './isMimirDetected';
+import { VaultQrSigner } from './vault_qr_signer_service';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -137,8 +152,10 @@ export class PolkadotApiService {
 	private async executeTx({
 		tx,
 		address,
+		wallet,
 		params = {},
 		errorMessageFallback,
+		setVaultQrState,
 		onSuccess,
 		onFailed,
 		onBroadcast,
@@ -149,8 +166,10 @@ export class PolkadotApiService {
 	}: {
 		tx: SubmittableExtrinsic<'promise'>;
 		address: string;
+		wallet: EWallet;
 		params?: Record<string, unknown>;
 		errorMessageFallback: string;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
 		onFailed: (errorMessageFallback: string) => Promise<void> | void;
 		onBroadcast?: () => void;
@@ -180,7 +199,7 @@ export class PolkadotApiService {
 			const result: any = await injected.signer.signPayload({
 				address,
 				method: tx.method.toHex(),
-				genesisHash: this.api.genesisHash.toHex()
+				genesisHash: this.getGenesisHash()
 			} as any);
 
 			const call = this.api.registry.createType('Call', result.payload.method);
@@ -190,6 +209,26 @@ export class PolkadotApiService {
 			newTx.addSignature(result.signer, result.signature, result.payload);
 
 			newTx
+				// eslint-disable-next-line sonarjs/cognitive-complexity
+				.send(async ({ status, events, txHash }) =>
+					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
+				)
+				.catch((error: unknown) => {
+					console.log(':( transaction failed');
+					setStatus?.(':( transaction failed');
+					console.error('ERROR:', error);
+					onFailed(error?.toString?.() || errorMessageFallback);
+				});
+		} else if (wallet === EWallet.POLKADOT_VAULT) {
+			const signer = new VaultQrSigner(this.api.registry, setVaultQrState);
+			await tx.signAsync(address, { nonce: -1, signer });
+
+			setVaultQrState((prev) => ({
+				...prev,
+				open: false
+			}));
+
+			tx
 				// eslint-disable-next-line sonarjs/cognitive-complexity
 				.send(async ({ status, events, txHash }) =>
 					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
@@ -246,6 +285,10 @@ export class PolkadotApiService {
 					onFailed(error?.toString?.() || errorMessageFallback);
 				});
 		}
+	}
+
+	getGenesisHash() {
+		return this.api.genesisHash.toHex();
 	}
 
 	async disconnect(): Promise<void> {
@@ -376,6 +419,8 @@ export class PolkadotApiService {
 
 	async voteReferendum({
 		address,
+		wallet,
+		setVaultQrState,
 		onSuccess,
 		onFailed,
 		referendumId,
@@ -388,6 +433,8 @@ export class PolkadotApiService {
 		selectedAccount
 	}: {
 		address: string;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
 		onFailed: (errorMessageFallback: string) => Promise<void> | void;
 		referendumId: number;
@@ -415,23 +462,69 @@ export class PolkadotApiService {
 			await this.executeTx({
 				tx: voteTx,
 				address,
+				wallet,
 				errorMessageFallback: 'Failed to vote',
 				waitTillFinalizedHash: true,
 				onSuccess,
 				onFailed,
-				selectedAccount
+				selectedAccount,
+				setVaultQrState
 			});
+		}
+	}
+
+	async removeReferendumVote({
+		address,
+		referendumId,
+		wallet,
+		onSuccess,
+		onFailed,
+		selectedAccount,
+		setVaultQrState
+	}: {
+		address: string;
+		referendumId: number;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		selectedAccount?: ISelectedAccount;
+	}) {
+		if (!this.api) {
+			onFailed('API not ready – unable to remove vote');
+			return;
+		}
+
+		try {
+			const tx: SubmittableExtrinsic<'promise'> = this.api.tx.convictionVoting.removeVote(null, referendumId);
+			await this.executeTx({
+				tx,
+				address,
+				wallet,
+				errorMessageFallback: 'Failed to remove vote',
+				waitTillFinalizedHash: true,
+				onSuccess,
+				onFailed,
+				selectedAccount,
+				setVaultQrState
+			});
+		} catch (error: unknown) {
+			onFailed((error as Error)?.message || 'Failed to remove vote');
 		}
 	}
 
 	async batchVoteReferendum({
 		address,
 		voteCartItems,
+		wallet,
 		onSuccess,
-		onFailed
+		onFailed,
+		setVaultQrState
 	}: {
 		address: string;
 		voteCartItems: IVoteCartItem[];
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
 		onFailed: (errorMessageFallback: string) => Promise<void> | void;
 	}) {
@@ -466,10 +559,12 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to batch vote',
 			waitTillFinalizedHash: true,
 			onSuccess,
-			onFailed
+			onFailed,
+			setVaultQrState
 		});
 	}
 
@@ -629,14 +724,18 @@ export class PolkadotApiService {
 
 	async notePreimage({
 		address,
+		wallet,
 		extrinsicFn,
 		onSuccess,
-		onFailed
+		onFailed,
+		setVaultQrState
 	}: {
 		address: string;
+		wallet: EWallet;
 		extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>;
 		onSuccess?: () => void;
 		onFailed?: () => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 	}) {
 		if (!this.api) {
 			return;
@@ -650,6 +749,8 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx: notePreimageTx,
 			address,
+			wallet,
+			setVaultQrState,
 			errorMessageFallback: 'Failed to note preimage',
 			waitTillFinalizedHash: true,
 			onSuccess: () => {
@@ -661,7 +762,21 @@ export class PolkadotApiService {
 		});
 	}
 
-	async unnotePreimage({ address, preimageHash, onSuccess, onFailed }: { address: string; preimageHash: string; onSuccess?: () => void; onFailed?: () => void }) {
+	async unnotePreimage({
+		address,
+		wallet,
+		preimageHash,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		address: string;
+		wallet: EWallet;
+		preimageHash: string;
+		onSuccess?: () => void;
+		onFailed?: () => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
 		if (!this.api) {
 			return;
 		}
@@ -674,6 +789,7 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx: unnotePreimageTx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to unnote preimage',
 			waitTillFinalizedHash: true,
 			onSuccess: () => {
@@ -681,11 +797,26 @@ export class PolkadotApiService {
 			},
 			onFailed: () => {
 				onFailed?.();
-			}
+			},
+			setVaultQrState
 		});
 	}
 
-	async unRequestPreimage({ address, preimageHash, onSuccess, onFailed }: { address: string; preimageHash: string; onSuccess?: () => void; onFailed?: () => void }) {
+	async unRequestPreimage({
+		address,
+		wallet,
+		preimageHash,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		address: string;
+		wallet: EWallet;
+		preimageHash: string;
+		onSuccess?: () => void;
+		onFailed?: () => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
 		if (!this.api) {
 			return;
 		}
@@ -698,6 +829,7 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx: unRequestPreimageTx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to unrequest preimage',
 			waitTillFinalizedHash: true,
 			onSuccess: () => {
@@ -705,7 +837,8 @@ export class PolkadotApiService {
 			},
 			onFailed: () => {
 				onFailed?.();
-			}
+			},
+			setVaultQrState
 		});
 	}
 
@@ -861,7 +994,21 @@ export class PolkadotApiService {
 		return this.api.tx.bounties.proposeBounty(bountyAmount, title);
 	}
 
-	async proposeBounty({ bountyAmount, address, onSuccess, onFailed }: { bountyAmount: BN; address: string; onSuccess?: (bountyId: number) => void; onFailed?: () => void }) {
+	async proposeBounty({
+		bountyAmount,
+		address,
+		wallet,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		bountyAmount: BN;
+		address: string;
+		wallet: EWallet;
+		onSuccess?: (bountyId: number) => void;
+		onFailed?: () => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
 		if (!this.api || !address || !bountyAmount) return;
 
 		const bountyId = Number(await this.api.query.bounties.bountyCount());
@@ -876,6 +1023,7 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to propose bounty',
 			waitTillFinalizedHash: true,
 			onSuccess: () => {
@@ -883,7 +1031,8 @@ export class PolkadotApiService {
 			},
 			onFailed: () => {
 				onFailed?.();
-			}
+			},
+			setVaultQrState
 		});
 	}
 
@@ -894,6 +1043,7 @@ export class PolkadotApiService {
 
 	async createProposal({
 		address,
+		wallet,
 		extrinsicFn,
 		track,
 		enactment,
@@ -901,9 +1051,11 @@ export class PolkadotApiService {
 		preimageHash,
 		preimageLength,
 		onSuccess,
-		onFailed
+		onFailed,
+		setVaultQrState
 	}: {
 		address: string;
+		wallet: EWallet;
 		track: EPostOrigin;
 		enactment: EEnactment;
 		enactmentValue: BN;
@@ -912,6 +1064,7 @@ export class PolkadotApiService {
 		preimageLength?: number;
 		onSuccess?: (postId: number) => void;
 		onFailed?: () => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 	}) {
 		const tracks = Object.values(EPostOrigin);
 		if (!tracks.includes(track as EPostOrigin)) {
@@ -942,6 +1095,7 @@ export class PolkadotApiService {
 			await this.executeTx({
 				tx: submitProposalTx,
 				address,
+				wallet,
 				errorMessageFallback: 'Failed to create treasury proposal',
 				waitTillFinalizedHash: true,
 				onSuccess: () => {
@@ -949,7 +1103,8 @@ export class PolkadotApiService {
 				},
 				onFailed: () => {
 					onFailed?.();
-				}
+				},
+				setVaultQrState
 			});
 
 			return;
@@ -988,6 +1143,7 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to create treasury proposal',
 			waitTillFinalizedHash: true,
 			onSuccess: () => {
@@ -995,7 +1151,8 @@ export class PolkadotApiService {
 			},
 			onFailed: () => {
 				onFailed?.();
-			}
+			},
+			setVaultQrState
 		});
 	}
 
@@ -1044,20 +1201,24 @@ export class PolkadotApiService {
 
 	async delegate({
 		address,
+		wallet,
 		delegateAddress,
 		balance,
 		conviction,
 		tracks,
 		onSuccess,
-		onFailed
+		onFailed,
+		setVaultQrState
 	}: {
 		address: string;
+		wallet: EWallet;
 		delegateAddress: string;
 		balance: BN;
 		conviction: number;
 		tracks: number[];
 		onSuccess: () => void;
 		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 	}) {
 		if (!this.api) return;
 
@@ -1068,14 +1229,30 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to delegate',
 			onSuccess,
 			onFailed,
-			waitTillFinalizedHash: true
+			waitTillFinalizedHash: true,
+			setVaultQrState
 		});
 	}
 
-	async undelegate({ address, trackId, onSuccess, onFailed }: { address: string; trackId: number; onSuccess: () => void; onFailed: (error: string) => void }) {
+	async undelegate({
+		address,
+		wallet,
+		trackId,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		address: string;
+		wallet: EWallet;
+		trackId: number;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
 		if (!this.api) return;
 
 		const tx = this.api.tx.convictionVoting.undelegate(trackId);
@@ -1083,10 +1260,12 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to undelegate',
 			onSuccess,
 			onFailed,
-			waitTillFinalizedHash: true
+			waitTillFinalizedHash: true,
+			setVaultQrState
 		});
 	}
 
@@ -1143,17 +1322,33 @@ export class PolkadotApiService {
 		return this.api.query.balances.totalIssuance();
 	}
 
-	async submitDecisionDeposit({ postId, address, onSuccess, onFailed }: { postId: number; address: string; onSuccess: () => void; onFailed: (error: string) => void }) {
+	async submitDecisionDeposit({
+		postId,
+		address,
+		wallet,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		postId: number;
+		address: string;
+		wallet: EWallet;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
 		if (!this.api) return;
 
 		const tx = this.api.tx.referenda.placeDecisionDeposit(postId);
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to submit decision deposit',
 			onSuccess,
 			onFailed,
-			waitTillFinalizedHash: true
+			waitTillFinalizedHash: true,
+			setVaultQrState
 		});
 	}
 
@@ -1206,7 +1401,21 @@ export class PolkadotApiService {
 		return treasuryPendingSpends;
 	}
 
-	async claimTreasuryPayout({ payouts, address, onSuccess, onFailed }: { payouts: IPayout[]; address: string; onSuccess: () => void; onFailed: (error: string) => void }) {
+	async claimTreasuryPayout({
+		payouts,
+		address,
+		wallet,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		payouts: IPayout[];
+		address: string;
+		wallet: EWallet;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
 		if (!this.api || !payouts || payouts.length === 0) return;
 
 		const tx = payouts.map((p) => this.api.tx.treasury.payout(p.treasurySpendIndex));
@@ -1216,10 +1425,12 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx: batchTx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to claim treasury payout',
 			onSuccess,
 			onFailed,
-			waitTillFinalizedHash: true
+			waitTillFinalizedHash: true,
+			setVaultQrState
 		});
 	}
 
@@ -1260,14 +1471,18 @@ export class PolkadotApiService {
 		beneficiaryAddress,
 		amount,
 		address,
+		wallet,
 		onSuccess,
-		onFailed
+		onFailed,
+		setVaultQrState
 	}: {
 		beneficiaryAddress: string;
 		amount: BN;
 		address: string;
+		wallet: EWallet;
 		onSuccess: () => void;
 		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 	}) {
 		if (!this.api) return;
 
@@ -1278,10 +1493,12 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to teleport to people chain',
 			onSuccess,
 			onFailed,
-			waitTillFinalizedHash: true
+			waitTillFinalizedHash: true,
+			setVaultQrState
 		});
 	}
 
@@ -1289,12 +1506,16 @@ export class PolkadotApiService {
 		address,
 		remarkLoginMessage,
 		onSuccess,
-		onFailed
+		onFailed,
+		wallet,
+		setVaultQrState
 	}: {
 		address: string;
 		remarkLoginMessage: string;
 		onSuccess: (pre?: unknown) => void;
 		onFailed: (error: string) => void;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 	}) {
 		if (!this.api) return;
 
@@ -1303,10 +1524,12 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to login with remark',
 			onSuccess,
 			onFailed,
-			waitTillFinalizedHash: true
+			waitTillFinalizedHash: true,
+			setVaultQrState
 		});
 	}
 
@@ -1331,15 +1554,19 @@ export class PolkadotApiService {
 		address,
 		canRefundDecisionDeposit,
 		canRefundSubmissionDeposit,
+		wallet,
 		onSuccess,
-		onFailed
+		onFailed,
+		setVaultQrState
 	}: {
 		postId: number;
 		address: string;
 		canRefundDecisionDeposit: boolean;
 		canRefundSubmissionDeposit: boolean;
+		wallet: EWallet;
 		onSuccess: () => void;
 		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 	}) {
 		if (!this.api) return;
 
@@ -1359,10 +1586,12 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to refund deposits',
 			onSuccess,
 			onFailed,
-			waitTillFinalizedHash: true
+			waitTillFinalizedHash: true,
+			setVaultQrState
 		});
 	}
 

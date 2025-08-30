@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { BN } from '@polkadot/util';
-import { ENetwork, EPostOrigin, EGovType, EAssets } from '@shared/types';
+import { ENetwork, EPostOrigin, EGovType, EAssets, ENetworkSocial } from '@shared/types';
 import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
 import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
 import { FaYoutube } from '@react-icons/all-files/fa/FaYoutube';
@@ -132,17 +132,6 @@ interface INetworkDetails {
 		large: string;
 		small: string;
 	};
-}
-
-enum ENetworkSocial {
-	HOME = 'home',
-	TWITTER = 'twitter',
-	DISCORD = 'discord',
-	GITHUB = 'github',
-	YOUTUBE = 'youtube',
-	REDDIT = 'reddit',
-	TELEGRAM = 'telegram',
-	SUBSCAN = 'subscan'
 }
 
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {

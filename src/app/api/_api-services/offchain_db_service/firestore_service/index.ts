@@ -521,6 +521,11 @@ export class FirestoreService extends FirestoreUtils {
 			const data = doc.data();
 			const publicUser = await this.GetPublicUserById(data.userId);
 
+			// Skip reactions that have a commentId (these are comment reactions)
+			if (data.commentId) {
+				return null;
+			}
+
 			return {
 				...data,
 				createdAt: data.createdAt?.toDate(),
@@ -529,7 +534,9 @@ export class FirestoreService extends FirestoreUtils {
 			} as IReaction;
 		});
 
-		return Promise.all(reactionPromises);
+		const results = await Promise.all(reactionPromises);
+		// Filter out null values (comment reactions that were skipped)
+		return results.filter((reaction): reaction is IReaction => reaction !== null);
 	}
 
 	static async GetCommentReactions({
@@ -556,6 +563,7 @@ export class FirestoreService extends FirestoreUtils {
 
 			return {
 				...data,
+				id: doc.id,
 				createdAt: data.createdAt?.toDate(),
 				updatedAt: data.updatedAt?.toDate(),
 				publicUser
@@ -581,6 +589,7 @@ export class FirestoreService extends FirestoreUtils {
 
 		return {
 			...data,
+			id: reactionDocSnapshot.id,
 			createdAt: data.createdAt?.toDate(),
 			updatedAt: data.updatedAt?.toDate(),
 			publicUser
@@ -1139,6 +1148,7 @@ export class FirestoreService extends FirestoreUtils {
 			.doc(reactionId)
 			.set(
 				{
+					id: reactionId,
 					network,
 					indexOrHash,
 					proposalType,

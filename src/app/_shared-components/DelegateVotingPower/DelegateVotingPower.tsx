@@ -24,6 +24,7 @@ import { useToast } from '@/hooks/useToast';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import styles from './DelegateVotingPower.module.scss';
 import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
 import AddressRelationsPicker from '../AddressRelationsPicker/AddressRelationsPicker';
@@ -39,7 +40,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId, onClose }: De
 	const t = useTranslations('Delegation');
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
-
+	const { setVaultQrState } = usePolkadotVault();
 	const { toast } = useToast();
 	const tracks = useMemo(() => Object.keys(NETWORKS_DETAILS[`${network}`].trackDetails), [network]);
 	const [delegateUserTracks, setDelegateUserTracks] = useAtom(delegateUserTracksAtom);
@@ -124,12 +125,14 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId, onClose }: De
 	}, [apiService, balance, selectedTrackIds, conviction, delegateAddress]);
 
 	const handleSubmit = useCallback(async () => {
-		if (!apiService || !balance || !userPreferences?.selectedAccount?.address || selectedTrackIds?.length === 0) return;
+		if (!apiService || !balance || !userPreferences?.selectedAccount?.address || selectedTrackIds?.length === 0 || !userPreferences.wallet) return;
 
 		try {
 			setLoading(true);
 			await apiService.delegate({
 				address: userPreferences.selectedAccount.address,
+				wallet: userPreferences.wallet,
+				setVaultQrState,
 				delegateAddress,
 				balance,
 				conviction,

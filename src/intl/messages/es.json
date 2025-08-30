@@ -96,17 +96,20 @@
 		"NoRank": "para ver tu rango"
 	},
 	"AddressDropdown": {
-		"fallbackText": "Por favor seleccione billetera",
-		"chooseLinkedAccount": "Elegir cuenta vinculada",
+		"fallbackText": "Por favor seleccione una billetera",
+		"chooseLinkedAccount": "Elegir Cuenta",
 		"noAccountsFound": "No se encontraron cuentas",
-		"selectWallet": "Por favor seleccione billetera",
+		"selectWallet": "Por favor seleccione una billetera",
 		"fetchingAddresses": "Para obtener sus direcciones, Polkassembly necesita acceso a sus extensiones de billetera. Por favor autorice esta transacción.",
-		"goBack": "Regresar",
+		"goBack": "Volver",
 		"gotIt": "Entendido",
-		"hidePassword": "Ocultar contraseña",
-		"showPassword": "Mostrar contraseña",
+		"hidePassword": "Ocultar Contraseña",
+		"showPassword": "Mostrar Contraseña",
 		"pleaseConnectWallet": "Por favor conecte su billetera a Polkassembly.",
 		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión.",
+		"scanYourAddressQr": "Escanee su código QR de dirección",
+		"scanYourAddressQrDescription1": "Inicie sesión en su aplicación Polkadot Vault.",
+		"scanYourAddressQrDescription2": "Escanee su código QR de dirección de {network}.",
 		"linkedAccount": "Cuenta Vinculada"
 	},
 	"AddressRelationsPicker": {
@@ -201,6 +204,18 @@
 			"VP": "VP",
 			"CA": "CA",
 			"CO": "CO"
+		},
+		"Votes": {
+			"noData": "No se encontraron votos",
+			"votes": "Votos",
+			"proposal": "Propuesta",
+			"voteFor": "Votar por",
+			"voter": "Votante",
+			"action": "Acción",
+			"status": "Estado",
+			"showMore": "Mostrar más",
+			"showLess": "Mostrar menos",
+			"selectAddresses": "Seleccionar direcciones"
 		},
 		"Activity": {
 			"voted_on_proposal": "Votó",
@@ -456,7 +471,11 @@
 		}
 	},
 	"PostDetails": {
+		"selectYourVoterAddress": "Seleccione su dirección de votación",
+		"address": "Dirección",
 		"castVote": "Emitir Voto",
+		"changeVote": "Cambiar Voto",
+		"myVote": "Mi Voto",
 		"castYourVote": "Emita su Voto",
 		"copyLink": "Copiar Enlace",
 		"loginToVote": "Inicie sesión para Votar",
@@ -475,6 +494,10 @@
 		"analytics": "Analíticas",
 		"cancel": "Cancelar",
 		"reply": "Responder",
+		"remove": "Eliminar",
+		"removing": "Eliminando",
+		"removeVote": "Eliminar Voto",
+		"removeVoteConfirmation": "¿Está seguro de que desea eliminar su voto?",
 		"proposalPassed": "Propuesta Aprobada",
 		"proposalFailed": "Propuesta Rechazada",
 		"confirmationPeriod": "Período de Confirmación",
@@ -482,6 +505,7 @@
 		"preparePeriod": "Período de Preparación",
 		"decisionPeriod": "Período de Decisión",
 		"summary": "Resumen",
+		"summarise": "Resumen",
 		"aye": "Sí",
 		"nay": "No",
 		"split": "Dividido",
@@ -490,12 +514,29 @@
 		"issuance": "Emisión",
 		"viewVoteHistory": "Ver Historial de Votos",
 		"voteHistory": "Historial de Votos",
+		"delegations": "Delegaciones",
 		"delegated": "Delegado",
 		"votingPower": "Poder de voto",
+		"voteRemoved": "Su voto ha sido eliminado correctamente",
+		"voteRemoveFailed": "La solicitud de eliminación de voto ha fallado",
+		"voteRemoveFailedTitle": "Eliminación de voto fallida",
+		"voteRemovedTitle": "Voto eliminado",
 		"capital": "Capital",
 		"account": "Cuenta",
 		"abstain": "Abstención",
 		"onchainInfo": "Información en cadena",
+		"BeneficiariesDetails": {
+			"requested": "Solicitado",
+			"details": "Detalles",
+			"immediately": "inmediatamente",
+			"in": "en",
+			"to": "a",
+			"totalEstimatedUSD": "Total estimado en USD",
+			"more": "más",
+			"requestedAmountDetails": "Detalles del monto solicitado",
+			"showMore": "Mostrar más",
+			"showLess": "Mostrar menos"
+		},
 		"Poll": {
 			"endsOn": "Termina el",
 			"endedOn": "Terminó el",
@@ -568,6 +609,7 @@
 			"origin": "Origen",
 			"method": "Método",
 			"proposalHash": "Hash de propuesta",
+			"details": "Detalles",
 			"preimage": "Preimagen",
 			"description": "Descripción",
 			"section": "Sección",
@@ -579,7 +621,13 @@
 			"fee": "Gastos",
 			"parentBountyIndex": "Índice de recompensa principal",
 			"payee": "Beneficiario",
-			"curator": "Curador"
+			"curator": "Curador",
+			"requested": "Solicitado",
+			"calls": "Llamadas",
+			"showMore": "Mostrar más",
+			"showLess": "Mostrar menos",
+			"call": "Llamada",
+			"timeline": "Línea de Tiempo"
 		},
 		"deleteComment": "Eliminar comentario",
 		"deleteCommentConfirmation": "¿Está seguro de que desea eliminar este comentario?",
@@ -590,8 +638,19 @@
 		"viewReplies": "Ver respuestas",
 		"commentSummary": "Resumen del comentario",
 		"aiSummary": "Resumen de IA",
+		"showingVotesFor": "Mostrando votos para",
+		"switchWallet": "Cambiar Billetera",
+		"errorLoadingVote": "Error al cargar datos de voto",
+		"noVoteForAddress": "No se encontró voto para esta dirección",
 		"showLikelySpam": "Mostrar spam probable",
 		"hideLikelySpam": "Ocultar spam probable",
+		"HighlightMenu": {
+			"quote": "Citar",
+			"share": "Compartir",
+			"copy": "Copiar",
+			"textCopiedToClipboard": "Texto copiado al portapapeles",
+			"failedToCopyText": "Error al copiar el texto"
+		},
 		"voted": "Votado",
 		"votes": "Votos",
 		"vote": "Voto",
@@ -726,6 +785,8 @@
 		"ayeVoteValue": "Valor de voto a favor",
 		"nayVoteValue": "Valor de voto en contra",
 		"confirm": "Confirmar",
+		"existingVote": "Voto Existente",
+		"existingVoteDescription": "Ya ha votado en esta propuesta. Reenviar el voto anulará el voto actual.",
 		"voteSuccess": "Tu voto ha sido emitido con éxito",
 		"voteFailed": "Tu voto no ha sido emitido con éxito",
 		"voteSuccessTitle": "Voto exitoso",
@@ -740,7 +801,8 @@
 		"your": "Tu",
 		"voteIsIn": "voto está registrado! ¿Te gustaría compartir por qué lo apoyas en un comentario?",
 		"reuseGovernanceLock": "Reutilizar bloqueo de gobernanza",
-		"reuseAllLocks": "Reutilizar todos los bloqueos"
+		"reuseAllLocks": "Reutilizar todos los bloqueos",
+		"changeVote": "Cambiar voto"
 	},
 	"Balance": {
 		"voteBalance": "Saldo de votación",
@@ -981,7 +1043,13 @@
 		"verify": "Verificar",
 		"verified": "Verificado",
 		"pending": "Pendiente",
-		"CurrentJudgement": "Juicio Actual"
+		"CurrentJudgement": "Juicio Actual",
+		"clearIdentity": "Borrar identidad",
+		"clearIdentitySuccess": "¡Identidad borrada!",
+		"clearIdentitySuccessDescription": "Su identidad ha sido borrada exitosamente",
+		"clearIdentityFailed": "Error al borrar la identidad",
+		"clearIdentityFailedDescription": "Hubo un error al borrar su identidad",
+		"clearIdentityDescription": "¿Está seguro de que desea borrar su identidad?"
 	},
 	"Overview": {
 		"month": "Mes",
@@ -1438,6 +1506,14 @@
 	"ConvictionSelector": {
 		"votes": "Votos",
 		"lockingPeriod": "Período de bloqueo",
-		"lockingPeriodDescription": "Tus {tokenSymbol} permanecerán bloqueados por un tiempo adicional después de votar, dependiendo del multiplicador que elijas."
+		"lockingPeriodDescription": "Sus {tokenSymbol} permanecerán bloqueados por tiempo adicional después de votar, dependiendo del multiplicador que elija."
+	},
+	"PolkadotVault": {
+		"signTransaction": "Firmar Transacción",
+		"addVaultAddress": "Agregar Dirección de Polkadot Vault",
+		"scan": "Escanear",
+		"openVaultAppInYourPhone": "Abra la aplicación Vault en su teléfono",
+		"scanTheQRHere": "Escanee el código QR aquí desde la aplicación Vault",
+		"scanTheSignatureQRInYourApp": "Verifique el código QR de firma en su aplicación y firme la transacción"
 	}
 }

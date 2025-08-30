@@ -58,7 +58,7 @@ function SelectTrack({
 	const sortedTracks = useMemo(() => getSortedTracks(trackArr, network), [trackArr, network]);
 
 	useEffect(() => {
-		if (!requestedAmount || requestedAmount.isZero()) {
+		if (!requestedAmount) {
 			return;
 		}
 
