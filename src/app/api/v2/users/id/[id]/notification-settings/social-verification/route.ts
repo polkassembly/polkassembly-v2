@@ -31,7 +31,7 @@ const zodVerifyTokenSchema = z.object({
 	handle: z.string().min(1)
 });
 
-function getVerificationInstructions(channel: ENotificationChannel, username: string, token: string) {
+function getVerificationInstructions(channel: ENotificationChannel, userId: string, token: string) {
 	switch (channel) {
 		case ENotificationChannel.TELEGRAM:
 			return {
@@ -39,10 +39,10 @@ function getVerificationInstructions(channel: ENotificationChannel, username: st
 				steps: [
 					'1. Click this invite link: https://t.me/PolkassemblyBot',
 					'2. Add @PolkassemblyBot to your Telegram chat as a member',
-					`3. Send this command to the chat with the bot: /verify ${username} ${token}`
+					`3. Send this command to the chat with the bot: /verify ${userId} ${token}`
 				],
 				botHandle: '@PolkassemblyBot',
-				command: `/verify ${username} ${token}`
+				command: `/verify ${userId} ${token}`
 			};
 
 		case ENotificationChannel.DISCORD:
@@ -51,10 +51,10 @@ function getVerificationInstructions(channel: ENotificationChannel, username: st
 				steps: [
 					'1. Click this invite link: https://discord.com/api/oauth2/authorize?client_id=YOUR_BOT_ID',
 					'2. Add the Polkassembly bot to your Discord server',
-					`3. Send this command to the chat with the bot: !verify ${username} ${token}`
+					`3. Send this command to the chat with the bot: !verify ${userId} ${token}`
 				],
 				botHandle: 'PolkassemblyBot',
-				command: `!verify ${username} ${token}`
+				command: `!verify ${userId} ${token}`
 			};
 
 		case ENotificationChannel.SLACK:
@@ -63,10 +63,10 @@ function getVerificationInstructions(channel: ENotificationChannel, username: st
 				steps: [
 					'1. Click this to get invite link: [Contact admin for Slack integration]',
 					'2. Add the Polkassembly bot to your Slack workspace',
-					`3. Send this command to the chat with the bot: /polkassembly-add ${username} ${token}`
+					`3. Send this command to the chat with the bot: /polkassembly-add ${userId} ${token}`
 				],
 				botHandle: 'PolkassemblyBot',
-				command: `/polkassembly-add ${username} ${token}`
+				command: `/polkassembly-add ${userId} ${token}`
 			};
 
 		default:
@@ -125,7 +125,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		notificationPreferences: updatedPreferences
 	});
 
-	const instructions = getVerificationInstructions(channel, user.username, verificationToken);
+	const instructions = getVerificationInstructions(channel, user.id.toString(), verificationToken);
 
 	return NextResponse.json({
 		verificationToken,
@@ -166,7 +166,8 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid or expired verification token');
 	}
 
-	const existingChannelPref = currentPreferences.channelPreferences?.[channel];
+	const channelPreferences = currentPreferences.channelPreferences || {};
+	const existingChannelPref = channelPreferences[channel as keyof typeof channelPreferences];
 	const updatedChannelPreference = {
 		...existingChannelPref,
 		name: channel,

@@ -34,7 +34,7 @@ export class NotificationService {
 		'x-source': 'polkassembly_v2'
 	});
 
-	private static async getUsersWithEnabledNotifications({ network, trigger }: { network: ENetwork; trigger: ENotificationTrigger }): Promise<number[]> {
+	private static async getUsersWithEnabledNotifications({ network, trigger, track }: { network: ENetwork; trigger: ENotificationTrigger; track?: string }): Promise<number[]> {
 		try {
 			if (!Object.values(ENetwork).includes(network)) {
 				console.error('Invalid network parameter:', network);
@@ -72,10 +72,13 @@ export class NotificationService {
 							return (prefs?.myProposals as { enabled?: boolean })?.enabled || false;
 						case ENotificationTrigger.NEW_REFERENDUM:
 						case ENotificationTrigger.REFERENDUM_VOTING:
-						case ENotificationTrigger.REFERENDUM_CLOSED:
-							return (prefs?.openGov as { tracks?: Record<string, { enabled?: boolean }> })?.tracks
-								? Object.values((prefs.openGov as { tracks: Record<string, { enabled?: boolean }> }).tracks).some((track) => track.enabled)
-								: false;
+						case ENotificationTrigger.REFERENDUM_CLOSED: {
+							const tracks = (prefs?.openGov as { tracks?: Record<string, { enabled?: boolean }> })?.tracks || {};
+							if (track && Object.prototype.hasOwnProperty.call(tracks, track)) {
+								return !!tracks[track]?.enabled;
+							}
+							return Object.values(tracks).some((trackConfig) => trackConfig.enabled);
+						}
 						case ENotificationTrigger.COUNCIL_MOTION_SUBMITTED:
 						case ENotificationTrigger.COUNCIL_MOTION_VOTING:
 						case ENotificationTrigger.COUNCIL_MOTION_CLOSED:
@@ -125,14 +128,24 @@ export class NotificationService {
 		}
 
 		try {
+			const ac = new AbortController();
+			const timeout = setTimeout(() => ac.abort(), 10_000);
+
 			const res = await fetch(`${this.NOTIFICATION_ENGINE_URL}/notify`, {
 				body: JSON.stringify({
 					args,
 					trigger
 				}),
 				headers: this.firebaseFunctionsHeader(network),
-				method: 'POST'
+				method: 'POST',
+				signal: ac.signal
 			});
+
+			clearTimeout(timeout);
+
+			if (!res.ok) {
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, `Notification HTTP ${res.status}`);
+			}
 
 			const { data, error } = (await res.json()) as { data?: string; error?: string };
 
@@ -318,11 +331,13 @@ export class NotificationService {
 	}) {
 		const enabledUserIds = await this.getUsersWithEnabledNotifications({
 			network,
-			trigger: ENotificationTrigger.NEW_REFERENDUM
+			trigger: ENotificationTrigger.NEW_REFERENDUM,
+			track
 		});
 
 		if (enabledUserIds.length === 0) {
-			console.log(`No users have enabled NEW_REFERENDUM notifications for ${network}`);
+			const trackInfo = track ? ` (track: ${track})` : '';
+			console.log(`No users have enabled NEW_REFERENDUM notifications for ${network}${trackInfo}`);
 			return;
 		}
 
@@ -572,7 +587,8 @@ export class NotificationService {
 	}) {
 		const enabledUserIds = await this.getUsersWithEnabledNotifications({
 			network,
-			trigger: ENotificationTrigger.REFERENDUM_VOTING
+			trigger: ENotificationTrigger.REFERENDUM_VOTING,
+			track
 		});
 		if (enabledUserIds.length === 0) return;
 
@@ -606,7 +622,8 @@ export class NotificationService {
 	}) {
 		const enabledUserIds = await this.getUsersWithEnabledNotifications({
 			network,
-			trigger: ENotificationTrigger.REFERENDUM_CLOSED
+			trigger: ENotificationTrigger.REFERENDUM_CLOSED,
+			track
 		});
 		if (enabledUserIds.length === 0) return;
 
@@ -661,14 +678,24 @@ export class NotificationService {
 		}
 
 		try {
+			const ac = new AbortController();
+			const timeout = setTimeout(() => ac.abort(), 10_000);
+
 			const res = await fetch(`${this.NOTIFICATION_ENGINE_URL}/getChannelVerifyToken`, {
 				body: JSON.stringify({
 					channel,
 					userId
 				}),
 				headers: this.firebaseFunctionsHeader(network),
-				method: 'POST'
+				method: 'POST',
+				signal: ac.signal
 			});
+
+			clearTimeout(timeout);
+
+			if (!res.ok) {
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, `Token generation HTTP ${res.status}`);
+			}
 
 			const { data: verifyToken, error: verifyTokenError } = (await res.json()) as {
 				data: string;
@@ -708,11 +735,21 @@ export class NotificationService {
 		}
 
 		try {
+			const ac = new AbortController();
+			const timeout = setTimeout(() => ac.abort(), 10_000);
+
 			const res = await fetch(`${this.NOTIFICATION_ENGINE_URL}/verifyChannelToken`, {
 				method: 'POST',
 				headers: this.firebaseFunctionsHeader(network),
-				body: JSON.stringify({ channel, userId, handle, token })
+				body: JSON.stringify({ channel, userId, handle, token }),
+				signal: ac.signal
 			});
+
+			clearTimeout(timeout);
+
+			if (!res.ok) {
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, `Channel verification HTTP ${res.status}`);
+			}
 
 			const { data, error } = (await res.json()) as { data?: { verified: boolean }; error?: string };
 
