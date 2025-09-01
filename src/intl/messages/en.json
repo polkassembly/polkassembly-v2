@@ -389,7 +389,8 @@
 		"Tip": "Tips",
 		"TipDescription": "This is the place to discuss on-chain tips. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
 		"CouncilMotion": "On Chain Motions",
-		"CouncilMotionDescription": "This is the place to discuss on-chain motions. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them."
+		"CouncilMotionDescription": "This is the place to discuss on-chain motions. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"FastGeneralAdmin": "Fast General Admin"
 	},
 	"Sidebar": {
 		"onChainIdentity": "On-Chain Identity",
@@ -446,6 +447,7 @@
 		"Treasury": "Treasury",
 		"LeaseAdmin": "Lease Admin",
 		"GeneralAdmin": "General Admin",
+		"FastGeneralAdmin": "Fast General Admin",
 		"Tag": {
 			"new": "New"
 		}

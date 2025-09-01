@@ -380,15 +380,16 @@
 		"WishForChange": "Deseo de Cambio",
 		"WishForChangeDescription": "Origen para señalar que la red desea algún cambio.",
 		"CouncilMotion": "Moción del Consejo",
-		"CouncilMotionDescription": "This is the place to discuss on-chain motions. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"CouncilMotionDescription": "Este es el lugar para discutir mociones en cadena. Las publicaciones en cadena se generan automáticamente tan pronto como se crean en la cadena. Solo el proponente puede editarlas.",
 		"TechCommitteeProposal": "Propuesta del Comité Técnico",
-		"TechCommitteeProposalDescription": "This is the place to discuss on-chain tech committee proposals. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"TechCommitteeProposalDescription": "Este es el lugar para discutir propuestas del comité técnico en cadena. Las publicaciones en cadena se generan automáticamente tan pronto como se crean en la cadena. Solo el proponente puede editarlas.",
 		"DemocracyProposal": "Propuesta de Democracia",
-		"DemocracyProposalDescription": "This is the place to discuss on-chain proposals. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"DemocracyProposalDescription": "Este es el lugar para discutir propuestas en cadena. Las publicaciones en cadena se generan automáticamente tan pronto como se crean en la cadena. Solo el proponente puede editarlas.",
 		"TreasuryProposal": "Propuesta de Tesorería",
-		"TreasuryProposalDescription": "This is the place to discuss on-chain treasury proposals. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them.",
+		"TreasuryProposalDescription": "Este es el lugar para discutir propuestas de tesorería en cadena. Las publicaciones en cadena se generan automáticamente tan pronto como se crean en la cadena. Solo el proponente puede editarlas.",
 		"Tip": "Propina",
-		"TipDescription": "This is the place to discuss on-chain tips. On-chain posts are automatically generated as soon as they are created on the chain. Only the proposer is able to edit them."
+		"TipDescription": "Este es el lugar para discutir propinas en cadena. Las publicaciones en cadena se generan automáticamente tan pronto como se crean en la cadena. Solo el proponente puede editarlas.",
+		"FastGeneralAdmin": "Administrador General Rápido"
 	},
 	"Sidebar": {
 		"onChainIdentity": "Identidad en Cadena",
@@ -445,6 +446,7 @@
 		"Treasury": "Tesorería",
 		"LeaseAdmin": "Admin de Arrendamiento",
 		"GeneralAdmin": "Admin General",
+		"FastGeneralAdmin": "Administrador General Rápido",
 		"Tag": {
 			"new": "Nuevo"
 		}

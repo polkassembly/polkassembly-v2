@@ -77,6 +77,10 @@ const getOriginIcon = (key: string) => {
 			return WhitelistedCallerIcon;
 		case EPostOrigin.FELLOWSHIP_ADMIN:
 			return FellowshipAdminIcon;
+		case EPostOrigin.FAST_GENERAL_ADMIN:
+			return AdministrationIcon;
+		case EPostOrigin.GENERAL_ADMIN:
+			return AdministrationIcon;
 		default:
 			return null;
 	}
@@ -160,18 +164,22 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 										url: '/all',
 										icon: All
 									},
-									{
-										title: t('Sidebar.treasury'),
-										url: '',
-										icon: TreasuryIcon,
-										items: getTrackItems(networkKey, 'Treasury', t, trackCounts)
-									},
-									{
-										title: t('Sidebar.administration'),
-										url: '',
-										icon: AdministrationIcon,
-										items: getTrackItems(networkKey, 'Main', t, trackCounts)
-									}
+									...(ValidatorService.isValidEthereumNetwork(networkKey)
+										? []
+										: [
+												{
+													title: t('Sidebar.treasury'),
+													url: '',
+													icon: TreasuryIcon,
+													items: getTrackItems(networkKey, 'Treasury', t, trackCounts)
+												},
+												{
+													title: t('Sidebar.administration'),
+													url: '',
+													icon: AdministrationIcon,
+													items: getTrackItems(networkKey, 'Main', t, trackCounts)
+												}
+											])
 								],
 								pathname
 							)

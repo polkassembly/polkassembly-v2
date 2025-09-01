@@ -2440,7 +2440,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.ROOT]: {
 			trackId: 0,
 			description: ROOT_ORIGIN_DESCRIPTION,
-			group: 'Main',
+			group: 'Origin',
 			name: 'root',
 			maxDeciding: 5,
 			decisionDeposit: new BN('2000000000000000000000000'),
@@ -2466,7 +2466,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.WHITELISTED_CALLER]: {
 			trackId: 1,
 			description: WHITELISTED_CALLER_DESCRIPTION,
-			group: 'Whitelist',
+			group: 'Origin',
 			name: 'whitelisted_caller',
 			maxDeciding: 100,
 			decisionDeposit: new BN('200000000000000000000000'),
@@ -2492,7 +2492,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.GENERAL_ADMIN]: {
 			trackId: 2,
 			description: GENERAL_ADMIN_DESCRIPTION,
-			group: 'Admin',
+			group: 'Origin',
 			name: 'general_admin',
 			maxDeciding: 10,
 			decisionDeposit: new BN('10000000000000000000000'),
@@ -2518,7 +2518,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.REFERENDUM_CANCELLER]: {
 			trackId: 3,
 			description: REFERENDUM_CANCELLER_DESCRIPTION,
-			group: 'Admin',
+			group: 'Origin',
 			name: 'referendum_canceller',
 			maxDeciding: 20,
 			decisionDeposit: new BN('200000000000000000000000'),
@@ -2544,7 +2544,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.REFERENDUM_KILLER]: {
 			trackId: 4,
 			description: REFERENDUM_KILLER_DESCRIPTION,
-			group: 'Admin',
+			group: 'Origin',
 			name: 'referendum_killer',
 			maxDeciding: 100,
 			decisionDeposit: new BN('400000000000000000000000'),
@@ -2570,7 +2570,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.FAST_GENERAL_ADMIN]: {
 			trackId: 5,
 			description: FAST_GENERAL_ADMIN_DESCRIPTION,
-			group: 'Admin',
+			group: 'Origin',
 			name: 'fast_general_admin',
 			maxDeciding: 10,
 			decisionDeposit: new BN('10000000000000000000000'),
@@ -2598,7 +2598,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.ROOT]: {
 			trackId: 0,
 			description: ROOT_ORIGIN_DESCRIPTION,
-			group: 'Main',
+			group: 'Origin',
 			name: 'root',
 			maxDeciding: 5,
 			decisionDeposit: new BN('100000000000000000000000'),
@@ -2624,7 +2624,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.WHITELISTED_CALLER]: {
 			trackId: 1,
 			description: WHITELISTED_CALLER_DESCRIPTION,
-			group: 'Privileged',
+			group: 'Origin',
 			name: 'whitelisted_caller',
 			maxDeciding: 100,
 			decisionDeposit: new BN('10000000000000000000000'),
@@ -2650,7 +2650,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.GENERAL_ADMIN]: {
 			trackId: 2,
 			description: GENERAL_ADMIN_DESCRIPTION,
-			group: 'Admin',
+			group: 'Origin',
 			name: 'general_admin',
 			maxDeciding: 10,
 			decisionDeposit: new BN('500000000000000000000'),
@@ -2676,7 +2676,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.REFERENDUM_CANCELLER]: {
 			trackId: 3,
 			description: REFERENDUM_CANCELLER_DESCRIPTION,
-			group: 'Emergency',
+			group: 'Origin',
 			name: 'referendum_canceller',
 			maxDeciding: 20,
 			decisionDeposit: new BN('10000000000000000000000'),
@@ -2702,7 +2702,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.REFERENDUM_KILLER]: {
 			trackId: 4,
 			description: REFERENDUM_KILLER_DESCRIPTION,
-			group: 'Emergency',
+			group: 'Origin',
 			name: 'referendum_killer',
 			maxDeciding: 100,
 			decisionDeposit: new BN('20000000000000000000000'),
@@ -2728,7 +2728,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		[EPostOrigin.FAST_GENERAL_ADMIN]: {
 			trackId: 5,
 			description: FAST_GENERAL_ADMIN_DESCRIPTION,
-			group: 'Admin',
+			group: 'Origin',
 			name: 'fast_general_admin',
 			maxDeciding: 10,
 			decisionDeposit: new BN('500000000000000000000'),
