@@ -451,7 +451,7 @@
 		}
 	},
 	"PostDetails": {
-		"selectYourVoterAddress": "选择您的投票地址",		
+		"selectYourVoterAddress": "选择您的投票地址",
 		"address": "地址",
 		"castVote": "投票",
 		"changeVote": "更改投票",
@@ -474,6 +474,8 @@
 		"post": "发布",
 		"cancel": "取消",
 		"reply": "回复",
+		"edited": "编辑",
+		"commentHistory": "评论历史",
 		"remove": "删除",
 		"removing": "删除中",
 		"removeVote": "删除投票",

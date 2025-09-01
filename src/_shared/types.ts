@@ -417,6 +417,9 @@ export interface IOffChainContentHistoryItem {
 	title?: string;
 	createdAt: Date;
 }
+
+export type ICommentHistoryItem = Omit<IOffChainContentHistoryItem, 'title'>;
+
 export interface IPollVote {
 	id: string;
 	userId: number;
@@ -728,7 +731,7 @@ export interface IComment {
 	isSpam?: boolean;
 	sentiment?: ECommentSentiment;
 	aiSentiment?: ECommentSentiment;
-	history?: IOffChainContentHistoryItem[];
+	history?: ICommentHistoryItem[];
 	disabled?: boolean;
 	authorAddress?: string;
 }

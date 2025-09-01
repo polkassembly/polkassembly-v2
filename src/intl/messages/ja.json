@@ -474,6 +474,8 @@
 		"post": "投稿",
 		"cancel": "キャンセル",
 		"reply": "返信",
+		"edited": "編集",
+		"commentHistory": "コメント履歴",
 		"remove": "削除",
 		"removing": "削除中",
 		"removeVote": "投票を削除",

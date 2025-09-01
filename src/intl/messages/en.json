@@ -478,6 +478,8 @@
 		"post": "Post",
 		"cancel": "Cancel",
 		"reply": "Reply",
+		"edited": "Edited",
+		"commentHistory": "Comment History",
 		"remove": "Remove",
 		"removing": "Removing",
 		"removeVote": "Remove Vote",
