@@ -14,14 +14,16 @@ export function removeSymbols(input: string | undefined): string {
 export function generateDiffHtml(originalHtml: string, modifiedHtml: string) {
 	const diff = diffWords(originalHtml, modifiedHtml);
 
+	const escapeHtml = (s: string) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
 	let diffHtml = '';
 	diff.forEach((part) => {
 		if (part.added) {
-			diffHtml += `<span class="diff-added">${part.value}</span>`;
+			diffHtml += `<span class="diff-added">${escapeHtml(part.value)}</span>`;
 		} else if (part.removed) {
-			diffHtml += `<span class="diff-removed">${part.value}</span>`;
+			diffHtml += `<span class="diff-removed">${escapeHtml(part.value)}</span>`;
 		} else {
-			diffHtml += part.value;
+			diffHtml += escapeHtml(part.value);
 		}
 	});
 	return diffHtml;
