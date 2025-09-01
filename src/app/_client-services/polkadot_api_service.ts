@@ -14,7 +14,7 @@ import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { Signer, ISubmittableResult, TypeDef } from '@polkadot/types/types';
-import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
+import { BN, BN_HUNDRED, BN_ZERO, BN_MAX_INTEGER, u8aToHex } from '@polkadot/util';
 import { getTypeDef } from '@polkadot/types';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
@@ -25,6 +25,7 @@ import {
 	ENetwork,
 	EPostOrigin,
 	EVoteDecision,
+	EVoteSource,
 	EWallet,
 	IBeneficiaryInput,
 	IParamDef,
@@ -37,6 +38,7 @@ import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateA
 import { APPNAME } from '@/_shared/_constants/appName';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
 import { Dispatch, SetStateAction } from 'react';
+import { getAllLockData } from '@/app/_client-utils/voteLockCalculations';
 import { BlockCalculationsService } from './block_calculations_service';
 import { isMimirDetected } from './isMimirDetected';
 import { VaultQrSigner } from './vault_qr_signer_service';
@@ -355,13 +357,15 @@ export class PolkadotApiService {
 		let freeBalance = BN_ZERO;
 		let lockedBalance = BN_ZERO;
 		let totalBalance = BN_ZERO;
+		let reservedBalance = BN_ZERO;
 		let transferableBalance = BN_ZERO;
 
 		const responseObj = {
 			freeBalance,
 			lockedBalance,
 			totalBalance,
-			transferableBalance
+			transferableBalance,
+			reservedBalance
 		};
 
 		if (!address || !this.api?.derive?.balances?.all) {
@@ -389,13 +393,14 @@ export class PolkadotApiService {
 
 				totalBalance = free.add(reserved);
 				freeBalance = free;
+				reservedBalance = reserved;
 
-				if (free.gt(frozen)) {
-					transferableBalance = free.sub(frozen);
+				// Calculate effective frozen balance (frozen - reserved to avoid double counting)
+				const effectiveFrozen = frozen.sub(reserved);
+				const minToSubtract = BN.max(effectiveFrozen, existentialDeposit);
 
-					if (transferableBalance.lt(existentialDeposit)) {
-						transferableBalance = BN_ZERO;
-					}
+				if (free.gt(minToSubtract)) {
+					transferableBalance = free.sub(minToSubtract);
 				} else {
 					transferableBalance = BN_ZERO;
 				}
@@ -408,7 +413,8 @@ export class PolkadotApiService {
 			freeBalance,
 			lockedBalance,
 			totalBalance,
-			transferableBalance
+			transferableBalance,
+			reservedBalance
 		};
 	}
 
@@ -1588,5 +1594,176 @@ export class PolkadotApiService {
 			waitTillFinalizedHash: true,
 			setVaultQrState
 		});
+	}
+
+	// Vote unlock methods
+	async getVotingLocks(address: string) {
+		if (!this.api || !this.api.isReady) return null;
+
+		try {
+			const lockPeriod = new BN(this.api.consts.convictionVoting.voteLockingPeriod.toString());
+			const currentBlock = await this.api.derive.chain.bestNumber();
+
+			// Get class locks for the address
+			const classLocks = await this.api.query.convictionVoting.classLocksFor(address);
+			const classLocksData = classLocks.toHuman() as any[];
+
+			if (!classLocksData || classLocksData.length === 0) {
+				return {
+					lockedVotes: [],
+					unlockableVotes: [],
+					ongoingVotes: []
+				};
+			}
+
+			// Get voting data for each track
+			const unlocks = classLocksData.map((lock: any) => [address, lock[0]]).filter((param) => !!param);
+			const votes = await this.api.query.convictionVoting.votingFor.multi(unlocks as any[]);
+
+			// Process votes to get referendum IDs
+			const customizeVotes = votes
+				.map((vote, index) => {
+					const voteObj = vote as unknown as Record<string, unknown>;
+					if (!voteObj.isCasting) return null;
+					const casting = voteObj.asCasting as Record<string, unknown>;
+					if (!casting || !Array.isArray(casting.votes)) return null;
+					const votesArray = casting.votes as unknown[][];
+					return [unlocks[index]?.[1], votesArray.map((voteItem) => (Array.isArray(voteItem) ? voteItem[0] : null)).filter(Boolean), casting];
+				})
+				.filter((vote) => !!vote);
+
+			// Get all referendum IDs
+			const refParams = customizeVotes.reduce<BN[]>((all, vote) => {
+				if (vote && Array.isArray(vote) && vote.length >= 2) {
+					const [, refIds] = vote;
+					return all.concat(refIds || []);
+				}
+				return all;
+			}, []);
+
+			if (refParams.length === 0) {
+				return {
+					lockedVotes: [],
+					unlockableVotes: [],
+					ongoingVotes: []
+				};
+			}
+
+			// Get referendum info for all refs
+			const referendas = await this.api.query.referenda.referendumInfoFor.multi(refParams);
+			const customizeReferenda = referendas
+				.map((ref, index) => {
+					const refObj = ref as unknown as Record<string, unknown>;
+					if (!refObj.isSome || typeof refObj.unwrapOr !== 'function') return null;
+					const unwrapped = (refObj.unwrapOr as (fallback: unknown) => unknown)(null);
+					return [refParams[index], unwrapped];
+				})
+				.filter((ref) => !!ref);
+
+			// Process all lock data using V1 logic
+			const allLockData = getAllLockData(customizeVotes as any[], customizeReferenda as [BN, any][], lockPeriod);
+
+			// Categorize votes based on current block
+			const lockedVotes: any[] = [];
+			const unlockableVotes: any[] = [];
+			const ongoingVotes: any[] = [];
+
+			allLockData.forEach((lock) => {
+				const voteData = {
+					refId: lock.refId.toString(),
+					track: lock.track.toString(),
+					balance: lock.total,
+					conviction: 0, // Will be updated based on lock type
+					endBlock: lock.endBlock,
+					status: lock.locked,
+					voteSource: EVoteSource.CONVICTION_VOTING,
+					locked: lock.locked
+				};
+
+				if (lock.endBlock.eq(BN_MAX_INTEGER)) {
+					// Ongoing referendum
+					ongoingVotes.push(voteData);
+				} else if (lock.endBlock.lte(currentBlock)) {
+					// Unlockable
+					unlockableVotes.push(voteData);
+				} else {
+					// Still locked
+					lockedVotes.push(voteData);
+				}
+			});
+
+			return {
+				lockedVotes: lockedVotes.sort((a, b) => a.endBlock.cmp(b.endBlock)),
+				unlockableVotes,
+				ongoingVotes
+			};
+		} catch (error) {
+			console.error('Error fetching voting locks:', error);
+			return null;
+		}
+	}
+
+	async unlockVotingTokens({
+		address,
+		unlockableVotes,
+		wallet,
+		onSuccess,
+		onFailed,
+		selectedAccount,
+		setVaultQrState
+	}: {
+		address: string;
+		unlockableVotes: any[];
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		selectedAccount?: ISelectedAccount;
+	}) {
+		if (!this.api || !this.api.isReady || !unlockableVotes.length) return;
+
+		try {
+			const txs: any[] = [];
+
+			// Group votes by track for unlocking
+			const trackVotes = new Map<string, string[]>();
+
+			unlockableVotes.forEach((vote) => {
+				const { track } = vote;
+				const { refId } = vote;
+
+				// Add removeVote transaction
+				txs.push(this.api.tx.convictionVoting.removeVote(track, refId));
+
+				// Group by track for unlock transactions
+				if (!trackVotes.has(track)) {
+					trackVotes.set(track, []);
+				}
+				trackVotes.get(track)!.push(refId);
+			});
+
+			// Add unlock transactions for each track
+			trackVotes.forEach((refIds, track) => {
+				txs.push(this.api.tx.convictionVoting.unlock(track, address));
+			});
+
+			// Batch only if multiple transactions, otherwise execute single transaction
+			const tx = txs.length > 1 ? this.api.tx.utility.batchAll(txs) : txs[0];
+
+			await this.executeTx({
+				tx,
+				address,
+				wallet,
+				errorMessageFallback: 'Failed to unlock voting tokens',
+				onSuccess,
+				onFailed,
+				waitTillFinalizedHash: true,
+				selectedAccount,
+				setVaultQrState
+			});
+		} catch (error) {
+			console.error('Error unlocking voting tokens:', error);
+			onFailed('Failed to unlock voting tokens');
+		}
 	}
 }

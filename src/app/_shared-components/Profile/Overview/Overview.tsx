@@ -17,6 +17,7 @@ import LinkAddress from './LinkAddress/LinkAddress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
 import classes from './Overview.module.scss';
 import Delegations from '../Delegations/Delegations';
+import Balance from '../Accounts/Balance/Balance';
 
 function Overview({ address, profileData }: { address?: string; profileData?: IPublicUser }) {
 	const [userProfile, setUserProfile] = useState<IPublicUser | undefined>(profileData);
@@ -78,6 +79,10 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 				</div>
 			</div>
 			<div className={classes.rightGrid}>
+				<Balance
+					address={address || userProfile?.addresses[0] || ''}
+					userProfile={userProfile}
+				/>
 				<div className={classes.onchainIdentityCard}>
 					<div className={classes.onchainIdentityCardHeader}>
 						<p className={classes.onchainIdentityCardHeaderTitle}>{t('Profile.onchainIdentity')}</p>
