@@ -25,6 +25,7 @@ import {
 	ENetwork,
 	EPostOrigin,
 	EVoteDecision,
+	EVoteSource,
 	EWallet,
 	IBeneficiaryInput,
 	IParamDef,
@@ -1600,7 +1601,6 @@ export class PolkadotApiService {
 		if (!this.api || !this.api.isReady) return null;
 
 		try {
-			const convictionMultipliers = [0.1, 1, 2, 4, 8, 16, 32];
 			const lockPeriod = new BN(this.api.consts.convictionVoting.voteLockingPeriod.toString());
 			const currentBlock = await this.api.derive.chain.bestNumber();
 
@@ -1661,7 +1661,7 @@ export class PolkadotApiService {
 				.filter((ref) => !!ref);
 
 			// Process all lock data using V1 logic
-			const allLockData = getAllLockData(customizeVotes as any[], customizeReferenda as [BN, any][], lockPeriod, convictionMultipliers);
+			const allLockData = getAllLockData(customizeVotes as any[], customizeReferenda as [BN, any][], lockPeriod);
 
 			// Categorize votes based on current block
 			const lockedVotes: any[] = [];
@@ -1676,7 +1676,7 @@ export class PolkadotApiService {
 					conviction: 0, // Will be updated based on lock type
 					endBlock: lock.endBlock,
 					status: lock.locked,
-					voteSource: 'conviction_voting' as const,
+					voteSource: EVoteSource.CONVICTION_VOTING,
 					locked: lock.locked
 				};
 

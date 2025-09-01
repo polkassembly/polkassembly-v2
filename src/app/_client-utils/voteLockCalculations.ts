@@ -118,13 +118,9 @@ function processVoteLock(refId: BN, track: BN, accountVote: VoteData, tally: Tal
 	return { endBlock, locked, refId, total: totalBalance, track };
 }
 
-export function getAllLockData(
-	votes: [track: BN, refIds: BN[], casting: VoteCasting][],
-	referendas: [BN, TallyData][],
-	lockPeriod: BN,
-	convictionMultipliers: number[]
-): VoteLockData[] {
+export function getAllLockData(votes: [track: BN, refIds: BN[], casting: VoteCasting][], referendas: [BN, TallyData][], lockPeriod: BN): VoteLockData[] {
 	const locks: VoteLockData[] = [];
+	const convictionMultipliers = [0.1, 1, 2, 4, 8, 16, 32];
 
 	votes.forEach(([track, , casting]) => {
 		casting.votes.forEach(([refId, accountVote]) => {
