@@ -54,7 +54,8 @@ import {
 	IPostAnalytics,
 	IPostBubbleVotes,
 	EAnalyticsType,
-	EVotesDisplayType
+	EVotesDisplayType,
+	IProfileVote
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -88,6 +89,7 @@ enum EApiRoute {
 	ADD_COMMENT = 'ADD_COMMENT',
 	GET_ACTIVITY_FEED = 'GET_ACTIVITY_FEED',
 	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
+	GET_POST_VOTES_BY_ADDRESS = 'GET_POST_VOTES_BY_ADDRESS',
 	ADD_POST_REACTION = 'ADD_POST_REACTION',
 	DELETE_REACTION = 'DELETE_REACTION',
 	PUBLIC_USER_DATA_BY_ID = 'PUBLIC_USER_DATA_BY_ID',
@@ -143,7 +145,10 @@ enum EApiRoute {
 	ADD_POLL_VOTE = 'ADD_POLL_VOTE',
 	DELETE_POLL_VOTE = 'DELETE_POLL_VOTE',
 	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
-	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES'
+	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES',
+	ADD_COMMENT_REACTION = 'ADD_COMMENT_REACTION',
+	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
+	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES'
 }
 
 export class NextApiClientService {
@@ -196,6 +201,9 @@ export class NextApiClientService {
 			case EApiRoute.FETCH_LEADERBOARD:
 				path = '/users';
 				break;
+			case EApiRoute.GET_VOTES_BY_ADDRESSES:
+				path = '/users/votes';
+				break;
 			case EApiRoute.FETCH_PREIMAGES:
 				path = '/preimages';
 				break;
@@ -243,6 +251,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_ON_CHAIN_METADATA_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.GET_POST_VOTES_BY_ADDRESS:
 			case EApiRoute.GET_CONTENT_SUMMARY:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 			case EApiRoute.GET_VOTE_CURVES:
@@ -324,6 +333,7 @@ export class NextApiClientService {
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.ADD_POST_SUBSCRIPTION:
 			case EApiRoute.ADD_POST_REACTION:
+			case EApiRoute.ADD_COMMENT_REACTION:
 				method = 'POST';
 				break;
 			case EApiRoute.JUDGEMENT_CALL:
@@ -357,6 +367,7 @@ export class NextApiClientService {
 			case EApiRoute.DELETE_REACTION:
 			case EApiRoute.DELETE_POST_SUBSCRIPTION:
 			case EApiRoute.DELETE_COMMENT:
+			case EApiRoute.DELETE_COMMENT_REACTION:
 				method = 'DELETE';
 				break;
 
@@ -677,6 +688,24 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_HISTORY, routeSegments: [proposalType, index, 'votes'], queryParams });
 		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });
+	}
+
+	static async getPostVotesByAddresses({ proposalType, index, addresses }: { proposalType: EProposalType; index: string; addresses: string[] }) {
+		const queryParams = new URLSearchParams({
+			page: '1',
+			limit: addresses.length.toString()
+		});
+
+		if (addresses.length) {
+			addresses.forEach((address) => queryParams.append('address', address));
+		}
+
+		const { url, method } = await NextApiClientService.getRouteConfig({
+			route: EApiRoute.GET_POST_VOTES_BY_ADDRESS,
+			routeSegments: [proposalType, index, 'votes', 'address'],
+			queryParams
+		});
+		return NextApiClientService.nextApiClientFetch<IVoteHistoryData>({ url, method });
 	}
 
 	// activity feed
@@ -1183,5 +1212,31 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_BUBBLE_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-bubble'], queryParams });
 		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method });
+	}
+
+	static async addCommentReaction(proposalType: EProposalType, index: string, commentId: string, reactionType: EReaction) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_COMMENT_REACTION, routeSegments: [proposalType, index, 'comments', commentId, 'reactions'] });
+		return this.nextApiClientFetch<{ message: string; reactionId: string }>({ url, method, data: { reaction: reactionType } });
+	}
+
+	static async deleteCommentReaction(proposalType: EProposalType, index: string, commentId: string, reactionId: string) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.DELETE_COMMENT_REACTION,
+			routeSegments: [proposalType, index, 'comments', commentId, 'reactions', reactionId]
+		});
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	static async getVotesByAddresses({ addresses, page, limit }: { addresses: string[]; page: number; limit: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+
+		if (addresses.length) {
+			addresses.forEach((address) => queryParams.append('address', address));
+		}
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_BY_ADDRESSES, queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IProfileVote>>({ url, method });
 	}
 }

@@ -12,7 +12,10 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getSupportedWallets } from '@/_shared/_utils/getSupportedWallets';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { METAMASK_SUPPORTED_FEATURES } from '@/_shared/_constants/featureFlags';
+import dynamic from 'next/dynamic';
 import classes from './WalletButtons.module.scss';
+
+const SignVaultTransaction = dynamic(() => import('../../PolkadotVault/SignVaultTransaction/SignVaultTransaction'), { ssr: false });
 
 function WalletButtons({
 	onWalletChange,
@@ -76,24 +79,27 @@ function WalletButtons({
 	}, [availableWallets]);
 
 	return (
-		<div className={`${small ? classes.buttonsAlignmentSmall : classes.buttonsAlignment}`}>
-			{!small && <p className={classes.header}>Select a Wallet</p>}
-			{supportedWallets.map((wallet) => {
-				if (!wallet) return null;
-				return (
-					<WalletButton
-						key={wallet}
-						// eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-explicit-any
-						disabled={Boolean(!(availableWallets as any)?.[wallet]) || disabled}
-						wallet={wallet}
-						onClick={onWalletChange}
-						label={WalletClientService.getWalletNameLabel(wallet)}
-						small={small}
-						hidePreference={hidePreference}
-					/>
-				);
-			})}
-		</div>
+		<>
+			<SignVaultTransaction />
+			<div className={`${small ? classes.buttonsAlignmentSmall : classes.buttonsAlignment}`}>
+				{!small && <p className={classes.header}>Select a Wallet</p>}
+				{supportedWallets.map((wallet) => {
+					if (!wallet) return null;
+					return (
+						<WalletButton
+							key={wallet}
+							// eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-explicit-any
+							disabled={Boolean(!(availableWallets as any)?.[wallet]) || disabled}
+							wallet={wallet}
+							onClick={onWalletChange}
+							label={WalletClientService.getWalletNameLabel(wallet)}
+							small={small}
+							hidePreference={hidePreference}
+						/>
+					);
+				})}
+			</div>
+		</>
 	);
 }
 

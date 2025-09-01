@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EVoteDecision, ENotificationStatus, ISelectedAccount, EPostOrigin, EProposalType, EFeature } from '@/_shared/types';
+import { EVoteDecision, ENotificationStatus, EPostOrigin, EProposalType, EReactQueryKeys, IVoteHistoryData, EFeature } from '@/_shared/types';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -12,13 +12,17 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useToast } from '@/hooks/useToast';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { cn } from '@/lib/utils';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
+import { Ban, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { useUser } from '@/hooks/useUser';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { Button } from '../../Button';
 import BalanceInput from '../../BalanceInput/BalanceInput';
 import ChooseVote from './ChooseVote/ChooseVote';
@@ -115,6 +119,7 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 	const { userPreferences } = useUserPreferences();
 	const [voteDecision, setVoteDecision] = useState(EVoteDecision.AYE);
 	const t = useTranslations();
+	const queryClient = useQueryClient();
 	const [balance, setBalance] = useState<BN>(BN_ZERO);
 	const [ayeVoteValue, setAyeVoteValue] = useState<BN>(BN_ZERO);
 	const [nayVoteValue, setNayVoteValue] = useState<BN>(BN_ZERO);
@@ -123,6 +128,10 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const { toast } = useToast();
 	const network = getCurrentNetwork();
+
+	const { user } = useUser();
+
+	const { setVaultQrState } = usePolkadotVault();
 
 	const [reuseLock, setReuseLock] = useState<BN | null>(null);
 
@@ -188,6 +197,29 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 		enabled: !!userPreferences.selectedAccount?.address && !!apiService
 	});
 
+	const fetchExistingVote = async () => {
+		if (!userPreferences.selectedAccount?.address) return null;
+		const { data, error } = await NextApiClientService.getPostVotesByAddresses({
+			proposalType,
+			index,
+			addresses: [userPreferences.selectedAccount.address]
+		});
+		if (error) throw new Error(error.message || 'Failed to fetch vote data');
+		if (!data) return null;
+		return data;
+	};
+
+	const { data: existingVoteData } = useQuery({
+		queryKey: ['existingVote', userPreferences.selectedAccount?.address, index],
+		queryFn: fetchExistingVote,
+		enabled: !!userPreferences.selectedAccount?.address
+	});
+
+	const existingVote = useMemo(() => {
+		if (!existingVoteData?.votes?.length) return null;
+		return existingVoteData.votes[0];
+	}, [existingVoteData]);
+
 	const isInvalidAmount = useMemo(() => {
 		return (
 			([EVoteDecision.AYE, EVoteDecision.NAY].includes(voteDecision) && balance.lte(BN_ZERO)) ||
@@ -197,21 +229,20 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 	}, [ayeVoteValue, balance, nayVoteValue, abstainVoteValue, voteDecision]);
 
 	const onVoteConfirm = async () => {
-		if (!apiService || !userPreferences.selectedAccount?.address) return;
+		if (!apiService || !userPreferences.selectedAccount?.address || !userPreferences.wallet || !user?.id) return;
 
 		if (isInvalidAmount) return;
 
+		const userAddress = userPreferences.selectedAccount.address;
+
 		try {
-			const getRegularAddress = (selectedAccount: ISelectedAccount): string => {
-				if (selectedAccount.parent) {
-					return getRegularAddress(selectedAccount.parent);
-				}
-				return selectedAccount.address;
-			};
 			setIsLoading(true);
+
 			await apiService.voteReferendum({
 				selectedAccount: userPreferences.selectedAccount,
-				address: getRegularAddress(userPreferences.selectedAccount),
+				wallet: userPreferences.wallet,
+				setVaultQrState,
+				address: userAddress,
 				onSuccess: () => {
 					toast({
 						title: t('VoteReferendum.voteSuccessTitle'),
@@ -219,13 +250,40 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 						status: ENotificationStatus.SUCCESS
 					});
 					setIsLoading(false);
+
+					// Optimistic update - immediately update cache with new vote on success
+					const optimisticVoteData = {
+						decision: voteDecision,
+						balanceValue: balance.toString(),
+						voterAddress: userAddress,
+						lockPeriod: conviction,
+						createdAt: new Date(),
+						selfVotingPower: balance.toString(),
+						totalVotingPower: balance.toString(),
+						delegatedVotingPower: '0'
+					};
+
+					queryClient.setQueryData([EReactQueryKeys.USER_VOTES, proposalType, index, user.id], (oldData: IVoteHistoryData) => {
+						const existingVotes = oldData?.votes || [];
+						const addressIndex = existingVotes.findIndex((vote) => getSubstrateAddress(vote.voterAddress) === getSubstrateAddress(userAddress));
+
+						if (addressIndex !== -1) {
+							// Replace existing vote for this address
+							const updatedVotes = [...existingVotes];
+							updatedVotes[`${addressIndex}`] = optimisticVoteData;
+							return { votes: updatedVotes };
+						}
+						// Add new vote
+						return { votes: [optimisticVoteData, ...existingVotes] };
+					});
+
 					onClose();
 					setOpenSuccessModal(true);
 					setSuccessModalContent(
 						<VoteSuccessContent
 							decision={voteDecision}
 							balance={balance}
-							address={userPreferences.selectedAccount ? getRegularAddress(userPreferences.selectedAccount) : ''}
+							address={userAddress}
 							conviction={conviction}
 							proposalType={proposalType}
 							index={index}
@@ -359,7 +417,35 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 						</div>
 					</div>
 				</div>
+				{existingVote && (
+					<div className='flex flex-col gap-y-3 rounded-xl bg-info_bg p-4'>
+						<p className='text-sm font-semibold text-text_primary'>{t('VoteReferendum.existingVote')}</p>
+						<p className='text-sm text-basic_text'>{t('VoteReferendum.existingVoteDescription')}</p>
+						<div className='flex items-center justify-between'>
+							<h3 className='flex items-center gap-1 text-base font-semibold text-text_primary'>
+								{existingVote.decision === EVoteDecision.ABSTAIN && <Ban className='h-4 w-4 text-basic_text' />}
+								{existingVote.decision === EVoteDecision.AYE && <ThumbsUp className='h-4 w-4 text-basic_text' />}
+								{existingVote.decision === EVoteDecision.NAY && <ThumbsDown className='h-4 w-4 text-basic_text' />}
+								{t(`PostDetails.${existingVote.decision}`)}
+							</h3>
+
+							<p className='text-sm text-basic_text'>
+								{formatBnBalance(
+									existingVote.selfVotingPower || '0',
+									{
+										withUnit: true,
+										numberAfterComma: 2,
+										compactNotation: true
+									},
+									network
+								)}{' '}
+								({!existingVote.lockPeriod || existingVote.lockPeriod === 0 ? 0.1 : existingVote.lockPeriod}x)
+							</p>
+						</div>
+					</div>
+				)}
 			</div>
+
 			<div className='flex items-center justify-end gap-x-4'>
 				<Button
 					disabled={isInvalidAmount}
@@ -367,7 +453,7 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 					onClick={onVoteConfirm}
 					size='lg'
 				>
-					{t('VoteReferendum.confirm')}
+					{existingVote ? t('VoteReferendum.changeVote') : t('VoteReferendum.confirm')}
 				</Button>
 			</div>
 		</div>
