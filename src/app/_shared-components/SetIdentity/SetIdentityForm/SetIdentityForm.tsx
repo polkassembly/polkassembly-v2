@@ -10,7 +10,7 @@ import TwitterIcon from '@assets/icons/twitter-icon-dark.svg';
 import RiotIcon from '@assets/icons/riot-icon.svg';
 import { AlertCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -20,7 +20,7 @@ import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { ENotificationStatus } from '@/_shared/types';
+import { ENotificationStatus, EReactQueryKeys } from '@/_shared/types';
 import { Alert, AlertDescription } from '../../Alert';
 import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelationsPicker';
 import IdentityFeeCollaps from '../IdentityFeeCollaps/IdentityFeeCollaps';
@@ -50,7 +50,16 @@ function SocialIcon({ icon }: { icon: string }) {
 	);
 }
 
-function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee: BN; onTeleport: () => void; onSuccess: (values: ISetIdentityFormFields) => void }) {
+function SetIdentityForm({
+	registrarFee,
+	onTeleport,
+	onSuccess
+}: {
+	registrarFee: BN;
+	onTeleport: () => void;
+	onClearIdentity: () => void;
+	onSuccess: (values: ISetIdentityFormFields) => void;
+}) {
 	const t = useTranslations();
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
@@ -63,7 +72,6 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 	const formData = useForm<ISetIdentityFormFields>();
 
 	const [loading, setLoading] = useState(false);
-	const [identityLoading, setIdentityLoading] = useState(false);
 
 	const fetchGasFee = async () => {
 		if (!identityService) return null;
@@ -89,23 +97,29 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 		retry: false
 	});
 
-	useEffect(() => {
-		const setDefaultIdentityValues = async () => {
-			if (!identityService || !network || !userPreferences.selectedAccount?.address) return;
+	const fetchIdentityInfo = async () => {
+		if (!identityService || !network || !userPreferences.selectedAccount?.address) return null;
 
-			setIdentityLoading(true);
-			const identityInfo = await identityService.getOnChainIdentity(userPreferences.selectedAccount.address);
+		const identityInfo = await identityService.getOnChainIdentity(userPreferences.selectedAccount.address);
 
-			formData.setValue('displayName', identityInfo.display);
-			formData.setValue('legalName', identityInfo.legal);
-			formData.setValue('email', identityInfo.email);
-			formData.setValue('twitter', identityInfo.twitter);
-			formData.setValue('matrix', identityInfo.matrix);
+		formData.setValue('displayName', identityInfo.display);
+		formData.setValue('legalName', identityInfo.legal);
+		formData.setValue('email', identityInfo.email);
+		formData.setValue('twitter', identityInfo.twitter);
+		formData.setValue('matrix', identityInfo.matrix);
 
-			setIdentityLoading(false);
-		};
-		setDefaultIdentityValues();
-	}, [formData, identityService, network, userPreferences.selectedAccount?.address]);
+		return identityInfo;
+	};
+
+	const { isFetching: fetchingIdentityInfo } = useQuery({
+		queryKey: [EReactQueryKeys.IDENTITY_INFO, user?.id, userPreferences.selectedAccount?.address],
+		queryFn: () => fetchIdentityInfo(),
+		enabled: !!user?.id && !!userPreferences.selectedAccount?.address && !!identityService,
+		placeholderData: (previousData) => previousData,
+		retry: true,
+		refetchOnMount: true,
+		refetchOnWindowFocus: true
+	});
 
 	const handleSetIdentity = async (values: ISetIdentityFormFields) => {
 		if (!userPreferences.wallet || !userPreferences.selectedAccount?.address || !identityService) return;
@@ -179,7 +193,7 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 								showPeopleChainBalance
 							/>
 						}
-						disabled={identityLoading}
+						disabled={fetchingIdentityInfo}
 					/>
 
 					{/* Display Name */}
@@ -187,7 +201,7 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 						control={formData.control}
 						name='displayName'
 						key='displayName'
-						disabled={loading || identityLoading}
+						disabled={loading || fetchingIdentityInfo}
 						rules={{
 							required: true,
 							validate: (value) => {
@@ -339,7 +353,7 @@ function SetIdentityForm({ registrarFee, onTeleport, onSuccess }: { registrarFee
 					gasFee={gasFee || BN_ZERO}
 				/>
 				<Separator className='my-4' />
-				<div className='flex justify-end'>
+				<div className='flex items-center justify-end'>
 					<Button
 						isLoading={loading}
 						type='submit'

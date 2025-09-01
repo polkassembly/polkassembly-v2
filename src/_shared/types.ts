@@ -7,7 +7,8 @@
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
-import { TypeDef } from '@polkadot/types/types';
+import { SignerResult, TypeDef } from '@polkadot/types/types';
+import { HexString } from '@polkadot/util/types';
 import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
@@ -167,6 +168,7 @@ export enum EWallet {
 	POLKAGATE = 'polkagate',
 	NOVAWALLET = 'nova',
 	MIMIR = 'mimir',
+	POLKADOT_VAULT = 'polkadot-vault',
 	OTHER = ''
 	// METAMASK = 'metamask',
 	// WALLETCONNECT = 'walletconnect',
@@ -1025,7 +1027,12 @@ export interface IPostSubscription {
 export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart',
 	COMMENTS = 'comments',
-	POST_DETAILS = 'postDetails'
+	POST_DETAILS = 'postDetails',
+	ACCOUNTS = 'accounts',
+	IDENTITY_INFO = 'identityInfo',
+	TOKENS_USD_PRICE = 'tokensUsdPrice',
+	USER_VOTES = 'userVotes',
+	PROFILE_IDENTITIES = 'profileIdentities'
 }
 
 export interface IParamDef {
@@ -1394,7 +1401,8 @@ export enum ESetIdentityStep {
 	SET_IDENTITY_FORM = 'SET_IDENTITY_FORM',
 	REQUEST_JUDGEMENT = 'REQUEST_JUDGEMENT',
 	IDENTITY_SUCCESS = 'IDENTITY_SUCCESS',
-	TELEPORT_TO_PEOPLE_CHAIN = 'TELEPORT_TO_PEOPLE_CHAIN'
+	TELEPORT_TO_PEOPLE_CHAIN = 'TELEPORT_TO_PEOPLE_CHAIN',
+	CLEAR_IDENTITY = 'CLEAR_IDENTITY'
 }
 
 export interface IAnalytics {
@@ -1487,3 +1495,41 @@ export type IPostBubbleVotes = {
 		status: EProposalStatus;
 	};
 };
+
+export interface IVaultScannedAddress {
+	content: string;
+	isAddress: boolean;
+	genesisHash: HexString | null;
+	name?: string;
+}
+
+export interface IVaultQrState {
+	open: boolean;
+	isQrHashed: boolean;
+	qrAddress: string;
+	qrPayload: Uint8Array;
+	qrResolve?: (result: SignerResult) => void;
+	qrReject?: (error: Error) => void;
+}
+
+export enum EVoteBubbleTabs {
+	Bubble = 'bubble',
+	Graph = 'graph'
+}
+
+export interface IProfileVote extends Omit<IVoteData, 'createdAtBlock' | 'delegatedTo' | 'balanceValue'> {
+	balance: {
+		value: string;
+		abstain: string;
+		aye: string;
+		nay: string;
+	};
+	proposalIndex: number;
+	proposalType: EProposalType;
+	postDetails?: IPostListing;
+	isDelegated: boolean;
+	extrinsicIndex: string;
+	proposal?: {
+		status: EProposalStatus;
+	};
+}

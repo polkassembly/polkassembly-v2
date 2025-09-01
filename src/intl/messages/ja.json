@@ -37,9 +37,6 @@
 		"About": "概要",
 		"AboutDescription": "Polkadotは、Polkadotのオールインワンのデファイハブです。",
 		"KnowMore": "詳細を見る",
-		"VotedProposals": "投票済み提案",
-		"ActiveProposals": "アクティブな提案",
-		"Last15Days": "過去15日間",
 		"Rank": "ランク",
 		"BatchVoting": "一括投票",
 		"BatchVotingDescription": "単一のトランザクションでトップ提案に投票",
@@ -97,16 +94,19 @@
 	},
 	"AddressDropdown": {
 		"fallbackText": "ウォレットを選択してください",
-		"chooseLinkedAccount": "リンクされたアカウントを選択",
+		"chooseLinkedAccount": "アカウントを選択",
 		"noAccountsFound": "アカウントが見つかりません",
 		"selectWallet": "ウォレットを選択してください",
-		"fetchingAddresses": "アドレスを取得するには、Polkassemblyがウォレット拡張機能へのアクセスを必要とします。このトランザクションを承認してください。",
+		"fetchingAddresses": "アドレスを取得するには、Polkassemblyがウォレット拡張機能にアクセスする必要があります。このトランザクションを承認してください。",
 		"goBack": "戻る",
 		"gotIt": "了解",
-		"hidePassword": "パスワードを隠す",
+		"hidePassword": "パスワードを非表示",
 		"showPassword": "パスワードを表示",
-		"pleaseConnectWallet": "Polkassemblyにウォレットを接続してください。",
-		"pleaseCheckConnectedAccounts": "拡張機能で接続されたアカウントを確認してください。",
+		"pleaseConnectWallet": "ウォレットをPolkassemblyに接続してください。",
+		"pleaseCheckConnectedAccounts": "拡張機能で接続されているアカウントを確認してください。",
+		"scanYourAddressQr": "アドレスQRコードをスキャン",
+		"scanYourAddressQrDescription1": "Polkadot Vaultアプリにログインしてください。",
+		"scanYourAddressQrDescription2": "{network}のアドレスQRコードをスキャンしてください。",
 		"linkedAccount": "リンクされたアカウント"
 	},
 	"AddressRelationsPicker": {
@@ -165,6 +165,8 @@
 		"on": "日時",
 		"judgements": "判定",
 		"since": "日時",
+		"noJudgements": "判定がありません",
+		"judgement": "判定",
 		"Delegations": {
 			"noDelegations": "委任が見つかりません",
 			"delegation": "委任",
@@ -181,6 +183,21 @@
 			"CA": "CA",
 			"CO": "CO",
 			"index": "インデックス"
+		},
+		"Votes": {
+			"noData": "投票が見つかりません",
+			"votes": "投票",
+			"proposal": "提案",
+			"voteFor": "投票する",
+			"voter": "投票者",
+			"action": "アクション",
+			"status": "ステータス",
+			"showMore": "もっと表示",
+			"showLess": "表示を減らす",
+			"selectAddresses": "アドレスを選択",
+			"votedProposals": "投票済み提案",
+			"activeProposals": "アクティブな提案",
+			"last15Days": "過去15日間"
 		},
 		"Activity": {
 			"voted_on_proposal": "投票済み",
@@ -434,7 +451,11 @@
 		}
 	},
 	"PostDetails": {
+		"selectYourVoterAddress": "投票者アドレスを選択",
+		"address": "アドレス",
 		"castVote": "投票する",
+		"changeVote": "投票を変更する",
+		"myVote": "私の投票",
 		"castYourVote": "投票してください",
 		"copyLink": "リンクをコピー",
 		"loginToVote": "投票するにはログイン",
@@ -455,6 +476,10 @@
 		"reply": "返信",
 		"edited": "編集",
 		"commentHistory": "コメント履歴",
+		"remove": "削除",
+		"removing": "削除中",
+		"removeVote": "投票を削除",
+		"removeVoteConfirmation": "本当に投票を削除しますか？",
 		"proposalPassed": "提案が可決されました",
 		"proposalFailed": "提案が否決されました",
 		"confirmationPeriod": "確認期間",
@@ -471,8 +496,13 @@
 		"issuance": "発行",
 		"viewVoteHistory": "投票履歴を表示",
 		"voteHistory": "投票履歴",
+		"delegations": "委任",
 		"delegated": "委任済み",
 		"votingPower": "投票力",
+		"voteRemoved": "投票が正常に削除されました",
+		"voteRemoveFailed": "投票の削除に失敗しました",
+		"voteRemoveFailedTitle": "投票削除に失敗しました",
+		"voteRemovedTitle": "投票削除",
 		"capital": "資本",
 		"account": "アカウント",
 		"abstain": "棄権",
@@ -485,7 +515,7 @@
 			"to": "に",
 			"totalEstimatedUSD": "合計推定USD相当",
 			"more": "もっと",
-			"requestedAmountDetails": "リクエストされた金額の詳細",	
+			"requestedAmountDetails": "リクエストされた金額の詳細",
 			"showMore": "もっと表示",
 			"showLess": "もっと少なく表示"
 		},
@@ -574,7 +604,7 @@
 			"parentBountyIndex": "親報奨金インデックス",
 			"payee": "受益者",
 			"curator": "クレジット",
-			"requested":"リクエスト済み",
+			"requested": "リクエスト済み",
 			"calls": "呼び出し",
 			"showMore": "もっと表示",
 			"showLess": "もっと少なく表示",
@@ -590,8 +620,19 @@
 		"viewReplies": "返信を表示",
 		"commentSummary": "コメントの要約",
 		"aiSummary": "AI要約",
+		"showingVotesFor": "投票を表示中：",
+		"switchWallet": "ウォレットを切り替え",
+		"errorLoadingVote": "投票データの読み込みエラー",
+		"noVoteForAddress": "このアドレスの投票が見つかりません",
 		"showLikelySpam": "疑わしいスパムを表示",
 		"hideLikelySpam": "疑わしいスパムを非表示",
+		"HighlightMenu": {
+			"quote": "引用",
+			"share": "共有",
+			"copy": "コピー",
+			"textCopiedToClipboard": "テキストがクリップボードにコピーされました",
+			"failedToCopyText": "テキストのコピーに失敗しました"
+		},
 		"voted": "投票済み",
 		"votes": "投票",
 		"vote": "投票",
@@ -726,6 +767,8 @@
 		"ayeVoteValue": "賛成票の値",
 		"nayVoteValue": "反対票の値",
 		"confirm": "確認",
+		"existingVote": "既存の投票",
+		"existingVoteDescription": "すでにこの提案に投票しています。投票を再送信すると、現在の投票記録が上書きされます。",
 		"voteSuccess": "投票が正常に行われました",
 		"voteFailed": "投票が正常に行われませんでした",
 		"voteSuccessTitle": "投票成功",
@@ -740,7 +783,8 @@
 		"your": "あなたの",
 		"voteIsIn": "投票が完了しました！コメントでサポートする理由を共有しませんか？",
 		"reuseGovernanceLock": "ガバナンスロックを再利用",
-		"reuseAllLocks": "すべてのロックを再利用"
+		"reuseAllLocks": "すべてのロックを再利用",
+		"changeVote": "投票を変更"
 	},
 	"Balance": {
 		"voteBalance": "投票残高",
@@ -981,7 +1025,13 @@
 		"verify": "確認",
 		"verified": "確認済み",
 		"pending": "保留中",
-		"CurrentJudgement": "現在の判定"
+		"CurrentJudgement": "現在の判定",
+		"clearIdentity": "アイデンティティをクリア",
+		"clearIdentitySuccess": "アイデンティティがクリアされました！",
+		"clearIdentitySuccessDescription": "アイデンティティが正常にクリアされました",
+		"clearIdentityFailed": "アイデンティティのクリアに失敗しました",
+		"clearIdentityFailedDescription": "アイデンティティのクリア中にエラーが発生しました",
+		"clearIdentityDescription": "アイデンティティをクリアしてもよろしいですか？"
 	},
 	"Overview": {
 		"month": "月",
@@ -1436,8 +1486,16 @@
 		"Amount": "金額"
 	},
 	"ConvictionSelector": {
-		"votes": "投票数",
+		"votes": "投票",
 		"lockingPeriod": "ロック期間",
-		"lockingPeriodDescription": "選択した乗数に応じて、投票後あなたの{tokenSymbol}は追加期間ロックされます。"
+		"lockingPeriodDescription": "選択した乗数に応じて、投票後も{tokenSymbol}は追加の期間ロックされます。"
+	},
+	"PolkadotVault": {
+		"signTransaction": "トランザクションに署名",
+		"addVaultAddress": "Polkadot Vaultアドレスを追加",
+		"scan": "スキャン",
+		"openVaultAppInYourPhone": "スマートフォンでVaultアプリを開いてください",
+		"scanTheQRHere": "VaultアプリでここのQRコードをスキャンしてください",
+		"scanTheSignatureQRInYourApp": "アプリで署名QRコードを確認し、トランザクションに署名してください"
 	}
 }

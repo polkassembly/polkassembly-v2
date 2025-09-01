@@ -27,7 +27,8 @@ import {
 	ITrackAnalyticsStats,
 	IVoteCurve,
 	IVoteData,
-	IVoteMetrics
+	IVoteMetrics,
+	IProfileVote
 } from '@shared/types';
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
@@ -306,19 +307,15 @@ export class SubsquidService extends SubsquidUtils {
 	private static getVotesQuery({
 		proposalType,
 		subsquidDecision,
-		votesType,
-		voterAddress
+		votesType
 	}: {
 		proposalType: EProposalType;
 		subsquidDecision: string | null;
 		votesType?: EVotesDisplayType;
-		voterAddress?: string;
 	}): string {
 		// Handle TIP proposal type
 		if (proposalType === EProposalType.TIP) {
-			return subsquidDecision
-				? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION({ voter: voterAddress })
-				: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH({ voter: voterAddress });
+			return subsquidDecision ? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION() : this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH();
 		}
 
 		// Handle REFERENDUM_V2 and FELLOWSHIP_REFERENDUM
@@ -329,19 +326,15 @@ export class SubsquidService extends SubsquidUtils {
 
 			if (subsquidDecision) {
 				return isFlattened
-					? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
-					: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress });
+					? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION()
+					: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION();
 			}
 
-			return isFlattened
-				? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress })
-				: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress });
+			return isFlattened ? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX() : this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX();
 		}
 
 		// Handle other proposal types
-		return subsquidDecision
-			? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
-			: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress });
+		return subsquidDecision ? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION() : this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX();
 	}
 
 	// FIXME: refactor this function
@@ -353,7 +346,7 @@ export class SubsquidService extends SubsquidUtils {
 		page,
 		limit,
 		decision,
-		voterAddress: address,
+		voterAddresses: addresses,
 		orderBy,
 		votesType
 	}: {
@@ -363,22 +356,23 @@ export class SubsquidService extends SubsquidUtils {
 		page: number;
 		limit: number;
 		decision?: EVoteDecision;
-		voterAddress?: string;
+		voterAddresses?: string[];
 		orderBy?: EVoteSortOptions;
 		votesType?: EVotesDisplayType;
 	}) {
-		const voterAddress = address ? (getEncodedAddress(address, network) ?? undefined) : undefined;
+		const voterAddresses = addresses?.length ? addresses.map((address) => getEncodedAddress(address, network)) : undefined;
 
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const subsquidDecision = decision ? this.convertVoteDecisionToSubsquidFormat({ decision }) : null;
 		const subsquidDecisionIn = decision ? (votesType === EVotesDisplayType.NESTED ? this.convertVoteDecisionToSubsquidFormatArray({ decision }) : [subsquidDecision]) : null;
 
+		const addressesWithoutUndefined = voterAddresses?.filter((address) => address !== undefined && address !== null);
+
 		const query = this.getVotesQuery({
 			proposalType,
 			subsquidDecision,
-			votesType,
-			voterAddress
+			votesType
 		});
 
 		const variables =
@@ -388,6 +382,7 @@ export class SubsquidService extends SubsquidUtils {
 						type_eq: proposalType,
 						limit,
 						offset: (page - 1) * limit,
+						voter_in: addressesWithoutUndefined,
 						...(subsquidDecision && { decision_in: subsquidDecisionIn })
 					}
 				: {
@@ -395,6 +390,7 @@ export class SubsquidService extends SubsquidUtils {
 						type_eq: proposalType,
 						limit,
 						offset: (page - 1) * limit,
+						voter_in: addressesWithoutUndefined,
 						orderBy: this.getOrderByForSubsquid({ orderBy }),
 						...(subsquidDecision && { decision_in: subsquidDecisionIn }),
 						...(subsquidDecision === 'yes' && votesType === EVotesDisplayType.NESTED && { aye_not_eq: BN_ZERO.toString(), value_isNull: false }),
@@ -587,16 +583,24 @@ export class SubsquidService extends SubsquidUtils {
 
 	static async GetActiveVotedProposalsCount({
 		addresses,
-		network
+		network,
+		last15days
 	}: {
 		addresses: string[];
 		network: ENetwork;
+		last15days?: boolean;
 	}): Promise<{ activeProposalsCount: number; votedProposalsCount: number }> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_ACTIVE_VOTED_PROPOSALS_COUNT;
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { status_in: ACTIVE_PROPOSAL_STATUSES, voter_in: addresses }).toPromise();
+		const variables: { status_in: EProposalStatus[]; voter_in: string[]; createdAt_gte?: string } = { status_in: ACTIVE_PROPOSAL_STATUSES, voter_in: addresses };
+
+		if (last15days) {
+			variables.createdAt_gte = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString();
+		}
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain active voted proposals count from Subsquid: ${subsquidErr}`);
@@ -1279,5 +1283,61 @@ export class SubsquidService extends SubsquidUtils {
 			}
 		);
 		return votesData;
+	}
+
+	static async GetVotesForAddresses({
+		network,
+		voters,
+		page,
+		limit,
+		proposalStatuses
+	}: {
+		network: ENetwork;
+		voters: string[];
+		page: number;
+		limit: number;
+		proposalStatuses?: EProposalStatus[];
+	}): Promise<IGenericListingResponse<IProfileVote>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_ALL_FLATTENED_VOTES_FOR_MULTIPLE_VOTERS;
+
+		const variables = {
+			limit,
+			offset: (page - 1) * limit,
+			voter_in: voters,
+			...(proposalStatuses && { status_in: proposalStatuses })
+		};
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain votes for multiple voters from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain votes for multiple voters from Subsquid');
+		}
+
+		const { votes, totalCount } = subsquidData;
+
+		if (totalCount.totalCount === 0) {
+			return {
+				items: [],
+				totalCount: totalCount.totalCount
+			};
+		}
+
+		const votesData: IProfileVote[] = votes.map((vote: { decision: string; voter: string; proposalIndex: number; type: EProposalType; parentVote: { extrinsicIndex: string } }) => {
+			return {
+				...vote,
+				decision: this.convertSubsquidVoteDecisionToVoteDecision({ decision: vote.decision }),
+				voterAddress: vote.voter,
+				proposalType: vote.type as EProposalType,
+				extrinsicIndex: vote.parentVote?.extrinsicIndex || ''
+			};
+		});
+
+		return {
+			items: votesData,
+			totalCount: totalCount.totalCount
+		};
 	}
 }

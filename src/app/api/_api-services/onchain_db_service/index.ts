@@ -102,7 +102,7 @@ export class OnChainDbService {
 		page,
 		limit,
 		decision,
-		voterAddress,
+		voterAddresses,
 		orderBy,
 		votesType
 	}: {
@@ -112,11 +112,11 @@ export class OnChainDbService {
 		page: number;
 		limit: number;
 		decision?: EVoteDecision;
-		voterAddress?: string;
+		voterAddresses?: string[];
 		orderBy?: EVoteSortOptions;
 		votesType?: EVotesDisplayType;
 	}) {
-		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddress, orderBy, votesType });
+		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddresses, orderBy, votesType });
 		if (postVoteData) return postVoteData;
 
 		return {
@@ -168,12 +168,14 @@ export class OnChainDbService {
 
 	static async GetActiveVotedProposalsCount({
 		addresses,
-		network
+		network,
+		last15days
 	}: {
 		addresses: string[];
 		network: ENetwork;
+		last15days?: boolean;
 	}): Promise<{ activeProposalsCount: number; votedProposalsCount: number }> {
-		return SubsquidService.GetActiveVotedProposalsCount({ addresses, network });
+		return SubsquidService.GetActiveVotedProposalsCount({ addresses, network, last15days });
 	}
 
 	static async GetBountyStats(network: ENetwork): Promise<IBountyStats> {
@@ -352,5 +354,21 @@ export class OnChainDbService {
 		votesType: EVotesDisplayType;
 	}) {
 		return SubsquidService.GetPostBubbleVotes({ network, proposalType, index, analyticsType, votesType });
+	}
+
+	static async GetVotesForAddresses({
+		network,
+		voters,
+		page,
+		limit,
+		proposalStatuses
+	}: {
+		network: ENetwork;
+		voters: string[];
+		page: number;
+		limit: number;
+		proposalStatuses?: EProposalStatus[];
+	}) {
+		return SubsquidService.GetVotesForAddresses({ network, voters, page, limit, proposalStatuses });
 	}
 }

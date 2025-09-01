@@ -8,13 +8,13 @@ import { EPostDetailsTab, IPost, EProposalStatus, EPostOrigin, EProposalType, ER
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { canVote } from '@/_shared/_utils/canVote';
 import { useAISummary } from '@/hooks/useAISummary';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import dynamic from 'next/dynamic';
+import { canVote } from '@/_shared/_utils/canVote';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -28,6 +28,7 @@ import ParentBountyCard from './ParentBountyCard/ParentBountyCard';
 import { Skeleton } from '../Skeleton';
 import Poll from './Poll/Poll';
 import BeneficiariesDetails from './BeneficiariesDetails/BeneficiariesDetails';
+import UserVoteStatus from './UserVoteStatus/UserVoteStatus';
 
 const AISummary = dynamic(() => import('../AISummary/AISummary'), {
 	ssr: false,
@@ -37,6 +38,11 @@ const AISummary = dynamic(() => import('../AISummary/AISummary'), {
 			<Skeleton className='h-20 w-full' />
 		</div>
 	)
+});
+
+const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), {
+	ssr: false,
+	loading: () => <Skeleton className='h-12 w-full rounded-lg' />
 });
 
 const OnchainInfo = dynamic(() => import('./OnchainInfo/OnchainInfo'), {
@@ -78,16 +84,14 @@ const VotesData = dynamic(() => import('./VotesData/VotesData'), {
 	ssr: false,
 	loading: () => (
 		<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
-			<Skeleton className='h-8 w-20' />
+			<div className='flex justify-between'>
+				<Skeleton className='h-8 w-20' />
+				<Skeleton className='h-8 w-10' />
+			</div>
 			<Skeleton className='h-10 w-full rounded-md' />
-			<Skeleton className='mt-2 h-36 w-full rounded-md' />
+			<Skeleton className='mt-2 h-52 w-full rounded-md' />
 		</div>
 	)
-});
-
-const VoteReferendumButton = dynamic(() => import('./VoteReferendumButton'), {
-	ssr: false,
-	loading: () => <Skeleton className='h-12 w-full rounded-lg' />
 });
 
 const PlaceDecisionDeposit = dynamic(() => import('./PlaceDecisionDeposit/PlaceDecisionDeposit'), {
@@ -244,6 +248,17 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								/>
 							</div>
 						</TabsContent>
+						{isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
+							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
+								{canVote(post.onChainInfo?.status) && (
+									<UserVoteStatus
+										index={index}
+										track={post.onChainInfo?.origin}
+										proposalType={post.proposalType}
+									/>
+								)}
+							</div>
+						)}
 						<div className={classes.commentsBox}>
 							<PostComments
 								proposalType={post.proposalType}
@@ -304,8 +319,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								/>
 							)}
 							{canVote(post.onChainInfo?.status) && (
-								<VoteReferendumButton
-									iconClassName='hidden'
+								<UserVoteStatus
 									index={index}
 									track={post.onChainInfo?.origin}
 									proposalType={post.proposalType}
