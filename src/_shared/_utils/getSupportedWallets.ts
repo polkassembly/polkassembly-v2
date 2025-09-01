@@ -12,5 +12,6 @@ export function getSupportedWallets(network: ENetwork, action?: EFeature) {
 	if (ValidatorService.isValidEthereumNetwork(network)) {
 		return [EWallet.SUBWALLET, EWallet.TALISMAN];
 	}
-	return Object.values(EWallet).filter((wallet) => wallet !== EWallet.METAMASK);
+	// TODO: Remove OTHER once we have a proper wallet for other networks
+	return Object.values(EWallet).filter((wallet) => wallet !== EWallet.METAMASK && wallet !== EWallet.OTHER);
 }
