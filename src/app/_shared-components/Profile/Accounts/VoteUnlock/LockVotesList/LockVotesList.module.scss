@@ -19,5 +19,5 @@
 }
 
 .collapsibleContent {
-	@apply px-4 pb-2 pt-0;
+	@apply relative max-h-[300px] overflow-y-auto px-4 pb-2 pt-0;
 }
