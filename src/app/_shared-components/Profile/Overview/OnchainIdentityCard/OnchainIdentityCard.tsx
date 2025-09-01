@@ -45,7 +45,7 @@ function OnchainIdentityCard({ userProfile, setUserProfile, addresses }: { userP
 	}, [identityService, addresses]);
 
 	const { data: identities, isFetching } = useQuery({
-		queryKey: [EReactQueryKeys.PROFILE_IDENTITIES, userProfile?.id],
+		queryKey: [EReactQueryKeys.PROFILE_IDENTITIES, addresses.join(',')],
 		queryFn: getIdentityOfAddresses,
 		enabled: !!addresses.length && !!identityService,
 		staleTime: FIVE_MIN_IN_MILLI
