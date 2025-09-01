@@ -125,7 +125,7 @@ function ReferendumCount() {
 						style={{ background: item.color }}
 					/>
 					<p className='m-0 p-0'>
-						{item.label} [{item.value}]: {((item.value / (data?.totalProposals ?? 0)) * 100).toFixed(2)}%
+						{item.label} [{item.value}]: {data?.totalProposals ? ((item.value / data.totalProposals) * 100).toFixed(2) : '0.00'}%
 					</p>
 				</div>
 			))}
