@@ -149,8 +149,7 @@ interface INetworkDetails {
 
 export enum EthereumNetwork {
 	MOONBEAM = 'moonbeam',
-	MOONRIVER = 'moonriver',
-	MOONBASE = 'moonbase'
+	MOONRIVER = 'moonriver'
 }
 
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
