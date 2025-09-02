@@ -1,9 +1,9 @@
 .headerWrapper {
-	@apply w-full max-w-[100vw] bg-bg_modal px-4 pt-6 shadow-lg lg:px-16;
+	@apply sticky top-12 z-20 w-full max-w-[100vw] bg-bg_modal px-4 pt-6 shadow-lg lg:px-16;
 }
 
 .detailsWrapper {
-	@apply grid w-full gap-y-4 px-4 py-6 lg:gap-4 lg:px-16;
+	@apply grid w-full gap-y-4 px-4 py-6 lg:gap-4 lg:px-0;
 }
 
 .leftWrapper {
@@ -15,11 +15,11 @@
 }
 
 .descBox {
-	@apply rounded-xl bg-bg_modal p-4 shadow-lg lg:p-6;
+	@apply rounded-xl border border-primary_border bg-bg_modal p-4 lg:p-6;
 }
 
 .commentsBox {
-	@apply flex flex-col gap-y-4 rounded-xl bg-bg_modal shadow-lg;
+	@apply flex flex-col gap-y-4 rounded-xl border border-primary_border bg-bg_modal;
 }
 
 .modalDescBox {
