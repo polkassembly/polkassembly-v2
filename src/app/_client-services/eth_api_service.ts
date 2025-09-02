@@ -11,16 +11,6 @@ import votingAbi from '@/app/_client-utils/abi/voting.json';
 import { BN } from '@polkadot/util';
 import { ClientError } from '../_client-utils/clientError';
 
-export enum EConviction {
-	NONE = 0,
-	LOCKED1X = 1,
-	LOCKED2X = 2,
-	LOCKED3X = 3,
-	LOCKED4X = 4,
-	LOCKED5X = 5,
-	LOCKED6X = 6
-}
-
 export class EthApiService {
 	// eslint-disable-next-line class-methods-use-this
 	private static async switchNetwork(provider: ethers.BrowserProvider, targetChainId: number, network: ENetwork) {
