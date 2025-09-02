@@ -154,8 +154,6 @@ export class WalletClientService {
 				this.identityService.setSigner(injected.signer as Signer);
 			}
 
-			console.log('accounts', accounts);
-
 			if (accounts) {
 				return accounts;
 			}
