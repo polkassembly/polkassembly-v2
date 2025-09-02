@@ -449,7 +449,7 @@
 		}
 	},
 	"PostDetails": {
-		"selectYourVoterAddress": "选择您的投票地址",		
+		"selectYourVoterAddress": "选择您的投票地址",
 		"address": "地址",
 		"castVote": "投票",
 		"changeVote": "更改投票",
@@ -482,6 +482,9 @@
 		"votingStarted": "投票已开始",
 		"preparePeriod": "准备期",
 		"decisionPeriod": "决策期",
+		"votingPeriod": "投票期",
+		"enactmentPeriod": "执行期",
+		"enactmentDescription": "此期间完成后执行Ref",
 		"summary": "摘要",
 		"summarise": "摘要",
 		"aye": "赞成",
