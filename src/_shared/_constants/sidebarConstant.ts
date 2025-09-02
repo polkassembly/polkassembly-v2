@@ -33,6 +33,7 @@ import TechCommIcon from '@assets/sidebar/tech-comm-proposals-icon.svg';
 import { ValidatorService } from '../_services/validator_service';
 import { EGovType, ENetwork, EPostOrigin, ISidebarMenuItem, ITrackCounts } from '../types';
 import { NETWORKS_DETAILS } from './networks';
+import { BATCH_VOTING_SUPPORTED_FEATURES, BOUNTY_SUPPORTED_FEATURES } from './featureFlags';
 
 const ActiveItems = (items: ISidebarMenuItem[], pathname: string): ISidebarMenuItem[] =>
 	items.map((item) => ({
@@ -128,7 +129,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 						...baseConfig.initalItems,
 						{ title: t('Sidebar.preimages'), url: '/preimages', icon: Preimages },
 						{ title: t('Sidebar.delegation'), url: '/delegation', icon: Delegation },
-						...(ValidatorService.isValidEthereumNetwork(networkKey)
+						...(BOUNTY_SUPPORTED_FEATURES.includes(networkKey)
 							? []
 							: [
 									{
@@ -145,9 +146,9 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 											{ title: t('Sidebar.onChainBounties'), url: '/bounties' },
 											{ title: t('Sidebar.childBounties'), url: '/child-bounties' }
 										]
-									},
-									{ title: t('Sidebar.batchVoting'), url: '/batch-voting', icon: BatchVoting }
-								])
+									}
+								]),
+						...(BATCH_VOTING_SUPPORTED_FEATURES.includes(networkKey) ? [] : [{ title: t('Sidebar.batchVoting'), url: '/batch-voting', icon: BatchVoting }])
 					],
 					pathname
 				),
