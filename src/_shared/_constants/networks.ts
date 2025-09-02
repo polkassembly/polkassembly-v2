@@ -2919,17 +2919,16 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 		}
 	],
 	[ENetwork.MOONRIVER]: [
-		// Add all links
 		{
 			id: ENetworkSocial.HOME,
 			icon: SocialIcons.Home,
 			href: 'https://moonbeam.network/networks/moonriver/',
-			label: 'Moonbeam Homepage'
+			label: 'Moonriver Homepage'
 		},
 		{
 			id: ENetworkSocial.TWITTER,
 			icon: SocialIcons.Twitter,
-			href: 'http://x.com/MoonriverNW',
+			href: 'https://x.com/MoonriverNW',
 			label: 'Twitter'
 		},
 		{
@@ -2968,7 +2967,6 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 			href: 'https://moonriver.subscan.io/',
 			label: 'Subscan'
 		}
-	]
 } as const;
 
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
