@@ -253,7 +253,7 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 		]
 	},
 	[ENetwork.MOONBEAM]: {
-		identityMinDeposit: new BN('1025800000000000000'),
+		identityMinDeposit: new BN('1258000000000000000000'),
 		rpcEndpoints: [
 			{
 				name: VIA_DWELLIR,
@@ -294,7 +294,7 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 		]
 	},
 	[ENetwork.MOONRIVER]: {
-		identityMinDeposit: new BN('1025800000000000000'),
+		identityMinDeposit: new BN('1025800000000000000000'),
 		rpcEndpoints: [
 			{
 				name: VIA_DWELLIR,
@@ -3244,7 +3244,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	[ENetwork.MOONBEAM]: {
 		key: ENetwork.MOONBEAM,
 		logo: MoonbeamLogo,
-		submissionDeposit: new BN('10000000000'),
+		submissionDeposit: new BN('1000000000000000000000'),
 		name: 'Moonbeam',
 		govtype: EGovType.OPENGOV,
 		palletInstance: '50',
@@ -3306,7 +3306,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	[ENetwork.MOONRIVER]: {
 		key: ENetwork.MOONRIVER,
 		logo: MoonriverLogo,
-		submissionDeposit: new BN('10000000000'),
+		submissionDeposit: new BN('1000000000000000000000'),
 		name: 'Moonriver',
 		govtype: EGovType.OPENGOV,
 		palletInstance: '50',
