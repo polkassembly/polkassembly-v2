@@ -11,6 +11,8 @@ const withNextIntl = createNextIntlPlugin('./src/intl/intlRequest.ts');
 // Change src/_shared/_constants/allowedOutboundIFrameDomains.ts if you change this
 export const ALLOWED_OUTBOUND_IFRAME_DOMAINS = ['https://app.mimir.global'];
 
+const NETWORKS = ['polkadot', 'kusama'];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	async headers() {
@@ -38,52 +40,45 @@ const nextConfig = {
 		];
 	},
 	async redirects() {
+		const ARCHIVE_ROUTES = ['proposal', 'referendum', 'treasury', 'tip', 'motion', 'tech'];
+
+		const dynamicNetworkRedirects = NETWORKS.flatMap((network) =>
+			ARCHIVE_ROUTES.map((route) => ({
+				source: `/${route}/:id`,
+				has: [
+					{
+						type: 'host',
+						value: `${network}.polkassembly.io`
+					}
+				],
+				destination: `https://${network}-old.polkassembly.io/${route}/:id`,
+				permanent: true
+			}))
+		);
+
 		return [
 			{
 				source: '/opengov',
 				destination: '/',
 				permanent: true
 			},
-			// Archive proposal types redirects
-			{
-				source: '/proposal/:id',
-				destination: 'https://polkadot-old.polkassembly.io/proposal/:id',
-				permanent: true
-			},
-			{
-				source: '/referendum/:id',
-				destination: 'https://polkadot-old.polkassembly.io/referendum/:id',
-				permanent: true
-			},
-			{
-				source: '/treasury/:id',
-				destination: 'https://polkadot-old.polkassembly.io/treasury/:id',
-				permanent: true
-			},
-			{
-				source: '/tip/:id',
-				destination: 'https://polkadot-old.polkassembly.io/tip/:id',
-				permanent: true
-			},
-			{
-				source: '/motion/:id',
-				destination: 'https://polkadot-old.polkassembly.io/motion/:id',
-				permanent: true
-			},
-			{
-				source: '/tech/:id',
-				destination: 'https://polkadot-old.polkassembly.io/tech/:id',
-				permanent: true
-			}
+			// Archive proposal types redirects (host-conditional per network)
+			...dynamicNetworkRedirects
 		];
 	},
 	async rewrites() {
-		return [
-			{
-				source: '/api/v1/:path*',
-				destination: 'https://polkadot-old.polkassembly.io/api/v1/:path*'
-			}
-		];
+		const dynamicNetworkRewrites = NETWORKS.map((network) => ({
+			source: '/api/v1/:path*',
+			has: [
+				{
+					type: 'host',
+					value: `${network}.polkassembly.io`
+				}
+			],
+			destination: `https://${network}-old.polkassembly.io/api/v1/:path*`
+		}));
+
+		return [...dynamicNetworkRewrites];
 	},
 	images: {
 		remotePatterns: [
