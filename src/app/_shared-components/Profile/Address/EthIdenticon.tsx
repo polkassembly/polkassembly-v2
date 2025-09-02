@@ -4,7 +4,6 @@
 
 'use client';
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 import Jazzicon from 'react-jazzicon';
 
 function EthIdenticon({ address, size }: { address: string; size: number }) {

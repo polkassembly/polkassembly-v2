@@ -149,8 +149,7 @@ interface INetworkDetails {
 
 export enum EthereumNetwork {
 	MOONBEAM = 'moonbeam',
-	MOONRIVER = 'moonriver',
-	MOONBASE = 'moonbase'
+	MOONRIVER = 'moonriver'
 }
 
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
@@ -2920,17 +2919,16 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 		}
 	],
 	[ENetwork.MOONRIVER]: [
-		// Add all links
 		{
 			id: ENetworkSocial.HOME,
 			icon: SocialIcons.Home,
 			href: 'https://moonbeam.network/networks/moonriver/',
-			label: 'Moonbeam Homepage'
+			label: 'Moonriver Homepage'
 		},
 		{
 			id: ENetworkSocial.TWITTER,
 			icon: SocialIcons.Twitter,
-			href: 'http://x.com/MoonriverNW',
+			href: 'https://x.com/MoonriverNW',
 			label: 'Twitter'
 		},
 		{
