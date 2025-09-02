@@ -2967,6 +2967,7 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 			href: 'https://moonriver.subscan.io/',
 			label: 'Subscan'
 		}
+	]
 } as const;
 
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
