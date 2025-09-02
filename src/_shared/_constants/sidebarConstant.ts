@@ -6,6 +6,7 @@ import Home from '@assets/sidebar/homeicon.svg';
 import Discussion from '@assets/sidebar/discussion-icon.svg';
 import Preimages from '@assets/sidebar/preimages.svg';
 import Delegation from '@assets/sidebar/delegation.svg';
+import ReferendaIcon from '@assets/sidebar/referenda-icon.svg';
 import Bounty from '@assets/sidebar/bounty.svg';
 import BatchVoting from '@assets/sidebar/batch-voting.svg';
 // import AnalyticsIcon from '@assets/sidebar/gov-analytics-icon.svg';
@@ -88,35 +89,31 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 				mainItems: ActiveItems(
 					[
 						{
-							heading: t(TREASURY_KEY),
 							title: t(TREASURY_KEY),
+							url: '',
+							icon: TreasuryIcon,
+							isNew: false,
+							items: [...getTrackItems(networkKey, 'Treasury', t, trackCounts)]
+						},
+						{
+							title: t('Sidebar.bounty'),
 							url: '',
 							icon: Bounty,
 							isNew: false,
 							items: [
 								{
-									title: t('Sidebar.bounty'),
-									url: '',
-									icon: Bounty,
-									isNew: false,
-									items: [
-										{
-											title: t('Sidebar.bountyDashboard'),
-											url: '/bounty-dashboard',
-											count: trackCounts.bounty_dashboard || 0
-										},
-										{ title: t('Sidebar.onChainBounties'), url: '/bounties' },
-										{ title: t('Sidebar.childBounties'), url: '/child-bounties' }
-									]
+									title: t('Sidebar.bountyDashboard'),
+									url: '/bounty-dashboard',
+									count: trackCounts.bounty_dashboard || 0
 								},
-								...getTrackItems(networkKey, 'Treasury', t, trackCounts)
+								{ title: t('Sidebar.onChainBounties'), url: '/bounties' },
+								{ title: t('Sidebar.childBounties'), url: '/child-bounties' }
 							]
 						},
 						{
-							heading: t(REFERENDA_KEY),
 							title: t(REFERENDA_KEY),
 							url: '',
-							icon: TreasuryIcon,
+							icon: ReferendaIcon,
 							items: [
 								{
 									title: t('ActivityFeed.Navbar.All'),
@@ -126,30 +123,32 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 								...getTrackItems(networkKey, 'Main', t, trackCounts),
 								...getTrackItems(networkKey, 'Origin', t, trackCounts)
 							]
-						}
-						// {
-						// title: t('Sidebar.analytics'),
-						// url: '#',
-						// icon: AnalyticsIcon,
-						// items: [
-						// { title: t('Sidebar.govAnalytics'), url: '#' },
-						// ]
-						// },
-						// {
-						// title: t('Sidebar.community'),
-						// url: '#',
-						// icon: CommunityIcon,
-						// items: [
-						// { title: t('Sidebar.members'), url: '#' },
-						// { title: t('Sidebar.ecosystemProjects'), url: '#' }
-						// ]
-						// },
+						},
+						/* {
+							title: t('Sidebar.analytics'),
+							url: '#',
+							icon: AnalyticsIcon,
+							items: [
+								{ title: t('Sidebar.govAnalytics'), url: '#' },
+								{ title: t('Sidebar.treasuryAnalytics'), url: '#' }
+							]
+						},
+						{
+							title: t('Sidebar.community'),
+							url: '#',
+							icon: CommunityIcon,
+							items: [
+								{ title: t('Sidebar.members'), url: '#' },
+								{ title: t('Sidebar.proxies'), url: '#' },
+								{ title: t('Sidebar.ecosystemProjects'), url: '#' }
+							]
+						}, */
+						{ title: t('Sidebar.preimages'), url: '/preimages', icon: Preimages }
 					],
 					pathname
 				),
 				endItems: ActiveItems(
 					[
-						{ title: t('Sidebar.preimages'), url: '/preimages', icon: Preimages },
 						{
 							title: t('Sidebar.more'),
 							url: '#',

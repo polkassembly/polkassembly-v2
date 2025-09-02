@@ -7,7 +7,6 @@
 import { SidebarGroup, SidebarMenu, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import React from 'react';
 import CollapsibleItem from '../CollapsibleItem/CollapsibleItem';
-import { CollapsedMainItem, ExpandedMainItem } from './MainItemsComponents';
 
 export function NavMain({
 	sections
@@ -101,23 +100,18 @@ export function NavMain({
 					)}
 
 					{section.mainItems && (
-						<div>
-							{section.mainItems.map((mainItem, index) =>
-								sidebarState === 'collapsed' ? (
-									<CollapsedMainItem
-										key={mainItem.heading || `mainItem-${index}`}
-										mainItem={mainItem}
-										index={index}
-									/>
-								) : (
-									<ExpandedMainItem
-										key={mainItem.heading || `mainItem-${index}`}
-										mainItem={mainItem}
-										index={index}
-										sidebarState={sidebarState}
-									/>
-								)
-							)}
+						<div className='mt-4'>
+							<div className='mt-4 flex items-center border-t-2 border-dotted border-border_grey pt-4'>
+								<SidebarMenu className='gap-4'>
+									{section.mainItems.map((item) => (
+										<CollapsibleItem
+											key={item.title}
+											item={item}
+											state={sidebarState}
+										/>
+									))}
+								</SidebarMenu>
+							</div>
 						</div>
 					)}
 
