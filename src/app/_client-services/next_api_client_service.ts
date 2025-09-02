@@ -55,7 +55,8 @@ import {
 	IPostBubbleVotes,
 	EAnalyticsType,
 	EVotesDisplayType,
-	IProfileVote
+	IProfileVote,
+	EProposalStatus
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -1227,7 +1228,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
-	static async getVotesByAddresses({ addresses, page, limit }: { addresses: string[]; page: number; limit: number }) {
+	static async getVotesByAddresses({ addresses, page, limit, proposalStatuses }: { addresses: string[]; page: number; limit: number; proposalStatuses?: EProposalStatus[] }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
 			limit: limit.toString()
@@ -1236,6 +1237,11 @@ export class NextApiClientService {
 		if (addresses.length) {
 			addresses.forEach((address) => queryParams.append('address', address));
 		}
+
+		if (proposalStatuses?.length) {
+			proposalStatuses.forEach((status) => queryParams.append('proposalStatus', status));
+		}
+
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_BY_ADDRESSES, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IProfileVote>>({ url, method });
 	}

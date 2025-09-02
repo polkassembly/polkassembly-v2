@@ -37,9 +37,6 @@
 		"About": "关于",
 		"AboutDescription": "Polkadot是Polkadot的一站式DeFi中心。",
 		"KnowMore": "了解更多",
-		"VotedProposals": "已投票提案",
-		"ActiveProposals": "活跃提案",
-		"Last15Days": "最近15天",
 		"Rank": "排名",
 		"BatchVoting": "批量投票",
 		"BatchVotingDescription": "在单个交易中对热门提案进行投票",
@@ -166,6 +163,8 @@
 		"balance": "余额",
 		"locked": "已锁定",
 		"on": "于",
+		"noJudgements": "无判定",
+		"judgement": "判定",
 		"Delegations": {
 			"noDelegations": "未找到委托",
 			"delegation": "委托",
@@ -193,7 +192,10 @@
 			"status": "状态",
 			"showMore": "显示更多",
 			"showLess": "显示更少",
-			"selectAddresses": "选择地址"
+			"selectAddresses": "选择地址",
+			"votedProposals": "已投票提案",
+			"activeProposals": "活跃提案",
+			"last15Days": "最近15天"
 		},
 		"Activity": {
 			"voted_on_proposal": "已投票",
@@ -449,7 +451,7 @@
 		}
 	},
 	"PostDetails": {
-		"selectYourVoterAddress": "选择您的投票地址",		
+		"selectYourVoterAddress": "选择您的投票地址",
 		"address": "地址",
 		"castVote": "投票",
 		"changeVote": "更改投票",
@@ -472,6 +474,8 @@
 		"post": "发布",
 		"cancel": "取消",
 		"reply": "回复",
+		"edited": "编辑",
+		"commentHistory": "评论历史",
 		"remove": "删除",
 		"removing": "删除中",
 		"removeVote": "删除投票",
