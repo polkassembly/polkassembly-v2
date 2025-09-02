@@ -18,7 +18,6 @@ import { getTypeDef } from '@polkadot/types';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-import { ethers } from 'ethers';
 import {
 	EAccountType,
 	EEnactment,
@@ -420,38 +419,6 @@ export class PolkadotApiService {
 			totalBalance,
 			transferableBalance
 		};
-	}
-
-	async switchNetwork(provider: ethers.BrowserProvider, targetChainId: number) {
-		const chainIdHex = `0x${targetChainId.toString(16)}`;
-
-		try {
-			await provider.send('wallet_switchEthereumChain', [{ chainId: chainIdHex }]);
-		} catch (switchError: any) {
-			if (switchError.code === 4902) {
-				const networkDetails = NETWORKS_DETAILS[this.network];
-
-				try {
-					await provider.send('wallet_addEthereumChain', [
-						{
-							chainId: chainIdHex,
-							chainName: networkDetails.name,
-							nativeCurrency: {
-								name: networkDetails.tokenSymbol,
-								symbol: networkDetails.tokenSymbol,
-								decimals: networkDetails.tokenDecimals
-							},
-							rpcUrls: networkDetails.rpcEndpoints.map((rpcEndpoint) => rpcEndpoint.url),
-							blockExplorerUrls: networkDetails.socialLinks?.[0]?.href || null
-						}
-					]);
-				} catch (addError) {
-					throw new Error(`Failed to add network to wallet: ${(addError as Error).message}`);
-				}
-			} else {
-				throw new Error(`Failed to switch network: ${switchError.message}`);
-			}
-		}
 	}
 
 	async voteReferendum({
