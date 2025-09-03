@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import IdentityBadge from '../IdentityBadge';
 import styles from './AddressInline.module.scss';
+import EthIdenticon from '../EthIdenticon';
 
 interface Props {
 	address: string;
@@ -45,12 +46,21 @@ function AddressInline({
 			data-for={`tooltip-${address}`}
 		>
 			{showIdenticon && address && (
-				<Identicon
-					className='image identicon'
-					value={address}
-					size={iconSize}
-					theme='polkadot'
-				/>
+				<span>
+					{address.startsWith('0x') ? (
+						<EthIdenticon
+							address={address}
+							size={iconSize}
+						/>
+					) : (
+						<Identicon
+							className='image identicon'
+							value={address}
+							size={iconSize}
+							theme='polkadot'
+						/>
+					)}
+				</span>
 			)}
 			{!showOnlyIdenticon &&
 				(redirectToProfile && userProfileUrl ? (

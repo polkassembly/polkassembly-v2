@@ -7,7 +7,7 @@
 import { useCallback, useState, useMemo } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useWalletService } from '@/hooks/useWalletService';
-import { EAccountType, EWallet, IMultisigAddress, IProxyAddress, ISelectedAccount, IVaultScannedAddress } from '@/_shared/types';
+import { EAccountType, EWallet, IMultisigAddress, IProxyAddress, ISelectedAccount, IVaultScannedAddress, EFeature } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
 import { AlertCircle, ChevronDown } from 'lucide-react';
 import { IoMdSync } from '@react-icons/all-files/io/IoMdSync';
@@ -196,7 +196,17 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 	);
 }
 
-function AddressSwitchButton({ disabled, showLinkedAccountBadge = false, className }: { disabled?: boolean; showLinkedAccountBadge?: boolean; className?: string }) {
+function AddressSwitchButton({
+	disabled,
+	showLinkedAccountBadge = false,
+	className,
+	action
+}: {
+	disabled?: boolean;
+	showLinkedAccountBadge?: boolean;
+	className?: string;
+	action?: EFeature;
+}) {
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
 	const [isOpen, setisOpen] = useState(false);
@@ -233,6 +243,7 @@ function AddressSwitchButton({ disabled, showLinkedAccountBadge = false, classNa
 					withRadioSelect
 					withBalance
 					showLinkedAccountBadge={showLinkedAccountBadge}
+					action={action}
 				/>
 
 				<div className='flex max-h-[60vh] flex-col gap-2 overflow-y-auto'>
@@ -272,7 +283,8 @@ export default function AddressRelationsPicker({
 	showLinkedAccountBadge = false,
 	iconSize = 25,
 	className,
-	switchButtonClassName
+	switchButtonClassName,
+	action
 }: {
 	withBalance?: boolean;
 	showPeopleChainBalance?: boolean;
@@ -282,6 +294,7 @@ export default function AddressRelationsPicker({
 	iconSize?: number;
 	className?: string;
 	switchButtonClassName?: string;
+	action?: EFeature;
 }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const walletService = useWalletService();
@@ -323,10 +336,17 @@ export default function AddressRelationsPicker({
 
 		const prevPreferredAccount = userPreferences.selectedAccount;
 
-		const selectedAccount =
-			prevPreferredAccount?.address && injectedAccounts.some((account) => getSubstrateAddress(account.address) === getSubstrateAddress(prevPreferredAccount.address))
-				? prevPreferredAccount
-				: injectedAccounts[0];
+		const getSelectedAccount = () => {
+			if (prevPreferredAccount?.address) {
+				if (prevPreferredAccount.address.startsWith('0x')) {
+					return injectedAccounts.find((account) => account.address === prevPreferredAccount.address) || injectedAccounts[0];
+				}
+				return injectedAccounts.find((account) => getSubstrateAddress(account.address) === getSubstrateAddress(prevPreferredAccount.address)) || injectedAccounts[0];
+			}
+			return injectedAccounts[0];
+		};
+
+		const selectedAccount = getSelectedAccount();
 
 		setUserPreferences({
 			...userPreferences,
@@ -453,6 +473,7 @@ export default function AddressRelationsPicker({
 							disabled={disabled}
 							showLinkedAccountBadge={showLinkedAccountBadge}
 							className={switchButtonClassName}
+							action={action}
 						/>
 					</div>
 				</>
