@@ -13,7 +13,6 @@ import BatchVoting from '@assets/sidebar/batch-voting.svg';
 import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
 // import CalendarIcon from '@assets/sidebar/calendar-icon.svg';
 // import CommunityIcon from '@assets/sidebar/community-icon.svg';
-import ParachainsIcon from '@assets/sidebar/parachains-icon.svg';
 import MoreIcon from '@assets/sidebar/more-circle-icon.svg';
 import DemocraryProposalIcon from '@assets/sidebar/democracy-proposal-icon.svg';
 import DemocraryReferendumIcon from '@assets/sidebar/democracy-referenda-icon.svg';
@@ -155,7 +154,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 							icon: MoreIcon,
 							items: [
 								// { title: t('Sidebar.calendar'), url: '#', icon: CalendarIcon },
-								{ title: t('Sidebar.parachains'), url: '/parachains', icon: ParachainsIcon },
+								{ title: t('Sidebar.parachains'), url: '/parachains' },
 								{
 									title: t('Sidebar.gov1'),
 									url: '#',
