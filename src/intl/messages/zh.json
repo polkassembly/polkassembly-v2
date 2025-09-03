@@ -1497,5 +1497,17 @@
 		"openVaultAppInYourPhone": "在您的手机上打开Vault应用",
 		"scanTheQRHere": "使用Vault应用扫描此处的二维码",
 		"scanTheSignatureQRInYourApp": "在您的应用中验证签名二维码并签署交易"
+	},
+	"GovAnalytics": {
+		"overview": "概览",
+		"voting": "投票",
+		"totalProposals": "总提案数",
+		"approvedProposals": "已批准提案",
+		"monitoredTracks": "监控轨道",
+		"referendumCount": "公投数量",
+		"referendumCountByStatus": "公投数量（状态）",
+		"referendumCountByCategory": "公投数量（类别）",
+		"monthlySpend": "每月DOT支出",
+		"averageTurnoutPercentage": "平均投票率"
 	}
 }

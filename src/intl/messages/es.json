@@ -1498,5 +1498,17 @@
 		"openVaultAppInYourPhone": "Abra la aplicación Vault en su teléfono",
 		"scanTheQRHere": "Escanee el código QR aquí desde la aplicación Vault",
 		"scanTheSignatureQRInYourApp": "Verifique el código QR de firma en su aplicación y firme la transacción"
+	},
+	"GovAnalytics": {
+		"overview": "Resumen",
+		"voting": "Votación",
+		"totalProposals": "Propuestas Totales",
+		"approvedProposals": "Propuestas Aprobadas",
+		"monitoredTracks": "Tracks Monitoreados",
+		"referendumCount": "Cantidad de Referendos",
+		"referendumCountByStatus": "Cantidad de Referendos por Estado",
+		"referendumCountByCategory": "Cantidad de Referendos por Categoría",
+		"monthlySpend": "Gasto Mensual de DOT",
+		"averageTurnoutPercentage": "Porcentaje de Asistencia Promedio"
 	}
 }
