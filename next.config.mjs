@@ -16,7 +16,7 @@ const nextConfig = {
 	async headers() {
 		return [
 			{
-				// Security headers for all pages
+				// Security headers for all pages to prevent clickjacking
 				source: '/(.*)',
 				headers: [
 					{ key: 'X-Frame-Options', value: 'SAMEORIGIN' },
@@ -24,7 +24,7 @@ const nextConfig = {
 					{ key: 'X-Content-Type-Options', value: 'nosniff' },
 					{
 						key: 'Content-Security-Policy',
-						value: `default-src 'self'; img-src '*' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; frame-src 'self'; frame-ancestors 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')};`
+						value: `frame-ancestors 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')};`
 					}
 				]
 			},
