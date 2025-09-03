@@ -2,10 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, EVoteDecision, EVoteSortOptions } from '@/_shared/types';
+import { EProposalType, EVoteDecision, EVoteSortOptions, EVotesDisplayType } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThumbsDown, ThumbsUp, Ban } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/Tabs';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -17,23 +17,30 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import VoteHistoryTable from './VoteHistoryTable';
 import classes from './VoteHistory.module.scss';
 
-function VoteHistory({ proposalType, index }: { proposalType: EProposalType; index: string }) {
+function VoteHistory({ proposalType, index, votesDisplayType }: { proposalType: EProposalType; index: string; votesDisplayType: EVotesDisplayType }) {
 	const t = useTranslations();
 	const [tab, setTab] = useState<EVoteDecision>(EVoteDecision.AYE);
 	const [page, setPage] = useState(1);
 	const [sortBy, setSortBy] = useState<EVoteSortOptions>(EVoteSortOptions.CreatedAtBlockDESC);
 
-	const fetchVoteHistory = async (pageNumber: number, decision: EVoteDecision, orderBy: EVoteSortOptions) => {
-		const { data, error } = await NextApiClientService.getVotesHistory({ proposalType, index, page: pageNumber, decision, orderBy });
+	// Reset all state variables to initial values when votesType changes
+	useEffect(() => {
+		setPage(1);
+		setSortBy(EVoteSortOptions.CreatedAtBlockDESC);
+	}, [votesDisplayType]);
+
+	const fetchVoteHistory = async (pageNumber: number, decision: EVoteDecision, orderBy: EVoteSortOptions, selectedVotesDisplayType: EVotesDisplayType) => {
+		const { data, error } = await NextApiClientService.getVotesHistory({ proposalType, index, page: pageNumber, decision, orderBy, votesType: selectedVotesDisplayType });
 
 		if (error) {
 			throw new Error(error.message || 'Failed to fetch data');
 		}
 		return data;
 	};
-	const { data, isLoading } = useQuery({
-		queryKey: ['voteHistory', proposalType, index, page, tab, sortBy],
-		queryFn: ({ queryKey }) => fetchVoteHistory(queryKey[3] as number, queryKey[4] as EVoteDecision, queryKey[5] as EVoteSortOptions),
+
+	const { data, isFetching } = useQuery({
+		queryKey: ['voteHistory', proposalType, index, page, tab, sortBy, votesDisplayType],
+		queryFn: ({ queryKey }) => fetchVoteHistory(queryKey[3] as number, queryKey[4] as EVoteDecision, queryKey[5] as EVoteSortOptions, queryKey[6] as EVotesDisplayType),
 		placeholderData: (previousData) => previousData,
 		retry: true,
 		refetchOnWindowFocus: true,
@@ -41,7 +48,7 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 	});
 
 	return (
-		<div>
+		<div className='overflow-x-hidden'>
 			<Tabs
 				defaultValue={tab}
 				onValueChange={(voteTab) => {
@@ -54,62 +61,65 @@ function VoteHistory({ proposalType, index }: { proposalType: EProposalType; ind
 					<TabsTrigger
 						className={cn(
 							classes.tabs,
-							'w-full py-1.5 data-[state=active]:rounded-lg data-[state=active]:border-none data-[state=active]:bg-success data-[state=active]:text-white'
+							'w-full px-2 py-1.5 text-xs data-[state=active]:rounded-lg data-[state=active]:border-none data-[state=active]:bg-success data-[state=active]:text-white sm:px-5 sm:text-sm'
 						)}
 						value={EVoteDecision.AYE}
 					>
 						<ThumbsUp
 							fill={tab === EVoteDecision.AYE ? THEME_COLORS.light.btn_primary_text : THEME_COLORS.light.wallet_btn_text}
-							className='h-4 w-4'
+							className='h-3 w-3 sm:h-4 sm:w-4'
 						/>
 						{t('PostDetails.aye')} {ValidatorService.isValidNumber(data?.totalCounts?.[EVoteDecision.AYE]) && `(${data?.totalCounts?.[EVoteDecision.AYE]})`}
 					</TabsTrigger>
 					<TabsTrigger
 						className={cn(
 							classes.tabs,
-							'w-full py-1.5 data-[state=active]:rounded-lg data-[state=active]:border-none data-[state=active]:bg-failure data-[state=active]:text-white'
+							'w-full px-2 py-1.5 text-xs data-[state=active]:rounded-lg data-[state=active]:border-none data-[state=active]:bg-failure data-[state=active]:text-white sm:px-5 sm:text-sm'
 						)}
 						value={EVoteDecision.NAY}
 					>
 						<ThumbsDown
 							fill={tab === EVoteDecision.NAY ? THEME_COLORS.light.btn_primary_text : THEME_COLORS.light.wallet_btn_text}
-							className='h-4 w-4'
+							className='h-3 w-3 sm:h-4 sm:w-4'
 						/>
 						{t('PostDetails.nay')} {ValidatorService.isValidNumber(data?.totalCounts?.[EVoteDecision.NAY]) && `(${data?.totalCounts?.[EVoteDecision.NAY]})`}
 					</TabsTrigger>
 					<TabsTrigger
 						className={cn(
 							classes.tabs,
-							'w-full py-1.5 data-[state=active]:rounded-lg data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white'
+							'w-full px-2 py-1.5 text-xs data-[state=active]:rounded-lg data-[state=active]:border-none data-[state=active]:bg-decision_bar_indicator data-[state=active]:text-white sm:px-5 sm:text-sm'
 						)}
 						value={EVoteDecision.SPLIT_ABSTAIN}
 					>
-						<Ban className='h-4 w-4' />
+						<Ban className='h-3 w-3 sm:h-4 sm:w-4' />
 						{t('PostDetails.abstain')} {ValidatorService.isValidNumber(data?.totalCounts?.[EVoteDecision.SPLIT_ABSTAIN]) && `(${data?.totalCounts?.[EVoteDecision.SPLIT_ABSTAIN]})`}
 					</TabsTrigger>
 				</TabsList>
 				<TabsContent value={EVoteDecision.AYE}>
 					<VoteHistoryTable
 						votes={data?.votes || []}
-						loading={isLoading}
+						loading={isFetching}
 						orderBy={sortBy}
 						onOrderByChange={(newSortBy) => setSortBy(newSortBy)}
+						votesType={votesDisplayType}
 					/>
 				</TabsContent>
 				<TabsContent value={EVoteDecision.NAY}>
 					<VoteHistoryTable
 						votes={data?.votes || []}
-						loading={isLoading}
+						loading={isFetching}
 						orderBy={sortBy}
 						onOrderByChange={(newSortBy) => setSortBy(newSortBy)}
+						votesType={votesDisplayType}
 					/>
 				</TabsContent>
 				<TabsContent value={EVoteDecision.SPLIT_ABSTAIN}>
 					<VoteHistoryTable
 						votes={data?.votes || []}
-						loading={isLoading}
+						loading={isFetching}
 						orderBy={sortBy}
 						onOrderByChange={(newSortBy) => setSortBy(newSortBy)}
+						votesType={votesDisplayType}
 					/>
 				</TabsContent>
 			</Tabs>

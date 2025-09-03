@@ -10,16 +10,33 @@ const { NEXT_PUBLIC_APP_ENV } = getSharedEnvVars();
 
 export const REFRESH_TOKEN_COOKIE_OPTIONS: CookieSerializeOptions = {
 	httpOnly: false,
-	maxAge: REFRESH_TOKEN_LIFE_IN_SECONDS,
 	path: '/',
 	sameSite: true,
-	secure: NEXT_PUBLIC_APP_ENV === EAppEnv.PRODUCTION
+	secure: NEXT_PUBLIC_APP_ENV === EAppEnv.PRODUCTION,
+	maxAge: REFRESH_TOKEN_LIFE_IN_SECONDS
 };
 
 export const ACCESS_TOKEN_COOKIE_OPTIONS: CookieSerializeOptions = {
 	httpOnly: false,
-	maxAge: ACCESS_TOKEN_LIFE_IN_SECONDS,
 	path: '/',
 	sameSite: true,
-	secure: NEXT_PUBLIC_APP_ENV === EAppEnv.PRODUCTION
+	secure: NEXT_PUBLIC_APP_ENV === EAppEnv.PRODUCTION,
+	maxAge: ACCESS_TOKEN_LIFE_IN_SECONDS
+};
+
+// Options for iframe compatibility (cross-site)
+export const IFRAME_ACCESS_TOKEN_COOKIE_OPTIONS: CookieSerializeOptions = {
+	httpOnly: false,
+	path: '/',
+	sameSite: 'none',
+	secure: true,
+	maxAge: ACCESS_TOKEN_LIFE_IN_SECONDS
+};
+
+export const IFRAME_REFRESH_TOKEN_COOKIE_OPTIONS: CookieSerializeOptions = {
+	httpOnly: false,
+	path: '/',
+	sameSite: 'none',
+	secure: true,
+	maxAge: REFRESH_TOKEN_LIFE_IN_SECONDS
 };

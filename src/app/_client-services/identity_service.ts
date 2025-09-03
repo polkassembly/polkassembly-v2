@@ -339,6 +339,25 @@ export class IdentityService {
 		});
 	}
 
+	async clearOnChainIdentity({ address, onSuccess, onFailed }: { address: string; onSuccess?: () => void; onFailed?: (errorMessageFallback?: string) => void }) {
+		const encodedAddress = getEncodedAddress(address, this.network) || address;
+		const clearIdentityTx = this.peopleChainApi.tx.identity.clearIdentity();
+
+		await this.executeTx({
+			tx: clearIdentityTx,
+			address: encodedAddress,
+			errorMessageFallback: 'Failed to clear identity',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: (errorMessageFallback: string) => {
+				console.log(errorMessageFallback, 'errorMessageFallback');
+				onFailed?.(errorMessageFallback);
+			}
+		});
+	}
+
 	async getRegistrars() {
 		const res = await this.peopleChainApi?.query?.identity?.registrars?.();
 		return res.toJSON() as unknown as { account: string; fee: number; fields: number }[];

@@ -10,7 +10,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import ConvictionSelector from '@/app/_shared-components/PostDetails/VoteReferendum/ConvictionSelector/ConvictionSelector';
 import { EConvictionAmount, EDelegationStatus, EPostOrigin, ENotificationStatus } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { BN } from '@polkadot/util';
+import { BN, BN_ZERO } from '@polkadot/util';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -23,6 +23,8 @@ import { useAtom } from 'jotai';
 import { useToast } from '@/hooks/useToast';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import styles from './DelegateVotingPower.module.scss';
 import SwitchWalletOrAddress from '../SwitchWalletOrAddress/SwitchWalletOrAddress';
 import AddressRelationsPicker from '../AddressRelationsPicker/AddressRelationsPicker';
@@ -30,16 +32,15 @@ import AddressRelationsPicker from '../AddressRelationsPicker/AddressRelationsPi
 interface DelegateDialogProps {
 	delegate: { address: string };
 	trackId?: number;
+	onClose?: () => void;
 }
 
-const LOCK_PERIODS = ['no lockup period', '7 days', '14 days', '28 days', '56 days', '112 days', '224 days'];
-
-function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDialogProps) {
+function DelegateVotingPower({ delegate: initialDelegate, trackId, onClose }: DelegateDialogProps) {
 	const { userPreferences } = useUserPreferences();
 	const t = useTranslations('Delegation');
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
-
+	const { setVaultQrState } = usePolkadotVault();
 	const { toast } = useToast();
 	const tracks = useMemo(() => Object.keys(NETWORKS_DETAILS[`${network}`].trackDetails), [network]);
 	const [delegateUserTracks, setDelegateUserTracks] = useAtom(delegateUserTracksAtom);
@@ -57,11 +58,6 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 		() => selectedTracks.map((track) => NETWORKS_DETAILS[`${network}`].trackDetails[track as EPostOrigin]?.trackId).filter((id): id is number => id !== undefined),
 		[selectedTracks, network]
 	);
-
-	const getConvictionMultiplier = (c: number) => {
-		if (c === 0) return 0.1;
-		return c;
-	};
 
 	const isBalanceValid = useMemo(() => {
 		if (!balance || balance.isZero() || !userBalance) return false;
@@ -129,12 +125,14 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 	}, [apiService, balance, selectedTrackIds, conviction, delegateAddress]);
 
 	const handleSubmit = useCallback(async () => {
-		if (!apiService || !balance || !userPreferences?.selectedAccount?.address || selectedTrackIds?.length === 0) return;
+		if (!apiService || !balance || !userPreferences?.selectedAccount?.address || selectedTrackIds?.length === 0 || !userPreferences.wallet) return;
 
 		try {
 			setLoading(true);
 			await apiService.delegate({
 				address: userPreferences.selectedAccount.address,
+				wallet: userPreferences.wallet,
+				setVaultQrState,
 				delegateAddress,
 				balance,
 				conviction,
@@ -165,12 +163,17 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 
 					setDelegates((prev) => {
 						const delegateIndex = prev.findIndex((d) => d.address === delegateAddress);
+						const encodedUserSelectedAccount = getEncodedAddress(userPreferences?.selectedAccount?.address || '', network);
 
 						if (delegateIndex >= 0) {
 							const updatedDelegates = [...prev];
 							updatedDelegates[`${delegateIndex}`] = {
 								...updatedDelegates[`${delegateIndex}`],
-								receivedDelegationsCount: (updatedDelegates[`${delegateIndex}`].receivedDelegationsCount || 0) + selectedTrackIds.length
+								receivedDelegationsCount: (updatedDelegates[`${delegateIndex}`].receivedDelegationsCount || 0) + selectedTrackIds.length,
+								delegators:
+									encodedUserSelectedAccount && !updatedDelegates[`${delegateIndex}`].delegators?.includes(encodedUserSelectedAccount)
+										? [...(updatedDelegates[`${delegateIndex}`].delegators || []), encodedUserSelectedAccount]
+										: updatedDelegates[`${delegateIndex}`].delegators
 							};
 							return updatedDelegates;
 						}
@@ -183,6 +186,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 						status: ENotificationStatus.SUCCESS
 					});
 					setLoading(false);
+					onClose?.();
 				},
 				onFailed: (error) => {
 					toast({
@@ -190,6 +194,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 						status: ENotificationStatus.ERROR
 					});
 					setLoading(false);
+					onClose?.();
 				}
 			});
 		} catch (error) {
@@ -199,6 +204,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 				status: ENotificationStatus.ERROR
 			});
 			setLoading(false);
+			onClose?.();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [apiService, userPreferences?.selectedAccount?.address, selectedTrackIds, delegateAddress, balance, conviction]);
@@ -246,7 +252,13 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 				<SwitchWalletOrAddress
 					small
 					withBalance
-					customAddressSelector={<AddressRelationsPicker withBalance />}
+					customAddressSelector={
+						<AddressRelationsPicker
+							withBalance
+							disabled={loading}
+						/>
+					}
+					disabled={loading}
 				/>
 
 				<div>
@@ -256,6 +268,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 						className='bg-network_dropdown_bg'
 						onChange={(a) => setDelegateAddress(a)}
 						placeholder={t('enterDelegateAddress')}
+						disabled={loading}
 					/>
 				</div>
 
@@ -265,27 +278,15 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 					label={t('balance')}
 					defaultValue={balance}
 					onChange={({ value }) => setBalance(value)}
+					disabled={loading}
 				/>
 				<div className='w-full'>
 					<p className='mb-3 text-sm text-wallet_btn_text'>{t('conviction')}</p>
-					<ConvictionSelector onConvictionChange={setConviction} />
-				</div>
-				<div className={styles.convictionContainer}>
-					<div className={styles.convictionItem}>
-						<p className={styles.convictionItemLabel}>{t('lockPeriod')}</p>
-						<p className={styles.convictionItemLabel}>
-							{conviction}
-							{t('xVotingBalanceForDuration')} ({LOCK_PERIODS[`${conviction}`]})
-						</p>
-					</div>
-					{balance && (
-						<div className={styles.convictionItem}>
-							<p className={styles.convictionItemLabel}>{t('votes')}</p>
-							<p className={styles.convictionItemLabel}>
-								{formatBnBalance(new BN(balance.toNumber() * getConvictionMultiplier(conviction)), { withUnit: true, numberAfterComma: 2 }, network)}
-							</p>
-						</div>
-					)}
+					<ConvictionSelector
+						onConvictionChange={setConviction}
+						disabled={loading}
+						voteBalance={balance || BN_ZERO}
+					/>
 				</div>
 
 				<div className='flex flex-col gap-4'>
@@ -296,8 +297,12 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 								<Checkbox
 									checked={isAllTracksSelected}
 									onCheckedChange={toggleAllTracks}
+									disabled={loading}
 								/>
-								<TooltipTrigger asChild>
+								<TooltipTrigger
+									asChild
+									disabled={loading}
+								>
 									<span className='text-sm text-wallet_btn_text'>{t('delegateToAllAvailableTracks')}</span>
 								</TooltipTrigger>
 							</div>
@@ -323,7 +328,7 @@ function DelegateVotingPower({ delegate: initialDelegate, trackId }: DelegateDia
 											<Checkbox
 												checked={isChecked}
 												onCheckedChange={() => toggleTrack(track)}
-												disabled={isTrackDelegated}
+												disabled={isTrackDelegated || loading}
 												className={styles.checkbox}
 											/>
 											<span className={isTrackDelegated ? 'text-text_secondary' : ''}>

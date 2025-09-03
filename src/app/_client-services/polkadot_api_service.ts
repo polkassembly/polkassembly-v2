@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+/* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
@@ -18,9 +19,27 @@ import { getTypeDef } from '@polkadot/types';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
-import { EAccountType, EEnactment, ENetwork, EPostOrigin, EVoteDecision, IBeneficiaryInput, IParamDef, IPayout, ISelectedAccount, IVoteCartItem } from '@shared/types';
+import {
+	EAccountType,
+	EEnactment,
+	ENetwork,
+	EPostOrigin,
+	EVoteDecision,
+	EWallet,
+	IBeneficiaryInput,
+	IParamDef,
+	IPayout,
+	ISelectedAccount,
+	IVaultQrState,
+	IVoteCartItem
+} from '@shared/types';
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
+import { APPNAME } from '@/_shared/_constants/appName';
+import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
+import { Dispatch, SetStateAction } from 'react';
 import { BlockCalculationsService } from './block_calculations_service';
+import { isMimirDetected } from './isMimirDetected';
+import { VaultQrSigner } from './vault_qr_signer_service';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -49,11 +68,93 @@ export class PolkadotApiService {
 		return new PolkadotApiService(network, api);
 	}
 
+	// eslint-disable-next-line sonarjs/cognitive-complexity
+	private async executeTxCallback({
+		status,
+		events,
+		txHash,
+		setStatus,
+		onBroadcast,
+		onSuccess,
+		onFailed,
+		waitTillFinalizedHash,
+		errorMessageFallback,
+		setIsTxFinalized
+	}: {
+		status: ExtrinsicStatus;
+		events: EventRecord[];
+		txHash: Hash;
+		setStatus?: (pre: string) => void;
+		onBroadcast?: () => void;
+		onSuccess: (pre?: unknown) => Promise<void> | void;
+		onFailed: (errorMessageFallback: string) => Promise<void> | void;
+		waitTillFinalizedHash: boolean;
+		errorMessageFallback: string;
+		setIsTxFinalized?: (pre: string) => void;
+	}) {
+		let isFailed = false;
+		if (status.isInvalid) {
+			console.log('Transaction invalid');
+			setStatus?.('Transaction invalid');
+		} else if (status.isReady) {
+			console.log('Transaction is ready');
+			setStatus?.('Transaction is ready');
+		} else if (status.isBroadcast) {
+			console.log('Transaction has been broadcasted');
+			setStatus?.('Transaction has been broadcasted');
+			onBroadcast?.();
+		} else if (status.isInBlock) {
+			console.log('Transaction is in block');
+			setStatus?.('Transaction is in block');
+
+			// eslint-disable-next-line no-restricted-syntax
+			for (const { event } of events) {
+				if (event.method === 'ExtrinsicSuccess') {
+					setStatus?.('Transaction Success');
+					isFailed = false;
+					if (!waitTillFinalizedHash) {
+						// eslint-disable-next-line no-await-in-loop
+						await onSuccess(txHash);
+					}
+				} else if (event.method === 'ExtrinsicFailed') {
+					// eslint-disable-next-line sonarjs/no-duplicate-string
+					console.log('Transaction failed');
+					setStatus?.('Transaction failed');
+					const dispatchError = (event.data as any)?.dispatchError;
+					isFailed = true;
+
+					if (dispatchError?.isModule) {
+						const errorModule = (event.data as any)?.dispatchError?.asModule;
+						const { method, section, docs } = this.api.registry.findMetaError(errorModule);
+						// eslint-disable-next-line no-param-reassign
+						errorMessageFallback = `${section}.${method} : ${docs.join(' ')}`;
+						console.log(errorMessageFallback, 'error module');
+						await onFailed(errorMessageFallback);
+					} else if (dispatchError?.isToken) {
+						console.log(`${dispatchError.type}.${dispatchError.asToken.type}`);
+						await onFailed(`${dispatchError.type}.${dispatchError.asToken.type}`);
+					} else {
+						await onFailed(`${dispatchError.type}` || errorMessageFallback);
+					}
+				}
+			}
+		} else if (status.isFinalized) {
+			console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
+			console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
+			setIsTxFinalized?.(txHash.toString());
+			if (!isFailed && waitTillFinalizedHash) {
+				await onSuccess(txHash);
+			}
+		}
+	}
+
 	private async executeTx({
 		tx,
 		address,
+		wallet,
 		params = {},
 		errorMessageFallback,
+		setVaultQrState,
 		onSuccess,
 		onFailed,
 		onBroadcast,
@@ -64,8 +165,10 @@ export class PolkadotApiService {
 	}: {
 		tx: SubmittableExtrinsic<'promise'>;
 		address: string;
+		wallet: EWallet;
 		params?: Record<string, unknown>;
 		errorMessageFallback: string;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
 		onFailed: (errorMessageFallback: string) => Promise<void> | void;
 		onBroadcast?: () => void;
@@ -74,106 +177,117 @@ export class PolkadotApiService {
 		waitTillFinalizedHash?: boolean;
 		selectedAccount?: ISelectedAccount;
 	}) {
-		let isFailed = false;
 		if (!this.api || !tx) return;
 
-		let extrinsic = tx;
+		const isMimirIframe = await isMimirDetected();
 
-		// for pure proxy accounts, we need to get the multisig account
-		const getMultisigAccount = (account?: ISelectedAccount): ISelectedAccount | null => {
-			if (!account) return null;
-			if (account.accountType === EAccountType.MULTISIG) {
-				return account;
+		if (isMimirIframe) {
+			const { web3Enable, web3FromSource } = await import('@polkadot/extension-dapp');
+
+			await web3Enable(APPNAME);
+			const injected = await web3FromSource('mimir');
+			const isMimir = injected.name === 'mimir';
+			if (!isMimir) {
+				return;
 			}
 
-			if (account.parent) {
-				return getMultisigAccount(account.parent);
+			if (!injected.signer?.signPayload) {
+				return;
 			}
 
-			return null;
-		};
+			const result: any = await injected.signer.signPayload({
+				address,
+				method: tx.method.toHex(),
+				genesisHash: this.getGenesisHash()
+			} as any);
 
-		const multisigAccount = getMultisigAccount(selectedAccount);
+			const call = this.api.registry.createType('Call', result.payload.method);
 
-		if (selectedAccount?.accountType === EAccountType.PROXY) {
-			extrinsic = this.api.tx.proxy.proxy(selectedAccount.address, null, extrinsic);
-		}
+			const newTx = this.api.tx[call.section][call.method](...call.args);
 
-		if (multisigAccount) {
-			const signatories = multisigAccount?.signatories?.map((signatory) => getEncodedAddress(signatory, this.network)).filter((signatory) => signatory !== address);
-			const { weight } = await extrinsic.paymentInfo(address);
-			extrinsic = this.api.tx.multisig.asMulti(multisigAccount?.threshold, signatories, null, extrinsic, weight);
-		}
+			newTx.addSignature(result.signer, result.signature, result.payload);
 
-		const signerOptions = {
-			...params,
-			withSignedTransaction: true
-		};
+			newTx
+				// eslint-disable-next-line sonarjs/cognitive-complexity
+				.send(async ({ status, events, txHash }) =>
+					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
+				)
+				.catch((error: unknown) => {
+					console.log(':( transaction failed');
+					setStatus?.(':( transaction failed');
+					console.error('ERROR:', error);
+					onFailed(error?.toString?.() || errorMessageFallback);
+				});
+		} else if (wallet === EWallet.POLKADOT_VAULT) {
+			const signer = new VaultQrSigner(this.api.registry, setVaultQrState);
+			await tx.signAsync(address, { nonce: -1, signer });
 
-		extrinsic
-			// eslint-disable-next-line sonarjs/cognitive-complexity
-			.signAndSend(address, signerOptions, async ({ status, events, txHash }) => {
-				if (status.isInvalid) {
-					console.log('Transaction invalid');
-					setStatus?.('Transaction invalid');
-				} else if (status.isReady) {
-					console.log('Transaction is ready');
-					setStatus?.('Transaction is ready');
-				} else if (status.isBroadcast) {
-					console.log('Transaction has been broadcasted');
-					setStatus?.('Transaction has been broadcasted');
-					onBroadcast?.();
-				} else if (status.isInBlock) {
-					console.log('Transaction is in block');
-					setStatus?.('Transaction is in block');
+			setVaultQrState((prev) => ({
+				...prev,
+				open: false
+			}));
 
-					// eslint-disable-next-line no-restricted-syntax
-					for (const { event } of events) {
-						if (event.method === 'ExtrinsicSuccess') {
-							setStatus?.('Transaction Success');
-							isFailed = false;
-							if (!waitTillFinalizedHash) {
-								// eslint-disable-next-line no-await-in-loop
-								await onSuccess(txHash);
-							}
-						} else if (event.method === 'ExtrinsicFailed') {
-							// eslint-disable-next-line sonarjs/no-duplicate-string
-							setStatus?.('Transaction failed');
-							console.log('Transaction failed');
-							setStatus?.('Transaction failed');
-							const dispatchError = (event.data as any)?.dispatchError;
-							isFailed = true;
+			tx
+				// eslint-disable-next-line sonarjs/cognitive-complexity
+				.send(async ({ status, events, txHash }) =>
+					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
+				)
+				.catch((error: unknown) => {
+					console.log(':( transaction failed');
+					setStatus?.(':( transaction failed');
+					console.error('ERROR:', error);
+					onFailed(error?.toString?.() || errorMessageFallback);
+				});
+		} else {
+			let extrinsic = tx;
 
-							if (dispatchError?.isModule) {
-								const errorModule = (event.data as any)?.dispatchError?.asModule;
-								const { method, section, docs } = this.api.registry.findMetaError(errorModule);
-								// eslint-disable-next-line no-param-reassign
-								errorMessageFallback = `${section}.${method} : ${docs.join(' ')}`;
-								console.log(errorMessageFallback, 'error module');
-								await onFailed(errorMessageFallback);
-							} else if (dispatchError?.isToken) {
-								console.log(`${dispatchError.type}.${dispatchError.asToken.type}`);
-								await onFailed(`${dispatchError.type}.${dispatchError.asToken.type}`);
-							} else {
-								await onFailed(`${dispatchError.type}` || errorMessageFallback);
-							}
-						}
-					}
-				} else if (status.isFinalized) {
-					console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
-					console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
-					setIsTxFinalized?.(txHash.toString());
-					if (!isFailed && waitTillFinalizedHash) {
-						await onSuccess(txHash);
-					}
+			// for pure proxy accounts, we need to get the multisig account
+			const getMultisigAccount = (account?: ISelectedAccount): ISelectedAccount | null => {
+				if (!account) return null;
+				if (account.accountType === EAccountType.MULTISIG) {
+					return account;
 				}
-			})
-			.catch((error: unknown) => {
-				console.log(':( transaction failed');
-				setStatus?.(':( transaction failed');
-				console.error('ERROR:', error);
-				onFailed(error?.toString?.() || errorMessageFallback);
-			});
+
+				if (account.parent) {
+					return getMultisigAccount(account.parent);
+				}
+
+				return null;
+			};
+
+			const multisigAccount = getMultisigAccount(selectedAccount);
+
+			if (selectedAccount?.accountType === EAccountType.PROXY) {
+				extrinsic = this.api.tx.proxy.proxy(selectedAccount.address, null, extrinsic);
+			}
+
+			if (multisigAccount) {
+				const signatories = multisigAccount?.signatories?.map((signatory) => getEncodedAddress(signatory, this.network)).filter((signatory) => signatory !== address);
+				const { weight } = await extrinsic.paymentInfo(address);
+				extrinsic = this.api.tx.multisig.asMulti(multisigAccount?.threshold, signatories, null, extrinsic, weight);
+			}
+
+			const signerOptions = {
+				...params,
+				withSignedTransaction: true
+			};
+
+			extrinsic
+				// eslint-disable-next-line sonarjs/cognitive-complexity
+				.signAndSend(address, signerOptions, async ({ status, events, txHash }) =>
+					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
+				)
+				.catch((error: unknown) => {
+					console.log(':( transaction failed');
+					setStatus?.(':( transaction failed');
+					console.error('ERROR:', error);
+					onFailed(error?.toString?.() || errorMessageFallback);
+				});
+		}
+	}
+
+	getGenesisHash() {
+		return this.api.genesisHash.toHex();
 	}
 
 	async disconnect(): Promise<void> {
@@ -300,6 +414,8 @@ export class PolkadotApiService {
 
 	async voteReferendum({
 		address,
+		wallet,
+		setVaultQrState,
 		onSuccess,
 		onFailed,
 		referendumId,
@@ -312,6 +428,8 @@ export class PolkadotApiService {
 		selectedAccount
 	}: {
 		address: string;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
 		onFailed: (errorMessageFallback: string) => Promise<void> | void;
 		referendumId: number;
@@ -339,23 +457,69 @@ export class PolkadotApiService {
 			await this.executeTx({
 				tx: voteTx,
 				address,
+				wallet,
 				errorMessageFallback: 'Failed to vote',
 				waitTillFinalizedHash: true,
 				onSuccess,
 				onFailed,
-				selectedAccount
+				selectedAccount,
+				setVaultQrState
 			});
+		}
+	}
+
+	async removeReferendumVote({
+		address,
+		referendumId,
+		wallet,
+		onSuccess,
+		onFailed,
+		selectedAccount,
+		setVaultQrState
+	}: {
+		address: string;
+		referendumId: number;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		selectedAccount?: ISelectedAccount;
+	}) {
+		if (!this.api) {
+			onFailed('API not ready – unable to remove vote');
+			return;
+		}
+
+		try {
+			const tx: SubmittableExtrinsic<'promise'> = this.api.tx.convictionVoting.removeVote(null, referendumId);
+			await this.executeTx({
+				tx,
+				address,
+				wallet,
+				errorMessageFallback: 'Failed to remove vote',
+				waitTillFinalizedHash: true,
+				onSuccess,
+				onFailed,
+				selectedAccount,
+				setVaultQrState
+			});
+		} catch (error: unknown) {
+			onFailed((error as Error)?.message || 'Failed to remove vote');
 		}
 	}
 
 	async batchVoteReferendum({
 		address,
 		voteCartItems,
+		wallet,
 		onSuccess,
-		onFailed
+		onFailed,
+		setVaultQrState
 	}: {
 		address: string;
 		voteCartItems: IVoteCartItem[];
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
 		onFailed: (errorMessageFallback: string) => Promise<void> | void;
 	}) {
@@ -390,10 +554,12 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to batch vote',
 			waitTillFinalizedHash: true,
 			onSuccess,
-			onFailed
+			onFailed,
+			setVaultQrState
 		});
 	}
 
@@ -553,14 +719,18 @@ export class PolkadotApiService {
 
 	async notePreimage({
 		address,
+		wallet,
 		extrinsicFn,
 		onSuccess,
-		onFailed
+		onFailed,
+		setVaultQrState
 	}: {
 		address: string;
+		wallet: EWallet;
 		extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>;
 		onSuccess?: () => void;
 		onFailed?: () => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 	}) {
 		if (!this.api) {
 			return;
@@ -574,6 +744,8 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx: notePreimageTx,
 			address,
+			wallet,
+			setVaultQrState,
 			errorMessageFallback: 'Failed to note preimage',
 			waitTillFinalizedHash: true,
 			onSuccess: () => {
@@ -585,7 +757,21 @@ export class PolkadotApiService {
 		});
 	}
 
-	async unnotePreimage({ address, preimageHash, onSuccess, onFailed }: { address: string; preimageHash: string; onSuccess?: () => void; onFailed?: () => void }) {
+	async unnotePreimage({
+		address,
+		wallet,
+		preimageHash,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		address: string;
+		wallet: EWallet;
+		preimageHash: string;
+		onSuccess?: () => void;
+		onFailed?: () => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
 		if (!this.api) {
 			return;
 		}
@@ -598,6 +784,7 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx: unnotePreimageTx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to unnote preimage',
 			waitTillFinalizedHash: true,
 			onSuccess: () => {
@@ -605,11 +792,26 @@ export class PolkadotApiService {
 			},
 			onFailed: () => {
 				onFailed?.();
-			}
+			},
+			setVaultQrState
 		});
 	}
 
-	async unRequestPreimage({ address, preimageHash, onSuccess, onFailed }: { address: string; preimageHash: string; onSuccess?: () => void; onFailed?: () => void }) {
+	async unRequestPreimage({
+		address,
+		wallet,
+		preimageHash,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		address: string;
+		wallet: EWallet;
+		preimageHash: string;
+		onSuccess?: () => void;
+		onFailed?: () => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
 		if (!this.api) {
 			return;
 		}
@@ -622,6 +824,7 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx: unRequestPreimageTx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to unrequest preimage',
 			waitTillFinalizedHash: true,
 			onSuccess: () => {
@@ -629,7 +832,8 @@ export class PolkadotApiService {
 			},
 			onFailed: () => {
 				onFailed?.();
-			}
+			},
+			setVaultQrState
 		});
 	}
 
@@ -785,7 +989,21 @@ export class PolkadotApiService {
 		return this.api.tx.bounties.proposeBounty(bountyAmount, title);
 	}
 
-	async proposeBounty({ bountyAmount, address, onSuccess, onFailed }: { bountyAmount: BN; address: string; onSuccess?: (bountyId: number) => void; onFailed?: () => void }) {
+	async proposeBounty({
+		bountyAmount,
+		address,
+		wallet,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		bountyAmount: BN;
+		address: string;
+		wallet: EWallet;
+		onSuccess?: (bountyId: number) => void;
+		onFailed?: () => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
 		if (!this.api || !address || !bountyAmount) return;
 
 		const bountyId = Number(await this.api.query.bounties.bountyCount());
@@ -800,6 +1018,7 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to propose bounty',
 			waitTillFinalizedHash: true,
 			onSuccess: () => {
@@ -807,7 +1026,8 @@ export class PolkadotApiService {
 			},
 			onFailed: () => {
 				onFailed?.();
-			}
+			},
+			setVaultQrState
 		});
 	}
 
@@ -818,6 +1038,7 @@ export class PolkadotApiService {
 
 	async createProposal({
 		address,
+		wallet,
 		extrinsicFn,
 		track,
 		enactment,
@@ -825,9 +1046,11 @@ export class PolkadotApiService {
 		preimageHash,
 		preimageLength,
 		onSuccess,
-		onFailed
+		onFailed,
+		setVaultQrState
 	}: {
 		address: string;
+		wallet: EWallet;
 		track: EPostOrigin;
 		enactment: EEnactment;
 		enactmentValue: BN;
@@ -836,6 +1059,7 @@ export class PolkadotApiService {
 		preimageLength?: number;
 		onSuccess?: (postId: number) => void;
 		onFailed?: () => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 	}) {
 		const tracks = Object.values(EPostOrigin);
 		if (!tracks.includes(track as EPostOrigin)) {
@@ -866,6 +1090,7 @@ export class PolkadotApiService {
 			await this.executeTx({
 				tx: submitProposalTx,
 				address,
+				wallet,
 				errorMessageFallback: 'Failed to create treasury proposal',
 				waitTillFinalizedHash: true,
 				onSuccess: () => {
@@ -873,7 +1098,8 @@ export class PolkadotApiService {
 				},
 				onFailed: () => {
 					onFailed?.();
-				}
+				},
+				setVaultQrState
 			});
 
 			return;
@@ -912,6 +1138,7 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to create treasury proposal',
 			waitTillFinalizedHash: true,
 			onSuccess: () => {
@@ -919,7 +1146,8 @@ export class PolkadotApiService {
 			},
 			onFailed: () => {
 				onFailed?.();
-			}
+			},
+			setVaultQrState
 		});
 	}
 
@@ -968,20 +1196,24 @@ export class PolkadotApiService {
 
 	async delegate({
 		address,
+		wallet,
 		delegateAddress,
 		balance,
 		conviction,
 		tracks,
 		onSuccess,
-		onFailed
+		onFailed,
+		setVaultQrState
 	}: {
 		address: string;
+		wallet: EWallet;
 		delegateAddress: string;
 		balance: BN;
 		conviction: number;
 		tracks: number[];
 		onSuccess: () => void;
 		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 	}) {
 		if (!this.api) return;
 
@@ -992,14 +1224,30 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to delegate',
 			onSuccess,
 			onFailed,
-			waitTillFinalizedHash: true
+			waitTillFinalizedHash: true,
+			setVaultQrState
 		});
 	}
 
-	async undelegate({ address, trackId, onSuccess, onFailed }: { address: string; trackId: number; onSuccess: () => void; onFailed: (error: string) => void }) {
+	async undelegate({
+		address,
+		wallet,
+		trackId,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		address: string;
+		wallet: EWallet;
+		trackId: number;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
 		if (!this.api) return;
 
 		const tx = this.api.tx.convictionVoting.undelegate(trackId);
@@ -1007,10 +1255,12 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to undelegate',
 			onSuccess,
 			onFailed,
-			waitTillFinalizedHash: true
+			waitTillFinalizedHash: true,
+			setVaultQrState
 		});
 	}
 
@@ -1067,17 +1317,33 @@ export class PolkadotApiService {
 		return this.api.query.balances.totalIssuance();
 	}
 
-	async submitDecisionDeposit({ postId, address, onSuccess, onFailed }: { postId: number; address: string; onSuccess: () => void; onFailed: (error: string) => void }) {
+	async submitDecisionDeposit({
+		postId,
+		address,
+		wallet,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		postId: number;
+		address: string;
+		wallet: EWallet;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
 		if (!this.api) return;
 
 		const tx = this.api.tx.referenda.placeDecisionDeposit(postId);
 		await this.executeTx({
 			tx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to submit decision deposit',
 			onSuccess,
 			onFailed,
-			waitTillFinalizedHash: true
+			waitTillFinalizedHash: true,
+			setVaultQrState
 		});
 	}
 
@@ -1130,7 +1396,21 @@ export class PolkadotApiService {
 		return treasuryPendingSpends;
 	}
 
-	async claimTreasuryPayout({ payouts, address, onSuccess, onFailed }: { payouts: IPayout[]; address: string; onSuccess: () => void; onFailed: (error: string) => void }) {
+	async claimTreasuryPayout({
+		payouts,
+		address,
+		wallet,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		payouts: IPayout[];
+		address: string;
+		wallet: EWallet;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
 		if (!this.api || !payouts || payouts.length === 0) return;
 
 		const tx = payouts.map((p) => this.api.tx.treasury.payout(p.treasurySpendIndex));
@@ -1140,10 +1420,173 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx: batchTx,
 			address,
+			wallet,
 			errorMessageFallback: 'Failed to claim treasury payout',
 			onSuccess,
 			onFailed,
-			waitTillFinalizedHash: true
+			waitTillFinalizedHash: true,
+			setVaultQrState
+		});
+	}
+
+	getTeleportToPeopleChainTx({ beneficiaryAddress, amount }: { beneficiaryAddress: string; amount: BN }) {
+		if (!this.api) return null;
+
+		return this.api.tx.xcmPallet.limitedTeleportAssets(
+			{
+				V3: {
+					interior: {
+						X1: { Parachain: NETWORKS_DETAILS[this.network]?.peopleChainParaId }
+					},
+					parents: 0
+				}
+			},
+			{ V3: { interior: { X1: { AccountId32: { id: decodeAddress(beneficiaryAddress), network: null } } } } },
+			{
+				V3: [
+					{
+						fun: {
+							Fungible: amount.toString()
+						},
+						id: {
+							Concrete: {
+								interior: 'Here',
+								parents: '0'
+							}
+						}
+					}
+				]
+			},
+			'0',
+			'Unlimited'
+		);
+	}
+
+	async teleportToPeopleChain({
+		beneficiaryAddress,
+		amount,
+		address,
+		wallet,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		beneficiaryAddress: string;
+		amount: BN;
+		address: string;
+		wallet: EWallet;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api) return;
+
+		const tx = this.getTeleportToPeopleChainTx({ beneficiaryAddress, amount });
+
+		if (!tx) return;
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			errorMessageFallback: 'Failed to teleport to people chain',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true,
+			setVaultQrState
+		});
+	}
+
+	async loginWithRemark({
+		address,
+		remarkLoginMessage,
+		onSuccess,
+		onFailed,
+		wallet,
+		setVaultQrState
+	}: {
+		address: string;
+		remarkLoginMessage: string;
+		onSuccess: (pre?: unknown) => void;
+		onFailed: (error: string) => void;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api) return;
+
+		const tx = this.api.tx.system.remark(remarkLoginMessage);
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			errorMessageFallback: 'Failed to login with remark',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true,
+			setVaultQrState
+		});
+	}
+
+	async getAddressGovernanceLock({ address }: { address: string }): Promise<BN | null> {
+		if (!this.api) return null;
+		const locks: any = await this.api.query?.convictionVoting?.classLocksFor(address);
+
+		return locks.reduce((max: BN, rawLock: any) => {
+			const locked = rawLock[1].toString();
+			return new BN(locked).gt(max) ? new BN(locked) : max;
+		}, BN_ZERO);
+	}
+
+	async getReferendaInfo({ postId }: { postId: number }) {
+		if (!this.api) return null;
+		const referendaInfo = await this.api.query.referenda.referendumInfoFor(postId);
+		return referendaInfo.toHuman() as { [key: string]: any[] };
+	}
+
+	async refundDeposits({
+		postId,
+		address,
+		canRefundDecisionDeposit,
+		canRefundSubmissionDeposit,
+		wallet,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		postId: number;
+		address: string;
+		canRefundDecisionDeposit: boolean;
+		canRefundSubmissionDeposit: boolean;
+		wallet: EWallet;
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api) return;
+
+		const refundDecisionDepositTx = this.api.tx.referenda.refundDecisionDeposit(postId);
+		const refundSubmissionDepositTx = this.api.tx.referenda.refundSubmissionDeposit(postId);
+
+		let tx: SubmittableExtrinsic<'promise', ISubmittableResult>;
+
+		if (canRefundDecisionDeposit && canRefundSubmissionDeposit) {
+			tx = this.api.tx.utility.batchAll([refundDecisionDepositTx, refundSubmissionDepositTx]);
+		} else if (canRefundSubmissionDeposit) {
+			tx = refundSubmissionDepositTx;
+		} else {
+			tx = refundDecisionDepositTx;
+		}
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			errorMessageFallback: 'Failed to refund deposits',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: true,
+			setVaultQrState
 		});
 	}
 }

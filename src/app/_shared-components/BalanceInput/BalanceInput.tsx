@@ -14,6 +14,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { EAssets } from '@/_shared/types';
 import { Input } from '../Input';
 import classes from './BalanceInput.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../DropdownMenu';
@@ -70,31 +71,39 @@ function BalanceInput({
 		value: asset.index
 	}));
 
+	// Reorder to put USDC first if it exists
+	const reorderedAssetOptions = assetOptions.sort((a, b) => {
+		if (a.label === EAssets.USDC) return -1;
+		if (b.label === EAssets.USDC) return 1;
+		return 0;
+	});
+
 	const [valueString, setValueString] = useState('');
 
-	const onBalanceChange = (value: string | null, id?: string | null): void => {
-		const { bnValue, isValid } = inputToBn(value || '', network, false, id || assetId);
+	const onBalanceChange = (v: string | null, id?: string | null): void => {
+		const { bnValue, isValid } = inputToBn(v || '', network, false, id);
 
-		if (isValid && ValidatorService.isValidNumber(value)) {
+		if (isValid && ValidatorService.isValidNumber(v)) {
 			setError('');
-			onChange?.({ value: bnValue, assetId: id || assetId });
+			onChange?.({ value: bnValue, assetId: id || null });
 		} else {
 			setError('Invalid Amount');
-			onChange?.({ value: BN_ZERO, assetId: id || assetId });
+			onChange?.({ value: BN_ZERO, assetId: id || null });
 		}
 	};
 
 	useEffect(() => {
+		const initialAssetId = defaultAssetId === undefined && multiAsset ? Object.values(supportedAssets).find((asset) => asset.symbol === EAssets.USDC)?.index : defaultAssetId;
+		setAssetId(initialAssetId || null);
+
 		if (!defaultValue || defaultValue.isZero()) {
 			if (value) {
-				setValueString(bnToInput(value, network, defaultAssetId));
-				setAssetId(defaultAssetId || null);
+				setValueString(bnToInput(value, network, initialAssetId));
 			}
 			return;
 		}
 
-		setValueString(bnToInput(defaultValue, network, defaultAssetId));
-		setAssetId(defaultAssetId || null);
+		setValueString(bnToInput(defaultValue, network, initialAssetId));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [network, value]);
 
@@ -141,7 +150,7 @@ function BalanceInput({
 					className={cn('w-full', className)}
 					placeholder={placeholder || t('BalanceInput.enterAmount')}
 					onChange={(e) => {
-						onBalanceChange(e.target.value);
+						onBalanceChange(e.target.value, assetId);
 						setValueString(e.target.value);
 					}}
 					name={name || 'balance'}
@@ -161,7 +170,7 @@ function BalanceInput({
 								{assetId ? networkDetails.supportedAssets[`${assetId}`].symbol : networkDetails.tokenSymbol}
 							</DropdownMenuTrigger>
 							<DropdownMenuContent>
-								{[{ label: networkDetails.tokenSymbol, value: null }, ...assetOptions].map((option) => (
+								{[...reorderedAssetOptions, { label: networkDetails.tokenSymbol, value: null }].map((option) => (
 									<DropdownMenuItem
 										key={option.value}
 										onClick={() => {

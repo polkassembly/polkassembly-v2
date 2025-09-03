@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { cn } from '@/lib/utils';
 import AddressInline from './AddressInline/AddressInline';
 import classes from './AddressInline/AddressInline.module.scss';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../../Tooltip';
@@ -28,6 +29,8 @@ interface AddressProps {
 	textClassName?: string;
 	redirectToProfile?: boolean;
 	disableTooltip?: boolean;
+	showOnlyIdenticon?: boolean;
+	wrapperClassName?: string;
 }
 
 function Address({
@@ -39,7 +42,9 @@ function Address({
 	walletAddressName,
 	textClassName,
 	redirectToProfile,
-	disableTooltip = false
+	disableTooltip = false,
+	showOnlyIdenticon = false,
+	wrapperClassName
 }: AddressProps) {
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
@@ -71,7 +76,7 @@ function Address({
 	useEffect(() => {
 		const initializeIdentity = async () => {
 			if (!encodedAddress) return;
-			setDisplayText(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
+			setDisplayText(userData?.username || walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
 
 			try {
 				const identityInfo = await getOnChainIdentity(encodedAddress);
@@ -87,7 +92,7 @@ function Address({
 		};
 
 		initializeIdentity();
-	}, [encodedAddress, getOnChainIdentity, truncateCharLen, walletAddressName]);
+	}, [encodedAddress, getOnChainIdentity, truncateCharLen, walletAddressName, userData]);
 
 	if (disableTooltip) {
 		return (
@@ -101,12 +106,13 @@ function Address({
 				showIdenticon={showIdenticon}
 				textClassName={textClassName}
 				redirectToProfile={redirectToProfile}
+				showOnlyIdenticon={showOnlyIdenticon}
 			/>
 		);
 	}
 
 	return (
-		<div className={classes.tooltipWrapper}>
+		<div className={cn(classes.tooltipWrapper, wrapperClassName)}>
 			<TooltipProvider>
 				<Tooltip>
 					<TooltipTrigger asChild>
@@ -121,6 +127,7 @@ function Address({
 								showIdenticon={showIdenticon}
 								textClassName={textClassName}
 								redirectToProfile={redirectToProfile}
+								showOnlyIdenticon={showOnlyIdenticon}
 							/>
 						</div>
 					</TooltipTrigger>

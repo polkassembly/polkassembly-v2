@@ -4,7 +4,7 @@
 
 'use client';
 
-import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences, EAccountType, IAddressRelations } from '@/_shared/types';
+import { IRefreshTokenPayload, IUserPreferences, EAccountType, IAddressRelations, IAccessTokenPayload } from '@/_shared/types';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -22,9 +22,12 @@ import { walletAtom } from '../_atoms/wallet/walletAtom';
 import { assethubApiAtom } from '../_atoms/polkadotJsApi/assethubApiAtom';
 import { AssethubApiService } from '../_client-services/assethub_api_service';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
+import { isMimirDetected } from '../_client-services/isMimirDetected';
 
 function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const network = getCurrentNetwork();
+
+	const userDataClient = CookieClientService.getAccessTokenPayload();
 
 	const { user, setUser, setUserAddressRelations } = useUser();
 	const { setUserPreferences } = useUserPreferences();
@@ -62,7 +65,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		}
 	}, [setUser]);
 
-	const restablishConnections = useCallback(() => {
+	const restablishConnections = useCallback(async () => {
 		if (document.visibilityState === 'hidden') return;
 
 		polkadotApi?.reconnect();
@@ -75,7 +78,9 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 				return;
 			}
 
-			AuthClientService.logout(() => setUser(null));
+			const isMimir = await isMimirDetected();
+
+			AuthClientService.logout({ isIframe: !!isMimir, onLogout: () => setUser(null) });
 		}
 	}, [assethubApi, identityApi, polkadotApi, refreshAccessToken, refreshTokenData, user, setUser]);
 
@@ -227,18 +232,18 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 	// set user
 	useEffect(() => {
-		if (!userData) {
+		if (!userData || !userDataClient) {
 			return;
 		}
 
 		setUser(userData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [userData]);
+	}, []);
 
 	// set address relations
 	useEffect(() => {
 		const fetchAddressRelations = async () => {
-			const userAddresses = userData?.addresses;
+			const userAddresses = userDataClient?.addresses;
 			if (!userAddresses?.length) return;
 
 			const addressRelations: IAddressRelations[] = [];

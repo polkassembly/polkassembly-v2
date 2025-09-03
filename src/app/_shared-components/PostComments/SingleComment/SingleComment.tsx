@@ -4,20 +4,22 @@
 
 'use client';
 
-import { EProposalType, ICommentResponse, IComment, IPublicUser, ENotificationStatus } from '@/_shared/types';
-import { Dispatch, SetStateAction, useCallback, memo, useState, useRef } from 'react';
+import { ICommentResponse, ENotificationStatus, ICommentHistoryItem } from '@/_shared/types';
+import { Dispatch, SetStateAction, useCallback, memo, useState, useRef, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Identicon from '@polkadot/react-identicon';
-import ReplyIcon from '@assets/icons/Vote.svg';
 import Image from 'next/image';
 import { Button } from '@ui/Button';
+import Link from 'next/link';
 import CreatedAtTime from '@ui/CreatedAtTime/CreatedAtTime';
 import { Separator } from '@ui/Separator';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useTranslations } from 'next-intl';
-import { Ellipsis } from 'lucide-react';
+import { CornerUpLeft, Ellipsis } from 'lucide-react';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
+import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import UserIcon from '@assets/profile/user-icon.svg';
 import { MarkdownViewer } from '@ui/MarkdownViewer/MarkdownViewer';
@@ -31,15 +33,21 @@ import Address from '../../Profile/Address/Address';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import VoteComments from '../VoteComments/VoteComments';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
+import { Skeleton } from '../../Skeleton';
+import CommentReactions from '../CommentReactions/CommentReactions';
+
+const CommentHistory = dynamic(() => import('./CommentHistory/CommentHistory'), { ssr: false, loading: () => <Skeleton className='h-8 w-16' /> });
 
 interface SingleCommentProps {
 	commentData: ICommentResponse;
-	proposalType: EProposalType;
-	index: string;
 	setParentComment?: Dispatch<SetStateAction<ICommentResponse | null>>;
+	setComments?: Dispatch<SetStateAction<ICommentResponse[]>>;
+	parentCommentId?: string;
 }
 
-function SingleComment({ commentData, proposalType, index, setParentComment }: SingleCommentProps) {
+function SingleComment({ commentData, setParentComment, setComments, parentCommentId }: SingleCommentProps) {
+	const { proposalType, indexOrHash: index } = commentData;
+
 	const [reply, setReply] = useState<boolean>(false);
 	const t = useTranslations();
 	const [comment, setComment] = useState<ICommentResponse | null>(commentData);
@@ -53,6 +61,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 	const [content, setContent] = useState<string>(commentData.content);
 
 	const user = useAtomValue(userAtom);
+	const [history, setHistory] = useState<ICommentHistoryItem[]>(commentData?.history || []);
 
 	const { toast } = useToast();
 
@@ -97,9 +106,21 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 					children: prev.children?.filter((child) => child.id !== comment.id)
 				};
 			});
+			setComments?.((prev) => {
+				if (!prev) return [];
+				const parentComment = prev.find((c) => c.id === parentCommentId);
+				if (!parentComment) return prev;
+				return [...prev.filter((c) => c.id !== parentCommentId), { ...parentComment, children: parentComment.children?.filter((c) => c.id !== comment.id) }];
+			});
 		} else {
 			setComment(null);
 		}
+		setComments?.((prev) => prev?.filter((c) => c.id !== comment.id));
+		toast({
+			title: 'Success!',
+			description: 'Comment deleted successfully',
+			status: ENotificationStatus.SUCCESS
+		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [comment, index, proposalType, setParentComment, user]);
 
@@ -128,6 +149,9 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 		});
 		setIsEditing(false);
 
+		// create a new comment history item with the new content
+		setHistory((prev) => [...prev, { content: originalContent || '', createdAt: new Date() }]);
+
 		setLoading(true);
 
 		const { data, error } = await CommentClientService.editCommentFromPost({
@@ -155,7 +179,15 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 				description: error?.message || 'Failed to edit comment',
 				status: ENotificationStatus.ERROR
 			});
+			// remove the new history item from the comment history array
+			setHistory((prev) => (prev && prev.length ? prev.slice(0, -1) : []));
+			return;
 		}
+		toast({
+			title: 'Success!',
+			description: 'Comment edited successfully',
+			status: ENotificationStatus.SUCCESS
+		});
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [comment, content, index, proposalType, user]);
@@ -167,23 +199,24 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 
 	const handleCancelReply = useCallback(() => setReply(false), []);
 
-	const handleConfirmReply = useCallback((newComment: IComment, publicUser: IPublicUser) => {
-		setComment((prev) => {
-			if (!prev) return null;
-			return {
-				...prev,
-				children: [
-					...(prev.children || []),
-					{
-						...newComment,
-						publicUser
-					}
-				]
-			};
+	useEffect(() => {
+		setComment(commentData);
+	}, [commentData]);
+
+	const handleCopyCommentLink = useCallback(() => {
+		const baseUrl = getPostTypeUrl({ proposalType, indexOrHash: index });
+
+		// Check if baseUrl is already an absolute URL (starts with http/https)
+		const isAbsoluteUrl = baseUrl.startsWith('http://') || baseUrl.startsWith('https://');
+		const url = isAbsoluteUrl ? `${baseUrl}#comment-${comment?.id}` : `${window?.location?.origin}${baseUrl}#comment-${comment?.id}`;
+
+		navigator.clipboard.writeText(url);
+		toast({
+			title: 'Success!',
+			description: 'Comment link copied to clipboard',
+			status: ENotificationStatus.SUCCESS
 		});
-		setReply(false);
-		setShowReplies(true);
-	}, []);
+	}, [comment, index, proposalType, toast]);
 
 	if (!comment) {
 		return null;
@@ -192,10 +225,15 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 	const network = getCurrentNetwork();
 	const userAddresses = !EVM_NETWORKS.includes(network) ? comment?.publicUser?.addresses?.filter((address) => !address.startsWith('0x')) : comment?.publicUser?.addresses;
 
-	const addressToDisplay = userAddresses?.[0] || comment?.publicUser?.addresses?.[0];
+	const addressToDisplay = comment?.authorAddress || userAddresses?.[0] || comment?.publicUser?.addresses?.[0];
+	const isHighlighted = typeof window !== 'undefined' && window?.location?.hash === `#comment-${comment.id}`;
+	const wrapperClassName = isHighlighted ? `${classes.wrapper} ${classes.highlighted}` : classes.wrapper;
 
 	return (
-		<div className={classes.wrapper}>
+		<div
+			id={`comment-${comment.id}`}
+			className={wrapperClassName}
+		>
 			<Dialog
 				open={openDeleteModal}
 				onOpenChange={setOpenDeleteModal}
@@ -263,6 +301,13 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 						className='h-3'
 					/>
 					<CreatedAtTime createdAt={comment.updatedAt || comment.createdAt} />
+					{history && history?.length > 0 && (
+						<CommentHistory
+							authorAddress={addressToDisplay}
+							authorUsername={comment?.publicUser?.username}
+							history={[...history, { content: comment.content, createdAt: comment.updatedAt || comment.createdAt }]}
+						/>
+					)}
 					{comment.voteData && comment.voteData.length > 0 && (
 						<>
 							<Separator
@@ -307,41 +352,76 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 					/>
 				)}
 
-				{user && (
-					<div className={classes.tools}>
+				<div className={classes.tools}>
+					<CommentReactions
+						commentData={comment}
+						disabled={comment.disabled}
+					/>
+					{user ? (
 						<Button
 							variant='ghost'
 							className={classes.replyButton}
 							onClick={handleToggleReply}
 							size='sm'
+							disabled={comment.disabled}
 							leftIcon={
-								<Image
-									src={ReplyIcon}
-									alt='reply'
-									className='darkIcon'
+								<CornerUpLeft
+									size={14}
+									className={classes.replyButton}
 								/>
 							}
 						>
 							{t('PostDetails.reply')}
 						</Button>
-						<div>
-							{comment.userId === user.id && (
-								<DropdownMenu>
-									<DropdownMenuTrigger
-										noArrow
-										className='border-none'
+					) : (
+						<Link
+							href='/login'
+							className='p-0'
+						>
+							<Button
+								variant='ghost'
+								size='sm'
+								className={classes.replyButton}
+								leftIcon={
+									<CornerUpLeft
+										size={14}
+										className={classes.replyButton}
+									/>
+								}
+							>
+								{t('PostDetails.reply')}
+							</Button>
+						</Link>
+					)}
+					<div className='ml-auto'>
+						<DropdownMenu>
+							<DropdownMenuTrigger
+								noArrow
+								className='border-none'
+							>
+								<Ellipsis
+									className='text-text_primary/[0.8]'
+									size={14}
+								/>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent>
+								<DropdownMenuItem className='hover:bg-bg_pink/10'>
+									<Button
+										variant='ghost'
+										className='h-auto p-0 text-sm text-text_primary'
+										onClick={handleCopyCommentLink}
+										size='sm'
 									>
-										<Ellipsis
-											className='text-text_primary/[0.8]'
-											size={14}
-										/>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent>
+										{t('PostDetails.copyLink')}
+									</Button>
+								</DropdownMenuItem>
+								{user && comment.userId === user.id && (
+									<>
 										<DropdownMenuItem className='hover:bg-bg_pink/10'>
 											<Button
 												variant='ghost'
 												className='h-auto p-0 text-sm text-text_primary'
-												disabled={comment.userId !== user.id}
+												disabled={comment.userId !== user.id || comment.disabled}
 												onClick={toggleEditComment}
 												size='sm'
 												isLoading={loading}
@@ -353,7 +433,7 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 											<Button
 												variant='ghost'
 												className='h-auto p-0 text-sm text-text_primary'
-												disabled={comment.userId !== user.id}
+												disabled={comment.userId !== user.id || comment.disabled}
 												onClick={handleOpenDeleteModal}
 												size='sm'
 												isLoading={loading}
@@ -361,12 +441,12 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 												{t('PostDetails.delete')}
 											</Button>
 										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							)}
-						</div>
+									</>
+								)}
+							</DropdownMenuContent>
+						</DropdownMenu>
 					</div>
-				)}
+				</div>
 
 				{reply && (
 					<AddComment
@@ -374,7 +454,10 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 						proposalType={proposalType}
 						parentCommentId={comment.id}
 						onCancel={handleCancelReply}
-						onConfirm={handleConfirmReply}
+						onOptimisticUpdate={() => {
+							setReply(false);
+							setShowReplies(true);
+						}}
 						isReply
 						replyTo={comment?.publicUser}
 					/>
@@ -397,10 +480,10 @@ function SingleComment({ commentData, proposalType, index, setParentComment }: S
 							comment.children.map((item) => (
 								<SingleComment
 									key={item.id}
-									proposalType={proposalType}
-									index={index}
 									commentData={item}
 									setParentComment={setComment}
+									setComments={setComments}
+									parentCommentId={parentCommentId || comment.id}
 								/>
 							))}
 					</div>

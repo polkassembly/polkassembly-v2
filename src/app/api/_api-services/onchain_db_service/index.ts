@@ -18,6 +18,8 @@ import {
 	IDelegationStats,
 	EBountyStatus,
 	EVoteSortOptions,
+	EAnalyticsType,
+	EVotesDisplayType,
 	IRawTurnoutData,
 	ITrackAnalyticsStats,
 	IGovAnalyticsStats,
@@ -105,8 +107,9 @@ export class OnChainDbService {
 		page,
 		limit,
 		decision,
-		voterAddress,
-		orderBy
+		voterAddresses,
+		orderBy,
+		votesType
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -114,10 +117,11 @@ export class OnChainDbService {
 		page: number;
 		limit: number;
 		decision?: EVoteDecision;
-		voterAddress?: string;
+		voterAddresses?: string[];
 		orderBy?: EVoteSortOptions;
+		votesType?: EVotesDisplayType;
 	}) {
-		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddress, orderBy });
+		const postVoteData = await SubsquidService.GetPostVoteData({ network, proposalType, indexOrHash, page, limit, decision, voterAddresses, orderBy, votesType });
 		if (postVoteData) return postVoteData;
 
 		return {
@@ -150,6 +154,16 @@ export class OnChainDbService {
 		};
 	}
 
+	static async GetPreimagesByAddress({ network, page, limit, address }: { network: ENetwork; page: number; limit: number; address: string }) {
+		const userPreimageListing = await SubsquidService.GetPreimagesByAddress({ network, page, limit, address });
+		if (userPreimageListing) return userPreimageListing;
+
+		return {
+			items: [],
+			totalCount: 0
+		};
+	}
+
 	static async GetPreimageByHash({ network, hash }: { network: ENetwork; hash: string }): Promise<IPreimage | null> {
 		const preimage = await SubsquidService.GetPreimageByHash({ network, hash });
 		if (preimage) return preimage;
@@ -159,12 +173,14 @@ export class OnChainDbService {
 
 	static async GetActiveVotedProposalsCount({
 		addresses,
-		network
+		network,
+		last15days
 	}: {
 		addresses: string[];
 		network: ENetwork;
+		last15days?: boolean;
 	}): Promise<{ activeProposalsCount: number; votedProposalsCount: number }> {
-		return SubsquidService.GetActiveVotedProposalsCount({ addresses, network });
+		return SubsquidService.GetActiveVotedProposalsCount({ addresses, network, last15days });
 	}
 
 	static async GetBountyStats(network: ENetwork): Promise<IBountyStats> {
@@ -313,6 +329,52 @@ export class OnChainDbService {
 		proposalType: EProposalType;
 	}) {
 		return SubsquidService.GetOnChainPostsByProposer({ network, proposer, page, limit, proposalType });
+	}
+
+	static async GetExtrinsicDetails({
+		network,
+		hash
+	}: {
+		network: ENetwork;
+		hash: string;
+	}): Promise<{ message: string; data: { account_id: string; params: { name: string; value: string }[] } }> {
+		return SubscanOnChainService.GetExtrinsicDetails({ network, hash });
+	}
+
+	static async GetPostAnalytics({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }) {
+		return SubsquidService.GetPostAnalytics({ network, proposalType, index });
+	}
+
+	static async GetPostBubbleVotes({
+		network,
+		proposalType,
+		index,
+		analyticsType,
+		votesType
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		analyticsType: EAnalyticsType;
+		votesType: EVotesDisplayType;
+	}) {
+		return SubsquidService.GetPostBubbleVotes({ network, proposalType, index, analyticsType, votesType });
+	}
+
+	static async GetVotesForAddresses({
+		network,
+		voters,
+		page,
+		limit,
+		proposalStatuses
+	}: {
+		network: ENetwork;
+		voters: string[];
+		page: number;
+		limit: number;
+		proposalStatuses?: EProposalStatus[];
+	}) {
+		return SubsquidService.GetVotesForAddresses({ network, voters, page, limit, proposalStatuses });
 	}
 
 	// Gov Analytics Methods

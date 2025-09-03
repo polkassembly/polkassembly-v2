@@ -11,6 +11,8 @@ import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
 import {
 	ENetwork,
+	EProposalStatus,
+	EAnalyticsType,
 	EPostOrigin,
 	EProposalType,
 	IContentSummary,
@@ -18,7 +20,10 @@ import {
 	IDelegationStats,
 	IGenericListingResponse,
 	IPost,
+	IPostAnalytics,
 	IPostListing,
+	EVotesDisplayType,
+	IPostBubbleVotes,
 	ITrackAnalyticsDelegations,
 	ITrackAnalyticsStats,
 	ITreasuryStats,
@@ -64,6 +69,9 @@ enum ERedisKeys {
 	TRACK_ANALYTICS_STATS = 'TAS',
 	TREASURY_STATS = 'TRS',
 	OVERVIEW_PAGE_DATA = 'OPD',
+	REMARK_LOGIN_MESSAGE = 'RLM',
+	POST_ANALYTICS_DATA = 'PAD',
+	POST_BUBBLE_VOTES_DATA = 'PBVD',
 	GOV_ANALYTICS_STATS = 'GAS',
 	GOV_ANALYTICS_REFERENDUM_OUTCOME = 'GAR',
 	GOV_ANALYTICS_REFERENDUM_COUNT = 'GAC',
@@ -136,6 +144,11 @@ export class RedisService {
 		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: EPostOrigin | 'all'): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
 		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
 		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
+		[ERedisKeys.REMARK_LOGIN_MESSAGE]: (address: string): string => `${ERedisKeys.REMARK_LOGIN_MESSAGE}-${address}`,
+		[ERedisKeys.POST_ANALYTICS_DATA]: (network: ENetwork, proposalType: EProposalType, index: number): string =>
+			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${index}`,
+		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: ENetwork, proposalType: EProposalType, index: number, votesType: EVotesDisplayType, analyticsType: EAnalyticsType): string =>
+			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${index}-${votesType}-${analyticsType}`,
 		[ERedisKeys.GOV_ANALYTICS_STATS]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_STATS}-${network}`,
 		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME}-${network}`,
 		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT}-${network}`,
@@ -149,84 +162,120 @@ export class RedisService {
 
 	private static async Get({ key, forceCache = false }: { key: string; forceCache?: boolean }): Promise<string | null> {
 		if (!IS_CACHE_ENABLED && !forceCache) return null;
-		return this.client.get(key);
+
+		try {
+			return this.client.get(key);
+		} catch (error) {
+			console.error('Error getting key:', error);
+			return null;
+		}
 	}
 
 	private static async Set({ key, value, ttlSeconds, forceCache = false }: { key: string; value: string; ttlSeconds?: number; forceCache?: boolean }): Promise<string | null> {
 		if (!IS_CACHE_ENABLED && !forceCache) return null;
 
-		if (ttlSeconds) {
-			return this.client.set(key, value, 'EX', ttlSeconds);
-		}
+		try {
+			if (ttlSeconds) {
+				return this.client.set(key, value, 'EX', ttlSeconds);
+			}
 
-		return this.client.set(key, value);
+			return this.client.set(key, value);
+		} catch (error) {
+			console.error('Error setting key:', error);
+			return null;
+		}
 	}
 
 	private static async Delete({ key, forceCache = false }: { key: string; forceCache?: boolean }): Promise<number> {
 		if (!IS_CACHE_ENABLED && !forceCache) return 0;
 
-		return this.client.del(key);
+		try {
+			return this.client.del(key);
+		} catch (error) {
+			console.error('Error deleting key:', error);
+			return 0;
+		}
 	}
 
 	private static async DeleteKeys({ pattern, forceCache = false }: { pattern: string; forceCache?: boolean }): Promise<void> {
 		if (!IS_CACHE_ENABLED && !forceCache) return Promise.resolve();
 
-		return new Promise((resolve, reject) => {
-			const stream = this.client.scanStream({
-				count: 200,
-				match: pattern
-			});
+		try {
+			return new Promise((resolve, reject) => {
+				const stream = this.client.scanStream({
+					count: 200,
+					match: pattern
+				});
 
-			let hasError = false;
+				let hasError = false;
 
-			stream.on('data', async (keys) => {
-				if (keys.length && !hasError) {
-					try {
-						const pipeline = this.client.pipeline();
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						keys.forEach((key: any) => {
-							pipeline.del(key);
-						});
-						await pipeline.exec();
-					} catch (error) {
-						hasError = true;
-						console.error('Error deleting keys:', error);
-						reject(error);
+				stream.on('data', async (keys) => {
+					if (keys.length && !hasError) {
+						try {
+							const pipeline = this.client.pipeline();
+							// eslint-disable-next-line @typescript-eslint/no-explicit-any
+							keys.forEach((key: any) => {
+								pipeline.del(key);
+							});
+							await pipeline.exec();
+						} catch (error) {
+							hasError = true;
+							console.error('Error deleting keys:', error);
+							reject(error);
+						}
 					}
-				}
-			});
+				});
 
-			stream.on('end', () => {
-				if (!hasError) {
-					console.log(`All keys matching pattern ${pattern} deleted.`);
-					resolve();
-				}
-			});
+				stream.on('end', () => {
+					if (!hasError) {
+						console.log(`All keys matching pattern ${pattern} deleted.`);
+						resolve();
+					}
+				});
 
-			stream.on('error', (error) => {
-				hasError = true;
-				console.error('Stream error:', error);
-				reject(error);
+				stream.on('error', (error) => {
+					hasError = true;
+					console.error('Stream error:', error);
+					reject(error);
+				});
 			});
-		});
+		} catch (error) {
+			console.error('Error deleting keys:', error);
+			return Promise.reject(error);
+		}
 	}
 
 	private static async AddToSet({ key, value, forceCache = false }: { key: string; value: string; forceCache?: boolean }): Promise<number> {
 		if (!IS_CACHE_ENABLED && !forceCache) return 0;
 
-		return this.client.sadd(key, value);
+		try {
+			return this.client.sadd(key, value);
+		} catch (error) {
+			console.error('Error adding to set:', error);
+			return 0;
+		}
 	}
 
 	private static async RemoveFromSet({ key, value, forceCache = false }: { key: string; value: string; forceCache?: boolean }): Promise<number> {
 		if (!IS_CACHE_ENABLED && !forceCache) return 0;
 
-		return this.client.srem(key, value);
+		try {
+			return this.client.srem(key, value);
+		} catch (error) {
+			console.error('Error removing from set:', error);
+			return 0;
+		}
 	}
 
 	private static async GetSetMembers({ key, forceCache = false }: { key: string; forceCache?: boolean }): Promise<string[]> {
 		if (!IS_CACHE_ENABLED && !forceCache) return [];
 
-		return this.client.smembers(key);
+		try {
+			return this.client.smembers(key);
+		} catch (error) {
+			console.error('Error getting set members:', error);
+			return [];
+		}
 	}
 
 	static async DeleteAllCacheForNetwork(network: ENetwork): Promise<void> {
@@ -242,7 +291,9 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` }),
-			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_ANALYTICS_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_STATS}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT}-${network}-*` }),
@@ -537,6 +588,11 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.ACTIVITY_FEED}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.CONTENT_SUMMARY}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.SUBSCRIPTION_FEED}-${network}-*` }),
+
+			// clear post analytics data
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_ANALYTICS_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-*` }),
+
 			// clear overview page data
 			this.DeleteOverviewPageData({ network }),
 
@@ -652,6 +708,108 @@ export class RedisService {
 
 	static async DeleteOverviewPageData({ network }: { network: ENetwork }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
+	}
+
+	// Remark login message caching methods
+	static async SetRemarkLoginMessage({ address, message }: { address: string; message: string }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.REMARK_LOGIN_MESSAGE](address), value: message, ttlSeconds: FIVE_MIN, forceCache: true });
+	}
+
+	static async GetRemarkLoginMessage(address: string): Promise<string | null> {
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.REMARK_LOGIN_MESSAGE](address), forceCache: true });
+	}
+
+	static async DeleteRemarkLoginMessage(address: string): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.REMARK_LOGIN_MESSAGE](address), forceCache: true });
+	}
+
+	static async SetPostAnalyticsData({
+		network,
+		proposalType,
+		index,
+		data,
+		proposalStatus
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		data: IPostAnalytics;
+		proposalStatus: EProposalStatus;
+	}): Promise<void> {
+		const isActivePost = ACTIVE_PROPOSAL_STATUSES.includes(proposalStatus);
+
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index),
+			value: JSON.stringify(data),
+			ttlSeconds: isActivePost ? ONE_DAY_IN_SECONDS : THIRTY_DAYS_IN_SECONDS
+		});
+	}
+
+	static async GetPostAnalyticsData({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index) });
+		return data ? (deepParseJson(data) as IPostAnalytics) : null;
+	}
+
+	static async DeletePostAnalyticsData({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index) });
+	}
+
+	static async SetPostBubbleVotesData({
+		network,
+		proposalType,
+		index,
+		data,
+		votesType,
+		analyticsType,
+		proposalStatus
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		data: IPostBubbleVotes;
+		votesType: EVotesDisplayType;
+		analyticsType: EAnalyticsType;
+		proposalStatus: EProposalStatus;
+	}): Promise<void> {
+		const isActivePost = ACTIVE_PROPOSAL_STATUSES.includes(proposalStatus);
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType),
+			value: JSON.stringify(data),
+			ttlSeconds: isActivePost ? ONE_DAY_IN_SECONDS : THIRTY_DAYS_IN_SECONDS
+		});
+	}
+
+	static async GetPostBubbleVotesData({
+		network,
+		proposalType,
+		index,
+		votesType,
+		analyticsType
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		votesType: EVotesDisplayType;
+		analyticsType: EAnalyticsType;
+	}): Promise<IPostBubbleVotes | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });
+		return data ? (deepParseJson(data) as IPostBubbleVotes) : null;
+	}
+
+	static async DeletePostBubbleVotesData({
+		network,
+		proposalType,
+		index,
+		votesType,
+		analyticsType
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		votesType: EVotesDisplayType;
+		analyticsType: EAnalyticsType;
+	}): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });
 	}
 
 	// Network governance analytics stats caching methods
