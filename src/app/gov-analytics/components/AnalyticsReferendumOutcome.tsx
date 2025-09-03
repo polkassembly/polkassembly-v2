@@ -48,14 +48,6 @@ function AnalyticsReferendumOutcome() {
 				backgroundColor: chartColors,
 				borderColor: theme === 'dark' ? '#000000' : '#ffffff',
 				borderWidth: 2, // Add spacing between segments
-				hoverBackgroundColor: chartColors.map((color) => {
-					// Slightly brighten colors on hover
-					const hex = color.replace('#', '');
-					const r = Math.min(255, parseInt(hex.substr(0, 2), 16) + 20);
-					const g = Math.min(255, parseInt(hex.substr(2, 2), 16) + 20);
-					const b = Math.min(255, parseInt(hex.substr(4, 2), 16) + 20);
-					return `rgb(${r}, ${g}, ${b})`;
-				}),
 				hoverBorderColor: '#ffffff',
 				hoverBorderWidth: 3,
 				borderRadius: 8, // Rounded edges for segments

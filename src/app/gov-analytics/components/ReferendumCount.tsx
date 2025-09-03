@@ -82,7 +82,6 @@ function ReferendumCount() {
 				backgroundColor: chartLabels.map((_, index) => `hsl(${index * 30}, 70%, 50%)`),
 				borderColor: theme === 'dark' ? '#000000' : '#ffffff',
 				borderWidth: 2, // Add spacing between segments
-				hoverBackgroundColor: chartLabels.map((_, index) => `hsl(${index * 30}, 70%, 55%)`),
 				hoverBorderColor: '#ffffff',
 				hoverBorderWidth: 3,
 				borderRadius: 8, // Rounded edges for segments
