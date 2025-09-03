@@ -31,6 +31,8 @@ import {
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { createId as createCuid } from '@paralleldrive/cuid2';
+import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
+import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
 import {
 	FIVE_MIN,
 	HALF_HOUR_IN_SECONDS,
@@ -382,7 +384,22 @@ export class RedisService {
 	// Posts caching methods
 	static async GetPostData({ network, proposalType, indexOrHash }: { network: string; proposalType: EProposalType; indexOrHash: string }): Promise<IPost | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash) });
-		return data ? (deepParseJson(data) as IPost) : null;
+		const parsedData = data ? (deepParseJson(data) as IPost) : null;
+
+		if (parsedData && parsedData.title !== undefined && typeof parsedData.title !== 'string') {
+			parsedData.title = String(parsedData.title || DEFAULT_POST_TITLE);
+		}
+		if (parsedData && parsedData.content !== undefined && typeof parsedData.content !== 'string') {
+			parsedData.content = String(parsedData.content || getDefaultPostContent(proposalType));
+		}
+
+		if (parsedData && parsedData.comments && Array.isArray(parsedData.comments)) {
+			parsedData.comments = parsedData.comments.map((comment) => ({
+				...comment,
+				content: comment.content !== undefined && typeof comment.content !== 'string' ? String(comment.content || '') : comment.content
+			}));
+		}
+		return parsedData as IPost | null;
 	}
 
 	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: EProposalType; indexOrHash: string; data: IPost }): Promise<void> {
