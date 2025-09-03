@@ -5,11 +5,15 @@
 import { EDataSource, ENetwork, EProposalType, IAlgoliaPost, IPost } from '@/_shared/types';
 import { createHash } from 'crypto';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { algoliasearch } from 'algoliasearch';
 import dayjs from 'dayjs';
+import { StatusCodes } from 'http-status-codes';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { markdownToPlainText } from '@/_shared/_utils/markdownToText';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ALGOLIA_WRITE_API_KEY } from '../../_api-constants/apiEnvVars';
+import { APIError } from '../../_api-utils/apiError';
 import { fetchPostData } from '../../_api-utils/fetchPostData';
 
 const { NEXT_PUBLIC_ALGOLIA_APP_ID } = getSharedEnvVars();
@@ -22,14 +26,14 @@ export class AlgoliaService {
 	private static initAlgoliaApi() {
 		if (!NEXT_PUBLIC_ALGOLIA_APP_ID || !ALGOLIA_WRITE_API_KEY) {
 			console.error('Algolia environment variables not set');
-			throw new Error('Algolia environment variables not set');
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Algolia environment variables not set');
 		}
 
 		try {
 			return algoliasearch(NEXT_PUBLIC_ALGOLIA_APP_ID, ALGOLIA_WRITE_API_KEY);
 		} catch (error) {
 			console.error('Error initializing Algolia client:', error);
-			throw error;
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error initializing Algolia client');
 		}
 	}
 
@@ -80,11 +84,84 @@ export class AlgoliaService {
 		return createHash('sha256').update(input, 'utf8').digest('hex');
 	}
 
+	// Helper method to extract index/hash from post data
+	private static getPostIdentifier(post: IPost): { indexOrHash: string; index?: number; hash?: string } | null {
+		if (post.proposalType === EProposalType.TIP) {
+			// Tips use hash as identifier
+			const hash = post.onChainInfo?.hash || post.hash || '';
+			return hash ? { indexOrHash: hash, hash } : null;
+		}
+		// Other proposal types use index
+		const index = post.onChainInfo?.index !== undefined ? post.onChainInfo.index : post.index;
+		return index !== undefined ? { indexOrHash: String(index), index } : null;
+	}
+
+	// Helper method to build Algolia post object from IPost data
+	private static buildAlgoliaPost(post: IPost): IAlgoliaPost | null {
+		// Validate required fields
+		if (!post.proposalType || !post.network) {
+			console.error('Missing required fields for Algolia: proposalType or network');
+			return null;
+		}
+
+		// Parse content to plain text
+		const parsedContent = markdownToPlainText(post.content || '');
+
+		// Extract tags
+		const tags = post.tags ? post.tags.map((tag: string | { value: string }) => (typeof tag === 'string' ? tag : tag.value)) : [];
+
+		// Get proposer and origin from onChainInfo
+		const proposer = post.onChainInfo?.proposer || '';
+		const origin = post.onChainInfo?.origin || '';
+
+		// Determine the correct index and hash
+		const identifier = this.getPostIdentifier(post);
+		if (!identifier) {
+			console.error('Missing index or hash for Algolia post');
+			return null;
+		}
+		const { indexOrHash, index, hash } = identifier;
+
+		// Create the Algolia post object
+		const algoliaPost: IAlgoliaPost = {
+			objectID: `${post.network}-${post.proposalType}-${indexOrHash}`,
+			title: post.title || DEFAULT_POST_TITLE,
+			createdAtTimestamp: post.createdAt ? dayjs(post.createdAt).unix() : dayjs().unix(),
+			updatedAtTimestamp: post.updatedAt ? dayjs(post.updatedAt).unix() : dayjs().unix(),
+			tags,
+			dataSource: post.dataSource || EDataSource.POLKASSEMBLY,
+			proposalType: post.proposalType,
+			network: post.network,
+			topic: typeof origin === 'string' ? origin : '',
+			lastCommentAtTimestamp: post.lastCommentAt ? dayjs(post.lastCommentAt).unix() : dayjs().unix(),
+			userId: post.userId || post.publicUser?.id || 0,
+			...(hash && { hash }),
+			...(ValidatorService.isValidNumber(index) && { index }),
+			parsedContent,
+			titleAndContentHash: this.hashTitleAndContent(post.title || DEFAULT_POST_TITLE, post.content || ''),
+			...(proposer && { proposer }),
+			...(origin && { origin })
+		};
+
+		return algoliaPost;
+	}
+
+	// Helper method to save post to Algolia
+	private static async saveToAlgolia(algoliaPost: IAlgoliaPost): Promise<void> {
+		const client = this.initAlgoliaApi();
+
+		// Truncate content if the object is too large for Algolia
+		const truncatedPost = this.truncateContentToFitLimit(algoliaPost);
+
+		// Save to Algolia
+		await client.saveObject({
+			indexName: 'polkassembly_v2_posts',
+			body: truncatedPost
+		});
+	}
+
 	static async createPreliminaryAlgoliaPostRecord({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }) {
 		try {
-			// Initialize Algolia client
-			const client = this.initAlgoliaApi();
-
 			// Fetch post data from the API
 			let postData: IPost;
 			try {
@@ -94,54 +171,63 @@ export class AlgoliaService {
 				return;
 			}
 
-			// Parse content to plain text
-			const parsedContent = markdownToPlainText(postData.content || '');
-
-			// Extract tags
-			const tags = postData.tags ? postData.tags.map((tag: string | { value: string }) => (typeof tag === 'string' ? tag : tag.value)) : [];
-
-			// Get proposer and origin from onChainInfo
-			const proposer = postData.onChainInfo?.proposer || '';
-			const origin = postData.onChainInfo?.origin || '';
-
-			// Determine the correct index and hash
-			const index = proposalType !== EProposalType.TIP ? Number(indexOrHash) : undefined;
-			const hash = proposalType === EProposalType.TIP ? indexOrHash : undefined;
-
-			// Create the Algolia post object
-			const algoliaPost: IAlgoliaPost = {
-				objectID: `${network}-${proposalType}-${indexOrHash}`,
-				title: postData.title || DEFAULT_POST_TITLE,
-				createdAtTimestamp: postData.createdAt ? dayjs(postData.createdAt).unix() : dayjs().unix(),
-				updatedAtTimestamp: postData.updatedAt ? dayjs(postData.updatedAt).unix() : dayjs().unix(),
-				tags,
-				dataSource: postData.dataSource || EDataSource.POLKASSEMBLY,
-				proposalType,
-				network,
-				topic: typeof origin === 'string' ? origin : '',
-				lastCommentAtTimestamp: postData.lastCommentAt ? dayjs(postData.lastCommentAt).unix() : dayjs().unix(),
-				userId: postData.userId || postData.publicUser?.id || 0,
-				...(hash && { hash }),
-				...(index && { index }),
-				parsedContent,
-				titleAndContentHash: this.hashTitleAndContent(postData.title || DEFAULT_POST_TITLE, postData.content || ''),
-				...(proposer && { proposer }),
-				...(origin && { origin })
-			};
-
-			// Truncate content if the object is too large for Algolia
-			const truncatedPost = this.truncateContentToFitLimit(algoliaPost);
+			// Build the Algolia post object
+			const algoliaPost = this.buildAlgoliaPost(postData);
+			if (!algoliaPost) {
+				console.error(`Failed to build Algolia post for ${proposalType}/${indexOrHash} on ${network}`);
+				return;
+			}
 
 			// Save to Algolia
-			await client.saveObject({
-				indexName: 'polkassembly_v2_posts',
-				body: truncatedPost
-			});
+			await this.saveToAlgolia(algoliaPost);
 
 			console.log(`Successfully created preliminary Algolia record for ${proposalType}/${indexOrHash} on ${network}`);
 		} catch (error) {
 			console.error(`Error creating preliminary Algolia record for ${proposalType}/${indexOrHash} on ${network}:`, error);
 			throw error;
+		}
+	}
+
+	static async updatePostRecord(post: IPost) {
+		try {
+			// Build the Algolia post object
+			const algoliaPost = this.buildAlgoliaPost(post);
+			if (!algoliaPost) {
+				console.error('Failed to build Algolia post for update');
+				return;
+			}
+
+			// Save to Algolia
+			await this.saveToAlgolia(algoliaPost);
+
+			// Extract identifier for logging
+			const identifier = this.getPostIdentifier(post);
+			const indexOrHash = identifier?.indexOrHash || 'unknown';
+
+			console.log(`Successfully updated Algolia record for ${post.proposalType}/${indexOrHash} on ${post.network}`);
+		} catch (error) {
+			console.error('Error updating Algolia record for post:', error);
+			// Don't throw the error to prevent disrupting the main flow
+		}
+	}
+
+	static async deletePostRecord({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+		try {
+			// Initialize Algolia client
+			const client = this.initAlgoliaApi();
+
+			const objectID = `${network}-${proposalType}-${indexOrHash}`;
+
+			// Delete from Algolia
+			await client.deleteObject({
+				indexName: 'polkassembly_v2_posts',
+				objectID
+			});
+
+			console.log(`Successfully deleted Algolia record: ${objectID}`);
+		} catch (error) {
+			console.error(`Error deleting Algolia record for ${proposalType}/${indexOrHash} on ${network}:`, error);
+			// Don't throw the error to prevent disrupting the main flow
 		}
 	}
 }
