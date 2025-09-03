@@ -69,7 +69,8 @@ enum ERedisKeys {
 	GOV_ANALYTICS_REFERENDUM_COUNT = 'GAC',
 	TRACK_LEVEL_PROPOSALS_ANALYTICS = 'TLP',
 	TURNOUT_DATA = 'TOD',
-	TRACK_DELEGATION_ANALYTICS = 'TDA'
+	TRACK_DELEGATION_ANALYTICS = 'TDA',
+	GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK = 'GAR_TRACK'
 }
 
 export class RedisService {
@@ -140,7 +141,8 @@ export class RedisService {
 		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT}-${network}`,
 		[ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS]: (network: string): string => `${ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS}-${network}`,
 		[ERedisKeys.TURNOUT_DATA]: (network: string): string => `${ERedisKeys.TURNOUT_DATA}-${network}`,
-		[ERedisKeys.TRACK_DELEGATION_ANALYTICS]: (network: string): string => `${ERedisKeys.TRACK_DELEGATION_ANALYTICS}-${network}`
+		[ERedisKeys.TRACK_DELEGATION_ANALYTICS]: (network: string): string => `${ERedisKeys.TRACK_DELEGATION_ANALYTICS}-${network}`,
+		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK]: (network: string, trackNo: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK}-${network}-${trackNo}`
 	} as const;
 
 	// helper methods
@@ -686,6 +688,20 @@ export class RedisService {
 
 	static async DeleteGovAnalyticsReferendumOutcome(network: string): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME](network) });
+	}
+
+	// Track-specific referendum outcome caching methods
+	static async GetGovAnalyticsReferendumOutcomeByTrack(network: string, trackNo: number): Promise<IGovAnalyticsReferendumOutcome | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK](network, trackNo.toString()) });
+		return data ? (deepParseJson(data) as IGovAnalyticsReferendumOutcome) : null;
+	}
+
+	static async SetGovAnalyticsReferendumOutcomeByTrack({ network, data, trackNo }: { network: string; data: IGovAnalyticsReferendumOutcome; trackNo: number }): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK](network, trackNo.toString()),
+			value: JSON.stringify(data),
+			ttlSeconds: ONE_DAY_IN_SECONDS
+		});
 	}
 
 	static async GetGovAnalyticsReferendumCount(network: string): Promise<{ categoryCounts: IGovAnalyticsCategoryCounts } | null> {

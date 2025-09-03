@@ -1098,11 +1098,12 @@ export class NextApiClientService {
 	}
 
 	static async getGovAnalyticsReferendumOutcome({ trackNo }: { trackNo?: number }) {
-		const queryParams = new URLSearchParams();
 		if (trackNo) {
-			queryParams.set('trackNo', trackNo.toString());
+			const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['referendum-outcome', 'track', trackNo.toString()] });
+			return this.nextApiClientFetch<IGovAnalyticsReferendumOutcome>({ url, method });
 		}
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['referendum-outcome'], queryParams });
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['referendum-outcome'] });
 		return this.nextApiClientFetch<IGovAnalyticsReferendumOutcome>({ url, method });
 	}
 
