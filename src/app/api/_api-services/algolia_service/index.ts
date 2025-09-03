@@ -3,9 +3,15 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { EDataSource, ENetwork, EPostOrigin, EProposalType, IAlgoliaPost } from '@/_shared/types';
+import { createHash } from 'crypto';
 
 // TODO: Implement Algolia Service
 export class AlgoliaService {
+	static hashTitleAndContent(title: string, content: string): string {
+		const input = `${title}||${content}`;
+		return createHash('sha256').update(input, 'utf8').digest('hex');
+	}
+
 	static async createPreliminaryAlgoliaPostRecord({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }) {
 		const newAlgoliaPost: IAlgoliaPost = {
 			objectID: `${network}-${proposalType}-${indexOrHash}`,
