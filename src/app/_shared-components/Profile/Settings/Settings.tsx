@@ -307,7 +307,7 @@ function Settings({ userProfileData, setUserProfileData }: { userProfileData: IP
 
 				<TabsContent
 					value='notifications'
-					className={classes.notificationSettings}
+					className={classes.settingsContent}
 				>
 					<Notifications />
 				</TabsContent>

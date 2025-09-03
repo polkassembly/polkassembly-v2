@@ -92,8 +92,7 @@ export enum ENotificationChannel {
 	TELEGRAM = 'telegram',
 	DISCORD = 'discord',
 	ELEMENT = 'element',
-	SLACK = 'slack',
-	IN_APP = 'in_app'
+	SLACK = 'slack'
 }
 
 export interface IUserNotificationChannelPreferences {
