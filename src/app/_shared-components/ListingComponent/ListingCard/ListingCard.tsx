@@ -4,7 +4,7 @@
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FaRegClock } from '@react-icons/all-files/fa/FaRegClock';
-import { EAssets, EProposalType, ETheme, IPostListing, IPostOffChainMetrics } from '@/_shared/types';
+import { EAssets, EGovType, EProposalType, ETheme, IPostListing, IPostOffChainMetrics } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image from 'next/image';
@@ -62,7 +62,9 @@ function ListingCard({
 
 	const groupedByAsset = groupBeneficiariesByAssetIndex({ beneficiaries: data.onChainInfo?.beneficiaries || [], network });
 
-	const redirectUrl = getPostTypeUrl({ proposalType, indexOrHash: index, network });
+	const redirectUrl = ARCHIVE_PROPOSAL_TYPES.includes(proposalType)
+		? getPostTypeUrl({ proposalType, indexOrHash: index, network, govType: EGovType.GOV_1 })
+		: getPostTypeUrl({ proposalType, indexOrHash: index, network });
 
 	return (
 		<Link
