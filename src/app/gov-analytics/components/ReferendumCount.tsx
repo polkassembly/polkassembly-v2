@@ -21,6 +21,27 @@ interface IReferendumCount {
 	[key: string]: number;
 }
 
+function LegendRow({ items, totalProposals }: { items: { label: string; value: number; color: string }[]; totalProposals: number }) {
+	return (
+		<div className='flex flex-wrap justify-between gap-x-10 gap-y-2 lg:w-full lg:gap-x-4'>
+			{items.map(({ label, value, color }) => (
+				<div
+					key={`${label}`}
+					className='flex items-center text-xs'
+				>
+					<div
+						className='mr-2 h-2 w-2 rounded-full'
+						style={{ background: color }}
+					/>
+					<p className='m-0 p-0'>
+						{label} [{value}]: {totalProposals ? ((value / totalProposals) * 100).toFixed(2) : '0.00'}%
+					</p>
+				</div>
+			))}
+		</div>
+	);
+}
+
 function ReferendumCount() {
 	const t = useTranslations('GovAnalytics');
 	const network = getCurrentNetwork();
@@ -113,25 +134,6 @@ function ReferendumCount() {
 	const secondRowData = legendData.slice(6, 11);
 	const thirdRowData = legendData.slice(11);
 
-	const renderLegendRow = (items: typeof legendData) => (
-		<div className='flex flex-wrap justify-between gap-x-10 gap-y-2 lg:w-full lg:gap-x-4'>
-			{items.map((item) => (
-				<div
-					key={`${item.label}`}
-					className='flex items-center text-xs'
-				>
-					<div
-						className='mr-2 h-2 w-2 rounded-full'
-						style={{ background: item.color }}
-					/>
-					<p className='m-0 p-0'>
-						{item.label} [{item.value}]: {data?.totalProposals ? ((item.value / data.totalProposals) * 100).toFixed(2) : '0.00'}%
-					</p>
-				</div>
-			))}
-		</div>
-	);
-
 	if (isLoading) {
 		return (
 			<div className='flex flex-col gap-4 rounded-lg border border-border_grey p-4'>
@@ -156,9 +158,24 @@ function ReferendumCount() {
 					/>
 				</div>
 				<div className='flex flex-col gap-x-10 lg:flex-row'>
-					<div className='flex flex-col gap-y-2'>{renderLegendRow(firstRowData)}</div>
-					<div className='flex flex-col gap-y-2'>{renderLegendRow(secondRowData)}</div>
-					<div className='flex flex-col gap-y-2'>{renderLegendRow(thirdRowData)}</div>
+					<div className='flex flex-col gap-y-2'>
+						<LegendRow
+							items={firstRowData}
+							totalProposals={data?.totalProposals ?? 0}
+						/>
+					</div>
+					<div className='flex flex-col gap-y-2'>
+						<LegendRow
+							items={secondRowData}
+							totalProposals={data?.totalProposals ?? 0}
+						/>
+					</div>
+					<div className='flex flex-col gap-y-2'>
+						<LegendRow
+							items={thirdRowData}
+							totalProposals={data?.totalProposals ?? 0}
+						/>
+					</div>
 				</div>
 			</div>
 		</div>
