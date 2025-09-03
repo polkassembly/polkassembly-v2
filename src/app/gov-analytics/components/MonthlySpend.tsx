@@ -20,7 +20,7 @@ function MonthlySpend() {
 		queryKey: ['monthlySpend', network],
 		queryFn: async () => {
 			const { data: treasuryStatsData, error: treasuryStatsError } = await NextApiClientService.getTreasuryStats({
-				from: dayjs().subtract(1, 'hour').toDate(),
+				from: dayjs().subtract(1, 'month').toDate(),
 				to: dayjs().toDate()
 			});
 			return treasuryStatsError ? [] : treasuryStatsData || [];
