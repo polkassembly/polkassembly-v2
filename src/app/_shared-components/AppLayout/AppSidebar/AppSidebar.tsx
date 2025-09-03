@@ -84,8 +84,8 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 								height={30}
 							/>
 							<div className='flex flex-col'>
-								<span className='text-blue-light-high dark:text-blue-dark-high text-sm font-semibold'>{t('Sidebar.chatWithKlara')}</span>
-								<span className='text-blue-light-medium dark:text-blue-dark-medium text-[11px]'>{t('Bounty.comingSoon')}</span>
+								<span className='text-sm font-semibold text-text_primary'>{t('Sidebar.chatWithKlara')}</span>
+								<span className='text-xs text-basic_text'>{t('Bounty.comingSoon')}</span>
 							</div>
 						</div>
 					</Link>
