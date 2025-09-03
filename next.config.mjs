@@ -16,15 +16,31 @@ const nextConfig = {
 	async headers() {
 		return [
 			{
-				// Security headers for all pages to prevent clickjacking
+				// Comprehensive security headers for all pages
 				source: '/(.*)',
 				headers: [
 					{ key: 'X-Frame-Options', value: 'SAMEORIGIN' },
 					{ key: 'X-XSS-Protection', value: '1; mode=block' },
 					{ key: 'X-Content-Type-Options', value: 'nosniff' },
+					{ key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+					{ key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
 					{
 						key: 'Content-Security-Policy',
-						value: `frame-ancestors 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')};`
+						value: [
+							"default-src 'self'",
+							"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.sentry-cdn.com",
+							"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+							"font-src 'self' https://fonts.gstatic.com",
+							"img-src 'self' data: blob: https:",
+							"media-src 'self' data: blob:",
+							"object-src 'none'",
+							"base-uri 'self'",
+							"form-action 'self'",
+							"connect-src 'self' https://api.github.com https://*.polkassembly.io https://*.firebaseapp.com https://*.googleapis.com https://sentry.io https://o4504609384013824.ingest.sentry.io wss: https://www.google-analytics.com",
+							`frame-src 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')}`,
+							`frame-ancestors 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')}`,
+							'upgrade-insecure-requests'
+						].join('; ')
 					}
 				]
 			},
