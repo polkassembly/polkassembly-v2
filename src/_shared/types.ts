@@ -1341,3 +1341,10 @@ export interface IGovAnalyticsDelegationStats {
 	totalDelegates: number;
 	totalDelegators: number;
 }
+
+export interface IGovAnalyticsCategoryCounts {
+	governance: number | null;
+	main: number | null;
+	treasury: number | null;
+	whiteList: number | null;
+}

@@ -12,16 +12,10 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, TooltipItem } from 'chart.js';
 import { useTheme } from 'next-themes';
+import { IGovAnalyticsCategoryCounts } from '@/_shared/types';
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
-
-interface ICategoryCounts {
-	governance: number | null;
-	main: number | null;
-	treasury: number | null;
-	whiteList: number | null;
-}
 
 function AnalyticsReferendumCount() {
 	const t = useTranslations('GovAnalytics');
@@ -36,7 +30,7 @@ function AnalyticsReferendumCount() {
 		}
 	});
 
-	const categoryCounts: ICategoryCounts = data?.categoryCounts || {
+	const categoryCounts: IGovAnalyticsCategoryCounts = data?.categoryCounts || {
 		governance: null,
 		main: null,
 		treasury: null,

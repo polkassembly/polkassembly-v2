@@ -25,7 +25,8 @@ import {
 	IGovAnalyticsStats,
 	IGovAnalyticsReferendumOutcome,
 	IRawTurnoutData,
-	IGovAnalyticsDelegationStats
+	IGovAnalyticsDelegationStats,
+	IGovAnalyticsCategoryCounts
 } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
@@ -687,20 +688,12 @@ export class RedisService {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME](network) });
 	}
 
-	static async GetGovAnalyticsReferendumCount(
-		network: string
-	): Promise<{ categoryCounts: { governance: number | null; main: number | null; treasury: number | null; whiteList: number | null } } | null> {
+	static async GetGovAnalyticsReferendumCount(network: string): Promise<{ categoryCounts: IGovAnalyticsCategoryCounts } | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT](network) });
-		return data ? (deepParseJson(data) as { categoryCounts: { governance: number | null; main: number | null; treasury: number | null; whiteList: number | null } }) : null;
+		return data ? (deepParseJson(data) as { categoryCounts: IGovAnalyticsCategoryCounts }) : null;
 	}
 
-	static async SetGovAnalyticsReferendumCount({
-		network,
-		data
-	}: {
-		network: string;
-		data: { categoryCounts: { governance: number | null; main: number | null; treasury: number | null; whiteList: number | null } };
-	}): Promise<void> {
+	static async SetGovAnalyticsReferendumCount({ network, data }: { network: string; data: { categoryCounts: IGovAnalyticsCategoryCounts } }): Promise<void> {
 		await this.Set({
 			key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT](network),
 			value: JSON.stringify(data),

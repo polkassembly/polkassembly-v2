@@ -53,7 +53,8 @@ import {
 	IGovAnalyticsStats,
 	IGovAnalyticsReferendumOutcome,
 	IRawTurnoutData,
-	IGovAnalyticsDelegationStats
+	IGovAnalyticsDelegationStats,
+	IGovAnalyticsCategoryCounts
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -1112,12 +1113,7 @@ export class NextApiClientService {
 		});
 
 		return this.nextApiClientFetch<{
-			categoryCounts: {
-				governance: number | null;
-				main: number | null;
-				treasury: number | null;
-				whiteList: number | null;
-			};
+			categoryCounts: IGovAnalyticsCategoryCounts;
 		}>({
 			method,
 			url

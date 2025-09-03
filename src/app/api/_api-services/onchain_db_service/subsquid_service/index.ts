@@ -26,7 +26,8 @@ import {
 	IGovAnalyticsStats,
 	IGovAnalyticsReferendumOutcome,
 	IRawTurnoutData,
-	IGovAnalyticsDelegationStats
+	IGovAnalyticsDelegationStats,
+	IGovAnalyticsCategoryCounts
 } from '@shared/types';
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
@@ -1104,11 +1105,7 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async GetGovAnalyticsReferendumCount({
-		network
-	}: {
-		network: ENetwork;
-	}): Promise<{ categoryCounts: { governance: number | null; main: number | null; treasury: number | null; whiteList: number | null } }> {
+	static async GetGovAnalyticsReferendumCount({ network }: { network: ENetwork }): Promise<{ categoryCounts: IGovAnalyticsCategoryCounts }> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_TOTAL_CATEGORY_PROPOSALS;
