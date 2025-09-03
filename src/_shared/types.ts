@@ -1594,10 +1594,10 @@ export interface IAlgoliaPost extends Record<string, unknown> {
 	topic: string;
 	lastCommentAtTimestamp?: number;
 	userId: number;
-	hash: string;
-	index: number;
+	hash?: string;
+	index?: number;
 	parsedContent: string;
 	titleAndContentHash: string;
-	proposer: string;
-	origin: EPostOrigin;
+	proposer?: string;
+	origin?: EPostOrigin;
 }
