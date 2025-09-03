@@ -1020,6 +1020,18 @@ export class NextApiClientService {
 	}
 
 	static async getDelegateTrack({ address, trackId }: { address: string; trackId: number }) {
+		const network = getCurrentNetwork();
+
+		// Check if it's a valid number first
+		if (!ValidatorService.isValidNumber(trackId)) {
+			throw new Error('Invalid track ID: must be a valid number');
+		}
+
+		// Check if it's a valid track number for the network
+		if (!ValidatorService.isValidTrackNumber({ trackNum: trackId, network })) {
+			throw new Error(`Track ID ${trackId} is not valid for network ${network}`);
+		}
+
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks', trackId.toString()] });
 		return this.nextApiClientFetch<ITrackDelegationDetails>({ url, method });
 	}
@@ -1260,7 +1272,20 @@ export class NextApiClientService {
 	}
 
 	static async getGovAnalyticsReferendumOutcome({ trackNo }: { trackNo?: number }) {
-		if (trackNo) {
+		// Validate trackNo if provided, but allow 0 (ROOT track)
+		if (trackNo !== undefined && trackNo !== null) {
+			const network = getCurrentNetwork();
+
+			// Check if it's a valid number first
+			if (!ValidatorService.isValidNumber(trackNo)) {
+				throw new Error('Invalid track number: must be a valid number');
+			}
+
+			// Check if it's a valid track number for the network
+			if (!ValidatorService.isValidTrackNumber({ trackNum: trackNo, network })) {
+				throw new Error(`Track number ${trackNo} is not valid for network ${network}`);
+			}
+
 			const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['referendum-outcome', 'track', trackNo.toString()] });
 			return this.nextApiClientFetch<IGovAnalyticsReferendumOutcome>({ url, method });
 		}
