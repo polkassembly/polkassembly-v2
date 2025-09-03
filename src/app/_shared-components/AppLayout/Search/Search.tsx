@@ -63,9 +63,9 @@ function Search() {
 				className='text-text_primary'
 				asChild
 			>
-				<div className='flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-sm text-placeholder/80 transition-colors duration-200 hover:border-bg_pink md:h-10 md:w-10 md:gap-0 md:px-0 md:py-0 xl:w-[550px] xl:justify-start xl:gap-2 xl:rounded-full xl:border xl:border-border_grey xl:bg-page_background xl:px-5 xl:py-2.5'>
+				<div className='flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-sm text-placeholder/80 transition-colors duration-200 hover:border-bg_pink md:h-10 md:w-10 md:gap-0 md:px-0 md:py-0 xl:w-[530px] xl:justify-start xl:gap-2 xl:rounded-full xl:border xl:border-border_grey xl:bg-page_background xl:px-5 xl:py-2.5'>
 					<SearchIcon className='h-5 w-5 text-wallet_btn_text' />
-					<p className='hidden xl:block'>Search For Proposal, Discussions And People</p>
+					<p className='hidden xl:block'>{t('searchTriggerLabel')}</p>
 				</div>
 			</DialogTrigger>
 			<DialogContent className={`${searchEnabledNetworks.includes(network.toUpperCase()) ? 'w-full max-w-screen-md md:max-w-4xl' : 'max-w-lg'} rounded-lg px-6 pt-4`}>

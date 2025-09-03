@@ -1389,7 +1389,8 @@
 		"useSuperSearchButton": "Usar Super Búsqueda",
 		"poweredByPolkassembly": "Desarrollado por Polkassembly.",
 		"enableSearchAndSuperSearch": "Si desea habilitar la búsqueda y super búsqueda para su cadena, contáctenos en",
-		"clearFilters": "Limpiar filtros"
+		"clearFilters": "Limpiar filtros",
+		"searchTriggerLabel": "Buscar propuestas, discusiones y personas"
 	},
 	"Bounties": {
 		"onchainBounties": "Recompensas en Cadena",
