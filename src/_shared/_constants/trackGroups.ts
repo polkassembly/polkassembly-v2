@@ -7,6 +7,15 @@ import { NETWORKS_DETAILS } from './networks';
 
 export type TrackGroup = 'Main' | 'Treasury' | 'Whitelist' | 'Governance' | 'Origin';
 
+// Pre-define the default groups to avoid recreating objects
+const DEFAULT_GROUPS: Record<TrackGroup, number[]> = {
+	Main: [],
+	Treasury: [],
+	Whitelist: [],
+	Governance: [],
+	Origin: []
+};
+
 /**
  * Dynamically generates track groups based on network track details and track purposes
  * @param network - The network to get track groups for
@@ -16,15 +25,10 @@ export function getTrackGroups(network: ENetwork): Record<TrackGroup, number[]> 
 	const trackDetails = NETWORKS_DETAILS[network]?.trackDetails;
 
 	if (!trackDetails) {
-		return {
-			Main: [],
-			Treasury: [],
-			Whitelist: [],
-			Governance: [],
-			Origin: []
-		};
+		return { ...DEFAULT_GROUPS };
 	}
 
+	// Create groups object with empty arrays
 	const groups: Record<TrackGroup, number[]> = {
 		Main: [],
 		Treasury: [],
@@ -40,30 +44,32 @@ export function getTrackGroups(network: ENetwork): Record<TrackGroup, number[]> 
 			const trackName = track.name;
 			const groupFromConstants = track.group;
 
-			// Whitelist tracks - tracks for whitelisting and fellowship administration
-			if (trackName === trackDetails[EPostOrigin.WHITELISTED_CALLER]?.name || trackName === trackDetails[EPostOrigin.FELLOWSHIP_ADMIN]?.name) {
-				groups.Whitelist.push(trackId);
-			}
-			// Governance tracks - tracks for referendum management and governance operations
-			else if (trackName === trackDetails[EPostOrigin.REFERENDUM_CANCELLER]?.name || trackName === trackDetails[EPostOrigin.REFERENDUM_KILLER]?.name) {
-				groups.Governance.push(trackId);
-			}
-			// Main tracks - administrative and operational tracks
-			else if (
-				trackName === trackDetails[EPostOrigin.STAKING_ADMIN]?.name ||
-				trackName === trackDetails[EPostOrigin.ROOT]?.name ||
-				trackName === trackDetails[EPostOrigin.WISH_FOR_CHANGE]?.name ||
-				trackName === trackDetails[EPostOrigin.AUCTION_ADMIN]?.name
-			) {
-				groups.Main.push(trackId);
-			}
-			// Governance tracks - tracks for governance operations
-			else if (trackName === trackDetails[EPostOrigin.LEASE_ADMIN]?.name || trackName === trackDetails[EPostOrigin.GENERAL_ADMIN]?.name) {
-				groups.Governance.push(trackId);
-			}
-			// Fallback: use the group from network constants if it matches our types
-			else if (groupFromConstants && groups[groupFromConstants as TrackGroup]) {
-				groups[groupFromConstants as TrackGroup].push(trackId);
+			// Use switch statement for better performance and cleaner code
+			switch (trackName) {
+				case trackDetails[EPostOrigin.WHITELISTED_CALLER]?.name:
+				case trackDetails[EPostOrigin.FELLOWSHIP_ADMIN]?.name:
+					groups.Whitelist.push(trackId);
+					break;
+				case trackDetails[EPostOrigin.REFERENDUM_CANCELLER]?.name:
+				case trackDetails[EPostOrigin.REFERENDUM_KILLER]?.name:
+					groups.Governance.push(trackId);
+					break;
+				case trackDetails[EPostOrigin.STAKING_ADMIN]?.name:
+				case trackDetails[EPostOrigin.ROOT]?.name:
+				case trackDetails[EPostOrigin.WISH_FOR_CHANGE]?.name:
+				case trackDetails[EPostOrigin.AUCTION_ADMIN]?.name:
+					groups.Main.push(trackId);
+					break;
+				case trackDetails[EPostOrigin.LEASE_ADMIN]?.name:
+				case trackDetails[EPostOrigin.GENERAL_ADMIN]?.name:
+					groups.Governance.push(trackId);
+					break;
+				default:
+					// Fallback: use the group from network constants if it matches our types
+					if (groupFromConstants && groups[groupFromConstants as TrackGroup]) {
+						groups[groupFromConstants as TrackGroup].push(trackId);
+					}
+					break;
 			}
 		}
 	});
