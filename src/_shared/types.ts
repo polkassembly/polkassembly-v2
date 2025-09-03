@@ -1580,3 +1580,24 @@ export interface IGovAnalyticsCategoryCounts {
 	treasury: number | null;
 	whiteList: number | null;
 }
+
+// please make sure this is updated with the latest changes in the functions/src/types.ts file
+export interface IAlgoliaPost extends Record<string, unknown> {
+	objectID: string;
+	title: string;
+	createdAtTimestamp?: number;
+	updatedAtTimestamp?: number;
+	tags: string[];
+	dataSource: string;
+	proposalType: string;
+	network: string;
+	topic: string;
+	lastCommentAtTimestamp?: number;
+	userId: number;
+	hash: string;
+	index: number;
+	parsedContent: string;
+	titleAndContentHash: string;
+	proposer: string;
+	origin: EPostOrigin;
+}
