@@ -37,9 +37,6 @@
 		"About": "Acerca de",
 		"AboutDescription": "Polkadot es el centro DeFi todo en uno de Polkadot.",
 		"KnowMore": "Saber más",
-		"VotedProposals": "Propuestas Votadas",
-		"ActiveProposals": "Propuestas Activas",
-		"Last15Days": "Últimos 15 días",
 		"Rank": "Rango",
 		"BatchVoting": "Votación por Lotes",
 		"BatchVotingDescription": "Vote sobre las principales propuestas en una sola transacción",
@@ -166,6 +163,8 @@
 		"balance": "Saldo",
 		"locked": "Bloqueado",
 		"on": "el",
+		"noJudgements": "No hay juicios",
+		"judgement": "Juicio",
 		"Delegations": {
 			"noDelegations": "No se encontraron delegaciones",
 			"index": "Índice",
@@ -194,7 +193,10 @@
 			"status": "Estado",
 			"showMore": "Mostrar más",
 			"showLess": "Mostrar menos",
-			"selectAddresses": "Seleccionar direcciones"
+			"selectAddresses": "Seleccionar direcciones",
+			"votedProposals": "Propuestas Votadas",
+			"activeProposals": "propuestas activas",
+			"last15Days": "Últimos 15 días"
 		},
 		"Activity": {
 			"voted_on_proposal": "Votó",
@@ -259,7 +261,7 @@
 			"noData": "No se encontraron publicaciones"
 		},
 		"overview": "Resumen",
-		"onchainIdentity": "Identidad en cadena",
+		"onchainIdentity": "Identidad en Cadena",
 		"linkAddress": "Vincular dirección",
 		"badges": "Insignias",
 		"badgesDescription": "Desbloquea, recibe y gana insignias mientras participas en Polkassembly",
@@ -461,6 +463,8 @@
 		"requested": "Solicitado",
 		"beneficiary": "Beneficiario",
 		"description": "Descripción",
+		"commentHistory": "Historial de Comentarios",
+		"edited": "Editado",
 		"noVotes": "No se encontraron votos",
 		"timeline": "Línea de Tiempo",
 		"more": "más",

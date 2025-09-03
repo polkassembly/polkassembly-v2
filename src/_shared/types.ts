@@ -417,6 +417,9 @@ export interface IOffChainContentHistoryItem {
 	title?: string;
 	createdAt: Date;
 }
+
+export type ICommentHistoryItem = Omit<IOffChainContentHistoryItem, 'title'>;
+
 export interface IPollVote {
 	id: string;
 	userId: number;
@@ -728,7 +731,7 @@ export interface IComment {
 	isSpam?: boolean;
 	sentiment?: ECommentSentiment;
 	aiSentiment?: ECommentSentiment;
-	history?: IOffChainContentHistoryItem[];
+	history?: ICommentHistoryItem[];
 	disabled?: boolean;
 	authorAddress?: string;
 }
@@ -1028,7 +1031,8 @@ export enum EReactQueryKeys {
 	ACCOUNTS = 'accounts',
 	IDENTITY_INFO = 'identityInfo',
 	TOKENS_USD_PRICE = 'tokensUsdPrice',
-	USER_VOTES = 'userVotes'
+	USER_VOTES = 'userVotes',
+	PROFILE_IDENTITIES = 'profileIdentities'
 }
 
 export interface IParamDef {
@@ -1525,4 +1529,7 @@ export interface IProfileVote extends Omit<IVoteData, 'createdAtBlock' | 'delega
 	postDetails?: IPostListing;
 	isDelegated: boolean;
 	extrinsicIndex: string;
+	proposal?: {
+		status: EProposalStatus;
+	};
 }

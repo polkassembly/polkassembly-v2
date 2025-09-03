@@ -16,7 +16,36 @@ const nextConfig = {
 	async headers() {
 		return [
 			{
-				// matching all API routes
+				// Comprehensive security headers for all pages
+				source: '/(.*)',
+				headers: [
+					{ key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+					{ key: 'X-XSS-Protection', value: '1; mode=block' },
+					{ key: 'X-Content-Type-Options', value: 'nosniff' },
+					{ key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+					{ key: 'Permissions-Policy', value: 'camera=self, microphone=(), geolocation=self' },
+					{
+						key: 'Content-Security-Policy',
+						value: [
+							"default-src 'self'",
+							"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.sentry-cdn.com",
+							"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+							"font-src 'self' https://fonts.gstatic.com",
+							"img-src 'self' data: blob: https:",
+							"media-src 'self' data: blob:",
+							"object-src 'none'",
+							"base-uri 'self'",
+							"form-action 'self'",
+							"connect-src 'self' https://api.github.com https://*.polkassembly.io https://*.firebaseapp.com https://*.googleapis.com https://sentry.io https://o4504609384013824.ingest.sentry.io wss: https://www.google-analytics.com",
+							`frame-src 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')}`,
+							`frame-ancestors 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')}`,
+							'upgrade-insecure-requests'
+						].join('; ')
+					}
+				]
+			},
+			{
+				// Additional headers for API routes
 				source: '/api/:path*',
 				headers: [
 					{ key: 'Access-Control-Allow-Credentials', value: 'true' },
@@ -25,12 +54,6 @@ const nextConfig = {
 					{
 						key: 'Access-Control-Allow-Headers',
 						value: '*'
-					},
-					{ key: 'X-XSS-Protection', value: '1; mode=block' },
-					{ key: 'X-Content-Type-Options', value: 'nosniff' },
-					{
-						key: 'Content-Security-Policy',
-						value: `default-src 'self'; img-src '*' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; frame-src 'self'; frame-ancestors 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')};`
 					},
 					{ key: 'Cache-Control', value: 's-maxage=60, stale-while-revalidate=59' }
 				]
