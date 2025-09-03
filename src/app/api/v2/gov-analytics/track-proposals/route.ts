@@ -47,7 +47,9 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 	};
 
 	// Cache the data
-	await RedisService.SetTrackLevelProposalsAnalytics({ network, data });
+	if (data) {
+		await RedisService.SetTrackLevelProposalsAnalytics({ network, data });
+	}
 
 	return NextResponse.json(data);
 });

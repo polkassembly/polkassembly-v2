@@ -25,7 +25,9 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 	const data = await OnChainDbService.GetTurnoutData({ network });
 
 	// Cache the data
-	await RedisService.SetTurnoutData({ network, data });
+	if (data) {
+		await RedisService.SetTurnoutData({ network, data });
+	}
 
 	return NextResponse.json(data);
 });

@@ -25,7 +25,9 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 	const data = await OnChainDbService.GetGovAnalyticsStats({ network });
 
 	// Cache the data
-	await RedisService.SetGovAnalyticsStats({ network, data });
+	if (data) {
+		await RedisService.SetGovAnalyticsStats({ network, data });
+	}
 
 	return NextResponse.json(data);
 });

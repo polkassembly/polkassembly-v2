@@ -25,7 +25,9 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 	const data = await OnChainDbService.GetGovAnalyticsReferendumCount({ network });
 
 	// Cache the data
-	await RedisService.SetGovAnalyticsReferendumCount({ network, data });
+	if (data) {
+		await RedisService.SetGovAnalyticsReferendumCount({ network, data });
+	}
 
 	return NextResponse.json(data);
 });

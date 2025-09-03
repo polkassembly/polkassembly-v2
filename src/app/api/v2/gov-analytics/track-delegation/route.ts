@@ -24,7 +24,9 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 	const data = await OnChainDbService.GetTrackDelegationAnalyticsStats({ network });
 
 	// Cache the data
-	await RedisService.SetTrackDelegationAnalytics({ network, data });
+	if (data) {
+		await RedisService.SetTrackDelegationAnalytics({ network, data });
+	}
 
 	return NextResponse.json(data);
 });
