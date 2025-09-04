@@ -84,7 +84,11 @@ const getEmbedUrl = (url: string): string | null => {
 
 const markdownComponents: Components = {
 	div: 'div',
-	table: 'table',
+	table: ({ children, ...props }) => (
+		<div className='w-full overflow-x-scroll'>
+			<table {...props}>{children}</table>
+		</div>
+	),
 	thead: 'thead',
 	tbody: 'tbody',
 	tr: 'tr',
