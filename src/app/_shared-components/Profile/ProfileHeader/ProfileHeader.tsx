@@ -12,7 +12,7 @@ import Image from 'next/image';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import UserIcon from '@assets/profile/user-icon.svg';
 import { useUser } from '@/hooks/useUser';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import EmailIcon from '@assets/icons/email-icon.svg';
 import TwitterIcon from '@assets/icons/twitter-icon.svg';
 import TelegramIcon from '@assets/icons/telegram-icon.svg';
@@ -54,21 +54,45 @@ function ProfileHeader({
 	const { user } = useUser();
 	const [openEditProfileDialog, setOpenEditProfileDialog] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
+
 	const { identityService, getOnChainIdentity } = useIdentityService();
 
-	useEffect(() => {
-		const fetchIdentity = async () => {
-			if (address) {
-				const identityLocal = await getOnChainIdentity(address);
-				setIdentity(identityLocal);
-			} else if (userProfileData?.addresses.length === 1) {
-				const identityLocal = await getOnChainIdentity(userProfileData.addresses[0]);
-				setIdentity(identityLocal);
+	const fetchIdentity = async (): Promise<{ identity?: IOnChainIdentity; displayAddress?: string }> => {
+		if (address) {
+			const identityLocal = await getOnChainIdentity(address);
+			return { identity: identityLocal || undefined, displayAddress: address };
+		}
+
+		if (userProfileData?.addresses.length) {
+			const identities: (IOnChainIdentity & { address: string })[] = [];
+			// eslint-disable-next-line no-restricted-syntax
+			for (const addr of userProfileData.addresses) {
+				// eslint-disable-next-line no-await-in-loop
+				const identityLocal = await getOnChainIdentity(addr);
+				if (identityLocal && identityLocal.isVerified) {
+					return { identity: identityLocal, displayAddress: addr };
+				}
+				if (identityLocal && identityLocal.display) {
+					identities.push({ ...identityLocal, address: addr });
+				}
 			}
-		};
-		fetchIdentity();
-	}, [identityService, address, getOnChainIdentity, userProfileData?.addresses]);
+			if (identities.length > 0) {
+				return { identity: identities[0], displayAddress: identities[0].address };
+			}
+
+			return { identity: undefined, displayAddress: undefined };
+		}
+		return { identity: undefined, displayAddress: undefined };
+	};
+
+	const {
+		data: { identity, displayAddress }
+	} = useQuery({
+		queryKey: ['profile-display', address || userProfileData?.id],
+		queryFn: fetchIdentity,
+		initialData: { identity: undefined, displayAddress: address },
+		enabled: !!identityService && (!!address || !!userProfileData?.addresses.length)
+	});
 
 	const queryClient = useQueryClient();
 
@@ -174,10 +198,10 @@ function ProfileHeader({
 								height={90}
 							/>
 						</div>
-					) : userProfileData?.addresses?.[0] || address ? (
+					) : displayAddress ? (
 						<Identicon
 							size={!userProfileData ? 70 : 90}
-							value={userProfileData?.addresses?.[0] || address}
+							value={displayAddress}
 							theme='polkadot'
 							className='rounded-full border-[5px] border-border_blue'
 						/>
@@ -203,35 +227,19 @@ function ProfileHeader({
 				<div className='flex w-full flex-col gap-y-2'>
 					<div className='flex w-full flex-col justify-between gap-x-2 gap-y-3 sm:flex-row sm:items-start'>
 						<div className='mt-2 flex w-full flex-col gap-y-2'>
-							{userProfileData?.addresses.length === 1 && (identity?.display || identity?.displayParent) ? (
+							{displayAddress && identity?.display ? (
 								<>
 									<Address
 										disableTooltip
 										redirectToProfile={false}
-										address={userProfileData.addresses[0]}
+										address={displayAddress}
 										iconSize={26}
 										showIdenticon={false}
 										textClassName={cn('text-center text-lg font-semibold sm:text-left lg:text-2xl')}
 									/>
 									<CopyToClipboard
-										label={shortenAddress(userProfileData.addresses[0], 5)}
-										text={userProfileData.addresses[0]}
-										className='text-base'
-									/>
-								</>
-							) : address && (identity?.display || identity?.displayParent) ? (
-								<>
-									<Address
-										disableTooltip
-										redirectToProfile={false}
-										address={address}
-										showIdenticon={false}
-										iconSize={26}
-										textClassName={cn('text-center text-lg font-semibold sm:text-left lg:text-2xl')}
-									/>
-									<CopyToClipboard
-										label={shortenAddress(address, 5)}
-										text={address}
+										label={shortenAddress(displayAddress, 5)}
+										text={displayAddress}
 										className='text-base'
 									/>
 								</>

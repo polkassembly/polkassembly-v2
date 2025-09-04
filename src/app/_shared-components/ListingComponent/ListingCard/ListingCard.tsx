@@ -4,7 +4,7 @@
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FaRegClock } from '@react-icons/all-files/fa/FaRegClock';
-import { EAssets, EGovType, EProposalType, ETheme, IPostListing, IPostOffChainMetrics } from '@/_shared/types';
+import { EAssets, EGovType, EProposalType, ETheme, IOnChainIdentity, IPostListing, IPostOffChainMetrics } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image from 'next/image';
@@ -28,8 +28,10 @@ import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ARCHIVE_PROPOSAL_TYPES } from '@/_shared/_constants/archiveProposalTypes';
-import styles from './ListingCard.module.scss';
+import { useIdentityService } from '@/hooks/useIdentityService';
+import { useQuery } from '@tanstack/react-query';
 import VotingBar from '../VotingBar/VotingBar';
+import styles from './ListingCard.module.scss';
 
 function ListingCard({
 	title,
@@ -66,6 +68,39 @@ function ListingCard({
 		? getPostTypeUrl({ proposalType, indexOrHash: index, network, govType: EGovType.GOV_1 })
 		: getPostTypeUrl({ proposalType, indexOrHash: index, network });
 
+	const { identityService, getOnChainIdentity } = useIdentityService();
+
+	const fetchIdentity = async (): Promise<{ identity?: IOnChainIdentity; displayAddress?: string }> => {
+		if (!data.publicUser?.addresses.length) return { identity: undefined, displayAddress: undefined };
+
+		const identities: (IOnChainIdentity & { address: string })[] = [];
+		// eslint-disable-next-line no-restricted-syntax
+		for (const addr of data.publicUser.addresses) {
+			// eslint-disable-next-line no-await-in-loop
+			const identityLocal = await getOnChainIdentity(addr);
+			if (identityLocal && identityLocal.isVerified) {
+				return { identity: identityLocal, displayAddress: addr };
+			}
+			if (identityLocal && identityLocal.display) {
+				identities.push({ ...identityLocal, address: addr });
+			}
+		}
+		if (identities.length > 0) {
+			return { identity: identities[0], displayAddress: identities[0].address };
+		}
+
+		return { identity: undefined, displayAddress: undefined };
+	};
+
+	const {
+		data: { displayAddress }
+	} = useQuery({
+		queryKey: ['profile-display', data.publicUser?.id],
+		initialData: { identity: undefined, displayAddress: undefined },
+		queryFn: fetchIdentity,
+		enabled: !!identityService && !!data.publicUser?.addresses.length
+	});
+
 	return (
 		<Link
 			href={redirectUrl}
@@ -92,9 +127,9 @@ function ListingCard({
 										<Address address={data.onChainInfo?.proposer} />
 										<span>|</span>
 									</>
-								) : data.publicUser?.addresses.length === 1 ? (
+								) : displayAddress ? (
 									<>
-										<Address address={data.publicUser?.addresses[0]} />
+										<Address address={displayAddress} />
 										<span>|</span>
 									</>
 								) : data.publicUser?.username ? (
