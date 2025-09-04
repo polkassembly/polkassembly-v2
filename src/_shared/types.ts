@@ -92,8 +92,7 @@ export enum ENotificationChannel {
 	TELEGRAM = 'telegram',
 	DISCORD = 'discord',
 	ELEMENT = 'element',
-	SLACK = 'slack',
-	IN_APP = 'in_app'
+	SLACK = 'slack'
 }
 
 export interface IUserNotificationChannelPreferences {
@@ -1532,4 +1531,95 @@ export interface IProfileVote extends Omit<IVoteData, 'createdAtBlock' | 'delega
 	proposal?: {
 		status: EProposalStatus;
 	};
+}
+
+export interface INotificationChannelSettings {
+	enabled: boolean;
+	handle?: string;
+	verification_token?: string;
+	verified?: boolean;
+}
+
+export interface INotificationTypeSettings {
+	enabled: boolean;
+	channels: Record<ENotificationChannel, boolean>;
+}
+
+export interface IOpenGovTrackSettings {
+	enabled: boolean;
+	notifications: {
+		newReferendumSubmitted: boolean;
+		referendumInVoting: boolean;
+		referendumClosed: boolean;
+	};
+}
+
+export interface IGov1ItemSettings {
+	enabled: boolean;
+	notifications?: Record<string, boolean>;
+}
+
+export interface INetworkNotificationSettings {
+	enabled: boolean;
+	isPrimary: boolean;
+	importPrimarySettings: boolean;
+	postsNotifications: {
+		proposalStatusChanges: INotificationTypeSettings;
+		newProposalsInCategories: INotificationTypeSettings;
+		votingDeadlineReminders: INotificationTypeSettings;
+		updatesOnFollowedProposals: INotificationTypeSettings;
+		proposalOutcomePublished: INotificationTypeSettings;
+		proposalsYouVotedOnEnacted: INotificationTypeSettings;
+	};
+	commentsNotifications: {
+		commentsOnMyProposals: INotificationTypeSettings;
+		repliesToMyComments: INotificationTypeSettings;
+		mentions: INotificationTypeSettings;
+	};
+	bountiesNotifications: {
+		bountyApplicationStatusUpdates: INotificationTypeSettings;
+		bountyPayoutsAndMilestones: INotificationTypeSettings;
+		activityOnBountiesIFollow: INotificationTypeSettings;
+	};
+	openGovTracks: Record<string, IOpenGovTrackSettings>;
+	gov1Items: Record<string, IGov1ItemSettings>;
+}
+
+export interface IUserNotificationPreferences {
+	channelPreferences: Record<ENotificationChannel, INotificationChannelSettings>;
+	networkPreferences: Record<string, INetworkNotificationSettings>;
+	// Legacy fields for backward compatibility
+	postsNotifications?: {
+		proposalStatusChanges: INotificationTypeSettings;
+		newProposalsInCategories: INotificationTypeSettings;
+		votingDeadlineReminders: INotificationTypeSettings;
+		updatesOnFollowedProposals: INotificationTypeSettings;
+		proposalOutcomePublished: INotificationTypeSettings;
+		proposalsYouVotedOnEnacted: INotificationTypeSettings;
+	};
+	commentsNotifications?: {
+		commentsOnMyProposals: INotificationTypeSettings;
+		repliesToMyComments: INotificationTypeSettings;
+		mentions: INotificationTypeSettings;
+	};
+	bountiesNotifications?: {
+		bountyApplicationStatusUpdates: INotificationTypeSettings;
+		bountyPayoutsAndMilestones: INotificationTypeSettings;
+		activityOnBountiesIFollow: INotificationTypeSettings;
+	};
+	openGovTracks?: Record<string, IOpenGovTrackSettings>;
+	gov1Items?: Record<string, IGov1ItemSettings>;
+}
+
+export interface IUpdateNotificationPreferencesRequest {
+	section: 'channels' | 'networks' | 'posts' | 'comments' | 'bounties' | 'opengov' | 'gov1';
+	key: string;
+	value: unknown;
+	network?: string;
+}
+
+export interface INetworkSettings {
+	id: string;
+	name: string;
+	removable: boolean;
 }
