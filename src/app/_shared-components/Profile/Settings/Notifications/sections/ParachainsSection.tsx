@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
-import { ChevronDown, Plus } from 'lucide-react';
+import { ChevronDown, Plus, Settings } from 'lucide-react';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import { Separator } from '@/app/_shared-components/Separator';
@@ -35,12 +35,13 @@ const getNetworkLogo = (networkId: string, parachainsData?: IParachain[]): strin
 function ParachainsSection() {
 	const t = useTranslations();
 	const currentNetwork = getCurrentNetwork();
-	const { preferences, updateNetworkPreference, importNetworkSettings } = useNotificationPreferences(true);
+	const { preferences, updateNetworkPreference, importNetworkSettings, bulkUpdateNetworkPreferences, isLoading } = useNotificationPreferences(true);
 
 	const [selectedNetworks, setSelectedNetworks] = useState<INetworkSettings[]>([]);
 	const [pendingRemovals, setPendingRemovals] = useState<Set<string>>(new Set());
 	const [pendingAdditions, setPendingAdditions] = useState<INetworkSettings[]>([]);
 	const [pendingOperations, setPendingOperations] = useState<Set<string>>(new Set());
+	const [isBulkOperationInProgress, setIsBulkOperationInProgress] = useState(false);
 
 	const { data: parachainsData } = useQuery({
 		queryKey: ['parachains'],
@@ -184,11 +185,38 @@ function ParachainsSection() {
 		});
 	};
 
+	const handleBulkNetworkToggle = async (enabled: boolean) => {
+		const networksToUpdate = selectedNetworks.filter((network) => network.id !== currentNetwork);
+
+		if (networksToUpdate.length === 0) return;
+
+		setIsBulkOperationInProgress(true);
+
+		try {
+			const updates = networksToUpdate.map((network) => {
+				const currentNetworkPrefs = preferences?.networkPreferences?.[network.id];
+				return {
+					section: 'networks',
+					key: network.id,
+					value: {
+						enabled,
+						isPrimary: currentNetworkPrefs?.isPrimary || false,
+						importPrimarySettings: currentNetworkPrefs?.importPrimarySettings || false
+					}
+				};
+			});
+
+			await bulkUpdateNetworkPreferences(updates);
+		} finally {
+			setIsBulkOperationInProgress(false);
+		}
+	};
+
 	const addNetwork = () => {
 		openNetworkModal('addNetworks');
 	};
 
-	const handleAddNetworksConfirm = (networks: INetworkSettings[]) => {
+	const handleAddNetworksConfirm = async (networks: INetworkSettings[]) => {
 		if (networks.length === 0) return;
 
 		setPendingAdditions((prev) => [...prev, ...networks]);
@@ -197,13 +225,36 @@ function ParachainsSection() {
 			setPendingOperations((prev) => new Set([...prev, `add-${network.id}`]));
 		});
 
-		networks.forEach((network) => {
-			updateNetworkPreference(network.id, {
-				enabled: true,
-				isPrimary: false,
-				importPrimarySettings: false
+		try {
+			if (networks.length > 1) {
+				const updates = networks.map((network) => ({
+					section: 'networks',
+					key: network.id,
+					value: {
+						enabled: true,
+						isPrimary: false,
+						importPrimarySettings: false
+					}
+				}));
+				await bulkUpdateNetworkPreferences(updates);
+			} else {
+				updateNetworkPreference(networks[0].id, {
+					enabled: true,
+					isPrimary: false,
+					importPrimarySettings: false
+				});
+			}
+		} catch (error) {
+			console.error('Failed to add networks:', error);
+			setPendingAdditions((prev) => prev.filter((pending) => !networks.some((network) => network.id === pending.id)));
+			networks.forEach((network) => {
+				setPendingOperations((prev) => {
+					const newSet = new Set(prev);
+					newSet.delete(`add-${network.id}`);
+					return newSet;
+				});
 			});
-		});
+		}
 	};
 
 	const handleImportPrimaryConfirm = () => {
@@ -214,10 +265,10 @@ function ParachainsSection() {
 	const handleFinalGoAhead = () => {
 		closeNetworkModal('addNetworksFinal');
 
-		selectedNetworks.forEach((network) => {
-			if (network.id !== currentNetwork) {
-				importNetworkSettings(currentNetwork, network.id);
-			}
+		const networksToImport = selectedNetworks.filter((network) => network.id !== currentNetwork);
+
+		networksToImport.forEach((network) => {
+			importNetworkSettings(currentNetwork, network.id);
 		});
 	};
 
@@ -234,39 +285,67 @@ function ParachainsSection() {
 		});
 	};
 
-	const handleImportPrimaryNetworkSettings = (checked: boolean) => {
+	const handleImportPrimaryNetworkSettings = async (checked: boolean) => {
 		setParachainSettings((prev) => ({
 			...prev,
 			importPrimaryNetworkSettings: checked,
 			setPrimaryNetworkSettings: checked ? true : prev.setPrimaryNetworkSettings
 		}));
 
-		if (checked) {
-			updateNetworkPreference(currentNetwork, {
-				enabled: true,
-				isPrimary: true,
-				importPrimarySettings: true
-			});
+		try {
+			if (checked) {
+				const otherNetworks = selectedNetworks.filter((network) => network.id !== currentNetwork);
 
-			selectedNetworks.forEach((network) => {
-				if (network.id !== currentNetwork) {
-					updateNetworkPreference(network.id, {
+				if (otherNetworks.length > 0) {
+					const updates = [
+						{
+							section: 'networks',
+							key: currentNetwork,
+							value: {
+								enabled: true,
+								isPrimary: true,
+								importPrimarySettings: true
+							}
+						},
+						...otherNetworks.map((network) => ({
+							section: 'networks',
+							key: network.id,
+							value: {
+								enabled: true,
+								isPrimary: false,
+								importPrimarySettings: true
+							}
+						}))
+					];
+
+					await bulkUpdateNetworkPreferences(updates);
+
+					otherNetworks.forEach((network) => {
+						importNetworkSettings(currentNetwork, network.id);
+					});
+				} else {
+					updateNetworkPreference(currentNetwork, {
 						enabled: true,
-						isPrimary: false,
+						isPrimary: true,
 						importPrimarySettings: true
 					});
-					importNetworkSettings(currentNetwork, network.id);
 				}
-			});
-		} else {
-			updateNetworkPreference(currentNetwork, {
-				enabled: currentNetworkPrefs?.enabled || true,
-				isPrimary: currentNetworkPrefs?.isPrimary || false,
-				importPrimarySettings: false
-			});
+			} else {
+				updateNetworkPreference(currentNetwork, {
+					enabled: currentNetworkPrefs?.enabled || true,
+					isPrimary: currentNetworkPrefs?.isPrimary || false,
+					importPrimarySettings: false
+				});
+			}
+		} catch (error) {
+			console.error('Failed to update import primary settings:', error);
+			setParachainSettings((prev) => ({
+				...prev,
+				importPrimaryNetworkSettings: !checked,
+				setPrimaryNetworkSettings: !checked ? prev.setPrimaryNetworkSettings : false
+			}));
 		}
 	};
-
 	const finalNetworks = selectedNetworks
 		.filter((network) => network.id !== currentNetwork)
 		.map((network) => ({
@@ -297,10 +376,14 @@ function ParachainsSection() {
 					<Separator />
 					<div className={classes.collapsibleContent}>
 						<div className='space-y-6'>
-							<p className='text-text_secondary text-sm'>
-								Current Network: <span className='font-semibold text-text_primary'>{currentNetwork.charAt(0).toUpperCase() + currentNetwork.slice(1)}</span>
-							</p>
-							<p className='text-text_secondary text-sm'>Manage your notification settings for different networks.</p>
+							<div className='space-y-2'>
+								<p className='text-text_secondary text-sm'>
+									Current Network: <span className='font-semibold text-text_primary'>{currentNetwork.charAt(0).toUpperCase() + currentNetwork.slice(1)}</span>
+								</p>
+								<p className='text-text_secondary text-sm'>
+									Manage your notification settings for different networks. Add multiple networks to receive notifications across various parachains and relay chains.
+								</p>
+							</div>
 
 							<div className='space-y-4'>
 								<div className='flex flex-wrap gap-3'>
@@ -342,6 +425,34 @@ function ParachainsSection() {
 									/>
 									<span className='text-sm text-text_pink'>Importing Primary Network Settings to the networks selected above</span>
 								</div>
+
+								{selectedNetworks.length > 1 && (
+									<div className='border-text_secondary/20 border-t pt-3'>
+										<div className='mb-2 flex items-center gap-2'>
+											<Settings className='text-text_secondary h-3 w-3' />
+											<p className='text-text_secondary text-xs font-medium'>Bulk Network Actions</p>
+										</div>
+										<div className='flex flex-wrap gap-2'>
+											<button
+												type='button'
+												onClick={() => handleBulkNetworkToggle(true)}
+												disabled={isBulkOperationInProgress || isLoading}
+												className='rounded-md bg-text_pink/10 px-3 py-1.5 text-xs font-medium text-text_pink transition-colors hover:bg-text_pink/20 disabled:cursor-not-allowed disabled:opacity-50'
+											>
+												{isBulkOperationInProgress ? 'Enabling...' : 'Enable All Networks'}
+											</button>
+											<button
+												type='button'
+												onClick={() => handleBulkNetworkToggle(false)}
+												disabled={isBulkOperationInProgress || isLoading}
+												className='bg-text_secondary/10 text-text_secondary hover:bg-text_secondary/20 rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50'
+											>
+												{isBulkOperationInProgress ? 'Disabling...' : 'Disable All Networks'}
+											</button>
+										</div>
+										<p className='text-text_secondary/70 mt-2 text-xs'>Bulk actions apply to all networks except the current network ({currentNetwork}).</p>
+									</div>
+								)}
 							</div>
 						</div>
 					</div>
