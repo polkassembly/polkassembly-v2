@@ -50,7 +50,7 @@ function TrackItem({ icon, title, enabled, notifications, onEnabledChange, onNot
 						checked={notifications.newReferendumSubmitted}
 						onCheckedChange={(checked) => onNotificationChange('newReferendumSubmitted', checked as boolean)}
 					/>
-					<span className='text-text_secondary text-xs'>New Referendum submitted</span>
+					<span className='text-text_secondary text-xs'>{t('newReferendumSubmitted')}</span>
 				</div>
 
 				<div className='flex items-center gap-2'>
@@ -58,7 +58,7 @@ function TrackItem({ icon, title, enabled, notifications, onEnabledChange, onNot
 						checked={notifications.referendumInVoting}
 						onCheckedChange={(checked) => onNotificationChange('referendumInVoting', checked as boolean)}
 					/>
-					<span className='text-text_secondary text-xs'>Referendum in voting</span>
+					<span className='text-text_secondary text-xs'>{t('referendumInVoting')}</span>
 				</div>
 
 				<div className='flex items-center gap-2'>
@@ -66,7 +66,7 @@ function TrackItem({ icon, title, enabled, notifications, onEnabledChange, onNot
 						checked={notifications.referendumClosed}
 						onCheckedChange={(checked) => onNotificationChange('referendumClosed', checked as boolean)}
 					/>
-					<span className='text-text_secondary text-xs'>Referendum closed</span>
+					<span className='text-text_secondary text-xs'>{t('referendumClosed')}</span>
 				</div>
 			</div>
 		</div>
