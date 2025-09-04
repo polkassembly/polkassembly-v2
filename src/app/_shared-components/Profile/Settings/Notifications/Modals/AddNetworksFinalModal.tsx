@@ -6,7 +6,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
-import { Plus, X } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 
 interface Network {
@@ -36,13 +36,6 @@ function AddNetworksFinalModal({ open, onClose, onGoBack, onGoAhead, networks }:
 							<Plus className='text-text_secondary h-5 w-5' />
 							<DialogTitle>Add Networks</DialogTitle>
 						</div>
-						<button
-							type='button'
-							onClick={onClose}
-							className='text-text_secondary hover:text-text_primary'
-						>
-							<X className='h-4 w-4' />
-						</button>
 					</div>
 				</DialogHeader>
 
