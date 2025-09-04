@@ -62,7 +62,7 @@
 }
 
 .analyticsBox {
-	@apply rounded-xl bg-bg_modal p-4 shadow-lg lg:p-6;
+	@apply rounded-xl border border-border_grey bg-bg_modal p-4 lg:p-6;
 
 	@media (max-width: 768px) {
 		@apply p-3;
