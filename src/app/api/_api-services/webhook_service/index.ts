@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { z } from 'zod';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EAnalyticsType, EHttpHeaderKey, ENetwork, EVotesDisplayType, EPostOrigin, EProposalType, ERole, EWallet, IUser } from '@/_shared/types';
+import { EAnalyticsType, EHttpHeaderKey, ENetwork, EVotesDisplayType, EPostOrigin, EProposalType, ERole, EWallet, IUser, EDataSource, IPost } from '@/_shared/types';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -14,6 +14,7 @@ import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { ACTIVE_BOUNTY_STATUSES } from '@/_shared/_constants/activeBountyStatuses';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { RedisService } from '../redis_service';
@@ -41,7 +42,8 @@ enum EWebhookEvent {
 	CACHE_REFRESH = 'cache_refresh',
 	USER_CREATED = 'user_created',
 	ADDRESS_CREATED = 'address_created',
-	CLEAR_CACHE = 'clear_cache'
+	CLEAR_CACHE = 'clear_cache',
+	REFRESH_SUBSQUARE_ALGOLIA = 'refresh_subsquare_algolia'
 }
 
 enum ECacheRefreshType {
@@ -123,7 +125,8 @@ export class WebhookService {
 			userId: z.number().refine((userId) => ValidatorService.isValidUserId(userId), ERROR_MESSAGES.INVALID_USER_ID),
 			wallet: z.string()
 		}),
-		[EWebhookEvent.CLEAR_CACHE]: z.object({})
+		[EWebhookEvent.CLEAR_CACHE]: z.object({}),
+		[EWebhookEvent.REFRESH_SUBSQUARE_ALGOLIA]: z.object({})
 	} as const;
 
 	static async handleIncomingEvent({ event, body, network }: { event: string; body: unknown; network: ENetwork }) {
@@ -171,6 +174,8 @@ export class WebhookService {
 				return this.handleAddressCreated({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.ADDRESS_CREATED]> });
 			case EWebhookEvent.CLEAR_CACHE:
 				return this.handleClearCache();
+			case EWebhookEvent.REFRESH_SUBSQUARE_ALGOLIA:
+				return this.handleRefreshSubsquareAlgolia({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.REFRESH_SUBSQUARE_ALGOLIA]> });
 			default:
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, `Unsupported event: ${event}`);
 		}
@@ -644,5 +649,58 @@ export class WebhookService {
 
 	private static async handleOtherEvent({ network, params }: { network: ENetwork; params: unknown }) {
 		console.log('TODO: add handling for event ', { network, params });
+	}
+
+	private static async handleRefreshSubsquareAlgolia({
+		network
+	}: {
+		network: ENetwork;
+		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.REFRESH_SUBSQUARE_ALGOLIA]>;
+	}) {
+		const { items: activeProposals } = await OnChainDbService.GetOnChainPostsListing({
+			network,
+			proposalType: undefined,
+			limit: 1000,
+			page: 1,
+			statuses: ACTIVE_PROPOSAL_STATUSES
+		});
+
+		const offChainDataPromises = activeProposals.map((postInfo) => {
+			return OffChainDbService.GetOffChainPostData({
+				network,
+				indexOrHash: postInfo.index!.toString() || postInfo.hash!,
+				proposalType: postInfo.type,
+				proposer: postInfo.proposer || ''
+			});
+		});
+
+		const offChainData = await Promise.all(offChainDataPromises);
+
+		const updateAlgoia = async (post: IPost) => {
+			const titleAndContentHash = AlgoliaService.hashTitleAndContent(post.title || DEFAULT_POST_TITLE, post.content || '');
+
+			const existingPost = await AlgoliaService.getPostFromAlgolia(`${network}-${post.proposalType}-${post.index!.toString() || post.hash!}`);
+			if (!existingPost) {
+				return;
+			}
+
+			if (existingPost.titleAndContentHash === titleAndContentHash) {
+				return;
+			}
+
+			await AlgoliaService.updatePostRecord(post);
+		};
+
+		activeProposals.forEach(async (postInfo, index) => {
+			if (offChainData[Number(index)].dataSource === EDataSource.SUBSQUARE) {
+				await updateAlgoia({
+					...offChainData[Number(index)],
+					dataSource: offChainData[Number(index)]?.dataSource || EDataSource.POLKASSEMBLY,
+					network,
+					proposalType: postInfo.type,
+					onChainInfo: postInfo
+				});
+			}
+		});
 	}
 }

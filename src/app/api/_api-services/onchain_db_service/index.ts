@@ -66,14 +66,14 @@ export class OnChainDbService {
 		notVotedByAddresses
 	}: {
 		network: ENetwork;
-		proposalType: EProposalType;
+		proposalType?: EProposalType;
 		limit: number;
 		page: number;
 		statuses?: EProposalStatus[];
 		origins?: EPostOrigin[];
 		notVotedByAddresses?: string[];
 	}): Promise<IGenericListingResponse<IOnChainPostListing>> {
-		if (ValidatorService.isValidOffChainProposalType(proposalType)) {
+		if (proposalType && ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
 		}
 

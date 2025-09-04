@@ -65,7 +65,7 @@ export class SubsquidQueries {
 	// proposal listing queries
 
 	protected static GET_PROPOSALS_LISTING_BY_TYPE = `
-		query GetProposalsListingByType($limit: Int!, $offset: Int!, $type_eq: ProposalType!) {
+		query GetProposalsListingByType($limit: Int!, $offset: Int!, $type_eq: ProposalType) {
 			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq}, orderBy: index_DESC) {
 				createdAt
 				description
@@ -76,6 +76,7 @@ export class SubsquidQueries {
 				status,
 				curator,
 				hash,
+				type,
 				preimage {
 					proposedCall {
 						args

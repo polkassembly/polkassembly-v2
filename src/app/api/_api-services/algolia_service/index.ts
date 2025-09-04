@@ -230,4 +230,19 @@ export class AlgoliaService {
 			// Don't throw the error to prevent disrupting the main flow
 		}
 	}
+
+	// get post from Algolia by objectID
+	static async getPostFromAlgolia(objectID: string): Promise<IAlgoliaPost | null> {
+		try {
+			const client = this.initAlgoliaApi();
+			const object = await client.getObject({ indexName: 'polkassembly_v2_posts', objectID });
+			if (!object) {
+				return null;
+			}
+			return object as unknown as IAlgoliaPost;
+		} catch (error) {
+			console.error(`Error getting post from Algolia by objectID ${objectID}:`, error);
+			return null;
+		}
+	}
 }

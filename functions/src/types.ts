@@ -10,7 +10,8 @@ export enum ENetwork {
 }
 
 export enum EWebhookEvent {
-	CACHE_REFRESH = 'cache_refresh'
+	CACHE_REFRESH = 'cache_refresh',
+	REFRESH_SUBSQUARE_ALGOLIA = 'refresh_subsquare_algolia'
 }
 
 export enum EHttpHeaderKey {

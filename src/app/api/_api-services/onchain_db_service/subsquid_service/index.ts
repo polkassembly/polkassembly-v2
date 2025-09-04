@@ -175,7 +175,7 @@ export class SubsquidService extends SubsquidUtils {
 		notVotedByAddresses
 	}: {
 		network: ENetwork;
-		proposalType: EProposalType;
+		proposalType?: EProposalType;
 		limit: number;
 		page: number;
 		statuses?: EProposalStatus[];
@@ -226,12 +226,16 @@ export class SubsquidService extends SubsquidUtils {
 		}
 
 		// fetch vote counts for each post
-		const voteMetricsPromises: Promise<IVoteMetrics>[] = subsquidData.proposals.map((proposal: { index?: number; hash?: string }) => {
+		const voteMetricsPromises: Promise<IVoteMetrics>[] = subsquidData.proposals.map((proposal: { index?: number; hash?: string; type: EProposalType }) => {
 			if (!ValidatorService.isValidNumber(proposal.index) && !proposal.hash?.startsWith?.('0x')) {
 				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Invalid index or hash for proposal');
 			}
 
-			return this.GetPostVoteMetrics({ network, proposalType, indexOrHash: (ValidatorService.isValidNumber(proposal.index) ? String(proposal.index) : proposal.hash) as string });
+			return this.GetPostVoteMetrics({
+				network,
+				proposalType: proposalType || proposal.type,
+				indexOrHash: (ValidatorService.isValidNumber(proposal.index) ? String(proposal.index) : proposal.hash) as string
+			});
 		});
 
 		const voteMetrics = await Promise.all(voteMetricsPromises);

@@ -9,9 +9,9 @@ import { HttpsError, onRequest } from 'firebase-functions/https';
 import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 import axios from 'axios';
 import { triggerFetchLatestTreasuryStats } from './utils/triggerFetchLatestTreasuryStats';
-import { ERROR_MESSAGES } from './constants';
+import { ERROR_MESSAGES, REFRESH_SUBSQUARE_ALGOLIA_NETWORKS } from './constants';
 import { triggerCacheRefresh } from './utils/triggerCacheRefresh';
-import { ECacheRefreshType, EWallet, IV1User, IV1UserAddress, IV2User, IV2UserAddress } from './types';
+import { ECacheRefreshType, EHttpHeaderKey, EWallet, EWebhookEvent, IV1User, IV1UserAddress, IV2User, IV2UserAddress } from './types';
 import { updatePostAlgolia } from './utils/updatePostAlgolia';
 import { updateUserAlgolia } from './utils/updateUserAlgolia';
 import { updateUserAddressesAlgolia } from './utils/updateUserAddressesAlgolia';
@@ -269,6 +269,36 @@ export const onUserAddressWritten = onDocumentWritten(
 			await updateUserAddressesAlgolia(addressData);
 		} catch (error) {
 			logger.error('Error in onUserAddressWritten function:', error);
+		}
+	}
+);
+
+export const scheduledRefreshSubsquareAlgolia = onSchedule(
+	{
+		schedule: 'every 1 hour',
+		timeZone: 'UTC',
+		retryCount: 3,
+		timeoutSeconds: 300
+	},
+	async () => {
+		try {
+			logger.info('Subsquare proposal refresh triggered for all networks');
+			REFRESH_SUBSQUARE_ALGOLIA_NETWORKS.forEach(async (network) => {
+				const response = await axios.post(
+					`https://${network}.polkassembly.io/api/v2/webhook/${EWebhookEvent.REFRESH_SUBSQUARE_ALGOLIA}`,
+					{}, // Empty body
+					{
+						headers: {
+							[EHttpHeaderKey.TOOLS_PASSPHRASE]: process.env.TOOLS_PASSPHRASE || '',
+							[EHttpHeaderKey.NETWORK]: network
+						}
+					}
+				);
+				logger.info('Subsquare proposal refresh triggered successfully', response.data, network);
+			});
+			logger.info('Subsquare proposal refresh triggered successfully for all networks');
+		} catch (error) {
+			logger.error('Error in scheduledSubsquareProposal function:', error);
 		}
 	}
 );
