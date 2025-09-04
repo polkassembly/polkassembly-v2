@@ -23,13 +23,22 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 	const { preferences, updateNetworkPostsNotification, bulkUpdateNetworkPostsNotifications } = useNotificationPreferences();
 
 	const networkPreferences = preferences?.networkPreferences?.[network];
+
+	const enabledChannels = preferences?.channelPreferences
+		? Object.entries(preferences.channelPreferences)
+				.filter(([, settings]) => settings.enabled && settings.verified)
+				.reduce((acc, [channel]) => ({ ...acc, [channel]: true }), {})
+		: {};
+
+	const hasEnabledChannels = Object.keys(enabledChannels).length > 0;
+
 	const postsNotifications = networkPreferences?.postsNotifications || {
-		proposalStatusChanges: { enabled: false, channels: {} },
-		newProposalsInCategories: { enabled: false, channels: {} },
-		votingDeadlineReminders: { enabled: false, channels: {} },
-		updatesOnFollowedProposals: { enabled: false, channels: {} },
-		proposalOutcomePublished: { enabled: false, channels: {} },
-		proposalsYouVotedOnEnacted: { enabled: false, channels: {} }
+		proposalStatusChanges: { enabled: hasEnabledChannels, channels: enabledChannels },
+		newProposalsInCategories: { enabled: hasEnabledChannels, channels: enabledChannels },
+		votingDeadlineReminders: { enabled: hasEnabledChannels, channels: enabledChannels },
+		updatesOnFollowedProposals: { enabled: hasEnabledChannels, channels: enabledChannels },
+		proposalOutcomePublished: { enabled: hasEnabledChannels, channels: enabledChannels },
+		proposalsYouVotedOnEnacted: { enabled: hasEnabledChannels, channels: enabledChannels }
 	};
 
 	const handlePostsNotificationChange = (type: string, enabled: boolean) => {

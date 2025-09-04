@@ -61,7 +61,6 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	const gov1Items = networkPreferences?.gov1Items || {};
 
 	const handleOpenGovTrackChange = (trackKey: string, enabled: boolean) => {
-		// Use bulk update function for individual tracks
 		bulkUpdateNetworkTrackNotifications(network, trackKey, enabled, 'opengov');
 	};
 
@@ -77,7 +76,6 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	};
 
 	const handleGov1ItemChange = (itemKey: string, enabled: boolean) => {
-		// Use bulk update function for individual Gov1 items
 		bulkUpdateNetworkTrackNotifications(network, itemKey, enabled, 'gov1');
 	};
 

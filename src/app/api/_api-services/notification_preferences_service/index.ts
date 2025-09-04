@@ -31,6 +31,10 @@ export class NotificationPreferencesService {
 
 		const preferences = this.convertToNewFormat(user.notificationPreferences) || this.getDefaultPreferences();
 
+		if (preferences.networkPreferences) {
+			preferences.networkPreferences = this.cleanupNetworkPreferences(preferences.networkPreferences);
+		}
+
 		if (network && preferences.networkPreferences?.[network]) {
 			return {
 				...preferences,
@@ -254,16 +258,28 @@ export class NotificationPreferencesService {
 		return oldFormat;
 	}
 
-	private static getDefaultNetworkPreferences() {
+	private static getDefaultNetworkPreferences(userChannelPreferences?: Record<string, INotificationChannelSettings>) {
+		const enabledChannels: Record<string, boolean> = {};
+		let hasEnabledChannels = false;
+
+		if (userChannelPreferences) {
+			Object.entries(userChannelPreferences).forEach(([channel, settings]) => {
+				if (settings.enabled && settings.verified) {
+					enabledChannels[channel] = true;
+					hasEnabledChannels = true;
+				} else {
+					enabledChannels[channel] = false;
+				}
+			});
+		} else {
+			Object.values(ENotificationChannel).forEach((channel) => {
+				enabledChannels[channel] = false;
+			});
+		}
+
 		const defaultNotificationSettings = {
-			enabled: false,
-			channels: {
-				[ENotificationChannel.EMAIL]: false,
-				[ENotificationChannel.TELEGRAM]: false,
-				[ENotificationChannel.DISCORD]: false,
-				[ENotificationChannel.SLACK]: false,
-				[ENotificationChannel.ELEMENT]: false
-			}
+			enabled: hasEnabledChannels,
+			channels: enabledChannels
 		};
 
 		const defaultAdvancedSettings = {
@@ -468,7 +484,7 @@ export class NotificationPreferencesService {
 		}
 
 		const newValue = value as Record<string, unknown>;
-		const existingNetworkPrefs = networkPreferences[key] || this.getDefaultNetworkPreferences();
+		const existingNetworkPrefs = networkPreferences[key] || this.getDefaultNetworkPreferences(updated.channelPreferences);
 
 		return {
 			...updated,
@@ -485,7 +501,7 @@ export class NotificationPreferencesService {
 	private static updateNestedNetworkPreferences(updated: IUserNotificationPreferences, key: string, value: unknown): IUserNotificationPreferences {
 		const [networkId, ...pathParts] = key.split('.');
 		const networkPreferences = updated.networkPreferences || {};
-		const networkSettings = networkPreferences[networkId] || this.getDefaultNetworkPreferences();
+		const networkSettings = networkPreferences[networkId] || this.getDefaultNetworkPreferences(updated.channelPreferences);
 
 		const updatedNetworkSettings = JSON.parse(JSON.stringify(networkSettings));
 		let current = updatedNetworkSettings as Record<string, unknown>;
@@ -571,6 +587,16 @@ export class NotificationPreferencesService {
 		return now - timestamp < oneHour;
 	}
 
+	private static cleanupNetworkPreferences(networkPreferences: Record<string, INetworkNotificationSettings>): Record<string, INetworkNotificationSettings> {
+		const cleanedNetworkPreferences: Record<string, INetworkNotificationSettings> = {};
+		Object.entries(networkPreferences).forEach(([key, value]) => {
+			if (!key.includes('.')) {
+				cleanedNetworkPreferences[key] = value;
+			}
+		});
+		return cleanedNetworkPreferences;
+	}
+
 	static async BulkUpdatePreferences(userId: number, preferences: Partial<IUserNotificationPreferences>): Promise<IUserNotificationPreferences> {
 		const user = await OffChainDbService.GetUserById(userId);
 
@@ -592,7 +618,10 @@ export class NotificationPreferencesService {
 		return updatedPreferences;
 	}
 
-	static async BulkUpdateMultipleSections(userId: number, updates: Array<{ section: string; key: string; value: unknown }>): Promise<IUserNotificationPreferences> {
+	static async BulkUpdateMultipleSections(
+		userId: number,
+		updates: Array<{ section: string; key: string; value: unknown; network?: string }>
+	): Promise<IUserNotificationPreferences> {
 		const existingPromise = userUpdateMutex.get(userId);
 
 		const updatePromise = (async () => {
@@ -618,7 +647,10 @@ export class NotificationPreferencesService {
 		}
 	}
 
-	private static async performBulkUpdate(userId: number, updates: Array<{ section: string; key: string; value: unknown }>): Promise<IUserNotificationPreferences> {
+	private static async performBulkUpdate(
+		userId: number,
+		updates: Array<{ section: string; key: string; value: unknown; network?: string }>
+	): Promise<IUserNotificationPreferences> {
 		const user = await OffChainDbService.GetUserById(userId);
 		if (!user) {
 			throw new APIError(ERROR_CODES.USER_NOT_FOUND, StatusCodes.NOT_FOUND, USER_NOT_FOUND_MESSAGE);
@@ -626,27 +658,51 @@ export class NotificationPreferencesService {
 
 		let currentPreferences = this.convertToNewFormat(user.notificationPreferences) || this.getDefaultPreferences();
 
+		if (currentPreferences.networkPreferences) {
+			currentPreferences.networkPreferences = this.cleanupNetworkPreferences(currentPreferences.networkPreferences);
+		}
+
+		const groupedUpdates = new Map<string, { section: string; key: string; value: unknown; network?: string }>();
+
 		updates.forEach((update) => {
+			const updateKey = `${update.section}:${update.key}`;
+
+			if (groupedUpdates.has(updateKey)) {
+				const existing = groupedUpdates.get(updateKey)!;
+				if (typeof existing.value === 'object' && existing.value !== null && typeof update.value === 'object' && update.value !== null) {
+					existing.value = { ...(existing.value as Record<string, unknown>), ...(update.value as Record<string, unknown>) };
+				} else {
+					existing.value = update.value;
+				}
+			} else {
+				groupedUpdates.set(updateKey, { ...update });
+			}
+		});
+
+		groupedUpdates.forEach((update) => {
 			if (update.section === 'networks') {
 				if (!currentPreferences.networkPreferences) {
 					currentPreferences.networkPreferences = {};
 				}
 
-				const updateValue = update.value as Record<string, unknown>;
+				if (update.key.includes('.')) {
+					currentPreferences = this.updateNestedNetworkPreferences(currentPreferences, update.key, update.value);
+				} else {
+					const updateValue = update.value as Record<string, unknown>;
 
-				if (!currentPreferences.networkPreferences[update.key]) {
-					currentPreferences.networkPreferences[update.key] = this.getDefaultNetworkPreferences() as INetworkNotificationSettings;
+					if (!currentPreferences.networkPreferences[update.key]) {
+						currentPreferences.networkPreferences[update.key] = this.getDefaultNetworkPreferences(currentPreferences.channelPreferences) as INetworkNotificationSettings;
+					}
+
+					const existingNetworkPrefs = currentPreferences.networkPreferences[update.key] as unknown as Record<string, unknown>;
+
+					currentPreferences.networkPreferences[update.key] = {
+						...existingNetworkPrefs,
+						...updateValue
+					} as unknown as INetworkNotificationSettings;
 				}
-
-				const existingNetworkPrefs = currentPreferences.networkPreferences[update.key] as unknown as Record<string, unknown>;
-
-				currentPreferences.networkPreferences[update.key] = {
-					...existingNetworkPrefs,
-					...updateValue
-				} as unknown as INetworkNotificationSettings;
 			} else {
-				const updateWithNetwork = update as { section: string; key: string; value: unknown; network?: string };
-				currentPreferences = this.updatePreferenceSection(currentPreferences, updateWithNetwork.section, updateWithNetwork.key, updateWithNetwork.value, updateWithNetwork.network);
+				currentPreferences = this.updatePreferenceSection(currentPreferences, update.section, update.key, update.value, update.network);
 			}
 		});
 

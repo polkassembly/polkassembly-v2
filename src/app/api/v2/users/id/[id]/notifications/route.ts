@@ -68,7 +68,7 @@ export const PUT = withErrorHandling(async (request: NextRequest, { params }: IR
 		throw new APIError(ERROR_CODES.FORBIDDEN, StatusCodes.FORBIDDEN, 'Unauthorized access');
 	}
 
-	const body = (await request.json()) as IUpdateNotificationPreferencesRequest | { updates: Array<{ section: string; key: string; value: unknown }> };
+	const body = (await request.json()) as IUpdateNotificationPreferencesRequest | { updates: Array<{ section: string; key: string; value: unknown; network?: string }> };
 
 	if ('updates' in body && Array.isArray(body.updates)) {
 		const updatedPreferences = await NotificationPreferencesService.BulkUpdateMultipleSections(userId, body.updates);

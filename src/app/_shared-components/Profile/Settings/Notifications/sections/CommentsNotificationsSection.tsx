@@ -23,10 +23,19 @@ function CommentsNotificationsSection({ network }: CommentsNotificationsSectionP
 	const { preferences, updateNetworkCommentsNotification, bulkUpdateNetworkCommentsNotifications } = useNotificationPreferences();
 
 	const networkPreferences = preferences?.networkPreferences?.[network];
+
+	const enabledChannels = preferences?.channelPreferences
+		? Object.entries(preferences.channelPreferences)
+				.filter(([, settings]) => settings.enabled && settings.verified)
+				.reduce((acc, [channel]) => ({ ...acc, [channel]: true }), {})
+		: {};
+
+	const hasEnabledChannels = Object.keys(enabledChannels).length > 0;
+
 	const commentsNotifications = networkPreferences?.commentsNotifications || {
-		commentsOnMyProposals: { enabled: false, channels: {} },
-		repliesToMyComments: { enabled: false, channels: {} },
-		mentions: { enabled: false, channels: {} }
+		commentsOnMyProposals: { enabled: hasEnabledChannels, channels: enabledChannels },
+		repliesToMyComments: { enabled: hasEnabledChannels, channels: enabledChannels },
+		mentions: { enabled: hasEnabledChannels, channels: enabledChannels }
 	};
 
 	const handleCommentsNotificationChange = (type: string, enabled: boolean) => {

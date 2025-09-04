@@ -23,10 +23,19 @@ function BountiesNotificationsSection({ network }: BountiesNotificationsSectionP
 	const { preferences, updateNetworkBountiesNotification, bulkUpdateNetworkBountiesNotifications } = useNotificationPreferences();
 
 	const networkPreferences = preferences?.networkPreferences?.[network];
+
+	const enabledChannels = preferences?.channelPreferences
+		? Object.entries(preferences.channelPreferences)
+				.filter(([, settings]) => settings.enabled && settings.verified)
+				.reduce((acc, [channel]) => ({ ...acc, [channel]: true }), {})
+		: {};
+
+	const hasEnabledChannels = Object.keys(enabledChannels).length > 0;
+
 	const bountiesNotifications = networkPreferences?.bountiesNotifications || {
-		bountyApplicationStatusUpdates: { enabled: false, channels: {} },
-		bountyPayoutsAndMilestones: { enabled: false, channels: {} },
-		activityOnBountiesIFollow: { enabled: false, channels: {} }
+		bountyApplicationStatusUpdates: { enabled: hasEnabledChannels, channels: enabledChannels },
+		bountyPayoutsAndMilestones: { enabled: hasEnabledChannels, channels: enabledChannels },
+		activityOnBountiesIFollow: { enabled: hasEnabledChannels, channels: enabledChannels }
 	};
 
 	const handleBountiesNotificationChange = (type: string, enabled: boolean) => {
