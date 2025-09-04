@@ -21,6 +21,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { cn } from '@/lib/utils';
 import { useIdentityService } from '@/hooks/useIdentityService';
+import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { TabsList, TabsTrigger } from '../../Tabs';
 import { Button } from '../../Button';
 import classes from './ProfileHeader.module.scss';
@@ -29,6 +30,7 @@ import EditProfile from '../EditProfile/EditProfile';
 import { Separator } from '../../Separator';
 import { Skeleton } from '../../Skeleton';
 import Address from '../Address/Address';
+import CopyToClipboard from '../../CopyToClipboard/CopyToClipboard';
 
 const SocialIcons = {
 	[ESocial.EMAIL]: EmailIcon,
@@ -205,21 +207,33 @@ function ProfileHeader({
 								<>
 									<Address
 										disableTooltip
+										redirectToProfile={false}
 										address={userProfileData.addresses[0]}
+										iconSize={26}
 										showIdenticon={false}
 										textClassName={cn('text-center text-lg font-semibold sm:text-left lg:text-2xl')}
 									/>
-									<p className='text-base'>{userProfileData.addresses[0]}</p>
+									<CopyToClipboard
+										label={shortenAddress(userProfileData.addresses[0], 5)}
+										text={userProfileData.addresses[0]}
+										className='text-base'
+									/>
 								</>
 							) : address && (identity?.display || identity?.displayParent) ? (
 								<>
 									<Address
 										disableTooltip
+										redirectToProfile={false}
 										address={address}
 										showIdenticon={false}
+										iconSize={26}
 										textClassName={cn('text-center text-lg font-semibold sm:text-left lg:text-2xl')}
 									/>
-									<p className='text-base'>{address}</p>
+									<CopyToClipboard
+										label={shortenAddress(address, 5)}
+										text={address}
+										className='text-base'
+									/>
 								</>
 							) : (
 								<p className={classes.profileHeaderTextTitle}>{userProfileData?.username}</p>
