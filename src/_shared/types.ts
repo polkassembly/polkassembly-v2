@@ -7,7 +7,8 @@
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
-import { TypeDef } from '@polkadot/types/types';
+import { SignerResult, TypeDef } from '@polkadot/types/types';
+import { HexString } from '@polkadot/util/types';
 import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
@@ -167,6 +168,7 @@ export enum EWallet {
 	POLKAGATE = 'polkagate',
 	NOVAWALLET = 'nova',
 	MIMIR = 'mimir',
+	POLKADOT_VAULT = 'polkadot-vault',
 	OTHER = ''
 	// METAMASK = 'metamask',
 	// WALLETCONNECT = 'walletconnect',
@@ -415,6 +417,9 @@ export interface IOffChainContentHistoryItem {
 	title?: string;
 	createdAt: Date;
 }
+
+export type ICommentHistoryItem = Omit<IOffChainContentHistoryItem, 'title'>;
+
 export interface IPollVote {
 	id: string;
 	userId: number;
@@ -727,7 +732,7 @@ export interface IComment {
 	isSpam?: boolean;
 	sentiment?: ECommentSentiment;
 	aiSentiment?: ECommentSentiment;
-	history?: IOffChainContentHistoryItem[];
+	history?: ICommentHistoryItem[];
 	disabled?: boolean;
 	authorAddress?: string;
 }
@@ -1024,8 +1029,11 @@ export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart',
 	COMMENTS = 'comments',
 	POST_DETAILS = 'postDetails',
+	ACCOUNTS = 'accounts',
 	IDENTITY_INFO = 'identityInfo',
-	TOKENS_USD_PRICE = 'tokensUsdPrice'
+	TOKENS_USD_PRICE = 'tokensUsdPrice',
+	USER_VOTES = 'userVotes',
+	PROFILE_IDENTITIES = 'profileIdentities'
 }
 
 export interface IParamDef {
@@ -1488,3 +1496,109 @@ export type IPostBubbleVotes = {
 		status: EProposalStatus;
 	};
 };
+
+export interface IVaultScannedAddress {
+	content: string;
+	isAddress: boolean;
+	genesisHash: HexString | null;
+	name?: string;
+}
+
+export interface IVaultQrState {
+	open: boolean;
+	isQrHashed: boolean;
+	qrAddress: string;
+	qrPayload: Uint8Array;
+	qrResolve?: (result: SignerResult) => void;
+	qrReject?: (error: Error) => void;
+}
+
+export enum EVoteBubbleTabs {
+	Bubble = 'bubble',
+	Graph = 'graph'
+}
+
+export interface IProfileVote extends Omit<IVoteData, 'createdAtBlock' | 'delegatedTo' | 'balanceValue'> {
+	balance: {
+		value: string;
+		abstain: string;
+		aye: string;
+		nay: string;
+	};
+	proposalIndex: number;
+	proposalType: EProposalType;
+	postDetails?: IPostListing;
+	isDelegated: boolean;
+	extrinsicIndex: string;
+	proposal?: {
+		status: EProposalStatus;
+	};
+}
+
+export interface IGovAnalyticsStats {
+	totalProposals: number;
+	approvedProposals: number;
+}
+
+export interface IGovAnalyticsReferendumOutcome {
+	approved: number;
+	rejected: number;
+	timeout: number;
+	ongoing: number;
+	cancelled: number;
+}
+
+export interface ITurnoutPercentageData {
+	averageSupportPercentages: Record<string, number>;
+}
+
+export interface IRawTurnoutData {
+	proposals: {
+		index: number;
+		trackNumber?: number;
+		convictionVoting: {
+			balance: {
+				value?: string;
+				aye?: string;
+				nay?: string;
+				abstain?: string;
+			};
+			decision: 'yes' | 'no' | 'abstain' | 'split' | 'splitAbstain';
+		}[];
+	}[];
+}
+
+export interface IGovAnalyticsDelegationStats {
+	totalCapital: string;
+	totalVotesBalance: string;
+	totalDelegates: number;
+	totalDelegators: number;
+}
+
+export interface IGovAnalyticsCategoryCounts {
+	governance: number | null;
+	main: number | null;
+	treasury: number | null;
+	whiteList: number | null;
+}
+
+// please make sure this is updated with the latest changes in the functions/src/types.ts file
+export interface IAlgoliaPost extends Record<string, unknown> {
+	objectID: string;
+	title: string;
+	createdAtTimestamp?: number;
+	updatedAtTimestamp?: number;
+	tags: string[];
+	dataSource: string;
+	proposalType: string;
+	network: string;
+	topic: string;
+	lastCommentAtTimestamp?: number;
+	userId: number;
+	hash?: string;
+	index?: number;
+	parsedContent: string;
+	titleAndContentHash: string;
+	proposer?: string;
+	origin?: EPostOrigin;
+}

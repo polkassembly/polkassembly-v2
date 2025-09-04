@@ -9,7 +9,7 @@ import Delegation from '@assets/sidebar/delegation.svg';
 import ReferendaIcon from '@assets/sidebar/referenda-icon.svg';
 import Bounty from '@assets/sidebar/bounty.svg';
 import BatchVoting from '@assets/sidebar/batch-voting.svg';
-// import AnalyticsIcon from '@assets/sidebar/gov-analytics-icon.svg';
+import AnalyticsIcon from '@assets/sidebar/gov-analytics-icon.svg';
 import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
 // import CalendarIcon from '@assets/sidebar/calendar-icon.svg';
 // import CommunityIcon from '@assets/sidebar/community-icon.svg';
@@ -123,16 +123,16 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 								...getTrackItems(networkKey, 'Origin', t, trackCounts)
 							]
 						},
-						/* {
+						{
 							title: t('Sidebar.analytics'),
-							url: '#',
+							url: '',
 							icon: AnalyticsIcon,
 							items: [
-								{ title: t('Sidebar.govAnalytics'), url: '#' },
-								{ title: t('Sidebar.treasuryAnalytics'), url: '#' }
+								{ title: t('Sidebar.govAnalytics'), url: '/gov-analytics' }
+								// { title: t('Sidebar.treasuryAnalytics'), url: '#' }
 							]
 						},
-						{
+						/* {
 							title: t('Sidebar.community'),
 							url: '#',
 							icon: CommunityIcon,

@@ -164,6 +164,8 @@ export const THEME_COLORS = {
 		progress_pink_indicator: '#ededed',
 		tag_input_bg: '#f4f6f8',
 		parachain_badge_bg: '#ea729d',
+		bar_chart_purple_light: '#B6B0FB',
+		bar_chart_purple: '#796EEC',
 		call_args_bg: '#F5F6F8',
 		poll_option_bg: '#d2d8e04d',
 		poll_header_bg: '#EFF4FF',
@@ -176,7 +178,11 @@ export const THEME_COLORS = {
 		nay_bubble_bg: '#ff5c5c66',
 		abstain_bubble_bg: '#DDE7FF',
 		switch_active_bg: '#E5007A',
-		switch_inactive_bg: '#B8C5D1'
+		switch_inactive_bg: '#B8C5D1',
+		diff_added_bg: '#D4F7DC',
+		diff_added_text: '#0D7936',
+		diff_removed_bg: '#FFD6D9',
+		diff_removed_text: '#C53030'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -337,6 +343,8 @@ export const THEME_COLORS = {
 		progress_pink_indicator: '#343744',
 		tag_input_bg: '#222222',
 		parachain_badge_bg: '#ea729d',
+		bar_chart_purple_light: '#B6B0FB',
+		bar_chart_purple: '#796EEC',
 		call_args_bg: '#222222',
 		poll_option_bg: '#222222',
 		poll_header_bg: '#333843',
@@ -351,6 +359,10 @@ export const THEME_COLORS = {
 		nay_bubble_bg: '#562525',
 		abstain_bubble_bg: '#1C2E56',
 		switch_active_bg: '#E5007A',
-		switch_inactive_bg: '#000'
+		switch_inactive_bg: '#000',
+		diff_added_bg: '#1A4D2E',
+		diff_added_text: '#68D391',
+		diff_removed_bg: '#4A1E1E',
+		diff_removed_text: '#FC8181'
 	}
 };

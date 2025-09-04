@@ -263,11 +263,13 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 			<div className={styles.content}>
 				<div>
 					{state.activeTab === EListingTabState.INTERNAL_PROPOSALS ? (
-						<ListingTab
-							data={listingData?.items || []}
-							totalCount={listingData?.totalCount || 0}
-							currentPage={state.currentPage}
-						/>
+						<div className='relative'>
+							<ListingTab
+								data={listingData?.items || []}
+								totalCount={listingData?.totalCount || 0}
+								currentPage={state.currentPage}
+							/>
+						</div>
 					) : proposalType === EProposalType.REFERENDUM_V2 ? (
 						<TrackAnalytics origin={origin} />
 					) : (

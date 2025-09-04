@@ -37,9 +37,6 @@
 		"About": "Acerca de",
 		"AboutDescription": "Polkadot es el centro DeFi todo en uno de Polkadot.",
 		"KnowMore": "Saber más",
-		"VotedProposals": "Propuestas Votadas",
-		"ActiveProposals": "Propuestas Activas",
-		"Last15Days": "Últimos 15 días",
 		"Rank": "Rango",
 		"BatchVoting": "Votación por Lotes",
 		"BatchVotingDescription": "Vote sobre las principales propuestas en una sola transacción",
@@ -96,17 +93,20 @@
 		"NoRank": "para ver tu rango"
 	},
 	"AddressDropdown": {
-		"fallbackText": "Por favor seleccione billetera",
-		"chooseLinkedAccount": "Elegir cuenta vinculada",
+		"fallbackText": "Por favor seleccione una billetera",
+		"chooseLinkedAccount": "Elegir Cuenta",
 		"noAccountsFound": "No se encontraron cuentas",
-		"selectWallet": "Por favor seleccione billetera",
+		"selectWallet": "Por favor seleccione una billetera",
 		"fetchingAddresses": "Para obtener sus direcciones, Polkassembly necesita acceso a sus extensiones de billetera. Por favor autorice esta transacción.",
-		"goBack": "Regresar",
+		"goBack": "Volver",
 		"gotIt": "Entendido",
-		"hidePassword": "Ocultar contraseña",
-		"showPassword": "Mostrar contraseña",
+		"hidePassword": "Ocultar Contraseña",
+		"showPassword": "Mostrar Contraseña",
 		"pleaseConnectWallet": "Por favor conecte su billetera a Polkassembly.",
 		"pleaseCheckConnectedAccounts": "Por favor verifique las cuentas conectadas en la extensión.",
+		"scanYourAddressQr": "Escanee su código QR de dirección",
+		"scanYourAddressQrDescription1": "Inicie sesión en su aplicación Polkadot Vault.",
+		"scanYourAddressQrDescription2": "Escanee su código QR de dirección de {network}.",
 		"linkedAccount": "Cuenta Vinculada"
 	},
 	"AddressRelationsPicker": {
@@ -163,6 +163,8 @@
 		"balance": "Saldo",
 		"locked": "Bloqueado",
 		"on": "el",
+		"noJudgements": "No hay juicios",
+		"judgement": "Juicio",
 		"Delegations": {
 			"noDelegations": "No se encontraron delegaciones",
 			"index": "Índice",
@@ -180,6 +182,21 @@
 			"VP": "VP",
 			"CA": "CA",
 			"CO": "CO"
+		},
+		"Votes": {
+			"noData": "No se encontraron votos",
+			"votes": "Votos",
+			"proposal": "Propuesta",
+			"voteFor": "Votar por",
+			"voter": "Votante",
+			"action": "Acción",
+			"status": "Estado",
+			"showMore": "Mostrar más",
+			"showLess": "Mostrar menos",
+			"selectAddresses": "Seleccionar direcciones",
+			"votedProposals": "Propuestas Votadas",
+			"activeProposals": "propuestas activas",
+			"last15Days": "Últimos 15 días"
 		},
 		"Activity": {
 			"voted_on_proposal": "Votó",
@@ -244,7 +261,7 @@
 			"noData": "No se encontraron publicaciones"
 		},
 		"overview": "Resumen",
-		"onchainIdentity": "Identidad en cadena",
+		"onchainIdentity": "Identidad en Cadena",
 		"linkAddress": "Vincular dirección",
 		"badges": "Insignias",
 		"badgesDescription": "Desbloquea, recibe y gana insignias mientras participas en Polkassembly",
@@ -441,13 +458,19 @@
 		}
 	},
 	"PostDetails": {
+		"selectYourVoterAddress": "Seleccione su dirección de votación",
+		"address": "Dirección",
 		"castVote": "Emitir Voto",
+		"changeVote": "Cambiar Voto",
+		"myVote": "Mi Voto",
 		"castYourVote": "Emita su Voto",
 		"copyLink": "Copiar Enlace",
 		"loginToVote": "Inicie sesión para Votar",
 		"requested": "Solicitado",
 		"beneficiary": "Beneficiario",
 		"description": "Descripción",
+		"commentHistory": "Historial de Comentarios",
+		"edited": "Editado",
 		"noVotes": "No se encontraron votos",
 		"timeline": "Línea de Tiempo",
 		"more": "más",
@@ -460,6 +483,10 @@
 		"analytics": "Analíticas",
 		"cancel": "Cancelar",
 		"reply": "Responder",
+		"remove": "Eliminar",
+		"removing": "Eliminando",
+		"removeVote": "Eliminar Voto",
+		"removeVoteConfirmation": "¿Está seguro de que desea eliminar su voto?",
 		"proposalPassed": "Propuesta Aprobada",
 		"proposalFailed": "Propuesta Rechazada",
 		"confirmationPeriod": "Período de Confirmación",
@@ -476,8 +503,13 @@
 		"issuance": "Emisión",
 		"viewVoteHistory": "Ver Historial de Votos",
 		"voteHistory": "Historial de Votos",
+		"delegations": "Delegaciones",
 		"delegated": "Delegado",
 		"votingPower": "Poder de voto",
+		"voteRemoved": "Su voto ha sido eliminado correctamente",
+		"voteRemoveFailed": "La solicitud de eliminación de voto ha fallado",
+		"voteRemoveFailedTitle": "Eliminación de voto fallida",
+		"voteRemovedTitle": "Voto eliminado",
 		"capital": "Capital",
 		"account": "Cuenta",
 		"abstain": "Abstención",
@@ -595,8 +627,19 @@
 		"viewReplies": "Ver respuestas",
 		"commentSummary": "Resumen del comentario",
 		"aiSummary": "Resumen de IA",
+		"showingVotesFor": "Mostrando votos para",
+		"switchWallet": "Cambiar Billetera",
+		"errorLoadingVote": "Error al cargar datos de voto",
+		"noVoteForAddress": "No se encontró voto para esta dirección",
 		"showLikelySpam": "Mostrar spam probable",
 		"hideLikelySpam": "Ocultar spam probable",
+		"HighlightMenu": {
+			"quote": "Citar",
+			"share": "Compartir",
+			"copy": "Copiar",
+			"textCopiedToClipboard": "Texto copiado al portapapeles",
+			"failedToCopyText": "Error al copiar el texto"
+		},
 		"voted": "Votado",
 		"votes": "Votos",
 		"vote": "Voto",
@@ -731,6 +774,8 @@
 		"ayeVoteValue": "Valor de voto a favor",
 		"nayVoteValue": "Valor de voto en contra",
 		"confirm": "Confirmar",
+		"existingVote": "Voto Existente",
+		"existingVoteDescription": "Ya ha votado en esta propuesta. Reenviar el voto anulará el voto actual.",
 		"voteSuccess": "Tu voto ha sido emitido con éxito",
 		"voteFailed": "Tu voto no ha sido emitido con éxito",
 		"voteSuccessTitle": "Voto exitoso",
@@ -745,7 +790,8 @@
 		"your": "Tu",
 		"voteIsIn": "voto está registrado! ¿Te gustaría compartir por qué lo apoyas en un comentario?",
 		"reuseGovernanceLock": "Reutilizar bloqueo de gobernanza",
-		"reuseAllLocks": "Reutilizar todos los bloqueos"
+		"reuseAllLocks": "Reutilizar todos los bloqueos",
+		"changeVote": "Cambiar voto"
 	},
 	"Balance": {
 		"voteBalance": "Saldo de votación",
@@ -1449,6 +1495,26 @@
 	"ConvictionSelector": {
 		"votes": "Votos",
 		"lockingPeriod": "Período de bloqueo",
-		"lockingPeriodDescription": "Tus {tokenSymbol} permanecerán bloqueados por un tiempo adicional después de votar, dependiendo del multiplicador que elijas."
+		"lockingPeriodDescription": "Sus {tokenSymbol} permanecerán bloqueados por tiempo adicional después de votar, dependiendo del multiplicador que elija."
+	},
+	"PolkadotVault": {
+		"signTransaction": "Firmar Transacción",
+		"addVaultAddress": "Agregar Dirección de Polkadot Vault",
+		"scan": "Escanear",
+		"openVaultAppInYourPhone": "Abra la aplicación Vault en su teléfono",
+		"scanTheQRHere": "Escanee el código QR aquí desde la aplicación Vault",
+		"scanTheSignatureQRInYourApp": "Verifique el código QR de firma en su aplicación y firme la transacción"
+	},
+	"GovAnalytics": {
+		"overview": "Resumen",
+		"voting": "Votación",
+		"totalProposals": "Propuestas Totales",
+		"approvedProposals": "Propuestas Aprobadas",
+		"monitoredTracks": "Tracks Monitoreados",
+		"referendumCount": "Cantidad de Referendos",
+		"referendumCountByStatus": "Cantidad de Referendos por Estado",
+		"referendumCountByCategory": "Cantidad de Referendos por Categoría",
+		"monthlySpend": "Gasto Mensual de DOT",
+		"averageTurnoutPercentage": "Porcentaje de Asistencia Promedio"
 	}
 }

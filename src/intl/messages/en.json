@@ -40,9 +40,6 @@
 		"About": "About",
 		"AboutDescription": "Polkadot is the all-in-one DeFi hub of Polkadot.",
 		"KnowMore": "Know More",
-		"VotedProposals": "Voted Proposals",
-		"ActiveProposals": "Active Proposals",
-		"Last15Days": "Last 15 days",
 		"Rank": "Rank",
 		"BatchVoting": "Batch Voting",
 		"BatchVotingDescription": "Vote on top proposals in a single transaction",
@@ -107,6 +104,9 @@
 		"showPassword": "Show Password",
 		"pleaseConnectWallet": "Please connect your wallet to Polkassembly.",
 		"pleaseCheckConnectedAccounts": "Please check the connected accounts in extension.",
+		"scanYourAddressQr": "Scan Your Address QR",
+		"scanYourAddressQrDescription1": "Login to your Polkadot Vault App.",
+		"scanYourAddressQrDescription2": "Scan your {network} address QR.",
 		"linkedAccount": "Linked Account"
 	},
 	"AddressRelationsPicker": {
@@ -167,6 +167,8 @@
 		"balance": "Balance",
 		"locked": "Locked",
 		"on": "on",
+		"noJudgements": "No Judgements",
+		"judgement": "Judgement",
 		"Delegations": {
 			"noDelegations": "No Delegations Found",
 			"delegation": "Delegation",
@@ -185,6 +187,21 @@
 			"VP": "VP",
 			"CA": "CA",
 			"CO": "CO"
+		},
+		"Votes": {
+			"noData": "No votes found",
+			"votes": "Votes",
+			"proposal": "Proposal",
+			"voter": "Voter",
+			"voteFor": "Vote For",
+			"action": "Action",
+			"status": "Status",
+			"showMore": "Show More",
+			"showLess": "Show Less",
+			"selectAddresses": "Select Addresses",
+			"votedProposals": "Voted Proposals",
+			"activeProposals": "active proposals",
+			"last15Days": "Last 15 days"
 		},
 		"Activity": {
 			"voted_on_proposal": "Voted",
@@ -249,7 +266,7 @@
 			"noData": "No posts found"
 		},
 		"overview": "Overview",
-		"onchainIdentity": "Onchain Identity",
+		"onchainIdentity": "On-Chain Identity",
 		"linkAddress": "Link Address",
 		"badges": "Badges",
 		"badgesDescription": "Unlock, receive and earn badges as you engage in polkassembly",
@@ -442,9 +459,13 @@
 		}
 	},
 	"PostDetails": {
+		"selectYourVoterAddress": "Select Your Voter Address",
+		"address": "Address",
 		"save": "Save",
 		"edit": "Edit",
 		"castVote": "Cast Vote",
+		"changeVote": "Change Vote",
+		"myVote": "My Votes",
 		"castYourVote": "Cast Your Vote",
 		"copyLink": "Copy Link",
 		"loginToVote": "Login to Vote",
@@ -463,6 +484,12 @@
 		"post": "Post",
 		"cancel": "Cancel",
 		"reply": "Reply",
+		"edited": "Edited",
+		"commentHistory": "Comment History",
+		"remove": "Remove",
+		"removing": "Removing",
+		"removeVote": "Remove Vote",
+		"removeVoteConfirmation": "Are you sure you want to remove your vote?",
 		"proposalPassed": "Proposal Passed",
 		"proposalFailed": "Proposal Failed",
 		"confirmationPeriod": "Confirmation Period",
@@ -480,6 +507,7 @@
 		"issuance": "Issuance",
 		"viewVoteHistory": "View Vote History",
 		"voteHistory": "Vote History",
+		"delegations": "Delegations",
 		"delegated": "Delegated",
 		"votingPower": "Voting Power",
 		"capital": "Capital",
@@ -490,8 +518,16 @@
 		"delete": "Delete",
 		"hideReplies": "Hide Replies",
 		"viewReplies": "View Replies",
+		"voteRemoved": "Your vote has been removed successfully",
+		"voteRemoveFailed": "Remove vote request failed",
+		"voteRemoveFailedTitle": "Vote Removal Failed",
+		"voteRemovedTitle": "Vote Removed",
 		"commentSummary": "Comment Summary",
 		"aiSummary": "AI Summary",
+		"showingVotesFor": "Showing votes for",
+		"switchWallet": "Switch Wallet",
+		"errorLoadingVote": "Error loading vote data",
+		"noVoteForAddress": "No vote found for this address",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
 		"BeneficiariesDetails": {
@@ -563,6 +599,13 @@
 		},
 		"commentsDisabled": "Comments have been disabled for this post.",
 		"commentsDisabledForNonVerifiedUsers": "Comments have been disabled for non verified users.",
+		"HighlightMenu": {
+			"quote": "Quote",
+			"share": "Share",
+			"copy": "Copy",
+			"textCopiedToClipboard": "Text copied to clipboard",
+			"failedToCopyText": "Failed to copy text"
+		},
 		"Poll": {
 			"endsOn": "Ends on",
 			"endedOn": "Ended on",
@@ -767,6 +810,8 @@
 		"ayeVoteValue": "Aye vote value",
 		"nayVoteValue": "Nay vote value",
 		"confirm": "Confirm",
+		"existingVote": "Existing Vote",
+		"existingVoteDescription": "You have already voted on this proposal, Resubmitting the vote will override the current voting record",
 		"voteSuccess": "Your vote has been cast successfully",
 		"voteFailed": "Your vote has not been cast successfully",
 		"voteSuccessTitle": "Vote Successful",
@@ -781,7 +826,8 @@
 		"your": "Your",
 		"voteIsIn": "vote is in! Mind sharing why you support this in a comment?",
 		"reuseGovernanceLock": "Reuse Governance Lock",
-		"reuseAllLocks": "Reuse All Locks"
+		"reuseAllLocks": "Reuse All Locks",
+		"changeVote": "Change Vote"
 	},
 	"Balance": {
 		"voteBalance": "Vote Balance",
@@ -1486,5 +1532,25 @@
 		"votes": "Votes",
 		"lockingPeriod": "Locking period",
 		"lockingPeriodDescription": "Your {tokenSymbol} will stay locked for extra time after voting, depending on the multiplier you choose."
+	},
+	"PolkadotVault": {
+		"signTransaction": "Sign Transaction",
+		"addVaultAddress": "Add Polkadot Vault Address",
+		"scan": "Scan",
+		"openVaultAppInYourPhone": "Open the Vault app in your phone",
+		"scanTheQRHere": "Scan the QR here from the Vault app",
+		"scanTheSignatureQRInYourApp": "Verify the signature QR in your app and sign the transaction"
+	},
+	"GovAnalytics": {
+		"overview": "Overview",
+		"voting": "Voting",
+		"totalProposals": "Total Proposals",
+		"approvedProposals": "Approved Proposals",
+		"monitoredTracks": "Monitored Tracks",
+		"referendumCount": "Referendum Count",
+		"referendumCountByStatus": "Referendum Count by Status",
+		"referendumCountByCategory": "Referendum Count by Category",
+		"monthlySpend": "Monthly DOT Spent",
+		"averageTurnoutPercentage": "Average Turnout Percentage"
 	}
 }
