@@ -21,6 +21,7 @@ import { EAccountType, ENetwork, EWallet, IOnChainIdentity, ISelectedAccount, IV
 import { Dispatch, SetStateAction } from 'react';
 import { isMimirDetected } from './isMimirDetected';
 import { VaultQrSigner } from './vault_qr_signer_service';
+import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
 
 // Usage:
 // const identityService = await IdentityService.Init(ENetwork.POLKADOT, api);
@@ -319,6 +320,11 @@ export class IdentityService {
 					onFailed(error?.toString?.() || errorMessageFallback);
 				});
 		} else {
+			const injected = await getInjectedWallet(wallet);
+
+			if (!injected) return;
+
+			this.setSigner(injected.signer as Signer);
 			let extrinsic = tx;
 
 			// for pure proxy accounts, we need to get the multisig account

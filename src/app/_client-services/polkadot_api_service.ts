@@ -40,6 +40,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { BlockCalculationsService } from './block_calculations_service';
 import { isMimirDetected } from './isMimirDetected';
 import { VaultQrSigner } from './vault_qr_signer_service';
+import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -239,6 +240,12 @@ export class PolkadotApiService {
 					onFailed(error?.toString?.() || errorMessageFallback);
 				});
 		} else {
+			const injected = await getInjectedWallet(wallet);
+
+			if (!injected) return;
+
+			this.setSigner(injected.signer as Signer);
+
 			let extrinsic = tx;
 
 			// for pure proxy accounts, we need to get the multisig account

@@ -13,6 +13,7 @@ import { inject } from '@mimirdev/apps-inject';
 import { PolkadotApiService } from './polkadot_api_service';
 import { IdentityService } from './identity_service';
 import { isMimirDetected } from './isMimirDetected';
+import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
 
 export class WalletClientService {
 	private injectedWindow: Window & InjectedWindow;
@@ -67,29 +68,9 @@ export class WalletClientService {
 				await web3Enable(APPNAME);
 				injected = await web3FromSource('mimir');
 			} else {
-				const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
-
-				if (!wallet) {
-					return [];
-				}
-				injected = await new Promise((resolve, reject) => {
-					const timeoutId = setTimeout(() => {
-						reject(new Error('Wallet Timeout'));
-					}, 60000); // wait 60 sec
-
-					if (wallet && wallet.enable) {
-						wallet
-							.enable(APPNAME)
-							.then((value) => {
-								clearTimeout(timeoutId);
-								resolve(value);
-							})
-							.catch((error) => {
-								reject(error);
-							});
-					}
-				});
+				injected = await getInjectedWallet(selectedWallet);
 			}
+
 			if (!injected) {
 				return [];
 			}
