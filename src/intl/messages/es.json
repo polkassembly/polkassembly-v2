@@ -1500,6 +1500,8 @@
 		"scanTheSignatureQRInYourApp": "Verifique el código QR de firma en su aplicación y firme la transacción"
 	},
 	"GovAnalytics": {
+		"governanceAnalytics": "Analíticas de Gobernanza",
+		"governanceAnalyticsDescription": "Los referendos son el mecanismo central de la gobernanza en cadena de Polkadot, permitiendo a los inversores (poseedores de DOT) tomar decisiones sobre actualizaciones de red, gastos de tesorería y otras cuestiones importantes.",
 		"overview": "Resumen",
 		"voting": "Votación",
 		"totalProposals": "Propuestas Totales",

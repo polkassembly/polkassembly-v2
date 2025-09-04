@@ -1499,6 +1499,8 @@
 		"scanTheSignatureQRInYourApp": "在您的应用中验证签名二维码并签署交易"
 	},
 	"GovAnalytics": {
+		"governanceAnalytics": "治理分析",
+		"governanceAnalyticsDescription": "公投是Polkadot的链上治理的核心机制，允许投资者（DOT持有者）就网络升级、国库支出和其他重要事项做出决定。",
 		"overview": "概览",
 		"voting": "投票",
 		"totalProposals": "总提案数",
