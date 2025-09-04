@@ -238,9 +238,10 @@ function ParachainsSection() {
 
 			await bulkUpdateNetworkPreferences(updates);
 
-			networksToImport.forEach((network) => {
-				importNetworkSettings(currentNetwork, network.id);
-			});
+			if (networksToImport.length > 0) {
+				const importPromises = networksToImport.map((network) => importNetworkSettings(currentNetwork, network.id));
+				await Promise.all(importPromises);
+			}
 		} catch {
 			setParachainSettings((prev) => ({
 				...prev,
@@ -282,7 +283,7 @@ function ParachainsSection() {
 		});
 	};
 
-	const handleImportPrimaryNetworkSettings = (checked: boolean) => {
+	const handleImportPrimaryNetworkSettings = async (checked: boolean) => {
 		if (checked) {
 			setParachainSettings((prev) => ({
 				...prev,
@@ -302,16 +303,31 @@ function ParachainsSection() {
 				});
 			}
 		} else {
-			setParachainSettings((prev) => ({
-				...prev,
-				importPrimaryNetworkSettings: false
-			}));
+			const allNetworkIds = selectedNetworks.map((network) => network.id);
 
-			updateNetworkPreference(currentNetwork, {
-				enabled: currentNetworkPrefs?.enabled || true,
-				isPrimary: currentNetworkPrefs?.isPrimary || false,
-				importPrimarySettings: false
-			});
+			try {
+				const updates = allNetworkIds.map((networkId) => ({
+					section: 'networks',
+					key: networkId,
+					value: {
+						enabled: preferences?.networkPreferences?.[networkId]?.enabled || true,
+						isPrimary: networkId === currentNetwork ? currentNetworkPrefs?.isPrimary || false : false,
+						importPrimarySettings: false
+					}
+				}));
+
+				await bulkUpdateNetworkPreferences(updates);
+
+				setParachainSettings((prev) => ({
+					...prev,
+					importPrimaryNetworkSettings: false
+				}));
+			} catch {
+				setParachainSettings((prev) => ({
+					...prev,
+					importPrimaryNetworkSettings: true
+				}));
+			}
 		}
 	};
 	const finalNetworks = selectedNetworks
