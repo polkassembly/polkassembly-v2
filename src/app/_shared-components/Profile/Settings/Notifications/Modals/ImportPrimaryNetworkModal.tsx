@@ -7,6 +7,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import { Download, X } from 'lucide-react';
+import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 
 interface Network {
 	id: string;
@@ -62,6 +63,9 @@ function ImportPrimaryNetworkModal({ open, onClose, onConfirm, primaryNetwork, p
 										width={12}
 										height={12}
 										className='rounded-full object-cover'
+										onError={(e) => {
+											e.currentTarget.src = PolkadotLogo.src;
+										}}
 									/>
 									<span className='text-xs text-text_primary'>{network.name}</span>
 								</div>
@@ -72,11 +76,14 @@ function ImportPrimaryNetworkModal({ open, onClose, onConfirm, primaryNetwork, p
 					<div className='flex items-center justify-center'>
 						<div className='flex items-center gap-2 rounded-full border-2 border-pink-500 px-4 py-2'>
 							<img
-								src={primaryNetworkLogo}
+								src={primaryNetworkLogo || PolkadotLogo.src}
 								alt={primaryNetwork}
 								width={16}
 								height={16}
 								className='rounded-full object-cover'
+								onError={(e) => {
+									e.currentTarget.src = PolkadotLogo.src;
+								}}
 							/>
 							<span className='text-sm font-medium text-text_primary'>{primaryNetwork}</span>
 						</div>

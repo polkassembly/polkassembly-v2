@@ -32,6 +32,7 @@ import AddNetworksModal from '../Modals/AddNetworksModal';
 
 import ImportPrimaryNetworkModal from '../Modals/ImportPrimaryNetworkModal';
 import AddNetworksFinalModal from '../Modals/AddNetworksFinalModal';
+import ConfirmationModal from '../Modals/ConfirmationModal';
 import classes from '../Notifications.module.scss';
 
 const getNetworkLogo = (networkId: string): string => {
@@ -139,7 +140,8 @@ function ParachainsSection() {
 	const [networkModals, setNetworkModals] = useState({
 		addNetworks: false,
 		importPrimary: false,
-		addNetworksFinal: false
+		addNetworksFinal: false,
+		confirmation: false
 	});
 
 	const [primaryNetwork] = useState(
@@ -249,83 +251,76 @@ function ParachainsSection() {
 	};
 
 	const handleSetPrimaryNetworkSettings = (checked: boolean) => {
+		if (checked) {
+			openNetworkModal('confirmation');
+		} else {
+			setParachainSettings((prev) => ({
+				...prev,
+				setPrimaryNetworkSettings: false
+			}));
+
+			updateNetworkPreference(currentNetwork, {
+				enabled: true,
+				isPrimary: false,
+				importPrimarySettings: currentNetworkPrefs?.importPrimarySettings || false
+			});
+		}
+	};
+
+	const handleConfirmPrimaryNetwork = () => {
+		closeNetworkModal('confirmation');
+
 		setParachainSettings((prev) => ({
 			...prev,
-			setPrimaryNetworkSettings: checked
+			setPrimaryNetworkSettings: true
 		}));
 
 		updateNetworkPreference(currentNetwork, {
 			enabled: true,
-			isPrimary: checked,
+			isPrimary: true,
 			importPrimarySettings: currentNetworkPrefs?.importPrimarySettings || false
 		});
 	};
 
-	const handleImportPrimaryNetworkSettings = async (checked: boolean) => {
-		setParachainSettings((prev) => ({
-			...prev,
-			importPrimaryNetworkSettings: checked,
-			setPrimaryNetworkSettings: checked ? true : prev.setPrimaryNetworkSettings
-		}));
-
-		try {
-			if (checked) {
-				const otherNetworks = selectedNetworks.filter((network) => network.id !== currentNetwork);
-
-				if (otherNetworks.length > 0) {
-					const updates = [
-						{
-							section: 'networks',
-							key: currentNetwork,
-							value: {
-								enabled: true,
-								isPrimary: true,
-								importPrimarySettings: true
-							}
-						},
-						...otherNetworks.map((network) => ({
-							section: 'networks',
-							key: network.id,
-							value: {
-								enabled: true,
-								isPrimary: false,
-								importPrimarySettings: true
-							}
-						}))
-					];
-
-					await bulkUpdateNetworkPreferences(updates);
-
-					otherNetworks.forEach((network) => {
-						importNetworkSettings(currentNetwork, network.id);
-					});
-				} else {
-					updateNetworkPreference(currentNetwork, {
-						enabled: true,
-						isPrimary: true,
-						importPrimarySettings: true
-					});
-				}
-			} else {
-				updateNetworkPreference(currentNetwork, {
-					enabled: currentNetworkPrefs?.enabled || true,
-					isPrimary: currentNetworkPrefs?.isPrimary || false,
-					importPrimarySettings: false
-				});
-			}
-		} catch {
+	const handleImportPrimaryNetworkSettings = (checked: boolean) => {
+		if (checked) {
 			setParachainSettings((prev) => ({
 				...prev,
-				importPrimaryNetworkSettings: !checked,
-				setPrimaryNetworkSettings: !checked ? prev.setPrimaryNetworkSettings : false
+				importPrimaryNetworkSettings: true,
+				setPrimaryNetworkSettings: true
 			}));
+
+			const otherNetworks = selectedNetworks.filter((network) => network.id !== currentNetwork);
+
+			if (otherNetworks.length > 0) {
+				openNetworkModal('importPrimary');
+			} else {
+				updateNetworkPreference(currentNetwork, {
+					enabled: true,
+					isPrimary: true,
+					importPrimarySettings: true
+				});
+			}
+		} else {
+			setParachainSettings((prev) => ({
+				...prev,
+				importPrimaryNetworkSettings: false
+			}));
+
+			updateNetworkPreference(currentNetwork, {
+				enabled: currentNetworkPrefs?.enabled || true,
+				isPrimary: currentNetworkPrefs?.isPrimary || false,
+				importPrimarySettings: false
+			});
 		}
 	};
-	const finalNetworks = selectedNetworks.map((network) => ({
-		id: network.id,
-		name: network.name,
-		logo: getNetworkLogo(network.id)
-	}));
+	const finalNetworks = selectedNetworks
+		.filter((network) => network.id !== currentNetwork)
+		.map((network) => ({
+			id: network.id,
+			name: network.name,
+			logo: getNetworkLogo(network.id)
+		}));
 
 	return (
 		<>
@@ -417,17 +412,45 @@ function ParachainsSection() {
 				selectedNetworks={selectedNetworks}
 			/>
 
+			<ConfirmationModal
+				open={networkModals.confirmation}
+				onClose={() => {
+					closeNetworkModal('confirmation');
+					setParachainSettings((prev) => ({
+						...prev,
+						setPrimaryNetworkSettings: false
+					}));
+				}}
+				onConfirm={handleConfirmPrimaryNetwork}
+				networkName={primaryNetwork}
+			/>
+
 			<ImportPrimaryNetworkModal
 				open={networkModals.importPrimary}
-				onClose={() => closeNetworkModal('importPrimary')}
+				onClose={() => {
+					closeNetworkModal('importPrimary');
+					setParachainSettings((prev) => ({
+						...prev,
+						importPrimaryNetworkSettings: false,
+						setPrimaryNetworkSettings: prev.setPrimaryNetworkSettings
+					}));
+				}}
 				onConfirm={handleImportPrimaryConfirm}
 				primaryNetwork={primaryNetwork}
+				primaryNetworkLogo={getNetworkLogo(currentNetwork)}
 				networks={finalNetworks}
 			/>
 
 			<AddNetworksFinalModal
 				open={networkModals.addNetworksFinal}
-				onClose={() => closeNetworkModal('addNetworksFinal')}
+				onClose={() => {
+					closeNetworkModal('addNetworksFinal');
+					setParachainSettings((prev) => ({
+						...prev,
+						importPrimaryNetworkSettings: false,
+						setPrimaryNetworkSettings: prev.setPrimaryNetworkSettings
+					}));
+				}}
 				onGoBack={() => {
 					closeNetworkModal('addNetworksFinal');
 					openNetworkModal('importPrimary');
