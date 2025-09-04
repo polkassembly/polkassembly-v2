@@ -322,7 +322,11 @@ export class IdentityService {
 		} else {
 			const injected = await getInjectedWallet(wallet);
 
-			if (!injected) return;
+			if (!injected) {
+				console.log('Signer not set, Please refresh and try again');
+				onFailed('Signer not set, Please refresh and try again');
+				return;
+			}
 
 			this.setSigner(injected.signer as Signer);
 			let extrinsic = tx;
