@@ -11,41 +11,159 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shar
 import { Separator } from '@/app/_shared-components/Separator';
 import { Switch } from '@/app/_shared-components/Switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
-import { ENetwork } from '@/_shared/types';
+import { ENetwork, EPostOrigin } from '@/_shared/types';
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import AdvancedSettingsIcon from '@assets/icons/notification-settings/advancedsettings.svg';
+import RootIcon from '@assets/sidebar/root-icon.svg';
+import TreasurerIcon from '@assets/sidebar/treasurer-icon.svg';
+import WishForChangeIcon from '@assets/sidebar/wish-for-change-icon.svg';
+import ReferendumCancellorIcon from '@assets/sidebar/referendum-cancellor-icon.svg';
+import ReferendumKillerIcon from '@assets/sidebar/referendum-killer-icon.svg';
+import WhitelistedCallerIcon from '@assets/sidebar/whitelisted-caller-icon.svg';
+import FellowshipAdminIcon from '@assets/sidebar/fellowship-admin-icon.svg';
+import AdministrationIcon from '@assets/sidebar/admin-icon.svg';
+import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
+import DemocracyReferendaIcon from '@assets/sidebar/democracy-referenda-icon.svg';
+import ProposalIcon from '@assets/sidebar/proposal-icon.svg';
+import BountyIcon from '@assets/sidebar/bounty.svg';
+import TipsIcon from '@assets/sidebar/tips-icon.svg';
+import TechCommProposalsIcon from '@assets/sidebar/tech-comm-proposals-icon.svg';
+import CouncilMotionIcon from '@assets/sidebar/council-motion-icon.svg';
 import TrackItem from '../components/TrackItem';
 import Gov1Item from '../components/Gov1Item';
 import classes from '../Notifications.module.scss';
 
-const trackLabels = {
-	root: 'Root',
-	stakingAdmin: 'Staking Admin',
-	auctionAdmin: 'Auction Admin',
-	treasurer: 'Treasurer',
-	referendumCanceller: 'Referendum Canceller',
-	referendumKiller: 'Referendum Killer',
-	leaseAdmin: 'Lease Admin',
-	memberReferenda: 'Member Referenda',
-	smallTipper: 'Small Tipper',
-	bigTipper: 'Big Tipper',
-	smallSpender: 'Small Spender',
-	mediumSpender: 'Medium Spender',
-	bigSpender: 'Big Spender',
-	fellowshipAdmin: 'Fellowship Admin',
-	generalAdmin: 'General Admin',
-	whitelistedCaller: 'Whitelisted Caller'
+const getOriginIcon = (origin: EPostOrigin) => {
+	switch (origin) {
+		case EPostOrigin.ROOT:
+			return RootIcon;
+		case EPostOrigin.TREASURER:
+			return TreasurerIcon;
+		case EPostOrigin.WISH_FOR_CHANGE:
+			return WishForChangeIcon;
+		case EPostOrigin.REFERENDUM_CANCELLER:
+			return ReferendumCancellorIcon;
+		case EPostOrigin.REFERENDUM_KILLER:
+			return ReferendumKillerIcon;
+		case EPostOrigin.WHITELISTED_CALLER:
+			return WhitelistedCallerIcon;
+		case EPostOrigin.FELLOWSHIP_ADMIN:
+			return FellowshipAdminIcon;
+		case EPostOrigin.STAKING_ADMIN:
+		case EPostOrigin.AUCTION_ADMIN:
+		case EPostOrigin.LEASE_ADMIN:
+		case EPostOrigin.GENERAL_ADMIN:
+			return AdministrationIcon;
+		case EPostOrigin.SMALL_TIPPER:
+		case EPostOrigin.BIG_TIPPER:
+		case EPostOrigin.SMALL_SPENDER:
+		case EPostOrigin.MEDIUM_SPENDER:
+		case EPostOrigin.BIG_SPENDER:
+			return TreasuryIcon;
+		default:
+			return AdministrationIcon;
+	}
 };
 
-const gov1Labels = {
-	mentionsIReceive: 'Mentions I receive',
-	referendums: 'Referendums',
-	proposals: 'Proposals',
-	bounties: 'Bounties',
-	childBounties: 'Child Bounties',
-	tips: 'Tips',
-	techCommittee: 'Tech Committee',
-	councilMotion: 'Council Motion'
+const getGov1Icon = (itemKey: string) => {
+	switch (itemKey) {
+		case 'mentionsIReceive':
+			return AdministrationIcon;
+		case 'referendums':
+			return DemocracyReferendaIcon;
+		case 'proposals':
+			return ProposalIcon;
+		case 'bounties':
+			return BountyIcon;
+		case 'childBounties':
+			return BountyIcon;
+		case 'tips':
+			return TipsIcon;
+		case 'techCommittee':
+			return TechCommProposalsIcon;
+		case 'councilMotion':
+			return CouncilMotionIcon;
+		default:
+			return AdministrationIcon;
+	}
+};
+
+const getGov1NotificationLabels = (itemKey: string): { [key: string]: string } | undefined => {
+	switch (itemKey) {
+		case 'referendums':
+			return {
+				newReferendumSubmitted: 'New Referendum submitted',
+				referendumInVoting: 'Referendum in voting',
+				referendumClosed: 'Referendum closed'
+			};
+		case 'proposals':
+			return {
+				newProposalsSubmitted: 'New Proposals submitted',
+				proposalInVoting: 'Proposal in voting',
+				proposalClosed: 'Proposal closed'
+			};
+		case 'bounties':
+			return {
+				bountiesSubmitted: 'Bounties submitted',
+				bountiesClosed: 'Bounties closed'
+			};
+		case 'childBounties':
+			return {
+				childBountiesSubmitted: 'Child Bounties submitted',
+				childBountiesClosed: 'Child Bounties closed'
+			};
+		case 'tips':
+			return {
+				newTipsSubmitted: 'New Tips submitted',
+				tipsOpened: 'Tips opened',
+				tipsClosed: 'Tips closed / retracted'
+			};
+		case 'techCommittee':
+			return {
+				newTechCommitteeProposalsSubmitted: 'New Tech Committee Proposals submitted',
+				proposalsClosed: 'Proposals closed'
+			};
+		case 'councilMotion':
+			return {
+				newMotionsSubmitted: 'New Motions submitted',
+				motionInVoting: 'Motion in voting',
+				motionClosed: 'Motion closed / retracted'
+			};
+		case 'mentionsIReceive':
+			return undefined;
+		default:
+			return undefined;
+	}
+};
+
+const trackLabels: Record<string, { origin: EPostOrigin; label: string }> = {
+	root: { origin: EPostOrigin.ROOT, label: 'Root' },
+	stakingAdmin: { origin: EPostOrigin.STAKING_ADMIN, label: 'Staking Admin' },
+	auctionAdmin: { origin: EPostOrigin.AUCTION_ADMIN, label: 'Auction Admin' },
+	treasurer: { origin: EPostOrigin.TREASURER, label: 'Treasurer' },
+	referendumCanceller: { origin: EPostOrigin.REFERENDUM_CANCELLER, label: 'Referendum Canceller' },
+	referendumKiller: { origin: EPostOrigin.REFERENDUM_KILLER, label: 'Referendum Killer' },
+	leaseAdmin: { origin: EPostOrigin.LEASE_ADMIN, label: 'Lease Admin' },
+	memberReferenda: { origin: EPostOrigin.MEMBERS, label: 'Member Referenda' },
+	smallTipper: { origin: EPostOrigin.SMALL_TIPPER, label: 'Small Tipper' },
+	bigTipper: { origin: EPostOrigin.BIG_TIPPER, label: 'Big Tipper' },
+	smallSpender: { origin: EPostOrigin.SMALL_SPENDER, label: 'Small Spender' },
+	mediumSpender: { origin: EPostOrigin.MEDIUM_SPENDER, label: 'Medium Spender' },
+	bigSpender: { origin: EPostOrigin.BIG_SPENDER, label: 'Big Spender' },
+	fellowshipAdmin: { origin: EPostOrigin.FELLOWSHIP_ADMIN, label: 'Fellowship Admin' },
+	generalAdmin: { origin: EPostOrigin.GENERAL_ADMIN, label: 'General Admin' },
+	whitelistedCaller: { origin: EPostOrigin.WHITELISTED_CALLER, label: 'Whitelisted Caller' }
+};
+
+const gov1Labels: Record<string, { origin?: EPostOrigin; label: string }> = {
+	mentionsIReceive: { label: 'Mentions I receive' },
+	referendums: { origin: EPostOrigin.ROOT, label: 'Referendums' },
+	proposals: { origin: EPostOrigin.ROOT, label: 'Proposals' },
+	bounties: { origin: EPostOrigin.ROOT, label: 'Bounties' },
+	childBounties: { origin: EPostOrigin.ROOT, label: 'Child Bounties' },
+	tips: { origin: EPostOrigin.ROOT, label: 'Tips' },
+	techCommittee: { origin: EPostOrigin.ROOT, label: 'Tech Committee' },
+	councilMotion: { origin: EPostOrigin.ROOT, label: 'Council Motion' }
 };
 
 interface AdvancedSettingsSectionProps {
@@ -165,10 +283,18 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 								<div className='space-y-4'>
 									{Object.entries(trackLabels)
 										.slice(0, 8)
-										.map(([key, label], index) => (
+										.map(([key, { origin, label }]) => (
 											<TrackItem
 												key={key}
-												icon={<div className={`h-4 w-4 rounded bg-${['blue', 'green', 'purple', 'yellow', 'red', 'gray', 'indigo', 'pink'][index]}-500`} />}
+												icon={
+													<Image
+														src={getOriginIcon(origin)}
+														alt={label}
+														width={16}
+														height={16}
+														className='rounded'
+													/>
+												}
 												title={label}
 												enabled={openGovTracks[key]?.enabled || false}
 												notifications={
@@ -187,10 +313,18 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 								<div className='space-y-4'>
 									{Object.entries(trackLabels)
 										.slice(8)
-										.map(([key, label], index) => (
+										.map(([key, { origin, label }]) => (
 											<TrackItem
 												key={key}
-												icon={<div className={`h-4 w-4 rounded bg-${['cyan', 'orange', 'teal', 'lime', 'emerald', 'violet', 'rose', 'slate'][index]}-500`} />}
+												icon={
+													<Image
+														src={getOriginIcon(origin)}
+														alt={label}
+														width={16}
+														height={16}
+														className='rounded'
+													/>
+												}
 												title={label}
 												enabled={openGovTracks[key]?.enabled || false}
 												notifications={
@@ -214,110 +348,55 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 						>
 							<div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
 								<div className='space-y-4'>
-									<Gov1Item
-										icon={<div className='h-4 w-4 rounded bg-purple-500' />}
-										title={gov1Labels.mentionsIReceive}
-										enabled={gov1Items.mentionsIReceive?.enabled || false}
-										onEnabledChange={(enabled) => handleGov1ItemChange('mentionsIReceive', enabled)}
-										isSimple
-									/>
-
-									<Gov1Item
-										icon={<div className='h-4 w-4 rounded bg-blue-500' />}
-										title={gov1Labels.referendums}
-										enabled={gov1Items.referendums?.enabled || false}
-										notifications={gov1Items.referendums?.notifications || {}}
-										notificationLabels={{
-											newReferendumSubmitted: 'New Referendum submitted',
-											referendumInVoting: 'Referendum in voting',
-											referendumClosed: 'Referendum closed'
-										}}
-										onEnabledChange={(enabled) => handleGov1ItemChange('referendums', enabled)}
-										onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange('referendums', notificationKey, enabled)}
-									/>
-
-									<Gov1Item
-										icon={<div className='h-4 w-4 rounded bg-green-500' />}
-										title={gov1Labels.bounties}
-										enabled={gov1Items.bounties?.enabled || false}
-										notifications={gov1Items.bounties?.notifications || {}}
-										notificationLabels={{
-											bountiesSubmitted: 'Bounties submitted',
-											bountiesClosed: 'Bounties closed'
-										}}
-										onEnabledChange={(enabled) => handleGov1ItemChange('bounties', enabled)}
-										onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange('bounties', notificationKey, enabled)}
-									/>
-
-									<Gov1Item
-										icon={<div className='h-4 w-4 rounded bg-yellow-500' />}
-										title={gov1Labels.tips}
-										enabled={gov1Items.tips?.enabled || false}
-										notifications={gov1Items.tips?.notifications || {}}
-										notificationLabels={{
-											newTipsSubmitted: 'New Tips submitted',
-											tipsOpened: 'Tips opened',
-											tipsClosed: 'Tips closed / retracted'
-										}}
-										onEnabledChange={(enabled) => handleGov1ItemChange('tips', enabled)}
-										onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange('tips', notificationKey, enabled)}
-									/>
-
-									<Gov1Item
-										icon={<div className='h-4 w-4 rounded bg-red-500' />}
-										title={gov1Labels.councilMotion}
-										enabled={gov1Items.councilMotion?.enabled || false}
-										notifications={gov1Items.councilMotion?.notifications || {}}
-										notificationLabels={{
-											newMotionsSubmitted: 'New Motions submitted',
-											motionInVoting: 'Motion in voting',
-											motionClosed: 'Motion closed / retracted'
-										}}
-										onEnabledChange={(enabled) => handleGov1ItemChange('councilMotion', enabled)}
-										onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange('councilMotion', notificationKey, enabled)}
-									/>
+									{Object.entries(gov1Labels)
+										.slice(0, 5)
+										.map(([key, { label }]) => (
+											<Gov1Item
+												key={key}
+												icon={
+													<Image
+														src={getGov1Icon(key)}
+														alt={label}
+														width={16}
+														height={16}
+														className='rounded'
+													/>
+												}
+												title={label}
+												enabled={gov1Items[key]?.enabled || false}
+												notifications={gov1Items[key]?.notifications || {}}
+												notificationLabels={getGov1NotificationLabels(key)}
+												onEnabledChange={(enabled) => handleGov1ItemChange(key, enabled)}
+												onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange(key, notificationKey, enabled)}
+												isSimple={key === 'mentionsIReceive'}
+											/>
+										))}
 								</div>
 
 								<div className='space-y-4'>
-									<Gov1Item
-										icon={<div className='h-4 w-4 rounded bg-indigo-500' />}
-										title={gov1Labels.proposals}
-										enabled={gov1Items.proposals?.enabled || false}
-										notifications={gov1Items.proposals?.notifications || {}}
-										notificationLabels={{
-											newProposalsSubmitted: 'New Proposals submitted',
-											proposalInVoting: 'Proposal in voting',
-											proposalClosed: 'Proposal closed'
-										}}
-										onEnabledChange={(enabled) => handleGov1ItemChange('proposals', enabled)}
-										onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange('proposals', notificationKey, enabled)}
-									/>
-
-									<Gov1Item
-										icon={<div className='h-4 w-4 rounded bg-teal-500' />}
-										title={gov1Labels.childBounties}
-										enabled={gov1Items.childBounties?.enabled || false}
-										notifications={gov1Items.childBounties?.notifications || {}}
-										notificationLabels={{
-											childBountiesSubmitted: 'Child Bounties submitted',
-											childBountiesClosed: 'Child Bounties closed'
-										}}
-										onEnabledChange={(enabled) => handleGov1ItemChange('childBounties', enabled)}
-										onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange('childBounties', notificationKey, enabled)}
-									/>
-
-									<Gov1Item
-										icon={<div className='h-4 w-4 rounded bg-gray-500' />}
-										title={gov1Labels.techCommittee}
-										enabled={gov1Items.techCommittee?.enabled || false}
-										notifications={gov1Items.techCommittee?.notifications || {}}
-										notificationLabels={{
-											newTechCommitteeProposalsSubmitted: 'New Tech Committee Proposals submitted',
-											proposalsClosed: 'Proposals closed'
-										}}
-										onEnabledChange={(enabled) => handleGov1ItemChange('techCommittee', enabled)}
-										onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange('techCommittee', notificationKey, enabled)}
-									/>
+									{Object.entries(gov1Labels)
+										.slice(5)
+										.map(([key, { label }]) => (
+											<Gov1Item
+												key={key}
+												icon={
+													<Image
+														src={getGov1Icon(key)}
+														alt={label}
+														width={16}
+														height={16}
+														className='rounded'
+													/>
+												}
+												title={label}
+												enabled={gov1Items[key]?.enabled || false}
+												notifications={gov1Items[key]?.notifications || {}}
+												notificationLabels={getGov1NotificationLabels(key)}
+												onEnabledChange={(enabled) => handleGov1ItemChange(key, enabled)}
+												onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange(key, notificationKey, enabled)}
+												isSimple={key === 'mentionsIReceive'}
+											/>
+										))}
 								</div>
 							</div>
 						</TabsContent>

@@ -19,6 +19,7 @@ interface BotSetupCardProps {
 function BotSetupCard({ Icon, title, description, channel, onClick }: BotSetupCardProps) {
 	const isComingSoon = description === 'Coming Soon';
 	const AddBotText = 'ADD THE POLKASSEMBLY BOT';
+
 	const getDescriptionParts = (desc: string) => {
 		if (desc.includes(AddBotText)) {
 			const parts = desc.split(AddBotText);
@@ -43,8 +44,12 @@ function BotSetupCard({ Icon, title, description, channel, onClick }: BotSetupCa
 				/>
 			</div>
 			<div className='flex-1 text-btn_secondary_text'>
-				<h4 className='text-base font-medium text-text_primary'>{title}</h4>
-				{!isComingSoon && (
+				<div className='flex items-center gap-2'>
+					<h4 className='text-base font-medium text-text_primary'>{title}</h4>
+					{channel === ENotificationChannel.ELEMENT && <span className='rounded-md bg-[#6C4CF1] px-2 py-0.5 text-xs font-medium text-white'>Coming Soon</span>}
+				</div>
+
+				{!isComingSoon && channel !== ENotificationChannel.ELEMENT && (
 					<div className='mt-2 flex items-center gap-2'>
 						<CirclePlus className='h-4 w-4 text-text_pink' />
 						<p className='text-text_secondary text-sm'>
@@ -60,7 +65,8 @@ function BotSetupCard({ Icon, title, description, channel, onClick }: BotSetupCa
 						</p>
 					</div>
 				)}
-				{isComingSoon && <p className='text-text_secondary mt-2 text-sm'>{description}</p>}
+
+				{isComingSoon && channel !== ENotificationChannel.ELEMENT && <p className='text-text_secondary mt-2 text-sm'>{description}</p>}
 			</div>
 		</div>
 	);
