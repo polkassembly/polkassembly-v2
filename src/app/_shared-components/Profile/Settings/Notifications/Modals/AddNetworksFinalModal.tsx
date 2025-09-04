@@ -76,7 +76,7 @@ function AddNetworksFinalModal({ open, onClose, onGoBack, onGoAhead, networks }:
 						</Button>
 						<Button
 							onClick={onGoAhead}
-							className='flex-1 bg-pink-500 hover:bg-pink-600'
+							className='flex-1 bg-text_pink'
 						>
 							{t('goAhead')}
 						</Button>

@@ -27,7 +27,7 @@ function ConfirmationModal({ open, onClose, onConfirm, networkName }: Confirmati
 				<DialogHeader>
 					<div className='flex items-center justify-between'>
 						<div className='flex items-center gap-2'>
-							<CheckCircle className='h-5 w-5 text-green-500' />
+							<CheckCircle className='h-5 w-5 text-social_green' />
 							<DialogTitle>{t('Profile.Settings.Notifications.Modals.confirmation')}</DialogTitle>
 						</div>
 						<button
@@ -43,9 +43,9 @@ function ConfirmationModal({ open, onClose, onConfirm, networkName }: Confirmati
 				<div className='space-y-4'>
 					<p className='text-sm text-text_primary'>{t('Profile.Settings.Notifications.Modals.areYouSureYouWant', { networkName })}</p>
 
-					<div className='flex items-start gap-3 rounded-lg bg-blue-50 p-3'>
-						<Info className='mt-0.5 h-4 w-4 flex-shrink-0 text-blue-500' />
-						<p className='text-xs text-blue-700'>{t('Profile.Settings.Notifications.Modals.primaryNetworkSettingsInfo')}</p>
+					<div className='flex items-start gap-3 rounded-lg p-3'>
+						<Info className='mt-0.5 h-4 w-4 flex-shrink-0 text-bg_blue' />
+						<p className='text-xs text-bg_blue'>{t('Profile.Settings.Notifications.Modals.primaryNetworkSettingsInfo')}</p>
 					</div>
 
 					<div className='flex gap-2 pt-4'>
@@ -58,7 +58,7 @@ function ConfirmationModal({ open, onClose, onConfirm, networkName }: Confirmati
 						</Button>
 						<Button
 							onClick={onConfirm}
-							className='flex-1 bg-pink-500 hover:bg-pink-600'
+							className='flex-1 bg-text_pink'
 						>
 							{t('Profile.Settings.Notifications.Modals.confirm')}
 						</Button>

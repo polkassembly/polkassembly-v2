@@ -263,15 +263,15 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 						defaultValue='opengov'
 						className='w-full'
 					>
-						<TabsList className='rounded-lg bg-[#F5F6F8] px-2 py-1'>
+						<TabsList className='rounded-lg bg-call_args_bg px-2 py-1'>
 							<TabsTrigger
-								className='rounded-xl border-none bg-[#F5F6F8] px-6 py-1 text-wallet_btn_text/70 data-[state=active]:bg-white data-[state=active]:text-btn_secondary_text'
+								className='rounded-xl border-none bg-call_args_bg px-6 py-1 text-wallet_btn_text/70 data-[state=active]:bg-white data-[state=active]:text-btn_secondary_text'
 								value='opengov'
 							>
 								OpenGov
 							</TabsTrigger>
 							<TabsTrigger
-								className='rounded-xl border-none bg-[#F5F6F8] px-6 py-1 text-wallet_btn_text/70 data-[state=active]:bg-white data-[state=active]:text-btn_secondary_text'
+								className='rounded-xl border-none bg-call_args_bg px-6 py-1 text-wallet_btn_text/70 data-[state=active]:bg-white data-[state=active]:text-btn_secondary_text'
 								value='gov1'
 							>
 								Gov1

@@ -150,7 +150,7 @@ function Comments({
 						<Button
 							variant='ghost'
 							onClick={() => setShowSpam(!showSpam)}
-							className='flex w-full items-center justify-center gap-x-2 text-sm font-medium text-pink-500'
+							className='flex w-full items-center justify-center gap-x-2 text-sm font-medium text-text_pink'
 							aria-expanded={showSpam}
 							aria-controls='spam-comments-section'
 						>

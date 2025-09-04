@@ -99,7 +99,7 @@ function ImportPrimaryNetworkModal({ open, onClose, onConfirm, primaryNetwork, p
 						</Button>
 						<Button
 							onClick={onConfirm}
-							className='flex-1 bg-pink-500 hover:bg-pink-600'
+							className='flex-1 bg-bg_pink'
 						>
 							{t('confirm')}
 						</Button>

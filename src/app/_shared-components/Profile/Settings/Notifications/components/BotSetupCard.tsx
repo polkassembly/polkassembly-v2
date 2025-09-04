@@ -23,15 +23,15 @@ function BotSetupCard({ Icon, title, description, channel, onClick }: BotSetupCa
 	const AddBotText = t('Profile.Settings.Notifications.addThePolkassemblyBot');
 
 	const getDescriptionParts = (desc: string) => {
-		if (desc.includes(AddBotText)) {
-			const parts = desc.split(AddBotText);
-			return {
-				beforeText: parts[0],
-				clickableText: AddBotText,
-				afterText: parts[1]
-			};
+		if (!desc || !desc.includes(AddBotText)) {
+			return { beforeText: '', clickableText: desc || '', afterText: '' };
 		}
-		return { beforeText: '', clickableText: desc, afterText: '' };
+		const parts = desc.split(AddBotText);
+		return {
+			beforeText: parts[0] || '',
+			clickableText: AddBotText,
+			afterText: parts[1] || ''
+		};
 	};
 
 	const { beforeText, clickableText, afterText } = getDescriptionParts(description);

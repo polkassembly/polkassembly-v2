@@ -245,7 +245,7 @@ function AddNetworksModal({ open, onClose, onConfirm, selectedNetworks }: AddNet
 						</Button>
 						<Button
 							onClick={handleConfirm}
-							className='flex-1 bg-pink-500 hover:bg-pink-600 disabled:opacity-50'
+							className='flex-1 bg-text_pink disabled:opacity-50'
 							disabled={
 								!Object.values(networks)
 									.flat()

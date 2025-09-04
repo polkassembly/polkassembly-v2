@@ -16,6 +16,7 @@ import {
 	IGov1ItemSettings
 } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { STALE_TIME } from '@/_shared/_constants/listingLimit';
 import { useUser } from './useUser';
 
 const fetchNotificationPreferences = async (userId: number, network?: string, getAllNetworks?: boolean): Promise<IUserNotificationPreferences> => {
@@ -144,8 +145,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		queryKey,
 		queryFn: () => fetchNotificationPreferences(user!.id, getAllNetworks ? undefined : currentNetwork, getAllNetworks),
 		enabled: !!user?.id,
-		staleTime: 10 * 60 * 1000,
-		gcTime: 15 * 60 * 1000,
+		staleTime: STALE_TIME,
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
 		refetchOnReconnect: false,

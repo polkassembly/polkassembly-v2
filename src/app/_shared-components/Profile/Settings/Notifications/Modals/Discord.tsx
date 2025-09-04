@@ -9,7 +9,8 @@ import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import { Copy } from 'lucide-react';
-import { ENotificationChannel } from '@/_shared/types';
+import { ENotificationChannel, ENotificationStatus } from '@/_shared/types';
+import { useToast } from '@/hooks/useToast';
 
 interface DiscordInfoModalProps {
 	icon: React.ReactNode;
@@ -25,14 +26,23 @@ function DiscordInfoModal({ icon, title, open, getVerifyToken, generatedToken = 
 	const [loading, setLoading] = useState(false);
 	const [token, setToken] = useState(generatedToken);
 	const username = 'user';
+	const { toast } = useToast();
 
 	const handleGenerateToken = async () => {
 		setLoading(true);
 		try {
 			const data = await getVerifyToken(ENotificationChannel.DISCORD);
 			setToken(data);
-		} catch {
-			// Handle error silently or use proper error handling
+			toast({
+				title: 'Token Generated Successfully',
+				status: ENotificationStatus.SUCCESS
+			});
+		} catch (error) {
+			console.error('Failed to generate verification token:', error);
+			toast({
+				title: 'Error Generating Token',
+				status: ENotificationStatus.ERROR
+			});
 		} finally {
 			setLoading(false);
 		}
@@ -41,9 +51,14 @@ function DiscordInfoModal({ icon, title, open, getVerifyToken, generatedToken = 
 	const handleCopyClicked = async (text: string) => {
 		try {
 			await navigator.clipboard.writeText(text);
-			// Successfully copied to clipboard
-		} catch {
-			// Handle copy error silently or use proper error handling
+			const message = text.includes('username') ? 'Username copied successfully' : 'Copied to clipboard';
+
+			toast({
+				title: message,
+				status: ENotificationStatus.SUCCESS
+			});
+		} catch (error) {
+			console.error('Failed to copy text:', error);
 		}
 	};
 
