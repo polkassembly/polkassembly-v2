@@ -5,15 +5,19 @@
 'use client';
 
 import { Button } from '@/app/_shared-components/Button';
+import { Switch } from '@/app/_shared-components/Switch';
 import { CheckCircle, AlertCircle } from 'lucide-react';
+import { ENotificationChannel } from '@/_shared/types';
 import { EmailIcon } from './Icons';
 
 interface EmailNotificationCardProps {
 	verifiedEmail: string;
 	verified: boolean;
+	enabled: boolean;
+	handleEnableDisabled: (channel: ENotificationChannel, enabled: boolean) => void;
 }
 
-function EmailNotificationCard({ verifiedEmail, verified }: EmailNotificationCardProps) {
+function EmailNotificationCard({ verifiedEmail, verified, enabled, handleEnableDisabled }: EmailNotificationCardProps) {
 	return (
 		<div className='flex items-start justify-between rounded-lg p-4'>
 			<div className='flex items-start gap-3'>
@@ -46,6 +50,13 @@ function EmailNotificationCard({ verifiedEmail, verified }: EmailNotificationCar
 						</Button>
 					)}
 				</div>
+			</div>
+			<div className='flex items-center'>
+				<Switch
+					checked={enabled}
+					onCheckedChange={(checked) => handleEnableDisabled(ENotificationChannel.EMAIL, checked)}
+					disabled={!verified}
+				/>
 			</div>
 		</div>
 	);

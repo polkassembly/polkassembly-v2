@@ -35,11 +35,12 @@ const getNetworkLogo = (networkId: string, parachainsData?: IParachain[]): strin
 function ParachainsSection() {
 	const t = useTranslations();
 	const currentNetwork = getCurrentNetwork();
-	const { preferences, updateNetworkPreference, importNetworkSettings, isLoading } = useNotificationPreferences(true);
+	const { preferences, updateNetworkPreference, importNetworkSettings } = useNotificationPreferences(true);
 
 	const [selectedNetworks, setSelectedNetworks] = useState<INetworkSettings[]>([]);
 	const [pendingRemovals, setPendingRemovals] = useState<Set<string>>(new Set());
 	const [pendingAdditions, setPendingAdditions] = useState<INetworkSettings[]>([]);
+	const [pendingOperations, setPendingOperations] = useState<Set<string>>(new Set());
 
 	const { data: parachainsData } = useQuery({
 		queryKey: ['parachains'],
@@ -66,7 +67,6 @@ function ParachainsSection() {
 
 		userNetworks.forEach((networkId) => {
 			const networkPrefs = preferences.networkPreferences[networkId];
-			// Only show networks that are enabled and not pending removal
 			if (networkPrefs?.enabled !== false && !pendingRemovals.has(networkId)) {
 				networks.push({
 					id: networkId,
@@ -76,7 +76,6 @@ function ParachainsSection() {
 			}
 		});
 
-		// If current network is not in preferences, add it as non-removable
 		if (!userNetworks.includes(currentNetwork)) {
 			networks.push({
 				id: currentNetwork,
@@ -85,7 +84,6 @@ function ParachainsSection() {
 			});
 		}
 
-		// Add pending additions that aren't already in the server state
 		pendingAdditions.forEach((pendingNetwork) => {
 			if (!networks.some((n) => n.id === pendingNetwork.id)) {
 				networks.push(pendingNetwork);
@@ -95,14 +93,53 @@ function ParachainsSection() {
 		setSelectedNetworks(networks);
 	}, [preferences?.networkPreferences, currentNetwork, pendingRemovals, pendingAdditions]);
 
-	// Clear pending operations when API calls complete
 	useEffect(() => {
-		if (!isLoading && (pendingRemovals.size > 0 || pendingAdditions.length > 0)) {
-			// Clear all pending operations after API calls complete
-			setPendingRemovals(new Set());
+		if (!preferences?.networkPreferences) return;
+
+		const serverNetworks = Object.keys(preferences.networkPreferences).filter((networkId) => preferences.networkPreferences[networkId]?.enabled !== false);
+
+		const additionsCompleted = pendingAdditions.every((pendingNetwork) => serverNetworks.includes(pendingNetwork.id));
+
+		const removalsCompleted = Array.from(pendingRemovals).every((networkId) => !serverNetworks.includes(networkId));
+
+		if (additionsCompleted && pendingAdditions.length > 0) {
 			setPendingAdditions([]);
+			setPendingOperations((prev) => {
+				const newSet = new Set(prev);
+				pendingAdditions.forEach((network) => {
+					newSet.delete(`add-${network.id}`);
+				});
+				return newSet;
+			});
 		}
-	}, [isLoading, pendingRemovals.size, pendingAdditions.length]);
+
+		if (removalsCompleted && pendingRemovals.size > 0) {
+			const removalsArray = Array.from(pendingRemovals);
+			setPendingRemovals(new Set());
+			setPendingOperations((prev) => {
+				const newSet = new Set(prev);
+				removalsArray.forEach((networkId) => {
+					newSet.delete(`remove-${networkId}`);
+				});
+				return newSet;
+			});
+		}
+	}, [preferences?.networkPreferences, pendingAdditions, pendingRemovals]);
+
+	useEffect(() => {
+		if (pendingOperations.size > 0) {
+			const timeout = setTimeout(() => {
+				console.warn('Clearing pending operations due to timeout');
+				setPendingRemovals(new Set());
+				setPendingAdditions([]);
+				setPendingOperations(new Set());
+			}, 10000);
+
+			return () => clearTimeout(timeout);
+		}
+
+		return undefined;
+	}, [pendingOperations.size]);
 
 	const currentNetworkPrefs = preferences?.networkPreferences?.[currentNetwork];
 	const [parachainSettings, setParachainSettings] = useState({
@@ -110,7 +147,6 @@ function ParachainsSection() {
 		importPrimaryNetworkSettings: currentNetworkPrefs?.importPrimarySettings || false
 	});
 
-	// Update parachainSettings when preferences change
 	useEffect(() => {
 		if (currentNetworkPrefs) {
 			setParachainSettings({
@@ -120,7 +156,6 @@ function ParachainsSection() {
 		}
 	}, [currentNetworkPrefs]);
 
-	// Network modals state
 	const [networkModals, setNetworkModals] = useState({
 		addNetworks: false,
 		importPrimary: false,
@@ -138,10 +173,10 @@ function ParachainsSection() {
 	};
 
 	const removeNetwork = (networkId: string) => {
-		// Add to pending removals to prevent it from reappearing during API calls
 		setPendingRemovals((prev) => new Set([...prev, networkId]));
 
-		// Update backend - pending removals will be cleared when loading completes
+		setPendingOperations((prev) => new Set([...prev, `remove-${networkId}`]));
+
 		updateNetworkPreference(networkId, {
 			enabled: false,
 			isPrimary: false,
@@ -156,10 +191,12 @@ function ParachainsSection() {
 	const handleAddNetworksConfirm = (networks: INetworkSettings[]) => {
 		if (networks.length === 0) return;
 
-		// Add to pending additions to show them immediately and prevent flickering
 		setPendingAdditions((prev) => [...prev, ...networks]);
 
-		// Update backend - pending additions will be cleared when loading completes
+		networks.forEach((network) => {
+			setPendingOperations((prev) => new Set([...prev, `add-${network.id}`]));
+		});
+
 		networks.forEach((network) => {
 			updateNetworkPreference(network.id, {
 				enabled: true,
@@ -177,7 +214,6 @@ function ParachainsSection() {
 	const handleFinalGoAhead = () => {
 		closeNetworkModal('addNetworksFinal');
 
-		// Import primary network settings to all selected networks
 		selectedNetworks.forEach((network) => {
 			if (network.id !== currentNetwork) {
 				importNetworkSettings(currentNetwork, network.id);
@@ -186,13 +222,11 @@ function ParachainsSection() {
 	};
 
 	const handleSetPrimaryNetworkSettings = (checked: boolean) => {
-		// Update local state
 		setParachainSettings((prev) => ({
 			...prev,
 			setPrimaryNetworkSettings: checked
 		}));
 
-		// Simple direct call
 		updateNetworkPreference(currentNetwork, {
 			enabled: true,
 			isPrimary: checked,
@@ -201,23 +235,19 @@ function ParachainsSection() {
 	};
 
 	const handleImportPrimaryNetworkSettings = (checked: boolean) => {
-		// Update local state
 		setParachainSettings((prev) => ({
 			...prev,
 			importPrimaryNetworkSettings: checked,
-			// If importing, also set as primary
 			setPrimaryNetworkSettings: checked ? true : prev.setPrimaryNetworkSettings
 		}));
 
 		if (checked) {
-			// Set current network as primary and import settings
 			updateNetworkPreference(currentNetwork, {
 				enabled: true,
 				isPrimary: true,
 				importPrimarySettings: true
 			});
 
-			// Import settings to all other networks
 			selectedNetworks.forEach((network) => {
 				if (network.id !== currentNetwork) {
 					updateNetworkPreference(network.id, {
@@ -229,7 +259,6 @@ function ParachainsSection() {
 				}
 			});
 		} else {
-			// Just update the current network
 			updateNetworkPreference(currentNetwork, {
 				enabled: currentNetworkPrefs?.enabled || true,
 				isPrimary: currentNetworkPrefs?.isPrimary || false,
