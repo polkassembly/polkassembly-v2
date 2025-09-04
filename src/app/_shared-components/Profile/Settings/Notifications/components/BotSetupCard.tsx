@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { CirclePlus } from 'lucide-react';
 import React from 'react';
 import { ENotificationChannel } from '@/_shared/types';
@@ -17,8 +18,9 @@ interface BotSetupCardProps {
 }
 
 function BotSetupCard({ Icon, title, description, channel, onClick }: BotSetupCardProps) {
-	const isComingSoon = description === 'Coming Soon';
-	const AddBotText = 'ADD THE POLKASSEMBLY BOT';
+	const t = useTranslations();
+	const isComingSoon = description === t('Profile.Settings.Notifications.comingSoon');
+	const AddBotText = t('Profile.Settings.Notifications.addThePolkassemblyBot');
 
 	const getDescriptionParts = (desc: string) => {
 		if (desc.includes(AddBotText)) {
@@ -46,7 +48,9 @@ function BotSetupCard({ Icon, title, description, channel, onClick }: BotSetupCa
 			<div className='flex-1 text-btn_secondary_text'>
 				<div className='flex items-center gap-2'>
 					<h4 className='text-base font-medium text-text_primary'>{title}</h4>
-					{channel === ENotificationChannel.ELEMENT && <span className='rounded-md bg-[#6C4CF1] px-2 py-0.5 text-xs font-medium text-white'>Coming Soon</span>}
+					{channel === ENotificationChannel.ELEMENT && (
+						<span className='rounded-md bg-[#6C4CF1] px-2 py-0.5 text-xs font-medium text-white'>{t('Profile.Settings.Notifications.comingSoon')}</span>
+					)}
 				</div>
 
 				{!isComingSoon && channel !== ENotificationChannel.ELEMENT && (

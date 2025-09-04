@@ -5,11 +5,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import { ChevronDown, Mail } from 'lucide-react';
 import { ENotificationChannel } from '@/_shared/types';
 import { TelegramIcon, DiscordIcon, SlackIcon, ElementIcon } from './Icons';
+
+type TranslateFn = ReturnType<typeof useTranslations>;
 
 interface NotificationItemProps {
 	title: string;
@@ -34,16 +37,18 @@ const channelIcons = {
 	[ENotificationChannel.ELEMENT]: ElementIcon
 };
 
-const channelLabels = {
-	[ENotificationChannel.EMAIL]: 'Email',
-	[ENotificationChannel.TELEGRAM]: 'Telegram',
-	[ENotificationChannel.DISCORD]: 'Discord',
-	[ENotificationChannel.SLACK]: 'Slack',
-	[ENotificationChannel.ELEMENT]: 'Element'
-};
+const getChannelLabels = (t: TranslateFn) => ({
+	[ENotificationChannel.EMAIL]: t('Profile.Settings.Notifications.email'),
+	[ENotificationChannel.TELEGRAM]: t('Profile.Settings.Notifications.telegram'),
+	[ENotificationChannel.DISCORD]: t('Profile.Settings.Notifications.discord'),
+	[ENotificationChannel.SLACK]: t('Profile.Settings.Notifications.slack'),
+	[ENotificationChannel.ELEMENT]: t('Profile.Settings.Notifications.element')
+});
 
 function NotificationItem({ title, description, checked, onCheckedChange, channels = {}, onChannelChange }: NotificationItemProps) {
+	const t = useTranslations();
 	const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+	const channelLabels = getChannelLabels(t);
 
 	return (
 		<div className='space-y-3'>
@@ -62,7 +67,7 @@ function NotificationItem({ title, description, checked, onCheckedChange, channe
 						onOpenChange={setIsAdvancedOpen}
 					>
 						<CollapsibleTrigger className='flex items-center gap-1 text-xs text-text_pink hover:underline'>
-							Advance
+							{t('Profile.Settings.Notifications.advance')}
 							<ChevronDown className={`h-3 w-3 transition-transform ${isAdvancedOpen ? 'rotate-180' : ''}`} />
 						</CollapsibleTrigger>
 						<CollapsibleContent>

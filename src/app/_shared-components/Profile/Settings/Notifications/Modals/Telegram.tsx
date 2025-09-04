@@ -5,6 +5,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import { Copy } from 'lucide-react';
@@ -20,6 +21,7 @@ interface TelegramInfoModalProps {
 }
 
 function TelegramInfoModal({ Icon, title, open, getVerifyToken, generatedToken = '', onClose }: TelegramInfoModalProps) {
+	const t = useTranslations('Profile.Settings.Notifications.Modals');
 	const [loading, setLoading] = useState(false);
 	const [token, setToken] = useState(generatedToken);
 	const username = 'user';
@@ -65,7 +67,7 @@ function TelegramInfoModal({ Icon, title, open, getVerifyToken, generatedToken =
 				<div className='space-y-4'>
 					<ol className='list-inside list-decimal space-y-4'>
 						<li className='leading-relaxed dark:text-white'>
-							Click this invite link{' '}
+							{t('clickInviteLink')}{' '}
 							<Button
 								variant='outline'
 								size='sm'
@@ -81,7 +83,7 @@ function TelegramInfoModal({ Icon, title, open, getVerifyToken, generatedToken =
 								</a>
 							</Button>
 							<br />
-							or Add{' '}
+							{t('orAdd')}{' '}
 							<Button
 								variant='outline'
 								size='sm'
@@ -91,11 +93,11 @@ function TelegramInfoModal({ Icon, title, open, getVerifyToken, generatedToken =
 							>
 								@PolkassemblyBot
 							</Button>{' '}
-							to your Telegram Chat as a member
+							{t('toYourTelegramChat')}
 						</li>
 
 						<li className='leading-relaxed dark:text-white'>
-							Send this command to the chat with the bot:
+							{t('sendThisCommand')}
 							<br />
 							<Button
 								variant='outline'
@@ -112,13 +114,13 @@ function TelegramInfoModal({ Icon, title, open, getVerifyToken, generatedToken =
 									onClick={handleGenerateToken}
 									variant='default'
 								>
-									Generate Token
+									{t('generateToken')}
 								</Button>
 							</div>
 							{token && (
 								<div className='mt-4 space-y-2'>
 									<div className='flex items-center gap-2 dark:text-white'>
-										<span>Username & Verification Token:</span>
+										<span>{t('usernameAndVerificationToken')}</span>
 									</div>
 									<Button
 										variant='outline'
@@ -134,7 +136,7 @@ function TelegramInfoModal({ Icon, title, open, getVerifyToken, generatedToken =
 						</li>
 
 						<li className='leading-relaxed dark:text-white'>
-							(Optional) Send this command to get help:{' '}
+							{t('optionalSendHelp')}{' '}
 							<Button
 								variant='outline'
 								size='sm'

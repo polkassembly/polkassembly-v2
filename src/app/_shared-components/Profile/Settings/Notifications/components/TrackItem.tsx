@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { Switch } from '@/app/_shared-components/Switch';
 import { ReactNode } from 'react';
@@ -22,6 +23,7 @@ interface TrackItemProps {
 }
 
 function TrackItem({ icon, title, enabled, notifications, onEnabledChange, onNotificationChange }: TrackItemProps) {
+	const t = useTranslations('Profile.Settings.Notifications');
 	const handleToggleAll = (newEnabled: boolean) => {
 		onEnabledChange(newEnabled);
 	};
@@ -38,7 +40,7 @@ function TrackItem({ icon, title, enabled, notifications, onEnabledChange, onNot
 						checked={enabled}
 						onCheckedChange={handleToggleAll}
 					/>
-					<span className='text-text_secondary text-xs'>All</span>
+					<span className='text-text_secondary text-xs'>{t('all')}</span>
 				</div>
 			</div>
 

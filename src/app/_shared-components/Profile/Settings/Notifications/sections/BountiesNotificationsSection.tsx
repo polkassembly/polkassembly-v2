@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
@@ -20,6 +21,7 @@ interface BountiesNotificationsSectionProps {
 }
 
 function BountiesNotificationsSection({ network }: BountiesNotificationsSectionProps) {
+	const t = useTranslations();
 	const { preferences, updateNetworkBountiesNotification, bulkUpdateNetworkBountiesNotifications } = useNotificationPreferences();
 
 	const networkPreferences = preferences?.networkPreferences?.[network];
@@ -78,7 +80,7 @@ function BountiesNotificationsSection({ network }: BountiesNotificationsSectionP
 								className='mt-1'
 								height={24}
 							/>
-							<h3 className='mb-0 pt-1 text-base font-semibold leading-5 tracking-wide text-btn_secondary_text md:text-lg'>Bounties</h3>
+							<h3 className='mb-0 pt-1 text-base font-semibold leading-5 tracking-wide text-btn_secondary_text md:text-lg'>{t('Profile.Settings.Notifications.bounties')}</h3>
 							<div
 								className='flex items-center gap-2'
 								onClick={(e) => e.stopPropagation()}
@@ -94,7 +96,7 @@ function BountiesNotificationsSection({ network }: BountiesNotificationsSectionP
 									checked={allBountiesEnabled}
 									onCheckedChange={toggleAllBounties}
 								/>
-								<span className='text-text_secondary text-sm'>All</span>
+								<span className='text-text_secondary text-sm'>{t('Profile.Settings.Notifications.all')}</span>
 							</div>
 						</div>
 					</div>
@@ -106,13 +108,13 @@ function BountiesNotificationsSection({ network }: BountiesNotificationsSectionP
 				<div className={classes.collapsibleContent}>
 					<div className='space-y-4'>
 						<div className='space-y-2'>
-							<p className='text-text_secondary text-sm'>Choose the type of notifications you&apos;d like to receive.</p>
-							<p className='text-text_secondary text-sm'>Want more control? Head to Advanced Settings to select specific apps and fine-tune your preferences.</p>
+							<p className='text-text_secondary text-sm'>{t('Profile.Settings.Notifications.chooseNotificationType')}</p>
+							<p className='text-text_secondary text-sm'>{t('Profile.Settings.Notifications.wantMoreControl')}</p>
 						</div>
 
 						<NotificationItem
-							title='Bounty Application Status Updates'
-							description='Status changes for your applications or submissions.'
+							title={t('Profile.Settings.Notifications.bountyApplicationStatusUpdates')}
+							description={t('Profile.Settings.Notifications.bountyApplicationStatusUpdatesDescription')}
 							checked={bountiesNotifications.bountyApplicationStatusUpdates?.enabled || false}
 							onCheckedChange={(checked) => handleBountiesNotificationChange('bountyApplicationStatusUpdates', checked)}
 							channels={bountiesNotifications.bountyApplicationStatusUpdates?.channels}
@@ -122,8 +124,8 @@ function BountiesNotificationsSection({ network }: BountiesNotificationsSectionP
 						<Separator className='my-2' />
 
 						<NotificationItem
-							title='Bounty Payouts & Milestone Completions'
-							description="Get notified when you're paid or a milestone is completed."
+							title={t('Profile.Settings.Notifications.bountyPayoutsAndMilestones')}
+							description={t('Profile.Settings.Notifications.bountyPayoutsAndMilestonesDescription')}
 							checked={bountiesNotifications.bountyPayoutsAndMilestones?.enabled || false}
 							onCheckedChange={(checked) => handleBountiesNotificationChange('bountyPayoutsAndMilestones', checked)}
 							channels={bountiesNotifications.bountyPayoutsAndMilestones?.channels}
@@ -133,8 +135,8 @@ function BountiesNotificationsSection({ network }: BountiesNotificationsSectionP
 						<Separator className='my-2' />
 
 						<NotificationItem
-							title='Activity on Bounties I Follow'
-							description='Get updates on bounties you bookmarked or applied to.'
+							title={t('Profile.Settings.Notifications.activityOnBountiesIFollow')}
+							description={t('Profile.Settings.Notifications.activityOnBountiesIFollowDescription')}
 							checked={bountiesNotifications.activityOnBountiesIFollow?.enabled || false}
 							onCheckedChange={(checked) => handleBountiesNotificationChange('activityOnBountiesIFollow', checked)}
 							channels={bountiesNotifications.activityOnBountiesIFollow?.channels}

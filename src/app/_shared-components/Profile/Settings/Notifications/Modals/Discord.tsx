@@ -5,6 +5,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import { Copy } from 'lucide-react';
@@ -20,6 +21,7 @@ interface DiscordInfoModalProps {
 }
 
 function DiscordInfoModal({ icon, title, open, getVerifyToken, generatedToken = '', onClose }: DiscordInfoModalProps) {
+	const t = useTranslations('Profile.Settings.Notifications.Modals');
 	const [loading, setLoading] = useState(false);
 	const [token, setToken] = useState(generatedToken);
 	const username = 'user';
@@ -64,7 +66,7 @@ function DiscordInfoModal({ icon, title, open, getVerifyToken, generatedToken = 
 				<div className='space-y-4'>
 					<ol className='list-inside list-decimal space-y-4'>
 						<li className='leading-relaxed dark:text-white'>
-							Click this invite link{' '}
+							{t('clickInviteLink')}{' '}
 							<Button
 								variant='outline'
 								size='sm'
@@ -82,7 +84,7 @@ function DiscordInfoModal({ icon, title, open, getVerifyToken, generatedToken = 
 						</li>
 
 						<li className='leading-relaxed dark:text-white'>
-							Send this command to the chat with the bot:
+							{t('sendThisCommand')}
 							<br />
 							<Button
 								variant='outline'
@@ -99,13 +101,13 @@ function DiscordInfoModal({ icon, title, open, getVerifyToken, generatedToken = 
 									onClick={handleGenerateToken}
 									variant='default'
 								>
-									Generate Token
+									{t('generateToken')}
 								</Button>
 							</div>
 							{token && (
 								<div className='mt-4 space-y-3'>
 									<div className='leading-relaxed dark:text-white'>
-										Copy your username:{' '}
+										{t('copyYourUsername')}{' '}
 										<Button
 											variant='outline'
 											size='sm'
@@ -118,7 +120,7 @@ function DiscordInfoModal({ icon, title, open, getVerifyToken, generatedToken = 
 									</div>
 
 									<div className='dark:text-white'>
-										<span>Verification Token: </span>
+										<span>{t('verificationToken')}: </span>
 										<div className='mt-2 space-y-2'>
 											<Button
 												variant='outline'

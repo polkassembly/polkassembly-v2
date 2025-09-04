@@ -5,6 +5,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import { Copy } from 'lucide-react';
@@ -20,6 +21,7 @@ interface SlackInfoModalProps {
 }
 
 function SlackInfoModal({ icon, title, open, getVerifyToken, generatedToken = '', onClose }: SlackInfoModalProps) {
+	const t = useTranslations('Profile.Settings.Notifications.Modals');
 	const [loading, setLoading] = useState(false);
 	const [token, setToken] = useState(generatedToken);
 
@@ -63,7 +65,7 @@ function SlackInfoModal({ icon, title, open, getVerifyToken, generatedToken = ''
 				<div className='space-y-4'>
 					<ol className='list-inside list-decimal space-y-4'>
 						<li className='leading-relaxed dark:text-white'>
-							Click this to get invite link:
+							{t('clickToGetInviteLink')}
 							<br />
 							<a
 								target='_blank'
@@ -76,13 +78,13 @@ function SlackInfoModal({ icon, title, open, getVerifyToken, generatedToken = ''
 									size='sm'
 									className='h-10'
 								>
-									Add to Slack
+									{t('addToSlack')}
 								</Button>
 							</a>
 						</li>
 
 						<li className='leading-relaxed dark:text-white'>
-							Send this command to the chat with the bot:
+							{t('sendThisCommand')}
 							<br />
 							<div className='mt-2 space-y-2'>
 								<Button
@@ -110,13 +112,13 @@ function SlackInfoModal({ icon, title, open, getVerifyToken, generatedToken = ''
 									onClick={handleGenerateToken}
 									variant='default'
 								>
-									Generate Token
+									{t('generateToken')}
 								</Button>
 							</div>
 							{token && (
 								<div className='mt-4 space-y-2'>
 									<div className='dark:text-white'>
-										<span>Verification Token:</span>
+										<span>{t('verificationToken')}:</span>
 									</div>
 									<div className='space-y-2'>
 										<Button

@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
@@ -20,6 +21,7 @@ interface CommentsNotificationsSectionProps {
 }
 
 function CommentsNotificationsSection({ network }: CommentsNotificationsSectionProps) {
+	const t = useTranslations();
 	const { preferences, updateNetworkCommentsNotification, bulkUpdateNetworkCommentsNotifications } = useNotificationPreferences();
 
 	const networkPreferences = preferences?.networkPreferences?.[network];
@@ -78,7 +80,7 @@ function CommentsNotificationsSection({ network }: CommentsNotificationsSectionP
 								className='mt-1'
 								height={24}
 							/>
-							<h3 className='mb-0 pt-1 text-base font-semibold leading-5 tracking-wide text-btn_secondary_text md:text-lg'>Comments</h3>
+							<h3 className='mb-0 pt-1 text-base font-semibold leading-5 tracking-wide text-btn_secondary_text md:text-lg'>{t('Profile.Settings.Notifications.comments')}</h3>
 							<div
 								className='flex items-center gap-2'
 								onClick={(e) => e.stopPropagation()}
@@ -94,7 +96,7 @@ function CommentsNotificationsSection({ network }: CommentsNotificationsSectionP
 									checked={allCommentsEnabled}
 									onCheckedChange={toggleAllComments}
 								/>
-								<span className='text-text_secondary text-sm'>All</span>
+								<span className='text-text_secondary text-sm'>{t('Profile.Settings.Notifications.all')}</span>
 							</div>
 						</div>
 					</div>
@@ -106,13 +108,13 @@ function CommentsNotificationsSection({ network }: CommentsNotificationsSectionP
 				<div className={classes.collapsibleContent}>
 					<div className='space-y-4'>
 						<div className='space-y-2'>
-							<p className='text-text_secondary text-sm'>Choose the type of notifications you&apos;d like to receive.</p>
-							<p className='text-text_secondary text-sm'>Want more control? Head to Advanced Settings to select specific apps and fine-tune your preferences.</p>
+							<p className='text-text_secondary text-sm'>{t('Profile.Settings.Notifications.chooseNotificationType')}</p>
+							<p className='text-text_secondary text-sm'>{t('Profile.Settings.Notifications.wantMoreControl')}</p>
 						</div>
 
 						<NotificationItem
-							title='Comments on my proposals'
-							description='Get notified when someone comments on my proposals.'
+							title={t('Profile.Settings.Notifications.commentsOnMyProposals')}
+							description={t('Profile.Settings.Notifications.commentsOnMyProposalsDescription')}
 							checked={commentsNotifications.commentsOnMyProposals?.enabled || false}
 							onCheckedChange={(checked) => handleCommentsNotificationChange('commentsOnMyProposals', checked)}
 							channels={commentsNotifications.commentsOnMyProposals?.channels}
@@ -122,8 +124,8 @@ function CommentsNotificationsSection({ network }: CommentsNotificationsSectionP
 						<Separator className='my-2' />
 
 						<NotificationItem
-							title='Replies to my comments'
-							description='Get notified when someone replies to your comments.'
+							title={t('Profile.Settings.Notifications.repliesToMyComments')}
+							description={t('Profile.Settings.Notifications.repliesToMyCommentsDescription')}
 							checked={commentsNotifications.repliesToMyComments?.enabled || false}
 							onCheckedChange={(checked) => handleCommentsNotificationChange('repliesToMyComments', checked)}
 							channels={commentsNotifications.repliesToMyComments?.channels}
@@ -133,8 +135,8 @@ function CommentsNotificationsSection({ network }: CommentsNotificationsSectionP
 						<Separator className='my-2' />
 
 						<NotificationItem
-							title='Mentions (@username)'
-							description='Get notified when someone mentions you.'
+							title={t('Profile.Settings.Notifications.mentions')}
+							description={t('Profile.Settings.Notifications.mentionsDescription')}
 							checked={commentsNotifications.mentions?.enabled || false}
 							onCheckedChange={(checked) => handleCommentsNotificationChange('mentions', checked)}
 							channels={commentsNotifications.mentions?.channels}

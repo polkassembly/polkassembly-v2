@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
@@ -20,6 +21,7 @@ interface PostsNotificationsSectionProps {
 }
 
 function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) {
+	const t = useTranslations();
 	const { preferences, updateNetworkPostsNotification, bulkUpdateNetworkPostsNotifications } = useNotificationPreferences();
 
 	const networkPreferences = preferences?.networkPreferences?.[network];
@@ -81,7 +83,7 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 								className='mt-1'
 								height={24}
 							/>
-							<h3 className='mb-0 pt-1 text-base font-semibold leading-5 tracking-wide text-btn_secondary_text md:text-lg'>Posts</h3>
+							<h3 className='mb-0 pt-1 text-base font-semibold leading-5 tracking-wide text-btn_secondary_text md:text-lg'>{t('Profile.Settings.Notifications.posts')}</h3>
 							<div
 								className='flex items-center gap-2'
 								onClick={(e) => e.stopPropagation()}
@@ -97,7 +99,7 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 									checked={allPostsEnabled}
 									onCheckedChange={toggleAllPosts}
 								/>
-								<span className='text-text_secondary text-sm'>All</span>
+								<span className='text-text_secondary text-sm'>{t('Profile.Settings.Notifications.all')}</span>
 							</div>
 						</div>
 					</div>
@@ -109,13 +111,13 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 				<div className={classes.collapsibleContent}>
 					<div className='space-y-4'>
 						<div className='space-y-2'>
-							<p className='text-text_secondary text-sm'>Choose the type of notifications you&apos;d like to receive.</p>
-							<p className='text-text_secondary text-sm'>Want more control? Head to Advanced Settings to select specific apps and fine-tune your preferences.</p>
+							<p className='text-text_secondary text-sm'>{t('Profile.Settings.Notifications.chooseNotificationType')}</p>
+							<p className='text-text_secondary text-sm'>{t('Profile.Settings.Notifications.wantMoreControl')}</p>
 						</div>
 
 						<NotificationItem
-							title='My Proposal Status Changes'
-							description='Updates on approval, rejection, review, or final enactment of your proposals.'
+							title={t('Profile.Settings.Notifications.myProposalStatusChanges')}
+							description={t('Profile.Settings.Notifications.myProposalStatusChangesDescription')}
 							checked={postsNotifications.proposalStatusChanges?.enabled || false}
 							onCheckedChange={(checked) => handlePostsNotificationChange('proposalStatusChanges', checked)}
 							channels={postsNotifications.proposalStatusChanges?.channels}
@@ -125,8 +127,8 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 						<Separator className='my-2' />
 
 						<NotificationItem
-							title='New Proposals in Tracked Categories'
-							description='Be the first to know when new proposals go live in categories you follow.'
+							title={t('Profile.Settings.Notifications.newProposalsInCategories')}
+							description={t('Profile.Settings.Notifications.newProposalsInCategoriesDescription')}
 							checked={postsNotifications.newProposalsInCategories?.enabled || false}
 							onCheckedChange={(checked) => handlePostsNotificationChange('newProposalsInCategories', checked)}
 							channels={postsNotifications.newProposalsInCategories?.channels}
@@ -136,8 +138,8 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 						<Separator className='my-2' />
 
 						<NotificationItem
-							title='Voting Deadline Reminders'
-							description='Alerts to vote before referenda close. Choose when to be reminded.'
+							title={t('Profile.Settings.Notifications.votingDeadlineReminders')}
+							description={t('Profile.Settings.Notifications.votingDeadlineRemindersDescription')}
 							checked={postsNotifications.votingDeadlineReminders?.enabled || false}
 							onCheckedChange={(checked) => handlePostsNotificationChange('votingDeadlineReminders', checked)}
 							channels={postsNotifications.votingDeadlineReminders?.channels}
@@ -147,8 +149,8 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 						<Separator className='my-2' />
 
 						<NotificationItem
-							title='Updates on Followed Proposals'
-							description='Changes, comments, or status updates on proposals you follow.'
+							title={t('Profile.Settings.Notifications.updatesOnFollowedProposals')}
+							description={t('Profile.Settings.Notifications.updatesOnFollowedProposalsDescription')}
 							checked={postsNotifications.updatesOnFollowedProposals?.enabled || false}
 							onCheckedChange={(checked) => handlePostsNotificationChange('updatesOnFollowedProposals', checked)}
 							channels={postsNotifications.updatesOnFollowedProposals?.channels}
@@ -158,8 +160,8 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 						<Separator className='my-2' />
 
 						<NotificationItem
-							title='Proposal Outcome Published'
-							description='Get the final results after voting ends.'
+							title={t('Profile.Settings.Notifications.proposalOutcomePublished')}
+							description={t('Profile.Settings.Notifications.proposalOutcomePublishedDescription')}
 							checked={postsNotifications.proposalOutcomePublished?.enabled || false}
 							onCheckedChange={(checked) => handlePostsNotificationChange('proposalOutcomePublished', checked)}
 							channels={postsNotifications.proposalOutcomePublished?.channels}
@@ -169,8 +171,8 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 						<Separator className='my-2' />
 
 						<NotificationItem
-							title='Proposals You Voted On — Enacted'
-							description='Know when a proposal you supported is implemented.'
+							title={t('Profile.Settings.Notifications.proposalsYouVotedOnEnacted')}
+							description={t('Profile.Settings.Notifications.proposalsYouVotedOnEnactedDescription')}
 							checked={postsNotifications.proposalsYouVotedOnEnacted?.enabled || false}
 							onCheckedChange={(checked) => handlePostsNotificationChange('proposalsYouVotedOnEnacted', checked)}
 							channels={postsNotifications.proposalsYouVotedOnEnacted?.channels}

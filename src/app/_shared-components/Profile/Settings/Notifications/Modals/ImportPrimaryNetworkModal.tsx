@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import { Download } from 'lucide-react';
@@ -25,6 +26,8 @@ interface ImportPrimaryNetworkModalProps {
 }
 
 function ImportPrimaryNetworkModal({ open, onClose, onConfirm, primaryNetwork, primaryNetworkLogo, networks }: ImportPrimaryNetworkModalProps) {
+	const t = useTranslations('Profile.Settings.Notifications.Modals');
+
 	return (
 		<Dialog
 			open={open}
@@ -35,13 +38,13 @@ function ImportPrimaryNetworkModal({ open, onClose, onConfirm, primaryNetwork, p
 					<div className='flex items-center justify-between'>
 						<div className='flex items-center gap-2'>
 							<Download className='text-text_secondary h-5 w-5' />
-							<DialogTitle>Add Networks</DialogTitle>
+							<DialogTitle>{t('addNetworks')}</DialogTitle>
 						</div>
 					</div>
 				</DialogHeader>
 
 				<div className='space-y-4'>
-					<p className='text-sm text-text_primary'>Pre-existing settings will be changed for the following networks:</p>
+					<p className='text-sm text-text_primary'>{t('preExistingSettingsWillBeChanged')}</p>
 
 					<div className='rounded-lg bg-gray-50 p-3'>
 						<div className='flex flex-wrap gap-2'>
@@ -82,9 +85,9 @@ function ImportPrimaryNetworkModal({ open, onClose, onConfirm, primaryNetwork, p
 						</div>
 					</div>
 
-					<p className='text-text_secondary text-center text-sm'>is set as your Primary Network.</p>
+					<p className='text-text_secondary text-center text-sm'>{t('isSetAsYourPrimaryNetwork')}</p>
 
-					<p className='text-sm text-text_primary'>Are you sure you want to import {primaryNetwork}&apos;s Network settings to all selected networks?</p>
+					<p className='text-sm text-text_primary'>{t('areYouSureYouWantToImport', { primaryNetwork })}</p>
 
 					<div className='flex gap-2 pt-4'>
 						<Button
@@ -92,13 +95,13 @@ function ImportPrimaryNetworkModal({ open, onClose, onConfirm, primaryNetwork, p
 							onClick={onClose}
 							className='flex-1'
 						>
-							Cancel
+							{t('cancel')}
 						</Button>
 						<Button
 							onClick={onConfirm}
 							className='flex-1 bg-pink-500 hover:bg-pink-600'
 						>
-							Confirm
+							{t('confirm')}
 						</Button>
 					</div>
 				</div>

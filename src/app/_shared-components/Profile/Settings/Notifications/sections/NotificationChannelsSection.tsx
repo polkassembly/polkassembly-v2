@@ -22,30 +22,32 @@ import DiscordInfoModal from '../Modals/Discord';
 import SlackInfoModal from '../Modals/Slack';
 import classes from '../Notifications.module.scss';
 
-const getBots = () => [
+type TranslateFn = ReturnType<typeof useTranslations>;
+
+const getBots = (t: TranslateFn) => [
 	{
 		Icon: TelegramIcon,
 		channel: ENotificationChannel.TELEGRAM,
-		description: 'ADD THE POLKASSEMBLY BOT to a Telegram chat to get Telegram notifications',
-		title: 'Telegram Notifications'
+		description: t('Profile.Settings.Notifications.telegramDescription'),
+		title: t('Profile.Settings.Notifications.telegramNotifications')
 	},
 	{
 		Icon: DiscordIcon,
 		channel: ENotificationChannel.DISCORD,
-		description: 'ADD THE POLKASSEMBLY BOT to a Discord Channel chat to get Discord notifications',
-		title: 'Discord Notifications'
+		description: t('Profile.Settings.Notifications.discordDescription'),
+		title: t('Profile.Settings.Notifications.discordNotifications')
 	},
 	{
 		Icon: SlackIcon,
 		channel: ENotificationChannel.SLACK,
-		description: 'ADD THE POLKASSEMBLY BOT to a Slack Channel chat to get Slack notifications',
-		title: 'Slack Notifications'
+		description: t('Profile.Settings.Notifications.slackDescription'),
+		title: t('Profile.Settings.Notifications.slackNotifications')
 	},
 	{
 		Icon: ElementIcon,
 		channel: ENotificationChannel.ELEMENT,
-		description: 'Coming Soon',
-		title: 'Element Notifications'
+		description: t('Profile.Settings.Notifications.elementDescription'),
+		title: t('Profile.Settings.Notifications.elementNotifications')
 	}
 ];
 
@@ -55,7 +57,7 @@ function NotificationChannelsSection() {
 	const { preferences, updateChannelPreference, generateToken } = useNotificationPreferences();
 	const [showModal, setShowModal] = useState<ENotificationChannel | null>(null);
 
-	const botsArr = getBots();
+	const botsArr = getBots(t);
 
 	const handleClick = (channel: ENotificationChannel) => {
 		setShowModal(channel);
@@ -91,7 +93,9 @@ function NotificationChannelsSection() {
 									className='mt-1'
 									height={24}
 								/>
-								<h3 className='mb-0 pt-1 text-base font-semibold leading-5 tracking-wide text-btn_secondary_text md:text-lg'>{t('Profile.Settings.notificationChannels')}</h3>
+								<h3 className='mb-0 pt-1 text-base font-semibold leading-5 tracking-wide text-btn_secondary_text md:text-lg'>
+									{t('Profile.Settings.Notifications.notificationChannels')}
+								</h3>
 							</div>
 						</div>
 						<div className='flex items-center gap-4'>
@@ -120,7 +124,7 @@ function NotificationChannelsSection() {
 					<Separator />
 					<div className={classes.collapsibleContent}>
 						<div className='flex flex-col'>
-							<p className='mb-3 text-sm font-medium leading-5 text-btn_secondary_text sm:mb-6 sm:text-base'>{t('Profile.Settings.configureNotificationChannels')}</p>
+							<p className='mb-3 text-sm font-medium leading-5 text-btn_secondary_text sm:mb-6 sm:text-base'>{t('Profile.Settings.Notifications.configureNotificationChannels')}</p>
 
 							<EmailNotificationCard
 								verifiedEmail={channelPreferences?.[ENotificationChannel.EMAIL]?.handle || user?.email || ''}
@@ -147,7 +151,7 @@ function NotificationChannelsSection() {
 			{/* Modals */}
 			<TelegramInfoModal
 				Icon={TelegramIcon}
-				title='How to add Bot to Telegram'
+				title={t('Profile.Settings.Notifications.Modals.howToAddBotToTelegram')}
 				open={showModal === ENotificationChannel.TELEGRAM}
 				getVerifyToken={getVerifyToken}
 				onClose={() => setShowModal(null)}
@@ -161,7 +165,7 @@ function NotificationChannelsSection() {
 						className='text-text_primary'
 					/>
 				}
-				title='How to add Bot to Discord'
+				title={t('Profile.Settings.Notifications.Modals.howToAddBotToDiscord')}
 				open={showModal === ENotificationChannel.DISCORD}
 				getVerifyToken={getVerifyToken}
 				onClose={() => setShowModal(null)}
@@ -175,7 +179,7 @@ function NotificationChannelsSection() {
 						className='text-text_primary'
 					/>
 				}
-				title='How to add Bot to Slack'
+				title={t('Profile.Settings.Notifications.Modals.howToAddBotToSlack')}
 				open={showModal === ENotificationChannel.SLACK}
 				getVerifyToken={getVerifyToken}
 				onClose={() => setShowModal(null)}

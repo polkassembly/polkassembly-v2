@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import { Plus } from 'lucide-react';
@@ -24,6 +25,8 @@ interface AddNetworksFinalModalProps {
 }
 
 function AddNetworksFinalModal({ open, onClose, onGoBack, onGoAhead, networks }: AddNetworksFinalModalProps) {
+	const t = useTranslations('Profile.Settings.Notifications.Modals');
+
 	return (
 		<Dialog
 			open={open}
@@ -34,13 +37,13 @@ function AddNetworksFinalModal({ open, onClose, onGoBack, onGoAhead, networks }:
 					<div className='flex items-center justify-between'>
 						<div className='flex items-center gap-2'>
 							<Plus className='text-text_secondary h-5 w-5' />
-							<DialogTitle>Add Networks</DialogTitle>
+							<DialogTitle>{t('addNetworks')}</DialogTitle>
 						</div>
 					</div>
 				</DialogHeader>
 
 				<div className='space-y-4'>
-					<p className='text-text_secondary text-sm'>Pre-existing settings will be changed for the following networks:</p>
+					<p className='text-text_secondary text-sm'>{t('preExistingSettingsWillBeChanged')}</p>
 
 					<div className='flex flex-wrap gap-2'>
 						{networks.map((network) => (
@@ -69,13 +72,13 @@ function AddNetworksFinalModal({ open, onClose, onGoBack, onGoAhead, networks }:
 							onClick={onGoBack}
 							className='flex-1'
 						>
-							Go Back
+							{t('goBack')}
 						</Button>
 						<Button
 							onClick={onGoAhead}
 							className='flex-1 bg-pink-500 hover:bg-pink-600'
 						>
-							Go Ahead
+							{t('goAhead')}
 						</Button>
 					</div>
 				</div>

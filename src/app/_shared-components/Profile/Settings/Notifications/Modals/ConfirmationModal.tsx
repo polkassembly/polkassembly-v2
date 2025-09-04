@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import { CheckCircle, X, Info } from 'lucide-react';
@@ -16,6 +17,7 @@ interface ConfirmationModalProps {
 }
 
 function ConfirmationModal({ open, onClose, onConfirm, networkName }: ConfirmationModalProps) {
+	const t = useTranslations('Profile.Settings.Notifications.Modals');
 	return (
 		<Dialog
 			open={open}
@@ -26,7 +28,7 @@ function ConfirmationModal({ open, onClose, onConfirm, networkName }: Confirmati
 					<div className='flex items-center justify-between'>
 						<div className='flex items-center gap-2'>
 							<CheckCircle className='h-5 w-5 text-green-500' />
-							<DialogTitle>Confirmation</DialogTitle>
+							<DialogTitle>{t('Profile.Settings.Notifications.Modals.confirmation')}</DialogTitle>
 						</div>
 						<button
 							type='button'
@@ -39,13 +41,11 @@ function ConfirmationModal({ open, onClose, onConfirm, networkName }: Confirmati
 				</DialogHeader>
 
 				<div className='space-y-4'>
-					<p className='text-sm text-text_primary'>Are you sure you want {networkName} as your Primary Network for settings?</p>
+					<p className='text-sm text-text_primary'>{t('Profile.Settings.Notifications.Modals.areYouSureYouWant', { networkName })}</p>
 
 					<div className='flex items-start gap-3 rounded-lg bg-blue-50 p-3'>
 						<Info className='mt-0.5 h-4 w-4 flex-shrink-0 text-blue-500' />
-						<p className='text-xs text-blue-700'>
-							Primary Network Settings allow you to copy settings to other networks by just one click. You can also change the Primary Network later.
-						</p>
+						<p className='text-xs text-blue-700'>{t('Profile.Settings.Notifications.Modals.primaryNetworkSettingsInfo')}</p>
 					</div>
 
 					<div className='flex gap-2 pt-4'>
@@ -54,13 +54,13 @@ function ConfirmationModal({ open, onClose, onConfirm, networkName }: Confirmati
 							onClick={onClose}
 							className='flex-1'
 						>
-							Cancel
+							{t('Profile.Settings.Notifications.Modals.cancel')}
 						</Button>
 						<Button
 							onClick={onConfirm}
 							className='flex-1 bg-pink-500 hover:bg-pink-600'
 						>
-							Confirm
+							{t('Profile.Settings.Notifications.Modals.confirm')}
 						</Button>
 					</div>
 				</div>

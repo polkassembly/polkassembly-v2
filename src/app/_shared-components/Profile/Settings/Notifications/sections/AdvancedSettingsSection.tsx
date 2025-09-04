@@ -88,46 +88,46 @@ const getGov1Icon = (itemKey: string) => {
 	}
 };
 
-const getGov1NotificationLabels = (itemKey: string): { [key: string]: string } | undefined => {
+const getGov1NotificationLabels = (itemKey: string, t: ReturnType<typeof useTranslations>): { [key: string]: string } | undefined => {
 	switch (itemKey) {
 		case 'referendums':
 			return {
-				newReferendumSubmitted: 'New Referendum submitted',
-				referendumInVoting: 'Referendum in voting',
-				referendumClosed: 'Referendum closed'
+				newReferendumSubmitted: t('Profile.Settings.Notifications.newReferendumSubmitted'),
+				referendumInVoting: t('Profile.Settings.Notifications.referendumInVoting'),
+				referendumClosed: t('Profile.Settings.Notifications.referendumClosed')
 			};
 		case 'proposals':
 			return {
-				newProposalsSubmitted: 'New Proposals submitted',
-				proposalInVoting: 'Proposal in voting',
-				proposalClosed: 'Proposal closed'
+				newProposalsSubmitted: t('Profile.Settings.Notifications.newProposalsSubmitted'),
+				proposalInVoting: t('Profile.Settings.Notifications.proposalInVoting'),
+				proposalClosed: t('Profile.Settings.Notifications.proposalClosed')
 			};
 		case 'bounties':
 			return {
-				bountiesSubmitted: 'Bounties submitted',
-				bountiesClosed: 'Bounties closed'
+				bountiesSubmitted: t('Profile.Settings.Notifications.bountiesSubmitted'),
+				bountiesClosed: t('Profile.Settings.Notifications.bountiesClosed')
 			};
 		case 'childBounties':
 			return {
-				childBountiesSubmitted: 'Child Bounties submitted',
-				childBountiesClosed: 'Child Bounties closed'
+				childBountiesSubmitted: t('Profile.Settings.Notifications.childBountiesSubmitted'),
+				childBountiesClosed: t('Profile.Settings.Notifications.childBountiesClosed')
 			};
 		case 'tips':
 			return {
-				newTipsSubmitted: 'New Tips submitted',
-				tipsOpened: 'Tips opened',
-				tipsClosed: 'Tips closed / retracted'
+				newTipsSubmitted: t('Profile.Settings.Notifications.newTipsSubmitted'),
+				tipsOpened: t('Profile.Settings.Notifications.tipsOpened'),
+				tipsClosed: t('Profile.Settings.Notifications.tipsClosed')
 			};
 		case 'techCommittee':
 			return {
-				newTechCommitteeProposalsSubmitted: 'New Tech Committee Proposals submitted',
-				proposalsClosed: 'Proposals closed'
+				newTechCommitteeProposalsSubmitted: t('Profile.Settings.Notifications.newTechCommitteeProposalsSubmitted'),
+				proposalsClosed: t('Profile.Settings.Notifications.proposalsClosed')
 			};
 		case 'councilMotion':
 			return {
-				newMotionsSubmitted: 'New Motions submitted',
-				motionInVoting: 'Motion in voting',
-				motionClosed: 'Motion closed / retracted'
+				newMotionsSubmitted: t('Profile.Settings.Notifications.newMotionsSubmitted'),
+				motionInVoting: t('Profile.Settings.Notifications.motionInVoting'),
+				motionClosed: t('Profile.Settings.Notifications.motionClosed')
 			};
 		case 'mentionsIReceive':
 			return undefined;
@@ -136,35 +136,35 @@ const getGov1NotificationLabels = (itemKey: string): { [key: string]: string } |
 	}
 };
 
-const trackLabels: Record<string, { origin: EPostOrigin; label: string }> = {
-	root: { origin: EPostOrigin.ROOT, label: 'Root' },
-	stakingAdmin: { origin: EPostOrigin.STAKING_ADMIN, label: 'Staking Admin' },
-	auctionAdmin: { origin: EPostOrigin.AUCTION_ADMIN, label: 'Auction Admin' },
-	treasurer: { origin: EPostOrigin.TREASURER, label: 'Treasurer' },
-	referendumCanceller: { origin: EPostOrigin.REFERENDUM_CANCELLER, label: 'Referendum Canceller' },
-	referendumKiller: { origin: EPostOrigin.REFERENDUM_KILLER, label: 'Referendum Killer' },
-	leaseAdmin: { origin: EPostOrigin.LEASE_ADMIN, label: 'Lease Admin' },
-	memberReferenda: { origin: EPostOrigin.MEMBERS, label: 'Member Referenda' },
-	smallTipper: { origin: EPostOrigin.SMALL_TIPPER, label: 'Small Tipper' },
-	bigTipper: { origin: EPostOrigin.BIG_TIPPER, label: 'Big Tipper' },
-	smallSpender: { origin: EPostOrigin.SMALL_SPENDER, label: 'Small Spender' },
-	mediumSpender: { origin: EPostOrigin.MEDIUM_SPENDER, label: 'Medium Spender' },
-	bigSpender: { origin: EPostOrigin.BIG_SPENDER, label: 'Big Spender' },
-	fellowshipAdmin: { origin: EPostOrigin.FELLOWSHIP_ADMIN, label: 'Fellowship Admin' },
-	generalAdmin: { origin: EPostOrigin.GENERAL_ADMIN, label: 'General Admin' },
-	whitelistedCaller: { origin: EPostOrigin.WHITELISTED_CALLER, label: 'Whitelisted Caller' }
-};
+const getTrackLabels = (t: ReturnType<typeof useTranslations>): Record<string, { origin: EPostOrigin; label: string }> => ({
+	root: { origin: EPostOrigin.ROOT, label: t('Sidebar.Root') },
+	stakingAdmin: { origin: EPostOrigin.STAKING_ADMIN, label: t('Sidebar.StakingAdmin') },
+	auctionAdmin: { origin: EPostOrigin.AUCTION_ADMIN, label: t('Sidebar.AuctionAdmin') },
+	treasurer: { origin: EPostOrigin.TREASURER, label: t('Sidebar.Treasurer') },
+	referendumCanceller: { origin: EPostOrigin.REFERENDUM_CANCELLER, label: t('Sidebar.ReferendumCanceller') },
+	referendumKiller: { origin: EPostOrigin.REFERENDUM_KILLER, label: t('Sidebar.ReferendumKiller') },
+	leaseAdmin: { origin: EPostOrigin.LEASE_ADMIN, label: t('Sidebar.LeaseAdmin') },
+	memberReferenda: { origin: EPostOrigin.MEMBERS, label: t('Sidebar.members') },
+	smallTipper: { origin: EPostOrigin.SMALL_TIPPER, label: t('Sidebar.SmallTipper') },
+	bigTipper: { origin: EPostOrigin.BIG_TIPPER, label: t('Sidebar.BigTipper') },
+	smallSpender: { origin: EPostOrigin.SMALL_SPENDER, label: t('Sidebar.SmallSpender') },
+	mediumSpender: { origin: EPostOrigin.MEDIUM_SPENDER, label: t('Sidebar.MediumSpender') },
+	bigSpender: { origin: EPostOrigin.BIG_SPENDER, label: t('Sidebar.BigSpender') },
+	fellowshipAdmin: { origin: EPostOrigin.FELLOWSHIP_ADMIN, label: t('Sidebar.FellowshipAdmin') },
+	generalAdmin: { origin: EPostOrigin.GENERAL_ADMIN, label: t('Sidebar.GeneralAdmin') },
+	whitelistedCaller: { origin: EPostOrigin.WHITELISTED_CALLER, label: t('Sidebar.WhitelistedCaller') }
+});
 
-const gov1Labels: Record<string, { origin?: EPostOrigin; label: string }> = {
-	mentionsIReceive: { label: 'Mentions I receive' },
-	referendums: { origin: EPostOrigin.ROOT, label: 'Referendums' },
-	proposals: { origin: EPostOrigin.ROOT, label: 'Proposals' },
-	bounties: { origin: EPostOrigin.ROOT, label: 'Bounties' },
-	childBounties: { origin: EPostOrigin.ROOT, label: 'Child Bounties' },
-	tips: { origin: EPostOrigin.ROOT, label: 'Tips' },
-	techCommittee: { origin: EPostOrigin.ROOT, label: 'Tech Committee' },
-	councilMotion: { origin: EPostOrigin.ROOT, label: 'Council Motion' }
-};
+const getGov1Labels = (t: ReturnType<typeof useTranslations>): Record<string, { origin?: EPostOrigin; label: string }> => ({
+	mentionsIReceive: { label: t('Profile.Settings.Notifications.mentionsIReceive') },
+	referendums: { origin: EPostOrigin.ROOT, label: t('Sidebar.referenda') },
+	proposals: { origin: EPostOrigin.ROOT, label: t('Sidebar.proposals') },
+	bounties: { origin: EPostOrigin.ROOT, label: t('Sidebar.bounty') },
+	childBounties: { origin: EPostOrigin.ROOT, label: t('Sidebar.childBounties') },
+	tips: { origin: EPostOrigin.ROOT, label: t('Sidebar.tips') },
+	techCommittee: { origin: EPostOrigin.ROOT, label: t('Sidebar.techComm') },
+	councilMotion: { origin: EPostOrigin.ROOT, label: t('Sidebar.motions') }
+});
 
 interface AdvancedSettingsSectionProps {
 	network: ENetwork;
@@ -177,6 +177,9 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	const networkPreferences = preferences?.networkPreferences?.[network];
 	const openGovTracks = networkPreferences?.openGovTracks || {};
 	const gov1Items = networkPreferences?.gov1Items || {};
+
+	const trackLabels = getTrackLabels(t);
+	const gov1Labels = getGov1Labels(t);
 
 	const handleOpenGovTrackChange = (trackKey: string, enabled: boolean) => {
 		bulkUpdateNetworkTrackNotifications(network, trackKey, enabled, 'opengov');
@@ -246,7 +249,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 									checked={allAdvancedEnabled}
 									onCheckedChange={toggleAllAdvanced}
 								/>
-								<span className='text-text_secondary text-sm'>All</span>
+								<span className='text-text_secondary text-sm'>{t('Profile.Settings.Notifications.all')}</span>
 							</div>
 						</div>
 					</div>
@@ -365,7 +368,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 												title={label}
 												enabled={gov1Items[key]?.enabled || false}
 												notifications={gov1Items[key]?.notifications || {}}
-												notificationLabels={getGov1NotificationLabels(key)}
+												notificationLabels={getGov1NotificationLabels(key, t)}
 												onEnabledChange={(enabled) => handleGov1ItemChange(key, enabled)}
 												onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange(key, notificationKey, enabled)}
 												isSimple={key === 'mentionsIReceive'}
@@ -391,7 +394,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 												title={label}
 												enabled={gov1Items[key]?.enabled || false}
 												notifications={gov1Items[key]?.notifications || {}}
-												notificationLabels={getGov1NotificationLabels(key)}
+												notificationLabels={getGov1NotificationLabels(key, t)}
 												onEnabledChange={(enabled) => handleGov1ItemChange(key, enabled)}
 												onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange(key, notificationKey, enabled)}
 												isSimple={key === 'mentionsIReceive'}

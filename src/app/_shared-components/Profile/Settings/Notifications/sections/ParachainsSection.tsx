@@ -351,7 +351,7 @@ function ParachainsSection() {
 								className='mt-1'
 								height={24}
 							/>{' '}
-							{t('Profile.Settings.parachains')}
+							{t('Profile.Settings.Notifications.parachains')}
 						</p>
 						<ChevronDown className={classes.collapsibleTriggerIcon} />
 					</div>
@@ -362,7 +362,7 @@ function ParachainsSection() {
 						<div className='space-y-6'>
 							<div className='space-y-2'>
 								<p className='text-text_secondary text-sm'>
-									Current Network:{' '}
+									{t('Profile.Settings.Notifications.currentNetwork')}{' '}
 									<span className='font-semibold text-text_primary'>
 										{currentNetwork
 											.split(/[-_]/)
@@ -370,9 +370,7 @@ function ParachainsSection() {
 											.join(' ')}
 									</span>
 								</p>
-								<p className='text-text_secondary text-sm'>
-									Manage your notification settings for networks. Add multiple networks to receive notifications across different blockchain ecosystems.
-								</p>
+								<p className='text-text_secondary text-sm'>{t('Profile.Settings.Notifications.manageNotificationSettings')}</p>
 							</div>
 
 							<div className='space-y-4'>
@@ -394,7 +392,7 @@ function ParachainsSection() {
 										className='flex items-center gap-2 rounded-full border border-dashed border-text_pink px-3 py-1 text-text_pink hover:bg-text_pink/5'
 									>
 										<Plus className='h-3 w-3' />
-										<span className='text-sm'>Add Networks</span>
+										<span className='text-sm'>{t('Profile.Settings.Notifications.addNetworks')}</span>
 									</button>
 								</div>
 							</div>
@@ -405,7 +403,7 @@ function ParachainsSection() {
 										checked={parachainSettings.setPrimaryNetworkSettings}
 										onCheckedChange={handleSetPrimaryNetworkSettings}
 									/>
-									<span className='text-sm text-text_pink'>Set as Primary Network Settings</span>
+									<span className='text-sm text-text_pink'>{t('Profile.Settings.Notifications.setPrimaryNetworkSettings')}</span>
 								</div>
 
 								<div className='flex items-center gap-2'>
@@ -413,7 +411,7 @@ function ParachainsSection() {
 										checked={parachainSettings.importPrimaryNetworkSettings}
 										onCheckedChange={handleImportPrimaryNetworkSettings}
 									/>
-									<span className='text-sm text-text_pink'>Importing Primary Network Settings to the networks selected above</span>
+									<span className='text-sm text-text_pink'>{t('Profile.Settings.Notifications.importPrimaryNetworkSettings')}</span>
 								</div>
 							</div>
 						</div>

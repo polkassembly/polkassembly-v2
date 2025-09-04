@@ -5,6 +5,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import { Alert, AlertDescription } from '@/app/_shared-components/Alert';
@@ -19,6 +20,8 @@ interface ResetConfirmationProps {
 }
 
 function ResetConfirmation({ open, onConfirm, onCancel, channel }: ResetConfirmationProps) {
+	const t = useTranslations('Profile.Settings.Notifications.Modals');
+
 	return (
 		<Dialog
 			open={open}
@@ -28,23 +31,19 @@ function ResetConfirmation({ open, onConfirm, onCancel, channel }: ResetConfirma
 				<DialogHeader>
 					<DialogTitle className='flex items-center gap-2'>
 						<CheckCircle className='h-5 w-5 text-success' />
-						Confirmation
+						{t('confirmation')}
 					</DialogTitle>
 				</DialogHeader>
 
 				<div className='space-y-4'>
-					<p className='text-blue-light-high dark:text-blue-dark-high text-base font-medium leading-5'>
-						{`Are you sure you want to remove Polkassembly bot from your ${channel} channel chat?`}
-					</p>
+					<p className='text-blue-light-high dark:text-blue-dark-high text-base font-medium leading-5'>{t('areYouSureRemoveBot', { channel })}</p>
 
 					<Alert
 						variant='info'
 						className='border-[#4E75FF] bg-[#4E75FF] text-white'
 					>
 						<Info className='h-4 w-4 text-white' />
-						<AlertDescription className='text-white'>
-							{`Removing bot means no more notifications for ${channel} channel chat. Stay connected and informed by keeping the bot.`}
-						</AlertDescription>
+						<AlertDescription className='text-white'>{t('removingBotMeansNoNotifications', { channel })}</AlertDescription>
 					</Alert>
 
 					<Separator />
@@ -56,14 +55,14 @@ function ResetConfirmation({ open, onConfirm, onCancel, channel }: ResetConfirma
 						onClick={onCancel}
 						size='sm'
 					>
-						Cancel
+						{t('cancel')}
 					</Button>
 					<Button
 						variant='default'
 						onClick={onConfirm}
 						size='sm'
 					>
-						Confirm
+						{t('confirm')}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

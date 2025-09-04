@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { Switch } from '@/app/_shared-components/Switch';
 import { ReactNode } from 'react';
@@ -24,6 +25,8 @@ interface Gov1ItemProps {
 }
 
 function Gov1Item({ icon, title, enabled, notifications = {}, notificationLabels = {}, onEnabledChange, onNotificationChange, isSimple = false }: Gov1ItemProps) {
+	const t = useTranslations('Profile.Settings.Notifications');
+
 	if (isSimple) {
 		return (
 			<div className='flex items-center gap-2'>
@@ -48,7 +51,7 @@ function Gov1Item({ icon, title, enabled, notifications = {}, notificationLabels
 						checked={enabled}
 						onCheckedChange={onEnabledChange}
 					/>
-					<span className='text-text_secondary text-xs'>All</span>
+					<span className='text-text_secondary text-xs'>{t('Profile.Settings.Notifications.all')}</span>
 				</div>
 			</div>
 

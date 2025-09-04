@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Button } from '@/app/_shared-components/Button';
 import { Switch } from '@/app/_shared-components/Switch';
 import { CheckCircle, AlertCircle } from 'lucide-react';
@@ -18,6 +19,7 @@ interface EmailNotificationCardProps {
 }
 
 function EmailNotificationCard({ verifiedEmail, verified, enabled, handleEnableDisabled }: EmailNotificationCardProps) {
+	const t = useTranslations();
 	return (
 		<div className='flex items-start justify-between rounded-lg p-4'>
 			<div className='flex items-start gap-3'>
@@ -29,7 +31,7 @@ function EmailNotificationCard({ verifiedEmail, verified, enabled, handleEnableD
 					/>
 				</div>
 				<div className='flex-1 text-btn_secondary_text'>
-					<h4 className='text-base font-medium text-text_primary'>Email Notifications</h4>
+					<h4 className='text-base font-medium text-text_primary'>{t('Profile.Settings.Notifications.emailNotifications')}</h4>
 					<div className='flex items-center gap-2'>
 						{verifiedEmail ? (
 							<>
@@ -37,7 +39,7 @@ function EmailNotificationCard({ verifiedEmail, verified, enabled, handleEnableD
 								{verified ? <CheckCircle className='h-4 w-4 text-success' /> : <AlertCircle className='h-4 w-4 text-warning' />}
 							</>
 						) : (
-							<span className='text-text_secondary text-sm'>No email configured</span>
+							<span className='text-text_secondary text-sm'>{t('Profile.Settings.Notifications.noEmailConfigured')}</span>
 						)}
 					</div>
 					{!verified && verifiedEmail && (
@@ -46,7 +48,7 @@ function EmailNotificationCard({ verifiedEmail, verified, enabled, handleEnableD
 							size='sm'
 							className='mt-2'
 						>
-							Verify Email
+							{t('Profile.Settings.Notifications.verifyEmail')}
 						</Button>
 					)}
 				</div>

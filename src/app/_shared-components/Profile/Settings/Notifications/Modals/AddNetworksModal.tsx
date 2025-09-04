@@ -5,6 +5,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import { Switch } from '@/app/_shared-components/Switch';
@@ -75,6 +76,7 @@ function NetworkGroup({
 	onToggleAll: (groupKey: keyof typeof networkGroups) => void;
 	onToggleNetwork: (groupKey: keyof typeof networkGroups, networkId: string) => void;
 }) {
+	const t = useTranslations();
 	const allSelected = groupNetworks.every((network) => network.selected);
 
 	return (
@@ -83,7 +85,7 @@ function NetworkGroup({
 				<Plus className='text-text_secondary h-4 w-4' />
 				<span className='text-sm font-medium text-text_primary'>{title}</span>
 				<div className='ml-auto flex items-center gap-2'>
-					<span className='text-xs text-text_primary'>All</span>
+					<span className='text-xs text-text_primary'>{t('Profile.Settings.Notifications.all')}</span>
 					<Switch
 						checked={allSelected}
 						onCheckedChange={() => onToggleAll(groupKey)}
@@ -115,6 +117,7 @@ function NetworkGroup({
 }
 
 function AddNetworksModal({ open, onClose, onConfirm, selectedNetworks }: AddNetworksModalProps) {
+	const t = useTranslations();
 	const [networks, setNetworks] = useState(networkGroups);
 
 	useEffect(() => {
@@ -189,17 +192,17 @@ function AddNetworksModal({ open, onClose, onConfirm, selectedNetworks }: AddNet
 					<div className='flex items-center justify-between'>
 						<div className='flex items-center gap-2'>
 							<Plus className='text-text_secondary h-5 w-5' />
-							<DialogTitle>Add Networks</DialogTitle>
+							<DialogTitle>{t('Profile.Settings.Notifications.Modals.addNetworks')}</DialogTitle>
 						</div>
 					</div>
 				</DialogHeader>
 
 				<div className='space-y-4'>
-					<p className='text-text_secondary text-sm'>Please select network(s) for which you want to replicate settings:</p>
+					<p className='text-text_secondary text-sm'>{t('Profile.Settings.Notifications.Modals.pleaseSelectNetworks')}</p>
 
 					<div className='space-y-6'>
 						<NetworkGroup
-							title='Kusama and Parachains'
+							title={t('Profile.Settings.Notifications.Modals.kusamaAndParachains')}
 							groupKey='kusamaParachains'
 							networks={networks.kusamaParachains}
 							onToggleAll={toggleAll}
@@ -207,7 +210,7 @@ function AddNetworksModal({ open, onClose, onConfirm, selectedNetworks }: AddNet
 						/>
 
 						<NetworkGroup
-							title='Polkadot and Parachains'
+							title={t('Profile.Settings.Notifications.Modals.polkadotAndParachains')}
 							groupKey='polkadotParachains'
 							networks={networks.polkadotParachains}
 							onToggleAll={toggleAll}
@@ -215,7 +218,7 @@ function AddNetworksModal({ open, onClose, onConfirm, selectedNetworks }: AddNet
 						/>
 
 						<NetworkGroup
-							title='Solo Chains'
+							title={t('Profile.Settings.Notifications.Modals.soloChains')}
 							groupKey='soloChains'
 							networks={networks.soloChains}
 							onToggleAll={toggleAll}
@@ -223,7 +226,7 @@ function AddNetworksModal({ open, onClose, onConfirm, selectedNetworks }: AddNet
 						/>
 
 						<NetworkGroup
-							title='Test Chains'
+							title={t('Profile.Settings.Notifications.Modals.testChains')}
 							groupKey='testChains'
 							networks={networks.testChains}
 							onToggleAll={toggleAll}
@@ -238,7 +241,7 @@ function AddNetworksModal({ open, onClose, onConfirm, selectedNetworks }: AddNet
 							className='flex-1'
 							disabled={false}
 						>
-							Cancel
+							{t('Profile.Settings.Notifications.Modals.cancel')}
 						</Button>
 						<Button
 							onClick={handleConfirm}
@@ -249,7 +252,7 @@ function AddNetworksModal({ open, onClose, onConfirm, selectedNetworks }: AddNet
 									.some((network) => network.selected)
 							}
 						>
-							Confirm
+							{t('Profile.Settings.Notifications.Modals.confirm')}
 						</Button>
 					</div>
 				</div>
