@@ -89,8 +89,8 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 					<div className='flex flex-wrap items-center gap-x-2 gap-y-2'>
 						{postData?.onChainInfo?.proposer ? (
 							<Address address={postData.onChainInfo?.proposer} />
-						) : postData.publicUser?.addresses.length === 1 ? (
-							<Address address={postData.publicUser?.addresses[0]} />
+						) : postData.publicUser?.addresses?.length === 1 ? (
+							<Address address={postData.publicUser?.addresses?.[0]} />
 						) : postData.publicUser?.username ? (
 							<Link
 								href={`/user/${postData.publicUser?.username}`}
