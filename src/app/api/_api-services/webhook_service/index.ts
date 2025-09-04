@@ -69,7 +69,8 @@ export class WebhookService {
 		}),
 		[EWebhookEvent.VOTED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
-			proposalType: z.nativeEnum(EProposalType)
+			proposalType: z.nativeEnum(EProposalType),
+			address: z.string().refine((address) => ValidatorService.isValidWeb3Address(address), ERROR_MESSAGES.INVALID_EVM_ADDRESS)
 		}),
 		[EWebhookEvent.BOUNTY_CLAIMED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
