@@ -12,7 +12,7 @@ import { ChevronDown, Mail } from 'lucide-react';
 import { ENotificationChannel } from '@/_shared/types';
 import { TelegramIcon, DiscordIcon, SlackIcon, ElementIcon } from './Icons';
 
-type TranslateFn = ReturnType<typeof useTranslations>;
+type TranslateFn = (key: string) => string;
 
 interface NotificationItemProps {
 	title: string;
