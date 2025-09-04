@@ -53,18 +53,20 @@ function Gov1Item({ icon, title, enabled, notifications = {}, notificationLabels
 			</div>
 
 			<div className='ml-6 space-y-2'>
-				{Object.entries(notifications).map(([key, value]) => (
-					<div
-						key={key}
-						className='flex items-center gap-2'
-					>
-						<Checkbox
-							checked={value}
-							onCheckedChange={(checked) => onNotificationChange?.(key, checked as boolean)}
-						/>
-						<span className='text-text_secondary text-xs'>{notificationLabels[key] || key}</span>
-					</div>
-				))}
+				{Object.entries(notifications)
+					.filter(([key]) => notificationLabels[key])
+					.map(([key, value]) => (
+						<div
+							key={key}
+							className='flex items-center gap-2'
+						>
+							<Checkbox
+								checked={value}
+								onCheckedChange={(checked) => onNotificationChange?.(key, checked as boolean)}
+							/>
+							<span className='text-text_secondary text-xs'>{notificationLabels[key]}</span>
+						</div>
+					))}
 			</div>
 		</div>
 	);
