@@ -2548,6 +2548,18 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 			{
 				name: VIA_PERMANENCE_DAO_EU,
 				url: 'wss://polkadot.rpc.permanence.io'
+			},
+			{
+				name: VIA_SIMPLY_STAKING,
+				url: 'wss://spectrum-03.simplystaking.xyz/cG9sa2Fkb3QtMDMtOTFkMmYwZGYtcG9sa2Fkb3Q/LjwBJpV3dIKyWQ/polkadot/mainnet/'
+			},
+			{
+				name: VIA_STAKETWORLD,
+				url: 'wss://dot-rpc.stakeworld.io'
+			},
+			{
+				name: VIA_SUBQUERY,
+				url: 'wss://polkadot.rpc.subquery.network/public/ws'
 			}
 		],
 		supportedAssets: {
@@ -2628,16 +2640,8 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				url: 'wss://kusama.public.curie.radiumblock.co/ws'
 			},
 			{
-				name: VIA_SIMPLY_STAKING,
-				url: 'wss://spectrum-03.simplystaking.xyz/cG9sa2Fkb3QtMDMtOTFkMmYwZGYtcG9sa2Fkb3Q/LjwBJpV3dIKyWQ/polkadot/mainnet/'
-			},
-			{
-				name: VIA_STAKETWORLD,
-				url: 'wss://dot-rpc.stakeworld.io'
-			},
-			{
-				name: VIA_SUBQUERY,
-				url: 'wss://polkadot.rpc.subquery.network/public/ws'
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-kusama.luckyfriday.io'
 			}
 		],
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.KUSAMA],
