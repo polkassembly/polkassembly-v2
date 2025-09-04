@@ -11,7 +11,7 @@
 }
 
 .subItemCount {
-	@apply ml-auto rounded-sm bg-gray-200 px-1 py-0.5 text-[10px] font-medium text-basic_text/80;
+	@apply ml-auto flex size-4 items-center justify-center rounded-sm bg-gray-200 text-[10px] font-medium text-basic_text/80;
 }
 
 .sidebarActive {
