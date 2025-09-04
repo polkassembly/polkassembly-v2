@@ -22,9 +22,7 @@ import DiscordInfoModal from '../Modals/Discord';
 import SlackInfoModal from '../Modals/Slack';
 import classes from '../Notifications.module.scss';
 
-type TranslateFn = (key: string) => string;
-
-const getBots = (t: TranslateFn) => [
+const getBots = (t: (key: string) => string) => [
 	{
 		Icon: TelegramIcon,
 		channel: ENotificationChannel.TELEGRAM,

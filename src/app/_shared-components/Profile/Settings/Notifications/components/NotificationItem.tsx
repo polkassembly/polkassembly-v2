@@ -12,8 +12,6 @@ import { ChevronDown, Mail } from 'lucide-react';
 import { ENotificationChannel } from '@/_shared/types';
 import { TelegramIcon, DiscordIcon, SlackIcon, ElementIcon } from './Icons';
 
-type TranslateFn = (key: string) => string;
-
 interface NotificationItemProps {
 	title: string;
 	description: string;
@@ -37,7 +35,7 @@ const channelIcons = {
 	[ENotificationChannel.ELEMENT]: ElementIcon
 };
 
-const getChannelLabels = (t: TranslateFn) => ({
+const getChannelLabels = (t: (key: string) => string) => ({
 	[ENotificationChannel.EMAIL]: t('Profile.Settings.Notifications.email'),
 	[ENotificationChannel.TELEGRAM]: t('Profile.Settings.Notifications.telegram'),
 	[ENotificationChannel.DISCORD]: t('Profile.Settings.Notifications.discord'),

@@ -88,7 +88,7 @@ const getGov1Icon = (itemKey: string) => {
 	}
 };
 
-const getGov1NotificationLabels = (itemKey: string, t: ReturnType<typeof useTranslations>): { [key: string]: string } | undefined => {
+const getGov1NotificationLabels = (itemKey: string, t: (key: string) => string): { [key: string]: string } | undefined => {
 	switch (itemKey) {
 		case 'referendums':
 			return {
@@ -136,7 +136,7 @@ const getGov1NotificationLabels = (itemKey: string, t: ReturnType<typeof useTran
 	}
 };
 
-const getTrackLabels = (t: ReturnType<typeof useTranslations>): Record<string, { origin: EPostOrigin; label: string }> => ({
+const getTrackLabels = (t: (key: string) => string): Record<string, { origin: EPostOrigin; label: string }> => ({
 	root: { origin: EPostOrigin.ROOT, label: t('Sidebar.Root') },
 	stakingAdmin: { origin: EPostOrigin.STAKING_ADMIN, label: t('Sidebar.StakingAdmin') },
 	auctionAdmin: { origin: EPostOrigin.AUCTION_ADMIN, label: t('Sidebar.AuctionAdmin') },
@@ -155,7 +155,7 @@ const getTrackLabels = (t: ReturnType<typeof useTranslations>): Record<string, {
 	whitelistedCaller: { origin: EPostOrigin.WHITELISTED_CALLER, label: t('Sidebar.WhitelistedCaller') }
 });
 
-const getGov1Labels = (t: ReturnType<typeof useTranslations>): Record<string, { origin?: EPostOrigin; label: string }> => ({
+const getGov1Labels = (t: (key: string) => string): Record<string, { origin?: EPostOrigin; label: string }> => ({
 	mentionsIReceive: { label: t('Profile.Settings.Notifications.mentionsIReceive') },
 	referendums: { origin: EPostOrigin.ROOT, label: t('Sidebar.referenda') },
 	proposals: { origin: EPostOrigin.ROOT, label: t('Sidebar.proposals') },
