@@ -23,6 +23,7 @@ import PolymeshLogo from '@assets/parachain-logos/polymesh-logo.png';
 import MoonbaseLogo from '@assets/parachain-logos/moonbase-logo.png';
 import WestendLogo from '@assets/parachain-logos/westend-logo.jpg';
 import PaseoLogo from '@assets/parachain-logos/paseo-logo.png';
+import Parachainlogo from '@assets/icons/notification-settings/parachain-dark.svg';
 
 interface Network {
 	id: string;
@@ -82,7 +83,13 @@ function NetworkGroup({
 	return (
 		<div className='space-y-3'>
 			<div className='flex items-center gap-2'>
-				<Plus className='text-text_secondary h-4 w-4' />
+				<Image
+					src={Parachainlogo}
+					alt=''
+					width={20}
+					height={20}
+					className='rounded-full object-cover'
+				/>{' '}
 				<span className='text-sm font-medium text-text_primary'>{title}</span>
 				<div className='ml-auto flex items-center gap-2'>
 					<span className='text-xs text-text_primary'>{t('Profile.Settings.Notifications.all')}</span>
