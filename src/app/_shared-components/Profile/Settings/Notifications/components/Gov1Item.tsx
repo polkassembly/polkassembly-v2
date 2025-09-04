@@ -38,7 +38,7 @@ function Gov1Item({ icon, title, enabled, notifications = {}, notificationLabels
 
 	return (
 		<div className='space-y-3'>
-			<div className='flex items-center justify-between'>
+			<div className='flex items-center gap-3'>
 				<div className='flex items-center gap-2'>
 					{icon}
 					<h4 className='text-sm font-medium text-text_primary'>{title}</h4>

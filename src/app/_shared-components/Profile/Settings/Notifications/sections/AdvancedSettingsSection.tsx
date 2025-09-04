@@ -221,7 +221,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 		<Collapsible className={classes.settingsCollapsible}>
 			<CollapsibleTrigger className='w-full'>
 				<div className={classes.collapsibleTrigger}>
-					<div className='flex items-center justify-between gap-2'>
+					<div className='flex items-center gap-2'>
 						<div className='flex items-center gap-2'>
 							<Image
 								src={AdvancedSettingsIcon}
