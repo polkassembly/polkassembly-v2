@@ -122,12 +122,17 @@ export class AlgoliaService {
 		}
 		const { indexOrHash, index, hash } = identifier;
 
+		// Get timestamps - check post first, then onChainInfo for createdAt
+		const createdAt = post.createdAt || post.onChainInfo?.createdAt;
+		const createdAtTimestamp = createdAt ? dayjs(createdAt).unix() : dayjs().unix();
+		const updatedAtTimestamp = post.updatedAt ? dayjs(post.updatedAt).unix() : dayjs().unix();
+
 		// Create the Algolia post object
 		const algoliaPost: IAlgoliaPost = {
 			objectID: `${post.network}-${post.proposalType}-${indexOrHash}`,
 			title: post.title || DEFAULT_POST_TITLE,
-			createdAtTimestamp: post.createdAt ? dayjs(post.createdAt).unix() : dayjs().unix(),
-			updatedAtTimestamp: post.updatedAt ? dayjs(post.updatedAt).unix() : dayjs().unix(),
+			createdAtTimestamp,
+			updatedAtTimestamp,
 			tags,
 			dataSource: post.dataSource || EDataSource.POLKASSEMBLY,
 			proposalType: post.proposalType,
