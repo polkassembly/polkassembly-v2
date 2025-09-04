@@ -10,7 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
-import TimeLineIcon from '@assets/icons/timeline.svg';
+import DelegateIcon from '@assets/icons/delegate-green-icon.svg';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { useTranslations } from 'next-intl';
@@ -71,13 +71,13 @@ function GovVoting() {
 		>
 			<CollapsibleTrigger className='flex w-full items-center gap-x-4 p-3 lg:p-4'>
 				<Image
-					src={TimeLineIcon}
-					alt='Delegation Green Icon'
+					src={DelegateIcon}
+					alt='Delegate Icon'
 					width={24}
 					height={24}
 					className='h-6 w-6'
 				/>
-				<p className='text-base font-semibold text-text_primary'>{t('voting')}</p>
+				<p className='text-base font-semibold text-text_primary'>{t('delegation')}</p>
 				<div className='flex-1' />
 				<ChevronDown className='text-lg font-semibold text-text_primary' />
 			</CollapsibleTrigger>
