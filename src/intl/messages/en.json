@@ -430,7 +430,12 @@
 					"clickToGetInviteLink": "Click this to get invite link:",
 					"addToSlack": "Add to Slack",
 					"areYouSureRemoveBot": "Are you sure you want to remove Polkassembly bot from your {channel} channel chat?",
-					"removingBotMeansNoNotifications": "Removing bot means no more notifications for {channel} channel chat. Stay connected and informed by keeping the bot."
+					"removingBotMeansNoNotifications": "Removing bot means no more notifications for {channel} channel chat. Stay connected and informed by keeping the bot.",
+					"preExistingSettingsWillBeChanged": "Pre-existing settings will be changed for the following networks:",
+					"isSetAsYourPrimaryNetwork": "is set as your Primary Network.",
+					"areYouSureYouWantToImport": "Are you sure you want to import {primaryNetwork}'s Network settings to all selected networks?",
+					"goBack": "Go Back",
+					"goAhead": "Go Ahead"
 				}
 			},
 			"appQrLogin": "App QR Login",
