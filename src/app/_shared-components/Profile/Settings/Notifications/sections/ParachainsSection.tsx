@@ -199,7 +199,8 @@ function ParachainsSection() {
 					importPrimarySettings: false
 				});
 			}
-		} catch {
+		} catch (error) {
+			console.error('Failed to add networks:', error);
 			setSelectedNetworks((prev) => prev.filter((existing) => !networks.some((network) => network.id === existing.id)));
 		}
 	};
@@ -239,8 +240,13 @@ function ParachainsSection() {
 			await bulkUpdateNetworkPreferences(updates);
 
 			if (networksToImport.length > 0) {
-				const importPromises = networksToImport.map((network) => importNetworkSettings(currentNetwork, network.id));
-				await Promise.all(importPromises);
+				const importResults = await Promise.allSettled(networksToImport.map((network) => importNetworkSettings(currentNetwork, network.id)));
+
+				const failedImports = importResults.map((result, index) => (result.status === 'rejected' ? networksToImport[index] : null)).filter(Boolean);
+
+				if (failedImports.length > 0) {
+					console.error('Some network imports failed:', failedImports);
+				}
 			}
 		} catch {
 			setParachainSettings((prev) => ({

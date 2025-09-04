@@ -25,6 +25,7 @@ function SlackInfoModal({ icon, title, open, getVerifyToken, generatedToken = ''
 	const t = useTranslations('Profile.Settings.Notifications.Modals');
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
+	const TexttoSlack = '/polkassembly-add <username> <verificationToken>';
 	const [token, setToken] = useState(generatedToken);
 
 	const handleGenerateToken = async () => {
@@ -103,7 +104,7 @@ function SlackInfoModal({ icon, title, open, getVerifyToken, generatedToken = ''
 								<Button
 									variant='outline'
 									size='sm'
-									onClick={() => handleCopyClicked('/polkassembly-d <username> <verificationToken>')}
+									onClick={() => handleCopyClicked(TexttoSlack)}
 									className='hidden h-auto px-2 py-1 sm:inline-flex'
 									leftIcon={<Copy className='h-3 w-3' />}
 								>
@@ -112,11 +113,11 @@ function SlackInfoModal({ icon, title, open, getVerifyToken, generatedToken = ''
 								<Button
 									variant='outline'
 									size='sm'
-									onClick={() => handleCopyClicked('/polkassembly-add <username> <verificationToken>')}
+									onClick={() => handleCopyClicked(TexttoSlack)}
 									className='h-auto px-2 py-1 sm:hidden'
 									leftIcon={<Copy className='h-3 w-3' />}
 								>
-									{shortenString('/polkassembly-add <username> <verificationToken>', 10)}
+									{shortenString(TexttoSlack, 10)}
 								</Button>
 							</div>
 							<div className='mt-4 flex justify-end'>

@@ -55,7 +55,7 @@ function NotificationChannelsSection() {
 	const { preferences, updateChannelPreference, generateToken } = useNotificationPreferences();
 	const [showModal, setShowModal] = useState<ENotificationChannel | null>(null);
 
-	const botsArr = getBots(t);
+	const botsArr = getBots(t).filter((b) => b.channel !== ENotificationChannel.ELEMENT);
 
 	const handleClick = (channel: ENotificationChannel) => {
 		setShowModal(channel);
@@ -133,7 +133,7 @@ function NotificationChannelsSection() {
 
 							<Separator className='my-5' />
 							{botsArr.map((bot, i) => (
-								<div key={bot.title}>
+								<div key={bot.channel}>
 									<BotSetupCard
 										{...bot}
 										onClick={handleClick}
@@ -168,6 +168,7 @@ function NotificationChannelsSection() {
 				getVerifyToken={getVerifyToken}
 				onClose={() => setShowModal(null)}
 				generatedToken={channelPreferences?.[ENotificationChannel.DISCORD]?.verification_token || ''}
+				username={user?.username || 'user'}
 			/>
 			<SlackInfoModal
 				icon={

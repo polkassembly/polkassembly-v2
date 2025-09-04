@@ -24,7 +24,7 @@ function BotSetupCard({ Icon, title, description, channel, onClick }: BotSetupCa
 
 	const getDescriptionParts = (desc: string) => {
 		if (!desc || !desc.includes(AddBotText)) {
-			return { beforeText: '', clickableText: desc || '', afterText: '' };
+			return { beforeText: desc || '', clickableText: '', afterText: '' };
 		}
 		const parts = desc.split(AddBotText);
 		return {
@@ -56,17 +56,21 @@ function BotSetupCard({ Icon, title, description, channel, onClick }: BotSetupCa
 				{!isComingSoon && channel !== ENotificationChannel.ELEMENT && (
 					<div className='mt-2 flex items-center gap-2'>
 						<CirclePlus className='h-4 w-4 text-text_pink' />
-						<p className='text-text_secondary text-sm'>
-							{beforeText}
-							<button
-								type='button'
-								className='text-text_pink underline-offset-2 transition-colors hover:text-text_pink/80 hover:underline'
-								onClick={() => onClick(channel)}
-							>
-								{clickableText}
-							</button>
-							<span className='text-xs'>{afterText}</span>
-						</p>
+						{clickableText ? (
+							<p className='text-text_secondary text-sm'>
+								{beforeText}
+								<button
+									type='button'
+									className='text-text_pink underline-offset-2 transition-colors hover:text-text_pink/80 hover:underline'
+									onClick={() => onClick(channel)}
+								>
+									{clickableText}
+								</button>
+								<span className='text-xs'>{afterText}</span>
+							</p>
+						) : (
+							<p className='text-text_secondary text-sm'>{beforeText}</p>
+						)}
 					</div>
 				)}
 

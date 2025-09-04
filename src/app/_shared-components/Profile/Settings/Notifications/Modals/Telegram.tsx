@@ -31,7 +31,7 @@ function TelegramInfoModal({ Icon, title, open, getVerifyToken, generatedToken =
 	const handleGenerateToken = async () => {
 		setLoading(true);
 		try {
-			const data = await getVerifyToken(ENotificationChannel.SLACK);
+			const data = await getVerifyToken(ENotificationChannel.TELEGRAM);
 			setToken(data);
 			toast({
 				title: 'Token Generated Successfully',

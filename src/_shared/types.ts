@@ -137,7 +137,7 @@ export interface IUser {
 	username: string;
 	isWeb3Signup: boolean;
 	primaryNetwork?: ENetwork;
-	notificationPreferences?: IUserNotificationSettings;
+	notificationPreferences?: IUserNotificationPreferences;
 	twoFactorAuth?: IUserTFADetails;
 	roles?: ERole[];
 	profileScore: number;
@@ -1588,7 +1588,6 @@ export interface INetworkNotificationSettings {
 export interface IUserNotificationPreferences {
 	channelPreferences: Record<ENotificationChannel, INotificationChannelSettings>;
 	networkPreferences: Record<string, INetworkNotificationSettings>;
-	// Legacy fields for backward compatibility
 	postsNotifications?: {
 		proposalStatusChanges: INotificationTypeSettings;
 		newProposalsInCategories: INotificationTypeSettings;

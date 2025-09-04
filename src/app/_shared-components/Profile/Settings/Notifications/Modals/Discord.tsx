@@ -18,14 +18,15 @@ interface DiscordInfoModalProps {
 	open: boolean;
 	getVerifyToken: (channel: ENotificationChannel) => Promise<string>;
 	generatedToken?: string;
+	username: string;
 	onClose: () => void;
 }
 
-function DiscordInfoModal({ icon, title, open, getVerifyToken, generatedToken = '', onClose }: DiscordInfoModalProps) {
+function DiscordInfoModal({ icon, title, open, getVerifyToken, generatedToken = '', username, onClose }: DiscordInfoModalProps) {
 	const t = useTranslations('Profile.Settings.Notifications.Modals');
 	const [loading, setLoading] = useState(false);
 	const [token, setToken] = useState(generatedToken);
-	const username = 'user';
+
 	const { toast } = useToast();
 
 	const handleGenerateToken = async () => {
@@ -48,17 +49,15 @@ function DiscordInfoModal({ icon, title, open, getVerifyToken, generatedToken = 
 		}
 	};
 
-	const handleCopyClicked = async (text: string) => {
+	const handleCopyClicked = async (text: string, successMsg: string) => {
 		try {
 			await navigator.clipboard.writeText(text);
-			const message = text.includes('username') ? 'Username copied successfully' : 'Copied to clipboard';
-
 			toast({
-				title: message,
+				title: successMsg,
 				status: ENotificationStatus.SUCCESS
 			});
-		} catch (error) {
-			console.error('Failed to copy text:', error);
+		} catch {
+			toast({ title: t('copyFailed'), status: ENotificationStatus.ERROR });
 		}
 	};
 
@@ -104,7 +103,7 @@ function DiscordInfoModal({ icon, title, open, getVerifyToken, generatedToken = 
 							<Button
 								variant='outline'
 								size='sm'
-								onClick={() => handleCopyClicked('/add <username> <verificationToken>')}
+								onClick={() => handleCopyClicked('/add <username> <verificationToken>', t('commandCopied'))}
 								className='mx-2 mt-2 h-auto px-2 py-1'
 								leftIcon={<Copy className='h-3 w-3' />}
 							>
@@ -126,7 +125,7 @@ function DiscordInfoModal({ icon, title, open, getVerifyToken, generatedToken = 
 										<Button
 											variant='outline'
 											size='sm'
-											onClick={() => handleCopyClicked(username)}
+											onClick={() => handleCopyClicked(username, t('usernameCopied'))}
 											className='mx-2 h-auto px-2 py-1'
 											leftIcon={<Copy className='h-3 w-3' />}
 										>
@@ -140,7 +139,7 @@ function DiscordInfoModal({ icon, title, open, getVerifyToken, generatedToken = 
 											<Button
 												variant='outline'
 												size='sm'
-												onClick={() => handleCopyClicked(token)}
+												onClick={() => handleCopyClicked(token, t('tokenCopied'))}
 												className='hidden h-auto px-2 py-1 sm:inline-flex'
 												leftIcon={<Copy className='h-3 w-3' />}
 											>
@@ -149,7 +148,7 @@ function DiscordInfoModal({ icon, title, open, getVerifyToken, generatedToken = 
 											<Button
 												variant='outline'
 												size='sm'
-												onClick={() => handleCopyClicked(token)}
+												onClick={() => handleCopyClicked(token, t('tokenCopied'))}
 												className='h-auto px-2 py-1 sm:hidden'
 												leftIcon={<Copy className='h-3 w-3' />}
 											>

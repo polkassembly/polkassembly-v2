@@ -186,11 +186,12 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	};
 
 	const handleOpenGovNotificationChange = (trackKey: string, notificationKey: string, enabled: boolean) => {
-		const currentSettings = openGovTracks[trackKey];
+		const current = openGovTracks[trackKey] ?? { enabled: false, notifications: {} as Record<string, boolean> };
 		updateNetworkOpenGovTrack(network, trackKey, {
-			...currentSettings,
+			...current,
+			enabled: current.enabled || enabled,
 			notifications: {
-				...currentSettings?.notifications,
+				...(current.notifications ?? {}),
 				[notificationKey]: enabled
 			}
 		});
@@ -201,11 +202,12 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	};
 
 	const handleGov1NotificationChange = (itemKey: string, notificationKey: string, enabled: boolean) => {
-		const currentSettings = gov1Items[itemKey];
+		const current = gov1Items[itemKey] ?? { enabled: false, notifications: {} as Record<string, boolean> };
 		updateNetworkGov1Item(network, itemKey, {
-			...currentSettings,
+			...current,
+			enabled: current.enabled || enabled,
 			notifications: {
-				...currentSettings?.notifications,
+				...(current.notifications ?? {}),
 				[notificationKey]: enabled
 			}
 		});

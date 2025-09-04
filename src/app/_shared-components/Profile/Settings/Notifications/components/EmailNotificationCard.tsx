@@ -16,9 +16,10 @@ interface EmailNotificationCardProps {
 	verified: boolean;
 	enabled: boolean;
 	handleEnableDisabled: (channel: ENotificationChannel, enabled: boolean) => void;
+	onVerifyEmail?: () => void;
 }
 
-function EmailNotificationCard({ verifiedEmail, verified, enabled, handleEnableDisabled }: EmailNotificationCardProps) {
+function EmailNotificationCard({ verifiedEmail, verified, enabled, handleEnableDisabled, onVerifyEmail }: EmailNotificationCardProps) {
 	const t = useTranslations();
 	return (
 		<div className='flex items-start justify-between rounded-lg p-4'>
@@ -47,6 +48,7 @@ function EmailNotificationCard({ verifiedEmail, verified, enabled, handleEnableD
 							variant='outline'
 							size='sm'
 							className='mt-2'
+							onClick={onVerifyEmail}
 						>
 							{t('Profile.Settings.Notifications.verifyEmail')}
 						</Button>

@@ -51,7 +51,7 @@ function Gov1Item({ icon, title, enabled, notifications = {}, notificationLabels
 						checked={enabled}
 						onCheckedChange={onEnabledChange}
 					/>
-					<span className='text-text_secondary text-xs'>{t('Profile.Settings.Notifications.all')}</span>
+					<span className='text-text_secondary text-xs'>{t('all')}</span>
 				</div>
 			</div>
 

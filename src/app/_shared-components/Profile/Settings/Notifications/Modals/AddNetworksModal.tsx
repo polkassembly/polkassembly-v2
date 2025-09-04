@@ -49,9 +49,7 @@ const networkGroups = {
 		{ id: 'polkadot', name: 'Polkadot', type: 'polkadot' as const, logo: PolkadotLogo, selected: false },
 		{ id: 'collectives', name: 'Collectives', type: 'polkadot' as const, logo: CollectivesLogo, selected: false },
 		{ id: 'moonbeam', name: 'Moonbeam', type: 'polkadot' as const, logo: MoonbeamLogo, selected: false },
-		{ id: 'pendulum', name: 'Pendulum', type: 'polkadot' as const, logo: PendulumLogo, selected: false },
-		{ id: 'westend', name: 'Westend', type: 'polkadot' as const, logo: WestendLogo, selected: false },
-		{ id: 'paseo', name: 'Paseo', type: 'polkadot' as const, logo: PaseoLogo, selected: false }
+		{ id: 'pendulum', name: 'Pendulum', type: 'polkadot' as const, logo: PendulumLogo, selected: false }
 	],
 	soloChains: [
 		{ id: 'cere', name: 'Cere', type: 'solo' as const, logo: CereLogo, selected: false },
@@ -60,7 +58,9 @@ const networkGroups = {
 	],
 	testChains: [
 		{ id: 'moonbase', name: 'Moonbase', type: 'test' as const, logo: MoonbaseLogo, selected: false },
-		{ id: 'polymesh-test', name: 'Polymesh-Test', type: 'test' as const, logo: PolymeshLogo, selected: false }
+		{ id: 'polymesh-test', name: 'Polymesh-Test', type: 'test' as const, logo: PolymeshLogo, selected: false },
+		{ id: 'westend', name: 'Westend', type: 'test' as const, logo: WestendLogo, selected: false },
+		{ id: 'paseo', name: 'Paseo', type: 'test' as const, logo: PaseoLogo, selected: false }
 	]
 };
 
@@ -162,11 +162,13 @@ function AddNetworksModal({ open, onClose, onConfirm, selectedNetworks }: AddNet
 	};
 
 	const toggleAll = (groupKey: keyof typeof networkGroups) => {
-		const allSelected = networks[groupKey].every((network) => network.selected);
-		setNetworks((prev) => ({
-			...prev,
-			[groupKey]: prev[groupKey].map((network) => ({ ...network, selected: !allSelected }))
-		}));
+		setNetworks((prev) => {
+			const allSelected = prev[groupKey].every((n) => n.selected);
+			return {
+				...prev,
+				[groupKey]: prev[groupKey].map((n) => ({ ...n, selected: !allSelected }))
+			};
+		});
 	};
 
 	const handleConfirm = () => {

@@ -11,12 +11,32 @@ import { AuthService } from '@api/_api-services/auth_service';
 import { NotificationPreferencesService } from '@api/_api-services/notification_preferences_service';
 import { IUpdateNotificationPreferencesRequest } from '@/_shared/types';
 import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
+import { z } from 'zod';
 
 interface IRouteParams {
 	params: Promise<{
 		id: string;
 	}>;
 }
+
+const UpdateSchema = z.union([
+	z.object({
+		updates: z.array(
+			z.object({
+				section: z.string(),
+				key: z.string(),
+				value: z.unknown(),
+				network: z.string().optional()
+			})
+		)
+	}),
+	z.object({
+		section: z.string(),
+		key: z.string(),
+		value: z.unknown(),
+		network: z.string().optional()
+	})
+]);
 
 export const GET = withErrorHandling(async (request: NextRequest, { params }: IRouteParams): Promise<NextResponse> => {
 	const { id } = await params;
@@ -47,8 +67,11 @@ export const GET = withErrorHandling(async (request: NextRequest, { params }: IR
 		allNetworks: getAllNetworks
 	});
 
-	response.headers.set('Cache-Control', 'private, max-age=600, must-revalidate');
-	response.headers.set('ETag', `"${userId}-${Date.now()}"`);
+	const etagContent = JSON.stringify(preferences);
+	const etag = `"${userId}-${Buffer.from(etagContent).toString('base64').substring(0, 20)}"`;
+
+	response.headers.set('Cache-Control', 'private, max-age=0, must-revalidate');
+	response.headers.set('ETag', etag);
 
 	return response;
 });
@@ -68,10 +91,11 @@ export const PUT = withErrorHandling(async (request: NextRequest, { params }: IR
 		throw new APIError(ERROR_CODES.FORBIDDEN, StatusCodes.FORBIDDEN, 'Unauthorized access');
 	}
 
-	const body = (await request.json()) as IUpdateNotificationPreferencesRequest | { updates: Array<{ section: string; key: string; value: unknown; network?: string }> };
+	const body = UpdateSchema.parse(await request.json());
 
 	if ('updates' in body && Array.isArray(body.updates)) {
-		const updatedPreferences = await NotificationPreferencesService.BulkUpdateMultipleSections(userId, body.updates);
+		const updates = body.updates as Array<{ section: string; key: string; value: unknown; network?: string }>;
+		const updatedPreferences = await NotificationPreferencesService.BulkUpdateMultipleSections(userId, updates);
 		return NextResponse.json({
 			data: updatedPreferences,
 			message: 'Notification preferences updated successfully'

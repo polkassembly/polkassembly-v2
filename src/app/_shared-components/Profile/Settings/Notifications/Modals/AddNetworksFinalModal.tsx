@@ -30,7 +30,9 @@ function AddNetworksFinalModal({ open, onClose, onGoBack, onGoAhead, networks }:
 	return (
 		<Dialog
 			open={open}
-			onOpenChange={onClose}
+			onOpenChange={(isOpen) => {
+				if (!isOpen) onClose();
+			}}
 		>
 			<DialogContent className='max-w-xl p-4 sm:p-6'>
 				<DialogHeader>
