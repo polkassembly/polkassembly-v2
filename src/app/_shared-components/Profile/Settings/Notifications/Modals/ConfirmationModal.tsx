@@ -28,7 +28,7 @@ function ConfirmationModal({ open, onClose, onConfirm, networkName }: Confirmati
 					<div className='flex items-center justify-between'>
 						<div className='flex items-center gap-2'>
 							<CheckCircle className='h-5 w-5 text-social_green' />
-							<DialogTitle>{t('Profile.Settings.Notifications.Modals.confirmation')}</DialogTitle>
+							<DialogTitle>{t('confirmation')}</DialogTitle>
 						</div>
 						<button
 							type='button'
@@ -41,11 +41,11 @@ function ConfirmationModal({ open, onClose, onConfirm, networkName }: Confirmati
 				</DialogHeader>
 
 				<div className='space-y-4'>
-					<p className='text-sm text-text_primary'>{t('Profile.Settings.Notifications.Modals.areYouSureYouWant', { networkName })}</p>
+					<p className='text-sm text-text_primary'>{t('areYouSureYouWant', { networkName })}</p>
 
 					<div className='flex items-start gap-3 rounded-lg p-3'>
 						<Info className='mt-0.5 h-4 w-4 flex-shrink-0 text-bg_blue' />
-						<p className='text-xs text-bg_blue'>{t('Profile.Settings.Notifications.Modals.primaryNetworkSettingsInfo')}</p>
+						<p className='text-xs text-bg_blue'>{t('primaryNetworkSettingsInfo')}</p>
 					</div>
 
 					<div className='flex gap-2 pt-4'>
@@ -54,13 +54,13 @@ function ConfirmationModal({ open, onClose, onConfirm, networkName }: Confirmati
 							onClick={onClose}
 							className='flex-1'
 						>
-							{t('Profile.Settings.Notifications.Modals.cancel')}
+							{t('cancel')}
 						</Button>
 						<Button
 							onClick={onConfirm}
 							className='flex-1 bg-text_pink'
 						>
-							{t('Profile.Settings.Notifications.Modals.confirm')}
+							{t('confirm')}
 						</Button>
 					</div>
 				</div>
