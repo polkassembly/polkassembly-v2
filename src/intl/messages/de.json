@@ -132,6 +132,7 @@
 		"contentWillBeAvailableSoon": "Inhalt wird in Kürze verfügbar sein..."
 	},
 	"Profile": {
+		"noAddresses": "Keine Adressen gefunden",
 		"settings": "Einstellungen",
 		"login": "Anmelden",
 		"loginFailed": "Anmeldung fehlgeschlagen",

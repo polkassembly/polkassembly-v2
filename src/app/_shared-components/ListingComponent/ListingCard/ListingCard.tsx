@@ -87,19 +87,22 @@ function ListingCard({
 						<h3 className={styles.titleText}>{title}</h3>
 						<div className={styles.infoContainer}>
 							<div className='flex items-center gap-2'>
-								{data.onChainInfo?.proposer && (
+								{data.onChainInfo?.proposer ? (
 									<>
 										<Address address={data.onChainInfo?.proposer} />
 										<span>|</span>
 									</>
-								)}
-
-								{!data.onChainInfo?.proposer && data.publicUser?.username && (
+								) : data.publicUser?.addresses.length === 1 ? (
+									<>
+										<Address address={data.publicUser?.addresses[0]} />
+										<span>|</span>
+									</>
+								) : data.publicUser?.username ? (
 									<>
 										<span>{data.publicUser?.username}</span>
 										<span>|</span>
 									</>
-								)}
+								) : null}
 
 								{(data.onChainInfo?.createdAt || data.createdAt) && (
 									<span className={styles.infoItem}>

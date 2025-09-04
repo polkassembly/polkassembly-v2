@@ -132,6 +132,7 @@
 		"contentWillBeAvailableSoon": "Content will be available soon..."
 	},
 	"Profile": {
+		"noAddresses": "No addresses linked",
 		"settings": "Settings",
 		"login": "Login",
 		"loginFailed": "Failed to login",

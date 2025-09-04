@@ -56,14 +56,17 @@ function ProfileHeader({
 	const { identityService, getOnChainIdentity } = useIdentityService();
 
 	useEffect(() => {
-		if (!address) return;
-
 		const fetchIdentity = async () => {
-			const identityLocal = await getOnChainIdentity(address);
-			setIdentity(identityLocal);
+			if (address) {
+				const identityLocal = await getOnChainIdentity(address);
+				setIdentity(identityLocal);
+			} else if (userProfileData?.addresses.length === 1) {
+				const identityLocal = await getOnChainIdentity(userProfileData.addresses[0]);
+				setIdentity(identityLocal);
+			}
 		};
 		fetchIdentity();
-	}, [identityService, address, getOnChainIdentity]);
+	}, [identityService, address, getOnChainIdentity, userProfileData?.addresses]);
 
 	const queryClient = useQueryClient();
 
@@ -198,20 +201,28 @@ function ProfileHeader({
 				<div className='flex w-full flex-col gap-y-2'>
 					<div className='flex w-full flex-col justify-between gap-x-2 gap-y-3 sm:flex-row sm:items-start'>
 						<div className='mt-2 flex w-full flex-col gap-y-2'>
-							{userProfileData?.username && !identity?.displayParent && !identity?.display ? (
-								<p className={classes.profileHeaderTextTitle}>{userProfileData.username}</p>
+							{userProfileData?.addresses.length === 1 && (identity?.display || identity?.displayParent) ? (
+								<>
+									<Address
+										disableTooltip
+										address={userProfileData.addresses[0]}
+										showIdenticon={false}
+										textClassName={cn('text-center text-lg font-semibold sm:text-left lg:text-2xl')}
+									/>
+									<p className='text-base'>{userProfileData.addresses[0]}</p>
+								</>
+							) : address && (identity?.display || identity?.displayParent) ? (
+								<>
+									<Address
+										disableTooltip
+										address={address}
+										showIdenticon={false}
+										textClassName={cn('text-center text-lg font-semibold sm:text-left lg:text-2xl')}
+									/>
+									<p className='text-base'>{address}</p>
+								</>
 							) : (
-								address && (
-									<>
-										<Address
-											disableTooltip
-											address={address}
-											showIdenticon={false}
-											textClassName={cn('text-center text-lg font-semibold sm:text-left lg:text-2xl')}
-										/>
-										{(identity?.display || identity?.displayParent) && <p className='text-base'>{address}</p>}
-									</>
-								)
+								<p className={classes.profileHeaderTextTitle}>{userProfileData?.username}</p>
 							)}
 
 							{userProfileData && (

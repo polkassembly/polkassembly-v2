@@ -132,6 +132,7 @@
 		"contentWillBeAvailableSoon": "内容即将可用..."
 	},
 	"Profile": {
+		"noAddresses": "未找到链接地址",
 		"settings": "设置",
 		"login": "登录",
 		"loginFailed": "登录失败",
