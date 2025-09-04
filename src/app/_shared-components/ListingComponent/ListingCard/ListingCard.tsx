@@ -28,8 +28,9 @@ import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ARCHIVE_PROPOSAL_TYPES } from '@/_shared/_constants/archiveProposalTypes';
-import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
+import styles from './ListingCard.module.scss';
+import UserAvatar from '../../UserAvatar/UserAvatar';
 
 function ListingCard({
 	title,
@@ -87,16 +88,14 @@ function ListingCard({
 						<h3 className={styles.titleText}>{title}</h3>
 						<div className={styles.infoContainer}>
 							<div className='flex items-center gap-2'>
-								{data.onChainInfo?.proposer && (
+								{data.onChainInfo?.proposer ? (
 									<>
 										<Address address={data.onChainInfo?.proposer} />
 										<span>|</span>
 									</>
-								)}
-
-								{!data.onChainInfo?.proposer && data.publicUser?.username && (
+								) : (
 									<>
-										<span>{data.publicUser?.username}</span>
+										<UserAvatar publicUser={data.publicUser} />
 										<span>|</span>
 									</>
 								)}

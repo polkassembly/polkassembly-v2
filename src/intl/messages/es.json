@@ -132,6 +132,7 @@
 		"contentWillBeAvailableSoon": "El contenido estará disponible pronto..."
 	},
 	"Profile": {
+		"noAddresses": "No se encontraron direcciones vinculadas",
 		"settings": "Configuración",
 		"login": "Iniciar sesión",
 		"loginFailed": "Error al iniciar sesión",
