@@ -20,6 +20,8 @@ import CereLogo from '@assets/parachain-logos/cere-logo.jpg';
 import PolkadexLogo from '@assets/parachain-logos/polkadex-logo.jpg';
 import PolymeshLogo from '@assets/parachain-logos/polymesh-logo.png';
 import MoonbaseLogo from '@assets/parachain-logos/moonbase-logo.png';
+import WestendLogo from '@assets/parachain-logos/westend-logo.jpg';
+import PaseoLogo from '@assets/parachain-logos/paseo-logo.png';
 
 interface Network {
 	id: string;
@@ -45,7 +47,9 @@ const networkGroups = {
 		{ id: 'polkadot', name: 'Polkadot', type: 'polkadot' as const, logo: PolkadotLogo, selected: false },
 		{ id: 'collectives', name: 'Collectives', type: 'polkadot' as const, logo: CollectivesLogo, selected: false },
 		{ id: 'moonbeam', name: 'Moonbeam', type: 'polkadot' as const, logo: MoonbeamLogo, selected: false },
-		{ id: 'pendulum', name: 'Pendulum', type: 'polkadot' as const, logo: PendulumLogo, selected: false }
+		{ id: 'pendulum', name: 'Pendulum', type: 'polkadot' as const, logo: PendulumLogo, selected: false },
+		{ id: 'westend', name: 'Westend', type: 'polkadot' as const, logo: WestendLogo, selected: false },
+		{ id: 'paseo', name: 'Paseo', type: 'polkadot' as const, logo: PaseoLogo, selected: false }
 	],
 	soloChains: [
 		{ id: 'cere', name: 'Cere', type: 'solo' as const, logo: CereLogo, selected: false },

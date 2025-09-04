@@ -19,10 +19,11 @@ interface ImportPrimaryNetworkModalProps {
 	onClose: () => void;
 	onConfirm: () => void;
 	primaryNetwork: string;
+	primaryNetworkLogo?: string;
 	networks: Network[];
 }
 
-function ImportPrimaryNetworkModal({ open, onClose, onConfirm, primaryNetwork, networks }: ImportPrimaryNetworkModalProps) {
+function ImportPrimaryNetworkModal({ open, onClose, onConfirm, primaryNetwork, primaryNetworkLogo, networks }: ImportPrimaryNetworkModalProps) {
 	return (
 		<Dialog
 			open={open}
@@ -70,7 +71,13 @@ function ImportPrimaryNetworkModal({ open, onClose, onConfirm, primaryNetwork, n
 
 					<div className='flex items-center justify-center'>
 						<div className='flex items-center gap-2 rounded-full border-2 border-pink-500 px-4 py-2'>
-							<div className='h-4 w-4 rounded-full bg-black' />
+							<img
+								src={primaryNetworkLogo}
+								alt={primaryNetwork}
+								width={16}
+								height={16}
+								className='rounded-full object-cover'
+							/>
 							<span className='text-sm font-medium text-text_primary'>{primaryNetwork}</span>
 						</div>
 					</div>

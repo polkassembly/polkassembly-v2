@@ -6,15 +6,25 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import { ChevronDown, Plus } from 'lucide-react';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
+import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
+import MoonbeamLogo from '@assets/parachain-logos/moonbeam-logo.png';
+import MoonriverLogo from '@assets/parachain-logos/moonriver-logo.png';
+import CollectivesLogo from '@assets/parachain-logos/collectives-logo.png';
+import PendulumLogo from '@assets/parachain-logos/pendulum-logo.jpg';
+import CereLogo from '@assets/parachain-logos/cere-logo.jpg';
+import PolkadexLogo from '@assets/parachain-logos/polkadex-logo.jpg';
+import PolymeshLogo from '@assets/parachain-logos/polymesh-logo.png';
+import MoonbaseLogo from '@assets/parachain-logos/moonbase-logo.png';
+import WestendLogo from '@assets/parachain-logos/westend-logo.jpg';
+import PaseoLogo from '@assets/parachain-logos/paseo-logo.png';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import { Separator } from '@/app/_shared-components/Separator';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { INetworkSettings, IParachain } from '@/_shared/types';
+import { INetworkSettings } from '@/_shared/types';
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import ParachainsIcon from '@assets/icons/notification-settings/parachains.svg';
 import NetworkBadge from '../components/NetworkBadge';
@@ -24,12 +34,25 @@ import ImportPrimaryNetworkModal from '../Modals/ImportPrimaryNetworkModal';
 import AddNetworksFinalModal from '../Modals/AddNetworksFinalModal';
 import classes from '../Notifications.module.scss';
 
-const getNetworkLogo = (networkId: string, parachainsData?: IParachain[]): string => {
-	if (!parachainsData) return PolkadotLogo.src;
+const getNetworkLogo = (networkId: string): string => {
+	const logoMap: Record<string, string> = {
+		polkadot: PolkadotLogo.src,
+		kusama: KusamaLogo.src,
+		moonbeam: MoonbeamLogo.src,
+		moonriver: MoonriverLogo.src,
+		collectives: CollectivesLogo.src,
+		pendulum: PendulumLogo.src,
+		cere: CereLogo.src,
+		polkadex: PolkadexLogo.src,
+		polymesh: PolymeshLogo.src,
+		'polymesh-test': PolymeshLogo.src,
+		moonbase: MoonbaseLogo.src,
+		'moonbase-alpha': MoonbaseLogo.src,
+		westend: WestendLogo.src,
+		paseo: PaseoLogo.src
+	};
 
-	const parachain = parachainsData.find((p) => p.name.toLowerCase().replace(/\s+/g, '-') === networkId.toLowerCase() || p.name.toLowerCase() === networkId.toLowerCase());
-
-	return parachain?.logoURL || PolkadotLogo.src;
+	return logoMap[networkId.toLowerCase()] || PolkadotLogo.src;
 };
 
 function ParachainsSection() {
@@ -39,16 +62,6 @@ function ParachainsSection() {
 
 	const [selectedNetworks, setSelectedNetworks] = useState<INetworkSettings[]>([]);
 	const [pendingRemovals, setPendingRemovals] = useState<Set<string>>(new Set());
-	const [pendingAdditions, setPendingAdditions] = useState<INetworkSettings[]>([]);
-	const [pendingOperations, setPendingOperations] = useState<Set<string>>(new Set());
-
-	const { data: parachainsData } = useQuery({
-		queryKey: ['parachains'],
-		queryFn: async () => {
-			const response = await fetch('/parachains.json');
-			return response.json() as Promise<IParachain[]>;
-		}
-	});
 
 	useEffect(() => {
 		if (!preferences?.networkPreferences) {
@@ -59,10 +72,24 @@ function ParachainsSection() {
 		const userNetworks = Object.keys(preferences.networkPreferences);
 		const networks: INetworkSettings[] = [];
 
+		const currentNetworkPrefs = preferences.networkPreferences[currentNetwork];
+		if (currentNetworkPrefs?.enabled !== false) {
+			const formattedCurrentName = currentNetwork
+				.split(/[-_]/)
+				.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+				.join(' ');
+
+			networks.push({
+				id: currentNetwork,
+				name: formattedCurrentName,
+				removable: false
+			});
+		}
+
 		userNetworks.forEach((networkId) => {
 			if (networkId === currentNetwork) return;
 
-			if (networkId.includes('.')) return;
+			if (networkId.includes('.') && !['polymesh-test', 'moonbase-alpha'].includes(networkId)) return;
 
 			const networkPrefs = preferences.networkPreferences[networkId];
 			if (networkPrefs?.enabled !== false && !pendingRemovals.has(networkId)) {
@@ -79,64 +106,20 @@ function ParachainsSection() {
 			}
 		});
 
-		pendingAdditions.forEach((pendingNetwork) => {
-			if (!networks.some((n) => n.id === pendingNetwork.id) && pendingNetwork.id !== currentNetwork) {
-				networks.push(pendingNetwork);
-			}
-		});
-
 		setSelectedNetworks(networks);
-	}, [preferences?.networkPreferences, currentNetwork, pendingRemovals, pendingAdditions]);
+	}, [preferences?.networkPreferences, currentNetwork, pendingRemovals]);
 
 	useEffect(() => {
 		if (!preferences?.networkPreferences) return;
 
-		const serverNetworks = Object.keys(preferences.networkPreferences).filter(
-			(networkId) => !networkId.includes('.') && preferences.networkPreferences[networkId]?.enabled !== false
-		);
-
-		const additionsCompleted = pendingAdditions.every((pendingNetwork) => serverNetworks.includes(pendingNetwork.id));
+		const serverNetworks = Object.keys(preferences.networkPreferences).filter((networkId) => preferences.networkPreferences[networkId]?.enabled !== false);
 
 		const removalsCompleted = Array.from(pendingRemovals).every((networkId) => !serverNetworks.includes(networkId));
 
-		if (additionsCompleted && pendingAdditions.length > 0) {
-			setPendingAdditions([]);
-			setPendingOperations((prev) => {
-				const newSet = new Set(prev);
-				pendingAdditions.forEach((network) => {
-					newSet.delete(`add-${network.id}`);
-				});
-				return newSet;
-			});
-		}
-
 		if (removalsCompleted && pendingRemovals.size > 0) {
-			const removalsArray = Array.from(pendingRemovals);
 			setPendingRemovals(new Set());
-			setPendingOperations((prev) => {
-				const newSet = new Set(prev);
-				removalsArray.forEach((networkId) => {
-					newSet.delete(`remove-${networkId}`);
-				});
-				return newSet;
-			});
 		}
-	}, [preferences?.networkPreferences, pendingAdditions, pendingRemovals]);
-
-	useEffect(() => {
-		if (pendingOperations.size > 0) {
-			const timeout = setTimeout(() => {
-				console.warn('Clearing pending operations due to timeout');
-				setPendingRemovals(new Set());
-				setPendingAdditions([]);
-				setPendingOperations(new Set());
-			}, 10000);
-
-			return () => clearTimeout(timeout);
-		}
-
-		return undefined;
-	}, [pendingOperations.size]);
+	}, [preferences?.networkPreferences, pendingRemovals]);
 
 	const currentNetworkPrefs = preferences?.networkPreferences?.[currentNetwork];
 	const [parachainSettings, setParachainSettings] = useState({
@@ -175,9 +158,9 @@ function ParachainsSection() {
 	};
 
 	const removeNetwork = (networkId: string) => {
-		setPendingRemovals((prev) => new Set([...prev, networkId]));
+		setSelectedNetworks((prev) => prev.filter((network) => network.id !== networkId));
 
-		setPendingOperations((prev) => new Set([...prev, `remove-${networkId}`]));
+		setPendingRemovals((prev) => new Set([...prev, networkId]));
 
 		updateNetworkPreference(networkId, {
 			enabled: false,
@@ -193,11 +176,7 @@ function ParachainsSection() {
 	const handleAddNetworksConfirm = async (networks: INetworkSettings[]) => {
 		if (networks.length === 0) return;
 
-		setPendingAdditions((prev) => [...prev, ...networks]);
-
-		networks.forEach((network) => {
-			setPendingOperations((prev) => new Set([...prev, `add-${network.id}`]));
-		});
+		setSelectedNetworks((prev) => [...prev, ...networks]);
 
 		try {
 			if (networks.length > 1) {
@@ -218,16 +197,8 @@ function ParachainsSection() {
 					importPrimarySettings: false
 				});
 			}
-		} catch (error) {
-			console.error('Failed to add networks:', error);
-			setPendingAdditions((prev) => prev.filter((pending) => !networks.some((network) => network.id === pending.id)));
-			networks.forEach((network) => {
-				setPendingOperations((prev) => {
-					const newSet = new Set(prev);
-					newSet.delete(`add-${network.id}`);
-					return newSet;
-				});
-			});
+		} catch {
+			setSelectedNetworks((prev) => prev.filter((existing) => !networks.some((network) => network.id === existing.id)));
 		}
 	};
 
@@ -236,14 +207,45 @@ function ParachainsSection() {
 		openNetworkModal('addNetworksFinal');
 	};
 
-	const handleFinalGoAhead = () => {
+	const handleFinalGoAhead = async () => {
 		closeNetworkModal('addNetworksFinal');
 
 		const networksToImport = selectedNetworks.filter((network) => network.id !== currentNetwork);
 
-		networksToImport.forEach((network) => {
-			importNetworkSettings(currentNetwork, network.id);
-		});
+		try {
+			const updates = [
+				{
+					section: 'networks',
+					key: currentNetwork,
+					value: {
+						enabled: true,
+						isPrimary: true,
+						importPrimarySettings: true
+					}
+				},
+				...networksToImport.map((network) => ({
+					section: 'networks',
+					key: network.id,
+					value: {
+						enabled: true,
+						isPrimary: false,
+						importPrimarySettings: true
+					}
+				}))
+			];
+
+			await bulkUpdateNetworkPreferences(updates);
+
+			networksToImport.forEach((network) => {
+				importNetworkSettings(currentNetwork, network.id);
+			});
+		} catch {
+			setParachainSettings((prev) => ({
+				...prev,
+				importPrimaryNetworkSettings: false,
+				setPrimaryNetworkSettings: false
+			}));
+		}
 	};
 
 	const handleSetPrimaryNetworkSettings = (checked: boolean) => {
@@ -268,9 +270,9 @@ function ParachainsSection() {
 
 		try {
 			if (checked) {
-				const parachainNetworks = selectedNetworks;
+				const otherNetworks = selectedNetworks.filter((network) => network.id !== currentNetwork);
 
-				if (parachainNetworks.length > 0) {
+				if (otherNetworks.length > 0) {
 					const updates = [
 						{
 							section: 'networks',
@@ -281,7 +283,7 @@ function ParachainsSection() {
 								importPrimarySettings: true
 							}
 						},
-						...parachainNetworks.map((network) => ({
+						...otherNetworks.map((network) => ({
 							section: 'networks',
 							key: network.id,
 							value: {
@@ -294,7 +296,7 @@ function ParachainsSection() {
 
 					await bulkUpdateNetworkPreferences(updates);
 
-					parachainNetworks.forEach((network) => {
+					otherNetworks.forEach((network) => {
 						importNetworkSettings(currentNetwork, network.id);
 					});
 				} else {
@@ -322,7 +324,7 @@ function ParachainsSection() {
 	const finalNetworks = selectedNetworks.map((network) => ({
 		id: network.id,
 		name: network.name,
-		logo: getNetworkLogo(network.id, parachainsData)
+		logo: getNetworkLogo(network.id)
 	}));
 
 	return (
@@ -358,7 +360,7 @@ function ParachainsSection() {
 									</span>
 								</p>
 								<p className='text-text_secondary text-sm'>
-									Manage your notification settings for parachain networks. Add multiple parachains to receive notifications across the Polkadot ecosystem.
+									Manage your notification settings for networks. Add multiple networks to receive notifications across different blockchain ecosystems.
 								</p>
 							</div>
 
@@ -369,7 +371,7 @@ function ParachainsSection() {
 											key={network.id}
 											id={network.id}
 											name={network.name}
-											logo={getNetworkLogo(network.id, parachainsData)}
+											logo={getNetworkLogo(network.id)}
 											removable={network.removable}
 											onRemove={removeNetwork}
 										/>
