@@ -65,7 +65,10 @@ function GovVoting() {
 	});
 
 	return (
-		<Collapsible className='rounded-lg border border-border_grey'>
+		<Collapsible
+			defaultOpen
+			className='rounded-lg border border-border_grey'
+		>
 			<CollapsibleTrigger className='flex w-full items-center gap-x-4 p-3 lg:p-4'>
 				<Image
 					src={TimeLineIcon}
