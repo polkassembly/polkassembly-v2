@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProfileTabs, ESocial, IFollowEntry, IOnChainIdentity, IPublicUser } from '@/_shared/types';
+import { EProfileTabs, ESocial, IFollowEntry, IPublicUser } from '@/_shared/types';
 import Identicon from '@polkadot/react-identicon';
 import { Pencil, ShieldPlus } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -12,15 +12,14 @@ import Image from 'next/image';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import UserIcon from '@assets/profile/user-icon.svg';
 import { useUser } from '@/hooks/useUser';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import EmailIcon from '@assets/icons/email-icon.svg';
 import TwitterIcon from '@assets/icons/twitter-icon.svg';
 import TelegramIcon from '@assets/icons/telegram-icon.svg';
 import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
-import { cn } from '@/lib/utils';
-import { useIdentityService } from '@/hooks/useIdentityService';
+import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { TabsList, TabsTrigger } from '../../Tabs';
 import { Button } from '../../Button';
 import classes from './ProfileHeader.module.scss';
@@ -29,6 +28,8 @@ import EditProfile from '../EditProfile/EditProfile';
 import { Separator } from '../../Separator';
 import { Skeleton } from '../../Skeleton';
 import Address from '../Address/Address';
+import CopyToClipboard from '../../CopyToClipboard/CopyToClipboard';
+import UserAvatar from '../../UserAvatar/UserAvatar';
 
 const SocialIcons = {
 	[ESocial.EMAIL]: EmailIcon,
@@ -52,18 +53,8 @@ function ProfileHeader({
 	const { user } = useUser();
 	const [openEditProfileDialog, setOpenEditProfileDialog] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
-	const { identityService, getOnChainIdentity } = useIdentityService();
 
-	useEffect(() => {
-		if (!address) return;
-
-		const fetchIdentity = async () => {
-			const identityLocal = await getOnChainIdentity(address);
-			setIdentity(identityLocal);
-		};
-		fetchIdentity();
-	}, [identityService, address, getOnChainIdentity]);
+	const [displayAddress, setDisplayAddress] = useState<string | undefined>();
 
 	const queryClient = useQueryClient();
 
@@ -169,10 +160,10 @@ function ProfileHeader({
 								height={90}
 							/>
 						</div>
-					) : userProfileData?.addresses?.[0] || address ? (
+					) : displayAddress ? (
 						<Identicon
 							size={!userProfileData ? 70 : 90}
-							value={userProfileData?.addresses?.[0] || address}
+							value={displayAddress}
 							theme='polkadot'
 							className='rounded-full border-[5px] border-border_blue'
 						/>
@@ -198,20 +189,41 @@ function ProfileHeader({
 				<div className='flex w-full flex-col gap-y-2'>
 					<div className='flex w-full flex-col justify-between gap-x-2 gap-y-3 sm:flex-row sm:items-start'>
 						<div className='mt-2 flex w-full flex-col gap-y-2'>
-							{userProfileData?.username && !identity?.displayParent && !identity?.display ? (
-								<p className={classes.profileHeaderTextTitle}>{userProfileData.username}</p>
+							{address ? (
+								<>
+									<Address
+										disableTooltip
+										redirectToProfile={false}
+										address={address}
+										iconSize={26}
+										showIdenticon={false}
+										textClassName='text-center text-lg font-semibold sm:text-left lg:text-2xl'
+									/>
+									<CopyToClipboard
+										label={shortenAddress(address, 5)}
+										text={address}
+										className='text-base'
+									/>
+								</>
 							) : (
-								address && (
-									<>
-										<Address
-											disableTooltip
-											address={address}
-											showIdenticon={false}
-											textClassName={cn('text-center text-lg font-semibold sm:text-left lg:text-2xl')}
+								<>
+									<UserAvatar
+										iconSize={26}
+										showIdenticon={false}
+										textClassName='text-center text-lg font-semibold sm:text-left lg:text-2xl'
+										disableTooltip
+										redirectToProfile={false}
+										publicUser={userProfileData}
+										onAddressSelection={setDisplayAddress}
+									/>
+									{displayAddress && (
+										<CopyToClipboard
+											label={shortenAddress(displayAddress, 5)}
+											text={displayAddress}
+											className='text-base'
 										/>
-										{(identity?.display || identity?.displayParent) && <p className='text-base'>{address}</p>}
-									</>
-								)
+									)}
+								</>
 							)}
 
 							{userProfileData && (

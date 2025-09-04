@@ -27,6 +27,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EVM_NETWORKS } from '@/_shared/_constants/evmNetworks';
 import { MDXEditorMethods } from '@mdxeditor/editor';
 import { useToast } from '@/hooks/useToast';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
@@ -266,7 +267,7 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 						value={addressToDisplay}
 						theme='polkadot'
 					/>
-				) : comment?.publicUser?.profileDetails?.image ? (
+				) : comment?.publicUser?.profileDetails?.image && ValidatorService.isValidImageSrc(comment.publicUser.profileDetails.image) ? (
 					<Image
 						src={comment.publicUser.profileDetails.image}
 						alt='profile'

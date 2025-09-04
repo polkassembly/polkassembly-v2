@@ -30,6 +30,7 @@ import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postA
 import { getPostListingUrl } from '@/app/_client-utils/getPostListingUrl';
 import classes from './PostHeader.module.scss';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
+import UserAvatar from '../../UserAvatar/UserAvatar';
 
 function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: boolean }) {
 	const network = getCurrentNetwork();
@@ -87,16 +88,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 				<p className={classes.postTitle}>{postData.title}</p>
 				<div className={classes.proposerWrapper}>
 					<div className='flex flex-wrap items-center gap-x-2 gap-y-2'>
-						{postData?.onChainInfo?.proposer ? (
-							<Address address={postData.onChainInfo?.proposer} />
-						) : postData.publicUser?.username ? (
-							<Link
-								href={`/user/${postData.publicUser?.username}`}
-								className='text-text_secondary text-xs'
-							>
-								{postData.publicUser?.username}
-							</Link>
-						) : null}
+						{postData?.onChainInfo?.proposer ? <Address address={postData.onChainInfo?.proposer} /> : <UserAvatar publicUser={postData.publicUser} />}
 
 						{postData.onChainInfo?.origin && (
 							<>

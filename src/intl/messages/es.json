@@ -132,6 +132,7 @@
 		"contentWillBeAvailableSoon": "El contenido estará disponible pronto..."
 	},
 	"Profile": {
+		"noAddresses": "No se encontraron direcciones vinculadas",
 		"settings": "Configuración",
 		"login": "Iniciar sesión",
 		"loginFailed": "Error al iniciar sesión",
@@ -1501,5 +1502,17 @@
 		"openVaultAppInYourPhone": "Abra la aplicación Vault en su teléfono",
 		"scanTheQRHere": "Escanee el código QR aquí desde la aplicación Vault",
 		"scanTheSignatureQRInYourApp": "Verifique el código QR de firma en su aplicación y firme la transacción"
+	},
+	"GovAnalytics": {
+		"overview": "Resumen",
+		"voting": "Votación",
+		"totalProposals": "Propuestas Totales",
+		"approvedProposals": "Propuestas Aprobadas",
+		"monitoredTracks": "Tracks Monitoreados",
+		"referendumCount": "Cantidad de Referendos",
+		"referendumCountByStatus": "Cantidad de Referendos por Estado",
+		"referendumCountByCategory": "Cantidad de Referendos por Categoría",
+		"monthlySpend": "Gasto Mensual de DOT",
+		"averageTurnoutPercentage": "Porcentaje de Asistencia Promedio"
 	}
 }
