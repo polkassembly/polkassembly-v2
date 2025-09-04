@@ -157,18 +157,26 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 		if (key.includes('.')) {
 			const [networkId, ...pathParts] = key.split('.');
-			const networkSettings = networkPreferences[networkId] || ({} as INetworkNotificationSettings);
+			if (!networkId || pathParts.length === 0) return updated;
+
+			const networkSettings = Object.prototype.hasOwnProperty.call(networkPreferences, networkId) ? networkPreferences[networkId] : ({} as INetworkNotificationSettings);
 
 			const updatedSettings = JSON.parse(JSON.stringify(networkSettings)) as Record<string, unknown>;
 			let pointer = updatedSettings;
 
 			for (let i = 0; i < pathParts.length - 1; i += 1) {
 				const pathPart = pathParts[i];
-				if (!pointer[pathPart]) pointer[pathPart] = {};
-				pointer = pointer[pathPart] as Record<string, unknown>;
+				if (pathPart) {
+					if (!Object.prototype.hasOwnProperty.call(pointer, pathPart)) {
+						pointer[pathPart] = {};
+					}
+					pointer = pointer[pathPart] as Record<string, unknown>;
+				}
 			}
 			const lastPathPart = pathParts[pathParts.length - 1];
-			pointer[lastPathPart] = value;
+			if (lastPathPart) {
+				pointer[lastPathPart] = value;
+			}
 
 			return {
 				...updated,
@@ -179,7 +187,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			};
 		}
 
-		const existingValue = networkPreferences[key] || ({} as INetworkNotificationSettings);
+		const existingValue = Object.prototype.hasOwnProperty.call(networkPreferences, key) ? networkPreferences[key] : ({} as INetworkNotificationSettings);
 		const newValue = typeof value === 'object' && value !== null ? (value as Partial<INetworkNotificationSettings>) : {};
 
 		return {
@@ -193,14 +201,15 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 	const updateChannelPreference = useCallback((updated: IUserNotificationPreferences, key: string, value: unknown) => {
 		const channelPreferences = updated.channelPreferences || ({} as Record<ENotificationChannel, INotificationChannelSettings>);
-		const existingValue = channelPreferences[key as ENotificationChannel] || {};
+		const channelKey = key as ENotificationChannel;
+		const existingValue = Object.prototype.hasOwnProperty.call(channelPreferences, channelKey) ? channelPreferences[channelKey] : {};
 		const newValue = typeof value === 'object' && value !== null ? (value as Partial<INotificationChannelSettings>) : {};
 
 		return {
 			...updated,
 			channelPreferences: {
 				...channelPreferences,
-				[key as ENotificationChannel]: { ...existingValue, ...newValue }
+				[channelKey]: { ...existingValue, ...newValue }
 			}
 		};
 	}, []);
@@ -223,6 +232,26 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 				}
 				if (section === 'channels') {
 					return updateChannelPreference(updated, key, value);
+				}
+				if (section === 'opengov') {
+					const openGovTracks = updated.openGovTracks || {};
+					return { ...updated, openGovTracks: { ...openGovTracks, [key]: value } };
+				}
+				if (section === 'gov1') {
+					const gov1Items = updated.gov1Items || {};
+					return { ...updated, gov1Items: { ...gov1Items, [key]: value } };
+				}
+				if (section === 'posts') {
+					const posts = updated.postsNotifications || {};
+					return { ...updated, postsNotifications: { ...posts, [key]: value } };
+				}
+				if (section === 'comments') {
+					const comments = updated.commentsNotifications || {};
+					return { ...updated, commentsNotifications: { ...comments, [key]: value } };
+				}
+				if (section === 'bounties') {
+					const bounties = updated.bountiesNotifications || {};
+					return { ...updated, bountiesNotifications: { ...bounties, [key]: value } };
 				}
 
 				return updated;
@@ -511,7 +540,10 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		};
 
 		return Object.keys(trackLabels).map((key) => {
-			const currentSettings = userPreferences.openGovTracks?.[key] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined;
+			const currentSettings =
+				userPreferences.openGovTracks && Object.prototype.hasOwnProperty.call(userPreferences.openGovTracks, key)
+					? (userPreferences.openGovTracks[key] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
+					: undefined;
 			const updatedSettings: { enabled: boolean; notifications: Record<string, boolean> } = {
 				...currentSettings,
 				enabled,
@@ -543,7 +575,10 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		};
 
 		return Object.keys(gov1Labels).map((key) => {
-			const currentSettings = userPreferences.gov1Items?.[key] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined;
+			const currentSettings =
+				userPreferences.gov1Items && Object.prototype.hasOwnProperty.call(userPreferences.gov1Items, key)
+					? (userPreferences.gov1Items[key] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
+					: undefined;
 			const updatedSettings: { enabled: boolean; notifications: Record<string, boolean> } = {
 				...currentSettings,
 				enabled,
@@ -560,7 +595,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 				councilMotion: { newMotionsSubmitted: enabled, motionInVoting: enabled, motionClosed: enabled }
 			};
 
-			if (notificationMappings[key]) {
+			if (Object.prototype.hasOwnProperty.call(notificationMappings, key)) {
 				updatedSettings.notifications = { ...updatedSettings.notifications, ...notificationMappings[key] };
 			}
 
@@ -602,7 +637,8 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 			postsKeys.forEach((key) => {
 				const { postsNotifications } = preferences;
-				const currentSettings = postsNotifications?.[key as keyof typeof postsNotifications];
+				const currentSettings =
+					postsNotifications && Object.prototype.hasOwnProperty.call(postsNotifications, key) ? postsNotifications[key as keyof typeof postsNotifications] : undefined;
 				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
 				updates.push({
 					section: 'posts',
@@ -633,7 +669,10 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 			postsKeys.forEach((key) => {
 				const networkPostsNotifications = preferences.networkPreferences?.[network]?.postsNotifications;
-				const currentSettings = networkPostsNotifications?.[key as keyof typeof networkPostsNotifications];
+				const currentSettings =
+					networkPostsNotifications && Object.prototype.hasOwnProperty.call(networkPostsNotifications, key)
+						? networkPostsNotifications[key as keyof typeof networkPostsNotifications]
+						: undefined;
 				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
 				updates.push({
 					section: 'networks',
@@ -658,7 +697,8 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 			commentsKeys.forEach((key) => {
 				const { commentsNotifications } = preferences;
-				const currentSettings = commentsNotifications?.[key as keyof typeof commentsNotifications];
+				const currentSettings =
+					commentsNotifications && Object.prototype.hasOwnProperty.call(commentsNotifications, key) ? commentsNotifications[key as keyof typeof commentsNotifications] : undefined;
 				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
 				updates.push({
 					section: 'comments',
@@ -682,7 +722,10 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 			commentsKeys.forEach((key) => {
 				const networkCommentsNotifications = preferences.networkPreferences?.[network]?.commentsNotifications;
-				const currentSettings = networkCommentsNotifications?.[key as keyof typeof networkCommentsNotifications];
+				const currentSettings =
+					networkCommentsNotifications && Object.prototype.hasOwnProperty.call(networkCommentsNotifications, key)
+						? networkCommentsNotifications[key as keyof typeof networkCommentsNotifications]
+						: undefined;
 				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
 				updates.push({
 					section: 'networks',
@@ -707,7 +750,8 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 			bountiesKeys.forEach((key) => {
 				const { bountiesNotifications } = preferences;
-				const currentSettings = bountiesNotifications?.[key as keyof typeof bountiesNotifications];
+				const currentSettings =
+					bountiesNotifications && Object.prototype.hasOwnProperty.call(bountiesNotifications, key) ? bountiesNotifications[key as keyof typeof bountiesNotifications] : undefined;
 				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
 				updates.push({
 					section: 'bounties',
@@ -731,7 +775,10 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 			bountiesKeys.forEach((key) => {
 				const networkBountiesNotifications = preferences.networkPreferences?.[network]?.bountiesNotifications;
-				const currentSettings = networkBountiesNotifications?.[key as keyof typeof networkBountiesNotifications];
+				const currentSettings =
+					networkBountiesNotifications && Object.prototype.hasOwnProperty.call(networkBountiesNotifications, key)
+						? networkBountiesNotifications[key as keyof typeof networkBountiesNotifications]
+						: undefined;
 				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
 				updates.push({
 					section: 'networks',
@@ -795,7 +842,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 		return {
 			...baseNotifications,
-			...(notificationMappings[trackKey] || {})
+			...(Object.prototype.hasOwnProperty.call(notificationMappings, trackKey) ? notificationMappings[trackKey] : {})
 		};
 	}, []);
 
@@ -805,8 +852,12 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 			const currentSettings =
 				trackType === 'opengov'
-					? (preferences.openGovTracks?.[trackKey] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
-					: (preferences.gov1Items?.[trackKey] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined);
+					? preferences.openGovTracks && Object.prototype.hasOwnProperty.call(preferences.openGovTracks, trackKey)
+						? (preferences.openGovTracks[trackKey] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
+						: undefined
+					: preferences.gov1Items && Object.prototype.hasOwnProperty.call(preferences.gov1Items, trackKey)
+						? (preferences.gov1Items[trackKey] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
+						: undefined;
 
 			const notifications = trackType === 'opengov' ? getOpenGovNotifications(enabled) : getGov1Notifications(trackKey, enabled, currentSettings);
 
@@ -875,7 +926,10 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		};
 
 		return Object.keys(trackLabels).map((key) => {
-			const currentSettings = userPreferences.networkPreferences?.[network]?.openGovTracks?.[key] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined;
+			const currentSettings =
+				userPreferences.networkPreferences?.[network]?.openGovTracks && Object.prototype.hasOwnProperty.call(userPreferences.networkPreferences[network].openGovTracks, key)
+					? (userPreferences.networkPreferences[network].openGovTracks[key] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
+					: undefined;
 			const updatedSettings: { enabled: boolean; notifications: Record<string, boolean> } = {
 				...currentSettings,
 				enabled,
@@ -908,7 +962,10 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		};
 
 		return Object.keys(gov1Labels).map((key) => {
-			const currentSettings = userPreferences.networkPreferences?.[network]?.gov1Items?.[key] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined;
+			const currentSettings =
+				userPreferences.networkPreferences?.[network]?.gov1Items && Object.prototype.hasOwnProperty.call(userPreferences.networkPreferences[network].gov1Items, key)
+					? (userPreferences.networkPreferences[network].gov1Items[key] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
+					: undefined;
 			const updatedSettings: { enabled: boolean; notifications: Record<string, boolean> } = {
 				...currentSettings,
 				enabled,
@@ -925,7 +982,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 				councilMotion: { newMotionsSubmitted: enabled, motionInVoting: enabled, motionClosed: enabled }
 			};
 
-			if (notificationMappings[key]) {
+			if (Object.prototype.hasOwnProperty.call(notificationMappings, key)) {
 				updatedSettings.notifications = { ...updatedSettings.notifications, ...notificationMappings[key] };
 			}
 
@@ -957,8 +1014,12 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 			const currentSettings =
 				trackType === 'opengov'
-					? (preferences.networkPreferences?.[network]?.openGovTracks?.[trackKey] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
-					: (preferences.networkPreferences?.[network]?.gov1Items?.[trackKey] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined);
+					? preferences.networkPreferences?.[network]?.openGovTracks && Object.prototype.hasOwnProperty.call(preferences.networkPreferences[network].openGovTracks, trackKey)
+						? (preferences.networkPreferences[network].openGovTracks[trackKey] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
+						: undefined
+					: preferences.networkPreferences?.[network]?.gov1Items && Object.prototype.hasOwnProperty.call(preferences.networkPreferences[network].gov1Items, trackKey)
+						? (preferences.networkPreferences[network].gov1Items[trackKey] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
+						: undefined;
 
 			const notifications = trackType === 'opengov' ? getOpenGovNotifications(enabled) : getGov1Notifications(trackKey, enabled, currentSettings);
 

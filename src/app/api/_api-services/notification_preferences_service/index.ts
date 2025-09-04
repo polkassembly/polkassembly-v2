@@ -8,8 +8,6 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import {
 	ENotificationChannel,
-	IUserNotificationSettings,
-	IUserNotificationChannelPreferences,
 	IUserNotificationPreferences,
 	INotificationChannelSettings,
 	IOpenGovTrackSettings,
@@ -19,7 +17,18 @@ import {
 
 const USER_NOT_FOUND_MESSAGE = 'User not found';
 
-const userUpdateMutex = new Map<number, Promise<unknown>>();
+const userUpdateMutex = new Map<number, { promise: Promise<unknown>; timestamp: number }>();
+const MUTEX_CLEANUP_INTERVAL = 5 * 60 * 1000;
+const MUTEX_MAX_AGE = 10 * 60 * 1000;
+
+setInterval(() => {
+	const now = Date.now();
+	userUpdateMutex.forEach((entry, userId) => {
+		if (now - entry.timestamp > MUTEX_MAX_AGE) {
+			userUpdateMutex.delete(userId);
+		}
+	});
+}, MUTEX_CLEANUP_INTERVAL);
 
 export class NotificationPreferencesService {
 	static async GetUserNotificationPreferences(userId: number, network?: string): Promise<IUserNotificationPreferences> {
@@ -29,11 +38,7 @@ export class NotificationPreferencesService {
 			throw new APIError(ERROR_CODES.USER_NOT_FOUND, StatusCodes.NOT_FOUND, USER_NOT_FOUND_MESSAGE);
 		}
 
-		const preferences = this.convertToNewFormat(user.notificationPreferences) || this.getDefaultPreferences();
-
-		if (preferences.networkPreferences) {
-			preferences.networkPreferences = this.cleanupNetworkPreferences(preferences.networkPreferences);
-		}
+		const preferences = user.notificationPreferences || this.getDefaultPreferences();
 
 		if (network && preferences.networkPreferences?.[network]) {
 			return {
@@ -49,11 +54,11 @@ export class NotificationPreferencesService {
 
 	static async UpdateUserNotificationPreferences(userId: number, section: string, key: string, value: unknown, network?: string): Promise<IUserNotificationPreferences> {
 		if (userUpdateMutex.has(userId)) {
-			await userUpdateMutex.get(userId);
+			await userUpdateMutex.get(userId)?.promise;
 		}
 
 		const updatePromise = this.performSingleUpdate(userId, section, key, value, network);
-		userUpdateMutex.set(userId, updatePromise);
+		userUpdateMutex.set(userId, { promise: updatePromise, timestamp: Date.now() });
 
 		try {
 			return await updatePromise;
@@ -69,40 +74,42 @@ export class NotificationPreferencesService {
 			throw new APIError(ERROR_CODES.USER_NOT_FOUND, StatusCodes.NOT_FOUND, USER_NOT_FOUND_MESSAGE);
 		}
 
-		const currentPreferences = this.convertToNewFormat(user.notificationPreferences) || this.getDefaultPreferences();
+		const currentPreferences = user.notificationPreferences || this.getDefaultPreferences();
 		const updatedPreferences = this.updatePreferenceSection(currentPreferences, section, key, value, network);
-
-		const oldFormatPreferences = this.convertToOldFormat(updatedPreferences);
 
 		await OffChainDbService.UpdateUserProfile({
 			userId,
 			newProfileDetails: user.profileDetails || {},
-			notificationPreferences: oldFormatPreferences
+			notificationPreferences: updatedPreferences
 		});
 
 		return updatedPreferences;
 	}
 
 	static async GenerateVerificationToken(userId: number, channel: ENotificationChannel): Promise<string> {
-		const timestamp = Date.now();
-		const randomBytes = crypto.getRandomValues(new Uint8Array(16));
-		const randomString = Array.from(randomBytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+		const randomBytes = crypto.getRandomValues(new Uint8Array(32));
+		const token = Buffer.from(randomBytes).toString('base64url');
 
-		const token = `${channel}_${userId}_${timestamp}_${randomString}`;
+		const tokenMetadata = {
+			channel,
+			userId,
+			timestamp: Date.now(),
+			token
+		};
 
 		const currentPreferences = await this.GetUserNotificationPreferences(userId);
 		const updatedPreferences = this.updatePreferenceSection(currentPreferences, 'channels', channel, {
 			...currentPreferences.channelPreferences[channel],
-			verificationToken: token
+			verification_token: token,
+			verificationMetadata: tokenMetadata
 		});
 
 		const user = await OffChainDbService.GetUserById(userId);
 		if (user) {
-			const oldFormatPreferences = this.convertToOldFormat(updatedPreferences);
 			await OffChainDbService.UpdateUserProfile({
 				userId,
 				newProfileDetails: user.profileDetails || {},
-				notificationPreferences: oldFormatPreferences
+				notificationPreferences: updatedPreferences
 			});
 		}
 
@@ -117,20 +124,25 @@ export class NotificationPreferencesService {
 
 			const currentPreferences = await this.GetUserNotificationPreferences(userId);
 			const channelSettings = currentPreferences.channelPreferences[channel];
+
+			if (!channelSettings?.verification_token || channelSettings.verification_token !== token) {
+				return false;
+			}
+
 			const updatedChannelSettings = {
 				enabled: channelSettings.enabled,
 				verified: true,
-				handle
+				handle,
+				verification_token: undefined
 			};
 			const updatedPreferences = this.updatePreferenceSection(currentPreferences, 'channels', channel, updatedChannelSettings);
 
 			const user = await OffChainDbService.GetUserById(userId);
 			if (user) {
-				const oldFormatPreferences = this.convertToOldFormat(updatedPreferences);
 				await OffChainDbService.UpdateUserProfile({
 					userId,
 					newProfileDetails: user.profileDetails || {},
-					notificationPreferences: oldFormatPreferences
+					notificationPreferences: updatedPreferences
 				});
 			}
 
@@ -138,124 +150,6 @@ export class NotificationPreferencesService {
 		} catch {
 			return false;
 		}
-	}
-
-	private static convertToNewFormat(oldPreferences?: IUserNotificationSettings): IUserNotificationPreferences | null {
-		if (!oldPreferences) {
-			return null;
-		}
-
-		const defaultChannels = {
-			[ENotificationChannel.EMAIL]: false,
-			[ENotificationChannel.TELEGRAM]: false,
-			[ENotificationChannel.DISCORD]: false,
-			[ENotificationChannel.SLACK]: false,
-			[ENotificationChannel.ELEMENT]: false
-		};
-
-		const newFormat: IUserNotificationPreferences = {
-			channelPreferences: {
-				[ENotificationChannel.EMAIL]: { enabled: false, verified: false },
-				[ENotificationChannel.TELEGRAM]: { enabled: false, verified: false },
-				[ENotificationChannel.DISCORD]: { enabled: false, verified: false },
-				[ENotificationChannel.SLACK]: { enabled: false, verified: false },
-				[ENotificationChannel.ELEMENT]: { enabled: false, verified: false }
-			},
-			networkPreferences: {},
-			postsNotifications: {
-				proposalStatusChanges: { enabled: false, channels: { ...defaultChannels } },
-				newProposalsInCategories: { enabled: false, channels: { ...defaultChannels } },
-				votingDeadlineReminders: { enabled: false, channels: { ...defaultChannels } },
-				updatesOnFollowedProposals: { enabled: false, channels: { ...defaultChannels } },
-				proposalOutcomePublished: { enabled: false, channels: { ...defaultChannels } },
-				proposalsYouVotedOnEnacted: { enabled: false, channels: { ...defaultChannels } }
-			},
-			commentsNotifications: {
-				commentsOnMyProposals: { enabled: false, channels: { ...defaultChannels } },
-				repliesToMyComments: { enabled: false, channels: { ...defaultChannels } },
-				mentions: { enabled: false, channels: { ...defaultChannels } }
-			},
-			bountiesNotifications: {
-				bountyApplicationStatusUpdates: { enabled: false, channels: { ...defaultChannels } },
-				bountyPayoutsAndMilestones: { enabled: false, channels: { ...defaultChannels } },
-				activityOnBountiesIFollow: { enabled: false, channels: { ...defaultChannels } }
-			},
-			openGovTracks: {},
-			gov1Items: {}
-		};
-
-		if (oldPreferences.channelPreferences) {
-			Object.entries(oldPreferences.channelPreferences).forEach(([channel, settings]) => {
-				const channelSettings = settings as IUserNotificationChannelPreferences;
-				newFormat.channelPreferences[channel as ENotificationChannel] = {
-					enabled: channelSettings.enabled,
-					verified: channelSettings.verified,
-					handle: channelSettings.handle,
-					verification_token: channelSettings.verification_token
-				};
-			});
-		}
-
-		const extendedPreferences = oldPreferences as unknown as Record<string, unknown>;
-
-		if (extendedPreferences.openGovTracks) {
-			newFormat.openGovTracks = extendedPreferences.openGovTracks as Record<string, IOpenGovTrackSettings>;
-		}
-
-		if (extendedPreferences.gov1Items) {
-			newFormat.gov1Items = extendedPreferences.gov1Items as Record<string, IGov1ItemSettings>;
-		}
-
-		if (extendedPreferences.networkPreferences) {
-			newFormat.networkPreferences = extendedPreferences.networkPreferences as Record<string, INetworkNotificationSettings>;
-		}
-
-		if (extendedPreferences.postsNotifications) {
-			newFormat.postsNotifications = extendedPreferences.postsNotifications as IUserNotificationPreferences['postsNotifications'];
-		}
-
-		if (extendedPreferences.commentsNotifications) {
-			newFormat.commentsNotifications = extendedPreferences.commentsNotifications as IUserNotificationPreferences['commentsNotifications'];
-		}
-
-		if (extendedPreferences.bountiesNotifications) {
-			newFormat.bountiesNotifications = extendedPreferences.bountiesNotifications as IUserNotificationPreferences['bountiesNotifications'];
-		}
-
-		return newFormat;
-	}
-
-	private static convertToOldFormat(newPreferences: IUserNotificationPreferences): IUserNotificationSettings {
-		const oldFormat: IUserNotificationSettings = {
-			channelPreferences: {},
-			triggerPreferences: {}
-		};
-
-		Object.entries(newPreferences.channelPreferences).forEach(([channel, settings]) => {
-			const channelSettings = settings as INotificationChannelSettings;
-			const channelData: IUserNotificationChannelPreferences = {
-				name: channel as ENotificationChannel,
-				enabled: channelSettings.enabled,
-				handle: channelSettings.handle || '',
-				verified: channelSettings.verified || false
-			};
-
-			if (channelSettings.verification_token !== undefined) {
-				(channelData as unknown as Record<string, unknown>).verification_token = channelSettings.verification_token;
-			}
-
-			oldFormat.channelPreferences[channel] = channelData;
-		});
-
-		const extendedOldFormat = oldFormat as unknown as Record<string, unknown>;
-		extendedOldFormat.openGovTracks = newPreferences.openGovTracks;
-		extendedOldFormat.gov1Items = newPreferences.gov1Items;
-		extendedOldFormat.networkPreferences = newPreferences.networkPreferences;
-		extendedOldFormat.postsNotifications = newPreferences.postsNotifications;
-		extendedOldFormat.commentsNotifications = newPreferences.commentsNotifications;
-		extendedOldFormat.bountiesNotifications = newPreferences.bountiesNotifications;
-
-		return oldFormat;
 	}
 
 	private static getDefaultNetworkPreferences(userChannelPreferences?: Record<string, INotificationChannelSettings>) {
@@ -273,7 +167,7 @@ export class NotificationPreferencesService {
 			});
 		} else {
 			Object.values(ENotificationChannel).forEach((channel) => {
-				enabledChannels[channel] = false;
+				enabledChannels[channel as string] = false;
 			});
 		}
 
@@ -587,16 +481,6 @@ export class NotificationPreferencesService {
 		return now - timestamp < oneHour;
 	}
 
-	private static cleanupNetworkPreferences(networkPreferences: Record<string, INetworkNotificationSettings>): Record<string, INetworkNotificationSettings> {
-		const cleanedNetworkPreferences: Record<string, INetworkNotificationSettings> = {};
-		Object.entries(networkPreferences).forEach(([key, value]) => {
-			if (!key.includes('.')) {
-				cleanedNetworkPreferences[key] = value;
-			}
-		});
-		return cleanedNetworkPreferences;
-	}
-
 	static async BulkUpdatePreferences(userId: number, preferences: Partial<IUserNotificationPreferences>): Promise<IUserNotificationPreferences> {
 		const user = await OffChainDbService.GetUserById(userId);
 
@@ -604,15 +488,13 @@ export class NotificationPreferencesService {
 			throw new APIError(ERROR_CODES.USER_NOT_FOUND, StatusCodes.NOT_FOUND, USER_NOT_FOUND_MESSAGE);
 		}
 
-		const currentPreferences = this.convertToNewFormat(user.notificationPreferences) || this.getDefaultPreferences();
+		const currentPreferences = user.notificationPreferences || this.getDefaultPreferences();
 		const updatedPreferences = { ...currentPreferences, ...preferences };
-
-		const oldFormatPreferences = this.convertToOldFormat(updatedPreferences);
 
 		await OffChainDbService.UpdateUserProfile({
 			userId,
 			newProfileDetails: user.profileDetails || {},
-			notificationPreferences: oldFormatPreferences
+			notificationPreferences: updatedPreferences
 		});
 
 		return updatedPreferences;
@@ -636,12 +518,12 @@ export class NotificationPreferencesService {
 			return this.performBulkUpdate(userId, updates);
 		})();
 
-		userUpdateMutex.set(userId, updatePromise);
+		userUpdateMutex.set(userId, { promise: updatePromise, timestamp: Date.now() });
 
 		try {
 			return await updatePromise;
 		} finally {
-			if (userUpdateMutex.get(userId) === updatePromise) {
+			if (userUpdateMutex.get(userId)?.promise === updatePromise) {
 				userUpdateMutex.delete(userId);
 			}
 		}
@@ -656,11 +538,7 @@ export class NotificationPreferencesService {
 			throw new APIError(ERROR_CODES.USER_NOT_FOUND, StatusCodes.NOT_FOUND, USER_NOT_FOUND_MESSAGE);
 		}
 
-		let currentPreferences = this.convertToNewFormat(user.notificationPreferences) || this.getDefaultPreferences();
-
-		if (currentPreferences.networkPreferences) {
-			currentPreferences.networkPreferences = this.cleanupNetworkPreferences(currentPreferences.networkPreferences);
-		}
+		let currentPreferences = user.notificationPreferences || this.getDefaultPreferences();
 
 		const groupedUpdates = new Map<string, { section: string; key: string; value: unknown; network?: string }>();
 
@@ -706,12 +584,10 @@ export class NotificationPreferencesService {
 			}
 		});
 
-		const oldFormatPreferences = this.convertToOldFormat(currentPreferences);
-
 		await OffChainDbService.UpdateUserProfile({
 			userId,
 			newProfileDetails: user.profileDetails || {},
-			notificationPreferences: oldFormatPreferences
+			notificationPreferences: currentPreferences
 		});
 
 		return currentPreferences;
