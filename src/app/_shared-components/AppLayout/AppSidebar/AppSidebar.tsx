@@ -15,6 +15,9 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } fro
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ComponentProps } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { ITrackCounts } from '@/_shared/types';
 import { NavMain } from '../NavItems/NavItems';
 import CreateButton from '../CreateButton/CreateButton';
 import styles from './AppSidebar.module.scss';
@@ -25,6 +28,21 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 	const pathname = usePathname();
 
 	const network = getCurrentNetwork();
+
+	const { data: trackCounts = {} } = useQuery<ITrackCounts>({
+		queryKey: ['track-counts'],
+		queryFn: async () => {
+			const { data, error } = await NextApiClientService.getTrackCounts();
+			if (error) {
+				throw new Error(error.message || 'Failed to fetch track counts');
+			}
+			return data || {};
+		},
+		staleTime: 5 * 60 * 1000, // 5 minutes
+		gcTime: 10 * 60 * 1000, // 10 minutes
+		refetchOnWindowFocus: false,
+		refetchOnMount: true
+	});
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 	const getLogo = () => {
@@ -43,7 +61,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 		);
 	};
 
-	const data = getSidebarData(network, pathname, t);
+	const data = getSidebarData(network, pathname, t, trackCounts);
 
 	return (
 		<Sidebar
