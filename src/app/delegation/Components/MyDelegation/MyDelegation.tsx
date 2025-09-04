@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Address from '@ui/Profile/Address/Address';
 import { useUser } from '@/hooks/useUser';
 import SocialLinks from '@/app/_shared-components/Profile/Address/SocialLinks';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import DelegationPopupCard from '../DelegationPopupCard/DelegationPopupCard';
 import MyDelegateTracks from '../MyDelegateTracks/MyDelegateTracks';
 import styles from './MyDelegation.module.scss';
@@ -18,7 +19,8 @@ function MyDelegation() {
 		return null;
 	}
 
-	const profileImage = user.publicUser?.profileDetails?.image || UserIcon;
+	const profileImage =
+		user.publicUser?.profileDetails?.image && ValidatorService.isValidImageSrc(user.publicUser?.profileDetails?.image) ? user.publicUser?.profileDetails?.image : UserIcon;
 	const socialLinks = user.publicUser?.profileDetails?.publicSocialLinks || [];
 
 	return (

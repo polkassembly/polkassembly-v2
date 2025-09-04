@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProfileTabs, ESocial, IFollowEntry, IOnChainIdentity, IPublicUser } from '@/_shared/types';
+import { EProfileTabs, ESocial, IFollowEntry, IPublicUser } from '@/_shared/types';
 import Identicon from '@polkadot/react-identicon';
 import { Pencil, ShieldPlus } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
@@ -19,8 +19,6 @@ import TelegramIcon from '@assets/icons/telegram-icon.svg';
 import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
-import { cn } from '@/lib/utils';
-import { useIdentityService } from '@/hooks/useIdentityService';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { TabsList, TabsTrigger } from '../../Tabs';
 import { Button } from '../../Button';
@@ -31,6 +29,7 @@ import { Separator } from '../../Separator';
 import { Skeleton } from '../../Skeleton';
 import Address from '../Address/Address';
 import CopyToClipboard from '../../CopyToClipboard/CopyToClipboard';
+import UserAvatar from '../../UserAvatar/UserAvatar';
 
 const SocialIcons = {
 	[ESocial.EMAIL]: EmailIcon,
@@ -55,44 +54,7 @@ function ProfileHeader({
 	const [openEditProfileDialog, setOpenEditProfileDialog] = useState(false);
 	const [loading, setLoading] = useState(false);
 
-	const { identityService, getOnChainIdentity } = useIdentityService();
-
-	const fetchIdentity = async (): Promise<{ identity?: IOnChainIdentity; displayAddress?: string }> => {
-		if (address) {
-			const identityLocal = await getOnChainIdentity(address);
-			return { identity: identityLocal || undefined, displayAddress: address };
-		}
-
-		if (userProfileData?.addresses.length) {
-			const identities: (IOnChainIdentity & { address: string })[] = [];
-			// eslint-disable-next-line no-restricted-syntax
-			for (const addr of userProfileData.addresses) {
-				// eslint-disable-next-line no-await-in-loop
-				const identityLocal = await getOnChainIdentity(addr);
-				if (identityLocal && identityLocal.isVerified) {
-					return { identity: identityLocal, displayAddress: addr };
-				}
-				if (identityLocal && identityLocal.display) {
-					identities.push({ ...identityLocal, address: addr });
-				}
-			}
-			if (identities.length > 0) {
-				return { identity: identities[0], displayAddress: identities[0].address };
-			}
-
-			return { identity: undefined, displayAddress: undefined };
-		}
-		return { identity: undefined, displayAddress: undefined };
-	};
-
-	const {
-		data: { identity, displayAddress }
-	} = useQuery({
-		queryKey: ['profile-display', address || userProfileData?.id],
-		queryFn: fetchIdentity,
-		initialData: { identity: undefined, displayAddress: address },
-		enabled: !!identityService && (!!address || !!userProfileData?.addresses.length)
-	});
+	const [displayAddress, setDisplayAddress] = useState<string | undefined>();
 
 	const queryClient = useQueryClient();
 
@@ -227,24 +189,41 @@ function ProfileHeader({
 				<div className='flex w-full flex-col gap-y-2'>
 					<div className='flex w-full flex-col justify-between gap-x-2 gap-y-3 sm:flex-row sm:items-start'>
 						<div className='mt-2 flex w-full flex-col gap-y-2'>
-							{displayAddress && identity?.display ? (
+							{address ? (
 								<>
 									<Address
 										disableTooltip
 										redirectToProfile={false}
-										address={displayAddress}
+										address={address}
 										iconSize={26}
 										showIdenticon={false}
-										textClassName={cn('text-center text-lg font-semibold sm:text-left lg:text-2xl')}
+										textClassName='text-center text-lg font-semibold sm:text-left lg:text-2xl'
 									/>
 									<CopyToClipboard
-										label={shortenAddress(displayAddress, 5)}
-										text={displayAddress}
+										label={shortenAddress(address, 5)}
+										text={address}
 										className='text-base'
 									/>
 								</>
 							) : (
-								<p className={classes.profileHeaderTextTitle}>{userProfileData?.username}</p>
+								<>
+									<UserAvatar
+										iconSize={26}
+										showIdenticon={false}
+										textClassName='text-center text-lg font-semibold sm:text-left lg:text-2xl'
+										disableTooltip
+										redirectToProfile={false}
+										publicUser={userProfileData}
+										onAddressSelection={setDisplayAddress}
+									/>
+									{displayAddress && (
+										<CopyToClipboard
+											label={shortenAddress(displayAddress, 5)}
+											text={displayAddress}
+											className='text-base'
+										/>
+									)}
+								</>
 							)}
 
 							{userProfileData && (

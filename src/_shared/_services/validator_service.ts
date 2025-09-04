@@ -343,4 +343,8 @@ export class ValidatorService {
 
 		return usernameRegex.test(username) && domainRegex.test(domain);
 	}
+
+	static isValidImageSrc(imageSrc: string): boolean {
+		return imageSrc.startsWith('https://i.ibb.co/');
+	}
 }
