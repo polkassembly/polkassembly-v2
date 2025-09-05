@@ -65,8 +65,17 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	});
 
 	const cacheResults = await Promise.all(cachePromises);
-	const cachedResults = cacheResults.filter(({ cachedData }) => cachedData).map(({ cachedData }) => cachedData!);
-	const uncachedAddresses = cacheResults.filter(({ cachedData }) => !cachedData).map(({ address }) => address);
+
+	// use forEach to filter the cachedData
+	const cachedResults: UserVotesResponse[] = [];
+	const uncachedAddresses: string[] = [];
+	cacheResults.forEach(({ cachedData, address }) => {
+		if (cachedData) {
+			cachedResults.push(cachedData!);
+		} else {
+			uncachedAddresses.push(address);
+		}
+	});
 
 	// If all addresses are cached, combine and return results
 	if (uncachedAddresses.length === 0) {
