@@ -56,7 +56,10 @@ import {
 	EAnalyticsType,
 	EVotesDisplayType,
 	IProfileVote,
-	EProposalStatus
+	EProposalStatus,
+	IUserNotificationSettings,
+	IUpdateNotificationPreferencesRequest,
+	ENotificationChannel
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -149,7 +152,11 @@ enum EApiRoute {
 	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES',
 	ADD_COMMENT_REACTION = 'ADD_COMMENT_REACTION',
 	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
-	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES'
+	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES',
+	GET_NOTIFICATION_PREFERENCES = 'GET_NOTIFICATION_PREFERENCES',
+	UPDATE_NOTIFICATION_PREFERENCES = 'UPDATE_NOTIFICATION_PREFERENCES',
+	GENERATE_VERIFICATION_TOKEN = 'GENERATE_VERIFICATION_TOKEN',
+	VERIFY_CHANNEL_TOKEN = 'VERIFY_CHANNEL_TOKEN'
 }
 
 export class NextApiClientService {
@@ -223,6 +230,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_FOLLOWERS:
 			case EApiRoute.GET_BATCH_VOTE_CART:
 			case EApiRoute.GET_USER_SOCIAL_HANDLES:
+			case EApiRoute.GET_NOTIFICATION_PREFERENCES:
 				path = '/users/id';
 				break;
 			case EApiRoute.GET_ADDRESS_RELATIONS:
@@ -322,6 +330,8 @@ export class NextApiClientService {
 			case EApiRoute.ADD_TO_BATCH_VOTE_CART:
 			case EApiRoute.FOLLOW_USER:
 			case EApiRoute.INIT_SOCIAL_VERIFICATION:
+			case EApiRoute.GENERATE_VERIFICATION_TOKEN:
+			case EApiRoute.VERIFY_CHANNEL_TOKEN:
 			case EApiRoute.CONFIRM_SOCIAL_VERIFICATION:
 				path = '/users/id';
 				method = 'POST';
@@ -351,6 +361,10 @@ export class NextApiClientService {
 			case EApiRoute.UPDATE_PA_DELEGATE:
 				path = '/delegation/delegates';
 				method = 'PATCH';
+				break;
+			case EApiRoute.UPDATE_NOTIFICATION_PREFERENCES:
+				path = '/users/id';
+				method = 'PUT';
 				break;
 			case EApiRoute.EDIT_PROPOSAL_DETAILS:
 			case EApiRoute.EDIT_COMMENT:
@@ -1244,5 +1258,81 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_BY_ADDRESSES, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IProfileVote>>({ url, method });
+	}
+
+	static async fetchNotificationPreferences({ userId, getAllNetworks }: { userId: number; network?: string; getAllNetworks?: boolean }) {
+		const queryParams = new URLSearchParams();
+
+		if (getAllNetworks) {
+			queryParams.set('allNetworks', 'true');
+		}
+
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_NOTIFICATION_PREFERENCES,
+			routeSegments: [userId.toString(), 'notifications'],
+			queryParams: queryParams.toString() ? queryParams : undefined
+		});
+
+		return this.nextApiClientFetch<IUserNotificationSettings>({ url, method });
+	}
+
+	static async updateNotificationPreferences({ userId, updateData }: { userId: number; updateData: IUpdateNotificationPreferencesRequest; network?: string }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.UPDATE_NOTIFICATION_PREFERENCES,
+			routeSegments: [userId.toString(), 'notifications']
+		});
+
+		return this.nextApiClientFetch<IUserNotificationSettings>({
+			url,
+			method,
+			data: {
+				section: updateData.section,
+				key: updateData.key,
+				value: updateData.value,
+				network: updateData.network
+			}
+		});
+	}
+
+	static async bulkUpdateNotificationPreferences({
+		userId,
+		updates
+	}: {
+		userId: number;
+		updates: Array<{ section: string; key: string; value: unknown; network?: string }>;
+		network?: string;
+	}) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.UPDATE_NOTIFICATION_PREFERENCES,
+			routeSegments: [userId.toString(), 'notifications']
+		});
+
+		return this.nextApiClientFetch<IUserNotificationSettings>({ url, method, data: { updates } });
+	}
+
+	static async generateVerificationToken({ userId, channel }: { userId: number; channel: ENotificationChannel }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GENERATE_VERIFICATION_TOKEN,
+			routeSegments: [userId.toString(), 'notifications', 'generate-token']
+		});
+
+		return this.nextApiClientFetch<{ token: string }>({
+			url,
+			method,
+			data: { channel }
+		});
+	}
+
+	static async verifyChannelToken({ userId, channel, token, handle }: { userId: number; channel: ENotificationChannel; token: string; handle: string }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.VERIFY_CHANNEL_TOKEN,
+			routeSegments: [userId.toString(), 'notifications', 'verify-token']
+		});
+
+		return this.nextApiClientFetch<{ verified: boolean }>({
+			url,
+			method,
+			data: { channel, token, handle }
+		});
 	}
 }

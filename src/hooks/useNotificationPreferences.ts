@@ -6,121 +6,11 @@
 
 import { useCallback, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { IUserNotificationSettings, IUpdateNotificationPreferencesRequest, IUserNotificationChannelPreferences, ENotificationChannel, ENotifications } from '@/_shared/types';
+import { IUpdateNotificationPreferencesRequest, IUserNotificationChannelPreferences, ENotificationChannel, ENotifications, EPostOrigin, EProposalType } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { STALE_TIME } from '@/_shared/_constants/listingLimit';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from './useUser';
-
-const fetchNotificationPreferences = async (userId: number, network?: string, getAllNetworks?: boolean): Promise<IUserNotificationSettings> => {
-	const headers: Record<string, string> = {
-		'Content-Type': 'application/json'
-	};
-
-	if (network) {
-		headers['x-network'] = network;
-	}
-
-	const url = new URL(`/api/v2/users/id/${userId}/notifications`, window.location.origin);
-	if (getAllNetworks) {
-		url.searchParams.set('allNetworks', 'true');
-	}
-
-	const response = await fetch(url.toString(), {
-		method: 'GET',
-		headers
-	});
-
-	if (!response.ok) {
-		throw new Error('Failed to fetch notification preferences');
-	}
-
-	const result = await response.json();
-	return result.data;
-};
-
-const updateNotificationPreferences = async (userId: number, updateData: IUpdateNotificationPreferencesRequest, network?: string): Promise<IUserNotificationSettings> => {
-	const headers: Record<string, string> = {
-		'Content-Type': 'application/json'
-	};
-
-	if (network) {
-		headers['x-network'] = network;
-	}
-
-	const response = await fetch(`/api/v2/users/id/${userId}/notifications`, {
-		method: 'PUT',
-		headers,
-		body: JSON.stringify(updateData)
-	});
-
-	if (!response.ok) {
-		throw new Error('Failed to update notification preferences');
-	}
-
-	const result = await response.json();
-	return result.data;
-};
-
-const bulkUpdateNotificationPreferences = async (
-	userId: number,
-	updates: Array<{ section: string; key: string; value: unknown; network?: string }>,
-	network?: string
-): Promise<IUserNotificationSettings> => {
-	const headers: Record<string, string> = {
-		'Content-Type': 'application/json'
-	};
-
-	if (network) {
-		headers['x-network'] = network;
-	}
-
-	const response = await fetch(`/api/v2/users/id/${userId}/notifications`, {
-		method: 'PUT',
-		headers,
-		body: JSON.stringify({ updates })
-	});
-
-	if (!response.ok) {
-		throw new Error('Failed to bulk update notification preferences');
-	}
-
-	const result = await response.json();
-	return result.data;
-};
-
-const generateVerificationToken = async (userId: number, channel: ENotificationChannel): Promise<string> => {
-	const response = await fetch(`/api/v2/users/id/${userId}/notifications/generate-token`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({ channel })
-	});
-
-	if (!response.ok) {
-		throw new Error('Failed to generate verification token');
-	}
-
-	const result = await response.json();
-	return result.data.token;
-};
-
-const verifyChannelToken = async (userId: number, channel: ENotificationChannel, token: string, handle: string): Promise<boolean> => {
-	const response = await fetch(`/api/v2/users/id/${userId}/notifications/verify-token`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({ channel, token, handle })
-	});
-
-	if (!response.ok) {
-		return false;
-	}
-
-	const result = await response.json();
-	return result.data.verified;
-};
 
 export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 	const { user } = useUser();
@@ -135,9 +25,19 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		error: queryError
 	} = useQuery({
 		queryKey,
-		queryFn: () => fetchNotificationPreferences(user!.id, getAllNetworks ? undefined : currentNetwork, getAllNetworks),
+		queryFn: async () => {
+			const response = await NextApiClientService.fetchNotificationPreferences({
+				userId: user!.id,
+				network: currentNetwork,
+				getAllNetworks
+			});
+			if (response.error) {
+				throw new Error(response.error.message || 'Failed to fetch notification preferences');
+			}
+			return response.data;
+		},
 		enabled: !!user?.id,
-		staleTime: STALE_TIME,
+		staleTime: STALE_TIME * 1000,
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
 		refetchOnReconnect: false,
@@ -145,7 +45,17 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 	});
 
 	const mutation = useMutation({
-		mutationFn: (updateData: IUpdateNotificationPreferencesRequest) => updateNotificationPreferences(user!.id, updateData, getAllNetworks ? undefined : currentNetwork),
+		mutationFn: async (updateData: IUpdateNotificationPreferencesRequest) => {
+			const response = await NextApiClientService.updateNotificationPreferences({
+				userId: user!.id,
+				updateData,
+				network: currentNetwork
+			});
+			if (response.error) {
+				throw new Error(response.error.message || 'Failed to update notification preferences');
+			}
+			return response.data;
+		},
 		onSuccess: (data) => {
 			queryClient.setQueryData(queryKey, data);
 			if (getAllNetworks) {
@@ -156,8 +66,17 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 	});
 
 	const bulkMutation = useMutation({
-		mutationFn: (updates: Array<{ section: string; key: string; value: unknown; network?: string }>) =>
-			bulkUpdateNotificationPreferences(user!.id, updates, getAllNetworks ? undefined : currentNetwork),
+		mutationFn: async (updates: Array<{ section: string; key: string; value: unknown; network?: string }>) => {
+			const response = await NextApiClientService.bulkUpdateNotificationPreferences({
+				userId: user!.id,
+				updates,
+				network: currentNetwork
+			});
+			if (response.error) {
+				throw new Error(response.error.message || 'Failed to bulk update notification preferences');
+			}
+			return response.data;
+		},
 		onSuccess: (data) => {
 			queryClient.setQueryData(queryKey, data);
 			if (getAllNetworks) {
@@ -193,19 +112,6 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		[user?.id, mutation]
 	);
 
-	const updatePostsNotification = useCallback(
-		(type: string, settings: unknown) => {
-			if (!user?.id) return;
-
-			mutation.mutate({
-				section: ENotifications.POSTS,
-				key: type,
-				value: settings
-			});
-		},
-		[user?.id, mutation]
-	);
-
 	const updateNetworkPostsNotification = useCallback(
 		(network: string, type: string, settings: unknown) => {
 			if (!user?.id) return;
@@ -218,38 +124,6 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			});
 		},
 		[user?.id, mutation]
-	);
-
-	const bulkUpdatePostsNotifications = useCallback(
-		(enabled: boolean) => {
-			if (!user?.id || !preferences) return;
-
-			const postsKeys = [
-				'proposalStatusChanges',
-				'newProposalsInCategories',
-				'votingDeadlineReminders',
-				'updatesOnFollowedProposals',
-				'proposalOutcomePublished',
-				'proposalsYouVotedOnEnacted'
-			];
-
-			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
-
-			postsKeys.forEach((key) => {
-				const { postsNotifications } = preferences;
-				const currentSettings =
-					postsNotifications && Object.prototype.hasOwnProperty.call(postsNotifications, key) ? postsNotifications[key as keyof typeof postsNotifications] : undefined;
-				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
-				updates.push({
-					section: 'posts',
-					key,
-					value: updatedSettings
-				});
-			});
-
-			bulkMutation.mutate(updates);
-		},
-		[user?.id, preferences, bulkMutation]
 	);
 
 	const bulkUpdateNetworkPostsNotifications = useCallback(
@@ -287,19 +161,6 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		[user?.id, preferences, bulkMutation]
 	);
 
-	const updateCommentsNotification = useCallback(
-		(type: string, settings: unknown) => {
-			if (!user?.id) return;
-
-			mutation.mutate({
-				section: ENotifications.COMMENTS,
-				key: type,
-				value: settings
-			});
-		},
-		[user?.id, mutation]
-	);
-
 	const updateNetworkCommentsNotification = useCallback(
 		(network: string, type: string, settings: unknown) => {
 			if (!user?.id) return;
@@ -312,31 +173,6 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			});
 		},
 		[user?.id, mutation]
-	);
-
-	const bulkUpdateCommentsNotifications = useCallback(
-		(enabled: boolean) => {
-			if (!user?.id || !preferences) return;
-
-			const commentsKeys = ['commentsOnMyProposals', 'repliesToMyComments', 'mentions'];
-
-			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
-
-			commentsKeys.forEach((key) => {
-				const { commentsNotifications } = preferences;
-				const currentSettings =
-					commentsNotifications && Object.prototype.hasOwnProperty.call(commentsNotifications, key) ? commentsNotifications[key as keyof typeof commentsNotifications] : undefined;
-				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
-				updates.push({
-					section: 'comments',
-					key,
-					value: updatedSettings
-				});
-			});
-
-			bulkMutation.mutate(updates);
-		},
-		[user?.id, preferences, bulkMutation]
 	);
 
 	const bulkUpdateNetworkCommentsNotifications = useCallback(
@@ -367,19 +203,6 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		[user?.id, preferences, bulkMutation]
 	);
 
-	const updateBountiesNotification = useCallback(
-		(type: string, settings: unknown) => {
-			if (!user?.id) return;
-
-			mutation.mutate({
-				section: ENotifications.BOUNTIES,
-				key: type,
-				value: settings
-			});
-		},
-		[user?.id, mutation]
-	);
-
 	const updateNetworkBountiesNotification = useCallback(
 		(network: string, type: string, settings: unknown) => {
 			if (!user?.id) return;
@@ -392,31 +215,6 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			});
 		},
 		[user?.id, mutation]
-	);
-
-	const bulkUpdateBountiesNotifications = useCallback(
-		(enabled: boolean) => {
-			if (!user?.id || !preferences) return;
-
-			const bountiesKeys = ['bountyApplicationStatusUpdates', 'bountyPayoutsAndMilestones', 'activityOnBountiesIFollow'];
-
-			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
-
-			bountiesKeys.forEach((key) => {
-				const { bountiesNotifications } = preferences;
-				const currentSettings =
-					bountiesNotifications && Object.prototype.hasOwnProperty.call(bountiesNotifications, key) ? bountiesNotifications[key as keyof typeof bountiesNotifications] : undefined;
-				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
-				updates.push({
-					section: 'bounties',
-					key,
-					value: updatedSettings
-				});
-			});
-
-			bulkMutation.mutate(updates);
-		},
-		[user?.id, preferences, bulkMutation]
 	);
 
 	const bulkUpdateNetworkBountiesNotifications = useCallback(
@@ -447,19 +245,6 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		[user?.id, preferences, bulkMutation]
 	);
 
-	const updateOpenGovTrack = useCallback(
-		(trackKey: string, settings: unknown) => {
-			if (!user?.id) return;
-
-			mutation.mutate({
-				section: ENotifications.OPENGOV,
-				key: trackKey,
-				value: settings
-			});
-		},
-		[user?.id, mutation]
-	);
-
 	const updateNetworkOpenGovTrack = useCallback(
 		(network: string, trackKey: string, settings: unknown) => {
 			if (!user?.id) return;
@@ -469,19 +254,6 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 				key: `${network}.openGovTracks.${trackKey}`,
 				value: settings,
 				network
-			});
-		},
-		[user?.id, mutation]
-	);
-
-	const updateGov1Item = useCallback(
-		(itemKey: string, settings: unknown) => {
-			if (!user?.id) return;
-
-			mutation.mutate({
-				section: ENotifications.GOV1,
-				key: itemKey,
-				value: settings
 			});
 		},
 		[user?.id, mutation]
@@ -501,111 +273,38 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		[user?.id, mutation]
 	);
 
-	const bulkUpdateAdvancedSettings = useCallback(
-		(enabled: boolean) => {
-			if (!user?.id || !preferences) return;
-
-			const trackLabels = {
-				root: 'Root',
-				stakingAdmin: 'Staking Admin',
-				auctionAdmin: 'Auction Admin',
-				treasurer: 'Treasurer',
-				referendumCanceller: 'Referendum Canceller',
-				referendumKiller: 'Referendum Killer',
-				leaseAdmin: 'Lease Admin',
-				memberReferenda: 'Member Referenda',
-				smallTipper: 'Small Tipper',
-				bigTipper: 'Big Tipper',
-				smallSpender: 'Small Spender',
-				mediumSpender: 'Medium Spender',
-				bigSpender: 'Big Spender',
-				fellowshipAdmin: 'Fellowship Admin',
-				generalAdmin: 'General Admin',
-				whitelistedCaller: 'Whitelisted Caller'
-			};
-
-			const gov1Labels = {
-				mentionsIReceive: 'Mentions I receive',
-				referendums: 'Referendums',
-				proposals: 'Proposals',
-				bounties: 'Bounties',
-				childBounties: 'Child Bounties',
-				tips: 'Tips',
-				techCommittee: 'Tech Committee',
-				councilMotion: 'Council Motion'
-			};
-
-			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
-
-			Object.keys(trackLabels).forEach((key) => {
-				const currentSettings = preferences.openGovTracks?.[key as keyof typeof preferences.openGovTracks];
-				const updatedSettings = {
-					...(currentSettings || {}),
-					enabled,
-					notifications: {
-						newReferendumSubmitted: enabled,
-						referendumInVoting: enabled,
-						referendumClosed: enabled
-					}
-				};
-				updates.push({
-					section: 'opengov',
-					key,
-					value: updatedSettings
-				});
-			});
-
-			Object.keys(gov1Labels).forEach((key) => {
-				const currentSettings = preferences.gov1Items?.[key as keyof typeof preferences.gov1Items];
-				const updatedSettings = {
-					...(currentSettings || {}),
-					enabled,
-					notifications: { ...(currentSettings?.notifications || {}) }
-				};
-				updates.push({
-					section: 'gov1',
-					key,
-					value: updatedSettings
-				});
-			});
-
-			bulkMutation.mutate(updates);
-		},
-		[user?.id, preferences, bulkMutation]
-	);
-
 	const bulkUpdateNetworkAdvancedSettings = useCallback(
 		(network: string, enabled: boolean) => {
 			if (!user?.id || !preferences) return;
 
 			const trackLabels = {
-				root: 'Root',
-				stakingAdmin: 'Staking Admin',
-				auctionAdmin: 'Auction Admin',
-				treasurer: 'Treasurer',
-				referendumCanceller: 'Referendum Canceller',
-				referendumKiller: 'Referendum Killer',
-				leaseAdmin: 'Lease Admin',
-				memberReferenda: 'Member Referenda',
-				smallTipper: 'Small Tipper',
-				bigTipper: 'Big Tipper',
-				smallSpender: 'Small Spender',
-				mediumSpender: 'Medium Spender',
-				bigSpender: 'Big Spender',
-				fellowshipAdmin: 'Fellowship Admin',
-				generalAdmin: 'General Admin',
-				whitelistedCaller: 'Whitelisted Caller'
+				root: EPostOrigin.ROOT,
+				stakingAdmin: EPostOrigin.STAKING_ADMIN,
+				auctionAdmin: EPostOrigin.AUCTION_ADMIN,
+				treasurer: EPostOrigin.TREASURER,
+				referendumCanceller: EPostOrigin.REFERENDUM_CANCELLER,
+				referendumKiller: EPostOrigin.REFERENDUM_KILLER,
+				leaseAdmin: EPostOrigin.LEASE_ADMIN,
+				memberReferenda: EPostOrigin.MEMBERS,
+				smallTipper: EPostOrigin.SMALL_TIPPER,
+				bigTipper: EPostOrigin.BIG_TIPPER,
+				smallSpender: EPostOrigin.SMALL_SPENDER,
+				mediumSpender: EPostOrigin.MEDIUM_SPENDER,
+				bigSpender: EPostOrigin.BIG_SPENDER,
+				fellowshipAdmin: EPostOrigin.FELLOWSHIP_ADMIN,
+				generalAdmin: EPostOrigin.GENERAL_ADMIN,
+				whitelistedCaller: EPostOrigin.WHITELISTED_CALLER
 			};
 
 			const gov1Labels = {
 				mentionsIReceive: 'Mentions I receive',
-				referendums: 'Referendums',
-				proposals: 'Proposals',
-				bounties: 'Bounties',
-				childBounties: 'Child Bounties',
-				tips: 'Tips',
-				techCommittee: 'Tech Committee',
-				councilMotion: 'Council Motion'
+				referendums: EProposalType.REFERENDUM,
+				proposals: EProposalType.DEMOCRACY_PROPOSAL,
+				bounties: EProposalType.BOUNTY,
+				childBounties: EProposalType.CHILD_BOUNTY,
+				tips: EProposalType.TIP,
+				techCommittee: EProposalType.TECHNICAL_COMMITTEE,
+				councilMotion: EProposalType.COUNCIL_MOTION
 			};
 
 			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
@@ -649,40 +348,6 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			bulkMutation.mutate(updates);
 		},
 		[user?.id, preferences, bulkMutation]
-	);
-
-	const bulkUpdateTrackNotifications = useCallback(
-		(trackKey: string, enabled: boolean, trackType: 'opengov' | 'gov1' = 'opengov') => {
-			if (!user?.id || !preferences) return;
-
-			const section = trackType === ENotifications.OPENGOV ? ENotifications.OPENGOV : ENotifications.GOV1;
-			const currentSettings =
-				trackType === ENotifications.OPENGOV
-					? preferences.openGovTracks?.[trackKey as keyof typeof preferences.openGovTracks]
-					: preferences.gov1Items?.[trackKey as keyof typeof preferences.gov1Items];
-
-			const notifications =
-				trackType === ENotifications.OPENGOV
-					? {
-							newReferendumSubmitted: enabled,
-							referendumInVoting: enabled,
-							referendumClosed: enabled
-						}
-					: {};
-
-			const updatedSettings = {
-				...currentSettings,
-				enabled,
-				notifications
-			};
-
-			mutation.mutate({
-				section,
-				key: trackKey,
-				value: updatedSettings
-			});
-		},
-		[user?.id, preferences, mutation]
 	);
 
 	const bulkUpdateNetworkTrackNotifications = useCallback(
@@ -742,7 +407,13 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 					}
 				];
 
-				await bulkUpdateNotificationPreferences(user.id, updates);
+				const response = await NextApiClientService.bulkUpdateNotificationPreferences({
+					userId: user.id,
+					updates
+				});
+				if (response.error) {
+					throw new Error(response.error.message || 'Failed to import network settings');
+				}
 				return true;
 			} catch (error) {
 				console.error('Failed to import network settings:', error);
@@ -756,11 +427,12 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		async (updates: Array<{ section: string; key: string; value: unknown; network?: string }>) => {
 			if (!user?.id) return;
 
-			try {
-				await bulkUpdateNotificationPreferences(user.id, updates);
-			} catch (error) {
-				console.error('Failed to bulk update network preferences:', error);
-				throw error;
+			const response = await NextApiClientService.bulkUpdateNotificationPreferences({
+				userId: user.id,
+				updates
+			});
+			if (response.error) {
+				throw new Error(response.error.message || 'Failed to bulk update network preferences');
 			}
 		},
 		[user?.id]
@@ -771,7 +443,14 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			if (!user?.id) return '';
 
 			try {
-				return await generateVerificationToken(user.id, channel);
+				const response = await NextApiClientService.generateVerificationToken({
+					userId: user.id,
+					channel
+				});
+				if (response.error) {
+					throw new Error(response.error.message || 'Failed to generate verification token');
+				}
+				return response.data?.token || '';
 			} catch {
 				return '';
 			}
@@ -784,7 +463,16 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			if (!user?.id) return false;
 
 			try {
-				return await verifyChannelToken(user.id, channel, token, handle);
+				const response = await NextApiClientService.verifyChannelToken({
+					userId: user.id,
+					channel,
+					token,
+					handle
+				});
+				if (response.error) {
+					return false;
+				}
+				return response.data?.verified || false;
 			} catch {
 				return false;
 			}
@@ -803,28 +491,18 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		importNetworkSettings,
 		bulkUpdateNetworkPreferences,
 
-		updatePostsNotification,
 		updateNetworkPostsNotification,
-		bulkUpdatePostsNotifications,
 		bulkUpdateNetworkPostsNotifications,
 
-		updateCommentsNotification,
 		updateNetworkCommentsNotification,
-		bulkUpdateCommentsNotifications,
 		bulkUpdateNetworkCommentsNotifications,
 
-		updateBountiesNotification,
 		updateNetworkBountiesNotification,
-		bulkUpdateBountiesNotifications,
 		bulkUpdateNetworkBountiesNotifications,
 
-		updateOpenGovTrack,
 		updateNetworkOpenGovTrack,
-		updateGov1Item,
 		updateNetworkGov1Item,
-		bulkUpdateAdvancedSettings,
 		bulkUpdateNetworkAdvancedSettings,
-		bulkUpdateTrackNotifications,
 		bulkUpdateNetworkTrackNotifications,
 
 		generateToken,
