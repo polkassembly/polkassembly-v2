@@ -72,7 +72,7 @@ function GovVoting() {
 			defaultOpen
 			className='rounded-lg border border-border_grey bg-bg_modal'
 		>
-			<CollapsibleTrigger className='flex w-full items-center gap-x-4 p-3 lg:p-4'>
+			<CollapsibleTrigger className='group flex w-full items-center gap-x-4 p-3 lg:p-4'>
 				<Image
 					src={DelegateIcon}
 					alt='Delegate Icon'
@@ -84,10 +84,11 @@ function GovVoting() {
 				<div className='flex-1' />
 				<Image
 					src={ExpandIcon}
-					alt='expand'
+					alt=''
+					aria-hidden
 					width={16}
 					height={16}
-					className={cn(userPreferences.theme === ETheme.DARK ? 'darkIcon' : '')}
+					className={cn(userPreferences?.theme === ETheme.DARK ? 'darkIcon' : '', 'transition-transform duration-200 group-data-[state=open]:rotate-180')}
 				/>
 			</CollapsibleTrigger>
 			<CollapsibleContent>
