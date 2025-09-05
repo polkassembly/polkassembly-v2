@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
@@ -41,7 +41,7 @@ const getChannelLabels = (t: (key: string) => string) => ({
 	[ENotificationChannel.ELEMENT]: t('Profile.Settings.Notifications.element')
 });
 
-function NotificationItem({ title, description, checked, onCheckedChange, channels = {}, onChannelChange }: NotificationItemProps) {
+const NotificationItem = memo(function NotificationItem({ title, description, checked, onCheckedChange, channels = {}, onChannelChange }: NotificationItemProps) {
 	const t = useTranslations();
 	const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 	const channelLabels = getChannelLabels(t);
@@ -102,6 +102,6 @@ function NotificationItem({ title, description, checked, onCheckedChange, channe
 			</div>
 		</div>
 	);
-}
+});
 
 export default NotificationItem;

@@ -5,7 +5,7 @@
 import { useTranslations } from 'next-intl';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { Switch } from '@/app/_shared-components/Switch';
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 
 interface Gov1ItemProps {
 	icon: ReactNode;
@@ -22,7 +22,16 @@ interface Gov1ItemProps {
 	isSimple?: boolean;
 }
 
-function Gov1Item({ icon, title, enabled, notifications = {}, notificationLabels = {}, onEnabledChange, onNotificationChange, isSimple = false }: Gov1ItemProps) {
+const Gov1Item = memo(function Gov1Item({
+	icon,
+	title,
+	enabled,
+	notifications = {},
+	notificationLabels = {},
+	onEnabledChange,
+	onNotificationChange,
+	isSimple = false
+}: Gov1ItemProps) {
 	const t = useTranslations('Profile.Settings.Notifications');
 
 	if (isSimple) {
@@ -69,6 +78,6 @@ function Gov1Item({ icon, title, enabled, notifications = {}, notificationLabels
 			</div>
 		</div>
 	);
-}
+});
 
 export default Gov1Item;

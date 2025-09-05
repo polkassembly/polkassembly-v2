@@ -195,15 +195,16 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 				queryClient.setQueryData(queryKey, context.previousData);
 			}
 		},
-		onSuccess: (data) => {
-			queryClient.setQueryData(queryKey, data);
-			if (getAllNetworks) {
-				queryClient.setQueryData(['notificationPreferences', user?.id, currentNetwork], data);
+		onSuccess: (response) => {
+			let normalizedData = response;
+			if (response && typeof response === 'object' && 'data' in response) {
+				normalizedData = (response as { data: IUserNotificationSettings }).data;
 			}
-			queryClient.refetchQueries({
-				queryKey: ['notificationPreferences', user?.id],
-				exact: false
-			});
+
+			queryClient.setQueryData(queryKey, normalizedData);
+			if (getAllNetworks) {
+				queryClient.setQueryData(['notificationPreferences', user?.id, currentNetwork], normalizedData);
+			}
 		}
 	});
 
@@ -245,15 +246,18 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 				queryClient.setQueryData(queryKey, context.previousData);
 			}
 		},
-		onSuccess: (data) => {
-			queryClient.setQueryData(queryKey, data);
-			if (getAllNetworks) {
-				queryClient.setQueryData(['notificationPreferences', user?.id, currentNetwork], data);
+		onSuccess: (response) => {
+			// Handle the same nested data structure as the fetch function
+			let normalizedData = response;
+			if (response && typeof response === 'object' && 'data' in response) {
+				normalizedData = (response as { data: IUserNotificationSettings }).data;
 			}
-			queryClient.refetchQueries({
-				queryKey: ['notificationPreferences', user?.id],
-				exact: false
-			});
+
+			// Only update cache, no refetching to prevent flickering
+			queryClient.setQueryData(queryKey, normalizedData);
+			if (getAllNetworks) {
+				queryClient.setQueryData(['notificationPreferences', user?.id, currentNetwork], normalizedData);
+			}
 		}
 	});
 
@@ -455,6 +459,58 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		[user?.id, mutation]
 	);
 
+	const updateNetworkOpenGovNotification = useCallback(
+		(network: string, trackKey: string, notificationKey: string, enabled: boolean) => {
+			if (!user?.id || !preferences) return;
+
+			const networkPrefs = preferences.triggerPreferences?.[network];
+			const currentSettings = networkPrefs?.openGovTracks?.[trackKey as keyof typeof networkPrefs.openGovTracks];
+
+			const updatedSettings = {
+				...(currentSettings || { enabled: false }),
+				enabled: currentSettings?.enabled || enabled, // Enable track if notification is enabled
+				notifications: {
+					...(currentSettings?.notifications || {}),
+					[notificationKey]: enabled
+				}
+			};
+
+			mutation.mutate({
+				section: ENotifications.NETWORKS,
+				key: `${network}.openGovTracks.${trackKey}`,
+				value: updatedSettings,
+				network
+			});
+		},
+		[user?.id, preferences, mutation]
+	);
+
+	const updateNetworkGov1Notification = useCallback(
+		(network: string, itemKey: string, notificationKey: string, enabled: boolean) => {
+			if (!user?.id || !preferences) return;
+
+			const networkPrefs = preferences.triggerPreferences?.[network];
+			const currentSettings = networkPrefs?.gov1Items?.[itemKey as keyof typeof networkPrefs.gov1Items];
+
+			const updatedSettings = {
+				...(currentSettings || { enabled: false }),
+				enabled: currentSettings?.enabled || enabled, // Enable item if notification is enabled
+				notifications: {
+					...(currentSettings?.notifications || {}),
+					[notificationKey]: enabled
+				}
+			};
+
+			mutation.mutate({
+				section: ENotifications.NETWORKS,
+				key: `${network}.gov1Items.${itemKey}`,
+				value: updatedSettings,
+				network
+			});
+		},
+		[user?.id, preferences, mutation]
+	);
+
 	const bulkUpdateNetworkAdvancedSettings = useCallback(
 		(network: string, enabled: boolean) => {
 			if (!user?.id || !preferences) return;
@@ -601,67 +657,70 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 					? networkPrefs?.openGovTracks?.[trackKey as keyof typeof networkPrefs.openGovTracks]
 					: networkPrefs?.gov1Items?.[trackKey as keyof typeof networkPrefs.gov1Items];
 
-			let notifications = {};
+			// Preserve existing notifications when toggling the main switch
+			let notifications = currentSettings?.notifications || {};
 
-			if (trackType === 'opengov') {
-				notifications = {
-					newReferendumSubmitted: enabled,
-					referendumInVoting: enabled,
-					referendumClosed: enabled
-				};
-			} else {
-				switch (trackKey) {
-					case EProposalType.REFERENDUM:
-						notifications = {
-							newReferendumSubmitted: enabled,
-							referendumInVoting: enabled,
-							referendumClosed: enabled
-						};
-						break;
-					case EProposalType.DEMOCRACY_PROPOSAL:
-						notifications = {
-							newProposalsSubmitted: enabled,
-							proposalInVoting: enabled,
-							proposalClosed: enabled
-						};
-						break;
-					case EProposalType.BOUNTY:
-						notifications = {
-							bountiesSubmitted: enabled,
-							bountiesClosed: enabled
-						};
-						break;
-					case EProposalType.CHILD_BOUNTY:
-						notifications = {
-							childBountiesSubmitted: enabled,
-							childBountiesClosed: enabled
-						};
-						break;
-					case EProposalType.TIP:
-						notifications = {
-							newTipsSubmitted: enabled,
-							tipsOpened: enabled,
-							tipsClosed: enabled
-						};
-						break;
-					case EProposalType.TECHNICAL_COMMITTEE:
-						notifications = {
-							newTechCommitteeProposalsSubmitted: enabled,
-							proposalsClosed: enabled
-						};
-						break;
-					case EProposalType.COUNCIL_MOTION:
-						notifications = {
-							newMotionsSubmitted: enabled,
-							motionInVoting: enabled,
-							motionClosed: enabled
-						};
-						break;
-					case 'mentionsIReceive':
-						notifications = {};
-						break;
-					default:
-						notifications = {};
+			if (enabled && (!currentSettings || Object.keys(notifications).length === 0)) {
+				if (trackType === 'opengov') {
+					notifications = {
+						newReferendumSubmitted: enabled,
+						referendumInVoting: enabled,
+						referendumClosed: enabled
+					};
+				} else {
+					switch (trackKey) {
+						case EProposalType.REFERENDUM:
+							notifications = {
+								newReferendumSubmitted: enabled,
+								referendumInVoting: enabled,
+								referendumClosed: enabled
+							};
+							break;
+						case EProposalType.DEMOCRACY_PROPOSAL:
+							notifications = {
+								newProposalsSubmitted: enabled,
+								proposalInVoting: enabled,
+								proposalClosed: enabled
+							};
+							break;
+						case EProposalType.BOUNTY:
+							notifications = {
+								bountiesSubmitted: enabled,
+								bountiesClosed: enabled
+							};
+							break;
+						case EProposalType.CHILD_BOUNTY:
+							notifications = {
+								childBountiesSubmitted: enabled,
+								childBountiesClosed: enabled
+							};
+							break;
+						case EProposalType.TIP:
+							notifications = {
+								newTipsSubmitted: enabled,
+								tipsOpened: enabled,
+								tipsClosed: enabled
+							};
+							break;
+						case EProposalType.TECHNICAL_COMMITTEE:
+							notifications = {
+								newTechCommitteeProposalsSubmitted: enabled,
+								proposalsClosed: enabled
+							};
+							break;
+						case EProposalType.COUNCIL_MOTION:
+							notifications = {
+								newMotionsSubmitted: enabled,
+								motionInVoting: enabled,
+								motionClosed: enabled
+							};
+							break;
+						case 'mentionsIReceive':
+							notifications = {};
+							break;
+						default:
+							notifications = {};
+					}
 				}
 			}
 
@@ -795,6 +854,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 	return {
 		preferences,
 		isLoading: isFetching,
+		isMutating: mutation.isPending || bulkMutation.isPending,
 		error: queryError || mutation.error || bulkMutation.error,
 
 		updateChannelPreference,
@@ -814,6 +874,8 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 		updateNetworkOpenGovTrack,
 		updateNetworkGov1Item,
+		updateNetworkOpenGovNotification,
+		updateNetworkGov1Notification,
 		bulkUpdateNetworkAdvancedSettings,
 		bulkUpdateNetworkTrackNotifications,
 

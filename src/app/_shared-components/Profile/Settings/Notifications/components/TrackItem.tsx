@@ -5,7 +5,7 @@
 import { useTranslations } from 'next-intl';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { Switch } from '@/app/_shared-components/Switch';
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 import { ETrackNotification } from '@/_shared/types';
 
 interface TrackItemProps {
@@ -21,7 +21,7 @@ interface TrackItemProps {
 	onNotificationChange: (type: string, enabled: boolean) => void;
 }
 
-function TrackItem({ icon, title, enabled, notifications, onEnabledChange, onNotificationChange }: TrackItemProps) {
+const TrackItem = memo(function TrackItem({ icon, title, enabled, notifications, onEnabledChange, onNotificationChange }: TrackItemProps) {
 	const t = useTranslations('Profile.Settings.Notifications');
 	const handleToggleAll = (newEnabled: boolean) => {
 		onEnabledChange(newEnabled);
@@ -70,6 +70,6 @@ function TrackItem({ icon, title, enabled, notifications, onEnabledChange, onNot
 			</div>
 		</div>
 	);
-}
+});
 
 export default TrackItem;

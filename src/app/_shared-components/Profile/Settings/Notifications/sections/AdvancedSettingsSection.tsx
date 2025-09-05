@@ -170,7 +170,8 @@ interface AdvancedSettingsSectionProps {
 
 function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	const t = useTranslations();
-	const { preferences, updateNetworkOpenGovTrack, updateNetworkGov1Item, bulkUpdateNetworkAdvancedSettings, bulkUpdateNetworkTrackNotifications } = useNotificationPreferences();
+	const { preferences, updateNetworkOpenGovNotification, updateNetworkGov1Notification, bulkUpdateNetworkAdvancedSettings, bulkUpdateNetworkTrackNotifications } =
+		useNotificationPreferences();
 
 	const networkPreferences = preferences?.triggerPreferences?.[network];
 	const openGovTracks = networkPreferences?.openGovTracks || {};
@@ -184,15 +185,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	};
 
 	const handleOpenGovNotificationChange = (trackKey: string, notificationKey: string, enabled: boolean) => {
-		const current = openGovTracks[trackKey as keyof typeof openGovTracks] ?? { enabled: false, notifications: {} as Record<string, boolean> };
-		updateNetworkOpenGovTrack(network, trackKey, {
-			...current,
-			enabled: current.enabled || enabled,
-			notifications: {
-				...(current.notifications ?? {}),
-				[notificationKey]: enabled
-			}
-		});
+		updateNetworkOpenGovNotification(network, trackKey, notificationKey, enabled);
 	};
 
 	const handleGov1ItemChange = (itemKey: string, enabled: boolean) => {
@@ -200,15 +193,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	};
 
 	const handleGov1NotificationChange = (itemKey: string, notificationKey: string, enabled: boolean) => {
-		const current = gov1Items[itemKey as keyof typeof gov1Items] ?? { enabled: false, notifications: {} as Record<string, boolean> };
-		updateNetworkGov1Item(network, itemKey, {
-			...current,
-			enabled: current.enabled || enabled,
-			notifications: {
-				...(current.notifications ?? {}),
-				[notificationKey]: enabled
-			}
-		});
+		updateNetworkGov1Notification(network, itemKey, notificationKey, enabled);
 	};
 
 	const allOpenGovEnabled = Object.keys(trackLabels).every((key) => openGovTracks[key as keyof typeof openGovTracks]?.enabled === true);
