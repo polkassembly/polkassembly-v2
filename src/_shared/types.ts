@@ -179,11 +179,10 @@ export interface INetworkNotificationSettings extends IBaseNotificationSettings 
 
 export interface IUserNotificationSettings extends IBaseNotificationSettings {
 	channelPreferences: Record<ENotificationChannel, IUserNotificationChannelPreferences>;
-	networkPreferences?: Record<string, INetworkNotificationSettings>;
 	triggerPreferences?: {
 		[network: string]: { [index: string]: IUserNotificationTriggerPreferences };
 	};
-	[additionalProperties: string]: unknown; // trigger specific properties
+	networkPreferences?: Record<string, INetworkNotificationSettings>;
 }
 
 export enum ERole {
