@@ -1412,7 +1412,8 @@
 		"useSuperSearchButton": "使用超级搜索",
 		"poweredByPolkassembly": "由Polkassembly提供。",
 		"enableSearchAndSuperSearch": "如果您想为您的链启用搜索和超级搜索功能，请联系我们",
-		"clearFilters": "清除筛选"
+		"clearFilters": "清除筛选",
+		"searchTriggerLabel": "搜索提案、讨论和人员"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "赏金提案成功",

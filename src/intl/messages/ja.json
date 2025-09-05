@@ -1389,7 +1389,8 @@
 		"useSuperSearchButton": "スーパー検索を使用",
 		"poweredByPolkassembly": "Polkassembly提供。",
 		"enableSearchAndSuperSearch": "チェーンの検索とスーパー検索を有効にしたい場合は、こちらまでご連絡ください",
-		"clearFilters": "フィルターをクリア"
+		"clearFilters": "フィルターをクリア",
+		"searchTriggerLabel": "提案、議論、人を検索"
 	},
 	"Bounties": {
 		"onchainBounties": "オンチェーン報奨金",

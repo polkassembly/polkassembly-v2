@@ -80,7 +80,7 @@ function Navbar() {
 				<div className='border-l-[1px] border-bg_pink pl-2 font-medium text-navbar_title md:border-none md:pl-0'>OpenGov</div>
 			</div>
 
-			<div className='flex items-center gap-x-2 md:hidden'>
+			<div className='flex w-full items-center justify-end gap-x-2 md:hidden'>
 				<Search />
 				<div
 					aria-hidden
@@ -98,7 +98,7 @@ function Navbar() {
 				</div>
 			</div>
 
-			<div className='hidden items-center gap-x-4 md:flex'>
+			<div className='hidden w-full items-center justify-end gap-x-4 md:flex'>
 				<Search />
 				<Select
 					value={userPreferences.locale}
