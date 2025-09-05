@@ -696,7 +696,8 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 						value: {
 							...fromSettings,
 							isPrimary: false
-						}
+						},
+						network: toNetwork
 					}
 				];
 

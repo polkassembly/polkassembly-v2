@@ -245,12 +245,19 @@ function ParachainsSection() {
 			await bulkUpdateTriggerPreferences(updates);
 
 			if (networksToImport.length > 0) {
-				const importResults = await Promise.allSettled(networksToImport.map((network) => importNetworkSettings(currentNetwork, network.id)));
-
-				const failedImports = importResults.map((result, index) => (result.status === 'rejected' ? networksToImport[index] : null)).filter(Boolean);
-
-				if (failedImports.length > 0) {
-					console.error('failed to import');
+				const importResults = await Promise.allSettled(networksToImport.map((n) => importNetworkSettings(currentNetwork, n.id)));
+				const failed = importResults.map((r, i) => (r.status === 'rejected' || r.value === false ? networksToImport[i] : null)).filter(Boolean) as typeof networksToImport;
+				if (failed.length > 0) {
+					console.error(
+						'Some network imports failed:',
+						failed.map((n) => n.id)
+					);
+					const revertUpdates = failed.map((n) => ({
+						section: ENotifications.NETWORKS,
+						key: n.id,
+						value: { enabled: true, isPrimary: false, importPrimarySettings: false }
+					}));
+					await bulkUpdateTriggerPreferences(revertUpdates);
 				}
 			}
 		} catch {
@@ -321,8 +328,8 @@ function ParachainsSection() {
 					section: ENotifications.NETWORKS,
 					key: networkId,
 					value: {
-						enabled: preferences?.triggerPreferences?.[networkId]?.enabled || true,
-						isPrimary: networkId === currentNetwork ? currentNetworkPrefs?.isPrimary || false : false,
+						enabled: preferences?.triggerPreferences?.[networkId]?.enabled ?? true,
+						isPrimary: networkId === currentNetwork ? (currentNetworkPrefs?.isPrimary ?? false) : false,
 						importPrimarySettings: false
 					}
 				}));
