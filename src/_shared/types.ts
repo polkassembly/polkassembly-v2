@@ -95,6 +95,27 @@ export enum ENotificationChannel {
 	SLACK = 'slack'
 }
 
+export interface IUserNotificationChannelPreferences {
+	name: ENotificationChannel;
+	enabled: boolean;
+	handle: string;
+	verified: boolean;
+	verification_token?: string;
+}
+
+export interface IUserNotificationTriggerPreferences {
+	name: string;
+	enabled: boolean;
+	[additionalProperties: string]: unknown; // trigger specific properties
+}
+
+export interface IUserNotificationSettings {
+	channelPreferences: { [channel: string]: IUserNotificationChannelPreferences };
+	triggerPreferences: {
+		[network: string]: { [index: string]: IUserNotificationTriggerPreferences };
+	};
+}
+
 export enum ERole {
 	ANONYMOUS = 'anonymous',
 	ADMIN = 'admin',
