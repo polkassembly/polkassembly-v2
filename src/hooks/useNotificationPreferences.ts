@@ -468,7 +468,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 			const updatedSettings = {
 				...(currentSettings || { enabled: false }),
-				enabled: currentSettings?.enabled || enabled, // Enable track if notification is enabled
+				enabled: currentSettings?.enabled || false,
 				notifications: {
 					...(currentSettings?.notifications || {}),
 					[notificationKey]: enabled
@@ -494,7 +494,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 			const updatedSettings = {
 				...(currentSettings || { enabled: false }),
-				enabled: currentSettings?.enabled || enabled, // Enable item if notification is enabled
+				enabled: currentSettings?.enabled || false,
 				notifications: {
 					...(currentSettings?.notifications || {}),
 					[notificationKey]: enabled
