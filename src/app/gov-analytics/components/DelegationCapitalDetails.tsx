@@ -10,6 +10,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartOptions } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import { useTranslations } from 'next-intl';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -22,6 +23,7 @@ interface IDelegationCapitalDetails {
 function DelegationCapitalDetails({ delegationData }: { delegationData: IDelegationCapitalDetails }) {
 	const network = getCurrentNetwork();
 	const { resolvedTheme: theme } = useTheme();
+	const t = useTranslations('GovAnalytics');
 
 	const bnToIntBalance = (bnValue: string | number | BN): number => {
 		const bn = BN.isBN(bnValue) ? bnValue : new BN(bnValue && bnValue.toString());
@@ -39,12 +41,12 @@ function DelegationCapitalDetails({ delegationData }: { delegationData: IDelegat
 		labels: trackNames,
 		datasets: [
 			{
-				label: 'Votes',
+				label: t('votes'),
 				data: Object.keys(delegationData || {}).map((key) => bnToIntBalance(delegationData[key].totalVotesBalance || ZERO) || 0),
 				backgroundColor: '#B6B0FB'
 			},
 			{
-				label: 'Capital',
+				label: t('capital'),
 				data: Object.keys(delegationData || {}).map((key) => bnToIntBalance(delegationData[key].totalCapital || ZERO) || 0),
 				backgroundColor: '#796EEC'
 			}
@@ -105,15 +107,15 @@ function DelegationCapitalDetails({ delegationData }: { delegationData: IDelegat
 	return (
 		<div className='max-h-[500px] w-full flex-1 rounded-lg border border-border_grey p-3 lg:p-4'>
 			<div className='flex flex-col items-start justify-between lg:flex-row lg:items-center'>
-				<h2 className='text-base font-semibold sm:text-xl'>Track Delegation</h2>
+				<h2 className='text-base font-semibold sm:text-xl'>{t('trackDelegation')}</h2>
 				<div className='flex gap-x-4'>
 					<div className='flex items-center gap-x-1'>
 						<div className='h-[5px] w-[5px] rounded-full bg-bar_chart_purple_light' />
-						<p className='m-0 p-0 text-xs font-normal'>Votes</p>
+						<p className='m-0 p-0 text-xs font-normal'>{t('votes')}</p>
 					</div>
 					<div className='flex items-center gap-x-1'>
 						<div className='h-[5px] w-[5px] rounded-full bg-bar_chart_purple' />
-						<p className='m-0 p-0 text-xs font-normal'>Capital</p>
+						<p className='m-0 p-0 text-xs font-normal'>{t('capital')}</p>
 					</div>
 				</div>
 			</div>

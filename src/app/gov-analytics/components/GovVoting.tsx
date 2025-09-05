@@ -8,14 +8,16 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { Separator } from '@/app/_shared-components/Separator';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
-import { ChevronDown } from 'lucide-react';
+import ExpandIcon from '@assets/icons/expand.svg';
+import { cn } from '@/lib/utils';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
-import TimeLineIcon from '@assets/icons/timeline.svg';
+import DelegateIcon from '@assets/icons/delegate-green-icon.svg';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { useTranslations } from 'next-intl';
 import { getTrackNameFromId } from '@/_shared/_utils/getTrackNameFromId';
-import { IGovAnalyticsDelegationStats } from '@/_shared/types';
+import { IGovAnalyticsDelegationStats, ETheme } from '@/_shared/types';
 import DelegationCapitalDetails from './DelegationCapitalDetails';
 import DelegationDetails from './DelegationDetails';
 
@@ -26,6 +28,7 @@ interface IDelegationInfo {
 function GovVoting() {
 	const t = useTranslations('GovAnalytics');
 	const network = getCurrentNetwork();
+	const { userPreferences } = useUserPreferences();
 
 	const fetchDelegations = async () => {
 		const { data, error } = await NextApiClientService.getTrackDelegationAnalyticsStats();
@@ -65,18 +68,28 @@ function GovVoting() {
 	});
 
 	return (
-		<Collapsible className='rounded-lg border border-border_grey'>
-			<CollapsibleTrigger className='flex w-full items-center gap-x-4 p-3 lg:p-4'>
+		<Collapsible
+			defaultOpen
+			className='rounded-lg border border-border_grey bg-bg_modal'
+		>
+			<CollapsibleTrigger className='group flex w-full items-center gap-x-4 p-3 lg:p-4'>
 				<Image
-					src={TimeLineIcon}
-					alt='Delegation Green Icon'
+					src={DelegateIcon}
+					alt='Delegate Icon'
 					width={24}
 					height={24}
 					className='h-6 w-6'
 				/>
-				<p className='text-base font-semibold text-text_primary'>{t('voting')}</p>
+				<p className='text-base font-semibold text-text_primary'>{t('delegation')}</p>
 				<div className='flex-1' />
-				<ChevronDown className='text-lg font-semibold text-text_primary' />
+				<Image
+					src={ExpandIcon}
+					alt=''
+					aria-hidden
+					width={16}
+					height={16}
+					className={cn(userPreferences?.theme === ETheme.DARK ? 'darkIcon' : '', 'transition-transform duration-200 group-data-[state=open]:rotate-180')}
+				/>
 			</CollapsibleTrigger>
 			<CollapsibleContent>
 				<Separator className='my-0' />

@@ -8,7 +8,10 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import TimeLineIcon from '@assets/icons/timeline.svg';
 import { Separator } from '@/app/_shared-components/Separator';
-import { ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { ETheme } from '@/_shared/types';
+import ExpandIcon from '@assets/icons/expand.svg';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import AnalyticsReferendumOutcome from './AnalyticsReferendumOutcome';
 import AnalyticsReferendumCount from './AnalyticsReferendumCount';
@@ -18,13 +21,14 @@ import ReferendumCount from './ReferendumCount';
 
 function GovOverview() {
 	const t = useTranslations('GovAnalytics');
+	const { userPreferences } = useUserPreferences();
 
 	return (
 		<Collapsible
 			defaultOpen
-			className='rounded-lg border border-border_grey'
+			className='rounded-lg border border-border_grey bg-bg_modal'
 		>
-			<CollapsibleTrigger className='flex w-full items-center gap-x-4 p-3 lg:p-4'>
+			<CollapsibleTrigger className='group flex w-full items-center gap-x-4 p-3 lg:p-4'>
 				<Image
 					src={TimeLineIcon}
 					alt='Delegation Green Icon'
@@ -34,7 +38,14 @@ function GovOverview() {
 				/>
 				<p className='text-base font-semibold text-text_primary'>{t('overview')}</p>
 				<div className='flex-1' />
-				<ChevronDown className='text-lg font-semibold text-text_primary' />
+				<Image
+					src={ExpandIcon}
+					alt=''
+					aria-hidden
+					width={16}
+					height={16}
+					className={cn(userPreferences?.theme === ETheme.DARK ? 'darkIcon' : '', 'transition-transform duration-200 group-data-[state=open]:rotate-180')}
+				/>
 			</CollapsibleTrigger>
 			<CollapsibleContent>
 				<Separator className='my-0' />
