@@ -21,6 +21,14 @@ import { STALE_TIME } from '@/_shared/_constants/listingLimit';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from './useUser';
 
+const DEFAULT_CHANNELS = {
+	[ENotificationChannel.EMAIL]: false,
+	[ENotificationChannel.TELEGRAM]: false,
+	[ENotificationChannel.DISCORD]: false,
+	[ENotificationChannel.SLACK]: false,
+	[ENotificationChannel.ELEMENT]: false
+};
+
 const updateChannelPreferences = (data: IUserNotificationSettings, key: string, value: IUserNotificationChannelPreferences): IUserNotificationSettings => {
 	const newData = { ...data };
 
@@ -327,6 +335,14 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 				'proposalsYouVotedOnEnacted'
 			];
 
+			const defaultChannels = {
+				[ENotificationChannel.EMAIL]: false,
+				[ENotificationChannel.TELEGRAM]: false,
+				[ENotificationChannel.DISCORD]: false,
+				[ENotificationChannel.SLACK]: false,
+				[ENotificationChannel.ELEMENT]: false
+			};
+
 			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
 
 			postsKeys.forEach((key) => {
@@ -335,7 +351,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 					networkPostsNotifications && Object.prototype.hasOwnProperty.call(networkPostsNotifications, key)
 						? networkPostsNotifications[key as keyof typeof networkPostsNotifications]
 						: undefined;
-				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
+				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: defaultChannels };
 				updates.push({
 					section: ENotifications.NETWORKS,
 					key: `${network}.postsNotifications.${key}`,
@@ -369,6 +385,14 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 			const commentsKeys = ['commentsOnMyProposals', 'repliesToMyComments', 'mentions'];
 
+			const defaultChannels = {
+				[ENotificationChannel.EMAIL]: false,
+				[ENotificationChannel.TELEGRAM]: false,
+				[ENotificationChannel.DISCORD]: false,
+				[ENotificationChannel.SLACK]: false,
+				[ENotificationChannel.ELEMENT]: false
+			};
+
 			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
 
 			commentsKeys.forEach((key) => {
@@ -377,7 +401,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 					networkCommentsNotifications && Object.prototype.hasOwnProperty.call(networkCommentsNotifications, key)
 						? networkCommentsNotifications[key as keyof typeof networkCommentsNotifications]
 						: undefined;
-				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
+				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: defaultChannels };
 				updates.push({
 					section: ENotifications.NETWORKS,
 					key: `${network}.commentsNotifications.${key}`,
@@ -419,7 +443,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 					networkBountiesNotifications && Object.prototype.hasOwnProperty.call(networkBountiesNotifications, key)
 						? networkBountiesNotifications[key as keyof typeof networkBountiesNotifications]
 						: undefined;
-				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
+				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: DEFAULT_CHANNELS };
 				updates.push({
 					section: ENotifications.NETWORKS,
 					key: `${network}.bountiesNotifications.${key}`,
