@@ -9,7 +9,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shar
 import { Separator } from '@/app/_shared-components/Separator';
 import { Switch } from '@/app/_shared-components/Switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
-import { ENetwork, EPostOrigin } from '@/_shared/types';
+import { ENetwork, ENotifications, EPostOrigin, EProposalType } from '@/_shared/types';
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import AdvancedSettingsIcon from '@assets/icons/notification-settings/advancedsettings.svg';
 import RootIcon from '@assets/sidebar/root-icon.svg';
@@ -67,19 +67,19 @@ const getGov1Icon = (itemKey: string) => {
 	switch (itemKey) {
 		case 'mentionsIReceive':
 			return AdministrationIcon;
-		case 'referendums':
+		case EProposalType.REFERENDUM:
 			return DemocracyReferendaIcon;
-		case 'proposals':
+		case EProposalType.DEMOCRACY_PROPOSAL:
 			return ProposalIcon;
-		case 'bounties':
+		case EProposalType.BOUNTY:
 			return BountyIcon;
-		case 'childBounties':
+		case EProposalType.CHILD_BOUNTY:
 			return BountyIcon;
-		case 'tips':
+		case EProposalType.TIP:
 			return TipsIcon;
-		case 'techCommittee':
+		case EProposalType.TECHNICAL_COMMITTEE:
 			return TechCommProposalsIcon;
-		case 'councilMotion':
+		case EProposalType.COUNCIL_MOTION:
 			return CouncilMotionIcon;
 		default:
 			return AdministrationIcon;
@@ -88,40 +88,40 @@ const getGov1Icon = (itemKey: string) => {
 
 const getGov1NotificationLabels = (itemKey: string, t: (key: string) => string): { [key: string]: string } | undefined => {
 	switch (itemKey) {
-		case 'referendums':
+		case EProposalType.REFERENDUM:
 			return {
 				newReferendumSubmitted: t('Profile.Settings.Notifications.newReferendumSubmitted'),
 				referendumInVoting: t('Profile.Settings.Notifications.referendumInVoting'),
 				referendumClosed: t('Profile.Settings.Notifications.referendumClosed')
 			};
-		case 'proposals':
+		case EProposalType.DEMOCRACY_PROPOSAL:
 			return {
 				newProposalsSubmitted: t('Profile.Settings.Notifications.newProposalsSubmitted'),
 				proposalInVoting: t('Profile.Settings.Notifications.proposalInVoting'),
 				proposalClosed: t('Profile.Settings.Notifications.proposalClosed')
 			};
-		case 'bounties':
+		case EProposalType.BOUNTY:
 			return {
 				bountiesSubmitted: t('Profile.Settings.Notifications.bountiesSubmitted'),
 				bountiesClosed: t('Profile.Settings.Notifications.bountiesClosed')
 			};
-		case 'childBounties':
+		case EProposalType.CHILD_BOUNTY:
 			return {
 				childBountiesSubmitted: t('Profile.Settings.Notifications.childBountiesSubmitted'),
 				childBountiesClosed: t('Profile.Settings.Notifications.childBountiesClosed')
 			};
-		case 'tips':
+		case EProposalType.TIP:
 			return {
 				newTipsSubmitted: t('Profile.Settings.Notifications.newTipsSubmitted'),
 				tipsOpened: t('Profile.Settings.Notifications.tipsOpened'),
 				tipsClosed: t('Profile.Settings.Notifications.tipsClosed')
 			};
-		case 'techCommittee':
+		case EProposalType.TECHNICAL_COMMITTEE:
 			return {
 				newTechCommitteeProposalsSubmitted: t('Profile.Settings.Notifications.newTechCommitteeProposalsSubmitted'),
 				proposalsClosed: t('Profile.Settings.Notifications.proposalsClosed')
 			};
-		case 'councilMotion':
+		case EProposalType.COUNCIL_MOTION:
 			return {
 				newMotionsSubmitted: t('Profile.Settings.Notifications.newMotionsSubmitted'),
 				motionInVoting: t('Profile.Settings.Notifications.motionInVoting'),
@@ -180,7 +180,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	const gov1Labels = getGov1Labels(t);
 
 	const handleOpenGovTrackChange = (trackKey: string, enabled: boolean) => {
-		bulkUpdateNetworkTrackNotifications(network, trackKey, enabled, 'opengov');
+		bulkUpdateNetworkTrackNotifications(network, trackKey, enabled, ENotifications.OPENGOV);
 	};
 
 	const handleOpenGovNotificationChange = (trackKey: string, notificationKey: string, enabled: boolean) => {
@@ -196,7 +196,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	};
 
 	const handleGov1ItemChange = (itemKey: string, enabled: boolean) => {
-		bulkUpdateNetworkTrackNotifications(network, itemKey, enabled, 'gov1');
+		bulkUpdateNetworkTrackNotifications(network, itemKey, enabled, ENotifications.GOV1);
 	};
 
 	const handleGov1NotificationChange = (itemKey: string, notificationKey: string, enabled: boolean) => {
@@ -260,26 +260,26 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 				<Separator />
 				<div className={classes.collapsibleContent}>
 					<Tabs
-						defaultValue='opengov'
+						defaultValue={ENotifications.OPENGOV}
 						className='w-full'
 					>
 						<TabsList className='rounded-lg bg-call_args_bg px-2 py-1'>
 							<TabsTrigger
 								className='rounded-xl border-none bg-call_args_bg px-6 py-1 text-wallet_btn_text/70 data-[state=active]:bg-white data-[state=active]:text-btn_secondary_text'
-								value='opengov'
+								value={ENotifications.OPENGOV}
 							>
 								OpenGov
 							</TabsTrigger>
 							<TabsTrigger
 								className='rounded-xl border-none bg-call_args_bg px-6 py-1 text-wallet_btn_text/70 data-[state=active]:bg-white data-[state=active]:text-btn_secondary_text'
-								value='gov1'
+								value={ENotifications.GOV1}
 							>
 								Gov1
 							</TabsTrigger>
 						</TabsList>
 
 						<TabsContent
-							value='opengov'
+							value={ENotifications.OPENGOV}
 							className='mt-4'
 						>
 							<div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
@@ -346,7 +346,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 						</TabsContent>
 
 						<TabsContent
-							value='gov1'
+							value={ENotifications.GOV1}
 							className='mt-4'
 						>
 							<div className='grid grid-cols-1 gap-4 md:grid-cols-2'>

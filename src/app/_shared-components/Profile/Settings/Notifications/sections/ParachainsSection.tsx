@@ -24,9 +24,9 @@ import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import ParachainsIcon from '@assets/icons/notification-settings/parachains.svg';
+import { ENotifications } from '@/_shared/types';
 import NetworkBadge from '../components/NetworkBadge';
 import AddNetworksModal from '../Modals/AddNetworksModal';
-
 import ImportPrimaryNetworkModal from '../Modals/ImportPrimaryNetworkModal';
 import AddNetworksFinalModal from '../Modals/AddNetworksFinalModal';
 import ConfirmationModal from '../Modals/ConfirmationModal';
@@ -188,7 +188,7 @@ function ParachainsSection() {
 		try {
 			if (networks.length > 1) {
 				const updates = networks.map((network) => ({
-					section: 'networks',
+					section: ENotifications.NETWORKS,
 					key: network.id,
 					value: {
 						enabled: true,
@@ -223,7 +223,7 @@ function ParachainsSection() {
 		try {
 			const updates = [
 				{
-					section: 'networks',
+					section: ENotifications.NETWORKS,
 					key: currentNetwork,
 					value: {
 						enabled: true,
@@ -232,7 +232,7 @@ function ParachainsSection() {
 					}
 				},
 				...networksToImport.map((network) => ({
-					section: 'networks',
+					section: ENotifications.NETWORKS,
 					key: network.id,
 					value: {
 						enabled: true,
@@ -318,7 +318,7 @@ function ParachainsSection() {
 
 			try {
 				const updates = allNetworkIds.map((networkId) => ({
-					section: 'networks',
+					section: ENotifications.NETWORKS,
 					key: networkId,
 					value: {
 						enabled: preferences?.networkPreferences?.[networkId]?.enabled || true,
