@@ -224,8 +224,8 @@ export class NotificationPreferencesService {
 					importPrimarySettings: false
 				} as IUserNotificationTriggerPreferences);
 
-			const updatedSettings = JSON.parse(JSON.stringify(networkSettings)) as Record<string, unknown>;
-			let pointer = updatedSettings;
+			const updatedSettings = JSON.parse(JSON.stringify(networkSettings)) as IUserNotificationTriggerPreferences;
+			let pointer = updatedSettings as Record<string, unknown>;
 
 			for (let i = 0; i < pathParts.length - 1; i += 1) {
 				const pathPart = pathParts[i];
@@ -245,7 +245,7 @@ export class NotificationPreferencesService {
 				...updated,
 				triggerPreferences: {
 					...triggerPreferences,
-					[networkId]: updatedSettings as unknown as IUserNotificationTriggerPreferences
+					[networkId]: updatedSettings
 				}
 			};
 		}

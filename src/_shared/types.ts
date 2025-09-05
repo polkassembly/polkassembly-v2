@@ -107,7 +107,7 @@ export interface IUserNotificationTriggerPreferences {
 	name: string;
 	enabled: boolean;
 	isPrimary?: boolean;
-	importPrimarySettings: boolean;
+	importPrimarySettings?: boolean;
 	postsNotifications?: IPostsNotificationSettings;
 	commentsNotifications?: ICommentsNotificationSettings;
 	bountiesNotifications?: IBountiesNotificationSettings;
@@ -127,15 +127,13 @@ export interface INotificationItemSettings {
 
 export type NotificationGroup<T extends string> = Record<T, INotificationItemSettings>;
 
-export type IPostsNotificationSettings = NotificationGroup<
-	'proposalStatusChanges' | 'newProposalsInCategories' | 'votingDeadlineReminders' | 'updatesOnFollowedProposals' | 'proposalOutcomePublished' | 'proposalsYouVotedOnEnacted'
->;
+export type IPostsNotificationSettings = NotificationGroup<EPostsNotification>;
 
-export type ICommentsNotificationSettings = NotificationGroup<'commentsOnMyProposals' | 'repliesToMyComments' | 'mentions'>;
+export type ICommentsNotificationSettings = NotificationGroup<ECommentsNotification>;
 
-export type IBountiesNotificationSettings = NotificationGroup<'bountyApplicationStatusUpdates' | 'bountyPayoutsAndMilestones' | 'activityOnBountiesIFollow'>;
+export type IBountiesNotificationSettings = NotificationGroup<EBountiesNotification>;
 
-export type IOpenGovTrackNotifications = NotificationFlags<'newReferendumSubmitted' | 'referendumInVoting' | 'referendumClosed'>;
+export type IOpenGovTrackNotifications = NotificationFlags<ETrackNotification>;
 
 export interface IOpenGovTrackSettings {
 	enabled: boolean;
@@ -165,25 +163,38 @@ export interface IUpdateNotificationPreferencesRequest {
 	network?: string;
 }
 
-export interface IBaseNotificationSettings {
-	postsNotifications?: IPostsNotificationSettings;
-	commentsNotifications?: ICommentsNotificationSettings;
-	bountiesNotifications?: IBountiesNotificationSettings;
-	openGovTracks?: Partial<IOpenGovTracksSettings>;
-	gov1Items?: Partial<IGov1ItemsSettings>;
-}
-
-export interface INetworkNotificationSettings extends IBaseNotificationSettings {
-	enabled: boolean;
-	isPrimary?: boolean;
-	importPrimarySettings: boolean;
-}
-
 export interface IUserNotificationSettings {
 	channelPreferences: Record<ENotificationChannel, IUserNotificationChannelPreferences>;
 	triggerPreferences?: {
 		[network: string]: IUserNotificationTriggerPreferences;
 	};
+}
+
+export enum EPostsNotification {
+	PROPOSAL_STATUS_CHANGES = 'proposalStatusChanges',
+	NEW_PROPOSALS_IN_CATEGORIES = 'newProposalsInCategories',
+	VOTING_DEADLINE_REMINDERS = 'votingDeadlineReminders',
+	UPDATES_ON_FOLLOWED_PROPOSALS = 'updatesOnFollowedProposals',
+	PROPOSAL_OUTCOME_PUBLISHED = 'proposalOutcomePublished',
+	PROPOSALS_YOU_VOTED_ON_ENACTED = 'proposalsYouVotedOnEnacted'
+}
+
+export enum ECommentsNotification {
+	COMMENTS_ON_MY_PROPOSALS = 'commentsOnMyProposals',
+	REPLIES_TO_MY_COMMENTS = 'repliesToMyComments',
+	MENTIONS = 'mentions'
+}
+
+export enum EBountiesNotification {
+	BOUNTY_APPLICATION_STATUS_UPDATES = 'bountyApplicationStatusUpdates',
+	BOUNTY_PAYOUTS_AND_MILESTONES = 'bountyPayoutsAndMilestones',
+	ACTIVITY_ON_BOUNTIES_I_FOLLOW = 'activityOnBountiesIFollow'
+}
+
+export enum ETrackNotification {
+	NEW_REFERENDUM_SUBMITTED = 'newReferendumSubmitted',
+	REFERENDUM_IN_VOTING = 'referendumInVoting',
+	REFERENDUM_CLOSED = 'referendumClosed'
 }
 
 export enum ERole {

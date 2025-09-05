@@ -9,7 +9,7 @@ import { ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import { Separator } from '@/app/_shared-components/Separator';
 import { Switch } from '@/app/_shared-components/Switch';
-import { ENotificationChannel, ENetwork } from '@/_shared/types';
+import { ENotificationChannel, ENetwork, EPostsNotification } from '@/_shared/types';
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import PostIcon from '@assets/icons/notification-settings/posts.svg';
 import NotificationItem from '../components/NotificationItem';
@@ -124,9 +124,9 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 							title={t('Profile.Settings.Notifications.myProposalStatusChanges')}
 							description={t('Profile.Settings.Notifications.myProposalStatusChangesDescription')}
 							checked={postsNotifications.proposalStatusChanges?.enabled || false}
-							onCheckedChange={(checked) => handlePostsNotificationChange('proposalStatusChanges', checked)}
+							onCheckedChange={(checked) => handlePostsNotificationChange(EPostsNotification.PROPOSAL_STATUS_CHANGES, checked)}
 							channels={postsNotifications.proposalStatusChanges?.channels}
-							onChannelChange={(channel, enabled) => handlePostsChannelChange('proposalStatusChanges', channel, enabled)}
+							onChannelChange={(channel, enabled) => handlePostsChannelChange(EPostsNotification.PROPOSAL_STATUS_CHANGES, channel, enabled)}
 						/>
 
 						<Separator className='my-2' />
@@ -135,9 +135,9 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 							title={t('Profile.Settings.Notifications.newProposalsInCategories')}
 							description={t('Profile.Settings.Notifications.newProposalsInCategoriesDescription')}
 							checked={postsNotifications.newProposalsInCategories?.enabled || false}
-							onCheckedChange={(checked) => handlePostsNotificationChange('newProposalsInCategories', checked)}
+							onCheckedChange={(checked) => handlePostsNotificationChange(EPostsNotification.NEW_PROPOSALS_IN_CATEGORIES, checked)}
 							channels={postsNotifications.newProposalsInCategories?.channels}
-							onChannelChange={(channel, enabled) => handlePostsChannelChange('newProposalsInCategories', channel, enabled)}
+							onChannelChange={(channel, enabled) => handlePostsChannelChange(EPostsNotification.NEW_PROPOSALS_IN_CATEGORIES, channel, enabled)}
 						/>
 
 						<Separator className='my-2' />
@@ -146,9 +146,9 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 							title={t('Profile.Settings.Notifications.votingDeadlineReminders')}
 							description={t('Profile.Settings.Notifications.votingDeadlineRemindersDescription')}
 							checked={postsNotifications.votingDeadlineReminders?.enabled || false}
-							onCheckedChange={(checked) => handlePostsNotificationChange('votingDeadlineReminders', checked)}
+							onCheckedChange={(checked) => handlePostsNotificationChange(EPostsNotification.VOTING_DEADLINE_REMINDERS, checked)}
 							channels={postsNotifications.votingDeadlineReminders?.channels}
-							onChannelChange={(channel, enabled) => handlePostsChannelChange('votingDeadlineReminders', channel, enabled)}
+							onChannelChange={(channel, enabled) => handlePostsChannelChange(EPostsNotification.VOTING_DEADLINE_REMINDERS, channel, enabled)}
 						/>
 
 						<Separator className='my-2' />
@@ -157,9 +157,9 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 							title={t('Profile.Settings.Notifications.updatesOnFollowedProposals')}
 							description={t('Profile.Settings.Notifications.updatesOnFollowedProposalsDescription')}
 							checked={postsNotifications.updatesOnFollowedProposals?.enabled || false}
-							onCheckedChange={(checked) => handlePostsNotificationChange('updatesOnFollowedProposals', checked)}
+							onCheckedChange={(checked) => handlePostsNotificationChange(EPostsNotification.UPDATES_ON_FOLLOWED_PROPOSALS, checked)}
 							channels={postsNotifications.updatesOnFollowedProposals?.channels}
-							onChannelChange={(channel, enabled) => handlePostsChannelChange('updatesOnFollowedProposals', channel, enabled)}
+							onChannelChange={(channel, enabled) => handlePostsChannelChange(EPostsNotification.UPDATES_ON_FOLLOWED_PROPOSALS, channel, enabled)}
 						/>
 
 						<Separator className='my-2' />
@@ -168,9 +168,9 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 							title={t('Profile.Settings.Notifications.proposalOutcomePublished')}
 							description={t('Profile.Settings.Notifications.proposalOutcomePublishedDescription')}
 							checked={postsNotifications.proposalOutcomePublished?.enabled || false}
-							onCheckedChange={(checked) => handlePostsNotificationChange('proposalOutcomePublished', checked)}
+							onCheckedChange={(checked) => handlePostsNotificationChange(EPostsNotification.PROPOSAL_OUTCOME_PUBLISHED, checked)}
 							channels={postsNotifications.proposalOutcomePublished?.channels}
-							onChannelChange={(channel, enabled) => handlePostsChannelChange('proposalOutcomePublished', channel, enabled)}
+							onChannelChange={(channel, enabled) => handlePostsChannelChange(EPostsNotification.PROPOSAL_OUTCOME_PUBLISHED, channel, enabled)}
 						/>
 
 						<Separator className='my-2' />
@@ -179,9 +179,9 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 							title={t('Profile.Settings.Notifications.proposalsYouVotedOnEnacted')}
 							description={t('Profile.Settings.Notifications.proposalsYouVotedOnEnactedDescription')}
 							checked={postsNotifications.proposalsYouVotedOnEnacted?.enabled || false}
-							onCheckedChange={(checked) => handlePostsNotificationChange('proposalsYouVotedOnEnacted', checked)}
+							onCheckedChange={(checked) => handlePostsNotificationChange(EPostsNotification.PROPOSALS_YOU_VOTED_ON_ENACTED, checked)}
 							channels={postsNotifications.proposalsYouVotedOnEnacted?.channels}
-							onChannelChange={(channel, enabled) => handlePostsChannelChange('proposalsYouVotedOnEnacted', channel, enabled)}
+							onChannelChange={(channel, enabled) => handlePostsChannelChange(EPostsNotification.PROPOSALS_YOU_VOTED_ON_ENACTED, channel, enabled)}
 						/>
 					</div>
 				</div>

@@ -9,7 +9,7 @@ import { ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import { Separator } from '@/app/_shared-components/Separator';
 import { Switch } from '@/app/_shared-components/Switch';
-import { ENotificationChannel, ENetwork } from '@/_shared/types';
+import { ENotificationChannel, ENetwork, ECommentsNotification } from '@/_shared/types';
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import CommentsIcon from '@assets/icons/notification-settings/comments.svg';
 import NotificationItem from '../components/NotificationItem';
@@ -121,9 +121,9 @@ function CommentsNotificationsSection({ network }: CommentsNotificationsSectionP
 							title={t('Profile.Settings.Notifications.commentsOnMyProposals')}
 							description={t('Profile.Settings.Notifications.commentsOnMyProposalsDescription')}
 							checked={commentsNotifications.commentsOnMyProposals?.enabled || false}
-							onCheckedChange={(checked) => handleCommentsNotificationChange('commentsOnMyProposals', checked)}
+							onCheckedChange={(checked) => handleCommentsNotificationChange(ECommentsNotification.COMMENTS_ON_MY_PROPOSALS, checked)}
 							channels={commentsNotifications.commentsOnMyProposals?.channels}
-							onChannelChange={(channel, enabled) => handleCommentsChannelChange('commentsOnMyProposals', channel, enabled)}
+							onChannelChange={(channel, enabled) => handleCommentsChannelChange(ECommentsNotification.COMMENTS_ON_MY_PROPOSALS, channel, enabled)}
 						/>
 
 						<Separator className='my-2' />
@@ -132,9 +132,9 @@ function CommentsNotificationsSection({ network }: CommentsNotificationsSectionP
 							title={t('Profile.Settings.Notifications.repliesToMyComments')}
 							description={t('Profile.Settings.Notifications.repliesToMyCommentsDescription')}
 							checked={commentsNotifications.repliesToMyComments?.enabled || false}
-							onCheckedChange={(checked) => handleCommentsNotificationChange('repliesToMyComments', checked)}
+							onCheckedChange={(checked) => handleCommentsNotificationChange(ECommentsNotification.REPLIES_TO_MY_COMMENTS, checked)}
 							channels={commentsNotifications.repliesToMyComments?.channels}
-							onChannelChange={(channel, enabled) => handleCommentsChannelChange('repliesToMyComments', channel, enabled)}
+							onChannelChange={(channel, enabled) => handleCommentsChannelChange(ECommentsNotification.REPLIES_TO_MY_COMMENTS, channel, enabled)}
 						/>
 
 						<Separator className='my-2' />
@@ -143,9 +143,9 @@ function CommentsNotificationsSection({ network }: CommentsNotificationsSectionP
 							title={t('Profile.Settings.Notifications.mentions')}
 							description={t('Profile.Settings.Notifications.mentionsDescription')}
 							checked={commentsNotifications.mentions?.enabled || false}
-							onCheckedChange={(checked) => handleCommentsNotificationChange('mentions', checked)}
+							onCheckedChange={(checked) => handleCommentsNotificationChange(ECommentsNotification.MENTIONS, checked)}
 							channels={commentsNotifications.mentions?.channels}
-							onChannelChange={(channel, enabled) => handleCommentsChannelChange('mentions', channel, enabled)}
+							onChannelChange={(channel, enabled) => handleCommentsChannelChange(ECommentsNotification.MENTIONS, channel, enabled)}
 						/>
 					</div>
 				</div>

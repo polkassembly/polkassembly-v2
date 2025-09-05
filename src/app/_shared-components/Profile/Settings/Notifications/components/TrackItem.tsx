@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { Switch } from '@/app/_shared-components/Switch';
 import { ReactNode } from 'react';
+import { ETrackNotification } from '@/_shared/types';
 
 interface TrackItemProps {
 	icon: ReactNode;
@@ -46,7 +47,7 @@ function TrackItem({ icon, title, enabled, notifications, onEnabledChange, onNot
 				<div className='flex items-center gap-2'>
 					<Checkbox
 						checked={notifications.newReferendumSubmitted}
-						onCheckedChange={(checked) => onNotificationChange('newReferendumSubmitted', checked as boolean)}
+						onCheckedChange={(checked) => onNotificationChange(ETrackNotification.NEW_REFERENDUM_SUBMITTED, checked as boolean)}
 					/>
 					<span className='text-text_secondary text-xs'>{t('newReferendumSubmitted')}</span>
 				</div>
@@ -54,7 +55,7 @@ function TrackItem({ icon, title, enabled, notifications, onEnabledChange, onNot
 				<div className='flex items-center gap-2'>
 					<Checkbox
 						checked={notifications.referendumInVoting}
-						onCheckedChange={(checked) => onNotificationChange('referendumInVoting', checked as boolean)}
+						onCheckedChange={(checked) => onNotificationChange(ETrackNotification.REFERENDUM_IN_VOTING, checked as boolean)}
 					/>
 					<span className='text-text_secondary text-xs'>{t('referendumInVoting')}</span>
 				</div>
@@ -62,7 +63,7 @@ function TrackItem({ icon, title, enabled, notifications, onEnabledChange, onNot
 				<div className='flex items-center gap-2'>
 					<Checkbox
 						checked={notifications.referendumClosed}
-						onCheckedChange={(checked) => onNotificationChange('referendumClosed', checked as boolean)}
+						onCheckedChange={(checked) => onNotificationChange(ETrackNotification.REFERENDUM_CLOSED, checked as boolean)}
 					/>
 					<span className='text-text_secondary text-xs'>{t('referendumClosed')}</span>
 				</div>

@@ -28,7 +28,8 @@ const UpdateSchema = z.union([
 				value: z.unknown(),
 				network: z.string().optional()
 			})
-		)
+		),
+		network: z.string().optional()
 	}),
 	z.object({
 		section: z.string(),
@@ -94,8 +95,23 @@ export const PUT = withErrorHandling(async (request: NextRequest, { params }: IR
 	const body = UpdateSchema.parse(await request.json());
 
 	if ('updates' in body && Array.isArray(body.updates)) {
+		const defaultNetwork = await getNetworkFromHeaders();
 		const updates = body.updates as Array<IUpdateNotificationPreferencesRequest>;
-		const updatedPreferences = await NotificationPreferencesService.BulkUpdateMultipleSections(userId, updates);
+
+		const updatesWithNetwork = updates.map((update) => {
+			if (update.section === 'networks' && !update.key.includes('.')) {
+				return {
+					...update,
+					network: update.network || update.key
+				};
+			}
+			return {
+				...update,
+				network: update.network || defaultNetwork
+			};
+		});
+
+		const updatedPreferences = await NotificationPreferencesService.BulkUpdateMultipleSections(userId, updatesWithNetwork);
 		return NextResponse.json({
 			data: updatedPreferences,
 			message: 'Notification preferences updated successfully'
@@ -106,6 +122,11 @@ export const PUT = withErrorHandling(async (request: NextRequest, { params }: IR
 
 	if (!updateRequest.section || !updateRequest.key || updateRequest.value === undefined) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Missing required parameters');
+	}
+
+	if (updateRequest.section === 'networks' && !updateRequest.network) {
+		const network = await getNetworkFromHeaders();
+		updateRequest.network = network;
 	}
 
 	const updatedPreferences = await NotificationPreferencesService.UpdateUserNotificationPreferences(userId, updateRequest);

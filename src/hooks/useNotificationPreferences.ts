@@ -14,7 +14,10 @@ import {
 	EPostOrigin,
 	EProposalType,
 	IUserNotificationSettings,
-	IUserNotificationTriggerPreferences
+	EPostsNotification,
+	ECommentsNotification,
+	IUserNotificationTriggerPreferences,
+	EBountiesNotification
 } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { STALE_TIME } from '@/_shared/_constants/listingLimit';
@@ -274,7 +277,8 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			mutation.mutate({
 				section: ENotifications.NETWORKS,
 				key: networkId,
-				value: settings
+				value: settings,
+				network: networkId
 			});
 		},
 		[user?.id, mutation]
@@ -299,12 +303,12 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			if (!user?.id || !preferences) return;
 
 			const postsKeys = [
-				'proposalStatusChanges',
-				'newProposalsInCategories',
-				'votingDeadlineReminders',
-				'updatesOnFollowedProposals',
-				'proposalOutcomePublished',
-				'proposalsYouVotedOnEnacted'
+				EPostsNotification.PROPOSAL_STATUS_CHANGES,
+				EPostsNotification.NEW_PROPOSALS_IN_CATEGORIES,
+				EPostsNotification.VOTING_DEADLINE_REMINDERS,
+				EPostsNotification.UPDATES_ON_FOLLOWED_PROPOSALS,
+				EPostsNotification.PROPOSAL_OUTCOME_PUBLISHED,
+				EPostsNotification.PROPOSALS_YOU_VOTED_ON_ENACTED
 			];
 
 			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
@@ -349,7 +353,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		(network: string, enabled: boolean) => {
 			if (!user?.id || !preferences) return;
 
-			const commentsKeys = ['commentsOnMyProposals', 'repliesToMyComments', 'mentions'];
+			const commentsKeys = [ECommentsNotification.COMMENTS_ON_MY_PROPOSALS, ECommentsNotification.REPLIES_TO_MY_COMMENTS, ECommentsNotification.MENTIONS];
 
 			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
 
@@ -393,7 +397,11 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		(network: string, enabled: boolean) => {
 			if (!user?.id || !preferences) return;
 
-			const bountiesKeys = ['bountyApplicationStatusUpdates', 'bountyPayoutsAndMilestones', 'activityOnBountiesIFollow'];
+			const bountiesKeys = [
+				EBountiesNotification.BOUNTY_APPLICATION_STATUS_UPDATES,
+				EBountiesNotification.BOUNTY_PAYOUTS_AND_MILESTONES,
+				EBountiesNotification.ACTIVITY_ON_BOUNTIES_I_FOLLOW
+			];
 
 			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
 

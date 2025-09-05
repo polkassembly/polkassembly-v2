@@ -9,7 +9,7 @@ import { ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import { Separator } from '@/app/_shared-components/Separator';
 import { Switch } from '@/app/_shared-components/Switch';
-import { ENotificationChannel, ENetwork } from '@/_shared/types';
+import { ENotificationChannel, ENetwork, EBountiesNotification } from '@/_shared/types';
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import BountiesIcon from '@assets/icons/notification-settings/Bounties.svg';
 import NotificationItem from '../components/NotificationItem';
@@ -121,9 +121,9 @@ function BountiesNotificationsSection({ network }: BountiesNotificationsSectionP
 							title={t('Profile.Settings.Notifications.bountyApplicationStatusUpdates')}
 							description={t('Profile.Settings.Notifications.bountyApplicationStatusUpdatesDescription')}
 							checked={bountiesNotifications.bountyApplicationStatusUpdates?.enabled || false}
-							onCheckedChange={(checked) => handleBountiesNotificationChange('bountyApplicationStatusUpdates', checked)}
+							onCheckedChange={(checked) => handleBountiesNotificationChange(EBountiesNotification.BOUNTY_APPLICATION_STATUS_UPDATES, checked)}
 							channels={bountiesNotifications.bountyApplicationStatusUpdates?.channels}
-							onChannelChange={(channel, enabled) => handleBountiesChannelChange('bountyApplicationStatusUpdates', channel, enabled)}
+							onChannelChange={(channel, enabled) => handleBountiesChannelChange(EBountiesNotification.BOUNTY_APPLICATION_STATUS_UPDATES, channel, enabled)}
 						/>
 
 						<Separator className='my-2' />
@@ -132,9 +132,9 @@ function BountiesNotificationsSection({ network }: BountiesNotificationsSectionP
 							title={t('Profile.Settings.Notifications.bountyPayoutsAndMilestones')}
 							description={t('Profile.Settings.Notifications.bountyPayoutsAndMilestonesDescription')}
 							checked={bountiesNotifications.bountyPayoutsAndMilestones?.enabled || false}
-							onCheckedChange={(checked) => handleBountiesNotificationChange('bountyPayoutsAndMilestones', checked)}
+							onCheckedChange={(checked) => handleBountiesNotificationChange(EBountiesNotification.BOUNTY_PAYOUTS_AND_MILESTONES, checked)}
 							channels={bountiesNotifications.bountyPayoutsAndMilestones?.channels}
-							onChannelChange={(channel, enabled) => handleBountiesChannelChange('bountyPayoutsAndMilestones', channel, enabled)}
+							onChannelChange={(channel, enabled) => handleBountiesChannelChange(EBountiesNotification.BOUNTY_PAYOUTS_AND_MILESTONES, channel, enabled)}
 						/>
 
 						<Separator className='my-2' />
@@ -143,9 +143,9 @@ function BountiesNotificationsSection({ network }: BountiesNotificationsSectionP
 							title={t('Profile.Settings.Notifications.activityOnBountiesIFollow')}
 							description={t('Profile.Settings.Notifications.activityOnBountiesIFollowDescription')}
 							checked={bountiesNotifications.activityOnBountiesIFollow?.enabled || false}
-							onCheckedChange={(checked) => handleBountiesNotificationChange('activityOnBountiesIFollow', checked)}
+							onCheckedChange={(checked) => handleBountiesNotificationChange(EBountiesNotification.ACTIVITY_ON_BOUNTIES_I_FOLLOW, checked)}
 							channels={bountiesNotifications.activityOnBountiesIFollow?.channels}
-							onChannelChange={(channel, enabled) => handleBountiesChannelChange('activityOnBountiesIFollow', channel, enabled)}
+							onChannelChange={(channel, enabled) => handleBountiesChannelChange(EBountiesNotification.ACTIVITY_ON_BOUNTIES_I_FOLLOW, channel, enabled)}
 						/>
 					</div>
 				</div>

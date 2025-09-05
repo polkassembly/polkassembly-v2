@@ -4,7 +4,18 @@
 
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { ECookieNames, ESocial, ENotificationChannel } from '@/_shared/types';
+import {
+	ECookieNames,
+	ESocial,
+	ENotificationChannel,
+	EPostsNotification,
+	ECommentsNotification,
+	IUserNotificationSettings,
+	EBountiesNotification,
+	ETrackNotification,
+	EPostOrigin,
+	EProposalType
+} from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -58,6 +69,7 @@ const zodEditSchema = z
 		notificationPreferences: z
 			.object({
 				channelPreferences: z.record(
+					z.nativeEnum(ENotificationChannel),
 					z.object({
 						name: z.nativeEnum(ENotificationChannel),
 						enabled: z.boolean(),
@@ -66,14 +78,78 @@ const zodEditSchema = z
 						verification_token: z.string().optional()
 					})
 				),
-				triggerPreferences: z.record(
-					z.record(
-						z.object({
-							name: z.string(),
-							enabled: z.boolean()
-						})
+				triggerPreferences: z
+					.record(
+						z.string(),
+						z
+							.object({
+								name: z.string(),
+								enabled: z.boolean(),
+								isPrimary: z.boolean().optional(),
+								importPrimarySettings: z.boolean().optional(),
+								postsNotifications: z
+									.record(
+										z.enum([
+											EPostsNotification.PROPOSAL_STATUS_CHANGES,
+											EPostsNotification.NEW_PROPOSALS_IN_CATEGORIES,
+											EPostsNotification.VOTING_DEADLINE_REMINDERS,
+											EPostsNotification.UPDATES_ON_FOLLOWED_PROPOSALS,
+											EPostsNotification.PROPOSAL_OUTCOME_PUBLISHED,
+											EPostsNotification.PROPOSALS_YOU_VOTED_ON_ENACTED
+										]),
+										z.object({
+											enabled: z.boolean(),
+											channels: z.record(z.nativeEnum(ENotificationChannel), z.boolean()).optional()
+										})
+									)
+									.optional(),
+								commentsNotifications: z
+									.record(
+										z.enum([ECommentsNotification.COMMENTS_ON_MY_PROPOSALS, ECommentsNotification.REPLIES_TO_MY_COMMENTS, ECommentsNotification.MENTIONS]),
+										z.object({
+											enabled: z.boolean(),
+											channels: z.record(z.nativeEnum(ENotificationChannel), z.boolean()).optional()
+										})
+									)
+									.optional(),
+								bountiesNotifications: z
+									.record(
+										z.enum([
+											EBountiesNotification.BOUNTY_APPLICATION_STATUS_UPDATES,
+											EBountiesNotification.ACTIVITY_ON_BOUNTIES_I_FOLLOW,
+											EBountiesNotification.BOUNTY_PAYOUTS_AND_MILESTONES
+										]),
+										z.object({
+											enabled: z.boolean(),
+											channels: z.record(z.nativeEnum(ENotificationChannel), z.boolean()).optional()
+										})
+									)
+									.optional(),
+								openGovTracks: z
+									.record(
+										z.nativeEnum(EPostOrigin),
+										z.object({
+											enabled: z.boolean(),
+											notifications: z.record(
+												z.enum([ETrackNotification.NEW_REFERENDUM_SUBMITTED, ETrackNotification.REFERENDUM_IN_VOTING, ETrackNotification.REFERENDUM_CLOSED]),
+												z.boolean()
+											)
+										})
+									)
+									.optional(),
+								gov1Items: z
+									.record(
+										z.union([z.literal('mentionsIReceive'), z.nativeEnum(EProposalType)]),
+										z.object({
+											enabled: z.boolean(),
+											notifications: z.record(z.string(), z.boolean())
+										})
+									)
+									.optional()
+							})
+							.catchall(z.any())
 					)
-				)
+					.optional()
 			})
 			.optional()
 	})
@@ -129,7 +205,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 			coverImage,
 			...(publicSocialLinks?.length ? { publicSocialLinks } : {})
 		},
-		notificationPreferences
+		notificationPreferences: notificationPreferences as IUserNotificationSettings | undefined
 	});
 
 	if (email) {
