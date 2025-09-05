@@ -1260,7 +1260,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IGenericListingResponse<IProfileVote>>({ url, method });
 	}
 
-	static async fetchNotificationPreferences({ userId, getAllNetworks }: { userId: number; network?: string; getAllNetworks?: boolean }) {
+	static async fetchNotificationPreferences({ userId, getAllNetworks }: { userId: number; getAllNetworks?: boolean }) {
 		const queryParams = new URLSearchParams();
 
 		if (getAllNetworks) {
@@ -1276,7 +1276,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IUserNotificationSettings>({ url, method });
 	}
 
-	static async updateNotificationPreferences({ userId, updateData }: { userId: number; updateData: IUpdateNotificationPreferencesRequest; network?: string }) {
+	static async updateNotificationPreferences({ userId, updateData }: { userId: number; updateData: IUpdateNotificationPreferencesRequest }) {
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.UPDATE_NOTIFICATION_PREFERENCES,
 			routeSegments: [userId.toString(), 'notifications']
@@ -1296,7 +1296,8 @@ export class NextApiClientService {
 
 	static async bulkUpdateNotificationPreferences({
 		userId,
-		updates
+		updates,
+		network
 	}: {
 		userId: number;
 		updates: Array<{ section: string; key: string; value: unknown; network?: string }>;
@@ -1307,7 +1308,7 @@ export class NextApiClientService {
 			routeSegments: [userId.toString(), 'notifications']
 		});
 
-		return this.nextApiClientFetch<IUserNotificationSettings>({ url, method, data: { updates } });
+		return this.nextApiClientFetch<IUserNotificationSettings>({ url, method, data: { updates, network } });
 	}
 
 	static async generateVerificationToken({ userId, channel }: { userId: number; channel: ENotificationChannel }) {

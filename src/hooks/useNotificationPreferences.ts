@@ -145,7 +145,6 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		queryFn: async () => {
 			const response = await NextApiClientService.fetchNotificationPreferences({
 				userId: user!.id,
-				network: currentNetwork,
 				getAllNetworks
 			});
 			if (response.error) {
@@ -169,8 +168,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		mutationFn: async (updateData: IUpdateNotificationPreferencesRequest) => {
 			const response = await NextApiClientService.updateNotificationPreferences({
 				userId: user!.id,
-				updateData,
-				network: currentNetwork
+				updateData
 			});
 			if (response.error) {
 				throw new Error(response.error.message || 'Failed to update notification preferences');
@@ -508,10 +506,66 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			Object.keys(gov1Labels).forEach((key) => {
 				const networkPrefs = preferences?.triggerPreferences?.[network];
 				const currentSettings = networkPrefs?.gov1Items?.[key as keyof typeof networkPrefs.gov1Items];
+
+				let defaultNotifications = {};
+				switch (key) {
+					case EProposalType.REFERENDUM:
+						defaultNotifications = {
+							newReferendumSubmitted: enabled,
+							referendumInVoting: enabled,
+							referendumClosed: enabled
+						};
+						break;
+					case EProposalType.DEMOCRACY_PROPOSAL:
+						defaultNotifications = {
+							newProposalsSubmitted: enabled,
+							proposalInVoting: enabled,
+							proposalClosed: enabled
+						};
+						break;
+					case EProposalType.BOUNTY:
+						defaultNotifications = {
+							bountiesSubmitted: enabled,
+							bountiesClosed: enabled
+						};
+						break;
+					case EProposalType.CHILD_BOUNTY:
+						defaultNotifications = {
+							childBountiesSubmitted: enabled,
+							childBountiesClosed: enabled
+						};
+						break;
+					case EProposalType.TIP:
+						defaultNotifications = {
+							newTipsSubmitted: enabled,
+							tipsOpened: enabled,
+							tipsClosed: enabled
+						};
+						break;
+					case EProposalType.TECHNICAL_COMMITTEE:
+						defaultNotifications = {
+							newTechCommitteeProposalsSubmitted: enabled,
+							proposalsClosed: enabled
+						};
+						break;
+					case EProposalType.COUNCIL_MOTION:
+						defaultNotifications = {
+							newMotionsSubmitted: enabled,
+							motionInVoting: enabled,
+							motionClosed: enabled
+						};
+						break;
+					case 'mentionsIReceive':
+						defaultNotifications = {};
+						break;
+					default:
+						defaultNotifications = {};
+				}
+
 				const updatedSettings = {
 					...(currentSettings || {}),
 					enabled,
-					notifications: { ...(currentSettings?.notifications || {}) }
+					notifications: currentSettings?.notifications ? { ...currentSettings.notifications } : defaultNotifications
 				};
 				updates.push({
 					section: ENotifications.NETWORKS,
@@ -539,14 +593,69 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 					? networkPrefs?.openGovTracks?.[trackKey as keyof typeof networkPrefs.openGovTracks]
 					: networkPrefs?.gov1Items?.[trackKey as keyof typeof networkPrefs.gov1Items];
 
-			const notifications =
-				trackType === 'opengov'
-					? {
+			let notifications = {};
+
+			if (trackType === 'opengov') {
+				notifications = {
+					newReferendumSubmitted: enabled,
+					referendumInVoting: enabled,
+					referendumClosed: enabled
+				};
+			} else {
+				switch (trackKey) {
+					case EProposalType.REFERENDUM:
+						notifications = {
 							newReferendumSubmitted: enabled,
 							referendumInVoting: enabled,
 							referendumClosed: enabled
-						}
-					: {};
+						};
+						break;
+					case EProposalType.DEMOCRACY_PROPOSAL:
+						notifications = {
+							newProposalsSubmitted: enabled,
+							proposalInVoting: enabled,
+							proposalClosed: enabled
+						};
+						break;
+					case EProposalType.BOUNTY:
+						notifications = {
+							bountiesSubmitted: enabled,
+							bountiesClosed: enabled
+						};
+						break;
+					case EProposalType.CHILD_BOUNTY:
+						notifications = {
+							childBountiesSubmitted: enabled,
+							childBountiesClosed: enabled
+						};
+						break;
+					case EProposalType.TIP:
+						notifications = {
+							newTipsSubmitted: enabled,
+							tipsOpened: enabled,
+							tipsClosed: enabled
+						};
+						break;
+					case EProposalType.TECHNICAL_COMMITTEE:
+						notifications = {
+							newTechCommitteeProposalsSubmitted: enabled,
+							proposalsClosed: enabled
+						};
+						break;
+					case EProposalType.COUNCIL_MOTION:
+						notifications = {
+							newMotionsSubmitted: enabled,
+							motionInVoting: enabled,
+							motionClosed: enabled
+						};
+						break;
+					case 'mentionsIReceive':
+						notifications = {};
+						break;
+					default:
+						notifications = {};
+				}
+			}
 
 			const updatedSettings = {
 				...(currentSettings || {}),
@@ -597,20 +706,39 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		},
 		[user?.id, preferences]
 	);
-
 	const bulkUpdateTriggerPreferences = useCallback(
 		async (updates: Array<{ section: string; key: string; value: unknown; network?: string }>) => {
 			if (!user?.id) return;
 
-			const response = await NextApiClientService.bulkUpdateNotificationPreferences({
-				userId: user.id,
-				updates
+			const updatesByNetwork = updates.reduce(
+				(acc, update) => {
+					const networkKey = update.network || currentNetwork;
+					if (!acc[networkKey]) {
+						acc[networkKey] = [];
+					}
+					acc[networkKey].push(update);
+					return acc;
+				},
+				{} as Record<string, typeof updates>
+			);
+
+			const promises = Object.entries(updatesByNetwork).map(([network, networkUpdates]) =>
+				NextApiClientService.bulkUpdateNotificationPreferences({
+					userId: user.id,
+					updates: networkUpdates,
+					network
+				})
+			);
+
+			const responses = await Promise.all(promises);
+
+			responses.forEach((response) => {
+				if (response.error) {
+					throw new Error(response.error.message || 'Failed to bulk update trigger preferences');
+				}
 			});
-			if (response.error) {
-				throw new Error(response.error.message || 'Failed to bulk update trigger preferences');
-			}
 		},
-		[user?.id]
+		[user?.id, currentNetwork]
 	);
 
 	const generateToken = useCallback(
