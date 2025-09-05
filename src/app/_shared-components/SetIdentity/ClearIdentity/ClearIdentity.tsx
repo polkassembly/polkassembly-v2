@@ -11,6 +11,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@/hooks/useUser';
 import Image from 'next/image';
 import MechanicGIF from '@assets/gifs/mechanic.gif';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { Separator } from '../../Separator';
 import { Button } from '../../Button';
 import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
@@ -30,6 +31,8 @@ function ClearIdentity({ onSuccess }: { onSuccess?: () => void }) {
 
 	const queryClient = useQueryClient();
 
+	const { setVaultQrState } = usePolkadotVault();
+
 	const fetchIdentityInfo = async () => {
 		if (!identityService || !userPreferences.selectedAccount?.address) return null;
 
@@ -47,12 +50,15 @@ function ClearIdentity({ onSuccess }: { onSuccess?: () => void }) {
 	});
 
 	const handleClearIdentity = async () => {
-		if (!identityService || !userPreferences.selectedAccount?.address) return;
+		if (!identityService || !userPreferences.selectedAccount?.address || !userPreferences.wallet) return;
 
 		setLoading(true);
 
 		await identityService.clearOnChainIdentity({
 			address: userPreferences.selectedAccount.address,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
+			selectedAccount: userPreferences.selectedAccount,
 			onSuccess: () => {
 				toast({
 					title: t('SetIdentity.clearIdentitySuccess'),

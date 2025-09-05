@@ -132,6 +132,7 @@
 		"contentWillBeAvailableSoon": "Inhalt wird in Kürze verfügbar sein..."
 	},
 	"Profile": {
+		"noAddresses": "Keine Adressen gefunden",
 		"settings": "Einstellungen",
 		"login": "Anmelden",
 		"loginFailed": "Anmeldung fehlgeschlagen",
@@ -1509,7 +1510,8 @@
 		"useSuperSearchButton": "Super Suche verwenden",
 		"poweredByPolkassembly": "Bereitgestellt von Polkassembly.",
 		"enableSearchAndSuperSearch": "Wenn Sie die Suche und Super-Suche für Ihre Chain aktivieren möchten, kontaktieren Sie uns bitte unter",
-		"clearFilters": "Filter löschen"
+		"clearFilters": "Filter löschen",
+		"searchTriggerLabel": "Nach Vorschlägen, Diskussionen und Personen suchen"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "Kopfgeld erfolgreich vorgeschlagen",

@@ -1,19 +1,27 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+
 /* eslint-disable no-await-in-loop */
+/* eslint-disable sonarjs/no-duplicate-string */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { APPNAME } from '@/_shared/_constants/appName';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
+import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
 import { BN, BN_ZERO, hexToString, isHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { ENetwork, IOnChainIdentity } from '@shared/types';
+import { EAccountType, ENetwork, EWallet, IOnChainIdentity, ISelectedAccount, IVaultQrState } from '@shared/types';
+import { Dispatch, SetStateAction } from 'react';
+import { isMimirDetected } from './isMimirDetected';
+import { VaultQrSigner } from './vault_qr_signer_service';
+import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
 
 // Usage:
 // const identityService = await IdentityService.Init(ENetwork.POLKADOT, api);
@@ -137,10 +145,95 @@ export class IdentityService {
 		this.peopleChainApi.setSigner(signer);
 	}
 
+	getGenesisHash() {
+		return this.peopleChainApi.genesisHash.toHex();
+	}
+
+	// eslint-disable-next-line sonarjs/cognitive-complexity
+	private async executeTxCallback({
+		status,
+		events,
+		txHash,
+		setStatus,
+		onBroadcast,
+		onSuccess,
+		onFailed,
+		waitTillFinalizedHash,
+		errorMessageFallback,
+		setIsTxFinalized
+	}: {
+		status: ExtrinsicStatus;
+		events: EventRecord[];
+		txHash: Hash;
+		setStatus?: (pre: string) => void;
+		onBroadcast?: () => void;
+		onSuccess: (pre?: unknown) => Promise<void> | void;
+		onFailed: (errorMessageFallback: string) => Promise<void> | void;
+		waitTillFinalizedHash: boolean;
+		errorMessageFallback: string;
+		setIsTxFinalized?: (pre: string) => void;
+	}) {
+		let isFailed = false;
+		if (status.isInvalid) {
+			console.log('Transaction invalid');
+			setStatus?.('Transaction invalid');
+		} else if (status.isReady) {
+			console.log('Transaction is ready');
+			setStatus?.('Transaction is ready');
+		} else if (status.isBroadcast) {
+			console.log('Transaction has been broadcasted');
+			setStatus?.('Transaction has been broadcasted');
+			onBroadcast?.();
+		} else if (status.isInBlock) {
+			console.log('Transaction is in block');
+			setStatus?.('Transaction is in block');
+
+			// eslint-disable-next-line no-restricted-syntax
+			for (const { event } of events) {
+				if (event.method === 'ExtrinsicSuccess') {
+					setStatus?.('Transaction Success');
+					isFailed = false;
+					if (!waitTillFinalizedHash) {
+						// eslint-disable-next-line no-await-in-loop
+						await onSuccess(txHash);
+					}
+				} else if (event.method === 'ExtrinsicFailed') {
+					// eslint-disable-next-line sonarjs/no-duplicate-string
+					setStatus?.('Transaction failed');
+					console.log('Transaction failed');
+					const dispatchError = (event.data as any)?.dispatchError;
+					isFailed = true;
+
+					if (dispatchError?.isModule) {
+						const errorModule = (event.data as any)?.dispatchError?.asModule;
+						const { method, section, docs } = this.peopleChainApi.registry.findMetaError(errorModule);
+						// eslint-disable-next-line no-param-reassign
+						errorMessageFallback = `${section}.${method} : ${docs.join(' ')}`;
+						console.log(errorMessageFallback, 'error module');
+						await onFailed(errorMessageFallback);
+					} else if (dispatchError?.isToken) {
+						console.log(`${dispatchError.type}.${dispatchError.asToken.type}`);
+						await onFailed(`${dispatchError.type}.${dispatchError.asToken.type}`);
+					} else {
+						await onFailed(`${dispatchError.type}` || errorMessageFallback);
+					}
+				}
+			}
+		} else if (status.isFinalized) {
+			console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
+			console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
+			setIsTxFinalized?.(txHash.toString());
+			if (!isFailed && waitTillFinalizedHash) {
+				await onSuccess(txHash);
+			}
+		}
+	}
+
 	private async executeTx({
 		tx,
 		address,
-		proxyAddress,
+		wallet,
+		setVaultQrState,
 		params = {},
 		errorMessageFallback,
 		onSuccess,
@@ -148,94 +241,140 @@ export class IdentityService {
 		onBroadcast,
 		setStatus,
 		setIsTxFinalized,
-		waitTillFinalizedHash = false
+		waitTillFinalizedHash = false,
+		selectedAccount
 	}: {
 		tx: SubmittableExtrinsic<'promise'>;
 		address: string;
-		proxyAddress?: string;
+		wallet: EWallet;
 		params?: Record<string, unknown>;
 		errorMessageFallback: string;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 		onSuccess: (pre?: unknown) => Promise<void> | void;
 		onFailed: (errorMessageFallback: string) => Promise<void> | void;
 		onBroadcast?: () => void;
 		setStatus?: (pre: string) => void;
 		setIsTxFinalized?: (pre: string) => void;
 		waitTillFinalizedHash?: boolean;
+		selectedAccount?: ISelectedAccount;
 	}) {
-		let isFailed = false;
 		if (!this.peopleChainApi || !tx) return;
 
-		const extrinsic = proxyAddress ? this.peopleChainApi.tx.proxy.proxy(address, null, tx) : tx;
+		const isMimirIframe = await isMimirDetected();
 
-		const signerOptions = {
-			...params,
-			withSignedTransaction: true
-		};
+		if (isMimirIframe) {
+			const { web3Enable, web3FromSource } = await import('@polkadot/extension-dapp');
 
-		extrinsic
-			// eslint-disable-next-line sonarjs/cognitive-complexity
-			.signAndSend(proxyAddress || address, signerOptions, async ({ status, events, txHash }) => {
-				if (status.isInvalid) {
-					console.log('Transaction invalid');
-					setStatus?.('Transaction invalid');
-				} else if (status.isReady) {
-					console.log('Transaction is ready');
-					setStatus?.('Transaction is ready');
-				} else if (status.isBroadcast) {
-					console.log('Transaction has been broadcasted');
-					setStatus?.('Transaction has been broadcasted');
-					onBroadcast?.();
-				} else if (status.isInBlock) {
-					console.log('Transaction is in block');
-					setStatus?.('Transaction is in block');
+			await web3Enable(APPNAME);
+			const injected = await web3FromSource('mimir');
+			const isMimir = injected.name === 'mimir';
+			if (!isMimir) {
+				return;
+			}
 
-					// eslint-disable-next-line no-restricted-syntax
-					for (const { event } of events) {
-						if (event.method === 'ExtrinsicSuccess') {
-							setStatus?.('Transaction Success');
-							isFailed = false;
-							if (!waitTillFinalizedHash) {
-								// eslint-disable-next-line no-await-in-loop
-								await onSuccess(txHash);
-							}
-						} else if (event.method === 'ExtrinsicFailed') {
-							// eslint-disable-next-line sonarjs/no-duplicate-string
-							setStatus?.('Transaction failed');
-							console.log('Transaction failed');
-							const dispatchError = (event.data as any)?.dispatchError;
-							isFailed = true;
+			if (!injected.signer?.signPayload) {
+				return;
+			}
 
-							if (dispatchError?.isModule) {
-								const errorModule = (event.data as any)?.dispatchError?.asModule;
-								const { method, section, docs } = this.peopleChainApi.registry.findMetaError(errorModule);
-								// eslint-disable-next-line no-param-reassign
-								errorMessageFallback = `${section}.${method} : ${docs.join(' ')}`;
-								console.log(errorMessageFallback, 'error module');
-								await onFailed(errorMessageFallback);
-							} else if (dispatchError?.isToken) {
-								console.log(`${dispatchError.type}.${dispatchError.asToken.type}`);
-								await onFailed(`${dispatchError.type}.${dispatchError.asToken.type}`);
-							} else {
-								await onFailed(`${dispatchError.type}` || errorMessageFallback);
-							}
-						}
-					}
-				} else if (status.isFinalized) {
-					console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
-					console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
-					setIsTxFinalized?.(txHash.toString());
-					if (!isFailed && waitTillFinalizedHash) {
-						await onSuccess(txHash);
-					}
+			const result: any = await injected.signer.signPayload({
+				address,
+				method: tx.method.toHex(),
+				genesisHash: this.getGenesisHash()
+			} as any);
+
+			const call = this.peopleChainApi.registry.createType('Call', result.payload.method);
+
+			const newTx = this.peopleChainApi.tx[call.section][call.method](...call.args);
+
+			newTx.addSignature(result.signer, result.signature, result.payload);
+
+			newTx
+				// eslint-disable-next-line sonarjs/cognitive-complexity
+				.send(async ({ status, events, txHash }) =>
+					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
+				)
+				.catch((error: unknown) => {
+					console.log(':( transaction failed');
+					setStatus?.(':( transaction failed');
+					console.error('ERROR:', error);
+					onFailed(error?.toString?.() || errorMessageFallback);
+				});
+		} else if (wallet === EWallet.POLKADOT_VAULT) {
+			const signer = new VaultQrSigner(this.peopleChainApi.registry, setVaultQrState);
+			await tx.signAsync(address, { nonce: -1, signer });
+
+			setVaultQrState((prev) => ({
+				...prev,
+				open: false
+			}));
+
+			tx
+				// eslint-disable-next-line sonarjs/cognitive-complexity
+				.send(async ({ status, events, txHash }) =>
+					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
+				)
+				.catch((error: unknown) => {
+					console.log(':( transaction failed');
+					setStatus?.(':( transaction failed');
+					console.error('ERROR:', error);
+					onFailed(error?.toString?.() || errorMessageFallback);
+				});
+		} else {
+			const injected = await getInjectedWallet(wallet);
+
+			if (!injected) {
+				console.log('Signer not set, Please refresh and try again');
+				onFailed('Signer not set, Please refresh and try again');
+				return;
+			}
+
+			this.setSigner(injected.signer as Signer);
+			let extrinsic = tx;
+
+			// for pure proxy accounts, we need to get the multisig account
+			const getMultisigAccount = (account?: ISelectedAccount): ISelectedAccount | null => {
+				if (!account) return null;
+				if (account.accountType === EAccountType.MULTISIG) {
+					return account;
 				}
-			})
-			.catch((error: unknown) => {
-				console.log(':( transaction failed');
-				setStatus?.(':( transaction failed');
-				console.log(error?.toString?.(), 'error?.toString?.()', errorMessageFallback);
-				onFailed(error?.toString?.() || errorMessageFallback);
-				console.error('ERROR:', error);
-			});
+
+				if (account.parent) {
+					return getMultisigAccount(account.parent);
+				}
+
+				return null;
+			};
+
+			const multisigAccount = getMultisigAccount(selectedAccount);
+
+			if (selectedAccount?.accountType === EAccountType.PROXY) {
+				extrinsic = this.peopleChainApi.tx.proxy.proxy(selectedAccount.address, null, extrinsic);
+			}
+
+			if (multisigAccount) {
+				const signatories = multisigAccount?.signatories?.map((signatory) => getEncodedAddress(signatory, this.network)).filter((signatory) => signatory !== address);
+				const { weight } = await extrinsic.paymentInfo(address);
+				extrinsic = this.peopleChainApi.tx.multisig.asMulti(multisigAccount?.threshold, signatories, null, extrinsic, weight);
+			}
+
+			const signerOptions = {
+				...params,
+				withSignedTransaction: true
+			};
+
+			extrinsic
+				// eslint-disable-next-line sonarjs/cognitive-complexity
+				.signAndSend(address, signerOptions, async ({ status, events, txHash }) =>
+					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
+				)
+				.catch((error: unknown) => {
+					console.log(':( transaction failed');
+					setStatus?.(':( transaction failed');
+					console.log(error?.toString?.(), 'error?.toString?.()', errorMessageFallback);
+					onFailed(error?.toString?.() || errorMessageFallback);
+					console.error('ERROR:', error);
+				});
+		}
 	}
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
@@ -290,6 +429,9 @@ export class IdentityService {
 
 	async setOnChainIdentity({
 		address,
+		wallet,
+		setVaultQrState,
+		selectedAccount,
 		displayName,
 		email,
 		legalName,
@@ -300,6 +442,9 @@ export class IdentityService {
 		onFailed
 	}: {
 		address: string;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+		selectedAccount?: ISelectedAccount;
 		displayName: string;
 		email: string;
 		legalName?: string;
@@ -327,6 +472,9 @@ export class IdentityService {
 		await this.executeTx({
 			tx,
 			address: encodedAddress,
+			wallet,
+			setVaultQrState,
+			selectedAccount,
 			errorMessageFallback: 'Failed to set identity',
 			waitTillFinalizedHash: true,
 			onSuccess: () => {
@@ -339,13 +487,31 @@ export class IdentityService {
 		});
 	}
 
-	async clearOnChainIdentity({ address, onSuccess, onFailed }: { address: string; onSuccess?: () => void; onFailed?: (errorMessageFallback?: string) => void }) {
+	async clearOnChainIdentity({
+		address,
+		wallet,
+		setVaultQrState,
+		selectedAccount,
+		onSuccess,
+		onFailed
+	}: {
+		address: string;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+		selectedAccount?: ISelectedAccount;
+		onSuccess?: () => void;
+		onFailed?: (errorMessageFallback?: string) => void;
+	}) {
 		const encodedAddress = getEncodedAddress(address, this.network) || address;
 		const clearIdentityTx = this.peopleChainApi.tx.identity.clearIdentity();
 
 		await this.executeTx({
 			tx: clearIdentityTx,
 			address: encodedAddress,
+			wallet,
+
+			setVaultQrState,
+			selectedAccount,
 			errorMessageFallback: 'Failed to clear identity',
 			waitTillFinalizedHash: true,
 			onSuccess: () => {

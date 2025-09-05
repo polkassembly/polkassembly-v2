@@ -16,6 +16,8 @@ import { Separator } from '@/app/_shared-components/Separator';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { cn } from '@/lib/utils';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import NoActivityGIF from '@assets/activityfeed/gifs/noactivity.gif';
+import Image from 'next/image';
 import classes from './OnchainIdentityCard.module.scss';
 import LinkAddress from '../LinkAddress/LinkAddress';
 import Address from '../../Address/Address';
@@ -90,65 +92,77 @@ function OnchainIdentityCard({ userProfile, setUserProfile, addresses }: { userP
 			</div>
 			<div className={classes.onchainIdentityCardContent}>
 				<TooltipProvider>
-					{displayedAddresses.map((a) => {
-						const identity = identities?.find((i) => i && i.address === a);
-						const judgementText = identity?.judgements?.[0]?.[1]?.toString() || t('Profile.noJudgements');
-						const judgementCount = identity?.judgements?.length || 0;
+					{addresses.length > 0 ? (
+						displayedAddresses.map((a) => {
+							const identity = identities?.find((i) => i && i.address === a);
+							const judgementText = identity?.judgements?.[0]?.[1]?.toString() || t('Profile.noJudgements');
+							const judgementCount = identity?.judgements?.length || 0;
 
-						return (
-							<div
-								key={a}
-								className={classes.identityRow}
-							>
-								<div className={classes.identityInfo}>
-									<div className='flex max-w-[100px] gap-1 truncate'>
-										<Address
-											address={a}
-											className={classes.addressComponent}
-											disableTooltip
-											redirectToProfile={false}
-											truncateCharLen={4}
-										/>
-									</div>
-
-									<Separator
-										orientation='vertical'
-										className='h-4'
-									/>
-									{isFetching || !identityService ? (
-										<Skeleton className='ml-2 h-4 w-16' />
-									) : (
-										<div className={classes.statusContainer}>
-											<div className={classes.judgementText}>
-												{!!judgementCount && <span>{t('Profile.judgement')}:</span>}
-												<span>{judgementText}</span>
-											</div>
-											{judgementCount > 1 && (
-												<Tooltip>
-													<TooltipTrigger asChild>
-														<div className={classes.judgementCounter}>+{judgementCount - 1}</div>
-													</TooltipTrigger>
-													<TooltipContent
-														side='top'
-														align='center'
-														className={cn(classes.tooltipContent, 'bg-tooltip_background text-white')}
-													>
-														{identity?.judgements?.map((j) => {
-															return (
-																<div key={j[0].toString()}>
-																	<span>{j[1].toString()}</span>
-																</div>
-															);
-														})}
-													</TooltipContent>
-												</Tooltip>
-											)}
+							return (
+								<div
+									key={a}
+									className={classes.identityRow}
+								>
+									<div className={classes.identityInfo}>
+										<div className='flex max-w-[100px] gap-1 truncate'>
+											<Address
+												address={a}
+												className={classes.addressComponent}
+												disableTooltip
+												redirectToProfile={false}
+												truncateCharLen={4}
+											/>
 										</div>
-									)}
+
+										<Separator
+											orientation='vertical'
+											className='h-4'
+										/>
+										{isFetching || !identityService ? (
+											<Skeleton className='ml-2 h-4 w-16' />
+										) : (
+											<div className={classes.statusContainer}>
+												<div className={classes.judgementText}>
+													{!!judgementCount && <span>{t('Profile.judgement')}:</span>}
+													<span>{judgementText}</span>
+												</div>
+												{judgementCount > 1 && (
+													<Tooltip>
+														<TooltipTrigger asChild>
+															<div className={classes.judgementCounter}>+{judgementCount - 1}</div>
+														</TooltipTrigger>
+														<TooltipContent
+															side='top'
+															align='center'
+															className={cn(classes.tooltipContent, 'bg-tooltip_background text-white')}
+														>
+															{identity?.judgements?.map((j) => {
+																return (
+																	<div key={j[0].toString()}>
+																		<span>{j[1].toString()}</span>
+																	</div>
+																);
+															})}
+														</TooltipContent>
+													</Tooltip>
+												)}
+											</div>
+										)}
+									</div>
 								</div>
-							</div>
-						);
-					})}
+							);
+						})
+					) : (
+						<div className='flex w-full flex-col items-center gap-y-2'>
+							<Image
+								src={NoActivityGIF}
+								alt='no-activity'
+								width={100}
+								height={100}
+							/>
+							<p className='text-sm text-text_primary'>{t('Profile.noAddresses')}</p>
+						</div>
+					)}
 					{addresses.length > 2 && (
 						<div className={classes.showMoreContainer}>
 							<Button

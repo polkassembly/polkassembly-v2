@@ -13,7 +13,6 @@ import Head1 from '@assets/sidebar/head1.svg';
 import Head2 from '@assets/sidebar/head2.svg';
 import Head3 from '@assets/sidebar/head3.svg';
 import Head4 from '@assets/sidebar/head4.svg';
-import Foot1 from '@assets/sidebar/foot1.svg';
 import Foot2 from '@assets/sidebar/foot2.svg';
 import Foot3 from '@assets/sidebar/foot3.svg';
 import Foot4 from '@assets/sidebar/foot4.svg';
@@ -78,7 +77,6 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 
 	const bgColor = 'bg-sidebar_footer';
 	const footerData = [
-		{ src: Foot1, alt: 'Foot 1', bgColor, tooltip: 'TownHall', url: 'https://townhallgov.com/' },
 		{ src: Foot2, alt: 'Foot 2', bgColor, tooltip: 'Polkasafe', url: 'https://polkasafe.xyz/' },
 		{ src: Foot3, alt: 'Foot 3', bgColor, tooltip: 'Fellowship', url: 'https://collectives.polkassembly.io/' },
 		{ src: Foot4, alt: 'Foot 4', bgColor, tooltip: 'Staking', url: 'https://staking.polkadot.cloud/#/overview' }

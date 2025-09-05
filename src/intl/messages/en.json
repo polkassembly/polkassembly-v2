@@ -132,6 +132,7 @@
 		"contentWillBeAvailableSoon": "Content will be available soon..."
 	},
 	"Profile": {
+		"noAddresses": "No addresses linked",
 		"settings": "Settings",
 		"login": "Login",
 		"loginFailed": "Failed to login",
@@ -1597,7 +1598,8 @@
 		"useSuperSearchButton": "Use Super Search",
 		"poweredByPolkassembly": "Powered by Polkassembly.",
 		"enableSearchAndSuperSearch": "If you'd like to enable search and super search for your chain, please reach out to us on",
-		"clearFilters": "Clear Filters"
+		"clearFilters": "Clear Filters",
+		"searchTriggerLabel": "Search for proposals, discussions, and people"
 	},
 	"Parachains": {
 		"projects": "Projects",
@@ -1656,5 +1658,17 @@
 		"openVaultAppInYourPhone": "Open the Vault app in your phone",
 		"scanTheQRHere": "Scan the QR here from the Vault app",
 		"scanTheSignatureQRInYourApp": "Verify the signature QR in your app and sign the transaction"
+	},
+	"GovAnalytics": {
+		"overview": "Overview",
+		"voting": "Voting",
+		"totalProposals": "Total Proposals",
+		"approvedProposals": "Approved Proposals",
+		"monitoredTracks": "Monitored Tracks",
+		"referendumCount": "Referendum Count",
+		"referendumCountByStatus": "Referendum Count by Status",
+		"referendumCountByCategory": "Referendum Count by Category",
+		"monthlySpend": "Monthly DOT Spent",
+		"averageTurnoutPercentage": "Average Turnout Percentage"
 	}
 }

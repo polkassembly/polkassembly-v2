@@ -442,7 +442,8 @@ export enum ENotificationTrigger {
 
 export enum EDataSource {
 	POLKASSEMBLY = 'polkassembly',
-	SUBSQUARE = 'subsquare'
+	SUBSQUARE = 'subsquare',
+	OTHER = 'other'
 }
 
 export enum EReaction {
@@ -1631,4 +1632,72 @@ export interface IProfileVote extends Omit<IVoteData, 'createdAtBlock' | 'delega
 	proposal?: {
 		status: EProposalStatus;
 	};
+}
+
+export interface IGovAnalyticsStats {
+	totalProposals: number;
+	approvedProposals: number;
+}
+
+export interface IGovAnalyticsReferendumOutcome {
+	approved: number;
+	rejected: number;
+	timeout: number;
+	ongoing: number;
+	cancelled: number;
+}
+
+export interface ITurnoutPercentageData {
+	averageSupportPercentages: Record<string, number>;
+}
+
+export interface IRawTurnoutData {
+	proposals: {
+		index: number;
+		trackNumber?: number;
+		convictionVoting: {
+			balance: {
+				value?: string;
+				aye?: string;
+				nay?: string;
+				abstain?: string;
+			};
+			decision: 'yes' | 'no' | 'abstain' | 'split' | 'splitAbstain';
+		}[];
+	}[];
+}
+
+export interface IGovAnalyticsDelegationStats {
+	totalCapital: string;
+	totalVotesBalance: string;
+	totalDelegates: number;
+	totalDelegators: number;
+}
+
+export interface IGovAnalyticsCategoryCounts {
+	governance: number | null;
+	main: number | null;
+	treasury: number | null;
+	whiteList: number | null;
+}
+
+// please make sure this is updated with the latest changes in the functions/src/types.ts file
+export interface IAlgoliaPost extends Record<string, unknown> {
+	objectID: string;
+	title: string;
+	createdAtTimestamp?: number;
+	updatedAtTimestamp?: number;
+	tags: string[];
+	dataSource: string;
+	proposalType: string;
+	network: string;
+	topic: string;
+	lastCommentAtTimestamp?: number;
+	userId: number;
+	hash?: string;
+	index?: number;
+	parsedContent: string;
+	titleAndContentHash: string;
+	proposer?: string;
+	origin?: EPostOrigin;
 }
