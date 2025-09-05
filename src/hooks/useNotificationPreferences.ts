@@ -6,11 +6,148 @@
 
 import { useCallback, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { IUpdateNotificationPreferencesRequest, IUserNotificationChannelPreferences, ENotificationChannel, ENotifications, EPostOrigin, EProposalType } from '@/_shared/types';
+import {
+	IUpdateNotificationPreferencesRequest,
+	IUserNotificationChannelPreferences,
+	ENotificationChannel,
+	ENotifications,
+	EPostOrigin,
+	EProposalType,
+	IUserNotificationSettings,
+	INetworkNotificationSettings
+} from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { STALE_TIME } from '@/_shared/_constants/listingLimit';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from './useUser';
+
+const updateChannelPreferences = (data: IUserNotificationSettings, key: string, value: IUserNotificationChannelPreferences): IUserNotificationSettings => {
+	const newData = { ...data };
+
+	if (!newData.channelPreferences) {
+		newData.channelPreferences = {} as Record<ENotificationChannel, IUserNotificationChannelPreferences>;
+	}
+
+	const channelKey = key as ENotificationChannel;
+	newData.channelPreferences = {
+		...newData.channelPreferences,
+		[channelKey]: {
+			...newData.channelPreferences[channelKey],
+			...value
+		}
+	};
+
+	return newData;
+};
+
+const ensureNetworkPreferences = (data: IUserNotificationSettings, networkKey: string): IUserNotificationSettings => {
+	const newData = { ...data };
+
+	if (!newData.networkPreferences) {
+		newData.networkPreferences = {};
+	}
+	if (!newData.networkPreferences[networkKey]) {
+		newData.networkPreferences[networkKey] = {
+			enabled: true,
+			importPrimarySettings: false
+		};
+	}
+
+	return newData;
+};
+
+const updateNestedNotificationSetting = (networkPrefs: INetworkNotificationSettings, sectionKey: string, itemKey: string, value: unknown): INetworkNotificationSettings => {
+	const sectionMap: Record<string, string> = {
+		postsNotifications: 'postsNotifications',
+		commentsNotifications: 'commentsNotifications',
+		bountiesNotifications: 'bountiesNotifications',
+		openGovTracks: 'openGovTracks',
+		gov1Items: 'gov1Items'
+	};
+
+	const targetSection = sectionMap[sectionKey];
+	if (!targetSection) return networkPrefs;
+
+	const updatedPrefs = { ...networkPrefs };
+
+	if (targetSection === 'postsNotifications') {
+		updatedPrefs.postsNotifications = {
+			...(updatedPrefs.postsNotifications || {}),
+			[itemKey]: value
+		} as typeof updatedPrefs.postsNotifications;
+	} else if (targetSection === 'commentsNotifications') {
+		updatedPrefs.commentsNotifications = {
+			...(updatedPrefs.commentsNotifications || {}),
+			[itemKey]: value
+		} as typeof updatedPrefs.commentsNotifications;
+	} else if (targetSection === 'bountiesNotifications') {
+		updatedPrefs.bountiesNotifications = {
+			...(updatedPrefs.bountiesNotifications || {}),
+			[itemKey]: value
+		} as typeof updatedPrefs.bountiesNotifications;
+	} else if (targetSection === 'openGovTracks') {
+		updatedPrefs.openGovTracks = {
+			...(updatedPrefs.openGovTracks || {}),
+			[itemKey]: value
+		} as typeof updatedPrefs.openGovTracks;
+	} else if (targetSection === 'gov1Items') {
+		updatedPrefs.gov1Items = {
+			...(updatedPrefs.gov1Items || {}),
+			[itemKey]: value
+		} as typeof updatedPrefs.gov1Items;
+	}
+
+	return updatedPrefs;
+};
+
+const updateNetworkPreferences = (data: IUserNotificationSettings, key: string, value: unknown): IUserNotificationSettings => {
+	const newData = { ...data };
+
+	if (!newData.networkPreferences) {
+		newData.networkPreferences = {};
+	}
+
+	if (key.includes('.')) {
+		const [networkKey, sectionKey, itemKey] = key.split('.');
+
+		const updatedData = ensureNetworkPreferences(newData, networkKey);
+
+		if (!updatedData.networkPreferences) {
+			return updatedData;
+		}
+
+		const networkPrefs = updatedData.networkPreferences[networkKey];
+
+		if (sectionKey && itemKey && networkPrefs) {
+			updatedData.networkPreferences![networkKey] = updateNestedNotificationSetting(networkPrefs, sectionKey, itemKey, value);
+		}
+
+		return updatedData;
+	}
+
+	const { networkPreferences } = newData;
+	networkPreferences[key] = {
+		...networkPreferences[key],
+		...(value as Record<string, unknown>)
+	};
+
+	return newData;
+};
+
+const applyOptimisticUpdate = (currentData: IUserNotificationSettings, update: IUpdateNotificationPreferencesRequest): IUserNotificationSettings => {
+	const { section, key, value } = update;
+	const newData = JSON.parse(JSON.stringify(currentData)) as IUserNotificationSettings;
+
+	switch (section) {
+		case ENotifications.CHANNELS:
+			return updateChannelPreferences(newData, key, value as IUserNotificationChannelPreferences);
+		case ENotifications.NETWORKS:
+		case 'networks':
+			return updateNetworkPreferences(newData, key, value);
+		default:
+			return newData;
+	}
+};
 
 export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 	const { user } = useUser();
@@ -56,12 +193,33 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			}
 			return response.data;
 		},
+		onMutate: async (updateData) => {
+			await queryClient.cancelQueries({ queryKey });
+
+			const previousData = queryClient.getQueryData<IUserNotificationSettings>(queryKey);
+
+			if (previousData) {
+				const optimisticData = applyOptimisticUpdate(previousData, updateData);
+				queryClient.setQueryData(queryKey, optimisticData);
+			}
+
+			return { previousData };
+		},
+		onError: (err, updateData, context) => {
+			if (context?.previousData) {
+				queryClient.setQueryData(queryKey, context.previousData);
+			}
+		},
 		onSuccess: (data) => {
 			queryClient.setQueryData(queryKey, data);
 			if (getAllNetworks) {
 				queryClient.setQueryData(['notificationPreferences', user?.id, currentNetwork], data);
 			}
-			queryClient.invalidateQueries({ queryKey: ['notificationPreferences', user?.id] });
+			queryClient.invalidateQueries({
+				queryKey: ['notificationPreferences', user?.id],
+				exact: false,
+				refetchType: 'none'
+			});
 		}
 	});
 
@@ -77,12 +235,42 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			}
 			return response.data;
 		},
+		onMutate: async (updates) => {
+			await queryClient.cancelQueries({ queryKey });
+
+			const previousData = queryClient.getQueryData<IUserNotificationSettings>(queryKey);
+
+			if (previousData) {
+				let optimisticData = previousData;
+				updates.forEach((update) => {
+					const typedUpdate: IUpdateNotificationPreferencesRequest = {
+						section: update.section as ENotifications,
+						key: update.key,
+						value: update.value,
+						network: update.network
+					};
+					optimisticData = applyOptimisticUpdate(optimisticData, typedUpdate);
+				});
+				queryClient.setQueryData(queryKey, optimisticData);
+			}
+
+			return { previousData };
+		},
+		onError: (err, updates, context) => {
+			if (context?.previousData) {
+				queryClient.setQueryData(queryKey, context.previousData);
+			}
+		},
 		onSuccess: (data) => {
 			queryClient.setQueryData(queryKey, data);
 			if (getAllNetworks) {
 				queryClient.setQueryData(['notificationPreferences', user?.id, currentNetwork], data);
 			}
-			queryClient.invalidateQueries({ queryKey: ['notificationPreferences', user?.id] });
+			queryClient.invalidateQueries({
+				queryKey: ['notificationPreferences', user?.id],
+				exact: false,
+				refetchType: 'none'
+			});
 		}
 	});
 
@@ -149,7 +337,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 						: undefined;
 				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
 				updates.push({
-					section: 'networks',
+					section: ENotifications.NETWORKS,
 					key: `${network}.postsNotifications.${key}`,
 					value: updatedSettings,
 					network
@@ -191,7 +379,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 						: undefined;
 				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
 				updates.push({
-					section: 'networks',
+					section: ENotifications.NETWORKS,
 					key: `${network}.commentsNotifications.${key}`,
 					value: updatedSettings,
 					network
@@ -233,7 +421,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 						: undefined;
 				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: {} };
 				updates.push({
-					section: 'networks',
+					section: ENotifications.NETWORKS,
 					key: `${network}.bountiesNotifications.${key}`,
 					value: updatedSettings,
 					network
@@ -297,14 +485,14 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			};
 
 			const gov1Labels = {
-				mentionsIReceive: 'Mentions I receive',
-				referendums: EProposalType.REFERENDUM,
-				proposals: EProposalType.DEMOCRACY_PROPOSAL,
-				bounties: EProposalType.BOUNTY,
-				childBounties: EProposalType.CHILD_BOUNTY,
-				tips: EProposalType.TIP,
-				techCommittee: EProposalType.TECHNICAL_COMMITTEE,
-				councilMotion: EProposalType.COUNCIL_MOTION
+				mentionsIReceive: 'mentionsIReceive',
+				[EProposalType.REFERENDUM]: EProposalType.REFERENDUM,
+				[EProposalType.DEMOCRACY_PROPOSAL]: EProposalType.DEMOCRACY_PROPOSAL,
+				[EProposalType.BOUNTY]: EProposalType.BOUNTY,
+				[EProposalType.CHILD_BOUNTY]: EProposalType.CHILD_BOUNTY,
+				[EProposalType.TIP]: EProposalType.TIP,
+				[EProposalType.TECHNICAL_COMMITTEE]: EProposalType.TECHNICAL_COMMITTEE,
+				[EProposalType.COUNCIL_MOTION]: EProposalType.COUNCIL_MOTION
 			};
 
 			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
@@ -322,7 +510,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 					}
 				};
 				updates.push({
-					section: 'networks',
+					section: ENotifications.NETWORKS,
 					key: `${network}.openGovTracks.${key}`,
 					value: updatedSettings,
 					network
@@ -338,7 +526,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 					notifications: { ...(currentSettings?.notifications || {}) }
 				};
 				updates.push({
-					section: 'networks',
+					section: ENotifications.NETWORKS,
 					key: `${network}.gov1Items.${key}`,
 					value: updatedSettings,
 					network
@@ -398,7 +586,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 				const updates = [
 					{
-						section: 'networks',
+						section: ENotifications.NETWORKS,
 						key: toNetwork,
 						value: {
 							...fromSettings,
@@ -415,8 +603,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 					throw new Error(response.error.message || 'Failed to import network settings');
 				}
 				return true;
-			} catch (error) {
-				console.error('Failed to import network settings:', error);
+			} catch {
 				return false;
 			}
 		},

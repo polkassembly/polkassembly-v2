@@ -136,7 +136,7 @@ const getGov1NotificationLabels = (itemKey: string, t: (key: string) => string):
 
 const getTrackLabels = (t: (key: string) => string): Record<string, { origin: EPostOrigin; label: string }> => ({
 	root: { origin: EPostOrigin.ROOT, label: t('Sidebar.Root') },
-	stakingAdmin: { origin: EPostOrigin.STAKING_ADMIN, label: t('Sidebar.StakingAdmin') },
+	stakingAdmin: { origin: EPostOrigin.STAKING_ADMIN, label: t('ListingPage.StakingAdmin') },
 	auctionAdmin: { origin: EPostOrigin.AUCTION_ADMIN, label: t('Sidebar.AuctionAdmin') },
 	treasurer: { origin: EPostOrigin.TREASURER, label: t('Sidebar.Treasurer') },
 	referendumCanceller: { origin: EPostOrigin.REFERENDUM_CANCELLER, label: t('Sidebar.ReferendumCanceller') },
@@ -155,13 +155,13 @@ const getTrackLabels = (t: (key: string) => string): Record<string, { origin: EP
 
 const getGov1Labels = (t: (key: string) => string): Record<string, { label: string }> => ({
 	mentionsIReceive: { label: t('Profile.Settings.Notifications.mentionsIReceive') },
-	referendums: { label: t('Sidebar.referenda') },
-	proposals: { label: t('Sidebar.proposals') },
-	bounties: { label: t('Sidebar.bounty') },
-	childBounties: { label: t('Sidebar.childBounties') },
-	tips: { label: t('Sidebar.tips') },
-	techCommittee: { label: t('Sidebar.techComm') },
-	councilMotion: { label: t('Sidebar.motions') }
+	[EProposalType.REFERENDUM]: { label: t('Sidebar.referenda') },
+	[EProposalType.DEMOCRACY_PROPOSAL]: { label: t('Sidebar.proposals') },
+	[EProposalType.BOUNTY]: { label: t('Sidebar.bounty') },
+	[EProposalType.CHILD_BOUNTY]: { label: t('Sidebar.childBounties') },
+	[EProposalType.TIP]: { label: t('Sidebar.tips') },
+	[EProposalType.TECHNICAL_COMMITTEE]: { label: t('Sidebar.techComm') },
+	[EProposalType.COUNCIL_MOTION]: { label: t('Sidebar.motions') }
 });
 
 interface AdvancedSettingsSectionProps {
