@@ -155,15 +155,15 @@ const getTrackLabels = (t: (key: string) => string): Record<string, { origin: EP
 	whitelistedCaller: { origin: EPostOrigin.WHITELISTED_CALLER, label: t('Sidebar.WhitelistedCaller') }
 });
 
-const getGov1Labels = (t: (key: string) => string): Record<string, { origin?: EPostOrigin; label: string }> => ({
+const getGov1Labels = (t: (key: string) => string): Record<string, { label: string }> => ({
 	mentionsIReceive: { label: t('Profile.Settings.Notifications.mentionsIReceive') },
-	referendums: { origin: EPostOrigin.ROOT, label: t('Sidebar.referenda') },
-	proposals: { origin: EPostOrigin.ROOT, label: t('Sidebar.proposals') },
-	bounties: { origin: EPostOrigin.ROOT, label: t('Sidebar.bounty') },
-	childBounties: { origin: EPostOrigin.ROOT, label: t('Sidebar.childBounties') },
-	tips: { origin: EPostOrigin.ROOT, label: t('Sidebar.tips') },
-	techCommittee: { origin: EPostOrigin.ROOT, label: t('Sidebar.techComm') },
-	councilMotion: { origin: EPostOrigin.ROOT, label: t('Sidebar.motions') }
+	referendums: { label: t('Sidebar.referenda') },
+	proposals: { label: t('Sidebar.proposals') },
+	bounties: { label: t('Sidebar.bounty') },
+	childBounties: { label: t('Sidebar.childBounties') },
+	tips: { label: t('Sidebar.tips') },
+	techCommittee: { label: t('Sidebar.techComm') },
+	councilMotion: { label: t('Sidebar.motions') }
 });
 
 interface AdvancedSettingsSectionProps {
@@ -186,7 +186,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	};
 
 	const handleOpenGovNotificationChange = (trackKey: string, notificationKey: string, enabled: boolean) => {
-		const current = openGovTracks[trackKey] ?? { enabled: false, notifications: {} as Record<string, boolean> };
+		const current = openGovTracks[trackKey as keyof typeof openGovTracks] ?? { enabled: false, notifications: {} as Record<string, boolean> };
 		updateNetworkOpenGovTrack(network, trackKey, {
 			...current,
 			enabled: current.enabled || enabled,
@@ -202,7 +202,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	};
 
 	const handleGov1NotificationChange = (itemKey: string, notificationKey: string, enabled: boolean) => {
-		const current = gov1Items[itemKey] ?? { enabled: false, notifications: {} as Record<string, boolean> };
+		const current = gov1Items[itemKey as keyof typeof gov1Items] ?? { enabled: false, notifications: {} as Record<string, boolean> };
 		updateNetworkGov1Item(network, itemKey, {
 			...current,
 			enabled: current.enabled || enabled,
@@ -213,8 +213,8 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 		});
 	};
 
-	const allOpenGovEnabled = Object.keys(trackLabels).every((key) => openGovTracks[key]?.enabled === true);
-	const allGov1Enabled = Object.keys(gov1Labels).every((key) => gov1Items[key]?.enabled === true);
+	const allOpenGovEnabled = Object.keys(trackLabels).every((key) => openGovTracks[key as keyof typeof openGovTracks]?.enabled === true);
+	const allGov1Enabled = Object.keys(gov1Labels).every((key) => gov1Items[key as keyof typeof gov1Items]?.enabled === true);
 	const allAdvancedEnabled = allOpenGovEnabled && allGov1Enabled;
 
 	const toggleAllAdvanced = () => {
@@ -301,9 +301,9 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 													/>
 												}
 												title={label}
-												enabled={openGovTracks[key]?.enabled || false}
+												enabled={openGovTracks[key as keyof typeof openGovTracks]?.enabled || false}
 												notifications={
-													openGovTracks[key]?.notifications || {
+													openGovTracks[key as keyof typeof openGovTracks]?.notifications || {
 														newReferendumSubmitted: false,
 														referendumInVoting: false,
 														referendumClosed: false
@@ -331,9 +331,9 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 													/>
 												}
 												title={label}
-												enabled={openGovTracks[key]?.enabled || false}
+												enabled={openGovTracks[key as keyof typeof openGovTracks]?.enabled || false}
 												notifications={
-													openGovTracks[key]?.notifications || {
+													openGovTracks[key as keyof typeof openGovTracks]?.notifications || {
 														newReferendumSubmitted: false,
 														referendumInVoting: false,
 														referendumClosed: false
@@ -368,8 +368,8 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 													/>
 												}
 												title={label}
-												enabled={gov1Items[key]?.enabled || false}
-												notifications={gov1Items[key]?.notifications || {}}
+												enabled={gov1Items[key as keyof typeof gov1Items]?.enabled || false}
+												notifications={gov1Items[key as keyof typeof gov1Items]?.notifications || {}}
 												notificationLabels={getGov1NotificationLabels(key, t)}
 												onEnabledChange={(enabled) => handleGov1ItemChange(key, enabled)}
 												onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange(key, notificationKey, enabled)}
@@ -394,8 +394,8 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 													/>
 												}
 												title={label}
-												enabled={gov1Items[key]?.enabled || false}
-												notifications={gov1Items[key]?.notifications || {}}
+												enabled={gov1Items[key as keyof typeof gov1Items]?.enabled || false}
+												notifications={gov1Items[key as keyof typeof gov1Items]?.notifications || {}}
 												notificationLabels={getGov1NotificationLabels(key, t)}
 												onEnabledChange={(enabled) => handleGov1ItemChange(key, enabled)}
 												onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange(key, notificationKey, enabled)}

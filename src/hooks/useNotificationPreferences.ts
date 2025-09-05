@@ -6,20 +6,12 @@
 
 import { useCallback, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-	IUserNotificationPreferences,
-	IUpdateNotificationPreferencesRequest,
-	INotificationChannelSettings,
-	ENotificationChannel,
-	INetworkNotificationSettings,
-	IOpenGovTrackSettings,
-	IGov1ItemSettings
-} from '@/_shared/types';
+import { IUserNotificationSettings, IUpdateNotificationPreferencesRequest, IUserNotificationChannelPreferences, ENotificationChannel, ENotifications } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { STALE_TIME } from '@/_shared/_constants/listingLimit';
 import { useUser } from './useUser';
 
-const fetchNotificationPreferences = async (userId: number, network?: string, getAllNetworks?: boolean): Promise<IUserNotificationPreferences> => {
+const fetchNotificationPreferences = async (userId: number, network?: string, getAllNetworks?: boolean): Promise<IUserNotificationSettings> => {
 	const headers: Record<string, string> = {
 		'Content-Type': 'application/json'
 	};
@@ -46,7 +38,7 @@ const fetchNotificationPreferences = async (userId: number, network?: string, ge
 	return result.data;
 };
 
-const updateNotificationPreferences = async (userId: number, updateData: IUpdateNotificationPreferencesRequest, network?: string): Promise<IUserNotificationPreferences> => {
+const updateNotificationPreferences = async (userId: number, updateData: IUpdateNotificationPreferencesRequest, network?: string): Promise<IUserNotificationSettings> => {
 	const headers: Record<string, string> = {
 		'Content-Type': 'application/json'
 	};
@@ -73,7 +65,7 @@ const bulkUpdateNotificationPreferences = async (
 	userId: number,
 	updates: Array<{ section: string; key: string; value: unknown; network?: string }>,
 	network?: string
-): Promise<IUserNotificationPreferences> => {
+): Promise<IUserNotificationSettings> => {
 	const headers: Record<string, string> = {
 		'Content-Type': 'application/json'
 	};
@@ -152,205 +144,20 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		refetchInterval: false
 	});
 
-	const updateNetworkPreference = useCallback((updated: IUserNotificationPreferences, key: string, value: unknown) => {
-		const networkPreferences = updated.networkPreferences || {};
-
-		if (key.includes('.')) {
-			const [networkId, ...pathParts] = key.split('.');
-			if (!networkId || pathParts.length === 0) return updated;
-
-			const networkSettings = Object.prototype.hasOwnProperty.call(networkPreferences, networkId) ? networkPreferences[networkId] : ({} as INetworkNotificationSettings);
-
-			const updatedSettings = JSON.parse(JSON.stringify(networkSettings)) as Record<string, unknown>;
-			let pointer = updatedSettings;
-
-			for (let i = 0; i < pathParts.length - 1; i += 1) {
-				const pathPart = pathParts[i];
-				if (pathPart) {
-					if (!Object.prototype.hasOwnProperty.call(pointer, pathPart)) {
-						pointer[pathPart] = {};
-					}
-					pointer = pointer[pathPart] as Record<string, unknown>;
-				}
-			}
-			const lastPathPart = pathParts[pathParts.length - 1];
-			if (lastPathPart) {
-				pointer[lastPathPart] = value;
-			}
-
-			return {
-				...updated,
-				networkPreferences: {
-					...networkPreferences,
-					[networkId]: updatedSettings as unknown as INetworkNotificationSettings
-				}
-			};
-		}
-
-		const existingValue = Object.prototype.hasOwnProperty.call(networkPreferences, key) ? networkPreferences[key] : ({} as INetworkNotificationSettings);
-		const newValue = typeof value === 'object' && value !== null ? (value as Partial<INetworkNotificationSettings>) : {};
-
-		return {
-			...updated,
-			networkPreferences: {
-				...networkPreferences,
-				[key]: { ...existingValue, ...newValue }
-			}
-		};
-	}, []);
-
-	const updateChannelPreference = useCallback((updated: IUserNotificationPreferences, key: string, value: unknown) => {
-		const channelPreferences = updated.channelPreferences || ({} as Record<ENotificationChannel, INotificationChannelSettings>);
-		const channelKey = key as ENotificationChannel;
-		const existingValue = Object.prototype.hasOwnProperty.call(channelPreferences, channelKey) ? channelPreferences[channelKey] : {};
-		const newValue = typeof value === 'object' && value !== null ? (value as Partial<INotificationChannelSettings>) : {};
-
-		return {
-			...updated,
-			channelPreferences: {
-				...channelPreferences,
-				[channelKey]: { ...existingValue, ...newValue }
-			}
-		};
-	}, []);
-
 	const mutation = useMutation({
 		mutationFn: (updateData: IUpdateNotificationPreferencesRequest) => updateNotificationPreferences(user!.id, updateData, getAllNetworks ? undefined : currentNetwork),
-		onMutate: async (updateData) => {
-			await queryClient.cancelQueries({ queryKey });
-
-			const previousData = queryClient.getQueryData(queryKey);
-
-			queryClient.setQueryData(queryKey, (old: IUserNotificationPreferences | undefined) => {
-				if (!old) return old;
-
-				const updated = { ...old };
-				const { section, key, value } = updateData;
-
-				if (section === 'networks') {
-					return updateNetworkPreference(updated, key, value);
-				}
-				if (section === 'channels') {
-					return updateChannelPreference(updated, key, value);
-				}
-				if (section === 'opengov') {
-					const openGovTracks = updated.openGovTracks || {};
-					return { ...updated, openGovTracks: { ...openGovTracks, [key]: value } };
-				}
-				if (section === 'gov1') {
-					const gov1Items = updated.gov1Items || {};
-					return { ...updated, gov1Items: { ...gov1Items, [key]: value } };
-				}
-				if (section === 'posts') {
-					const posts = updated.postsNotifications || {};
-					return { ...updated, postsNotifications: { ...posts, [key]: value } };
-				}
-				if (section === 'comments') {
-					const comments = updated.commentsNotifications || {};
-					return { ...updated, commentsNotifications: { ...comments, [key]: value } };
-				}
-				if (section === 'bounties') {
-					const bounties = updated.bountiesNotifications || {};
-					return { ...updated, bountiesNotifications: { ...bounties, [key]: value } };
-				}
-
-				return updated;
-			});
-
-			return { previousData };
-		},
-		onError: (err, updateData, context) => {
-			if (context?.previousData) {
-				queryClient.setQueryData(queryKey, context.previousData);
-			}
-		},
 		onSuccess: (data) => {
 			queryClient.setQueryData(queryKey, data);
-
 			if (getAllNetworks) {
 				queryClient.setQueryData(['notificationPreferences', user?.id, currentNetwork], data);
 			}
-
 			queryClient.invalidateQueries({ queryKey: ['notificationPreferences', user?.id] });
 		}
 	});
-
-	const processGroupedUpdates = useCallback(
-		(updated: IUserNotificationPreferences, groupedUpdates: Map<string, { section: string; key: string; value: unknown }>) => {
-			let result = { ...updated };
-
-			groupedUpdates.forEach(({ section, key, value }) => {
-				if (section === 'networks') {
-					result = updateNetworkPreference(result, key, value);
-				} else if (section === 'opengov') {
-					const openGovTracks = result.openGovTracks || {};
-					result = {
-						...result,
-						openGovTracks: {
-							...openGovTracks,
-							[key]: value as IOpenGovTrackSettings
-						}
-					};
-				} else if (section === 'gov1') {
-					const gov1Items = result.gov1Items || {};
-					result = {
-						...result,
-						gov1Items: {
-							...gov1Items,
-							[key]: value as IGov1ItemSettings
-						}
-					};
-				}
-			});
-			return result;
-		},
-		[updateNetworkPreference]
-	);
-
-	const groupUpdates = useCallback((updates: Array<{ section: string; key: string; value: unknown; network?: string }>) => {
-		const groupedUpdates = new Map<string, { section: string; key: string; value: unknown }>();
-
-		updates.forEach((update) => {
-			const updateKey = `${update.section}:${update.key}`;
-
-			if (groupedUpdates.has(updateKey)) {
-				const existing = groupedUpdates.get(updateKey)!;
-				if (typeof existing.value === 'object' && existing.value !== null && typeof update.value === 'object' && update.value !== null) {
-					existing.value = { ...existing.value, ...update.value };
-				} else {
-					existing.value = update.value;
-				}
-			} else {
-				groupedUpdates.set(updateKey, { section: update.section, key: update.key, value: update.value });
-			}
-		});
-
-		return groupedUpdates;
-	}, []);
 
 	const bulkMutation = useMutation({
 		mutationFn: (updates: Array<{ section: string; key: string; value: unknown; network?: string }>) =>
 			bulkUpdateNotificationPreferences(user!.id, updates, getAllNetworks ? undefined : currentNetwork),
-		onMutate: async (updates) => {
-			await queryClient.cancelQueries({ queryKey });
-
-			const previousData = queryClient.getQueryData(queryKey);
-
-			queryClient.setQueryData(queryKey, (old: IUserNotificationPreferences | undefined) => {
-				if (!old) return old;
-
-				const updated = { ...old };
-				const groupedUpdates = groupUpdates(updates);
-				return processGroupedUpdates(updated, groupedUpdates);
-			});
-
-			return { previousData };
-		},
-		onError: (err, updates, context) => {
-			if (context?.previousData) {
-				queryClient.setQueryData(queryKey, context.previousData);
-			}
-		},
 		onSuccess: (data) => {
 			queryClient.setQueryData(queryKey, data);
 			if (getAllNetworks) {
@@ -360,12 +167,12 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		}
 	});
 
-	const updateChannelPreferenceMutation = useCallback(
-		(channel: ENotificationChannel, settings: Partial<INotificationChannelSettings>) => {
+	const updateChannelPreference = useCallback(
+		(channel: ENotificationChannel, settings: Partial<IUserNotificationChannelPreferences>) => {
 			if (!user?.id) return;
 
 			mutation.mutate({
-				section: 'channels',
+				section: ENotifications.CHANNELS,
 				key: channel,
 				value: settings
 			});
@@ -373,12 +180,12 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		[user?.id, mutation]
 	);
 
-	const updateNetworkPreferenceMutation = useCallback(
+	const updateNetworkPreference = useCallback(
 		(networkId: string, settings: { enabled: boolean; isPrimary?: boolean; importPrimarySettings: boolean }) => {
 			if (!user?.id) return;
 
 			mutation.mutate({
-				section: 'networks',
+				section: ENotifications.NETWORKS,
 				key: networkId,
 				value: settings
 			});
@@ -391,7 +198,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			if (!user?.id) return;
 
 			mutation.mutate({
-				section: 'posts',
+				section: ENotifications.POSTS,
 				key: type,
 				value: settings
 			});
@@ -404,220 +211,13 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			if (!user?.id) return;
 
 			mutation.mutate({
-				section: 'networks',
+				section: ENotifications.NETWORKS,
 				key: `${network}.postsNotifications.${type}`,
 				value: settings,
 				network
 			});
 		},
 		[user?.id, mutation]
-	);
-
-	const updateCommentsNotification = useCallback(
-		(type: string, settings: unknown) => {
-			if (!user?.id) return;
-
-			mutation.mutate({
-				section: 'comments',
-				key: type,
-				value: settings
-			});
-		},
-		[user?.id, mutation]
-	);
-
-	const updateNetworkCommentsNotification = useCallback(
-		(network: string, type: string, settings: unknown) => {
-			if (!user?.id) return;
-
-			mutation.mutate({
-				section: 'networks',
-				key: `${network}.commentsNotifications.${type}`,
-				value: settings,
-				network
-			});
-		},
-		[user?.id, mutation]
-	);
-
-	const updateBountiesNotification = useCallback(
-		(type: string, settings: unknown) => {
-			if (!user?.id) return;
-
-			mutation.mutate({
-				section: 'bounties',
-				key: type,
-				value: settings
-			});
-		},
-		[user?.id, mutation]
-	);
-
-	const updateNetworkBountiesNotification = useCallback(
-		(network: string, type: string, settings: unknown) => {
-			if (!user?.id) return;
-
-			mutation.mutate({
-				section: 'networks',
-				key: `${network}.bountiesNotifications.${type}`,
-				value: settings,
-				network
-			});
-		},
-		[user?.id, mutation]
-	);
-
-	const updateOpenGovTrack = useCallback(
-		(trackKey: string, settings: unknown) => {
-			if (!user?.id) return;
-
-			mutation.mutate({
-				section: 'opengov',
-				key: trackKey,
-				value: settings
-			});
-		},
-		[user?.id, mutation]
-	);
-
-	const updateGov1Item = useCallback(
-		(itemKey: string, settings: unknown) => {
-			if (!user?.id) return;
-
-			mutation.mutate({
-				section: 'gov1',
-				key: itemKey,
-				value: settings
-			});
-		},
-		[user?.id, mutation]
-	);
-
-	const generateToken = useCallback(
-		async (channel: ENotificationChannel) => {
-			if (!user?.id) return '';
-
-			try {
-				return await generateVerificationToken(user.id, channel);
-			} catch {
-				return '';
-			}
-		},
-		[user?.id]
-	);
-
-	const verifyToken = useCallback(
-		async (channel: ENotificationChannel, token: string, handle: string) => {
-			if (!user?.id) return false;
-
-			try {
-				return await verifyChannelToken(user.id, channel, token, handle);
-			} catch {
-				return false;
-			}
-		},
-		[user?.id]
-	);
-
-	const createOpenGovTrackUpdates = useCallback((enabled: boolean, userPreferences: IUserNotificationPreferences) => {
-		const trackLabels = {
-			root: 'Root',
-			stakingAdmin: 'Staking Admin',
-			auctionAdmin: 'Auction Admin',
-			treasurer: 'Treasurer',
-			referendumCanceller: 'Referendum Canceller',
-			referendumKiller: 'Referendum Killer',
-			leaseAdmin: 'Lease Admin',
-			memberReferenda: 'Member Referenda',
-			smallTipper: 'Small Tipper',
-			bigTipper: 'Big Tipper',
-			smallSpender: 'Small Spender',
-			mediumSpender: 'Medium Spender',
-			bigSpender: 'Big Spender',
-			fellowshipAdmin: 'Fellowship Admin',
-			generalAdmin: 'General Admin',
-			whitelistedCaller: 'Whitelisted Caller'
-		};
-
-		return Object.keys(trackLabels).map((key) => {
-			const currentSettings =
-				userPreferences.openGovTracks && Object.prototype.hasOwnProperty.call(userPreferences.openGovTracks, key)
-					? (userPreferences.openGovTracks[key] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
-					: undefined;
-			const updatedSettings: { enabled: boolean; notifications: Record<string, boolean> } = {
-				...currentSettings,
-				enabled,
-				notifications: {
-					newReferendumSubmitted: enabled,
-					referendumInVoting: enabled,
-					referendumClosed: enabled
-				}
-			};
-
-			return {
-				section: 'opengov',
-				key,
-				value: updatedSettings
-			};
-		});
-	}, []);
-
-	const createGov1ItemUpdates = useCallback((enabled: boolean, userPreferences: IUserNotificationPreferences) => {
-		const gov1Labels = {
-			mentionsIReceive: 'Mentions I receive',
-			referendums: 'Referendums',
-			proposals: 'Proposals',
-			bounties: 'Bounties',
-			childBounties: 'Child Bounties',
-			tips: 'Tips',
-			techCommittee: 'Tech Committee',
-			councilMotion: 'Council Motion'
-		};
-
-		return Object.keys(gov1Labels).map((key) => {
-			const currentSettings =
-				userPreferences.gov1Items && Object.prototype.hasOwnProperty.call(userPreferences.gov1Items, key)
-					? (userPreferences.gov1Items[key] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
-					: undefined;
-			const updatedSettings: { enabled: boolean; notifications: Record<string, boolean> } = {
-				...currentSettings,
-				enabled,
-				notifications: { ...(currentSettings?.notifications || {}) }
-			};
-
-			const notificationMappings: Record<string, Record<string, boolean>> = {
-				referendums: { newReferendumSubmitted: enabled, referendumInVoting: enabled, referendumClosed: enabled },
-				proposals: { newProposalsSubmitted: enabled, proposalInVoting: enabled, proposalClosed: enabled },
-				bounties: { bountiesSubmitted: enabled, bountiesClosed: enabled },
-				childBounties: { childBountiesSubmitted: enabled, childBountiesClosed: enabled },
-				tips: { newTipsSubmitted: enabled, tipsOpened: enabled, tipsClosed: enabled },
-				techCommittee: { newTechCommitteeProposalsSubmitted: enabled, proposalsClosed: enabled },
-				councilMotion: { newMotionsSubmitted: enabled, motionInVoting: enabled, motionClosed: enabled }
-			};
-
-			if (Object.prototype.hasOwnProperty.call(notificationMappings, key)) {
-				updatedSettings.notifications = { ...updatedSettings.notifications, ...notificationMappings[key] };
-			}
-
-			return {
-				section: 'gov1',
-				key,
-				value: updatedSettings
-			};
-		});
-	}, []);
-
-	const bulkUpdateAdvancedSettings = useCallback(
-		(enabled: boolean) => {
-			if (!user?.id || !preferences) return;
-
-			const openGovUpdates = createOpenGovTrackUpdates(enabled, preferences);
-			const gov1Updates = createGov1ItemUpdates(enabled, preferences);
-			const updates = [...openGovUpdates, ...gov1Updates];
-
-			bulkMutation.mutate(updates);
-		},
-		[user?.id, preferences, bulkMutation, createOpenGovTrackUpdates, createGov1ItemUpdates]
 	);
 
 	const bulkUpdatePostsNotifications = useCallback(
@@ -687,6 +287,33 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		[user?.id, preferences, bulkMutation]
 	);
 
+	const updateCommentsNotification = useCallback(
+		(type: string, settings: unknown) => {
+			if (!user?.id) return;
+
+			mutation.mutate({
+				section: ENotifications.COMMENTS,
+				key: type,
+				value: settings
+			});
+		},
+		[user?.id, mutation]
+	);
+
+	const updateNetworkCommentsNotification = useCallback(
+		(network: string, type: string, settings: unknown) => {
+			if (!user?.id) return;
+
+			mutation.mutate({
+				section: ENotifications.NETWORKS,
+				key: `${network}.commentsNotifications.${type}`,
+				value: settings,
+				network
+			});
+		},
+		[user?.id, mutation]
+	);
+
 	const bulkUpdateCommentsNotifications = useCallback(
 		(enabled: boolean) => {
 			if (!user?.id || !preferences) return;
@@ -738,6 +365,33 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			bulkMutation.mutate(updates);
 		},
 		[user?.id, preferences, bulkMutation]
+	);
+
+	const updateBountiesNotification = useCallback(
+		(type: string, settings: unknown) => {
+			if (!user?.id) return;
+
+			mutation.mutate({
+				section: ENotifications.BOUNTIES,
+				key: type,
+				value: settings
+			});
+		},
+		[user?.id, mutation]
+	);
+
+	const updateNetworkBountiesNotification = useCallback(
+		(network: string, type: string, settings: unknown) => {
+			if (!user?.id) return;
+
+			mutation.mutate({
+				section: ENotifications.NETWORKS,
+				key: `${network}.bountiesNotifications.${type}`,
+				value: settings,
+				network
+			});
+		},
+		[user?.id, mutation]
 	);
 
 	const bulkUpdateBountiesNotifications = useCallback(
@@ -793,88 +447,17 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		[user?.id, preferences, bulkMutation]
 	);
 
-	const getOpenGovNotifications = useCallback(
-		(enabled: boolean) => ({
-			newReferendumSubmitted: enabled,
-			referendumInVoting: enabled,
-			referendumClosed: enabled
-		}),
-		[]
-	);
+	const updateOpenGovTrack = useCallback(
+		(trackKey: string, settings: unknown) => {
+			if (!user?.id) return;
 
-	const getGov1Notifications = useCallback((trackKey: string, enabled: boolean, currentSettings?: { notifications?: Record<string, boolean> }) => {
-		const baseNotifications = { ...(currentSettings?.notifications || {}) };
-
-		const notificationMappings: Record<string, Record<string, boolean>> = {
-			referendums: {
-				newReferendumSubmitted: enabled,
-				referendumInVoting: enabled,
-				referendumClosed: enabled
-			},
-			proposals: {
-				newProposalsSubmitted: enabled,
-				proposalInVoting: enabled,
-				proposalClosed: enabled
-			},
-			bounties: {
-				bountiesSubmitted: enabled,
-				bountiesClosed: enabled
-			},
-			childBounties: {
-				childBountiesSubmitted: enabled,
-				childBountiesClosed: enabled
-			},
-			tips: {
-				newTipsSubmitted: enabled,
-				tipsOpened: enabled,
-				tipsClosed: enabled
-			},
-			techCommittee: {
-				newTechCommitteeProposalsSubmitted: enabled,
-				proposalsClosed: enabled
-			},
-			councilMotion: {
-				newMotionsSubmitted: enabled,
-				motionInVoting: enabled,
-				motionClosed: enabled
-			}
-		};
-
-		return {
-			...baseNotifications,
-			...(Object.prototype.hasOwnProperty.call(notificationMappings, trackKey) ? notificationMappings[trackKey] : {})
-		};
-	}, []);
-
-	const bulkUpdateTrackNotifications = useCallback(
-		(trackKey: string, enabled: boolean, trackType: 'opengov' | 'gov1' = 'opengov') => {
-			if (!user?.id || !preferences) return;
-
-			const currentSettings =
-				trackType === 'opengov'
-					? preferences.openGovTracks && Object.prototype.hasOwnProperty.call(preferences.openGovTracks, trackKey)
-						? (preferences.openGovTracks[trackKey] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
-						: undefined
-					: preferences.gov1Items && Object.prototype.hasOwnProperty.call(preferences.gov1Items, trackKey)
-						? (preferences.gov1Items[trackKey] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
-						: undefined;
-
-			const notifications = trackType === 'opengov' ? getOpenGovNotifications(enabled) : getGov1Notifications(trackKey, enabled, currentSettings);
-
-			const updatedSettings = {
-				...currentSettings,
-				enabled,
-				notifications
-			};
-
-			const section = trackType === 'opengov' ? 'opengov' : 'gov1';
 			mutation.mutate({
-				section,
+				section: ENotifications.OPENGOV,
 				key: trackKey,
-				value: updatedSettings
+				value: settings
 			});
 		},
-		[user?.id, preferences, mutation, getOpenGovNotifications, getGov1Notifications]
+		[user?.id, mutation]
 	);
 
 	const updateNetworkOpenGovTrack = useCallback(
@@ -882,10 +465,23 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			if (!user?.id) return;
 
 			mutation.mutate({
-				section: 'networks',
+				section: ENotifications.NETWORKS,
 				key: `${network}.openGovTracks.${trackKey}`,
 				value: settings,
 				network
+			});
+		},
+		[user?.id, mutation]
+	);
+
+	const updateGov1Item = useCallback(
+		(itemKey: string, settings: unknown) => {
+			if (!user?.id) return;
+
+			mutation.mutate({
+				section: ENotifications.GOV1,
+				key: itemKey,
+				value: settings
 			});
 		},
 		[user?.id, mutation]
@@ -896,7 +492,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			if (!user?.id) return;
 
 			mutation.mutate({
-				section: 'networks',
+				section: ENotifications.NETWORKS,
 				key: `${network}.gov1Items.${itemKey}`,
 				value: settings,
 				network
@@ -905,123 +501,174 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		[user?.id, mutation]
 	);
 
-	const createNetworkOpenGovTrackUpdates = useCallback((network: string, enabled: boolean, userPreferences: IUserNotificationPreferences) => {
-		const trackLabels = {
-			root: 'Root',
-			stakingAdmin: 'Staking Admin',
-			auctionAdmin: 'Auction Admin',
-			treasurer: 'Treasurer',
-			referendumCanceller: 'Referendum Canceller',
-			referendumKiller: 'Referendum Killer',
-			leaseAdmin: 'Lease Admin',
-			memberReferenda: 'Member Referenda',
-			smallTipper: 'Small Tipper',
-			bigTipper: 'Big Tipper',
-			smallSpender: 'Small Spender',
-			mediumSpender: 'Medium Spender',
-			bigSpender: 'Big Spender',
-			fellowshipAdmin: 'Fellowship Admin',
-			generalAdmin: 'General Admin',
-			whitelistedCaller: 'Whitelisted Caller'
-		};
+	const bulkUpdateAdvancedSettings = useCallback(
+		(enabled: boolean) => {
+			if (!user?.id || !preferences) return;
 
-		return Object.keys(trackLabels).map((key) => {
-			const currentSettings =
-				userPreferences.networkPreferences?.[network]?.openGovTracks && Object.prototype.hasOwnProperty.call(userPreferences.networkPreferences[network].openGovTracks, key)
-					? (userPreferences.networkPreferences[network].openGovTracks[key] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
-					: undefined;
-			const updatedSettings: { enabled: boolean; notifications: Record<string, boolean> } = {
-				...currentSettings,
-				enabled,
-				notifications: {
-					newReferendumSubmitted: enabled,
-					referendumInVoting: enabled,
-					referendumClosed: enabled
-				}
+			const trackLabels = {
+				root: 'Root',
+				stakingAdmin: 'Staking Admin',
+				auctionAdmin: 'Auction Admin',
+				treasurer: 'Treasurer',
+				referendumCanceller: 'Referendum Canceller',
+				referendumKiller: 'Referendum Killer',
+				leaseAdmin: 'Lease Admin',
+				memberReferenda: 'Member Referenda',
+				smallTipper: 'Small Tipper',
+				bigTipper: 'Big Tipper',
+				smallSpender: 'Small Spender',
+				mediumSpender: 'Medium Spender',
+				bigSpender: 'Big Spender',
+				fellowshipAdmin: 'Fellowship Admin',
+				generalAdmin: 'General Admin',
+				whitelistedCaller: 'Whitelisted Caller'
 			};
 
-			return {
-				section: 'networks',
-				key: `${network}.openGovTracks.${key}`,
-				value: updatedSettings,
-				network
-			};
-		});
-	}, []);
-
-	const createNetworkGov1ItemUpdates = useCallback((network: string, enabled: boolean, userPreferences: IUserNotificationPreferences) => {
-		const gov1Labels = {
-			mentionsIReceive: 'Mentions I receive',
-			referendums: 'Referendums',
-			proposals: 'Proposals',
-			bounties: 'Bounties',
-			childBounties: 'Child Bounties',
-			tips: 'Tips',
-			techCommittee: 'Tech Committee',
-			councilMotion: 'Council Motion'
-		};
-
-		return Object.keys(gov1Labels).map((key) => {
-			const currentSettings =
-				userPreferences.networkPreferences?.[network]?.gov1Items && Object.prototype.hasOwnProperty.call(userPreferences.networkPreferences[network].gov1Items, key)
-					? (userPreferences.networkPreferences[network].gov1Items[key] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
-					: undefined;
-			const updatedSettings: { enabled: boolean; notifications: Record<string, boolean> } = {
-				...currentSettings,
-				enabled,
-				notifications: { ...(currentSettings?.notifications || {}) }
+			const gov1Labels = {
+				mentionsIReceive: 'Mentions I receive',
+				referendums: 'Referendums',
+				proposals: 'Proposals',
+				bounties: 'Bounties',
+				childBounties: 'Child Bounties',
+				tips: 'Tips',
+				techCommittee: 'Tech Committee',
+				councilMotion: 'Council Motion'
 			};
 
-			const notificationMappings: Record<string, Record<string, boolean>> = {
-				referendums: { newReferendumSubmitted: enabled, referendumInVoting: enabled, referendumClosed: enabled },
-				proposals: { newProposalsSubmitted: enabled, proposalInVoting: enabled, proposalClosed: enabled },
-				bounties: { bountiesSubmitted: enabled, bountiesClosed: enabled },
-				childBounties: { childBountiesSubmitted: enabled, childBountiesClosed: enabled },
-				tips: { newTipsSubmitted: enabled, tipsOpened: enabled, tipsClosed: enabled },
-				techCommittee: { newTechCommitteeProposalsSubmitted: enabled, proposalsClosed: enabled },
-				councilMotion: { newMotionsSubmitted: enabled, motionInVoting: enabled, motionClosed: enabled }
-			};
+			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
 
-			if (Object.prototype.hasOwnProperty.call(notificationMappings, key)) {
-				updatedSettings.notifications = { ...updatedSettings.notifications, ...notificationMappings[key] };
-			}
+			Object.keys(trackLabels).forEach((key) => {
+				const currentSettings = preferences.openGovTracks?.[key as keyof typeof preferences.openGovTracks];
+				const updatedSettings = {
+					...(currentSettings || {}),
+					enabled,
+					notifications: {
+						newReferendumSubmitted: enabled,
+						referendumInVoting: enabled,
+						referendumClosed: enabled
+					}
+				};
+				updates.push({
+					section: 'opengov',
+					key,
+					value: updatedSettings
+				});
+			});
 
-			return {
-				section: 'networks',
-				key: `${network}.gov1Items.${key}`,
-				value: updatedSettings,
-				network
-			};
-		});
-	}, []);
+			Object.keys(gov1Labels).forEach((key) => {
+				const currentSettings = preferences.gov1Items?.[key as keyof typeof preferences.gov1Items];
+				const updatedSettings = {
+					...(currentSettings || {}),
+					enabled,
+					notifications: { ...(currentSettings?.notifications || {}) }
+				};
+				updates.push({
+					section: 'gov1',
+					key,
+					value: updatedSettings
+				});
+			});
+
+			bulkMutation.mutate(updates);
+		},
+		[user?.id, preferences, bulkMutation]
+	);
 
 	const bulkUpdateNetworkAdvancedSettings = useCallback(
 		(network: string, enabled: boolean) => {
 			if (!user?.id || !preferences) return;
 
-			const openGovUpdates = createNetworkOpenGovTrackUpdates(network, enabled, preferences);
-			const gov1Updates = createNetworkGov1ItemUpdates(network, enabled, preferences);
-			const updates = [...openGovUpdates, ...gov1Updates];
+			const trackLabels = {
+				root: 'Root',
+				stakingAdmin: 'Staking Admin',
+				auctionAdmin: 'Auction Admin',
+				treasurer: 'Treasurer',
+				referendumCanceller: 'Referendum Canceller',
+				referendumKiller: 'Referendum Killer',
+				leaseAdmin: 'Lease Admin',
+				memberReferenda: 'Member Referenda',
+				smallTipper: 'Small Tipper',
+				bigTipper: 'Big Tipper',
+				smallSpender: 'Small Spender',
+				mediumSpender: 'Medium Spender',
+				bigSpender: 'Big Spender',
+				fellowshipAdmin: 'Fellowship Admin',
+				generalAdmin: 'General Admin',
+				whitelistedCaller: 'Whitelisted Caller'
+			};
+
+			const gov1Labels = {
+				mentionsIReceive: 'Mentions I receive',
+				referendums: 'Referendums',
+				proposals: 'Proposals',
+				bounties: 'Bounties',
+				childBounties: 'Child Bounties',
+				tips: 'Tips',
+				techCommittee: 'Tech Committee',
+				councilMotion: 'Council Motion'
+			};
+
+			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
+
+			Object.keys(trackLabels).forEach((key) => {
+				const networkPrefs = preferences.networkPreferences?.[network];
+				const currentSettings = networkPrefs?.openGovTracks?.[key as keyof typeof networkPrefs.openGovTracks];
+				const updatedSettings = {
+					...(currentSettings || {}),
+					enabled,
+					notifications: {
+						newReferendumSubmitted: enabled,
+						referendumInVoting: enabled,
+						referendumClosed: enabled
+					}
+				};
+				updates.push({
+					section: 'networks',
+					key: `${network}.openGovTracks.${key}`,
+					value: updatedSettings,
+					network
+				});
+			});
+
+			Object.keys(gov1Labels).forEach((key) => {
+				const networkPrefs = preferences.networkPreferences?.[network];
+				const currentSettings = networkPrefs?.gov1Items?.[key as keyof typeof networkPrefs.gov1Items];
+				const updatedSettings = {
+					...(currentSettings || {}),
+					enabled,
+					notifications: { ...(currentSettings?.notifications || {}) }
+				};
+				updates.push({
+					section: 'networks',
+					key: `${network}.gov1Items.${key}`,
+					value: updatedSettings,
+					network
+				});
+			});
 
 			bulkMutation.mutate(updates);
 		},
-		[user?.id, preferences, bulkMutation, createNetworkOpenGovTrackUpdates, createNetworkGov1ItemUpdates]
+		[user?.id, preferences, bulkMutation]
 	);
 
-	const bulkUpdateNetworkTrackNotifications = useCallback(
-		(network: string, trackKey: string, enabled: boolean, trackType: 'opengov' | 'gov1' = 'opengov') => {
+	const bulkUpdateTrackNotifications = useCallback(
+		(trackKey: string, enabled: boolean, trackType: 'opengov' | 'gov1' = 'opengov') => {
 			if (!user?.id || !preferences) return;
 
+			const section = trackType === ENotifications.OPENGOV ? ENotifications.OPENGOV : ENotifications.GOV1;
 			const currentSettings =
-				trackType === 'opengov'
-					? preferences.networkPreferences?.[network]?.openGovTracks && Object.prototype.hasOwnProperty.call(preferences.networkPreferences[network].openGovTracks, trackKey)
-						? (preferences.networkPreferences[network].openGovTracks[trackKey] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
-						: undefined
-					: preferences.networkPreferences?.[network]?.gov1Items && Object.prototype.hasOwnProperty.call(preferences.networkPreferences[network].gov1Items, trackKey)
-						? (preferences.networkPreferences[network].gov1Items[trackKey] as { enabled: boolean; notifications?: Record<string, boolean> } | undefined)
-						: undefined;
+				trackType === ENotifications.OPENGOV
+					? preferences.openGovTracks?.[trackKey as keyof typeof preferences.openGovTracks]
+					: preferences.gov1Items?.[trackKey as keyof typeof preferences.gov1Items];
 
-			const notifications = trackType === 'opengov' ? getOpenGovNotifications(enabled) : getGov1Notifications(trackKey, enabled, currentSettings);
+			const notifications =
+				trackType === ENotifications.OPENGOV
+					? {
+							newReferendumSubmitted: enabled,
+							referendumInVoting: enabled,
+							referendumClosed: enabled
+						}
+					: {};
 
 			const updatedSettings = {
 				...currentSettings,
@@ -1029,8 +676,42 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 				notifications
 			};
 
-			const section = 'networks';
-			const key = trackType === 'opengov' ? `${network}.openGovTracks.${trackKey}` : `${network}.gov1Items.${trackKey}`;
+			mutation.mutate({
+				section,
+				key: trackKey,
+				value: updatedSettings
+			});
+		},
+		[user?.id, preferences, mutation]
+	);
+
+	const bulkUpdateNetworkTrackNotifications = useCallback(
+		(network: string, trackKey: string, enabled: boolean, trackType: 'opengov' | 'gov1' = 'opengov') => {
+			if (!user?.id || !preferences) return;
+
+			const section = ENotifications.NETWORKS;
+			const key = trackType === ENotifications.OPENGOV ? `${network}.openGovTracks.${trackKey}` : `${network}.gov1Items.${trackKey}`;
+
+			const networkPrefs = preferences.networkPreferences?.[network];
+			const currentSettings =
+				trackType === ENotifications.OPENGOV
+					? networkPrefs?.openGovTracks?.[trackKey as keyof typeof networkPrefs.openGovTracks]
+					: networkPrefs?.gov1Items?.[trackKey as keyof typeof networkPrefs.gov1Items];
+
+			const notifications =
+				trackType === ENotifications.OPENGOV
+					? {
+							newReferendumSubmitted: enabled,
+							referendumInVoting: enabled,
+							referendumClosed: enabled
+						}
+					: {};
+
+			const updatedSettings = {
+				...(currentSettings || {}),
+				enabled,
+				notifications
+			};
 
 			mutation.mutate({
 				section,
@@ -1039,69 +720,113 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 				network
 			});
 		},
-		[user?.id, preferences, mutation, getOpenGovNotifications, getGov1Notifications]
-	);
-
-	const importNetworkSettings = useCallback(
-		(fromNetwork: string, toNetwork: string) => {
-			if (!user?.id || !preferences) return;
-
-			const sourceSettings = preferences.networkPreferences?.[fromNetwork];
-			if (!sourceSettings) return;
-
-			const targetSettings = {
-				...sourceSettings,
-				enabled: true,
-				isPrimary: false,
-				importPrimarySettings: true
-			};
-
-			mutation.mutate({
-				section: 'networks',
-				key: toNetwork,
-				value: targetSettings,
-				network: toNetwork
-			});
-		},
 		[user?.id, preferences, mutation]
 	);
 
-	const bulkUpdateNetworkPreferences = useCallback(
-		(updates: Array<{ section: string; key: string; value: unknown; network?: string }>) => {
-			if (!user?.id) return;
-			bulkMutation.mutate(updates);
+	const importNetworkSettings = useCallback(
+		async (fromNetwork: string, toNetwork: string) => {
+			if (!user?.id || !preferences) return false;
+
+			try {
+				const fromSettings = preferences.networkPreferences?.[fromNetwork];
+				if (!fromSettings) return false;
+
+				const updates = [
+					{
+						section: 'networks',
+						key: toNetwork,
+						value: {
+							...fromSettings,
+							isPrimary: false
+						}
+					}
+				];
+
+				await bulkUpdateNotificationPreferences(user.id, updates);
+				return true;
+			} catch (error) {
+				console.error('Failed to import network settings:', error);
+				return false;
+			}
 		},
-		[user?.id, bulkMutation]
+		[user?.id, preferences]
+	);
+
+	const bulkUpdateNetworkPreferences = useCallback(
+		async (updates: Array<{ section: string; key: string; value: unknown; network?: string }>) => {
+			if (!user?.id) return;
+
+			try {
+				await bulkUpdateNotificationPreferences(user.id, updates);
+			} catch (error) {
+				console.error('Failed to bulk update network preferences:', error);
+				throw error;
+			}
+		},
+		[user?.id]
+	);
+
+	const generateToken = useCallback(
+		async (channel: ENotificationChannel) => {
+			if (!user?.id) return '';
+
+			try {
+				return await generateVerificationToken(user.id, channel);
+			} catch {
+				return '';
+			}
+		},
+		[user?.id]
+	);
+
+	const verifyToken = useCallback(
+		async (channel: ENotificationChannel, token: string, handle: string) => {
+			if (!user?.id) return false;
+
+			try {
+				return await verifyChannelToken(user.id, channel, token, handle);
+			} catch {
+				return false;
+			}
+		},
+		[user?.id]
 	);
 
 	return {
 		preferences,
-		isLoading: isFetching || mutation.isPending || bulkMutation.isPending,
+		isLoading: isFetching,
 		error: queryError || mutation.error || bulkMutation.error,
-		updateChannelPreference: updateChannelPreferenceMutation,
-		updateNetworkPreference: updateNetworkPreferenceMutation,
+
+		updateChannelPreference,
+
+		updateNetworkPreference,
+		importNetworkSettings,
+		bulkUpdateNetworkPreferences,
+
 		updatePostsNotification,
 		updateNetworkPostsNotification,
+		bulkUpdatePostsNotifications,
+		bulkUpdateNetworkPostsNotifications,
+
 		updateCommentsNotification,
 		updateNetworkCommentsNotification,
+		bulkUpdateCommentsNotifications,
+		bulkUpdateNetworkCommentsNotifications,
+
 		updateBountiesNotification,
 		updateNetworkBountiesNotification,
+		bulkUpdateBountiesNotifications,
+		bulkUpdateNetworkBountiesNotifications,
+
 		updateOpenGovTrack,
 		updateNetworkOpenGovTrack,
 		updateGov1Item,
 		updateNetworkGov1Item,
 		bulkUpdateAdvancedSettings,
 		bulkUpdateNetworkAdvancedSettings,
-		bulkUpdatePostsNotifications,
-		bulkUpdateNetworkPostsNotifications,
-		bulkUpdateCommentsNotifications,
-		bulkUpdateNetworkCommentsNotifications,
-		bulkUpdateBountiesNotifications,
-		bulkUpdateNetworkBountiesNotifications,
 		bulkUpdateTrackNotifications,
 		bulkUpdateNetworkTrackNotifications,
-		bulkUpdateNetworkPreferences,
-		importNetworkSettings,
+
 		generateToken,
 		verifyToken
 	};

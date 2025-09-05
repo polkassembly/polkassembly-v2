@@ -24,7 +24,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shar
 import { Separator } from '@/app/_shared-components/Separator';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { INetworkSettings } from '@/_shared/types';
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import ParachainsIcon from '@assets/icons/notification-settings/parachains.svg';
 import NetworkBadge from '../components/NetworkBadge';
@@ -35,6 +34,11 @@ import AddNetworksFinalModal from '../Modals/AddNetworksFinalModal';
 import ConfirmationModal from '../Modals/ConfirmationModal';
 import classes from '../Notifications.module.scss';
 
+interface INetworkSettings {
+	id: string;
+	name: string;
+	removable: boolean;
+}
 const getNetworkLogo = (networkId: string): string => {
 	const logoMap: Record<string, string> = {
 		polkadot: PolkadotLogo.src,
@@ -92,7 +96,9 @@ function ParachainsSection() {
 
 			if (networkId.includes('.') && !['polymesh-test', 'moonbase-alpha'].includes(networkId)) return;
 
-			const networkPrefs = preferences.networkPreferences[networkId];
+			const networkPrefs =
+				preferences?.networkPreferences && Object.prototype.hasOwnProperty.call(preferences.networkPreferences, networkId) ? preferences.networkPreferences[networkId] : undefined;
+
 			if (networkPrefs?.enabled !== false && !pendingRemovals.has(networkId)) {
 				const formattedName = networkId
 					.split(/[-_]/)
@@ -113,7 +119,8 @@ function ParachainsSection() {
 	useEffect(() => {
 		if (!preferences?.networkPreferences) return;
 
-		const serverNetworks = Object.keys(preferences.networkPreferences).filter((networkId) => preferences.networkPreferences[networkId]?.enabled !== false);
+		const networkPrefs = preferences.networkPreferences as Record<string, { enabled?: boolean } | undefined>;
+		const serverNetworks: string[] = Object.keys(networkPrefs).filter((networkId) => networkPrefs[networkId]?.enabled !== false);
 
 		const removalsCompleted = Array.from(pendingRemovals).every((networkId) => !serverNetworks.includes(networkId));
 

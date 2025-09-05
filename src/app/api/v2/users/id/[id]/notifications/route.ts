@@ -94,7 +94,7 @@ export const PUT = withErrorHandling(async (request: NextRequest, { params }: IR
 	const body = UpdateSchema.parse(await request.json());
 
 	if ('updates' in body && Array.isArray(body.updates)) {
-		const updates = body.updates as Array<{ section: string; key: string; value: unknown; network?: string }>;
+		const updates = body.updates as Array<IUpdateNotificationPreferencesRequest>;
 		const updatedPreferences = await NotificationPreferencesService.BulkUpdateMultipleSections(userId, updates);
 		return NextResponse.json({
 			data: updatedPreferences,
@@ -102,13 +102,13 @@ export const PUT = withErrorHandling(async (request: NextRequest, { params }: IR
 		});
 	}
 
-	const { section, key, value, network } = body as IUpdateNotificationPreferencesRequest;
+	const updateRequest = body as IUpdateNotificationPreferencesRequest;
 
-	if (!section || !key || value === undefined) {
+	if (!updateRequest.section || !updateRequest.key || updateRequest.value === undefined) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Missing required parameters');
 	}
 
-	const updatedPreferences = await NotificationPreferencesService.UpdateUserNotificationPreferences(userId, section, key, value, network);
+	const updatedPreferences = await NotificationPreferencesService.UpdateUserNotificationPreferences(userId, updateRequest);
 
 	return NextResponse.json({
 		data: updatedPreferences,

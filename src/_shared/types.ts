@@ -106,14 +106,84 @@ export interface IUserNotificationChannelPreferences {
 export interface IUserNotificationTriggerPreferences {
 	name: string;
 	enabled: boolean;
-	[additionalProperties: string]: unknown; // trigger specific properties
+	[additionalProperties: string]: unknown;
 }
 
-export interface IUserNotificationSettings {
-	channelPreferences: { [channel: string]: IUserNotificationChannelPreferences };
-	triggerPreferences: {
+export type INotificationChannelSettings = Partial<Record<ENotificationChannel, boolean>>;
+
+export type NotificationFlags<T extends string = string> = Record<T, boolean>;
+
+export interface INotificationItemSettings {
+	enabled: boolean;
+	channels: INotificationChannelSettings;
+}
+
+export type NotificationGroup<T extends string> = Record<T, INotificationItemSettings>;
+
+export type IPostsNotificationSettings = NotificationGroup<
+	'proposalStatusChanges' | 'newProposalsInCategories' | 'votingDeadlineReminders' | 'updatesOnFollowedProposals' | 'proposalOutcomePublished' | 'proposalsYouVotedOnEnacted'
+>;
+
+export type ICommentsNotificationSettings = NotificationGroup<'commentsOnMyProposals' | 'repliesToMyComments' | 'mentions'>;
+
+export type IBountiesNotificationSettings = NotificationGroup<'bountyApplicationStatusUpdates' | 'bountyPayoutsAndMilestones' | 'activityOnBountiesIFollow'>;
+
+export type IOpenGovTrackNotifications = NotificationFlags<'newReferendumSubmitted' | 'referendumInVoting' | 'referendumClosed'>;
+
+export interface IOpenGovTrackSettings {
+	enabled: boolean;
+	notifications: IOpenGovTrackNotifications;
+}
+
+export type IOpenGovTracksSettings = Record<EPostOrigin, IOpenGovTrackSettings>;
+
+export type IGov1ItemNotifications = NotificationFlags;
+
+export interface IGov1ItemSettings {
+	enabled: boolean;
+	notifications: IGov1ItemNotifications;
+}
+
+export type IGov1ItemsSettings = Record<'mentionsIReceive' | EProposalType, IGov1ItemSettings>;
+
+export enum ENotifications {
+	CHANNELS = 'channels',
+	NETWORKS = 'networks',
+	POSTS = 'posts',
+	COMMENTS = 'comments',
+	BOUNTIES = 'bounties',
+	OPENGOV = 'opengov',
+	GOV1 = 'gov1'
+}
+
+export interface IUpdateNotificationPreferencesRequest {
+	section: ENotifications;
+	key: string;
+	value: unknown;
+	network?: string;
+}
+
+export interface IBaseNotificationSettings {
+	postsNotifications?: IPostsNotificationSettings;
+	commentsNotifications?: ICommentsNotificationSettings;
+	bountiesNotifications?: IBountiesNotificationSettings;
+	openGovTracks?: Partial<IOpenGovTracksSettings>;
+	gov1Items?: Partial<IGov1ItemsSettings>;
+}
+
+export interface INetworkNotificationSettings extends IBaseNotificationSettings {
+	enabled: boolean;
+	isPrimary?: boolean;
+	importPrimarySettings: boolean;
+}
+
+export interface IUserNotificationSettings extends IBaseNotificationSettings {
+	channelPreferences: Record<ENotificationChannel, IUserNotificationChannelPreferences>;
+	networkPreferences?: Record<string, INetworkNotificationSettings>;
+	triggerPreferences?: {
 		[network: string]: { [index: string]: IUserNotificationTriggerPreferences };
 	};
+	[additionalProperties: string]: unknown; // trigger specific properties
 }
 
 export enum ERole {
@@ -137,7 +207,7 @@ export interface IUser {
 	username: string;
 	isWeb3Signup: boolean;
 	primaryNetwork?: ENetwork;
-	notificationPreferences?: IUserNotificationPreferences;
+	notificationPreferences?: IUserNotificationSettings;
 	twoFactorAuth?: IUserTFADetails;
 	roles?: ERole[];
 	profileScore: number;
@@ -337,7 +407,26 @@ export interface IUserPreferences {
 
 export enum ENotificationTrigger {
 	VERIFY_EMAIL = 'verifyEmail',
-	RESET_PASSWORD = 'resetPassword'
+	RESET_PASSWORD = 'resetPassword',
+	PROPOSALS_CREATED = 'newProposalCreated',
+	MENTIONED = 'newMention',
+	COMMENTED = 'newCommentAdded',
+	REPLIED = 'newReplyAdded',
+	PROPOSALS_STATUS_CHANGED = 'proposalStatusChanged',
+	CONTENT_DELETED_BY_MOD = 'contentDeletedByMod',
+	OWN_PROPOSAL_CREATED = 'ownProposalCreated',
+	OPENGOV_REFERENDUM_SUBMITTED = 'openGovReferendumSubmitted',
+	OPENGOV_REFERENDUM_INVOTING = 'openGovReferendumInVoting',
+	OPENGOV_REFERENDUM_CLOSED = 'openGovReferendumClosed',
+	FELLOWSHIP_REFERENDUM_SUBMITTED = 'fellowShipReferendumSubmitted',
+	FELLOWSHIP_REFERENDUM_INVOTING = 'fellowShipReferendumInVoting',
+	FELLOWSHIP_REFERENDUM_CLOSED = 'fellowShipReferendumClosed',
+	PIP_SUBMITTED = 'pipSubmitted',
+	PIP_INVOTING = 'pipInVoting',
+	PIP_CLOSED = 'pipClosed',
+	GOV1_PROPOSAL_SUBMITTED = 'gov1ProposalSubmitted',
+	GOV1_PROPOSAL_INVOTING = 'gov1ProposalInVoting',
+	GOV1_PROPOSAL_CLOSED = 'gov1ProposalClosed'
 }
 
 export enum EDataSource {
@@ -1531,94 +1620,4 @@ export interface IProfileVote extends Omit<IVoteData, 'createdAtBlock' | 'delega
 	proposal?: {
 		status: EProposalStatus;
 	};
-}
-
-export interface INotificationChannelSettings {
-	enabled: boolean;
-	handle?: string;
-	verification_token?: string;
-	verified?: boolean;
-}
-
-export interface INotificationTypeSettings {
-	enabled: boolean;
-	channels: Record<ENotificationChannel, boolean>;
-}
-
-export interface IOpenGovTrackSettings {
-	enabled: boolean;
-	notifications: {
-		newReferendumSubmitted: boolean;
-		referendumInVoting: boolean;
-		referendumClosed: boolean;
-	};
-}
-
-export interface IGov1ItemSettings {
-	enabled: boolean;
-	notifications?: Record<string, boolean>;
-}
-
-export interface INetworkNotificationSettings {
-	enabled: boolean;
-	isPrimary: boolean;
-	importPrimarySettings: boolean;
-	postsNotifications: {
-		proposalStatusChanges: INotificationTypeSettings;
-		newProposalsInCategories: INotificationTypeSettings;
-		votingDeadlineReminders: INotificationTypeSettings;
-		updatesOnFollowedProposals: INotificationTypeSettings;
-		proposalOutcomePublished: INotificationTypeSettings;
-		proposalsYouVotedOnEnacted: INotificationTypeSettings;
-	};
-	commentsNotifications: {
-		commentsOnMyProposals: INotificationTypeSettings;
-		repliesToMyComments: INotificationTypeSettings;
-		mentions: INotificationTypeSettings;
-	};
-	bountiesNotifications: {
-		bountyApplicationStatusUpdates: INotificationTypeSettings;
-		bountyPayoutsAndMilestones: INotificationTypeSettings;
-		activityOnBountiesIFollow: INotificationTypeSettings;
-	};
-	openGovTracks: Record<string, IOpenGovTrackSettings>;
-	gov1Items: Record<string, IGov1ItemSettings>;
-}
-
-export interface IUserNotificationPreferences {
-	channelPreferences: Record<ENotificationChannel, INotificationChannelSettings>;
-	networkPreferences: Record<string, INetworkNotificationSettings>;
-	postsNotifications?: {
-		proposalStatusChanges: INotificationTypeSettings;
-		newProposalsInCategories: INotificationTypeSettings;
-		votingDeadlineReminders: INotificationTypeSettings;
-		updatesOnFollowedProposals: INotificationTypeSettings;
-		proposalOutcomePublished: INotificationTypeSettings;
-		proposalsYouVotedOnEnacted: INotificationTypeSettings;
-	};
-	commentsNotifications?: {
-		commentsOnMyProposals: INotificationTypeSettings;
-		repliesToMyComments: INotificationTypeSettings;
-		mentions: INotificationTypeSettings;
-	};
-	bountiesNotifications?: {
-		bountyApplicationStatusUpdates: INotificationTypeSettings;
-		bountyPayoutsAndMilestones: INotificationTypeSettings;
-		activityOnBountiesIFollow: INotificationTypeSettings;
-	};
-	openGovTracks?: Record<string, IOpenGovTrackSettings>;
-	gov1Items?: Record<string, IGov1ItemSettings>;
-}
-
-export interface IUpdateNotificationPreferencesRequest {
-	section: 'channels' | 'networks' | 'posts' | 'comments' | 'bounties' | 'opengov' | 'gov1';
-	key: string;
-	value: unknown;
-	network?: string;
-}
-
-export interface INetworkSettings {
-	id: string;
-	name: string;
-	removable: boolean;
 }

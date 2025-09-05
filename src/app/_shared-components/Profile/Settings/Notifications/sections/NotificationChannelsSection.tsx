@@ -70,11 +70,11 @@ function NotificationChannelsSection() {
 	};
 
 	const channelPreferences = preferences?.channelPreferences || {
-		[ENotificationChannel.EMAIL]: { enabled: false },
-		[ENotificationChannel.TELEGRAM]: { enabled: false },
-		[ENotificationChannel.DISCORD]: { enabled: false },
-		[ENotificationChannel.SLACK]: { enabled: false },
-		[ENotificationChannel.ELEMENT]: { enabled: false }
+		[ENotificationChannel.EMAIL]: { name: ENotificationChannel.EMAIL, enabled: false, handle: '', verified: false },
+		[ENotificationChannel.TELEGRAM]: { name: ENotificationChannel.TELEGRAM, enabled: false, handle: '', verified: false },
+		[ENotificationChannel.DISCORD]: { name: ENotificationChannel.DISCORD, enabled: false, handle: '', verified: false },
+		[ENotificationChannel.SLACK]: { name: ENotificationChannel.SLACK, enabled: false, handle: '', verified: false },
+		[ENotificationChannel.ELEMENT]: { name: ENotificationChannel.ELEMENT, enabled: false, handle: '', verified: false }
 	};
 
 	return (
