@@ -160,12 +160,16 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 				url: 'wss://polkadot-people-rpc.polkadot.io'
 			},
 			{
+				name: VIA_DWELLIR,
+				url: 'wss://people-polkadot-rpc.n.dwellir.com'
+			},
+			{
 				name: VIA_LUCKYFRIDAY,
 				url: 'wss://rpc-people-polkadot.luckyfriday.io'
 			},
 			{
-				name: VIA_RADIUMBLOCK,
-				url: 'wss://people-polkadot.public.curie.radiumblock.co/ws'
+				name: VIA_ONFINALITY,
+				url: 'wss://people-polkadot.api.onfinality.io/public-ws'
 			},
 			{
 				name: VIA_IBP_GEODNS1,
@@ -174,6 +178,10 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 			{
 				name: VIA_IBP_GEODNS2,
 				url: 'wss://people-polkadot.dotters.network'
+			},
+			{
+				name: VIA_STAKETWORLD,
+				url: 'wss://dot-rpc.stakeworld.io/people'
 			}
 		]
 	},
@@ -253,7 +261,11 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 			},
 			{
 				name: VIA_DWELLIR,
-				url: 'wss://asset-hub-polkadot-rpc.dwellir.com'
+				url: 'wss://asset-hub-polkadot-rpc.n.dwellir.com'
+			},
+			{
+				name: VIA_DWELLIR_TUNISIA,
+				url: 'wss://statemint-rpc-tn.dwellir.com'
 			},
 			{
 				name: VIA_ONFINALITY,
@@ -270,6 +282,14 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 			{
 				name: VIA_LUCKYFRIDAY,
 				url: 'wss://rpc-asset-hub-polkadot.luckyfriday.io'
+			},
+			{
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://statemint.public.curie.radiumblock.co/ws'
+			},
+			{
+				name: VIA_STAKETWORLD,
+				url: 'wss://dot-rpc.stakeworld.io/assethub'
 			}
 		]
 	},
