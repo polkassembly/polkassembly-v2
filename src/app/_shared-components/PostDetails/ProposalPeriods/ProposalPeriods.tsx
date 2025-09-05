@@ -1,15 +1,18 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import React from 'react';
+import React, { useState } from 'react';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { EPeriodType, EPostOrigin, EProposalStatus } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { FAILED_PROPOSAL_STATUSES, PASSED_PROPOSAL_STATUSES } from '@/_shared/_constants/proposalResultStatuses';
-import PeriodProgress from './PeriodProgress';
-import classes from './ProposalPeriods.module.scss';
+import { getPeriodProgressLabel } from '@/app/_client-utils/getPeriodProgressLabel';
+import { Minus, Plus } from 'lucide-react';
+import { Separator } from '@/app/_shared-components/Separator';
+import { PeriodProgress } from './PeriodProgress';
+import { TimelineSection } from './TimelineSection';
 
-const TOTAL_PERIODS = 3;
+import classes from './ProposalPeriods.module.scss';
 
 function RenderPeriodProgress({
 	confirmationPeriodEnded,
@@ -38,15 +41,15 @@ function RenderPeriodProgress({
 			<div className='flex flex-col gap-y-6'>
 				<PeriodProgress
 					periodEndsAt={decisionPeriodEndsAt}
-					periodName={t('PostDetails.decisionPeriod')}
 					trackName={trackName}
 					periodType={EPeriodType.DECISION}
+					periodName={t('PostDetails.decisionPeriod')}
 				/>
 				<PeriodProgress
 					periodEndsAt={confirmationPeriodEndsAt}
-					periodName={t('PostDetails.confirmationPeriod')}
 					trackName={trackName}
 					periodType={EPeriodType.CONFIRM}
+					periodName={t('PostDetails.confirmationPeriod')}
 				/>
 			</div>
 		);
@@ -56,7 +59,6 @@ function RenderPeriodProgress({
 		<div>
 			<PeriodProgress
 				periodEndsAt={preparePeriodEndsAt}
-				periodName={t('PostDetails.preparePeriod')}
 				trackName={trackName}
 				periodType={EPeriodType.PREPARE}
 			/>
@@ -78,13 +80,13 @@ function ProposalPeriods({
 	trackName: EPostOrigin;
 }) {
 	const t = useTranslations();
+	const [isExpanded, setIsExpanded] = useState(false);
+
 	const preparePeriodEnded = preparePeriodEndsAt ? dayjs(preparePeriodEndsAt).isBefore(dayjs()) : false;
 	const decisionPeriodEnded = decisionPeriodEndsAt ? dayjs(decisionPeriodEndsAt).isBefore(dayjs()) : false;
 	const confirmationPeriodEnded = confirmationPeriodEndsAt ? dayjs(confirmationPeriodEndsAt).isBefore(dayjs()) : false;
 	const proposalHasFailed = FAILED_PROPOSAL_STATUSES.includes(status);
 	const proposalHasPassed = PASSED_PROPOSAL_STATUSES.includes(status);
-
-	const periodsEnded = [preparePeriodEnded, decisionPeriodEnded, confirmationPeriodEnded].filter((period) => period);
 
 	const getStatusText = () => {
 		if (proposalHasFailed) {
@@ -100,19 +102,54 @@ function ProposalPeriods({
 		}
 
 		if (preparePeriodEnded) {
-			return t('PostDetails.votingStarted');
+			return t('PostDetails.votingPeriod');
 		}
 
 		return t('PostDetails.preparePeriod');
 	};
 
+	// Get the current period progress label (e.g., "4/10 days")
+	const getCurrentPeriodLabel = () => {
+		if (!preparePeriodEnded) {
+			return getPeriodProgressLabel({ endAt: preparePeriodEndsAt, trackName, periodType: EPeriodType.PREPARE });
+		}
+		return '';
+	};
+
+	const currentPeriodLabel = getCurrentPeriodLabel();
+
+	const toggleExpanded = () => {
+		setIsExpanded(!isExpanded);
+	};
+
 	return (
 		<div className={classes.proposalPeriodsWrapper}>
 			<div className={classes.proposalPeriodsHeader}>
-				<p className={classes.proposalPeriodsHeaderTitle}>{getStatusText()}</p>
-				<div className={classes.proposalPeriodsHeaderPeriods}>
-					<p className={classes.proposalPeriodsHeaderPeriodsNumber}>{Math.min(periodsEnded.length + 1, TOTAL_PERIODS)}</p>
-					<span className='pl-1 pr-2'>of {TOTAL_PERIODS}</span>
+				<div className={classes.headerLeft}>
+					<p className={classes.proposalPeriodsHeaderTitle}>{getStatusText()}</p>
+					<div className={classes.progressIndicator}>
+						<span className={classes.progressNumber}>{currentPeriodLabel}</span>
+					</div>
+				</div>
+				<div className={classes.headerRight}>
+					<button
+						type='button'
+						className={classes.collapseButton}
+						title={isExpanded ? 'Collapse timeline' : 'Expand timeline'}
+						onClick={toggleExpanded}
+					>
+						{isExpanded ? (
+							<Minus
+								className={classes.collapseIcon}
+								size={16}
+							/>
+						) : (
+							<Plus
+								className={classes.collapseIcon}
+								size={16}
+							/>
+						)}
+					</button>
 				</div>
 			</div>
 			<RenderPeriodProgress
@@ -124,6 +161,20 @@ function ProposalPeriods({
 				preparePeriodEndsAt={preparePeriodEndsAt}
 				trackName={trackName}
 			/>
+			{isExpanded && (
+				<>
+					<Separator
+						orientation='horizontal'
+						className='w-full bg-border_grey opacity-70'
+					/>
+					<TimelineSection
+						confirmationPeriodEnded={confirmationPeriodEnded}
+						proposalHasFailed={proposalHasFailed}
+						preparePeriodEnded={preparePeriodEnded}
+						decisionPeriodEnded={decisionPeriodEnded}
+					/>
+				</>
+			)}
 		</div>
 	);
 }

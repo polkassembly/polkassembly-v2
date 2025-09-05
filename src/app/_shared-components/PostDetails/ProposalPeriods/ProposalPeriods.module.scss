@@ -1,19 +1,162 @@
 .proposalPeriodsWrapper {
-	@apply flex flex-col gap-y-8 rounded-xl bg-bg_modal p-6 shadow-lg;
+	@apply flex flex-col gap-y-5 rounded-xl border border-border_grey bg-bg_modal p-6;
 }
 
 .proposalPeriodsHeader {
-	@apply flex items-center justify-between
+	@apply flex w-full items-center justify-between;
+}
+
+.headerLeft {
+	@apply flex items-center gap-x-1;
 }
 
 .proposalPeriodsHeaderTitle {
-	@apply text-xl font-semibold text-text_primary
+	@apply text-xl font-semibold text-text_primary;
+	font-family: 'DM Sans', sans-serif;
+	font-weight: 600;
+	line-height: 24px;
 }
 
-.proposalPeriodsHeaderPeriods {
-	@apply flex items-center rounded-xl bg-primary_border/[0.2] text-xs text-wallet_btn_text
+.progressIndicator {
+	@apply flex items-center gap-x-1.5;
 }
 
-.proposalPeriodsHeaderPeriodsNumber {
-	@apply h-6 w-6 rounded-full bg-bg_pink p-1 text-center text-white
+.progressNumber {
+	@apply text-xs font-medium text-text_primary;
+	font-family: 'DM Sans', sans-serif;
+	font-weight: 500;
+}
+
+.headerRight {
+	@apply flex items-center;
+}
+
+.collapseButton {
+	@apply flex size-5 items-center justify-center rounded border border-border_grey bg-bg_modal shadow-sm;
+}
+
+.collapseIcon {
+	@apply text-text_primary;
+}
+
+.progressSection {
+	@apply flex flex-col gap-y-2;
+}
+
+.progressBars {
+	@apply flex w-full items-center justify-between;
+}
+
+.progressBar {
+	@apply h-5 w-1 rounded-sm;
+}
+
+.progressLabel {
+	@apply flex justify-between text-xs text-text_primary;
+}
+
+.filled {
+	@apply bg-bg_pink;
+}
+
+.empty {
+	@apply bg-empty_bar_bg;
+}
+
+.periodCompleted {
+	@apply flex size-8 items-center justify-center rounded-full bg-bg_pink;
+}
+
+.periodInactive {
+	@apply relative flex size-8 items-center justify-center;
+}
+
+.periodInactiveInner {
+	@apply size-3 rounded-full bg-empty_bar_bg;
+}
+
+.timelineSection {
+	@apply relative flex flex-col gap-y-6;
+}
+
+.timelineConnectorWrapper {
+	@apply absolute left-0 top-0 flex h-full w-8 items-center justify-center;
+}
+
+.timelineConnector {
+	@apply mx-4 h-4/5 border-r border-dashed border-border_grey opacity-70;
+}
+
+.timelineItem {
+	@apply flex items-center gap-x-4;
+}
+
+.timelineIcon {
+	@apply relative size-8 shrink-0;
+}
+
+.timelineIcon.active {
+	@apply bg-bg_modal;
+}
+
+// Breathing animation for active timeline icons
+.pulseOuter {
+	@apply flex size-8 animate-pulse items-center justify-center rounded-full bg-[#FFF0F8];
+}
+
+.pulseInner {
+	@apply size-3 animate-pulse rounded-full bg-bg_pink;
+}
+
+.timelineContent {
+	@apply flex flex-col gap-y-0.5;
+}
+
+.timelineTitle {
+	@apply text-sm font-medium;
+	font-family: 'DM Sans', sans-serif;
+	font-weight: 500;
+	line-height: normal;
+	letter-spacing: -0.14px;
+}
+
+.timelineTitle.active {
+	@apply font-semibold text-text_primary;
+}
+
+.timelineTitle.inactive {
+	@apply font-normal text-text_primary/60;
+}
+
+.timelineStatus {
+	@apply text-xs text-bg_pink;
+	font-family: 'DM Sans', sans-serif;
+	font-weight: 400;
+	line-height: normal;
+}
+
+.timelineSubtext {
+	@apply flex items-center gap-x-[9px];
+}
+
+.timelineSubtext span {
+	@apply text-xs text-text_primary/60;
+	font-family: 'DM Sans', sans-serif;
+	font-weight: 400;
+	line-height: normal;
+}
+
+.activeSubtext {
+	@apply text-bg_pink !important;
+}
+
+.timelineDot {
+	@apply text-xs text-text_primary/60;
+}
+
+.enactmentDescription {
+	@apply text-xs text-text_primary/60;
+	font-family: 'DM Sans', sans-serif;
+	font-weight: 400;
+	line-height: normal;
 }

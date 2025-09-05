@@ -1,48 +1,48 @@
-  .spanStyle {
-      @apply bg-sidebar_footer dark:bg-primary_border text-sidebar_text dark:text-tooltip_foreground;
-  }
+.spanStyle {
+	@apply bg-sidebar_footer text-sidebar_text dark:bg-primary_border dark:text-tooltip_foreground;
+}
 
-  .Auction,
-  .BigTipper,
-  .BigSpender,
-  .Bounties,
-  .ChildBounties,
-  .SmallSpender,
-  .SmallTipper,
-  .Treasurer,
-  .Treasury,
-  .Governance {
-      @apply bg-sidebar_head3 dark:bg-dark_auction_bg text-light_auction_text dark:text-dark_auction_text;
-  }
+.Auction,
+.BigTipper,
+.BigSpender,
+.Bounties,
+.ChildBounties,
+.SmallSpender,
+.SmallTipper,
+.Treasurer,
+.Treasury,
+.Governance {
+	@apply bg-sidebar_head3 text-auction_text dark:bg-auction_bg;
+}
 
-  .Community,
-  .Democracy,
-  .GeneralAdmin,
-  .ReferendumCanceller,
-  .ReferendumKiller,
-  .LeaseAdmin,
-  .Staking {
-      @apply bg-sidebar_head4 dark:bg-dark_community_bg text-light_community_text dark:text-dark_community_text;
-  }
+.Community,
+.Democracy,
+.GeneralAdmin,
+.ReferendumCanceller,
+.ReferendumKiller,
+.LeaseAdmin,
+.Staking {
+	@apply bg-sidebar_head4 text-community_text dark:bg-community_bg;
+}
 
-  .Council,
-  .Root,
-  .Whitelist,
-  .WishForChange,
-  .StakingAdmin {
-      @apply bg-light_council_bg text-light_council_text;
-  }
+.Council,
+.Root,
+.Whitelist,
+.WishForChange,
+.StakingAdmin {
+	@apply bg-council_bg text-council_text;
+}
 
-  .Technical,
-  .Tech,
-  .AuctionAdmin,
-  .WhitelistedCaller,
-  .FellowshipAdmin,
-  .Members {
-      @apply bg-light_technical_bg dark:bg-dark_technical_bg text-light_technical_text dark:text-dark_technical_text;
-  }
+.Technical,
+.Tech,
+.AuctionAdmin,
+.WhitelistedCaller,
+.FellowshipAdmin,
+.Members {
+	@apply bg-technical_bg text-technical_text;
+}
 
-  .General,
-  .Upgrade {
-      @apply bg-light_general_bg dark:bg-dark_general_bg text-light_general_text dark:text-dark_general_text;
-  }
+.General,
+.Upgrade {
+	@apply bg-general_bg text-general_text;
+}
