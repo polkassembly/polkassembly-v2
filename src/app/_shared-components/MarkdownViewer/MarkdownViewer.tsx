@@ -147,28 +147,22 @@ const markdownComponents: Components = {
 			);
 		}
 
-		console.log('height', height);
-		console.log('width', width);
-
 		return (
-			<Link
-				href={src}
-				target='_blank'
-				rel='noopener noreferrer'
-				className='max-w-max'
-			>
-				<Image
-					src={src}
-					alt={alt || 'Image'}
-					height={ValidatorService.isValidNumber(height) ? Number(height) : 256}
-					width={ValidatorService.isValidNumber(width) ? Number(width) : 256}
-					sizes='100vw'
-					// style={{
-					// width: '90%',
-					// height: 'auto'
-					// }}
-				/>
-			</Link>
+			<div className='max-w-max'>
+				<Link
+					href={src}
+					target='_blank'
+					rel='noopener noreferrer'
+				>
+					<Image
+						src={src}
+						alt={alt || 'Image'}
+						height={ValidatorService.isValidNumber(height) ? Number(height) : 256}
+						width={ValidatorService.isValidNumber(width) ? Number(width) : 256}
+						sizes='100vw'
+					/>
+				</Link>
+			</div>
 		);
 	},
 	a: ({ href, children, ...props }) => {
