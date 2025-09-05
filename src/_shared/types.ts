@@ -343,7 +343,8 @@ export enum ENotificationTrigger {
 
 export enum EDataSource {
 	POLKASSEMBLY = 'polkassembly',
-	SUBSQUARE = 'subsquare'
+	SUBSQUARE = 'subsquare',
+	OTHER = 'other'
 }
 
 export enum EReaction {
