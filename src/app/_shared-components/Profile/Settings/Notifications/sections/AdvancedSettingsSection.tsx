@@ -9,7 +9,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shar
 import { Separator } from '@/app/_shared-components/Separator';
 import { Switch } from '@/app/_shared-components/Switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
-import { ENetwork, ENotifications, EPostOrigin, EProposalType } from '@/_shared/types';
+import { ENetwork, EPostOrigin, EProposalType } from '@/_shared/types';
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import AdvancedSettingsIcon from '@assets/icons/notification-settings/advancedsettings.svg';
 import RootIcon from '@assets/sidebar/root-icon.svg';
@@ -172,7 +172,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	const t = useTranslations();
 	const { preferences, updateNetworkOpenGovTrack, updateNetworkGov1Item, bulkUpdateNetworkAdvancedSettings, bulkUpdateNetworkTrackNotifications } = useNotificationPreferences();
 
-	const networkPreferences = preferences?.networkPreferences?.[network];
+	const networkPreferences = preferences?.triggerPreferences?.[network];
 	const openGovTracks = networkPreferences?.openGovTracks || {};
 	const gov1Items = networkPreferences?.gov1Items || {};
 
@@ -180,7 +180,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	const gov1Labels = getGov1Labels(t);
 
 	const handleOpenGovTrackChange = (trackKey: string, enabled: boolean) => {
-		bulkUpdateNetworkTrackNotifications(network, trackKey, enabled, ENotifications.OPENGOV);
+		bulkUpdateNetworkTrackNotifications(network, trackKey, enabled, 'opengov');
 	};
 
 	const handleOpenGovNotificationChange = (trackKey: string, notificationKey: string, enabled: boolean) => {
@@ -196,7 +196,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	};
 
 	const handleGov1ItemChange = (itemKey: string, enabled: boolean) => {
-		bulkUpdateNetworkTrackNotifications(network, itemKey, enabled, ENotifications.GOV1);
+		bulkUpdateNetworkTrackNotifications(network, itemKey, enabled, 'gov1');
 	};
 
 	const handleGov1NotificationChange = (itemKey: string, notificationKey: string, enabled: boolean) => {
@@ -260,26 +260,26 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 				<Separator />
 				<div className={classes.collapsibleContent}>
 					<Tabs
-						defaultValue={ENotifications.OPENGOV}
+						defaultValue='opengov'
 						className='w-full'
 					>
 						<TabsList className='rounded-lg bg-call_args_bg px-2 py-1'>
 							<TabsTrigger
 								className='rounded-xl border-none bg-call_args_bg px-6 py-1 text-wallet_btn_text/70 data-[state=active]:bg-white data-[state=active]:text-btn_secondary_text'
-								value={ENotifications.OPENGOV}
+								value='opengov'
 							>
 								OpenGov
 							</TabsTrigger>
 							<TabsTrigger
 								className='rounded-xl border-none bg-call_args_bg px-6 py-1 text-wallet_btn_text/70 data-[state=active]:bg-white data-[state=active]:text-btn_secondary_text'
-								value={ENotifications.GOV1}
+								value='gov1'
 							>
 								Gov1
 							</TabsTrigger>
 						</TabsList>
 
 						<TabsContent
-							value={ENotifications.OPENGOV}
+							value='opengov'
 							className='mt-4'
 						>
 							<div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
@@ -346,7 +346,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 						</TabsContent>
 
 						<TabsContent
-							value={ENotifications.GOV1}
+							value='gov1'
 							className='mt-4'
 						>
 							<div className='grid grid-cols-1 gap-4 md:grid-cols-2'>

@@ -61,21 +61,21 @@ const getNetworkLogo = (networkId: string): string => {
 function ParachainsSection() {
 	const t = useTranslations();
 	const currentNetwork = getCurrentNetwork();
-	const { preferences, updateNetworkPreference, importNetworkSettings, bulkUpdateNetworkPreferences } = useNotificationPreferences(true);
+	const { preferences, updateNetworkPreference, importNetworkSettings, bulkUpdateTriggerPreferences } = useNotificationPreferences(true);
 
 	const [selectedNetworks, setSelectedNetworks] = useState<INetworkSettings[]>([]);
 	const [pendingRemovals, setPendingRemovals] = useState<Set<string>>(new Set());
 
 	useEffect(() => {
-		if (!preferences?.networkPreferences) {
+		if (!preferences?.triggerPreferences) {
 			setSelectedNetworks([]);
 			return;
 		}
 
-		const userNetworks = Object.keys(preferences.networkPreferences);
+		const userNetworks = Object.keys(preferences.triggerPreferences);
 		const networks: INetworkSettings[] = [];
 
-		const currentNetworkPrefs = preferences.networkPreferences[currentNetwork];
+		const currentNetworkPrefs = preferences.triggerPreferences[currentNetwork];
 		if (currentNetworkPrefs?.enabled !== false) {
 			const formattedCurrentName = currentNetwork
 				.split(/[-_]/)
@@ -95,7 +95,7 @@ function ParachainsSection() {
 			if (networkId.includes('.') && !['polymesh-test', 'moonbase-alpha'].includes(networkId)) return;
 
 			const networkPrefs =
-				preferences?.networkPreferences && Object.prototype.hasOwnProperty.call(preferences.networkPreferences, networkId) ? preferences.networkPreferences[networkId] : undefined;
+				preferences?.triggerPreferences && Object.prototype.hasOwnProperty.call(preferences.triggerPreferences, networkId) ? preferences.triggerPreferences[networkId] : undefined;
 
 			if (networkPrefs?.enabled !== false && !pendingRemovals.has(networkId)) {
 				const formattedName = networkId
@@ -112,12 +112,12 @@ function ParachainsSection() {
 		});
 
 		setSelectedNetworks(networks);
-	}, [preferences?.networkPreferences, currentNetwork, pendingRemovals]);
+	}, [preferences?.triggerPreferences, currentNetwork, pendingRemovals]);
 
 	useEffect(() => {
-		if (!preferences?.networkPreferences) return;
+		if (!preferences?.triggerPreferences) return;
 
-		const networkPrefs = preferences.networkPreferences as Record<string, { enabled?: boolean } | undefined>;
+		const networkPrefs = preferences.triggerPreferences as Record<string, { enabled?: boolean } | undefined>;
 		const serverNetworks: string[] = Object.keys(networkPrefs).filter((networkId) => networkPrefs[networkId]?.enabled !== false);
 
 		const removalsCompleted = Array.from(pendingRemovals).every((networkId) => !serverNetworks.includes(networkId));
@@ -125,9 +125,9 @@ function ParachainsSection() {
 		if (removalsCompleted && pendingRemovals.size > 0) {
 			setPendingRemovals(new Set());
 		}
-	}, [preferences?.networkPreferences, pendingRemovals]);
+	}, [preferences?.triggerPreferences, pendingRemovals]);
 
-	const currentNetworkPrefs = preferences?.networkPreferences?.[currentNetwork];
+	const currentNetworkPrefs = preferences?.triggerPreferences?.[currentNetwork];
 	const [parachainSettings, setParachainSettings] = useState({
 		setPrimaryNetworkSettings: currentNetworkPrefs?.isPrimary || false,
 		importPrimaryNetworkSettings: currentNetworkPrefs?.importPrimarySettings || false
@@ -196,7 +196,7 @@ function ParachainsSection() {
 						importPrimarySettings: false
 					}
 				}));
-				await bulkUpdateNetworkPreferences(updates);
+				await bulkUpdateTriggerPreferences(updates);
 			} else {
 				updateNetworkPreference(networks[0].id, {
 					enabled: true,
@@ -242,7 +242,7 @@ function ParachainsSection() {
 				}))
 			];
 
-			await bulkUpdateNetworkPreferences(updates);
+			await bulkUpdateTriggerPreferences(updates);
 
 			if (networksToImport.length > 0) {
 				const importResults = await Promise.allSettled(networksToImport.map((network) => importNetworkSettings(currentNetwork, network.id)));
@@ -250,7 +250,7 @@ function ParachainsSection() {
 				const failedImports = importResults.map((result, index) => (result.status === 'rejected' ? networksToImport[index] : null)).filter(Boolean);
 
 				if (failedImports.length > 0) {
-					console.error('Some network imports failed:', failedImports);
+					console.error('failed to import');
 				}
 			}
 		} catch {
@@ -321,13 +321,13 @@ function ParachainsSection() {
 					section: ENotifications.NETWORKS,
 					key: networkId,
 					value: {
-						enabled: preferences?.networkPreferences?.[networkId]?.enabled || true,
+						enabled: preferences?.triggerPreferences?.[networkId]?.enabled || true,
 						isPrimary: networkId === currentNetwork ? currentNetworkPrefs?.isPrimary || false : false,
 						importPrimarySettings: false
 					}
 				}));
 
-				await bulkUpdateNetworkPreferences(updates);
+				await bulkUpdateTriggerPreferences(updates);
 
 				setParachainSettings((prev) => ({
 					...prev,

@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
@@ -22,21 +23,27 @@ function BountiesNotificationsSection({ network }: BountiesNotificationsSectionP
 	const t = useTranslations();
 	const { preferences, updateNetworkBountiesNotification, bulkUpdateNetworkBountiesNotifications } = useNotificationPreferences();
 
-	const networkPreferences = preferences?.networkPreferences?.[network];
+	const networkPreferences = preferences?.triggerPreferences?.[network];
 
-	const enabledChannels = preferences?.channelPreferences
-		? Object.entries(preferences.channelPreferences)
-				.filter(([, settings]) => settings.enabled && settings.verified)
-				.reduce((acc, [channel]) => ({ ...acc, [channel]: true }), {})
-		: {};
+	const enabledChannels = useMemo(() => {
+		return preferences?.channelPreferences
+			? Object.entries(preferences.channelPreferences)
+					.filter(([, settings]) => settings.enabled && settings.verified)
+					.reduce((acc, [channel]) => ({ ...acc, [channel]: true }), {})
+			: {};
+	}, [preferences?.channelPreferences]);
 
-	const hasEnabledChannels = Object.keys(enabledChannels).length > 0;
+	const bountiesNotifications = useMemo(() => {
+		if (networkPreferences?.bountiesNotifications) {
+			return networkPreferences.bountiesNotifications;
+		}
 
-	const bountiesNotifications = networkPreferences?.bountiesNotifications || {
-		bountyApplicationStatusUpdates: { enabled: hasEnabledChannels, channels: enabledChannels },
-		bountyPayoutsAndMilestones: { enabled: hasEnabledChannels, channels: enabledChannels },
-		activityOnBountiesIFollow: { enabled: hasEnabledChannels, channels: enabledChannels }
-	};
+		return {
+			bountyApplicationStatusUpdates: { enabled: false, channels: enabledChannels },
+			bountyPayoutsAndMilestones: { enabled: false, channels: enabledChannels },
+			activityOnBountiesIFollow: { enabled: false, channels: enabledChannels }
+		};
+	}, [networkPreferences?.bountiesNotifications, enabledChannels]);
 
 	const handleBountiesNotificationChange = (type: string, enabled: boolean) => {
 		const currentSettings = bountiesNotifications[type as keyof typeof bountiesNotifications];

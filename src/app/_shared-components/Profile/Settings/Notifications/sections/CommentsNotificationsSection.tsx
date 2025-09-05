@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
@@ -22,21 +23,27 @@ function CommentsNotificationsSection({ network }: CommentsNotificationsSectionP
 	const t = useTranslations();
 	const { preferences, updateNetworkCommentsNotification, bulkUpdateNetworkCommentsNotifications } = useNotificationPreferences();
 
-	const networkPreferences = preferences?.networkPreferences?.[network];
+	const networkPreferences = preferences?.triggerPreferences?.[network];
 
-	const enabledChannels = preferences?.channelPreferences
-		? Object.entries(preferences.channelPreferences)
-				.filter(([, settings]) => settings.enabled && settings.verified)
-				.reduce((acc, [channel]) => ({ ...acc, [channel]: true }), {})
-		: {};
+	const enabledChannels = useMemo(() => {
+		return preferences?.channelPreferences
+			? Object.entries(preferences.channelPreferences)
+					.filter(([, settings]) => settings.enabled && settings.verified)
+					.reduce((acc, [channel]) => ({ ...acc, [channel]: true }), {})
+			: {};
+	}, [preferences?.channelPreferences]);
 
-	const hasEnabledChannels = Object.keys(enabledChannels).length > 0;
+	const commentsNotifications = useMemo(() => {
+		if (networkPreferences?.commentsNotifications) {
+			return networkPreferences.commentsNotifications;
+		}
 
-	const commentsNotifications = networkPreferences?.commentsNotifications || {
-		commentsOnMyProposals: { enabled: hasEnabledChannels, channels: enabledChannels },
-		repliesToMyComments: { enabled: hasEnabledChannels, channels: enabledChannels },
-		mentions: { enabled: hasEnabledChannels, channels: enabledChannels }
-	};
+		return {
+			commentsOnMyProposals: { enabled: false, channels: enabledChannels },
+			repliesToMyComments: { enabled: false, channels: enabledChannels },
+			mentions: { enabled: false, channels: enabledChannels }
+		};
+	}, [networkPreferences?.commentsNotifications, enabledChannels]);
 
 	const handleCommentsNotificationChange = (type: string, enabled: boolean) => {
 		const currentSettings = commentsNotifications[type as keyof typeof commentsNotifications];

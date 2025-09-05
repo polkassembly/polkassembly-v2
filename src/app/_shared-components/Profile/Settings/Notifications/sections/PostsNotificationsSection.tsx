@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
@@ -22,24 +23,30 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 	const t = useTranslations();
 	const { preferences, updateNetworkPostsNotification, bulkUpdateNetworkPostsNotifications } = useNotificationPreferences();
 
-	const networkPreferences = preferences?.networkPreferences?.[network];
+	const networkPreferences = preferences?.triggerPreferences?.[network];
 
-	const enabledChannels = preferences?.channelPreferences
-		? Object.entries(preferences.channelPreferences)
-				.filter(([, settings]) => settings.enabled && settings.verified)
-				.reduce((acc, [channel]) => ({ ...acc, [channel]: true }), {})
-		: {};
+	const enabledChannels = useMemo(() => {
+		return preferences?.channelPreferences
+			? Object.entries(preferences.channelPreferences)
+					.filter(([, settings]) => settings.enabled && settings.verified)
+					.reduce((acc, [channel]) => ({ ...acc, [channel]: true }), {})
+			: {};
+	}, [preferences?.channelPreferences]);
 
-	const hasEnabledChannels = Object.keys(enabledChannels).length > 0;
+	const postsNotifications = useMemo(() => {
+		if (networkPreferences?.postsNotifications) {
+			return networkPreferences.postsNotifications;
+		}
 
-	const postsNotifications = networkPreferences?.postsNotifications || {
-		proposalStatusChanges: { enabled: hasEnabledChannels, channels: enabledChannels },
-		newProposalsInCategories: { enabled: hasEnabledChannels, channels: enabledChannels },
-		votingDeadlineReminders: { enabled: hasEnabledChannels, channels: enabledChannels },
-		updatesOnFollowedProposals: { enabled: hasEnabledChannels, channels: enabledChannels },
-		proposalOutcomePublished: { enabled: hasEnabledChannels, channels: enabledChannels },
-		proposalsYouVotedOnEnacted: { enabled: hasEnabledChannels, channels: enabledChannels }
-	};
+		return {
+			proposalStatusChanges: { enabled: false, channels: enabledChannels },
+			newProposalsInCategories: { enabled: false, channels: enabledChannels },
+			votingDeadlineReminders: { enabled: false, channels: enabledChannels },
+			updatesOnFollowedProposals: { enabled: false, channels: enabledChannels },
+			proposalOutcomePublished: { enabled: false, channels: enabledChannels },
+			proposalsYouVotedOnEnacted: { enabled: false, channels: enabledChannels }
+		};
+	}, [networkPreferences?.postsNotifications, enabledChannels]);
 
 	const handlePostsNotificationChange = (type: string, enabled: boolean) => {
 		const currentSettings = postsNotifications[type as keyof typeof postsNotifications];

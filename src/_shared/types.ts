@@ -106,6 +106,13 @@ export interface IUserNotificationChannelPreferences {
 export interface IUserNotificationTriggerPreferences {
 	name: string;
 	enabled: boolean;
+	isPrimary?: boolean;
+	importPrimarySettings: boolean;
+	postsNotifications?: IPostsNotificationSettings;
+	commentsNotifications?: ICommentsNotificationSettings;
+	bountiesNotifications?: IBountiesNotificationSettings;
+	openGovTracks?: Partial<IOpenGovTracksSettings>;
+	gov1Items?: Partial<IGov1ItemsSettings>;
 	[additionalProperties: string]: unknown; // trigger specific properties
 }
 
@@ -148,12 +155,7 @@ export type IGov1ItemsSettings = Record<'mentionsIReceive' | EProposalType, IGov
 
 export enum ENotifications {
 	CHANNELS = 'channels',
-	NETWORKS = 'networks',
-	POSTS = 'posts',
-	COMMENTS = 'comments',
-	BOUNTIES = 'bounties',
-	OPENGOV = 'opengov',
-	GOV1 = 'gov1'
+	NETWORKS = 'networks'
 }
 
 export interface IUpdateNotificationPreferencesRequest {
@@ -177,12 +179,11 @@ export interface INetworkNotificationSettings extends IBaseNotificationSettings 
 	importPrimarySettings: boolean;
 }
 
-export interface IUserNotificationSettings extends IBaseNotificationSettings {
+export interface IUserNotificationSettings {
 	channelPreferences: Record<ENotificationChannel, IUserNotificationChannelPreferences>;
 	triggerPreferences?: {
-		[network: string]: { [index: string]: IUserNotificationTriggerPreferences };
+		[network: string]: IUserNotificationTriggerPreferences;
 	};
-	networkPreferences?: Record<string, INetworkNotificationSettings>;
 }
 
 export enum ERole {

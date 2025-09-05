@@ -14,7 +14,7 @@ import {
 	EPostOrigin,
 	EProposalType,
 	IUserNotificationSettings,
-	INetworkNotificationSettings
+	IUserNotificationTriggerPreferences
 } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { STALE_TIME } from '@/_shared/_constants/listingLimit';
@@ -48,14 +48,15 @@ const updateChannelPreferences = (data: IUserNotificationSettings, key: string, 
 	return newData;
 };
 
-const ensureNetworkPreferences = (data: IUserNotificationSettings, networkKey: string): IUserNotificationSettings => {
+const ensureTriggerPreferences = (data: IUserNotificationSettings, networkKey: string): IUserNotificationSettings => {
 	const newData = { ...data };
 
-	if (!newData.networkPreferences) {
-		newData.networkPreferences = {};
+	if (!newData.triggerPreferences) {
+		newData.triggerPreferences = {};
 	}
-	if (!newData.networkPreferences[networkKey]) {
-		newData.networkPreferences[networkKey] = {
+	if (!newData.triggerPreferences[networkKey]) {
+		newData.triggerPreferences[networkKey] = {
+			name: networkKey,
 			enabled: true,
 			importPrimarySettings: false
 		};
@@ -64,78 +65,49 @@ const ensureNetworkPreferences = (data: IUserNotificationSettings, networkKey: s
 	return newData;
 };
 
-const updateNestedNotificationSetting = (networkPrefs: INetworkNotificationSettings, sectionKey: string, itemKey: string, value: unknown): INetworkNotificationSettings => {
-	const sectionMap: Record<string, string> = {
-		postsNotifications: 'postsNotifications',
-		commentsNotifications: 'commentsNotifications',
-		bountiesNotifications: 'bountiesNotifications',
-		openGovTracks: 'openGovTracks',
-		gov1Items: 'gov1Items'
-	};
-
-	const targetSection = sectionMap[sectionKey];
-	if (!targetSection) return networkPrefs;
-
-	const updatedPrefs = { ...networkPrefs };
-
-	if (targetSection === 'postsNotifications') {
-		updatedPrefs.postsNotifications = {
-			...(updatedPrefs.postsNotifications || {}),
-			[itemKey]: value
-		} as typeof updatedPrefs.postsNotifications;
-	} else if (targetSection === 'commentsNotifications') {
-		updatedPrefs.commentsNotifications = {
-			...(updatedPrefs.commentsNotifications || {}),
-			[itemKey]: value
-		} as typeof updatedPrefs.commentsNotifications;
-	} else if (targetSection === 'bountiesNotifications') {
-		updatedPrefs.bountiesNotifications = {
-			...(updatedPrefs.bountiesNotifications || {}),
-			[itemKey]: value
-		} as typeof updatedPrefs.bountiesNotifications;
-	} else if (targetSection === 'openGovTracks') {
-		updatedPrefs.openGovTracks = {
-			...(updatedPrefs.openGovTracks || {}),
-			[itemKey]: value
-		} as typeof updatedPrefs.openGovTracks;
-	} else if (targetSection === 'gov1Items') {
-		updatedPrefs.gov1Items = {
-			...(updatedPrefs.gov1Items || {}),
-			[itemKey]: value
-		} as typeof updatedPrefs.gov1Items;
-	}
-
-	return updatedPrefs;
-};
-
-const updateNetworkPreferences = (data: IUserNotificationSettings, key: string, value: unknown): IUserNotificationSettings => {
+const updateTriggerPreferences = (data: IUserNotificationSettings, key: string, value: unknown): IUserNotificationSettings => {
 	const newData = { ...data };
 
-	if (!newData.networkPreferences) {
-		newData.networkPreferences = {};
+	if (!newData.triggerPreferences) {
+		newData.triggerPreferences = {};
 	}
 
 	if (key.includes('.')) {
-		const [networkKey, sectionKey, itemKey] = key.split('.');
+		const [networkKey, ...pathParts] = key.split('.');
 
-		const updatedData = ensureNetworkPreferences(newData, networkKey);
+		if (!networkKey || pathParts.length === 0) return newData;
 
-		if (!updatedData.networkPreferences) {
+		const updatedData = ensureTriggerPreferences(newData, networkKey);
+
+		if (!updatedData.triggerPreferences) {
 			return updatedData;
 		}
 
-		const networkPrefs = updatedData.networkPreferences[networkKey];
+		const networkSettings = JSON.parse(JSON.stringify(updatedData.triggerPreferences[networkKey])) as Record<string, unknown>;
+		let pointer = networkSettings;
 
-		if (sectionKey && itemKey && networkPrefs) {
-			updatedData.networkPreferences![networkKey] = updateNestedNotificationSetting(networkPrefs, sectionKey, itemKey, value);
+		for (let i = 0; i < pathParts.length - 1; i += 1) {
+			const pathPart = pathParts[i];
+			if (pathPart) {
+				if (!Object.prototype.hasOwnProperty.call(pointer, pathPart)) {
+					pointer[pathPart] = {};
+				}
+				pointer = pointer[pathPart] as Record<string, unknown>;
+			}
 		}
 
+		const lastPathPart = pathParts[pathParts.length - 1];
+		if (lastPathPart) {
+			pointer[lastPathPart] = value;
+		}
+
+		updatedData.triggerPreferences[networkKey] = networkSettings as IUserNotificationTriggerPreferences;
 		return updatedData;
 	}
 
-	const { networkPreferences } = newData;
-	networkPreferences[key] = {
-		...networkPreferences[key],
+	const { triggerPreferences } = newData;
+	triggerPreferences[key] = {
+		...triggerPreferences[key],
 		...(value as Record<string, unknown>)
 	};
 
@@ -151,7 +123,7 @@ const applyOptimisticUpdate = (currentData: IUserNotificationSettings, update: I
 			return updateChannelPreferences(newData, key, value as IUserNotificationChannelPreferences);
 		case ENotifications.NETWORKS:
 		case 'networks':
-			return updateNetworkPreferences(newData, key, value);
+			return updateTriggerPreferences(newData, key, value);
 		default:
 			return newData;
 	}
@@ -178,6 +150,10 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			});
 			if (response.error) {
 				throw new Error(response.error.message || 'Failed to fetch notification preferences');
+			}
+
+			if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+				return (response.data as { data: IUserNotificationSettings }).data;
 			}
 			return response.data;
 		},
@@ -223,10 +199,9 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			if (getAllNetworks) {
 				queryClient.setQueryData(['notificationPreferences', user?.id, currentNetwork], data);
 			}
-			queryClient.invalidateQueries({
+			queryClient.refetchQueries({
 				queryKey: ['notificationPreferences', user?.id],
-				exact: false,
-				refetchType: 'none'
+				exact: false
 			});
 		}
 	});
@@ -274,10 +249,9 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			if (getAllNetworks) {
 				queryClient.setQueryData(['notificationPreferences', user?.id, currentNetwork], data);
 			}
-			queryClient.invalidateQueries({
+			queryClient.refetchQueries({
 				queryKey: ['notificationPreferences', user?.id],
-				exact: false,
-				refetchType: 'none'
+				exact: false
 			});
 		}
 	});
@@ -335,23 +309,17 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 				'proposalsYouVotedOnEnacted'
 			];
 
-			const defaultChannels = {
-				[ENotificationChannel.EMAIL]: false,
-				[ENotificationChannel.TELEGRAM]: false,
-				[ENotificationChannel.DISCORD]: false,
-				[ENotificationChannel.SLACK]: false,
-				[ENotificationChannel.ELEMENT]: false
-			};
-
 			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
 
 			postsKeys.forEach((key) => {
-				const networkPostsNotifications = preferences.networkPreferences?.[network]?.postsNotifications;
+				const networkPostsNotifications = preferences?.triggerPreferences?.[network]?.postsNotifications;
 				const currentSettings =
 					networkPostsNotifications && Object.prototype.hasOwnProperty.call(networkPostsNotifications, key)
 						? networkPostsNotifications[key as keyof typeof networkPostsNotifications]
 						: undefined;
-				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: defaultChannels };
+
+				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: DEFAULT_CHANNELS };
+
 				updates.push({
 					section: ENotifications.NETWORKS,
 					key: `${network}.postsNotifications.${key}`,
@@ -385,23 +353,17 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 			const commentsKeys = ['commentsOnMyProposals', 'repliesToMyComments', 'mentions'];
 
-			const defaultChannels = {
-				[ENotificationChannel.EMAIL]: false,
-				[ENotificationChannel.TELEGRAM]: false,
-				[ENotificationChannel.DISCORD]: false,
-				[ENotificationChannel.SLACK]: false,
-				[ENotificationChannel.ELEMENT]: false
-			};
-
 			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
 
 			commentsKeys.forEach((key) => {
-				const networkCommentsNotifications = preferences.networkPreferences?.[network]?.commentsNotifications;
+				const networkCommentsNotifications = preferences?.triggerPreferences?.[network]?.commentsNotifications;
 				const currentSettings =
 					networkCommentsNotifications && Object.prototype.hasOwnProperty.call(networkCommentsNotifications, key)
 						? networkCommentsNotifications[key as keyof typeof networkCommentsNotifications]
 						: undefined;
-				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: defaultChannels };
+
+				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: DEFAULT_CHANNELS };
+
 				updates.push({
 					section: ENotifications.NETWORKS,
 					key: `${network}.commentsNotifications.${key}`,
@@ -438,12 +400,14 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
 
 			bountiesKeys.forEach((key) => {
-				const networkBountiesNotifications = preferences.networkPreferences?.[network]?.bountiesNotifications;
+				const networkBountiesNotifications = preferences?.triggerPreferences?.[network]?.bountiesNotifications;
 				const currentSettings =
 					networkBountiesNotifications && Object.prototype.hasOwnProperty.call(networkBountiesNotifications, key)
 						? networkBountiesNotifications[key as keyof typeof networkBountiesNotifications]
 						: undefined;
+
 				const updatedSettings = currentSettings ? { ...currentSettings, enabled } : { enabled, channels: DEFAULT_CHANNELS };
+
 				updates.push({
 					section: ENotifications.NETWORKS,
 					key: `${network}.bountiesNotifications.${key}`,
@@ -522,7 +486,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			const updates: Array<{ section: string; key: string; value: unknown; network?: string }> = [];
 
 			Object.keys(trackLabels).forEach((key) => {
-				const networkPrefs = preferences.networkPreferences?.[network];
+				const networkPrefs = preferences?.triggerPreferences?.[network];
 				const currentSettings = networkPrefs?.openGovTracks?.[key as keyof typeof networkPrefs.openGovTracks];
 				const updatedSettings = {
 					...(currentSettings || {}),
@@ -542,7 +506,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			});
 
 			Object.keys(gov1Labels).forEach((key) => {
-				const networkPrefs = preferences.networkPreferences?.[network];
+				const networkPrefs = preferences?.triggerPreferences?.[network];
 				const currentSettings = networkPrefs?.gov1Items?.[key as keyof typeof networkPrefs.gov1Items];
 				const updatedSettings = {
 					...(currentSettings || {}),
@@ -567,16 +531,16 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			if (!user?.id || !preferences) return;
 
 			const section = ENotifications.NETWORKS;
-			const key = trackType === ENotifications.OPENGOV ? `${network}.openGovTracks.${trackKey}` : `${network}.gov1Items.${trackKey}`;
+			const key = trackType === 'opengov' ? `${network}.openGovTracks.${trackKey}` : `${network}.gov1Items.${trackKey}`;
 
-			const networkPrefs = preferences.networkPreferences?.[network];
+			const networkPrefs = preferences.triggerPreferences?.[network];
 			const currentSettings =
-				trackType === ENotifications.OPENGOV
+				trackType === 'opengov'
 					? networkPrefs?.openGovTracks?.[trackKey as keyof typeof networkPrefs.openGovTracks]
 					: networkPrefs?.gov1Items?.[trackKey as keyof typeof networkPrefs.gov1Items];
 
 			const notifications =
-				trackType === ENotifications.OPENGOV
+				trackType === 'opengov'
 					? {
 							newReferendumSubmitted: enabled,
 							referendumInVoting: enabled,
@@ -605,7 +569,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 			if (!user?.id || !preferences) return false;
 
 			try {
-				const fromSettings = preferences.networkPreferences?.[fromNetwork];
+				const fromSettings = preferences.triggerPreferences?.[fromNetwork];
 				if (!fromSettings) return false;
 
 				const updates = [
@@ -634,7 +598,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 		[user?.id, preferences]
 	);
 
-	const bulkUpdateNetworkPreferences = useCallback(
+	const bulkUpdateTriggerPreferences = useCallback(
 		async (updates: Array<{ section: string; key: string; value: unknown; network?: string }>) => {
 			if (!user?.id) return;
 
@@ -643,7 +607,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 				updates
 			});
 			if (response.error) {
-				throw new Error(response.error.message || 'Failed to bulk update network preferences');
+				throw new Error(response.error.message || 'Failed to bulk update trigger preferences');
 			}
 		},
 		[user?.id]
@@ -700,7 +664,7 @@ export const useNotificationPreferences = (getAllNetworks?: boolean) => {
 
 		updateNetworkPreference,
 		importNetworkSettings,
-		bulkUpdateNetworkPreferences,
+		bulkUpdateTriggerPreferences,
 
 		updateNetworkPostsNotification,
 		bulkUpdateNetworkPostsNotifications,

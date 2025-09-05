@@ -11,13 +11,7 @@ import {
 	IUserNotificationChannelPreferences,
 	IUpdateNotificationPreferencesRequest,
 	IUserNotificationSettings,
-	INetworkNotificationSettings,
-	IPostsNotificationSettings,
-	ICommentsNotificationSettings,
-	IBountiesNotificationSettings,
-	IOpenGovTracksSettings,
-	IGov1ItemsSettings,
-	INotificationChannelSettings,
+	IUserNotificationTriggerPreferences,
 	ENotifications
 } from '@/_shared/types';
 
@@ -46,11 +40,11 @@ export class NotificationPreferencesService {
 
 		const preferences = user.notificationPreferences || this.getDefaultPreferences();
 
-		if (network && !getAllNetworks && preferences.networkPreferences?.[network]) {
+		if (network && !getAllNetworks && preferences.triggerPreferences?.[network]) {
 			return {
 				...preferences,
-				networkPreferences: {
-					[network]: preferences.networkPreferences[network]
+				triggerPreferences: {
+					[network]: preferences.triggerPreferences[network]
 				}
 			};
 		}
@@ -174,35 +168,6 @@ export class NotificationPreferencesService {
 			verified: false
 		};
 
-		const defaultChannels: INotificationChannelSettings = {
-			[ENotificationChannel.EMAIL]: false,
-			[ENotificationChannel.TELEGRAM]: false,
-			[ENotificationChannel.DISCORD]: false,
-			[ENotificationChannel.SLACK]: false,
-			[ENotificationChannel.ELEMENT]: false
-		};
-
-		const defaultPostsNotifications: IPostsNotificationSettings = {
-			proposalStatusChanges: { enabled: false, channels: defaultChannels },
-			newProposalsInCategories: { enabled: false, channels: defaultChannels },
-			votingDeadlineReminders: { enabled: false, channels: defaultChannels },
-			updatesOnFollowedProposals: { enabled: false, channels: defaultChannels },
-			proposalOutcomePublished: { enabled: false, channels: defaultChannels },
-			proposalsYouVotedOnEnacted: { enabled: false, channels: defaultChannels }
-		};
-
-		const defaultCommentsNotifications: ICommentsNotificationSettings = {
-			commentsOnMyProposals: { enabled: false, channels: defaultChannels },
-			repliesToMyComments: { enabled: false, channels: defaultChannels },
-			mentions: { enabled: false, channels: defaultChannels }
-		};
-
-		const defaultBountiesNotifications: IBountiesNotificationSettings = {
-			bountyApplicationStatusUpdates: { enabled: false, channels: defaultChannels },
-			bountyPayoutsAndMilestones: { enabled: false, channels: defaultChannels },
-			activityOnBountiesIFollow: { enabled: false, channels: defaultChannels }
-		};
-
 		return {
 			channelPreferences: {
 				[ENotificationChannel.EMAIL]: { ...defaultChannelSettings, name: ENotificationChannel.EMAIL },
@@ -211,12 +176,7 @@ export class NotificationPreferencesService {
 				[ENotificationChannel.SLACK]: { ...defaultChannelSettings, name: ENotificationChannel.SLACK },
 				[ENotificationChannel.ELEMENT]: { ...defaultChannelSettings, name: ENotificationChannel.ELEMENT }
 			},
-			networkPreferences: {},
-			postsNotifications: defaultPostsNotifications,
-			commentsNotifications: defaultCommentsNotifications,
-			bountiesNotifications: defaultBountiesNotifications,
-			openGovTracks: {},
-			gov1Items: {}
+			triggerPreferences: {}
 		};
 	}
 
@@ -227,19 +187,10 @@ export class NotificationPreferencesService {
 			case ENotifications.CHANNELS:
 				return this.updateChannelPreferences(updated, request.key, request.value);
 			case ENotifications.NETWORKS:
+			case 'networks':
 				return this.updateNetworkPreferences(updated, request.key, request.value, request.network);
-			case ENotifications.POSTS:
-				return this.updatePostsPreferences(updated, request.key, request.value);
-			case ENotifications.COMMENTS:
-				return this.updateCommentsPreferences(updated, request.key, request.value);
-			case ENotifications.BOUNTIES:
-				return this.updateBountiesPreferences(updated, request.key, request.value);
-			case ENotifications.OPENGOV:
-				return this.updateOpenGovPreferences(updated, request.key, request.value);
-			case ENotifications.GOV1:
-				return this.updateGov1Preferences(updated, request.key, request.value);
 			default:
-				throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid preference section');
+				throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid preference section. Only channels and networks are supported.');
 		}
 	}
 
@@ -259,13 +210,20 @@ export class NotificationPreferencesService {
 	}
 
 	private static updateNetworkPreferences(updated: IUserNotificationSettings, key: string, value: unknown, network?: string): IUserNotificationSettings {
-		const networkPreferences = updated.networkPreferences || {};
+		const triggerPreferences = updated.triggerPreferences || {};
 
 		if (key.includes('.')) {
 			const [networkId, ...pathParts] = key.split('.');
 			if (!networkId || pathParts.length === 0) return updated;
 
-			const networkSettings = networkPreferences[networkId] || ({} as INetworkNotificationSettings);
+			const networkSettings =
+				triggerPreferences[networkId] ||
+				({
+					name: networkId,
+					enabled: true,
+					importPrimarySettings: false
+				} as IUserNotificationTriggerPreferences);
+
 			const updatedSettings = JSON.parse(JSON.stringify(networkSettings)) as Record<string, unknown>;
 			let pointer = updatedSettings;
 
@@ -285,9 +243,9 @@ export class NotificationPreferencesService {
 
 			return {
 				...updated,
-				networkPreferences: {
-					...networkPreferences,
-					[networkId]: updatedSettings as unknown as INetworkNotificationSettings
+				triggerPreferences: {
+					...triggerPreferences,
+					[networkId]: updatedSettings as unknown as IUserNotificationTriggerPreferences
 				}
 			};
 		}
@@ -296,69 +254,21 @@ export class NotificationPreferencesService {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Network is required for network preferences');
 		}
 
-		const existingValue = networkPreferences[network] || ({} as INetworkNotificationSettings);
-		const newValue = typeof value === 'object' && value !== null ? (value as Partial<INetworkNotificationSettings>) : {};
+		const existingValue =
+			triggerPreferences[network] ||
+			({
+				name: network,
+				enabled: true,
+				importPrimarySettings: false
+			} as IUserNotificationTriggerPreferences);
+
+		const newValue = typeof value === 'object' && value !== null ? (value as Partial<IUserNotificationTriggerPreferences>) : {};
 
 		return {
 			...updated,
-			networkPreferences: {
-				...networkPreferences,
+			triggerPreferences: {
+				...triggerPreferences,
 				[network]: { ...existingValue, ...newValue }
-			}
-		};
-	}
-
-	private static updatePostsPreferences(updated: IUserNotificationSettings, key: string, value: unknown): IUserNotificationSettings {
-		const postsNotifications = updated.postsNotifications || ({} as IPostsNotificationSettings);
-		return {
-			...updated,
-			postsNotifications: {
-				...postsNotifications,
-				[key]: value
-			}
-		};
-	}
-
-	private static updateCommentsPreferences(updated: IUserNotificationSettings, key: string, value: unknown): IUserNotificationSettings {
-		const commentsNotifications = updated.commentsNotifications || ({} as ICommentsNotificationSettings);
-		return {
-			...updated,
-			commentsNotifications: {
-				...commentsNotifications,
-				[key]: value
-			}
-		};
-	}
-
-	private static updateBountiesPreferences(updated: IUserNotificationSettings, key: string, value: unknown): IUserNotificationSettings {
-		const bountiesNotifications = updated.bountiesNotifications || ({} as IBountiesNotificationSettings);
-		return {
-			...updated,
-			bountiesNotifications: {
-				...bountiesNotifications,
-				[key]: value
-			}
-		};
-	}
-
-	private static updateOpenGovPreferences(updated: IUserNotificationSettings, key: string, value: unknown): IUserNotificationSettings {
-		const openGovTracks = updated.openGovTracks || ({} as Partial<IOpenGovTracksSettings>);
-		return {
-			...updated,
-			openGovTracks: {
-				...openGovTracks,
-				[key]: value
-			}
-		};
-	}
-
-	private static updateGov1Preferences(updated: IUserNotificationSettings, key: string, value: unknown): IUserNotificationSettings {
-		const gov1Items = updated.gov1Items || ({} as Partial<IGov1ItemsSettings>);
-		return {
-			...updated,
-			gov1Items: {
-				...gov1Items,
-				[key]: value
 			}
 		};
 	}
