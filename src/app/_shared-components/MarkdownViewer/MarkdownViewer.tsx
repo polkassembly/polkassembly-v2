@@ -106,11 +106,11 @@ const markdownComponents: Components = {
 				<div className='video-container'>
 					<iframe
 						src={embedUrl}
-						// className='aspect-video h-auto w-full max-w-[90%]'
-						// style={{
-						// width: '90%',
-						// height: 'auto'
-						// }}
+						className='aspect-video h-auto w-full max-w-[90%]'
+						style={{
+							width: '90%',
+							height: 'auto'
+						}}
 						allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
 						allowFullScreen
 						title={alt || 'Embedded video'}
