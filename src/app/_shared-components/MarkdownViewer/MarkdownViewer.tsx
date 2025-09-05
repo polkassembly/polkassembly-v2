@@ -148,7 +148,7 @@ const markdownComponents: Components = {
 		}
 
 		return (
-			<div className='max-w-max'>
+			<span className='mr-2 inline-block max-w-max align-top'>
 				<Link
 					href={src}
 					target='_blank'
@@ -162,7 +162,7 @@ const markdownComponents: Components = {
 						sizes='100vw'
 					/>
 				</Link>
-			</div>
+			</span>
 		);
 	},
 	a: ({ href, children, ...props }) => {
