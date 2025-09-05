@@ -95,7 +95,7 @@ const markdownComponents: Components = {
 	li: 'li',
 	code: 'code',
 	pre: 'pre',
-	img: ({ src, alt }) => {
+	img: ({ src, alt, height, width }) => {
 		if (!src) {
 			return null;
 		}
@@ -106,11 +106,11 @@ const markdownComponents: Components = {
 				<div className='video-container'>
 					<iframe
 						src={embedUrl}
-						className='aspect-video h-auto w-full max-w-[90%]'
-						style={{
-							width: '90%',
-							height: 'auto'
-						}}
+						// className='aspect-video h-auto w-full max-w-[90%]'
+						// style={{
+						// width: '90%',
+						// height: 'auto'
+						// }}
 						allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
 						allowFullScreen
 						title={alt || 'Embedded video'}
@@ -147,23 +147,26 @@ const markdownComponents: Components = {
 			);
 		}
 
+		console.log('height', height);
+		console.log('width', width);
+
 		return (
 			<Link
 				href={src}
 				target='_blank'
 				rel='noopener noreferrer'
-				className='cursor-pointer'
+				className='max-w-max'
 			>
 				<Image
 					src={src}
 					alt={alt || 'Image'}
-					height={256}
-					width={256}
+					height={ValidatorService.isValidNumber(height) ? Number(height) : 256}
+					width={ValidatorService.isValidNumber(width) ? Number(width) : 256}
 					sizes='100vw'
-					style={{
-						width: '90%',
-						height: 'auto'
-					}}
+					// style={{
+					// width: '90%',
+					// height: 'auto'
+					// }}
 				/>
 			</Link>
 		);
