@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
@@ -194,7 +192,7 @@ function AddNetworksModal({ open, onClose, onConfirm, selectedNetworks }: AddNet
 	return (
 		<Dialog
 			open={open}
-			onOpenChange={onClose}
+			onOpenChange={(isOpen) => !isOpen && onClose()}
 		>
 			<DialogContent className='max-w-xl p-4 sm:p-6'>
 				<DialogHeader>

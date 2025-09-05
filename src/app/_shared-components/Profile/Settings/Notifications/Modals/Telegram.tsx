@@ -2,9 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
-import React, { useState } from 'react';
+import { ComponentType, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
@@ -13,7 +11,7 @@ import { ENotificationChannel, ENotificationStatus } from '@/_shared/types';
 import { useToast } from '@/hooks/useToast';
 
 interface TelegramInfoModalProps {
-	Icon: React.ComponentType<{ width?: number; height?: number; className?: string }>;
+	Icon: ComponentType<{ width?: number; height?: number; className?: string }>;
 	title: string;
 	open: boolean;
 	getVerifyToken: (channel: ENotificationChannel) => Promise<string>;
@@ -90,7 +88,7 @@ function TelegramInfoModal({ Icon, title, open, getVerifyToken, generatedToken =
 								<a
 									href='https://t.me/PolkassemblyBot'
 									target='_blank'
-									rel='noreferrer'
+									rel='noreferrer noopener'
 								>
 									t.me/PolkassemblyBot
 								</a>
