@@ -106,7 +106,7 @@ export interface IUserNotificationChannelPreferences {
 export interface IUserNotificationTriggerPreferences {
 	name: string;
 	enabled: boolean;
-	[additionalProperties: string]: unknown;
+	[additionalProperties: string]: unknown; // trigger specific properties
 }
 
 export type INotificationChannelSettings = Partial<Record<ENotificationChannel, boolean>>;
