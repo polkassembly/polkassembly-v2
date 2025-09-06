@@ -205,7 +205,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 			coverImage,
 			...(publicSocialLinks?.length ? { publicSocialLinks } : {})
 		},
-		notificationPreferences: notificationPreferences as IUserNotificationSettings | undefined
+		notificationPreferences: notificationPreferences as IUserNotificationSettings
 	});
 
 	if (email) {
