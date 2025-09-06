@@ -92,8 +92,7 @@ export enum ENotificationChannel {
 	TELEGRAM = 'telegram',
 	DISCORD = 'discord',
 	ELEMENT = 'element',
-	SLACK = 'slack',
-	IN_APP = 'in_app'
+	SLACK = 'slack'
 }
 
 export interface IUserNotificationChannelPreferences {
@@ -107,14 +106,95 @@ export interface IUserNotificationChannelPreferences {
 export interface IUserNotificationTriggerPreferences {
 	name: string;
 	enabled: boolean;
+	isPrimary?: boolean;
+	importPrimarySettings?: boolean;
+	postsNotifications?: IPostsNotificationSettings;
+	commentsNotifications?: ICommentsNotificationSettings;
+	bountiesNotifications?: IBountiesNotificationSettings;
+	openGovTracks?: Partial<IOpenGovTracksSettings>;
+	gov1Items?: Partial<IGov1ItemsSettings>;
 	[additionalProperties: string]: unknown; // trigger specific properties
 }
 
+export type INotificationChannelSettings = Partial<Record<ENotificationChannel, boolean>>;
+
+export type NotificationFlags<T extends string = string> = Record<T, boolean>;
+
+export interface INotificationItemSettings {
+	enabled: boolean;
+	channels: INotificationChannelSettings;
+}
+
+export type NotificationGroup<T extends string> = Record<T, INotificationItemSettings>;
+
+export type IPostsNotificationSettings = NotificationGroup<EPostsNotification>;
+
+export type ICommentsNotificationSettings = NotificationGroup<ECommentsNotification>;
+
+export type IBountiesNotificationSettings = NotificationGroup<EBountiesNotification>;
+
+export type IOpenGovTrackNotifications = NotificationFlags<ETrackNotification>;
+
+export interface IOpenGovTrackSettings {
+	enabled: boolean;
+	notifications: IOpenGovTrackNotifications;
+}
+
+export type IOpenGovTracksSettings = Record<EPostOrigin, IOpenGovTrackSettings>;
+
+export type IGov1ItemNotifications = NotificationFlags;
+
+export interface IGov1ItemSettings {
+	enabled: boolean;
+	notifications: IGov1ItemNotifications;
+}
+
+export type IGov1ItemsSettings = Record<'mentionsIReceive' | EProposalType, IGov1ItemSettings>;
+
+export enum ENotifications {
+	CHANNELS = 'channels',
+	NETWORKS = 'networks'
+}
+
+export interface IUpdateNotificationPreferencesRequest {
+	section: ENotifications;
+	key: string;
+	value: unknown;
+	network?: string;
+}
+
 export interface IUserNotificationSettings {
-	channelPreferences: { [channel: string]: IUserNotificationChannelPreferences };
-	triggerPreferences: {
-		[network: string]: { [index: string]: IUserNotificationTriggerPreferences };
+	channelPreferences: Record<ENotificationChannel, IUserNotificationChannelPreferences>;
+	triggerPreferences?: {
+		[network: string]: IUserNotificationTriggerPreferences;
 	};
+}
+
+export enum EPostsNotification {
+	PROPOSAL_STATUS_CHANGES = 'proposalStatusChanges',
+	NEW_PROPOSALS_IN_CATEGORIES = 'newProposalsInCategories',
+	VOTING_DEADLINE_REMINDERS = 'votingDeadlineReminders',
+	UPDATES_ON_FOLLOWED_PROPOSALS = 'updatesOnFollowedProposals',
+	PROPOSAL_OUTCOME_PUBLISHED = 'proposalOutcomePublished',
+	PROPOSALS_YOU_VOTED_ON_ENACTED = 'proposalsYouVotedOnEnacted'
+}
+
+export enum ECommentsNotification {
+	COMMENTS_ON_MY_PROPOSALS = 'commentsOnMyProposals',
+	REPLIES_TO_MY_COMMENTS = 'repliesToMyComments',
+	MENTIONS = 'mentions'
+}
+
+export enum EBountiesNotification {
+	BOUNTY_APPLICATION_STATUS_UPDATES = 'bountyApplicationStatusUpdates',
+	BOUNTY_PAYOUTS_AND_MILESTONES = 'bountyPayoutsAndMilestones',
+	ACTIVITY_ON_BOUNTIES_I_FOLLOW = 'activityOnBountiesIFollow'
+}
+
+export enum ETrackNotification {
+	NEW_REFERENDUM_SUBMITTED = 'newReferendumSubmitted',
+	REFERENDUM_IN_VOTING = 'referendumInVoting',
+	REFERENDUM_CLOSED = 'referendumClosed'
 }
 
 export enum ERole {
@@ -338,7 +418,26 @@ export interface IUserPreferences {
 
 export enum ENotificationTrigger {
 	VERIFY_EMAIL = 'verifyEmail',
-	RESET_PASSWORD = 'resetPassword'
+	RESET_PASSWORD = 'resetPassword',
+	PROPOSALS_CREATED = 'newProposalCreated',
+	MENTIONED = 'newMention',
+	COMMENTED = 'newCommentAdded',
+	REPLIED = 'newReplyAdded',
+	PROPOSALS_STATUS_CHANGED = 'proposalStatusChanged',
+	CONTENT_DELETED_BY_MOD = 'contentDeletedByMod',
+	OWN_PROPOSAL_CREATED = 'ownProposalCreated',
+	OPENGOV_REFERENDUM_SUBMITTED = 'openGovReferendumSubmitted',
+	OPENGOV_REFERENDUM_INVOTING = 'openGovReferendumInVoting',
+	OPENGOV_REFERENDUM_CLOSED = 'openGovReferendumClosed',
+	FELLOWSHIP_REFERENDUM_SUBMITTED = 'fellowShipReferendumSubmitted',
+	FELLOWSHIP_REFERENDUM_INVOTING = 'fellowShipReferendumInVoting',
+	FELLOWSHIP_REFERENDUM_CLOSED = 'fellowShipReferendumClosed',
+	PIP_SUBMITTED = 'pipSubmitted',
+	PIP_INVOTING = 'pipInVoting',
+	PIP_CLOSED = 'pipClosed',
+	GOV1_PROPOSAL_SUBMITTED = 'gov1ProposalSubmitted',
+	GOV1_PROPOSAL_INVOTING = 'gov1ProposalInVoting',
+	GOV1_PROPOSAL_CLOSED = 'gov1ProposalClosed'
 }
 
 export enum EDataSource {
