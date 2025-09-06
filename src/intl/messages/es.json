@@ -294,6 +294,7 @@
 			"newEmail": "Nuevo correo electrónico",
 			"type": "Tipo",
 			"general": "General",
+			"advancedSettings": "Configuración Avanzada",
 			"notifications": "Notificaciones",
 			"belowToConfirm": "abajo para confirmar",
 			"Notifications": {
@@ -354,7 +355,6 @@
 				"discord": "Discord",
 				"slack": "Slack",
 				"element": "Element",
-				"advancedSettings": "Configuración Avanzada",
 				"general": "General",
 				"notifications": "Notificaciones",
 				"Modals": {

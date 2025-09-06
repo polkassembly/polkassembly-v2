@@ -293,6 +293,7 @@
 			"newEmail": "新しいメール",
 			"type": "タイプ",
 			"general": "一般",
+			"advancedSettings": "詳細設定",
 			"notifications": "通知",
 			"belowToConfirm": "確認するには下",
 			"Notifications": {
@@ -353,7 +354,6 @@
 				"discord": "Discord",
 				"slack": "Slack",
 				"element": "Element",
-				"advancedSettings": "詳細設定",
 				"general": "一般",
 				"notifications": "通知",
 				"Modals": {

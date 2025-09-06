@@ -53,7 +53,7 @@ function NotificationChannelsSection() {
 	const { preferences, updateChannelPreference, generateToken } = useNotificationPreferences();
 	const [showModal, setShowModal] = useState<ENotificationChannel | null>(null);
 
-	const botsArr = getBots(t).filter((b) => b.channel !== ENotificationChannel.ELEMENT);
+	const botsArr = getBots(t);
 
 	const handleClick = (channel: ENotificationChannel) => {
 		setShowModal(channel);

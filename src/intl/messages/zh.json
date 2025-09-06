@@ -291,6 +291,7 @@
 			"save": "保存",
 			"oldEmail": "旧电子邮件",
 			"newEmail": "新电子邮件",
+			"advancedSettings": "高级设置",
 			"type": "类型",
 			"belowToConfirm": "在下方确认",
 			"Notifications": {
@@ -351,7 +352,6 @@
 				"discord": "Discord",
 				"slack": "Slack",
 				"element": "Element",
-				"advancedSettings": "高级设置",
 				"general": "一般",
 				"notifications": "通知",
 				"Modals": {

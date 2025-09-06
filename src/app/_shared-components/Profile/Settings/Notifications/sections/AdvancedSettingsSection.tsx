@@ -218,7 +218,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 								className='mt-1'
 								height={24}
 							/>
-							<h3 className='mb-0 pt-1 text-base font-semibold leading-5 tracking-wide text-btn_secondary_text md:text-lg'>{t('Profile.Settings.advancedsettings')}</h3>
+							<h3 className='mb-0 pt-1 text-base font-semibold leading-5 tracking-wide text-btn_secondary_text md:text-lg'>{t('Profile.Settings.advancedSettings')}</h3>
 							<div
 								className='flex items-center gap-2'
 								onClick={(e) => e.stopPropagation()}

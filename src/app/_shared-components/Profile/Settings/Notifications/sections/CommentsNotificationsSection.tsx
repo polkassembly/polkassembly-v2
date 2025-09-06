@@ -26,11 +26,12 @@ function CommentsNotificationsSection({ network }: CommentsNotificationsSectionP
 	const networkPreferences = preferences?.triggerPreferences?.[network];
 
 	const enabledChannels = useMemo(() => {
-		return preferences?.channelPreferences
-			? Object.entries(preferences.channelPreferences)
-					.filter(([, settings]) => settings.enabled && settings.verified)
-					.reduce((acc, [channel]) => ({ ...acc, [channel]: true }), {})
-			: {};
+		const map = {} as Record<ENotificationChannel, boolean>;
+		Object.values(ENotificationChannel).forEach((ch) => {
+			const s = preferences?.channelPreferences?.[ch];
+			map[ch] = !!(s?.enabled && s?.verified);
+		});
+		return map;
 	}, [preferences?.channelPreferences]);
 
 	const commentsNotifications = useMemo(() => {
