@@ -225,51 +225,53 @@ export class SubsquidService extends SubsquidUtils {
 			};
 		}
 
-		// fetch vote counts for each post
-		const voteMetricsPromises: Promise<IVoteMetrics>[] = subsquidData.proposals.map((proposal: { index?: number; hash?: string; type: EProposalType }) => {
-			if (!ValidatorService.isValidNumber(proposal.index) && !proposal.hash?.startsWith?.('0x')) {
-				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Invalid index or hash for proposal');
-			}
+		const flag = false;
 
-			return this.GetPostVoteMetrics({
-				network,
-				proposalType: proposalType || proposal.type,
-				indexOrHash: (ValidatorService.isValidNumber(proposal.index) ? String(proposal.index) : proposal.hash) as string
+		if (flag) {
+			// fetch vote counts for each post
+			const voteMetricsPromises: Promise<IVoteMetrics>[] = subsquidData.proposals.map((proposal: { index?: number; hash?: string; type: EProposalType }) => {
+				if (!ValidatorService.isValidNumber(proposal.index) && !proposal.hash?.startsWith?.('0x')) {
+					throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Invalid index or hash for proposal');
+				}
+
+				return this.GetPostVoteMetrics({
+					network,
+					proposalType: proposalType || proposal.type,
+					indexOrHash: (ValidatorService.isValidNumber(proposal.index) ? String(proposal.index) : proposal.hash) as string
+				});
 			});
-		});
 
-		const voteMetrics = await Promise.all(voteMetricsPromises);
+			const voteMetrics = await Promise.all(voteMetricsPromises);
+			console.log(`Fetched vote metrics from Subsquid with data: ${JSON.stringify(voteMetrics)}`);
+		}
 
 		const posts: IOnChainPostListing[] = [];
 
 		const postsPromises = subsquidData.proposals.map(
-			async (
-				proposal: {
-					createdAt: string;
-					description?: string | null;
-					index: number;
-					origin: EPostOrigin;
-					proposer?: string;
-					curator?: string;
-					status?: EProposalStatus;
-					reward?: string;
-					hash?: string;
-					preimage?: {
-						proposedCall?: {
-							args?: Record<string, unknown>;
-						};
+			async (proposal: {
+				createdAt: string;
+				description?: string | null;
+				index: number;
+				origin: EPostOrigin;
+				proposer?: string;
+				curator?: string;
+				status?: EProposalStatus;
+				reward?: string;
+				hash?: string;
+				preimage?: {
+					proposedCall?: {
+						args?: Record<string, unknown>;
 					};
-					statusHistory?: Array<{
-						status: EProposalStatus;
-						timestamp: string;
-					}>;
-				},
-				index: number
-			) => {
+				};
+				type: EProposalType;
+				statusHistory?: Array<{
+					status: EProposalStatus;
+					timestamp: string;
+				}>;
+			}) => {
 				const allPeriodEnds =
 					proposal.statusHistory && proposalType === EProposalType.REFERENDUM_V2 ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
 				let childBountiesCount = 0;
-
 				// child bounties count
 				if (proposalType === EProposalType.BOUNTY) {
 					const childBountiesCountGQL = this.GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDICES;
@@ -294,9 +296,9 @@ export class SubsquidService extends SubsquidUtils {
 					proposer: proposal.proposer || '',
 					...(proposal.reward && { reward: proposal.reward }),
 					status: proposal.status || EProposalStatus.Unknown,
-					type: proposalType,
+					type: proposalType || proposal.type,
 					hash: proposal.hash || '',
-					voteMetrics: voteMetrics[Number(index)],
+					// voteMetrics: voteMetrics[Number(index)],
 					beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
 					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
 					preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined

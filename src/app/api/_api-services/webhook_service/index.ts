@@ -1,12 +1,13 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+/* eslint-disable no-await-in-loop */
 
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { z } from 'zod';
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EAnalyticsType, EHttpHeaderKey, ENetwork, EVotesDisplayType, EPostOrigin, EProposalType, ERole, EWallet, IUser, EDataSource, IPost } from '@/_shared/types';
+import { EAnalyticsType, EHttpHeaderKey, ENetwork, EVotesDisplayType, EPostOrigin, EProposalType, ERole, EWallet, IUser, EDataSource } from '@/_shared/types';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { getBaseUrl } from '@/_shared/_utils/getBaseUrl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -14,13 +15,13 @@ import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { ACTIVE_BOUNTY_STATUSES } from '@/_shared/_constants/activeBountyStatuses';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { RedisService } from '../redis_service';
 import { OnChainDbService } from '../onchain_db_service';
 import { OffChainDbService } from '../offchain_db_service';
 import { AlgoliaService } from '../algolia_service';
+import { fetchPostData } from '../../_api-utils/fetchPostData';
 
 if (!TOOLS_PASSPHRASE) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'TOOLS_PASSPHRASE is not set');
@@ -132,8 +133,9 @@ export class WebhookService {
 
 	static async handleIncomingEvent({ event, body, network }: { event: string; body: unknown; network: ENetwork }) {
 		const { webhookEvent } = this.zodParamsSchema.parse({ webhookEvent: event });
+		console.log(`Handling incoming event: ${webhookEvent} for network: ${network}`);
 		const params = this.zodEventBodySchemas[webhookEvent as EWebhookEvent].parse(body);
-
+		console.log(`Parsed params: ${JSON.stringify(params)}`);
 		switch (webhookEvent) {
 			case EWebhookEvent.PROPOSAL_CREATED: {
 				const parsedParams = params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_CREATED]>;
@@ -176,6 +178,7 @@ export class WebhookService {
 			case EWebhookEvent.CLEAR_CACHE:
 				return this.handleClearCache();
 			case EWebhookEvent.REFRESH_SUBSQUARE_ALGOLIA:
+				console.log(`Handling refresh subsquare algolia event for network: ${network}`);
 				return this.handleRefreshSubsquareAlgolia({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.REFRESH_SUBSQUARE_ALGOLIA]> });
 			default:
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, `Unsupported event: ${event}`);
@@ -658,50 +661,126 @@ export class WebhookService {
 		network: ENetwork;
 		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.REFRESH_SUBSQUARE_ALGOLIA]>;
 	}) {
-		const { items: activeProposals } = await OnChainDbService.GetOnChainPostsListing({
-			network,
-			proposalType: undefined,
-			limit: 1000,
-			page: 1,
-			statuses: ACTIVE_PROPOSAL_STATUSES
-		});
+		console.log(`Handling refresh subsquare algolia event for network: ${network}`);
 
-		const offChainDataPromises = activeProposals.map((postInfo) => {
-			return OffChainDbService.GetOffChainPostData({
+		const batchSize = 200;
+		let currentPage = 43;
+		let totalProcessed = 0;
+		let totalUpdated = 0;
+		let totalSuccessCount = 0;
+		let totalFailureCount = 0;
+		let hasMoreData = true;
+
+		while (hasMoreData) {
+			console.log(`Fetching batch ${currentPage} with limit ${batchSize} for network: ${network}`);
+
+			const { items: proposals } = await OnChainDbService.GetOnChainPostsListing({
 				network,
-				indexOrHash: postInfo.index!.toString() || postInfo.hash!,
-				proposalType: postInfo.type,
-				proposer: postInfo.proposer || ''
+				limit: batchSize,
+				page: currentPage
 			});
-		});
 
-		const offChainData = await Promise.all(offChainDataPromises);
-
-		const updateAlgoia = async (post: IPost) => {
-			const titleAndContentHash = AlgoliaService.hashTitleAndContent(post.title || DEFAULT_POST_TITLE, post.content || '');
-
-			const existingPost = await AlgoliaService.getPostFromAlgolia(`${network}-${post.proposalType}-${post.index!.toString() || post.hash!}`);
-			if (!existingPost) {
-				return;
+			if (proposals.length === 0) {
+				hasMoreData = false;
+				break;
 			}
 
-			if (existingPost.titleAndContentHash === titleAndContentHash) {
-				return;
+			console.log(`Fetched ${proposals.length} proposals in batch ${currentPage} for ${network}`);
+			if (proposals.length < batchSize) {
+				console.log(`⚠️  Batch ${currentPage} has fewer proposals than expected (${proposals.length}/${batchSize}) - likely near end of data`);
 			}
 
-			await AlgoliaService.updatePostRecord(post);
-		};
+			// Process posts in this batch
+			const posts = await Promise.all(
+				proposals.map(async (postInfo) => {
+					return fetchPostData({
+						network,
+						proposalType: postInfo.type,
+						indexOrHash: postInfo.index?.toString() || postInfo.hash!
+					});
+				})
+			);
 
-		activeProposals.forEach(async (postInfo, index) => {
-			if (offChainData[Number(index)].dataSource === EDataSource.SUBSQUARE) {
-				await updateAlgoia({
-					...offChainData[Number(index)],
-					dataSource: offChainData[Number(index)]?.dataSource || EDataSource.POLKASSEMBLY,
-					network,
-					proposalType: postInfo.type,
-					onChainInfo: postInfo
-				});
+			console.log(`Fetched ${posts.length} posts in batch ${currentPage} for ${network}`);
+
+			// Count data sources to understand distribution
+			const dataSourceCounts = posts.reduce(
+				(acc, post) => {
+					acc[post.dataSource] = (acc[post.dataSource] || 0) + 1;
+					return acc;
+				},
+				{} as Record<string, number>
+			);
+			console.log(`Data source distribution in batch ${currentPage}:`, dataSourceCounts);
+
+			// Update Algolia for posts in this batch
+			let batchUpdatedCount = 0;
+			let batchSuccessCount = 0;
+			let batchFailureCount = 0;
+			let batchSkippedCount = 0;
+			const batchResults = await Promise.allSettled(
+				posts.map(async (postInfo) => {
+					// console.log(`Processing ${postInfo.proposalType}/${postInfo.index || postInfo.hash} on ${postInfo.network}`);
+					if (postInfo.dataSource !== EDataSource.POLKASSEMBLY) {
+						try {
+							await AlgoliaService.updatePostRecord(postInfo);
+							console.log(`---------------------------------Successfully refreshed Algolia for ${postInfo.proposalType}/${postInfo.index || postInfo.hash} on ${postInfo.network}`);
+							batchUpdatedCount += 1;
+							return { success: true, postInfo };
+						} catch (error) {
+							console.error(
+								`---------------------------------Failed to refresh Algolia for ${postInfo.proposalType}/${postInfo.index || postInfo.hash} on ${postInfo.network}:`,
+								error
+							);
+							return { success: false, postInfo, error };
+						}
+					}
+					batchSkippedCount += 1;
+					return { success: true, postInfo, skipped: true };
+				})
+			);
+
+			// Count successes and failures
+			batchResults.forEach((result) => {
+				if (result.status === 'fulfilled') {
+					if (result.value.success && !result.value.skipped) {
+						batchSuccessCount += 1;
+					} else if (!result.value.success) {
+						batchFailureCount += 1;
+					}
+				} else {
+					batchFailureCount += 1;
+					console.error('Promise rejected:', result.reason);
+				}
+			});
+
+			totalProcessed += posts.length;
+			totalUpdated += batchUpdatedCount;
+			totalSuccessCount += batchSuccessCount;
+			totalFailureCount += batchFailureCount;
+
+			console.log(
+				`Batch ${currentPage} completed: ${posts.length} posts processed, ${batchUpdatedCount} attempted updates, ${batchSkippedCount} skipped (POLKASSEMBLY data source)`
+			);
+			console.log(`Batch ${currentPage} results: ${batchSuccessCount} successful, ${batchFailureCount} failed`);
+			console.log(`Total progress: ${totalProcessed} posts processed, ${totalUpdated} attempted updates`);
+			console.log(`Total results: ${totalSuccessCount} successful, ${totalFailureCount} failed`);
+
+			// Check if we have more data to process
+			if (proposals.length < batchSize) {
+				hasMoreData = false;
+			} else {
+				currentPage += 1;
 			}
-		});
+
+			// Add a small delay between batches to prevent overwhelming the system
+			if (hasMoreData) {
+				await this.delay(5000);
+			}
+		}
+
+		console.log(`Successfully refreshed Algolia for ${network}: ${totalProcessed} total posts processed`);
+		console.log(`Algolia update summary: ${totalUpdated} attempted updates, ${totalSuccessCount} successful, ${totalFailureCount} failed`);
+		console.log(`Expected Algolia records: ${totalSuccessCount} (successful updates)`);
 	}
 }

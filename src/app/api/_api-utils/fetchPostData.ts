@@ -12,19 +12,23 @@ import { APIError } from './apiError';
 
 async function getPublicUser({ proposer, userId }: { proposer?: string; userId?: number }) {
 	let publicUser: IPublicUser | null = null;
-
+	// console.log('Getting public user by address:', proposer);
 	if (proposer && ValidatorService.isValidWeb3Address(proposer)) {
+		// if (proposer === '14Uypo3euFeeVJYnUpExxSLbPrc57NTTKzbYHUA6Y5CmUKmr') console.log('Getting public user by address:', proposer);
+		// console.log('Getting public user by address:', proposer);
 		publicUser = await OffChainDbService.GetPublicUserByAddress(proposer);
 	}
 
 	if (!publicUser && userId && ValidatorService.isValidUserId(Number(userId || -1))) {
 		publicUser = await OffChainDbService.GetPublicUserById(userId);
 	}
+	// if (proposer === '14Uypo3euFeeVJYnUpExxSLbPrc57NTTKzbYHUA6Y5CmUKmr') console.log('Public user:', publicUser);
 
 	return publicUser;
 }
 
 export async function fetchPostData({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IPost> {
+	// console.log(`Fetching post data for ${network}/${proposalType}/${indexOrHash}`);
 	const offChainPostData = await OffChainDbService.GetOffChainPostData({ network, indexOrHash, proposalType: proposalType as EProposalType });
 
 	let post: IPost;
@@ -53,6 +57,7 @@ export async function fetchPostData({ network, proposalType, indexOrHash }: { ne
 	}
 
 	const publicUser = await getPublicUser({ userId: post.userId, proposer: post.onChainInfo?.proposer });
+	// if (post.hash === '0xd8ac99b03efba48486fb3f116a386dc42fdafa367edcce82215cd40ee3fc1256') console.log('Post data:', post, publicUser);
 
 	if (publicUser) {
 		post = { ...post, publicUser };

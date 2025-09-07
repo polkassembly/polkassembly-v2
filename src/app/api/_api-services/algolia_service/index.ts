@@ -197,6 +197,7 @@ export class AlgoliaService {
 		try {
 			// Build the Algolia post object
 			const algoliaPost = this.buildAlgoliaPost(post);
+			console.log(`---------------------------------Algolia post: ${JSON.stringify(algoliaPost?.index)} ${JSON.stringify(algoliaPost?.hash)}`);
 			if (!algoliaPost) {
 				console.error('Failed to build Algolia post for update');
 				return;
