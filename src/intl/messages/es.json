@@ -132,6 +132,7 @@
 		"contentWillBeAvailableSoon": "El contenido estará disponible pronto..."
 	},
 	"Profile": {
+		"noAddresses": "No se encontraron direcciones vinculadas",
 		"settings": "Configuración",
 		"login": "Iniciar sesión",
 		"loginFailed": "Error al iniciar sesión",
@@ -1389,7 +1390,8 @@
 		"useSuperSearchButton": "Usar Super Búsqueda",
 		"poweredByPolkassembly": "Desarrollado por Polkassembly.",
 		"enableSearchAndSuperSearch": "Si desea habilitar la búsqueda y super búsqueda para su cadena, contáctenos en",
-		"clearFilters": "Limpiar filtros"
+		"clearFilters": "Limpiar filtros",
+		"searchTriggerLabel": "Buscar propuestas, discusiones y personas"
 	},
 	"Bounties": {
 		"onchainBounties": "Recompensas en Cadena",

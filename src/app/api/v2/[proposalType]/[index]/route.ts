@@ -120,6 +120,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	}
 
 	if (post.dataSource !== EDataSource.POLKASSEMBLY) {
+		console.log(`Updating Algolia record for ${post.proposalType}/${post.index}`);
 		await AlgoliaService.updatePostRecord(post);
 	}
 

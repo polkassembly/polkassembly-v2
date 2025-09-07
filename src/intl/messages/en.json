@@ -132,6 +132,7 @@
 		"contentWillBeAvailableSoon": "Content will be available soon..."
 	},
 	"Profile": {
+		"noAddresses": "No addresses linked",
 		"settings": "Settings",
 		"login": "Login",
 		"loginFailed": "Failed to login",
@@ -1475,7 +1476,8 @@
 		"useSuperSearchButton": "Use Super Search",
 		"poweredByPolkassembly": "Powered by Polkassembly.",
 		"enableSearchAndSuperSearch": "If you'd like to enable search and super search for your chain, please reach out to us on",
-		"clearFilters": "Clear Filters"
+		"clearFilters": "Clear Filters",
+		"searchTriggerLabel": "Search for proposals, discussions, and people"
 	},
 	"Parachains": {
 		"projects": "Projects",
