@@ -247,7 +247,8 @@ export class WebhookService {
 			RedisService.DeletePostsListing({ network, proposalType }),
 			RedisService.DeleteActivityFeed({ network }),
 			RedisService.DeleteAllSubscriptionFeedsForNetwork(network),
-			RedisService.DeleteOverviewPageData({ network })
+			RedisService.DeleteOverviewPageData({ network }),
+			RedisService.DeleteTrackCounts({ network })
 		]);
 
 		// Refresh above caches

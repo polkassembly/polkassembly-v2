@@ -47,7 +47,9 @@ export const GET = withErrorHandling(async () => {
 	}
 
 	// Cache the result
-	await RedisService.SetTrackCounts({ network, data: result });
+	if (result && Object.keys(result).length > 0) {
+		await RedisService.SetTrackCounts({ network, data: result });
+	}
 
 	return NextResponse.json(result);
 });
