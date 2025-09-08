@@ -272,7 +272,8 @@ export default function AddressRelationsPicker({
 	showLinkedAccountBadge = false,
 	iconSize = 25,
 	className,
-	switchButtonClassName
+	switchButtonClassName,
+	hideAccountsAlert = false
 }: {
 	withBalance?: boolean;
 	showPeopleChainBalance?: boolean;
@@ -282,6 +283,7 @@ export default function AddressRelationsPicker({
 	iconSize?: number;
 	className?: string;
 	switchButtonClassName?: string;
+	hideAccountsAlert?: boolean;
 }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const walletService = useWalletService();
@@ -402,6 +404,12 @@ export default function AddressRelationsPicker({
 						</ul>
 						<Button onClick={() => setOpenVaultModal(true)}>{t('PolkadotVault.scan')}</Button>
 					</div>
+				) : hideAccountsAlert ? (
+					<AddressSwitchButton
+						disabled={disabled}
+						showLinkedAccountBadge={showLinkedAccountBadge}
+						className={switchButtonClassName}
+					/>
 				) : (
 					<Alert
 						variant='info'
