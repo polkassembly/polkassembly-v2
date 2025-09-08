@@ -124,7 +124,7 @@ function ListingCard({
 										src={CommentIcon}
 										alt='comments'
 										width={16}
-										className={userPreferences.theme === ETheme.DARK ? 'dark-icons' : ''}
+										className={userPreferences.theme === ETheme.DARK ? 'darkIcon' : ''}
 										height={16}
 									/>
 									<span className='text-text_primary'>{metrics?.comments || 0}</span>
