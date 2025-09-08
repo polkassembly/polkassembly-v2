@@ -196,7 +196,17 @@ function AddressRadioGroup({ accountType, addresses, defaultOpen = false, closeD
 	);
 }
 
-function AddressSwitchButton({ disabled, showLinkedAccountBadge = false, className }: { disabled?: boolean; showLinkedAccountBadge?: boolean; className?: string }) {
+function AddressSwitchButton({
+	disabled,
+	showLinkedAccountBadge = false,
+	className,
+	switchButtonText
+}: {
+	disabled?: boolean;
+	showLinkedAccountBadge?: boolean;
+	className?: string;
+	switchButtonText?: string;
+}) {
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
 	const [isOpen, setisOpen] = useState(false);
@@ -220,7 +230,7 @@ function AddressSwitchButton({ disabled, showLinkedAccountBadge = false, classNa
 					className={cn('ml-auto flex items-center gap-1 text-xs', className)}
 					disabled={disabled}
 				>
-					<IoMdSync /> {t('Switch')}
+					<IoMdSync /> {switchButtonText || t('Switch')}
 				</Button>
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-3 sm:p-6'>
@@ -409,6 +419,7 @@ export default function AddressRelationsPicker({
 						disabled={disabled}
 						showLinkedAccountBadge={showLinkedAccountBadge}
 						className={switchButtonClassName}
+						switchButtonText={t('AddressRelationsPicker.switchWallet')}
 					/>
 				) : (
 					<Alert
