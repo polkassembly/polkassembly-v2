@@ -17,6 +17,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '@/hooks/useUser';
 import dynamic from 'next/dynamic';
+import { isWeb3Injected } from '@polkadot/extension-dapp';
 import classes from './AddressDropdown.module.scss';
 import { Alert, AlertDescription } from '../Alert';
 import Balance from '../Balance';
@@ -112,12 +113,12 @@ function AddressDropdown({
 
 		return injectedAccounts;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [userPreferences?.wallet, walletService]);
+	}, [userPreferences?.wallet, walletService, isWeb3Injected]);
 
 	const { data: accounts, isFetching: accountsLoading } = useQuery({
 		queryKey: [EReactQueryKeys.ACCOUNTS, userPreferences?.wallet],
 		queryFn: getAccounts,
-		enabled: !!userPreferences?.wallet && !!walletService,
+		enabled: !!userPreferences?.wallet && !!walletService && isWeb3Injected,
 		retry: true,
 		refetchOnMount: true,
 		refetchOnWindowFocus: true
