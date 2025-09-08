@@ -20,7 +20,7 @@
 }
 
 .dropdownMenuContent {
-	@apply flex w-full items-center justify-start gap-2 text-nowrap p-0 text-sm text-basic_text;
+	@apply flex w-full items-center justify-start gap-2 whitespace-nowrap p-0 text-sm text-basic_text;
 }
 
 .translateIconLocale {

@@ -157,7 +157,10 @@ function Navbar() {
 								)}
 							</DropdownMenuTrigger>
 							<DropdownMenuContent className='min-w-max'>
-								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+								<DropdownMenuItem
+									asChild
+									className='hover:bg-sidebar_menu_hover'
+								>
 									<Link
 										className={classes.dropdownMenuContent}
 										href={`/user/${user.username}`}
@@ -171,7 +174,10 @@ function Navbar() {
 										{t('Profile.profile')}
 									</Link>
 								</DropdownMenuItem>
-								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+								<DropdownMenuItem
+									asChild
+									className='hover:bg-sidebar_menu_hover'
+								>
 									<Link
 										className={classes.dropdownMenuContent}
 										href='/set-identity'
@@ -185,7 +191,10 @@ function Navbar() {
 										{t('SetIdentity.setIdentity')}
 									</Link>
 								</DropdownMenuItem>
-								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+								<DropdownMenuItem
+									asChild
+									className='hover:bg-sidebar_menu_hover'
+								>
 									<Link
 										className={classes.dropdownMenuContent}
 										href={`/set-identity?open=${ESetIdentityStep.REQUEST_JUDGEMENT}`}
@@ -208,10 +217,13 @@ function Navbar() {
 										{t('SetIdentity.clearIdentity')}
 									</Link>
 								</DropdownMenuItem>
-								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+								<DropdownMenuItem
+									asChild
+									className='hover:bg-sidebar_menu_hover'
+								>
 									<Button
 										variant='ghost'
-										className='flex w-full justify-start p-0 text-sm text-basic_text'
+										className='flex w-full justify-start p-0 px-2 text-sm text-basic_text'
 										onClick={onLogout}
 										size='sm'
 									>
