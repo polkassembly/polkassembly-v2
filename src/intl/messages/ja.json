@@ -132,6 +132,8 @@
 		"contentWillBeAvailableSoon": "コンテンツはまもなく利用可能になります..."
 	},
 	"Profile": {
+		"noAddresses": "リンクされたアドレスが見つかりません",
+		"blacklistWarning": "このユーザーアカウントはコミュニティガイドライン違反のためフラグが立てられています。",
 		"settings": "設定",
 		"login": "ログイン",
 		"loginFailed": "ログインに失敗しました",
@@ -492,6 +494,9 @@
 		"votingStarted": "投票が開始されました",
 		"preparePeriod": "準備期間",
 		"decisionPeriod": "決定期間",
+		"votingPeriod": "投票期間",
+		"enactmentPeriod": "施行期間",
+		"enactmentDescription": "この期間完了後のRef実行",
 		"summary": "要約",
 		"summarise": "要約",
 		"aye": "賛成",
@@ -1394,7 +1399,8 @@
 		"useSuperSearchButton": "スーパー検索を使用",
 		"poweredByPolkassembly": "Polkassembly提供。",
 		"enableSearchAndSuperSearch": "チェーンの検索とスーパー検索を有効にしたい場合は、こちらまでご連絡ください",
-		"clearFilters": "フィルターをクリア"
+		"clearFilters": "フィルターをクリア",
+		"searchTriggerLabel": "提案、議論、人を検索"
 	},
 	"Bounties": {
 		"onchainBounties": "オンチェーン報奨金",

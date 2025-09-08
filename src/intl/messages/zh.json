@@ -132,6 +132,8 @@
 		"contentWillBeAvailableSoon": "内容即将可用..."
 	},
 	"Profile": {
+		"noAddresses": "未找到链接地址",
+		"blacklistWarning": "此用户账户因违反社区准则而被标记。",
 		"settings": "设置",
 		"login": "登录",
 		"loginFailed": "登录失败",
@@ -492,6 +494,9 @@
 		"votingStarted": "投票已开始",
 		"preparePeriod": "准备期",
 		"decisionPeriod": "决策期",
+		"votingPeriod": "投票期",
+		"enactmentPeriod": "执行期",
+		"enactmentDescription": "此期间完成后执行Ref",
 		"summary": "摘要",
 		"summarise": "摘要",
 		"aye": "赞成",
@@ -1417,7 +1422,8 @@
 		"useSuperSearchButton": "使用超级搜索",
 		"poweredByPolkassembly": "由Polkassembly提供。",
 		"enableSearchAndSuperSearch": "如果您想为您的链启用搜索和超级搜索功能，请联系我们",
-		"clearFilters": "清除筛选"
+		"clearFilters": "清除筛选",
+		"searchTriggerLabel": "搜索提案、讨论和人员"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "赏金提案成功",

@@ -176,7 +176,7 @@ export class OffChainDbService {
 			title: DEFAULT_POST_TITLE,
 			content,
 			tags: [],
-			dataSource: EDataSource.POLKASSEMBLY,
+			dataSource: EDataSource.OTHER,
 			proposalType,
 			network,
 			metrics: postMetrics,

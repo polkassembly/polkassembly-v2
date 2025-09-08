@@ -68,14 +68,12 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 				</div>
 			</div>
 			<div className={classes.rightGrid}>
-				{profileAddresses.length && (
-					<OnchainIdentityCard
-						userProfile={userProfile}
-						setUserProfile={setUserProfile}
-						addresses={profileAddresses}
-					/>
-				)}
-				{profileAddresses.length && <VotedActiveProposalCard addresses={profileAddresses} />}
+				<OnchainIdentityCard
+					userProfile={userProfile}
+					setUserProfile={setUserProfile}
+					addresses={profileAddresses}
+				/>
+				{profileAddresses.length > 0 && <VotedActiveProposalCard addresses={profileAddresses} />}
 			</div>
 		</div>
 	);

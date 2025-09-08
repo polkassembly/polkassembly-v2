@@ -84,7 +84,11 @@ const getEmbedUrl = (url: string): string | null => {
 
 const markdownComponents: Components = {
 	div: 'div',
-	table: 'table',
+	table: ({ children, ...props }) => (
+		<div className='w-full overflow-x-auto'>
+			<table {...props}>{children}</table>
+		</div>
+	),
 	thead: 'thead',
 	tbody: 'tbody',
 	tr: 'tr',
@@ -95,7 +99,7 @@ const markdownComponents: Components = {
 	li: 'li',
 	code: 'code',
 	pre: 'pre',
-	img: ({ src, alt }) => {
+	img: ({ src, alt, height, width }) => {
 		if (!src) {
 			return null;
 		}
@@ -148,24 +152,21 @@ const markdownComponents: Components = {
 		}
 
 		return (
-			<Link
-				href={src}
-				target='_blank'
-				rel='noopener noreferrer'
-				className='cursor-pointer'
-			>
-				<Image
-					src={src}
-					alt={alt || 'Image'}
-					height={256}
-					width={256}
-					sizes='100vw'
-					style={{
-						width: '90%',
-						height: 'auto'
-					}}
-				/>
-			</Link>
+			<span className='mr-2 inline-block max-w-max align-top'>
+				<Link
+					href={src}
+					target='_blank'
+					rel='noopener noreferrer'
+				>
+					<Image
+						src={src}
+						alt={alt || 'Image'}
+						height={ValidatorService.isValidNumber(height) ? Number(height) : 256}
+						width={ValidatorService.isValidNumber(width) ? Number(width) : 256}
+						sizes='100vw'
+					/>
+				</Link>
+			</span>
 		);
 	},
 	a: ({ href, children, ...props }) => {

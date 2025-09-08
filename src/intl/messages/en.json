@@ -132,6 +132,8 @@
 		"contentWillBeAvailableSoon": "Content will be available soon..."
 	},
 	"Profile": {
+		"noAddresses": "No addresses linked",
+		"blacklistWarning": "This user account has been flagged for violating community guidelines.",
 		"settings": "Settings",
 		"login": "Login",
 		"loginFailed": "Failed to login",
@@ -496,6 +498,9 @@
 		"votingStarted": "Voting has Started",
 		"preparePeriod": "Prepare Period",
 		"decisionPeriod": "Decision Period",
+		"votingPeriod": "Voting Period",
+		"enactmentPeriod": "Enactment Period",
+		"enactmentDescription": "Ref execution after completion of this period",
 		"summary": "Summary",
 		"summarise": "SUMMARISE",
 		"analytics": "Analytics",
@@ -1481,7 +1486,8 @@
 		"useSuperSearchButton": "Use Super Search",
 		"poweredByPolkassembly": "Powered by Polkassembly.",
 		"enableSearchAndSuperSearch": "If you'd like to enable search and super search for your chain, please reach out to us on",
-		"clearFilters": "Clear Filters"
+		"clearFilters": "Clear Filters",
+		"searchTriggerLabel": "Search for proposals, discussions, and people"
 	},
 	"Parachains": {
 		"projects": "Projects",

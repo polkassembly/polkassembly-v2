@@ -79,14 +79,15 @@ function OnchainInfo({
 				className={cn(classes.onchainInfoBox)}
 				defaultOpen
 			>
-				<CollapsibleTrigger className='flex w-full items-center justify-between'>
+				<CollapsibleTrigger className='group flex w-full items-center justify-between'>
 					<p className={classes.metadataHeading}>{t('PostDetails.OnchainInfo.metadata')}</p>
 					<Image
 						src={ExpandIcon}
-						alt='expand'
+						alt=''
 						width={24}
 						height={24}
-						className={cn(userPreferences.theme === ETheme.DARK ? 'darkIcon' : '')}
+						className={cn(userPreferences?.theme === ETheme.DARK ? 'darkIcon' : '', 'transition-transform duration-200 group-data-[state=open]:rotate-180')}
+						aria-hidden
 					/>
 				</CollapsibleTrigger>
 				<CollapsibleContent>
@@ -252,14 +253,15 @@ function OnchainInfo({
 				className={cn(classes.onchainInfoBox)}
 				defaultOpen
 			>
-				<CollapsibleTrigger className='flex w-full items-center justify-between'>
+				<CollapsibleTrigger className='group flex w-full items-center justify-between'>
 					<p className={classes.metadataHeading}>{t('PostDetails.OnchainInfo.calls')}</p>
 					<Image
 						src={ExpandIcon}
-						alt='expand'
+						alt=''
 						width={24}
 						height={24}
-						className={cn(userPreferences.theme === ETheme.DARK ? 'darkIcon' : '')}
+						className={cn(userPreferences?.theme === ETheme.DARK ? 'darkIcon' : '', 'transition-transform duration-200 group-data-[state=open]:rotate-180')}
+						aria-hidden
 					/>
 				</CollapsibleTrigger>
 				<CollapsibleContent>
@@ -276,14 +278,15 @@ function OnchainInfo({
 				className={cn(classes.onchainInfoBox)}
 				defaultOpen
 			>
-				<CollapsibleTrigger className='flex w-full items-center justify-between'>
+				<CollapsibleTrigger className='group flex w-full items-center justify-between'>
 					<p className={classes.metadataHeading}>{t('PostDetails.OnchainInfo.timeline')}</p>
 					<Image
 						src={ExpandIcon}
-						alt='expand'
+						alt=''
+						aria-hidden
 						width={24}
 						height={24}
-						className={cn(userPreferences.theme === ETheme.DARK ? 'darkIcon' : '')}
+						className={cn(userPreferences?.theme === ETheme.DARK ? 'darkIcon' : '', 'transition-transform duration-200 group-data-[state=open]:rotate-180')}
 					/>
 				</CollapsibleTrigger>
 				<CollapsibleContent>
