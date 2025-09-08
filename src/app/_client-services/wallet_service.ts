@@ -18,36 +18,40 @@ import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
 export class WalletClientService {
 	private injectedWindow: Window & InjectedWindow;
 
-	private apiService: PolkadotApiService;
+	private apiService?: PolkadotApiService;
 
 	private identityService?: IdentityService;
 
 	private readonly network: ENetwork;
 
-	private constructor(injectedWindow: Window & InjectedWindow, apiService: PolkadotApiService, network: ENetwork, identityService?: IdentityService) {
+	private constructor({
+		injectedWindow,
+		apiService,
+		network,
+		identityService
+	}: {
+		injectedWindow: Window & InjectedWindow;
+		apiService?: PolkadotApiService;
+		network: ENetwork;
+		identityService?: IdentityService;
+	}) {
 		this.network = network;
 		this.injectedWindow = injectedWindow;
 		this.apiService = apiService;
 		this.identityService = identityService;
 	}
 
-	static async Init(network: ENetwork, apiService: PolkadotApiService, identityService?: IdentityService) {
+	static async Init(network: ENetwork, apiService?: PolkadotApiService, identityService?: IdentityService) {
 		// Todo: wait for doc ready. (async)
 		const returnWalletService = async () => {
 			const injectedWindow = window as Window & InjectedWindow;
-
-			await apiService.apiReady();
-			if (identityService) {
-				await identityService.ready();
-			}
-
 			const isMimirIframe = await isMimirDetected();
 
 			if (isMimirIframe) {
 				inject();
 			}
 
-			return new WalletClientService(injectedWindow, apiService, network, identityService);
+			return new WalletClientService({ injectedWindow, apiService, network, identityService });
 		};
 
 		if (document.readyState !== 'loading') {
