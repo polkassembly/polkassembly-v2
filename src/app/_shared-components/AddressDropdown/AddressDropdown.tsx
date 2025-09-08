@@ -57,11 +57,7 @@ function AddressDropdown({
 	const network = getCurrentNetwork();
 
 	const getAccounts = useCallback(async () => {
-		console.log('getAccounts called', userPreferences.wallet);
-		if (!walletService || !userPreferences?.wallet) {
-			console.log('returning null');
-			return null;
-		}
+		if (!walletService || !userPreferences?.wallet) return null;
 
 		if (userPreferences.wallet === EWallet.POLKADOT_VAULT) {
 			if (user?.loginWallet === EWallet.POLKADOT_VAULT && user?.loginAddress) {
@@ -84,8 +80,6 @@ function AddressDropdown({
 		}
 
 		const injectedAccounts = await walletService?.getAddressesFromWallet(userPreferences.wallet);
-
-		console.log('injectedAccounts', injectedAccounts);
 
 		if (injectedAccounts.length === 0) {
 			setUserPreferences({
