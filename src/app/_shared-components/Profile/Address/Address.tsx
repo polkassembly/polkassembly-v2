@@ -31,6 +31,7 @@ interface AddressProps {
 	disableTooltip?: boolean;
 	showOnlyIdenticon?: boolean;
 	wrapperClassName?: string;
+	maxDisplayLength?: number;
 }
 
 function Address({
@@ -44,7 +45,8 @@ function Address({
 	redirectToProfile,
 	disableTooltip = false,
 	showOnlyIdenticon = false,
-	wrapperClassName
+	wrapperClassName,
+	maxDisplayLength
 }: AddressProps) {
 	const network = getCurrentNetwork();
 	const { getOnChainIdentity } = useIdentityService();
@@ -76,14 +78,24 @@ function Address({
 	useEffect(() => {
 		const initializeIdentity = async () => {
 			if (!encodedAddress) return;
-			setDisplayText(userData?.username || walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
+			let initial = userData?.username || walletAddressName || shortenAddress(encodedAddress, truncateCharLen);
+
+			if (typeof maxDisplayLength === 'number' && initial && initial.length > maxDisplayLength) {
+				initial = `${initial.substring(0, maxDisplayLength)}...`;
+			}
+
+			setDisplayText(initial);
 
 			try {
 				const identityInfo = await getOnChainIdentity(encodedAddress);
 				if (identityInfo) {
 					setIdentity(identityInfo);
 					if (identityInfo?.display) {
-						setDisplayText(identityInfo.display);
+						let idDisplay = identityInfo.display;
+						if (typeof maxDisplayLength === 'number' && idDisplay.length > maxDisplayLength) {
+							idDisplay = `${idDisplay.substring(0, maxDisplayLength)}...`;
+						}
+						setDisplayText(idDisplay);
 					}
 				}
 			} catch {
@@ -92,7 +104,7 @@ function Address({
 		};
 
 		initializeIdentity();
-	}, [encodedAddress, getOnChainIdentity, truncateCharLen, walletAddressName, userData]);
+	}, [encodedAddress, getOnChainIdentity, truncateCharLen, walletAddressName, userData, maxDisplayLength]);
 
 	if (disableTooltip) {
 		return (

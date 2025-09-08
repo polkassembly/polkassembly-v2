@@ -90,7 +90,16 @@ function ListingCard({
 							<div className='flex items-center gap-2'>
 								{data.onChainInfo?.proposer ? (
 									<>
-										<Address address={data.onChainInfo?.proposer} />
+										<span className='hidden md:flex'>
+											<Address address={data.onChainInfo?.proposer} />
+										</span>
+										<span className='flex md:hidden'>
+											<Address
+												address={data.onChainInfo?.proposer}
+												truncateCharLen={2}
+												maxDisplayLength={10}
+											/>
+										</span>
 										<span>|</span>
 									</>
 								) : (
