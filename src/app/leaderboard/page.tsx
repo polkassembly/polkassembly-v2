@@ -8,7 +8,8 @@ import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
-import Leaderboard from './Components/index';
+import { ExternalLink } from 'lucide-react';
+import LeaderboardTabsClient from './LeaderboardTabsClient';
 import { ClientError } from '../_client-utils/clientError';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
 
@@ -36,8 +37,28 @@ async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ page?
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 	}
 	return (
-		<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 p-5 sm:p-10'>
-			<Leaderboard
+		<div className='w-full bg-bg_modal'>
+			{/* Header */}
+			<div className='border-0 px-20 py-10 shadow-none'>
+				<div className='mb-4 p-0'>
+					<div className='text-2xl font-bold'>Leaderboard</div>
+				</div>
+				<div className='p-0'>
+					<p className='mb-2 text-muted-foreground'>
+						Discover the most active and impactful participants across the network. The leaderboard highlights top voters, delegates, and proposers driving governance forward —
+						based on verified activity and influence.
+					</p>
+					<a
+						href='//wiki.polkassembly.io/docs/learn-governance/leaderboard'
+						className='inline-flex items-center gap-1 font-medium text-pink-600 hover:underline'
+					>
+						Read More <ExternalLink size={14} />
+					</a>
+				</div>
+			</div>
+
+			{/* Tabs */}
+			<LeaderboardTabsClient
 				data={data}
 				top3RankData={top3RankData}
 			/>

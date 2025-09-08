@@ -1,0 +1,25 @@
+.tabs {
+	// padding-left: 4rem;
+	// padding-right: 4rem;
+}
+
+.tab-button {
+	position: relative;
+	padding-bottom: 0.75rem;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	background: transparent;
+	border: none;
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: var(--text-primary, #111827);
+}
+
+.tab-button-active {
+	color: #ec4899;
+	/* pink-600 */
+}
+
+.selectedicon {
+	color: #ec4899;
+}

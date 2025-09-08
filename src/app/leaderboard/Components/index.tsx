@@ -6,9 +6,7 @@
 
 import { IGenericListingResponse, IPublicUser } from '@/_shared/types';
 import { useMemo } from 'react';
-import Trophy from '@assets/leaderboard/Trophy.png';
 import { useSearchParams } from 'next/navigation';
-import Image from 'next/image';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
@@ -105,29 +103,8 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 	}, [user, page]);
 
 	return (
-		<div className='bg-page_background'>
-			<div className={styles.Card}>
-				<div className='flex min-h-[200px] items-center justify-center'>
-					<div className='flex w-full items-center justify-center md:-ml-60'>
-						<div className='relative flex-shrink-0'>
-							<Image
-								src={Trophy}
-								alt='Cup'
-								width={256}
-								height={256}
-								className='h-auto w-24 md:w-52 lg:w-64'
-								priority
-							/>
-						</div>
-						<div className='flex flex-col items-center justify-center text-center'>
-							<p className='text-2xl font-semibold text-white lg:text-4xl'>{t('Leaderboard.leaderboard')}</p>
-							<p className='text-white md:whitespace-nowrap'>{t('Leaderboard.findYourRank')}</p>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div className='my-5 flex flex-wrap items-center justify-center gap-4 xl:my-10 xl:flex-nowrap'>
+		<div>
+			<div className='flex flex-wrap items-center justify-center gap-4 xl:flex-nowrap'>
 				{top3RankData.items.map((item: IPublicUser, index: number) => (
 					<RankCard
 						key={item.id}
