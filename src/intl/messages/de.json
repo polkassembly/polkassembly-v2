@@ -133,6 +133,7 @@
 	},
 	"Profile": {
 		"noAddresses": "Keine Adressen gefunden",
+		"blacklistWarning": "Dieses Benutzerkonto wurde wegen Verstoß gegen die Community-Richtlinien markiert.",
 		"settings": "Einstellungen",
 		"login": "Anmelden",
 		"loginFailed": "Anmeldung fehlgeschlagen",

@@ -133,6 +133,7 @@
 	},
 	"Profile": {
 		"noAddresses": "No addresses linked",
+		"blacklistWarning": "This user account has been flagged for violating community guidelines.",
 		"settings": "Settings",
 		"login": "Login",
 		"loginFailed": "Failed to login",

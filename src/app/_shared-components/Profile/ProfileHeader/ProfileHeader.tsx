@@ -4,7 +4,7 @@
 
 import { EProfileTabs, ESocial, IFollowEntry, IPublicUser } from '@/_shared/types';
 import Identicon from '@polkadot/react-identicon';
-import { Pencil, ShieldPlus } from 'lucide-react';
+import { Pencil, ShieldPlus, ShieldAlert } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { useTranslations } from 'next-intl';
 import { dayjs } from '@shared/_utils/dayjsInit';
@@ -20,6 +20,7 @@ import { UserProfileClientService } from '@/app/_client-services/user_profile_cl
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
+import { isUserBlacklisted } from '@/_shared/_utils/isUserBlacklisted';
 import { TabsList, TabsTrigger } from '../../Tabs';
 import { Button } from '../../Button';
 import classes from './ProfileHeader.module.scss';
@@ -30,6 +31,7 @@ import { Skeleton } from '../../Skeleton';
 import Address from '../Address/Address';
 import CopyToClipboard from '../../CopyToClipboard/CopyToClipboard';
 import UserAvatar from '../../UserAvatar/UserAvatar';
+import UserBlacklistWarning from '../../UserBlacklistWarning/UserBlacklistWarning';
 
 const SocialIcons = {
 	[ESocial.EMAIL]: EmailIcon,
@@ -191,14 +193,17 @@ function ProfileHeader({
 						<div className='mt-2 flex w-full flex-col gap-y-2'>
 							{address ? (
 								<>
-									<Address
-										disableTooltip
-										redirectToProfile={false}
-										address={address}
-										iconSize={26}
-										showIdenticon={false}
-										textClassName='text-center text-lg font-semibold sm:text-left lg:text-2xl'
-									/>
+									<div className='flex items-center gap-2'>
+										<Address
+											disableTooltip
+											redirectToProfile={false}
+											address={address}
+											iconSize={26}
+											showIdenticon={false}
+											textClassName='text-center text-lg font-semibold sm:text-left lg:text-2xl'
+										/>
+										{isUserBlacklisted(userProfileData?.id) && <ShieldAlert className='h-5 w-5 text-red-500' />}
+									</div>
 									<CopyToClipboard
 										label={shortenAddress(address, 5)}
 										text={address}
@@ -207,15 +212,18 @@ function ProfileHeader({
 								</>
 							) : (
 								<>
-									<UserAvatar
-										iconSize={26}
-										showIdenticon={false}
-										textClassName='text-center text-lg font-semibold sm:text-left lg:text-2xl'
-										disableTooltip
-										redirectToProfile={false}
-										publicUser={userProfileData}
-										onAddressSelection={setDisplayAddress}
-									/>
+									<div className='flex items-center gap-2'>
+										<UserAvatar
+											iconSize={26}
+											showIdenticon={false}
+											textClassName='text-center text-lg font-semibold sm:text-left lg:text-2xl'
+											disableTooltip
+											redirectToProfile={false}
+											publicUser={userProfileData}
+											onAddressSelection={setDisplayAddress}
+										/>
+										{isUserBlacklisted(userProfileData?.id) && <ShieldAlert className='h-5 w-5 text-red-500' />}
+									</div>
 									{displayAddress && (
 										<CopyToClipboard
 											label={shortenAddress(displayAddress, 5)}
@@ -330,6 +338,11 @@ function ProfileHeader({
 					{userProfileData?.profileDetails.bio && <p className='text-center text-text_primary sm:text-left'>{userProfileData.profileDetails.bio}</p>}
 				</div>
 			</div>
+			{isUserBlacklisted(userProfileData?.id) && (
+				<div className='mt-6 px-4 sm:px-6'>
+					<UserBlacklistWarning />
+				</div>
+			)}
 			<TabsList className='flex w-full overflow-x-auto'>
 				<TabsTrigger
 					className='uppercase'

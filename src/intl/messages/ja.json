@@ -133,6 +133,7 @@
 	},
 	"Profile": {
 		"noAddresses": "リンクされたアドレスが見つかりません",
+		"blacklistWarning": "このユーザーアカウントはコミュニティガイドライン違反のためフラグが立てられています。",
 		"settings": "設定",
 		"login": "ログイン",
 		"loginFailed": "ログインに失敗しました",

@@ -133,6 +133,7 @@
 	},
 	"Profile": {
 		"noAddresses": "No se encontraron direcciones vinculadas",
+		"blacklistWarning": "Esta cuenta de usuario ha sido marcada por violar las pautas de la comunidad.",
 		"settings": "Configuración",
 		"login": "Iniciar sesión",
 		"loginFailed": "Error al iniciar sesión",

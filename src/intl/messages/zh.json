@@ -133,6 +133,7 @@
 	},
 	"Profile": {
 		"noAddresses": "未找到链接地址",
+		"blacklistWarning": "此用户账户因违反社区准则而被标记。",
 		"settings": "设置",
 		"login": "登录",
 		"loginFailed": "登录失败",
