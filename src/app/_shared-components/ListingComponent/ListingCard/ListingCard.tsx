@@ -273,7 +273,7 @@ function ListingCard({
 
 					{data.onChainInfo?.status && (
 						<div className='flex'>
-							<StatusTag status={data.onChainInfo?.status.toLowerCase().replace(/\s+/g, '_')} />
+							<StatusTag status={data.onChainInfo?.status} />
 						</div>
 					)}
 				</div>
