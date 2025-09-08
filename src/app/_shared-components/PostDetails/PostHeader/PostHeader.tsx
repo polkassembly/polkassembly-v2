@@ -5,6 +5,7 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
 import { Separator } from '@ui/Separator';
 import { EPostDetailsTab, IPost } from '@/_shared/types';
@@ -31,6 +32,9 @@ import { getPostListingUrl } from '@/app/_client-utils/getPostListingUrl';
 import classes from './PostHeader.module.scss';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 import UserAvatar from '../../UserAvatar/UserAvatar';
+import { Skeleton } from '../../Skeleton';
+
+const PostHistory = dynamic(() => import('../PostHistory/PostHistory'), { ssr: false, loading: () => <Skeleton className='h-8 w-16' /> });
 
 function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: boolean }) {
 	const network = getCurrentNetwork();
@@ -106,6 +110,16 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 									className='h-3'
 								/>
 								<CreatedAtTime createdAt={createdAt} />
+								{postData.history && postData.history.length > 0 && (
+									<PostHistory
+										authorAddress={postData?.onChainInfo?.proposer}
+										authorUsername={postData?.publicUser?.username}
+										history={postData.history}
+										currentTitle={postData.title}
+										currentContent={postData.content}
+										updatedAt={postData.updatedAt}
+									/>
+								)}
 							</>
 						)}
 
