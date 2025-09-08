@@ -204,7 +204,7 @@ function Navbar() {
 										className={classes.dropdownMenuContent}
 										href={`/set-identity?open=${ESetIdentityStep.CLEAR_IDENTITY}`}
 									>
-										<ShieldMinusIcon className='h-6 w-6 font-light text-text_primary opacity-80' />
+										<ShieldMinusIcon className='h-6 w-6 font-light text-basic_text' />
 										{t('SetIdentity.clearIdentity')}
 									</Link>
 								</DropdownMenuItem>
