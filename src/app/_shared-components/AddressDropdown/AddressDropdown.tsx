@@ -8,12 +8,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { useTranslations } from 'next-intl';
 import { useWalletService } from '@/hooks/useWalletService';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { AlertCircle } from 'lucide-react';
 import { EAccountType, EReactQueryKeys, EWallet, ISelectedAccount, IVaultScannedAddress } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '@/hooks/useUser';
 import dynamic from 'next/dynamic';
@@ -56,17 +56,13 @@ function AddressDropdown({
 
 	const network = getCurrentNetwork();
 
-	const [accounts, setAccounts] = useState<InjectedAccount[]>([]);
-	const [accountsLoading, setAccountsLoading] = useState(false);
-
 	const getAccounts = useCallback(async () => {
 		console.log('getAccounts called', userPreferences.wallet);
 		if (!walletService || !userPreferences?.wallet) {
 			console.log('returning null');
-			return;
+			return null;
 		}
 
-		setAccountsLoading(true);
 		if (userPreferences.wallet === EWallet.POLKADOT_VAULT) {
 			if (user?.loginWallet === EWallet.POLKADOT_VAULT && user?.loginAddress) {
 				setUserPreferences({
@@ -76,18 +72,15 @@ function AddressDropdown({
 						accountType: EAccountType.REGULAR
 					}
 				});
-				setAccountsLoading(false);
 
-				setAccounts([{ address: user.loginAddress, name: '' }]);
-				return;
+				return [{ address: user.loginAddress, name: '' }];
 			}
 
 			setUserPreferences({
 				...userPreferences,
 				selectedAccount: undefined
 			});
-			setAccountsLoading(false);
-			return;
+			return null;
 		}
 
 		const injectedAccounts = await walletService?.getAddressesFromWallet(userPreferences.wallet);
@@ -99,8 +92,7 @@ function AddressDropdown({
 				...userPreferences,
 				selectedAccount: undefined
 			});
-			setAccountsLoading(false);
-			return;
+			return null;
 		}
 
 		const prevPreferredAccount = userPreferences.selectedAccount;
@@ -118,23 +110,18 @@ function AddressDropdown({
 			}
 		});
 
-		setAccounts(injectedAccounts);
-		setAccountsLoading(false);
+		return injectedAccounts;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userPreferences?.wallet, walletService]);
 
-	// const { data: accounts, isFetching: accountsLoading } = useQuery({
-	// queryKey: [EReactQueryKeys.ACCOUNTS, userPreferences?.wallet],
-	// queryFn: getAccounts,
-	// enabled: !!userPreferences?.wallet && !!walletService,
-	// retry: true,
-	// refetchOnMount: true,
-	// refetchOnWindowFocus: false
-	// });
-
-	useEffect(() => {
-		getAccounts();
-	}, [getAccounts]);
+	const { data: accounts, isFetching: accountsLoading } = useQuery({
+		queryKey: [EReactQueryKeys.ACCOUNTS, userPreferences?.wallet],
+		queryFn: getAccounts,
+		enabled: !!userPreferences?.wallet && !!walletService,
+		retry: true,
+		refetchOnMount: true,
+		refetchOnWindowFocus: true
+	});
 
 	const onVaultAddressScan = (scanned: IVaultScannedAddress): void => {
 		if (!scanned.isAddress) return;

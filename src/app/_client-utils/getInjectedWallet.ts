@@ -8,6 +8,7 @@ import { isWeb3Injected } from '@polkadot/extension-dapp';
 import { Injected, InjectedWindow } from '@polkadot/extension-inject/types';
 
 export async function getInjectedWallet(selectedWallet: EWallet): Promise<Injected | undefined> {
+	console.log('isWeb3Injected', isWeb3Injected, typeof window !== 'undefined', (window as Window & InjectedWindow).injectedWeb3);
 	const wallet = typeof window !== 'undefined' && isWeb3Injected ? (window as Window & InjectedWindow).injectedWeb3[String(selectedWallet)] : null;
 
 	console.log('wallet from injectedFunc', wallet);
