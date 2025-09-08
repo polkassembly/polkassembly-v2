@@ -8,7 +8,6 @@ import { Signer } from '@polkadot/types/types';
 import { APPNAME } from '@/_shared/_constants/appName';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { stringToHex } from '@polkadot/util';
-import { isWeb3Injected } from '@polkadot/extension-dapp';
 import { inject } from '@mimirdev/apps-inject';
 import { PolkadotApiService } from './polkadot_api_service';
 import { IdentityService } from './identity_service';
@@ -99,7 +98,7 @@ export class WalletClientService {
 	}
 
 	async signMessage({ data, address, selectedWallet }: { data: string; address: string; selectedWallet: EWallet }) {
-		const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
+		const wallet = typeof window !== 'undefined' ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
 
 		if (!wallet) {
 			return null;
