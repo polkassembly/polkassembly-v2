@@ -3,13 +3,11 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import { ENetwork } from '@/_shared/types';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { NextResponse } from 'next/server';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 
 export const GET = withErrorHandling(async () => {
 	const network = await getNetworkFromHeaders();
@@ -21,7 +19,7 @@ export const GET = withErrorHandling(async () => {
 	}
 
 	// Get all track IDs from the network
-	const trackDetails = NETWORKS_DETAILS[network as ENetwork]?.trackDetails;
+	const trackDetails = NETWORKS_DETAILS[network]?.trackDetails;
 	if (!trackDetails) {
 		return NextResponse.json({});
 	}
@@ -31,10 +29,10 @@ export const GET = withErrorHandling(async () => {
 	// Fetch active proposal counts for all tracks and bounty stats
 	const [trackCounts, bountyStats] = await Promise.all([
 		OnChainDbService.GetActiveProposalsCountByTrackIds({
-			network: network as ENetwork,
+			network,
 			trackIds: allTrackIds
 		}),
-		NextApiClientService.fetchBountiesStats()
+		OnChainDbService.GetBountyStats(network)
 	]);
 
 	// Transform the data to match the expected format
@@ -44,8 +42,8 @@ export const GET = withErrorHandling(async () => {
 	});
 
 	// Add bounty dashboard count
-	if (bountyStats.data) {
-		result.bounty_dashboard = bountyStats.data.activeBounties || 0;
+	if (bountyStats) {
+		result.bounty_dashboard = bountyStats.activeBounties || 0;
 	}
 
 	// Cache the result
