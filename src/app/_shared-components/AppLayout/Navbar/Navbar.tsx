@@ -21,6 +21,7 @@ import ProfileIcon from '@assets/navbar/profile-icon.svg';
 import SetIdentityIcon from '@assets/navbar/set-identity-icon.svg';
 import RequestJudgementIcon from '@assets/navbar/request-judgement-icon.svg';
 import LogoutIcon from '@assets/navbar/logout-icon.svg';
+import { ShieldMinusIcon } from 'lucide-react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { isMimirDetected } from '@/app/_client-services/isMimirDetected';
@@ -196,6 +197,15 @@ function Navbar() {
 											height={24}
 										/>
 										{t('SetIdentity.requestJudgement')}
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+									<Link
+										className={classes.dropdownMenuContent}
+										href={`/set-identity?open=${ESetIdentityStep.CLEAR_IDENTITY}`}
+									>
+										<ShieldMinusIcon className='h-6 w-6 font-light text-text_primary' />
+										{t('SetIdentity.clearIdentity')}
 									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
