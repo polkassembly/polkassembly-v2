@@ -110,7 +110,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 									className='h-3'
 								/>
 								<CreatedAtTime createdAt={createdAt} />
-								{postData.history && postData.history.length > 0 && (
+								{postData.history && postData.history.length > 0 && !(!isOffchainPost && postData.history.length === 1 && postData.isDefaultContent) && (
 									<PostHistory
 										authorAddress={postData?.onChainInfo?.proposer}
 										authorUsername={postData?.publicUser?.username}
