@@ -87,11 +87,7 @@ export class WalletClientService {
 				this.identityService.setSigner(injected.signer as Signer);
 			}
 
-			const wallets = await injected.accounts.get();
-
-			console.log('accounts', wallets);
-
-			return wallets;
+			return injected.accounts.get();
 		} catch {
 			// TODO: show notification
 			return [];
