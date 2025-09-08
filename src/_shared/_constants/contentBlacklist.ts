@@ -20,5 +20,5 @@ export const CONTENT_BLACKLIST = [
 	'captainwebgenesis',
 	'recuvahackersolutions',
 	'tracehackerscryptorecovery',
-	'Voxonomics'
+	'voxonomics'
 ];
