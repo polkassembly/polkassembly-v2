@@ -99,7 +99,6 @@ export class WalletClientService {
 	}
 
 	getInjectedWallets() {
-		console.log('wallets', this.injectedWindow.injectedWeb3);
 		return this.injectedWindow.injectedWeb3 || {};
 	}
 
