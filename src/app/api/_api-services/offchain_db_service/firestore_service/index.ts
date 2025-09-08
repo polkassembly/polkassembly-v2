@@ -42,7 +42,8 @@ import {
 	IPoll,
 	EPollVotesType,
 	IOffChainPollPayload,
-	ICommentHistoryItem
+	ICommentHistoryItem,
+	IOffChainContentHistoryItem
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -317,6 +318,14 @@ export class FirestoreService extends FirestoreUtils {
 			createdAt: postData.createdAt?.toDate(),
 			updatedAt: postData.updatedAt?.toDate(),
 			allowedCommentor: postData.allowedCommentor || EAllowedCommentor.ALL,
+			history:
+				postData.history?.map((item: IOffChainContentHistoryItem & { createdAt: Timestamp | Date | string }) => ({
+					...item,
+					createdAt:
+						typeof item.createdAt === 'object' && item.createdAt !== null && typeof (item.createdAt as Timestamp).toDate === 'function'
+							? (item.createdAt as Timestamp).toDate()
+							: new Date(item.createdAt as string) || new Date()
+				})) || [],
 			isDefaultContent
 		} as IOffChainPost;
 	}
@@ -1205,9 +1214,25 @@ export class FirestoreService extends FirestoreUtils {
 			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Post ID is required');
 		}
 
+		const currentPostDoc = await this.postsCollectionRef().doc(String(id)).get();
+		if (!currentPostDoc.exists) {
+			throw new APIError(ERROR_CODES.POST_NOT_FOUND_ERROR, StatusCodes.NOT_FOUND, 'Post not found');
+		}
+
+		const currentPost = currentPostDoc.data() as IOffChainPost;
+
+		const history: IOffChainContentHistoryItem[] = [
+			...(currentPost.history || []),
+			{
+				title: currentPost.title || '',
+				content: currentPost.content || '',
+				createdAt: currentPost.updatedAt || currentPost.createdAt || new Date()
+			}
+		];
+
 		await this.postsCollectionRef()
 			.doc(String(id))
-			.set({ content, title, allowedCommentor, updatedAt: new Date(), ...(linkedPost && { linkedPost }) }, { merge: true });
+			.set({ content, title, allowedCommentor, updatedAt: new Date(), history, ...(linkedPost && { linkedPost }) }, { merge: true });
 
 		// add back link to linkedPost for linkedPost if it exists
 		if (linkedPost) {
