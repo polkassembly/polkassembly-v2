@@ -319,13 +319,19 @@ export class FirestoreService extends FirestoreUtils {
 			updatedAt: postData.updatedAt?.toDate(),
 			allowedCommentor: postData.allowedCommentor || EAllowedCommentor.ALL,
 			history:
-				postData.history?.map((item: IOffChainContentHistoryItem & { createdAt: Timestamp | Date | string }) => ({
-					...item,
-					createdAt:
-						typeof item.createdAt === 'object' && item.createdAt !== null && typeof (item.createdAt as Timestamp).toDate === 'function'
-							? (item.createdAt as Timestamp).toDate()
-							: new Date(item.createdAt as string) || new Date()
-				})) || [],
+				postData.history?.map((item: IOffChainContentHistoryItem & { createdAt: Timestamp | Date | string }) => {
+					let createdAt: Date;
+					if (typeof item.createdAt === 'object' && item.createdAt !== null && typeof (item.createdAt as Timestamp).toDate === 'function') {
+						createdAt = (item.createdAt as Timestamp).toDate();
+					} else if (item.createdAt instanceof Date) {
+						createdAt = item.createdAt;
+					} else {
+						const d = new Date(String(item.createdAt));
+						createdAt = isNaN(d.getTime()) ? new Date() : d;
+					}
+					return { ...item, createdAt };
+				}) || [],
+
 			isDefaultContent
 		} as IOffChainPost;
 	}

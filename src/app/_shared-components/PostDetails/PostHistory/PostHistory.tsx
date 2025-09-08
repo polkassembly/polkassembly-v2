@@ -50,8 +50,8 @@ function PostHistory({
 			const previousContentStr = previousItem ? removeSymbols(previousItem.content) : '';
 			const previousTitleStr = previousItem ? removeSymbols(previousItem.title || '') : '';
 
-			const contentDiffHtml = previousContentStr ? generateDiffHtml(currentContentStr, previousContentStr) : currentContentStr;
-			const titleDiffHtml = previousTitleStr ? generateDiffHtml(currentTitleStr, previousTitleStr) : currentTitleStr;
+			const contentDiffHtml = previousContentStr ? generateDiffHtml(previousContentStr, currentContentStr) : currentContentStr;
+			const titleDiffHtml = previousTitleStr ? generateDiffHtml(previousTitleStr, currentTitleStr) : currentTitleStr;
 
 			return {
 				...item,
@@ -101,16 +101,16 @@ function PostHistory({
 
 									{item.title && (
 										<div className='mt-2'>
-											<h4 className='text-text_secondary mb-1 text-sm font-semibold'>Title</h4>
+											<h4 className='text-text_secondary mb-1 text-sm font-semibold'>{t('Create.title')}</h4>
 											<MarkdownViewer
-												markdown={item.titleDiffHtml || item.title}
+												markdown={item.titleDiffHtml || removeSymbols(item.title || '')}
 												className='text-base font-medium text-text_primary'
 											/>
 										</div>
 									)}
 
 									<div className='mt-3'>
-										<h4 className='text-text_secondary mb-1 text-sm font-semibold'>Description</h4>
+										<h4 className='text-text_secondary mb-1 text-sm font-semibold'>{t('PostDetails.description')}</h4>
 										<MarkdownViewer
 											markdown={item.contentDiffHtml || item.content}
 											truncate
