@@ -9,6 +9,7 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { NON_SPAM_POSTS, SPAM_POSTS } from '@/_shared/_constants/spamDetectionExamples';
 import { MIN_COMMENTS_FOR_SUMMARY } from '@/_shared/_constants/commentSummaryConstants';
+import { CONTENT_BLACKLIST } from '@/_shared/_constants/contentBlacklist';
 import { AI_SERVICE_URL, IS_AI_ENABLED } from '../../_api-constants/apiEnvVars';
 import { OffChainDbService } from '../offchain_db_service';
 import { OnChainDbService } from '../onchain_db_service';
@@ -329,6 +330,14 @@ export class AIService {
 	private static async getContentSpamCheck({ mdContent, title }: { mdContent?: string; title?: string }): Promise<boolean | null> {
 		if (!mdContent && !title) {
 			return null;
+		}
+
+		if (title && CONTENT_BLACKLIST.some((blacklist) => title.toLowerCase().includes(blacklist))) {
+			return true;
+		}
+
+		if (mdContent && CONTENT_BLACKLIST.some((blacklist) => mdContent.toLowerCase().includes(blacklist))) {
+			return true;
 		}
 
 		// Construct the prompt with the content
