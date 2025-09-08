@@ -20,7 +20,7 @@ function StatusTag({ className = '', status, colorInverted }: Props) {
 	const t = useTranslations();
 
 	const finalStatus = useMemo(() => {
-		return status && DECIDING_PROPOSAL_STATUSES.includes(status) ? EProposalStatus.Deciding : status?.toLowerCase().replace(/\s+/g, '_');
+		return status && DECIDING_PROPOSAL_STATUSES.includes(status) ? EProposalStatus.Deciding.toLowerCase() : status?.toLowerCase().replace(/\s+/g, '_');
 	}, [status]);
 
 	return (
