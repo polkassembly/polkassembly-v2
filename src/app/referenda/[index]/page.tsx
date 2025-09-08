@@ -25,7 +25,9 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 	return getGeneratedContentMetadata({
 		title: `Polkassembly - Referendum #${index}`,
 		description: data
-			? `Referendum #${index}: ${data.contentSummary?.postSummary ? markdownToPlainText(data.contentSummary.postSummary) : data.title}`
+			? `${data.title ? data.title : ''}
+		${data.contentSummary?.postSummary ? markdownToPlainText(data.contentSummary.postSummary) : ''}
+		`
 			: `Explore Polkassembly Referendum #${index}`,
 		network,
 		url: `https://${network}.polkassembly.io/referenda/${index}`,
