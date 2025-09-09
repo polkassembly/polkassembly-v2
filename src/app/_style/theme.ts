@@ -182,7 +182,9 @@ export const THEME_COLORS = {
 		diff_added_bg: '#D4F7DC',
 		diff_added_text: '#0D7936',
 		diff_removed_bg: '#FFD6D9',
-		diff_removed_text: '#C53030'
+		diff_removed_text: '#C53030',
+		astral_card_bg: '#F7F7F7',
+		astral_score: '#FFBA03'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -363,6 +365,8 @@ export const THEME_COLORS = {
 		diff_added_bg: '#1A4D2E',
 		diff_added_text: '#68D391',
 		diff_removed_bg: '#4A1E1E',
-		diff_removed_text: '#FC8181'
+		diff_removed_text: '#FC8181',
+		astral_card_bg: '#F7F7F7',
+		astral_score: '#FFBA03'
 	}
 };

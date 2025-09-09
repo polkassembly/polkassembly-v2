@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { IGenericListingResponse, IPublicUser } from '@/_shared/types';
 import Leaderboard from './Components/index';
 import styles from './LeaderboardTabsClient.module.scss';
+import AstralScoring from './Components/AstralScoring';
 
 interface Props {
 	data: IGenericListingResponse<IPublicUser>;
@@ -57,9 +58,7 @@ export default function LeaderboardTabsClient({ data, top3RankData }: Props) {
 					</div>
 				) : (
 					<div>
-						<div className='p-6'>
-							<p className='text-sm text-muted-foreground'>Astrals Scoring content goes here...</p>
-						</div>
+						<AstralScoring />
 					</div>
 				)}
 			</div>
