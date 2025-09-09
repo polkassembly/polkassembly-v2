@@ -448,6 +448,12 @@
 		"Treasury": "国库",
 		"LeaseAdmin": "租赁管理员",
 		"GeneralAdmin": "总管理员",
+		"chatWithKlara": "与Klara聊天",
+		"more": "更多",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "分析",
+		"treasuryAnalytics": "国库分析",
+		"proxies": "代理",
 		"Tag": {
 			"new": "新"
 		}
