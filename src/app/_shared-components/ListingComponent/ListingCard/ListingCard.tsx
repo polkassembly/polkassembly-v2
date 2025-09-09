@@ -29,6 +29,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ARCHIVE_PROPOSAL_TYPES } from '@/_shared/_constants/archiveProposalTypes';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import VotingBar from '../VotingBar/VotingBar';
 import styles from './ListingCard.module.scss';
 import UserAvatar from '../../UserAvatar/UserAvatar';
@@ -50,6 +51,7 @@ function ListingCard({
 }) {
 	const network = getCurrentNetwork();
 	const { userPreferences } = useUserPreferences();
+	const t = useTranslations();
 
 	const formattedCreatedAt = dayjs(data.createdAt || data.onChainInfo?.createdAt || new Date()).fromNow();
 	const ayeValue = new BN(data.onChainInfo?.voteMetrics?.aye.value || '0');
@@ -74,46 +76,25 @@ function ListingCard({
 		return (
 			<div className='flex items-center gap-1'>
 				{Object.keys(groupedByAsset).length > 1 ? (
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<div className='flex items-center gap-1'>
-								<span className='text-sm font-bold text-text_primary'>Multiple</span>
-								<div className='flex items-center -space-x-1.5'>
-									{Object.entries(groupedByAsset).map(([assetId]) => {
-										const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
-										const icon = treasuryAssetsData[unit as EAssets]?.icon || NETWORKS_DETAILS[`${network}`].logo;
-										return (
-											<Image
-												key={assetId}
-												className='rounded-full'
-												src={icon}
-												alt={unit}
-												width={16}
-												height={16}
-											/>
-										);
-									})}
-								</div>
-							</div>
-						</TooltipTrigger>
-						<TooltipContent
-							side='top'
-							align='center'
-						>
-							<div className={styles.assetContainer}>
-								{Object.entries(groupedByAsset).map(([assetId, amount]) => (
-									<div key={assetId}>
-										{formatBnBalance(
-											amount.toString(),
-											{ withUnit: true, numberAfterComma: 1, compactNotation: true },
-											network,
-											assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
-										)}
-									</div>
-								))}
-							</div>
-						</TooltipContent>
-					</Tooltip>
+					<div className='flex items-center gap-1'>
+						<span className='text-sm font-bold text-text_primary'>{t('Profile.Delegations.multiple')}</span>
+						<div className='flex items-center -space-x-1.5'>
+							{Object.entries(groupedByAsset).map(([assetId]) => {
+								const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
+								const icon = treasuryAssetsData[unit as EAssets]?.icon || NETWORKS_DETAILS[`${network}`].logo;
+								return (
+									<Image
+										key={assetId}
+										className='rounded-full'
+										src={icon}
+										alt={unit}
+										width={16}
+										height={16}
+									/>
+								);
+							})}
+						</div>
+					</div>
 				) : (
 					Object.entries(groupedByAsset).map(([assetId, amount]) => (
 						<div
@@ -222,22 +203,19 @@ function ListingCard({
 										);
 									})}
 								</div>
-								<span className='block lg:hidden'>|</span>
 							</div>
 						</TooltipTrigger>
 						<TooltipContent
 							side='top'
 							align='center'
+							className='m-0 p-0'
 						>
 							<div className={styles.assetContainer}>
-								{Object.entries(groupedByAsset).map(([assetId, amount]) => (
-									<div key={assetId}>
-										~{' '}
-										{formatUSDWithUnits(
-											formatBnBalance(amount.toString(), { withUnit: true, numberAfterComma: 2 }, network, assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId)
-										)}{' '}
-									</div>
-								))}
+								{Object.entries(groupedByAsset).map(([assetId, amount]) => {
+									const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
+									const assetParam = unit === NETWORKS_DETAILS[`${network}`]?.tokenSymbol ? null : assetId;
+									return <div key={assetId}>{formatUSDWithUnits(formatBnBalance(amount.toString(), { withUnit: true, numberAfterComma: 2 }, network, assetParam))}</div>;
+								})}
 							</div>
 						</TooltipContent>
 					</Tooltip>
@@ -248,11 +226,12 @@ function ListingCard({
 							key={assetId}
 						>
 							<span className='whitespace-nowrap'>
-								{formatUSDWithUnits(
-									formatBnBalance(amount.toString(), { withUnit: true, numberAfterComma: 2 }, network, assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId)
-								)}
+								{(() => {
+									const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
+									const assetParam = unit === NETWORKS_DETAILS[`${network}`]?.tokenSymbol ? null : assetId;
+									return formatUSDWithUnits(formatBnBalance(amount.toString(), { withUnit: true, numberAfterComma: 2 }, network, assetParam));
+								})()}
 							</span>
-							<span className='block lg:hidden'>|</span>
 						</div>
 					))
 				)}
