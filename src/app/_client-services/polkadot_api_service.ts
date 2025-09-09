@@ -1604,6 +1604,37 @@ export class PolkadotApiService {
 		});
 	}
 
+	private static mapIndividualProxies(proxyArray: any[]): IProxyAddress[] {
+		return proxyArray.map((proxyEntry: any) => {
+			const delayValue = proxyEntry?.delay ? parseInt(proxyEntry.delay.replace(/,/g, ''), 10) : 0;
+			return {
+				address: proxyEntry?.delegate || 'Unknown',
+				proxyType: (proxyEntry?.proxyType as EProxyType) || EProxyType.GOVERNANCE,
+				delay: delayValue
+			};
+		});
+	}
+
+	private static processProxyInfo(delegator: string, proxyHuman: any): IProxyRequest | null {
+		if (!proxyHuman || !Array.isArray(proxyHuman)) return null;
+		const proxyArray = proxyHuman[0];
+		if (!proxyArray || !Array.isArray(proxyArray) || proxyArray.length === 0) return null;
+
+		const individualProxies = this.mapIndividualProxies(proxyArray);
+		const firstProxyDelay = individualProxies[0]?.delay || 0;
+
+		return {
+			id: `${delegator}-proxy-${Date.now()}`,
+			delegator,
+			proxyType: '-' as any,
+			delay: firstProxyDelay,
+			proxies: proxyArray.length,
+			proxyAddresses: individualProxies.map((p) => p.address),
+			individualProxies,
+			dateCreated: new Date()
+		};
+	}
+
 	async getProxyRequests({ page, limit, search }: { page: number; limit: number; search?: string }) {
 		if (!this.api) return { items: [], totalCount: 0 };
 
@@ -1621,36 +1652,8 @@ export class PolkadotApiService {
 					return;
 				}
 
-				if (proxyData && Array.isArray(proxyData) && proxyData.length >= 2) {
-					// Extract the proxy array and balance from the data structure
-					const proxyArray = proxyData[0]; // Array of proxy objects
-
-					// Only process if there are actual proxies
-					if (proxyArray && Array.isArray(proxyArray) && proxyArray.length > 0) {
-						// Parse individual proxy details for accordion functionality
-						const individualProxies: IProxyAddress[] = proxyArray.map((proxyEntry: any) => {
-							const delayValue = proxyEntry?.delay ? parseInt(proxyEntry.delay.replace(/,/g, ''), 10) : 0;
-
-							return {
-								address: proxyEntry?.delegate || 'Unknown',
-								proxyType: (proxyEntry?.proxyType as EProxyType) || EProxyType.GOVERNANCE,
-								delay: delayValue
-							};
-						});
-
-						const proxyRequest: IProxyRequest = {
-							id: `${delegator}-proxy-${Date.now()}`,
-							delegator,
-							proxyType: '-' as any, // Show '-' for parent row
-							delay: 0,
-							proxies: proxyArray.length,
-							proxyAddresses: individualProxies.map((p) => p.address),
-							individualProxies,
-							dateCreated: new Date()
-						};
-						proxies.push(proxyRequest);
-					}
-				}
+				const proxyRequest = PolkadotApiService.processProxyInfo(delegator, proxyData);
+				if (proxyRequest) proxies.push(proxyRequest);
 			});
 
 			// Sort by date created (newest first)
@@ -1681,36 +1684,8 @@ export class PolkadotApiService {
 
 			const proxyInfo = proxyData.toHuman() as any;
 
-			if (proxyInfo && Array.isArray(proxyInfo) && proxyInfo.length >= 2) {
-				// Extract the proxy array and balance from the data structure
-				const proxyArray = proxyInfo[0]; // Array of proxy objects
-
-				// Only process if there are actual proxies
-				if (proxyArray && Array.isArray(proxyArray) && proxyArray.length > 0) {
-					// Parse individual proxy details for accordion functionality
-					const individualProxies: IProxyAddress[] = proxyArray.map((proxyEntry: any) => {
-						const delayValue = proxyEntry?.delay ? parseInt(proxyEntry.delay.replace(/,/g, ''), 10) : 0;
-
-						return {
-							address: proxyEntry?.delegate || 'Unknown',
-							proxyType: (proxyEntry?.proxyType as EProxyType) || EProxyType.GOVERNANCE,
-							delay: delayValue
-						};
-					});
-
-					const proxyRequest: IProxyRequest = {
-						id: `${userAddress}-proxy-${Date.now()}`,
-						delegator: userAddress,
-						proxyType: '-' as any, // Show '-' for parent row
-						delay: 0,
-						proxies: proxyArray.length,
-						proxyAddresses: individualProxies.map((p) => p.address),
-						individualProxies,
-						dateCreated: new Date()
-					};
-					proxies.push(proxyRequest);
-				}
-			}
+			const proxyRequest = PolkadotApiService.processProxyInfo(userAddress, proxyInfo);
+			if (proxyRequest) proxies.push(proxyRequest);
 
 			// Sort by date created (newest first)
 			proxies.sort((a, b) => b.dateCreated.getTime() - a.dateCreated.getTime());
