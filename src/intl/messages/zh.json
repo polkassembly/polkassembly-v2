@@ -133,6 +133,7 @@
 	},
 	"Profile": {
 		"noAddresses": "未找到链接地址",
+		"blacklistWarning": "此用户账户因违反社区准则而被标记。",
 		"settings": "设置",
 		"login": "登录",
 		"loginFailed": "登录失败",
@@ -447,6 +448,12 @@
 		"Treasury": "国库",
 		"LeaseAdmin": "租赁管理员",
 		"GeneralAdmin": "总管理员",
+		"chatWithKlara": "与Klara聊天",
+		"more": "更多",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "分析",
+		"treasuryAnalytics": "国库分析",
+		"proxies": "代理",
 		"Tag": {
 			"new": "新"
 		}
@@ -487,6 +494,9 @@
 		"votingStarted": "投票已开始",
 		"preparePeriod": "准备期",
 		"decisionPeriod": "决策期",
+		"votingPeriod": "投票期",
+		"enactmentPeriod": "执行期",
+		"enactmentDescription": "此期间完成后执行Ref",
 		"summary": "摘要",
 		"summarise": "摘要",
 		"aye": "赞成",

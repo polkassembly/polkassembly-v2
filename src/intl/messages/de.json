@@ -133,6 +133,7 @@
 	},
 	"Profile": {
 		"noAddresses": "Keine Adressen gefunden",
+		"blacklistWarning": "Dieses Benutzerkonto wurde wegen Verstoß gegen die Community-Richtlinien markiert.",
 		"settings": "Einstellungen",
 		"login": "Anmelden",
 		"loginFailed": "Anmeldung fehlgeschlagen",
@@ -446,6 +447,12 @@
 		"Treasury": "Finanzverwaltung",
 		"LeaseAdmin": "Leasing-Admin",
 		"GeneralAdmin": "Allgemeiner Admin",
+		"chatWithKlara": "Chat mit Klara",
+		"more": "Mehr",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "Analysen",
+		"treasuryAnalytics": "Finanzverwaltungsanalysen",
+		"proxies": "Proxies",
 		"Tag": {
 			"new": "Neu"
 		}
@@ -485,6 +492,9 @@
 		"votingStarted": "Abstimmung hat begonnen",
 		"preparePeriod": "Vorbereitungszeit",
 		"decisionPeriod": "Entscheidungszeit",
+		"votingPeriod": "Abstimmungszeitraum",
+		"enactmentPeriod": "Durchführungszeitraum",
+		"enactmentDescription": "Ref-Ausführung nach Abschluss dieser Periode",
 		"summary": "Zusammenfassung",
 		"summarise": "Zusammenfassung",
 		"aye": "Ja",

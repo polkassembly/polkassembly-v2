@@ -122,7 +122,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 							orientation='vertical'
 							className='hidden h-3 lg:block'
 						/>
-						{postData?.onChainInfo?.status && <StatusTag status={postData.onChainInfo.status.toLowerCase().replace(/\s+/g, '_')} />}
+						{postData?.onChainInfo?.status && <StatusTag status={postData.onChainInfo.status} />}
 					</div>
 
 					{postData?.onChainInfo?.voteMetrics && isModalOpen && (

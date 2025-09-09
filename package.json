@@ -12,7 +12,8 @@
 		"lint:fix": "next lint --fix",
 		"format": "prettier --check --ignore-path .gitignore .",
 		"format:fix": "prettier --write --ignore-path .gitignore .",
-		"prepare": "husky"
+		"prepare": "husky",
+		"api-bump:polkadot": "yarn add @polkadot/api @polkadot/api-augment @polkadot/extension-dapp @polkadot/extension-inject @polkadot/react-identicon @polkadot/react-qr @polkadot/types @polkadot/util @polkadot/util-crypto"
 	},
 	"engines": {
 		"node": "22"
@@ -27,15 +28,15 @@
 		"@nivo/circle-packing": "^0.99.0",
 		"@nivo/treemap": "^0.99.0",
 		"@paralleldrive/cuid2": "^2.2.2",
-		"@polkadot/api": "^13.0.1",
-		"@polkadot/api-augment": "^13.0.1",
-		"@polkadot/extension-dapp": "^0.57.1",
-		"@polkadot/extension-inject": "^0.57.1",
-		"@polkadot/react-identicon": "^3.11.3",
-		"@polkadot/react-qr": "^3.15.2",
-		"@polkadot/types": "^13.0.1",
-		"@polkadot/util": "^13.0.2",
-		"@polkadot/util-crypto": "^13.0.2",
+		"@polkadot/api": "^16.4.6",
+		"@polkadot/api-augment": "^16.4.6",
+		"@polkadot/extension-dapp": "^0.61.7",
+		"@polkadot/extension-inject": "^0.61.7",
+		"@polkadot/react-identicon": "^3.16.1",
+		"@polkadot/react-qr": "^3.16.1",
+		"@polkadot/types": "^16.4.6",
+		"@polkadot/util": "^13.5.6",
+		"@polkadot/util-crypto": "^13.5.6",
 		"@radix-ui/react-avatar": "^1.1.1",
 		"@radix-ui/react-checkbox": "^1.1.4",
 		"@radix-ui/react-collapsible": "^1.1.1",
@@ -97,7 +98,6 @@
 		"react-chartjs-2": "^5.3.0",
 		"react-day-picker": "^9.6.3",
 		"react-dom": "19.0.0",
-
 		"react-hook-form": "^7.53.2",
 		"react-instantsearch": "^7.15.4",
 		"react-json-view": "^1.21.3",
@@ -154,8 +154,13 @@
 		"typescript": "5.4.5"
 	},
 	"lint-staged": {
-		"**/*.(ts|tsx|js|jsx)": ["yarn eslint --fix", "yarn prettier --write"],
-		"**/*.(md|css|scss|html)": ["yarn prettier --write"]
+		"**/*.(ts|tsx|js|jsx)": [
+			"yarn eslint --fix",
+			"yarn prettier --write"
+		],
+		"**/*.(md|css|scss|html)": [
+			"yarn prettier --write"
+		]
 	},
 	"resolutions": {
 		"@types/react": "npm:types-react@19.0.0-rc.1",

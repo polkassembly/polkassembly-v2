@@ -4,13 +4,16 @@
 
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import { IOnChainIdentity } from '@/_shared/types';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { W3F_DELEGATES_2025 } from '@/_shared/_constants/delegates2025';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import IdentityBadge from '../IdentityBadge';
 import styles from './AddressInline.module.scss';
+import DVBadge from '../DVBadge';
 
 interface Props {
 	address: string;
@@ -37,6 +40,10 @@ function AddressInline({
 	userProfileUrl,
 	showOnlyIdenticon = false
 }: Props) {
+	const isDV = useMemo(() => {
+		return W3F_DELEGATES_2025.some((dv) => getSubstrateAddress(dv.address) === getSubstrateAddress(address));
+	}, [address]);
+
 	return (
 		<div
 			className={`${styles.container} ${className}`.trim()}
@@ -64,6 +71,7 @@ function AddressInline({
 						/>
 
 						<p className={cn(styles.displaytext, 'text-xs font-bold lg:text-sm', textClassName)}>{addressDisplayText}</p>
+						{isDV && <DVBadge />}
 					</Link>
 				) : (
 					<div className={styles.container}>
@@ -73,6 +81,7 @@ function AddressInline({
 						/>
 
 						<p className={cn(styles.displaytext, 'text-xs font-bold lg:text-sm', textClassName)}>{addressDisplayText}</p>
+						{isDV && <DVBadge />}
 					</div>
 				))}
 		</div>

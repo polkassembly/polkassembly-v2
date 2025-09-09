@@ -133,6 +133,7 @@
 	},
 	"Profile": {
 		"noAddresses": "No addresses linked",
+		"blacklistWarning": "This user account has been flagged for violating community guidelines.",
 		"settings": "Settings",
 		"login": "Login",
 		"loginFailed": "Failed to login",
@@ -449,6 +450,12 @@
 		"Treasury": "Treasury",
 		"LeaseAdmin": "Lease Admin",
 		"GeneralAdmin": "General Admin",
+		"chatWithKlara": "Chat with Klara",
+		"more": "More",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "Analytics",
+		"treasuryAnalytics": "Treasury Analytics",
+		"proxies": "Proxies",
 		"Tag": {
 			"new": "New"
 		}
@@ -491,6 +498,9 @@
 		"votingStarted": "Voting has Started",
 		"preparePeriod": "Prepare Period",
 		"decisionPeriod": "Decision Period",
+		"votingPeriod": "Voting Period",
+		"enactmentPeriod": "Enactment Period",
+		"enactmentDescription": "Ref execution after completion of this period",
 		"summary": "Summary",
 		"summarise": "SUMMARISE",
 		"analytics": "Analytics",
