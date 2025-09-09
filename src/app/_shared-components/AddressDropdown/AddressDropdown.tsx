@@ -311,6 +311,8 @@ function AddressDropdown({
 								<Balance
 									address={userPreferences?.selectedAccount?.address || ''}
 									showPeopleChainBalance={showPeopleChainBalance}
+									showTransferableBalance={showTransferableBalance}
+									showVotingBalance={showVotingBalance}
 								/>
 							)}
 						</div>
