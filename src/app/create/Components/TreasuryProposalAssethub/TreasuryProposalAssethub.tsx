@@ -61,10 +61,13 @@ const calculateNativeTokenEquivalent = ({
 			dedTokenUsdPrice
 		});
 
-		const nativeTokenBN = assetUsdPrice
-			.mul(new BN(10).pow(new BN(nativeTokenDecimals)))
-			.mul(new BN(10).pow(new BN(nativeTokenUsdPrice?.decimals || 0)))
-			.div(nativeTokenUsdPrice?.value || BN_ZERO);
+		const nativeTokenBN =
+			nativeTokenUsdPrice?.value && nativeTokenUsdPrice?.value.gt(BN_ZERO)
+				? assetUsdPrice
+						.mul(new BN(10).pow(new BN(nativeTokenDecimals)))
+						.mul(new BN(10).pow(new BN(nativeTokenUsdPrice?.decimals || 0)))
+						.div(nativeTokenUsdPrice.value)
+				: BN_ZERO;
 
 		return acc.add(nativeTokenBN);
 	}, BN_ZERO);
