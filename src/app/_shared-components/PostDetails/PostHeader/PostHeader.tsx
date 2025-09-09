@@ -146,7 +146,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 			</div>
 
 			<div className='w-full overflow-hidden'>
-				<TabsList className={cn('m-0 flex items-center gap-1 p-0 py-2 font-bold capitalize sm:gap-2', classes.scrollbarHide)}>
+				<TabsList className={cn('m-0 flex items-center gap-1 p-0 py-2 font-bold sm:gap-2 md:justify-start', classes.scrollbarHide)}>
 					{' '}
 					<TabsTrigger
 						className='px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm'
@@ -172,7 +172,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 					)}
 					<TabsTrigger
 						value={EPostDetailsTab.SUMMARISE}
-						className={cn(classes.tabTrigger, 'px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm')}
+						className={cn(classes.tabTrigger, 'px-2 py-1 text-xs capitalize sm:px-3 sm:py-2 sm:text-sm')}
 					>
 						<div className={classes.summariseTabContent}>
 							<Image
