@@ -214,7 +214,12 @@ function CreateBounty({ onSuccess }: { onSuccess: (proposalId: number) => void }
 			<div className='flex flex-1 flex-col gap-y-3 overflow-y-auto sm:gap-y-4'>
 				<SwitchWalletOrAddress
 					small
-					customAddressSelector={<AddressRelationsPicker withBalance />}
+					customAddressSelector={
+						<AddressRelationsPicker
+							withBalance
+							showTransferableBalance
+						/>
+					}
 				/>
 
 				<div className='flex flex-col gap-y-1'>

@@ -123,7 +123,12 @@ function ExistingPreimage({ createdPreimageHash, onSuccess }: { createdPreimageH
 			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
 				<SwitchWalletOrAddress
 					small
-					customAddressSelector={<AddressRelationsPicker withBalance />}
+					customAddressSelector={
+						<AddressRelationsPicker
+							withBalance
+							showTransferableBalance
+						/>
+					}
 				/>
 				<div className='flex flex-col gap-y-1'>
 					<p className='flex items-center justify-between text-sm text-wallet_btn_text'>
