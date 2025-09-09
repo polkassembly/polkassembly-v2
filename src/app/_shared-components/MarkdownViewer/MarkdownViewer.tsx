@@ -17,6 +17,9 @@ import type { Components } from 'react-markdown';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import Image from 'next/image';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const HighlightMenu = dynamic(() => import('../HighlightMenu/HighlightMenu'), { ssr: false });
 
 const extractUrlsAndEmails = (text: string): string[] => {
 	const words = text.split(/\s+/);
@@ -81,7 +84,11 @@ const getEmbedUrl = (url: string): string | null => {
 
 const markdownComponents: Components = {
 	div: 'div',
-	table: 'table',
+	table: ({ children, ...props }) => (
+		<div className='w-full overflow-x-auto'>
+			<table {...props}>{children}</table>
+		</div>
+	),
 	thead: 'thead',
 	tbody: 'tbody',
 	tr: 'tr',
@@ -92,7 +99,7 @@ const markdownComponents: Components = {
 	li: 'li',
 	code: 'code',
 	pre: 'pre',
-	img: ({ src, alt }) => {
+	img: ({ src, alt, height, width }) => {
 		if (!src) {
 			return null;
 		}
@@ -145,24 +152,21 @@ const markdownComponents: Components = {
 		}
 
 		return (
-			<Link
-				href={src}
-				target='_blank'
-				rel='noopener noreferrer'
-				className='cursor-pointer'
-			>
-				<Image
-					src={src}
-					alt={alt || 'Image'}
-					height={256}
-					width={256}
-					sizes='100vw'
-					style={{
-						width: '90%',
-						height: 'auto'
-					}}
-				/>
-			</Link>
+			<span className='mr-2 inline-block max-w-max align-top'>
+				<Link
+					href={src}
+					target='_blank'
+					rel='noopener noreferrer'
+				>
+					<Image
+						src={src}
+						alt={alt || 'Image'}
+						height={ValidatorService.isValidNumber(height) ? Number(height) : 256}
+						width={ValidatorService.isValidNumber(width) ? Number(width) : 256}
+						sizes='100vw'
+					/>
+				</Link>
+			</span>
 		);
 	},
 	a: ({ href, children, ...props }) => {
@@ -330,6 +334,7 @@ export function MarkdownViewer(props: ReactMarkdownProps) {
 				ref={editorRef}
 				className={cn('markdown-body', truncate && !showMore ? `line-clamp-${maxLines}` : 'line-clamp-none', 'w-full', className)}
 			>
+				<HighlightMenu markdownRef={editorRef} />
 				<ReactMarkdownLib
 					components={markdownComponents}
 					remarkPlugins={[remarkGfm, remarkBreaks]}

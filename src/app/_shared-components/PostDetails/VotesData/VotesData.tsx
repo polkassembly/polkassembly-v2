@@ -1,8 +1,8 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { EAnalyticsType, EPostOrigin, EProposalStatus, EProposalType, EVotesDisplayType, IStatusHistoryItem } from '@/_shared/types';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { EAnalyticsType, EPostOrigin, EProposalStatus, EProposalType, EVoteBubbleTabs, EVotesDisplayType, IStatusHistoryItem } from '@/_shared/types';
+import { ChevronDown, ChevronRight, Expand } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -30,15 +30,11 @@ interface IVotesDataProps {
 	thresholdValues?: { approvalThreshold: number; supportThreshold: number };
 }
 
-enum EProposalVoteType {
-	Bubble = 'bubble',
-	Graph = 'graph'
-}
-
 function VotesData({ proposalType, index, trackName, createdAt, timeline, setThresholdValues, thresholdValues }: IVotesDataProps) {
 	const t = useTranslations('PostDetails.VotesData');
-	const [activeTab, setActiveTab] = useState<EProposalVoteType>(EProposalVoteType.Bubble);
+	const [activeTab, setActiveTab] = useState<EVoteBubbleTabs>(EVoteBubbleTabs.Bubble);
 	const [votesDisplayType, setVotesDisplayType] = useState<EVotesDisplayType>(EVotesDisplayType.NESTED);
+	const [isExpanded, setIsExpanded] = useState(false);
 	const fetchVoteCurves = async () => {
 		const { data, error } = await NextApiClientService.getVoteCurves({
 			proposalType,
@@ -66,12 +62,22 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 	const latestSupport = Array.isArray(voteCurveData) && voteCurveData.length > 0 ? voteCurveData[voteCurveData.length - 1].supportPercent : null;
 
 	const enableGraph = useMemo(() => !!trackName && !!timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced), [trackName, timeline]);
+
 	return (
 		<div className={classes.card}>
 			<div className='flex w-full items-center justify-between'>
 				<h1 className={classes.header}>{t('votes')}</h1>
+				<Button
+					variant='ghost'
+					className='mr-6 flex justify-between rounded-sm px-1.5 py-0.5 text-xs font-normal text-text_pink'
+					onClick={() => setIsExpanded(true)}
+				>
+					<Expand className='h-2.5 w-2.5' />
+				</Button>
 				<VotesDataDialog
 					index={index}
+					setIsExpanded={setIsExpanded}
+					isExpanded={isExpanded}
 					voteCurveData={voteCurveData || []}
 					trackName={trackName}
 					timeline={timeline || []}
@@ -92,7 +98,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 					defaultValue={activeTab}
 				>
 					<div className={classes.tabs}>
-						{[EProposalVoteType.Bubble, EProposalVoteType.Graph].map((tab) => (
+						{[EVoteBubbleTabs.Bubble, EVoteBubbleTabs.Graph].map((tab) => (
 							<Button
 								key={tab}
 								variant='ghost'
@@ -105,7 +111,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 						))}
 					</div>
 					<TabsContent
-						value={EProposalVoteType.Bubble}
+						value={EVoteBubbleTabs.Bubble}
 						className='px-6'
 					>
 						<VotesBubbleChart
@@ -113,9 +119,10 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 							index={index}
 							analyticsType={EAnalyticsType.CONVICTIONS}
 							enableFullHeight={false}
+							setIsExpanded={setIsExpanded}
 						/>
 					</TabsContent>
-					<TabsContent value={EProposalVoteType.Graph}>
+					<TabsContent value={EVoteBubbleTabs.Graph}>
 						<VoteCurvesData
 							latestApproval={latestApproval}
 							latestSupport={latestSupport}
@@ -136,6 +143,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 						index={index}
 						analyticsType={EAnalyticsType.CONVICTIONS}
 						enableFullHeight={false}
+						setIsExpanded={setIsExpanded}
 					/>
 				</div>
 			)}

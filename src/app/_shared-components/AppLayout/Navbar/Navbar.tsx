@@ -17,6 +17,11 @@ import { FaBars } from '@react-icons/all-files/fa/FaBars';
 import { IoMdClose } from '@react-icons/all-files/io/IoMdClose';
 import { useState } from 'react';
 import TranslateIcon from '@assets/icons/translate.svg';
+import ProfileIcon from '@assets/navbar/profile-icon.svg';
+import SetIdentityIcon from '@assets/navbar/set-identity-icon.svg';
+import RequestJudgementIcon from '@assets/navbar/request-judgement-icon.svg';
+import LogoutIcon from '@assets/navbar/logout-icon.svg';
+import { ShieldMinusIcon } from 'lucide-react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { isMimirDetected } from '@/app/_client-services/isMimirDetected';
@@ -80,7 +85,7 @@ function Navbar() {
 				<div className='border-l-[1px] border-bg_pink pl-2 font-medium text-navbar_title md:border-none md:pl-0'>OpenGov</div>
 			</div>
 
-			<div className='flex items-center gap-x-2 md:hidden'>
+			<div className='flex w-full items-center justify-end gap-x-2 md:hidden'>
 				<Search />
 				<div
 					aria-hidden
@@ -98,7 +103,7 @@ function Navbar() {
 				</div>
 			</div>
 
-			<div className='hidden items-center gap-x-4 md:flex'>
+			<div className='hidden w-full items-center justify-end gap-x-4 md:flex'>
 				<Search />
 				<Select
 					value={userPreferences.locale}
@@ -151,37 +156,83 @@ function Navbar() {
 									<p>{user.username}</p>
 								)}
 							</DropdownMenuTrigger>
-							<DropdownMenuContent>
-								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+							<DropdownMenuContent className='min-w-max'>
+								<DropdownMenuItem
+									asChild
+									className='hover:bg-sidebar_menu_hover'
+								>
 									<Link
-										className='w-full'
+										className={classes.dropdownMenuContent}
 										href={`/user/${user.username}`}
 									>
+										<Image
+											src={ProfileIcon}
+											alt='profile'
+											width={24}
+											height={24}
+										/>
 										{t('Profile.profile')}
 									</Link>
 								</DropdownMenuItem>
-								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+								<DropdownMenuItem
+									asChild
+									className='hover:bg-sidebar_menu_hover'
+								>
 									<Link
-										className='w-full'
+										className={classes.dropdownMenuContent}
 										href='/set-identity'
 									>
+										<Image
+											src={SetIdentityIcon}
+											alt='set identity'
+											width={24}
+											height={24}
+										/>
 										{t('SetIdentity.setIdentity')}
 									</Link>
 								</DropdownMenuItem>
-								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+								<DropdownMenuItem
+									asChild
+									className='hover:bg-sidebar_menu_hover'
+								>
 									<Link
-										className='w-full'
+										className={classes.dropdownMenuContent}
 										href={`/set-identity?open=${ESetIdentityStep.REQUEST_JUDGEMENT}`}
 									>
+										<Image
+											src={RequestJudgementIcon}
+											alt='request judgement'
+											width={24}
+											height={24}
+										/>
 										{t('SetIdentity.requestJudgement')}
 									</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+									<Link
+										className={classes.dropdownMenuContent}
+										href={`/set-identity?open=${ESetIdentityStep.CLEAR_IDENTITY}`}
+									>
+										<ShieldMinusIcon className='h-6 w-6 font-light text-basic_text' />
+										{t('SetIdentity.clearIdentity')}
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									asChild
+									className='hover:bg-sidebar_menu_hover'
+								>
 									<Button
 										variant='ghost'
-										className='flex w-full justify-start p-0 text-sm'
+										className='flex w-full justify-start p-0 px-2 text-sm text-basic_text'
 										onClick={onLogout}
+										size='sm'
 									>
+										<Image
+											src={LogoutIcon}
+											alt='logout'
+											width={24}
+											height={24}
+										/>
 										{t('Profile.logout')}
 									</Button>
 								</DropdownMenuItem>

@@ -41,7 +41,8 @@ import {
 	IPollVote,
 	IPoll,
 	EPollVotesType,
-	IOffChainPollPayload
+	IOffChainPollPayload,
+	ICommentHistoryItem
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -471,6 +472,11 @@ export class FirestoreService extends FirestoreUtils {
 
 			const commentData = {
 				...dataRaw,
+				history:
+					dataRaw.history?.map((item: { createdAt: Timestamp; content: string }) => ({
+						...item,
+						createdAt: item.createdAt.toDate()
+					})) || [],
 				content: dataRaw.content || '',
 				createdAt: dataRaw.createdAt?.toDate(),
 				updatedAt: dataRaw.updatedAt?.toDate(),
@@ -507,6 +513,11 @@ export class FirestoreService extends FirestoreUtils {
 
 		return {
 			...data,
+			history:
+				data.history?.map((item: { createdAt: Timestamp; content: string }) => ({
+					...item,
+					createdAt: item.createdAt.toDate()
+				})) || [],
 			content: data.content || '',
 			createdAt: data.createdAt?.toDate(),
 			updatedAt: data.updatedAt?.toDate(),
@@ -521,6 +532,11 @@ export class FirestoreService extends FirestoreUtils {
 			const data = doc.data();
 			const publicUser = await this.GetPublicUserById(data.userId);
 
+			// Skip reactions that have a commentId (these are comment reactions)
+			if (data.commentId) {
+				return null;
+			}
+
 			return {
 				...data,
 				createdAt: data.createdAt?.toDate(),
@@ -529,7 +545,9 @@ export class FirestoreService extends FirestoreUtils {
 			} as IReaction;
 		});
 
-		return Promise.all(reactionPromises);
+		const results = await Promise.all(reactionPromises);
+		// Filter out null values (comment reactions that were skipped)
+		return results.filter((reaction): reaction is IReaction => reaction !== null);
 	}
 
 	static async GetCommentReactions({
@@ -556,6 +574,7 @@ export class FirestoreService extends FirestoreUtils {
 
 			return {
 				...data,
+				id: doc.id,
 				createdAt: data.createdAt?.toDate(),
 				updatedAt: data.updatedAt?.toDate(),
 				publicUser
@@ -581,6 +600,7 @@ export class FirestoreService extends FirestoreUtils {
 
 		return {
 			...data,
+			id: reactionDocSnapshot.id,
 			createdAt: data.createdAt?.toDate(),
 			updatedAt: data.updatedAt?.toDate(),
 			publicUser
@@ -1031,6 +1051,7 @@ export class FirestoreService extends FirestoreUtils {
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			isDeleted: false,
+			history: [],
 			indexOrHash,
 			parentCommentId: parentCommentId || null,
 			dataSource: EDataSource.POLKASSEMBLY,
@@ -1044,12 +1065,20 @@ export class FirestoreService extends FirestoreUtils {
 	}
 
 	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: string; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
+		const comment = await this.GetCommentById(commentId);
+
+		if (!comment) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
+		}
+
+		const history: ICommentHistoryItem[] = [...(comment?.history || []), { content: comment?.content, createdAt: comment?.updatedAt || new Date() }];
 		const newCommentData: Partial<IComment> = {
 			content,
 			...(isSpam && { isSpam }),
 			...(aiSentiment && { aiSentiment }),
 			updatedAt: new Date(),
-			dataSource: EDataSource.POLKASSEMBLY
+			dataSource: EDataSource.POLKASSEMBLY,
+			history
 		};
 
 		await this.commentsCollectionRef().doc(commentId).set(newCommentData, { merge: true });
@@ -1139,6 +1168,7 @@ export class FirestoreService extends FirestoreUtils {
 			.doc(reactionId)
 			.set(
 				{
+					id: reactionId,
 					network,
 					indexOrHash,
 					proposalType,

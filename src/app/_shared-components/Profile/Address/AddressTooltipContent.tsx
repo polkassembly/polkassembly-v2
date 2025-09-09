@@ -12,6 +12,7 @@ import { useUser } from '@/hooks/useUser';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { useToast } from '@/hooks/useToast';
 import { ShieldPlus } from 'lucide-react';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import ProfileImage from './ProfileImage';
 import UserStats from './UserStats';
 import SocialLinks from './SocialLinks';
@@ -140,7 +141,13 @@ function AddressTooltipContent({ address, userProfileUrl, displayText, identity,
 
 	return (
 		<div>
-			{isUserDataLoading ? <Skeleton className='mx-auto h-12 w-12 rounded-full' /> : <ProfileImage imageUrl={userData?.profileDetails?.image} />}
+			{isUserDataLoading ? (
+				<Skeleton className='mx-auto h-12 w-12 rounded-full' />
+			) : (
+				<ProfileImage
+					imageUrl={userData?.profileDetails?.image && ValidatorService.isValidImageSrc(userData?.profileDetails?.image) ? userData?.profileDetails?.image : undefined}
+				/>
+			)}
 			<div className={classes.tooltipContentWrapper}>
 				<div className='relative flex flex-col gap-1.5 border-solid pb-2 dark:border-none'>
 					<div className='flex flex-col gap-1.5 px-4'>

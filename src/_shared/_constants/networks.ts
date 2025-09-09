@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { BN } from '@polkadot/util';
-import { ENetwork, EPostOrigin, EGovType, EAssets } from '@shared/types';
+import { ENetwork, EPostOrigin, EGovType, EAssets, ENetworkSocial } from '@shared/types';
 import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
 import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
 import { FaYoutube } from '@react-icons/all-files/fa/FaYoutube';
@@ -38,7 +38,16 @@ const VIA_IBP_GEODNS1 = 'via IBP-GeoDNS1';
 const VIA_IBP_GEODNS2 = 'via IBP-GeoDNS2';
 const VIA_RADIUMBLOCK = 'via RadiumBlock';
 const VIA_LUCKYFRIDAY = 'via LuckyFriday';
-const VIA_PINKNODE = 'via Pinknode';
+const VIA_ALL_NODES = 'via All Nodes';
+const VIA_BLOCKOPS = 'via Blockops';
+const VIA_DWELLIR_TUNISIA = 'via Dwellir Tunisia';
+const VIA_HELIXSTREET = 'via HelixStreet';
+const VIA_IBP_1 = 'via IBP 1';
+const VIA_IBP_2 = 'via IBP 2';
+const VIA_PERMANENCE_DAO_EU = 'via Permanence DAO EU';
+const VIA_STAKETWORLD = 'via Stakeworld';
+const VIA_SIMPLY_STAKING = 'via Simply Staking';
+const VIA_SUBQUERY = 'via SubQuery';
 
 interface ITreasuryAsset {
 	name: string;
@@ -134,17 +143,6 @@ interface INetworkDetails {
 	};
 }
 
-enum ENetworkSocial {
-	HOME = 'home',
-	TWITTER = 'twitter',
-	DISCORD = 'discord',
-	GITHUB = 'github',
-	YOUTUBE = 'youtube',
-	REDDIT = 'reddit',
-	TELEGRAM = 'telegram',
-	SUBSCAN = 'subscan'
-}
-
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
 	[EAssets.DED]: { name: 'dot-is-ded', tokenDecimal: 10, symbol: 'DED', icon: DEDIcon },
 	[EAssets.USDT]: { name: 'usdt', tokenDecimal: 6, symbol: 'USDT', icon: USDTIcon },
@@ -162,12 +160,16 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 				url: 'wss://polkadot-people-rpc.polkadot.io'
 			},
 			{
+				name: VIA_DWELLIR,
+				url: 'wss://people-polkadot-rpc.n.dwellir.com'
+			},
+			{
 				name: VIA_LUCKYFRIDAY,
 				url: 'wss://rpc-people-polkadot.luckyfriday.io'
 			},
 			{
-				name: VIA_RADIUMBLOCK,
-				url: 'wss://people-polkadot.public.curie.radiumblock.co/ws'
+				name: VIA_ONFINALITY,
+				url: 'wss://people-polkadot.api.onfinality.io/public-ws'
 			},
 			{
 				name: VIA_IBP_GEODNS1,
@@ -176,6 +178,10 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 			{
 				name: VIA_IBP_GEODNS2,
 				url: 'wss://people-polkadot.dotters.network'
+			},
+			{
+				name: VIA_STAKETWORLD,
+				url: 'wss://dot-rpc.stakeworld.io/people'
 			}
 		]
 	},
@@ -255,7 +261,11 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 			},
 			{
 				name: VIA_DWELLIR,
-				url: 'wss://asset-hub-polkadot-rpc.dwellir.com'
+				url: 'wss://asset-hub-polkadot-rpc.n.dwellir.com'
+			},
+			{
+				name: VIA_DWELLIR_TUNISIA,
+				url: 'wss://statemint-rpc-tn.dwellir.com'
 			},
 			{
 				name: VIA_ONFINALITY,
@@ -272,6 +282,14 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 			{
 				name: VIA_LUCKYFRIDAY,
 				url: 'wss://rpc-asset-hub-polkadot.luckyfriday.io'
+			},
+			{
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://statemint.public.curie.radiumblock.co/ws'
+			},
+			{
+				name: VIA_STAKETWORLD,
+				url: 'wss://dot-rpc.stakeworld.io/assethub'
 			}
 		]
 	},
@@ -2496,36 +2514,72 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		tokenSymbol: 'DOT',
 		rpcEndpoints: [
 			{
-				name: `${VIA_PARITY} (recommended)`,
-				url: 'wss://rpc.polkadot.io'
+				name: `${VIA_ALL_NODES} (recommended)`,
+				url: 'wss://polkadot-rpc.publicnode.com'
+			},
+			{
+				name: VIA_BLOCKOPS,
+				url: 'wss://polkadot-public-rpc.blockops.network/ws'
+			},
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://polkadot-rpc.n.dwellir.com'
+			},
+			{
+				name: VIA_DWELLIR_TUNISIA,
+				url: 'wss://polkadot-rpc-tn.dwellir.com'
+			},
+			{
+				name: VIA_HELIXSTREET,
+				url: 'wss://rpc-polkadot.helixstreet.io'
+			},
+			{
+				name: VIA_IBP_1,
+				url: 'wss://rpc.ibp.network/polkadot'
+			},
+			{
+				name: VIA_IBP_2,
+				url: 'wss://polkadot.dotters.network'
+			},
+			{
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-polkadot.luckyfriday.io'
+			},
+			{
+				name: VIA_PERMANENCE_DAO_EU,
+				url: 'wss://rpc.permanence.io'
 			},
 			{
 				name: VIA_ONFINALITY,
 				url: 'wss://polkadot.api.onfinality.io/public-ws'
 			},
 			{
-				name: VIA_DWELLIR,
-				url: 'wss://polkadot-rpc.dwellir.com'
-			},
-			{
-				name: VIA_PINKNODE,
-				url: 'wss://public-rpc.pinknode.io/polkadot'
-			},
-			{
-				name: VIA_IBP_GEODNS1,
-				url: 'wss://rpc.ibp.network/polkadot'
-			},
-			{
-				name: VIA_IBP_GEODNS2,
-				url: 'wss://rpc.dotters.network/polkadot'
+				name: VIA_PERMANENCE_DAO_EU,
+				url: 'wss://polkadot.rpc.permanence.io'
 			},
 			{
 				name: VIA_RADIUMBLOCK,
 				url: 'wss://polkadot.public.curie.radiumblock.co/ws'
 			},
 			{
-				name: VIA_LUCKYFRIDAY,
-				url: 'wss://rpc-polkadot.luckyfriday.io'
+				name: VIA_ONFINALITY,
+				url: 'wss://polkadot.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_PERMANENCE_DAO_EU,
+				url: 'wss://polkadot.rpc.permanence.io'
+			},
+			{
+				name: VIA_SIMPLY_STAKING,
+				url: 'wss://spectrum-03.simplystaking.xyz/cG9sa2Fkb3QtMDMtOTFkMmYwZGYtcG9sa2Fkb3Q/LjwBJpV3dIKyWQ/polkadot/mainnet/'
+			},
+			{
+				name: VIA_STAKETWORLD,
+				url: 'wss://dot-rpc.stakeworld.io'
+			},
+			{
+				name: VIA_SUBQUERY,
+				url: 'wss://polkadot.rpc.subquery.network/public/ws'
 			}
 		],
 		supportedAssets: {
@@ -2653,19 +2707,19 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				url: 'wss://rpc-westend.luckyfriday.io'
 			},
 			{
-				name: 'via OnFinality',
+				name: VIA_ONFINALITY,
 				url: 'wss://westend.api.onfinality.io/public-ws'
 			},
 			{
-				name: 'via Parity',
+				name: VIA_PARITY,
 				url: 'wss://westend-rpc.polkadot.io'
 			},
 			{
-				name: 'via RadiumBlock',
+				name: VIA_RADIUMBLOCK,
 				url: 'wss://westend.public.curie.radiumblock.co/ws'
 			},
 			{
-				name: 'via Stakeworld',
+				name: VIA_STAKETWORLD,
 				url: 'wss://wnd-rpc.stakeworld.io'
 			}
 		],

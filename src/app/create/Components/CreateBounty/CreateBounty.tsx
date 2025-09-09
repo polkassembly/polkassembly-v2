@@ -29,6 +29,7 @@ import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Input } from '@/app/_shared-components/Input';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 
 enum ECreateBountyOptions {
 	BOUNTY_EXISTS = 'bountyExists',
@@ -41,6 +42,8 @@ function CreateBounty({ onSuccess }: { onSuccess: (proposalId: number) => void }
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const { userPreferences } = useUserPreferences();
+
+	const { setVaultQrState } = usePolkadotVault();
 
 	const [bountyOption, setBountyOption] = useState<ECreateBountyOptions>(ECreateBountyOptions.NEW_BOUNTY);
 
@@ -120,7 +123,7 @@ function CreateBounty({ onSuccess }: { onSuccess: (proposalId: number) => void }
 	}, [existingBountyData, userPreferences.selectedAccount?.address]);
 
 	const createProposal = async (id: number) => {
-		if (!apiService || !userPreferences.selectedAccount?.address || !id || !selectedTrack) {
+		if (!apiService || !userPreferences.selectedAccount?.address || !id || !selectedTrack || !userPreferences.wallet) {
 			setLoading(false);
 			toast({
 				title: t('CreateTreasuryProposal.invalidParameters'),
@@ -145,6 +148,8 @@ function CreateBounty({ onSuccess }: { onSuccess: (proposalId: number) => void }
 		setLoading(true);
 		apiService.createProposal({
 			address: userPreferences.selectedAccount.address,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
 			track: selectedTrack.name,
 			extrinsicFn: proposalTx,
 			enactment: selectedEnactment,
@@ -170,7 +175,7 @@ function CreateBounty({ onSuccess }: { onSuccess: (proposalId: number) => void }
 	};
 
 	const proposeBounty = async () => {
-		if (!apiService || bountyAmount.isZero() || !userPreferences.selectedAccount?.address) {
+		if (!apiService || bountyAmount.isZero() || !userPreferences.selectedAccount?.address || !userPreferences.wallet) {
 			setLoading(false);
 			return;
 		}
@@ -179,6 +184,8 @@ function CreateBounty({ onSuccess }: { onSuccess: (proposalId: number) => void }
 
 		await apiService.proposeBounty({
 			address: userPreferences.selectedAccount.address,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
 			bountyAmount,
 			onSuccess: (id) => {
 				setBountyId(id);

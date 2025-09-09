@@ -4,7 +4,7 @@
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FaRegClock } from '@react-icons/all-files/fa/FaRegClock';
-import { EAssets, EProposalType, ETheme, IPostListing, IPostOffChainMetrics } from '@/_shared/types';
+import { EAssets, EGovType, EProposalType, ETheme, IPostListing, IPostOffChainMetrics } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image from 'next/image';
@@ -19,7 +19,7 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/Tooltip';
 import { calculateDecisionProgress } from '@/app/_client-utils/calculateDecisionProgress';
 import { Progress } from '@/app/_shared-components/Progress/Progress';
-import { groupBeneficiariesByAsset } from '@/app/_client-utils/beneficiaryUtils';
+import { groupBeneficiariesByAssetIndex } from '@/app/_client-utils/beneficiaryUtils';
 import { calculatePercentage } from '@/app/_client-utils/calculatePercentage';
 import { BN } from '@polkadot/util';
 import { redirectFromServer } from '@/app/_client-utils/redirectFromServer';
@@ -28,8 +28,9 @@ import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ARCHIVE_PROPOSAL_TYPES } from '@/_shared/_constants/archiveProposalTypes';
-import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
+import styles from './ListingCard.module.scss';
+import UserAvatar from '../../UserAvatar/UserAvatar';
 
 function ListingCard({
 	title,
@@ -60,9 +61,11 @@ function ListingCard({
 	const timeRemaining = data.onChainInfo?.decisionPeriodEndsAt ? getTimeRemaining(data.onChainInfo?.decisionPeriodEndsAt) : null;
 	const formattedTime = timeRemaining ? `Deciding ends in ${timeRemaining.days}d : ${timeRemaining.hours}hrs : ${timeRemaining.minutes}mins` : 'Decision period has ended.';
 
-	const groupedByAsset = groupBeneficiariesByAsset(data.onChainInfo?.beneficiaries || [], network);
+	const groupedByAsset = groupBeneficiariesByAssetIndex({ beneficiaries: data.onChainInfo?.beneficiaries || [], network });
 
-	const redirectUrl = getPostTypeUrl({ proposalType, indexOrHash: index, network });
+	const redirectUrl = ARCHIVE_PROPOSAL_TYPES.includes(proposalType)
+		? getPostTypeUrl({ proposalType, indexOrHash: index, network, govType: EGovType.GOV_1 })
+		: getPostTypeUrl({ proposalType, indexOrHash: index, network });
 
 	return (
 		<Link
@@ -85,16 +88,14 @@ function ListingCard({
 						<h3 className={styles.titleText}>{title}</h3>
 						<div className={styles.infoContainer}>
 							<div className='flex items-center gap-2'>
-								{data.onChainInfo?.proposer && (
+								{data.onChainInfo?.proposer ? (
 									<>
 										<Address address={data.onChainInfo?.proposer} />
 										<span>|</span>
 									</>
-								)}
-
-								{!data.onChainInfo?.proposer && data.publicUser?.username && (
+								) : (
 									<>
-										<span>{data.publicUser?.username}</span>
+										<UserAvatar publicUser={data.publicUser} />
 										<span>|</span>
 									</>
 								)}
@@ -123,7 +124,7 @@ function ListingCard({
 										src={CommentIcon}
 										alt='comments'
 										width={16}
-										className={userPreferences.theme === ETheme.DARK ? 'dark-icons' : ''}
+										className={userPreferences.theme === ETheme.DARK ? 'darkIcon' : ''}
 										height={16}
 									/>
 									<span className='text-text_primary'>{metrics?.comments || 0}</span>
@@ -197,80 +198,82 @@ function ListingCard({
 				</div>
 
 				<div className={styles.tagContainer}>
-					{data.onChainInfo?.beneficiaries && data.onChainInfo?.beneficiaries.length > 0 && groupBeneficiariesByAsset(data.onChainInfo?.beneficiaries, network) && (
-						<div className={styles.beneficiaryContainer}>
-							{Object.keys(groupedByAsset).length > 1 ? (
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<div className='flex items-center gap-1'>
-											<div className='flex items-center -space-x-1.5'>
-												{Object.entries(groupedByAsset).map(([assetId]) => {
-													const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
-													const icon = treasuryAssetsData[unit as EAssets]?.icon || NETWORKS_DETAILS[`${network}`].logo;
+					{data.onChainInfo?.beneficiaries &&
+						data.onChainInfo?.beneficiaries.length > 0 &&
+						groupBeneficiariesByAssetIndex({ beneficiaries: data.onChainInfo?.beneficiaries, network }) && (
+							<div className={styles.beneficiaryContainer}>
+								{Object.keys(groupedByAsset).length > 1 ? (
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<div className='flex items-center gap-1'>
+												<div className='flex items-center -space-x-1.5'>
+													{Object.entries(groupedByAsset).map(([assetId]) => {
+														const unit = NETWORKS_DETAILS[`${network}`]?.supportedAssets?.[`${assetId}`]?.symbol || NETWORKS_DETAILS[`${network}`]?.tokenSymbol || assetId;
+														const icon = treasuryAssetsData[unit as EAssets]?.icon || NETWORKS_DETAILS[`${network}`].logo;
+														return (
+															<Image
+																key={assetId}
+																className='rounded-full'
+																src={icon}
+																alt={unit}
+																width={18}
+																height={18}
+															/>
+														);
+													})}
+												</div>
+												<span className='block lg:hidden'>|</span>
+											</div>
+										</TooltipTrigger>
+										<TooltipContent
+											side='top'
+											align='center'
+										>
+											<div className={styles.assetContainer}>
+												{Object.entries(groupedByAsset).map(([assetId, amount]) => {
 													return (
-														<Image
-															key={assetId}
-															className='rounded-full'
-															src={icon}
-															alt={unit}
-															width={18}
-															height={18}
-														/>
+														<div key={assetId}>
+															~{' '}
+															{formatUSDWithUnits(
+																formatBnBalance(
+																	amount.toString(),
+																	{ withUnit: true, numberAfterComma: 2 },
+																	network,
+																	assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
+																)
+															)}{' '}
+														</div>
 													);
 												})}
 											</div>
+										</TooltipContent>
+									</Tooltip>
+								) : (
+									Object.entries(groupedByAsset).map(([assetId, amount]) => (
+										<div
+											className={styles.requestedAmount}
+											key={assetId}
+										>
+											<span className='whitespace-nowrap'>
+												{formatUSDWithUnits(
+													formatBnBalance(
+														amount.toString(),
+														{ withUnit: true, numberAfterComma: 2 },
+														network,
+														assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
+													)
+												)}
+											</span>
 											<span className='block lg:hidden'>|</span>
 										</div>
-									</TooltipTrigger>
-									<TooltipContent
-										side='top'
-										align='center'
-									>
-										<div className={styles.assetContainer}>
-											{Object.entries(groupedByAsset).map(([assetId, amount]) => {
-												return (
-													<div key={assetId}>
-														~{' '}
-														{formatUSDWithUnits(
-															formatBnBalance(
-																amount.toString(),
-																{ withUnit: true, numberAfterComma: 2 },
-																network,
-																assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
-															)
-														)}{' '}
-													</div>
-												);
-											})}
-										</div>
-									</TooltipContent>
-								</Tooltip>
-							) : (
-								Object.entries(groupedByAsset).map(([assetId, amount]) => (
-									<div
-										className={styles.requestedAmount}
-										key={assetId}
-									>
-										<span className='whitespace-nowrap'>
-											{formatUSDWithUnits(
-												formatBnBalance(
-													amount.toString(),
-													{ withUnit: true, numberAfterComma: 2 },
-													network,
-													assetId === NETWORKS_DETAILS[`${network}`].tokenSymbol ? null : assetId
-												)
-											)}
-										</span>
-										<span className='block lg:hidden'>|</span>
-									</div>
-								))
-							)}
-						</div>
-					)}
+									))
+								)}
+							</div>
+						)}
 
 					{data.onChainInfo?.status && (
 						<div className='flex'>
-							<StatusTag status={data.onChainInfo?.status.toLowerCase().replace(/\s+/g, '_')} />
+							<StatusTag status={data.onChainInfo?.status} />
 						</div>
 					)}
 				</div>

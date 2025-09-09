@@ -54,7 +54,7 @@ export async function updatePostServer({
 	await OffChainDbService.DeleteContentSummary({ network, proposalType, indexOrHash });
 
 	// Invalidate caches
-	Promise.all([
+	await Promise.all([
 		RedisService.DeletePostData({ network, proposalType, indexOrHash }),
 		RedisService.DeletePostsListing({ network, proposalType }),
 		RedisService.DeleteContentSummary({ network, indexOrHash, proposalType }),

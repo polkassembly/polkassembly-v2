@@ -38,7 +38,9 @@ import {
 	ESocialVerificationStatus,
 	ESocial,
 	IPostLink,
-	IOffChainPollPayload
+	IOffChainPollPayload,
+	IBeneficiary,
+	EAssets
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -48,6 +50,9 @@ import { StatusCodes } from 'http-status-codes';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { ON_CHAIN_ACTIVITY_NAMES } from '@/_shared/_constants/onChainActivityNames';
 import { OFF_CHAIN_PROPOSAL_TYPES } from '@/_shared/_constants/offChainProposalTypes';
+import dayjs from 'dayjs';
+import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
+import { convertAssetToUSD } from '@/app/_client-utils/convertAssetToUSD';
 import { APIError } from '../../_api-utils/apiError';
 import { SubsquareOffChainService } from './subsquare_offchain_service';
 import { FirestoreService } from './firestore_service';
@@ -171,7 +176,7 @@ export class OffChainDbService {
 			title: DEFAULT_POST_TITLE,
 			content,
 			tags: [],
-			dataSource: EDataSource.POLKASSEMBLY,
+			dataSource: EDataSource.OTHER,
 			proposalType,
 			network,
 			metrics: postMetrics,
@@ -969,5 +974,35 @@ export class OffChainDbService {
 
 	static async GetPollVotes({ network, proposalType, index, pollId }: { network: ENetwork; proposalType: EProposalType; index: number; pollId: string }) {
 		return FirestoreService.GetPollVotes({ network, proposalType, index, pollId });
+	}
+
+	static async GetBeneficiariesWithUsdAmount({ network, beneficiaries }: { network: ENetwork; beneficiaries: IBeneficiary[] }) {
+		const treasuryStats = await FirestoreService.GetTreasuryStats({ network, from: dayjs().subtract(1, 'hour').toDate(), to: dayjs().toDate(), limit: 1, page: 1 });
+
+		if (!treasuryStats) {
+			return beneficiaries;
+		}
+
+		if (!treasuryStats[0]?.nativeTokenUsdPrice && !treasuryStats[0]?.dedTokenUsdPrice) {
+			return beneficiaries;
+		}
+		return beneficiaries?.map((beneficiary) => {
+			const assetSymbol = beneficiary.assetId
+				? (getAssetDataByIndexForNetwork({
+						network,
+						generalIndex: beneficiary.assetId
+					}).symbol as Exclude<EAssets, EAssets.MYTH>)
+				: null;
+
+			const usdAmount = convertAssetToUSD({
+				amount: beneficiary.amount,
+				asset: assetSymbol,
+				currentTokenPrice: treasuryStats[0]?.nativeTokenUsdPrice,
+				dedTokenUsdPrice: treasuryStats[0]?.dedTokenUsdPrice,
+				network
+			})?.toString();
+
+			return { ...beneficiary, usdAmount };
+		});
 	}
 }

@@ -55,7 +55,14 @@ import {
 	IPostBubbleVotes,
 	EAnalyticsType,
 	EVotesDisplayType,
-	IProxyListingResponse
+	IProxyListingResponse,
+	IProfileVote,
+	EProposalStatus,
+	IGovAnalyticsStats,
+	IGovAnalyticsReferendumOutcome,
+	IRawTurnoutData,
+	IGovAnalyticsDelegationStats,
+	IGovAnalyticsCategoryCounts
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -89,6 +96,7 @@ enum EApiRoute {
 	ADD_COMMENT = 'ADD_COMMENT',
 	GET_ACTIVITY_FEED = 'GET_ACTIVITY_FEED',
 	GET_VOTES_HISTORY = 'GET_VOTES_HISTORY',
+	GET_POST_VOTES_BY_ADDRESS = 'GET_POST_VOTES_BY_ADDRESS',
 	ADD_POST_REACTION = 'ADD_POST_REACTION',
 	DELETE_REACTION = 'DELETE_REACTION',
 	PUBLIC_USER_DATA_BY_ID = 'PUBLIC_USER_DATA_BY_ID',
@@ -146,7 +154,12 @@ enum EApiRoute {
 	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
 	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES',
 	FETCH_PROXY_REQUESTS = 'FETCH_PROXY_REQUESTS',
-	FETCH_MY_PROXIES = 'FETCH_MY_PROXIES'
+	FETCH_MY_PROXIES = 'FETCH_MY_PROXIES',
+	ADD_COMMENT_REACTION = 'ADD_COMMENT_REACTION',
+	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
+	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES',
+	GET_GOV_ANALYTICS = 'GET_GOV_ANALYTICS',
+	GET_TRACK_COUNTS = 'GET_TRACK_COUNTS'
 }
 
 export class NextApiClientService {
@@ -199,6 +212,9 @@ export class NextApiClientService {
 			case EApiRoute.FETCH_LEADERBOARD:
 				path = '/users';
 				break;
+			case EApiRoute.GET_VOTES_BY_ADDRESSES:
+				path = '/users/votes';
+				break;
 			case EApiRoute.FETCH_PREIMAGES:
 				path = '/preimages';
 				break;
@@ -246,6 +262,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_ON_CHAIN_METADATA_FOR_POST:
 			case EApiRoute.GET_COMMENTS:
 			case EApiRoute.GET_VOTES_HISTORY:
+			case EApiRoute.GET_POST_VOTES_BY_ADDRESS:
 			case EApiRoute.GET_CONTENT_SUMMARY:
 			case EApiRoute.FETCH_CHILD_BOUNTIES:
 			case EApiRoute.GET_VOTE_CURVES:
@@ -265,6 +282,12 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
 				path = '/track-analytics';
+				break;
+			case EApiRoute.GET_TRACK_COUNTS:
+				path = '/track-counts';
+				break;
+			case EApiRoute.GET_GOV_ANALYTICS:
+				path = '/gov-analytics';
 				break;
 			case EApiRoute.FETCH_PROXY_REQUESTS:
 				path = '/proxies/requests';
@@ -333,6 +356,7 @@ export class NextApiClientService {
 			case EApiRoute.ADD_COMMENT:
 			case EApiRoute.ADD_POST_SUBSCRIPTION:
 			case EApiRoute.ADD_POST_REACTION:
+			case EApiRoute.ADD_COMMENT_REACTION:
 				method = 'POST';
 				break;
 			case EApiRoute.JUDGEMENT_CALL:
@@ -366,6 +390,7 @@ export class NextApiClientService {
 			case EApiRoute.DELETE_REACTION:
 			case EApiRoute.DELETE_POST_SUBSCRIPTION:
 			case EApiRoute.DELETE_COMMENT:
+			case EApiRoute.DELETE_COMMENT_REACTION:
 				method = 'DELETE';
 				break;
 
@@ -688,6 +713,24 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IVoteHistoryData>({ url, method });
 	}
 
+	static async getPostVotesByAddresses({ proposalType, index, addresses }: { proposalType: EProposalType; index: string; addresses: string[] }) {
+		const queryParams = new URLSearchParams({
+			page: '1',
+			limit: addresses.length.toString()
+		});
+
+		if (addresses.length) {
+			addresses.forEach((address) => queryParams.append('address', address));
+		}
+
+		const { url, method } = await NextApiClientService.getRouteConfig({
+			route: EApiRoute.GET_POST_VOTES_BY_ADDRESS,
+			routeSegments: [proposalType, index, 'votes', 'address'],
+			queryParams
+		});
+		return NextApiClientService.nextApiClientFetch<IVoteHistoryData>({ url, method });
+	}
+
 	// activity feed
 	static async fetchActivityFeed({ page, origins, limit = DEFAULT_LISTING_LIMIT, userId }: { page: number; origins?: EPostOrigin[]; limit?: number; userId?: number }) {
 		if (this.isServerSide()) {
@@ -991,6 +1034,18 @@ export class NextApiClientService {
 	}
 
 	static async getDelegateTrack({ address, trackId }: { address: string; trackId: number }) {
+		const network = getCurrentNetwork();
+
+		// Check if it's a valid number first
+		if (!ValidatorService.isValidNumber(trackId)) {
+			throw new Error('Invalid track ID: must be a valid number');
+		}
+
+		// Check if it's a valid track number for the network
+		if (!ValidatorService.isValidTrackNumber({ trackNum: trackId, network })) {
+			throw new Error(`Track ID ${trackId} is not valid for network ${network}`);
+		}
+
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks', trackId.toString()] });
 		return this.nextApiClientFetch<ITrackDelegationDetails>({ url, method });
 	}
@@ -1085,6 +1140,11 @@ export class NextApiClientService {
 	static async getTrackAnalyticsDelegations({ origin }: { origin: EPostOrigin | 'all' }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TRACK_ANALYTICS, routeSegments: [origin, 'delegations'] });
 		return this.nextApiClientFetch<ITrackAnalyticsDelegations>({ url, method });
+	}
+
+	static async getTrackCounts() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TRACK_COUNTS });
+		return this.nextApiClientFetch<Record<string, number>>({ url, method });
 	}
 
 	static async fetchOverviewData(): Promise<{
@@ -1192,6 +1252,111 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_BUBBLE_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-bubble'], queryParams });
 		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method });
+	}
+
+	static async addCommentReaction(proposalType: EProposalType, index: string, commentId: string, reactionType: EReaction) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_COMMENT_REACTION, routeSegments: [proposalType, index, 'comments', commentId, 'reactions'] });
+		return this.nextApiClientFetch<{ message: string; reactionId: string }>({ url, method, data: { reaction: reactionType } });
+	}
+
+	static async deleteCommentReaction(proposalType: EProposalType, index: string, commentId: string, reactionId: string) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.DELETE_COMMENT_REACTION,
+			routeSegments: [proposalType, index, 'comments', commentId, 'reactions', reactionId]
+		});
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
+	}
+
+	static async getVotesByAddresses({ addresses, page, limit, proposalStatuses }: { addresses: string[]; page: number; limit: number; proposalStatuses?: EProposalStatus[] }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+
+		if (addresses.length) {
+			addresses.forEach((address) => queryParams.append('address', address));
+		}
+
+		if (proposalStatuses?.length) {
+			proposalStatuses.forEach((status) => queryParams.append('proposalStatus', status));
+		}
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_BY_ADDRESSES, queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IProfileVote>>({ url, method });
+	}
+
+	static async getGovAnalyticsStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['stats'] });
+		return this.nextApiClientFetch<IGovAnalyticsStats>({ url, method });
+	}
+
+	static async getGovAnalyticsReferendumOutcome({ trackNo }: { trackNo?: number }) {
+		// Validate trackNo if provided, but allow 0 (ROOT track)
+		if (trackNo !== undefined && trackNo !== null) {
+			const network = getCurrentNetwork();
+
+			// Check if it's a valid number first
+			if (!ValidatorService.isValidNumber(trackNo)) {
+				throw new Error('Invalid track number: must be a valid number');
+			}
+
+			// Check if it's a valid track number for the network
+			if (!ValidatorService.isValidTrackNumber({ trackNum: trackNo, network })) {
+				throw new Error(`Track number ${trackNo} is not valid for network ${network}`);
+			}
+
+			const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['referendum-outcome', 'track', trackNo.toString()] });
+			return this.nextApiClientFetch<IGovAnalyticsReferendumOutcome>({ url, method });
+		}
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['referendum-outcome'] });
+		return this.nextApiClientFetch<IGovAnalyticsReferendumOutcome>({ url, method });
+	}
+
+	static async getGovAnalyticsReferendumCount() {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_GOV_ANALYTICS,
+			routeSegments: ['referendum-count']
+		});
+
+		return this.nextApiClientFetch<{
+			categoryCounts: IGovAnalyticsCategoryCounts;
+		}>({
+			method,
+			url
+		});
+	}
+
+	static async getTurnoutData() {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_GOV_ANALYTICS,
+			routeSegments: ['turnout-percentage']
+		});
+
+		return this.nextApiClientFetch<IRawTurnoutData>({
+			method,
+			url
+		});
+	}
+
+	static async getTrackDelegationAnalyticsStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['track-delegation'] });
+		return this.nextApiClientFetch<IGovAnalyticsDelegationStats[]>({ url, method });
+	}
+
+	static async getTrackLevelProposalsAnalytics() {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_GOV_ANALYTICS,
+			routeSegments: ['track-proposals']
+		});
+
+		return this.nextApiClientFetch<{
+			data: Record<number, number>;
+			totalProposals: number;
+		}>({
+			method,
+			url
+		});
 	}
 
 	static async fetchProxyRequests({ page, limit, search }: { page: number; limit: number; search?: string }) {

@@ -19,6 +19,7 @@ import { APIError } from '../../_api-utils/apiError';
 import { RedisService } from '../redis_service';
 import { OnChainDbService } from '../onchain_db_service';
 import { OffChainDbService } from '../offchain_db_service';
+import { AlgoliaService } from '../algolia_service';
 
 if (!TOOLS_PASSPHRASE) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'TOOLS_PASSPHRASE is not set');
@@ -68,7 +69,8 @@ export class WebhookService {
 		}),
 		[EWebhookEvent.VOTED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
-			proposalType: z.nativeEnum(EProposalType)
+			proposalType: z.nativeEnum(EProposalType),
+			address: z.string().refine((address) => ValidatorService.isValidWeb3Address(address), ERROR_MESSAGES.INVALID_EVM_ADDRESS)
 		}),
 		[EWebhookEvent.BOUNTY_CLAIMED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
@@ -130,7 +132,22 @@ export class WebhookService {
 		const params = this.zodEventBodySchemas[webhookEvent as EWebhookEvent].parse(body);
 
 		switch (webhookEvent) {
-			case EWebhookEvent.PROPOSAL_CREATED:
+			case EWebhookEvent.PROPOSAL_CREATED: {
+				const parsedParams = params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_CREATED]>;
+
+				return Promise.allSettled([
+					AlgoliaService.createPreliminaryAlgoliaPostRecord({
+						network,
+						indexOrHash: parsedParams.indexOrHash,
+						proposalType: parsedParams.proposalType
+					}),
+					this.handleProposalStatusChanged({
+						network,
+						params: parsedParams,
+						event: webhookEvent
+					})
+				]);
+			}
 			case EWebhookEvent.PROPOSAL_ENDED:
 			case EWebhookEvent.BOUNTY_CLAIMED:
 			case EWebhookEvent.DECISION_DEPOSIT_PLACED:
@@ -230,7 +247,8 @@ export class WebhookService {
 			RedisService.DeletePostsListing({ network, proposalType }),
 			RedisService.DeleteActivityFeed({ network }),
 			RedisService.DeleteAllSubscriptionFeedsForNetwork(network),
-			RedisService.DeleteOverviewPageData({ network })
+			RedisService.DeleteOverviewPageData({ network }),
+			RedisService.DeleteTrackCounts({ network })
 		]);
 
 		// Refresh above caches

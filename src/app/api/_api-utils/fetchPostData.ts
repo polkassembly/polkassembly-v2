@@ -45,7 +45,7 @@ export async function fetchPostData({ network, proposalType, indexOrHash }: { ne
 
 		post = {
 			...offChainPostData,
-			dataSource: offChainPostData?.dataSource || EDataSource.POLKASSEMBLY,
+			dataSource: offChainPostData?.dataSource || EDataSource.OTHER,
 			proposalType: proposalType as EProposalType,
 			network: network as ENetwork,
 			onChainInfo: onChainPostInfo
