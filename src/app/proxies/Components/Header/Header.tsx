@@ -8,7 +8,6 @@ import { useTranslations } from 'next-intl';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
 import Link from 'next/link';
 import { EProxyDashboardTabs } from '@/_shared/types';
-import { Button } from '@/app/_shared-components/Button';
 import { Pencil } from 'lucide-react';
 import styles from './Header.module.scss';
 
@@ -21,8 +20,12 @@ function Header({ data }: { data: { allProxiesCount: number } }) {
 				<div className={styles.header_title_container}>
 					<p className={styles.header_title}>{t('Proxies.proxyExplorer')}</p>
 					<div className={styles.header_button_container}>
-						<Link href='/create'>
-							<Button leftIcon={<Pencil size={16} />}>{t('Proxies.createProxy')}</Button>
+						<Link
+							href='/create'
+							className={styles.header_create_button}
+						>
+							<Pencil size={16} />
+							<span>{t('Proxies.createProxy')}</span>
 						</Link>
 					</div>
 				</div>
