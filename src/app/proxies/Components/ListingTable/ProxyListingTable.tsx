@@ -89,6 +89,7 @@ function ProxyListingTable({ data, totalCount }: { data: IProxyRequest[]; totalC
 														<Address
 															truncateCharLen={5}
 															address={proxy.delegator}
+															redirectToProfile={false}
 														/>
 													</div>
 												</td>
