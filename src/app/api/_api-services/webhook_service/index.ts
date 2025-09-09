@@ -228,7 +228,7 @@ export class WebhookService {
 			}),
 			RedisService.DeletePostBubbleVotesData({ network, proposalType, index: Number(indexOrHash), votesType: EVotesDisplayType.FLATTENED, analyticsType: EAnalyticsType.VOTES }),
 			RedisService.DeletePostBubbleVotesData({ network, proposalType, index: Number(indexOrHash), votesType: EVotesDisplayType.NESTED, analyticsType: EAnalyticsType.VOTES }),
-			RedisService.DeleteUserVotesByAddress({ network, address })
+			...(address ? [RedisService.DeleteUserVotesByAddress({ network, address })] : [])
 		]);
 	}
 
