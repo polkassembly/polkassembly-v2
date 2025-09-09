@@ -52,8 +52,8 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 	const createdAt = postData.createdAt || postData.onChainInfo?.createdAt;
 
 	return (
-		<div className='mx-auto w-full px-4 sm:px-6 lg:max-w-7xl'>
-			<div className='mb-4 flex items-center gap-x-1'>
+		<div className='mx-auto w-full lg:max-w-7xl'>
+			<div className='mb-4 flex items-center gap-x-1 px-4 sm:px-6'>
 				<ArrowLeftIcon className='h-3 w-4' />
 				<Link
 					href={getPostListingUrl({ proposalType: postData.proposalType, origin: postData.onChainInfo?.origin })}
@@ -85,7 +85,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 					</>
 				)}
 			</div>
-			<div className='mb-4'>
+			<div className='mb-4 px-4 sm:px-6'>
 				<p className={classes.postTitle}>{postData.title}</p>
 				<div className={classes.proposerWrapper}>
 					<div className='flex flex-wrap items-center gap-x-2 gap-y-2'>
