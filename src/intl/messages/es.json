@@ -133,6 +133,7 @@
 	},
 	"Profile": {
 		"noAddresses": "No se encontraron direcciones vinculadas",
+		"blacklistWarning": "Esta cuenta de usuario ha sido marcada por violar las pautas de la comunidad.",
 		"settings": "Configuración",
 		"login": "Iniciar sesión",
 		"loginFailed": "Error al iniciar sesión",
@@ -448,6 +449,12 @@
 		"Treasury": "Tesorería",
 		"LeaseAdmin": "Admin de Arrendamiento",
 		"GeneralAdmin": "Admin General",
+		"chatWithKlara": "Chat con Klara",
+		"more": "Más",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "Analíticas",
+		"treasuryAnalytics": "Analíticas de Tesorería",
+		"proxies": "Proxies",
 		"Tag": {
 			"new": "Nuevo"
 		}
@@ -488,6 +495,9 @@
 		"votingStarted": "La votación ha comenzado",
 		"preparePeriod": "Período de Preparación",
 		"decisionPeriod": "Período de Decisión",
+		"votingPeriod": "Período de Votación",
+		"enactmentPeriod": "Período de Promulgación",
+		"enactmentDescription": "Ejecución de Ref después de completar este período",
 		"summary": "Resumen",
 		"summarise": "Resumen",
 		"aye": "Sí",

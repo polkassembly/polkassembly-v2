@@ -133,7 +133,7 @@ function ListingCard({
 										src={CommentIcon}
 										alt='comments'
 										width={16}
-										className={userPreferences.theme === ETheme.DARK ? 'dark-icons' : ''}
+										className={userPreferences.theme === ETheme.DARK ? 'darkIcon' : ''}
 										height={16}
 									/>
 									<span className='text-text_primary'>{metrics?.comments || 0}</span>
@@ -282,7 +282,7 @@ function ListingCard({
 
 					{data.onChainInfo?.status && (
 						<div className='flex'>
-							<StatusTag status={data.onChainInfo?.status.toLowerCase().replace(/\s+/g, '_')} />
+							<StatusTag status={data.onChainInfo?.status} />
 						</div>
 					)}
 				</div>

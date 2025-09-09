@@ -155,7 +155,8 @@ enum EApiRoute {
 	ADD_COMMENT_REACTION = 'ADD_COMMENT_REACTION',
 	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
 	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES',
-	GET_GOV_ANALYTICS = 'GET_GOV_ANALYTICS'
+	GET_GOV_ANALYTICS = 'GET_GOV_ANALYTICS',
+	GET_TRACK_COUNTS = 'GET_TRACK_COUNTS'
 }
 
 export class NextApiClientService {
@@ -278,6 +279,9 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
 				path = '/track-analytics';
+				break;
+			case EApiRoute.GET_TRACK_COUNTS:
+				path = '/track-counts';
 				break;
 			case EApiRoute.GET_GOV_ANALYTICS:
 				path = '/gov-analytics';
@@ -1126,6 +1130,11 @@ export class NextApiClientService {
 	static async getTrackAnalyticsDelegations({ origin }: { origin: EPostOrigin | 'all' }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TRACK_ANALYTICS, routeSegments: [origin, 'delegations'] });
 		return this.nextApiClientFetch<ITrackAnalyticsDelegations>({ url, method });
+	}
+
+	static async getTrackCounts() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TRACK_COUNTS });
+		return this.nextApiClientFetch<Record<string, number>>({ url, method });
 	}
 
 	static async fetchOverviewData(): Promise<{

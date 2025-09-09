@@ -16,11 +16,23 @@
 }
 
 .descBox {
-	@apply rounded-xl bg-bg_modal p-4 shadow-lg lg:p-6;
+	@apply rounded-xl border border-primary_border bg-bg_modal p-4 lg:p-6;
+
+	@media (max-width: 1279px) {
+		order: 1;
+	}
+
+	@media (max-width: 768px) {
+		@apply p-3;
+	}
 }
 
 .commentsBox {
-	@apply flex flex-col gap-y-4 rounded-xl bg-bg_modal shadow-lg;
+	@apply flex flex-col gap-y-4 rounded-xl border border-primary_border bg-bg_modal;
+
+	@media (max-width: 1279px) {
+		order: 3;
+	}
 }
 
 .modalDescBox {
@@ -29,46 +41,13 @@
 }
 
 .analyticsBox {
-	@apply rounded-xl bg-bg_modal p-4 shadow-lg lg:p-6;
+	@apply rounded-xl border border-border_grey bg-bg_modal p-4 lg:p-6;
+
+	@media (max-width: 768px) {
+		@apply p-3;
+	}
 }
 
 .modalOpen {
 	grid-template-columns: 1fr !important;
-}
-
-.detailsWrapper {
-	@media (max-width: 1279px) {
-		display: grid !important;
-		grid-template-columns: 1fr !important;
-		gap: 16px;
-		padding-left: 12px;
-		padding-right: 12px;
-	}
-}
-
-.leftWrapper {
-	@media (max-width: 1279px) {
-		display: block;
-		width: 100%;
-	}
-}
-
-.descBox {
-	@media (max-width: 1279px) {
-		order: 1;
-	}
-}
-
-.rightWrapper {
-	@media (max-width: 1279px) {
-		order: 2;
-	}
-}
-
-.commentsBox {
-	@apply mt-3;
-
-	@media (max-width: 1279px) {
-		order: 3;
-	}
 }
