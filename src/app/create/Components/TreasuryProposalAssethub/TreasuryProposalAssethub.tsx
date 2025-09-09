@@ -25,9 +25,9 @@ import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPic
 import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
-import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
 import { convertAssetToUSD } from '@/app/_client-utils/convertAssetToUSD';
 import { decimalToBN } from '@/_shared/_utils/decimalToBN';
+import { NATIVE_TOKEN_PRICE_FOR_TRACKS } from '@/_shared/_constants/nativeTokenPriceForTracks';
 
 const calculateNativeTokenEquivalent = ({
 	beneficiaries,
@@ -40,27 +40,34 @@ const calculateNativeTokenEquivalent = ({
 	currentTokenPrice?: string;
 	dedTokenUsdPrice?: string;
 }) => {
-	if (!currentTokenPrice || !beneficiaries?.length || !network) return BN_ZERO;
-	const totalUsdAmount = beneficiaries.reduce((acc, beneficiary) => {
-		const assetSymbol = beneficiary.assetId
-			? (getAssetDataByIndexForNetwork({
-					network,
-					generalIndex: beneficiary.assetId
-				}).symbol as unknown as Exclude<EAssets, EAssets.MYTH>)
-			: null;
+	if (!beneficiaries?.length || !network) return BN_ZERO;
 
-		const usdPrice = convertAssetToUSD({ amount: beneficiary.amount, asset: assetSymbol, network, currentTokenPrice, dedTokenUsdPrice });
-		return acc?.add(usdPrice || BN_ZERO);
+	return beneficiaries.reduce((acc, beneficiary) => {
+		if (!beneficiary.assetId) {
+			return acc.add(new BN(beneficiary.amount));
+		}
+
+		const nativeTokenDecimals = NETWORKS_DETAILS[`${network}`].tokenDecimals;
+
+		const nativeTokenUsdPrice = network === ENetwork.POLKADOT ? decimalToBN(NATIVE_TOKEN_PRICE_FOR_TRACKS) : currentTokenPrice ? decimalToBN(currentTokenPrice) : null;
+
+		const assetSymbol = NETWORKS_DETAILS[`${network}`].supportedAssets[`${beneficiary.assetId}`]?.symbol;
+
+		const assetUsdPrice = convertAssetToUSD({
+			amount: beneficiary.amount,
+			asset: assetSymbol as Exclude<EAssets, EAssets.MYTH>,
+			network,
+			currentTokenPrice,
+			dedTokenUsdPrice
+		});
+
+		const nativeTokenBN = assetUsdPrice
+			.mul(new BN(10).pow(new BN(nativeTokenDecimals)))
+			.mul(new BN(10).pow(new BN(nativeTokenUsdPrice?.decimals || 0)))
+			.div(nativeTokenUsdPrice?.value || BN_ZERO);
+
+		return acc.add(nativeTokenBN);
 	}, BN_ZERO);
-	const tokenDecimal = NETWORKS_DETAILS[`${network}`].tokenDecimals;
-
-	const nativeTokenUsdPrice = currentTokenPrice ? decimalToBN(currentTokenPrice) : null;
-	return nativeTokenUsdPrice
-		? totalUsdAmount
-				.mul(new BN(10).pow(new BN(tokenDecimal)))
-				.mul(new BN(10).pow(new BN(nativeTokenUsdPrice?.decimals || BN_ZERO.toString())))
-				.div(nativeTokenUsdPrice?.value || BN_ZERO)
-		: BN_ZERO;
 };
 
 function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: number) => void }) {
@@ -103,8 +110,7 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 	}, [apiService, beneficiaries]);
 
 	const totalNativeTokenAmount = useMemo(() => {
-		if (!tokensUsdPrice) return undefined;
-		return calculateNativeTokenEquivalent({ beneficiaries, network, currentTokenPrice: tokensUsdPrice.nativeTokenUsdPrice, dedTokenUsdPrice: tokensUsdPrice.dedTokenUsdPrice });
+		return calculateNativeTokenEquivalent({ beneficiaries, network, currentTokenPrice: tokensUsdPrice?.nativeTokenUsdPrice, dedTokenUsdPrice: tokensUsdPrice?.dedTokenUsdPrice });
 	}, [beneficiaries, network, tokensUsdPrice]);
 
 	const preimageDetails = useMemo(() => apiService && tx && apiService.getPreimageTxDetails({ extrinsicFn: tx }), [apiService, tx]);
