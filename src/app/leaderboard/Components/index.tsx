@@ -12,6 +12,8 @@ import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@ui/Table';
 import { PaginationWithLinks } from '@ui/PaginationWithLinks';
+import { Search } from 'lucide-react';
+import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
 import RankCard from './RankCard';
 import styles from './Leaderboard.module.scss';
 import LeadboardRow from './LeadboardTable';
@@ -114,34 +116,74 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 				))}
 			</div>
 
-			<div className='rounded-lg bg-bg_modal p-6'>
-				<Table>
-					<TableHeader>
-						<TableRow className={styles.tableRow}>
-							<TableHead className={styles.tableCell_1}>{t('Profile.rank')}</TableHead>
-							<TableHead className={styles.tableCell_2}>{t('Leaderboard.username')}</TableHead>
-							<TableHead className={styles.tableCell}>{t('Leaderboard.astrals')}</TableHead>
-							<TableHead className={styles.tableCell}>{t('Leaderboard.userSince')}</TableHead>
-							<TableHead className={styles.tableCell_last}>{t('Leaderboard.actions')}</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{processDisplayedItems?.map((item: IPublicUser) => (
-							<LeadboardRow
-								key={item.id}
-								user={item}
-								isCurrentUser={item.id === user?.publicUser?.id}
+			<div className='mt-6 rounded-2xl border border-primary_border bg-bg_modal p-6 lg:mx-20'>
+				<div className='flex flex-wrap items-center justify-between gap-4 pb-5'>
+					<div>
+						<p className='text-lg font-semibold'>Top 50 Ranks</p>
+					</div>
+					<div className='flex items-center gap-3'>
+						<div className='flex items-center gap-2 rounded-md border border-primary_border bg-bg_modal px-3 py-1'>
+							<input
+								type='search'
+								placeholder='Enter address to search'
+								className='w-28 bg-transparent text-sm outline-none placeholder:text-placeholder lg:w-60'
+								aria-label='Search by address'
 							/>
-						))}
-						{shouldShowUserAtBottom && user?.publicUser && (
-							<LeadboardRow
-								user={user.publicUser}
-								isCurrentUser
-								isBottom
-							/>
-						)}
-					</TableBody>
-				</Table>
+							<button
+								type='button'
+								aria-label='Search'
+								className='ml-2 rounded-md bg-transparent p-1 text-sm'
+							>
+								<Search className='h-4 w-4' />
+							</button>
+						</div>
+						<button
+							type='button'
+							className='rounded-md border border-primary_border bg-bg_modal px-4 py-2 text-sm'
+						>
+							Current
+						</button>
+						<button
+							type='button'
+							aria-label='Filters'
+							className='flex h-10 w-10 items-center justify-center rounded-md border border-primary_border bg-bg_modal'
+						>
+							<FaFilter className='h-4 w-4' />
+						</button>
+					</div>
+				</div>
+
+				<div className='w-full overflow-x-auto'>
+					<div className='inline-block min-w-full align-middle'>
+						<Table className='min-w-[680px]'>
+							<TableHeader>
+								<TableRow className={styles.tableRow}>
+									<TableHead className={styles.tableCell_1}>{t('Profile.rank')}</TableHead>
+									<TableHead className={styles.tableCell_2}>{t('Leaderboard.username')}</TableHead>
+									<TableHead className={styles.tableCell}>{t('Leaderboard.astrals')}</TableHead>
+									<TableHead className={styles.tableCell}>{t('Leaderboard.userSince')}</TableHead>
+									<TableHead className={styles.tableCell_last}>{t('Leaderboard.actions')}</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{processDisplayedItems?.map((item: IPublicUser) => (
+									<LeadboardRow
+										key={item.id}
+										user={item}
+										isCurrentUser={item.id === user?.publicUser?.id}
+									/>
+								))}
+								{shouldShowUserAtBottom && user?.publicUser && (
+									<LeadboardRow
+										user={user.publicUser}
+										isCurrentUser
+										isBottom
+									/>
+								)}
+							</TableBody>
+						</Table>
+					</div>
+				</div>
 
 				{data.totalCount > DEFAULT_LISTING_LIMIT && (
 					<div className='mt-5 w-full'>

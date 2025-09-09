@@ -38,8 +38,7 @@ async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ page?
 	}
 	return (
 		<div className='w-full bg-bg_modal'>
-			{/* Header */}
-			<div className='border-0 px-20 py-10 shadow-none'>
+			<div className='border-0 px-4 py-5 shadow-none lg:px-20 lg:py-10'>
 				<div className='mb-4 p-0'>
 					<div className='text-2xl font-bold'>Leaderboard</div>
 				</div>
@@ -56,8 +55,6 @@ async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ page?
 					</a>
 				</div>
 			</div>
-
-			{/* Tabs */}
 			<LeaderboardTabsClient
 				data={data}
 				top3RankData={top3RankData}
