@@ -145,34 +145,36 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 				</div>
 			</div>
 
-			<div className='w-full overflow-hidden'>
-				<TabsList className={cn('m-0 flex items-center gap-1 p-0 py-2 font-bold sm:gap-2 md:justify-start', classes.scrollbarHide)}>
-					{' '}
+			<div className={cn('w-full overflow-x-auto', classes.scrollbarHide)}>
+				<TabsList className='flex flex-nowrap items-center gap-1 p-0 py-2 font-bold sm:justify-start sm:gap-2'>
 					<TabsTrigger
-						className='px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm'
+						className='flex-shrink-0 px-1 py-1 text-[11px] sm:px-3 sm:py-2 sm:text-sm'
 						value={EPostDetailsTab.DESCRIPTION}
 					>
 						{t('PostDetails.description')}
 					</TabsTrigger>
+
 					{!isOffchainPost && (
 						<TabsTrigger
-							className='px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm'
+							className='flex-shrink-0 px-1 py-1 text-[11px] sm:px-3 sm:py-2 sm:text-sm'
 							value={EPostDetailsTab.ONCHAIN_INFO}
 						>
 							{t('PostDetails.onchainInfo')}
 						</TabsTrigger>
 					)}
+
 					{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(postData.proposalType) && (
 						<TabsTrigger
-							className='px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm'
+							className='flex-shrink-0 px-1 py-1 text-[11px] sm:px-3 sm:py-2 sm:text-sm'
 							value={EPostDetailsTab.POST_ANALYTICS}
 						>
 							{t('PostDetails.analytics')}
 						</TabsTrigger>
 					)}
+
 					<TabsTrigger
 						value={EPostDetailsTab.SUMMARISE}
-						className={cn(classes.tabTrigger, 'px-2 py-1 text-xs capitalize sm:px-3 sm:py-2 sm:text-sm')}
+						className={cn('flex-shrink-0 px-1 py-1 text-[11px] capitalize sm:px-3 sm:py-2 sm:text-sm', classes.tabTrigger)}
 					>
 						<div className={classes.summariseTabContent}>
 							<Image
