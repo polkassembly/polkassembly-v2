@@ -28,6 +28,7 @@ import { ArrowLeftIcon, ChevronsRight } from 'lucide-react';
 import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import { getPostListingUrl } from '@/app/_client-utils/getPostListingUrl';
+import { cn } from '@/lib/utils';
 import classes from './PostHeader.module.scss';
 import { getSpanStyle } from '../../TopicTag/TopicTag';
 import UserAvatar from '../../UserAvatar/UserAvatar';
@@ -51,7 +52,7 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 	const createdAt = postData.createdAt || postData.onChainInfo?.createdAt;
 
 	return (
-		<div className='mx-auto max-w-[100vw] lg:max-w-7xl'>
+		<div className='mx-auto w-full px-4 sm:px-6 lg:max-w-7xl'>
 			<div className='mb-4 flex items-center gap-x-1'>
 				<ArrowLeftIcon className='h-3 w-4' />
 				<Link
@@ -144,26 +145,48 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 				</div>
 			</div>
 
-			<TabsList className={`mx-auto max-w-full overflow-auto pl-4 font-bold capitalize md:pl-0 ${classes.hideScrollbar}`}>
-				<TabsTrigger value={EPostDetailsTab.DESCRIPTION}>{t('PostDetails.description')}</TabsTrigger>
-				{!isOffchainPost && <TabsTrigger value={EPostDetailsTab.ONCHAIN_INFO}>{t('PostDetails.onchainInfo')}</TabsTrigger>}
-				{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(postData.proposalType) && <TabsTrigger value={EPostDetailsTab.POST_ANALYTICS}>{t('PostDetails.analytics')}</TabsTrigger>}
-				<TabsTrigger
-					value={EPostDetailsTab.SUMMARISE}
-					className={classes.tabTrigger}
-				>
-					<div className={` ${classes.summariseTabContent}`}>
-						<Image
-							src={SummariseIcon}
-							alt='summarise'
-							width={16}
-							height={16}
-							className={classes.summariseTabIcon}
-						/>
-						<span>{t('PostDetails.summarise')}</span>
-					</div>
-				</TabsTrigger>
-			</TabsList>
+			<div className='w-full overflow-hidden'>
+				<TabsList className={cn('m-0 flex items-center gap-1 p-0 py-2 font-bold capitalize sm:gap-2', classes.scrollbarHide)}>
+					{' '}
+					<TabsTrigger
+						className='px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm'
+						value={EPostDetailsTab.DESCRIPTION}
+					>
+						{t('PostDetails.description')}
+					</TabsTrigger>
+					{!isOffchainPost && (
+						<TabsTrigger
+							className='px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm'
+							value={EPostDetailsTab.ONCHAIN_INFO}
+						>
+							{t('PostDetails.onchainInfo')}
+						</TabsTrigger>
+					)}
+					{POST_ANALYTICS_ENABLED_PROPOSAL_TYPE.includes(postData.proposalType) && (
+						<TabsTrigger
+							className='px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm'
+							value={EPostDetailsTab.POST_ANALYTICS}
+						>
+							{t('PostDetails.analytics')}
+						</TabsTrigger>
+					)}
+					<TabsTrigger
+						value={EPostDetailsTab.SUMMARISE}
+						className={cn(classes.tabTrigger, 'px-2 py-1 text-xs sm:px-3 sm:py-2 sm:text-sm')}
+					>
+						<div className={classes.summariseTabContent}>
+							<Image
+								src={SummariseIcon}
+								alt='summarise'
+								width={16}
+								height={16}
+								className={classes.summariseTabIcon}
+							/>
+							<span>{t('PostDetails.summarise')}</span>
+						</div>
+					</TabsTrigger>
+				</TabsList>
+			</div>
 		</div>
 	);
 }

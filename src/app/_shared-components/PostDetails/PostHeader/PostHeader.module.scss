@@ -34,23 +34,62 @@
 	@apply whitespace-normal break-words rounded-md px-1.5 py-1 text-[10px] lg:text-xs;
 }
 
-.hideScrollbar {
-	-ms-overflow-style: none; /* IE and Edge */
-	scrollbar-width: none; /* Firefox */
+.scrollbarHide {
 	&::-webkit-scrollbar {
-		/* Chrome, Safari and Opera */
 		display: none;
+	}
+
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.tabsWrapper {
+	@apply w-full overflow-x-auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.tabsList {
+	@apply flex items-center gap-2 whitespace-nowrap py-2 font-bold capitalize;
+	width: max-content;
+	min-width: 100%;
+	padding-left: 16px;
+	padding-right: 16px;
+}
+
+@media (min-width: 768px) {
+	.tabsList {
+		padding-left: 0;
+		padding-right: 0;
 	}
 }
 
 .tabTrigger {
 	.summariseTabContent {
-		@apply flex items-center gap-x-1 rounded-full bg-text_pink/10 px-4 py-1.5 text-text_pink;
+		@apply flex items-center gap-x-1 rounded-full bg-text_pink/10 px-3 py-1 text-text_pink;
 	}
+
 	&[data-state='active'] .summariseTabContent {
 		@apply bg-bg_pink text-white;
 	}
+
 	&[data-state='active'] .summariseTabIcon {
 		filter: brightness(0) invert(1);
+	}
+}
+
+@media (max-width: 640px) {
+	.tabsWrapper {
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.tabTrigger {
+		.summariseTabContent {
+			@apply gap-x-0.5 px-1.5 py-0.5 text-xs;
+		}
+
+		.summariseTabIcon {
+			width: 12px;
+			height: 12px;
+		}
 	}
 }

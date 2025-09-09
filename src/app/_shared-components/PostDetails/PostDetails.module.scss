@@ -1,17 +1,18 @@
 .headerWrapper {
-	@apply w-full max-w-[100vw] bg-bg_modal px-4 pt-6 shadow-lg lg:px-16;
+	@apply w-full bg-bg_modal px-4 pt-6 shadow-lg lg:px-16;
 }
 
 .detailsWrapper {
 	@apply grid w-full gap-y-4 px-4 py-6 lg:gap-4 lg:px-16;
+	overflow-x: hidden;
 }
 
 .leftWrapper {
-	@apply col-span-2 flex flex-col gap-y-4;
+	@apply col-span-2 flex w-full flex-col gap-y-4;
 }
 
 .rightWrapper {
-	@apply col-span-1 flex flex-col gap-y-6;
+	@apply col-span-1 flex w-full flex-col gap-y-6;
 }
 
 .descBox {
@@ -23,7 +24,8 @@
 }
 
 .modalDescBox {
-	@apply flex max-h-96 w-96 overflow-y-auto border-none lg:w-full;
+	@apply flex max-h-96 overflow-y-auto border-none lg:w-full;
+	max-width: 100%;
 }
 
 .analyticsBox {
@@ -39,12 +41,15 @@
 		display: grid !important;
 		grid-template-columns: 1fr !important;
 		gap: 16px;
+		padding-left: 12px;
+		padding-right: 12px;
 	}
 }
 
 .leftWrapper {
 	@media (max-width: 1279px) {
-		display: contents;
+		display: block;
+		width: 100%;
 	}
 }
 
@@ -61,6 +66,8 @@
 }
 
 .commentsBox {
+	@apply mt-3;
+
 	@media (max-width: 1279px) {
 		order: 3;
 	}
