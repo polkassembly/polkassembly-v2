@@ -129,9 +129,13 @@ function ListingCard({
 					/>
 				</div>
 				<div className='flex items-center justify-between text-xs font-medium text-wallet_btn_text'>
-					<span>Aye: {ayePercent.toFixed(0)}%</span>
-					<span>To Pass: 50%</span>
-					<span>Nay: {nayPercent.toFixed(0)}%</span>
+					<span>
+						{t('PostDetails.Aye')}: {ayePercent.toFixed(0)}%
+					</span>
+					<span>{t('PostDetails.ToPass')}: 50%</span>
+					<span>
+						{t('PostDetails.Nay')}: {nayPercent.toFixed(0)}%
+					</span>
 				</div>
 			</div>
 		);
@@ -158,14 +162,14 @@ function ListingCard({
 					>
 						<div className={styles.progressBarContainer}>
 							<p>
-								Aye ={' '}
+								{t('PostDetails.Aye')} ={' '}
 								{formatUSDWithUnits(
 									formatBnBalance(data.onChainInfo?.voteMetrics?.aye.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
 								)}{' '}
 								({ayePercent.toFixed(2)}%)
 							</p>
 							<p>
-								Nay ={' '}
+								{t('PostDetails.Nay')} ={' '}
 								{formatUSDWithUnits(
 									formatBnBalance(data.onChainInfo?.voteMetrics?.nay.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
 								)}{' '}

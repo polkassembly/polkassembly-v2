@@ -373,7 +373,7 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 												className='text-text_pink'
 												onClick={resetFilters}
 											>
-												Reset
+												{t('PostDetails.reset')}
 											</button>
 										</div>
 										<div className='px-4'>
@@ -390,7 +390,7 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 												onClick={applyMobileFilters}
 												className='w-full bg-text_pink'
 											>
-												Apply Filters
+												{t('PostDetails.applyfilters')}
 											</Button>
 										</SheetFooter>
 									</SheetContent>
