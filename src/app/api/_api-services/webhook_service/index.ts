@@ -251,7 +251,7 @@ export class WebhookService {
 			RedisService.DeleteActivityFeed({ network }),
 			RedisService.DeleteAllSubscriptionFeedsForNetwork(network),
 			RedisService.DeleteOverviewPageData({ network }),
-			RedisService.DeleteUserVotesByAddress({ network, address }),
+			...(address ? [RedisService.DeleteUserVotesByAddress({ network, address })] : []),
 			RedisService.DeleteTrackCounts({ network })
 		]);
 
