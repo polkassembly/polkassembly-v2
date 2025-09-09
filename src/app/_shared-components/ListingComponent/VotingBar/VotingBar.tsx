@@ -4,7 +4,22 @@
 
 import styles from './VotingBar.module.scss';
 
-export default function VotingBar({ ayePercent, nayPercent }: { ayePercent: number; nayPercent: number }) {
+export default function VotingBar({ ayePercent, nayPercent, variant = 'curved' }: { ayePercent: number; nayPercent: number; variant?: 'curved' | 'linear' }) {
+	if (variant === 'linear') {
+		return (
+			<div className='relative h-2 w-full overflow-hidden rounded-full bg-gray-200'>
+				<div
+					className={`absolute left-0 top-0 h-full transition-all duration-300 ease-in-out ${styles.progress_aye_bg}`}
+					style={{ width: `${ayePercent}%` }}
+				/>
+				<div
+					className={`absolute right-0 top-0 h-full transition-all duration-300 ease-in-out ${styles.progress_nay_bg}`}
+					style={{ width: `${nayPercent}%` }}
+				/>
+			</div>
+		);
+	}
+
 	const width = 120;
 	const height = 30;
 	const strokeWidth = 16;
