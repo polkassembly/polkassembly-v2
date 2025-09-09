@@ -55,7 +55,6 @@ import {
 	IPostBubbleVotes,
 	EAnalyticsType,
 	EVotesDisplayType,
-	IProxyListingResponse,
 	IProfileVote,
 	EProposalStatus,
 	IGovAnalyticsStats,
@@ -153,8 +152,6 @@ enum EApiRoute {
 	DELETE_POLL_VOTE = 'DELETE_POLL_VOTE',
 	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
 	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES',
-	FETCH_PROXY_REQUESTS = 'FETCH_PROXY_REQUESTS',
-	FETCH_MY_PROXIES = 'FETCH_MY_PROXIES',
 	ADD_COMMENT_REACTION = 'ADD_COMMENT_REACTION',
 	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
 	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES',
@@ -288,12 +285,6 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_GOV_ANALYTICS:
 				path = '/gov-analytics';
-				break;
-			case EApiRoute.FETCH_PROXY_REQUESTS:
-				path = '/proxies/requests';
-				break;
-			case EApiRoute.FETCH_MY_PROXIES:
-				path = '/proxies/my-proxies';
 				break;
 
 			// post routes
@@ -1357,29 +1348,5 @@ export class NextApiClientService {
 			method,
 			url
 		});
-	}
-
-	static async fetchProxyRequests({ page, limit, search }: { page: number; limit: number; search?: string }) {
-		const queryParams = new URLSearchParams({
-			page: page.toString(),
-			limit: limit.toString()
-		});
-		if (search) {
-			queryParams.set('search', search);
-		}
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_PROXY_REQUESTS, queryParams });
-		return this.nextApiClientFetch<IProxyListingResponse>({ url, method });
-	}
-
-	static async fetchMyProxies({ page, limit, search }: { page: number; limit: number; search?: string }) {
-		const queryParams = new URLSearchParams({
-			page: page.toString(),
-			limit: limit.toString()
-		});
-		if (search) {
-			queryParams.set('search', search);
-		}
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_MY_PROXIES, queryParams });
-		return this.nextApiClientFetch<IProxyListingResponse>({ url, method });
 	}
 }

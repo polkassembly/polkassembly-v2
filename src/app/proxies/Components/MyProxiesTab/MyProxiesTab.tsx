@@ -8,17 +8,34 @@ import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { IProxyRequest } from '@/_shared/types';
+import { useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import SearchBar from '../SearchBar/SearchBar';
 import ProxyListingTable from '../ListingTable/ProxyListingTable';
 
-interface Props {
-	data: IProxyRequest[];
-	totalCount: number;
-}
-
-function MyProxiesTab({ data, totalCount }: Props) {
+function MyProxiesTab() {
 	const { user } = useUser();
 	const t = useTranslations('Proxies');
+	const searchParams = useSearchParams();
+	const page = parseInt(searchParams?.get('page') || '1', 10);
+	const myProxiesSearch = searchParams?.get('myProxiesSearch') || '';
+	const { apiService } = usePolkadotApiService();
+
+	const userAddress = useMemo(() => user?.defaultAddress || user?.addresses?.[0] || '', [user]);
+
+	const { data } = useQuery<{ items: IProxyRequest[]; totalCount: number }>({
+		queryKey: ['proxies', 'my', userAddress, page, 10],
+		enabled: !!apiService && !!userAddress,
+		queryFn: async () => apiService!.getMyProxies({ page, limit: 10, userAddress }),
+		placeholderData: keepPreviousData
+	});
+
+	const filtered = useMemo(
+		() => (myProxiesSearch && data?.items ? data.items.filter((item) => item.delegator.toLowerCase().includes(myProxiesSearch.toLowerCase())) : data?.items) || [],
+		[data?.items, myProxiesSearch]
+	);
 
 	// Show not authenticated message
 	if (!user?.addresses?.length) {
@@ -44,8 +61,8 @@ function MyProxiesTab({ data, totalCount }: Props) {
 		<div className='flex flex-col gap-y-4'>
 			<SearchBar searchKey='myProxiesSearch' />
 			<ProxyListingTable
-				data={data}
-				totalCount={totalCount}
+				data={filtered}
+				totalCount={data?.totalCount || 0}
 			/>
 		</div>
 	);
