@@ -1530,5 +1530,8 @@
 		"referendumCountByCategory": "レファレンダム数（カテゴリ別）",
 		"monthlySpend": "月間DOT支出",
 		"averageTurnoutPercentage": "平均投票率"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "分散化された声"
 	}
 }

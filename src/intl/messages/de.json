@@ -1529,5 +1529,8 @@
 		"referendumCountByCategory": "Referendum Anzahl nach Kategorie",
 		"monthlySpend": "Monatliche DOT Ausgaben",
 		"averageTurnoutPercentage": "Durchschnittliche Abstimmungsrate"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "Dezentralisierte Stimme"
 	}
 }
