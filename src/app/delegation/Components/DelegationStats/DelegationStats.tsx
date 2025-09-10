@@ -16,15 +16,14 @@ import { IDelegationStats } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import styles from './DelegationStats.module.scss';
-
-const ZERO_BN = new BN(0);
 
 function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegationStats }) {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const t = useTranslations('Delegation');
-	const [totalSupply, setTotalSupply] = useState<BN>(ZERO_BN);
+	const [totalSupply, setTotalSupply] = useState<BN | null>(null);
 
 	useEffect(() => {
 		const fetchSupply = async () => {
@@ -56,9 +55,13 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 					/>
 					<div className='flex flex-col'>
 						<p className={styles.totalDelegates}>{t('totalSupply')}</p>
-						<p className='text-sm font-semibold lg:text-base xl:text-lg'>
-							{formatUSDWithUnits(formatBnBalance(totalSupply, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 2)}
-						</p>
+						{totalSupply ? (
+							<p className='text-sm font-semibold lg:text-xl'>
+								{formatUSDWithUnits(formatBnBalance(totalSupply, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 2)}
+							</p>
+						) : (
+							<Skeleton className='h-4 w-20' />
+						)}
 					</div>
 				</div>
 				<div className={`${styles.delegationSupplyData} ${styles.borderLeft}`}>

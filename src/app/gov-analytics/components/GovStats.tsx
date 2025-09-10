@@ -26,7 +26,7 @@ function GovStats({ data }: GovStatsProps) {
 	const trackInfo = NETWORKS_DETAILS[network as ENetwork].trackDetails;
 
 	return (
-		<div className='flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6 lg:gap-12'>
+		<div className='flex w-full flex-col gap-4 rounded-lg border border-border_grey bg-bg_modal p-4 md:flex-row md:items-center md:justify-between md:gap-6 lg:gap-12'>
 			<div className='flex items-center gap-x-2'>
 				<Image
 					src={ProposalsCreated}
