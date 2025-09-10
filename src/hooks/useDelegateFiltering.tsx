@@ -16,31 +16,41 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	const [sortBy, setSortBy] = useState<SortOption | null>(null);
 	const [currentPage, setCurrentPage] = useState(1);
 	const itemsPerPage = DEFAULT_LISTING_LIMIT;
-	const { getOnChainIdentity } = useIdentityService();
 	const [delegatesWithIdentity, setDelegatesWithIdentity] = useState<Map<string, string | undefined>>(new Map());
+	const { identityService } = useIdentityService();
 
 	useEffect(() => {
-		const fetchIdentities = async () => {
-			const identityMap = new Map<string, string | undefined>();
+		if (!delegates?.length || !identityService) return () => {};
+		let isActive = true;
 
-			await Promise.all(
-				delegates.map(async (delegate) => {
-					try {
-						const identity = await getOnChainIdentity(delegate.address);
-						if (identity?.display) {
-							identityMap.set(delegate.address, identity.display);
+		(async () => {
+			try {
+				const results = await Promise.all(
+					delegates.map(async (delegate) => {
+						try {
+							const identity = await identityService.getOnChainIdentity(delegate.address);
+							return identity?.display ? ([delegate.address, identity.display] as const) : null;
+						} catch (e) {
+							console.error('Error fetching identity for delegate:', delegate.address, e);
+							return null;
 						}
-					} catch {
-						console.error('Error fetching identity for delegate:', delegate.address);
-					}
-				})
-			);
+					})
+				);
+				if (!isActive) return;
+				const identityMap = new Map<string, string>();
+				results.forEach((entry) => {
+					if (entry) identityMap.set(entry[0], entry[1]);
+				});
+				setDelegatesWithIdentity(identityMap);
+			} catch (e) {
+				console.error('Error fetching identities batch:', e);
+			}
+		})();
 
-			setDelegatesWithIdentity(identityMap);
+		return () => {
+			isActive = false;
 		};
-
-		fetchIdentities();
-	}, [delegates, getOnChainIdentity]);
+	}, [delegates, identityService]);
 
 	const searchDelegate = useCallback(
 		(delegate: IDelegateDetails, query: string) => {
