@@ -1605,14 +1605,19 @@ export class PolkadotApiService {
 	}
 
 	private static mapIndividualProxies(proxyArray: any[]): IProxyAddress[] {
-		return proxyArray.map((proxyEntry: any) => {
-			const delayValue = proxyEntry?.delay ? parseInt(proxyEntry.delay.replace(/,/g, ''), 10) : 0;
-			return {
-				address: proxyEntry?.delegate || 'Unknown',
-				proxyType: (proxyEntry?.proxyType as EProxyType) || EProxyType.GOVERNANCE,
-				delay: delayValue
-			};
-		});
+		return proxyArray
+			.map((proxyEntry: any) => {
+				const delayValue = proxyEntry?.delay ? parseInt(proxyEntry.delay.replace(/,/g, ''), 10) : 0;
+				if (!proxyEntry.delegate) {
+					return undefined;
+				}
+				return {
+					address: proxyEntry.delegate,
+					proxyType: (proxyEntry?.proxyType as EProxyType) || EProxyType.GOVERNANCE,
+					delay: delayValue
+				};
+			})
+			.filter((proxy) => proxy !== undefined) as IProxyAddress[];
 	}
 
 	private static processProxyInfo(delegator: string, proxyHuman: any): IProxyRequest | null {
@@ -1624,9 +1629,8 @@ export class PolkadotApiService {
 		const firstProxyDelay = individualProxies[0]?.delay || 0;
 
 		return {
-			id: `${delegator}-proxy-${Date.now()}`,
+			id: `${delegator}`,
 			delegator,
-			proxyType: '-' as any,
 			delay: firstProxyDelay,
 			proxies: proxyArray.length,
 			proxyAddresses: individualProxies.map((p) => p.address),
@@ -1656,8 +1660,8 @@ export class PolkadotApiService {
 				if (proxyRequest) proxies.push(proxyRequest);
 			});
 
-			// Sort by date created (newest first)
-			proxies.sort((a, b) => b.dateCreated.getTime() - a.dateCreated.getTime());
+			// Deterministic ordering
+			proxies.sort((a, b) => a.delegator.localeCompare(b.delegator));
 
 			// Apply pagination
 			const startIndex = (page - 1) * limit;
@@ -1668,8 +1672,7 @@ export class PolkadotApiService {
 				items: paginatedProxies,
 				totalCount: proxies.length
 			};
-		} catch (error) {
-			console.error('Error fetching proxy requests:', error);
+		} catch {
 			return { items: [], totalCount: 0 };
 		}
 	}
@@ -1699,8 +1702,7 @@ export class PolkadotApiService {
 				items: paginatedProxies,
 				totalCount: proxies.length
 			};
-		} catch (error) {
-			console.error('Error fetching my proxies:', error);
+		} catch {
 			return { items: [], totalCount: 0 };
 		}
 	}

@@ -1613,7 +1613,7 @@ export enum EProxyDashboardTabs {
 export interface IProxyRequest {
 	id: string;
 	delegator: string;
-	proxyType: EProxyType;
+	proxyType?: EProxyType;
 	delay: number;
 	proxies: number;
 	proxyAddresses: string[];

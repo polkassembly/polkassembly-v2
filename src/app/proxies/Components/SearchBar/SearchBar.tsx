@@ -40,11 +40,6 @@ function SearchBar({ searchKey = 'allSearch' }: { searchKey?: string }) {
 				<Input
 					className='h-9 w-full pr-12 sm:pr-12'
 					value={inputValue}
-					onKeyDown={(e) => {
-						if (e.key === 'Enter') {
-							handleSearch();
-						}
-					}}
 					onChange={(e) => setInputValue(e.target.value)}
 					placeholder={t('Proxies.searchByAddress')}
 				/>

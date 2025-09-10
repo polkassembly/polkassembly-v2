@@ -26,10 +26,17 @@ function MyProxiesTab() {
 	const userAddress = useMemo(() => user?.defaultAddress || user?.addresses?.[0] || '', [user]);
 
 	const { data } = useQuery<{ items: IProxyRequest[]; totalCount: number }>({
-		queryKey: ['proxies', 'my', userAddress, page, 10],
+		queryKey: ['proxies', 'my', userAddress, page, 10, myProxiesSearch || ''],
 		enabled: !!apiService && !!userAddress,
-		queryFn: async () => apiService!.getMyProxies({ page, limit: 10, userAddress }),
-		placeholderData: keepPreviousData
+		queryFn: async () =>
+			apiService!.getMyProxies({
+				page,
+				limit: 10,
+				userAddress,
+				search: myProxiesSearch || undefined
+			}),
+		placeholderData: keepPreviousData,
+		staleTime: 30_000
 	});
 
 	const filtered = useMemo(
@@ -62,7 +69,7 @@ function MyProxiesTab() {
 			<SearchBar searchKey='myProxiesSearch' />
 			<ProxyListingTable
 				data={filtered}
-				totalCount={data?.totalCount || 0}
+				totalCount={myProxiesSearch ? filtered.length : data?.totalCount || 0}
 			/>
 		</div>
 	);
