@@ -449,6 +449,12 @@
 		"Treasury": "Tesorería",
 		"LeaseAdmin": "Admin de Arrendamiento",
 		"GeneralAdmin": "Admin General",
+		"chatWithKlara": "Chat con Klara",
+		"more": "Más",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "Analíticas",
+		"treasuryAnalytics": "Analíticas de Tesorería",
+		"proxies": "Proxies",
 		"Tag": {
 			"new": "Nuevo"
 		}
@@ -489,6 +495,9 @@
 		"votingStarted": "La votación ha comenzado",
 		"preparePeriod": "Período de Preparación",
 		"decisionPeriod": "Período de Decisión",
+		"votingPeriod": "Período de Votación",
+		"enactmentPeriod": "Período de Promulgación",
+		"enactmentDescription": "Ejecución de Ref después de completar este período",
 		"summary": "Resumen",
 		"summarise": "Resumen",
 		"aye": "Sí",
@@ -1503,8 +1512,17 @@
 		"scanTheSignatureQRInYourApp": "Verifique el código QR de firma en su aplicación y firme la transacción"
 	},
 	"GovAnalytics": {
+		"governanceAnalytics": "Analíticas de Gobernanza",
+		"governanceAnalyticsDescription": "Los referendos son el mecanismo central de la gobernanza en cadena de Polkadot, permitiendo a los inversores (poseedores de DOT) tomar decisiones sobre actualizaciones de red, gastos de tesorería y otras cuestiones importantes.",
 		"overview": "Resumen",
 		"voting": "Votación",
+		"votes": "Votos",
+		"capital": "Capital",
+		"delegator": "Delegator",
+		"delegatee": "Delegatee",
+		"delegation": "Delegación",
+		"trackDelegation": "Delegación de Track",
+		"delegationSplit": "Delegación Split",
 		"totalProposals": "Propuestas Totales",
 		"approvedProposals": "Propuestas Aprobadas",
 		"monitoredTracks": "Tracks Monitoreados",
@@ -1513,5 +1531,8 @@
 		"referendumCountByCategory": "Cantidad de Referendos por Categoría",
 		"monthlySpend": "Gasto Mensual de DOT",
 		"averageTurnoutPercentage": "Porcentaje de Asistencia Promedio"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "Voz Descentralizada"
 	}
 }

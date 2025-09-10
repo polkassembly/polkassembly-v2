@@ -450,6 +450,12 @@
 		"Treasury": "Treasury",
 		"LeaseAdmin": "Lease Admin",
 		"GeneralAdmin": "General Admin",
+		"chatWithKlara": "Chat with Klara",
+		"more": "More",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "Analytics",
+		"treasuryAnalytics": "Treasury Analytics",
+		"proxies": "Proxies",
 		"Tag": {
 			"new": "New"
 		}
@@ -492,6 +498,9 @@
 		"votingStarted": "Voting has Started",
 		"preparePeriod": "Prepare Period",
 		"decisionPeriod": "Decision Period",
+		"votingPeriod": "Voting Period",
+		"enactmentPeriod": "Enactment Period",
+		"enactmentDescription": "Ref execution after completion of this period",
 		"summary": "Summary",
 		"summarise": "SUMMARISE",
 		"analytics": "Analytics",
@@ -1539,8 +1548,17 @@
 		"scanTheSignatureQRInYourApp": "Verify the signature QR in your app and sign the transaction"
 	},
 	"GovAnalytics": {
+		"governanceAnalytics": "Governance Analytics",
+		"governanceAnalyticsDescription": "Referenda are the core mechanism of Polkadot’s on-chain governance, allowing stakeholders (DOT holders) to make decisions about network upgrades, treasury spending, and other important matters.",
 		"overview": "Overview",
 		"voting": "Voting",
+		"votes": "Votes",
+		"capital": "Capital",
+		"delegator": "Delegator",
+		"delegatee": "Delegatee",
+		"delegation": "Delegation",
+		"trackDelegation": "Track Delegation",
+		"delegationSplit": "Delegation Split",
 		"totalProposals": "Total Proposals",
 		"approvedProposals": "Approved Proposals",
 		"monitoredTracks": "Monitored Tracks",
@@ -1549,5 +1567,8 @@
 		"referendumCountByCategory": "Referendum Count by Category",
 		"monthlySpend": "Monthly DOT Spent",
 		"averageTurnoutPercentage": "Average Turnout Percentage"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "Decentralized Voice"
 	}
 }

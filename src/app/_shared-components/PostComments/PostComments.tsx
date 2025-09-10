@@ -67,7 +67,7 @@ function PostComments({
 		enabled: !!identityService,
 		retry: true,
 		refetchOnMount: true,
-		refetchOnWindowFocus: true
+		refetchOnWindowFocus: false
 	});
 
 	return (

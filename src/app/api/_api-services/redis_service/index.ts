@@ -80,7 +80,8 @@ enum ERedisKeys {
 	TRACK_LEVEL_PROPOSALS_ANALYTICS = 'TLP',
 	TURNOUT_DATA = 'TOD',
 	TRACK_DELEGATION_ANALYTICS = 'TDA',
-	GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK = 'GAR_TRACK'
+	GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK = 'GAR_TRACK',
+	TRACK_COUNTS = 'TC'
 }
 
 export class RedisService {
@@ -151,6 +152,7 @@ export class RedisService {
 			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${index}`,
 		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: ENetwork, proposalType: EProposalType, index: number, votesType: EVotesDisplayType, analyticsType: EAnalyticsType): string =>
 			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${index}-${votesType}-${analyticsType}`,
+		[ERedisKeys.TRACK_COUNTS]: (network: string): string => `${ERedisKeys.TRACK_COUNTS}-${network}`,
 		[ERedisKeys.GOV_ANALYTICS_STATS]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_STATS}-${network}`,
 		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME}-${network}`,
 		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT}-${network}`,
@@ -692,6 +694,20 @@ export class RedisService {
 
 	static async DeleteTrackAnalyticsStats({ network, origin }: { network: string; origin: EPostOrigin | 'all' }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin) });
+	}
+
+	// Track counts caching methods
+	static async GetTrackCounts({ network }: { network: string }): Promise<Record<string, number> | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TRACK_COUNTS](network) });
+		return data ? (deepParseJson(data) as Record<string, number>) : null;
+	}
+
+	static async SetTrackCounts({ network, data }: { network: string; data: Record<string, number> }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TRACK_COUNTS](network), value: JSON.stringify(data), ttlSeconds: HALF_HOUR_IN_SECONDS });
+	}
+
+	static async DeleteTrackCounts({ network }: { network: string }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TRACK_COUNTS](network) });
 	}
 
 	// Treasury stats caching methods

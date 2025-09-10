@@ -90,7 +90,10 @@ function ListingCard({
 							<div className='flex items-center gap-2'>
 								{data.onChainInfo?.proposer ? (
 									<>
-										<Address address={data.onChainInfo?.proposer} />
+										<Address
+											address={data.onChainInfo?.proposer}
+											textClassName='max-w-[40px] truncate sm:max-w-full'
+										/>
 										<span>|</span>
 									</>
 								) : (
@@ -124,7 +127,7 @@ function ListingCard({
 										src={CommentIcon}
 										alt='comments'
 										width={16}
-										className={userPreferences.theme === ETheme.DARK ? 'dark-icons' : ''}
+										className={userPreferences.theme === ETheme.DARK ? 'darkIcon' : ''}
 										height={16}
 									/>
 									<span className='text-text_primary'>{metrics?.comments || 0}</span>
@@ -273,7 +276,7 @@ function ListingCard({
 
 					{data.onChainInfo?.status && (
 						<div className='flex'>
-							<StatusTag status={data.onChainInfo?.status.toLowerCase().replace(/\s+/g, '_')} />
+							<StatusTag status={data.onChainInfo?.status} />
 						</div>
 					)}
 				</div>

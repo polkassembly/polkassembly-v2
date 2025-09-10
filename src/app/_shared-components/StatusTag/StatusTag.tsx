@@ -5,22 +5,27 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { EProposalStatus } from '@/_shared/types';
+import { useMemo } from 'react';
+import { DECIDING_PROPOSAL_STATUSES } from '@/_shared/_constants/decidingProposalStatuses';
 import styles from './StatusTag.module.scss';
 
 interface Props {
 	className?: string;
-	status?: string;
+	status?: EProposalStatus;
 	colorInverted?: boolean;
 }
 
 function StatusTag({ className = '', status, colorInverted }: Props) {
 	const t = useTranslations();
 
-	const normalizedStatus = status?.toLowerCase().replace(/\s+/g, '_');
+	const finalStatus = useMemo(() => {
+		return status && DECIDING_PROPOSAL_STATUSES.includes(status) ? EProposalStatus.Deciding.toLowerCase() : status?.toLowerCase().replace(/\s+/g, '_');
+	}, [status]);
 
 	return (
-		<div className={`${styles.base} ${normalizedStatus ? styles[String(normalizedStatus)] : ''} ${colorInverted ? styles.inverted : ''} ${className}`}>
-			{t(`ProposalStatus.${status?.toLowerCase()}`)}
+		<div className={`${styles.base} ${finalStatus ? styles[String(finalStatus)] : ''} ${colorInverted ? styles.inverted : ''} ${className}`}>
+			{t(`ProposalStatus.${finalStatus}`)}
 		</div>
 	);
 }
