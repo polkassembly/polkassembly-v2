@@ -354,7 +354,7 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 											}}
 											value={reuseLock && reuseLock.gt(BN_ZERO) ? reuseLock : undefined}
 										/>
-										<div className='flex items-center gap-x-2'>
+										<div className='flex-col items-center gap-2 sm:flex'>
 											{governanceLock && governanceLock.gt(BN_ZERO) && (
 												<Button
 													variant='ghost'

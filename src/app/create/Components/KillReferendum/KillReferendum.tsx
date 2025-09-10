@@ -136,7 +136,12 @@ function KillReferendum({ onSuccess }: { onSuccess: (proposalId: number) => void
 			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
 				<SwitchWalletOrAddress
 					small
-					customAddressSelector={<AddressRelationsPicker withBalance />}
+					customAddressSelector={
+						<AddressRelationsPicker
+							withBalance
+							showTransferableBalance
+						/>
+					}
 				/>
 				<div className='flex flex-col gap-y-2'>
 					<p className='text-sm text-wallet_btn_text'>{t('KillCancelReferendum.referendumId')}</p>

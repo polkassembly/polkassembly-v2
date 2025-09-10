@@ -3,22 +3,12 @@
 }
 
 .detailsWrapper {
-	@apply grid w-full gap-y-4 px-4 py-6 lg:gap-4 lg:px-16 2xl:px-0;
-
-	@media (max-width: 1279px) {
-		display: grid !important;
-		grid-template-columns: 1fr !important;
-		gap: 16px;
-	}
-
-	@media (max-width: 768px) {
-		@apply px-2 py-4;
-		overflow-x: hidden;
-	}
+	@apply grid w-full gap-y-4 px-4 py-6 lg:gap-4 lg:px-16;
+	overflow-x: hidden;
 }
 
 .leftWrapper {
-	@apply col-span-2 flex flex-col gap-y-4;
+	@apply col-span-2 flex w-full flex-col gap-y-4;
 
 	@media (max-width: 1279px) {
 		display: contents;
@@ -26,7 +16,7 @@
 }
 
 .rightWrapper {
-	@apply col-span-1 flex flex-col gap-y-6;
+	@apply col-span-1 flex w-full flex-col gap-y-6;
 
 	@media (max-width: 1279px) {
 		order: 2;
@@ -58,7 +48,8 @@
 }
 
 .modalDescBox {
-	@apply flex max-h-96 w-96 overflow-y-auto border-none lg:w-full;
+	@apply flex max-h-96 overflow-y-auto border-none lg:w-full;
+	max-width: 100%;
 }
 
 .analyticsBox {

@@ -200,12 +200,18 @@ function AddressSwitchButton({
 	disabled,
 	showLinkedAccountBadge = false,
 	className,
-	switchButtonText
+	switchButtonText,
+	showTransferableBalance = false,
+	showVotingBalance = false,
+	showPeopleChainBalance = false
 }: {
 	disabled?: boolean;
 	showLinkedAccountBadge?: boolean;
 	className?: string;
 	switchButtonText?: string;
+	showTransferableBalance?: boolean;
+	showVotingBalance?: boolean;
+	showPeopleChainBalance?: boolean;
 }) {
 	const { user } = useUser();
 	const { userPreferences } = useUserPreferences();
@@ -242,7 +248,10 @@ function AddressSwitchButton({
 					small
 					withRadioSelect
 					withBalance
+					showTransferableBalance={showTransferableBalance}
+					showVotingBalance={showVotingBalance}
 					showLinkedAccountBadge={showLinkedAccountBadge}
+					showPeopleChainBalance={showPeopleChainBalance}
 				/>
 
 				<div className='flex max-h-[60vh] flex-col gap-2 overflow-y-auto'>
@@ -278,6 +287,7 @@ export default function AddressRelationsPicker({
 	withBalance = false,
 	showPeopleChainBalance = false,
 	showVotingBalance = false,
+	showTransferableBalance = false,
 	disabled,
 	showLinkedAccountBadge = false,
 	iconSize = 25,
@@ -288,6 +298,7 @@ export default function AddressRelationsPicker({
 	withBalance?: boolean;
 	showPeopleChainBalance?: boolean;
 	showVotingBalance?: boolean;
+	showTransferableBalance?: boolean;
 	disabled?: boolean;
 	showLinkedAccountBadge?: boolean;
 	iconSize?: number;
@@ -444,6 +455,7 @@ export default function AddressRelationsPicker({
 							classname='ml-auto'
 							showPeopleChainBalance={showPeopleChainBalance}
 							showVotingBalance={showVotingBalance}
+							showTransferableBalance={showTransferableBalance}
 						/>
 					)}
 
@@ -472,6 +484,9 @@ export default function AddressRelationsPicker({
 							disabled={disabled}
 							showLinkedAccountBadge={showLinkedAccountBadge}
 							className={switchButtonClassName}
+							showTransferableBalance={showTransferableBalance}
+							showVotingBalance={showVotingBalance}
+							showPeopleChainBalance={showPeopleChainBalance}
 						/>
 					</div>
 				</>

@@ -1543,8 +1543,17 @@
 		"scanTheSignatureQRInYourApp": "アプリで署名QRコードを確認し、トランザクションに署名してください"
 	},
 	"GovAnalytics": {
+		"governanceAnalytics": "ガバナンス分析",
+		"governanceAnalyticsDescription": "レファレンダムはPolkadotのオンチェーンガバナンスの中心メカニズムであり、投資家（DOT保有者）がネットワークアップグレード、トレジャリー支出、その他の重要な事項について決定することを可能にします。",
 		"overview": "概要",
 		"voting": "投票",
+		"votes": "投票",
+		"capital": "資本",
+		"delegator": "委任者",
+		"delegatee": "受任者",
+		"delegation": "委任",
+		"trackDelegation": "トラック委任",
+		"delegationSplit": "委任分割",
 		"totalProposals": "総提案数",
 		"approvedProposals": "承認された提案",
 		"monitoredTracks": "監視中のトラック",

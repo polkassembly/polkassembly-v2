@@ -266,7 +266,7 @@ function Navbar() {
 
 			{isModalOpen && (
 				<div className='absolute left-0 top-full z-50 w-full border-t-[3px] border-navbar_border bg-bg_modal p-4 pb-10 shadow-md md:hidden'>
-					<div className='flex flex-col gap-5 pt-14'>
+					<div className='flex flex-col gap-5'>
 						<div>
 							<p className='pb-1 text-sm text-text_primary'>{t('Header.network')}</p>
 							<NetworkDropdown className='w-full' />

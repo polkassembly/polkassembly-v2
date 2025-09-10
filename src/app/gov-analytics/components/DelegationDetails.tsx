@@ -7,6 +7,7 @@ import { IGovAnalyticsDelegationStats } from '@/_shared/types';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartOptions } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import { useTranslations } from 'next-intl';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -16,6 +17,7 @@ interface IDelegationCapitalDetails {
 
 function DelegationDetails({ delegationData }: { delegationData: IDelegationCapitalDetails }) {
 	const { resolvedTheme: theme } = useTheme();
+	const t = useTranslations('GovAnalytics');
 
 	const trackNames = Object.keys(delegationData || {}).map((key) =>
 		key
@@ -28,12 +30,12 @@ function DelegationDetails({ delegationData }: { delegationData: IDelegationCapi
 		labels: trackNames,
 		datasets: [
 			{
-				label: 'Delegator',
+				label: t('delegator'),
 				data: Object.keys(delegationData || {}).map((key) => delegationData[key].totalDelegators || 0),
 				backgroundColor: '#B6B0FB'
 			},
 			{
-				label: 'Delegatee',
+				label: t('delegatee'),
 				data: Object.keys(delegationData || {}).map((key) => delegationData[key].totalDelegates || 0),
 				backgroundColor: '#796EEC'
 			}
@@ -94,15 +96,15 @@ function DelegationDetails({ delegationData }: { delegationData: IDelegationCapi
 	return (
 		<div className='max-h-[500px] w-full flex-1 rounded-lg border border-border_grey p-3 lg:p-4'>
 			<div className='flex flex-col items-start justify-between lg:flex-row lg:items-center'>
-				<h2 className='text-base font-semibold sm:text-xl'>Track Delegation</h2>
+				<h2 className='text-base font-semibold sm:text-xl'>{t('delegationSplit')}</h2>
 				<div className='flex gap-x-4'>
 					<div className='flex items-center gap-x-1'>
 						<div className='h-[5px] w-[5px] rounded-full bg-bar_chart_purple_light' />
-						<p className='m-0 p-0 text-xs font-normal'>Delegator</p>
+						<p className='m-0 p-0 text-xs font-normal'>{t('delegator')}</p>
 					</div>
 					<div className='flex items-center gap-x-1'>
 						<div className='h-[5px] w-[5px] rounded-full bg-bar_chart_purple' />
-						<p className='m-0 p-0 text-xs font-normal'>Delegatee</p>
+						<p className='m-0 p-0 text-xs font-normal'>{t('delegatee')}</p>
 					</div>
 				</div>
 			</div>
