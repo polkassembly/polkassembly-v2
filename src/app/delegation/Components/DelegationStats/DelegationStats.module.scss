@@ -1,13 +1,13 @@
 .delegationSupplyDataContainer {
-	@apply mt-5 grid grid-cols-1 gap-4 rounded-lg bg-bg_modal p-4 text-btn_secondary_text shadow-lg lg:flex lg:flex-row lg:items-center lg:p-6;
+	@apply mt-5 grid grid-cols-1 gap-4 rounded-lg bg-bg_modal p-4 text-btn_secondary_text shadow-lg xl:flex xl:flex-row xl:items-center xl:p-6;
 }
 
 .topRow {
-	@apply grid grid-cols-3 items-center gap-1.5 border-b border-border_grey pb-4 lg:contents;
+	@apply grid grid-cols-3 items-center gap-1.5 border-b border-border_grey pb-4 xl:contents;
 }
 
 .bottomRow {
-	@apply grid grid-cols-2 items-center pt-2 lg:contents;
+	@apply grid grid-cols-2 items-center pt-2 xl:contents;
 }
 
 .totalDelegates {
@@ -15,16 +15,16 @@
 }
 
 .borderLeft {
-	@apply border-l border-border_grey pl-2 lg:pl-4;
+	@apply border-l border-border_grey pl-2 xl:pl-4;
 }
 
 .borderLeftTotalDelegatedVotes {
-	@apply lg:border-l lg:border-border_grey lg:pl-4;
+	@apply xl:border-l xl:border-border_grey xl:pl-4;
 }
 
 .delegationSupplyData {
-	@apply flex flex-col items-center gap-1 text-center lg:flex-row lg:items-center lg:gap-3 lg:text-left;
-	@apply lg:flex-1 lg:justify-center;
+	@apply flex flex-col items-center gap-1 text-center xl:flex-row xl:items-center xl:gap-3 xl:text-left;
+	@apply xl:flex-1 xl:justify-center;
 }
 
 .delegationSupplyDataImage {
@@ -32,5 +32,5 @@
 }
 
 .lastRowItem {
-	@apply col-span-3 lg:col-span-1;
+	@apply col-span-3 xl:col-span-1;
 }
