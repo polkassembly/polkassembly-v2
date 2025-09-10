@@ -17,11 +17,11 @@ function DelegationPopupCard() {
 	const [showDelegationInfo, setShowDelegationInfo] = useState(true);
 	const t = useTranslations('Delegation');
 	return (
-		<div>
+		<div className='text-btn_secondary_text'>
 			{showDelegationInfo && (
 				<div className={styles.delegationPopupCard}>
 					<div className='flex items-center justify-between px-6'>
-						<p className='text-xl font-semibold text-btn_secondary_text'>{t('howToDelegateOnPolkassembly')}</p>
+						<p className='text-xl font-semibold'>{t('howToDelegateOnPolkassembly')}</p>
 						<div className='flex items-center gap-4'>
 							<BecomeDelegateDialog />
 							<IoMdClose
@@ -32,7 +32,7 @@ function DelegationPopupCard() {
 					</div>
 
 					<div className='mt-4 flex flex-row items-center justify-center xl:items-start xl:justify-between'>
-						<div className='flex flex-col items-center xl:flex-row'>
+						<div className='flex flex-col items-center xl:flex-row xl:items-start'>
 							<Image
 								src={PolkaAsset}
 								alt='Polka Asset'
@@ -54,7 +54,7 @@ function DelegationPopupCard() {
 							/>
 						</div>
 						<div className={styles.delegationPopupCardStepWrapper}>
-							<div className='flex flex-col items-center gap-4 xl:flex-row'>
+							<div className='flex flex-col items-center gap-4 xl:flex-row xl:items-start'>
 								<Image
 									src={PolkaBadge}
 									alt='Polka Badge'

@@ -277,7 +277,7 @@ export const THEME_COLORS = {
 		child_bounties_bg: '#343434',
 		arrow_bg_color: '#FFF',
 		delegation_bgcard: '#1b1d1f',
-		delegation_card_text: '#595959',
+		delegation_card_text: '#6E6E6E',
 		delegation_card_border: '#7F8FA4',
 		delegation_card_polkassembly: '#33071E',
 		delegation_card_polkadot: '#3d3f41',
