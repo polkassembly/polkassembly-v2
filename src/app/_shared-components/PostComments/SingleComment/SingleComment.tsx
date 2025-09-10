@@ -230,6 +230,10 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 	const isHighlighted = typeof window !== 'undefined' && window?.location?.hash === `#comment-${comment.id}`;
 	const wrapperClassName = isHighlighted ? `${classes.wrapper} ${classes.highlighted}` : classes.wrapper;
 
+	const firstReply = comment.children?.[0];
+
+	const repliesToShow = !parentCommentId ? comment.children?.slice(1) : comment.children;
+
 	return (
 		<div
 			id={`comment-${comment.id}`}
@@ -464,7 +468,16 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 					/>
 				)}
 
-				{comment.children && comment.children.length > 0 && (
+				{!parentCommentId && firstReply && (
+					<SingleComment
+						commentData={firstReply}
+						setParentComment={setComment}
+						setComments={setComments}
+						parentCommentId={parentCommentId || comment.id}
+					/>
+				)}
+
+				{repliesToShow && repliesToShow.length > 0 && (
 					<div className={classes.replies}>
 						<div className={classes.viewReplies}>
 							<Separator className='w-[20px]' />
@@ -474,11 +487,11 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 								variant='ghost'
 								size='sm'
 							>
-								{showReplies ? t('PostDetails.hideReplies') : `${t('PostDetails.viewReplies')} (${comment.children.length})`}
+								{showReplies ? t('PostDetails.hideReplies') : `${t('PostDetails.viewReplies')} (${repliesToShow.length})`}
 							</Button>
 						</div>
 						{showReplies &&
-							comment.children.map((item) => (
+							repliesToShow.map((item) => (
 								<SingleComment
 									key={item.id}
 									commentData={item}
