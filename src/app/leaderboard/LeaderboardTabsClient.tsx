@@ -28,7 +28,7 @@ export default function LeaderboardTabsClient({ data, top3RankData }: Props) {
 			<div className='flex gap-x-2 lg:px-20'>
 				<button
 					type='button'
-					className={`${styles['tab-button']} uppercase ${activeTab === ETabState.LEADERBOARD ? styles['tab-button-active'] : ''}`}
+					className={`${styles['tab-button']} uppercase ${activeTab === ETabState.LEADERBOARD ? styles['tab-button-active'] : 'text-btn_secondary_text'}`}
 					onClick={() => setActiveTab(ETabState.LEADERBOARD)}
 				>
 					LEADERBOARD
@@ -38,7 +38,7 @@ export default function LeaderboardTabsClient({ data, top3RankData }: Props) {
 				</button>
 				<button
 					type='button'
-					className={`${styles['tab-button']} uppercase ${activeTab === ETabState.ASTRALS ? styles['tab-button-active'] : ''}`}
+					className={`${styles['tab-button']} uppercase ${activeTab === ETabState.ASTRALS ? styles['tab-button-active'] : 'text-btn_secondary_text'}`}
 					onClick={() => setActiveTab(ETabState.ASTRALS)}
 				>
 					ASTRALS SCORING
