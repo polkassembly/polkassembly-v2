@@ -56,7 +56,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 					/>
 					<div className='flex flex-col'>
 						<p className={styles.totalDelegates}>{t('totalSupply')}</p>
-						<p className='text-sm font-semibold lg:text-xl'>
+						<p className='text-sm font-semibold lg:text-base xl:text-lg'>
 							{formatUSDWithUnits(formatBnBalance(totalSupply, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 2)}
 						</p>
 					</div>
@@ -69,7 +69,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 					/>
 					<div className='flex flex-col'>
 						<p className={styles.totalDelegates}>{t('delegatedTokens')}</p>
-						<p className='text-sm font-semibold lg:text-xl'>
+						<p className='text-sm font-semibold lg:text-base xl:text-lg'>
 							{formatUSDWithUnits(formatBnBalance(delegationStats.totalDelegatedTokens, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 2)}
 						</p>
 					</div>
@@ -82,7 +82,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 					/>
 					<div className='flex flex-col'>
 						<p className={styles.totalDelegates}>{t('totalDelegatedVotes')}</p>
-						<p className='text-sm font-semibold lg:text-xl'>{formatUSDWithUnits(String(delegationStats.totalDelegatedVotes))}</p>
+						<p className='text-sm font-semibold lg:text-base xl:text-lg'>{formatUSDWithUnits(String(delegationStats.totalDelegatedVotes))}</p>
 					</div>
 				</div>
 			</div>
@@ -95,7 +95,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 					/>
 					<div className='flex flex-col'>
 						<p className={styles.totalDelegates}>{t('totalDelegates')}</p>
-						<p className='text-sm font-semibold lg:text-xl'>{delegationStats?.totalDelegates}</p>
+						<p className='text-sm font-semibold lg:text-base xl:text-lg'>{delegationStats?.totalDelegates}</p>
 					</div>
 				</div>
 				<div className={`${styles.delegationSupplyData} ${styles.borderLeft}`}>
@@ -106,7 +106,7 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 					/>
 					<div className='flex flex-col'>
 						<p className={styles.totalDelegates}>{t('totalDelegators')}</p>
-						<p className='text-sm font-semibold lg:text-xl'>{delegationStats?.totalDelegators}</p>
+						<p className='text-sm font-semibold lg:text-base xl:text-lg'>{delegationStats?.totalDelegators}</p>
 					</div>
 				</div>
 			</div>

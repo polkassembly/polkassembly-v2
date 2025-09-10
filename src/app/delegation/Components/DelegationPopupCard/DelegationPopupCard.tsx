@@ -31,8 +31,8 @@ function DelegationPopupCard() {
 						</div>
 					</div>
 
-					<div className='mt-4 grid grid-cols-2'>
-						<div className='grid grid-cols-[auto_1fr] items-start'>
+					<div className='mt-4 flex flex-row items-center justify-center xl:items-start xl:justify-between'>
+						<div className='flex flex-col items-center xl:flex-row'>
 							<Image
 								src={PolkaAsset}
 								alt='Polka Asset'
@@ -40,31 +40,33 @@ function DelegationPopupCard() {
 							/>
 							<div className={styles.delegationPopupCardStep}>
 								<p className='whitespace-nowrap font-semibold'>{t('step1')}</p>
-								<div>
+								<div className='pb-4 text-center xl:pb-0 xl:text-left'>
 									<p className='font-semibold'>{t('selectTrackForDelegation')}</p>
 									<p className='max-w-xs'>{t('openGovAllowsForTrackLevelAgileDelegationChooseATrackToProceed')}</p>
 								</div>
 							</div>
 						</div>
+						<div className='grid grid-cols-2 items-start'>
+							<Image
+								src={Reverse}
+								alt='Reverse'
+								className='mt-5 h-auto w-12'
+							/>
+						</div>
 						<div className={styles.delegationPopupCardStepWrapper}>
-							<div className='grid grid-cols-2 items-start'>
-								<Image
-									src={Reverse}
-									alt='Reverse'
-									className='mt-5 h-auto w-12'
-								/>
+							<div className='flex flex-col items-center gap-4 xl:flex-row'>
 								<Image
 									src={PolkaBadge}
 									alt='Polka Badge'
 									className='h-auto w-24'
 								/>
-							</div>
-							<div className={styles.delegationPopupCardStepWrapper}>
-								<div className={styles.delegationPopupCardStep}>
-									<p className='whitespace-nowrap font-semibold'>{t('step2')}</p>
-									<div>
-										<p className='font-semibold'>{t('selectDelegate')}</p>
-										<p>{t('chooseADelegateBasedOnTheStatsToCompleteYourDelegationProcess')}</p>
+								<div className={styles.delegationPopupCardStepWrapper}>
+									<div className={styles.delegationPopupCardStep}>
+										<p className='whitespace-nowrap font-semibold'>{t('step2')}</p>
+										<div className='pb-4 text-center xl:pb-0 xl:text-left'>
+											<p className='font-semibold'>{t('selectDelegate')}</p>
+											<p className='max-w-xs'>{t('chooseADelegateBasedOnTheStatsToCompleteYourDelegationProcess')}</p>
+										</div>
 									</div>
 								</div>
 							</div>

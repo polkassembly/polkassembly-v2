@@ -23,7 +23,7 @@
 }
 
 .delegationSupplyData {
-	@apply flex flex-col items-center gap-1 text-center md:flex-row md:items-center md:gap-3 md:text-left;
+	@apply flex flex-col items-center gap-1 text-center md:flex-row md:items-center md:text-left lg:gap-3;
 	@apply md:flex-1 md:justify-center;
 }
 
