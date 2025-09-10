@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EListingTab, EPostOrigin, EProposalStatus, EProposalType, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import { Popover, PopoverTrigger, PopoverContent } from '@ui/Popover/Popover';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger, SheetFooter } from '@ui/Sheet';
@@ -200,24 +200,25 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 					? { INTERNAL_PROPOSALS: t('ListingTab.Referenda'), EXTERNAL_PROPOSALS: t('ListingTab.Analytics') }
 					: { INTERNAL_PROPOSALS: t('ListingTab.Referenda') };
 
+	useEffect(() => {
+		const params = new URLSearchParams(searchParams?.toString() || '');
+		params.delete('status');
+
+		if (state.selectedStatuses.length > 0) {
+			state.selectedStatuses.forEach((status: EProposalStatus) => {
+				params.append('status', status);
+			});
+		}
+
+		const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
+		router.push(newUrl, { scroll: false });
+	}, [state.selectedStatuses]);
+
 	const handleStatusToggle = (statusStr: string) => {
+		const status = Object.values(EProposalStatus).find((s) => t(`ListingPage_Status.${s}`) === statusStr) as EProposalStatus;
+
 		setState((prev) => {
-			const status = Object.values(EProposalStatus).find((s) => t(`ListingPage_Status.${s}`) === statusStr) as EProposalStatus;
 			const newStatuses = prev.selectedStatuses.includes(status) ? prev.selectedStatuses.filter((s) => s !== status) : [...prev.selectedStatuses, status];
-
-			const params = new URLSearchParams(searchParams?.toString() || '');
-
-			params.delete('status');
-
-			if (newStatuses.length > 0) {
-				newStatuses.forEach((newStatus: EProposalStatus) => {
-					params.append('status', newStatus);
-				});
-			} else {
-				params.delete('status');
-			}
-
-			router.push(`?${params.toString()}`, { scroll: false });
 
 			return {
 				...prev,
@@ -241,46 +242,22 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 	};
 
 	const applyMobileFilters = () => {
-		setState((prev) => {
-			const params = new URLSearchParams(searchParams?.toString() || '');
-
-			params.delete('status');
-
-			if (prev.tempMobileStatuses.length > 0) {
-				prev.tempMobileStatuses.forEach((status: EProposalStatus) => {
-					params.append('status', status);
-				});
-			} else {
-				params.delete('status');
-			}
-
-			router.push(`?${params.toString()}`, { scroll: false });
-
-			return {
-				...prev,
-				selectedStatuses: prev.tempMobileStatuses,
-				mobileSheetOpen: false,
-				currentPage: 1
-			};
-		});
+		setState((prev) => ({
+			...prev,
+			selectedStatuses: prev.tempMobileStatuses,
+			mobileSheetOpen: false,
+			currentPage: 1
+		}));
 	};
 
 	const resetFilters = () => {
-		setState((prev) => {
-			const params = new URLSearchParams(searchParams?.toString() || '');
-			params.delete('status');
-
-			const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
-			router.push(newUrl, { scroll: false });
-
-			return {
-				...prev,
-				selectedStatuses: [],
-				tempMobileStatuses: [],
-				mobileSheetOpen: false,
-				currentPage: 1
-			};
-		});
+		setState((prev) => ({
+			...prev,
+			selectedStatuses: [],
+			tempMobileStatuses: [],
+			mobileSheetOpen: false,
+			currentPage: 1
+		}));
 	};
 
 	return (
@@ -307,7 +284,6 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 							))}
 						</div>
 						<div className='flex gap-4 text-sm text-gray-700'>
-							{/* Desktop Filter - Popover */}
 							<div className='hidden lg:block'>
 								<Popover onOpenChange={(open) => setState((prev) => ({ ...prev, filterActive: open }))}>
 									<PopoverTrigger asChild>

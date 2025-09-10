@@ -130,11 +130,11 @@ function ListingCard({
 				</div>
 				<div className='flex items-center justify-between text-xs font-medium text-wallet_btn_text'>
 					<span>
-						{t('PostDetails.Aye')}: {ayePercent.toFixed(0)}%
+						{t('PostDetails.aye')}: {ayePercent.toFixed(0)}%
 					</span>
 					<span>{t('PostDetails.ToPass')}: 50%</span>
 					<span>
-						{t('PostDetails.Nay')}: {nayPercent.toFixed(0)}%
+						{t('PostDetails.nay')}: {nayPercent.toFixed(0)}%
 					</span>
 				</div>
 			</div>
@@ -162,14 +162,14 @@ function ListingCard({
 					>
 						<div className={styles.progressBarContainer}>
 							<p>
-								{t('PostDetails.Aye')} ={' '}
+								{t('PostDetails.aye')} ={' '}
 								{formatUSDWithUnits(
 									formatBnBalance(data.onChainInfo?.voteMetrics?.aye.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
 								)}{' '}
 								({ayePercent.toFixed(2)}%)
 							</p>
 							<p>
-								{t('PostDetails.Nay')} ={' '}
+								{t('PostDetails.nay')} ={' '}
 								{formatUSDWithUnits(
 									formatBnBalance(data.onChainInfo?.voteMetrics?.nay.value || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
 								)}{' '}
@@ -285,7 +285,14 @@ function ListingCard({
 					</div>
 
 					<div className='mb-3 flex items-center gap-2 text-xs text-text_primary'>
-						{data.onChainInfo?.proposer ? <Address address={data.onChainInfo?.proposer} /> : <UserAvatar publicUser={data.publicUser} />}
+						{data.onChainInfo?.proposer ? (
+							<Address
+								textClassName='max-w-[40px] truncate sm:max-w-full'
+								address={data.onChainInfo?.proposer}
+							/>
+						) : (
+							<UserAvatar publicUser={data.publicUser} />
+						)}
 						{ValidatorService.isValidOnChainProposalType(proposalType) && data.onChainInfo?.origin && (
 							<span className={`${getSpanStyle(data.onChainInfo?.origin || '', 1)} rounded px-2 py-1 text-xs font-semibold`}>
 								{convertCamelCaseToTitleCase(data.onChainInfo?.origin || '')}
