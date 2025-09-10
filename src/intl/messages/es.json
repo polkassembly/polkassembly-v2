@@ -1531,5 +1531,8 @@
 		"referendumCountByCategory": "Cantidad de Referendos por Categoría",
 		"monthlySpend": "Gasto Mensual de DOT",
 		"averageTurnoutPercentage": "Porcentaje de Asistencia Promedio"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "Voz Descentralizada"
 	}
 }

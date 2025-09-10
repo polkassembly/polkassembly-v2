@@ -1567,5 +1567,8 @@
 		"referendumCountByCategory": "Referendum Count by Category",
 		"monthlySpend": "Monthly DOT Spent",
 		"averageTurnoutPercentage": "Average Turnout Percentage"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "Decentralized Voice"
 	}
 }

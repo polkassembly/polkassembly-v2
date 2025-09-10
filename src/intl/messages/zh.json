@@ -1530,5 +1530,8 @@
 		"referendumCountByCategory": "公投数量（类别）",
 		"monthlySpend": "每月DOT支出",
 		"averageTurnoutPercentage": "平均投票率"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "分散化声音"
 	}
 }
