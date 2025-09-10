@@ -17,12 +17,12 @@ export function AnalyticsHeader() {
 				<h1 className={styles.header_title}>{t('GovAnalytics.governanceAnalytics')}</h1>
 				<p className={styles.header_description}>{t('GovAnalytics.governanceAnalyticsDescription')}</p>
 				<Link
-					href="https://wiki.polkadot.com/general/glossary/#referendum"
-					target="_blank"
-					rel="noopener noreferrer"
-					className="flex items-center gap-x-1 text-sm font-medium text-text_pink underline"
+					href='https://wiki.polkadot.com/general/glossary/#referendum'
+					target='_blank'
+					rel='noopener noreferrer'
+					className='flex items-center gap-x-1 text-sm font-medium text-text_pink underline'
 				>
-					{t('ActivityFeed.PostItem.readMore')} <ArrowUpRightFromSquareIcon className="h-3.5 w-3.5" />
+					{t('ActivityFeed.PostItem.readMore')} <ArrowUpRightFromSquareIcon className='h-3.5 w-3.5' />
 				</Link>
 			</div>
 		</div>
