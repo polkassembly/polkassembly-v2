@@ -10,10 +10,12 @@ import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { MIN_COMMENTS_FOR_SUMMARY } from '@/_shared/_constants/commentSummaryConstants';
 import { useIdentityService } from '@/hooks/useIdentityService';
+import { AlertCircle } from 'lucide-react';
 import Comments from './Comments/Comments';
 import classes from './PostComments.module.scss';
 import { Skeleton } from '../Skeleton';
 import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
+import { Alert, AlertDescription } from '../Alert';
 
 interface ICommentWithIdentityStatus extends ICommentResponse {
 	isVerified?: boolean;
@@ -79,6 +81,17 @@ function PostComments({
 				<p className={classes.title}>
 					{t('PostDetails.comments')} <span className='text-base font-normal'>{data ? `(${data?.length})` : ''}</span>
 				</p>
+				{allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED && (
+					<Alert
+						variant='info'
+						className='flex items-center gap-x-3 px-2 py-1.5'
+					>
+						<AlertCircle className='h-4 w-4' />
+						<AlertDescription className='flex w-full items-center justify-between'>
+							<p className='text-sm font-medium'>{t('PostDetails.onlyVerifiedCommentsVisible')}</p>
+						</AlertDescription>
+					</Alert>
+				)}
 			</div>
 
 			{data && data?.length >= MIN_COMMENTS_FOR_SUMMARY && (
