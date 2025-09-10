@@ -52,7 +52,7 @@ function DelegateStats({ delegate }: { delegate: IDelegateDetails }) {
 		<div className={styles.delegationCardStats}>
 			<div className={styles.delegationCardStatsItem}>
 				<div>
-					<div className='text-sm text-btn_secondary_text lg:whitespace-nowrap'>
+					<div className='text-sm text-btn_secondary_text xl:whitespace-nowrap'>
 						<span className='font-semibold md:text-2xl'>
 							{' '}
 							{formatUSDWithUnits(formatBnBalance(delegate?.maxDelegated, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
