@@ -11,7 +11,7 @@
 }
 
 .totalDelegates {
-	@apply text-xs text-wallet_btn_text text-opacity-[70%];
+	@apply text-xs text-wallet_btn_text text-opacity-[70%] xl:whitespace-nowrap;
 }
 
 .borderLeft {
