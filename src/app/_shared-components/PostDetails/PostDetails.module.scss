@@ -1,5 +1,5 @@
 .headerWrapper {
-	@apply w-full bg-bg_modal px-4 pt-6 shadow-lg lg:px-16;
+	@apply sticky top-12 z-20 w-full bg-bg_modal px-4 pt-6 shadow-lg lg:px-16;
 }
 
 .detailsWrapper {
