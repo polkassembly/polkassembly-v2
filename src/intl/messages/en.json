@@ -1568,6 +1568,9 @@
 		"monthlySpend": "Monthly DOT Spent",
 		"averageTurnoutPercentage": "Average Turnout Percentage"
 	},
+	"DVBadge": {
+		"decentralizedVoice": "Decentralized Voice"
+	},
 	"Proxies": {
 		"proxyExplorer": "Proxy Explorer",
 		"createProxy": "Create Proxy",

@@ -1530,6 +1530,9 @@
 		"monthlySpend": "Monatliche DOT Ausgaben",
 		"averageTurnoutPercentage": "Durchschnittliche Abstimmungsrate"
 	},
+	"DVBadge": {
+		"decentralizedVoice": "Dezentralisierte Stimme"
+	},
 	"Proxies": {
 		"proxyExplorer": "Proxy-Explorer",
 		"createProxy": "Proxy erstellen",

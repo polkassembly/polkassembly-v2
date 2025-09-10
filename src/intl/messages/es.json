@@ -1532,6 +1532,9 @@
 		"monthlySpend": "Gasto Mensual de DOT",
 		"averageTurnoutPercentage": "Porcentaje de Asistencia Promedio"
 	},
+	"DVBadge": {
+		"decentralizedVoice": "Voz Descentralizada"
+	},
 	"Proxies": {
 		"proxyExplorer": "Explorador de Proxies",
 		"createProxy": "Crear Proxy",

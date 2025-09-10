@@ -1531,6 +1531,9 @@
 		"monthlySpend": "月間DOT支出",
 		"averageTurnoutPercentage": "平均投票率"
 	},
+	"DVBadge": {
+		"decentralizedVoice": "分散化された声"
+	},
 	"Proxies": {
 		"proxyExplorer": "プロキシエクスプローラー",
 		"createProxy": "プロキシを作成",
