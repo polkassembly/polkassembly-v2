@@ -1509,6 +1509,27 @@
 		"scanTheQRHere": "Scannen Sie den QR-Code hier von der Vault-App",
 		"scanTheSignatureQRInYourApp": "Überprüfen Sie den Signatur-QR in Ihrer App und signieren Sie die Transaktion"
 	},
+	"GovAnalytics": {
+		"governanceAnalytics": "Governance Analytics",
+		"governanceAnalyticsDescription": "Referenda sind der Kernmechanismus der On-Chain-Governance von Polkadot, der Anlegern (DOT-Haltern) ermöglicht, über Netzwerkupgrades, Treasury-Ausgaben und andere wichtige Angelegenheiten zu entscheiden.",
+		"overview": "Übersicht",
+		"voting": "Abstimmung",
+		"votes": "Stimmen",
+		"capital": "Kapital",
+		"delegator": "Delegator",
+		"delegatee": "Delegatee",
+		"delegation": "Delegation",
+		"trackDelegation": "Track Delegation",
+		"delegationSplit": "Delegation Split",
+		"totalProposals": "Gesamte Vorschläge",
+		"approvedProposals": "Genehmigte Vorschläge",
+		"monitoredTracks": "Überwachte Tracks",
+		"referendumCount": "Referendum Anzahl",
+		"referendumCountByStatus": "Referendum Anzahl nach Status",
+		"referendumCountByCategory": "Referendum Anzahl nach Kategorie",
+		"monthlySpend": "Monatliche DOT Ausgaben",
+		"averageTurnoutPercentage": "Durchschnittliche Abstimmungsrate"
+	},
 	"Proxies": {
 		"proxyExplorer": "Proxy-Explorer",
 		"createProxy": "Proxy erstellen",

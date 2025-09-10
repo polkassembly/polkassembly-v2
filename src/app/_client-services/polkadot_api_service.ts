@@ -404,15 +404,8 @@ export class PolkadotApiService {
 				totalBalance = free.add(reserved);
 				freeBalance = free;
 
-				if (free.gt(frozen)) {
-					transferableBalance = free.sub(frozen);
-
-					if (transferableBalance.lt(existentialDeposit)) {
-						transferableBalance = BN_ZERO;
-					}
-				} else {
-					transferableBalance = BN_ZERO;
-				}
+				const frozenMinusReserved = frozen.sub(reserved);
+				transferableBalance = BN.max(free.sub(BN.max(frozenMinusReserved, existentialDeposit)), BN_ZERO);
 			})
 			.catch(() => {
 				// TODO: show notification
