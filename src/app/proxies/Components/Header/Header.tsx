@@ -6,9 +6,7 @@
 
 import { useTranslations } from 'next-intl';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
-import Link from 'next/link';
 import { EProxyDashboardTabs } from '@/_shared/types';
-import { Pencil } from 'lucide-react';
 import styles from './Header.module.scss';
 
 function Header({ data }: { data: { allProxiesCount: number } }) {
@@ -19,15 +17,6 @@ function Header({ data }: { data: { allProxiesCount: number } }) {
 			<div className={styles.header_container}>
 				<div className={styles.header_title_container}>
 					<p className={styles.header_title}>{t('Proxies.proxyExplorer')}</p>
-					<div className={styles.header_button_container}>
-						<Link
-							href='/create'
-							className={styles.header_create_button}
-						>
-							<Pencil size={16} />
-							<span>{t('Proxies.createProxy')}</span>
-						</Link>
-					</div>
 				</div>
 				<TabsList className={`w-fit max-w-full items-start overflow-auto pl-4 font-bold md:pl-0 ${styles.hideScrollbar}`}>
 					<TabsTrigger
