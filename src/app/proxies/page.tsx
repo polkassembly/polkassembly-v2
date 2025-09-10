@@ -28,8 +28,9 @@ export async function generateMetadata(): Promise<Metadata> {
 	});
 }
 
-async function Proxies({ searchParams }: { readonly searchParams?: { page?: string; allSearch?: string; myProxiesSearch?: string } }) {
-	const { page: pageParam = '1', allSearch = '' } = searchParams ?? {};
+async function Proxies({ searchParams }: { readonly searchParams?: Promise<{ page?: string; allSearch?: string; myProxiesSearch?: string }> }) {
+	const resolvedSearchParams = await searchParams;
+	const { page: pageParam = '1', allSearch = '' } = resolvedSearchParams ?? {};
 	const rawPage = Number.parseInt(pageParam, 10);
 	const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
 	// Fetch all proxies directly from Polkadot API (no Next API route)
