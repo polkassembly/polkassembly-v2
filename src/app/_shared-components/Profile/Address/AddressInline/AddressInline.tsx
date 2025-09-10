@@ -70,7 +70,7 @@ function AddressInline({
 							iconSize={iconSize}
 						/>
 
-						<p className={cn(styles.displaytext, 'max-w-[40px] truncate text-xs font-bold sm:max-w-full lg:text-sm', textClassName)}>{addressDisplayText}</p>
+						<p className={cn(styles.displaytext, 'text-xs font-bold lg:text-sm', textClassName)}>{addressDisplayText}</p>
 						{isDV && <DVBadge />}
 					</Link>
 				) : (
@@ -80,7 +80,7 @@ function AddressInline({
 							iconSize={iconSize}
 						/>
 
-						<p className={cn(styles.displaytext, 'max-w-[40px] truncate text-xs font-bold sm:w-full lg:text-sm', textClassName)}>{addressDisplayText}</p>
+						<p className={cn(styles.displaytext, 'text-xs font-bold lg:text-sm', textClassName)}>{addressDisplayText}</p>
 						{isDV && <DVBadge />}
 					</div>
 				))}
