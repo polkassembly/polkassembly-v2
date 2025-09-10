@@ -40,7 +40,7 @@ function SetDefaults({
 		<div>
 			<div className='p-4'>{t('BatchVote.setDefaults')}</div>
 			<Separator />
-			<div className='flex w-full flex-col gap-y-4 px-24 py-4'>
+			<div className='flex w-full flex-col gap-y-4 py-4 lg:px-24'>
 				<SwitchWalletOrAddress
 					small
 					withBalance
