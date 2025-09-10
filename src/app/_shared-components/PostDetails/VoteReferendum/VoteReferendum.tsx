@@ -231,7 +231,14 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 	const onVoteConfirm = async () => {
 		if (!apiService || !userPreferences.selectedAccount?.address || !userPreferences.wallet || !user?.id) return;
 
-		if (isInvalidAmount) return;
+		if (isInvalidAmount) {
+			toast({
+				title: 'Invalid Amount',
+				description: 'Please enter a valid amount to vote.',
+				status: ENotificationStatus.ERROR
+			});
+			return;
+		}
 
 		const userAddress = userPreferences.selectedAccount.address;
 
