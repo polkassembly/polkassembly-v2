@@ -10,10 +10,8 @@ import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeader
 import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 import { Tabs, TabsContent } from '@ui/Tabs';
 import { EProxyDashboardTabs } from '@/_shared/types';
-import { PolkadotApiService } from '../_client-services/polkadot_api_service';
-import ProxyListingTable from './Components/ListingTable/ProxyListingTable';
-import SearchBar from './Components/SearchBar/SearchBar';
 import MyProxiesTab from './Components/MyProxiesTab/MyProxiesTab';
+import AllProxiesTab from './Components/AllProxiesTab/AllProxiesTab';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
@@ -28,29 +26,14 @@ export async function generateMetadata(): Promise<Metadata> {
 	});
 }
 
-async function Proxies({ searchParams }: { readonly searchParams?: Promise<{ page?: string; allSearch?: string; myProxiesSearch?: string }> }) {
-	const resolvedSearchParams = await searchParams;
-	const { page: pageParam = '1', allSearch = '' } = resolvedSearchParams ?? {};
-	const rawPage = Number.parseInt(pageParam, 10);
-	const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
-	// Fetch all proxies directly from Polkadot API (no Next API route)
-	const network = await getNetworkFromHeaders();
-	const apiService = await PolkadotApiService.Init(network);
-	const allProxiesResponse = await apiService.getProxyRequests({ page: Number(page), limit: 10, search: allSearch });
-
+async function Proxies() {
 	return (
 		<div className='w-full'>
 			<Tabs defaultValue={EProxyDashboardTabs.ALL}>
-				<Header data={{ allProxiesCount: allProxiesResponse.totalCount }} />
+				<Header />
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 					<TabsContent value={EProxyDashboardTabs.ALL}>
-						<div className='flex flex-col gap-y-4'>
-							<SearchBar searchKey='allSearch' />
-							<ProxyListingTable
-								data={allProxiesResponse.items}
-								totalCount={allProxiesResponse.totalCount}
-							/>
-						</div>
+						<AllProxiesTab />
 					</TabsContent>
 					<TabsContent value={EProxyDashboardTabs.MY_PROXIES}>
 						<MyProxiesTab />

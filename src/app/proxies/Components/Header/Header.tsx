@@ -4,13 +4,28 @@
 
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
 import { EProxyDashboardTabs } from '@/_shared/types';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import styles from './Header.module.scss';
 
-function Header({ data }: { data: { allProxiesCount: number } }) {
+function Header() {
+	const { apiService } = usePolkadotApiService();
 	const t = useTranslations();
+
+	const { data: totalCount } = useQuery({
+		queryKey: ['proxyRequestsCount'],
+		queryFn: async () => {
+			if (!apiService) throw new Error('API service not available');
+			const response = await apiService.getProxyRequests({ page: 1, limit: 1 });
+			return response.totalCount;
+		},
+		enabled: !!apiService,
+		staleTime: 60000, // 1 minute
+		gcTime: 300000 // 5 minutes
+	});
 
 	return (
 		<div className={styles.header}>
@@ -23,7 +38,7 @@ function Header({ data }: { data: { allProxiesCount: number } }) {
 						className={styles.header_tab}
 						value={EProxyDashboardTabs.ALL}
 					>
-						{t('Proxies.all')} ({data?.allProxiesCount})
+						{t('Proxies.all')} ({totalCount ?? 0})
 					</TabsTrigger>
 					<TabsTrigger
 						className={styles.header_tab}

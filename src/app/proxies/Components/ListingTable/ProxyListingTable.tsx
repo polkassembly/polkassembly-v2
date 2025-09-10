@@ -14,10 +14,11 @@ import { Info, ChevronDown, ChevronUp } from 'lucide-react';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '../../../_shared-components/Table';
 import { PaginationWithLinks } from '../../../_shared-components/PaginationWithLinks';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../_shared-components/Tooltip';
+import { LoadingSpinner } from '../../../_shared-components/LoadingSpinner';
 import ProxyTypeBadge from '../../../_shared-components/ProxyTypeBadge/ProxyTypeBadge';
 import styles from './ListingTable.module.scss';
 
-function ProxyListingTable({ data, totalCount }: { data: IProxyRequest[]; totalCount: number }) {
+function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyRequest[]; totalCount: number; isLoading?: boolean }) {
 	const searchParams = useSearchParams();
 	const page = searchParams?.get('page') || 1;
 	const t = useTranslations('Proxies');
@@ -32,6 +33,17 @@ function ProxyListingTable({ data, totalCount }: { data: IProxyRequest[]; totalC
 		}
 		setExpandedRows(newExpandedRows);
 	};
+
+	if (isLoading) {
+		return (
+			<div className='flex w-full items-center justify-center rounded-lg border border-primary_border bg-bg_modal p-6 py-12'>
+				<LoadingSpinner
+					size='large'
+					message='Loading...'
+				/>
+			</div>
+		);
+	}
 
 	return (
 		<div className='w-full'>
@@ -140,7 +152,7 @@ function ProxyListingTable({ data, totalCount }: { data: IProxyRequest[]; totalC
 					)}
 				</>
 			) : (
-				<div className='flex items-center justify-center'>
+				<div className='flex w-full items-center justify-center rounded-lg border border-primary_border bg-bg_modal p-6 py-12'>
 					<h1 className='text-center text-2xl font-bold text-text_primary'>{t('noProxiesFound')}</h1>
 				</div>
 			)}
