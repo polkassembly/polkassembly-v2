@@ -18,15 +18,16 @@ function DVBadge({ className }: { className?: string }) {
 			<TooltipTrigger asChild>
 				<Image
 					alt='DV Badge'
-					className={cn('h-5 w-5', className)}
+					className={cn('h-6 w-6', className)}
 					src={DVBadgeIcon}
-					height={20}
-					width={20}
+					height={24}
+					width={24}
 				/>
 			</TooltipTrigger>
 			<TooltipContent
 				side='top'
 				align='center'
+				className='bg-tooltip_background'
 			>
 				{t('DVBadge.decentralizedVoice')}
 			</TooltipContent>
