@@ -27,7 +27,7 @@ function DVBadge({ className }: { className?: string }) {
 			<TooltipContent
 				side='top'
 				align='center'
-				className='bg-tooltip_background'
+				className='bg-bg_pink/20 text-text_pink'
 			>
 				{t('DVBadge.decentralizedVoice')}
 			</TooltipContent>
