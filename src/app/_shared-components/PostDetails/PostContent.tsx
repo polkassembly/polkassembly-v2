@@ -48,6 +48,7 @@ function PostContent({ postData, isModalOpen }: { postData: IPost; isModalOpen: 
 					markdown={content}
 					className={cn(isModalOpen ? '' : 'max-h-full border-none')}
 					truncate
+					lineClampClassName='line-clamp-[12]'
 				/>
 			)}
 
