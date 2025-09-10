@@ -9,10 +9,22 @@
 
 .leftWrapper {
 	@apply col-span-2 flex w-full flex-col gap-y-4;
+
+	@media (max-width: 1279px) {
+		display: contents;
+	}
 }
 
 .rightWrapper {
 	@apply col-span-1 flex w-full flex-col gap-y-6;
+
+	@media (max-width: 1279px) {
+		order: 2;
+	}
+
+	@media (max-width: 768px) {
+		@apply gap-y-4;
+	}
 }
 
 .descBox {

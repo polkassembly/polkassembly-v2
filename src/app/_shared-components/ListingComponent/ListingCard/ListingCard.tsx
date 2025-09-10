@@ -97,7 +97,6 @@ function ListingCard({
 											<Address
 												address={data.onChainInfo?.proposer}
 												truncateCharLen={2}
-												maxDisplayLength={10}
 											/>
 										</span>
 										<span>|</span>
