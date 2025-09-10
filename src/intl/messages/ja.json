@@ -639,7 +639,6 @@
 		"hideLikelySpam": "疑わしいスパムを非表示",
 		"showUnverifiedComments": "未確認のコメントを表示",
 		"hideUnverifiedComments": "未確認のコメントを非表示",
-		"onlyVerifiedCommentsAllowed": "確認済みユーザーのみがコメントを追加できます",
 		"HighlightMenu": {
 			"quote": "引用",
 			"share": "共有",

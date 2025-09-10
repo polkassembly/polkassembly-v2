@@ -639,7 +639,6 @@
 		"hideLikelySpam": "隐藏疑似垃圾评论",
 		"showUnverifiedComments": "显示未验证评论",
 		"hideUnverifiedComments": "隐藏未验证评论",
-		"onlyVerifiedCommentsAllowed": "只有经过验证的用户才能添加评论",
 		"HighlightMenu": {
 			"quote": "引用",
 			"share": "分享",
