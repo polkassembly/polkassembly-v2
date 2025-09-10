@@ -44,18 +44,28 @@ function Comments({
 	const [showSpam, setShowSpam] = useState(false);
 	const [showUnverified, setShowUnverified] = useState(false);
 	const [comments, setComments] = useState<ICommentResponse[]>(commentsFromProps);
+	const [identitiesLoaded, setIdentitiesLoaded] = useState<boolean>(false);
 
 	interface CommentWithVerification extends ICommentResponse {
 		isVerified?: boolean;
 	}
+
+	useEffect(() => {
+		const allCommentsHaveIdentityCheck = comments.every((comment) => typeof (comment as CommentWithVerification).isVerified !== 'undefined');
+
+		if (allCommentsHaveIdentityCheck && comments.length > 0) {
+			setIdentitiesLoaded(true);
+		}
+	}, [comments]);
 
 	const verifiedComments = useMemo(() => {
 		return comments.filter((comment) => !comment.isSpam && (comment as CommentWithVerification).isVerified);
 	}, [comments]);
 
 	const unverifiedComments = useMemo(() => {
+		if (!identitiesLoaded) return [];
 		return comments.filter((comment) => !comment.isSpam && !(comment as CommentWithVerification).isVerified);
-	}, [comments]);
+	}, [comments, identitiesLoaded]);
 
 	const spamComments = useMemo(() => {
 		return comments.filter((comment) => comment.isSpam);
@@ -171,7 +181,7 @@ function Comments({
 					</div>
 				) : null}
 
-				{unverifiedComments.length > 0 && (
+				{unverifiedComments.length > 0 && identitiesLoaded && (
 					<div className='mt-4 border-y border-border_grey py-4'>
 						<Button
 							variant='ghost'
@@ -201,7 +211,7 @@ function Comments({
 					</div>
 				)}
 
-				{spamComments.length > 0 && (
+				{spamComments.length > 0 && identitiesLoaded && (
 					<div className='mt-4 border-y border-border_grey py-4'>
 						<Button
 							variant='ghost'

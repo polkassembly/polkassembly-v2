@@ -49,9 +49,14 @@ function PostComments({
 
 		const commentsWithIdentities: ICommentWithIdentityStatus[] = await Promise.all(
 			allComments.map(async (comment) => {
-				const identity = await getOnChainIdentity(comment?.publicUser?.addresses?.[0]);
-				const isVerified = identity?.isVerified;
-				return { ...comment, isVerified };
+				try {
+					const identity = await getOnChainIdentity(comment?.publicUser?.addresses?.[0]);
+					const isVerified = identity?.isVerified;
+					return { ...comment, isVerified };
+				} catch {
+					console.log('Error fetching identity');
+					return { ...comment, isVerified: false };
+				}
 			})
 		);
 
