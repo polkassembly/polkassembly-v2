@@ -271,12 +271,12 @@ interface ReactMarkdownProps {
 	markdown: string;
 	className?: string;
 	truncate?: boolean;
-	maxLines?: number;
+	lineClampClassName?: string;
 	onShowMore?: () => void;
 }
 
 export function MarkdownViewer(props: ReactMarkdownProps) {
-	const { markdown, className, truncate = false, maxLines = 4, onShowMore } = props;
+	const { markdown, className, truncate = false, lineClampClassName, onShowMore } = props;
 	const [showMore, setShowMore] = useState(false);
 	const [isTruncated, setIsTruncated] = useState(false);
 	const editorRef = useRef<HTMLDivElement>(null);
@@ -332,7 +332,7 @@ export function MarkdownViewer(props: ReactMarkdownProps) {
 		<div className='w-full'>
 			<div
 				ref={editorRef}
-				className={cn('markdown-body', truncate && !showMore ? `line-clamp-${maxLines}` : 'line-clamp-none', 'w-full', className)}
+				className={cn('markdown-body', truncate && !showMore ? lineClampClassName || 'line-clamp-4' : 'line-clamp-none', 'w-full', className)}
 			>
 				<HighlightMenu markdownRef={editorRef} />
 				<ReactMarkdownLib
