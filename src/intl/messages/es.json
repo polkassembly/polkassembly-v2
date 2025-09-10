@@ -638,6 +638,9 @@
 		"noVoteForAddress": "No se encontró voto para esta dirección",
 		"showLikelySpam": "Mostrar spam probable",
 		"hideLikelySpam": "Ocultar spam probable",
+		"showUnverifiedComments": "Mostrar comentarios no verificados",
+		"hideUnverifiedComments": "Ocultar comentarios no verificados",
+		"onlyVerifiedCommentsAllowed": "Solo los usuarios verificados pueden añadir comentarios",
 		"HighlightMenu": {
 			"quote": "Citar",
 			"share": "Compartir",

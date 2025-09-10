@@ -57,7 +57,7 @@ function PostComments({
 			})
 		);
 
-		return allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED ? commentsWithIdentities.filter((comment) => comment.isVerified) : commentsWithIdentities;
+		return commentsWithIdentities;
 	};
 
 	const { data, isLoading } = useQuery({
@@ -83,7 +83,7 @@ function PostComments({
 					>
 						<AlertCircle className='h-4 w-4' />
 						<AlertDescription className='flex w-full items-center justify-between'>
-							<p className='text-sm font-medium'>{t('PostDetails.onlyVerifiedCommentsVisible')}</p>
+							<p className='text-sm font-medium'>{t('PostDetails.onlyVerifiedCommentsAllowed')}</p>
 						</AlertDescription>
 					</Alert>
 				)}
