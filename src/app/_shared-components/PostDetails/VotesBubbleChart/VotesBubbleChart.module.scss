@@ -101,16 +101,6 @@
 
 .card {
 	@apply mx-auto h-full w-full flex-1 rounded-2xl border-[1px] border-solid border-border_grey bg-transparent p-4 text-basic_text;
-
-	@media (max-width: 768px) {
-		max-height: 520px;
-		padding: 12px;
-	}
-
-	@media (max-width: 480px) {
-		max-height: 550px;
-		padding: 8px;
-	}
 }
 
 .description {

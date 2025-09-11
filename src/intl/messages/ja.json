@@ -448,6 +448,12 @@
 		"Treasury": "財務",
 		"LeaseAdmin": "リース管理者",
 		"GeneralAdmin": "一般管理者",
+		"chatWithKlara": "Klaraとチャット",
+		"more": "もっと",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "分析",
+		"treasuryAnalytics": "財務分析",
+		"proxies": "プロキシ",
 		"Tag": {
 			"new": "新規"
 		}
@@ -1505,8 +1511,17 @@
 		"scanTheSignatureQRInYourApp": "アプリで署名QRコードを確認し、トランザクションに署名してください"
 	},
 	"GovAnalytics": {
+		"governanceAnalytics": "ガバナンス分析",
+		"governanceAnalyticsDescription": "レファレンダムはPolkadotのオンチェーンガバナンスの中心メカニズムであり、投資家（DOT保有者）がネットワークアップグレード、トレジャリー支出、その他の重要な事項について決定することを可能にします。",
 		"overview": "概要",
 		"voting": "投票",
+		"votes": "投票",
+		"capital": "資本",
+		"delegator": "委任者",
+		"delegatee": "受任者",
+		"delegation": "委任",
+		"trackDelegation": "トラック委任",
+		"delegationSplit": "委任分割",
 		"totalProposals": "総提案数",
 		"approvedProposals": "承認された提案",
 		"monitoredTracks": "監視中のトラック",
@@ -1515,5 +1530,8 @@
 		"referendumCountByCategory": "レファレンダム数（カテゴリ別）",
 		"monthlySpend": "月間DOT支出",
 		"averageTurnoutPercentage": "平均投票率"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "分散化された声"
 	}
 }

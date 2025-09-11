@@ -90,7 +90,10 @@ function ListingCard({
 							<div className='flex items-center gap-2'>
 								{data.onChainInfo?.proposer ? (
 									<>
-										<Address address={data.onChainInfo?.proposer} />
+										<Address
+											address={data.onChainInfo?.proposer}
+											textClassName='max-w-[40px] truncate sm:max-w-full'
+										/>
 										<span>|</span>
 									</>
 								) : (

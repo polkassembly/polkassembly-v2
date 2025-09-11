@@ -1064,14 +1064,28 @@ export class FirestoreService extends FirestoreUtils {
 		return newComment;
 	}
 
-	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: string; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
+	static async UpdateComment({
+		commentId,
+		content,
+		isSpam,
+		updateHistory,
+		aiSentiment
+	}: {
+		commentId: string;
+		content: string;
+		isSpam?: boolean;
+		updateHistory?: boolean;
+		aiSentiment?: ECommentSentiment;
+	}) {
 		const comment = await this.GetCommentById(commentId);
 
 		if (!comment) {
 			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
 		}
 
-		const history: ICommentHistoryItem[] = [...(comment?.history || []), { content: comment?.content, createdAt: comment?.updatedAt || new Date() }];
+		const history: ICommentHistoryItem[] = updateHistory
+			? [...(comment?.history || []), { content: comment?.content, createdAt: comment?.updatedAt || new Date() }]
+			: comment?.history || [];
 		const newCommentData: Partial<IComment> = {
 			content,
 			...(isSpam && { isSpam }),
