@@ -5,7 +5,7 @@
 import { useTranslations } from 'next-intl';
 import { CirclePlus } from 'lucide-react';
 import { ENotificationChannel } from '@/_shared/types';
-import { ComponentType } from '@react-spring/web';
+import { ComponentType } from 'react';
 
 interface BotSetupCardProps {
 	Icon: ComponentType<{ width?: number; height?: number; className?: string }>;
