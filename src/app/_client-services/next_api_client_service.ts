@@ -958,11 +958,15 @@ export class NextApiClientService {
 		});
 	}
 
-	static async fetchLeaderboardApi({ page, limit }: { page: number; limit?: number }) {
+	static async fetchLeaderboardApi({ page, limit, searchTerm }: { page: number; limit?: number; searchTerm?: string }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString() || '1',
 			limit: limit?.toString() || DEFAULT_LISTING_LIMIT.toString()
 		});
+
+		if (searchTerm) {
+			queryParams.append('searchTerm', searchTerm);
+		}
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_LEADERBOARD, queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });

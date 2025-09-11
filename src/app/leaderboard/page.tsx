@@ -26,11 +26,12 @@ export async function generateMetadata(): Promise<Metadata> {
 	});
 }
 
-async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ page?: string; search?: string }> }) {
 	const searchParamsValue = await searchParams;
 	const page = parseInt(searchParamsValue.page || '1', DEFAULT_LISTING_LIMIT);
+	const searchTerm = searchParamsValue.search || '';
 
-	const { data, error } = await NextApiClientService.fetchLeaderboardApi({ page });
+	const { data, error } = await NextApiClientService.fetchLeaderboardApi({ page, searchTerm });
 	const { data: top3RankData, error: top3RankError } = await NextApiClientService.fetchLeaderboardApi({ page: 1, limit: 3 });
 
 	if (error || !data || top3RankError || !top3RankData) {

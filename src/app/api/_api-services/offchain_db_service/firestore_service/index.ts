@@ -176,42 +176,151 @@ export class FirestoreService extends FirestoreUtils {
 		};
 	}
 
-	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
-		const usersQuery = this.usersCollectionRef()
-			.orderBy('profileScore', 'desc')
-			.limit(limit)
-			.offset((page - 1) * limit);
+	private static async searchUsersByUsername(searchTerm: string, page: number, limit: number): Promise<{ users: IPublicUser[]; totalCount: number }> {
+		let usersQuery = this.usersCollectionRef().orderBy('profileScore', 'desc');
+		let totalCount = 0;
+
+		if (searchTerm && searchTerm.trim()) {
+			const searchTermLower = searchTerm.toLowerCase();
+
+			const exactMatchQuery = this.usersCollectionRef().where('username', '==', searchTermLower).orderBy('profileScore', 'desc');
+
+			const exactMatchSnapshot = await exactMatchQuery.get();
+
+			if (exactMatchSnapshot.empty) {
+				usersQuery = this.usersCollectionRef()
+					.where('username', '>=', searchTermLower)
+					.where('username', '<=', `${searchTermLower}\uf8ff`)
+					.orderBy('username')
+					.orderBy('profileScore', 'desc');
+			} else {
+				usersQuery = exactMatchQuery;
+			}
+		}
+
+		usersQuery = usersQuery.limit(limit).offset((page - 1) * limit);
 
 		const usersQuerySnapshot = await usersQuery.get();
 
-		const totalUsersCount = (await this.usersCollectionRef().count().get()).data().count || 0;
+		if (!searchTerm || !searchTerm.trim()) {
+			totalCount = (await this.usersCollectionRef().count().get()).data().count || 0;
+		} else {
+			const exactMatchCountQuery = this.usersCollectionRef().where('username', '==', searchTerm.toLowerCase());
+			const exactMatchCount = (await exactMatchCountQuery.count().get()).data().count || 0;
+
+			if (exactMatchCount > 0) {
+				totalCount = exactMatchCount;
+			} else {
+				const prefixCountQuery = this.usersCollectionRef().where('username', '>=', searchTerm.toLowerCase()).where('username', '<=', `${searchTerm.toLowerCase()}\uf8ff`);
+				totalCount = (await prefixCountQuery.count().get()).data().count || 0;
+			}
+		}
+
+		const usernameResults = await Promise.all(
+			usersQuerySnapshot.docs.map(async (doc) => {
+				const data = doc.data();
+
+				const addresses = await this.GetAddressesForUserId(data.id);
+				const rank =
+					(
+						await this.usersCollectionRef()
+							.where('profileScore', '>', Number(data.profileScore || 0))
+							.count()
+							.get()
+					).data().count + 1;
+
+				return {
+					id: data.id,
+					username: data.username,
+					profileScore: data.profileScore,
+					addresses: addresses.map((addr: IUserAddress) => addr.address),
+					rank,
+					createdAt: data.createdAt?.toDate?.(),
+					profileDetails: data.profileDetails || DEFAULT_PROFILE_DETAILS
+				} as IPublicUser;
+			})
+		);
+
+		return { users: usernameResults, totalCount };
+	}
+
+	private static async searchUsersByAddress(searchTerm: string): Promise<IPublicUser[]> {
+		const substrateAddress = getSubstrateAddress(searchTerm);
+
+		let addressesSnapshot;
+		if (substrateAddress) {
+			addressesSnapshot = await this.addressesCollectionRef().where('address', '==', substrateAddress).get();
+		} else {
+			addressesSnapshot = await this.addressesCollectionRef().where('address', '==', searchTerm).get();
+		}
+
+		if (addressesSnapshot.empty) {
+			addressesSnapshot = await this.addressesCollectionRef().where('address', '>=', searchTerm).where('address', '<=', `${searchTerm}\uf8ff`).get();
+		}
+
+		if (addressesSnapshot.empty) {
+			return [];
+		}
+
+		const userIds = [...new Set(addressesSnapshot.docs.map((doc) => doc.data().userId))];
+
+		const addressUserDetails = await Promise.all(
+			userIds.map(async (userId) => {
+				const user = await this.GetUserById(userId);
+				if (!user) return null;
+
+				const addresses = await this.GetAddressesForUserId(userId);
+				const rank =
+					(
+						await this.usersCollectionRef()
+							.where('profileScore', '>', Number(user.profileScore || 0))
+							.count()
+							.get()
+					).data().count + 1;
+
+				return {
+					id: user.id,
+					username: user.username,
+					profileScore: user.profileScore,
+					addresses: addresses.map((addr) => addr.address),
+					rank,
+					createdAt: user.createdAt,
+					profileDetails: user.profileDetails || DEFAULT_PROFILE_DETAILS
+				} as IPublicUser;
+			})
+		);
+
+		return addressUserDetails.filter((result): result is IPublicUser => result !== null);
+	}
+
+	static async GetPublicUsers(page: number, limit: number, searchTerm?: string): Promise<IGenericListingResponse<IPublicUser>> {
+		if (!searchTerm || !searchTerm.trim()) {
+			const { users, totalCount } = await this.searchUsersByUsername('', page, limit);
+			return { items: users, totalCount };
+		}
+
+		const { users: usernameResults, totalCount: usernameCount } = await this.searchUsersByUsername(searchTerm, page, limit);
+
+		const addressResults = await this.searchUsersByAddress(searchTerm);
+
+		let combinedResults = usernameResults;
+		let totalCount = usernameCount;
+
+		if (addressResults.length > 0) {
+			totalCount += addressResults.length;
+			const allResults = [...usernameResults, ...addressResults];
+			const uniqueUserIds = [...new Set(allResults.map((user) => user.id))];
+			combinedResults = uniqueUserIds.map((id) => allResults.find((user) => user.id === id)!);
+
+			combinedResults.sort((a, b) => (a.rank || 999) - (b.rank || 999));
+
+			const startIndex = (page - 1) * limit;
+			combinedResults = combinedResults.slice(startIndex, startIndex + limit);
+		}
 
 		return {
-			items: await Promise.all(
-				usersQuerySnapshot.docs.map(async (doc) => {
-					const data = doc.data();
-
-					const addresses = await this.GetAddressesForUserId(data.id);
-					const rank =
-						(
-							await this.usersCollectionRef()
-								.where('profileScore', '>', Number(data.profileScore || 0))
-								.count()
-								.get()
-						).data().count + 1;
-
-					return {
-						id: data.id,
-						username: data.username,
-						profileScore: data.profileScore,
-						addresses: addresses.map((addr: IUserAddress) => addr.address),
-						rank,
-						createdAt: data.createdAt?.toDate?.(),
-						profileDetails: data.profileDetails || DEFAULT_PROFILE_DETAILS
-					} as IPublicUser;
-				})
-			),
-			totalCount: totalUsersCount
+			items: combinedResults,
+			totalCount
 		};
 	}
 

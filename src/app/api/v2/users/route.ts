@@ -12,12 +12,13 @@ import { z } from 'zod';
 export const GET = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
 	const zodQuerySchema = z.object({
 		page: z.coerce.number().optional().default(1),
-		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)
+		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
+		searchTerm: z.string().optional()
 	});
 
-	const { page, limit } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
+	const { page, limit, searchTerm } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 
-	const usersListing: IGenericListingResponse<IPublicUser> = await OffChainDbService.GetPublicUsers(page, limit);
+	const usersListing: IGenericListingResponse<IPublicUser> = await OffChainDbService.GetPublicUsers(page, limit, searchTerm);
 
 	return NextResponse.json(usersListing);
 });

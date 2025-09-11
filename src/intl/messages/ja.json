@@ -990,7 +990,9 @@
 		"top50Ranks": "トップ50ランク",
 		"enterAddressToSearch": "検索するアドレスを入力",
 		"current": "現在",
-		"unknownUser": "不明なユーザー"
+		"unknownUser": "不明なユーザー",
+		"clearSearch": "検索をクリア",
+		"searching": "検索中..."
 	},
 	"AstralScoring": {
 		"bannerAlt": "アストラルスコアリングバナー",

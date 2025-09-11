@@ -112,8 +112,8 @@ export class OffChainDbService {
 		return FirestoreService.GetAddressDataByAddress(address);
 	}
 
-	static async GetPublicUsers(page: number, limit: number): Promise<IGenericListingResponse<IPublicUser>> {
-		return FirestoreService.GetPublicUsers(page, limit);
+	static async GetPublicUsers(page: number, limit: number, searchTerm?: string): Promise<IGenericListingResponse<IPublicUser>> {
+		return FirestoreService.GetPublicUsers(page, limit, searchTerm);
 	}
 
 	static async GetOffChainPostData({

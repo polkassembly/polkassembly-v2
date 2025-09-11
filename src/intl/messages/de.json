@@ -988,7 +988,9 @@
 		"top50Ranks": "Top 50 Ränge",
 		"enterAddressToSearch": "Adresse zum Suchen eingeben",
 		"current": "Aktuell",
-		"unknownUser": "Unbekannter Benutzer"
+		"unknownUser": "Unbekannter Benutzer",
+		"clearSearch": "Suche zurücksetzen",
+		"searching": "Suche..."
 	},
 	"AstralScoring": {
 		"bannerAlt": "Astral Scoring Banner",

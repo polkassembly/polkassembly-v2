@@ -990,7 +990,9 @@
 		"top50Ranks": "前50名排名",
 		"enterAddressToSearch": "输入地址搜索",
 		"current": "当前",
-		"unknownUser": "未知用户"
+		"unknownUser": "未知用户",
+		"clearSearch": "清除搜索",
+		"searching": "搜索中..."
 	},
 	"AstralScoring": {
 		"bannerAlt": "天体评分横幅",

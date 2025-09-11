@@ -991,7 +991,9 @@
 		"top50Ranks": "Top 50 Rangos",
 		"enterAddressToSearch": "Ingrese dirección para buscar",
 		"current": "Actual",
-		"filters": "Filtros"
+		"filters": "Filtros",
+		"clearSearch": "Borrar búsqueda",
+		"searching": "Buscando..."
 	},
 	"AstralScoring": {
 		"bannerAlt": "Banner de Puntuación Astral",

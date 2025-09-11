@@ -1040,7 +1040,9 @@
 		"top50Ranks": "Top 50 Ranks",
 		"enterAddressToSearch": "Enter address to search",
 		"current": "Current",
-		"unknownUser": "Unknown User"
+		"unknownUser": "Unknown User",
+		"clearSearch": "Clear Search",
+		"searching": "Searching..."
 	},
 	"AstralScoring": {
 		"bannerAlt": "Astral Scoring Banner",
