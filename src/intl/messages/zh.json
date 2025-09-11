@@ -980,7 +980,79 @@
 		"actions": "操作",
 		"leaderboard": "排行榜",
 		"findYourRank": "在生态系统中找到你的排名",
-		"searchUsername": "搜索用户名"
+		"searchUsername": "搜索用户名",
+		"topRanksTitle": "前50名排名",
+		"searchPlaceholder": "输入地址搜索",
+		"currentButton": "当前",
+		"filtersAria": "筛选",
+		"searchAria": "按地址搜索",
+		"profileRank": "排名",
+		"top50Ranks": "前50名排名",
+		"enterAddressToSearch": "输入地址搜索",
+		"current": "当前",
+		"unknownUser": "未知用户"
+	},
+	"AstralScoring": {
+		"bannerAlt": "天体评分横幅",
+		"Profile": "个人资料",
+		"Discussions": "讨论",
+		"Referendum": "公投",
+		"Bounties": "赏金",
+		"VerifyIdentity": "验证身份",
+		"Tips": "小费",
+		"Delegation": "委托",
+		"OffChain": "链下",
+		"OnChain": "链上",
+		"rankStarAlt": "排名星",
+		"items": {
+			"Profile": {
+				"addProfilePicture": "添加个人资料图片",
+				"addBio": "添加简介",
+				"linkMultipleWalletAddresses": "链接多个钱包地址",
+				"addDescription": "添加描述",
+				"addTags": "添加标签"
+			},
+			"Discussions": {
+				"likeDislike": "喜欢/不喜欢",
+				"postCommentOrReply": "发表评论或回复",
+				"linkDiscussionToProposal": "将讨论链接到提案",
+				"createDiscussion": "创建讨论",
+				"receivedLikeOnDiscussions": "您的讨论收到喜欢",
+				"receivedLikeOnCommentOrReply": "您的评论/回复收到喜欢"
+			},
+			"Referendum": {
+				"likeDislike": "喜欢/不喜欢",
+				"postCommentOrReply": "发表评论或回复",
+				"voteSuccessfullyPassed": "投票成功通过",
+				"voteFailed": "投票失败",
+				"createProposalReferendum": "创建提案/公投",
+				"linkDiscussionToProposal": "将讨论链接到提案",
+				"takeQuiz": "参加测验",
+				"answerQuizCorrectly": "在投票前正确回答测验",
+				"voteOnTreasuryProposal": "对财政提案投票",
+				"placeDecisionDepositOnBehalf": "用户可以代表另一个提案放置决策存款",
+				"receivedLikeOnCommentOrReply": "您的评论/回复收到喜欢"
+			},
+			"Bounties": {
+				"createBounty": "创建赏金",
+				"approveBounty": "批准赏金",
+				"createChildBounty": "创建子赏金",
+				"claimBounty": "认领赏金"
+			},
+			"VerifyIdentity": {
+				"signUpForVerification": "注册链上身份验证",
+				"requestAndCompleteJudgement": "请求并完成判断"
+			},
+			"Tips": {
+				"createTip": "创建小费",
+				"giveTip": "给予小费",
+				"tipNewUniqueUser": "用户给Polks的新用户小费>0.01DOT"
+			},
+			"Delegation": {
+				"userDelegatesVote": "用户将投票委托给另一个用户（首次#个跟踪 - 一次性）",
+				"receivedDelegation": "收到委托：用户从另一个用户收到委托"
+			}
+		}
 	},
 	"SetIdentity": {
 		"TeleportFundsToPeopleChain": "传送资金至People Chain",

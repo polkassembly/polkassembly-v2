@@ -980,7 +980,79 @@
 		"actions": "アクション",
 		"leaderboard": "リーダーボード",
 		"findYourRank": "生態系でのランクを見つける",
-		"searchUsername": "ユーザー名を検索"
+		"searchUsername": "ユーザー名を検索",
+		"topRanksTitle": "トップ50ランク",
+		"searchPlaceholder": "検索するアドレスを入力",
+		"currentButton": "現在",
+		"filtersAria": "フィルター",
+		"searchAria": "アドレスで検索",
+		"profileRank": "ランク",
+		"top50Ranks": "トップ50ランク",
+		"enterAddressToSearch": "検索するアドレスを入力",
+		"current": "現在",
+		"unknownUser": "不明なユーザー"
+	},
+	"AstralScoring": {
+		"bannerAlt": "アストラルスコアリングバナー",
+		"Profile": "プロフィール",
+		"Discussions": "ディスカッション",
+		"Referendum": "レファレンダム",
+		"Bounties": "報奨金",
+		"VerifyIdentity": "アイデンティティを確認",
+		"Tips": "チップ",
+		"Delegation": "委任",
+		"OffChain": "オフチェーン",
+		"OnChain": "オンチェーン",
+		"rankStarAlt": "ランクスター",
+		"items": {
+			"Profile": {
+				"addProfilePicture": "プロフィール写真を追加",
+				"addBio": "経歴を追加",
+				"linkMultipleWalletAddresses": "複数のウォレットアドレスをリンク",
+				"addDescription": "説明を追加",
+				"addTags": "タグを追加"
+			},
+			"Discussions": {
+				"likeDislike": "いいね/よくないね",
+				"postCommentOrReply": "コメントを投稿または返信する",
+				"linkDiscussionToProposal": "ディスカッションを提案にリンク",
+				"createDiscussion": "ディスカッションを作成",
+				"receivedLikeOnDiscussions": "あなたのディスカッションにいいねを受け取りました",
+				"receivedLikeOnCommentOrReply": "あなたのコメント/返信にいいねを受け取りました"
+			},
+			"Referendum": {
+				"likeDislike": "いいね/よくないね",
+				"postCommentOrReply": "コメントを投稿または返信する",
+				"voteSuccessfullyPassed": "投票が成功しました",
+				"voteFailed": "投票が失敗しました",
+				"createProposalReferendum": "提案/レファレンダムを作成",
+				"linkDiscussionToProposal": "ディスカッションを提案にリンク",
+				"takeQuiz": "クイズに参加",
+				"answerQuizCorrectlyBeforeVote": "投票前にクイズに正しく回答",
+				"voteOnTreasuryProposal": "財務提案に投票",
+				"placeDecisionDeposit": "ユーザーは他の提案に代わって決定預金を置くことができます",
+				"receivedLikeOnCommentOrReply": "あなたのコメント/返信にいいねを受け取りました"
+			},
+			"Bounties": {
+				"createBounty": "報奨金を作成",
+				"approveBounty": "報奨金を承認",
+				"createChildBounty": "子報奨金を作成",
+				"claimBounty": "報奨金を請求"
+			},
+			"VerifyIdentity": {
+				"signUpForVerification": "オンチェーンアイデンティティの検証に登録",
+				"requestAndCompleteJudgement": "判断を要求して完了"
+			},
+			"Tips": {
+				"createTip": "チップを作成",
+				"giveTip": "チップを与える",
+				"tipNewUniqueUser": "ユーザーがPolksの新しいユニークユーザーに0.01DOT以上のチップを与える"
+			},
+			"Delegation": {
+				"delegateVote": "ユーザーが自分の投票を別のユーザーに委任します（最初の＃の＃トラック - 一度）",
+				"receivedDelegation": "受け取った委任：ユーザーが別のユーザーから委任を受け取る"
+			}
+		}
 	},
 	"SetIdentity": {
 		"TeleportFundsToPeopleChain": "People Chainに資金をテレポート",

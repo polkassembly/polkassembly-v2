@@ -978,7 +978,79 @@
 		"actions": "Aktionen",
 		"leaderboard": "Bestenliste",
 		"findYourRank": "Finde deinen Rang in der Ökosystem",
-		"searchUsername": "Benutzername suchen"
+		"searchUsername": "Benutzername suchen",
+		"topRanksTitle": "Top 50 Ränge",
+		"searchPlaceholder": "Adresse zum Suchen eingeben",
+		"currentButton": "Aktuell",
+		"filtersAria": "Filter",
+		"searchAria": "Suche nach Adresse",
+		"profileRank": "Rang",
+		"top50Ranks": "Top 50 Ränge",
+		"enterAddressToSearch": "Adresse zum Suchen eingeben",
+		"current": "Aktuell",
+		"unknownUser": "Unbekannter Benutzer"
+	},
+	"AstralScoring": {
+		"bannerAlt": "Astral Scoring Banner",
+		"Profile": "Profil",
+		"Discussions": "Diskussionen",
+		"Referendum": "Referendum",
+		"Bounties": "Prämien",
+		"VerifyIdentity": "Identität verifizieren",
+		"Tips": "Trinkgelder",
+		"Delegation": "Delegation",
+		"OffChain": "Off-Chain",
+		"OnChain": "On-Chain",
+		"rankStarAlt": "Rang-Stern",
+		"items": {
+			"Profile": {
+				"addProfilePicture": "Profilbild hinzufügen",
+				"addBio": "Biografie hinzufügen",
+				"linkMultipleWalletAddresses": "Mehrere Wallet-Adressen verknüpfen",
+				"addDescription": "Beschreibung hinzufügen",
+				"addTags": "Tags hinzufügen"
+			},
+			"Discussions": {
+				"likeDislike": "Gefällt mir/Gefällt mir nicht",
+				"postCommentOrReply": "Kommentar verfassen oder antworten",
+				"linkDiscussionToProposal": "Diskussion mit Vorschlag verknüpfen",
+				"createDiscussion": "Diskussion erstellen",
+				"receivedLikeOnDiscussions": "Like für deine Diskussionen erhalten",
+				"receivedLikeOnCommentOrReply": "Like für deinen Kommentar/Antwort erhalten"
+			},
+			"Referendum": {
+				"likeDislike": "Gefällt mir/Gefällt mir nicht",
+				"postCommentOrReply": "Kommentar verfassen oder antworten",
+				"voteSuccessfullyPassed": "Abstimmung erfolgreich bestanden",
+				"voteFailed": "Abstimmung fehlgeschlagen",
+				"createProposalReferendum": "Vorschlag/Referendum erstellen",
+				"linkDiscussionToProposal": "Diskussion mit Vorschlag verknüpfen",
+				"takeQuiz": "Quiz absolvieren",
+				"answerQuizCorrectlyBeforeVote": "Quiz vor der Abstimmung korrekt beantworten",
+				"voteOnTreasuryProposal": "Über Treasury-Vorschlag abstimmen",
+				"placeDecisionDeposit": "Entscheidungseinlage im Namen eines anderen Vorschlags platzieren",
+				"receivedLikeOnCommentOrReply": "Like für deinen Kommentar/Antwort erhalten"
+			},
+			"Bounties": {
+				"createBounty": "Prämie erstellen",
+				"approveBounty": "Prämie genehmigen",
+				"createChildBounty": "Untergeordnete Prämie erstellen",
+				"claimBounty": "Prämie beanspruchen"
+			},
+			"VerifyIdentity": {
+				"signUpForVerification": "Für die Überprüfung der On-Chain-Identität anmelden",
+				"requestAndCompleteJudgement": "Urteil beantragen und abschließen"
+			},
+			"Tips": {
+				"createTip": "Trinkgeld erstellen",
+				"giveTip": "Trinkgeld geben",
+				"tipNewUniqueUser": "Neuen einzigartigen Benutzer bei Polks mit > 0,01 DOT ein Trinkgeld geben"
+			},
+			"Delegation": {
+				"delegateVote": "Benutzer delegiert seine Stimme an einen anderen Benutzer (erste # von # Tracks - einmalig)",
+				"receivedDelegation": "Erhaltene Delegation: Benutzer erhält Delegation von einem anderen Benutzer"
+			}
+		}
 	},
 	"SetIdentity": {
 		"TeleportFundsToPeopleChain": "Mittel zur People Chain teleportieren",

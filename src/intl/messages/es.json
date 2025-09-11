@@ -981,7 +981,79 @@
 		"actions": "Acciones",
 		"leaderboard": "Tabla de Clasificación",
 		"findYourRank": "Encuentra tu rango en el ecosistema",
-		"searchUsername": "Buscar nombre de usuario"
+		"searchUsername": "Buscar nombre de usuario",
+		"topRanksTitle": "Top 50 Rangos",
+		"searchPlaceholder": "Ingrese dirección para buscar",
+		"currentButton": "Actual",
+		"filtersAria": "Filtros",
+		"searchAria": "Buscar por dirección",
+		"profileRank": "Rango",
+		"top50Ranks": "Top 50 Rangos",
+		"enterAddressToSearch": "Ingrese dirección para buscar",
+		"current": "Actual",
+		"filters": "Filtros"
+	},
+	"AstralScoring": {
+		"bannerAlt": "Banner de Puntuación Astral",
+		"Profile": "Perfil",
+		"Discussions": "Discusiones",
+		"Referendum": "Referéndum",
+		"Bounties": "Recompensas",
+		"VerifyIdentity": "Verificar Identidad",
+		"Tips": "Propinas",
+		"Delegation": "Delegación",
+		"OffChain": "Fuera de Cadena",
+		"OnChain": "En Cadena",
+		"rankStarAlt": "Estrella de Rango",
+		"items": {
+			"Profile": {
+				"addProfilePicture": "Añadir Foto de Perfil",
+				"addBio": "Añadir biografía",
+				"linkMultipleWalletAddresses": "Vincular múltiples direcciones de monedero",
+				"addDescription": "Añadir Descripción",
+				"addTags": "Añadir Etiquetas"
+			},
+			"Discussions": {
+				"likeDislike": "Me gusta/No me gusta",
+				"postCommentOrReply": "Publicar un comentario o responder a uno",
+				"linkDiscussionToProposal": "Vincular Discusión a Propuesta",
+				"createDiscussion": "Crear Discusión",
+				"receivedLikeOnDiscussions": "Recibió un me gusta en sus discusiones",
+				"receivedLikeOnCommentOrReply": "Recibió un me gusta en su comentario/respuesta"
+			},
+			"Referendum": {
+				"likeDislike": "Me gusta/No me gusta",
+				"postCommentOrReply": "Publicar un comentario o responder a uno",
+				"voteSuccessfullyPassed": "Voto Aprobado Exitosamente",
+				"voteFailed": "Voto Fallido",
+				"createProposalReferendum": "Crear Propuesta/Referéndum",
+				"linkDiscussionToProposal": "Vincular Discusión a Propuesta",
+				"takeQuiz": "Realizar Cuestionario",
+				"answerQuizCorrectlyBeforeVote": "Responder Cuestionario Correctamente antes de Votar",
+				"voteOnTreasuryProposal": "Votar en Propuesta de Tesorería",
+				"placeDecisionDeposit": "El usuario puede colocar depósito de decisión en nombre de otra propuesta",
+				"receivedLikeOnCommentOrReply": "Recibió un me gusta en su comentario/respuesta"
+			},
+			"Bounties": {
+				"createBounty": "Crear Recompensa",
+				"approveBounty": "Aprobar Recompensa",
+				"createChildBounty": "Crear Recompensa Secundaria",
+				"claimBounty": "Reclamar Recompensa"
+			},
+			"VerifyIdentity": {
+				"signUpForVerification": "Registrarse para verificación de identidad en cadena",
+				"requestAndCompleteJudgement": "Solicitar y completar juicio"
+			},
+			"Tips": {
+				"createTip": "Crear Propina",
+				"giveTip": "Dar Propina",
+				"tipNewUniqueUser": "Usuario da propina a un nuevo usuario único en Polks con > 0.01DOT"
+			},
+			"Delegation": {
+				"delegateVote": "El usuario delega su voto a otro usuario (primer # de # pistas - una vez)",
+				"receivedDelegation": "Delegación Recibida: Usuario recibe delegación de otro usuario"
+			}
+		}
 	},
 	"SetIdentity": {
 		"TeleportFundsToPeopleChain": "Teleportar Fondos a People Chain",

@@ -1030,7 +1030,79 @@
 		"actions": "Actions",
 		"leaderboard": "Leaderboard",
 		"findYourRank": "Find your rank in the ecosystem",
-		"searchUsername": "Enter username to search"
+		"searchUsername": "Enter username to search",
+		"topRanksTitle": "Top 50 Ranks",
+		"searchPlaceholder": "Enter address to search",
+		"currentButton": "Current",
+		"filtersAria": "Filters",
+		"searchAria": "Search by address",
+		"profileRank": "Rank",
+		"top50Ranks": "Top 50 Ranks",
+		"enterAddressToSearch": "Enter address to search",
+		"current": "Current",
+		"unknownUser": "Unknown User"
+	},
+	"AstralScoring": {
+		"bannerAlt": "Astral Scoring Banner",
+		"Profile": "Profile",
+		"Discussions": "Discussions",
+		"Referendum": "Referendum",
+		"Bounties": "Bounties",
+		"VerifyIdentity": "Verify Identity",
+		"Tips": "Tips",
+		"Delegation": "Delegation",
+		"OffChain": "Off-Chain",
+		"OnChain": "On-Chain",
+		"rankStarAlt": "Rank Star",
+		"items": {
+			"Profile": {
+				"addProfilePicture": "Add Profile Picture",
+				"addBio": "Add bio",
+				"linkMultipleWalletAddresses": "Link Multiple Wallet addresses",
+				"addDescription": "Add Description",
+				"addTags": "Add Tags"
+			},
+			"Discussions": {
+				"likeDislike": "Like/Dislike",
+				"postCommentOrReply": "Post a comment or Reply to one",
+				"linkDiscussionToProposal": "Link Discussion to Proposal",
+				"createDiscussion": "Create Discussion",
+				"receivedLikeOnDiscussions": "Received a like on your discussions",
+				"receivedLikeOnCommentOrReply": "Received a like on your comment/reply"
+			},
+			"Referendum": {
+				"likeDislike": "Like/Dislike",
+				"postCommentOrReply": "Post a comment or Reply to one",
+				"voteSuccessfullyPassed": "Vote Successfully Passed",
+				"voteFailed": "Vote Failed",
+				"createProposalReferendum": "Create Proposal/Referendum",
+				"linkDiscussionToProposal": "Link Discussion to Proposal",
+				"takeQuiz": "Take Quiz",
+				"answerQuizCorrectly": "Answer Quiz Correctly before Vote",
+				"voteOnTreasuryProposal": "Vote on Treasury Proposal",
+				"placeDecisionDepositOnBehalf": "User can place decision deposit on behalf of another proposal",
+				"receivedLikeOnCommentOrReply": "Received a like on your comment/reply"
+			},
+			"Bounties": {
+				"createBounty": "Create Bounty",
+				"approveBounty": "Approve Bounty",
+				"createChildBounty": "Create Child Bounty",
+				"claimBounty": "Claim Bounty"
+			},
+			"VerifyIdentity": {
+				"signUpForVerification": "Sign up for verification of on chain identity",
+				"requestAndCompleteJudgement": "Request and complete judgement"
+			},
+			"Tips": {
+				"createTip": "Create Tip",
+				"giveTip": "Give Tip",
+				"tipNewUniqueUser": "User tips a new unique user at Polks with > 0.01DOT"
+			},
+			"Delegation": {
+				"userDelegatesVote": "User delegates their vote to another user (first # of # tracks – one time)",
+				"receivedDelegation": "Received Delegation: User receives delegation from another user"
+			}
+		}
 	},
 	"SetIdentity": {
 		"TeleportFundsToPeopleChain": "Teleport Funds to People Chain",

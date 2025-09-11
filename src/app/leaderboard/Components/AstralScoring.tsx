@@ -8,6 +8,7 @@ import React from 'react';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@ui/Collapsible';
+import { useTranslations } from 'next-intl';
 import AstralScoringBanner from '@assets/leaderboard/astralscoring.svg';
 import BountiesIcon from '@assets/leaderboard/Bounties.svg';
 import DelegationIcon from '@assets/leaderboard/Delegation.svg';
@@ -21,80 +22,82 @@ import OffchainIcon from '@assets/leaderboard/OffChain.svg';
 import rankStar from '@assets/leaderboard/star.svg';
 
 function AstralScoring() {
+	const t = useTranslations();
+
 	const sections = [
 		{
-			title: 'Profile',
+			title: t('AstralScoring.Profile'),
 			icon: ProfileIcon,
 			items: [
-				{ name: 'Add Profile Picture', score: '0.5', isOffChain: true },
-				{ name: 'Add bio', score: '0.5', isOffChain: true },
-				{ name: 'Link Multiple Wallet addresses', score: '0.5', isOffChain: true },
-				{ name: 'Add Description', score: '0.5', isOffChain: true },
-				{ name: 'Add Tags', score: '0.25', isOffChain: true }
+				{ name: t('AstralScoring.items.Profile.addProfilePicture'), score: '0.5', isOffChain: true },
+				{ name: t('AstralScoring.items.Profile.addBio'), score: '0.5', isOffChain: true },
+				{ name: t('AstralScoring.items.Profile.linkMultipleWalletAddresses'), score: '0.5', isOffChain: true },
+				{ name: t('AstralScoring.items.Profile.addDescription'), score: '0.5', isOffChain: true },
+				{ name: t('AstralScoring.items.Profile.addTags'), score: '0.25', isOffChain: true }
 			]
 		},
 		{
-			title: 'Discussions',
+			title: t('AstralScoring.Discussions'),
 			icon: DiscussionsIcon,
 			items: [
-				{ name: 'Like/Dislike', score: '0.25', isOffChain: true },
-				{ name: 'Post a comment or Reply to one', score: '0.25', isOffChain: true },
-				{ name: 'Link Discussion to Proposal', score: '0.5', isOffChain: true },
-				{ name: 'Create Discussion', score: '1', isOffChain: true },
-				{ name: 'Received a like on your discussions', score: '1', isOffChain: true },
-				{ name: 'Received a like on your comment/reply', score: '1', isOffChain: true }
+				{ name: t('AstralScoring.items.Discussions.likeDislike'), score: '0.25', isOffChain: true },
+				{ name: t('AstralScoring.items.Discussions.postCommentOrReply'), score: '0.25', isOffChain: true },
+				{ name: t('AstralScoring.items.Discussions.linkDiscussionToProposal'), score: '0.5', isOffChain: true },
+				{ name: t('AstralScoring.items.Discussions.createDiscussion'), score: '1', isOffChain: true },
+				{ name: t('AstralScoring.items.Discussions.receivedLikeOnDiscussions'), score: '1', isOffChain: true },
+				{ name: t('AstralScoring.items.Discussions.receivedLikeOnCommentOrReply'), score: '1', isOffChain: true }
 			]
 		},
 		{
-			title: 'Referendum',
+			title: t('AstralScoring.Referendum'),
 			icon: ReferendumIcon,
 			items: [
-				{ name: 'Like/Dislike', score: '0.25', isOffChain: true },
-				{ name: 'Post a comment or Reply to one', score: '1', isOffChain: true },
-				{ name: 'Vote Successfully Passed', score: '1', isOnChain: true },
-				{ name: 'Vote Failed', score: '2', isOnChain: true },
-				{ name: 'Create Proposal/Referendum', score: '5', isOnChain: true },
-				{ name: 'Link Discussion to Proposal', score: '0.5', isOffChain: true },
-				{ name: 'Take Quiz', score: '1', isOnChain: true },
-				{ name: 'Answer Quiz Correctly before Vote', score: '1', isOnChain: true },
-				{ name: 'Vote on Treasury Proposal', score: '2', isOnChain: true },
-				{ name: 'User can place decision deposit on behalf of another proposal', score: '1-5', isOnChain: true },
-				{ name: 'Received a like on your comment/reply', score: '1', isOnChain: true }
+				{ name: t('AstralScoring.items.Referendum.likeDislike'), score: '0.25', isOffChain: true },
+				{ name: t('AstralScoring.items.Referendum.postCommentOrReply'), score: '1', isOffChain: true },
+				{ name: t('AstralScoring.items.Referendum.voteSuccessfullyPassed'), score: '1', isOnChain: true },
+				{ name: t('AstralScoring.items.Referendum.voteFailed'), score: '2', isOnChain: true },
+				{ name: t('AstralScoring.items.Referendum.createProposalReferendum'), score: '5', isOnChain: true },
+				{ name: t('AstralScoring.items.Referendum.linkDiscussionToProposal'), score: '0.5', isOffChain: true },
+				{ name: t('AstralScoring.items.Referendum.takeQuiz'), score: '1', isOnChain: true },
+				{ name: t('AstralScoring.items.Referendum.answerQuizCorrectly'), score: '1', isOnChain: true },
+				{ name: t('AstralScoring.items.Referendum.voteOnTreasuryProposal'), score: '2', isOnChain: true },
+				{ name: t('AstralScoring.items.Referendum.placeDecisionDepositOnBehalf'), score: '1-5', isOnChain: true },
+				{ name: t('AstralScoring.items.Referendum.receivedLikeOnCommentOrReply'), score: '1', isOnChain: true }
 			]
 		},
 		{
-			title: 'Bounties',
+			title: t('AstralScoring.Bounties'),
 			icon: BountiesIcon,
 			items: [
-				{ name: 'Create Bounty', score: '5', isOnChain: true },
-				{ name: 'Approve Bounty', score: '1', isOnChain: true },
-				{ name: 'Create Child Bounty', score: '3', isOnChain: true },
-				{ name: 'Claim Bounty', score: '0.5', isOnChain: true }
+				{ name: t('AstralScoring.items.Bounties.createBounty'), score: '5', isOnChain: true },
+				{ name: t('AstralScoring.items.Bounties.approveBounty'), score: '1', isOnChain: true },
+				{ name: t('AstralScoring.items.Bounties.createChildBounty'), score: '3', isOnChain: true },
+				{ name: t('AstralScoring.items.Bounties.claimBounty'), score: '0.5', isOnChain: true }
 			]
 		},
 		{
-			title: 'Verify Indentity',
+			title: t('AstralScoring.VerifyIdentity'),
 			icon: VerifyIdentityIcon,
 			items: [
-				{ name: 'Sign up for verification of on chain identity', score: '2', isOnChain: true },
-				{ name: 'Request and complete judgement', score: '3', isOnChain: true }
+				{ name: t('AstralScoring.items.VerifyIdentity.signUpForVerification'), score: '2', isOnChain: true },
+				{ name: t('AstralScoring.items.VerifyIdentity.requestAndCompleteJudgement'), score: '3', isOnChain: true }
 			]
 		},
 		{
-			title: 'Tips',
+			title: t('AstralScoring.Tips'),
 			icon: TipsIcon,
 			items: [
-				{ name: 'Create Tip', score: '2', isOnChain: true },
-				{ name: 'Give Tip', score: '1', isOnChain: true },
-				{ name: 'User tips a new unique user at Polks with > 0.01DOT', score: '1-5', isOnChain: true }
+				{ name: t('AstralScoring.items.Tips.createTip'), score: '2', isOnChain: true },
+				{ name: t('AstralScoring.items.Tips.giveTip'), score: '1', isOnChain: true },
+				{ name: t('AstralScoring.items.Tips.tipNewUniqueUser'), score: '1-5', isOnChain: true }
 			]
 		},
 		{
-			title: 'Delegation',
+			title: t('AstralScoring.Delegation'),
 			icon: DelegationIcon,
 			items: [
-				{ name: 'User delegates their vote to another user (first # of # tracks – one time)', score: '5', isOnChain: true },
-				{ name: 'Received Delegation: User receives delegation from another user', score: '1', isOnChain: true }
+				{ name: t('AstralScoring.items.Delegation.userDelegatesVote'), score: '5', isOnChain: true },
+				{ name: t('AstralScoring.items.Delegation.receivedDelegation'), score: '1', isOnChain: true }
 			]
 		}
 	];
@@ -104,7 +107,7 @@ function AstralScoring() {
 			<div className='rounded-lg bg-bg_modal p-6 shadow-md'>
 				<Image
 					src={AstralScoringBanner}
-					alt='Astral Scoring Banner'
+					alt={t('AstralScoring.bannerAlt')}
 					width={1200}
 					height={300}
 					className='h-auto w-full'
@@ -140,11 +143,11 @@ function AstralScoring() {
 													<div className='flex items-center gap-2 rounded-md bg-bg_modal px-2 py-0.5'>
 														<Image
 															src={item.isOffChain ? OffchainIcon : OnchainIcon}
-															alt={item.isOffChain ? 'Off Chain' : 'On Chain'}
+															alt={item.isOffChain ? t('AstralScoring.OffChain') : t('AstralScoring.OnChain')}
 															width={14}
 															height={14}
 														/>
-														<p className='whitespace-nowrap text-xs text-wallet_btn_text'>{item.isOffChain ? 'Off-Chain' : 'On-Chain'}</p>
+														<p className='whitespace-nowrap text-xs text-wallet_btn_text'>{item.isOffChain ? t('AstralScoring.OffChain') : t('AstralScoring.OnChain')}</p>
 													</div>
 												)}
 											</div>
@@ -152,7 +155,7 @@ function AstralScoring() {
 												<span className='text-sm text-astral_score'>{item.score}</span>
 												<Image
 													src={rankStar}
-													alt='Rank Star'
+													alt={t('AstralScoring.rankStarAlt')}
 													width={14}
 													height={14}
 												/>

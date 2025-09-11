@@ -118,19 +118,19 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 			<div className='mt-6 rounded-2xl border border-primary_border bg-bg_modal p-6 lg:mx-20'>
 				<div className='flex flex-wrap items-center justify-between gap-4 pb-5'>
 					<div>
-						<p className='text-lg font-semibold'>Top 50 Ranks</p>
+						<p className='text-lg font-semibold'>{t('Leaderboard.top50Ranks')}</p>
 					</div>
 					<div className='flex items-center gap-3'>
 						<div className='flex items-center gap-2 rounded-md border border-primary_border bg-bg_modal px-3 py-1'>
 							<input
 								type='search'
-								placeholder='Enter address to search'
+								placeholder={t('Leaderboard.enterAddressToSearch')}
 								className='w-28 bg-transparent text-sm outline-none placeholder:text-placeholder lg:w-60'
-								aria-label='Search by address'
+								aria-label={t('Leaderboard.searchAria')}
 							/>
 							<button
 								type='button'
-								aria-label='Search'
+								aria-label={t('Leaderboard.searchAria')}
 								className='ml-2 rounded-md bg-transparent p-1 text-sm'
 							>
 								<Search className='h-4 w-4' />
@@ -140,11 +140,11 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 							type='button'
 							className='rounded-md border border-primary_border bg-bg_modal px-4 py-2 text-sm'
 						>
-							Current
+							{t('Leaderboard.current')}
 						</button>
 						<button
 							type='button'
-							aria-label='Filters'
+							aria-label={t('Leaderboard.filtersAria')}
 							className='flex h-10 w-10 items-center justify-center rounded-md border border-primary_border bg-bg_modal'
 						>
 							<ListFilter className='h-4 w-4' />
