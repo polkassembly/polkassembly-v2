@@ -30,14 +30,20 @@ function Comments({
 	proposalType,
 	index,
 	allowedCommentor,
-	postUserId
-}: {
+	postUserId,
+	sortBy = 'newest',
+	filterBy = 'hide_zero_balance',
+	onFilteredCommentsChange
+}: Readonly<{
 	comments: ICommentResponse[];
 	proposalType: EProposalType;
 	index: string;
 	allowedCommentor: EAllowedCommentor;
 	postUserId?: number;
-}) {
+	sortBy?: 'newest' | 'oldest' | 'top';
+	filterBy?: 'hide_zero_balance' | 'voters_only' | 'dv_delegates_only' | 'hide_deleted';
+	onFilteredCommentsChange?: (count: number) => void;
+}>) {
 	const t = useTranslations();
 	const user = useAtomValue(userAtom);
 	const [showMore, setShowMore] = useState(false);
@@ -46,7 +52,56 @@ function Comments({
 
 	const regularComments = useMemo(() => comments.filter((comment) => !comment.isSpam), [comments]);
 	const spamComments = useMemo(() => comments.filter((comment) => comment.isSpam), [comments]);
-	const commentsToShow = showMore ? regularComments : regularComments.slice(0, 2);
+
+	const processedRegularComments = useMemo(() => {
+		let arr = [...regularComments];
+
+		// Apply filters
+		switch (filterBy) {
+			case 'voters_only':
+				if (postUserId) {
+					arr = arr.filter((c) => c.userId === postUserId);
+				}
+				break;
+			case 'dv_delegates_only':
+				arr = arr.filter((c) => (c as unknown as { isVerified?: boolean })?.isVerified);
+				break;
+			case 'hide_deleted':
+				arr = arr.filter((c) => c.voteData && c.voteData.length > 0);
+				break;
+			case 'hide_zero_balance':
+			default:
+				// No additional filtering for 'hide_zero_balance' (shows all comments)
+				break;
+		}
+
+		// Apply sorting
+		const score = (c: ICommentResponse) => {
+			const likes = c.reactions?.filter((r) => r.reaction === 'like').length || 0;
+			const dislikes = c.reactions?.filter((r) => r.reaction === 'dislike').length || 0;
+			return likes - dislikes;
+		};
+
+		switch (sortBy) {
+			case 'newest':
+				arr.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+				break;
+			case 'oldest':
+				arr.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+				break;
+			case 'top':
+				arr.sort((a, b) => score(b) - score(a));
+				break;
+			default:
+				// Default to newest if unknown sort option
+				arr.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+				break;
+		}
+
+		return arr;
+	}, [regularComments, filterBy, sortBy, postUserId]);
+
+	const commentsToShow = showMore ? processedRegularComments : processedRegularComments.slice(0, 2);
 
 	const handleShowMore = () => {
 		setShowMore(true);
@@ -80,29 +135,26 @@ function Comments({
 		if (allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED) {
 			return { canComment: onchainIdentities?.some((identity) => identity?.isVerified), commentDisabledMessage: t('PostDetails.commentsDisabledForNonVerifiedUsers') };
 		}
-		return { canComment: !(allowedCommentor === EAllowedCommentor.NONE), commentDisabledMessage: t('PostDetails.commentsDisabled') };
+		return { canComment: allowedCommentor !== EAllowedCommentor.NONE, commentDisabledMessage: t('PostDetails.commentsDisabled') };
 	}, [allowedCommentor, onchainIdentities, user, postUserId, t]);
 
 	// Handle comment link navigation
 	const handleCommentLink = useCallback(() => {
 		const { hash } = window?.location || { hash: '' };
-		if (!hash) return;
-
-		const commentId = hash.replace('#comment-', '');
-		const comment = regularComments.find((c) => c.id === commentId);
-
-		if (comment && !showMore && regularComments.indexOf(comment) >= 2) {
-			handleShowMore();
-		}
-
-		// Use requestAnimationFrame to ensure the DOM is ready
-		requestAnimationFrame(() => {
-			const element = document.getElementById(hash.substring(1));
-			if (element) {
-				element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		if (hash !== '') {
+			const commentId = hash.replace('#comment-', '');
+			const comment = processedRegularComments.find((c) => c.id === commentId);
+			if (comment && showMore === false && processedRegularComments.indexOf(comment) >= 2) {
+				handleShowMore();
 			}
-		});
-	}, [regularComments, showMore]);
+			requestAnimationFrame(() => {
+				const element = document.getElementById(hash.substring(1));
+				if (element) {
+					element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				}
+			});
+		}
+	}, [processedRegularComments, showMore]);
 
 	// Call handleCommentLink when the component mounts
 	useLayoutEffect(() => {
@@ -112,6 +164,13 @@ function Comments({
 	useEffect(() => {
 		setComments(commentsFromProps);
 	}, [commentsFromProps]);
+
+	// Notify parent component about filtered comments count
+	useEffect(() => {
+		if (onFilteredCommentsChange) {
+			onFilteredCommentsChange(processedRegularComments.length);
+		}
+	}, [processedRegularComments.length, onFilteredCommentsChange]);
 
 	return (
 		<div className={classes.wrapper}>
@@ -123,27 +182,37 @@ function Comments({
 						setComments={setComments}
 					/>
 				))}
-				{showMore && regularComments?.length > 2 ? (
-					<div className='flex justify-center'>
-						<span
-							onClick={handleShowLess}
-							className={classes.loadMoreComments}
-							aria-hidden='true'
-						>
-							{t('ActivityFeed.PostItem.showLessComments')} <FiArrowUpCircle className='text-lg' />
-						</span>
-					</div>
-				) : !showMore && regularComments?.length > 2 ? (
-					<div className='flex justify-center'>
-						<span
-							onClick={handleShowMore}
-							className={classes.loadMoreComments}
-							aria-hidden='true'
-						>
-							{t('ActivityFeed.PostItem.loadMoreComments')} <FiArrowDownCircle className='text-lg' />
-						</span>
-					</div>
-				) : null}
+				{(() => {
+					if (showMore && regularComments?.length > 2) {
+						return (
+							<div className='flex justify-center'>
+								<span
+									onClick={handleShowLess}
+									className={classes.loadMoreComments}
+									aria-hidden='true'
+								>
+									{t('ActivityFeed.PostItem.showLessComments')} <FiArrowUpCircle className='text-lg' />
+								</span>
+							</div>
+						);
+					}
+
+					if (!showMore && regularComments?.length > 2) {
+						return (
+							<div className='flex justify-center'>
+								<span
+									onClick={handleShowMore}
+									className={classes.loadMoreComments}
+									aria-hidden='true'
+								>
+									{t('ActivityFeed.PostItem.loadMoreComments')} <FiArrowDownCircle className='text-lg' />
+								</span>
+							</div>
+						);
+					}
+
+					return null;
+				})()}
 
 				{spamComments.length > 0 && (
 					<div className='mt-4 border-y border-border_grey py-4'>
@@ -172,34 +241,42 @@ function Comments({
 				)}
 			</div>
 
-			{user ? (
-				canComment ? (
-					<div className='w-full px-6 py-6'>
-						<AddComment
-							id='commentForm'
-							proposalType={proposalType}
-							proposalIndex={index}
-							onOptimisticUpdate={handleShowMore}
-						/>
-					</div>
-				) : (
+			{(() => {
+				if (!user) {
+					return (
+						<div className={classes.loginToComment}>
+							{t('PostDetails.please')}
+							<Link
+								className='text-text_pink'
+								href='/login'
+								id='commentLoginPrompt'
+							>
+								{t('PostDetails.login')}
+							</Link>{' '}
+							{t('PostDetails.toComment')}
+						</div>
+					);
+				}
+
+				if (canComment) {
+					return (
+						<div className='w-full px-6 py-6'>
+							<AddComment
+								id='commentForm'
+								proposalType={proposalType}
+								proposalIndex={index}
+								onOptimisticUpdate={handleShowMore}
+							/>
+						</div>
+					);
+				}
+
+				return (
 					<div className={classes.loginToComment}>
 						<p className='text-sm text-text_primary'>{commentDisabledMessage}</p>
 					</div>
-				)
-			) : (
-				<div className={classes.loginToComment}>
-					{t('PostDetails.please')}
-					<Link
-						className='text-text_pink'
-						href='/login'
-						id='commentLoginPrompt'
-					>
-						{t('PostDetails.login')}
-					</Link>{' '}
-					{t('PostDetails.toComment')}
-				</div>
-			)}
+				);
+			})()}
 		</div>
 	);
 }

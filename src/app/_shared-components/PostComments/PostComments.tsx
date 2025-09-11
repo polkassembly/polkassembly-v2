@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useState } from 'react';
 import { EAllowedCommentor, EProposalType, EReactQueryKeys, ICommentResponse, IContentSummary } from '@/_shared/types';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { useTranslations } from 'next-intl';
@@ -16,6 +17,7 @@ import classes from './PostComments.module.scss';
 import { Skeleton } from '../Skeleton';
 import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 import { Alert, AlertDescription } from '../Alert';
+import CommentsFilter from './CommentsFilter/CommentsFilter';
 
 interface ICommentWithIdentityStatus extends ICommentResponse {
 	isVerified?: boolean;
@@ -28,16 +30,21 @@ function PostComments({
 	comments,
 	allowedCommentor,
 	postUserId
-}: {
+}: Readonly<{
 	proposalType: EProposalType;
 	index: string;
 	contentSummary?: IContentSummary;
 	comments?: ICommentResponse[];
 	allowedCommentor: EAllowedCommentor;
 	postUserId?: number;
-}) {
+}>) {
 	const t = useTranslations();
 	const { getOnChainIdentity, identityService } = useIdentityService();
+
+	// Comments controls
+	const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'top'>('newest');
+	const [filterBy, setFilterBy] = useState<'hide_zero_balance' | 'voters_only' | 'dv_delegates_only' | 'hide_deleted'>('hide_zero_balance');
+	const [filteredCommentsCount, setFilteredCommentsCount] = useState<number>(0);
 
 	const fetchComments = async () => {
 		const { data, error } = await CommentClientService.getCommentsOfPost({ proposalType, index });
@@ -47,7 +54,7 @@ function PostComments({
 			return comments;
 		}
 
-		const allComments = data && data.length ? data : comments || [];
+		const allComments = data?.length ? data : comments || [];
 
 		const commentsWithIdentities: ICommentWithIdentityStatus[] = await Promise.all(
 			allComments.map(async (comment) => {
@@ -74,8 +81,27 @@ function PostComments({
 		<div>
 			<div className='mb-4 flex flex-wrap items-center gap-4 px-6 pt-6'>
 				<p className={classes.title}>
-					{t('PostDetails.comments')} <span className='text-base font-normal'>{data ? `(${data?.length})` : ''}</span>
+					{t('PostDetails.comments')}{' '}
+					<span className='text-base font-normal'>
+						{(() => {
+							if (filteredCommentsCount > 0) {
+								return `(${filteredCommentsCount})`;
+							}
+							if (data) {
+								return `(${data?.length})`;
+							}
+							return '';
+						})()}
+					</span>
 				</p>
+				<div className='ml-auto flex items-center gap-3'>
+					<CommentsFilter
+						sortBy={sortBy}
+						setSortBy={setSortBy}
+						filterBy={filterBy}
+						setFilterBy={setFilterBy}
+					/>
+				</div>
 				{allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED && (
 					<Alert
 						variant='info'
@@ -114,6 +140,9 @@ function PostComments({
 					comments={data || []}
 					allowedCommentor={allowedCommentor}
 					postUserId={postUserId}
+					sortBy={sortBy}
+					filterBy={filterBy}
+					onFilteredCommentsChange={setFilteredCommentsCount}
 				/>
 			)}
 		</div>
