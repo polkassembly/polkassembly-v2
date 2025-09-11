@@ -11,6 +11,8 @@ interface IconProps {
 export function TelegramIcon({ width = 20, height = 20, className }: IconProps) {
 	return (
 		<svg
+			aria-hidden='true'
+			focusable='false'
 			width={width}
 			height={height}
 			viewBox='0 0 16 16'
@@ -42,6 +44,8 @@ export function TelegramIcon({ width = 20, height = 20, className }: IconProps) 
 export function DiscordIcon({ width = 20, height = 20, className }: IconProps) {
 	return (
 		<svg
+			aria-hidden='true'
+			focusable='false'
 			width={width}
 			height={height}
 			viewBox='0 0 16 16'
@@ -60,6 +64,8 @@ export function DiscordIcon({ width = 20, height = 20, className }: IconProps) {
 export function SlackIcon({ width = 20, height = 20, className }: IconProps) {
 	return (
 		<svg
+			aria-hidden='true'
+			focusable='false'
 			width={width}
 			height={height}
 			viewBox='0 0 16 16'
@@ -78,6 +84,8 @@ export function SlackIcon({ width = 20, height = 20, className }: IconProps) {
 export function ElementIcon({ width = 20, height = 20, className }: IconProps) {
 	return (
 		<svg
+			aria-hidden='true'
+			focusable='false'
 			width={width}
 			height={height}
 			viewBox='0 0 20 20'
@@ -107,6 +115,8 @@ export function ElementIcon({ width = 20, height = 20, className }: IconProps) {
 export function EmailIcon({ width = 20, height = 20, className }: IconProps) {
 	return (
 		<svg
+			aria-hidden='true'
+			focusable='false'
 			width={width}
 			height={height}
 			viewBox='0 0 16 16'

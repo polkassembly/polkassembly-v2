@@ -18,7 +18,7 @@ interface TrackItemProps {
 		referendumClosed: boolean;
 	};
 	onEnabledChange: (enabled: boolean) => void;
-	onNotificationChange: (type: string, enabled: boolean) => void;
+	onNotificationChange: (type: ETrackNotification, enabled: boolean) => void;
 }
 
 const TrackItem = memo(function TrackItem({ icon, title, enabled, notifications, onEnabledChange, onNotificationChange }: TrackItemProps) {

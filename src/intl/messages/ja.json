@@ -404,6 +404,7 @@
 					"isSetAsYourPrimaryNetwork": "がプライマリネットワークとして設定されています。",
 					"areYouSureYouWantToImport": "{primaryNetwork}のネットワーク設定を選択したすべてのネットワークにインポートしてもよろしいですか？",
 					"goAhead": "続行",
+					"goBack": "戻る",
 					"commandCopied": "コマンドがクリップボードにコピーされました",
 					"usernameCopied": "ユーザー名がクリップボードにコピーされました",
 					"tokenCopied": "トークンがクリップボードにコピーされました",

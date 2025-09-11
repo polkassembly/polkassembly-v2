@@ -1395,7 +1395,11 @@
 		"CreateProposal": "Create Proposal",
 		"goBack": "Go Back",
 		"Preimage": "Preimage",
-		"createSuccessfully": "created successfully!"
+		"createSuccessfully": "created successfully!",
+		"commandCopied": "Command copied to clipboard",
+		"usernameCopied": "Username copied to clipboard",
+		"tokenCopied": "Token copied to clipboard",
+		"copyFailed": "Failed to copy to clipboard"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "Bounty proposed successfully",

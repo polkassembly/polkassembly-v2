@@ -405,6 +405,7 @@
 					"isSetAsYourPrimaryNetwork": "está configurada como su Red Primaria.",
 					"areYouSureYouWantToImport": "¿Está seguro de que quiere importar la configuración de Red de {primaryNetwork} a todas las redes seleccionadas?",
 					"goAhead": "Continuar",
+					"goBack": "Volver",
 					"commandCopied": "Comando copiado al portapapeles",
 					"usernameCopied": "Nombre de usuario copiado al portapapeles",
 					"tokenCopied": "Token copiado al portapapeles",

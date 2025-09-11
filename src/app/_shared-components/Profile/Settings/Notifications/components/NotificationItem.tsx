@@ -82,16 +82,14 @@ const NotificationItem = memo(function NotificationItem({ title, description, ch
 											}}
 											className={`rounded p-1 transition-opacity ${isEnabled ? 'opacity-100' : 'opacity-30'} hover:opacity-80`}
 											title={channelLabels[channel as ENotificationChannel]}
+											aria-pressed={isEnabled}
+											aria-label={channelLabels[channel as ENotificationChannel]}
 										>
-											{channel === ENotificationChannel.EMAIL ? (
-												<IconComponent className='h-4 w-4 text-text_primary' />
-											) : (
-												<IconComponent
-													width={16}
-													height={16}
-													className='text-text_primary'
-												/>
-											)}
+											<IconComponent
+												width={16}
+												height={16}
+												className='text-text_primary'
+											/>
 										</button>
 									);
 								})}

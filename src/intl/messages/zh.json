@@ -404,6 +404,7 @@
 					"isSetAsYourPrimaryNetwork": "被设置为您的主要网络。",
 					"areYouSureYouWantToImport": "您确定要将{primaryNetwork}的网络设置导入到所有选定的网络吗？",
 					"goAhead": "继续",
+					"goBack": "返回",
 					"commandCopied": "命令已复制到剪贴板",
 					"usernameCopied": "用户名已复制到剪贴板",
 					"tokenCopied": "令牌已复制到剪贴板",
