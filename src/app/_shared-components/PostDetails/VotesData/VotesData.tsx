@@ -59,7 +59,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 		const latestSupport = voteCurveData.length > 0 ? voteCurveData[voteCurveData.length - 1].supportPercent : undefined;
 
 		const trackInfo = NETWORKS_DETAILS[`${network}`]?.trackDetails?.[`${trackName}`];
-		if (!trackInfo) {
+		if (!trackInfo || voteCurveData.length === 0) {
 			return {
 				supportData: [],
 				approvalData: [],
