@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EAllowedCommentor, EProposalType, ICommentResponse } from '@/_shared/types';
+import { EAllowedCommentor, ECommentFilterCondition, ECommentSortBy, EProposalType, ICommentResponse } from '@/_shared/types';
 import { useMemo, useState, useCallback, useLayoutEffect, useEffect } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
@@ -20,6 +20,7 @@ import { useIdentityService } from '@/hooks/useIdentityService';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import dynamic from 'next/dynamic';
 import { Button } from '@ui/Button';
+import { useCommentFilters } from '@/hooks/useCommentFilters';
 import SingleComment from '../SingleComment/SingleComment';
 import classes from './Comments.module.scss';
 
@@ -31,8 +32,8 @@ function Comments({
 	index,
 	allowedCommentor,
 	postUserId,
-	sortBy = 'newest',
-	filterBy = 'hide_zero_balance',
+	sortBy = ECommentSortBy.newest,
+	activeFilters = [],
 	onFilteredCommentsChange
 }: Readonly<{
 	comments: ICommentResponse[];
@@ -40,8 +41,8 @@ function Comments({
 	index: string;
 	allowedCommentor: EAllowedCommentor;
 	postUserId?: number;
-	sortBy?: 'newest' | 'oldest' | 'top';
-	filterBy?: 'hide_zero_balance' | 'voters_only' | 'dv_delegates_only' | 'hide_deleted';
+	sortBy?: ECommentSortBy;
+	activeFilters?: ECommentFilterCondition[];
 	onFilteredCommentsChange?: (count: number) => void;
 }>) {
 	const t = useTranslations();
@@ -53,53 +54,12 @@ function Comments({
 	const regularComments = useMemo(() => comments.filter((comment) => !comment.isSpam), [comments]);
 	const spamComments = useMemo(() => comments.filter((comment) => comment.isSpam), [comments]);
 
-	const processedRegularComments = useMemo(() => {
-		let arr = [...regularComments];
-
-		// Apply filters
-		switch (filterBy) {
-			case 'voters_only':
-				if (postUserId) {
-					arr = arr.filter((c) => c.userId === postUserId);
-				}
-				break;
-			case 'dv_delegates_only':
-				arr = arr.filter((c) => (c as unknown as { isVerified?: boolean })?.isVerified);
-				break;
-			case 'hide_deleted':
-				arr = arr.filter((c) => c.voteData && c.voteData.length > 0);
-				break;
-			case 'hide_zero_balance':
-			default:
-				// No additional filtering for 'hide_zero_balance' (shows all comments)
-				break;
-		}
-
-		// Apply sorting
-		const score = (c: ICommentResponse) => {
-			const likes = c.reactions?.filter((r) => r.reaction === 'like').length || 0;
-			const dislikes = c.reactions?.filter((r) => r.reaction === 'dislike').length || 0;
-			return likes - dislikes;
-		};
-
-		switch (sortBy) {
-			case 'newest':
-				arr.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-				break;
-			case 'oldest':
-				arr.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-				break;
-			case 'top':
-				arr.sort((a, b) => score(b) - score(a));
-				break;
-			default:
-				// Default to newest if unknown sort option
-				arr.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-				break;
-		}
-
-		return arr;
-	}, [regularComments, filterBy, sortBy, postUserId]);
+	// Use the custom hook for filtering and sorting
+	const { processedComments: processedRegularComments } = useCommentFilters({
+		comments: regularComments,
+		activeFilters: activeFilters || [],
+		sortBy: sortBy || ECommentSortBy.newest
+	});
 
 	const commentsToShow = showMore ? processedRegularComments : processedRegularComments.slice(0, 2);
 
@@ -141,7 +101,7 @@ function Comments({
 	// Handle comment link navigation
 	const handleCommentLink = useCallback(() => {
 		const { hash } = window?.location || { hash: '' };
-		if (hash !== '') {
+		if (hash.length > 0) {
 			const commentId = hash.replace('#comment-', '');
 			const comment = processedRegularComments.find((c) => c.id === commentId);
 			if (comment && showMore === false && processedRegularComments.indexOf(comment) >= 2) {

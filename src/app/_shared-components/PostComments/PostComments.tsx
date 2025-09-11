@@ -4,8 +4,8 @@
 
 'use client';
 
-import { useState } from 'react';
-import { EAllowedCommentor, EProposalType, EReactQueryKeys, ICommentResponse, IContentSummary } from '@/_shared/types';
+import { useState, useEffect } from 'react';
+import { EAllowedCommentor, ECommentFilterCondition, ECommentSortBy, EProposalType, EReactQueryKeys, ICommentResponse, IContentSummary } from '@/_shared/types';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
@@ -42,14 +42,15 @@ function PostComments({
 	const { getOnChainIdentity, identityService } = useIdentityService();
 
 	// Comments controls
-	const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'top'>('newest');
-	const [filterBy, setFilterBy] = useState<'hide_zero_balance' | 'voters_only' | 'dv_delegates_only' | 'hide_deleted'>('hide_zero_balance');
+	const [sortBy, setSortBy] = useState<ECommentSortBy>(ECommentSortBy.newest);
+	const [activeFilters, setActiveFilters] = useState<ECommentFilterCondition[]>([]);
 	const [filteredCommentsCount, setFilteredCommentsCount] = useState<number>(0);
 
 	const fetchComments = async () => {
 		const { data, error } = await CommentClientService.getCommentsOfPost({ proposalType, index });
 
 		if (error) {
+			// eslint-disable-next-line no-console
 			console.log(error?.message || 'Failed to fetch data');
 			return comments;
 		}
@@ -77,6 +78,13 @@ function PostComments({
 		refetchOnWindowFocus: false
 	});
 
+	// Update filtered count when data changes or filters are reset
+	useEffect(() => {
+		if (activeFilters.length === 0 && data) {
+			setFilteredCommentsCount(data.length);
+		}
+	}, [data, activeFilters.length]);
+
 	return (
 		<div>
 			<div className='mb-4 flex flex-wrap items-center gap-4 px-6 pt-6'>
@@ -84,9 +92,11 @@ function PostComments({
 					{t('PostDetails.comments')}{' '}
 					<span className='text-base font-normal'>
 						{(() => {
-							if (filteredCommentsCount > 0) {
+							// Show filtered count when filters are active
+							if (activeFilters.length > 0) {
 								return `(${filteredCommentsCount})`;
 							}
+							// Show original count when no filters are active
 							if (data) {
 								return `(${data?.length})`;
 							}
@@ -98,8 +108,8 @@ function PostComments({
 					<CommentsFilter
 						sortBy={sortBy}
 						setSortBy={setSortBy}
-						filterBy={filterBy}
-						setFilterBy={setFilterBy}
+						activeFilters={activeFilters}
+						setActiveFilters={setActiveFilters}
 					/>
 				</div>
 				{allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED && (
@@ -141,7 +151,7 @@ function PostComments({
 					allowedCommentor={allowedCommentor}
 					postUserId={postUserId}
 					sortBy={sortBy}
-					filterBy={filterBy}
+					activeFilters={activeFilters}
 					onFilteredCommentsChange={setFilteredCommentsCount}
 				/>
 			)}

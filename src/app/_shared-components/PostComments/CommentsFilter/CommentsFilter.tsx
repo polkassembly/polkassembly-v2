@@ -6,26 +6,58 @@
 
 import { useTranslations } from 'next-intl';
 import { CheckSquare, Filter } from 'lucide-react';
+import { useCallback, useMemo } from 'react';
+import { ECommentFilterCondition, ECommentSortBy } from '@/_shared/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../Select/Select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import { Button } from '../../Button';
 
-function CommentsFilter({
-	sortBy,
-	setSortBy,
-	filterBy,
-	setFilterBy
-}: Readonly<{
-	sortBy: 'newest' | 'oldest' | 'top';
-	setSortBy: (sortBy: 'newest' | 'oldest' | 'top') => void;
-	filterBy: 'hide_zero_balance' | 'voters_only' | 'dv_delegates_only' | 'hide_deleted';
-	setFilterBy: (filterBy: 'hide_zero_balance' | 'voters_only' | 'dv_delegates_only' | 'hide_deleted') => void;
-}>) {
+interface CommentsFilterProps {
+	sortBy: ECommentSortBy;
+	setSortBy: (sortBy: ECommentSortBy) => void;
+	activeFilters: ECommentFilterCondition[];
+	setActiveFilters: (filters: ECommentFilterCondition[]) => void;
+}
+
+function CommentsFilter({ sortBy, setSortBy, activeFilters, setActiveFilters }: Readonly<CommentsFilterProps>) {
 	const t = useTranslations();
 
-	const CHECK_ICON_BASE = 'h-4 w-4';
-	const CHECK_ICON_ACTIVE = 'text-text_pink';
-	const CHECK_ICON_INACTIVE = 'text-accent_blue';
+	// Optimized filter toggle handler
+	const toggleFilter = useCallback(
+		(filter: ECommentFilterCondition) => {
+			setActiveFilters(activeFilters.includes(filter) ? activeFilters.filter((f) => f !== filter) : [...activeFilters, filter]);
+		},
+		[activeFilters, setActiveFilters]
+	);
+
+	// Reset handler
+	const handleReset = useCallback(() => {
+		setSortBy(ECommentSortBy.newest);
+		setActiveFilters([]);
+	}, [setSortBy, setActiveFilters]);
+
+	// Filter options configuration
+	const filterOptions = useMemo(
+		() => [
+			{
+				condition: ECommentFilterCondition.HIDE_ZERO_BALANCE,
+				label: 'Hide 0 Balance Accounts'
+			},
+			{
+				condition: ECommentFilterCondition.VOTERS_ONLY,
+				label: "Show Voter's Comments Only"
+			},
+			{
+				condition: ECommentFilterCondition.DV_DELEGATES_ONLY,
+				label: 'Show DV delegates Only'
+			},
+			{
+				condition: ECommentFilterCondition.HIDE_DELETED,
+				label: 'Hide (deleted) Comments'
+			}
+		],
+		[]
+	);
 
 	return (
 		<div className='flex items-center gap-2'>
@@ -44,10 +76,7 @@ function CommentsFilter({
 							variant='ghost'
 							size='sm'
 							className='text-xs font-medium text-text_pink'
-							onClick={() => {
-								setSortBy('newest');
-								setFilterBy('hide_zero_balance');
-							}}
+							onClick={handleReset}
 						>
 							{t('PostDetails.CommentsFilter.reset')}
 						</Button>
@@ -57,49 +86,29 @@ function CommentsFilter({
 							<span className='text-sm text-basic_text'>{t('PostDetails.CommentsFilter.sortBy')}</span>
 							<Select
 								value={sortBy}
-								onValueChange={(val) => setSortBy(val as typeof sortBy)}
+								onValueChange={(val) => setSortBy(val as ECommentSortBy)}
 							>
 								<SelectTrigger className='h-8 w-fit min-w-[82px] px-3 text-sm text-basic_text'>
 									<SelectValue placeholder={t('PostDetails.CommentsFilter.newest')} />
 								</SelectTrigger>
 								<SelectContent className='w-fit border-border_grey text-basic_text'>
-									<SelectItem value='newest'>{t('PostDetails.CommentsFilter.newest')}</SelectItem>
-									<SelectItem value='oldest'>{t('PostDetails.CommentsFilter.oldest')}</SelectItem>
-									<SelectItem value='top'>{t('PostDetails.CommentsFilter.top')}</SelectItem>
+									<SelectItem value={ECommentSortBy.newest}>{t('PostDetails.CommentsFilter.newest')}</SelectItem>
+									<SelectItem value={ECommentSortBy.oldest}>{t('PostDetails.CommentsFilter.oldest')}</SelectItem>
+									<SelectItem value={ECommentSortBy.top}>{t('PostDetails.CommentsFilter.top')}</SelectItem>
 								</SelectContent>
 							</Select>
 						</div>
 					</DropdownMenuItem>
-					<DropdownMenuItem
-						onClick={() => setFilterBy('hide_zero_balance')}
-						className='flex cursor-pointer items-center justify-between text-xs text-basic_text'
-					>
-						<span>Hide 0 Balance Accounts</span>
-						<CheckSquare className={`${CHECK_ICON_BASE} ${filterBy === 'hide_zero_balance' ? CHECK_ICON_ACTIVE : CHECK_ICON_INACTIVE}`} />
-					</DropdownMenuItem>
-
-					<DropdownMenuItem
-						onClick={() => setFilterBy('voters_only')}
-						className='flex cursor-pointer items-center justify-between text-xs text-basic_text'
-					>
-						<span>Show Voter&apos;s Comments Only</span>
-						<CheckSquare className={`${CHECK_ICON_BASE} ${filterBy === 'voters_only' ? CHECK_ICON_ACTIVE : CHECK_ICON_INACTIVE}`} />
-					</DropdownMenuItem>
-
-					<DropdownMenuItem
-						onClick={() => setFilterBy('dv_delegates_only')}
-						className='flex cursor-pointer items-center justify-between text-xs text-basic_text'
-					>
-						<span>Show DV delegates Only</span>
-						<CheckSquare className={`${CHECK_ICON_BASE} ${filterBy === 'dv_delegates_only' ? CHECK_ICON_ACTIVE : CHECK_ICON_INACTIVE}`} />
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						onClick={() => setFilterBy('hide_deleted')}
-						className='flex cursor-pointer items-center justify-between text-xs text-basic_text'
-					>
-						<span>Hide (deleted) Comments</span>
-						<CheckSquare className={`${CHECK_ICON_BASE} ${filterBy === 'hide_deleted' ? CHECK_ICON_ACTIVE : CHECK_ICON_INACTIVE}`} />
-					</DropdownMenuItem>
+					{filterOptions.map(({ condition, label }) => (
+						<DropdownMenuItem
+							key={condition}
+							onClick={() => toggleFilter(condition)}
+							className='flex cursor-pointer items-center justify-between text-xs text-basic_text'
+						>
+							<span>{label}</span>
+							<CheckSquare className={`h-4 w-4 ${activeFilters.includes(condition) ? 'text-text_pink' : 'text-accent_blue'}`} />
+						</DropdownMenuItem>
+					))}
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</div>
