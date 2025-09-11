@@ -2509,7 +2509,8 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		palletInstance: '50',
 		blockTime: 6000,
 		ss58Format: 0,
-		subsquidUrl: 'https://squid.subsquid.io/polkadot-polkassembly/graphql',
+		// subsquidUrl: 'https://squid.subsquid.io/polkadot-polkassembly/graphql',
+		subsquidUrl: 'https://polkassembly.squids.live/polkadot-polkassembly@v2/api/graphql',
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.POLKADOT],
 		tokenSymbol: 'DOT',
 		rpcEndpoints: [
