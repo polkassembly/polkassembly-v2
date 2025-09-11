@@ -92,8 +92,7 @@ export enum ENotificationChannel {
 	TELEGRAM = 'telegram',
 	DISCORD = 'discord',
 	ELEMENT = 'element',
-	SLACK = 'slack',
-	IN_APP = 'in_app'
+	SLACK = 'slack'
 }
 
 export interface IUserNotificationChannelPreferences {
@@ -115,6 +114,12 @@ export interface IUserNotificationSettings {
 	triggerPreferences: {
 		[network: string]: { [index: string]: IUserNotificationTriggerPreferences };
 	};
+}
+
+export enum ETrackNotification {
+	NEW_REFERENDUM_SUBMITTED = 'newReferendumSubmitted',
+	REFERENDUM_IN_VOTING = 'referendumInVoting',
+	REFERENDUM_CLOSED = 'referendumClosed'
 }
 
 export enum ERole {
