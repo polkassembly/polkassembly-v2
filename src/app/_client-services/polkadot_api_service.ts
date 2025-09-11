@@ -38,7 +38,6 @@ import { APPNAME } from '@/_shared/_constants/appName';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
 import { Dispatch, SetStateAction } from 'react';
 import { BlockCalculationsService } from './block_calculations_service';
-import { isMimirDetected } from './isMimirDetected';
 import { VaultQrSigner } from './vault_qr_signer_service';
 import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
 
@@ -180,9 +179,7 @@ export class PolkadotApiService {
 	}) {
 		if (!this.api || !tx) return;
 
-		const isMimirIframe = await isMimirDetected();
-
-		if (isMimirIframe) {
+		if (wallet === EWallet.MIMIR) {
 			const { web3Enable, web3FromSource } = await import('@polkadot/extension-dapp');
 
 			await web3Enable(APPNAME);
@@ -401,15 +398,8 @@ export class PolkadotApiService {
 				totalBalance = free.add(reserved);
 				freeBalance = free;
 
-				if (free.gt(frozen)) {
-					transferableBalance = free.sub(frozen);
-
-					if (transferableBalance.lt(existentialDeposit)) {
-						transferableBalance = BN_ZERO;
-					}
-				} else {
-					transferableBalance = BN_ZERO;
-				}
+				const frozenMinusReserved = frozen.sub(reserved);
+				transferableBalance = BN.max(free.sub(BN.max(frozenMinusReserved, existentialDeposit)), BN_ZERO);
 			})
 			.catch(() => {
 				// TODO: show notification

@@ -67,7 +67,8 @@ export const PATCH = withErrorHandling(async (req: NextRequest, { params }: { pa
 
 	await OffChainDbService.UpdateComment({
 		commentId: id,
-		content
+		content,
+		updateHistory: true
 	});
 
 	const network = await getNetworkFromHeaders();

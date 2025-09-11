@@ -117,7 +117,12 @@ function TreasuryProposalLocal({ onSuccess }: { onSuccess: (proposalId: number) 
 			<div className='flex flex-1 flex-col gap-y-3 overflow-y-auto sm:gap-y-4'>
 				<SwitchWalletOrAddress
 					small
-					customAddressSelector={<AddressRelationsPicker withBalance />}
+					customAddressSelector={
+						<AddressRelationsPicker
+							withBalance
+							showTransferableBalance
+						/>
+					}
 				/>
 				<MultipleBeneficiaryForm
 					beneficiaries={beneficiaries}

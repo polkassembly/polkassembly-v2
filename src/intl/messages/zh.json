@@ -133,6 +133,7 @@
 	},
 	"Profile": {
 		"noAddresses": "未找到链接地址",
+		"blacklistWarning": "此用户账户因违反社区准则而被标记。",
 		"settings": "设置",
 		"login": "登录",
 		"loginFailed": "登录失败",
@@ -546,6 +547,12 @@
 		"Treasury": "国库",
 		"LeaseAdmin": "租赁管理员",
 		"GeneralAdmin": "总管理员",
+		"chatWithKlara": "与Klara聊天",
+		"more": "更多",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "分析",
+		"treasuryAnalytics": "国库分析",
+		"proxies": "代理",
 		"Tag": {
 			"new": "新"
 		}
@@ -586,6 +593,9 @@
 		"votingStarted": "投票已开始",
 		"preparePeriod": "准备期",
 		"decisionPeriod": "决策期",
+		"votingPeriod": "投票期",
+		"enactmentPeriod": "执行期",
+		"enactmentDescription": "此期间完成后执行Ref",
 		"summary": "摘要",
 		"summarise": "摘要",
 		"aye": "赞成",
@@ -1600,8 +1610,17 @@
 		"scanTheSignatureQRInYourApp": "在您的应用中验证签名二维码并签署交易"
 	},
 	"GovAnalytics": {
+		"governanceAnalytics": "治理分析",
+		"governanceAnalyticsDescription": "公投是Polkadot的链上治理的核心机制，允许投资者（DOT持有者）就网络升级、国库支出和其他重要事项做出决定。",
 		"overview": "概览",
 		"voting": "投票",
+		"votes": "投票",
+		"capital": "资本",
+		"delegator": "委任者",
+		"delegatee": "受任者",
+		"delegation": "委任",
+		"trackDelegation": "轨道委任",
+		"delegationSplit": "委任分割",
 		"totalProposals": "总提案数",
 		"approvedProposals": "已批准提案",
 		"monitoredTracks": "监控轨道",
@@ -1610,5 +1629,8 @@
 		"referendumCountByCategory": "公投数量（类别）",
 		"monthlySpend": "每月DOT支出",
 		"averageTurnoutPercentage": "平均投票率"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "分散化声音"
 	}
 }

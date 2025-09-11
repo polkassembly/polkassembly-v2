@@ -19,5 +19,5 @@
 }
 
 .onchainInfoBox {
-	@apply rounded-none bg-bg_modal p-4 shadow-lg lg:rounded-xl lg:p-6;
+	@apply rounded-none border border-border_grey bg-bg_modal p-4 lg:rounded-xl lg:p-6;
 }

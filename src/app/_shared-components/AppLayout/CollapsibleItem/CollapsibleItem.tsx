@@ -21,6 +21,7 @@ interface ISidebarMenuItem {
 	isActive?: boolean;
 	isNew?: boolean;
 	count?: number;
+	renderAsParentItem?: boolean;
 	items?: ISidebarMenuItem[];
 }
 
@@ -34,7 +35,7 @@ function NestedPopover({ item }: { item: ISidebarMenuItem }) {
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<div className={style.nestedTrigger}>
+				<div className={`${style.nestedTrigger} ${item.renderAsParentItem ? '!px-1.5' : ''}`}>
 					{item.icon && (
 						<div className={style.iconWrapper}>
 							<Image
@@ -100,7 +101,7 @@ function NestedCollapsible({ item }: { item: ISidebarMenuItem }) {
 		>
 			<CollapsibleTrigger asChild>
 				<SidebarMenuSubButton className={style.nestedButton}>
-					<div className={style.nestedTrigger}>
+					<div className={`${style.nestedTrigger} ${item.renderAsParentItem ? '!px-1.5' : ''}`}>
 						{item.icon && (
 							<div className={style.iconWrapper}>
 								<Image
@@ -234,7 +235,7 @@ function CollapsibleButton({ item, isOpen, onClick }: { item: ISidebarMenuItem; 
 		<SidebarMenuButton
 			size='default'
 			tooltip={item.title}
-			className={`${style.mainButton} ${item.isActive || item.items?.some((subItem) => subItem.isActive) ? style.sidebarActive : ''}`}
+			className={`${style.mainButton} ${item.isActive || item.items?.some((subItem) => subItem.isActive) ? style.sidebarActive : ''} ${!item.icon ? '!pl-5' : ''}`}
 			onClick={onClick}
 		>
 			{item.icon && (
@@ -305,7 +306,17 @@ function ExpandedState({ item, isOpen, setIsOpen }: { item: ISidebarMenuItem; is
 												href={subItem.url || '#'}
 												className={`${style.menuItem} ${subItem.isActive ? style.sidebarActive : 'text-sidebar_title'}`}
 											>
-												<div className='flex items-center'>
+												<div className='flex w-full items-center'>
+													{subItem.icon && (
+														<div className={style.iconWrapper}>
+															<Image
+																src={subItem.icon}
+																alt={subItem.title || 'icon'}
+																width={24}
+																height={24}
+															/>
+														</div>
+													)}
 													{subItem.title}
 													{subItem.count !== undefined && subItem.count !== 0 && <span className={style.subItemCount}>{subItem.count}</span>}
 												</div>
