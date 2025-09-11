@@ -1202,6 +1202,7 @@ export interface IDelegateDetails extends IDelegate {
 	delegators: string[];
 	receivedDelegationsCount: number;
 	last30DaysVotedProposalsCount: number;
+	hasDecentralizedVoice?: boolean;
 }
 
 export enum EDelegationStatus {
