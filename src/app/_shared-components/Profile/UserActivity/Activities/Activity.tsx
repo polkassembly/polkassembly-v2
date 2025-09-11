@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import CreatedAtTime from '../../../CreatedAtTime/CreatedAtTime';
-import classes from './Activity.module.scss';
+import classes from './Activities.module.scss';
 
 function IconComponent({ icon, className }: { icon: ReactNode; className?: string }) {
 	return <div className={cn('flex h-8 w-8 items-center justify-center rounded-full border border-border_grey', className)}>{icon}</div>;
