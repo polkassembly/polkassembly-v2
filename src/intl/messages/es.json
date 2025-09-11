@@ -1534,5 +1534,33 @@
 	},
 	"DVBadge": {
 		"decentralizedVoice": "Voz Descentralizada"
+	},
+	"Proxies": {
+		"proxyExplorer": "Explorador de Proxies",
+		"createProxy": "Crear Proxy",
+		"all": "Todos",
+		"myProxies": "Mis Proxies",
+		"delegator": "Delegador",
+		"proxyType": "Tipo de Proxy",
+		"delay": "Retraso",
+		"proxies": "Proxies",
+		"noProxiesFound": "No se encontraron proxies",
+		"searchByAddress": "Ingrese dirección para buscar",
+		"delayTooltip": "El retraso actúa como una característica de seguridad: después de que el proxy anuncia su acción prevista, hay una ventana de 24 horas durante la cual la acción puede ser revisada y, si es necesario, cancelada por la cuenta controladora antes de que se ejecute. Como Polkadot tiene un tiempo de bloque promedio de aproximadamente 6 segundos, un retraso de 14,400 bloques se traduce en aproximadamente 24 horas.",
+		"please": "Por favor",
+		"logIn": "inicia sesión",
+		"toViewMyProxies": "para ver tus proxies"
+	},
+	"ProxyType": {
+		"any": "Cualquiera",
+		"non_transfer": "Sin Transferencia",
+		"governance": "Gobernanza",
+		"staking": "Staking",
+		"identity_judgement": "Juicio de Identidad",
+		"auction": "Subasta",
+		"cancel_proxy": "Cancelar Proxy",
+		"pararegistration": "Registro de Para",
+		"nomination_pools": "Pools de Nominación",
+		"sudo_balances": "Sudo Balances"
 	}
 }

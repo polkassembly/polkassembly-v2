@@ -286,6 +286,7 @@ export class NextApiClientService {
 			case EApiRoute.GET_GOV_ANALYTICS:
 				path = '/gov-analytics';
 				break;
+
 			// post routes
 			case EApiRoute.LOGOUT:
 				path = '/auth/logout';

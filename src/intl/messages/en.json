@@ -1078,7 +1078,7 @@
 		"IdentityNotSet": "Identity Not Set",
 		"IdentityNotSetDescription": "To request a judgment, you need to have your on-chain identity set first.",
 		"IdentityNotSetDescription2": "Judgment is a way for registrars to verify your profile and provide a level of trustworthiness based on your identity information (such as display name, email, website, legal name, etc.).",
-		"IdentityNotSetDescription3": "Once you’ve set your identity, you can request a judgment from a registrar. This judgment will be visible to others and helps you build credibility on-chain.",
+		"IdentityNotSetDescription3": "Once you've set your identity, you can request a judgment from a registrar. This judgment will be visible to others and helps you build credibility on-chain.",
 		"IdentityVerified": "Your Identity has been verified.",
 		"edit": "Edit",
 		"resend": "Resend",
@@ -1570,5 +1570,33 @@
 	},
 	"DVBadge": {
 		"decentralizedVoice": "Decentralized Voice"
+	},
+	"Proxies": {
+		"proxyExplorer": "Proxy Explorer",
+		"createProxy": "Create Proxy",
+		"all": "All",
+		"myProxies": "My Proxies",
+		"delegator": "Delegator",
+		"proxyType": "Proxy Type",
+		"delay": "Delay",
+		"proxies": "Proxies",
+		"noProxiesFound": "No proxies found",
+		"searchByAddress": "Enter address to search",
+		"delayTooltip": "Delay acts as a security feature: after the proxy announces its intended action, there is a 24-hour window during which the action can be reviewed and, if necessary, canceled by the controlling account before it is executed. Since Polkadot has an average block time of about 6 seconds, a delay of 14,400 blocks translates to approximately 24 hours.",
+		"please": "Please",
+		"logIn": "log in",
+		"toViewMyProxies": "to view your proxies"
+	},
+	"ProxyType": {
+		"any": "Any",
+		"non_transfer": "Non Transfer",
+		"governance": "Governance",
+		"staking": "Staking",
+		"identity_judgement": "Identity Judgement",
+		"auction": "Auction",
+		"cancel_proxy": "Cancel Proxy",
+		"pararegistration": "Para Registration",
+		"nomination_pools": "Nomination Pools",
+		"sudo_balances": "Sudo Balances"
 	}
 }

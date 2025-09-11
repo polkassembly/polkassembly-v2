@@ -1533,5 +1533,33 @@
 	},
 	"DVBadge": {
 		"decentralizedVoice": "分散化声音"
+	},
+	"Proxies": {
+		"proxyExplorer": "代理浏览器",
+		"createProxy": "创建代理",
+		"all": "全部",
+		"myProxies": "我的代理",
+		"delegator": "委托人",
+		"proxyType": "代理类型",
+		"delay": "延迟",
+		"proxies": "代理",
+		"noProxiesFound": "未找到代理",
+		"searchByAddress": "输入地址进行搜索",
+		"delayTooltip": "延迟作为安全功能：代理宣布其预期行动后，有24小时的窗口期，在此期间可以审查该行动，如有必要，控制账户可以在执行前取消该行动。由于Polkadot的平均区块时间约为6秒，14,400个区块的延迟相当于大约24小时。",
+		"please": "请",
+		"logIn": "登录",
+		"toViewMyProxies": "查看您的代理"
+	},
+	"ProxyType": {
+		"any": "任意",
+		"non_transfer": "非转账",
+		"governance": "治理",
+		"staking": "质押",
+		"identity_judgement": "身份判断",
+		"auction": "拍卖",
+		"cancel_proxy": "取消代理",
+		"pararegistration": "平行链注册",
+		"nomination_pools": "提名池",
+		"sudo_balances": "Sudo余额"
 	}
 }

@@ -11,8 +11,7 @@ import Bounty from '@assets/sidebar/bounty.svg';
 import BatchVoting from '@assets/sidebar/batch-voting.svg';
 import AnalyticsIcon from '@assets/sidebar/gov-analytics-icon.svg';
 import TreasuryIcon from '@assets/sidebar/treasury-icon.svg';
-// import CalendarIcon from '@assets/sidebar/calendar-icon.svg';
-// import CommunityIcon from '@assets/sidebar/community-icon.svg';
+import CommunityIcon from '@assets/sidebar/community-icon.svg';
 import MoreIcon from '@assets/sidebar/more-circle-icon.svg';
 import DemocraryProposalIcon from '@assets/sidebar/democracy-proposal-icon.svg';
 import DemocraryReferendumIcon from '@assets/sidebar/democracy-referenda-icon.svg';
@@ -127,21 +126,14 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 							title: t('Sidebar.analytics'),
 							url: '',
 							icon: AnalyticsIcon,
-							items: [
-								{ title: t('Sidebar.govAnalytics'), url: '/gov-analytics' }
-								// { title: t('Sidebar.treasuryAnalytics'), url: '#' }
-							]
+							items: [{ title: t('Sidebar.govAnalytics'), url: '/gov-analytics' }]
 						},
-						/* {
+						{
 							title: t('Sidebar.community'),
 							url: '#',
 							icon: CommunityIcon,
-							items: [
-								{ title: t('Sidebar.members'), url: '#' },
-								{ title: t('Sidebar.proxies'), url: '#' },
-								{ title: t('Sidebar.ecosystemProjects'), url: '#' }
-							]
-						}, */
+							items: [{ title: t('Sidebar.proxies'), url: '/proxies' }]
+						},
 						{ title: t('Sidebar.preimages'), url: '/preimages', icon: Preimages }
 					],
 					pathname
@@ -153,7 +145,6 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 							url: '#',
 							icon: MoreIcon,
 							items: [
-								// { title: t('Sidebar.calendar'), url: '#', icon: CalendarIcon },
 								{ title: t('Sidebar.parachains'), url: '/parachains' },
 								{
 									title: t('Sidebar.gov1'),
