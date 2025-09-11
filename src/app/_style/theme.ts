@@ -367,7 +367,7 @@ export const THEME_COLORS = {
 		diff_added_text: '#68D391',
 		diff_removed_bg: '#4A1E1E',
 		diff_removed_text: '#FC8181',
-		astral_card_bg: '#F7F7F7',
+		astral_card_bg: '#222222',
 		astral_score: '#FFBA03',
 		empty_bar_bg: '#2A2A2A'
 	}

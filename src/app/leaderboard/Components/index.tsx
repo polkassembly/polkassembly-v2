@@ -12,8 +12,7 @@ import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@ui/Table';
 import { PaginationWithLinks } from '@ui/PaginationWithLinks';
-import { Search } from 'lucide-react';
-import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
+import { ListFilter, Search } from 'lucide-react';
 import RankCard from './RankCard';
 import styles from './Leaderboard.module.scss';
 import LeadboardRow from './LeadboardTable';
@@ -148,7 +147,7 @@ function Leaderboard({ data, top3RankData }: { data: IGenericListingResponse<IPu
 							aria-label='Filters'
 							className='flex h-10 w-10 items-center justify-center rounded-md border border-primary_border bg-bg_modal'
 						>
-							<FaFilter className='h-4 w-4' />
+							<ListFilter className='h-4 w-4' />
 						</button>
 					</div>
 				</div>

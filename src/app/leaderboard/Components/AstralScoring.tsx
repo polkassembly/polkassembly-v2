@@ -135,7 +135,7 @@ function AstralScoring() {
 											className='flex items-center justify-between rounded-lg bg-astral_card_bg px-3 py-1'
 										>
 											<div className='flex items-center gap-2'>
-												<span className='max-w-80 text-sm text-text_primary'>{item.name}</span>
+												<span className='max-w-80 text-sm text-btn_secondary_text'>{item.name}</span>
 												{(item.isOffChain || item.isOnChain) && (
 													<div className='flex items-center gap-2 rounded-md bg-bg_modal px-2 py-0.5'>
 														<Image
