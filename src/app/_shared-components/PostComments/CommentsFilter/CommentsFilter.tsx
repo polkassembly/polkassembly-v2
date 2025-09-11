@@ -69,7 +69,10 @@ function CommentsFilter({ sortBy, setSortBy, activeFilters, setActiveFilters }: 
 					{t('PostDetails.CommentsFilter.filter')}
 					<Filter className='h-4 w-4' />
 				</DropdownMenuTrigger>
-				<DropdownMenuContent className='min-w-[220px] border border-border_grey p-2'>
+				<DropdownMenuContent
+					align='end'
+					className='min-w-[220px] border border-border_grey p-2'
+				>
 					<div className='flex items-center justify-between'>
 						<span className='px-2 text-xs font-semibold uppercase text-basic_text opacity-70'>{t('PostDetails.CommentsFilter.conditions')}</span>
 						<Button
