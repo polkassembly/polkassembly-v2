@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { EAllowedCommentor, ECommentFilterCondition, ECommentSortBy, EProposalType, EReactQueryKeys, ICommentResponse, IContentSummary } from '@/_shared/types';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { useTranslations } from 'next-intl';
@@ -85,6 +85,13 @@ function PostComments({
 		}
 	}, [data, activeFilters.length]);
 
+	// Helper function to determine if comments filter should be shown
+	const shouldShowCommentsFilter = useMemo(() => {
+		return [EProposalType.REFERENDUM, EProposalType.REFERENDUM_V2, EProposalType.DEMOCRACY_PROPOSAL, EProposalType.TREASURY_PROPOSAL, EProposalType.FELLOWSHIP_REFERENDUM].includes(
+			proposalType
+		);
+	}, [proposalType]);
+
 	return (
 		<div>
 			<div className='mb-4 flex flex-wrap items-center gap-4 px-6 pt-6'>
@@ -105,12 +112,14 @@ function PostComments({
 					</span>
 				</p>
 				<div className='ml-auto flex items-center gap-3'>
-					<CommentsFilter
-						sortBy={sortBy}
-						setSortBy={setSortBy}
-						activeFilters={activeFilters}
-						setActiveFilters={setActiveFilters}
-					/>
+					{shouldShowCommentsFilter && (
+						<CommentsFilter
+							sortBy={sortBy}
+							setSortBy={setSortBy}
+							activeFilters={activeFilters}
+							setActiveFilters={setActiveFilters}
+						/>
+					)}
 				</div>
 				{allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED && (
 					<Alert
@@ -151,8 +160,8 @@ function PostComments({
 					allowedCommentor={allowedCommentor}
 					postUserId={postUserId}
 					sortBy={sortBy}
-					activeFilters={activeFilters}
-					onFilteredCommentsChange={setFilteredCommentsCount}
+					activeFilters={shouldShowCommentsFilter ? activeFilters : []}
+					onFilteredCommentsChange={shouldShowCommentsFilter ? setFilteredCommentsCount : undefined}
 				/>
 			)}
 		</div>
