@@ -47,7 +47,7 @@ function BotSetupCard({ Icon, title, description, channel, onClick }: BotSetupCa
 				<div className='flex items-center gap-2'>
 					<h4 className='text-base font-medium text-text_primary'>{title}</h4>
 					{channel === ENotificationChannel.ELEMENT && (
-						<span className='bg-social_element_bg rounded-md px-2 py-0.5 text-xs font-medium text-btn_primary_text'>{t('Profile.Settings.Notifications.comingSoon')}</span>
+						<span className='rounded-md bg-social_element_bg px-2 py-0.5 text-xs font-medium text-btn_primary_text'>{t('Profile.Settings.Notifications.comingSoon')}</span>
 					)}
 				</div>
 
