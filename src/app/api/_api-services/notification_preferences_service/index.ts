@@ -170,6 +170,7 @@ export class NotificationPreferencesService {
 
 		return {
 			channelPreferences: {
+				[ENotificationChannel.IN_APP]: { ...defaultChannelSettings, name: ENotificationChannel.IN_APP },
 				[ENotificationChannel.EMAIL]: { ...defaultChannelSettings, name: ENotificationChannel.EMAIL },
 				[ENotificationChannel.TELEGRAM]: { ...defaultChannelSettings, name: ENotificationChannel.TELEGRAM },
 				[ENotificationChannel.DISCORD]: { ...defaultChannelSettings, name: ENotificationChannel.DISCORD },
