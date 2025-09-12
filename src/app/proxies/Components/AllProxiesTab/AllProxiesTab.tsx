@@ -4,10 +4,10 @@
 
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { IProxyRequest } from '@/_shared/types';
 import ProxyListingTable from '../ListingTable/ProxyListingTable';
 import SearchBar from '../SearchBar/SearchBar';
 
@@ -17,32 +17,43 @@ export default function AllProxiesTab() {
 
 	const page = Number(searchParams.get('page')) || 1;
 	const search = searchParams.get('allSearch') || '';
+	const [proxyData, setProxyData] = useState<IProxyRequest[]>([]);
+	const [totalCount, setTotalCount] = useState(0);
+	const [isLoading, setIsLoading] = useState(false);
 
-	const { data, isLoading } = useQuery({
-		queryKey: ['proxyRequests', page, search],
-		queryFn: async () => {
-			if (!apiService) throw new Error('API service not available');
-			return apiService.getProxyRequests({
-				page,
-				limit: 10,
-				search
-			});
-		},
-		enabled: !!apiService,
-		staleTime: 30000, // 30 seconds
-		gcTime: 300000 // 5 minutes
-	});
+	useEffect(() => {
+		const fetchProxyData = async () => {
+			if (!apiService) return;
+			setIsLoading(true);
+			try {
+				await apiService.apiReady();
 
-	// Show loading state while API service is initializing or data is loading
-	const isInitializing = !apiService || isLoading;
+				const data = await apiService.getProxyRequests({
+					page,
+					limit: 10,
+					search
+				});
+				if (data) {
+					setProxyData(data.items);
+					setTotalCount(data.totalCount);
+				}
+			} catch (err) {
+				console.error('Error fetching proxy data:', err);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		fetchProxyData();
+	}, [apiService]);
 
 	return (
 		<div className='flex flex-col gap-y-4'>
 			<SearchBar searchKey='allSearch' />
 			<ProxyListingTable
-				data={data?.items ?? []}
-				totalCount={data?.totalCount ?? 0}
-				isLoading={isInitializing}
+				data={proxyData}
+				totalCount={totalCount}
+				isLoading={!apiService || isLoading}
 			/>
 		</div>
 	);
