@@ -4,56 +4,26 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useSearchParams } from 'next/navigation';
-import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
-import { IProxyRequest } from '@/_shared/types';
+import { useProxyData } from '@/hooks/useProxyData';
 import ProxyListingTable from '../ListingTable/ProxyListingTable';
 import SearchBar from '../SearchBar/SearchBar';
 
 export default function AllProxiesTab() {
-	const { apiService } = usePolkadotApiService();
 	const searchParams = useSearchParams();
-
 	const page = Number(searchParams.get('page')) || 1;
 	const search = searchParams.get('allSearch') || '';
-	const [proxyData, setProxyData] = useState<IProxyRequest[]>([]);
-	const [totalCount, setTotalCount] = useState(0);
-	const [isLoading, setIsLoading] = useState(false);
 
-	useEffect(() => {
-		const fetchProxyData = async () => {
-			if (!apiService) return;
-			setIsLoading(true);
-			try {
-				await apiService.apiReady();
-
-				const data = await apiService.getProxyRequests({
-					page,
-					limit: 10,
-					search
-				});
-				if (data) {
-					setProxyData(data.items);
-					setTotalCount(data.totalCount);
-				}
-			} catch (err) {
-				console.error('Error fetching proxy data:', err);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		fetchProxyData();
-	}, [apiService]);
+	const { items, totalCount, isLoading, error } = useProxyData(page, search);
 
 	return (
 		<div className='flex flex-col gap-y-4'>
 			<SearchBar searchKey='allSearch' />
 			<ProxyListingTable
-				data={proxyData}
-				totalCount={totalCount}
-				isLoading={!apiService || isLoading}
+				data={error ? [] : items}
+				totalCount={error ? 0 : totalCount}
+				isLoading={isLoading}
 			/>
 		</div>
 	);
