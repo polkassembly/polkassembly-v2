@@ -308,8 +308,8 @@ export class ValidatorService {
 		// Twitter handle rules:
 		// - 4-15 characters long
 		// - Only alphanumeric characters and underscores
-		// - Can start with a letter or number (no leading underscore)
-		const twitterHandleRegex = /^[a-zA-Z0-9][a-zA-Z0-9_]{3,14}$/;
+		// - Can start with a letter or number or underscore (@0x, @_abc)
+		const twitterHandleRegex = /^[a-zA-Z0-9_][a-zA-Z0-9_]{3,14}$/;
 
 		return twitterHandleRegex.test(cleanHandle);
 	}
