@@ -1435,16 +1435,16 @@ export class PolkadotApiService {
 
 		return this.api.tx.xcmPallet.limitedTeleportAssets(
 			{
-				V4: {
+				V3: {
 					interior: {
 						X1: { Parachain: NETWORKS_DETAILS[this.network]?.peopleChainParaId }
 					},
 					parents: 0
 				}
 			},
-			{ V4: { interior: { X1: { AccountId32: { id: decodeAddress(beneficiaryAddress), network: null } } } } },
+			{ V3: { interior: { X1: { AccountId32: { id: decodeAddress(beneficiaryAddress), network: null } } } } },
 			{
-				V4: [
+				V3: [
 					{
 						fun: {
 							Fungible: amount.toString()
