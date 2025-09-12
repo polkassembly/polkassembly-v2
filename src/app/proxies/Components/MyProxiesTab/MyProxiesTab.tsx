@@ -44,6 +44,9 @@ function MyProxiesTab() {
 		[data?.items, myProxiesSearch]
 	);
 
+	// Show loading state while API service is initializing or data is loading
+	const isInitializing = !apiService || isLoading;
+
 	// Show not authenticated message
 	if (!user?.addresses?.length) {
 		return (
@@ -70,7 +73,7 @@ function MyProxiesTab() {
 			<ProxyListingTable
 				data={filtered}
 				totalCount={myProxiesSearch ? filtered.length : data?.totalCount || 0}
-				isLoading={isLoading}
+				isLoading={isInitializing}
 			/>
 		</div>
 	);

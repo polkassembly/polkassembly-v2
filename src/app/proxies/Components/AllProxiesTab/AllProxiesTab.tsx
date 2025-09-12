@@ -33,13 +33,16 @@ export default function AllProxiesTab() {
 		gcTime: 300000 // 5 minutes
 	});
 
+	// Show loading state while API service is initializing or data is loading
+	const isInitializing = !apiService || isLoading;
+
 	return (
 		<div className='flex flex-col gap-y-4'>
 			<SearchBar searchKey='allSearch' />
 			<ProxyListingTable
 				data={data?.items ?? []}
 				totalCount={data?.totalCount ?? 0}
-				isLoading={isLoading}
+				isLoading={isInitializing}
 			/>
 		</div>
 	);
