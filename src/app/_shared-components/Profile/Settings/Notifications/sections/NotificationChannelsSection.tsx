@@ -19,6 +19,7 @@ import TelegramInfoModal from '../Modals/Telegram';
 import DiscordInfoModal from '../Modals/Discord';
 import SlackInfoModal from '../Modals/Slack';
 import classes from '../Notifications.module.scss';
+import InAPPNotificationCard from '../components/InAPPNotificationCard';
 
 const getBots = (t: (key: string) => string) => [
 	{
@@ -69,12 +70,16 @@ function NotificationChannelsSection() {
 
 	const channelPreferences = preferences?.channelPreferences || {
 		[ENotificationChannel.EMAIL]: { name: ENotificationChannel.EMAIL, enabled: false, handle: '', verified: false },
+		[ENotificationChannel.IN_APP]: { name: ENotificationChannel.IN_APP, enabled: false, handle: '', verified: false },
 		[ENotificationChannel.TELEGRAM]: { name: ENotificationChannel.TELEGRAM, enabled: false, handle: '', verified: false },
 		[ENotificationChannel.DISCORD]: { name: ENotificationChannel.DISCORD, enabled: false, handle: '', verified: false },
 		[ENotificationChannel.SLACK]: { name: ENotificationChannel.SLACK, enabled: false, handle: '', verified: false },
 		[ENotificationChannel.ELEMENT]: { name: ENotificationChannel.ELEMENT, enabled: false, handle: '', verified: false }
 	};
 
+	const handleInAPPNotificationToggle = (channel: ENotificationChannel, enabled: boolean) => {
+		updateChannelPreference(channel, { enabled });
+	};
 	return (
 		<>
 			<Collapsible className={classes.settingsCollapsible}>
@@ -127,6 +132,13 @@ function NotificationChannelsSection() {
 								verified={user?.isEmailVerified || false}
 								enabled={channelPreferences?.[ENotificationChannel.EMAIL]?.enabled || false}
 								handleEnableDisabled={handleEmailNotificationToggle}
+							/>
+
+							<Separator className='my-5' />
+
+							<InAPPNotificationCard
+								enabled={channelPreferences?.[ENotificationChannel.IN_APP]?.enabled || false}
+								handleEnableDisabled={handleInAPPNotificationToggle}
 							/>
 
 							<Separator className='my-5' />

@@ -356,6 +356,11 @@
 				"discord": "Discord",
 				"slack": "Slack",
 				"element": "Element",
+				"inApp": "En la Aplicación",
+				"inAppNotifications": "In-App-Benachrichtigungen",
+				"inAppDescription": "para recibir notificaciones en la plataforma",
+				"on": "An",
+				"off": "Aus",
 				"general": "General",
 				"notifications": "Notificaciones",
 				"Modals": {

@@ -41,15 +41,15 @@ function Settings({ userProfileData, setUserProfileData }: { userProfileData: IP
 			>
 				<div className='flex items-center gap-x-6 px-6 text-text_primary'>
 					<p className={classes.accountsHeaderText}>{t('Profile.Settings.settings')}</p>
-					<TabsList className='rounded-lg bg-[#F5F6F8] px-2 py-1'>
+					<TabsList className='rounded-lg bg-call_args_bg px-2 py-1'>
 						<TabsTrigger
-							className='rounded-xl border-none bg-[#F5F6F8] px-6 py-1 text-wallet_btn_text/70 data-[state=active]:bg-white data-[state=active]:text-btn_secondary_text'
+							className='rounded-xl border-none bg-call_args_bg px-6 py-1 text-wallet_btn_text/70 data-[state=active]:bg-bg_modal data-[state=active]:text-btn_secondary_text'
 							value='general'
 						>
 							{t('Profile.Settings.general')}
 						</TabsTrigger>
 						<TabsTrigger
-							className='rounded-xl border-none bg-[#F5F6F8] px-6 py-1 text-wallet_btn_text/70 data-[state=active]:bg-white data-[state=active]:text-btn_secondary_text'
+							className='rounded-xl border-none bg-call_args_bg px-6 py-1 text-wallet_btn_text/70 data-[state=active]:bg-bg_modal data-[state=active]:text-btn_secondary_text'
 							value='notifications'
 						>
 							{t('Profile.Settings.notifications')}

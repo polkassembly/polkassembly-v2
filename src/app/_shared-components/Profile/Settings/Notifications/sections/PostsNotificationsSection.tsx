@@ -104,6 +104,8 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 								<Switch
 									checked={allPostsEnabled}
 									onCheckedChange={toggleAllPosts}
+									className='h-4 w-8 border border-btn_secondary_text bg-transparent px-0.5 data-[state=checked]:bg-switch_inactive_bg data-[state=unchecked]:bg-transparent'
+									thumbClassName='h-2 w-2 bg-btn_secondary_text'
 								/>
 								<span className='text-text_secondary text-sm'>{t('Profile.Settings.Notifications.all')}</span>
 							</div>
