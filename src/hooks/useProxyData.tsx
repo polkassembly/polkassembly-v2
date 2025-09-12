@@ -11,8 +11,7 @@ import { usePolkadotApiService } from './usePolkadotApiService';
 export const useProxyData = (page: number = 1, search: string = '') => {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
-	const [allProxies, setAllProxies] = useAtom(allProxiesAtom);
-	const [totalCount, setTotalCount] = useState(0);
+	const [proxyData, setProxyData] = useAtom(allProxiesAtom);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -39,16 +38,19 @@ export const useProxyData = (page: number = 1, search: string = '') => {
 				});
 
 				if (isMounted) {
-					const newItems = data?.items ?? [];
-					const newTotalCount = data?.totalCount ?? 0;
-					setTotalCount(newTotalCount);
-					setAllProxies(newItems);
+					setProxyData({
+						items: data?.items ?? [],
+						totalCount: data?.totalCount ?? 0
+					});
 				}
 			} catch (err) {
 				// Error is handled via error state
 				if (isMounted) {
 					setError(err instanceof Error ? err.message : 'Failed to fetch proxies');
-					setTotalCount(0);
+					setProxyData({
+						items: [],
+						totalCount: 0
+					});
 				}
 			} finally {
 				if (isMounted) {
@@ -62,11 +64,11 @@ export const useProxyData = (page: number = 1, search: string = '') => {
 		return () => {
 			isMounted = false;
 		};
-	}, [apiService, page, search, network, setAllProxies]);
+	}, [apiService, page, search, network, setProxyData]);
 
 	return {
-		items: allProxies,
-		totalCount,
+		items: proxyData.items,
+		totalCount: proxyData.totalCount,
 		isLoading: !apiService || isLoading,
 		error
 	};
