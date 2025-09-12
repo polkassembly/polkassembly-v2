@@ -62,9 +62,10 @@ function SetIdentity() {
 	};
 
 	const { data: registrarFee } = useQuery({
-		queryKey: ['registrarFee', user?.id, userPreferences.selectedAccount?.address],
+		queryKey: ['registrarFee', network],
 		queryFn: () => fetchRegistrarFees(),
 		placeholderData: (previousData) => previousData,
+		enabled: !!identityService && !!network,
 		staleTime: FIVE_MIN_IN_MILLI,
 		retry: false,
 		refetchOnMount: false,
