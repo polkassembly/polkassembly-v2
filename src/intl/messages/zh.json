@@ -370,6 +370,11 @@
 				"discord": "Discord",
 				"slack": "Slack",
 				"element": "Element",
+				"inApp": "应用内",
+				"inAppNotifications": "应用内通知",
+				"inAppDescription": "在平台上接收通知",
+				"on": "开启",
+				"off": "关闭",
 				"general": "一般",
 				"notifications": "通知",
 				"Modals": {
