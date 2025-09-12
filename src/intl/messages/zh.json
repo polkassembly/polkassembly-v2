@@ -637,6 +637,8 @@
 		"noVoteForAddress": "未找到此地址的投票",
 		"showLikelySpam": "显示疑似垃圾评论",
 		"hideLikelySpam": "隐藏疑似垃圾评论",
+		"showUnverifiedComments": "显示未验证评论",
+		"hideUnverifiedComments": "隐藏未验证评论",
 		"HighlightMenu": {
 			"quote": "引用",
 			"share": "分享",
