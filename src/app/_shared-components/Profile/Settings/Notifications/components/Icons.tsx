@@ -131,3 +131,35 @@ export function EmailIcon({ width = 20, height = 20, className }: IconProps) {
 		</svg>
 	);
 }
+
+export function InAppIcon({ width = 20, height = 20, className }: IconProps) {
+	return (
+		<svg
+			width={width}
+			height={height}
+			viewBox='2 2 16 17'
+			fill='none'
+			xmlns='http://www.w3.org/2000/svg'
+			className={className}
+		>
+			<path
+				d='M15.6703 14.25C16.8007 13.4502 17.5 12.3453 17.5 11.125C17.5 9.90459 16.8007 8.79976 15.6703 8M13.75 9.5625C14.3152 9.96237 14.6649 10.5148 14.6649 11.125C14.6649 11.7352 14.3152 12.2876 13.75 12.6875'
+				stroke='currentColor'
+				strokeLinecap='round'
+				strokeLinejoin='round'
+			/>
+			<path
+				d='M13.75 6.75C13.75 4.98224 13.75 4.09835 13.1868 3.54917C12.6235 3 11.7169 3 9.90385 3H7.59615C5.78306 3 4.87652 3 4.31325 3.54917C3.75 4.09835 3.75 4.98224 3.75 6.75V14.25C3.75 16.0178 3.75 16.9016 4.31325 17.4508C4.87652 18 5.78306 18 7.59615 18H9.90385C11.7169 18 12.6235 18 13.1868 17.4508C13.75 16.9016 13.75 16.0178 13.75 14.25'
+				stroke='currentColor'
+				strokeLinecap='round'
+				strokeLinejoin='round'
+			/>
+			<path
+				d='M10 3H7.5L7.8125 4.25H9.6875L10 3Z'
+				stroke='currentColor'
+				strokeLinecap='round'
+				strokeLinejoin='round'
+			/>
+		</svg>
+	);
+}

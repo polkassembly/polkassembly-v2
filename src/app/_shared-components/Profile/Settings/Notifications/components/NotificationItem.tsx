@@ -8,7 +8,7 @@ import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import { ChevronDown, Mail } from 'lucide-react';
 import { ENotificationChannel } from '@/_shared/types';
-import { TelegramIcon, DiscordIcon, SlackIcon, ElementIcon } from './Icons';
+import { TelegramIcon, DiscordIcon, SlackIcon, ElementIcon, InAppIcon } from './Icons';
 
 interface NotificationItemProps {
 	title: string;
@@ -17,6 +17,7 @@ interface NotificationItemProps {
 	onCheckedChange: (checked: boolean) => void;
 	channels?: {
 		[ENotificationChannel.EMAIL]?: boolean;
+		[ENotificationChannel.IN_APP]?: boolean;
 		[ENotificationChannel.TELEGRAM]?: boolean;
 		[ENotificationChannel.DISCORD]?: boolean;
 		[ENotificationChannel.SLACK]?: boolean;
@@ -27,6 +28,7 @@ interface NotificationItemProps {
 
 const channelIcons = {
 	[ENotificationChannel.EMAIL]: Mail,
+	[ENotificationChannel.IN_APP]: InAppIcon,
 	[ENotificationChannel.TELEGRAM]: TelegramIcon,
 	[ENotificationChannel.DISCORD]: DiscordIcon,
 	[ENotificationChannel.SLACK]: SlackIcon,
@@ -35,6 +37,7 @@ const channelIcons = {
 
 const getChannelLabels = (t: (key: string) => string) => ({
 	[ENotificationChannel.EMAIL]: t('Profile.Settings.Notifications.email'),
+	[ENotificationChannel.IN_APP]: t('Profile.Settings.Notifications.inApp'),
 	[ENotificationChannel.TELEGRAM]: t('Profile.Settings.Notifications.telegram'),
 	[ENotificationChannel.DISCORD]: t('Profile.Settings.Notifications.discord'),
 	[ENotificationChannel.SLACK]: t('Profile.Settings.Notifications.slack'),
