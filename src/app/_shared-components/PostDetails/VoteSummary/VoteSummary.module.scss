@@ -3,7 +3,7 @@
 }
 
 .voteSummaryTitle {
-	@apply text-xl font-semibold text-text_primary;
+	@apply flex items-center gap-2 text-xl font-semibold text-text_primary;
 }
 
 .voteSummaryPieChart {
