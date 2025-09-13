@@ -2620,6 +2620,8 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		key: ENetwork.KUSAMA,
 		logo: KusamaLogo,
 		submissionDeposit: new BN('33333333333'),
+		assetHubParaId: '1000',
+		peopleChainParaId: '1004',
 		govtype: EGovType.OPENGOV,
 		name: 'Kusama',
 		blockTime: 6000,

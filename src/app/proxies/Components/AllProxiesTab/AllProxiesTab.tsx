@@ -6,39 +6,23 @@
 
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
-import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { useProxyData } from '@/hooks/useProxyData';
 import ProxyListingTable from '../ListingTable/ProxyListingTable';
 import SearchBar from '../SearchBar/SearchBar';
 
 export default function AllProxiesTab() {
-	const { apiService } = usePolkadotApiService();
 	const searchParams = useSearchParams();
-
 	const page = Number(searchParams.get('page')) || 1;
 	const search = searchParams.get('allSearch') || '';
 
-	const { data, isLoading } = useQuery({
-		queryKey: ['proxyRequests', page, search],
-		queryFn: async () => {
-			if (!apiService) throw new Error('API service not available');
-			return apiService.getProxyRequests({
-				page,
-				limit: 10,
-				search
-			});
-		},
-		enabled: !!apiService,
-		staleTime: 30000, // 30 seconds
-		gcTime: 300000 // 5 minutes
-	});
+	const { items, totalCount, isLoading, error } = useProxyData(page, search);
 
 	return (
 		<div className='flex flex-col gap-y-4'>
 			<SearchBar searchKey='allSearch' />
 			<ProxyListingTable
-				data={data?.items ?? []}
-				totalCount={data?.totalCount ?? 0}
+				data={error ? [] : items}
+				totalCount={error ? 0 : totalCount}
 				isLoading={isLoading}
 			/>
 		</div>
