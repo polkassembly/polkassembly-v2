@@ -7,38 +7,49 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 
 interface ProfileViewsData {
 	total: number;
 	unique: number;
-	period: string;
+	startDate: string;
+	endDate: string;
 }
 
 interface UseProfileViewsOptions {
-	timePeriod?: 'today' | 'week' | 'month' | 'all';
+	startDate?: Date;
+	endDate?: Date;
 	enabled?: boolean;
 }
 
-export const useProfileViews = (userId?: number, address?: string, options: UseProfileViewsOptions = {}) => {
-	const { timePeriod = 'month', enabled = true } = options;
+export const useProfileViews = (userId?: number, options: UseProfileViewsOptions = {}) => {
 	const queryClient = useQueryClient();
+	const defaultStartDate = dayjs().subtract(30, 'days').toDate();
+	const defaultEndDate = dayjs().toDate();
 
-	// Fetch profile views data
+	const { startDate = defaultStartDate, endDate = defaultEndDate, enabled = true } = options;
+
+	const defaultData = {
+		total: 0,
+		unique: 0,
+		startDate: startDate.toISOString(),
+		endDate: endDate.toISOString()
+	};
+
 	const {
 		data: profileViewsData,
 		isLoading: isProfileViewsLoading,
 		error: profileViewsError,
 		refetch: refetchProfileViews
 	} = useQuery({
-		queryKey: ['profileViews', userId, timePeriod],
+		queryKey: ['profileViews', userId],
 		queryFn: async (): Promise<ProfileViewsData> => {
-			if (!userId) {
-				throw new ClientError('User ID is required');
-			}
+			if (!userId) return defaultData;
 
 			const { data, error } = await NextApiClientService.getProfileViews({
 				userId,
-				timePeriod
+				startDate: startDate.toISOString(),
+				endDate: endDate.toISOString()
 			});
 
 			if (error || !data) {
@@ -48,10 +59,12 @@ export const useProfileViews = (userId?: number, address?: string, options: UseP
 			return data;
 		},
 		enabled: !!userId && enabled,
-		retry: false,
+		placeholderData: defaultData,
+		staleTime: 5 * 60 * 1000, // 5 minutes
+		gcTime: 10 * 60 * 1000, // 10 minutes
+		retry: 1,
 		refetchOnMount: false,
-		refetchOnWindowFocus: false,
-		staleTime: 5 * 60 * 1000 // 5 minutes
+		refetchOnWindowFocus: false
 	});
 
 	// Increment profile view mutation
@@ -61,9 +74,7 @@ export const useProfileViews = (userId?: number, address?: string, options: UseP
 		error: incrementError
 	} = useMutation({
 		mutationFn: async (): Promise<void> => {
-			if (!userId) {
-				throw new ClientError('User ID is required');
-			}
+			if (!userId) return;
 
 			const { error } = await NextApiClientService.incrementProfileView({ userId });
 
@@ -73,7 +84,9 @@ export const useProfileViews = (userId?: number, address?: string, options: UseP
 		},
 		onSuccess: () => {
 			// Invalidate and refetch profile views data
-			queryClient.invalidateQueries({ queryKey: ['profileViews', userId] });
+			if (userId) {
+				queryClient.invalidateQueries({ queryKey: ['profileViews', userId] });
+			}
 		},
 		onError: (error) => {
 			console.error('Failed to increment profile view:', error);

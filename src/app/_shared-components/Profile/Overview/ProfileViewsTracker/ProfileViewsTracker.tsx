@@ -4,27 +4,29 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useProfileViews } from '@/hooks/useProfileViews';
 import ProfileViewsCard from './ProfileViewsCard';
 
 interface ProfileViewsTrackerProps {
 	userId?: number;
-	address?: string;
-	timePeriod?: 'today' | 'week' | 'month' | 'all';
 	isProfileOwner?: boolean;
 }
 
-function ProfileViewsTracker({ userId, address, timePeriod = 'month', isProfileOwner }: Readonly<ProfileViewsTrackerProps>) {
-	const { profileViewsData, isProfileViewsLoading, incrementProfileView } = useProfileViews(userId, address, { timePeriod });
+function ProfileViewsTracker({ userId, isProfileOwner }: Readonly<ProfileViewsTrackerProps>) {
+	const { profileViewsData, isProfileViewsLoading, incrementProfileView } = useProfileViews(userId, {
+		enabled: isProfileOwner
+	});
 
-	// Track profile view when component mounts
-	useEffect(() => {
-		if (userId || address) {
-			// Increment profile view when the profile is viewed
+	const increment = useCallback(() => {
+		if (userId && !isProfileOwner) {
 			incrementProfileView();
 		}
-	}, [userId, address, incrementProfileView]);
+	}, [userId, isProfileOwner, incrementProfileView]);
+
+	useEffect(() => {
+		increment();
+	}, [increment]);
 
 	if (!isProfileOwner) {
 		return null;

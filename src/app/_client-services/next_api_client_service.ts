@@ -991,9 +991,10 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ delegationStats: ITrackDelegationStats[] }>({ url, method });
 	}
 
-	static async getProfileViews({ userId, timePeriod = 'month' }: { userId: number; timePeriod?: 'today' | 'week' | 'month' | 'all' }) {
+	static async getProfileViews({ userId, startDate, endDate }: { userId: number; startDate: string; endDate: string }) {
 		const queryParams = new URLSearchParams({
-			timePeriod
+			startDate,
+			endDate
 		});
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.GET_PROFILE_VIEWS,
@@ -1001,7 +1002,7 @@ export class NextApiClientService {
 			queryParams
 		});
 
-		return this.nextApiClientFetch<{ total: number; unique: number; period: string }>({ url, method });
+		return this.nextApiClientFetch<{ total: number; unique: number; startDate: string; endDate: string }>({ url, method });
 	}
 
 	static async incrementProfileView({ userId }: { userId: number }) {

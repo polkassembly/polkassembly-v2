@@ -5,12 +5,34 @@
 'use client';
 
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import classes from './ProfileViewsCard.module.scss';
+
+function getHumanReadableDateRange(startDate: string, endDate: string): string {
+	const start = dayjs(startDate);
+	const end = dayjs(endDate);
+	const diffDays = end.diff(start, 'days');
+
+	if (diffDays === 0) return 'Today';
+	if (diffDays === 1) return 'Last 24 hours';
+	if (diffDays === 7) return 'Last 7 days';
+	if (diffDays === 30) return 'Last 30 days';
+	if (diffDays >= 365) {
+		const years = Math.floor(diffDays / 365);
+		return `Last ${years} ${years === 1 ? 'year' : 'years'}`;
+	}
+	if (diffDays >= 30) {
+		const months = Math.floor(diffDays / 30);
+		return `Last ${months} ${months === 1 ? 'month' : 'months'}`;
+	}
+	return `Last ${diffDays} days`;
+}
 
 interface ProfileViewsData {
 	total: number;
 	unique: number;
-	period: string;
+	startDate: string;
+	endDate: string;
 }
 
 interface ProfileViewsCardProps {
@@ -49,7 +71,7 @@ function ProfileViewsCard({ profileViewsData, isLoading = false }: Readonly<Prof
 			<span className={classes.statCardTitle}>Profile Views</span>
 			<div className={classes.profileViewsValue}>
 				<span className={classes.value}>{profileViewsData.unique}</span>
-				<span className={classes.timePeriod}>{profileViewsData.period}</span>
+				<span className={classes.timePeriod}>{getHumanReadableDateRange(profileViewsData.startDate, profileViewsData.endDate)}</span>
 			</div>
 		</div>
 	);

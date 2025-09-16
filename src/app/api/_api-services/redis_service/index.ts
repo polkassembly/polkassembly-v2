@@ -138,7 +138,8 @@ export class RedisService {
 			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${index}`,
 		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: ENetwork, proposalType: EProposalType, index: number, votesType: EVotesDisplayType, analyticsType: EAnalyticsType): string =>
 			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${index}-${votesType}-${analyticsType}`,
-		[ERedisKeys.PROFILE_VIEWS]: (userId: string, network: string, timePeriod: string): string => `${ERedisKeys.PROFILE_VIEWS}-${userId}-${network}-${timePeriod}`
+		[ERedisKeys.PROFILE_VIEWS]: (userId: string, network: string, startDate: string, endDate: string): string =>
+			`${ERedisKeys.PROFILE_VIEWS}-${userId}-${network}-${startDate}-${endDate}`
 	} as const;
 
 	// helper methods
@@ -794,29 +795,33 @@ export class RedisService {
 	static async GetProfileViews({
 		userId,
 		network,
-		timePeriod
+		startDate,
+		endDate
 	}: {
 		userId: number;
 		network: ENetwork;
-		timePeriod: string;
-	}): Promise<{ total: number; unique: number; period: string } | null> {
-		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.PROFILE_VIEWS](userId.toString(), network, timePeriod) });
-		return data ? (deepParseJson(data) as { total: number; unique: number; period: string }) : null;
+		startDate: string;
+		endDate: string;
+	}): Promise<{ total: number; unique: number; startDate: string; endDate: string } | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.PROFILE_VIEWS](userId.toString(), network, startDate, endDate) });
+		return data ? (deepParseJson(data) as { total: number; unique: number; startDate: string; endDate: string }) : null;
 	}
 
 	static async SetProfileViews({
 		userId,
 		network,
-		timePeriod,
+		startDate,
+		endDate,
 		data
 	}: {
 		userId: number;
 		network: ENetwork;
-		timePeriod: string;
-		data: { total: number; unique: number; period: string };
+		startDate: string;
+		endDate: string;
+		data: { total: number; unique: number; startDate: string; endDate: string };
 	}): Promise<void> {
 		await this.Set({
-			key: this.redisKeysMap[ERedisKeys.PROFILE_VIEWS](userId.toString(), network, timePeriod),
+			key: this.redisKeysMap[ERedisKeys.PROFILE_VIEWS](userId.toString(), network, startDate, endDate),
 			value: JSON.stringify(data),
 			ttlSeconds: 300 // Cache for 5 minutes
 		});

@@ -18,35 +18,41 @@ const zodParamsSchema = z.object({
 });
 
 const zodQuerySchema = z.object({
-	timePeriod: z.enum(['today', 'week', 'month', 'all']).optional().default('month')
+	startDate: z.string().datetime(),
+	endDate: z.string().datetime()
 });
 
 // GET - Retrieve profile views
 export const GET = withErrorHandling(
-	async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse<{ total: number; unique: number; period: string }>> => {
+	async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse<{ total: number; unique: number; startDate: string; endDate: string }>> => {
 		const { id } = zodParamsSchema.parse(await params);
-		const { timePeriod } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
+		const { startDate, endDate } = zodQuerySchema.parse(Object.fromEntries(req.nextUrl.searchParams));
 
 		const [network, readonlyHeaders] = await Promise.all([getNetworkFromHeaders(), headers()]);
 		const skipCache = readonlyHeaders.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
 
 		// Try to get from cache first
-		let profileViews = await RedisService.GetProfileViews({ userId: id, network, timePeriod });
+		let profileViews = await RedisService.GetProfileViews({ userId: id, network, startDate, endDate });
 		if (profileViews && !skipCache) {
 			return NextResponse.json(profileViews);
 		}
 
 		// Get from database
-		profileViews = await OffChainDbService.GetProfileViews({ userId: id, network, timePeriod });
+		profileViews = await OffChainDbService.GetProfileViews({ userId: id, network, startDate, endDate });
 
 		if (!profileViews) {
 			throw new Error('Failed to fetch profile views');
 		}
 
 		// Cache the result
-		await RedisService.SetProfileViews({ userId: id, network, timePeriod, data: profileViews });
+		await RedisService.SetProfileViews({ userId: id, network, startDate, endDate, data: profileViews });
 
-		return NextResponse.json(profileViews);
+		return NextResponse.json({
+			total: profileViews.total,
+			unique: profileViews.unique,
+			startDate: profileViews.startDate,
+			endDate: profileViews.endDate
+		});
 	}
 );
 
@@ -63,6 +69,11 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		// Try to get authenticated user
 		const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
 		viewerId = AuthService.GetUserIdFromAccessToken(newAccessToken);
+
+		// Skip increment if viewing own profile
+		if (viewerId === id) {
+			return NextResponse.json({ message: 'Skipped incrementing own profile view' });
+		}
 	} catch {
 		// User is not authenticated, use IP hash for anonymous tracking
 		const forwarded = req.headers.get('x-forwarded-for');

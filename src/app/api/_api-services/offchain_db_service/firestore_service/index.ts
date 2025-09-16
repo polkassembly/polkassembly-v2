@@ -1870,29 +1870,15 @@ export class FirestoreService extends FirestoreUtils {
 		userId,
 		address,
 		network,
-		timePeriod = 'month'
+		startDate,
+		endDate
 	}: {
 		userId?: number;
 		address?: string;
 		network: ENetwork;
-		timePeriod?: 'today' | 'week' | 'month' | 'all';
-	}): Promise<{ total: number; unique: number; period: string }> {
-		let startDate: Date | null = null;
-
-		switch (timePeriod) {
-			case 'today':
-				startDate = dayjs().startOf('day').toDate();
-				break;
-			case 'week':
-				startDate = dayjs().subtract(7, 'day').toDate();
-				break;
-			case 'month':
-				startDate = dayjs().subtract(1, 'month').toDate();
-				break;
-			default:
-				startDate = null;
-		}
-
+		startDate: string;
+		endDate: string;
+	}): Promise<{ total: number; unique: number; startDate: string; endDate: string }> {
 		let query = this.profileViewsCollectionRef().where('network', '==', network);
 
 		// Query by userId or address
@@ -1904,9 +1890,10 @@ export class FirestoreService extends FirestoreUtils {
 			throw new Error('Either userId or address must be provided');
 		}
 
-		if (startDate) {
-			query = query.where('timestamp', '>=', startDate);
-		}
+		const start = dayjs(startDate).toDate();
+		const end = dayjs(endDate).toDate();
+
+		query = query.where('timestamp', '>=', start).where('timestamp', '<=', end);
 
 		const snapshot = await query.get();
 		const views = snapshot.docs.map((doc) => doc.data());
@@ -1921,17 +1908,11 @@ export class FirestoreService extends FirestoreUtils {
 			}
 		});
 
-		const periodLabels = {
-			today: 'Today',
-			week: 'Last 7 days',
-			month: 'Last 30 days',
-			all: 'All Time'
-		};
-
 		return {
 			total: views.length,
 			unique: uniqueViewers.size,
-			period: periodLabels[timePeriod]
+			startDate,
+			endDate
 		};
 	}
 }

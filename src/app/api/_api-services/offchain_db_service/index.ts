@@ -480,14 +480,16 @@ export class OffChainDbService {
 		userId,
 		address,
 		network,
-		timePeriod = 'month'
+		startDate,
+		endDate
 	}: {
 		userId?: number;
 		address?: string;
 		network: ENetwork;
-		timePeriod?: 'today' | 'week' | 'month' | 'all';
-	}): Promise<{ total: number; unique: number; period: string }> {
-		return FirestoreService.GetProfileViews({ userId, address, network, timePeriod });
+		startDate: string;
+		endDate: string;
+	}): Promise<{ total: number; unique: number; startDate: string; endDate: string }> {
+		return FirestoreService.GetProfileViews({ userId, address, network, startDate, endDate });
 	}
 
 	static async AddNewUser(user: IUser) {

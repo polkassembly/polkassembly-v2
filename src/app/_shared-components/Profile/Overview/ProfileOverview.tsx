@@ -72,7 +72,6 @@ function ProfileOverview({ profileData, address }: ProfileOverviewProps) {
 				<ProfileViewsTracker
 					isProfileOwner={isProfileOwner}
 					userId={profileData?.id}
-					address={address}
 				/>
 			</div>
 		</div>
