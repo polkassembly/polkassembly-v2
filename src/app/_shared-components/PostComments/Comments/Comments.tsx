@@ -50,14 +50,6 @@ function Comments({
 		isVerified?: boolean;
 	}
 
-	useEffect(() => {
-		const allCommentsHaveIdentityCheck = comments.every((comment) => typeof (comment as CommentWithVerification).isVerified !== 'undefined');
-
-		if (allCommentsHaveIdentityCheck && comments.length > 0) {
-			setIdentitiesLoaded(true);
-		}
-	}, [comments]);
-
 	const verifiedComments = useMemo(() => {
 		return comments.filter((comment) => !comment.isSpam && (comment as CommentWithVerification).isVerified);
 	}, [comments]);
@@ -118,15 +110,16 @@ function Comments({
 
 		if (!comment) return;
 
-		if (verifiedComments.includes(comment) && !showMore && verifiedComments.indexOf(comment) >= 2) {
+		const verifiedCommentIndex = verifiedComments.findIndex((c) => c.id === comment.id);
+		if (verifiedCommentIndex !== -1 && !showMore && verifiedCommentIndex >= 2) {
 			handleShowMore();
 		}
 
-		if (unverifiedComments.includes(comment) && !showUnverified) {
+		if (unverifiedComments.some((c) => c.id === comment.id) && !showUnverified) {
 			setShowUnverified(true);
 		}
 
-		if (spamComments.includes(comment) && !showSpam) {
+		if (spamComments.some((c) => c.id === comment.id) && !showSpam) {
 			setShowSpam(true);
 		}
 
@@ -148,6 +141,11 @@ function Comments({
 		setComments(commentsFromProps);
 	}, [commentsFromProps]);
 
+	useEffect(() => {
+		if (comments.length > 0 && identityService) {
+			setIdentitiesLoaded(true);
+		}
+	}, [comments, identityService]);
 	return (
 		<div className={classes.wrapper}>
 			<div className='flex flex-col gap-y-4 px-4 lg:px-6'>
