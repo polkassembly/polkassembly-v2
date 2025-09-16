@@ -21,6 +21,7 @@ import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import dynamic from 'next/dynamic';
 import { Button } from '@ui/Button';
 import SingleComment from '../SingleComment/SingleComment';
+import LoadingLayover from '../../LoadingLayover';
 import classes from './Comments.module.scss';
 
 const AddComment = dynamic(() => import('../AddComment/AddComment'), { ssr: false });
@@ -44,7 +45,8 @@ function Comments({
 	const [showSpam, setShowSpam] = useState(false);
 	const [showUnverified, setShowUnverified] = useState(false);
 	const [comments, setComments] = useState<ICommentResponse[]>(commentsFromProps);
-	const { verifiedComments, unverifiedComments, spamComments } = useMemo(() => {
+	const [isVerifyingComments, setIsVerifyingComments] = useState(true);
+	const { verifiedComments, unverifiedComments, spamComments, allCommentsProcessed } = useMemo(() => {
 		const verified: ICommentWithIdentityStatus[] = [];
 		const unverified: ICommentWithIdentityStatus[] = [];
 		const spam: ICommentResponse[] = [];
@@ -59,10 +61,17 @@ function Comments({
 			}
 		});
 
+		const allProcessed =
+			comments.length === 0 ||
+			comments.every((comment) => {
+				return comment.isSpam !== undefined || (comment as ICommentWithIdentityStatus).isVerified !== undefined;
+			});
+
 		return {
 			verifiedComments: verified,
 			unverifiedComments: unverified,
-			spamComments: spam
+			spamComments: spam,
+			allCommentsProcessed: allProcessed
 		};
 	}, [comments]);
 
@@ -146,11 +155,27 @@ function Comments({
 
 	useEffect(() => {
 		setComments(commentsFromProps);
+		setIsVerifyingComments(true);
 	}, [commentsFromProps]);
+
+	useEffect(() => {
+		if (!allCommentsProcessed) {
+			return undefined;
+		}
+
+		const timer = setTimeout(() => {
+			setIsVerifyingComments(false);
+		}, 500);
+
+		return () => {
+			clearTimeout(timer);
+		};
+	}, [allCommentsProcessed]);
 
 	return (
 		<div className={classes.wrapper}>
-			<div className='flex flex-col gap-y-4 px-4 lg:px-6'>
+			<div className='relative flex flex-col gap-y-4 px-4 lg:px-6'>
+				{isVerifyingComments && <LoadingLayover />}
 				{verifiedCommentsToShow?.map((item) => (
 					<SingleComment
 						key={item.id}
