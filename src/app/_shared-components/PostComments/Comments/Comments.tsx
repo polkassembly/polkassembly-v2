@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EAllowedCommentor, EProposalType, ICommentResponse } from '@/_shared/types';
+import { EAllowedCommentor, EProposalType, ICommentResponse, ICommentWithIdentityStatus } from '@/_shared/types';
 import { useMemo, useState, useCallback, useLayoutEffect, useEffect } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
@@ -44,23 +44,26 @@ function Comments({
 	const [showSpam, setShowSpam] = useState(false);
 	const [showUnverified, setShowUnverified] = useState(false);
 	const [comments, setComments] = useState<ICommentResponse[]>(commentsFromProps);
-	const [identitiesLoaded, setIdentitiesLoaded] = useState<boolean>(false);
+	const { verifiedComments, unverifiedComments, spamComments } = useMemo(() => {
+		const verified: ICommentWithIdentityStatus[] = [];
+		const unverified: ICommentWithIdentityStatus[] = [];
+		const spam: ICommentResponse[] = [];
 
-	interface CommentWithVerification extends ICommentResponse {
-		isVerified?: boolean;
-	}
+		comments.forEach((comment) => {
+			if (comment.isSpam) {
+				spam.push(comment);
+			} else if ((comment as ICommentWithIdentityStatus).isVerified) {
+				verified.push(comment as ICommentWithIdentityStatus);
+			} else {
+				unverified.push(comment as ICommentWithIdentityStatus);
+			}
+		});
 
-	const verifiedComments = useMemo(() => {
-		return comments.filter((comment) => !comment.isSpam && (comment as CommentWithVerification).isVerified);
-	}, [comments]);
-
-	const unverifiedComments = useMemo(() => {
-		if (!identitiesLoaded) return [];
-		return comments.filter((comment) => !comment.isSpam && !(comment as CommentWithVerification).isVerified);
-	}, [comments, identitiesLoaded]);
-
-	const spamComments = useMemo(() => {
-		return comments.filter((comment) => comment.isSpam);
+		return {
+			verifiedComments: verified,
+			unverifiedComments: unverified,
+			spamComments: spam
+		};
 	}, [comments]);
 
 	const verifiedCommentsToShow = showMore ? verifiedComments : verifiedComments.slice(0, 2);
@@ -106,20 +109,24 @@ function Comments({
 		if (!hash) return;
 
 		const commentId = hash.replace('#comment-', '');
-		const comment = [...verifiedComments, ...unverifiedComments, ...spamComments].find((c) => c.id === commentId);
+		const comment = comments.find((c) => c.id === commentId);
 
 		if (!comment) return;
 
-		const verifiedCommentIndex = verifiedComments.findIndex((c) => c.id === comment.id);
-		if (verifiedCommentIndex !== -1 && !showMore && verifiedCommentIndex >= 2) {
-			handleShowMore();
+		const isVerified = !comment.isSpam && (comment as ICommentWithIdentityStatus).isVerified;
+		if (isVerified) {
+			const verifiedIndex = comments.filter((c) => !c.isSpam && (c as ICommentWithIdentityStatus).isVerified).findIndex((c) => c.id === comment.id);
+			if (verifiedIndex >= 2) {
+				setShowMore(true);
+			}
 		}
 
-		if (unverifiedComments.some((c) => c.id === comment.id) && !showUnverified) {
+		const isUnverified = !comment.isSpam && !(comment as ICommentWithIdentityStatus).isVerified;
+		if (isUnverified) {
 			setShowUnverified(true);
 		}
 
-		if (spamComments.some((c) => c.id === comment.id) && !showSpam) {
+		if (comment.isSpam) {
 			setShowSpam(true);
 		}
 
@@ -130,7 +137,7 @@ function Comments({
 				element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 			}
 		});
-	}, [verifiedComments, unverifiedComments, spamComments, showMore, showUnverified, showSpam]);
+	}, [comments]);
 
 	// Call handleCommentLink when the component mounts
 	useLayoutEffect(() => {
@@ -141,11 +148,6 @@ function Comments({
 		setComments(commentsFromProps);
 	}, [commentsFromProps]);
 
-	useEffect(() => {
-		if (comments.length > 0 && identityService) {
-			setIdentitiesLoaded(true);
-		}
-	}, [comments, identityService]);
 	return (
 		<div className={classes.wrapper}>
 			<div className='flex flex-col gap-y-4 px-4 lg:px-6'>
@@ -179,7 +181,7 @@ function Comments({
 					</div>
 				) : null}
 
-				{unverifiedComments.length > 0 && identitiesLoaded && (
+				{unverifiedComments.length > 0 && (
 					<div className='mt-4 border-y border-border_grey py-4'>
 						<Button
 							variant='ghost'
@@ -209,7 +211,7 @@ function Comments({
 					</div>
 				)}
 
-				{spamComments.length > 0 && identitiesLoaded && (
+				{spamComments.length > 0 && (
 					<div className='mt-4 border-y border-border_grey py-4'>
 						<Button
 							variant='ghost'

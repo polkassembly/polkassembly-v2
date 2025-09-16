@@ -1603,3 +1603,7 @@ export interface IAlgoliaPost extends Record<string, unknown> {
 	proposer?: string;
 	origin?: EPostOrigin;
 }
+
+export interface ICommentWithIdentityStatus extends ICommentResponse {
+	isVerified?: boolean;
+}

@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EAllowedCommentor, EProposalType, EReactQueryKeys, ICommentResponse, IContentSummary } from '@/_shared/types';
+import { EAllowedCommentor, EProposalType, EReactQueryKeys, ICommentResponse, ICommentWithIdentityStatus, IContentSummary } from '@/_shared/types';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
@@ -16,10 +16,6 @@ import classes from './PostComments.module.scss';
 import { Skeleton } from '../Skeleton';
 import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 import { Alert, AlertDescription } from '../Alert';
-
-interface ICommentWithIdentityStatus extends ICommentResponse {
-	isVerified?: boolean;
-}
 
 function PostComments({
 	proposalType,
@@ -106,7 +102,7 @@ function PostComments({
 				</div>
 			)}
 
-			{isLoading ? (
+			{isLoading && !data ? (
 				<div className='flex flex-col gap-2 px-8'>
 					<Skeleton className='h-8' />
 					<Skeleton className='h-8' />
