@@ -3061,7 +3061,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		rpcEndpoints: [
 			{
 				name: VIA_PARITY,
-				url: 'wss://polkadot-asset-hub-rpc.polkadot.io'
+				url: 'wss://invalid-rpc.example.com'
 			},
 			{
 				name: VIA_DWELLIR,
