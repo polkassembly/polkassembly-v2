@@ -12,9 +12,10 @@ interface ProfileViewsTrackerProps {
 	userId?: number;
 	address?: string;
 	timePeriod?: 'today' | 'week' | 'month' | 'all';
+	isProfileOwner?: boolean;
 }
 
-function ProfileViewsTracker({ userId, address, timePeriod = 'month' }: ProfileViewsTrackerProps) {
+function ProfileViewsTracker({ userId, address, timePeriod = 'month', isProfileOwner }: Readonly<ProfileViewsTrackerProps>) {
 	const { profileViewsData, isProfileViewsLoading, incrementProfileView } = useProfileViews(userId, address, { timePeriod });
 
 	// Track profile view when component mounts
@@ -24,6 +25,10 @@ function ProfileViewsTracker({ userId, address, timePeriod = 'month' }: ProfileV
 			incrementProfileView();
 		}
 	}, [userId, address, incrementProfileView]);
+
+	if (!isProfileOwner) {
+		return null;
+	}
 
 	return (
 		<ProfileViewsCard

@@ -4,14 +4,12 @@
 
 'use client';
 
-// import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { BN } from '@polkadot/util';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
-// import VotingPowerChart from '@assets/profile/voting-power-chart.svg';
 import classes from './VotingPowerCard.module.scss';
 
 interface VotingPowerData {
@@ -22,24 +20,16 @@ interface VotingPowerData {
 
 interface VotingPowerCardProps {
 	votingPowerData: VotingPowerData;
+	isProfileOwner?: boolean;
 }
 
-function VotingPowerCard({ votingPowerData }: VotingPowerCardProps) {
+function VotingPowerCard({ votingPowerData, isProfileOwner }: VotingPowerCardProps) {
 	const network = getCurrentNetwork();
 	const { tokenSymbol } = NETWORKS_DETAILS[network];
 
 	return (
-		<div className={cn(classes.statCard, classes.votingPowerCard)}>
-			{/* <div className='flex justify-center lg:justify-start'>
-				<Image
-					src={VotingPowerChart}
-					alt='Voting Power'
-					width={89}
-					height={20}
-					className='mb-2'
-				/>
-			</div> */}
-			<div className={classes.votingPowerBreakdown}>
+		<div className={cn(classes.statCard, !isProfileOwner ? classes.spanFour : classes.votingPowerCard)}>
+			<div className={cn(classes.votingPowerBreakdown, !isProfileOwner ? 'lg:justify-around' : '')}>
 				<div className={classes.votingPowerItem}>
 					<div className={classes.votingPowerLabel}>
 						<span>Voting Power</span>

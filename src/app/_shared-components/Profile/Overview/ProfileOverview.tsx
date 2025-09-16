@@ -7,6 +7,7 @@
 import { IPublicUser } from '@/_shared/types';
 import { BarChart3 } from 'lucide-react';
 import { useUserBalanceData } from '@/hooks/useUserBalanceData';
+import { useUser } from '@/hooks/useUser';
 import { Skeleton } from '../../Skeleton';
 import classes from './ProfileOverview.module.scss';
 import VotingPowerCard from './VotingPowerCard/VotingPowerCard';
@@ -23,6 +24,10 @@ function ProfileOverview({ profileData, address }: ProfileOverviewProps) {
 	const primaryAddress = address || profileData?.addresses?.[0];
 
 	// Fetch user balance data using the custom hook
+	const { user } = useUser();
+
+	const isProfileOwner = Boolean((profileData?.id && user?.id === profileData?.id) || (address && user?.addressRelations?.some((relation) => relation.address === address)));
+
 	const { userBalanceData, isLoading } = useUserBalanceData(primaryAddress);
 
 	if (isLoading) {
@@ -56,12 +61,16 @@ function ProfileOverview({ profileData, address }: ProfileOverviewProps) {
 
 			{/* Stats Cards */}
 			<div className={classes.statsGrid}>
-				<VotingPowerCard votingPowerData={userBalanceData.votingPower} />
+				<VotingPowerCard
+					votingPowerData={userBalanceData.votingPower}
+					isProfileOwner={isProfileOwner}
+				/>
 				<BalanceCard
 					availableBalance={userBalanceData.available}
 					delegatedBalance={userBalanceData.delegated}
 				/>
 				<ProfileViewsTracker
+					isProfileOwner={isProfileOwner}
 					userId={profileData?.id}
 					address={address}
 				/>

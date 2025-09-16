@@ -6,6 +6,10 @@
 	@apply md:col-span-3;
 }
 
+.spanFour {
+	@apply md:col-span-4;
+}
+
 .statCardHeader {
 	@apply mb-2 flex items-center gap-2;
 }

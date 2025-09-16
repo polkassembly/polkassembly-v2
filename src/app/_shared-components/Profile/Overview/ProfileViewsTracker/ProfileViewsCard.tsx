@@ -4,7 +4,6 @@
 
 'use client';
 
-// import { Eye } from 'lucide-react';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import classes from './ProfileViewsCard.module.scss';
 
@@ -19,12 +18,11 @@ interface ProfileViewsCardProps {
 	isLoading?: boolean;
 }
 
-function ProfileViewsCard({ profileViewsData, isLoading = false }: ProfileViewsCardProps) {
+function ProfileViewsCard({ profileViewsData, isLoading = false }: Readonly<ProfileViewsCardProps>) {
 	if (isLoading) {
 		return (
 			<div className={classes.statCard}>
 				<div className={classes.statCardHeader}>
-					{/* <Eye className={classes.statCardIcon} /> */}
 					<span className={classes.statCardTitle}>Profile Views</span>
 				</div>
 				<div className={classes.profileViewsValue}>
@@ -37,7 +35,6 @@ function ProfileViewsCard({ profileViewsData, isLoading = false }: ProfileViewsC
 	if (!profileViewsData) {
 		return (
 			<div className={classes.statCard}>
-				{/* <Eye className={classes.statCardIcon} /> */}
 				<span className={classes.statCardTitle}>Profile Views</span>
 				<div className={classes.profileViewsValue}>
 					<span className={classes.value}>0</span>
@@ -49,7 +46,6 @@ function ProfileViewsCard({ profileViewsData, isLoading = false }: ProfileViewsC
 
 	return (
 		<div className={classes.statCard}>
-			{/* <Eye className={classes.statCardIcon} /> */}
 			<span className={classes.statCardTitle}>Profile Views</span>
 			<div className={classes.profileViewsValue}>
 				<span className={classes.value}>{profileViewsData.unique}</span>
