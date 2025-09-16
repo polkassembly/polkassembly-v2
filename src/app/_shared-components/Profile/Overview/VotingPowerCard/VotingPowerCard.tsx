@@ -4,14 +4,14 @@
 
 'use client';
 
-import Image from 'next/image';
+// import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { BN } from '@polkadot/util';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
-import VotingPowerChart from '@assets/profile/voting-power-chart.svg';
+// import VotingPowerChart from '@assets/profile/voting-power-chart.svg';
 import classes from './VotingPowerCard.module.scss';
 
 interface VotingPowerData {
@@ -30,7 +30,7 @@ function VotingPowerCard({ votingPowerData }: VotingPowerCardProps) {
 
 	return (
 		<div className={cn(classes.statCard, classes.votingPowerCard)}>
-			<div className='flex justify-center lg:justify-start'>
+			{/* <div className='flex justify-center lg:justify-start'>
 				<Image
 					src={VotingPowerChart}
 					alt='Voting Power'
@@ -38,7 +38,7 @@ function VotingPowerCard({ votingPowerData }: VotingPowerCardProps) {
 					height={20}
 					className='mb-2'
 				/>
-			</div>
+			</div> */}
 			<div className={classes.votingPowerBreakdown}>
 				<div className={classes.votingPowerItem}>
 					<div className={classes.votingPowerLabel}>

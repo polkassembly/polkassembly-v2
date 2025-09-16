@@ -4,9 +4,9 @@
 
 'use client';
 
-import AvailableBalanceChart from '@assets/profile/available-balance-chart.svg';
-import DelegatedBalanceChart from '@assets/profile/delegated-balance-chart.svg';
-import Image from 'next/image';
+// import AvailableBalanceChart from '@assets/profile/available-balance-chart.svg';
+// import DelegatedBalanceChart from '@assets/profile/delegated-balance-chart.svg';
+// import Image from 'next/image';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -26,13 +26,13 @@ function BalanceCard({ availableBalance, delegatedBalance }: BalanceCardProps) {
 	return (
 		<>
 			<div className={classes.statCard}>
-				<Image
+				{/* <Image
 					src={AvailableBalanceChart}
 					alt='Available Balance'
 					width={62}
 					height={20}
 					className='mb-2'
-				/>
+				/> */}
 				<div className={classes.statCardHeader}>
 					<span className={classes.statCardTitle}>Available</span>
 					<Tooltip>
@@ -52,13 +52,13 @@ function BalanceCard({ availableBalance, delegatedBalance }: BalanceCardProps) {
 				</div>
 			</div>
 			<div className={classes.statCard}>
-				<Image
+				{/* <Image
 					src={DelegatedBalanceChart}
 					alt='Delegated Balance'
 					width={62}
 					height={20}
 					className='mb-2'
-				/>
+				/> */}
 				<div className={classes.statCardHeader}>
 					<span className={classes.statCardTitle}>Delegated</span>
 					<Tooltip>
