@@ -46,6 +46,11 @@ function Comments({
 	const [showUnverified, setShowUnverified] = useState(false);
 	const [comments, setComments] = useState<ICommentResponse[]>(commentsFromProps);
 	const [isVerifyingComments, setIsVerifyingComments] = useState(true);
+
+	const hasIdentityStatus = (comment: ICommentResponse): comment is ICommentWithIdentityStatus => {
+		return 'isVerified' in comment && typeof comment.isVerified === 'boolean';
+	};
+
 	const { verifiedComments, unverifiedComments, spamComments, allCommentsProcessed } = useMemo(() => {
 		const verified: ICommentWithIdentityStatus[] = [];
 		const unverified: ICommentWithIdentityStatus[] = [];
@@ -54,18 +59,14 @@ function Comments({
 		comments.forEach((comment) => {
 			if (comment.isSpam) {
 				spam.push(comment);
-			} else if ((comment as ICommentWithIdentityStatus).isVerified) {
-				verified.push(comment as ICommentWithIdentityStatus);
-			} else {
-				unverified.push(comment as ICommentWithIdentityStatus);
+			} else if (hasIdentityStatus(comment) && comment.isVerified) {
+				verified.push(comment);
+			} else if (hasIdentityStatus(comment)) {
+				unverified.push(comment);
 			}
 		});
 
-		const allProcessed =
-			comments.length === 0 ||
-			comments.every((comment) => {
-				return comment.isSpam !== undefined || (comment as ICommentWithIdentityStatus).isVerified !== undefined;
-			});
+		const allProcessed = comments.length === 0 || comments.every((c) => typeof c.isSpam === 'boolean' || hasIdentityStatus(c));
 
 		return {
 			verifiedComments: verified,
@@ -122,15 +123,15 @@ function Comments({
 
 		if (!comment) return;
 
-		const isVerified = !comment.isSpam && (comment as ICommentWithIdentityStatus).isVerified;
+		const isVerified = !comment.isSpam && hasIdentityStatus(comment) && comment.isVerified;
 		if (isVerified) {
-			const verifiedIndex = comments.filter((c) => !c.isSpam && (c as ICommentWithIdentityStatus).isVerified).findIndex((c) => c.id === comment.id);
+			const verifiedIndex = comments.filter((c) => !c.isSpam && hasIdentityStatus(c) && c.isVerified).findIndex((c) => c.id === comment.id);
 			if (verifiedIndex >= 2) {
 				setShowMore(true);
 			}
 		}
 
-		const isUnverified = !comment.isSpam && !(comment as ICommentWithIdentityStatus).isVerified;
+		const isUnverified = !comment.isSpam && hasIdentityStatus(comment) && !comment.isVerified;
 		if (isUnverified) {
 			setShowUnverified(true);
 		}
