@@ -215,7 +215,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 			theme: theme || userPreferences.theme,
 			...(accessTokenPayload?.loginAddress
 				? {
-						address: {
+						selectedAccount: {
 							address: accessTokenPayload.loginAddress,
 							accountType: EAccountType.REGULAR,
 							name: '',

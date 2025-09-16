@@ -1,8 +1,8 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { EAnalyticsType, EPostOrigin, EProposalStatus, EProposalType, EVotesDisplayType, IStatusHistoryItem } from '@/_shared/types';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { EAnalyticsType, EPostOrigin, EProposalStatus, EProposalType, EVoteBubbleTabs, EVotesDisplayType, IStatusHistoryItem } from '@/_shared/types';
+import { ChevronDown, ChevronRight, Expand } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,11 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { ClientError } from '@/app/_client-utils/clientError';
 import { useQuery } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
+import { dayjs } from '@shared/_utils/dayjsInit';
+import { getTrackFunctions } from '@/app/_client-utils/trackCurvesUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import { Button } from '../../Button';
 import VoteHistory from '../VoteSummary/VoteHistory/VoteHistory';
@@ -30,56 +35,179 @@ interface IVotesDataProps {
 	thresholdValues?: { approvalThreshold: number; supportThreshold: number };
 }
 
-enum EProposalVoteType {
-	Bubble = 'bubble',
-	Graph = 'graph'
-}
-
 function VotesData({ proposalType, index, trackName, createdAt, timeline, setThresholdValues, thresholdValues }: IVotesDataProps) {
 	const t = useTranslations('PostDetails.VotesData');
-	const [activeTab, setActiveTab] = useState<EProposalVoteType>(EProposalVoteType.Bubble);
+	const [activeTab, setActiveTab] = useState<EVoteBubbleTabs>(EVoteBubbleTabs.Bubble);
 	const [votesDisplayType, setVotesDisplayType] = useState<EVotesDisplayType>(EVotesDisplayType.NESTED);
+	const [isExpanded, setIsExpanded] = useState(false);
+
+	const network = getCurrentNetwork();
+
+	const { approvalCalc, supportCalc } = getTrackFunctions({ network, trackName });
+
 	const fetchVoteCurves = async () => {
-		const { data, error } = await NextApiClientService.getVoteCurves({
+		const { data: voteCurveData, error } = await NextApiClientService.getVoteCurves({
 			proposalType,
 			indexOrHash: index
 		});
 
-		if (error || !data) {
+		if (error || !voteCurveData) {
 			throw new ClientError(error?.message || 'Failed to fetch API data');
 		}
 
-		return data;
+		const latestApproval = voteCurveData.length > 0 ? voteCurveData[voteCurveData.length - 1].approvalPercent : undefined;
+		const latestSupport = voteCurveData.length > 0 ? voteCurveData[voteCurveData.length - 1].supportPercent : undefined;
+
+		const trackInfo = NETWORKS_DETAILS[`${network}`]?.trackDetails?.[`${trackName}`];
+		if (!trackInfo || voteCurveData.length === 0) {
+			return {
+				supportData: [],
+				approvalData: [],
+				approvalThresholdData: [],
+				supportThresholdData: [],
+				latestApproval,
+				latestSupport,
+				labels: []
+			};
+		}
+
+		const labels: number[] = [];
+		const supportData: { x: number; y: number }[] = [];
+		const approvalData: { x: number; y: number }[] = [];
+
+		const approvalThresholdData: { x: number; y: number }[] = [];
+		const supportThresholdData: { x: number; y: number }[] = [];
+
+		const statusBlock = timeline?.find((s) => s?.status === EProposalStatus.Deciding);
+
+		const lastGraphPoint = voteCurveData[voteCurveData.length - 1];
+		const proposalCreatedAt = dayjs(statusBlock?.timestamp || createdAt || voteCurveData[0].timestamp);
+
+		const { decisionPeriod } = trackInfo;
+
+		const { totalSeconds } = BlockCalculationsService.getTimeForBlocks({ network, blocks: decisionPeriod });
+		const decisionPeriodInHrs = Math.floor(dayjs.duration(totalSeconds, 'seconds').asHours());
+		const decisionPeriodFromTimelineInHrs = dayjs(lastGraphPoint.timestamp).diff(proposalCreatedAt, 'hour');
+
+		if (decisionPeriodFromTimelineInHrs < decisionPeriodInHrs) {
+			for (let i = 0; i < decisionPeriodInHrs; i += 1) {
+				labels.push(i);
+
+				if (approvalCalc) {
+					approvalThresholdData.push({
+						x: i,
+						y: approvalCalc(i / decisionPeriodInHrs) * 100
+					});
+				}
+
+				if (supportCalc) {
+					supportThresholdData.push({
+						x: i,
+						y: supportCalc(i / decisionPeriodInHrs) * 100
+					});
+				}
+			}
+		}
+
+		// Process each data point
+		voteCurveData.forEach((point) => {
+			const hour = dayjs(point.timestamp).diff(proposalCreatedAt, 'hour');
+			labels.push(hour);
+
+			if (decisionPeriodFromTimelineInHrs > decisionPeriodInHrs) {
+				if (approvalCalc) {
+					approvalThresholdData.push({
+						x: hour,
+						y: approvalCalc(hour / decisionPeriodFromTimelineInHrs) * 100
+					});
+				}
+				if (supportCalc) {
+					supportThresholdData.push({
+						x: hour,
+						y: supportCalc(hour / decisionPeriodFromTimelineInHrs) * 100
+					});
+				}
+			}
+
+			// Add actual data points
+			if (point.supportPercent !== undefined) {
+				supportData.push({
+					x: hour,
+					y: point.supportPercent
+				});
+			}
+
+			if (point.approvalPercent !== undefined) {
+				approvalData.push({
+					x: hour,
+					y: point.approvalPercent
+				});
+			}
+		});
+
+		const currentApproval = approvalData[approvalData.length - 1];
+		const currentSupport = supportData[supportData.length - 1];
+
+		setThresholdValues?.({
+			approvalThreshold: approvalThresholdData.find((data) => data && data?.x >= currentApproval?.x)?.y || 0,
+			supportThreshold: supportThresholdData.find((data) => data && data?.x >= currentSupport?.x)?.y || 0
+		});
+
+		return {
+			supportData,
+			approvalData,
+			approvalThresholdData,
+			supportThresholdData,
+			latestApproval,
+			latestSupport,
+			labels
+		};
 	};
 
 	const { data: voteCurveData, isFetching } = useQuery({
 		queryKey: ['vote-curves', proposalType, index],
 		queryFn: () => fetchVoteCurves(),
-		placeholderData: [],
+		placeholderData: (prev) =>
+			prev || {
+				supportData: [],
+				approvalData: [],
+				approvalThresholdData: [],
+				supportThresholdData: [],
+				latestApproval: undefined,
+				latestSupport: undefined,
+				labels: []
+			},
 		staleTime: FIVE_MIN_IN_MILLI,
 		retry: false,
 		refetchOnWindowFocus: false,
 		refetchOnMount: false
 	});
 
-	const latestApproval = Array.isArray(voteCurveData) && voteCurveData.length > 0 ? voteCurveData[voteCurveData.length - 1].approvalPercent : null;
-	const latestSupport = Array.isArray(voteCurveData) && voteCurveData.length > 0 ? voteCurveData[voteCurveData.length - 1].supportPercent : null;
-
 	const enableGraph = useMemo(() => !!trackName && !!timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced), [trackName, timeline]);
+
 	return (
 		<div className={classes.card}>
 			<div className='flex w-full items-center justify-between'>
 				<h1 className={classes.header}>{t('votes')}</h1>
+				<Button
+					variant='ghost'
+					className='mr-6 flex justify-between rounded-sm px-1.5 py-0.5 text-xs font-normal text-text_pink'
+					onClick={() => setIsExpanded(true)}
+				>
+					<Expand className='h-2.5 w-2.5' />
+				</Button>
 				<VotesDataDialog
 					index={index}
-					voteCurveData={voteCurveData || []}
-					trackName={trackName}
-					timeline={timeline || []}
-					createdAt={createdAt || new Date()}
-					setThresholdValues={setThresholdValues || (() => {})}
+					setIsExpanded={setIsExpanded}
+					isExpanded={isExpanded}
+					chartLabels={voteCurveData?.labels || []}
+					approvalData={voteCurveData?.approvalData || []}
+					supportData={voteCurveData?.supportData || []}
+					approvalThresholdData={voteCurveData?.approvalThresholdData || []}
+					supportThresholdData={voteCurveData?.supportThresholdData || []}
 					thresholdValues={thresholdValues || { approvalThreshold: 0, supportThreshold: 0 }}
-					latestApproval={latestApproval}
-					latestSupport={latestSupport}
+					latestApproval={voteCurveData?.latestApproval}
+					latestSupport={voteCurveData?.latestSupport}
 					isFetching={isFetching}
 					proposalType={proposalType}
 					selectedTab={activeTab}
@@ -92,7 +220,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 					defaultValue={activeTab}
 				>
 					<div className={classes.tabs}>
-						{[EProposalVoteType.Bubble, EProposalVoteType.Graph].map((tab) => (
+						{[EVoteBubbleTabs.Bubble, EVoteBubbleTabs.Graph].map((tab) => (
 							<Button
 								key={tab}
 								variant='ghost'
@@ -105,7 +233,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 						))}
 					</div>
 					<TabsContent
-						value={EProposalVoteType.Bubble}
+						value={EVoteBubbleTabs.Bubble}
 						className='px-6'
 					>
 						<VotesBubbleChart
@@ -113,18 +241,19 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 							index={index}
 							analyticsType={EAnalyticsType.CONVICTIONS}
 							enableFullHeight={false}
+							setIsExpanded={setIsExpanded}
 						/>
 					</TabsContent>
-					<TabsContent value={EProposalVoteType.Graph}>
+					<TabsContent value={EVoteBubbleTabs.Graph}>
 						<VoteCurvesData
-							latestApproval={latestApproval}
-							latestSupport={latestSupport}
+							latestApproval={voteCurveData?.latestApproval}
+							chartLabels={voteCurveData?.labels || []}
+							approvalData={voteCurveData?.approvalData || []}
+							supportData={voteCurveData?.supportData || []}
+							approvalThresholdData={voteCurveData?.approvalThresholdData || []}
+							supportThresholdData={voteCurveData?.supportThresholdData || []}
+							latestSupport={voteCurveData?.latestSupport}
 							isFetching={isFetching}
-							voteCurveData={voteCurveData || []}
-							createdAt={createdAt}
-							trackName={trackName}
-							timeline={timeline}
-							setThresholdValues={setThresholdValues}
 							thresholdValues={thresholdValues}
 						/>
 					</TabsContent>
@@ -136,6 +265,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 						index={index}
 						analyticsType={EAnalyticsType.CONVICTIONS}
 						enableFullHeight={false}
+						setIsExpanded={setIsExpanded}
 					/>
 				</div>
 			)}

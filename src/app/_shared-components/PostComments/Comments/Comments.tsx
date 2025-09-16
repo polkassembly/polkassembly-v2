@@ -81,8 +81,7 @@ function Comments({
 			return { canComment: onchainIdentities?.some((identity) => identity?.isVerified), commentDisabledMessage: t('PostDetails.commentsDisabledForNonVerifiedUsers') };
 		}
 		return { canComment: !(allowedCommentor === EAllowedCommentor.NONE), commentDisabledMessage: t('PostDetails.commentsDisabled') };
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [allowedCommentor, onchainIdentities]);
+	}, [allowedCommentor, onchainIdentities, user, postUserId, t]);
 
 	// Handle comment link navigation
 	const handleCommentLink = useCallback(() => {
@@ -177,6 +176,7 @@ function Comments({
 				canComment ? (
 					<div className='w-full px-6 py-6'>
 						<AddComment
+							id='commentForm'
 							proposalType={proposalType}
 							proposalIndex={index}
 							onOptimisticUpdate={handleShowMore}
@@ -193,6 +193,7 @@ function Comments({
 					<Link
 						className='text-text_pink'
 						href='/login'
+						id='commentLoginPrompt'
 					>
 						{t('PostDetails.login')}
 					</Link>{' '}

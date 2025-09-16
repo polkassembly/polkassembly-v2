@@ -229,6 +229,7 @@ export interface IMultisigAddress {
 export interface IProxyAddress {
 	address: string;
 	proxyType: EProxyType;
+	delay?: number;
 }
 
 export interface IAddressRelations {
@@ -343,7 +344,8 @@ export enum ENotificationTrigger {
 
 export enum EDataSource {
 	POLKASSEMBLY = 'polkassembly',
-	SUBSQUARE = 'subsquare'
+	SUBSQUARE = 'subsquare',
+	OTHER = 'other'
 }
 
 export enum EReaction {
@@ -417,6 +419,9 @@ export interface IOffChainContentHistoryItem {
 	title?: string;
 	createdAt: Date;
 }
+
+export type ICommentHistoryItem = Omit<IOffChainContentHistoryItem, 'title'>;
+
 export interface IPollVote {
 	id: string;
 	userId: number;
@@ -663,6 +668,7 @@ export interface ISidebarMenuItem {
 	items?: ISidebarMenuItem[];
 	key?: string;
 	heading?: string;
+	renderAsParentItem?: boolean;
 }
 
 export interface IMessageResponse {
@@ -728,7 +734,7 @@ export interface IComment {
 	isSpam?: boolean;
 	sentiment?: ECommentSentiment;
 	aiSentiment?: ECommentSentiment;
-	history?: IOffChainContentHistoryItem[];
+	history?: ICommentHistoryItem[];
 	disabled?: boolean;
 	authorAddress?: string;
 }
@@ -1027,7 +1033,9 @@ export enum EReactQueryKeys {
 	POST_DETAILS = 'postDetails',
 	ACCOUNTS = 'accounts',
 	IDENTITY_INFO = 'identityInfo',
-	TOKENS_USD_PRICE = 'tokensUsdPrice'
+	TOKENS_USD_PRICE = 'tokensUsdPrice',
+	USER_VOTES = 'userVotes',
+	PROFILE_IDENTITIES = 'profileIdentities'
 }
 
 export interface IParamDef {
@@ -1506,3 +1514,111 @@ export interface IVaultQrState {
 	qrResolve?: (result: SignerResult) => void;
 	qrReject?: (error: Error) => void;
 }
+
+export enum EVoteBubbleTabs {
+	Bubble = 'bubble',
+	Graph = 'graph'
+}
+
+export interface IProfileVote extends Omit<IVoteData, 'createdAtBlock' | 'delegatedTo' | 'balanceValue'> {
+	balance: {
+		value: string;
+		abstain: string;
+		aye: string;
+		nay: string;
+	};
+	proposalIndex: number;
+	proposalType: EProposalType;
+	postDetails?: IPostListing;
+	isDelegated: boolean;
+	extrinsicIndex: string;
+	proposal?: {
+		status: EProposalStatus;
+	};
+}
+
+export interface IGovAnalyticsStats {
+	totalProposals: number;
+	approvedProposals: number;
+}
+
+export interface IGovAnalyticsReferendumOutcome {
+	approved: number;
+	rejected: number;
+	timeout: number;
+	ongoing: number;
+	cancelled: number;
+}
+
+export interface ITurnoutPercentageData {
+	averageSupportPercentages: Record<string, number>;
+}
+
+export interface IRawTurnoutData {
+	proposals: {
+		index: number;
+		trackNumber?: number;
+		convictionVoting: {
+			balance: {
+				value?: string;
+				aye?: string;
+				nay?: string;
+				abstain?: string;
+			};
+			decision: 'yes' | 'no' | 'abstain' | 'split' | 'splitAbstain';
+		}[];
+	}[];
+}
+
+export interface IGovAnalyticsDelegationStats {
+	totalCapital: string;
+	totalVotesBalance: string;
+	totalDelegates: number;
+	totalDelegators: number;
+}
+
+export interface IGovAnalyticsCategoryCounts {
+	governance: number | null;
+	main: number | null;
+	treasury: number | null;
+	whiteList: number | null;
+}
+
+// please make sure this is updated with the latest changes in the functions/src/types.ts file
+export interface IAlgoliaPost extends Record<string, unknown> {
+	objectID: string;
+	title: string;
+	createdAtTimestamp?: number;
+	updatedAtTimestamp?: number;
+	tags: string[];
+	dataSource: string;
+	proposalType: string;
+	network: string;
+	topic: string;
+	lastCommentAtTimestamp?: number;
+	userId: number;
+	hash?: string;
+	index?: number;
+	parsedContent: string;
+	titleAndContentHash: string;
+	proposer?: string;
+	origin?: EPostOrigin;
+}
+
+export enum EProxyDashboardTabs {
+	ALL = 'all',
+	MY_PROXIES = 'my-proxies'
+}
+
+export interface IProxyRequest {
+	id: string;
+	delegator: string;
+	proxyType?: EProxyType;
+	delay: number;
+	proxies: number;
+	proxyAddresses: string[];
+	individualProxies: IProxyAddress[];
+	dateCreated: Date;
+}
+
+export type IProxyListingResponse = IGenericListingResponse<IProxyRequest>;

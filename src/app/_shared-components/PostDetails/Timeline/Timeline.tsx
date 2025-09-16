@@ -65,7 +65,7 @@ function Timeline({ timeline, proposalType, createdAt, linkedPost }: { timeline?
 							<div className='flex flex-col gap-y-4'>
 								<div className={classes.timelineItem}>
 									<span className='text-xs text-text_primary'>{dayjs(linkedPostData.createdAt).format(dateFormat)}</span>
-									<StatusTag status={EProposalStatus.Created.toLowerCase()} />
+									<StatusTag status={EProposalStatus.Created} />
 								</div>
 							</div>
 
@@ -102,7 +102,7 @@ function Timeline({ timeline, proposalType, createdAt, linkedPost }: { timeline?
 								>
 									<div className={classes.timelineItem}>
 										<span className='text-xs text-text_primary'>{dayjs(item.timestamp).format("Do MMM 'YY, h:mm a")}</span>
-										<StatusTag status={item.status.toLowerCase().replace(/\s+/g, '_')} />
+										<StatusTag status={item.status} />
 									</div>
 									{i !== timeline.length - 1 && <Separator className='bg-border_grey' />}
 								</div>
@@ -111,7 +111,7 @@ function Timeline({ timeline, proposalType, createdAt, linkedPost }: { timeline?
 							<div className='flex flex-col gap-y-4'>
 								<div className={classes.timelineItem}>
 									<span className='text-xs text-text_primary'>{dayjs(createdAt).format(dateFormat)}</span>
-									<StatusTag status={EProposalStatus.Created.toLowerCase().replace(/\s+/g, '_')} />
+									<StatusTag status={EProposalStatus.Created} />
 								</div>
 							</div>
 						)}

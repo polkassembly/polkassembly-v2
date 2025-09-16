@@ -19,6 +19,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import Image from 'next/image';
 import noData from '@/_assets/activityfeed/gifs/noactivity.gif';
 import { animated } from '@react-spring/web';
+import { useRouter } from 'next/navigation';
 import Address from '../../Profile/Address/Address';
 import classes from './VotesBubbleChart.module.scss';
 import { Skeleton } from '../../Skeleton';
@@ -142,7 +143,8 @@ function VotesBubbleChart({
 	analyticsType,
 	enableTitle = false,
 	enableFilter = false,
-	enableFullHeight = true
+	enableFullHeight = true,
+	setIsExpanded
 }: {
 	proposalType: EProposalType;
 	index: string;
@@ -150,9 +152,11 @@ function VotesBubbleChart({
 	enableTitle?: boolean;
 	enableFilter?: boolean;
 	enableFullHeight?: boolean;
+	setIsExpanded?: (isExpanded: boolean) => void;
 }) {
 	const t = useTranslations('PostDetails.VotesBubble');
 	const network = getCurrentNetwork();
+	const router = useRouter();
 	const {
 		userPreferences: { theme }
 	} = useUserPreferences();
@@ -200,6 +204,8 @@ function VotesBubbleChart({
 						<Address
 							address={id}
 							textClassName='text-sm'
+							redirectToProfile
+							disableTooltip
 						/>
 						{votesType === EVotesDisplayType.NESTED ? (
 							<div className={classes.tooltipContent}>
@@ -347,6 +353,13 @@ function VotesBubbleChart({
 								return chartItem ? getDecisionColor(chartItem.decision) : '#000';
 							}}
 							leavesOnly
+							onClick={(node) => {
+								if (setIsExpanded) {
+									setIsExpanded(true);
+								} else {
+									router.push(`/user/address/${node.id}`);
+								}
+							}}
 							value='value'
 							valueFormat={(value) => formatUSDWithUnits(value?.toString(), 1)}
 							padding={6}

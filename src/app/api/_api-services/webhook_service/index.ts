@@ -19,6 +19,7 @@ import { APIError } from '../../_api-utils/apiError';
 import { RedisService } from '../redis_service';
 import { OnChainDbService } from '../onchain_db_service';
 import { OffChainDbService } from '../offchain_db_service';
+import { AlgoliaService } from '../algolia_service';
 
 if (!TOOLS_PASSPHRASE) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'TOOLS_PASSPHRASE is not set');
@@ -60,7 +61,8 @@ export class WebhookService {
 	private static readonly zodEventBodySchemas = {
 		[EWebhookEvent.PROPOSAL_CREATED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
-			proposalType: z.nativeEnum(EProposalType)
+			proposalType: z.nativeEnum(EProposalType),
+			address: z.string().refine((address) => ValidatorService.isValidWeb3Address(address), ERROR_MESSAGES.INVALID_EVM_ADDRESS)
 		}),
 		[EWebhookEvent.PROPOSAL_ENDED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
@@ -68,7 +70,8 @@ export class WebhookService {
 		}),
 		[EWebhookEvent.VOTED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
-			proposalType: z.nativeEnum(EProposalType)
+			proposalType: z.nativeEnum(EProposalType),
+			address: z.string().refine((address) => ValidatorService.isValidWeb3Address(address), ERROR_MESSAGES.INVALID_EVM_ADDRESS)
 		}),
 		[EWebhookEvent.BOUNTY_CLAIMED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
@@ -94,7 +97,8 @@ export class WebhookService {
 		}),
 		[EWebhookEvent.PROPOSAL_STATUS_UPDATED]: z.object({
 			indexOrHash: z.string().refine((indexOrHash) => ValidatorService.isValidIndexOrHash(indexOrHash), ERROR_MESSAGES.INVALID_INDEX_OR_HASH),
-			proposalType: z.nativeEnum(EProposalType)
+			proposalType: z.nativeEnum(EProposalType),
+			address: z.string().refine((address) => ValidatorService.isValidWeb3Address(address), ERROR_MESSAGES.INVALID_EVM_ADDRESS)
 		}),
 		[EWebhookEvent.CACHE_REFRESH]: z.object({
 			cacheRefreshType: z.nativeEnum(ECacheRefreshType)
@@ -130,7 +134,22 @@ export class WebhookService {
 		const params = this.zodEventBodySchemas[webhookEvent as EWebhookEvent].parse(body);
 
 		switch (webhookEvent) {
-			case EWebhookEvent.PROPOSAL_CREATED:
+			case EWebhookEvent.PROPOSAL_CREATED: {
+				const parsedParams = params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_CREATED]>;
+
+				return Promise.allSettled([
+					AlgoliaService.createPreliminaryAlgoliaPostRecord({
+						network,
+						indexOrHash: parsedParams.indexOrHash,
+						proposalType: parsedParams.proposalType
+					}),
+					this.handleProposalStatusChanged({
+						network,
+						params: parsedParams,
+						event: webhookEvent
+					})
+				]);
+			}
 			case EWebhookEvent.PROPOSAL_ENDED:
 			case EWebhookEvent.BOUNTY_CLAIMED:
 			case EWebhookEvent.DECISION_DEPOSIT_PLACED:
@@ -189,7 +208,7 @@ export class WebhookService {
 	}
 
 	private static async handleVoted({ network, params }: { network: ENetwork; params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.VOTED]> }) {
-		const { indexOrHash, proposalType } = params;
+		const { indexOrHash, proposalType, address } = params;
 
 		await Promise.allSettled([
 			RedisService.DeletePostAnalyticsData({ network, proposalType, index: Number(indexOrHash) }),
@@ -208,7 +227,8 @@ export class WebhookService {
 				analyticsType: EAnalyticsType.CONVICTIONS
 			}),
 			RedisService.DeletePostBubbleVotesData({ network, proposalType, index: Number(indexOrHash), votesType: EVotesDisplayType.FLATTENED, analyticsType: EAnalyticsType.VOTES }),
-			RedisService.DeletePostBubbleVotesData({ network, proposalType, index: Number(indexOrHash), votesType: EVotesDisplayType.NESTED, analyticsType: EAnalyticsType.VOTES })
+			RedisService.DeletePostBubbleVotesData({ network, proposalType, index: Number(indexOrHash), votesType: EVotesDisplayType.NESTED, analyticsType: EAnalyticsType.VOTES }),
+			...(address ? [RedisService.DeleteUserVotesByAddress({ network, address })] : [])
 		]);
 	}
 
@@ -222,7 +242,7 @@ export class WebhookService {
 		event: EWebhookEvent;
 	}) {
 		// TODO: add origin and clear cache for origin page too
-		const { indexOrHash, proposalType } = params;
+		const { indexOrHash, proposalType, address } = params;
 
 		// Invalidate caches
 		await Promise.allSettled([
@@ -230,7 +250,9 @@ export class WebhookService {
 			RedisService.DeletePostsListing({ network, proposalType }),
 			RedisService.DeleteActivityFeed({ network }),
 			RedisService.DeleteAllSubscriptionFeedsForNetwork(network),
-			RedisService.DeleteOverviewPageData({ network })
+			RedisService.DeleteOverviewPageData({ network }),
+			...(address ? [RedisService.DeleteUserVotesByAddress({ network, address })] : []),
+			RedisService.DeleteTrackCounts({ network })
 		]);
 
 		// Refresh above caches

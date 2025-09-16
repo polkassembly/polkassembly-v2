@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { EWallet } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
@@ -31,6 +31,11 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 
 	// 2. get user id from tfa token
 	const user = await AuthService.GetUserFromTfaToken(tfaToken);
+
+	// 2.5. Check if user is blacklisted before proceeding with TFA login
+	if (AuthService.IsUserBlacklisted(user.id)) {
+		throw new APIError(ERROR_CODES.USER_BLACKLISTED, StatusCodes.FORBIDDEN, ERROR_MESSAGES.USER_BLACKLISTED);
+	}
 
 	// 3. verify if user has tfa enabled
 	if (!user.twoFactorAuth || !user.twoFactorAuth.enabled || !user.twoFactorAuth.base32Secret || !user.twoFactorAuth.url) {

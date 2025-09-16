@@ -32,6 +32,7 @@ function AddComment({
 	onCancel,
 	isReply,
 	replyTo,
+	id,
 	voteData
 }: {
 	proposalType: EProposalType;
@@ -42,6 +43,7 @@ function AddComment({
 	onCancel?: () => void;
 	isReply?: boolean;
 	replyTo?: Omit<IPublicUser, 'rank'>;
+	id?: string;
 	voteData?: IVoteData;
 }) {
 	const t = useTranslations();
@@ -254,7 +256,10 @@ function AddComment({
 
 	return (
 		<div className='flex flex-col gap-2'>
-			<div className='-ml-2 flex w-full'>
+			<div
+				className='flex w-full'
+				id={id}
+			>
 				<AddressSwitchButton
 					showLinkedAccountBadge
 					showPeopleChainBalance={false}
@@ -262,6 +267,7 @@ function AddComment({
 					className='w-full gap-0 border-none pl-0'
 					iconSize={30}
 					switchButtonClassName='px-2 text-[8px] h-6'
+					hideAccountsAlert
 				/>
 			</div>
 			<div className='mb-2'>

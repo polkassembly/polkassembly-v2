@@ -4,7 +4,7 @@
 
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FaRegClock } from '@react-icons/all-files/fa/FaRegClock';
-import { EAssets, EProposalType, ETheme, IPostListing, IPostOffChainMetrics } from '@/_shared/types';
+import { EAssets, EGovType, EProposalType, ETheme, IPostListing, IPostOffChainMetrics } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image from 'next/image';
@@ -28,8 +28,9 @@ import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ARCHIVE_PROPOSAL_TYPES } from '@/_shared/_constants/archiveProposalTypes';
-import styles from './ListingCard.module.scss';
 import VotingBar from '../VotingBar/VotingBar';
+import styles from './ListingCard.module.scss';
+import UserAvatar from '../../UserAvatar/UserAvatar';
 
 function ListingCard({
 	title,
@@ -62,7 +63,9 @@ function ListingCard({
 
 	const groupedByAsset = groupBeneficiariesByAssetIndex({ beneficiaries: data.onChainInfo?.beneficiaries || [], network });
 
-	const redirectUrl = getPostTypeUrl({ proposalType, indexOrHash: index, network });
+	const redirectUrl = ARCHIVE_PROPOSAL_TYPES.includes(proposalType)
+		? getPostTypeUrl({ proposalType, indexOrHash: index, network, govType: EGovType.GOV_1 })
+		: getPostTypeUrl({ proposalType, indexOrHash: index, network });
 
 	return (
 		<Link
@@ -85,16 +88,17 @@ function ListingCard({
 						<h3 className={styles.titleText}>{title}</h3>
 						<div className={styles.infoContainer}>
 							<div className='flex items-center gap-2'>
-								{data.onChainInfo?.proposer && (
+								{data.onChainInfo?.proposer ? (
 									<>
-										<Address address={data.onChainInfo?.proposer} />
+										<Address
+											address={data.onChainInfo?.proposer}
+											textClassName='max-w-[40px] truncate sm:max-w-full'
+										/>
 										<span>|</span>
 									</>
-								)}
-
-								{!data.onChainInfo?.proposer && data.publicUser?.username && (
+								) : (
 									<>
-										<span>{data.publicUser?.username}</span>
+										<UserAvatar publicUser={data.publicUser} />
 										<span>|</span>
 									</>
 								)}
@@ -123,7 +127,7 @@ function ListingCard({
 										src={CommentIcon}
 										alt='comments'
 										width={16}
-										className={userPreferences.theme === ETheme.DARK ? 'dark-icons' : ''}
+										className={userPreferences.theme === ETheme.DARK ? 'darkIcon' : ''}
 										height={16}
 									/>
 									<span className='text-text_primary'>{metrics?.comments || 0}</span>
@@ -272,7 +276,7 @@ function ListingCard({
 
 					{data.onChainInfo?.status && (
 						<div className='flex'>
-							<StatusTag status={data.onChainInfo?.status.toLowerCase().replace(/\s+/g, '_')} />
+							<StatusTag status={data.onChainInfo?.status} />
 						</div>
 					)}
 				</div>
