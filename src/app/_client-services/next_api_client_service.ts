@@ -120,7 +120,6 @@ enum EApiRoute {
 	GET_BATCH_VOTE_CART = 'GET_BATCH_VOTE_CART',
 	EDIT_BATCH_VOTE_CART_ITEM = 'EDIT_BATCH_VOTE_CART_ITEM',
 	DELETE_BATCH_VOTE_CART_ITEM = 'DELETE_BATCH_VOTE_CART_ITEM',
-	GET_USER_BALANCE_HISTORY = 'GET_USER_BALANCE_HISTORY',
 	DELETE_BATCH_VOTE_CART = 'DELETE_BATCH_VOTE_CART',
 	ADD_TO_BATCH_VOTE_CART = 'ADD_TO_BATCH_VOTE_CART',
 	GET_SUBSCRIBED_ACTIVITY_FEED = 'GET_SUBSCRIBED_ACTIVITY_FEED',
@@ -226,7 +225,6 @@ export class NextApiClientService {
 			case EApiRoute.GET_ADDRESS_RELATIONS:
 			case EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS:
 			case EApiRoute.GET_USER_POSTS_BY_ADDRESS:
-			case EApiRoute.GET_USER_BALANCE_HISTORY:
 				path = '/users/address';
 				break;
 
@@ -1000,26 +998,6 @@ export class NextApiClientService {
 	static async getDelegateTracks({ address }: { address: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks'] });
 		return this.nextApiClientFetch<{ delegationStats: ITrackDelegationStats[] }>({ url, method });
-	}
-
-	static async getUserBalanceHistory({ address, months = 6, granularity = 'monthly' }: { address: string; months?: number; granularity?: 'daily' | 'weekly' | 'monthly' }) {
-		const queryParams = new URLSearchParams({
-			months: months.toString(),
-			granularity
-		});
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.GET_USER_BALANCE_HISTORY,
-			routeSegments: ['users', 'address', address, 'balance-history'],
-			queryParams
-		});
-		return this.nextApiClientFetch<
-			Array<{
-				date: string;
-				totalVotingPower: number;
-				availableBalance: number;
-				delegatedBalance: number;
-			}>
-		>({ url, method });
 	}
 
 	static async getProfileViews({ userId, timePeriod = 'month' }: { userId: number; timePeriod?: 'today' | 'week' | 'month' | 'all' }) {
