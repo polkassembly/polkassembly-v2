@@ -23,10 +23,6 @@ export const useProfileViews = (userId?: number, address?: string, options: UseP
 	const { timePeriod = 'month', enabled = true } = options;
 	const queryClient = useQueryClient();
 
-	// Determine if we should use userId or address for tracking
-	const useUserId = !!userId;
-	const useAddress = !userId && !!address;
-
 	// Fetch profile views data
 	const {
 		data: profileViewsData,
@@ -34,27 +30,14 @@ export const useProfileViews = (userId?: number, address?: string, options: UseP
 		error: profileViewsError,
 		refetch: refetchProfileViews
 	} = useQuery({
-		queryKey: ['profileViews', userId || address, timePeriod],
+		queryKey: ['profileViews', userId, timePeriod],
 		queryFn: async (): Promise<ProfileViewsData> => {
-			if (!userId && !address) {
-				throw new ClientError('Either User ID or Address is required');
+			if (!userId) {
+				throw new ClientError('User ID is required');
 			}
 
-			if (useUserId) {
-				const { data, error } = await NextApiClientService.getProfileViews({
-					userId: userId!,
-					timePeriod
-				});
-
-				if (error || !data) {
-					throw new ClientError(error?.message || 'Failed to fetch profile views');
-				}
-
-				return data;
-			}
-
-			const { data, error } = await NextApiClientService.getProfileViewsByAddress({
-				address: address!,
+			const { data, error } = await NextApiClientService.getProfileViews({
+				userId,
 				timePeriod
 			});
 
@@ -64,7 +47,7 @@ export const useProfileViews = (userId?: number, address?: string, options: UseP
 
 			return data;
 		},
-		enabled: (useUserId || useAddress) && enabled,
+		enabled: !!userId && enabled,
 		retry: false,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
@@ -78,27 +61,19 @@ export const useProfileViews = (userId?: number, address?: string, options: UseP
 		error: incrementError
 	} = useMutation({
 		mutationFn: async (): Promise<void> => {
-			if (!userId && !address) {
-				throw new ClientError('Either User ID or Address is required');
+			if (!userId) {
+				throw new ClientError('User ID is required');
 			}
 
-			if (useUserId) {
-				const { error } = await NextApiClientService.incrementProfileView({ userId: userId! });
+			const { error } = await NextApiClientService.incrementProfileView({ userId });
 
-				if (error) {
-					throw new ClientError(error.message || 'Failed to increment profile view');
-				}
-			} else {
-				const { error } = await NextApiClientService.incrementProfileViewByAddress({ address: address! });
-
-				if (error) {
-					throw new ClientError(error.message || 'Failed to increment profile view');
-				}
+			if (error) {
+				throw new ClientError(error.message || 'Failed to increment profile view');
 			}
 		},
 		onSuccess: () => {
 			// Invalidate and refetch profile views data
-			queryClient.invalidateQueries({ queryKey: ['profileViews', userId || address] });
+			queryClient.invalidateQueries({ queryKey: ['profileViews', userId] });
 		},
 		onError: (error) => {
 			console.error('Failed to increment profile view:', error);

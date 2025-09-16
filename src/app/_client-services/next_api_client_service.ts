@@ -147,9 +147,7 @@ enum EApiRoute {
 	ADD_COMMENT_REACTION = 'ADD_COMMENT_REACTION',
 	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
 	GET_PROFILE_VIEWS = 'GET_PROFILE_VIEWS',
-	GET_PROFILE_VIEWS_BY_ADDRESS = 'GET_PROFILE_VIEWS_BY_ADDRESS',
-	INCREMENT_PROFILE_VIEW = 'INCREMENT_PROFILE_VIEW',
-	INCREMENT_PROFILE_VIEW_BY_ADDRESS = 'INCREMENT_PROFILE_VIEW_BY_ADDRESS'
+	INCREMENT_PROFILE_VIEW = 'INCREMENT_PROFILE_VIEW'
 }
 
 export class NextApiClientService {
@@ -272,9 +270,6 @@ export class NextApiClientService {
 			case EApiRoute.GET_PROFILE_VIEWS:
 				path = '/users/id';
 				break;
-			case EApiRoute.GET_PROFILE_VIEWS_BY_ADDRESS:
-				path = '/users/address';
-				break;
 
 			// post routes
 			case EApiRoute.LOGOUT:
@@ -327,10 +322,6 @@ export class NextApiClientService {
 			case EApiRoute.CONFIRM_SOCIAL_VERIFICATION:
 			case EApiRoute.INCREMENT_PROFILE_VIEW:
 				path = '/users/id';
-				method = 'POST';
-				break;
-			case EApiRoute.INCREMENT_PROFILE_VIEW_BY_ADDRESS:
-				path = '/users/address';
 				method = 'POST';
 				break;
 			case EApiRoute.CREATE_PA_DELEGATE:
@@ -1013,32 +1004,10 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ total: number; unique: number; period: string }>({ url, method });
 	}
 
-	static async getProfileViewsByAddress({ address, timePeriod = 'month' }: { address: string; timePeriod?: 'today' | 'week' | 'month' | 'all' }) {
-		const queryParams = new URLSearchParams({
-			timePeriod
-		});
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.GET_PROFILE_VIEWS_BY_ADDRESS,
-			routeSegments: [address, 'profile-views'],
-			queryParams
-		});
-
-		return this.nextApiClientFetch<{ total: number; unique: number; period: string }>({ url, method });
-	}
-
 	static async incrementProfileView({ userId }: { userId: number }) {
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.INCREMENT_PROFILE_VIEW,
 			routeSegments: [userId.toString(), 'profile-views']
-		});
-
-		return this.nextApiClientFetch<{ message: string }>({ url, method });
-	}
-
-	static async incrementProfileViewByAddress({ address }: { address: string }) {
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.INCREMENT_PROFILE_VIEW_BY_ADDRESS,
-			routeSegments: [address, 'profile-views']
 		});
 
 		return this.nextApiClientFetch<{ message: string }>({ url, method });
