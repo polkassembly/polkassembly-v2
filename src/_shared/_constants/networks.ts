@@ -2562,14 +2562,6 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				url: 'wss://polkadot.public.curie.radiumblock.co/ws'
 			},
 			{
-				name: VIA_ONFINALITY,
-				url: 'wss://polkadot.api.onfinality.io/public-ws'
-			},
-			{
-				name: VIA_PERMANENCE_DAO_EU,
-				url: 'wss://polkadot.rpc.permanence.io'
-			},
-			{
 				name: VIA_SIMPLY_STAKING,
 				url: 'wss://spectrum-03.simplystaking.xyz/cG9sa2Fkb3QtMDMtOTFkMmYwZGYtcG9sa2Fkb3Q/LjwBJpV3dIKyWQ/polkadot/mainnet/'
 			},

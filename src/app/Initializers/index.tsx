@@ -169,21 +169,12 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 	// init polkadot api and wallet service
 	useEffect(() => {
-		let polkadotApiIntervalId: ReturnType<typeof setInterval>;
-
 		(async () => {
 			if (polkadotApi) return;
 
 			const newApi = await PolkadotApiService.Init(network);
 			setPolkadotApiAtom(newApi);
-
-			polkadotApiIntervalId = setInterval(async () => {
-				try {
-					await newApi.keepAlive();
-				} catch {
-					await newApi.switchToNewRpcEndpoint();
-				}
-			}, 6000);
+			setUserPreferences({ ...userPreferences, rpcIndex: newApi.getCurrentRpcIndex() });
 		})();
 
 		// init wallet service
@@ -195,9 +186,6 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		})();
 
 		return () => {
-			if (polkadotApiIntervalId) {
-				clearInterval(polkadotApiIntervalId);
-			}
 			polkadotApi?.disconnect().then(() => setPolkadotApiAtom(null));
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
