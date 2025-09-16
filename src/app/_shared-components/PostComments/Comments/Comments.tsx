@@ -42,11 +42,28 @@ function Comments({
 	const user = useAtomValue(userAtom);
 	const [showMore, setShowMore] = useState(false);
 	const [showSpam, setShowSpam] = useState(false);
+	const [showUnverified, setShowUnverified] = useState(false);
 	const [comments, setComments] = useState<ICommentResponse[]>(commentsFromProps);
+	const [identitiesLoaded, setIdentitiesLoaded] = useState<boolean>(false);
 
-	const regularComments = useMemo(() => comments.filter((comment) => !comment.isSpam), [comments]);
-	const spamComments = useMemo(() => comments.filter((comment) => comment.isSpam), [comments]);
-	const commentsToShow = showMore ? regularComments : regularComments.slice(0, 2);
+	interface CommentWithVerification extends ICommentResponse {
+		isVerified?: boolean;
+	}
+
+	const verifiedComments = useMemo(() => {
+		return comments.filter((comment) => !comment.isSpam && (comment as CommentWithVerification).isVerified);
+	}, [comments]);
+
+	const unverifiedComments = useMemo(() => {
+		if (!identitiesLoaded) return [];
+		return comments.filter((comment) => !comment.isSpam && !(comment as CommentWithVerification).isVerified);
+	}, [comments, identitiesLoaded]);
+
+	const spamComments = useMemo(() => {
+		return comments.filter((comment) => comment.isSpam);
+	}, [comments]);
+
+	const verifiedCommentsToShow = showMore ? verifiedComments : verifiedComments.slice(0, 2);
 
 	const handleShowMore = () => {
 		setShowMore(true);
@@ -89,10 +106,21 @@ function Comments({
 		if (!hash) return;
 
 		const commentId = hash.replace('#comment-', '');
-		const comment = regularComments.find((c) => c.id === commentId);
+		const comment = [...verifiedComments, ...unverifiedComments, ...spamComments].find((c) => c.id === commentId);
 
-		if (comment && !showMore && regularComments.indexOf(comment) >= 2) {
+		if (!comment) return;
+
+		const verifiedCommentIndex = verifiedComments.findIndex((c) => c.id === comment.id);
+		if (verifiedCommentIndex !== -1 && !showMore && verifiedCommentIndex >= 2) {
 			handleShowMore();
+		}
+
+		if (unverifiedComments.some((c) => c.id === comment.id) && !showUnverified) {
+			setShowUnverified(true);
+		}
+
+		if (spamComments.some((c) => c.id === comment.id) && !showSpam) {
+			setShowSpam(true);
 		}
 
 		// Use requestAnimationFrame to ensure the DOM is ready
@@ -102,7 +130,7 @@ function Comments({
 				element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 			}
 		});
-	}, [regularComments, showMore]);
+	}, [verifiedComments, unverifiedComments, spamComments, showMore, showUnverified, showSpam]);
 
 	// Call handleCommentLink when the component mounts
 	useLayoutEffect(() => {
@@ -113,17 +141,23 @@ function Comments({
 		setComments(commentsFromProps);
 	}, [commentsFromProps]);
 
+	useEffect(() => {
+		if (comments.length > 0 && identityService) {
+			setIdentitiesLoaded(true);
+		}
+	}, [comments, identityService]);
 	return (
 		<div className={classes.wrapper}>
 			<div className='flex flex-col gap-y-4 px-4 lg:px-6'>
-				{commentsToShow?.map((item) => (
+				{verifiedCommentsToShow?.map((item) => (
 					<SingleComment
 						key={item.id}
 						commentData={item}
 						setComments={setComments}
 					/>
 				))}
-				{showMore && regularComments?.length > 2 ? (
+
+				{showMore && verifiedComments?.length > 2 ? (
 					<div className='flex justify-center'>
 						<span
 							onClick={handleShowLess}
@@ -133,7 +167,7 @@ function Comments({
 							{t('ActivityFeed.PostItem.showLessComments')} <FiArrowUpCircle className='text-lg' />
 						</span>
 					</div>
-				) : !showMore && regularComments?.length > 2 ? (
+				) : !showMore && verifiedComments?.length > 2 ? (
 					<div className='flex justify-center'>
 						<span
 							onClick={handleShowMore}
@@ -145,7 +179,37 @@ function Comments({
 					</div>
 				) : null}
 
-				{spamComments.length > 0 && (
+				{unverifiedComments.length > 0 && identitiesLoaded && (
+					<div className='mt-4 border-y border-border_grey py-4'>
+						<Button
+							variant='ghost'
+							onClick={() => setShowUnverified(!showUnverified)}
+							className='flex w-full items-center justify-center gap-x-2 text-sm font-medium text-blue-500'
+							aria-expanded={showUnverified}
+							aria-controls='unverified-comments-section'
+						>
+							{showUnverified ? t('PostDetails.hideUnverifiedComments') : t('PostDetails.showUnverifiedComments')}
+							<span className='text-blue-500'>({unverifiedComments.length})</span>
+							{showUnverified ? <FaChevronUp className='text-base' /> : <FaChevronDown className='text-base' />}
+						</Button>
+						{showUnverified && (
+							<div
+								id='unverified-comments-section'
+								className='mt-4 flex flex-col gap-y-4'
+							>
+								{unverifiedComments.map((item) => (
+									<SingleComment
+										key={item.id}
+										commentData={item}
+										setComments={setComments}
+									/>
+								))}
+							</div>
+						)}
+					</div>
+				)}
+
+				{spamComments.length > 0 && identitiesLoaded && (
 					<div className='mt-4 border-y border-border_grey py-4'>
 						<Button
 							variant='ghost'
@@ -159,11 +223,15 @@ function Comments({
 							{showSpam ? <FaChevronUp className='text-base' /> : <FaChevronDown className='text-base' />}
 						</Button>
 						{showSpam && (
-							<div className='mt-4 flex flex-col gap-y-4'>
+							<div
+								id='spam-comments-section'
+								className='mt-4 flex flex-col gap-y-4'
+							>
 								{spamComments.map((item) => (
 									<SingleComment
 										key={item.id}
 										commentData={item}
+										setComments={setComments}
 									/>
 								))}
 							</div>

@@ -635,6 +635,8 @@
 		"noVoteForAddress": "Keine Abstimmung für diese Adresse gefunden",
 		"showLikelySpam": "Wahrscheinlichen Spam anzeigen",
 		"hideLikelySpam": "Wahrscheinlichen Spam ausblenden",
+		"showUnverifiedComments": "Nicht verifizierte Kommentare anzeigen",
+		"hideUnverifiedComments": "Nicht verifizierte Kommentare ausblenden",
 		"HighlightMenu": {
 			"quote": "Zitieren",
 			"share": "Teilen",

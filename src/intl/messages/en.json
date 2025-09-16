@@ -535,6 +535,8 @@
 		"noVoteForAddress": "No vote found for this address",
 		"showLikelySpam": "Show Likely Spam",
 		"hideLikelySpam": "Hide Likely Spam",
+		"showUnverifiedComments": "Show Unverified Comments",
+		"hideUnverifiedComments": "Hide Unverified Comments",
 		"BeneficiariesDetails": {
 			"requested": "Requested",
 			"details": "Details",
