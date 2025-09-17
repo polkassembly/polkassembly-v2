@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { EAllowedCommentor, ECommentFilterCondition, ECommentSortBy, EProposalType, EReactQueryKeys, ICommentResponse, IContentSummary } from '@/_shared/types';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { useTranslations } from 'next-intl';
@@ -77,13 +77,6 @@ function PostComments({
 		refetchOnMount: true,
 		refetchOnWindowFocus: false
 	});
-
-	// Update filtered count when data changes or filters are reset
-	useEffect(() => {
-		if (activeFilters.length === 0 && data) {
-			setFilteredCommentsCount(data.length);
-		}
-	}, [data, activeFilters.length]);
 
 	// Helper function to determine if comments filter should be shown
 	const shouldShowCommentsFilter = useMemo(() => {
