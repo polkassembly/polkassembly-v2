@@ -101,19 +101,19 @@ function Comments({
 	// Handle comment link navigation
 	const handleCommentLink = useCallback(() => {
 		const { hash } = window?.location || { hash: '' };
-		if (hash.length > 0) {
-			const commentId = hash.replace('#comment-', '');
-			const comment = processedRegularComments.find((c) => c.id === commentId);
-			if (comment && showMore === false && processedRegularComments.indexOf(comment) >= 2) {
-				handleShowMore();
-			}
-			requestAnimationFrame(() => {
-				const element = document.getElementById(hash.substring(1));
-				if (element) {
-					element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-				}
-			});
+
+		if (!hash) return;
+		const commentId = hash.replace('#comment-', '');
+		const comment = processedRegularComments.find((c) => c.id === commentId);
+		if (comment && showMore === false && processedRegularComments.indexOf(comment) >= 2) {
+			handleShowMore();
 		}
+		requestAnimationFrame(() => {
+			const element = document.getElementById(hash.substring(1));
+			if (element) {
+				element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			}
+		});
 	}, [processedRegularComments, showMore]);
 
 	// Call handleCommentLink when the component mounts
@@ -142,37 +142,27 @@ function Comments({
 						setComments={setComments}
 					/>
 				))}
-				{(() => {
-					if (showMore && regularComments?.length > 2) {
-						return (
-							<div className='flex justify-center'>
-								<span
-									onClick={handleShowLess}
-									className={classes.loadMoreComments}
-									aria-hidden='true'
-								>
-									{t('ActivityFeed.PostItem.showLessComments')} <FiArrowUpCircle className='text-lg' />
-								</span>
-							</div>
-						);
-					}
-
-					if (!showMore && regularComments?.length > 2) {
-						return (
-							<div className='flex justify-center'>
-								<span
-									onClick={handleShowMore}
-									className={classes.loadMoreComments}
-									aria-hidden='true'
-								>
-									{t('ActivityFeed.PostItem.loadMoreComments')} <FiArrowDownCircle className='text-lg' />
-								</span>
-							</div>
-						);
-					}
-
-					return null;
-				})()}
+				{showMore && regularComments?.length > 2 ? (
+					<div className='flex justify-center'>
+						<span
+							onClick={handleShowLess}
+							className={classes.loadMoreComments}
+							aria-hidden='true'
+						>
+							{t('ActivityFeed.PostItem.showLessComments')} <FiArrowUpCircle className='text-lg' />
+						</span>
+					</div>
+				) : !showMore && regularComments?.length > 2 ? (
+					<div className='flex justify-center'>
+						<span
+							onClick={handleShowMore}
+							className={classes.loadMoreComments}
+							aria-hidden='true'
+						>
+							{t('ActivityFeed.PostItem.loadMoreComments')} <FiArrowDownCircle className='text-lg' />
+						</span>
+					</div>
+				) : null}
 
 				{spamComments.length > 0 && (
 					<div className='mt-4 border-y border-border_grey py-4'>
@@ -201,42 +191,34 @@ function Comments({
 				)}
 			</div>
 
-			{(() => {
-				if (!user) {
-					return (
-						<div className={classes.loginToComment}>
-							{t('PostDetails.please')}
-							<Link
-								className='text-text_pink'
-								href='/login'
-								id='commentLoginPrompt'
-							>
-								{t('PostDetails.login')}
-							</Link>{' '}
-							{t('PostDetails.toComment')}
-						</div>
-					);
-				}
-
-				if (canComment) {
-					return (
-						<div className='w-full px-6 py-6'>
-							<AddComment
-								id='commentForm'
-								proposalType={proposalType}
-								proposalIndex={index}
-								onOptimisticUpdate={handleShowMore}
-							/>
-						</div>
-					);
-				}
-
-				return (
+			{user ? (
+				canComment ? (
+					<div className='w-full px-6 py-6'>
+						<AddComment
+							id='commentForm'
+							proposalType={proposalType}
+							proposalIndex={index}
+							onOptimisticUpdate={handleShowMore}
+						/>
+					</div>
+				) : (
 					<div className={classes.loginToComment}>
 						<p className='text-sm text-text_primary'>{commentDisabledMessage}</p>
 					</div>
-				);
-			})()}
+				)
+			) : (
+				<div className={classes.loginToComment}>
+					{t('PostDetails.please')}
+					<Link
+						className='text-text_pink'
+						href='/login'
+						id='commentLoginPrompt'
+					>
+						{t('PostDetails.login')}
+					</Link>{' '}
+					{t('PostDetails.toComment')}
+				</div>
+			)}
 		</div>
 	);
 }
