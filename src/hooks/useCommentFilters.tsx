@@ -106,21 +106,32 @@ export const useCommentFilters = ({ comments, activeFilters, sortBy }: UseCommen
 					}
 				}
 
-				// Show only voters
-				if (activeFilters.includes(ECommentFilterCondition.VOTERS_ONLY) && !filterHelpers.hasVotedOnProposal(comment)) {
+				// Hide deleted comments
+				if (activeFilters.includes(ECommentFilterCondition.HIDE_DELETED) && filterHelpers.isCommentDeleted(comment)) {
 					return false;
 				}
 
-				// Show only DV delegates
+				// combine positive filters (show conditions)
+				const hasPositiveFilters = activeFilters.includes(ECommentFilterCondition.VOTERS_ONLY) || activeFilters.includes(ECommentFilterCondition.DV_DELEGATES_ONLY);
+
+				if (!hasPositiveFilters) {
+					return true;
+				}
+
+				// Check if comment meets any of the positive filters
+				if (activeFilters.includes(ECommentFilterCondition.VOTERS_ONLY) && filterHelpers.hasVotedOnProposal(comment)) {
+					return true;
+				}
+
 				if (activeFilters.includes(ECommentFilterCondition.DV_DELEGATES_ONLY)) {
 					const address = comment.authorAddress || comment.publicUser.addresses[0];
-					if (!address || !filterHelpers.isDVDelegate(address)) {
-						return false;
+					if (address && filterHelpers.isDVDelegate(address)) {
+						return true;
 					}
 				}
 
-				// Hide deleted comments
-				return !(activeFilters.includes(ECommentFilterCondition.HIDE_DELETED) && filterHelpers.isCommentDeleted(comment));
+				// If none of the positive filters match, exclude the comment
+				return false;
 			});
 		}
 
