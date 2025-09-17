@@ -45,11 +45,11 @@ function CommentsFilter({ sortBy, setSortBy, activeFilters, setActiveFilters }: 
 			},
 			{
 				condition: ECommentFilterCondition.VOTERS_ONLY,
-				label: "Show Voter's Comments Only"
+				label: "Show Voter's Comments"
 			},
 			{
 				condition: ECommentFilterCondition.DV_DELEGATES_ONLY,
-				label: 'Show DV delegates Only'
+				label: 'Show DV delegates'
 			},
 			{
 				condition: ECommentFilterCondition.HIDE_DELETED,
