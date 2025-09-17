@@ -377,6 +377,10 @@ export class OnChainDbService {
 		return SubsquidService.GetVotesForAddresses({ network, voters, page, limit, proposalStatuses });
 	}
 
+	static async GetAllFlattenedVotesWithoutFilters({ network, page, limit }: { network: ENetwork; page: number; limit: number }) {
+		return SubsquidService.GetAllFlattenedVotesWithoutFilters({ network, page, limit });
+	}
+
 	// Gov Analytics Methods
 	static async GetTurnoutData({ network }: { network: ENetwork }): Promise<IRawTurnoutData> {
 		return SubsquidService.GetTurnoutData({ network });

@@ -1286,6 +1286,56 @@ export class SubsquidQueries {
 
 	`;
 
+	protected static GET_ALL_FLATTENED_VOTES_WITHOUT_FILTERS = `
+		query GetAllFlattenedVotesWithoutFilters(
+			$limit: Int!,
+			$offset: Int!
+		) {
+			votes: flattenedConvictionVotes(
+				where: {
+					removedAtBlock_isNull: true
+				},
+				limit: $limit,
+				offset: $offset,
+				orderBy: createdAt_DESC
+			) {
+				proposalIndex
+				isDelegated
+				parentVote {
+					extrinsicIndex
+				}
+				type
+				voter
+				balance {
+					__typename
+					... on StandardVoteBalance {
+						value
+					}
+					... on SplitVoteBalance {
+						aye
+						nay
+						abstain
+					}
+				}
+				decision
+				createdAt
+				lockPeriod
+				proposal {
+					status
+				}
+			}
+			totalCount: flattenedConvictionVotesConnection(
+				where: {
+					removedAtBlock_isNull: true
+				},
+				orderBy: createdAt_DESC
+			) {
+				totalCount
+			}
+		}
+
+	`;
+
 	protected static GET_GOV_ANALYTICS_STATS = `
 		query GetGovAnalyticsStats {
 			totalProposals: proposalsConnection(
