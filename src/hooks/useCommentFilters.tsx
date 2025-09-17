@@ -49,7 +49,7 @@ export const useCommentFilters = ({ comments, activeFilters, sortBy }: UseCommen
 
 	// Get unique addresses for balance checking
 	const uniqueAddresses = useMemo(() => {
-		return [...new Set(comments.map((c) => c.publicUser?.addresses?.[0]).filter(Boolean))];
+		return [...new Set(comments.map((c) => c.authorAddress || c.publicUser.addresses[0]).filter(Boolean))];
 	}, [comments]);
 
 	// Fetch balance data only when needed
@@ -89,7 +89,7 @@ export const useCommentFilters = ({ comments, activeFilters, sortBy }: UseCommen
 	// Helper function for zero balance check with actual balance data
 	const hasZeroBalanceWithData = useCallback(
 		(comment: ICommentResponse) => {
-			const address = comment.publicUser?.addresses?.[0];
+			const address = comment.authorAddress || comment.publicUser.addresses[0];
 			if (!address) return true;
 
 			const typedBalanceData = balanceData as Record<string, { totalBalance: string }>;
@@ -119,7 +119,7 @@ export const useCommentFilters = ({ comments, activeFilters, sortBy }: UseCommen
 
 				// Show only DV delegates
 				if (activeFilters.includes(ECommentFilterCondition.DV_DELEGATES_ONLY)) {
-					const address = comment.publicUser?.addresses?.[0];
+					const address = comment.authorAddress || comment.publicUser.addresses[0];
 					if (!address || !filterHelpers.isDVDelegate(address)) {
 						return false;
 					}
