@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import MedalIcon from '@assets/icons/medal-icon.svg';
 import { achievementBadges } from '@/_shared/_constants/achievementBadges';
 import classes from './Overview.module.scss';
+import ProfileOverview from './ProfileOverview';
 import Delegations from '../Delegations/Delegations';
 import VotedActiveProposalCard from '../../VotedActiveProposalCard/VotedActiveProposalCard';
 import OnchainIdentityCard from './OnchainIdentityCard/OnchainIdentityCard';
@@ -28,6 +29,10 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 	return (
 		<div className={classes.overview}>
 			<div className={classes.overviewGrid}>
+				<ProfileOverview
+					profileData={profileData}
+					address={address}
+				/>
 				{address || profileData?.addresses?.length ? <Delegations addresses={address ? [address] : profileData?.addresses || []} /> : null}
 				<div className={classes.badgesCard}>
 					<div className={classes.badgesCardHeader}>
@@ -43,8 +48,8 @@ function Overview({ address, profileData }: { address?: string; profileData?: IP
 								({userProfile?.profileDetails.achievementBadges?.length || 0} / {Object.keys(achievementBadges).length})
 							</span>
 						</p>
-						<p className='text-sm'>{t('Profile.badgesDescription')}</p>
 					</div>
+					<p className='mb-4 text-sm'>{t('Profile.badgesDescription')}</p>
 					<div className={classes.badgesCardContent}>
 						{Object.keys(achievementBadges || []).map((badge) => {
 							const badgeDetails = achievementBadges[`${badge}` as EUserBadge];

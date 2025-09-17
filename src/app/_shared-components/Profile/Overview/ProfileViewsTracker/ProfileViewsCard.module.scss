@@ -1,0 +1,43 @@
+.statCard {
+	@apply flex flex-col items-center justify-between rounded-xl border border-border_grey bg-bg_modal p-2 shadow-sm lg:items-start lg:p-3;
+}
+
+.statCardHeader {
+	@apply mb-2 flex items-center gap-2;
+}
+
+.statCardIcon {
+	@apply mb-1 h-5 w-5 text-text_grey;
+}
+
+.statCardTitle {
+	@apply text-xs text-text_grey;
+}
+
+.profileViewsValue {
+	@apply flex items-end gap-1;
+}
+
+.value {
+	@apply text-xl font-semibold text-text_pink;
+}
+
+.timePeriod {
+	@apply mb-1 text-xs text-text_grey;
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+	.statCard {
+		@apply border-border_grey bg-bg_modal;
+	}
+
+	.value {
+		@apply text-text_pink;
+	}
+
+	.statCardTitle,
+	.timePeriod {
+		@apply text-text_grey;
+	}
+}
