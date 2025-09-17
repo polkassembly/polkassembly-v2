@@ -30,14 +30,14 @@ function PostComments({
 	comments,
 	allowedCommentor,
 	postUserId
-}: Readonly<{
+}: {
 	proposalType: EProposalType;
 	index: string;
 	contentSummary?: IContentSummary;
 	comments?: ICommentResponse[];
 	allowedCommentor: EAllowedCommentor;
 	postUserId?: number;
-}>) {
+}) {
 	const t = useTranslations();
 	const { getOnChainIdentity, identityService } = useIdentityService();
 
