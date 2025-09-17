@@ -132,12 +132,11 @@ export const useCommentFilters = ({ comments, activeFilters, sortBy }: UseCommen
 		};
 
 		switch (sortBy) {
-			case ECommentSortBy.newest:
-				return filteredComments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 			case ECommentSortBy.oldest:
 				return filteredComments.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 			case ECommentSortBy.top:
 				return filteredComments.sort((a, b) => score(b) - score(a));
+			case ECommentSortBy.newest:
 			default:
 				return filteredComments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 		}
