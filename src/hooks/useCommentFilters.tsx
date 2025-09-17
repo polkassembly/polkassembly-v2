@@ -101,7 +101,7 @@ export const useCommentFilters = ({ comments, activeFilters, sortBy }: UseCommen
 					const typedBalanceData = balanceData as Record<string, { totalBalance: string }>;
 					// eslint-disable-next-line security/detect-object-injection
 					const balance = Object.hasOwn(typedBalanceData, address) ? typedBalanceData[address] : undefined;
-					if (!balance || balance.totalBalance === '0') {
+					if (balance && balance.totalBalance === '0') {
 						return false;
 					}
 				}
