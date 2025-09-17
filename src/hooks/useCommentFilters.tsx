@@ -60,22 +60,23 @@ export const useCommentFilters = ({ comments, activeFilters, sortBy }: UseCommen
 				return {};
 			}
 
-			const balancePromises = uniqueAddresses.map(async (address) => {
-				if (!address) return { address, totalBalance: '0' };
-				try {
-					const { totalBalance } = await apiService.getUserBalances({ address });
-					return { address, totalBalance: totalBalance.toString() };
-				} catch {
-					return { address, totalBalance: '0' };
-				}
-			});
+			const balances = await Promise.all(
+				uniqueAddresses.map(async (address) => {
+					if (!address) return null;
+					try {
+						const { totalBalance } = await apiService.getUserBalances({ address });
+						return { address, totalBalance: totalBalance.toString() };
+					} catch {
+						return null;
+					}
+				})
+			);
 
-			const balances = await Promise.all(balancePromises);
 			return balances.reduce(
-				(acc, { address, totalBalance }) => {
-					if (address && typeof address === 'string') {
+				(acc, balance) => {
+					if (balance?.address) {
 						// eslint-disable-next-line security/detect-object-injection
-						acc[address] = { totalBalance };
+						acc[balance.address] = { totalBalance: balance.totalBalance };
 					}
 					return acc;
 				},
