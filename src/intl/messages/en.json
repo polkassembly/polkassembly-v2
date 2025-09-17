@@ -733,7 +733,11 @@
 			"conditions": "Conditions",
 			"fromAuthor": "From Author",
 			"verifiedOnly": "Verified only",
-			"withVotes": "With votes"
+			"withVotes": "With votes",
+			"hideZeroBalance": "Hide 0 Balance Accounts",
+			"showVotersComments": "Show Voter's Comments",
+			"showDVDelegates": "Show DV delegates",
+			"hideDeletedComments": "Hide (deleted) Comments"
 		}
 	},
 	"ListingPage_Status": {

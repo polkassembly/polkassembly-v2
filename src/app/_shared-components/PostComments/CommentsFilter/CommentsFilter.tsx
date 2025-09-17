@@ -41,22 +41,22 @@ function CommentsFilter({ sortBy, setSortBy, activeFilters, setActiveFilters }: 
 		() => [
 			{
 				condition: ECommentFilterCondition.HIDE_ZERO_BALANCE,
-				label: 'Hide 0 Balance Accounts'
+				label: t('PostDetails.CommentsFilter.hideZeroBalance')
 			},
 			{
 				condition: ECommentFilterCondition.VOTERS_ONLY,
-				label: "Show Voter's Comments"
+				label: t('PostDetails.CommentsFilter.showVotersComments')
 			},
 			{
 				condition: ECommentFilterCondition.DV_DELEGATES_ONLY,
-				label: 'Show DV delegates'
+				label: t('PostDetails.CommentsFilter.showDVDelegates')
 			},
 			{
 				condition: ECommentFilterCondition.HIDE_DELETED,
-				label: 'Hide (deleted) Comments'
+				label: t('PostDetails.CommentsFilter.hideDeletedComments')
 			}
 		],
-		[]
+		[t]
 	);
 
 	return (
