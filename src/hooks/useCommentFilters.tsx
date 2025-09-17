@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useMemo, useCallback } from 'react';
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ECommentFilterCondition, ECommentSortBy, EReaction, ICommentResponse } from '@/_shared/types';
 import { W3F_DELEGATES_2025 } from '@/_shared/_constants/delegates2025';
@@ -86,20 +86,6 @@ export const useCommentFilters = ({ comments, activeFilters, sortBy }: UseCommen
 		staleTime: 5 * 60 * 1000 // 5 minutes
 	});
 
-	// Helper function for zero balance check with actual balance data
-	const hasZeroBalanceWithData = useCallback(
-		(comment: ICommentResponse) => {
-			const address = comment.authorAddress || comment.publicUser.addresses[0];
-			if (!address) return true;
-
-			const typedBalanceData = balanceData as Record<string, { totalBalance: string }>;
-			// eslint-disable-next-line security/detect-object-injection
-			const balance = Object.hasOwn(typedBalanceData, address) ? typedBalanceData[address] : undefined;
-			return !balance || balance.totalBalance === '0';
-		},
-		[balanceData]
-	);
-
 	// Filter and sort comments
 	const processedComments = useMemo(() => {
 		let filteredComments = [...comments];
@@ -108,8 +94,16 @@ export const useCommentFilters = ({ comments, activeFilters, sortBy }: UseCommen
 		if (activeFilters.length > 0) {
 			filteredComments = filteredComments.filter((comment) => {
 				// Hide zero balance accounts
-				if (activeFilters.includes(ECommentFilterCondition.HIDE_ZERO_BALANCE) && hasZeroBalanceWithData(comment)) {
-					return false;
+				if (activeFilters.includes(ECommentFilterCondition.HIDE_ZERO_BALANCE)) {
+					const address = comment.authorAddress || comment.publicUser.addresses[0];
+					if (!address) return false;
+
+					const typedBalanceData = balanceData as Record<string, { totalBalance: string }>;
+					// eslint-disable-next-line security/detect-object-injection
+					const balance = Object.hasOwn(typedBalanceData, address) ? typedBalanceData[address] : undefined;
+					if (!balance || balance.totalBalance === '0') {
+						return false;
+					}
 				}
 
 				// Show only voters
@@ -147,13 +141,13 @@ export const useCommentFilters = ({ comments, activeFilters, sortBy }: UseCommen
 			default:
 				return filteredComments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 		}
-	}, [comments, activeFilters, sortBy, hasZeroBalanceWithData, filterHelpers]);
+	}, [comments, activeFilters, sortBy, filterHelpers, balanceData]);
 
 	return {
 		processedComments,
 		filterHelpers: {
 			...filterHelpers,
-			hasZeroBalance: hasZeroBalanceWithData
+			hasZeroBalance: filterHelpers.hasZeroBalance
 		}
 	};
 };
