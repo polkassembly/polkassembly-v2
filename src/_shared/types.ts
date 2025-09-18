@@ -1622,3 +1622,10 @@ export interface IProxyRequest {
 }
 
 export type IProxyListingResponse = IGenericListingResponse<IProxyRequest>;
+
+export enum ECommunityRole {
+	MEMBERS = 'members',
+	DELEGATES = 'delegates',
+	CURATORS = 'curators',
+	EXPERTS = 'experts'
+}

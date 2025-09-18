@@ -1598,5 +1598,13 @@
 		"pararegistration": "Para Registration",
 		"nomination_pools": "Nomination Pools",
 		"sudo_balances": "Sudo Balances"
+	},
+	"Community": {
+		"community": "Community",
+		"communityDescription": "Explore all members contributing to the Polkadot ecosystem.",
+		"members": "Members",
+		"delegates": "Delegates",
+		"curators": "Curators",
+		"experts": "Experts"
 	}
 }

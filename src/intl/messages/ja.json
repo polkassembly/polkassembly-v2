@@ -1561,5 +1561,13 @@
 		"pararegistration": "パラレジストレーション",
 		"nomination_pools": "ノミネーションプール",
 		"sudo_balances": "Sudoバランス"
+	},
+	"Community": {
+		"community": "コミュニティ",
+		"communityDescription": "Polkadot エコシステムに貢献しているすべてのメンバーをご覧ください。",
+		"members": "メンバー",
+		"delegates": "代表者",
+		"curators": "キュレーター",
+		"experts": "専門家"
 	}
 }

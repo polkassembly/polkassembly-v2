@@ -1561,5 +1561,13 @@
 		"pararegistration": "平行链注册",
 		"nomination_pools": "提名池",
 		"sudo_balances": "Sudo余额"
+	},
+	"Community": {
+		"community": "社区",
+		"communityDescription": "探索所有為 Polkadot 生態系統做出貢獻的成員。",
+		"members": "成员",
+		"delegates": "代表",
+		"curators": "策展人",
+		"experts": "专家"
 	}
 }
