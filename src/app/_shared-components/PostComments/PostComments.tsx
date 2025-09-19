@@ -89,20 +89,7 @@ function PostComments({
 		<div>
 			<div className='mb-4 flex flex-wrap items-center gap-4 px-6 pt-6'>
 				<p className={classes.title}>
-					{t('PostDetails.comments')}{' '}
-					<span className='text-base font-normal'>
-						{(() => {
-							// Show filtered count when filters are active
-							if (activeFilters.length > 0) {
-								return `(${filteredCommentsCount})`;
-							}
-							// Show original count when no filters are active
-							if (data) {
-								return `(${data?.length})`;
-							}
-							return '';
-						})()}
-					</span>
+					{t('PostDetails.comments')} <span className='text-base font-normal'>{activeFilters.length > 0 ? `(${filteredCommentsCount})` : data ? `(${data?.length})` : ''}</span>
 				</p>
 				<div className='ml-auto flex items-center gap-3'>
 					{shouldShowCommentsFilter && (
