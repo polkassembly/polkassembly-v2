@@ -1568,6 +1568,14 @@
 		"members": "メンバー",
 		"delegates": "代表者",
 		"curators": "キュレーター",
-		"experts": "専門家"
+		"experts": "専門家",
+		"Members": {
+			"totalMembers": "総メンバー数",
+			"verifiedMembers": "確認済みメンバー",
+			"tip": "チップ",
+			"independent": "独立",
+			"readMore": "続きを読む",
+			"judgement": "判断"
+		}
 	}
 }

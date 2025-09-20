@@ -1567,6 +1567,14 @@
 		"members": "Mitglieder",
 		"delegates": "Delegierte",
 		"curators": "Kuratoren",
-		"experts": "Experten"
+		"experts": "Experten",
+		"Members": {
+			"totalMembers": "Gesamtmitglieder",
+			"verifiedMembers": "Verifizierte Mitglieder",
+			"tip": "Tipp",
+			"independent": "Unabhängig",
+			"readMore": "Mehr lesen",
+			"judgement": "Beurteilung"
+		}
 	}
 }

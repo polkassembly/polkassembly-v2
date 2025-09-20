@@ -1568,6 +1568,14 @@
 		"members": "成员",
 		"delegates": "代表",
 		"curators": "策展人",
-		"experts": "专家"
+		"experts": "专家",
+		"Members": {
+			"totalMembers": "总成员数",
+			"verifiedMembers": "已验证成员",
+			"tip": "提示",
+			"independent": "独立",
+			"readMore": "阅读更多",
+			"judgement": "判断"
+		}
 	}
 }

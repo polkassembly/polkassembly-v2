@@ -10,6 +10,7 @@ import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeader
 import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
 import { Tabs, TabsContent } from '@ui/Tabs';
 import { ECommunityRole } from '@/_shared/types';
+import CommunityMembers from './Components/Members/Members';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
@@ -39,7 +40,9 @@ async function Community({ searchParams }: { searchParams: { tab?: ECommunityRol
 					tabCounts={allTabCounts}
 				/>
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
-					<TabsContent value={ECommunityRole.MEMBERS}>hello world</TabsContent>
+					<TabsContent value={ECommunityRole.MEMBERS}>
+						<CommunityMembers />
+					</TabsContent>
 					<TabsContent value={ECommunityRole.DELEGATES}>hello world 2</TabsContent>
 					<TabsContent value={ECommunityRole.CURATORS}>hello world 3</TabsContent>
 					<TabsContent value={ECommunityRole.EXPERTS}>hello world 4</TabsContent>
