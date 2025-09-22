@@ -64,9 +64,8 @@ function CommentsFilter({ sortBy, setSortBy, activeFilters, setActiveFilters }: 
 			<DropdownMenu>
 				<DropdownMenuTrigger
 					noArrow
-					className='flex items-center gap-x-2 rounded-md border border-border_grey px-3 py-1.5 text-sm text-text_pink hover:bg-grey_bg'
+					className='flex items-center justify-center rounded-md border border-border_grey px-3 py-1.5 text-sm text-text_pink hover:bg-grey_bg'
 				>
-					{t('PostDetails.CommentsFilter.filter')}
 					<Filter className='h-4 w-4' />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
