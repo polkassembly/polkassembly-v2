@@ -52,15 +52,21 @@ function MemberCard({ member }: { member: IPublicUser }) {
 		<div className={styles.memberCard}>
 			<div className='flex items-center justify-between gap-3'>
 				<div className='flex items-center gap-2'>
-					<Address
-						disableTooltip
-						redirectToProfile={false}
-						address={member?.addresses[0] || ''}
-						iconSize={32}
-						showIdenticon
-						textClassName='text-center text-lg font-semibold sm:text-left lg:text-2xl'
-					/>
-					{isUserBlacklisted(member.id) && <ShieldAlert className='h-5 w-5 text-red-500' />}
+					{member.addresses.length > 0 ? (
+						<>
+							<Address
+								disableTooltip
+								redirectToProfile={false}
+								address={member?.addresses[0] || ''}
+								iconSize={32}
+								showIdenticon
+								textClassName='text-center text-lg font-semibold sm:text-left lg:text-2xl'
+							/>
+							{isUserBlacklisted(member.id) && <ShieldAlert className='h-5 w-5 text-red-500' />}
+						</>
+					) : (
+						<span className='text-xl font-semibold text-text_primary'>{member?.username || ''}</span>
+					)}
 				</div>
 				<div className='flex items-center gap-x-2'>
 					<span className='inline-flex items-center gap-x-1 text-sm font-medium text-text_pink'>
@@ -80,13 +86,13 @@ function MemberCard({ member }: { member: IPublicUser }) {
 			</div>
 			<div className='flex items-center justify-between gap-x-4'>
 				<div className='flex items-center gap-x-2'>
-					<div>
+					{member.addresses.length > 0 ? (
 						<CopyToClipboard
 							label={shortenAddress(member?.addresses[0] || '', 5)}
 							text={member?.addresses[0] || ''}
 							className='text-base'
 						/>
-					</div>
+					) : null}
 					<div className='flex items-center gap-1 rounded-md bg-topic_tag_bg px-1.5 py-1'>
 						<UserIcon className='h-4 w-4 text-basic_text' />
 						<span className='text-xs text-basic_text'>{t('Community.Members.independent')}</span>
