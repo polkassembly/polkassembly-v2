@@ -7,7 +7,7 @@
 }
 
 .tagWrapper {
-	@apply border-b-2 py-2 sm:border-b-0 sm:border-r-2 sm:py-3;
+	@apply border-b-2 py-2 sm:py-3;
 }
 
 .tag {
@@ -15,9 +15,9 @@
 }
 
 .username {
-	@apply w-full border-b-2 px-2 py-2 text-left sm:w-auto sm:border-b-0 sm:border-r-2 sm:py-3 sm:text-center;
+	@apply w-full border-b-2 px-2 py-2 text-left sm:w-auto sm:py-3 sm:text-center;
 }
 
 .password {
-	@apply w-full border-b-2 border-border_grey px-2 py-2 text-left sm:w-auto sm:border-b-0 sm:py-3 sm:text-center;
+	@apply w-full border-b-2 border-border_grey px-2 py-2 text-left sm:w-auto sm:py-3 sm:text-center;
 }
