@@ -56,7 +56,6 @@ function MemberCard({ member }: { member: IPublicUser }) {
 						<>
 							<Address
 								disableTooltip
-								redirectToProfile={false}
 								address={member?.addresses[0] || ''}
 								iconSize={32}
 								showIdenticon
