@@ -11,6 +11,7 @@ import { WalletIcon } from '@ui/WalletsUI/WalletsIcon';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { cn } from '@/lib/utils';
 import { isMimirDetected } from '@/app/_client-services/isMimirDetected';
+import { useSignetSdk } from '@talismn/signet-apps-sdk';
 import classes from './WalletButton.module.scss';
 
 // Type for the Nova wallet extension
@@ -40,6 +41,8 @@ function WalletButton({
 	small?: boolean;
 	hidePreference?: boolean;
 }) {
+	const { inSignet } = useSignetSdk();
+
 	const walletName = wallet === EWallet.NOVAWALLET ? EWallet.POLKADOT : wallet;
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const onWalletSelect = (selectedWallet: EWallet) => {
@@ -71,6 +74,10 @@ function WalletButton({
 	}
 
 	if (wallet === EWallet.MIMIR && !showMimirWallet) {
+		return null;
+	}
+
+	if (wallet === EWallet.SIGNET && !inSignet) {
 		return null;
 	}
 

@@ -168,6 +168,7 @@ export enum EWallet {
 	POLKAGATE = 'polkagate',
 	NOVAWALLET = 'nova',
 	MIMIR = 'mimir',
+	SIGNET = 'signet',
 	POLKADOT_VAULT = 'polkadot-vault',
 	OTHER = ''
 	// METAMASK = 'metamask',

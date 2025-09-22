@@ -58,6 +58,7 @@
 		"@react-icons/all-files": "^4.1.0",
 		"@react-spring/web": "^10.0.1",
 		"@sentry/nextjs": "^9.22.0",
+		"@talismn/signet-apps-sdk": "^0.0.7",
 		"@tanstack/react-query": "^5.62.8",
 		"@tanstack/react-table": "^8.20.6",
 		"@types/marked": "^6.0.0",
