@@ -8,6 +8,7 @@ import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { Tabs, TabsContent } from '@ui/Tabs';
 import { ECommunityRole } from '@/_shared/types';
 import CommunityMembers from './Components/Members/Members';
@@ -25,9 +26,11 @@ export async function generateMetadata(): Promise<Metadata> {
 	});
 }
 
-async function Community({ searchParams }: { searchParams: { tab?: ECommunityRole } }) {
+async function Community({ searchParams }: { searchParams: Promise<{ tab?: ECommunityRole; page?: string }> }) {
 	// Default to members tab
-	const activeTab = searchParams?.tab || ECommunityRole.MEMBERS;
+	const searchParamsValue = await searchParams;
+	const activeTab = searchParamsValue?.tab || ECommunityRole.MEMBERS;
+	const page = parseInt(searchParamsValue?.page || '1', DEFAULT_LISTING_LIMIT);
 
 	// Todo: fetch allTab counts in single server call and pass to header
 	const allTabCounts: Record<ECommunityRole, number> = { members: 1, delegates: 2, curators: 3, experts: 0 };
@@ -41,7 +44,7 @@ async function Community({ searchParams }: { searchParams: { tab?: ECommunityRol
 				/>
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 					<TabsContent value={ECommunityRole.MEMBERS}>
-						<CommunityMembers />
+						<CommunityMembers page={page} />
 					</TabsContent>
 					<TabsContent value={ECommunityRole.DELEGATES}>hello world 2</TabsContent>
 					<TabsContent value={ECommunityRole.CURATORS}>hello world 3</TabsContent>

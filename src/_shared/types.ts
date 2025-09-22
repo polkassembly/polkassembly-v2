@@ -151,6 +151,8 @@ export interface IPublicUser {
 	profileScore: number;
 	addresses: string[];
 	rank?: number;
+	followers?: IFollowEntry[];
+	following?: IFollowEntry[];
 	profileDetails: IProfileDetails;
 }
 

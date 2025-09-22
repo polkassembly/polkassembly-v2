@@ -2,10 +2,13 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import Image from 'next/image';
-import { ESocial, EUserBadge } from '@/_shared/types';
+import { ESocial, EUserBadge, IPublicUser, IUserBadgeDetails } from '@/_shared/types';
 import EmailIcon from '@assets/icons/email-icon.svg';
 import TwitterIcon from '@assets/icons/twitter-icon.svg';
 import TelegramIcon from '@assets/icons/telegram-icon.svg';
@@ -17,11 +20,12 @@ import { achievementBadges } from '@/_shared/_constants/achievementBadges';
 import CopyToClipboard from '@ui/CopyToClipboard/CopyToClipboard';
 import { Separator } from '@ui/Separator';
 import { Button } from '@ui/Button';
+import { isUserBlacklisted } from '@/_shared/_utils/isUserBlacklisted';
 import Address from '@ui/Profile/Address/Address';
 import { ShieldPlus, CircleDollarSign, UserIcon, ShieldAlert } from 'lucide-react';
+import { useUser } from '@/hooks/useUser';
 import styles from './MemberCard.module.scss';
 
-const displayAddress = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNonXo';
 const SocialIcons = {
 	[ESocial.EMAIL]: EmailIcon,
 	[ESocial.TWITTER]: TwitterIcon,
@@ -31,25 +35,18 @@ const SocialIcons = {
 	[ESocial.GITHUB]: TelegramIcon
 };
 
-const profileLinks = [
-	{
-		platform: ESocial.EMAIL,
-		url: 'mailto:larry.page@example.com'
-	},
-	{
-		platform: ESocial.TWITTER,
-		url: 'https://twitter.com/larrypage'
-	},
-	{
-		platform: ESocial.TELEGRAM,
-		url: 'https://t.me/larrypage'
-	}
-];
-
-function MemberCard() {
+function MemberCard({ member }: { member: IPublicUser }) {
 	const t = useTranslations();
-	const isFollowing = false;
-	const isUserBlacklisted = false;
+	const { user } = useUser();
+	const [isReadMoreVisible, setIsReadMoreVisible] = useState(false);
+
+	const userBadges = {} as Record<EUserBadge, IUserBadgeDetails>;
+
+	member?.profileDetails.achievementBadges?.forEach((badge) => {
+		userBadges[badge.name] = badge;
+	});
+
+	const isFollowing = member?.following?.some((item) => item.followerUserId === user?.id);
 
 	return (
 		<div className={styles.memberCard}>
@@ -58,12 +55,12 @@ function MemberCard() {
 					<Address
 						disableTooltip
 						redirectToProfile={false}
-						address={displayAddress}
-						iconSize={26}
-						showIdenticon={false}
+						address={member?.addresses[0] || ''}
+						iconSize={32}
+						showIdenticon
 						textClassName='text-center text-lg font-semibold sm:text-left lg:text-2xl'
 					/>
-					{isUserBlacklisted && <ShieldAlert className='h-5 w-5 text-red-500' />}
+					{isUserBlacklisted(member.id) && <ShieldAlert className='h-5 w-5 text-red-500' />}
 				</div>
 				<div className='flex items-center gap-x-2'>
 					<span className='inline-flex items-center gap-x-1 text-sm font-medium text-text_pink'>
@@ -75,7 +72,7 @@ function MemberCard() {
 						leftIcon={<ShieldPlus />}
 						// isLoading={loading}
 						// onClick={isFollowing ? unfollowUser : followUser}
-						// disabled={!user?.id}
+						disabled={!user?.id}
 					>
 						{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
 					</Button>
@@ -85,8 +82,8 @@ function MemberCard() {
 				<div className='flex items-center gap-x-2'>
 					<div>
 						<CopyToClipboard
-							label={shortenAddress(displayAddress, 5)}
-							text={displayAddress}
+							label={shortenAddress(member?.addresses[0] || '', 5)}
+							text={member?.addresses[0] || ''}
 							className='text-base'
 						/>
 					</div>
@@ -101,7 +98,7 @@ function MemberCard() {
 							width={16}
 							height={16}
 						/>
-						<span className='text-sm font-medium text-leaderboard_score'>{650}</span>
+						<span className='text-sm font-medium text-leaderboard_score'>{Math.floor(member?.profileScore)}</span>
 					</span>
 				</div>
 				<div className='flex items-center gap-x-1'>
@@ -126,7 +123,7 @@ function MemberCard() {
 							width={20}
 							height={20}
 						/>
-						{dayjs('2022-01-02').format("Do MMM 'YY")}
+						{dayjs(member?.createdAt).format("Do MMM 'YY")}
 					</span>
 				</p>
 
@@ -135,24 +132,35 @@ function MemberCard() {
 					orientation='vertical'
 				/>
 				<div className={styles.memberFollowing}>
-					{t('Profile.following')}: <span className='font-medium text-text_pink'>{0}</span>
+					{t('Profile.following')}: <span className='font-medium text-text_pink'>{member?.following?.length || 0}</span>
 				</div>
 				<Separator
 					className='h-4'
 					orientation='vertical'
 				/>
 				<div className={styles.memberFollowing}>
-					{t('Profile.followers')}: <span className='font-medium text-text_pink'>{0}</span>
+					{t('Profile.followers')}: <span className='font-medium text-text_pink'>{member?.followers?.length || 0}</span>
 				</div>
 			</div>
 			<div>
-				<p className='mt-3 text-sm text-basic_text'>
-					A bit about me: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-				</p>
-				<span className='text-sm text-link'>{t('Community.Members.readMore')}</span>
+				{member?.profileDetails?.bio && (
+					<>
+						<div className={`${styles.bio} ${isReadMoreVisible ? '' : styles.bioCollapsed} mt-3`}>{member?.profileDetails?.bio}</div>
+						{member?.profileDetails?.bio.length > 100 && (
+							<Button
+								variant='ghost'
+								className={styles.readMoreButton}
+								onClick={() => setIsReadMoreVisible(!isReadMoreVisible)}
+								aria-expanded={isReadMoreVisible ? 'true' : 'false'}
+							>
+								{isReadMoreVisible ? t('Community.Members.readLess') : t('Community.Members.readMore')}
+							</Button>
+						)}
+					</>
+				)}
 			</div>
 			<div className='flex items-center gap-x-4'>
-				{profileLinks?.map((social) => (
+				{member?.profileDetails.publicSocialLinks?.map((social) => (
 					<a
 						key={social.platform}
 						href={social.platform === ESocial.EMAIL ? `mailto:${social.url}` : social.url}
@@ -170,15 +178,15 @@ function MemberCard() {
 				))}
 			</div>
 			<div className='flex flex-wrap items-center gap-x-3'>
-				{Object.keys(achievementBadges || []).map((badge) => {
-					const badgeDetails = achievementBadges[`${badge}` as EUserBadge];
+				{Object.keys(userBadges || []).map((badge) => {
+					const badgeDetails = userBadges[`${badge}` as EUserBadge];
 					return (
 						<div
 							key={badgeDetails.name}
 							className={[EUserBadge.COUNCIL, EUserBadge.WHALE].includes(badgeDetails.name) ? 'w-12' : 'w-16'}
 						>
 							<Image
-								src={badgeDetails.image}
+								src={achievementBadges[badgeDetails.name].image}
 								alt={badgeDetails.name}
 							/>
 						</div>

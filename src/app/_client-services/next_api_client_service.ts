@@ -156,7 +156,8 @@ enum EApiRoute {
 	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
 	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES',
 	GET_GOV_ANALYTICS = 'GET_GOV_ANALYTICS',
-	GET_TRACK_COUNTS = 'GET_TRACK_COUNTS'
+	GET_TRACK_COUNTS = 'GET_TRACK_COUNTS',
+	FETCH_COMMUNITY_MEMBERS = 'FETCH_COMMUNITY_MEMBERS'
 }
 
 export class NextApiClientService {
@@ -207,6 +208,7 @@ export class NextApiClientService {
 				path = '/activity-feed/subscriptions';
 				break;
 			case EApiRoute.FETCH_LEADERBOARD:
+			case EApiRoute.FETCH_COMMUNITY_MEMBERS:
 				path = '/users';
 				break;
 			case EApiRoute.GET_VOTES_BY_ADDRESSES:
@@ -1348,5 +1350,15 @@ export class NextApiClientService {
 			method,
 			url
 		});
+	}
+
+	static async fetchCommunityMembers({ page, limit }: { page: number; limit?: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString() || '1',
+			limit: limit?.toString() || DEFAULT_LISTING_LIMIT.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_COMMUNITY_MEMBERS, queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
 	}
 }

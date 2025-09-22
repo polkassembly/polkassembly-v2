@@ -9,3 +9,15 @@
 .memberFollowing {
 	@apply flex items-center gap-x-1 text-sm text-wallet_btn_text;
 }
+
+.bio {
+	@apply text-sm text-basic_text;
+}
+
+.bioCollapsed {
+	@apply line-clamp-2;
+}
+
+.readMoreButton {
+	@apply cursor-pointer !p-0 text-xs text-link;
+}
