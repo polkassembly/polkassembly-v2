@@ -9,6 +9,7 @@ import { APPNAME } from '@/_shared/_constants/appName';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { stringToHex } from '@polkadot/util';
 import { inject } from '@mimirdev/apps-inject';
+import { SignetSdk } from '@talismn/signet-apps-sdk';
 import { PolkadotApiService } from './polkadot_api_service';
 import { IdentityService } from './identity_service';
 import { isMimirDetected } from './isMimirDetected';
@@ -65,6 +66,23 @@ export class WalletClientService {
 	async getAddressesFromWallet(selectedWallet: EWallet): Promise<InjectedAccount[]> {
 		let injected: Injected | undefined;
 		try {
+			if (selectedWallet === EWallet.SIGNET) {
+				const signetSdk = new SignetSdk();
+				const inSignet = await signetSdk.init();
+				console.log('inSignet', inSignet);
+				if (inSignet) {
+					const signetAccount = await signetSdk.getAccount();
+					console.log('signetAccount', signetAccount);
+					return [
+						{
+							address: signetAccount.vaultAddress,
+							name: signetAccount.name
+						}
+					];
+				}
+				return [];
+			}
+
 			if (selectedWallet === EWallet.MIMIR) {
 				const { web3Enable, web3FromSource } = await import('@polkadot/extension-dapp');
 

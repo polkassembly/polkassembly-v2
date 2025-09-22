@@ -10,6 +10,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '@/hooks/useUser';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useSignetSdk } from '@talismn/signet-apps-sdk';
 import { polkadotApiAtom } from '../_atoms/polkadotJsApi/polkadotJsApiAtom';
 import { AuthClientService } from '../_client-services/auth_client_service';
 import { ClientError } from '../_client-utils/clientError';
@@ -28,6 +29,10 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 	const network = getCurrentNetwork();
 
 	const userDataClient = CookieClientService.getAccessTokenPayload();
+
+	const { inSignet } = useSignetSdk();
+
+	console.log('inSignet', inSignet);
 
 	const { user, setUser, setUserAddressRelations } = useUser();
 	const { setUserPreferences } = useUserPreferences();

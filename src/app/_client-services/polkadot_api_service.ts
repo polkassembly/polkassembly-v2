@@ -40,6 +40,7 @@ import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateA
 import { APPNAME } from '@/_shared/_constants/appName';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
 import { Dispatch, SetStateAction } from 'react';
+import { SignetSdk } from '@talismn/signet-apps-sdk';
 import { BlockCalculationsService } from './block_calculations_service';
 import { VaultQrSigner } from './vault_qr_signer_service';
 import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
@@ -181,6 +182,29 @@ export class PolkadotApiService {
 		selectedAccount?: ISelectedAccount;
 	}) {
 		if (!this.api || !tx) return;
+
+		if (wallet === EWallet.SIGNET) {
+			const signetSdk = new SignetSdk();
+			const inSignet = await signetSdk.init();
+			if (!inSignet) return;
+
+			signetSdk
+				.send(tx.method.toHex())
+				.then((result) => {
+					console.log('result', result);
+					if (result.ok) {
+						onSuccess(result.receipt?.txHash);
+					} else {
+						onFailed(result.error || errorMessageFallback);
+					}
+				})
+				.catch((error: unknown) => {
+					console.log(':( transaction failed');
+					setStatus?.(':( transaction failed');
+					console.error('ERROR:', error);
+					onFailed(error?.toString?.() || errorMessageFallback);
+				});
+		}
 
 		if (wallet === EWallet.MIMIR) {
 			const { web3Enable, web3FromSource } = await import('@polkadot/extension-dapp');
