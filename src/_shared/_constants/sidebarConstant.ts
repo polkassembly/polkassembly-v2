@@ -133,7 +133,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 							url: '#',
 							icon: CommunityIcon,
 							items: [
-								{ title: t('Sidebar.members'), url: '/community?tab=members' },
+								{ title: t('Sidebar.members'), url: '/community' },
 								{ title: t('Sidebar.proxies'), url: '/proxies' }
 							]
 						},
