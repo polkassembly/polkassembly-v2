@@ -46,7 +46,7 @@ function VotingPowerCard({ votingPowerData, isProfileOwner }: VotingPowerCardPro
 					</div>
 					<div className={classes.votingPowerValue}>
 						<span className={classes.value}>
-							{formatBnBalance(votingPowerData.total, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 1, compactNotation: true }, network)}
+							{formatBnBalance(votingPowerData.total, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
 						</span>
 						<span className={classes.unit}>{tokenSymbol}</span>
 					</div>
@@ -66,7 +66,7 @@ function VotingPowerCard({ votingPowerData, isProfileOwner }: VotingPowerCardPro
 					</div>
 					<div className={classes.votingPowerValue}>
 						<span className={classes.value}>
-							{formatBnBalance(votingPowerData.self, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 1, compactNotation: true }, network)}
+							{formatBnBalance(votingPowerData.self, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
 						</span>
 						<span className={classes.unit}>{tokenSymbol}</span>
 					</div>
@@ -86,7 +86,7 @@ function VotingPowerCard({ votingPowerData, isProfileOwner }: VotingPowerCardPro
 					</div>
 					<div className={classes.votingPowerValue}>
 						<span className={classes.value}>
-							{formatBnBalance(votingPowerData.delegated, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 1, compactNotation: true }, network)}
+							{formatBnBalance(votingPowerData.delegated, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
 						</span>
 						<span className={classes.unit}>{tokenSymbol}</span>
 					</div>

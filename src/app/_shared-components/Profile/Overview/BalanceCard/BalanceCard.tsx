@@ -38,7 +38,7 @@ function BalanceCard({ availableBalance, delegatedBalance }: BalanceCardProps) {
 				</div>
 				<div className={classes.statCardValue}>
 					<span className={classes.value}>
-						{formatBnBalance(availableBalance, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 1, compactNotation: true }, network)}
+						{formatBnBalance(availableBalance, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
 					</span>
 					<span className={classes.unit}>{tokenSymbol}</span>
 				</div>
@@ -57,7 +57,7 @@ function BalanceCard({ availableBalance, delegatedBalance }: BalanceCardProps) {
 				</div>
 				<div className={classes.statCardValue}>
 					<span className={classes.value}>
-						{formatBnBalance(delegatedBalance, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 1, compactNotation: true }, network)}
+						{formatBnBalance(delegatedBalance, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
 					</span>
 					<span className={classes.unit}>{tokenSymbol}</span>
 				</div>
