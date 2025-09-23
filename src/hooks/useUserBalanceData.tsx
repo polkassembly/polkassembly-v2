@@ -28,25 +28,56 @@ const calculateVotingPower = (balance: string, lockPeriod: number): BN => {
 };
 
 const getUpdatedDelegationData = (delegationData: ITrackDelegationStats[]) => {
+	// Token totals (raw balances)
 	let totalDelegated = new BN(0);
 	let totalReceived = new BN(0);
+	// Voting power totals
+	let maxDelegatedVP = new BN(0);
+	let maxReceivedVP = new BN(0); // Changed from totalReceivedVP to maxReceivedVP
+
+	// Handle edge case with empty delegationData
+	if (!delegationData?.length) {
+		return {
+			totalDelegated: '0',
+			totalReceived: '0',
+			maxDelegatedVP: '0',
+			maxReceivedVP: '0' // Changed from totalReceivedVP to maxReceivedVP
+		};
+	}
 
 	delegationData.forEach((delegation) => {
 		if (delegation.status === EDelegationStatus.RECEIVED || delegation.status === EDelegationStatus.DELEGATED) {
-			delegation?.delegations?.forEach((d) => {
-				const votingPower = calculateVotingPower(d.balance, d?.lockPeriod || 0);
+			// Handle edge case with empty delegations array
+			if (!delegation?.delegations?.length) return;
+
+			delegation.delegations.forEach((d) => {
+				// Ensure we have valid balance values
+				const balance = d.balance || '0';
+				const balanceBn = new BN(balance);
+				const votingPower = calculateVotingPower(balance, d?.lockPeriod || 0);
+
 				if (delegation.status === EDelegationStatus.RECEIVED) {
-					totalReceived = totalReceived.add(votingPower);
+					totalReceived = totalReceived.add(balanceBn);
+					// Instead of adding, track the maximum received voting power
+					if (votingPower.gt(maxReceivedVP)) {
+						maxReceivedVP = votingPower;
+					}
 				} else {
-					totalDelegated = totalDelegated.add(votingPower);
+					totalDelegated = totalDelegated.add(balanceBn);
+					// Track the maximum delegated voting power
+					if (votingPower.gt(maxDelegatedVP)) {
+						maxDelegatedVP = votingPower;
+					}
 				}
 			});
 		}
 	});
 
 	return {
-		totalDelegated: totalDelegated.toString(),
-		totalReceived: totalReceived.toString()
+		totalDelegated: totalDelegated.toString(), // tokens
+		totalReceived: totalReceived.toString(), // tokens
+		maxDelegatedVP: maxDelegatedVP.toString(), // maximum delegated voting power (not sum)
+		maxReceivedVP: maxReceivedVP.toString() // maximum received voting power (not sum)
 	};
 };
 
@@ -54,15 +85,20 @@ export const useUserBalanceData = (address?: string) => {
 	const { apiService } = usePolkadotApiService();
 
 	const getDelegations = async () => {
-		if (!address) return { totalDelegated: '0', totalReceived: '0' };
+		if (!address) return { totalDelegated: '0', totalReceived: '0', maxDelegatedVP: '0', maxReceivedVP: '0' };
 
-		const { data: delegationData, error: delegationError } = await NextApiClientService.getDelegateTracks({ address });
+		try {
+			const { data: delegationData, error: delegationError } = await NextApiClientService.getDelegateTracks({ address });
 
-		if (delegationError || !delegationData) {
-			throw new ClientError(delegationError?.message || 'Failed to fetch delegation data');
+			if (delegationError || !delegationData) {
+				throw new ClientError(delegationError?.message || 'Failed to fetch delegation data');
+			}
+
+			return getUpdatedDelegationData(delegationData.delegationStats || []);
+		} catch {
+			// Silent fail with default values
+			return { totalDelegated: '0', totalReceived: '0', maxDelegatedVP: '0', maxReceivedVP: '0' };
 		}
-
-		return getUpdatedDelegationData(delegationData.delegationStats || []);
 	};
 
 	const { data: delegationData, isFetching: isDelegationFetching } = useQuery({
@@ -103,23 +139,23 @@ export const useUserBalanceData = (address?: string) => {
 	if (balanceData && delegationData) {
 		// getUserBalances returns { freeBalance, lockedBalance, totalBalance, transferableBalance }
 		const { lockedBalance, freeBalance } = balanceData;
-		const totalReceived = new BN(delegationData.totalReceived || '0');
-		const totalDelegated = new BN(delegationData.totalDelegated || '0');
+		const maxReceivedVP = new BN('maxReceivedVP' in delegationData ? delegationData.maxReceivedVP || '0' : '0');
+		const maxDelegatedVP = new BN('maxDelegatedVP' in delegationData ? delegationData.maxDelegatedVP || '0' : '0');
 
 		// Self voting power is the locked balance
 		userBalanceData.votingPower.self = lockedBalance;
 
-		// Delegated voting power is what others have delegated to this address
-		userBalanceData.votingPower.delegated = totalReceived;
+		// Delegated voting power is what others have delegated to this address (max received)
+		userBalanceData.votingPower.delegated = maxReceivedVP;
 
-		// Total voting power is self + delegated
-		userBalanceData.votingPower.total = lockedBalance.add(totalReceived);
+		// Total voting power is self + max received delegations
+		userBalanceData.votingPower.total = lockedBalance.add(maxReceivedVP);
 
 		// Available balance is free balance
 		userBalanceData.available = freeBalance;
 
-		// Delegated balance is what this address has delegated to others
-		userBalanceData.delegated = totalDelegated;
+		// Delegated balance is the maximum delegated voting power (not the sum)
+		userBalanceData.delegated = maxDelegatedVP;
 	}
 
 	return {
