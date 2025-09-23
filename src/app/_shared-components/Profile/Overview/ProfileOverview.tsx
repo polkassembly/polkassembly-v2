@@ -26,7 +26,7 @@ function ProfileOverview({ profileData, address }: ProfileOverviewProps) {
 	// Fetch user balance data using the custom hook
 	const { user } = useUser();
 
-	const isProfileOwner = Boolean((profileData?.id && user?.id === profileData?.id) || (address && user?.addressRelations?.some((relation) => relation.address === address)));
+	const isProfileOwner = Boolean(profileData?.id && user?.id === profileData?.id);
 
 	const { userBalanceData, isLoading } = useUserBalanceData(primaryAddress);
 
