@@ -53,7 +53,7 @@ export const useProfileViews = (userId?: number, options: UseProfileViewsOptions
 			});
 
 			if (error || !data) {
-				throw new ClientError(error?.message || 'Failed to fetch profile views');
+				return defaultData;
 			}
 
 			return data;
