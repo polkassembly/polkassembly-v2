@@ -89,7 +89,7 @@ function MemberCard({ member }: { member: IPublicUser }) {
 								address={member?.addresses[0] || ''}
 								iconSize={30}
 								showIdenticon
-								textClassName='text-left text-lg lg:text-lg font-semibold'
+								textClassName='text-left text-lg font-semibold'
 							/>
 							{isUserBlacklisted(member.id) && <ShieldAlert className='h-5 w-5 text-red-500' />}
 						</>
