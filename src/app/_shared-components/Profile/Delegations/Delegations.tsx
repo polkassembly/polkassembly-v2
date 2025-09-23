@@ -175,9 +175,14 @@ function Delegations({ addresses }: { addresses: string[] }) {
 							href='https://wiki.polkadot.com/learn/learn-polkadot-opengov/#multirole-delegation'
 							className='flex items-center gap-x-1 text-sm font-medium text-text_pink underline'
 							target='_blank'
+							rel='noopener noreferrer'
+							aria-label={t('Delegations.readMore')}
 						>
 							{t('Delegations.readMore')}
-							<ArrowUpRightFromSquare className='h-4 w-4 text-text_pink' />
+							<ArrowUpRightFromSquare
+								aria-hidden='true'
+								className='h-4 w-4 text-text_pink'
+							/>
 						</Link>
 					</div>
 

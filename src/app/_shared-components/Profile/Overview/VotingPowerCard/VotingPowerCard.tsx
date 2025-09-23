@@ -10,6 +10,7 @@ import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { BN } from '@polkadot/util';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
+import { useTranslations } from 'next-intl';
 import classes from './VotingPowerCard.module.scss';
 
 interface VotingPowerData {
@@ -25,6 +26,7 @@ interface VotingPowerCardProps {
 
 function VotingPowerCard({ votingPowerData, isProfileOwner }: VotingPowerCardProps) {
 	const network = getCurrentNetwork();
+	const t = useTranslations();
 	const { tokenSymbol } = NETWORKS_DETAILS[network];
 
 	return (
@@ -32,13 +34,13 @@ function VotingPowerCard({ votingPowerData, isProfileOwner }: VotingPowerCardPro
 			<div className={cn(classes.votingPowerBreakdown, !isProfileOwner ? 'lg:justify-around' : '')}>
 				<div className={classes.votingPowerItem}>
 					<div className={classes.votingPowerLabel}>
-						<span>Voting Power</span>
+						<span>{t('Profile.votingPower')}</span>
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<div className={classes.infoIcon}>?</div>
 							</TooltipTrigger>
 							<TooltipContent className='max-w-xs bg-tooltip_background p-2 text-white'>
-								<p>Total DOT you can use to vote on proposals — includes your own tokens plus any delegated to you by others.</p>
+								<p>{t('Profile.totalVotingPowerText')}</p>
 							</TooltipContent>
 						</Tooltip>
 					</div>
@@ -52,13 +54,13 @@ function VotingPowerCard({ votingPowerData, isProfileOwner }: VotingPowerCardPro
 				<div className={classes.divider} />
 				<div className={classes.votingPowerItem}>
 					<div className={classes.votingPowerLabel}>
-						<span>Self</span>
+						<span>{t('Profile.self')}</span>
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<div className={classes.infoIcon}>?</div>
 							</TooltipTrigger>
 							<TooltipContent className='max-w-xs bg-tooltip_background p-2 text-white'>
-								<p>The amount of DOT you personally control and are using for on-chain voting (without delegation).</p>
+								<p>{t('Profile.selfVotingPowerText')}</p>
 							</TooltipContent>
 						</Tooltip>
 					</div>
@@ -72,13 +74,13 @@ function VotingPowerCard({ votingPowerData, isProfileOwner }: VotingPowerCardPro
 				<div className={classes.divider} />
 				<div className={classes.votingPowerItem}>
 					<div className={classes.votingPowerLabel}>
-						<span>Delegated</span>
+						<span>{t('Profile.delegated')}</span>
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<div className={classes.infoIcon}>?</div>
 							</TooltipTrigger>
 							<TooltipContent className='max-w-xs bg-tooltip_background p-2 text-white'>
-								<p>The DOT that others have delegated to you, giving you the power to vote on their behalf.</p>
+								<p>{t('Profile.delegatedVotingPowerText')}</p>
 							</TooltipContent>
 						</Tooltip>
 					</div>

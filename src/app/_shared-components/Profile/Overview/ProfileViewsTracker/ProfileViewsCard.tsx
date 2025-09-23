@@ -6,6 +6,7 @@
 
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { useTranslations } from 'next-intl';
 import classes from './ProfileViewsCard.module.scss';
 
 function getHumanReadableDateRange(startDate: string, endDate: string): string {
@@ -41,11 +42,12 @@ interface ProfileViewsCardProps {
 }
 
 function ProfileViewsCard({ profileViewsData, isLoading = false }: Readonly<ProfileViewsCardProps>) {
+	const t = useTranslations();
 	if (isLoading) {
 		return (
 			<div className={classes.statCard}>
 				<div className={classes.statCardHeader}>
-					<span className={classes.statCardTitle}>Profile Views</span>
+					<span className={classes.statCardTitle}>{t('Profile.profileViews')}</span>
 				</div>
 				<div className={classes.profileViewsValue}>
 					<Skeleton className='h-8 w-16' />
@@ -54,24 +56,12 @@ function ProfileViewsCard({ profileViewsData, isLoading = false }: Readonly<Prof
 		);
 	}
 
-	if (!profileViewsData) {
-		return (
-			<div className={classes.statCard}>
-				<span className={classes.statCardTitle}>Profile Views</span>
-				<div className={classes.profileViewsValue}>
-					<span className={classes.value}>0</span>
-					<span className={classes.timePeriod}>Last 30 days</span>
-				</div>
-			</div>
-		);
-	}
-
 	return (
 		<div className={classes.statCard}>
-			<span className={classes.statCardTitle}>Profile Views</span>
+			<span className={classes.statCardTitle}>{t('Profile.profileViews')}</span>
 			<div className={classes.profileViewsValue}>
-				<span className={classes.value}>{profileViewsData.unique}</span>
-				<span className={classes.timePeriod}>{getHumanReadableDateRange(profileViewsData.startDate, profileViewsData.endDate)}</span>
+				<span className={classes.value}>{profileViewsData?.unique || 0}</span>
+				<span className={classes.timePeriod}>{getHumanReadableDateRange(profileViewsData?.startDate ?? '', profileViewsData?.endDate ?? '') || 'Last 30 days'}</span>
 			</div>
 		</div>
 	);
