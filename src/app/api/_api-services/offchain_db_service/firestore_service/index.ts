@@ -50,7 +50,7 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
-import dayjs from 'dayjs';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FirestoreUtils } from './firestoreUtils';
 
 export class FirestoreService extends FirestoreUtils {
