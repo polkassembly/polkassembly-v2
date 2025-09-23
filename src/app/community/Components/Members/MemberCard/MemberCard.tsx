@@ -4,11 +4,11 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import Image from 'next/image';
-import { ESocial, EUserBadge, IPublicUser, IUserBadgeDetails } from '@/_shared/types';
+import { ESocial, EUserBadge, IPublicUser, IUserBadgeDetails, EReactQueryKeys } from '@/_shared/types';
 import EmailIcon from '@assets/icons/email-icon.svg';
 import TwitterIcon from '@assets/icons/twitter-icon.svg';
 import TelegramIcon from '@assets/icons/telegram-icon.svg';
@@ -20,6 +20,11 @@ import { achievementBadges } from '@/_shared/_constants/achievementBadges';
 import CopyToClipboard from '@ui/CopyToClipboard/CopyToClipboard';
 import { Separator } from '@ui/Separator';
 import { Button } from '@ui/Button';
+import { useIdentityService } from '@/hooks/useIdentityService';
+import { useQuery } from '@tanstack/react-query';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { RegistrationJudgement } from '@polkadot/types/interfaces';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { isUserBlacklisted } from '@/_shared/_utils/isUserBlacklisted';
 import Address from '@ui/Profile/Address/Address';
 import { ShieldPlus, CircleDollarSign, UserIcon, ShieldAlert } from 'lucide-react';
@@ -38,6 +43,8 @@ const SocialIcons = {
 function MemberCard({ member }: { member: IPublicUser }) {
 	const t = useTranslations();
 	const { user } = useUser();
+
+	const { identityService } = useIdentityService();
 	const [isReadMoreVisible, setIsReadMoreVisible] = useState(false);
 
 	const userBadges = {} as Record<EUserBadge, IUserBadgeDetails>;
@@ -48,6 +55,29 @@ function MemberCard({ member }: { member: IPublicUser }) {
 
 	const isFollowing = member?.following?.some((item) => item.followerUserId === user?.id);
 
+	const getIdentityOfAddresses = useCallback(async () => {
+		if (!identityService || !member?.addresses.length) return undefined;
+		const identities = await Promise.all(
+			member.addresses.map(async (a) => {
+				const identity = await identityService.getOnChainIdentity(a);
+				if (identity) {
+					return { ...identity, address: a };
+				}
+				return null;
+			})
+		);
+		return identities.filter((i) => i !== null);
+	}, [identityService, member?.addresses]);
+
+	const { data: identities, isFetching } = useQuery({
+		queryKey: [EReactQueryKeys.PROFILE_IDENTITIES, member?.addresses.join(',')],
+		queryFn: getIdentityOfAddresses,
+		enabled: !!member?.addresses.length && !!identityService,
+		staleTime: FIVE_MIN_IN_MILLI
+	});
+
+	const judgements = identities?.[0]?.judgements.filter(([, judgement]: RegistrationJudgement): boolean => !judgement.isFeePaid) || [];
+
 	return (
 		<div className={styles.memberCard}>
 			<div className='flex items-center justify-between gap-3'>
@@ -57,9 +87,9 @@ function MemberCard({ member }: { member: IPublicUser }) {
 							<Address
 								disableTooltip
 								address={member?.addresses[0] || ''}
-								iconSize={32}
+								iconSize={30}
 								showIdenticon
-								textClassName='text-center text-lg font-semibold sm:text-left lg:text-2xl'
+								textClassName='text-left text-lg lg:text-lg font-semibold'
 							/>
 							{isUserBlacklisted(member.id) && <ShieldAlert className='h-5 w-5 text-red-500' />}
 						</>
@@ -113,9 +143,13 @@ function MemberCard({ member }: { member: IPublicUser }) {
 						width={14}
 						height={14}
 					/>
-					<span className='text-xs text-basic_text'>
-						{t('Community.Members.judgement')}: <span className='font-medium'>Reasonable</span>
-					</span>
+					{isFetching || !identityService ? (
+						<Skeleton className='ml-2 h-4 w-16' />
+					) : (
+						<span className='text-xs text-basic_text'>
+							{t('Profile.judgement')}: <span className='font-medium'>{judgements?.[0]?.[1]?.toString() || t('Profile.noJudgements')}</span>
+						</span>
+					)}
 				</div>
 			</div>
 			<div className='flex flex-wrap items-center gap-x-2 gap-y-2'>
