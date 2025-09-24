@@ -175,7 +175,7 @@ export class RedisService {
 			return baseKey + proposalTypePart;
 		},
 		[ERedisKeys.PROFILE_VIEWS]: (userId: string, network: string, startDate: string, endDate: string): string =>
-			`${ERedisKeys.PROFILE_VIEWS}-${userId}-${network}-${startDate}-${endDate}`
+			`${ERedisKeys.PROFILE_VIEWS}-${network}-${userId}-${startDate}-${endDate}`
 	} as const;
 
 	// helper methods
@@ -1104,6 +1104,6 @@ export class RedisService {
 	}
 
 	static async DeleteProfileViews({ userId, network }: { userId: number; network: ENetwork }): Promise<void> {
-		await this.DeleteKeys({ pattern: `${ERedisKeys.PROFILE_VIEWS}-${userId}-${network}-*` });
+		await this.DeleteKeys({ pattern: `${ERedisKeys.PROFILE_VIEWS}-${network}-${userId}-*` });
 	}
 }
