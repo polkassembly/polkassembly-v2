@@ -5,7 +5,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { BN } from '@polkadot/util';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ClientError } from '@/app/_client-utils/clientError';
 import { EDelegationStatus, ITrackDelegationStats } from '@/_shared/types';
 import { usePolkadotApiService } from './usePolkadotApiService';
 
@@ -91,7 +90,7 @@ export const useUserBalanceData = (address?: string) => {
 			const { data: delegationData, error: delegationError } = await NextApiClientService.getDelegateTracks({ address });
 
 			if (delegationError || !delegationData) {
-				throw new ClientError(delegationError?.message || 'Failed to fetch delegation data');
+				return null;
 			}
 
 			return getUpdatedDelegationData(delegationData.delegationStats || []);
@@ -138,21 +137,21 @@ export const useUserBalanceData = (address?: string) => {
 
 	if (balanceData && delegationData) {
 		// getUserBalances returns { freeBalance, lockedBalance, totalBalance, transferableBalance }
-		const { lockedBalance, freeBalance } = balanceData;
+		const { freeBalance, totalBalance } = balanceData;
 		const maxReceivedVP = new BN('maxReceivedVP' in delegationData ? delegationData.maxReceivedVP || '0' : '0');
 		const maxDelegatedVP = new BN('maxDelegatedVP' in delegationData ? delegationData.maxDelegatedVP || '0' : '0');
 
-		// Self voting power is the locked balance
-		userBalanceData.votingPower.self = lockedBalance;
+		// Self voting power is the free balance
+		userBalanceData.votingPower.self = freeBalance;
 
 		// Delegated voting power is what others have delegated to this address (max received)
 		userBalanceData.votingPower.delegated = maxReceivedVP;
 
 		// Total voting power is self + max received delegations
-		userBalanceData.votingPower.total = lockedBalance.add(maxReceivedVP);
+		userBalanceData.votingPower.total = freeBalance.add(maxReceivedVP);
 
-		// Available balance is free balance
-		userBalanceData.available = freeBalance;
+		// Available balance is total balance of an account
+		userBalanceData.available = totalBalance;
 
 		// Delegated balance is the maximum delegated voting power (not the sum)
 		userBalanceData.delegated = maxDelegatedVP;

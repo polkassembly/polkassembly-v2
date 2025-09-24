@@ -6,7 +6,6 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ClientError } from '@/app/_client-utils/clientError';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 
 interface ProfileViewsData {
@@ -76,11 +75,7 @@ export const useProfileViews = (userId?: number, options: UseProfileViewsOptions
 		mutationFn: async (): Promise<void> => {
 			if (!userId) return;
 
-			const { error } = await NextApiClientService.incrementProfileView({ userId });
-
-			if (error) {
-				throw new ClientError(error.message || 'Failed to increment profile view');
-			}
+			await NextApiClientService.incrementProfileView({ userId });
 		},
 		onSuccess: () => {
 			// Invalidate and refetch profile views data
