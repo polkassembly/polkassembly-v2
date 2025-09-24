@@ -148,7 +148,7 @@ export const useUserBalanceData = (address?: string) => {
 		userBalanceData.votingPower.delegated = maxReceivedVP;
 
 		// Total voting power is self + max received delegations
-		userBalanceData.votingPower.total = freeBalance.add(maxReceivedVP);
+		userBalanceData.votingPower.total = freeBalance.mul(new BN(6)).add(maxReceivedVP);
 
 		// Available balance is total balance of an account
 		userBalanceData.available = totalBalance;
