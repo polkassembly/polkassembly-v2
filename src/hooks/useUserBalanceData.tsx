@@ -30,9 +30,9 @@ const getUpdatedDelegationData = (delegationData: ITrackDelegationStats[]) => {
 	// Token totals (raw balances)
 	let totalDelegated = new BN(0);
 	let totalReceived = new BN(0);
-	// Voting power totals
-	let maxDelegatedVP = new BN(0);
-	let maxReceivedVP = new BN(0);
+	// Voting power totals - track the max voting power per track
+	const delegatedVPByTrack = new Map<number, BN>();
+	const receivedVPByTrack = new Map<number, BN>();
 
 	// Handle edge case with empty delegationData
 	if (!delegationData?.length) {
@@ -54,29 +54,36 @@ const getUpdatedDelegationData = (delegationData: ITrackDelegationStats[]) => {
 				const balance = d.balance || '0';
 				const balanceBn = new BN(balance);
 				const votingPower = calculateVotingPower(balance, d?.lockPeriod || 0);
+				// Use track ID from the delegation
+				const { trackId } = delegation;
 
 				if (delegation.status === EDelegationStatus.RECEIVED) {
 					totalReceived = totalReceived.add(balanceBn);
-					// Instead of adding, track the maximum received voting power
-					if (votingPower.gt(maxReceivedVP)) {
-						maxReceivedVP = votingPower;
-					}
+					// Add voting power to the track's total
+					const currentTrackVP = receivedVPByTrack.get(trackId) || new BN(0);
+					receivedVPByTrack.set(trackId, currentTrackVP.add(votingPower));
 				} else {
 					totalDelegated = totalDelegated.add(balanceBn);
-					// Track the maximum delegated voting power
-					if (votingPower.gt(maxDelegatedVP)) {
-						maxDelegatedVP = votingPower;
-					}
+					// Add voting power to the track's total
+					const currentTrackVP = delegatedVPByTrack.get(trackId) || new BN(0);
+					delegatedVPByTrack.set(trackId, currentTrackVP.add(votingPower));
 				}
 			});
 		}
 	});
 
+	// Find maximum voting power across tracks for both delegated and received
+	const trackDelegatedPowers = Array.from(delegatedVPByTrack.values());
+	const maxDelegatedVP = trackDelegatedPowers.length > 0 ? trackDelegatedPowers.reduce((max, current) => (current.gt(max) ? current : max), new BN(0)) : new BN(0);
+
+	const trackReceivedPowers = Array.from(receivedVPByTrack.values());
+	const maxReceivedVP = trackReceivedPowers.length > 0 ? trackReceivedPowers.reduce((max, current) => (current.gt(max) ? current : max), new BN(0)) : new BN(0);
+
 	return {
 		totalDelegated: totalDelegated.toString(), // tokens
 		totalReceived: totalReceived.toString(), // tokens
-		maxDelegatedVP: maxDelegatedVP.toString(), // maximum delegated voting power (not sum)
-		maxReceivedVP: maxReceivedVP.toString() // maximum received voting power (not sum)
+		maxDelegatedVP: maxDelegatedVP.toString(), // maximum delegated voting power per track
+		maxReceivedVP: maxReceivedVP.toString() // maximum received voting power per track
 	};
 };
 
