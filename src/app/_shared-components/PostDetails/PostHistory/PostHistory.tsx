@@ -41,11 +41,26 @@ function PostHistory({
 			}
 		];
 
-		return fullHistory.map((item, index) => {
+		const filteredHistory = fullHistory.filter((item, index) => {
+			if (index === fullHistory.length - 1) return true;
+
+			const currentContentStr = removeSymbols(item.content).trim();
+			const currentTitleStr = removeSymbols(item.title || '').trim();
+
+			const nextItem = fullHistory[index - 1];
+			if (!nextItem) return true;
+
+			const nextContentStr = removeSymbols(nextItem.content).trim();
+			const nextTitleStr = removeSymbols(nextItem.title || '').trim();
+
+			return currentContentStr !== nextContentStr || currentTitleStr !== nextTitleStr;
+		});
+
+		return filteredHistory.map((item, index) => {
 			const currentContentStr = removeSymbols(item.content);
 			const currentTitleStr = removeSymbols(item.title || '');
 
-			const previousItem = index < (fullHistory?.length ? fullHistory.length - 1 : 0) ? fullHistory[index + 1] : null;
+			const previousItem = index < (filteredHistory?.length ? filteredHistory.length - 1 : 0) ? filteredHistory[index + 1] : null;
 
 			const previousContentStr = previousItem ? removeSymbols(previousItem.content) : '';
 			const previousTitleStr = previousItem ? removeSymbols(previousItem.title || '') : '';
