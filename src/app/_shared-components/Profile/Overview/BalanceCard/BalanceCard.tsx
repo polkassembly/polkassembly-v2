@@ -10,14 +10,16 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { BN } from '@polkadot/util';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { useTranslations } from 'next-intl';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import classes from './BalanceCard.module.scss';
 
 interface BalanceCardProps {
 	availableBalance: BN;
 	delegatedBalance: BN;
+	isLoading?: boolean;
 }
 
-function BalanceCard({ availableBalance, delegatedBalance }: BalanceCardProps) {
+function BalanceCard({ availableBalance, delegatedBalance, isLoading }: BalanceCardProps) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 	const { tokenSymbol } = NETWORKS_DETAILS[network];
@@ -36,12 +38,16 @@ function BalanceCard({ availableBalance, delegatedBalance }: BalanceCardProps) {
 						</TooltipContent>
 					</Tooltip>
 				</div>
-				<div className={classes.statCardValue}>
-					<span className={classes.value}>
-						{formatBnBalance(availableBalance, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
-					</span>
-					<span className={classes.unit}>{tokenSymbol}</span>
-				</div>
+				{isLoading ? (
+					<Skeleton className='h-8 w-full' />
+				) : (
+					<div className={classes.statCardValue}>
+						<span className={classes.value}>
+							{formatBnBalance(availableBalance, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
+						</span>
+						<span className={classes.unit}>{tokenSymbol}</span>
+					</div>
+				)}
 			</div>
 			<div className={classes.statCard}>
 				<div className={classes.statCardHeader}>
@@ -55,12 +61,16 @@ function BalanceCard({ availableBalance, delegatedBalance }: BalanceCardProps) {
 						</TooltipContent>
 					</Tooltip>
 				</div>
-				<div className={classes.statCardValue}>
-					<span className={classes.value}>
-						{formatBnBalance(delegatedBalance, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
-					</span>
-					<span className={classes.unit}>{tokenSymbol}</span>
-				</div>
+				{isLoading ? (
+					<Skeleton className='h-8 w-full' />
+				) : (
+					<div className={classes.statCardValue}>
+						<span className={classes.value}>
+							{formatBnBalance(delegatedBalance, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
+						</span>
+						<span className={classes.unit}>{tokenSymbol}</span>
+					</div>
+				)}
 			</div>
 		</>
 	);

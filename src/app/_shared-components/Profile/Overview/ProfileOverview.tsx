@@ -8,7 +8,6 @@ import { IPublicUser } from '@/_shared/types';
 import { BarChart3 } from 'lucide-react';
 import { useUserBalanceData } from '@/hooks/useUserBalanceData';
 import { useUser } from '@/hooks/useUser';
-import { Skeleton } from '../../Skeleton';
 import classes from './ProfileOverview.module.scss';
 import VotingPowerCard from './VotingPowerCard/VotingPowerCard';
 import BalanceCard from './BalanceCard/BalanceCard';
@@ -30,25 +29,6 @@ function ProfileOverview({ profileData, address }: ProfileOverviewProps) {
 
 	const { userBalanceData, isLoading } = useUserBalanceData(primaryAddress);
 
-	if (isLoading) {
-		return (
-			<div className={classes.profileOverview}>
-				<div className={classes.header}>
-					<div className={classes.headerContent}>
-						<BarChart3 className={classes.headerIcon} />
-						<h2 className={classes.headerTitle}>Overview</h2>
-					</div>
-				</div>
-				<div className={classes.statsGrid}>
-					<Skeleton className='h-32 w-full' />
-					<Skeleton className='h-32 w-full' />
-					<Skeleton className='h-32 w-full' />
-					<Skeleton className='h-32 w-full' />
-				</div>
-			</div>
-		);
-	}
-
 	return (
 		<div className={classes.profileOverview}>
 			{/* Header */}
@@ -64,10 +44,12 @@ function ProfileOverview({ profileData, address }: ProfileOverviewProps) {
 				<VotingPowerCard
 					votingPowerData={userBalanceData.votingPower}
 					isProfileOwner={isProfileOwner}
+					isLoading={isLoading}
 				/>
 				<BalanceCard
 					availableBalance={userBalanceData.available}
 					delegatedBalance={userBalanceData.delegated}
+					isLoading={isLoading}
 				/>
 				<ProfileViewsTracker
 					isProfileOwner={isProfileOwner}

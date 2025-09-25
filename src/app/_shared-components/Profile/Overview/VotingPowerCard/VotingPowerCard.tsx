@@ -11,6 +11,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { BN } from '@polkadot/util';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { useTranslations } from 'next-intl';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import classes from './VotingPowerCard.module.scss';
 
 interface VotingPowerData {
@@ -22,9 +23,10 @@ interface VotingPowerData {
 interface VotingPowerCardProps {
 	votingPowerData: VotingPowerData;
 	isProfileOwner?: boolean;
+	isLoading?: boolean;
 }
 
-function VotingPowerCard({ votingPowerData, isProfileOwner }: VotingPowerCardProps) {
+function VotingPowerCard({ votingPowerData, isProfileOwner, isLoading }: VotingPowerCardProps) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 	const { tokenSymbol } = NETWORKS_DETAILS[network];
@@ -44,12 +46,16 @@ function VotingPowerCard({ votingPowerData, isProfileOwner }: VotingPowerCardPro
 							</TooltipContent>
 						</Tooltip>
 					</div>
-					<div className={classes.votingPowerValue}>
-						<span className={classes.value}>
-							{formatBnBalance(votingPowerData.total, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
-						</span>
-						<span className={classes.unit}>{tokenSymbol}</span>
-					</div>
+					{isLoading ? (
+						<Skeleton className='h-8 w-full' />
+					) : (
+						<div className={classes.votingPowerValue}>
+							<span className={classes.value}>
+								{formatBnBalance(votingPowerData.total, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
+							</span>
+							<span className={classes.unit}>{tokenSymbol}</span>
+						</div>
+					)}
 				</div>
 				<div className={classes.divider} />
 				<div className={classes.votingPowerItem}>
@@ -64,12 +70,16 @@ function VotingPowerCard({ votingPowerData, isProfileOwner }: VotingPowerCardPro
 							</TooltipContent>
 						</Tooltip>
 					</div>
-					<div className={classes.votingPowerValue}>
-						<span className={classes.value}>
-							{formatBnBalance(votingPowerData.self, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
-						</span>
-						<span className={classes.unit}>{tokenSymbol}</span>
-					</div>
+					{isLoading ? (
+						<Skeleton className='h-8 w-full' />
+					) : (
+						<div className={classes.votingPowerValue}>
+							<span className={classes.value}>
+								{formatBnBalance(votingPowerData.self, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
+							</span>
+							<span className={classes.unit}>{tokenSymbol}</span>
+						</div>
+					)}
 				</div>
 				<div className={classes.divider} />
 				<div className={classes.votingPowerItem}>
@@ -84,12 +94,16 @@ function VotingPowerCard({ votingPowerData, isProfileOwner }: VotingPowerCardPro
 							</TooltipContent>
 						</Tooltip>
 					</div>
-					<div className={classes.votingPowerValue}>
-						<span className={classes.value}>
-							{formatBnBalance(votingPowerData.delegated, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
-						</span>
-						<span className={classes.unit}>{tokenSymbol}</span>
-					</div>
+					{isLoading ? (
+						<Skeleton className='h-8 w-full' />
+					) : (
+						<div className={classes.votingPowerValue}>
+							<span className={classes.value}>
+								{formatBnBalance(votingPowerData.delegated, { withThousandDelimitor: false, withUnit: false, numberAfterComma: 2, compactNotation: true }, network)}
+							</span>
+							<span className={classes.unit}>{tokenSymbol}</span>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
