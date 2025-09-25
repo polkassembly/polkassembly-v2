@@ -10,7 +10,12 @@ import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import Address from '@/app/_shared-components/Profile/Address/Address';
-import { Info, ChevronDown, ChevronUp } from 'lucide-react';
+import { Info } from 'lucide-react';
+import Image from 'next/image';
+import { FaCaretDown } from '@react-icons/all-files/fa/FaCaretDown';
+import { FaCaretUp } from '@react-icons/all-files/fa/FaCaretUp';
+import TrailLine from '@assets/icons/trail-line.svg';
+import TrailLineEnd from '@assets/icons/trail-line-end.svg';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '../../../_shared-components/Table';
 import { PaginationWithLinks } from '../../../_shared-components/PaginationWithLinks';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../_shared-components/Tooltip';
@@ -49,10 +54,11 @@ function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyReques
 		<div className='w-full'>
 			{data && data.length > 0 ? (
 				<>
-					<div className='w-full rounded-lg border border-primary_border bg-bg_modal p-6'>
+					<div className='w-full rounded-3xl border border-primary_border bg-bg_modal p-6'>
 						<Table>
 							<TableHeader>
-								<TableRow className={styles.tableRow}>
+								<TableRow className={styles.tableHeader}>
+									<TableHead className={`${styles.tableCell}`} />
 									<TableHead className={styles.tableCell_2}>{t('delegator')}</TableHead>
 									<TableHead className={styles.tableCell}>{t('proxyType')}</TableHead>
 									<TableHead className={styles.tableCell}>
@@ -84,26 +90,26 @@ function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyReques
 												className={`${hasChildProxies ? 'cursor-pointer hover:bg-section_dark_overlay' : ''}`}
 												onClick={() => hasChildProxies && toggleRow(proxy.id)}
 											>
-												<td className='px-6 py-5'>
-													<div className='flex items-center gap-2'>
-														{hasChildProxies && (
-															<button
-																type='button'
-																className='focus:outline-none'
-																onClick={(e) => {
-																	e.stopPropagation();
-																	toggleRow(proxy.id);
-																}}
-															>
-																{isExpanded ? <ChevronUp className='h-4 w-4 text-text_grey' /> : <ChevronDown className='h-4 w-4 text-text_grey' />}
-															</button>
-														)}
-														<Address
-															truncateCharLen={5}
-															address={proxy.delegator}
-															redirectToProfile={false}
-														/>
-													</div>
+												<td className='w-4 px-6 py-5'>
+													{hasChildProxies && (
+														<button
+															type='button'
+															className='focus:outline-none'
+															onClick={(e) => {
+																e.stopPropagation();
+																toggleRow(proxy.id);
+															}}
+														>
+															{isExpanded ? <FaCaretUp className='h-4 w-4 text-text_pink' /> : <FaCaretDown className='h-4 w-4 text-text_grey' />}
+														</button>
+													)}
+												</td>
+												<td className='px-4 py-5'>
+													<Address
+														truncateCharLen={5}
+														address={proxy.delegator}
+														redirectToProfile={false}
+													/>
 												</td>
 												<td className='px-6 py-5' />
 												<td className='px-6 py-5' />
@@ -114,24 +120,33 @@ function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyReques
 
 											{hasChildProxies &&
 												isExpanded &&
-												proxy.individualProxies.map((individualProxy) => (
+												proxy.individualProxies.map((individualProxy, index) => (
 													<TableRow
 														key={`${proxy.id}-child-${individualProxy.address}`}
-														className='border-l-4 border-pink-200 bg-pink-50 dark:border-pink-800 dark:bg-pink-950/20'
+														className='border-primary_border bg-sidebar_menu_active'
 													>
-														<td className='px-6 py-3'>
+														<td className='px-6 py-1 text-text_pink'>
+															<Image
+																src={index === proxy.individualProxies.length - 1 ? TrailLineEnd : TrailLine}
+																width={16}
+																height={30}
+																className='h-14 w-5'
+																alt='trail line'
+															/>
+														</td>
+														<td className='px-6 py-1'>
 															<Address
 																truncateCharLen={5}
 																address={individualProxy.address}
 															/>
 														</td>
-														<td className='px-6 py-3'>
+														<td className='px-6 py-1'>
 															<ProxyTypeBadge proxyType={individualProxy.proxyType} />
 														</td>
-														<td className='px-6 py-3'>
+														<td className='px-6 py-1'>
 															<div className='truncate'>{individualProxy.delay || '-'}</div>
 														</td>
-														<td className='px-6 py-3' />
+														<td className='px-6 py-1' />
 													</TableRow>
 												))}
 										</React.Fragment>
