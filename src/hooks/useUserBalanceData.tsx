@@ -32,7 +32,7 @@ const getUpdatedDelegationData = (delegationData: ITrackDelegationStats[]) => {
 	let totalReceived = new BN(0);
 	// Voting power totals
 	let maxDelegatedVP = new BN(0);
-	let maxReceivedVP = new BN(0); // Changed from totalReceivedVP to maxReceivedVP
+	let maxReceivedVP = new BN(0);
 
 	// Handle edge case with empty delegationData
 	if (!delegationData?.length) {
@@ -40,7 +40,7 @@ const getUpdatedDelegationData = (delegationData: ITrackDelegationStats[]) => {
 			totalDelegated: '0',
 			totalReceived: '0',
 			maxDelegatedVP: '0',
-			maxReceivedVP: '0' // Changed from totalReceivedVP to maxReceivedVP
+			maxReceivedVP: '0'
 		};
 	}
 
@@ -137,18 +137,18 @@ export const useUserBalanceData = (address?: string) => {
 
 	if (balanceData && delegationData) {
 		// getUserBalances returns { freeBalance, lockedBalance, totalBalance, transferableBalance }
-		const { freeBalance, totalBalance } = balanceData;
+		const { totalBalance } = balanceData;
 		const maxReceivedVP = new BN('maxReceivedVP' in delegationData ? delegationData.maxReceivedVP || '0' : '0');
 		const maxDelegatedVP = new BN('maxDelegatedVP' in delegationData ? delegationData.maxDelegatedVP || '0' : '0');
 
 		// Self voting power is the free balance
-		userBalanceData.votingPower.self = freeBalance;
+		userBalanceData.votingPower.self = totalBalance;
 
 		// Delegated voting power is what others have delegated to this address (max received)
 		userBalanceData.votingPower.delegated = maxReceivedVP;
 
 		// Total voting power is self + max received delegations
-		userBalanceData.votingPower.total = freeBalance.mul(new BN(6)).add(maxReceivedVP);
+		userBalanceData.votingPower.total = totalBalance.mul(new BN(6)).add(maxReceivedVP);
 
 		// Available balance is total balance of an account
 		userBalanceData.available = totalBalance;
