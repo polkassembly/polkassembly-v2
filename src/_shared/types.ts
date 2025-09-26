@@ -117,6 +117,12 @@ export interface IUserNotificationSettings {
 	};
 }
 
+export enum ETrackNotification {
+	NEW_REFERENDUM_SUBMITTED = 'newReferendumSubmitted',
+	REFERENDUM_IN_VOTING = 'referendumInVoting',
+	REFERENDUM_CLOSED = 'referendumClosed'
+}
+
 export enum ERole {
 	ANONYMOUS = 'anonymous',
 	ADMIN = 'admin',

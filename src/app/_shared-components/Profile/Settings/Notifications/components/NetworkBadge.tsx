@@ -1,0 +1,43 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+import { X } from 'lucide-react';
+import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
+
+interface NetworkBadgeProps {
+	id: string;
+	name: string;
+	logo: string;
+	removable: boolean;
+	onRemove?: (id: string) => void;
+}
+
+function NetworkBadge({ id, name, logo, removable, onRemove }: NetworkBadgeProps) {
+	return (
+		<div className='flex items-center gap-2 rounded-full border border-border_grey px-3 py-1'>
+			<img
+				src={logo}
+				alt={name}
+				width={16}
+				height={16}
+				className='rounded-full object-cover'
+				onError={(e) => {
+					e.currentTarget.src = PolkadotLogo.src;
+				}}
+			/>
+			<span className='text-sm text-text_primary'>{name}</span>
+			{removable && onRemove && (
+				<button
+					type='button'
+					onClick={() => onRemove(id)}
+					className='text-text_secondary ml-1 hover:text-text_primary'
+				>
+					<X className='h-3 w-3' />
+				</button>
+			)}
+		</div>
+	);
+}
+
+export default NetworkBadge;
