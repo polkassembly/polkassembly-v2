@@ -1,23 +1,23 @@
 .wrapper {
-	@apply mb-6 flex w-full flex-col items-start gap-2 sm:mb-8 sm:flex-row sm:items-center sm:gap-x-4;
+	@apply mb-6 flex w-full items-start gap-1 sm:mb-8 sm:items-center sm:gap-x-4;
 }
 
 .btn {
-	@apply flex w-full items-center justify-start gap-x-2 px-2 py-2 text-sm font-normal text-text_primary sm:w-auto sm:justify-center sm:px-0 sm:py-0 sm:text-base;
+	@apply flex w-full items-center gap-0 gap-x-0 px-0 text-xs font-normal text-text_primary sm:text-sm;
 }
 
 .tagWrapper {
-	@apply border-b-2 py-2 sm:border-b-0 sm:border-r-2 sm:py-3;
+	@apply border-b-2 py-3;
 }
 
 .tag {
-	@apply rounded-full px-2 py-1 text-xs sm:text-sm;
+	@apply rounded-full px-2 py-1;
 }
 
 .username {
-	@apply w-full border-b-2 px-2 py-2 text-left sm:w-auto sm:border-b-0 sm:border-r-2 sm:py-3 sm:text-center;
+	@apply w-full border-b-2 py-3 text-left sm:px-2;
 }
 
 .password {
-	@apply w-full border-b-2 border-border_grey px-2 py-2 text-left sm:w-auto sm:border-b-0 sm:py-3 sm:text-center;
+	@apply w-full border-b-2 border-border_grey py-3 text-left sm:px-2;
 }

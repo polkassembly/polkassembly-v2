@@ -1351,6 +1351,48 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
+	static async GetAllFlattenedVotesWithoutFilters({ network, page, limit }: { network: ENetwork; page: number; limit: number }): Promise<IGenericListingResponse<IProfileVote>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_ALL_FLATTENED_VOTES_WITHOUT_FILTERS;
+
+		const variables = {
+			limit,
+			offset: (page - 1) * limit
+		};
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching all flattened votes from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching all flattened votes from Subsquid');
+		}
+
+		const { votes, totalCount } = subsquidData;
+
+		if (totalCount.totalCount === 0) {
+			return {
+				items: [],
+				totalCount: totalCount.totalCount
+			};
+		}
+
+		const votesData: IProfileVote[] = votes.map((vote: { decision: string; voter: string; proposalIndex: number; type: EProposalType; parentVote: { extrinsicIndex: string } }) => {
+			return {
+				...vote,
+				decision: this.convertSubsquidVoteDecisionToVoteDecision({ decision: vote.decision }),
+				voterAddress: vote.voter,
+				proposalType: vote.type as EProposalType,
+				extrinsicIndex: vote.parentVote?.extrinsicIndex || ''
+			};
+		});
+
+		return {
+			items: votesData,
+			totalCount: totalCount.totalCount
+		};
+	}
+
 	static async GetGovAnalyticsStats({ network }: { network: ENetwork }): Promise<IGovAnalyticsStats> {
 		const gqlClient = this.subsquidGqlClient(network);
 

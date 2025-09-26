@@ -40,7 +40,7 @@ async function ConfirmVerificationPage({ searchParams }: PageProps) {
 			if (oauth_verifier) redirectSearchParams.append('oauth_verifier', oauth_verifier);
 			if (oauth_token) redirectSearchParams.append('oauth_token', oauth_token);
 
-			redirect(`https://${network}.polkassembly.io/confirm-verification?${searchParams.toString()}`);
+			redirect(`https://${network}.polkassembly.io/confirm-verification?${redirectSearchParams.toString()}`);
 		}
 
 		if (!social || (social === ESocial.TWITTER && !oauth_token) || (social === ESocial.EMAIL && !token)) {
