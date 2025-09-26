@@ -167,13 +167,15 @@ function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyReques
 														className='border-primary_border bg-sidebar_menu_active'
 													>
 														<td className='px-6 py-1 text-text_pink'>
-															<Image
-																src={index === proxy.individualProxies.length - 1 ? TrailLineEnd : TrailLine}
-																width={16}
-																height={30}
-																className='h-14 w-5'
-																alt='trail line'
-															/>
+															<div className='flex h-10 w-4 items-start'>
+																<Image
+																	src={index === proxy.individualProxies.length - 1 ? TrailLineEnd : TrailLine}
+																	width={10}
+																	height={25}
+																	className='w-4'
+																	alt='trail line'
+																/>
+															</div>
 														</td>
 														<td className='px-6 py-1'>
 															<Address
