@@ -13,7 +13,7 @@ import styles from './Header.module.scss';
 function Header() {
 	const t = useTranslations();
 
-	const { totalCount } = useProxyData();
+	const { totalCount } = useProxyData({});
 
 	return (
 		<div className={styles.header}>

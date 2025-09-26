@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { IProxyRequest } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { Info } from 'lucide-react';
 import Image from 'next/image';
@@ -16,6 +16,7 @@ import { FaCaretDown } from '@react-icons/all-files/fa/FaCaretDown';
 import { FaCaretUp } from '@react-icons/all-files/fa/FaCaretUp';
 import TrailLine from '@assets/icons/trail-line.svg';
 import TrailLineEnd from '@assets/icons/trail-line-end.svg';
+import { SortDirection } from '@tanstack/react-table';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '../../../_shared-components/Table';
 import { PaginationWithLinks } from '../../../_shared-components/PaginationWithLinks';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../_shared-components/Tooltip';
@@ -24,10 +25,15 @@ import ProxyTypeBadge from '../../../_shared-components/ProxyTypeBadge/ProxyType
 import styles from './ListingTable.module.scss';
 
 function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyRequest[]; totalCount: number; isLoading?: boolean }) {
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const page = searchParams?.get('page') || 1;
 	const t = useTranslations('Proxies');
 	const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
+	// Get sort params from URL
+	const sortBy = searchParams?.get('sortBy');
+	const sortDirection = searchParams?.get('sortDirection') as SortDirection | null;
 
 	const toggleRow = (proxyId: string) => {
 		const newExpandedRows = new Set(expandedRows);
@@ -37,6 +43,30 @@ function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyReques
 			newExpandedRows.add(proxyId);
 		}
 		setExpandedRows(newExpandedRows);
+	};
+
+	const toggleSort = () => {
+		const newParams = new URLSearchParams(searchParams.toString());
+
+		// Simple direction cycling: null -> asc -> desc -> null
+		const nextDirection = !sortDirection ? 'asc' : sortDirection === 'asc' ? 'desc' : null;
+
+		// Update or remove sorting parameters
+		if (nextDirection) {
+			newParams.set('sortBy', 'proxies');
+			newParams.set('sortDirection', nextDirection);
+		} else {
+			newParams.delete('sortBy');
+			newParams.delete('sortDirection');
+		}
+
+		// Preserve other search parameters (if any)
+		['page', 'search', 'allSearch'].forEach((param) => {
+			const value = searchParams.get(param);
+			if (value) newParams.set(param, value);
+		});
+
+		router.push(`?${newParams.toString()}`);
 	};
 
 	if (isLoading) {
@@ -76,7 +106,18 @@ function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyReques
 											</TooltipProvider>
 										</div>
 									</TableHead>
-									<TableHead className={styles.tableCell_last}>{t('proxies')}</TableHead>
+									<TableHead className={styles.tableCell_last}>
+										<button
+											type='button'
+											onClick={toggleSort}
+											className='flex items-center gap-x-2 focus:outline-none'
+										>
+											{t('proxies')}
+											{sortBy === 'proxies' && sortDirection === 'asc' && <FaCaretUp className='h-4 w-4 text-text_pink' />}
+											{sortBy === 'proxies' && sortDirection === 'desc' && <FaCaretDown className='h-4 w-4 text-text_pink' />}
+											{(!sortBy || sortBy !== 'proxies' || !sortDirection) && <FaCaretDown className='h-4 w-4 text-text_grey' />}
+										</button>
+									</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -155,7 +196,7 @@ function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyReques
 							</TableBody>
 						</Table>
 					</div>
-					{totalCount && totalCount > DEFAULT_LISTING_LIMIT && (
+					{Boolean(totalCount) && totalCount > DEFAULT_LISTING_LIMIT && (
 						<div className='mt-5 flex w-full justify-end'>
 							<PaginationWithLinks
 								page={Number(page)}

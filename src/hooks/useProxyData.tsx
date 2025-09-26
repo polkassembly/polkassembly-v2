@@ -6,9 +6,25 @@ import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { allProxiesAtom } from '@/app/_atoms/proxy/proxyAtom';
+import { IProxyRequest } from '@/_shared/types';
+import { SortDirection } from '@tanstack/react-table';
 import { usePolkadotApiService } from './usePolkadotApiService';
 
-export const useProxyData = (page: number = 1, search: string = '') => {
+type ProxyDataReturn = {
+	items: IProxyRequest[];
+	totalCount: number;
+	isLoading: boolean;
+	error: string | null;
+};
+
+type UseProxyDataParams = {
+	sortBy?: string;
+	sortDirection?: SortDirection | null;
+	page?: number;
+	search?: string;
+};
+
+export const useProxyData = ({ page = 1, sortBy, sortDirection, search = '' }: UseProxyDataParams): ProxyDataReturn => {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const [proxyData, setProxyData] = useAtom(allProxiesAtom);
@@ -31,11 +47,27 @@ export const useProxyData = (page: number = 1, search: string = '') => {
 				// Wait for API to be fully ready
 				await apiService.apiReady();
 
-				const data = await apiService.getProxyRequests({
+				let data = await apiService.getProxyRequests({
 					page,
 					limit: 10,
 					search
 				});
+
+				// Apply client-side sorting if sortBy and sortDirection are provided
+				// This will be replaced with API-side sorting when available
+				if (sortBy === 'proxies' && sortDirection && data?.items?.length) {
+					const sortedItems = [...data.items].sort((a, b) => {
+						const aProxyCount = typeof a.proxies === 'number' ? a.proxies : a.proxyAddresses?.length || 0;
+						const bProxyCount = typeof b.proxies === 'number' ? b.proxies : b.proxyAddresses?.length || 0;
+
+						return sortDirection === 'asc' ? aProxyCount - bProxyCount : bProxyCount - aProxyCount;
+					});
+
+					data = {
+						items: sortedItems,
+						totalCount: data.totalCount
+					};
+				}
 
 				if (isMounted) {
 					setProxyData({
@@ -64,11 +96,11 @@ export const useProxyData = (page: number = 1, search: string = '') => {
 		return () => {
 			isMounted = false;
 		};
-	}, [apiService, page, search, network, setProxyData]);
+	}, [apiService, page, search, sortBy, sortDirection, network, setProxyData]);
 
 	return {
-		items: proxyData.items,
-		totalCount: proxyData.totalCount,
+		items: proxyData.items || [],
+		totalCount: proxyData.totalCount || 0,
 		isLoading: !apiService || isLoading,
 		error
 	};
