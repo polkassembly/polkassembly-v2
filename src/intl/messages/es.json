@@ -174,7 +174,7 @@
 		"profileViews": "Vistas de Perfil",
 		"availableBalanceText": "Los DOT en tu billetera que actualmente no están bloqueados o delegados — están libres para ser utilizados para votar o hacer staking.",
 		"delegatedBalanceText": "La cantidad de DOT que has delegado a otra persona para que vote en tu nombre.",
-		"totalVotingPowerText": "Total de DOT que puedes usar para votar en propuestas — incluye tus propios tokens y los que otros te han delegado.",
+		"totalVotingPowerText": "Poder de voto = Saldo bloqueado × Convicción (máx. 6x) + Delegaciones",
 		"selfVotingPowerText": "La cantidad de DOT que controlas personalmente y estás usando para votar en la cadena (sin delegación).",
 		"delegatedVotingPowerText": "Los DOT que otros te han delegado, dándote el poder para votar en su nombre.",
 		"Delegations": {

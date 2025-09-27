@@ -174,7 +174,7 @@
 		"profileViews": "Profilansichten",
 		"availableBalanceText": "Die DOT in deiner Wallet, die derzeit nicht gesperrt oder delegiert sind — sie können frei für Abstimmungen oder Staking verwendet werden.",
 		"delegatedBalanceText": "Die Menge an DOT, die du an jemand anderen delegiert hast, um in deinem Namen abzustimmen.",
-		"totalVotingPowerText": "Gesamte DOT, die du für Abstimmungen zu Vorschlägen nutzen kannst — beinhaltet deine eigenen Token plus alle, die dir von anderen delegiert wurden.",
+		"totalVotingPowerText": "Stimmgewicht = Gesperrtes Guthaben × Überzeugung (max. 6x) + Delegationen",
 		"selfVotingPowerText": "Die Menge an DOT, die du persönlich kontrollierst und für On-Chain-Abstimmungen verwendest (ohne Delegation).",
 		"delegatedVotingPowerText": "Die DOT, die andere an dich delegiert haben und dir die Befugnis geben, in ihrem Namen abzustimmen.",
 		"Delegations": {

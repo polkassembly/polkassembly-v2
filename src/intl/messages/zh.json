@@ -174,7 +174,7 @@
 		"profileViews": "个人资料浏览量",
 		"availableBalanceText": "您钱包中当前未锁定或未委托的DOT——可自由用于投票或质押。",
 		"delegatedBalanceText": "您已委托给他人代表您投票的DOT数量。",
-		"totalVotingPowerText": "您可以用来对提案进行投票的总DOT——包括您自己的代币以及其他人委托给您的任何代币。",
+		"totalVotingPowerText": "投票力 = 锁定余额 × 信念（最高6倍） + 委托",
 		"selfVotingPowerText": "您个人控制并用于链上投票的DOT数量（不包括委托）。",
 		"delegatedVotingPowerText": "其他人委托给您的DOT，使您有权代表他们投票。",
 		"Delegations": {

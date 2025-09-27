@@ -178,7 +178,7 @@
 		"profileViews": "Profile Views",
 		"availableBalanceText": "The DOT in your wallet that's currently not locked or delegated — it's free to be used for voting or staking.",
 		"delegatedBalanceText": "The amount of DOT you've delegated to someone else to vote on your behalf.",
-		"totalVotingPowerText": "Total DOT you can use to vote on proposals — includes your own tokens plus any delegated to you by others.",
+		"totalVotingPowerText": " Voting Power = Locked Balance ×  Conviction ( max 6x ) + Delegations",
 		"selfVotingPowerText": "The amount of DOT you personally control and are using for on-chain voting (without delegation).",
 		"delegatedVotingPowerText": "The DOT that others have delegated to you, giving you the power to vote on their behalf.",
 		"Delegations": {
