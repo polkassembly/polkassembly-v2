@@ -3,7 +3,7 @@
 }
 
 .overviewCard {
-	@apply rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal p-4 shadow-lg;
+	@apply rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal p-4;
 }
 
 .overviewCardHeader {
@@ -15,7 +15,7 @@
 }
 
 .onchainIdentityCard {
-	@apply rounded-3xl border border-border_grey bg-bg_modal p-6 shadow-lg;
+	@apply rounded-3xl border border-border_grey bg-bg_modal p-6;
 }
 
 .onchainIdentityCardHeader {
@@ -39,7 +39,7 @@
 }
 
 .badgesCard {
-	@apply rounded-3xl border border-border_grey bg-bg_modal p-6 shadow-lg;
+	@apply rounded-3xl border border-border_grey bg-bg_modal p-6;
 }
 
 .badgesCardHeader {

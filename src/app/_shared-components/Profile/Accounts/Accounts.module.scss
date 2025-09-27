@@ -1,15 +1,15 @@
 .accountsWrapper {
-    @apply flex flex-col gap-y-4 rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal py-4 shadow-lg
+	@apply flex flex-col gap-y-4 rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal py-4;
 }
 
 .accountsHeader {
-    @apply flex items-center gap-x-2 px-6 text-text_primary
+	@apply flex items-center gap-x-2 px-6 text-text_primary;
 }
 
 .accountsHeaderText {
-    @apply text-2xl font-semibold
+	@apply text-2xl font-semibold;
 }
 
 .accountsList {
-    @apply flex flex-col gap-y-4 px-6
+	@apply flex flex-col gap-y-4 px-6;
 }
