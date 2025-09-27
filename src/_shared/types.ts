@@ -10,6 +10,9 @@ import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { SignerResult, TypeDef } from '@polkadot/types/types';
 import { HexString } from '@polkadot/util/types';
 import { StatusCodes } from 'http-status-codes';
+import { TypedApi } from 'polkadot-api';
+// eslint-disable-next-line import/no-cycle
+import { NETWORKS_DETAILS } from './_constants/networks';
 
 export enum ENetwork {
 	KUSAMA = 'kusama',
@@ -18,6 +21,10 @@ export enum ENetwork {
 	PASEO = 'paseo',
 	CERE = 'cere'
 }
+
+export type INetworkDescriptor = (typeof NETWORKS_DETAILS)[keyof typeof NETWORKS_DETAILS]['descriptor'];
+
+export type IPolkadotApi = TypedApi<INetworkDescriptor>;
 
 export enum ENetworkSocial {
 	HOME = 'home',
