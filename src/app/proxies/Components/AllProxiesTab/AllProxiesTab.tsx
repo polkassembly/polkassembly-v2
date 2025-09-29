@@ -17,8 +17,10 @@ export default function AllProxiesTab() {
 	const search = searchParams.get('allSearch') || '';
 	const sortBy = searchParams.get('sortBy') || undefined;
 	const sortDirection = (searchParams.get('sortDirection') as SortDirection) || null;
+	const typesParam = searchParams.get('types');
+	const filterTypes = typesParam ? typesParam.split(',') : [];
 
-	const { items, totalCount, isLoading, error } = useProxyData({ page, search, sortBy, sortDirection });
+	const { items, totalCount, isLoading, error } = useProxyData({ page, search, sortBy, sortDirection, filterTypes });
 
 	return (
 		<div className='flex flex-col gap-y-4'>

@@ -22,14 +22,24 @@ type UseProxyDataParams = {
 	sortDirection?: SortDirection | null;
 	page?: number;
 	search?: string;
+	filterTypes?: string[];
 };
 
-export const useProxyData = ({ page = 1, sortBy, sortDirection, search = '' }: UseProxyDataParams): ProxyDataReturn => {
+export const useProxyData = ({ page = 1, sortBy, sortDirection, search = '', filterTypes = [] }: UseProxyDataParams): ProxyDataReturn => {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const [proxyData, setProxyData] = useAtom(allProxiesAtom);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+
+	// Helper function to check if a proxy has any of the selected proxy types
+	const filterProxiesByType = (proxies: IProxyRequest[], types: string[]): IProxyRequest[] => {
+		if (!types.length) return proxies;
+
+		return proxies.filter((proxy) => {
+			return proxy.individualProxies?.some((ip) => types.includes(ip.proxyType)) || false;
+		});
+	};
 
 	useEffect(() => {
 		let isMounted = true;
@@ -52,6 +62,16 @@ export const useProxyData = ({ page = 1, sortBy, sortDirection, search = '' }: U
 					limit: 10,
 					search
 				});
+
+				// Apply client-side filtering by proxy types if any types are selected
+				if (filterTypes.length > 0 && data?.items?.length) {
+					const filteredItems = filterProxiesByType(data.items, filterTypes);
+
+					data = {
+						items: filteredItems,
+						totalCount: filteredItems.length
+					};
+				}
 
 				// Apply client-side sorting if sortBy and sortDirection are provided
 				// This will be replaced with API-side sorting when available
@@ -96,7 +116,7 @@ export const useProxyData = ({ page = 1, sortBy, sortDirection, search = '' }: U
 		return () => {
 			isMounted = false;
 		};
-	}, [apiService, page, search, sortBy, sortDirection, network, setProxyData]);
+	}, [apiService, page, search, sortBy, sortDirection, filterTypes, network, setProxyData]);
 
 	return {
 		items: proxyData.items || [],
