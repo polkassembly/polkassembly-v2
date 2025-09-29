@@ -67,12 +67,15 @@ export const useProxyData = ({ page = 1, sortBy, sortDirection, search = '', fil
 				if (filterTypes.length > 0 && data?.items?.length) {
 					const filteredItems = filterProxiesByType(data.items, filterTypes);
 
+-					data = {
+-						items: filteredItems,
+-						totalCount: filteredItems.length
 					data = {
 						items: filteredItems,
-						totalCount: filteredItems.length
+						// keep server-provided totalCount to avoid broken pagination UI
+						totalCount: data.totalCount
 					};
 				}
-
 				// Apply client-side sorting if sortBy and sortDirection are provided
 				// This will be replaced with API-side sorting when available
 				if (sortBy === 'proxies' && sortDirection && data?.items?.length) {
