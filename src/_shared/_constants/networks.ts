@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { BN } from '@polkadot/util';
+// eslint-disable-next-line import/no-cycle
 import { ENetwork, EPostOrigin, EGovType, EAssets, ENetworkSocial } from '@shared/types';
 import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
 import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
@@ -23,6 +24,7 @@ import USDCIcon from '@/_assets/icons/usdc.svg';
 import USDTIcon from '@/_assets/icons/usdt.svg';
 import MYTHIcon from '@/_assets/icons/myth.svg';
 import DEDIcon from '@/_assets/icons/ded.png';
+import { Polkadot, polkadot } from '@polkadot-api/descriptors';
 
 interface ISocialLink {
 	id: string;
@@ -115,6 +117,7 @@ interface IAssethubDetails {
 }
 
 interface INetworkDetails {
+	descriptor: Polkadot;
 	key: ENetwork;
 	logo: StaticImageData;
 	preimageBaseDeposit?: BN;
@@ -2498,6 +2501,7 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	[ENetwork.POLKADOT]: {
+		descriptor: polkadot,
 		key: ENetwork.POLKADOT,
 		logo: PolkadotLogo,
 		preimageBaseDeposit: new BN('400000000000'),
@@ -2618,6 +2622,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	},
 	[ENetwork.KUSAMA]: {
 		key: ENetwork.KUSAMA,
+		descriptor: polkadot,
 		logo: KusamaLogo,
 		submissionDeposit: new BN('33333333333'),
 		assetHubParaId: '1000',
@@ -2678,6 +2683,8 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	},
 	[ENetwork.WESTEND]: {
 		key: ENetwork.WESTEND,
+		descriptor: polkadot,
+
 		logo: WestendLogo,
 		submissionDeposit: new BN('30000000000'),
 		name: 'Westend',
@@ -2733,6 +2740,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	},
 	[ENetwork.PASEO]: {
 		key: ENetwork.PASEO,
+		descriptor: polkadot,
 		logo: PaseoLogo,
 		submissionDeposit: new BN('10000000000'),
 		name: 'Paseo',
@@ -2780,6 +2788,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 	},
 	[ENetwork.CERE]: {
 		key: ENetwork.CERE,
+		descriptor: polkadot,
 		logo: CereLogo,
 		submissionDeposit: new BN('10000000000'),
 		name: 'Cere',

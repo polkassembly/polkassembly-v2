@@ -35,14 +35,22 @@ import {
 	EProxyType,
 	IProxyRequest,
 	IProxyAddress
+	// IPolkadotApi
 } from '@shared/types';
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
 import { APPNAME } from '@/_shared/_constants/appName';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
 import { Dispatch, SetStateAction } from 'react';
-import { BlockCalculationsService } from './block_calculations_service';
-import { VaultQrSigner } from './vault_qr_signer_service';
+
+import { polkadot } from '@polkadot-api/descriptors';
+import { createClient } from 'polkadot-api';
+import { getSmProvider } from 'polkadot-api/sm-provider';
+import { chainSpec } from 'polkadot-api/chains/polkadot';
+import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
+
 import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
+import { VaultQrSigner } from './vault_qr_signer_service';
+import { BlockCalculationsService } from './block_calculations_service';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -62,11 +70,24 @@ export class PolkadotApiService {
 	}
 
 	static async Init(network: ENetwork): Promise<PolkadotApiService> {
+		const worker = new Worker(new URL('polkadot-api/smoldot/worker', import.meta.url));
+		const smoldot = startFromWorker(worker);
+		const chain = await smoldot.addChain({ chainSpec });
+
+		const client = createClient(getSmProvider(chain));
+
+		client.finalizedBlock$.subscribe((finalizedBlock) => console.log('api init', finalizedBlock.number, finalizedBlock.hash));
+
+		// To interact with the chain, you need to get the `TypedApi`, which includes
+		// all the types for every call in that chain:
+
+		const papi = client.getTypedApi(NETWORKS_DETAILS[`${network}`].descriptor || polkadot);
+
+		console.log('papi', papi.view);
+
 		const api = await ApiPromise.create({
 			provider: new WsProvider(NETWORKS_DETAILS[network as ENetwork].rpcEndpoints[0].url)
 		});
-
-		await api.isReady;
 
 		return new PolkadotApiService(network, api);
 	}
