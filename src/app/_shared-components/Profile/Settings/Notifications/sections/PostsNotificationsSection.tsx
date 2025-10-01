@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
@@ -21,35 +22,65 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 	console.log('current network', network);
 	const t = useTranslations();
 
-	const staticEnabledChannels = {
+	const [staticEnabledChannels] = useState({
 		[ENotificationChannel.EMAIL]: false,
 		[ENotificationChannel.TELEGRAM]: false,
 		[ENotificationChannel.DISCORD]: false,
 		[ENotificationChannel.ELEMENT]: false,
 		[ENotificationChannel.SLACK]: false,
 		[ENotificationChannel.IN_APP]: false
-	};
+	});
 
-	const postsNotifications = {
+	const [postsNotifications, setPostsNotifications] = useState({
 		proposalStatusChanges: { enabled: false, channels: staticEnabledChannels },
 		newProposalsInCategories: { enabled: false, channels: staticEnabledChannels },
 		votingDeadlineReminders: { enabled: false, channels: staticEnabledChannels },
 		updatesOnFollowedProposals: { enabled: false, channels: staticEnabledChannels },
 		proposalOutcomePublished: { enabled: false, channels: staticEnabledChannels },
 		proposalsYouVotedOnEnacted: { enabled: false, channels: staticEnabledChannels }
-	};
+	});
 
-	const handlePostsNotificationChange = (_type: string, _enabled: boolean) => {
-		console.log(_type, _enabled);
+	const handlePostsNotificationChange = (type: string, enabled: boolean) => {
+		setPostsNotifications((prev) => ({
+			...prev,
+			[type]: {
+				...prev[type as keyof typeof prev],
+				enabled
+			}
+		}));
+		console.log(type, enabled);
 		// TODO: Implement backend integration
 	};
 
-	const handlePostsChannelChange = (_type: string, _channel: ENotificationChannel, _enabled: boolean) => {
-		console.log(_type, _channel, _enabled);
+	const handlePostsChannelChange = (type: string, channel: ENotificationChannel, enabled: boolean) => {
+		setPostsNotifications((prev) => ({
+			...prev,
+			[type]: {
+				...prev[type as keyof typeof prev],
+				channels: {
+					...prev[type as keyof typeof prev]?.channels,
+					[channel]: enabled
+				}
+			}
+		}));
+		console.log(type, channel, enabled);
 		// TODO: Implement backend integration
 	};
 
 	const toggleAllPosts = () => {
+		const allEnabled = Object.values(postsNotifications).every((item) => item?.enabled);
+		const newState = !allEnabled;
+		setPostsNotifications((prev) => {
+			const updated = { ...prev };
+			Object.keys(updated).forEach((key) => {
+				updated[key as keyof typeof updated] = {
+					...updated[key as keyof typeof updated],
+					enabled: newState
+				};
+			});
+			return updated;
+		});
+		console.log('Toggle all posts:', newState);
 		// TODO: Implement backend integration
 	};
 

@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
@@ -21,32 +22,62 @@ function CommentsNotificationsSection({ network }: CommentsNotificationsSectionP
 	console.log('current network', network);
 	const t = useTranslations();
 
-	const enabledChannels = {
+	const [enabledChannels] = useState({
 		[ENotificationChannel.EMAIL]: false,
 		[ENotificationChannel.TELEGRAM]: false,
 		[ENotificationChannel.DISCORD]: false,
 		[ENotificationChannel.ELEMENT]: false,
 		[ENotificationChannel.SLACK]: false,
 		[ENotificationChannel.IN_APP]: false
-	};
+	});
 
-	const commentsNotifications = {
+	const [commentsNotifications, setCommentsNotifications] = useState({
 		commentsOnMyProposals: { enabled: false, channels: enabledChannels },
 		repliesToMyComments: { enabled: false, channels: enabledChannels },
 		mentions: { enabled: false, channels: enabledChannels }
-	};
+	});
 
-	const handleCommentsNotificationChange = (_type: string, _enabled: boolean) => {
-		console.log(_type, _enabled);
+	const handleCommentsNotificationChange = (type: string, enabled: boolean) => {
+		setCommentsNotifications((prev) => ({
+			...prev,
+			[type]: {
+				...prev[type as keyof typeof prev],
+				enabled
+			}
+		}));
+		console.log(type, enabled);
 		// TODO: Implement backend integration
 	};
 
-	const handleCommentsChannelChange = (_type: string, _channel: ENotificationChannel, _enabled: boolean) => {
-		console.log(_type, _channel, _enabled);
+	const handleCommentsChannelChange = (type: string, channel: ENotificationChannel, enabled: boolean) => {
+		setCommentsNotifications((prev) => ({
+			...prev,
+			[type]: {
+				...prev[type as keyof typeof prev],
+				channels: {
+					...prev[type as keyof typeof prev]?.channels,
+					[channel]: enabled
+				}
+			}
+		}));
+		console.log(type, channel, enabled);
 		// TODO: Implement backend integration
 	};
 
 	const toggleAllComments = () => {
+		const allEnabled = Object.values(commentsNotifications).every((item) => item?.enabled);
+		const newState = !allEnabled;
+		setCommentsNotifications((prev) => {
+			const updated = { ...prev };
+			Object.keys(updated).forEach((key) => {
+				updated[key as keyof typeof updated] = {
+					...updated[key as keyof typeof updated],
+					enabled: newState
+				};
+			});
+			return updated;
+		});
+		console.log('Toggle all comments:', newState);
 		// TODO: Implement backend integration
 	};
 

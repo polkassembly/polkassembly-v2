@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
@@ -21,32 +22,62 @@ function BountiesNotificationsSection({ network }: BountiesNotificationsSectionP
 	console.log('current network', network);
 	const t = useTranslations();
 
-	const enabledChannels = {
+	const [enabledChannels] = useState({
 		[ENotificationChannel.EMAIL]: false,
 		[ENotificationChannel.TELEGRAM]: false,
 		[ENotificationChannel.DISCORD]: false,
 		[ENotificationChannel.ELEMENT]: false,
 		[ENotificationChannel.SLACK]: false,
 		[ENotificationChannel.IN_APP]: false
-	};
+	});
 
-	const bountiesNotifications = {
+	const [bountiesNotifications, setBountiesNotifications] = useState({
 		bountyApplicationStatusUpdates: { enabled: false, channels: enabledChannels },
 		bountyPayoutsAndMilestones: { enabled: false, channels: enabledChannels },
 		activityOnBountiesIFollow: { enabled: false, channels: enabledChannels }
-	};
+	});
 
-	const handleBountiesNotificationChange = (_type: string, _enabled: boolean) => {
-		console.log(_type, _enabled);
+	const handleBountiesNotificationChange = (type: string, enabled: boolean) => {
+		setBountiesNotifications((prev) => ({
+			...prev,
+			[type]: {
+				...prev[type as keyof typeof prev],
+				enabled
+			}
+		}));
+		console.log(type, enabled);
 		// TODO: Implement backend integration
 	};
 
-	const handleBountiesChannelChange = (_type: string, _channel: ENotificationChannel, _enabled: boolean) => {
-		console.log(_type, _channel, _enabled);
+	const handleBountiesChannelChange = (type: string, channel: ENotificationChannel, enabled: boolean) => {
+		setBountiesNotifications((prev) => ({
+			...prev,
+			[type]: {
+				...prev[type as keyof typeof prev],
+				channels: {
+					...prev[type as keyof typeof prev]?.channels,
+					[channel]: enabled
+				}
+			}
+		}));
+		console.log(type, channel, enabled);
 		// TODO: Implement backend integration
 	};
 
 	const toggleAllBounties = () => {
+		const allEnabled = Object.values(bountiesNotifications).every((item) => item?.enabled);
+		const newState = !allEnabled;
+		setBountiesNotifications((prev) => {
+			const updated = { ...prev };
+			Object.keys(updated).forEach((key) => {
+				updated[key as keyof typeof updated] = {
+					...updated[key as keyof typeof updated],
+					enabled: newState
+				};
+			});
+			return updated;
+		});
+		console.log('Toggle all bounties:', newState);
 		// TODO: Implement backend integration
 	};
 

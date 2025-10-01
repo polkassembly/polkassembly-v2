@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
@@ -171,7 +172,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	console.log('current network', network);
 	const t = useTranslations();
 
-	const openGovTracks = {
+	const [openGovTracks, setOpenGovTracks] = useState({
 		root: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
 		stakingAdmin: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
 		auctionAdmin: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
@@ -188,9 +189,9 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 		fellowshipAdmin: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
 		generalAdmin: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
 		whitelistedCaller: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } }
-	};
+	});
 
-	const gov1Items = {
+	const [gov1Items, setGov1Items] = useState({
 		mentionsIReceive: { enabled: false, notifications: {} },
 		[EProposalType.REFERENDUM]: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
 		[EProposalType.DEMOCRACY_PROPOSAL]: { enabled: false, notifications: { newProposalsSubmitted: false, proposalInVoting: false, proposalClosed: false } },
@@ -199,27 +200,94 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 		[EProposalType.TIP]: { enabled: false, notifications: { newTipsSubmitted: false, tipsOpened: false, tipsClosed: false } },
 		[EProposalType.TECHNICAL_COMMITTEE]: { enabled: false, notifications: { newTechCommitteeProposalsSubmitted: false, proposalsClosed: false } },
 		[EProposalType.COUNCIL_MOTION]: { enabled: false, notifications: { newMotionsSubmitted: false, motionInVoting: false, motionClosed: false } }
-	};
+	});
 
 	const trackLabels = getTrackLabels(t);
 	const gov1Labels = getGov1Labels(t);
 
 	const handleOpenGovTrackChange = (trackKey: string, enabled: boolean) => {
+		setOpenGovTracks((prev) => ({
+			...prev,
+			[trackKey]: {
+				...prev[trackKey as keyof typeof prev],
+				enabled,
+				notifications: {
+					newReferendumSubmitted: enabled,
+					referendumInVoting: enabled,
+					referendumClosed: enabled
+				}
+			}
+		}));
 		console.log(trackKey, enabled);
 		// TODO: Implement backend integration
 	};
 
 	const handleOpenGovNotificationChange = (trackKey: string, notificationKey: string, enabled: boolean) => {
+		setOpenGovTracks((prev) => {
+			const updatedNotifications = {
+				...prev[trackKey as keyof typeof prev]?.notifications,
+				[notificationKey]: enabled
+			};
+
+			const allNotificationsEnabled = Object.values(updatedNotifications).every((val) => val === true);
+
+			return {
+				...prev,
+				[trackKey]: {
+					...prev[trackKey as keyof typeof prev],
+					enabled: allNotificationsEnabled,
+					notifications: updatedNotifications
+				}
+			};
+		});
 		console.log(trackKey, notificationKey, enabled);
 		// TODO: Implement backend integration
 	};
 
 	const handleGov1ItemChange = (itemKey: string, enabled: boolean) => {
+		setGov1Items((prev) => {
+			const currentItem = prev[itemKey as keyof typeof prev];
+			const updatedNotifications: { [key: string]: boolean } = {};
+
+			if (currentItem?.notifications && typeof currentItem.notifications === 'object') {
+				Object.keys(currentItem.notifications).forEach((notifKey) => {
+					updatedNotifications[notifKey] = enabled;
+				});
+			}
+
+			return {
+				...prev,
+				[itemKey]: {
+					...currentItem,
+					enabled,
+					notifications: updatedNotifications
+				}
+			};
+		});
 		console.log(itemKey, enabled);
 		// TODO: Implement backend integration
 	};
 
 	const handleGov1NotificationChange = (itemKey: string, notificationKey: string, enabled: boolean) => {
+		setGov1Items((prev) => {
+			const currentItem = prev[itemKey as keyof typeof prev];
+			const updatedNotifications = {
+				...currentItem?.notifications,
+				[notificationKey]: enabled
+			};
+
+			const hasNotifications = Object.keys(updatedNotifications).length > 0;
+			const allNotificationsEnabled = hasNotifications ? Object.values(updatedNotifications).every((val) => val === true) : enabled;
+
+			return {
+				...prev,
+				[itemKey]: {
+					...currentItem,
+					enabled: allNotificationsEnabled,
+					notifications: updatedNotifications
+				}
+			};
+		});
 		console.log(itemKey, notificationKey, enabled);
 		// TODO: Implement backend integration
 	};
@@ -230,12 +298,24 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 
 	const toggleAllAdvanced = () => {
 		const newState = !allAdvancedEnabled;
+
+		const updatedOpenGovTracks = { ...openGovTracks };
 		Object.keys(trackLabels).forEach((key) => {
-			handleOpenGovTrackChange(key, newState);
+			updatedOpenGovTracks[key as keyof typeof openGovTracks] = {
+				enabled: newState,
+				notifications: {
+					newReferendumSubmitted: newState,
+					referendumInVoting: newState,
+					referendumClosed: newState
+				}
+			};
 		});
+		setOpenGovTracks(updatedOpenGovTracks);
+
 		Object.keys(gov1Labels).forEach((key) => {
 			handleGov1ItemChange(key, newState);
 		});
+
 		// TODO: Implement backend integration
 	};
 
@@ -392,6 +472,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 												notificationLabels={getGov1NotificationLabels(key, t)}
 												onEnabledChange={(enabled) => handleGov1ItemChange(key, enabled)}
 												onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange(key, notificationKey, enabled)}
+												singleKey={key === 'mentionsIReceive'}
 											/>
 										))}
 								</div>
@@ -417,6 +498,7 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 												notificationLabels={getGov1NotificationLabels(key, t)}
 												onEnabledChange={(enabled) => handleGov1ItemChange(key, enabled)}
 												onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange(key, notificationKey, enabled)}
+												singleKey={key === 'mentionsIReceive'}
 											/>
 										))}
 								</div>

@@ -52,14 +52,14 @@ function NotificationChannelsSection() {
 	const { user } = useUser();
 	const [showModal, setShowModal] = useState<ENotificationChannel | null>(null);
 
-	const channelPreferences = {
+	const [channelPreferences, setChannelPreferences] = useState({
 		[ENotificationChannel.EMAIL]: { name: ENotificationChannel.EMAIL, enabled: false, handle: '', verified: false, verification_token: '' },
 		[ENotificationChannel.IN_APP]: { name: ENotificationChannel.IN_APP, enabled: false, handle: '', verified: false, verification_token: '' },
 		[ENotificationChannel.TELEGRAM]: { name: ENotificationChannel.TELEGRAM, enabled: false, handle: '', verified: false, verification_token: '' },
 		[ENotificationChannel.DISCORD]: { name: ENotificationChannel.DISCORD, enabled: false, handle: '', verified: false, verification_token: '' },
 		[ENotificationChannel.SLACK]: { name: ENotificationChannel.SLACK, enabled: false, handle: '', verified: false, verification_token: '' },
 		[ENotificationChannel.ELEMENT]: { name: ENotificationChannel.ELEMENT, enabled: false, handle: '', verified: false, verification_token: '' }
-	};
+	});
 
 	const botsArr = getBots(t);
 
@@ -67,19 +67,33 @@ function NotificationChannelsSection() {
 		setShowModal(channel);
 	};
 
-	const getVerifyToken = async (_channel: ENotificationChannel) => {
-		console.log('getVerifyToken', _channel);
+	const getVerifyToken = async (channel: ENotificationChannel) => {
+		console.log('getVerifyToken', channel);
 		// TODO: Implement backend integration
 		return 'mock-token';
 	};
 
-	const handleEmailNotificationToggle = (_channel: ENotificationChannel, _enabled: boolean) => {
-		console.log('_channel', _channel, _enabled);
+	const handleEmailNotificationToggle = (channel: ENotificationChannel, enabled: boolean) => {
+		setChannelPreferences((prev) => ({
+			...prev,
+			[channel]: {
+				...prev[channel],
+				enabled
+			}
+		}));
+		console.log('channel', channel, enabled);
 		// TODO: Implement backend integration
 	};
 
-	const handleInAPPNotificationToggle = (_channel: ENotificationChannel, _enabled: boolean) => {
-		console.log('_channel', _channel, _enabled);
+	const handleInAPPNotificationToggle = (channel: ENotificationChannel, enabled: boolean) => {
+		setChannelPreferences((prev) => ({
+			...prev,
+			[channel]: {
+				...prev[channel],
+				enabled
+			}
+		}));
+		console.log('inapp channel', channel, enabled);
 		// TODO: Implement backend integration
 	};
 	return (
