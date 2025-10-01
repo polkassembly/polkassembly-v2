@@ -117,10 +117,36 @@ export interface IUserNotificationSettings {
 	};
 }
 
+export enum ENotifications {
+	CHANNELS = 'channels',
+	NETWORKS = 'networks'
+}
+
 export enum ETrackNotification {
 	NEW_REFERENDUM_SUBMITTED = 'newReferendumSubmitted',
 	REFERENDUM_IN_VOTING = 'referendumInVoting',
 	REFERENDUM_CLOSED = 'referendumClosed'
+}
+
+export enum EPostsNotification {
+	PROPOSAL_STATUS_CHANGES = 'proposalStatusChanges',
+	NEW_PROPOSALS_IN_CATEGORIES = 'newProposalsInCategories',
+	VOTING_DEADLINE_REMINDERS = 'votingDeadlineReminders',
+	UPDATES_ON_FOLLOWED_PROPOSALS = 'updatesOnFollowedProposals',
+	PROPOSAL_OUTCOME_PUBLISHED = 'proposalOutcomePublished',
+	PROPOSALS_YOU_VOTED_ON_ENACTED = 'proposalsYouVotedOnEnacted'
+}
+
+export enum ECommentsNotification {
+	COMMENTS_ON_MY_PROPOSALS = 'commentsOnMyProposals',
+	REPLIES_TO_MY_COMMENTS = 'repliesToMyComments',
+	MENTIONS = 'mentions'
+}
+
+export enum EBountiesNotification {
+	BOUNTY_APPLICATION_STATUS_UPDATES = 'bountyApplicationStatusUpdates',
+	BOUNTY_PAYOUTS_AND_MILESTONES = 'bountyPayoutsAndMilestones',
+	ACTIVITY_ON_BOUNTIES_I_FOLLOW = 'activityOnBountiesIFollow'
 }
 
 export enum ERole {
