@@ -10,9 +10,22 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shar
 import { Separator } from '@/app/_shared-components/Separator';
 import { Switch } from '@/app/_shared-components/Switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
-import { ENetwork, EProposalType } from '@/_shared/types';
+import { ENetwork, EPostOrigin, EProposalType } from '@/_shared/types';
 import AdvancedSettingsIcon from '@assets/icons/notification-settings/advancedsettings.svg';
-import { getGov1Icon, getGov1Labels, getGov1NotificationLabels, getOriginIcon, getTrackLabels } from '@/_shared/_constants/NotificationConstants';
+import {
+	defaultBountyNotifications,
+	defaultChildBountyNotifications,
+	defaultCouncilMotionNotifications,
+	defaultDemocracyProposalNotifications,
+	defaultReferendumNotifications,
+	defaultTechCommitteeNotifications,
+	defaultTipNotifications,
+	getGov1Icon,
+	getGov1Labels,
+	getGov1NotificationLabels,
+	getOriginIcon,
+	getTrackLabels
+} from '@/_shared/_constants/NotificationConstants';
 import TrackItem from '../components/TrackItem';
 import Gov1Item from '../components/Gov1Item';
 import classes from '../Notifications.module.scss';
@@ -22,38 +35,44 @@ interface AdvancedSettingsSectionProps {
 }
 
 function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
-	console.log('current network', network);
+	const openGovTracksList = [
+		EPostOrigin.ROOT,
+		EPostOrigin.STAKING_ADMIN,
+		EPostOrigin.AUCTION_ADMIN,
+		EPostOrigin.TREASURER,
+		EPostOrigin.MEMBERS,
+		EPostOrigin.REFERENDUM_KILLER,
+		EPostOrigin.LEASE_ADMIN,
+		EPostOrigin.REFERENDUM_CANCELLER,
+		EPostOrigin.SMALL_TIPPER,
+		EPostOrigin.BIG_TIPPER,
+		EPostOrigin.SMALL_SPENDER,
+		EPostOrigin.MEDIUM_SPENDER,
+		EPostOrigin.BIG_SPENDER,
+		EPostOrigin.FELLOWSHIP_ADMIN,
+		EPostOrigin.GENERAL_ADMIN,
+		EPostOrigin.WHITELISTED_CALLER
+	];
+	const gov1ProposalsList = {
+		mentionsIReceive: {},
+		[EProposalType.REFERENDUM]: defaultReferendumNotifications,
+		[EProposalType.BOUNTY]: defaultBountyNotifications,
+		[EProposalType.TIP]: defaultTipNotifications,
+		[EProposalType.COUNCIL_MOTION]: defaultCouncilMotionNotifications,
+		[EProposalType.DEMOCRACY_PROPOSAL]: defaultDemocracyProposalNotifications,
+		[EProposalType.CHILD_BOUNTY]: defaultChildBountyNotifications,
+		[EProposalType.TECHNICAL_COMMITTEE]: defaultTechCommitteeNotifications
+	};
+	const createOpenGovDefaults = () => Object.fromEntries(openGovTracksList.map((track) => [track, { enabled: false, notifications: { ...defaultReferendumNotifications } }]));
+
+	const createGov1Defaults = () =>
+		Object.fromEntries(Object.entries(gov1ProposalsList).map(([key, notifications]) => [key, { enabled: false, notifications: { ...notifications } }]));
+
+	const [openGovTracks, setOpenGovTracks] = useState(createOpenGovDefaults);
+	const [gov1Items, setGov1Items] = useState(createGov1Defaults);
+
 	const t = useTranslations();
-
-	const [openGovTracks, setOpenGovTracks] = useState({
-		root: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		stakingAdmin: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		auctionAdmin: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		treasurer: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		referendumCanceller: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		referendumKiller: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		leaseAdmin: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		memberReferenda: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		smallTipper: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		bigTipper: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		smallSpender: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		mediumSpender: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		bigSpender: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		fellowshipAdmin: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		generalAdmin: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		whitelistedCaller: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } }
-	});
-
-	const [gov1Items, setGov1Items] = useState({
-		mentionsIReceive: { enabled: false, notifications: {} },
-		[EProposalType.REFERENDUM]: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		[EProposalType.BOUNTY]: { enabled: false, notifications: { bountiesSubmitted: false, bountiesClosed: false } },
-		[EProposalType.TIP]: { enabled: false, notifications: { newTipsSubmitted: false, tipsOpened: false, tipsClosed: false } },
-		[EProposalType.COUNCIL_MOTION]: { enabled: false, notifications: { newMotionsSubmitted: false, motionInVoting: false, motionClosed: false } },
-		[EProposalType.DEMOCRACY_PROPOSAL]: { enabled: false, notifications: { newProposalsSubmitted: false, proposalInVoting: false, proposalClosed: false } },
-		[EProposalType.CHILD_BOUNTY]: { enabled: false, notifications: { childBountiesSubmitted: false, childBountiesClosed: false } },
-		[EProposalType.TECHNICAL_COMMITTEE]: { enabled: false, notifications: { newTechCommitteeProposalsSubmitted: false, proposalsClosed: false } }
-	});
+	console.log('current network', network);
 
 	const trackLabels = getTrackLabels(t);
 	const gov1Labels = getGov1Labels(t);

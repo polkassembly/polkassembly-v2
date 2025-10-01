@@ -184,3 +184,42 @@ export const getNetworkLogo = (networkId: string): string => {
 
 	return logoMap[networkId.toLowerCase()] || PolkadotLogo.src;
 };
+
+export const defaultReferendumNotifications = {
+	newReferendumSubmitted: false,
+	referendumInVoting: false,
+	referendumClosed: false
+};
+
+export const defaultBountyNotifications = {
+	bountiesSubmitted: false,
+	bountiesClosed: false
+};
+
+export const defaultTipNotifications = {
+	newTipsSubmitted: false,
+	tipsOpened: false,
+	tipsClosed: false
+};
+
+export const defaultCouncilMotionNotifications = {
+	newMotionsSubmitted: false,
+	motionInVoting: false,
+	motionClosed: false
+};
+
+export const defaultDemocracyProposalNotifications = {
+	newProposalsSubmitted: false,
+	proposalInVoting: false,
+	proposalClosed: false
+};
+
+export const defaultChildBountyNotifications = {
+	childBountiesSubmitted: false,
+	childBountiesClosed: false
+};
+
+export const defaultTechCommitteeNotifications = {
+	newTechCommitteeProposalsSubmitted: false,
+	proposalsClosed: false
+};
