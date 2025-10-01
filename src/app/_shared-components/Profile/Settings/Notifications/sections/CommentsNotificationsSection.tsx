@@ -42,7 +42,8 @@ function CommentsNotificationsSection({ network }: CommentsNotificationsSectionP
 			...prev,
 			[type]: {
 				...prev[type as keyof typeof prev],
-				enabled
+				enabled,
+				channels: enabled ? prev[type as keyof typeof prev]?.channels || enabledChannels : enabledChannels
 			}
 		}));
 		console.log(type, enabled);
@@ -50,16 +51,23 @@ function CommentsNotificationsSection({ network }: CommentsNotificationsSectionP
 	};
 
 	const handleCommentsChannelChange = (type: string, channel: ENotificationChannel, enabled: boolean) => {
-		setCommentsNotifications((prev) => ({
-			...prev,
-			[type]: {
-				...prev[type as keyof typeof prev],
-				channels: {
-					...prev[type as keyof typeof prev]?.channels,
-					[channel]: enabled
+		setCommentsNotifications((prev) => {
+			const updatedChannels = {
+				...prev[type as keyof typeof prev]?.channels,
+				[channel]: enabled
+			};
+
+			const anyChannelEnabled = Object.values(updatedChannels).some((channelEnabled) => channelEnabled);
+
+			return {
+				...prev,
+				[type]: {
+					...prev[type as keyof typeof prev],
+					enabled: anyChannelEnabled,
+					channels: updatedChannels
 				}
-			}
-		}));
+			};
+		});
 		console.log(type, channel, enabled);
 		// TODO: Implement backend integration
 	};

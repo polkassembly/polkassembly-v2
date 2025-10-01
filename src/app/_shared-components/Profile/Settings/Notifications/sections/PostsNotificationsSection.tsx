@@ -45,7 +45,8 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 			...prev,
 			[type]: {
 				...prev[type as keyof typeof prev],
-				enabled
+				enabled,
+				channels: enabled ? prev[type as keyof typeof prev]?.channels || enabledChannels : enabledChannels
 			}
 		}));
 		console.log(type, enabled);
@@ -53,16 +54,23 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 	};
 
 	const handlePostsChannelChange = (type: string, channel: ENotificationChannel, enabled: boolean) => {
-		setPostsNotifications((prev) => ({
-			...prev,
-			[type]: {
-				...prev[type as keyof typeof prev],
-				channels: {
-					...prev[type as keyof typeof prev]?.channels,
-					[channel]: enabled
+		setPostsNotifications((prev) => {
+			const updatedChannels = {
+				...prev[type as keyof typeof prev]?.channels,
+				[channel]: enabled
+			};
+
+			const anyChannelEnabled = Object.values(updatedChannels).some((channelEnabled) => channelEnabled);
+
+			return {
+				...prev,
+				[type]: {
+					...prev[type as keyof typeof prev],
+					enabled: anyChannelEnabled,
+					channels: updatedChannels
 				}
-			}
-		}));
+			};
+		});
 		console.log(type, channel, enabled);
 		// TODO: Implement backend integration
 	};
