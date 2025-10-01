@@ -156,12 +156,12 @@ const getTrackLabels = (t: (key: string) => string): Record<string, { origin: EP
 const getGov1Labels = (t: (key: string) => string): Record<string, { label: string }> => ({
 	mentionsIReceive: { label: t('Profile.Settings.Notifications.mentionsIReceive') },
 	[EProposalType.REFERENDUM]: { label: t('Sidebar.referenda') },
-	[EProposalType.DEMOCRACY_PROPOSAL]: { label: t('Sidebar.proposals') },
 	[EProposalType.BOUNTY]: { label: t('Sidebar.bounty') },
-	[EProposalType.CHILD_BOUNTY]: { label: t('Sidebar.childBounties') },
 	[EProposalType.TIP]: { label: t('Sidebar.tips') },
-	[EProposalType.TECHNICAL_COMMITTEE]: { label: t('Sidebar.techComm') },
-	[EProposalType.COUNCIL_MOTION]: { label: t('Sidebar.motions') }
+	[EProposalType.COUNCIL_MOTION]: { label: t('Sidebar.motions') },
+	[EProposalType.DEMOCRACY_PROPOSAL]: { label: t('Sidebar.proposals') },
+	[EProposalType.CHILD_BOUNTY]: { label: t('Sidebar.childBounties') },
+	[EProposalType.TECHNICAL_COMMITTEE]: { label: t('Sidebar.techComm') }
 });
 
 interface AdvancedSettingsSectionProps {
@@ -194,12 +194,12 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 	const [gov1Items, setGov1Items] = useState({
 		mentionsIReceive: { enabled: false, notifications: {} },
 		[EProposalType.REFERENDUM]: { enabled: false, notifications: { newReferendumSubmitted: false, referendumInVoting: false, referendumClosed: false } },
-		[EProposalType.DEMOCRACY_PROPOSAL]: { enabled: false, notifications: { newProposalsSubmitted: false, proposalInVoting: false, proposalClosed: false } },
 		[EProposalType.BOUNTY]: { enabled: false, notifications: { bountiesSubmitted: false, bountiesClosed: false } },
-		[EProposalType.CHILD_BOUNTY]: { enabled: false, notifications: { childBountiesSubmitted: false, childBountiesClosed: false } },
 		[EProposalType.TIP]: { enabled: false, notifications: { newTipsSubmitted: false, tipsOpened: false, tipsClosed: false } },
-		[EProposalType.TECHNICAL_COMMITTEE]: { enabled: false, notifications: { newTechCommitteeProposalsSubmitted: false, proposalsClosed: false } },
-		[EProposalType.COUNCIL_MOTION]: { enabled: false, notifications: { newMotionsSubmitted: false, motionInVoting: false, motionClosed: false } }
+		[EProposalType.COUNCIL_MOTION]: { enabled: false, notifications: { newMotionsSubmitted: false, motionInVoting: false, motionClosed: false } },
+		[EProposalType.DEMOCRACY_PROPOSAL]: { enabled: false, notifications: { newProposalsSubmitted: false, proposalInVoting: false, proposalClosed: false } },
+		[EProposalType.CHILD_BOUNTY]: { enabled: false, notifications: { childBountiesSubmitted: false, childBountiesClosed: false } },
+		[EProposalType.TECHNICAL_COMMITTEE]: { enabled: false, notifications: { newTechCommitteeProposalsSubmitted: false, proposalsClosed: false } }
 	});
 
 	const trackLabels = getTrackLabels(t);
@@ -381,126 +381,168 @@ function AdvancedSettingsSection({ network }: AdvancedSettingsSectionProps) {
 
 						<TabsContent
 							value='opengov'
-							className='mt-4'
+							className='mt-6'
 						>
-							<div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-								<div className='space-y-4'>
-									{Object.entries(trackLabels)
-										.slice(0, 8)
-										.map(([key, { origin, label }]) => (
-											<TrackItem
-												key={key}
-												icon={
-													<Image
-														src={getOriginIcon(origin)}
-														alt={label}
-														width={16}
-														height={16}
-														className='rounded'
+							<div className='overflow-hidden rounded-lg border border-border_grey'>
+								<div className='grid grid-cols-1 md:grid-cols-2'>
+									<div className='border-border_grey md:border-r md:border-dashed'>
+										{Object.entries(trackLabels)
+											.slice(0, 8)
+											.map(([key, { origin, label }], index, arr) => (
+												<div
+													key={key}
+													className={`p-4 ${index < arr.length - 1 ? 'border-b border-dashed border-border_grey md:text-left' : ''}`}
+												>
+													<TrackItem
+														icon={
+															<Image
+																src={getOriginIcon(origin)}
+																alt={label}
+																width={16}
+																height={16}
+																className='rounded'
+															/>
+														}
+														title={label}
+														enabled={openGovTracks[key as keyof typeof openGovTracks]?.enabled || false}
+														notifications={
+															openGovTracks[key as keyof typeof openGovTracks]?.notifications || {
+																newReferendumSubmitted: false,
+																referendumInVoting: false,
+																referendumClosed: false
+															}
+														}
+														onEnabledChange={(enabled) => handleOpenGovTrackChange(key, enabled)}
+														onNotificationChange={(notificationKey, enabled) => handleOpenGovNotificationChange(key, notificationKey, enabled)}
 													/>
-												}
-												title={label}
-												enabled={openGovTracks[key as keyof typeof openGovTracks]?.enabled || false}
-												notifications={
-													openGovTracks[key as keyof typeof openGovTracks]?.notifications || {
-														newReferendumSubmitted: false,
-														referendumInVoting: false,
-														referendumClosed: false
-													}
-												}
-												onEnabledChange={(enabled) => handleOpenGovTrackChange(key, enabled)}
-												onNotificationChange={(notificationKey, enabled) => handleOpenGovNotificationChange(key, notificationKey, enabled)}
-											/>
-										))}
-								</div>
+												</div>
+											))}
+									</div>
 
-								<div className='space-y-4'>
-									{Object.entries(trackLabels)
-										.slice(8)
-										.map(([key, { origin, label }]) => (
-											<TrackItem
-												key={key}
-												icon={
-													<Image
-														src={getOriginIcon(origin)}
-														alt={label}
-														width={16}
-														height={16}
-														className='rounded'
+									<div>
+										{Object.entries(trackLabels)
+											.slice(8)
+											.map(([key, { origin, label }], index, arr) => (
+												<div
+													key={key}
+													className={`p-4 ${index < arr.length - 1 ? 'border-b border-dashed border-border_grey text-left' : ''}`}
+												>
+													<TrackItem
+														icon={
+															<Image
+																src={getOriginIcon(origin)}
+																alt={label}
+																width={16}
+																height={16}
+																className='rounded'
+															/>
+														}
+														title={label}
+														enabled={openGovTracks[key as keyof typeof openGovTracks]?.enabled || false}
+														notifications={
+															openGovTracks[key as keyof typeof openGovTracks]?.notifications || {
+																newReferendumSubmitted: false,
+																referendumInVoting: false,
+																referendumClosed: false
+															}
+														}
+														onEnabledChange={(enabled) => handleOpenGovTrackChange(key, enabled)}
+														onNotificationChange={(notificationKey, enabled) => handleOpenGovNotificationChange(key, notificationKey, enabled)}
 													/>
-												}
-												title={label}
-												enabled={openGovTracks[key as keyof typeof openGovTracks]?.enabled || false}
-												notifications={
-													openGovTracks[key as keyof typeof openGovTracks]?.notifications || {
-														newReferendumSubmitted: false,
-														referendumInVoting: false,
-														referendumClosed: false
-													}
-												}
-												onEnabledChange={(enabled) => handleOpenGovTrackChange(key, enabled)}
-												onNotificationChange={(notificationKey, enabled) => handleOpenGovNotificationChange(key, notificationKey, enabled)}
-											/>
-										))}
+												</div>
+											))}
+									</div>
 								</div>
 							</div>
 						</TabsContent>
-
 						<TabsContent
 							value='gov1'
-							className='mt-4'
+							className='mt-6'
 						>
-							<div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-								<div className='space-y-4'>
-									{Object.entries(gov1Labels)
-										.slice(0, 5)
-										.map(([key, { label }]) => (
-											<Gov1Item
-												key={key}
-												icon={
-													<Image
-														src={getGov1Icon(key)}
-														alt={label}
-														width={16}
-														height={16}
-														className='rounded'
-													/>
-												}
-												title={label}
-												enabled={gov1Items[key as keyof typeof gov1Items]?.enabled || false}
-												notifications={gov1Items[key as keyof typeof gov1Items]?.notifications || {}}
-												notificationLabels={getGov1NotificationLabels(key, t)}
-												onEnabledChange={(enabled) => handleGov1ItemChange(key, enabled)}
-												onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange(key, notificationKey, enabled)}
-												singleKey={key === 'mentionsIReceive'}
-											/>
-										))}
-								</div>
+							<div className='mb-4'>
+								<Gov1Item
+									icon={
+										<Image
+											src={getGov1Icon('mentionsIReceive')}
+											alt={gov1Labels.mentionsIReceive.label}
+											width={16}
+											height={16}
+											className='rounded'
+										/>
+									}
+									title={gov1Labels.mentionsIReceive.label}
+									enabled={gov1Items.mentionsIReceive?.enabled || false}
+									notifications={gov1Items.mentionsIReceive?.notifications || {}}
+									notificationLabels={getGov1NotificationLabels('mentionsIReceive', t)}
+									onEnabledChange={(enabled) => handleGov1ItemChange('mentionsIReceive', enabled)}
+									onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange('mentionsIReceive', notificationKey, enabled)}
+									singleKey
+								/>
+							</div>
 
-								<div className='space-y-4'>
-									{Object.entries(gov1Labels)
-										.slice(5)
-										.map(([key, { label }]) => (
-											<Gov1Item
-												key={key}
-												icon={
-													<Image
-														src={getGov1Icon(key)}
-														alt={label}
-														width={16}
-														height={16}
-														className='rounded'
+							<div className='overflow-hidden rounded-lg border border-border_grey'>
+								<div className='grid grid-cols-1 md:grid-cols-2'>
+									<div className='border-border_grey md:border-r md:border-dashed'>
+										{Object.entries(gov1Labels)
+											.filter(([key]) => key !== 'mentionsIReceive')
+											.slice(0, 4)
+											.map(([key, { label }], index, arr) => (
+												<div
+													key={key}
+													className={`p-4 ${index < arr.length - 1 ? 'border-b border-dashed border-border_grey' : ''}`}
+												>
+													<Gov1Item
+														icon={
+															<Image
+																src={getGov1Icon(key)}
+																alt={label}
+																width={16}
+																height={16}
+																className='rounded'
+															/>
+														}
+														title={label}
+														enabled={gov1Items[key as keyof typeof gov1Items]?.enabled || false}
+														notifications={gov1Items[key as keyof typeof gov1Items]?.notifications || {}}
+														notificationLabels={getGov1NotificationLabels(key, t)}
+														onEnabledChange={(enabled) => handleGov1ItemChange(key, enabled)}
+														onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange(key, notificationKey, enabled)}
+														singleKey={false}
 													/>
-												}
-												title={label}
-												enabled={gov1Items[key as keyof typeof gov1Items]?.enabled || false}
-												notifications={gov1Items[key as keyof typeof gov1Items]?.notifications || {}}
-												notificationLabels={getGov1NotificationLabels(key, t)}
-												onEnabledChange={(enabled) => handleGov1ItemChange(key, enabled)}
-												onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange(key, notificationKey, enabled)}
-												singleKey={key === 'mentionsIReceive'}
-											/>
-										))}
+												</div>
+											))}
+									</div>
+
+									<div>
+										{Object.entries(gov1Labels)
+											.filter(([key]) => key !== 'mentionsIReceive')
+											.slice(4)
+											.map(([key, { label }], index, arr) => (
+												<div
+													key={key}
+													className={`p-4 ${index < arr.length - 1 ? 'border-b border-dashed border-border_grey' : ''}`}
+												>
+													<Gov1Item
+														icon={
+															<Image
+																src={getGov1Icon(key)}
+																alt={label}
+																width={16}
+																height={16}
+																className='rounded'
+															/>
+														}
+														title={label}
+														enabled={gov1Items[key as keyof typeof gov1Items]?.enabled || false}
+														notifications={gov1Items[key as keyof typeof gov1Items]?.notifications || {}}
+														notificationLabels={getGov1NotificationLabels(key, t)}
+														onEnabledChange={(enabled) => handleGov1ItemChange(key, enabled)}
+														onNotificationChange={(notificationKey, enabled) => handleGov1NotificationChange(key, notificationKey, enabled)}
+														singleKey={false}
+													/>
+												</div>
+											))}
+									</div>
 								</div>
 							</div>
 						</TabsContent>

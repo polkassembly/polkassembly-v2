@@ -22,7 +22,7 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 	console.log('current network', network);
 	const t = useTranslations();
 
-	const [staticEnabledChannels] = useState({
+	const [enabledChannels] = useState({
 		[ENotificationChannel.EMAIL]: false,
 		[ENotificationChannel.TELEGRAM]: false,
 		[ENotificationChannel.DISCORD]: false,
@@ -32,12 +32,12 @@ function PostsNotificationsSection({ network }: PostsNotificationsSectionProps) 
 	});
 
 	const [postsNotifications, setPostsNotifications] = useState({
-		proposalStatusChanges: { enabled: false, channels: staticEnabledChannels },
-		newProposalsInCategories: { enabled: false, channels: staticEnabledChannels },
-		votingDeadlineReminders: { enabled: false, channels: staticEnabledChannels },
-		updatesOnFollowedProposals: { enabled: false, channels: staticEnabledChannels },
-		proposalOutcomePublished: { enabled: false, channels: staticEnabledChannels },
-		proposalsYouVotedOnEnacted: { enabled: false, channels: staticEnabledChannels }
+		proposalStatusChanges: { enabled: false, channels: enabledChannels },
+		newProposalsInCategories: { enabled: false, channels: enabledChannels },
+		votingDeadlineReminders: { enabled: false, channels: enabledChannels },
+		updatesOnFollowedProposals: { enabled: false, channels: enabledChannels },
+		proposalOutcomePublished: { enabled: false, channels: enabledChannels },
+		proposalsYouVotedOnEnacted: { enabled: false, channels: enabledChannels }
 	});
 
 	const handlePostsNotificationChange = (type: string, enabled: boolean) => {
