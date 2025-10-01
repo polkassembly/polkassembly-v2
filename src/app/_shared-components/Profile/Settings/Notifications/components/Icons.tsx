@@ -132,7 +132,7 @@ export function EmailIcon({ width = 20, height = 20, className }: IconProps) {
 	);
 }
 
-export function InAPPIcon({ width = 20, height = 20, className }: IconProps) {
+export function InAppIcon({ width = 20, height = 20, className }: IconProps) {
 	return (
 		<svg
 			width={width}

@@ -57,6 +57,8 @@ const Gov1Item = memo(function Gov1Item({
 					<Switch
 						checked={enabled}
 						onCheckedChange={onEnabledChange}
+						className='h-4 w-8 border border-btn_secondary_text bg-transparent px-0.5 data-[state=checked]:bg-switch_inactive_bg data-[state=unchecked]:bg-transparent'
+						thumbClassName='h-2 w-2 bg-btn_secondary_text'
 					/>
 					<span className='text-text_secondary text-xs'>{t('all')}</span>
 				</div>
