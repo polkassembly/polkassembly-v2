@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import NotificationChannelsSection from './sections/NotificationChannelsSection';
 import ParachainsSection from './sections/ParachainsSection';
