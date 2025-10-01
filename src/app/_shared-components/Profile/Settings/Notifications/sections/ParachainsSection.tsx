@@ -6,23 +6,12 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { ChevronDown, Plus } from 'lucide-react';
-import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
-import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
-import MoonbeamLogo from '@assets/parachain-logos/moonbeam-logo.png';
-import MoonriverLogo from '@assets/parachain-logos/moonriver-logo.png';
-import CollectivesLogo from '@assets/parachain-logos/collectives-logo.png';
-import PendulumLogo from '@assets/parachain-logos/pendulum-logo.jpg';
-import CereLogo from '@assets/parachain-logos/cere-logo.jpg';
-import PolkadexLogo from '@assets/parachain-logos/polkadex-logo.jpg';
-import PolymeshLogo from '@assets/parachain-logos/polymesh-logo.png';
-import MoonbaseLogo from '@assets/parachain-logos/moonbase-logo.png';
-import WestendLogo from '@assets/parachain-logos/westend-logo.jpg';
-import PaseoLogo from '@assets/parachain-logos/paseo-logo.png';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import { Separator } from '@/app/_shared-components/Separator';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import ParachainsIcon from '@assets/icons/notification-settings/parachains.svg';
+import { getNetworkLogo } from '@/_shared/_constants/NotificationConstants';
 import NetworkBadge from '../components/NetworkBadge';
 import AddNetworksModal from '../Modals/AddNetworksModal';
 import ImportPrimaryNetworkModal from '../Modals/ImportPrimaryNetworkModal';
@@ -35,26 +24,6 @@ interface INetworkSettings {
 	name: string;
 	removable: boolean;
 }
-const getNetworkLogo = (networkId: string): string => {
-	const logoMap: Record<string, string> = {
-		polkadot: PolkadotLogo.src,
-		kusama: KusamaLogo.src,
-		moonbeam: MoonbeamLogo.src,
-		moonriver: MoonriverLogo.src,
-		collectives: CollectivesLogo.src,
-		pendulum: PendulumLogo.src,
-		cere: CereLogo.src,
-		polkadex: PolkadexLogo.src,
-		polymesh: PolymeshLogo.src,
-		'polymesh-test': PolymeshLogo.src,
-		moonbase: MoonbaseLogo.src,
-		'moonbase-alpha': MoonbaseLogo.src,
-		westend: WestendLogo.src,
-		paseo: PaseoLogo.src
-	};
-
-	return logoMap[networkId.toLowerCase()] || PolkadotLogo.src;
-};
 
 function ParachainsSection() {
 	const t = useTranslations();
