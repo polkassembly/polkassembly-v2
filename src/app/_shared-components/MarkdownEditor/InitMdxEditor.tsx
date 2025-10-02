@@ -398,6 +398,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 	}, []);
 
 	// Memoize YouTube directive to prevent recreation on every render
+	// OPTIMIZATION: Lazy load YouTube iframes for better performance
 	const YoutubeDirectiveDescriptor: any = useMemo(
 		() => ({
 			name: 'youtube',
@@ -430,6 +431,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 							src={`https://www.youtube.com/embed/${videoId}`}
 							title='YouTube video player'
 							allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+							loading='lazy' // Lazy load iframe for performance
 						/>
 					</div>
 				);
@@ -439,27 +441,38 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 	);
 
 	// Memoize plugins array - prevents recreation on every render
-	// This is critical: plugin initialization is expensive
-	const plugins = useMemo(
-		() => [
+	// OPTIMIZATION: Only load plugins needed for the current mode
+	const plugins = useMemo(() => {
+		// Essential plugins - always needed for rendering
+		const essentialPlugins = [
 			listsPlugin(),
 			quotePlugin(),
 			headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
 			linkPlugin(),
-			linkDialogPlugin(),
 			imagePlugin({
-				disableImageSettingsButton: true
+				disableImageSettingsButton: true,
+				imageUploadHandler // Pass the upload handler to imagePlugin
 			}),
-			tablePlugin(),
-			thematicBreakPlugin(),
-			frontmatterPlugin(),
 			codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-			directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
-			diffSourcePlugin({ viewMode: 'rich-text' }),
-			markdownShortcutPlugin()
-		],
-		[YoutubeDirectiveDescriptor]
-	);
+			directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] })
+		];
+
+		// Editing plugins - only needed in edit mode
+		if (!props.readOnly) {
+			return [
+				...essentialPlugins,
+				linkDialogPlugin(), // Link editing
+				tablePlugin(), // Table editing
+				thematicBreakPlugin(), // HR insertion
+				frontmatterPlugin(), // Frontmatter editing
+				diffSourcePlugin({ viewMode: 'rich-text' }), // Source toggle
+				markdownShortcutPlugin() // Keyboard shortcuts
+			];
+		}
+
+		// Readonly mode - minimal plugins for display only
+		return essentialPlugins;
+	}, [YoutubeDirectiveDescriptor, props.readOnly, imageUploadHandler]);
 
 	// Memoize toolbar to prevent recreation on every render
 	const toolbarContents = useCallback(() => {
