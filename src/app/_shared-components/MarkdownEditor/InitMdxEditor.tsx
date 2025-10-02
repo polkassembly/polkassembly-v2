@@ -32,7 +32,6 @@ import {
 	BoldItalicUnderlineToggles,
 	Separator,
 	DiffSourceToggleWrapper,
-	ConditionalContents,
 	CodeToggle,
 	ListsToggle,
 	BlockTypeSelect,
@@ -447,7 +446,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 		frontmatterPlugin(),
 		codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
 		directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
-		diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
+		diffSourcePlugin({ viewMode: 'rich-text' }),
 		markdownShortcutPlugin()
 	];
 
@@ -457,44 +456,36 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 		}
 		return (
 			<DiffSourceToggleWrapper>
-				<ConditionalContents
-					options={[
-						{
-							fallback: () => (
-								<>
-									<BoldItalicUnderlineToggles />
-									<StrikeThroughSupSubToggles options={['Strikethrough']} />
-									<CodeToggle />
+				<>
+					<BoldItalicUnderlineToggles />
+					<StrikeThroughSupSubToggles options={['Strikethrough']} />
+					<CodeToggle />
 
-									<Separator />
+					<Separator />
 
-									<ListsToggle options={['number', 'bullet']} />
+					<ListsToggle options={['number', 'bullet']} />
 
-									<Separator />
+					<Separator />
 
-									<BlockTypeSelect />
+					<BlockTypeSelect />
 
-									<Separator />
+					<Separator />
 
-									<CreateLink />
-									<ButtonWithTooltip
-										onClick={() => {
-											setOpenImageUploadDialog(true);
-										}}
-										title={t('insertImage')}
-									>
-										<ImagePlus className='h-5 w-5' />
-									</ButtonWithTooltip>
+					<CreateLink />
+					<ButtonWithTooltip
+						onClick={() => {
+							setOpenImageUploadDialog(true);
+						}}
+						title={t('insertImage')}
+					>
+						<ImagePlus className='h-5 w-5' />
+					</ButtonWithTooltip>
 
-									<Separator />
+					<Separator />
 
-									<InsertTable />
-									<InsertThematicBreak />
-								</>
-							)
-						}
-					]}
-				/>
+					<InsertTable />
+					<InsertThematicBreak />
+				</>
 			</DiffSourceToggleWrapper>
 		);
 	};
