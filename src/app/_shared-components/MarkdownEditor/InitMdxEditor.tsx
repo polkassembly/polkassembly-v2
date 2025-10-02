@@ -124,8 +124,9 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [quoteCommentText, editorRef, setQuoteCommentText, user, debouncedOnChange]);
 
+	// Memoize expensive markdown preprocessing - only run when markdown changes
 	// eslint-disable-next-line sonarjs/cognitive-complexity
-	const preprocessMarkdown = (markdown: string): string => {
+	const preprocessMarkdown = useCallback((markdown: string): string => {
 		let inCode = false;
 		let result = '';
 		let i = 0;
@@ -184,7 +185,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 		}
 
 		return result;
-	};
+	}, []);
 
 	const handleMentionSuggestions = useCallback(
 		(editor: MDXEditorMethods, textContent: string, cursorPosition: number, currentTheme: string) => {
@@ -379,9 +380,10 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 		[throttledHandleChange]
 	);
 
-	const processedMarkdown = props.readOnly ? preprocessMarkdown(props.markdown || '') : props.markdown;
+	// Memoize processed markdown to avoid re-processing on every render
+	const processedMarkdown = useMemo(() => (props.readOnly ? preprocessMarkdown(props.markdown || '') : props.markdown), [props.readOnly, props.markdown, preprocessMarkdown]);
 
-	const imageUploadHandler = async (file: File) => {
+	const imageUploadHandler = useCallback(async (file: File) => {
 		const form = new FormData();
 		form.append('image', file, file.name);
 		const res = await fetch(`https://api.imgbb.com/1/upload?key=${NEXT_PUBLIC_IMBB_KEY}`, {
@@ -393,64 +395,74 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 			return uploadData.data.url;
 		}
 		return undefined;
-	};
+	}, []);
 
-	const YoutubeDirectiveDescriptor: any = {
-		name: 'youtube',
-		type: 'leafDirective',
-		testNode(node: any) {
-			return node.name === 'youtube';
-		},
-		attributes: ['id'],
-		hasChildren: false,
-		// eslint-disable-next-line react/no-unstable-nested-components
-		Editor: ({ mdastNode, lexicalNode, parentEditor }: { mdastNode: any; lexicalNode: any; parentEditor: any }) => {
-			const videoId = mdastNode.attributes.id || mdastNode.attributes['#'] || Object.values(mdastNode.attributes)[0];
+	// Memoize YouTube directive to prevent recreation on every render
+	const YoutubeDirectiveDescriptor: any = useMemo(
+		() => ({
+			name: 'youtube',
+			type: 'leafDirective',
+			testNode(node: any) {
+				return node.name === 'youtube';
+			},
+			attributes: ['id'],
+			hasChildren: false,
+			// eslint-disable-next-line react/no-unstable-nested-components
+			Editor: ({ mdastNode, lexicalNode, parentEditor }: { mdastNode: any; lexicalNode: any; parentEditor: any }) => {
+				const videoId = mdastNode.attributes.id || mdastNode.attributes['#'] || Object.values(mdastNode.attributes)[0];
 
-			return (
-				<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-					<button
-						type='button'
-						onClick={() => {
-							parentEditor.update(() => {
-								lexicalNode.selectNext();
-								lexicalNode.remove();
-							});
-						}}
-					>
-						delete
-					</button>
-					<iframe
-						width='560'
-						height='315'
-						src={`https://www.youtube.com/embed/${videoId}`}
-						title='YouTube video player'
-						allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
-					/>
-				</div>
-			);
-		}
-	};
-
-	const plugins = [
-		listsPlugin(),
-		quotePlugin(),
-		headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
-		linkPlugin(),
-		linkDialogPlugin(),
-		imagePlugin({
-			disableImageSettingsButton: true
+				return (
+					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+						<button
+							type='button'
+							onClick={() => {
+								parentEditor.update(() => {
+									lexicalNode.selectNext();
+									lexicalNode.remove();
+								});
+							}}
+						>
+							delete
+						</button>
+						<iframe
+							width='560'
+							height='315'
+							src={`https://www.youtube.com/embed/${videoId}`}
+							title='YouTube video player'
+							allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+						/>
+					</div>
+				);
+			}
 		}),
-		tablePlugin(),
-		thematicBreakPlugin(),
-		frontmatterPlugin(),
-		codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-		directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
-		diffSourcePlugin({ viewMode: 'rich-text' }),
-		markdownShortcutPlugin()
-	];
+		[]
+	);
 
-	const toolbarContents = () => {
+	// Memoize plugins array - prevents recreation on every render
+	// This is critical: plugin initialization is expensive
+	const plugins = useMemo(
+		() => [
+			listsPlugin(),
+			quotePlugin(),
+			headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
+			linkPlugin(),
+			linkDialogPlugin(),
+			imagePlugin({
+				disableImageSettingsButton: true
+			}),
+			tablePlugin(),
+			thematicBreakPlugin(),
+			frontmatterPlugin(),
+			codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
+			directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
+			diffSourcePlugin({ viewMode: 'rich-text' }),
+			markdownShortcutPlugin()
+		],
+		[YoutubeDirectiveDescriptor]
+	);
+
+	// Memoize toolbar to prevent recreation on every render
+	const toolbarContents = useCallback(() => {
 		if (props.readOnly) {
 			return null;
 		}
@@ -488,12 +500,15 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 				</>
 			</DiffSourceToggleWrapper>
 		);
-	};
+	}, [props.readOnly, t, setOpenImageUploadDialog]);
 
-	if (!props.readOnly) {
-		// eslint-disable-next-line react/no-unstable-nested-components
-		plugins.push(toolbarPlugin({ toolbarContents, toolbarClassName: 'relative' }));
-	}
+	// Conditionally add toolbar plugin - only in edit mode
+	const pluginsWithToolbar = useMemo(() => {
+		if (props.readOnly) {
+			return plugins;
+		}
+		return [...plugins, toolbarPlugin({ toolbarContents, toolbarClassName: 'relative' })];
+	}, [plugins, props.readOnly, toolbarContents]);
 
 	return (
 		<div className='mdxEditorWrapper w-full'>
@@ -504,7 +519,7 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 				setIsDialogOpen={setOpenImageUploadDialog}
 			/>
 			<MDXEditor
-				plugins={plugins}
+				plugins={pluginsWithToolbar}
 				{...props}
 				markdown={processedMarkdown}
 				className={cn(theme === ETheme.DARK ? 'dark-theme' : '', props.readOnly && 'p-0', props.className)}
