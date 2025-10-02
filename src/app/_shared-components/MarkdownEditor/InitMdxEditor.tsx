@@ -62,10 +62,8 @@ const algoliaClient = algoliasearch(NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGO
 const MAX_MENTION_SUGGESTIONS = 5;
 const RECT_ELLIPSIS_WIDTH = 25;
 
-// Debounce delay for onChange callback (in milliseconds)
-const ONCHANGE_DEBOUNCE_DELAY = 300;
-// Throttle delay for mention suggestions (in milliseconds)
-const MENTION_THROTTLE_DELAY = 500;
+// Very aggressive debouncing for onChange to prevent constant parent re-renders
+const ONCHANGE_DEBOUNCE_DELAY = 500;
 
 // Only import this to the next file
 export default function InitializedMDXEditor({ editorRef, ...props }: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
@@ -334,37 +332,53 @@ export default function InitializedMDXEditor({ editorRef, ...props }: { editorRe
 		[debouncedOnChange]
 	);
 
-	// Create throttled version of mention suggestions to limit API calls
+	// Throttled version of the entire handleChange to prevent excessive processing
+	// This is the key optimization - we don't process every single keystroke
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const throttledMentionSuggestions = useMemo(() => throttle(handleMentionSuggestions, MENTION_THROTTLE_DELAY), [handleMentionSuggestions]);
+	const throttledHandleChange = useMemo(
+		() =>
+			throttle((newMarkdown: string) => {
+				// Call the debounced onChange
+				debouncedOnChange(newMarkdown);
 
-	// Add autocomplete functionality with debouncing and throttling
-	const handleChange = (newMarkdown: string) => {
-		// Use debounced onChange to avoid performance issues
-		debouncedOnChange(newMarkdown);
+				// Only check for mentions if @ symbol exists and we're not in read-only mode
+				if (!props.readOnly && newMarkdown.includes('@')) {
+					const editor = (editorRef as RefObject<MDXEditorMethods>)?.current;
+					if (!editor) return;
 
-		const editor = (editorRef as RefObject<MDXEditorMethods>)?.current;
-		if (!editor) return;
+					// Get the current selection from the editor
+					const selection = window.getSelection();
+					if (!selection || !selection.rangeCount) return;
 
-		// Get the current selection from the editor
-		const editorElement = document.querySelector('.mdxeditor');
-		if (!editorElement) return;
+					const range = selection.getRangeAt(0);
+					const container = range.startContainer;
 
-		const selection = window.getSelection();
-		if (!selection || !selection.rangeCount) return;
+					// Only process if we're in a text node
+					if (container.nodeType !== Node.TEXT_NODE) return;
 
-		const range = selection.getRangeAt(0);
-		const container = range.startContainer;
+					const textContent = container.textContent || '';
+					const cursorPosition = range.startOffset;
 
-		// Only process if we're in a text node
-		if (container.nodeType !== Node.TEXT_NODE) return;
+					// Check if user is typing @ for mentions
+					const textBeforeCursor = textContent.substring(0, cursorPosition);
+					const lastAtSymbol = textBeforeCursor.lastIndexOf('@');
 
-		const textContent = container.textContent || '';
-		const cursorPosition = range.startOffset;
+					// Only trigger mention suggestions if @ was recently typed (within 30 chars)
+					if (lastAtSymbol !== -1 && cursorPosition - lastAtSymbol < 30) {
+						handleMentionSuggestions(editor, textContent, cursorPosition, theme as string);
+					}
+				}
+			}, 200), // Throttle the entire onChange to once every 200ms
+		[debouncedOnChange, editorRef, handleMentionSuggestions, theme, props.readOnly]
+	);
 
-		// Use throttled mention suggestions to avoid too frequent API calls
-		throttledMentionSuggestions(editor, textContent, cursorPosition, theme as string);
-	};
+	// Simplified handleChange - just call the throttled version
+	const handleChange = useCallback(
+		(newMarkdown: string) => {
+			throttledHandleChange(newMarkdown);
+		},
+		[throttledHandleChange]
+	);
 
 	const processedMarkdown = props.readOnly ? preprocessMarkdown(props.markdown || '') : props.markdown;
 
