@@ -1562,5 +1562,21 @@
 		"pararegistration": "Registro de Para",
 		"nomination_pools": "Pools de Nominación",
 		"sudo_balances": "Sudo Balances"
+	},
+	"Community": {
+		"community": "Comunidad",
+		"communityDescription": "Explora todos los miembros que contribuyen al ecosistema de Polkadot.",
+		"members": "Miembros",
+		"delegates": "Delegados",
+		"curators": "Curadores",
+		"experts": "Expertos",
+		"Members": {
+			"totalMembers": "Total de Miembros",
+			"verifiedMembers": "Miembros Verificados",
+			"tip": "Propina",
+			"independent": "Independiente",
+			"readMore": "Leer más",
+			"readLess": "Leer menos"
+		}
 	}
 }

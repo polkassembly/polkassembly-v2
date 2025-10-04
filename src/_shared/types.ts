@@ -151,6 +151,8 @@ export interface IPublicUser {
 	profileScore: number;
 	addresses: string[];
 	rank?: number;
+	followers?: IFollowEntry[];
+	following?: IFollowEntry[];
 	profileDetails: IProfileDetails;
 }
 
@@ -1622,3 +1624,10 @@ export interface IProxyRequest {
 }
 
 export type IProxyListingResponse = IGenericListingResponse<IProxyRequest>;
+
+export enum ECommunityRole {
+	MEMBERS = 'members',
+	DELEGATES = 'delegates',
+	CURATORS = 'curators',
+	EXPERTS = 'experts'
+}
