@@ -1,0 +1,91 @@
+.statCard {
+	@apply rounded-xl border border-border_grey bg-bg_modal p-2 shadow-sm lg:p-3;
+}
+
+.votingPowerCard {
+	@apply md:col-span-3;
+}
+
+.spanFour {
+	@apply md:col-span-4;
+}
+
+.statCardHeader {
+	@apply mb-2 flex items-center gap-2;
+}
+
+.statCardIcon {
+	@apply h-5 w-5 text-text_grey;
+}
+
+.statCardTitle {
+	@apply text-sm text-text_grey;
+}
+
+.votingPowerBreakdown {
+	@apply flex items-center gap-3;
+}
+
+.votingPowerItem {
+	@apply flex flex-col gap-1;
+}
+
+.votingPowerLabel {
+	@apply flex items-center gap-1;
+
+	span {
+		@apply text-xs text-text_grey;
+	}
+}
+
+.votingPowerValue {
+	@apply flex items-end gap-1;
+}
+
+.value {
+	@apply text-xl font-semibold text-text_primary;
+}
+
+.unit {
+	@apply mb-1 text-xs text-text_grey;
+}
+
+.divider {
+	@apply h-11 w-px bg-border_grey;
+}
+
+.infoIcon {
+	@apply flex h-3 w-3 cursor-pointer items-center justify-center rounded-full bg-info_icon_bg text-[10px] font-medium text-white;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+	.votingPowerCard {
+		@apply col-span-1;
+	}
+
+	.votingPowerBreakdown {
+		@apply flex-col gap-2;
+	}
+
+	.divider {
+		@apply h-px w-full;
+	}
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+	.statCard {
+		@apply border-border_grey bg-bg_modal;
+	}
+
+	.value {
+		@apply text-text_primary;
+	}
+
+	.statCardTitle,
+	.votingPowerLabel span,
+	.unit {
+		@apply text-text_grey;
+	}
+}

@@ -50,6 +50,7 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { FirestoreUtils } from './firestoreUtils';
 
 export class FirestoreService extends FirestoreUtils {
@@ -1870,5 +1871,82 @@ export class FirestoreService extends FirestoreUtils {
 				})
 				.filter((vote): vote is IPollVote => vote !== null);
 		});
+	}
+
+	// Profile Views methods
+	static async IncrementProfileView({
+		userId,
+		address,
+		viewerId,
+		network,
+		ipHash
+	}: {
+		userId?: number;
+		address?: string;
+		viewerId?: number;
+		network: ENetwork;
+		ipHash?: string;
+	}): Promise<void> {
+		const viewRecord = {
+			...(userId && { userId }),
+			...(address && { address }),
+			...(viewerId && { viewerId }),
+			...(ipHash && { ipHash }),
+			network,
+			timestamp: new Date(),
+			createdAt: new Date()
+		};
+
+		await this.profileViewsCollectionRef().add(viewRecord);
+	}
+
+	static async GetProfileViews({
+		userId,
+		address,
+		network,
+		startDate,
+		endDate
+	}: {
+		userId?: number;
+		address?: string;
+		network: ENetwork;
+		startDate: string;
+		endDate: string;
+	}): Promise<{ total: number; unique: number; startDate: string; endDate: string }> {
+		let query = this.profileViewsCollectionRef().where('network', '==', network);
+
+		// Query by userId or address
+		if (userId) {
+			query = query.where('userId', '==', userId);
+		} else if (address) {
+			query = query.where('address', '==', address);
+		} else {
+			throw new Error('Either userId or address must be provided');
+		}
+
+		const start = dayjs(startDate).toDate();
+		const end = dayjs(endDate).toDate();
+
+		query = query.where('timestamp', '>=', start).where('timestamp', '<=', end);
+
+		const snapshot = await query.get();
+		const views = snapshot.docs.map((doc) => doc.data());
+
+		// Calculate unique views (by viewerId or ipHash)
+		const uniqueViewers = new Set();
+		views.forEach((view) => {
+			if (view.viewerId) {
+				uniqueViewers.add(view.viewerId);
+			} else if (view.ipHash) {
+				uniqueViewers.add(view.ipHash);
+			}
+		});
+
+		return {
+			total: views.length,
+			unique: uniqueViewers.size,
+			startDate,
+			endDate
+		};
 	}
 }
