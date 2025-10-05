@@ -1,0 +1,29 @@
+.chatUI {
+	@apply relative z-10 w-96 rounded-t-xl bg-bg_modal p-[1px] pb-0;
+	background-image: linear-gradient(139.05deg, #e5007a 4.08%, #3473ff 41.41%, #ffd663 60.08%, #51d36e 78.75%);
+}
+
+.container {
+	@apply cursor-pointer rounded-t-[10.5px] bg-bg_modal;
+}
+
+.chatUIHeader {
+	@apply flex h-12 w-full items-center gap-3 border-b border-primary_border px-4;
+}
+
+.chatUIControls {
+	@apply ml-auto flex items-center gap-2;
+}
+
+.controlIcon {
+	@apply flex h-5 w-5 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:scale-110;
+}
+
+.chatUIBody {
+	@apply flex h-80 flex-col-reverse gap-3 overflow-y-auto p-4;
+}
+
+.chatUIInput {
+	@apply sticky bottom-0 flex h-12 w-full items-center gap-2 bg-bg_modal px-4 py-2;
+	box-shadow: 0px -2px 4px 0px #e5007a1f;
+}

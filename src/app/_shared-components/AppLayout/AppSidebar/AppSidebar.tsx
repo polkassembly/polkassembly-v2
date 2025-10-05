@@ -88,12 +88,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 
 			<SidebarFooter className='mb-3'>
 				{state === 'expanded' && (
-					<Link
-						href='https://klara.polkassembly.io/'
-						target='_blank'
-						rel='noreferrer'
-						className='pointer-events-none'
-					>
+					<Link href='/klara'>
 						<div className={styles.create_proposal_button}>
 							<Image
 								src={MagicWandIcon}
