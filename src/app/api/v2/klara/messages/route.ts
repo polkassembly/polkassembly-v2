@@ -3,20 +3,20 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { NextRequest, NextResponse } from 'next/server';
 import { KlaraDatabaseService } from '@/app/api/_api-services/klara/database';
+import { z } from 'zod';
+import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 
-export async function GET(request: NextRequest) {
-	try {
-		const { searchParams } = new URL(request.url);
-		const conversationId = searchParams.get('conversationId');
+export const GET = withErrorHandling(async (request: NextRequest) => {
+	const zodQuerySchema = z.object({
+		conversationId: z.string()
+	});
 
-		if (!conversationId) {
-			return NextResponse.json({ error: 'Conversation ID is required' }, { status: 400 });
-		}
+	const { conversationId } = zodQuerySchema.parse(Object.fromEntries(request.nextUrl.searchParams));
 
-		const messages = await KlaraDatabaseService.GetConversationMessages(conversationId);
-		return NextResponse.json(messages);
-	} catch (error) {
-		console.error('Error fetching messages:', error);
-		return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 });
+	if (!conversationId) {
+		return NextResponse.json({ error: 'Conversation ID is required' }, { status: 400 });
 	}
-}
+
+	const messages = await KlaraDatabaseService.GetConversationMessages(conversationId);
+	return NextResponse.json(messages);
+});
