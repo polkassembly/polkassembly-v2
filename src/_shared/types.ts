@@ -1653,3 +1653,50 @@ export interface IConversationMessage {
 	sources?: Source[];
 	followUpQuestions?: string[];
 }
+
+export interface IConversationTurn {
+	query: string; // User's question
+	response: string; // AI's response
+	timestamp?: string; // Optional timestamp
+}
+
+export interface IChatApiResponse {
+	answer: string; // AI-generated response
+	sources: Source[]; // Array of source documents
+	follow_up_questions: string[]; // Array of suggested questions
+	remaining_requests: number; // Rate limit remaining count
+	confidence: number; // 0.0-1.0 confidence score
+	context_used: boolean; // Whether document context was used
+	model_used: string; // AI model name (e.g., "gpt-3.5-turbo")
+	chunks_used: number; // Number of document chunks used
+	processing_time_ms: number; // Response time in milliseconds
+	timestamp: string; // ISO timestamp
+	search_method: string; // Method: "local_knowledge", "web_search", etc.
+}
+
+export interface IChatRequestBody {
+	message: string;
+	userId: string;
+	conversationId?: string;
+}
+
+export interface IChatResponse {
+	text: string;
+	sources?: Source[];
+	followUpQuestions?: string[];
+	isNewConversation?: boolean;
+	conversationId?: string;
+}
+
+export interface IChatStreamData {
+	content?: string;
+	conversationId?: string;
+	sources?: Source[];
+	followUpQuestions?: string[];
+}
+
+export interface IChatApiErrorResponse {
+	success: false;
+	error: string;
+	details?: unknown;
+}
