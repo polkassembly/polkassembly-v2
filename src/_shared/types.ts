@@ -1628,3 +1628,28 @@ export enum EChatState {
 	COLLAPSED = 'collapsed',
 	CLOSED = 'closed'
 }
+
+export interface IConversationHistory {
+	id: string;
+	title: string;
+	lastMessage: string;
+	lastActivity: number;
+	messageCount: number;
+}
+
+export interface Source {
+	title: string;
+	url: string;
+	source_type: string;
+	similarity_score: number;
+}
+
+export interface IConversationMessage {
+	id: string;
+	text: string;
+	sender: 'user' | 'ai';
+	timestamp: number;
+	isStreaming?: boolean;
+	sources?: Source[];
+	followUpQuestions?: string[];
+}
