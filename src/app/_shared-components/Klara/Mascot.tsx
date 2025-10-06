@@ -5,7 +5,7 @@
 'use client';
 
 import React from 'react';
-import { mascotGifs, MascotGif } from '@app/api/_api-services/klara/mascots';
+import { mascotGifs, MascotGif } from '@/_shared/_constants/mascots';
 import Image from 'next/image';
 
 interface MascotProps {
