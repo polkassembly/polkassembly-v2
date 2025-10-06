@@ -10,20 +10,24 @@ import Link from 'next/link';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
 import PaLogo from '@ui/AppLayout/PaLogo';
 import { useTranslations } from 'next-intl';
-import MagicWandIcon from '@assets/sidebar/magic-wand.svg';
+import KlaraAvatar from '@assets/klara/avatar.svg';
+import { useChatState } from '@/hooks/useChatState';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ComponentProps } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { IoChevronUp } from '@react-icons/all-files/io5/IoChevronUp';
+import ChatsHistory from '@/app/_shared-components/Klara/ChatsHistory';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ITrackCounts } from '@/_shared/types';
+import { ITrackCounts, EChatState } from '@/_shared/types';
 import { NavMain } from '../NavItems/NavItems';
 import CreateButton from '../CreateButton/CreateButton';
 import styles from './AppSidebar.module.scss';
 
 function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 	const { state } = useSidebar();
+	const { chatState, setChatState } = useChatState();
 	const t = useTranslations();
 	const pathname = usePathname();
 
@@ -86,22 +90,50 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 				<NavMain sections={data} />
 			</SidebarContent>
 
-			<SidebarFooter className='mb-3'>
-				{state === 'expanded' && (
-					<Link href='/klara'>
-						<div className={styles.create_proposal_button}>
-							<Image
-								src={MagicWandIcon}
-								alt=''
-								width={30}
-								height={30}
-							/>
-							<div className='flex flex-col'>
-								<span className='text-sm font-semibold text-text_primary'>{t('Sidebar.chatWithKlara')}</span>
-								<span className='text-xs text-basic_text'>{t('Bounty.comingSoon')}</span>
+			<SidebarFooter className='mb-3 px-3'>
+				{state === 'expanded' ? (
+					chatState === EChatState.EXPANDED ? (
+						<ChatsHistory />
+					) : (
+						<button
+							type='button'
+							className={styles.chat_button}
+							onClick={() => setChatState(EChatState.EXPANDED)}
+							aria-label='Chat with Klara'
+						>
+							<div className={styles.chat_button_content}>
+								<Image
+									src={KlaraAvatar}
+									alt=''
+									width={36}
+									height={36}
+								/>
+								<div className='flex flex-col text-left'>
+									<div className='flex items-center gap-1 text-sm font-semibold text-text_primary'>
+										<span>{t('Sidebar.chatWithKlara')}</span>
+										<IoChevronUp className='h-4 w-4 rotate-90' />
+									</div>
+									<span className='text-xs text-basic_text'>{t('Bounty.comingSoon')}</span>
+								</div>
 							</div>
+						</button>
+					)
+				) : (
+					<button
+						type='button'
+						className={styles.chat_button}
+						onClick={() => setChatState(EChatState.EXPANDED)}
+						aria-label='Chat with Klara'
+					>
+						<div className={`${styles.chat_button_content} justify-center`}>
+							<Image
+								src={KlaraAvatar}
+								alt=''
+								width={36}
+								height={36}
+							/>
 						</div>
-					</Link>
+					</button>
 				)}
 			</SidebarFooter>
 		</Sidebar>

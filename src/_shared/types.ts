@@ -1622,3 +1622,9 @@ export interface IProxyRequest {
 }
 
 export type IProxyListingResponse = IGenericListingResponse<IProxyRequest>;
+
+export enum EChatState {
+	EXPANDED = 'expanded',
+	COLLAPSED = 'collapsed',
+	CLOSED = 'closed'
+}

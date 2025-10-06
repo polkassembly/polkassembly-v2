@@ -13,11 +13,16 @@
 }
 
 .create_proposal_button {
-	@apply mx-3 mb-2 flex cursor-pointer items-center justify-center gap-[10px] rounded-xl border border-solid border-border_grey bg-page_background px-[5px] py-2;
+	@apply flex cursor-pointer items-center justify-center gap-[10px] rounded-xl border border-solid border-border_grey bg-page_background px-[5px] py-2;
 }
 
-.dark .create_proposal_button {
-	@apply border-[var(--separator-dark)] bg-[var(--section-dark-background)];
+.chat_button {
+	@apply z-10 mb-2 w-full rounded-xl bg-page_background p-[2px];
+	background-image: linear-gradient(139.05deg, #e5007a 4.08%, #3473ff 41.41%, #ffd663 60.08%, #51d36e 78.75%);
+}
+
+.chat_button_content {
+	@apply flex cursor-pointer items-center gap-[10px] rounded-[10.5px] bg-page_background px-[5px] py-2;
 }
 
 .sidebar_logo {
