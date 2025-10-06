@@ -22,8 +22,7 @@ function cleanUndefinedValues(obj: any): any {
 export class KlaraDatabaseService extends FirestoreUtils {
 	// Read methods
 	static async GetUserConversations(userId: string): Promise<IConversationHistory[]> {
-		const normalizedUserId = userId.toLowerCase();
-		const querySnapshot = await this.conversationsCollectionRef().where('userId', '==', normalizedUserId).where('messageCount', '>', 0).orderBy('lastActivity', 'desc').get();
+		const querySnapshot = await this.conversationsCollectionRef().where('userId', '==', userId).where('messageCount', '>', 0).orderBy('lastActivity', 'desc').get();
 		const conversations: IConversationHistory[] = [];
 
 		querySnapshot.forEach((doc) => {
@@ -57,22 +56,20 @@ export class KlaraDatabaseService extends FirestoreUtils {
 
 	static async CreateConversation(userId: string, title?: string): Promise<string> {
 		try {
-			const normalizedUserId = userId.toLowerCase();
-
 			const conversationData = {
 				title: title || 'New Conversation',
 				createdAt: dayjs().toDate(),
 				lastActivity: dayjs().toDate(),
 				messageCount: 0,
 				lastMessage: '',
-				userId: normalizedUserId
+				userId
 			};
 
 			// Let Firebase auto-generate the ID
 			const docRef = await this.conversationsCollectionRef().add(conversationData);
 			const conversationId = docRef.id;
 
-			console.log(`Created conversation ${conversationId} for user: ${normalizedUserId}`);
+			console.log(`Created conversation ${conversationId} for user: ${userId}`);
 			return conversationId;
 		} catch (error) {
 			console.error('Error creating conversation:', error);
@@ -90,8 +87,6 @@ export class KlaraDatabaseService extends FirestoreUtils {
 	}
 
 	static async DeleteConversation(userId: string, conversationId: string): Promise<void> {
-		const normalizedUserId = userId.toLowerCase();
-
 		// Delete conversation metadata
 		await this.conversationsCollectionRef().doc(conversationId).delete();
 
@@ -101,7 +96,7 @@ export class KlaraDatabaseService extends FirestoreUtils {
 		const deletePromises = messagesSnapshot.docs.map((doc) => doc.ref.delete());
 		await Promise.all(deletePromises);
 
-		console.log(`Deleted conversation ${conversationId} for user: ${normalizedUserId}`);
+		console.log(`Deleted conversation ${conversationId} for user: ${userId}`);
 	}
 
 	static async SaveMessageToConversation(conversationId: string, message: IConversationMessage): Promise<void> {
