@@ -62,7 +62,7 @@ export class KlaraDatabaseService extends FirestoreUtils {
 				lastActivity: dayjs().toDate(),
 				messageCount: 0,
 				lastMessage: '',
-				userId
+				userId: userId.toString()
 			};
 
 			// Let Firebase auto-generate the ID
@@ -133,11 +133,3 @@ export class KlaraDatabaseService extends FirestoreUtils {
 		}
 	}
 }
-
-// Export legacy functions for backward compatibility
-export const createConversation = KlaraDatabaseService.CreateConversation.bind(KlaraDatabaseService);
-export const getUserConversations = KlaraDatabaseService.GetUserConversations.bind(KlaraDatabaseService);
-export const updateConversation = KlaraDatabaseService.UpdateConversation.bind(KlaraDatabaseService);
-export const deleteConversation = KlaraDatabaseService.DeleteConversation.bind(KlaraDatabaseService);
-export const saveMessageToConversation = KlaraDatabaseService.SaveMessageToConversation.bind(KlaraDatabaseService);
-export const getConversationMessages = KlaraDatabaseService.GetConversationMessages.bind(KlaraDatabaseService);
