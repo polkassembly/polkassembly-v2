@@ -1,0 +1,93 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+'use client';
+
+import React, { useCallback } from 'react';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/app/_shared-components/Collapsible';
+import { IoChevronDown } from '@react-icons/all-files/io5/IoChevronDown';
+import { useUser } from '@/hooks/useUser';
+import { useQuery } from '@tanstack/react-query';
+import Image from 'next/image';
+import { useActiveChatId } from '@/hooks/useActiveChatId';
+import KlaraAvatar from '@assets/klara/avatar.svg';
+import EmptyBox from '@assets/klara/empty-box.svg';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { IConversationHistory } from '@/_shared/types';
+import styles from './ChatsHistory.module.scss';
+
+function ChatsHistory() {
+	const { user } = useUser();
+	const { setActiveChatId } = useActiveChatId();
+
+	const { data: conversations } = useQuery({
+		queryKey: ['klara-conversations', user?.id],
+		queryFn: async () => {
+			const res = await NextApiClientService.getConversationHistory({ userId: user?.id.toString() ?? '' });
+			if (!res.data) {
+				throw new Error('Network response was not ok');
+			}
+			return res.data;
+		},
+		enabled: !!user?.id
+	});
+
+	const openChat = useCallback(
+		(id: string) => {
+			setActiveChatId(id ?? null);
+		},
+		[setActiveChatId]
+	);
+
+	return (
+		<div className={styles.container}>
+			<div className={styles.content}>
+				{conversations?.length ? (
+					<Collapsible defaultOpen>
+						<CollapsibleTrigger className='flex w-full items-center justify-between gap-5 text-sm font-medium text-basic_text'>
+							<span>CHAT HISTORY</span>
+							<IoChevronDown className='h-5 w-5' />
+						</CollapsibleTrigger>
+						<CollapsibleContent>
+							<div className={styles.conversations}>
+								{conversations?.map((conversation: IConversationHistory) => (
+									<button
+										type='button'
+										onClick={() => openChat(conversation.id)}
+										key={conversation.id}
+										className='line-clamp-1 border-b border-primary_border p-2 text-sm font-semibold leading-loose text-text_primary last:border-b-0'
+									>
+										{conversation.title}
+									</button>
+								))}
+							</div>
+						</CollapsibleContent>
+					</Collapsible>
+				) : (
+					<div>
+						<div className='flex items-center justify-center p-2'>
+							<Image
+								src={EmptyBox}
+								alt='Klara Avatar'
+								width={160}
+								height={160}
+							/>
+						</div>
+						<div className='flex items-center gap-4'>
+							<Image
+								src={KlaraAvatar}
+								alt='Klara Avatar'
+								width={36}
+								height={36}
+							/>
+							<p className='text-left text-xs font-semibold text-text_primary'>Hi, I am Klara, ask me about your governance interests</p>
+						</div>
+					</div>
+				)}
+			</div>
+		</div>
+	);
+}
+
+export default ChatsHistory;
