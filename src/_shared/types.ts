@@ -13,6 +13,7 @@ import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
 	KUSAMA = 'kusama',
+	ASSETHUB_KUSAMA = 'assethub-kusama',
 	POLKADOT = 'polkadot',
 	WESTEND = 'westend',
 	PASEO = 'paseo',
