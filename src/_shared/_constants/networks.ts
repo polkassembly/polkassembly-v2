@@ -15,6 +15,7 @@ import { BiCube } from '@react-icons/all-files/bi/BiCube';
 import { IconType } from '@react-icons/all-files/lib';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
+import AssethubKusamaLogo from '@assets/parachain-logos/assethub-kusama.svg';
 import WestendLogo from '@assets/parachain-logos/westend-logo.jpg';
 import PaseoLogo from '@assets/parachain-logos/paseo-logo.png';
 import CereLogo from '@assets/parachain-logos/cere-logo.jpg';
@@ -203,6 +204,7 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 			}
 		]
 	},
+	// TODO: Verify Assethub Kusama specific configuration
 	[ENetwork.ASSETHUB_KUSAMA]: {
 		polkassemblyRegistrarIndex: 5,
 		identityMinDeposit: new BN('6672333321'),
@@ -1209,6 +1211,7 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 			}
 		}
 	},
+	// TODO: Verify Assethub Kusama track details configuration
 	[ENetwork.ASSETHUB_KUSAMA]: {
 		[EPostOrigin.ROOT]: {
 			trackId: 0,
@@ -2934,6 +2937,7 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 			label: 'Subscan'
 		}
 	],
+	// TODO: Verify Assethub Kusama social links configuration
 	[ENetwork.ASSETHUB_KUSAMA]: [
 		{
 			id: ENetworkSocial.HOME,
@@ -3169,9 +3173,10 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 			small: 'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fkusama-small.png?alt=media&token=a268b1d7-ea0c-4b03-a423-db93ac1f0d4e'
 		}
 	},
+	// TODO: Verify Assethub Kusama specific configuration
 	[ENetwork.ASSETHUB_KUSAMA]: {
 		key: ENetwork.ASSETHUB_KUSAMA,
-		logo: KusamaLogo,
+		logo: AssethubKusamaLogo,
 		submissionDeposit: new BN('33333333333'),
 		assetHubParaId: '1000',
 		peopleChainParaId: '1004',
