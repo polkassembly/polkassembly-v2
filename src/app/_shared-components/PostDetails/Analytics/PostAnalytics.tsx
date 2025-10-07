@@ -20,7 +20,7 @@ import VotesAnalytics from './VotesAnalytics';
 
 const getPostAnalytics = async ({ proposalType, index }: { proposalType: EProposalType; index: string }) => {
 	const { data, error } = await NextApiClientService.getPostAnalytics({ proposalType, index });
-	if (error && (!data || data === null)) {
+	if (error) {
 		throw new Error(error?.message || 'Failed to fetch data');
 	}
 	return data;
