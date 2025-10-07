@@ -19,7 +19,7 @@ import styles from './ChatsHistory.module.scss';
 
 function ChatsHistory() {
 	const { user } = useUser();
-	const { setActiveChatId } = useActiveChatId();
+	const { activeChatId, setActiveChatId } = useActiveChatId();
 
 	const { data: conversations } = useQuery({
 		queryKey: ['klara-conversations', user?.id],
@@ -56,7 +56,7 @@ function ChatsHistory() {
 										type='button'
 										onClick={() => openChat(conversation.id)}
 										key={conversation.id}
-										className='line-clamp-1 border-b border-primary_border p-2 text-left text-sm font-semibold capitalize leading-loose text-text_primary last:border-b-0'
+										className={`line-clamp-1 border-b border-primary_border p-2 text-left text-sm font-semibold capitalize leading-loose text-text_primary last:border-b-0 ${activeChatId === conversation.id ? 'border-y border-klara_active_chat_border bg-klara_active_chat_bg first:border-t-0 last:border-b-0' : ''}`}
 									>
 										{conversation.title}
 									</button>
