@@ -1562,5 +1562,9 @@
 		"pararegistration": "Registro de Para",
 		"nomination_pools": "Pools de Nominación",
 		"sudo_balances": "Sudo Balances"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "Kusama está en curso la migración de Assethub programada en el bloque 30423691, algunas funcionalidades pueden estar no disponibles. Para más información, visite",
+		"here": "aquí"
 	}
 }
