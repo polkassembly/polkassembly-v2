@@ -1561,5 +1561,9 @@
 		"pararegistration": "パラレジストレーション",
 		"nomination_pools": "ノミネーションプール",
 		"sudo_balances": "Sudoバランス"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "Kusamaはブロック30423691で予定されているAssethub Migration中であり、いくつかの機能が利用できない場合があります。詳細については、",
+		"here": "こちら"
 	}
 }

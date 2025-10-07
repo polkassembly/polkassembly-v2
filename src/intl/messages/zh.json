@@ -1561,5 +1561,9 @@
 		"pararegistration": "平行链注册",
 		"nomination_pools": "提名池",
 		"sudo_balances": "Sudo余额"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "Kusama正在进行Assethub迁移，计划在区块30423691进行，一些功能可能不可用。更多信息请访问",
+		"here": "这里"
 	}
 }

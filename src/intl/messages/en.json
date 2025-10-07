@@ -1598,5 +1598,9 @@
 		"pararegistration": "Para Registration",
 		"nomination_pools": "Nomination Pools",
 		"sudo_balances": "Sudo Balances"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "Kusama is undergoing Assethub Migration scheduled at block 30423691, some functionality may be unavailable. For more information, visit",
+		"here": "here"
 	}
 }
