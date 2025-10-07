@@ -22,7 +22,7 @@ function cleanUndefinedValues(obj: any): any {
 export class KlaraDatabaseService extends FirestoreUtils {
 	// Read methods
 	static async GetUserConversations(userId: string): Promise<IConversationHistory[]> {
-		const querySnapshot = await this.conversationsCollectionRef().where('userId', '==', userId).where('messageCount', '>', 0).orderBy('lastActivity', 'desc').get();
+		const querySnapshot = await this.conversationsCollectionRef().where('userId', '==', userId).where('messageCount', '>', 0).orderBy('lastActivity', 'desc').limit(5).get();
 		const conversations: IConversationHistory[] = [];
 
 		querySnapshot.forEach((doc) => {

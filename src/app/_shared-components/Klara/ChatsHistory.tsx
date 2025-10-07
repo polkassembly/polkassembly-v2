@@ -56,7 +56,7 @@ function ChatsHistory() {
 										type='button'
 										onClick={() => openChat(conversation.id)}
 										key={conversation.id}
-										className='line-clamp-1 border-b border-primary_border p-2 text-sm font-semibold leading-loose text-text_primary last:border-b-0'
+										className='line-clamp-1 border-b border-primary_border p-2 text-left text-sm font-semibold capitalize leading-loose text-text_primary last:border-b-0'
 									>
 										{conversation.title}
 									</button>
