@@ -63,7 +63,10 @@ function Search() {
 				className='text-text_primary'
 				asChild
 			>
-				<SearchIcon className='h-6 w-6 cursor-pointer hover:text-text_pink' />
+				<div className='flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-sm text-placeholder/80 transition-colors duration-200 hover:border-bg_pink md:h-10 md:w-10 md:gap-0 md:px-0 md:py-0 lg:w-full lg:justify-start lg:gap-2 lg:rounded-full lg:border lg:border-border_grey lg:bg-page_background lg:px-5 lg:py-2.5'>
+					<SearchIcon className='h-5 w-5 text-wallet_btn_text' />
+					<p className='hidden truncate whitespace-nowrap text-xs lg:block xl:text-sm'>{t('searchTriggerLabel')}</p>
+				</div>
 			</DialogTrigger>
 			<DialogContent className={`${searchEnabledNetworks.includes(network.toUpperCase()) ? 'w-full max-w-screen-md md:max-w-4xl' : 'max-w-lg'} rounded-lg px-6 pt-4`}>
 				<DialogHeader>

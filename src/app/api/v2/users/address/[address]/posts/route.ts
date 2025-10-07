@@ -3,11 +3,12 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ValidatorService } from '@/_shared/_services/validator_service';
-import { EProposalType, IGenericListingResponse, IOnChainPostListing, IPostListing, IUserPosts } from '@/_shared/types';
+import { EProposalType, IGenericListingResponse, IOnChainPostListing, IPostListing, IUserPosts, EHttpHeaderKey } from '@/_shared/types';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
+import { RedisService } from '@/app/api/_api-services/redis_service';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { MAX_LISTING_LIMIT, DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
@@ -28,6 +29,22 @@ export const GET = withErrorHandling(async (request: NextRequest, { params }: { 
 
 	const requestQueryParams = Object.fromEntries(request.nextUrl.searchParams.entries());
 	const { page: pageNumber, limit: pageSize, proposalType: selectedProposalType } = paginationParamsSchema.parse(requestQueryParams);
+
+	const skipCache = request.headers.get(EHttpHeaderKey.SKIP_CACHE) === 'true';
+
+	// Try to get from cache first
+	if (!skipCache) {
+		const cachedData = await RedisService.GetUserPosts({
+			network: networkName,
+			address: walletAddress,
+			page: pageNumber,
+			limit: pageSize,
+			proposalType: selectedProposalType
+		});
+		if (cachedData) {
+			return NextResponse.json(cachedData);
+		}
+	}
 
 	const userProfile = await OffChainDbService.GetPublicUserByAddress(walletAddress);
 
@@ -78,8 +95,20 @@ export const GET = withErrorHandling(async (request: NextRequest, { params }: { 
 		totalCount: onChainListingResponse.totalCount
 	};
 
-	return NextResponse.json({
+	const responseData: IUserPosts = {
 		offchainPostsResponse: offChainListingResponse,
 		onchainPostsResponse: onChainResponse
-	} as IUserPosts);
+	};
+
+	// Cache the response
+	await RedisService.SetUserPosts({
+		network: networkName,
+		address: walletAddress,
+		page: pageNumber,
+		limit: pageSize,
+		proposalType: selectedProposalType,
+		data: responseData
+	});
+
+	return NextResponse.json(responseData);
 });

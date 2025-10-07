@@ -7,7 +7,10 @@ import WalletButton from '@ui/WalletsUI/WalletButton/WalletButton';
 import { WalletClientService } from '@/app/_client-services/wallet_service';
 import { useWalletService } from '@/hooks/useWalletService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import dynamic from 'next/dynamic';
 import classes from './WalletButtons.module.scss';
+
+const SignVaultTransaction = dynamic(() => import('../../PolkadotVault/SignVaultTransaction/SignVaultTransaction'), { ssr: false });
 
 function WalletButtons({
 	onWalletChange,
@@ -39,23 +42,26 @@ function WalletButtons({
 	}, [availableWallets]);
 
 	return (
-		<div className={`${small ? classes.buttonsAlignmentSmall : classes.buttonsAlignment}`}>
-			{!small && <p className={classes.header}>Select a Wallet</p>}
-			{Object.values(EWallet).map((wallet) => {
-				if (!wallet) return null;
-				return (
-					<WalletButton
-						key={wallet}
-						disabled={!availableWallets?.[String(wallet)] || disabled}
-						wallet={wallet}
-						onClick={onWalletChange}
-						label={WalletClientService.getWalletNameLabel(wallet)}
-						small={small}
-						hidePreference={hidePreference}
-					/>
-				);
-			})}
-		</div>
+		<>
+			<SignVaultTransaction />
+			<div className={`${small ? classes.buttonsAlignmentSmall : classes.buttonsAlignment}`}>
+				{!small && <p className={classes.header}>Select a Wallet</p>}
+				{Object.values(EWallet).map((wallet) => {
+					if (!wallet) return null;
+					return (
+						<WalletButton
+							key={wallet}
+							disabled={(!availableWallets?.[String(wallet)] && wallet !== EWallet.POLKADOT_VAULT) || disabled}
+							wallet={wallet}
+							onClick={onWalletChange}
+							label={WalletClientService.getWalletNameLabel(wallet)}
+							small={small}
+							hidePreference={hidePreference}
+						/>
+					);
+				})}
+			</div>
+		</>
 	);
 }
 

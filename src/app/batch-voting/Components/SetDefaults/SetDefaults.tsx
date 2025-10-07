@@ -22,7 +22,8 @@ function SetDefaults({
 	onDefaultAbstainValueChange,
 	onDefaultAbstainAyeValueChange,
 	onDefaultAbstainNayValueChange,
-	onNext
+	onNext,
+	defaultAyeNayValue
 }: {
 	voteDecision: EVoteDecision;
 	onVoteDecisionChange: (voteDecision: EVoteDecision) => void;
@@ -32,13 +33,14 @@ function SetDefaults({
 	onDefaultAbstainAyeValueChange: (ayeVoteValue: BN) => void;
 	onDefaultAbstainNayValueChange: (nayVoteValue: BN) => void;
 	onNext: () => void;
+	defaultAyeNayValue: BN;
 }) {
 	const t = useTranslations();
 	return (
 		<div>
 			<div className='p-4'>{t('BatchVote.setDefaults')}</div>
 			<Separator />
-			<div className='flex w-full flex-col gap-y-4 px-24 py-4'>
+			<div className='flex w-full flex-col gap-y-4 py-4 lg:px-24'>
 				<SwitchWalletOrAddress
 					small
 					withBalance
@@ -81,7 +83,10 @@ function SetDefaults({
 				</div>
 				<div className='w-full'>
 					<p className='mb-3 text-sm text-wallet_btn_text'>{t('BatchVote.setConviction')}</p>
-					<ConvictionSelector onConvictionChange={onConvictionChange} />
+					<ConvictionSelector
+						onConvictionChange={onConvictionChange}
+						voteBalance={defaultAyeNayValue}
+					/>
 				</div>
 				<Separator />
 				<div className='flex w-full justify-end'>

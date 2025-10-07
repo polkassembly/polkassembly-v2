@@ -14,7 +14,7 @@ const SidebarTrigger = dynamic(() => import('../../Sidebar/Sidebar').then((mod) 
 function CustomSidebarTrigger() {
 	const { state } = useSidebar();
 	return (
-		<div className={cn('fixed left-4 top-4 z-50 transition-all duration-200 ease-in-out md:top-12', state === 'collapsed' ? 'md:left-16' : 'md:left-[13.5rem]')}>
+		<div className={cn('fixed left-4 top-4 z-50 transition-all duration-200 ease-in-out md:top-12', state === 'collapsed' ? 'md:left-16' : 'md:left-[14.3rem]')}>
 			<SidebarTrigger />
 		</div>
 	);

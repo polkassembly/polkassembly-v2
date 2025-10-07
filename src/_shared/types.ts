@@ -7,14 +7,27 @@
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
-import { TypeDef } from '@polkadot/types/types';
+import { SignerResult, TypeDef } from '@polkadot/types/types';
+import { HexString } from '@polkadot/util/types';
 import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
 	KUSAMA = 'kusama',
 	POLKADOT = 'polkadot',
 	WESTEND = 'westend',
-	PASEO = 'paseo'
+	PASEO = 'paseo',
+	CERE = 'cere'
+}
+
+export enum ENetworkSocial {
+	HOME = 'home',
+	TWITTER = 'twitter',
+	DISCORD = 'discord',
+	GITHUB = 'github',
+	YOUTUBE = 'youtube',
+	REDDIT = 'reddit',
+	TELEGRAM = 'telegram',
+	SUBSCAN = 'subscan'
 }
 
 export enum EGovType {
@@ -154,6 +167,8 @@ export enum EWallet {
 	TALISMAN = 'talisman',
 	POLKAGATE = 'polkagate',
 	NOVAWALLET = 'nova',
+	MIMIR = 'mimir',
+	POLKADOT_VAULT = 'polkadot-vault',
 	OTHER = ''
 	// METAMASK = 'metamask',
 	// WALLETCONNECT = 'walletconnect',
@@ -214,6 +229,7 @@ export interface IMultisigAddress {
 export interface IProxyAddress {
 	address: string;
 	proxyType: EProxyType;
+	delay?: number;
 }
 
 export interface IAddressRelations {
@@ -328,7 +344,8 @@ export enum ENotificationTrigger {
 
 export enum EDataSource {
 	POLKASSEMBLY = 'polkassembly',
-	SUBSQUARE = 'subsquare'
+	SUBSQUARE = 'subsquare',
+	OTHER = 'other'
 }
 
 export enum EReaction {
@@ -403,6 +420,36 @@ export interface IOffChainContentHistoryItem {
 	createdAt: Date;
 }
 
+export type ICommentHistoryItem = Omit<IOffChainContentHistoryItem, 'title'>;
+
+export interface IPollVote {
+	id: string;
+	userId: number;
+	createdAt: Date;
+	selectedOption: string;
+	updatedAt?: Date;
+	publicUser?: IPublicUser;
+}
+
+export enum EPollVotesType {
+	ANONYMOUS = 'anonymous',
+	MASKED = 'masked'
+}
+
+export interface IPoll {
+	id: string;
+	network: ENetwork;
+	proposalType: EProposalType;
+	index: number;
+	endsAt: Date;
+	createdAt: Date;
+	updatedAt: Date;
+	title: string;
+	options: string[];
+	votes: IPollVote[];
+	voteTypes: EPollVotesType[];
+}
+
 export interface IOffChainPost {
 	id?: string;
 	index?: number;
@@ -426,6 +473,7 @@ export interface IOffChainPost {
 	topic?: EOffChainPostTopic;
 	history?: IOffChainContentHistoryItem[];
 	isDefaultContent?: boolean;
+	poll?: IPoll;
 }
 
 export enum EProposalStatus {
@@ -477,6 +525,8 @@ export enum EPostOrigin {
 	BIG_SPENDER = 'BigSpender',
 	BIG_TIPPER = 'BigTipper',
 	CANDIDATES = 'Candidates',
+	CLUSTER_PROTOCOL_ACTIVATOR = 'ClusterProtocolActivator',
+	CLUSTER_PROTOCOL_UPDATER = 'ClusterProtocolUpdater',
 	EXPERTS = 'Experts',
 	FELLOWS = 'Fellows',
 	FELLOWSHIP_ADMIN = 'FellowshipAdmin',
@@ -520,8 +570,9 @@ export interface IVoteMetrics {
 export interface IBeneficiary {
 	address: string;
 	amount: string;
-	assetId: string | null;
+	assetId?: string | null;
 	validFromBlock?: string;
+	usdAmount?: string;
 }
 
 export interface IBeneficiaryInput extends IBeneficiary {
@@ -617,6 +668,7 @@ export interface ISidebarMenuItem {
 	items?: ISidebarMenuItem[];
 	key?: string;
 	heading?: string;
+	renderAsParentItem?: boolean;
 }
 
 export interface IMessageResponse {
@@ -663,6 +715,7 @@ export interface IVoteData {
 	selfVotingPower?: string;
 	totalVotingPower?: string;
 	delegatedVotingPower?: string;
+	votingPower?: string;
 	delegatedVotes?: IVoteData[];
 }
 
@@ -681,7 +734,9 @@ export interface IComment {
 	isSpam?: boolean;
 	sentiment?: ECommentSentiment;
 	aiSentiment?: ECommentSentiment;
-	history?: IOffChainContentHistoryItem[];
+	history?: ICommentHistoryItem[];
+	disabled?: boolean;
+	authorAddress?: string;
 }
 
 export interface ICommentResponse extends IComment {
@@ -721,8 +776,8 @@ export enum EAssets {
 
 export enum EPostDetailsTab {
 	DESCRIPTION = 'description',
-	TIMELINE = 'timeline',
-	ONCHAIN_INFO = 'onchain info',
+	ONCHAIN_INFO = 'onchain_info',
+	SUMMARISE = 'summarise',
 	POST_ANALYTICS = 'post_analytics'
 }
 
@@ -833,6 +888,9 @@ export interface IActivityMetadata {
 	// for posts
 	title?: string;
 	content?: string;
+
+	// for comments
+	authorAddress?: string;
 }
 
 export interface IUserActivity {
@@ -972,7 +1030,12 @@ export interface IPostSubscription {
 export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart',
 	COMMENTS = 'comments',
-	POST_DETAILS = 'postDetails'
+	POST_DETAILS = 'postDetails',
+	ACCOUNTS = 'accounts',
+	IDENTITY_INFO = 'identityInfo',
+	TOKENS_USD_PRICE = 'tokensUsdPrice',
+	USER_VOTES = 'userVotes',
+	PROFILE_IDENTITIES = 'profileIdentities'
 }
 
 export interface IParamDef {
@@ -1000,6 +1063,11 @@ export interface IWritePostFormFields {
 	tags: ITag[];
 	topic: EOffChainPostTopic;
 	allowedCommentor: EAllowedCommentor;
+	pollTitle?: string;
+	pollOptions?: string[];
+	pollEndDate?: Date;
+	pollVoteTypes?: EPollVotesType[];
+	isAddingPoll?: boolean;
 }
 
 export enum ENotificationStatus {
@@ -1087,6 +1155,8 @@ export interface ITreasuryStats {
 	};
 	nativeTokenUsdPrice?: string;
 	nativeTokenUsdPrice24hChange?: string;
+	dedTokenUsdPrice?: string;
+	dedTokenUsdPrice24hChange?: string;
 	[key: string]: unknown;
 }
 
@@ -1129,7 +1199,8 @@ export interface IDelegate {
 
 export interface IDelegateDetails extends IDelegate {
 	publicUser?: IPublicUser;
-	votingPower: string;
+	maxDelegated: string;
+	delegators: string[];
 	receivedDelegationsCount: number;
 	last30DaysVotedProposalsCount: number;
 }
@@ -1302,6 +1373,41 @@ export interface IPayout {
 		generalIndex: string;
 	};
 }
+
+export enum EPreImageTabs {
+	ALL = 'all',
+	USER = 'user'
+}
+
+export interface IOffChainPollPayload extends Omit<IPoll, 'id' | 'createdAt' | 'updatedAt' | 'proposalType' | 'updatedBy' | 'network' | 'votes' | 'index'> {
+	title: string;
+	options: string[];
+	voteTypes: EPollVotesType[];
+	endsAt: Date;
+}
+
+export interface ICreateOffChainPostPayload {
+	proposalType: EProposalType;
+	content: string;
+	title: string;
+	allowedCommentor: EAllowedCommentor;
+	tags?: ITag[];
+	topic?: EOffChainPostTopic;
+	poll?: IOffChainPollPayload;
+}
+export enum EVotesDisplayType {
+	NESTED = 'nested',
+	FLATTENED = 'flattened'
+}
+export enum ESetIdentityStep {
+	GAS_FEE = 'GAS_FEE',
+	SET_IDENTITY_FORM = 'SET_IDENTITY_FORM',
+	REQUEST_JUDGEMENT = 'REQUEST_JUDGEMENT',
+	IDENTITY_SUCCESS = 'IDENTITY_SUCCESS',
+	TELEPORT_TO_PEOPLE_CHAIN = 'TELEPORT_TO_PEOPLE_CHAIN',
+	CLEAR_IDENTITY = 'CLEAR_IDENTITY'
+}
+
 export interface IAnalytics {
 	[EVoteDecision.ABSTAIN]: string;
 	[EVoteDecision.AYE]: string;
@@ -1379,7 +1485,6 @@ export enum EAnalyticsType {
 }
 
 export interface IVoteDistribution extends Omit<IVoteData, 'createdAt' | 'createdAtBlock' | 'proposalIndex' | 'delegatedTo'> {
-	votingPower: string | null;
 	delegatorsCount?: number;
 	isDelegated: boolean;
 	percentage?: number;
@@ -1394,7 +1499,126 @@ export type IPostBubbleVotes = {
 	};
 };
 
-export enum EPostBubbleVotesType {
-	NESTED = 'nested',
-	FLATTENED = 'flattened'
+export interface IVaultScannedAddress {
+	content: string;
+	isAddress: boolean;
+	genesisHash: HexString | null;
+	name?: string;
 }
+
+export interface IVaultQrState {
+	open: boolean;
+	isQrHashed: boolean;
+	qrAddress: string;
+	qrPayload: Uint8Array;
+	qrResolve?: (result: SignerResult) => void;
+	qrReject?: (error: Error) => void;
+}
+
+export enum EVoteBubbleTabs {
+	Bubble = 'bubble',
+	Graph = 'graph'
+}
+
+export interface IProfileVote extends Omit<IVoteData, 'createdAtBlock' | 'delegatedTo' | 'balanceValue'> {
+	balance: {
+		value: string;
+		abstain: string;
+		aye: string;
+		nay: string;
+	};
+	proposalIndex: number;
+	proposalType: EProposalType;
+	postDetails?: IPostListing;
+	isDelegated: boolean;
+	extrinsicIndex: string;
+	proposal?: {
+		status: EProposalStatus;
+	};
+}
+
+export interface IGovAnalyticsStats {
+	totalProposals: number;
+	approvedProposals: number;
+}
+
+export interface IGovAnalyticsReferendumOutcome {
+	approved: number;
+	rejected: number;
+	timeout: number;
+	ongoing: number;
+	cancelled: number;
+}
+
+export interface ITurnoutPercentageData {
+	averageSupportPercentages: Record<string, number>;
+}
+
+export interface IRawTurnoutData {
+	proposals: {
+		index: number;
+		trackNumber?: number;
+		convictionVoting: {
+			balance: {
+				value?: string;
+				aye?: string;
+				nay?: string;
+				abstain?: string;
+			};
+			decision: 'yes' | 'no' | 'abstain' | 'split' | 'splitAbstain';
+		}[];
+	}[];
+}
+
+export interface IGovAnalyticsDelegationStats {
+	totalCapital: string;
+	totalVotesBalance: string;
+	totalDelegates: number;
+	totalDelegators: number;
+}
+
+export interface IGovAnalyticsCategoryCounts {
+	governance: number | null;
+	main: number | null;
+	treasury: number | null;
+	whiteList: number | null;
+}
+
+// please make sure this is updated with the latest changes in the functions/src/types.ts file
+export interface IAlgoliaPost extends Record<string, unknown> {
+	objectID: string;
+	title: string;
+	createdAtTimestamp?: number;
+	updatedAtTimestamp?: number;
+	tags: string[];
+	dataSource: string;
+	proposalType: string;
+	network: string;
+	topic: string;
+	lastCommentAtTimestamp?: number;
+	userId: number;
+	hash?: string;
+	index?: number;
+	parsedContent: string;
+	titleAndContentHash: string;
+	proposer?: string;
+	origin?: EPostOrigin;
+}
+
+export enum EProxyDashboardTabs {
+	ALL = 'all',
+	MY_PROXIES = 'my-proxies'
+}
+
+export interface IProxyRequest {
+	id: string;
+	delegator: string;
+	proxyType?: EProxyType;
+	delay: number;
+	proxies: number;
+	proxyAddresses: string[];
+	individualProxies: IProxyAddress[];
+	dateCreated: Date;
+}
+
+export type IProxyListingResponse = IGenericListingResponse<IProxyRequest>;

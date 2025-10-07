@@ -85,7 +85,14 @@ function Web2Signup({ switchToLogin, onWalletChange }: { switchToLogin: () => vo
 				});
 
 				if (error || !data) {
+					// eslint-disable-next-line sonarjs/no-duplicate-string
 					setErrorMessage(error?.message || t('Profile.signupFailed'));
+					toast({
+						status: ENotificationStatus.ERROR,
+						title: t('Profile.signupFailed'),
+						description: error?.message || 'please try again'
+					});
+
 					setLoading(false);
 					return;
 				}

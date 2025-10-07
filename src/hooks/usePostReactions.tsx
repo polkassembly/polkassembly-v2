@@ -2,12 +2,22 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, EReaction, IReaction, ENotificationStatus } from '@/_shared/types';
+import { EProposalType, EReaction, IReaction, ENotificationStatus, IPublicUser } from '@/_shared/types';
+import { calculateUpdatedReactionUserArrays } from '@/_shared/_utils/reactionUtils';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ClientError } from '@/app/_client-utils/clientError';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useUser } from './useUser';
 import { useToast as useToastLib } from './useToast';
+
+interface IPostReactionState {
+	isLiked: boolean;
+	isDisliked: boolean;
+	likesCount: number;
+	dislikesCount: number;
+	usersWhoLikedPost: IPublicUser[];
+	usersWhoDislikedPost: IPublicUser[];
+}
 
 interface IPostData {
 	reactions?: IReaction[];
@@ -33,16 +43,24 @@ export const usePostReactions = (postData: IPostData) => {
 		setIsSubscribed(!!postData?.isSubscribed);
 	}, [postData?.isSubscribed]);
 
-	const { isLiked, isDisliked, likesCount, dislikesCount } = useMemo(() => {
-		const reactionsArray = postData?.reactions || [];
+	const { isLiked, isDisliked, likesCount, dislikesCount, usersWhoLikedPost, usersWhoDislikedPost } = useMemo(() => {
+		const postReactionsArray = postData?.reactions || [];
 
-		const userReactions = reactionsArray.filter((reaction) => reaction.userId === user?.id);
+		const currentUserReactions = postReactionsArray.filter((reaction) => reaction.userId === user?.id);
 
 		return {
-			isLiked: userReactions.some((reaction) => reaction.reaction === EReaction.like),
-			isDisliked: userReactions.some((reaction) => reaction.reaction === EReaction.dislike),
-			likesCount: reactionsArray.filter((reaction) => reaction.reaction === EReaction.like).length,
-			dislikesCount: reactionsArray.filter((reaction) => reaction.reaction === EReaction.dislike).length
+			isLiked: currentUserReactions.some((reaction) => reaction.reaction === EReaction.like),
+			isDisliked: currentUserReactions.some((reaction) => reaction.reaction === EReaction.dislike),
+			likesCount: postReactionsArray.filter((reaction) => reaction.reaction === EReaction.like).length,
+			dislikesCount: postReactionsArray.filter((reaction) => reaction.reaction === EReaction.dislike).length,
+			usersWhoLikedPost: postReactionsArray
+				.filter((reaction) => reaction.reaction === EReaction.like)
+				.map((reaction) => reaction.publicUser)
+				.filter(Boolean),
+			usersWhoDislikedPost: postReactionsArray
+				.filter((reaction) => reaction.reaction === EReaction.dislike)
+				.map((reaction) => reaction.publicUser)
+				.filter(Boolean)
 		};
 	}, [postData?.reactions, user?.id]);
 
@@ -53,17 +71,15 @@ export const usePostReactions = (postData: IPostData) => {
 		}),
 		[postData.proposalType, postData.indexOrHash]
 	);
-	const [reactionState, setReactionState] = useState({ isLiked, isDisliked, likesCount, dislikesCount });
-	const [showLikeGif, setShowLikeGif] = useState(false);
-	const [showDislikeGif, setShowDislikeGif] = useState(false);
+	const [reactionState, setReactionState] = useState<IPostReactionState>({ isLiked, isDisliked, likesCount, dislikesCount, usersWhoLikedPost, usersWhoDislikedPost });
 
 	const [currentReactionId, setCurrentReactionId] = useState<string | null>(
 		useMemo(() => postData?.reactions?.find((reaction) => reaction.userId === user?.id)?.id || null, [postData?.reactions, user?.id])
 	);
 
 	useEffect(() => {
-		setReactionState({ isLiked, isDisliked, likesCount, dislikesCount });
-	}, [isLiked, isDisliked, likesCount, dislikesCount]);
+		setReactionState({ isLiked, isDisliked, likesCount, dislikesCount, usersWhoLikedPost, usersWhoDislikedPost });
+	}, [isLiked, isDisliked, likesCount, dislikesCount, usersWhoLikedPost, usersWhoDislikedPost]);
 
 	const handleReaction = useCallback(
 		async (type: EReaction) => {
@@ -71,21 +87,30 @@ export const usePostReactions = (postData: IPostData) => {
 				throw new ClientError('Index or hash is required');
 			}
 			const isLikeAction = type === EReaction.like;
-			const showGifSetter = isLikeAction ? setShowLikeGif : setShowDislikeGif;
-			try {
-				const isDeleteAction = currentReactionId && ((isLikeAction && reactionState.isLiked) || (!isLikeAction && reactionState.isDisliked));
-				if (!isDeleteAction) {
-					showGifSetter(true);
-					setTimeout(() => showGifSetter(false), 1500);
-				}
 
-				setReactionState((prev) => ({
-					...prev,
-					isLiked: isLikeAction ? !prev.isLiked : false,
-					isDisliked: !isLikeAction ? !prev.isDisliked : false,
-					likesCount: prev.likesCount + (isLikeAction ? (prev.isLiked ? -1 : 1) : prev.isLiked ? -1 : 0),
-					dislikesCount: prev.dislikesCount + (!isLikeAction ? (prev.isDisliked ? -1 : 1) : prev.isDisliked ? -1 : 0)
-				}));
+			try {
+				const isDeleteAction = Boolean(currentReactionId && ((isLikeAction && reactionState.isLiked) || (!isLikeAction && reactionState.isDisliked)));
+
+				setReactionState((previousState) => {
+					const updatedUserArrays = calculateUpdatedReactionUserArrays({
+						currentUsersWhoLiked: previousState.usersWhoLikedPost,
+						currentUsersWhoDisliked: previousState.usersWhoDislikedPost,
+						isLikeAction,
+						isDeleteAction,
+						currentPublicUser: user?.publicUser,
+						likedArrayKey: 'usersWhoLikedPost',
+						dislikedArrayKey: 'usersWhoDislikedPost'
+					});
+
+					return {
+						...previousState,
+						isLiked: isLikeAction ? !previousState.isLiked : false,
+						isDisliked: !isLikeAction ? !previousState.isDisliked : false,
+						likesCount: previousState.likesCount + (isLikeAction ? (previousState.isLiked ? -1 : 1) : previousState.isLiked ? -1 : 0),
+						dislikesCount: previousState.dislikesCount + (!isLikeAction ? (previousState.isDisliked ? -1 : 1) : previousState.isDisliked ? -1 : 0),
+						...updatedUserArrays
+					};
+				});
 
 				if (isDeleteAction) {
 					if (currentReactionId) {
@@ -101,16 +126,11 @@ export const usePostReactions = (postData: IPostData) => {
 					setCurrentReactionId(response?.data?.reactionId || null);
 				}
 			} catch {
-				setReactionState((prev) => ({
-					...prev,
-					isLiked: isLikeAction ? !prev.isLiked : prev.isLiked,
-					isDisliked: !isLikeAction ? !prev.isDisliked : prev.isDisliked,
-					likesCount: prev.likesCount - (isLikeAction ? 1 : 0),
-					dislikesCount: prev.dislikesCount - (!isLikeAction ? 1 : 0)
-				}));
+				// Revert optimistic update on error - restore to original state
+				setReactionState({ isLiked, isDisliked, likesCount, dislikesCount, usersWhoLikedPost, usersWhoDislikedPost });
 			}
 		},
-		[currentReactionId, reactionState, postData.proposalType, postData.indexOrHash]
+		[currentReactionId, reactionState, postData.proposalType, postData.indexOrHash, user, isLiked, isDisliked, likesCount, dislikesCount, usersWhoLikedPost, usersWhoDislikedPost]
 	);
 
 	const handleSubscribe = async (): Promise<SubscriptionResult> => {
@@ -162,8 +182,6 @@ export const usePostReactions = (postData: IPostData) => {
 
 	return {
 		reactionState,
-		showLikeGif,
-		showDislikeGif,
 		handleReaction,
 		isSubscribed,
 		handleSubscribe,

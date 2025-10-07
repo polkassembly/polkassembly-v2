@@ -34,11 +34,38 @@
 	@apply whitespace-normal break-words rounded-md px-1.5 py-1 text-[10px] lg:text-xs;
 }
 
-.hideScrollbar {
-	-ms-overflow-style: none; /* IE and Edge */
-	scrollbar-width: none; /* Firefox */
+.scrollbarHide {
 	&::-webkit-scrollbar {
-		/* Chrome, Safari and Opera */
 		display: none;
+	}
+
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.tabTrigger {
+	.summariseTabContent {
+		@apply flex items-center gap-x-1 rounded-full bg-text_pink/10 px-3 py-1 text-text_pink;
+	}
+
+	&[data-state='active'] .summariseTabContent {
+		@apply bg-bg_pink text-white;
+	}
+
+	&[data-state='active'] .summariseTabIcon {
+		filter: brightness(0) invert(1);
+	}
+}
+
+@media (max-width: 640px) {
+	.tabTrigger {
+		.summariseTabContent {
+			@apply gap-x-0.5 px-1.5 py-0.5 text-xs;
+		}
+
+		.summariseTabIcon {
+			width: 12px;
+			height: 12px;
+		}
 	}
 }

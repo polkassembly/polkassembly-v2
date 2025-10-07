@@ -10,13 +10,15 @@ import userIcon from '@assets/profile/user-icon.svg';
 import { Hits, Index, useInstantSearch, useSearchBox, Configure, usePagination } from 'react-instantsearch';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Link from 'next/link';
-import { EProposalType, ESearchType } from '@/_shared/types';
+import { EProposalType, ESearchType, ENetwork } from '@/_shared/types';
 import CommentIcon from '@assets/icons/Comment.svg';
 import { POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { AiOutlineDislike } from '@react-icons/all-files/ai/AiOutlineDislike';
 import { AiOutlineLike } from '@react-icons/all-files/ai/AiOutlineLike';
+import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import PaLogo from '../PaLogo';
 import { Separator } from '../../Separator';
 import Address from '../../Profile/Address/Address';
@@ -65,9 +67,15 @@ function PostHit({ hit }: { hit: Post }) {
 	const topic = hit.topic_id ? Object.entries(POST_TOPIC_MAP).find(([, value]) => value === hit.topic_id)?.[0] : null;
 	const backgroundColor = position ? (position % 2 !== 0 ? 'bg-listing_card1' : 'bg-section_dark_overlay') : '';
 
+	const postUrl = getPostTypeUrl({
+		proposalType: hit.proposalType,
+		indexOrHash: hit.index,
+		network: hit.network as ENetwork
+	});
+
 	return (
 		<Link
-			href={hit.proposalType !== EProposalType.DISCUSSION ? `/referenda/${hit.index}` : `/post/${hit.index}`}
+			href={postUrl}
 			target='_blank'
 		>
 			<div className={`${styles.search_results_wrapper} ${backgroundColor} hover:bg-bg_pink/10`}>
@@ -190,6 +198,7 @@ function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 	const t = useTranslations();
 	const isLoading = results?.nbHits === 0 && (status === 'loading' || status === 'stalled');
 	const hasNoResults = results?.nbHits === 0 && query.length > 2;
+	const network = getCurrentNetwork();
 
 	return (
 		<div>
@@ -265,14 +274,14 @@ function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 							<div className='h-full overflow-y-auto pr-2'>
 								{activeIndex === ESearchType.POSTS ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters='NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS' />
+										<Configure filters={`NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS AND network:${network}`} />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>
 									</Index>
 								) : activeIndex === ESearchType.DISCUSSIONS ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters='proposalType:DISCUSSION OR proposalType:GRANTS' />
+										<Configure filters={`proposalType:DISCUSSION OR proposalType:GRANTS AND network:${network}`} />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>

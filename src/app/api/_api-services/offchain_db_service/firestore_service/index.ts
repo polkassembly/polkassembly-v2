@@ -37,7 +37,12 @@ import {
 	ESocial,
 	ISocialHandle,
 	ESocialVerificationStatus,
-	IPostLink
+	IPostLink,
+	IPollVote,
+	IPoll,
+	EPollVotesType,
+	IOffChainPollPayload,
+	ICommentHistoryItem
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -467,6 +472,11 @@ export class FirestoreService extends FirestoreUtils {
 
 			const commentData = {
 				...dataRaw,
+				history:
+					dataRaw.history?.map((item: { createdAt: Timestamp; content: string }) => ({
+						...item,
+						createdAt: item.createdAt.toDate()
+					})) || [],
 				content: dataRaw.content || '',
 				createdAt: dataRaw.createdAt?.toDate(),
 				updatedAt: dataRaw.updatedAt?.toDate(),
@@ -503,6 +513,11 @@ export class FirestoreService extends FirestoreUtils {
 
 		return {
 			...data,
+			history:
+				data.history?.map((item: { createdAt: Timestamp; content: string }) => ({
+					...item,
+					createdAt: item.createdAt.toDate()
+				})) || [],
 			content: data.content || '',
 			createdAt: data.createdAt?.toDate(),
 			updatedAt: data.updatedAt?.toDate(),
@@ -517,6 +532,11 @@ export class FirestoreService extends FirestoreUtils {
 			const data = doc.data();
 			const publicUser = await this.GetPublicUserById(data.userId);
 
+			// Skip reactions that have a commentId (these are comment reactions)
+			if (data.commentId) {
+				return null;
+			}
+
 			return {
 				...data,
 				createdAt: data.createdAt?.toDate(),
@@ -525,7 +545,9 @@ export class FirestoreService extends FirestoreUtils {
 			} as IReaction;
 		});
 
-		return Promise.all(reactionPromises);
+		const results = await Promise.all(reactionPromises);
+		// Filter out null values (comment reactions that were skipped)
+		return results.filter((reaction): reaction is IReaction => reaction !== null);
 	}
 
 	static async GetCommentReactions({
@@ -552,6 +574,7 @@ export class FirestoreService extends FirestoreUtils {
 
 			return {
 				...data,
+				id: doc.id,
 				createdAt: data.createdAt?.toDate(),
 				updatedAt: data.updatedAt?.toDate(),
 				publicUser
@@ -577,6 +600,7 @@ export class FirestoreService extends FirestoreUtils {
 
 		return {
 			...data,
+			id: reactionDocSnapshot.id,
 			createdAt: data.createdAt?.toDate(),
 			updatedAt: data.updatedAt?.toDate(),
 			publicUser
@@ -1003,7 +1027,8 @@ export class FirestoreService extends FirestoreUtils {
 		userId,
 		content,
 		parentCommentId,
-		sentiment
+		sentiment,
+		authorAddress
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -1013,6 +1038,7 @@ export class FirestoreService extends FirestoreUtils {
 		parentCommentId?: string;
 		address?: string;
 		sentiment?: ECommentSentiment;
+		authorAddress?: string;
 	}) {
 		const newCommentId = this.commentsCollectionRef().doc().id;
 
@@ -1025,10 +1051,12 @@ export class FirestoreService extends FirestoreUtils {
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			isDeleted: false,
+			history: [],
 			indexOrHash,
 			parentCommentId: parentCommentId || null,
 			dataSource: EDataSource.POLKASSEMBLY,
-			...(sentiment && { sentiment })
+			...(sentiment && { sentiment }),
+			...(authorAddress && { authorAddress })
 		};
 
 		await this.commentsCollectionRef().doc(newCommentId).set(newComment);
@@ -1036,13 +1064,35 @@ export class FirestoreService extends FirestoreUtils {
 		return newComment;
 	}
 
-	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: string; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
+	static async UpdateComment({
+		commentId,
+		content,
+		isSpam,
+		updateHistory,
+		aiSentiment
+	}: {
+		commentId: string;
+		content: string;
+		isSpam?: boolean;
+		updateHistory?: boolean;
+		aiSentiment?: ECommentSentiment;
+	}) {
+		const comment = await this.GetCommentById(commentId);
+
+		if (!comment) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
+		}
+
+		const history: ICommentHistoryItem[] = updateHistory
+			? [...(comment?.history || []), { content: comment?.content, createdAt: comment?.updatedAt || new Date() }]
+			: comment?.history || [];
 		const newCommentData: Partial<IComment> = {
 			content,
 			...(isSpam && { isSpam }),
 			...(aiSentiment && { aiSentiment }),
 			updatedAt: new Date(),
-			dataSource: EDataSource.POLKASSEMBLY
+			dataSource: EDataSource.POLKASSEMBLY,
+			history
 		};
 
 		await this.commentsCollectionRef().doc(commentId).set(newCommentData, { merge: true });
@@ -1132,6 +1182,7 @@ export class FirestoreService extends FirestoreUtils {
 			.doc(reactionId)
 			.set(
 				{
+					id: reactionId,
 					network,
 					indexOrHash,
 					proposalType,
@@ -1546,6 +1597,7 @@ export class FirestoreService extends FirestoreUtils {
 				.set(
 					{
 						...existingSocialHandle,
+						...(verificationToken && { verificationToken }),
 						status,
 						updatedAt: new Date()
 					},
@@ -1553,6 +1605,7 @@ export class FirestoreService extends FirestoreUtils {
 				);
 			return {
 				...existingSocialHandle,
+				...(verificationToken && { verificationToken: { token: verificationToken.token } }),
 				status,
 				updatedAt: new Date()
 			} as ISocialHandle;
@@ -1624,8 +1677,21 @@ export class FirestoreService extends FirestoreUtils {
 			.offset((page - 1) * limit)
 			.get();
 
+		const postsWithMetrics = await Promise.all(
+			posts.docs.map(async (doc) => {
+				const data = doc.data();
+				const metrics = await this.GetPostMetrics({ network, indexOrHash: String(data.index), proposalType });
+				return {
+					...data,
+					metrics,
+					createdAt: data.createdAt?.toDate(),
+					updatedAt: data.updatedAt?.toDate()
+				} as IOffChainPost;
+			})
+		);
+
 		return {
-			items: posts.docs.map((doc) => doc.data() as IOffChainPost),
+			items: postsWithMetrics,
 			totalCount: totalCount.data().count
 		};
 	}
@@ -1641,5 +1707,168 @@ export class FirestoreService extends FirestoreUtils {
 			// sometimes multiple content summaries are generated for the same post
 			await Promise.all(contentSummary.docs.map((doc) => doc.ref.delete()));
 		}
+	}
+
+	static async CreatePoll({ network, proposalType, index, poll }: { network: ENetwork; proposalType: EProposalType; index: number; poll: IOffChainPollPayload }) {
+		const pollDoc = this.pollsCollectionRef().doc();
+		await pollDoc.set({
+			network,
+			proposalType,
+			index,
+			title: poll.title,
+			options: poll.options,
+			voteTypes: poll.voteTypes || [],
+			endsAt: new Date(poll.endsAt),
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			id: pollDoc.id
+		});
+	}
+
+	static async GetPollForPost({ network, index, proposalType }: { network: ENetwork; index: number; proposalType: EProposalType }) {
+		const pollSnapshot = await this.pollsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('index', '==', index).limit(1).get();
+
+		if (!pollSnapshot.docs?.length) {
+			return null;
+		}
+
+		const pollDoc = pollSnapshot.docs[0];
+
+		const pollData = pollDoc.data();
+		if (!pollData) {
+			return null;
+		}
+		const payload: IPoll = {
+			createdAt: pollData?.createdAt?.toDate?.(),
+			updatedAt: pollData?.updatedAt?.toDate?.(),
+			title: pollData?.title,
+			options: pollData?.options || [],
+			voteTypes: pollData?.voteTypes || [],
+			endsAt: pollData?.endsAt?.toDate?.(),
+			index: pollData?.index,
+			network: pollData?.network,
+			proposalType: pollData?.proposalType,
+			id: pollData?.id,
+			votes: [] // initially empty, will be fetched from the votes collection client side
+		};
+		return payload;
+	}
+
+	static async DeletePollVote({ userId, pollId }: { userId: number; pollId: string }) {
+		const votesSnapshot = await this.pollsCollectionRef().doc(pollId).collection('votes').where('isDeleted', '==', false).where('userId', '==', userId).limit(1).get();
+
+		if (votesSnapshot.empty) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Invalid vote or user not found');
+		}
+		// soft delete the vote
+		await votesSnapshot.docs[0].ref.set({ isDeleted: true, updatedAt: new Date() }, { merge: true });
+	}
+
+	static async CreatePollVote({
+		network,
+		proposalType,
+		index,
+		userId,
+		pollId,
+		selectedOption
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		index: number;
+		userId: number;
+		pollId: string;
+		selectedOption: string;
+	}) {
+		const pollSnapshot = await this.pollsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('index', '==', index)
+			.where('id', '==', pollId)
+			.limit(1)
+			.get();
+
+		if (!pollSnapshot.docs?.length) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Poll not found');
+		}
+
+		const pollDoc = pollSnapshot.docs[0];
+
+		const pollData = pollDoc.data() as IPoll;
+		if (!pollData.options.includes(selectedOption)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid option');
+		}
+
+		// if user has already voted, delete the vote
+		const pollVoteDoc = await pollDoc.ref.collection('votes').where('isDeleted', '==', false).where('userId', '==', userId).limit(1).get();
+		if (pollVoteDoc.docs.length) {
+			await this.DeletePollVote({ userId, pollId });
+		}
+
+		const newPollVoteDoc = pollDoc.ref.collection('votes').doc();
+		const vote = { network, proposalType, index, userId, selectedOption, createdAt: new Date(), id: newPollVoteDoc.id, isDeleted: false, updatedAt: new Date() };
+
+		const includePublicUser = !pollData?.voteTypes?.includes(EPollVotesType.ANONYMOUS);
+		const publicUser = includePublicUser ? await this.GetPublicUserById(userId) : null;
+
+		await newPollVoteDoc.set(vote, { merge: true });
+
+		return {
+			...vote,
+			...(publicUser && { publicUser })
+		} as IPollVote;
+	}
+
+	static async GetPollVotes({ network, proposalType, index, pollId }: { network: ENetwork; proposalType: EProposalType; index: number; pollId: string }) {
+		const pollSnapshot = await this.pollsCollectionRef()
+			.where('network', '==', network)
+			.where('proposalType', '==', proposalType)
+			.where('index', '==', index)
+			.where('id', '==', pollId)
+			.get();
+
+		if (!pollSnapshot.docs?.length) {
+			return [];
+		}
+
+		const pollDoc = pollSnapshot.docs[0];
+
+		// Get poll data and check if poll ended
+		const pollData = pollDoc.data() as IPoll;
+		if (!pollData) {
+			return [];
+		}
+
+		const includePublicUser = !pollData?.voteTypes?.includes(EPollVotesType.ANONYMOUS);
+
+		const votesDoc = await pollDoc.ref.collection('votes').where('isDeleted', '==', false).get();
+
+		if (votesDoc.empty) {
+			return [];
+		}
+
+		const votesPromises = votesDoc.docs.map(async (doc) => {
+			const data = doc.data();
+			const publicUser = includePublicUser ? await this.GetPublicUserById(data.userId) : null;
+			if (!doc.exists) {
+				return null;
+			}
+			return {
+				...data,
+				createdAt: data.createdAt?.toDate?.(),
+				updatedAt: data.updatedAt?.toDate?.(),
+				...(publicUser && { publicUser })
+			} as IPollVote;
+		});
+
+		return Promise.allSettled(votesPromises).then((results) => {
+			return results
+				.map((result) => {
+					if (result.status === 'fulfilled') {
+						return result.value;
+					}
+					return null;
+				})
+				.filter((vote): vote is IPollVote => vote !== null);
+		});
 	}
 }

@@ -27,7 +27,8 @@ export const ERROR_CODES = {
 	FORBIDDEN: 'FORBIDDEN',
 	ALREADY_EXISTS: 'ALREADY_EXISTS',
 	NETWORK_NOT_SUPPORTED: 'NETWORK_NOT_SUPPORTED',
-	INVALID_INDEX_OR_HASH: 'INVALID_INDEX_OR_HASH'
+	INVALID_INDEX_OR_HASH: 'INVALID_INDEX_OR_HASH',
+	USER_BLACKLISTED: 'USER_BLACKLISTED'
 };
 
 export const ERROR_MESSAGES = {
@@ -55,5 +56,6 @@ export const ERROR_MESSAGES = {
 	[ERROR_CODES.FORBIDDEN]: 'You are not allowed to do this action.',
 	[ERROR_CODES.ALREADY_EXISTS]: 'This resource already exists.',
 	[ERROR_CODES.NETWORK_NOT_SUPPORTED]: 'Network not supported for this action.',
-	[ERROR_CODES.INVALID_INDEX_OR_HASH]: 'Invalid index or hash.'
+	[ERROR_CODES.INVALID_INDEX_OR_HASH]: 'Invalid index or hash.',
+	[ERROR_CODES.USER_BLACKLISTED]: 'Your account has been suspended. Please contact support for assistance.'
 };

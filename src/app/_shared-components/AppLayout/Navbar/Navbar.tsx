@@ -9,7 +9,7 @@ import { Button } from '@ui/Button';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import { AuthClientService } from '@/app/_client-services/auth_client_service';
-import { ELocales } from '@/_shared/types';
+import { ELocales, ESetIdentityStep } from '@/_shared/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
 import { setLocaleCookie } from '@/app/_client-utils/setCookieFromServer';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -17,8 +17,14 @@ import { FaBars } from '@react-icons/all-files/fa/FaBars';
 import { IoMdClose } from '@react-icons/all-files/io/IoMdClose';
 import { useState } from 'react';
 import TranslateIcon from '@assets/icons/translate.svg';
+import ProfileIcon from '@assets/navbar/profile-icon.svg';
+import SetIdentityIcon from '@assets/navbar/set-identity-icon.svg';
+import RequestJudgementIcon from '@assets/navbar/request-judgement-icon.svg';
+import LogoutIcon from '@assets/navbar/logout-icon.svg';
+import { ShieldMinusIcon } from 'lucide-react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import { isMimirDetected } from '@/app/_client-services/isMimirDetected';
 import classes from './Navbar.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import Address from '../../Profile/Address/Address';
@@ -60,6 +66,13 @@ function Navbar() {
 		setModalOpen(false);
 		handleModalClose();
 	};
+
+	const onLogout = async () => {
+		const isMimir = await isMimirDetected();
+
+		await AuthClientService.logout({ isIframe: !!isMimir, onLogout: () => setUser(null) });
+	};
+
 	return (
 		<nav className={classes.navbar}>
 			<div className='flex items-center pl-12 md:pl-0'>
@@ -72,7 +85,7 @@ function Navbar() {
 				<div className='border-l-[1px] border-bg_pink pl-2 font-medium text-navbar_title md:border-none md:pl-0'>OpenGov</div>
 			</div>
 
-			<div className='flex items-center gap-x-2 md:hidden'>
+			<div className='flex w-full items-center justify-end gap-x-2 md:hidden'>
 				<Search />
 				<div
 					aria-hidden
@@ -90,7 +103,7 @@ function Navbar() {
 				</div>
 			</div>
 
-			<div className='hidden items-center gap-x-4 md:flex'>
+			<div className='hidden w-full items-center justify-end gap-x-4 md:flex'>
 				<Search />
 				<Select
 					value={userPreferences.locale}
@@ -143,29 +156,83 @@ function Navbar() {
 									<p>{user.username}</p>
 								)}
 							</DropdownMenuTrigger>
-							<DropdownMenuContent>
-								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+							<DropdownMenuContent className='min-w-max'>
+								<DropdownMenuItem
+									asChild
+									className='hover:bg-sidebar_menu_hover'
+								>
 									<Link
-										className='w-full'
+										className={classes.dropdownMenuContent}
 										href={`/user/${user.username}`}
 									>
+										<Image
+											src={ProfileIcon}
+											alt='profile'
+											width={24}
+											height={24}
+										/>
 										{t('Profile.profile')}
 									</Link>
 								</DropdownMenuItem>
-								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+								<DropdownMenuItem
+									asChild
+									className='hover:bg-sidebar_menu_hover'
+								>
 									<Link
-										className='w-full'
+										className={classes.dropdownMenuContent}
 										href='/set-identity'
 									>
+										<Image
+											src={SetIdentityIcon}
+											alt='set identity'
+											width={24}
+											height={24}
+										/>
 										{t('SetIdentity.setIdentity')}
 									</Link>
 								</DropdownMenuItem>
+								<DropdownMenuItem
+									asChild
+									className='hover:bg-sidebar_menu_hover'
+								>
+									<Link
+										className={classes.dropdownMenuContent}
+										href={`/set-identity?open=${ESetIdentityStep.REQUEST_JUDGEMENT}`}
+									>
+										<Image
+											src={RequestJudgementIcon}
+											alt='request judgement'
+											width={24}
+											height={24}
+										/>
+										{t('SetIdentity.requestJudgement')}
+									</Link>
+								</DropdownMenuItem>
 								<DropdownMenuItem className='hover:bg-sidebar_menu_hover'>
+									<Link
+										className={classes.dropdownMenuContent}
+										href={`/set-identity?open=${ESetIdentityStep.CLEAR_IDENTITY}`}
+									>
+										<ShieldMinusIcon className='h-6 w-6 font-light text-basic_text' />
+										{t('SetIdentity.clearIdentity')}
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									asChild
+									className='hover:bg-sidebar_menu_hover'
+								>
 									<Button
 										variant='ghost'
-										className='flex w-full justify-start p-0 text-sm'
-										onClick={() => AuthClientService.logout(() => setUser(null))}
+										className='flex w-full justify-start p-0 px-2 text-sm text-basic_text'
+										onClick={onLogout}
+										size='sm'
 									>
+										<Image
+											src={LogoutIcon}
+											alt='logout'
+											width={24}
+											height={24}
+										/>
 										{t('Profile.logout')}
 									</Button>
 								</DropdownMenuItem>
@@ -199,7 +266,7 @@ function Navbar() {
 
 			{isModalOpen && (
 				<div className='absolute left-0 top-full z-50 w-full border-t-[3px] border-navbar_border bg-bg_modal p-4 pb-10 shadow-md md:hidden'>
-					<div className='flex flex-col gap-5 pt-14'>
+					<div className='flex flex-col gap-5'>
 						<div>
 							<p className='pb-1 text-sm text-text_primary'>{t('Header.network')}</p>
 							<NetworkDropdown className='w-full' />
@@ -269,10 +336,18 @@ function Navbar() {
 											</Link>
 										</DropdownMenuItem>
 										<DropdownMenuItem>
+											<Link
+												className='w-full'
+												href={`/set-identity?open=${ESetIdentityStep.REQUEST_JUDGEMENT}`}
+											>
+												{t('SetIdentity.requestJudgement')}
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem>
 											<Button
 												variant='ghost'
 												className='flex w-full justify-start p-0 text-sm'
-												onClick={() => AuthClientService.logout(() => setUser(null))}
+												onClick={onLogout}
 											>
 												{t('Profile.logout')}
 											</Button>

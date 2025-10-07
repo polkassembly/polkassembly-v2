@@ -45,7 +45,7 @@ export async function fetchCommentsVoteData({
 								network,
 								proposalType,
 								indexOrHash: index,
-								voterAddress: address.address,
+								voterAddresses: [address.address],
 								page: 1,
 								limit: DEFAULT_LISTING_LIMIT
 							});

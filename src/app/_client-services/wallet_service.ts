@@ -8,37 +8,49 @@ import { Signer } from '@polkadot/types/types';
 import { APPNAME } from '@/_shared/_constants/appName';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { stringToHex } from '@polkadot/util';
-import { isWeb3Injected } from '@polkadot/extension-dapp';
+import { inject } from '@mimirdev/apps-inject';
 import { PolkadotApiService } from './polkadot_api_service';
 import { IdentityService } from './identity_service';
+import { isMimirDetected } from './isMimirDetected';
+import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
 
 export class WalletClientService {
 	private injectedWindow: Window & InjectedWindow;
 
-	private apiService: PolkadotApiService;
+	private apiService?: PolkadotApiService;
 
 	private identityService?: IdentityService;
 
 	private readonly network: ENetwork;
 
-	private constructor(injectedWindow: Window & InjectedWindow, apiService: PolkadotApiService, network: ENetwork, identityService?: IdentityService) {
+	private constructor({
+		injectedWindow,
+		apiService,
+		network,
+		identityService
+	}: {
+		injectedWindow: Window & InjectedWindow;
+		apiService?: PolkadotApiService;
+		network: ENetwork;
+		identityService?: IdentityService;
+	}) {
 		this.network = network;
 		this.injectedWindow = injectedWindow;
 		this.apiService = apiService;
 		this.identityService = identityService;
 	}
 
-	static async Init(network: ENetwork, apiService: PolkadotApiService, identityService?: IdentityService) {
+	static async Init(network: ENetwork, apiService?: PolkadotApiService, identityService?: IdentityService) {
 		// Todo: wait for doc ready. (async)
 		const returnWalletService = async () => {
 			const injectedWindow = window as Window & InjectedWindow;
+			const isMimirIframe = await isMimirDetected();
 
-			await apiService.apiReady();
-			if (identityService) {
-				await identityService.ready();
+			if (isMimirIframe) {
+				inject();
 			}
 
-			return new WalletClientService(injectedWindow, apiService, network, identityService);
+			return new WalletClientService({ injectedWindow, apiService, network, identityService });
 		};
 
 		if (document.readyState !== 'loading') {
@@ -51,30 +63,17 @@ export class WalletClientService {
 	}
 
 	async getAddressesFromWallet(selectedWallet: EWallet): Promise<InjectedAccount[]> {
-		const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
-		if (!wallet) {
-			return [];
-		}
-
 		let injected: Injected | undefined;
 		try {
-			injected = await new Promise((resolve, reject) => {
-				const timeoutId = setTimeout(() => {
-					reject(new Error('Wallet Timeout'));
-				}, 60000); // wait 60 sec
+			if (selectedWallet === EWallet.MIMIR) {
+				const { web3Enable, web3FromSource } = await import('@polkadot/extension-dapp');
 
-				if (wallet && wallet.enable) {
-					wallet
-						.enable(APPNAME)
-						.then((value) => {
-							clearTimeout(timeoutId);
-							resolve(value);
-						})
-						.catch((error) => {
-							reject(error);
-						});
-				}
-			});
+				await web3Enable(APPNAME);
+				injected = await web3FromSource('mimir');
+			} else {
+				injected = await getInjectedWallet(selectedWallet);
+			}
+
 			if (!injected) {
 				return [];
 			}
@@ -87,7 +86,7 @@ export class WalletClientService {
 				this.identityService.setSigner(injected.signer as Signer);
 			}
 
-			return await injected.accounts.get();
+			return injected.accounts.get();
 		} catch {
 			// TODO: show notification
 			return [];
@@ -99,7 +98,7 @@ export class WalletClientService {
 	}
 
 	async signMessage({ data, address, selectedWallet }: { data: string; address: string; selectedWallet: EWallet }) {
-		const wallet = typeof window !== 'undefined' && isWeb3Injected ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
+		const wallet = typeof window !== 'undefined' ? this.injectedWindow.injectedWeb3[String(selectedWallet)] : null;
 
 		if (!wallet) {
 			return null;

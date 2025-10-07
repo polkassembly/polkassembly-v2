@@ -19,6 +19,7 @@ import SuccessGif from '@assets/gifs/success.gif';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { Extrinsic } from './Extrinsic/Extrinsic';
 import { Button } from '../../Button';
 import PreimageDetailsView from '../PreimageDetailsView/PreimageDetailsView';
@@ -43,8 +44,10 @@ function ManualExtrinsic({ onSuccess }: { onSuccess: (preimageHash: string) => v
 
 	const notePreimageTx = useMemo(() => apiService?.getNotePreimageTx({ extrinsicFn }), [apiService, extrinsicFn]);
 
+	const { setVaultQrState } = usePolkadotVault();
+
 	const notePreimage = useCallback(async () => {
-		if (!userPreferences.selectedAccount?.address || !extrinsicFn) {
+		if (!userPreferences.selectedAccount?.address || !extrinsicFn || !userPreferences.wallet) {
 			return;
 		}
 
@@ -52,6 +55,8 @@ function ManualExtrinsic({ onSuccess }: { onSuccess: (preimageHash: string) => v
 
 		await apiService?.notePreimage({
 			address: userPreferences.selectedAccount.address,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
 			extrinsicFn,
 			onSuccess: () => {
 				setIsLoading(false);
@@ -127,7 +132,12 @@ function ManualExtrinsic({ onSuccess }: { onSuccess: (preimageHash: string) => v
 			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
 				<SwitchWalletOrAddress
 					small
-					customAddressSelector={<AddressRelationsPicker withBalance />}
+					customAddressSelector={
+						<AddressRelationsPicker
+							withBalance
+							showTransferableBalance
+						/>
+					}
 				/>
 				<Extrinsic onChange={setExtrinsicFn} />
 			</div>

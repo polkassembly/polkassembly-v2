@@ -27,7 +27,7 @@ function ChooseVote({
 			defaultValue={voteDecision}
 			onValueChange={(tab) => onVoteDecisionChange(tab as EVoteDecision)}
 		>
-			<TabsList className='flex gap-x-2 rounded border border-border_grey p-1'>
+			<TabsList className='grid grid-cols-2 gap-2 rounded border border-border_grey p-1 lg:grid-cols-4'>
 				<TabsTrigger
 					className={cn(classes.tabs, 'py-1.5 data-[state=active]:rounded data-[state=active]:border-none data-[state=active]:bg-success data-[state=active]:text-white')}
 					value={EVoteDecision.AYE}

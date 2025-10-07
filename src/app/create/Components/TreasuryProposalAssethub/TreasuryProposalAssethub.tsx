@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EEnactment, EPostOrigin, IBeneficiaryInput, ENotificationStatus } from '@/_shared/types';
+import { EEnactment, EPostOrigin, IBeneficiaryInput, ENotificationStatus, IBeneficiary, ENetwork, EAssets, EReactQueryKeys } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -22,6 +22,56 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useQuery } from '@tanstack/react-query';
+import { convertAssetToUSD } from '@/app/_client-utils/convertAssetToUSD';
+import { decimalToBN } from '@/_shared/_utils/decimalToBN';
+import { NATIVE_TOKEN_PRICE_FOR_TRACKS } from '@/_shared/_constants/nativeTokenPriceForTracks';
+
+const calculateNativeTokenEquivalent = ({
+	beneficiaries,
+	network,
+	currentTokenPrice,
+	dedTokenUsdPrice
+}: {
+	beneficiaries: IBeneficiary[];
+	network: ENetwork;
+	currentTokenPrice?: string;
+	dedTokenUsdPrice?: string;
+}) => {
+	if (!beneficiaries?.length || !network) return BN_ZERO;
+
+	return beneficiaries.reduce((acc, beneficiary) => {
+		if (!beneficiary.assetId) {
+			return acc.add(new BN(beneficiary.amount));
+		}
+
+		const nativeTokenDecimals = NETWORKS_DETAILS[`${network}`].tokenDecimals;
+
+		const nativeTokenUsdPrice = network === ENetwork.POLKADOT ? decimalToBN(NATIVE_TOKEN_PRICE_FOR_TRACKS) : currentTokenPrice ? decimalToBN(currentTokenPrice) : null;
+
+		const assetSymbol = NETWORKS_DETAILS[`${network}`].supportedAssets[`${beneficiary.assetId}`]?.symbol;
+
+		const assetUsdPrice = convertAssetToUSD({
+			amount: beneficiary.amount,
+			asset: assetSymbol as Exclude<EAssets, EAssets.MYTH>,
+			network,
+			currentTokenPrice,
+			dedTokenUsdPrice
+		});
+
+		const nativeTokenBN =
+			nativeTokenUsdPrice?.value && nativeTokenUsdPrice?.value.gt(BN_ZERO)
+				? assetUsdPrice
+						.mul(new BN(10).pow(new BN(nativeTokenDecimals)))
+						.mul(new BN(10).pow(new BN(nativeTokenUsdPrice?.decimals || 0)))
+						.div(nativeTokenUsdPrice.value)
+				: BN_ZERO;
+
+		return acc.add(nativeTokenBN);
+	}, BN_ZERO);
+};
 
 function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: number) => void }) {
 	const t = useTranslations();
@@ -29,7 +79,8 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
 	const { userPreferences } = useUserPreferences();
-	const [beneficiaries, setBeneficiaries] = useState<IBeneficiaryInput[]>([{ address: '', amount: BN_ZERO.toString(), assetId: null, id: dayjs().get('milliseconds').toString() }]);
+
+	const [beneficiaries, setBeneficiaries] = useState<IBeneficiaryInput[]>([{ address: '', amount: BN_ZERO.toString(), id: dayjs().get('milliseconds').toString() }]);
 	const [selectedTrack, setSelectedTrack] = useState<{ name: EPostOrigin; trackId: number }>();
 	const [selectedEnactment, setSelectedEnactment] = useState<EEnactment>(EEnactment.After_No_Of_Blocks);
 	const [advancedDetails, setAdvancedDetails] = useState<{ [key in EEnactment]: BN }>({ [EEnactment.At_Block_No]: BN_ONE, [EEnactment.After_No_Of_Blocks]: BN_HUNDRED });
@@ -37,11 +88,33 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
 
+	const { setVaultQrState } = usePolkadotVault();
+	const getTokensUsdPrice = async () => {
+		const to = new Date();
+		const from = new Date();
+		from.setHours(to.getHours() - 2);
+		const { data, error } = await NextApiClientService.getTreasuryStats({ from, to });
+		if (error) {
+			throw new Error(error.message);
+		}
+		return { nativeTokenUsdPrice: data?.[0]?.nativeTokenUsdPrice, dedTokenUsdPrice: data?.[0]?.dedTokenUsdPrice };
+	};
+
+	const { data: tokensUsdPrice } = useQuery({
+		queryKey: [EReactQueryKeys.TOKENS_USD_PRICE],
+		queryFn: getTokensUsdPrice,
+		retry: false
+	});
+
 	const tx = useMemo(() => {
 		if (!apiService) return null;
 
 		return apiService.getTreasurySpendExtrinsic({ beneficiaries });
 	}, [apiService, beneficiaries]);
+
+	const totalNativeTokenAmount = useMemo(() => {
+		return calculateNativeTokenEquivalent({ beneficiaries, network, currentTokenPrice: tokensUsdPrice?.nativeTokenUsdPrice, dedTokenUsdPrice: tokensUsdPrice?.dedTokenUsdPrice });
+	}, [beneficiaries, network, tokensUsdPrice]);
 
 	const preimageDetails = useMemo(() => apiService && tx && apiService.getPreimageTxDetails({ extrinsicFn: tx }), [apiService, tx]);
 
@@ -68,7 +141,7 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 	);
 
 	const createProposal = async () => {
-		if (!apiService || !userPreferences.selectedAccount?.address || !tx || !selectedTrack) {
+		if (!apiService || !userPreferences.selectedAccount?.address || !userPreferences.wallet || !tx || !selectedTrack) {
 			return;
 		}
 
@@ -76,6 +149,8 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 
 		await apiService.createProposal({
 			address: userPreferences.selectedAccount?.address,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
 			extrinsicFn: tx,
 			track: selectedTrack.name,
 			enactment: selectedEnactment,
@@ -105,7 +180,12 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 			<div className='flex flex-1 flex-col gap-y-3 overflow-y-auto sm:gap-y-4'>
 				<SwitchWalletOrAddress
 					small
-					customAddressSelector={<AddressRelationsPicker withBalance />}
+					customAddressSelector={
+						<AddressRelationsPicker
+							withBalance
+							showTransferableBalance
+						/>
+					}
 				/>
 				<MultipleBeneficiaryForm
 					beneficiaries={beneficiaries}
@@ -118,6 +198,7 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 					selectedTrack={selectedTrack}
 					onChange={setSelectedTrack}
 					isTreasury
+					requestedAmount={totalNativeTokenAmount}
 				/>
 				<EnactmentForm
 					selectedEnactment={selectedEnactment}

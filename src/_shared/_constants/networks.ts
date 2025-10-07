@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { BN } from '@polkadot/util';
-import { ENetwork, EPostOrigin, EGovType, EAssets } from '@shared/types';
+import { ENetwork, EPostOrigin, EGovType, EAssets, ENetworkSocial } from '@shared/types';
 import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
 import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
 import { FaYoutube } from '@react-icons/all-files/fa/FaYoutube';
@@ -17,6 +17,7 @@ import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import WestendLogo from '@assets/parachain-logos/westend-logo.jpg';
 import PaseoLogo from '@assets/parachain-logos/paseo-logo.png';
+import CereLogo from '@assets/parachain-logos/cere-logo.jpg';
 import { StaticImageData } from 'next/image';
 import USDCIcon from '@/_assets/icons/usdc.svg';
 import USDTIcon from '@/_assets/icons/usdt.svg';
@@ -37,7 +38,16 @@ const VIA_IBP_GEODNS1 = 'via IBP-GeoDNS1';
 const VIA_IBP_GEODNS2 = 'via IBP-GeoDNS2';
 const VIA_RADIUMBLOCK = 'via RadiumBlock';
 const VIA_LUCKYFRIDAY = 'via LuckyFriday';
-const VIA_PINKNODE = 'via Pinknode';
+const VIA_ALL_NODES = 'via All Nodes';
+const VIA_BLOCKOPS = 'via Blockops';
+const VIA_DWELLIR_TUNISIA = 'via Dwellir Tunisia';
+const VIA_HELIXSTREET = 'via HelixStreet';
+const VIA_IBP_1 = 'via IBP 1';
+const VIA_IBP_2 = 'via IBP 2';
+const VIA_PERMANENCE_DAO_EU = 'via Permanence DAO EU';
+const VIA_STAKETWORLD = 'via Stakeworld';
+const VIA_SIMPLY_STAKING = 'via Simply Staking';
+const VIA_SUBQUERY = 'via SubQuery';
 
 interface ITreasuryAsset {
 	name: string;
@@ -133,17 +143,6 @@ interface INetworkDetails {
 	};
 }
 
-enum ENetworkSocial {
-	HOME = 'home',
-	TWITTER = 'twitter',
-	DISCORD = 'discord',
-	GITHUB = 'github',
-	YOUTUBE = 'youtube',
-	REDDIT = 'reddit',
-	TELEGRAM = 'telegram',
-	SUBSCAN = 'subscan'
-}
-
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
 	[EAssets.DED]: { name: 'dot-is-ded', tokenDecimal: 10, symbol: 'DED', icon: DEDIcon },
 	[EAssets.USDT]: { name: 'usdt', tokenDecimal: 6, symbol: 'USDT', icon: USDTIcon },
@@ -161,12 +160,16 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 				url: 'wss://polkadot-people-rpc.polkadot.io'
 			},
 			{
+				name: VIA_DWELLIR,
+				url: 'wss://people-polkadot-rpc.n.dwellir.com'
+			},
+			{
 				name: VIA_LUCKYFRIDAY,
 				url: 'wss://rpc-people-polkadot.luckyfriday.io'
 			},
 			{
-				name: VIA_RADIUMBLOCK,
-				url: 'wss://people-polkadot.public.curie.radiumblock.co/ws'
+				name: VIA_ONFINALITY,
+				url: 'wss://people-polkadot.api.onfinality.io/public-ws'
 			},
 			{
 				name: VIA_IBP_GEODNS1,
@@ -175,6 +178,10 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 			{
 				name: VIA_IBP_GEODNS2,
 				url: 'wss://people-polkadot.dotters.network'
+			},
+			{
+				name: VIA_STAKETWORLD,
+				url: 'wss://dot-rpc.stakeworld.io/people'
 			}
 		]
 	},
@@ -233,6 +240,15 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 				url: 'wss://people-paseo.rpc.amforc.com'
 			}
 		]
+	},
+	[ENetwork.CERE]: {
+		identityMinDeposit: new BN('100000000000'),
+		rpcEndpoints: [
+			{
+				name: 'via Cere Network',
+				url: 'wss://archive.mainnet.cere.network/ws'
+			}
+		]
 	}
 } as const;
 
@@ -245,7 +261,11 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 			},
 			{
 				name: VIA_DWELLIR,
-				url: 'wss://asset-hub-polkadot-rpc.dwellir.com'
+				url: 'wss://asset-hub-polkadot-rpc.n.dwellir.com'
+			},
+			{
+				name: VIA_DWELLIR_TUNISIA,
+				url: 'wss://statemint-rpc-tn.dwellir.com'
 			},
 			{
 				name: VIA_ONFINALITY,
@@ -262,6 +282,14 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 			{
 				name: VIA_LUCKYFRIDAY,
 				url: 'wss://rpc-asset-hub-polkadot.luckyfriday.io'
+			},
+			{
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://statemint.public.curie.radiumblock.co/ws'
+			},
+			{
+				name: VIA_STAKETWORLD,
+				url: 'wss://dot-rpc.stakeworld.io/assethub'
 			}
 		]
 	},
@@ -308,7 +336,8 @@ const NETWORK_TOKEN_DECIMALS: Record<ENetwork, number> = {
 	[ENetwork.POLKADOT]: 10,
 	[ENetwork.KUSAMA]: 12,
 	[ENetwork.WESTEND]: 12,
-	[ENetwork.PASEO]: 10
+	[ENetwork.PASEO]: 10,
+	[ENetwork.CERE]: 10
 } as const;
 
 // TODO: update for other networks than polkadot
@@ -1981,6 +2010,372 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 				}
 			}
 		}
+	},
+	[ENetwork.CERE]: {
+		[EPostOrigin.ROOT]: {
+			trackId: 0,
+			description: ROOT_ORIGIN_DESCRIPTION,
+			group: 'Origin',
+			name: 'root',
+			maxDeciding: 1,
+			decisionDeposit: new BN('1000000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 14400,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				reciprocal: {
+					factor: 222222224,
+					xOffset: 333333335,
+					yOffset: 333333332
+				}
+			},
+			minSupport: {
+				linearDecreasing: {
+					length: 1000000000,
+					floor: 200000000,
+					ceil: 500000000
+				}
+			}
+		},
+		[EPostOrigin.WHITELISTED_CALLER]: {
+			trackId: 1,
+			description: WHITELISTED_CALLER_DESCRIPTION,
+			group: 'Origin',
+			name: 'whitelisted_caller',
+			maxDeciding: 100,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 300,
+			decisionPeriod: 403200,
+			confirmPeriod: 100,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 270899180,
+					xOffset: 389830523,
+					yOffset: 305084738
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 27823,
+					xOffset: 55670,
+					yOffset: 222179
+				}
+			}
+		},
+		[EPostOrigin.STAKING_ADMIN]: {
+			trackId: 10,
+			description: STAKING_ADMIN_DESCRIPTION,
+			group: 'Main',
+			name: 'staking_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7996925,
+					xOffset: 19607844,
+					yOffset: 92156862
+				}
+			}
+		},
+		[EPostOrigin.TREASURER]: {
+			trackId: 11,
+			description: TREASURER_DESCRIPTION,
+			group: 'Treasury',
+			name: 'treasurer',
+			maxDeciding: 10,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				reciprocal: {
+					factor: 222222224,
+					xOffset: 333333335,
+					yOffset: 333333332
+				}
+			},
+			minSupport: {
+				linearDecreasing: {
+					length: 1000000000,
+					floor: 100000000,
+					ceil: 500000000
+				}
+			}
+		},
+		[EPostOrigin.GENERAL_ADMIN]: {
+			trackId: 14,
+			description: GENERAL_ADMIN_DESCRIPTION,
+			group: 'Main',
+			name: 'general_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 222222224,
+					xOffset: 333333335,
+					yOffset: 333333332
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 56250000,
+					xOffset: 125000000,
+					yOffset: 50000000
+				}
+			}
+		},
+		[EPostOrigin.REFERENDUM_CANCELLER]: {
+			trackId: 20,
+			description: REFERENDUM_CANCELLER_DESCRIPTION,
+			group: 'Origin',
+			name: 'referendum_canceller',
+			maxDeciding: 1000,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 100800,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7996925,
+					xOffset: 19607844,
+					yOffset: 92156862
+				}
+			}
+		},
+		[EPostOrigin.REFERENDUM_KILLER]: {
+			trackId: 21,
+			description: REFERENDUM_KILLER_DESCRIPTION,
+			group: 'Origin',
+			name: 'referendum_killer',
+			maxDeciding: 1000,
+			decisionDeposit: new BN('500000000000000'),
+			preparePeriod: 1200,
+			decisionPeriod: 403200,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7996925,
+					xOffset: 19607844,
+					yOffset: 92156862
+				}
+			}
+		},
+		[EPostOrigin.SMALL_TIPPER]: {
+			trackId: 30,
+			description: 'Origin able to spend small amounts from the treasury',
+			group: 'Treasury',
+			name: 'small_tipper',
+			maxDeciding: 200,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 10,
+			decisionPeriod: 100800,
+			confirmPeriod: 100,
+			minEnactmentPeriod: 10,
+			minApproval: {
+				linearDecreasing: {
+					length: 357142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 1659723,
+					xOffset: 4132231,
+					yOffset: 98347107
+				}
+			}
+		},
+		[EPostOrigin.BIG_TIPPER]: {
+			trackId: 31,
+			description: 'Origin able to spend medium amounts from the treasury',
+			group: 'Treasury',
+			name: 'big_tipper',
+			maxDeciding: 100,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 100,
+			decisionPeriod: 100800,
+			confirmPeriod: 600,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 357142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 4188032,
+					xOffset: 10362694,
+					yOffset: 95854922
+				}
+			}
+		},
+		[EPostOrigin.SMALL_SPENDER]: {
+			trackId: 32,
+			description: 'Origin able to spend small amounts from the treasury',
+			group: 'Treasury',
+			name: 'small_spender',
+			maxDeciding: 50,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 2400,
+			decisionPeriod: 403200,
+			confirmPeriod: 7200,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7996925,
+					xOffset: 19607844,
+					yOffset: 92156862
+				}
+			}
+		},
+		[EPostOrigin.MEDIUM_SPENDER]: {
+			trackId: 33,
+			description: 'Origin able to spend medium amounts from the treasury',
+			group: 'Treasury',
+			name: 'medium_spender',
+			maxDeciding: 50,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 2400,
+			decisionPeriod: 403200,
+			confirmPeriod: 14400,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				linearDecreasing: {
+					length: 821428571,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 14660507,
+					xOffset: 35398231,
+					yOffset: 85840707
+				}
+			}
+		},
+		[EPostOrigin.BIG_SPENDER]: {
+			trackId: 34,
+			description: 'Origin able to spend large amounts from the treasury',
+			group: 'Treasury',
+			name: 'big_spender',
+			maxDeciding: 50,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 2400,
+			decisionPeriod: 403200,
+			confirmPeriod: 28800,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				linearDecreasing: {
+					length: 1000000000,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 29273788,
+					xOffset: 68493157,
+					yOffset: 72602737
+				}
+			}
+		},
+		[EPostOrigin.CLUSTER_PROTOCOL_ACTIVATOR]: {
+			trackId: 100,
+			description: 'Origin for cluster protocol activation',
+			group: 'Protocol',
+			name: 'cluster_protocol_activator',
+			maxDeciding: 50,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 300,
+			decisionPeriod: 403200,
+			confirmPeriod: 100,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 270899180,
+					xOffset: 389830523,
+					yOffset: 305084738
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 2778,
+					xOffset: 5556,
+					yOffset: 22222
+				}
+			}
+		},
+		[EPostOrigin.CLUSTER_PROTOCOL_UPDATER]: {
+			trackId: 101,
+			description: 'Origin for cluster protocol updates',
+			group: 'Protocol',
+			name: 'cluster_protocol_updater',
+			maxDeciding: 50,
+			decisionDeposit: new BN('100000000000000'),
+			preparePeriod: 300,
+			decisionPeriod: 403200,
+			confirmPeriod: 100,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 270899180,
+					xOffset: 389830523,
+					yOffset: 305084738
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 2778,
+					xOffset: 5556,
+					yOffset: 22222
+				}
+			}
+		}
 	}
 } as const;
 
@@ -2097,7 +2492,8 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 		}
 	],
 	[ENetwork.WESTEND]: [],
-	[ENetwork.PASEO]: []
+	[ENetwork.PASEO]: [],
+	[ENetwork.CERE]: []
 } as const;
 
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
@@ -2118,36 +2514,72 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		tokenSymbol: 'DOT',
 		rpcEndpoints: [
 			{
-				name: `${VIA_PARITY} (recommended)`,
-				url: 'wss://rpc.polkadot.io'
+				name: `${VIA_ALL_NODES} (recommended)`,
+				url: 'wss://polkadot-rpc.publicnode.com'
+			},
+			{
+				name: VIA_BLOCKOPS,
+				url: 'wss://polkadot-public-rpc.blockops.network/ws'
+			},
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://polkadot-rpc.n.dwellir.com'
+			},
+			{
+				name: VIA_DWELLIR_TUNISIA,
+				url: 'wss://polkadot-rpc-tn.dwellir.com'
+			},
+			{
+				name: VIA_HELIXSTREET,
+				url: 'wss://rpc-polkadot.helixstreet.io'
+			},
+			{
+				name: VIA_IBP_1,
+				url: 'wss://rpc.ibp.network/polkadot'
+			},
+			{
+				name: VIA_IBP_2,
+				url: 'wss://polkadot.dotters.network'
+			},
+			{
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-polkadot.luckyfriday.io'
+			},
+			{
+				name: VIA_PERMANENCE_DAO_EU,
+				url: 'wss://rpc.permanence.io'
 			},
 			{
 				name: VIA_ONFINALITY,
 				url: 'wss://polkadot.api.onfinality.io/public-ws'
 			},
 			{
-				name: VIA_DWELLIR,
-				url: 'wss://polkadot-rpc.dwellir.com'
-			},
-			{
-				name: VIA_PINKNODE,
-				url: 'wss://public-rpc.pinknode.io/polkadot'
-			},
-			{
-				name: VIA_IBP_GEODNS1,
-				url: 'wss://rpc.ibp.network/polkadot'
-			},
-			{
-				name: VIA_IBP_GEODNS2,
-				url: 'wss://rpc.dotters.network/polkadot'
+				name: VIA_PERMANENCE_DAO_EU,
+				url: 'wss://polkadot.rpc.permanence.io'
 			},
 			{
 				name: VIA_RADIUMBLOCK,
 				url: 'wss://polkadot.public.curie.radiumblock.co/ws'
 			},
 			{
-				name: VIA_LUCKYFRIDAY,
-				url: 'wss://rpc-polkadot.luckyfriday.io'
+				name: VIA_ONFINALITY,
+				url: 'wss://polkadot.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_PERMANENCE_DAO_EU,
+				url: 'wss://polkadot.rpc.permanence.io'
+			},
+			{
+				name: VIA_SIMPLY_STAKING,
+				url: 'wss://spectrum-03.simplystaking.xyz/cG9sa2Fkb3QtMDMtOTFkMmYwZGYtcG9sa2Fkb3Q/LjwBJpV3dIKyWQ/polkadot/mainnet/'
+			},
+			{
+				name: VIA_STAKETWORLD,
+				url: 'wss://dot-rpc.stakeworld.io'
+			},
+			{
+				name: VIA_SUBQUERY,
+				url: 'wss://polkadot.rpc.subquery.network/public/ws'
 			}
 		],
 		supportedAssets: {
@@ -2156,14 +2588,14 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				index: '1984',
 				tokenDecimal: 6
 			},
+			'30': {
+				...treasuryAssetsData[EAssets.DED],
+				index: '30'
+			},
 			'1337': {
 				...treasuryAssetsData[EAssets.USDC],
 				index: '1337',
 				tokenDecimal: 6
-			},
-			'30': {
-				...treasuryAssetsData[EAssets.DED],
-				index: '30'
 			}
 		},
 		foreignAssets: {
@@ -2188,6 +2620,8 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		key: ENetwork.KUSAMA,
 		logo: KusamaLogo,
 		submissionDeposit: new BN('33333333333'),
+		assetHubParaId: '1000',
+		peopleChainParaId: '1004',
 		govtype: EGovType.OPENGOV,
 		name: 'Kusama',
 		blockTime: 6000,
@@ -2275,19 +2709,19 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				url: 'wss://rpc-westend.luckyfriday.io'
 			},
 			{
-				name: 'via OnFinality',
+				name: VIA_ONFINALITY,
 				url: 'wss://westend.api.onfinality.io/public-ws'
 			},
 			{
-				name: 'via Parity',
+				name: VIA_PARITY,
 				url: 'wss://westend-rpc.polkadot.io'
 			},
 			{
-				name: 'via RadiumBlock',
+				name: VIA_RADIUMBLOCK,
 				url: 'wss://westend.public.curie.radiumblock.co/ws'
 			},
 			{
-				name: 'via Stakeworld',
+				name: VIA_STAKETWORLD,
 				url: 'wss://wnd-rpc.stakeworld.io'
 			}
 		],
@@ -2341,6 +2775,31 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 			small:
 				'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fpolkassembly-small.jpg?alt=media&token=63accae8-ea14-4705-817b-92c7bf80ccce'
 		},
+		supportedAssets: {},
+		foreignAssets: {}
+	},
+	[ENetwork.CERE]: {
+		key: ENetwork.CERE,
+		logo: CereLogo,
+		submissionDeposit: new BN('10000000000'),
+		name: 'Cere',
+		govtype: EGovType.OPENGOV,
+		palletInstance: '50',
+		blockTime: 6000,
+		ss58Format: 54,
+		subsquidUrl: 'https://polkassembly.squids.live/cere-polkassembly/graphql',
+		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.CERE],
+		tokenSymbol: 'BCERE',
+		rpcEndpoints: [
+			{
+				name: 'via Cere Network',
+				url: 'wss://archive.mainnet.cere.network/ws'
+			}
+		],
+		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.CERE],
+		socialLinks: networkSocialLinks[ENetwork.CERE],
+		convictionVotingPeriodInBlocks: new BN('100800'),
+		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.CERE],
 		supportedAssets: {},
 		foreignAssets: {}
 	}
