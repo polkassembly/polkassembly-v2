@@ -369,7 +369,7 @@ function Navbar() {
 					</div>
 				)}
 			</nav>
-			{network === ENetwork.KUSAMA && (
+			{[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network) && (
 				<AnnouncementBanner
 					message={
 						<p className='flex flex-wrap items-center gap-x-1 text-sm'>
