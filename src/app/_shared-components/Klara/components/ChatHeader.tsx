@@ -8,15 +8,17 @@ import KlaraAvatar from '@assets/klara/avatar.svg';
 import { CgArrowsVAlt } from '@react-icons/all-files/cg/CgArrowsVAlt';
 import { IoClose } from '@react-icons/all-files/io5/IoClose';
 import { IoChevronDown } from '@react-icons/all-files/io5/IoChevronDown';
+import { IoChevronUp } from '@react-icons/all-files/io5/IoChevronUp';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { EChatState } from '@/_shared/types';
 import styles from '../ChatUI.module.scss';
 
 interface Props {
+	chatState: EChatState | null;
 	setChatState: (state: EChatState) => void;
 }
 
-function ChatHeader({ setChatState }: Props) {
+function ChatHeader({ chatState, setChatState }: Props) {
 	return (
 		<div className={styles.chatUIHeader}>
 			<Image
@@ -33,7 +35,7 @@ function ChatHeader({ setChatState }: Props) {
 						<button
 							type='button'
 							aria-label='expand'
-							onClick={() => setChatState(EChatState.EXPANDED)}
+							// onClick={() => setChatState(EChatState.EXPANDED)}
 							className={`${styles.controlIcon} border-none bg-green-400 outline-none focus:outline-none`}
 						>
 							<CgArrowsVAlt className='size-4 rotate-45 text-white' />
@@ -48,15 +50,15 @@ function ChatHeader({ setChatState }: Props) {
 					<TooltipTrigger asChild>
 						<button
 							type='button'
-							onClick={() => setChatState(EChatState.COLLAPSED)}
+							onClick={() => setChatState(chatState === EChatState.EXPANDED_SMALL ? EChatState.COLLAPSED : EChatState.EXPANDED_SMALL)}
 							aria-label='collapse'
 							className={`${styles.controlIcon} border-none bg-yellow-400 outline-none focus:outline-none`}
 						>
-							<IoChevronDown className='size-4 text-white' />
+							{chatState === EChatState.EXPANDED_SMALL ? <IoChevronDown className='size-4 text-white' /> : <IoChevronUp className='size-4 text-white' />}
 						</button>
 					</TooltipTrigger>
 					<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
-						<p>collapse</p>
+						<p>{chatState === EChatState.EXPANDED_SMALL ? 'collapse' : 'open'}</p>
 					</TooltipContent>
 				</Tooltip>
 

@@ -92,13 +92,13 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 
 			<SidebarFooter className='mb-3 px-3'>
 				{state === 'expanded' ? (
-					chatState === EChatState.EXPANDED ? (
+					chatState === EChatState.EXPANDED_SMALL ? (
 						<ChatsHistory />
 					) : (
 						<button
 							type='button'
 							className={styles.chat_button}
-							onClick={() => setChatState(EChatState.EXPANDED)}
+							onClick={() => setChatState(EChatState.EXPANDED_SMALL)}
 							aria-label='Chat with Klara'
 						>
 							<div className={styles.chat_button_content}>
@@ -122,7 +122,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 					<button
 						type='button'
 						className={styles.chat_button}
-						onClick={() => setChatState(EChatState.EXPANDED)}
+						onClick={() => setChatState(EChatState.EXPANDED_SMALL)}
 						aria-label='Chat with Klara'
 					>
 						<div className={`${styles.chat_button_content} justify-center`}>

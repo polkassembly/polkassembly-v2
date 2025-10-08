@@ -41,8 +41,11 @@ function ChatUI() {
 	return (
 		<div className={styles.chatUI}>
 			<div className={styles.container}>
-				<ChatHeader setChatState={setChatState} />
-				{chatState === EChatState.EXPANDED && (
+				<ChatHeader
+					chatState={chatState}
+					setChatState={setChatState}
+				/>
+				{chatState === EChatState.EXPANDED_SMALL && (
 					<>
 						<ChatMessages
 							messages={messages}
