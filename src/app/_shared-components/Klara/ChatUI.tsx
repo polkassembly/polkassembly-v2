@@ -14,6 +14,7 @@ import ChatHeader from './components/ChatHeader';
 import ChatMessages from './components/ChatMessages';
 import ChatInput from './components/ChatInput';
 import styles from './ChatUI.module.scss';
+import ExpandedChatModal from './components/ExpandedChatModal';
 
 function ChatUI() {
 	const { chatState, setChatState } = useChatState();
@@ -39,51 +40,56 @@ function ChatUI() {
 	}
 
 	return (
-		<div className={styles.chatUI}>
-			<div className={styles.container}>
-				<ChatHeader
-					chatState={chatState}
-					setChatState={setChatState}
-				/>
-				{chatState === EChatState.EXPANDED_SMALL && (
-					<>
-						<ChatMessages
-							messages={messages}
-							streamingMessage={streamingMessage}
-							mascotType={mascotType}
-							isLoadingMessages={isLoadingMessages}
-							onFollowUpClick={handleFollowUpClick}
-						/>
-						<ChatInput
-							inputText={inputText}
-							isLoading={isLoading}
-							isLoadingMessages={isLoadingMessages}
-							isStreaming={!!streamingMessage?.isStreaming}
-							onInputChange={handleInputChange}
-							onSubmit={handleSubmit}
-							onStopGeneration={handleStopGeneration}
-						/>
-						{messages.length > 0 && !isLoading && !streamingMessage && (
-							<div className='w-full'>
-								<button
-									type='button'
-									onClick={handleNewChat}
-									className={styles.newChatBtn}
-								>
-									<Image
-										src={NewChatIcon}
-										alt='new chat'
-										width={24}
-										height={24}
-									/>
-									Start a new chat
-								</button>
+		<>
+			<div className={styles.chatUI}>
+				<div className={styles.container}>
+					<ChatHeader
+						chatState={chatState}
+						setChatState={setChatState}
+					/>
+					{chatState === EChatState.EXPANDED_SMALL && (
+						<>
+							<div className='h-80 overflow-y-auto'>
+								<ChatMessages
+									messages={messages}
+									streamingMessage={streamingMessage}
+									mascotType={mascotType}
+									isLoadingMessages={isLoadingMessages}
+									onFollowUpClick={handleFollowUpClick}
+								/>
 							</div>
-						)}
-					</>
-				)}
+							<ChatInput
+								inputText={inputText}
+								isLoading={isLoading}
+								isLoadingMessages={isLoadingMessages}
+								isStreaming={!!streamingMessage?.isStreaming}
+								onInputChange={handleInputChange}
+								onSubmit={handleSubmit}
+								onStopGeneration={handleStopGeneration}
+							/>
+							{messages.length > 0 && !isLoading && !streamingMessage && (
+								<div className='w-full'>
+									<button
+										type='button'
+										onClick={handleNewChat}
+										className={styles.newChatBtn}
+									>
+										<Image
+											src={NewChatIcon}
+											alt='new chat'
+											width={24}
+											height={24}
+										/>
+										Start a new chat
+									</button>
+								</div>
+							)}
+						</>
+					)}
+				</div>
 			</div>
-		</div>
+			<ExpandedChatModal open={chatState === EChatState.EXPANDED} />
+		</>
 	);
 }
 

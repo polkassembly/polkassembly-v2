@@ -35,7 +35,7 @@ function ChatHeader({ chatState, setChatState }: Props) {
 						<button
 							type='button'
 							aria-label='expand'
-							// onClick={() => setChatState(EChatState.EXPANDED)}
+							onClick={() => setChatState(EChatState.EXPANDED)}
 							className={`${styles.controlIcon} border-none bg-green-400 outline-none focus:outline-none`}
 						>
 							<CgArrowsVAlt className='size-4 rotate-45 text-white' />
@@ -50,15 +50,15 @@ function ChatHeader({ chatState, setChatState }: Props) {
 					<TooltipTrigger asChild>
 						<button
 							type='button'
-							onClick={() => setChatState(chatState === EChatState.EXPANDED_SMALL ? EChatState.COLLAPSED : EChatState.EXPANDED_SMALL)}
+							onClick={() => setChatState(chatState === EChatState.COLLAPSED ? EChatState.EXPANDED_SMALL : EChatState.COLLAPSED)}
 							aria-label='collapse'
 							className={`${styles.controlIcon} border-none bg-yellow-400 outline-none focus:outline-none`}
 						>
-							{chatState === EChatState.EXPANDED_SMALL ? <IoChevronDown className='size-4 text-white' /> : <IoChevronUp className='size-4 text-white' />}
+							{chatState === EChatState.COLLAPSED ? <IoChevronUp className='size-4 text-white' /> : <IoChevronDown className='size-4 text-white' />}
 						</button>
 					</TooltipTrigger>
 					<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
-						<p>{chatState === EChatState.EXPANDED_SMALL ? 'collapse' : 'open'}</p>
+						<p>{chatState === EChatState.COLLAPSED ? 'open' : 'collapse'}</p>
 					</TooltipContent>
 				</Tooltip>
 
