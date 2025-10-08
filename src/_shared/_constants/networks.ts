@@ -312,30 +312,6 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 				url: 'wss://dot-rpc.stakeworld.io/assethub'
 			}
 		]
-	},
-	[ENetwork.KUSAMA]: {
-		rpcEndpoints: [
-			{
-				name: VIA_IBP_GEODNS1,
-				url: 'wss://sys.ibp.network/asset-hub-kusama'
-			},
-			{
-				name: VIA_PARITY,
-				url: 'wss://kusama-asset-hub-rpc.polkadot.io'
-			},
-			{
-				name: VIA_IBP_GEODNS2,
-				url: 'wss://asset-hub-kusama.dotters.network'
-			},
-			{
-				name: VIA_DWELLIR,
-				url: 'wss://asset-hub-kusama-rpc.dwellir.com'
-			},
-			{
-				name: VIA_LUCKYFRIDAY,
-				url: 'wss://rpc-asset-hub-kusama.luckyfriday.io'
-			}
-		]
 	}
 } as const;
 
@@ -3136,35 +3112,30 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		rpcEndpoints: [
 			{
 				name: VIA_ONFINALITY,
-				url: 'wss://kusama.api.onfinality.io/public-ws'
-			},
-			{
-				name: VIA_DWELLIR,
-				url: 'wss://kusama-rpc.dwellir.com'
-			},
-			{
-				name: VIA_PARITY,
-				url: 'wss://kusama-rpc.polkadot.io'
+				url: 'wss://assethub-kusama.api.onfinality.io/public-ws'
 			},
 			{
 				name: VIA_IBP_GEODNS1,
-				url: 'wss://rpc.ibp.network/kusama'
+				url: 'wss://sys.ibp.network/asset-hub-kusama'
+			},
+			{
+				name: VIA_PARITY,
+				url: 'wss://kusama-asset-hub-rpc.polkadot.io'
 			},
 			{
 				name: VIA_IBP_GEODNS2,
-				url: 'wss://rpc.dotters.network/kusama'
+				url: 'wss://asset-hub-kusama.dotters.network'
 			},
 			{
-				name: VIA_RADIUMBLOCK,
-				url: 'wss://kusama.public.curie.radiumblock.co/ws'
+				name: VIA_DWELLIR,
+				url: 'wss://asset-hub-kusama-rpc.dwellir.com'
 			},
 			{
 				name: VIA_LUCKYFRIDAY,
-				url: 'wss://rpc-kusama.luckyfriday.io'
+				url: 'wss://rpc-asset-hub-kusama.luckyfriday.io'
 			}
 		],
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.KUSAMA],
-		assethubDetails: ASSETHUB_DETAILS[ENetwork.KUSAMA],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.KUSAMA],
 		socialLinks: networkSocialLinks[ENetwork.KUSAMA],
 		convictionVotingPeriodInBlocks: new BN('100800'),
