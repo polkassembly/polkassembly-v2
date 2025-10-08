@@ -8,6 +8,7 @@ import KlaraAvatar from '@assets/klara/avatar.svg';
 import { IConversationMessage } from '@/_shared/types';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
+import { KALRA_CHAT_SUGGESTIONS } from '@/_shared/_constants/klaraChatSuggestions';
 import Mascot from '../Mascot';
 import ChatMessage from './ChatMessage';
 import styles from '../ChatUI.module.scss';
@@ -32,6 +33,23 @@ function WelcomeMessage() {
 			/>
 			<p className='text-lg font-medium text-text_primary'>Welcome to Klara!</p>
 			<p className='text-text_secondary text-sm'>Ask me anything about Polkadot governance.</p>
+		</div>
+	);
+}
+
+function ChatSuggestions({ onFollowUpClick }: { onFollowUpClick: (suggestion: string) => void }) {
+	return (
+		<div className='flex flex-wrap items-center justify-center gap-3 p-3'>
+			{KALRA_CHAT_SUGGESTIONS.map((suggestion) => (
+				<button
+					key={suggestion}
+					type='button'
+					className='rounded-full border border-primary_border px-3 py-1 text-xs text-basic_text transition-all duration-200 hover:scale-105'
+					onClick={() => onFollowUpClick(suggestion)}
+				>
+					{suggestion}
+				</button>
+			))}
 		</div>
 	);
 }
@@ -74,7 +92,10 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 
 	return (
 		<div className={styles.chatUIBody}>
-			{!messages.length && !streamingMessage && !mascotType && <WelcomeMessage />}
+			<div className='flex h-full flex-col items-center justify-center'>
+				{!messages.length && !streamingMessage && !mascotType && <WelcomeMessage />}
+				{!messages.length && !streamingMessage && mascotType === 'welcome' && <ChatSuggestions onFollowUpClick={onFollowUpClick} />}
+			</div>
 
 			<div className='flex flex-col gap-3'>
 				{messages.map((message) => (
@@ -85,7 +106,7 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 					/>
 				))}
 
-				{mascotType && <Mascot type={mascotType} />}
+				{mascotType && mascotType !== 'welcome' && <Mascot type={mascotType} />}
 				{streamingMessage && <StreamingMessage message={streamingMessage} />}
 			</div>
 		</div>
