@@ -8,15 +8,29 @@
 }
 
 .chatUIHeader {
-	@apply flex h-12 w-full items-center gap-2 border-b border-primary_border px-4;
+	@apply flex h-14 w-full items-center gap-2 border-b border-primary_border px-4;
 }
 
 .chatUIControls {
-	@apply ml-auto flex items-center gap-2;
+	@apply ml-auto flex items-center gap-4;
+
+	&:hover {
+		.controlIcon {
+			@apply scale-110;
+
+			svg {
+				@apply opacity-100;
+			}
+		}
+	}
 }
 
 .controlIcon {
-	@apply flex h-5 w-5 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:scale-110;
+	@apply flex h-5 w-5 cursor-pointer items-center justify-center rounded-full transition-all duration-200;
+
+	svg {
+		@apply opacity-0 transition-opacity duration-200;
+	}
 }
 
 .chatUIBody {
