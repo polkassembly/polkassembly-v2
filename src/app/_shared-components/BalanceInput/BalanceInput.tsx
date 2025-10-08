@@ -14,7 +14,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { EAssets } from '@/_shared/types';
+import { EAssets, ENetwork } from '@/_shared/types';
 import { Input } from '../Input';
 import classes from './BalanceInput.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../DropdownMenu';
@@ -66,7 +66,7 @@ function BalanceInput({
 	const [treasuryBalance, setTreasuryBalance] = useState<{ [key: string]: BN } | null>(null);
 	const [nativeTreasuryBalance, setNativeTreasuryBalance] = useState<BN | null>(null);
 
-	const assetOptions = Object.values(supportedAssets).map((asset) => ({
+	const assetOptions: { label: string; value: string | null }[] = Object.values(supportedAssets).map((asset) => ({
 		label: asset.symbol,
 		value: asset.index
 	}));
@@ -77,6 +77,11 @@ function BalanceInput({
 		if (b.label === EAssets.USDC) return 1;
 		return 0;
 	});
+
+	// disable native token in multi asset for assethub kusama
+	if (![ENetwork.ASSETHUB_KUSAMA, ENetwork.KUSAMA].includes(network)) {
+		reorderedAssetOptions.push({ label: networkDetails.tokenSymbol, value: null });
+	}
 
 	const [valueString, setValueString] = useState('');
 
@@ -93,7 +98,11 @@ function BalanceInput({
 	};
 
 	useEffect(() => {
-		const initialAssetId = defaultAssetId === undefined && multiAsset ? Object.values(supportedAssets).find((asset) => asset.symbol === EAssets.USDC)?.index : defaultAssetId;
+		const initialAssetId =
+			defaultAssetId === undefined && multiAsset
+				? Object.values(supportedAssets).find((asset) => asset.symbol === EAssets.USDC)?.index ||
+					Object.values(supportedAssets).find((asset) => asset.symbol === EAssets.USDT)?.index
+				: defaultAssetId;
 		setAssetId(initialAssetId || null);
 
 		if (!defaultValue || defaultValue.isZero()) {
@@ -170,7 +179,7 @@ function BalanceInput({
 								{assetId ? networkDetails.supportedAssets[`${assetId}`].symbol : networkDetails.tokenSymbol}
 							</DropdownMenuTrigger>
 							<DropdownMenuContent>
-								{[...reorderedAssetOptions, { label: networkDetails.tokenSymbol, value: null }].map((option) => (
+								{reorderedAssetOptions.map((option) => (
 									<DropdownMenuItem
 										key={option.value}
 										onClick={() => {
