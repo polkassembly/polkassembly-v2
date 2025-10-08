@@ -4,7 +4,7 @@
 
 @property --angle {
 	syntax: '<angle>';
-	initial-value: 139.05deg;
+	initial-value: 136.17deg;
 	inherits: false;
 }
 
@@ -24,7 +24,8 @@
 
 .chat_button {
 	@apply z-10 mb-2 w-full rounded-xl bg-page_background p-[2px];
-	background-image: conic-gradient(from var(--angle), #e5007a, #3473ff, #ffd663, #51d36e);
+	background-image: conic-gradient(from var(--angle) at 53.41% 52.82%, #51d36e 0deg, #e5007a 77.42deg, #3473ff 158.47deg, #ffd663 270deg, #51d36e 360deg);
+
 	animation: spin 3s linear infinite;
 }
 
