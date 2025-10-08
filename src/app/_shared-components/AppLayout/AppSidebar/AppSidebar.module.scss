@@ -2,6 +2,12 @@
 	@apply bg-border_grey;
 }
 
+@property --angle {
+	syntax: '<angle>';
+	initial-value: 139.05deg;
+	inherits: false;
+}
+
 .hide_scrollbar {
 	@apply overflow-y-auto;
 	-ms-overflow-style: none;
@@ -18,7 +24,18 @@
 
 .chat_button {
 	@apply z-10 mb-2 w-full rounded-xl bg-page_background p-[2px];
-	background-image: linear-gradient(139.05deg, #e5007a 4.08%, #3473ff 41.41%, #ffd663 60.08%, #51d36e 78.75%);
+	background-image: conic-gradient(from var(--angle), #e5007a, #3473ff, #ffd663, #51d36e);
+	animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+	from {
+		--angle: 0deg;
+	}
+
+	to {
+		--angle: 360deg;
+	}
 }
 
 .chat_button_content {

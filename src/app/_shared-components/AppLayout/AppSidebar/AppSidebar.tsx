@@ -113,7 +113,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 										<span>{t('Sidebar.chatWithKlara')}</span>
 										<IoChevronUp className='h-4 w-4 rotate-90' />
 									</div>
-									<span className='text-xs text-basic_text'>{t('Bounty.comingSoon')}</span>
+									<span className='text-xs text-basic_text'>{t('Sidebar.klaraDesc')}</span>
 								</div>
 							</div>
 						</button>
