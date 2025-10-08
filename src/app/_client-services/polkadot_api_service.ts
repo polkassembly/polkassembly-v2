@@ -922,7 +922,9 @@ export class PolkadotApiService {
 								}
 							},
 							beneficiary.amount.toString(),
-							{ V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
+							[ENetwork.ASSETHUB_KUSAMA, ENetwork.KUSAMA].includes(this.network)
+								? { V4: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } }
+								: { V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
 							beneficiary.validFromBlock || null
 						)
 					);
