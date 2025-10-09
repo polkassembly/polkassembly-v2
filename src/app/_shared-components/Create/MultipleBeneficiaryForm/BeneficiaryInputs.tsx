@@ -55,9 +55,9 @@ function BeneficiaryInputs({
 
 	useEffect(() => {
 		const getCurrentBlockNumber = async () => {
-			const height = await apiService?.getCurrentBlockHeight();
+			const height = await apiService?.getRelayChainBlockHeight();
 			if (height) {
-				setBlockHeight(height);
+				setBlockHeight(new BN(height));
 			}
 		};
 		getCurrentBlockNumber();

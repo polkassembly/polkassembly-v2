@@ -142,6 +142,7 @@ interface INetworkDetails {
 		large: string;
 		small: string;
 	};
+	relayChainRpcEndpoints?: IRpcEndpoint[];
 }
 
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
@@ -3109,6 +3110,36 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		},
 		foreignAssets: {},
 		tokenSymbol: 'KSM',
+		relayChainRpcEndpoints: [
+			{
+				name: VIA_ONFINALITY,
+				url: 'wss://kusama.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://kusama-rpc.dwellir.com'
+			},
+			{
+				name: VIA_PARITY,
+				url: 'wss://kusama-rpc.polkadot.io'
+			},
+			{
+				name: VIA_IBP_GEODNS1,
+				url: 'wss://rpc.ibp.network/kusama'
+			},
+			{
+				name: VIA_IBP_GEODNS2,
+				url: 'wss://rpc.dotters.network/kusama'
+			},
+			{
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://kusama.public.curie.radiumblock.co/ws'
+			},
+			{
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-kusama.luckyfriday.io'
+			}
+		],
 		rpcEndpoints: [
 			{
 				name: VIA_ONFINALITY,
@@ -3165,6 +3196,36 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		},
 		foreignAssets: {},
 		tokenSymbol: 'KSM',
+		relayChainRpcEndpoints: [
+			{
+				name: VIA_ONFINALITY,
+				url: 'wss://kusama.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://kusama-rpc.dwellir.com'
+			},
+			{
+				name: VIA_PARITY,
+				url: 'wss://kusama-rpc.polkadot.io'
+			},
+			{
+				name: VIA_IBP_GEODNS1,
+				url: 'wss://rpc.ibp.network/kusama'
+			},
+			{
+				name: VIA_IBP_GEODNS2,
+				url: 'wss://rpc.dotters.network/kusama'
+			},
+			{
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://kusama.public.curie.radiumblock.co/ws'
+			},
+			{
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-kusama.luckyfriday.io'
+			}
+		],
 		rpcEndpoints: [
 			{
 				name: VIA_ONFINALITY,

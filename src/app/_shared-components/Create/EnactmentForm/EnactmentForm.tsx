@@ -34,7 +34,7 @@ function EnactmentForm({
 
 	useEffect(() => {
 		const getCurrentBlockNumber = async () => {
-			const blockHeight = await apiService?.getCurrentBlockHeight();
+			const blockHeight = await apiService?.getRelayChainBlockHeight();
 			if (blockHeight) {
 				onEnactmentValueChange({ ...advancedDetails, [EEnactment.At_Block_No]: new BN(blockHeight).add(BN_THOUSAND) });
 			}
