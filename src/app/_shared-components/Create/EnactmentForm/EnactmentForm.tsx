@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { useEffect, useRef, useState } from 'react';
 import { BN, BN_THOUSAND, BN_ZERO } from '@polkadot/util';
-import { EEnactment } from '@/_shared/types';
+import { EEnactment, ENetwork } from '@/_shared/types';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { ChevronDown } from 'lucide-react';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -34,7 +34,7 @@ function EnactmentForm({
 
 	useEffect(() => {
 		const getCurrentBlockNumber = async () => {
-			const blockHeight = await apiService?.getCurrentBlockHeight();
+			const blockHeight = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network) ? await apiService?.getRelayChainBlockHeight() : await apiService?.getBlockHeight();
 			if (blockHeight) {
 				onEnactmentValueChange({ ...advancedDetails, [EEnactment.At_Block_No]: new BN(blockHeight).add(BN_THOUSAND) });
 			}
