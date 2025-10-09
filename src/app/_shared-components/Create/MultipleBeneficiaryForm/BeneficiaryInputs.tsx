@@ -6,7 +6,7 @@ import { CalendarRange, ChevronUp, Minus, Pencil, Trash, X } from 'lucide-react'
 import { useTranslations } from 'next-intl';
 import { BN } from '@polkadot/util';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { IBeneficiaryInput } from '@/_shared/types';
+import { ENetwork, IBeneficiaryInput } from '@/_shared/types';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -55,7 +55,7 @@ function BeneficiaryInputs({
 
 	useEffect(() => {
 		const getCurrentBlockNumber = async () => {
-			const height = await apiService?.getRelayChainBlockHeight();
+			const height = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network) ? await apiService?.getRelayChainBlockHeight() : await apiService?.getBlockHeight();
 			if (height) {
 				setBlockHeight(new BN(height));
 			}

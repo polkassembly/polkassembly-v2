@@ -334,17 +334,12 @@ export class PolkadotApiService {
 
 	async getRelayChainBlockHeight(): Promise<number> {
 		const relayChainApi = await ApiPromise.create({
-			provider: new WsProvider(
-				[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(this.network)
-					? NETWORKS_DETAILS[this.network].relayChainRpcEndpoints?.[0].url
-					: NETWORKS_DETAILS[this.network].rpcEndpoints[0].url
-			)
+			provider: new WsProvider(NETWORKS_DETAILS[this.network].relayChainRpcEndpoints?.[0].url)
 		});
 
 		await relayChainApi.isReady;
 
 		const header = await relayChainApi.rpc.chain.getHeader();
-		console.log('relay block height', header.number.toNumber());
 		return header.number.toNumber();
 	}
 
@@ -1365,7 +1360,7 @@ export class PolkadotApiService {
 	async getTreasurySpendsData() {
 		if (!this.api) return null;
 
-		const currentBlockHeight = await this.getRelayChainBlockHeight();
+		const currentBlockHeight = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(this.network) ? await this.getRelayChainBlockHeight() : await this.getBlockHeight();
 
 		const proposals = await this.api?.query?.treasury?.spends?.entries();
 
