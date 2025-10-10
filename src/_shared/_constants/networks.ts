@@ -3155,7 +3155,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		name: 'Kusama Assethub',
 		blockTime: 6000,
 		ss58Format: 2,
-		subsquidUrl: 'https://polkassembly.squids.live/kusama-assethub-polkassembly@v1/api/graphql',
+		subsquidUrl: 'https://polkassembly.squids.live/kusama-assethub-unified-pa@v1/api/graphql',
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.KUSAMA],
 		supportedAssets: {
 			'1984': {
