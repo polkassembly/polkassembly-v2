@@ -100,7 +100,7 @@ function OnchainInfo({
 							</div>
 						)}
 
-						{!proposer && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='h-4' />
 						) : (
 							proposer && (
@@ -111,7 +111,7 @@ function OnchainInfo({
 							)
 						)}
 
-						{!createdAtDate && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-7' />
 						) : (
 							createdAtDate && (
@@ -122,7 +122,7 @@ function OnchainInfo({
 							)
 						)}
 
-						{!createdAtBlock && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-7' />
 						) : proposalType === EProposalType.REFERENDUM_V2 && submittedAtBlock ? (
 							<div className={classes.infoRow}>
@@ -149,7 +149,7 @@ function OnchainInfo({
 							)
 						)}
 
-						{!enactmentAtBlock && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-7' />
 						) : (
 							enactmentAtBlock && (
@@ -160,7 +160,7 @@ function OnchainInfo({
 							)
 						)}
 
-						{!enactmentAfterBlock && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-7' />
 						) : (
 							enactmentAfterBlock && (
@@ -170,7 +170,7 @@ function OnchainInfo({
 								</div>
 							)
 						)}
-						{!method && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-7' />
 						) : (
 							method && (
@@ -181,7 +181,7 @@ function OnchainInfo({
 							)
 						)}
 
-						{!section && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-7' />
 						) : (
 							section && (
@@ -192,7 +192,7 @@ function OnchainInfo({
 							)
 						)}
 
-						{!description && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-20' />
 						) : (
 							description && (

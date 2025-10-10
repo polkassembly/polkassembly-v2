@@ -314,6 +314,7 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 			}
 		]
 	},
+	// TODO: here the rpc is of relay chain, update this.
 	[ENetwork.KUSAMA]: {
 		rpcEndpoints: [
 			{
@@ -3122,6 +3123,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fpolkassembly-small.jpg?alt=media&token=63accae8-ea14-4705-817b-92c7bf80ccce'
 		}
 	},
+	// TODO: here the primary rpc is of assethub, update this.
 	[ENetwork.KUSAMA]: {
 		key: ENetwork.KUSAMA,
 		logo: KusamaLogo,
