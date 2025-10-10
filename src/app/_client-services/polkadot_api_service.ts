@@ -332,17 +332,6 @@ export class PolkadotApiService {
 		return header.number.toNumber();
 	}
 
-	async getRelayChainBlockHeight(): Promise<number> {
-		const relayChainApi = await ApiPromise.create({
-			provider: new WsProvider(NETWORKS_DETAILS[this.network].relayChainRpcEndpoints?.[0].url)
-		});
-
-		await relayChainApi.isReady;
-
-		const header = await relayChainApi.rpc.chain.getHeader();
-		return header.number.toNumber();
-	}
-
 	async keepAlive(): Promise<void> {
 		await this.getBlockHeight();
 	}
@@ -1357,10 +1346,10 @@ export class PolkadotApiService {
 		});
 	}
 
-	async getTreasurySpendsData() {
+	async getTreasurySpendsData({ relayChainBlockHeight }: { relayChainBlockHeight?: number }) {
 		if (!this.api) return null;
 
-		const currentBlockHeight = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(this.network) ? await this.getRelayChainBlockHeight() : await this.getBlockHeight();
+		const currentBlockHeight = relayChainBlockHeight || (await this.getBlockHeight());
 
 		const proposals = await this.api?.query?.treasury?.spends?.entries();
 
@@ -1701,5 +1690,27 @@ export class PolkadotApiService {
 		} catch {
 			return { items: [], totalCount: 0 };
 		}
+	}
+
+	async getAssethubTreasuryAssetsBalance(): Promise<{ [key: string]: BN }> {
+		const assetIds = Object.keys(NETWORKS_DETAILS[this.network].supportedAssets || {});
+		const treasuryAddress = TREASURY_NETWORK_CONFIG[this.network]?.assetHubTreasuryAddress;
+		const balances: { [key: string]: BN } = {};
+
+		await Promise.all(
+			assetIds.map(async (assetId) => {
+				const data: any = await this.api.query.assets.account(assetId, treasuryAddress);
+				const assetInfo = data.unwrap();
+				balances[`${assetId}`] = new BN(assetInfo.balance.toBigInt());
+			})
+		);
+
+		const nativeTokenData: any = await this.api?.query?.system?.account(treasuryAddress);
+		if (nativeTokenData?.data?.free) {
+			const freeTokenBalance = nativeTokenData.data.free.toBigInt();
+			balances[`${NETWORKS_DETAILS[this.network].tokenSymbol}`] = new BN(freeTokenBalance);
+		}
+
+		return balances;
 	}
 }

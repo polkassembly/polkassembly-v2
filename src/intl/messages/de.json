@@ -618,7 +618,16 @@
 			"showMore": "Mehr anzeigen",
 			"showLess": "Weniger anzeigen",
 			"call": "Aufruf",
-			"timeline": "Zeitlinie"
+			"timeline": "Zeitlinie",
+			"submittedAtBlock": "Eingereicht am Block",
+			"createdAtBlock": "Erstellt am Block",
+			"createdAt": "Erstellt am",
+			"proposer": "Proposer",
+			"updatedAtBlock": "Aktualisiert am Block",
+			"enactmentAtBlock": "Ausgeführt am Block",
+			"enactmentAfterBlock": "Ausgeführt nach Block",
+			"trackNumber": "Track Nummer",
+			"hash": "Hash"
 		},
 		"deleteComment": "Kommentar löschen",
 		"deleteCommentConfirmation": "Möchten Sie diesen Kommentar wirklich löschen?",
@@ -1183,7 +1192,8 @@
 		"redirectingToProposal": "Weiterleitung zum Vorschlag...",
 		"addContextToProposal": "Kontext zum Vorschlag hinzufügen",
 		"redirectingToPost": "Weiterleitung zum Beitrag...",
-		"discussion": "Diskussion"
+		"discussion": "Diskussion",
+		"postMigrationInfo": "Post-Migration Info: Blockhöhe der Relay-Kette wird für Berechnungen verwendet."
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Begünstigter",

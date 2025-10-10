@@ -513,6 +513,7 @@ export class SubsquidService extends SubsquidUtils {
 			proposedCall: data.proposalArguments,
 			proposer: getSubstrateAddress(proposer) || undefined,
 			trackNumber: data.trackNumber,
+			submittedAtBlock: data.submittedAtBlock,
 			updatedAtBlock: data.updatedAtBlock,
 			enactmentAtBlock: data.enactmentAtBlock,
 			enactmentAfterBlock: data.enactmentAfterBlock

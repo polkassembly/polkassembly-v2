@@ -621,7 +621,16 @@
 			"showMore": "Mostrar más",
 			"showLess": "Mostrar menos",
 			"call": "Llamada",
-			"timeline": "Línea de Tiempo"
+			"timeline": "Línea de Tiempo",
+			"submittedAtBlock": "Enviado en Block",
+			"createdAtBlock": "Creado en Block",
+			"createdAt": "Creado en",
+			"proposer": "Proposer",
+			"updatedAtBlock": "Actualizado en Block",
+			"enactmentAtBlock": "Ejecutado en Block",
+			"enactmentAfterBlock": "Ejecutado después de Block",
+			"trackNumber": "Número de Pista",
+			"hash": "Hash"
 		},
 		"deleteComment": "Eliminar comentario",
 		"deleteCommentConfirmation": "¿Está seguro de que desea eliminar este comentario?",
@@ -1163,7 +1172,8 @@
 		"redirectingToProposal": "Redirigiendo a la propuesta...",
 		"addContextToProposal": "Agregar contexto a la propuesta",
 		"redirectingToPost": "Redirigiendo a la publicación...",
-		"discussion": "Discusión"
+		"discussion": "Discusión",
+		"postMigrationInfo": "Información de post-migración: La altura de bloque de la cadena de relay se utiliza para cálculos."
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiario",

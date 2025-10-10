@@ -620,7 +620,16 @@
 			"showMore": "もっと表示",
 			"showLess": "もっと少なく表示",
 			"call": "呼び出し",
-			"timeline": "タイムライン"
+			"timeline": "タイムライン",
+			"submittedAtBlock": "提出されたブロック",
+			"createdAtBlock": "作成されたブロック",
+			"createdAt": "作成された",
+			"proposer": "プロポーザー",
+			"updatedAtBlock": "更新されたブロック",
+			"enactmentAtBlock": "実行されたブロック",
+			"enactmentAfterBlock": "実行された後のブロック",
+			"trackNumber": "トラック番号",
+			"hash": "ハッシュ"
 		},
 		"deleteComment": "コメントを削除",
 		"deleteCommentConfirmation": "このコメントを削除してもよろしいですか？",
@@ -1162,7 +1171,8 @@
 		"redirectingToProposal": "提案にリダイレクト中...",
 		"addContextToProposal": "提案にコンテキストを追加",
 		"redirectingToPost": "投稿にリダイレクト中...",
-		"discussion": "ディスカッション"
+		"discussion": "ディスカッション",
+		"postMigrationInfo": "Post-Migration Info: リレーチェーンのブロック高が計算に使用されます。"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",

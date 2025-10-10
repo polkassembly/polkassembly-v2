@@ -748,6 +748,7 @@ export class SubsquidQueries {
 				updatedAtBlock
 				createdAt
 				createdAtBlock
+				submittedAtBlock
 				hash
 			}
 		}
