@@ -619,7 +619,16 @@
 			"showMore": "显示更多",
 			"showLess": "显示更少",
 			"call": "调用",
-			"timeline": "时间线"
+			"timeline": "时间线",
+			"submittedAtBlock": "提交于块",
+			"createdAtBlock": "创建于块",
+			"createdAt": "创建于",
+			"proposer": "提议者",
+			"updatedAtBlock": "更新于块",
+			"enactmentAtBlock": "执行于块",
+			"enactmentAfterBlock": "执行于块后",
+			"trackNumber": "轨道编号",
+			"hash": "哈希"
 		},
 		"onchainInfo": "链上信息",
 		"deleteComment": "删除评论",
@@ -1185,7 +1194,8 @@
 		"redirectingToProposal": "正在跳转到提案...",
 		"addContextToProposal": "为提案添加上下文",
 		"redirectingToPost": "正在跳转到帖子...",
-		"discussion": "讨论"
+		"discussion": "讨论",
+		"postMigrationInfo": "Post-Migration Info: 链上区块高度用于计算。"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",

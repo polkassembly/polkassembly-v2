@@ -129,11 +129,13 @@ function BalanceInput({
 	useEffect(() => {
 		const fetchTreasuryBalance = async () => {
 			if (!showTreasuryBalance || !assethubApiService || !multiAsset) return;
-			const balances = await assethubApiService?.getAssethubTreasuryAssetsBalance();
-			setTreasuryBalance(balances);
+			const balances = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network)
+				? await apiService?.getAssethubTreasuryAssetsBalance()
+				: await assethubApiService?.getAssethubTreasuryAssetsBalance();
+			setTreasuryBalance(balances || null);
 		};
 		fetchTreasuryBalance();
-	}, [assethubApiService, showTreasuryBalance, multiAsset]);
+	}, [assethubApiService, showTreasuryBalance, multiAsset, apiService, network]);
 
 	useEffect(() => {
 		const fetchNativeTreasuryBalance = async () => {

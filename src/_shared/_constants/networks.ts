@@ -313,6 +313,38 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 				url: 'wss://dot-rpc.stakeworld.io/assethub'
 			}
 		]
+	},
+	[ENetwork.KUSAMA]: {
+		rpcEndpoints: [
+			{
+				name: VIA_ONFINALITY,
+				url: 'wss://kusama.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://kusama-rpc.dwellir.com'
+			},
+			{
+				name: VIA_PARITY,
+				url: 'wss://kusama-rpc.polkadot.io'
+			},
+			{
+				name: VIA_IBP_GEODNS1,
+				url: 'wss://rpc.ibp.network/kusama'
+			},
+			{
+				name: VIA_IBP_GEODNS2,
+				url: 'wss://rpc.dotters.network/kusama'
+			},
+			{
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://kusama.public.curie.radiumblock.co/ws'
+			},
+			{
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-kusama.luckyfriday.io'
+			}
+		]
 	}
 } as const;
 
@@ -3110,36 +3142,6 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		},
 		foreignAssets: {},
 		tokenSymbol: 'KSM',
-		relayChainRpcEndpoints: [
-			{
-				name: VIA_ONFINALITY,
-				url: 'wss://kusama.api.onfinality.io/public-ws'
-			},
-			{
-				name: VIA_DWELLIR,
-				url: 'wss://kusama-rpc.dwellir.com'
-			},
-			{
-				name: VIA_PARITY,
-				url: 'wss://kusama-rpc.polkadot.io'
-			},
-			{
-				name: VIA_IBP_GEODNS1,
-				url: 'wss://rpc.ibp.network/kusama'
-			},
-			{
-				name: VIA_IBP_GEODNS2,
-				url: 'wss://rpc.dotters.network/kusama'
-			},
-			{
-				name: VIA_RADIUMBLOCK,
-				url: 'wss://kusama.public.curie.radiumblock.co/ws'
-			},
-			{
-				name: VIA_LUCKYFRIDAY,
-				url: 'wss://rpc-kusama.luckyfriday.io'
-			}
-		],
 		rpcEndpoints: [
 			{
 				name: VIA_ONFINALITY,
@@ -3168,6 +3170,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		],
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.KUSAMA],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.KUSAMA],
+		assethubDetails: ASSETHUB_DETAILS[ENetwork.KUSAMA],
 		socialLinks: networkSocialLinks[ENetwork.KUSAMA],
 		convictionVotingPeriodInBlocks: new BN('100800'),
 		openGraphImage: {
@@ -3255,6 +3258,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.KUSAMA],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.KUSAMA],
 		socialLinks: networkSocialLinks[ENetwork.ASSETHUB_KUSAMA],
+		assethubDetails: ASSETHUB_DETAILS[ENetwork.KUSAMA],
 		convictionVotingPeriodInBlocks: new BN('100800'),
 		openGraphImage: {
 			large: 'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fkusama.png?alt=media&token=82219f8f-c3bb-4c87-950c-7fcecfdca883',

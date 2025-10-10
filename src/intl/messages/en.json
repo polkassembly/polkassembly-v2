@@ -646,6 +646,7 @@
 			"proposer": "Proposer",
 			"createdAt": "Created At",
 			"createdAtBlock": "Created At Block",
+			"submittedAtBlock": "Submitted At Block",
 			"updatedAtBlock": "Updated At Block",
 			"enactmentAtBlock": "Enactment At Block",
 			"enactmentAfterBlock": "Enactment After Block",
@@ -1235,7 +1236,8 @@
 		"redirectingToProposal": "Redirecting to proposal...",
 		"addContextToProposal": "Add Context to Proposal",
 		"redirectingToPost": "Redirecting to post...",
-		"discussion": "Discussion"
+		"discussion": "Discussion",
+		"postMigrationInfo": "Post-Migration Info: Relay chain block height is used for calculations."
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",

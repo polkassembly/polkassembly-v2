@@ -961,6 +961,7 @@ export interface IOnChainMetadata {
 	enactmentAfterBlock?: number;
 	createdAt?: Date;
 	createdAtBlock?: number;
+	submittedAtBlock?: number;
 	hash?: string;
 }
 
