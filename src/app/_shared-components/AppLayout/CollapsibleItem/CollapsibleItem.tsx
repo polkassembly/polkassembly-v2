@@ -306,7 +306,7 @@ function ExpandedState({ item, isOpen, setIsOpen }: { item: ISidebarMenuItem; is
 												href={subItem.url || '#'}
 												className={`${style.menuItem} ${subItem.isActive ? style.sidebarActive : 'text-sidebar_title'}`}
 											>
-												<div className='flex w-full items-center'>
+												<div className='flex w-full items-center gap-1 px-1 pl-5'>
 													{subItem.icon && (
 														<div className={style.iconWrapper}>
 															<Image
