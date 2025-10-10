@@ -20,7 +20,7 @@ function ListingTab({ data, currentPage, totalCount }: ListingTabProps) {
 
 	const renderListingCards = () =>
 		data.slice(0, DEFAULT_LISTING_LIMIT).map((item, idx) => {
-			const backgroundColor = idx % 2 === 0 ? 'bg-listing_card1' : 'bg-section_dark_overlay';
+			const backgroundColor = idx % 2 === 0 ? 'sm:bg-listing_card1 bg-bg_modal' : 'sm:bg-section_dark_overlay bg-bg_modal';
 
 			return (
 				<div
