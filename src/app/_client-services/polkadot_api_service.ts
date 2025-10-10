@@ -332,6 +332,17 @@ export class PolkadotApiService {
 		return header.number.toNumber();
 	}
 
+	async getRelayChainBlockHeight(): Promise<number> {
+		const relayChainApi = await ApiPromise.create({
+			provider: new WsProvider(NETWORKS_DETAILS[this.network].relayChainRpcEndpoints?.[0].url)
+		});
+
+		await relayChainApi.isReady;
+
+		const header = await relayChainApi.rpc.chain.getHeader();
+		return header.number.toNumber();
+	}
+
 	async keepAlive(): Promise<void> {
 		await this.getBlockHeight();
 	}
@@ -1161,13 +1172,6 @@ export class PolkadotApiService {
 		return this.api?.registry;
 	}
 
-	async getCurrentBlockHeight() {
-		if (!this.api) {
-			return null;
-		}
-		return this.api.derive.chain.bestNumber();
-	}
-
 	async getTotalActiveIssuance() {
 		if (!this.api) return null;
 		try {
@@ -1356,7 +1360,7 @@ export class PolkadotApiService {
 	async getTreasurySpendsData() {
 		if (!this.api) return null;
 
-		const currentBlockHeight = await this.getBlockHeight();
+		const currentBlockHeight = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(this.network) ? await this.getRelayChainBlockHeight() : await this.getBlockHeight();
 
 		const proposals = await this.api?.query?.treasury?.spends?.entries();
 
