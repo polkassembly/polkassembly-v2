@@ -164,9 +164,20 @@
 		"follow": "关注",
 		"balance": "余额",
 		"locked": "已锁定",
+		"unlocked": "未锁定",
 		"on": "于",
 		"noJudgements": "无判定",
 		"judgement": "判定",
+		"self": "本人",
+		"available": "可用",
+		"delegated": "已委托",
+		"votingPower": "投票权",
+		"profileViews": "个人资料浏览量",
+		"availableBalanceText": "您钱包中当前未锁定或未委托的DOT——可自由用于投票或质押。",
+		"delegatedBalanceText": "您已委托给他人代表您投票的DOT数量。",
+		"totalVotingPowerText": "投票力 = 锁定余额 × 信念（最高6倍） + 委托",
+		"selfVotingPowerText": "您个人控制并用于链上投票的DOT数量（不包括委托）。",
+		"delegatedVotingPowerText": "其他人委托给您的DOT，使您有权代表他们投票。",
 		"Delegations": {
 			"noDelegations": "未找到委托",
 			"delegation": "委托",
@@ -182,7 +193,10 @@
 			"VP": "VP",
 			"CA": "CA",
 			"CO": "CO",
-			"index": "索引"
+			"index": "索引",
+			"delegationMandate": "委任令",
+			"delegationMandateDescription": "Polkadot OpenGov 允许您将投票权按 track 分配给其他人，并选择置信度与数量。受委托者可以代表您投票，但不能访问您的资金或进行更多委托。您可以随时更新或移除。",
+			"readMore": "阅读更多"
 		},
 		"Votes": {
 			"noData": "未找到投票",
