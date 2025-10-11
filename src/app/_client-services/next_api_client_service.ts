@@ -61,7 +61,9 @@ import {
 	IGovAnalyticsReferendumOutcome,
 	IRawTurnoutData,
 	IGovAnalyticsDelegationStats,
-	IGovAnalyticsCategoryCounts
+	IGovAnalyticsCategoryCounts,
+	IConversationHistory,
+	IConversationMessage
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -156,7 +158,9 @@ enum EApiRoute {
 	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
 	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES',
 	GET_GOV_ANALYTICS = 'GET_GOV_ANALYTICS',
-	GET_TRACK_COUNTS = 'GET_TRACK_COUNTS'
+	GET_TRACK_COUNTS = 'GET_TRACK_COUNTS',
+	GET_CONVERSATION_HISTORY = 'GET_CONVERSATION_HISTORY',
+	GET_CONVERSATION_MESSAGES = 'GET_CONVERSATION_MESSAGES'
 }
 
 export class NextApiClientService {
@@ -383,6 +387,12 @@ export class NextApiClientService {
 			case EApiRoute.DELETE_COMMENT:
 			case EApiRoute.DELETE_COMMENT_REACTION:
 				method = 'DELETE';
+				break;
+
+			case EApiRoute.GET_CONVERSATION_HISTORY:
+			case EApiRoute.GET_CONVERSATION_MESSAGES:
+				path = '/klara';
+				method = 'GET';
 				break;
 
 			default:
@@ -1348,5 +1358,21 @@ export class NextApiClientService {
 			method,
 			url
 		});
+	}
+
+	static async getConversationHistory({ userId }: { userId: string }) {
+		const queryParams = new URLSearchParams({
+			userId
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CONVERSATION_HISTORY, routeSegments: ['conversations'], queryParams });
+		return this.nextApiClientFetch<IConversationHistory[]>({ url, method });
+	}
+
+	static async getConversationMessages({ conversationId }: { conversationId: string }) {
+		const queryParams = new URLSearchParams({
+			conversationId
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CONVERSATION_MESSAGES, routeSegments: ['messages'], queryParams });
+		return this.nextApiClientFetch<IConversationMessage[]>({ url, method });
 	}
 }
