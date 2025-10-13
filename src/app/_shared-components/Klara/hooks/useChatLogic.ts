@@ -7,6 +7,7 @@ import { IConversationMessage, Source } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
 import { useActiveChatId } from '@/hooks/useActiveChatId';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useQueryClient } from '@tanstack/react-query';
 
 type MascotType = 'welcome' | 'loading' | 'error' | null;
 
@@ -25,6 +26,7 @@ interface StreamingState {
 export const useChatLogic = () => {
 	const { user } = useUser();
 	const { activeChatId, setActiveChatId } = useActiveChatId();
+	const queryClient = useQueryClient();
 	const [inputText, setInputText] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const [isLoadingMessages, setIsLoadingMessages] = useState(false);
@@ -63,6 +65,8 @@ export const useChatLogic = () => {
 			if (data.conversationId && !conversationId) {
 				setConversationId(data.conversationId);
 				setActiveChatId(data.conversationId);
+				// Invalidate conversations query to refresh the list
+				queryClient.invalidateQueries({ queryKey: ['klara-conversations', user?.id] });
 			}
 
 			if (!data.content) return state;
