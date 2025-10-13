@@ -74,14 +74,14 @@ function ChatsHistory() {
 								height={160}
 							/>
 						</div>
-						<div className='flex items-center gap-4'>
+						<div className='flex items-center gap-2'>
 							<Image
 								src={KlaraAvatar}
 								alt='Klara Avatar'
 								width={36}
 								height={36}
 							/>
-							<p className='text-left text-xs font-semibold text-text_primary'>Hi, I am Klara, ask me about your governance interests</p>
+							<p className='text-left text-[11px] font-semibold text-text_primary'>Hi, I am Klara, ask me about your governance interests</p>
 						</div>
 					</div>
 				)}
