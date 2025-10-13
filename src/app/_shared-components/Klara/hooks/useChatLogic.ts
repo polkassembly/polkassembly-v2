@@ -8,7 +8,7 @@ import { useUser } from '@/hooks/useUser';
 import { useActiveChatId } from '@/hooks/useActiveChatId';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 
-type MascotType = 'welcome' | 'loading' | 'error' | 'taskdone' | null;
+type MascotType = 'welcome' | 'loading' | 'error' | null;
 
 interface StreamingData {
 	conversationId?: string;
@@ -117,7 +117,6 @@ export const useChatLogic = () => {
 							};
 							addMessage(finalMessage);
 							setStreamingMessage(null);
-							setMascotType('taskdone');
 						}
 						return;
 					}
@@ -249,7 +248,7 @@ export const useChatLogic = () => {
 
 			if (!hasUserStartedTyping && value.length > 0) {
 				setHasUserStartedTyping(true);
-				if (mascotType === 'welcome' || mascotType === 'taskdone') {
+				if (mascotType === 'welcome') {
 					setMascotType(null);
 				}
 			}

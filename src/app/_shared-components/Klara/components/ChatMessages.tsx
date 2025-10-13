@@ -16,7 +16,7 @@ import styles from '../ChatUI.module.scss';
 interface Props {
 	messages: IConversationMessage[];
 	streamingMessage: IConversationMessage | null;
-	mascotType: 'welcome' | 'loading' | 'error' | 'taskdone' | null;
+	mascotType: 'welcome' | 'loading' | 'error' | null;
 	isLoadingMessages: boolean;
 	onFollowUpClick: (question: string) => void;
 }

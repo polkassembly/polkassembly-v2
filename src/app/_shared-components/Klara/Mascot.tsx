@@ -9,7 +9,7 @@ import { mascotGifs, MascotGif } from '@/_shared/_constants/mascots';
 import Image from 'next/image';
 
 interface MascotProps {
-	type: 'welcome' | 'loading' | 'error' | 'taskdone';
+	type: 'welcome' | 'loading' | 'error' | null;
 }
 
 const getRandomGifUrl = (type: MascotProps['type']): string | null => {
