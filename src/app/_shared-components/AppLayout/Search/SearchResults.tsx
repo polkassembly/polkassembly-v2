@@ -18,6 +18,7 @@ import { useTranslations } from 'next-intl';
 import { AiOutlineDislike } from '@react-icons/all-files/ai/AiOutlineDislike';
 import { AiOutlineLike } from '@react-icons/all-files/ai/AiOutlineLike';
 import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import PaLogo from '../PaLogo';
 import { Separator } from '../../Separator';
 import Address from '../../Profile/Address/Address';
@@ -197,6 +198,7 @@ function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 	const t = useTranslations();
 	const isLoading = results?.nbHits === 0 && (status === 'loading' || status === 'stalled');
 	const hasNoResults = results?.nbHits === 0 && query.length > 2;
+	const network = getCurrentNetwork();
 
 	return (
 		<div>
@@ -272,14 +274,14 @@ function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 							<div className='h-full overflow-y-auto pr-2'>
 								{activeIndex === ESearchType.POSTS ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters='NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS' />
+										<Configure filters={`NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS AND network:${network}`} />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>
 									</Index>
 								) : activeIndex === ESearchType.DISCUSSIONS ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters='proposalType:DISCUSSION OR proposalType:GRANTS' />
+										<Configure filters={`proposalType:DISCUSSION OR proposalType:GRANTS AND network:${network}`} />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>

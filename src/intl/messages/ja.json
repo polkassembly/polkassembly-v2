@@ -37,9 +37,6 @@
 		"About": "概要",
 		"AboutDescription": "Polkadotは、Polkadotのオールインワンのデファイハブです。",
 		"KnowMore": "詳細を見る",
-		"VotedProposals": "投票済み提案",
-		"ActiveProposals": "アクティブな提案",
-		"Last15Days": "過去15日間",
 		"Rank": "ランク",
 		"BatchVoting": "一括投票",
 		"BatchVotingDescription": "単一のトランザクションでトップ提案に投票",
@@ -135,6 +132,8 @@
 		"contentWillBeAvailableSoon": "コンテンツはまもなく利用可能になります..."
 	},
 	"Profile": {
+		"noAddresses": "リンクされたアドレスが見つかりません",
+		"blacklistWarning": "このユーザーアカウントはコミュニティガイドライン違反のためフラグが立てられています。",
 		"settings": "設定",
 		"login": "ログイン",
 		"loginFailed": "ログインに失敗しました",
@@ -168,6 +167,8 @@
 		"on": "日時",
 		"judgements": "判定",
 		"since": "日時",
+		"noJudgements": "判定がありません",
+		"judgement": "判定",
 		"Delegations": {
 			"noDelegations": "委任が見つかりません",
 			"delegation": "委任",
@@ -195,7 +196,10 @@
 			"status": "ステータス",
 			"showMore": "もっと表示",
 			"showLess": "表示を減らす",
-			"selectAddresses": "アドレスを選択"
+			"selectAddresses": "アドレスを選択",
+			"votedProposals": "投票済み提案",
+			"activeProposals": "アクティブな提案",
+			"last15Days": "過去15日間"
 		},
 		"Activity": {
 			"voted_on_proposal": "投票済み",
@@ -446,6 +450,12 @@
 		"LeaseAdmin": "リース管理者",
 		"GeneralAdmin": "一般管理者",
 		"FastGeneralAdmin": "高速一般管理者",
+		"chatWithKlara": "Klaraとチャット",
+		"more": "もっと",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "分析",
+		"treasuryAnalytics": "財務分析",
+		"proxies": "プロキシ",
 		"Tag": {
 			"new": "新規"
 		}
@@ -474,6 +484,8 @@
 		"post": "投稿",
 		"cancel": "キャンセル",
 		"reply": "返信",
+		"edited": "編集",
+		"commentHistory": "コメント履歴",
 		"remove": "削除",
 		"removing": "削除中",
 		"removeVote": "投票を削除",
@@ -484,6 +496,9 @@
 		"votingStarted": "投票が開始されました",
 		"preparePeriod": "準備期間",
 		"decisionPeriod": "決定期間",
+		"votingPeriod": "投票期間",
+		"enactmentPeriod": "施行期間",
+		"enactmentDescription": "この期間完了後のRef実行",
 		"summary": "要約",
 		"summarise": "要約",
 		"aye": "賛成",
@@ -607,7 +622,16 @@
 			"showMore": "もっと表示",
 			"showLess": "もっと少なく表示",
 			"call": "呼び出し",
-			"timeline": "タイムライン"
+			"timeline": "タイムライン",
+			"submittedAtBlock": "提出されたブロック",
+			"createdAtBlock": "作成されたブロック",
+			"createdAt": "作成された",
+			"proposer": "プロポーザー",
+			"updatedAtBlock": "更新されたブロック",
+			"enactmentAtBlock": "実行されたブロック",
+			"enactmentAfterBlock": "実行された後のブロック",
+			"trackNumber": "トラック番号",
+			"hash": "ハッシュ"
 		},
 		"deleteComment": "コメントを削除",
 		"deleteCommentConfirmation": "このコメントを削除してもよろしいですか？",
@@ -1149,7 +1173,8 @@
 		"redirectingToProposal": "提案にリダイレクト中...",
 		"addContextToProposal": "提案にコンテキストを追加",
 		"redirectingToPost": "投稿にリダイレクト中...",
-		"discussion": "ディスカッション"
+		"discussion": "ディスカッション",
+		"postMigrationInfo": "Post-Migration Info: リレーチェーンのブロック高が計算に使用されます。"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",
@@ -1386,7 +1411,8 @@
 		"useSuperSearchButton": "スーパー検索を使用",
 		"poweredByPolkassembly": "Polkassembly提供。",
 		"enableSearchAndSuperSearch": "チェーンの検索とスーパー検索を有効にしたい場合は、こちらまでご連絡ください",
-		"clearFilters": "フィルターをクリア"
+		"clearFilters": "フィルターをクリア",
+		"searchTriggerLabel": "提案、議論、人を検索"
 	},
 	"Bounties": {
 		"onchainBounties": "オンチェーン報奨金",
@@ -1495,5 +1521,61 @@
 		"openVaultAppInYourPhone": "スマートフォンでVaultアプリを開いてください",
 		"scanTheQRHere": "VaultアプリでここのQRコードをスキャンしてください",
 		"scanTheSignatureQRInYourApp": "アプリで署名QRコードを確認し、トランザクションに署名してください"
+	},
+	"GovAnalytics": {
+		"governanceAnalytics": "ガバナンス分析",
+		"governanceAnalyticsDescription": "レファレンダムはPolkadotのオンチェーンガバナンスの中心メカニズムであり、投資家（DOT保有者）がネットワークアップグレード、トレジャリー支出、その他の重要な事項について決定することを可能にします。",
+		"overview": "概要",
+		"voting": "投票",
+		"votes": "投票",
+		"capital": "資本",
+		"delegator": "委任者",
+		"delegatee": "受任者",
+		"delegation": "委任",
+		"trackDelegation": "トラック委任",
+		"delegationSplit": "委任分割",
+		"totalProposals": "総提案数",
+		"approvedProposals": "承認された提案",
+		"monitoredTracks": "監視中のトラック",
+		"referendumCount": "レファレンダム数",
+		"referendumCountByStatus": "レファレンダム数（ステータス別）",
+		"referendumCountByCategory": "レファレンダム数（カテゴリ別）",
+		"monthlySpend": "月間DOT支出",
+		"averageTurnoutPercentage": "平均投票率"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "分散化された声"
+	},
+	"Proxies": {
+		"proxyExplorer": "プロキシエクスプローラー",
+		"createProxy": "プロキシを作成",
+		"all": "すべて",
+		"myProxies": "マイプロキシ",
+		"delegator": "委任者",
+		"proxyType": "プロキシタイプ",
+		"delay": "遅延",
+		"proxies": "プロキシ",
+		"noProxiesFound": "プロキシが見つかりません",
+		"searchByAddress": "検索するアドレスを入力",
+		"delayTooltip": "遅延はセキュリティ機能として機能します：プロキシが意図したアクションを発表した後、アクションが実行される前に制御アカウントによってアクションをレビューし、必要に応じてキャンセルできる24時間のウィンドウがあります。Polkadotの平均ブロック時間は約6秒であるため、14,400ブロックの遅延は約24時間に相当します。",
+		"please": "お願いします",
+		"logIn": "ログイン",
+		"toViewMyProxies": "プロキシを表示するには"
+	},
+	"ProxyType": {
+		"any": "任意",
+		"non_transfer": "非転送",
+		"governance": "ガバナンス",
+		"staking": "ステーキング",
+		"identity_judgement": "アイデンティティ判断",
+		"auction": "オークション",
+		"cancel_proxy": "プロキシキャンセル",
+		"pararegistration": "パラレジストレーション",
+		"nomination_pools": "ノミネーションプール",
+		"sudo_balances": "Sudoバランス"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "Kusamaはブロック30423691で予定されているAssethub Migration中であり、いくつかの機能が利用できない場合があります。詳細については、",
+		"here": "こちら"
 	}
 }

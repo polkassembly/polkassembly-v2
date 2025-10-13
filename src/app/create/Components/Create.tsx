@@ -11,7 +11,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { ChevronLeft, ChevronRight, Pencil } from 'lucide-react';
+import { AlertCircle, ChevronLeft, ChevronRight, Pencil } from 'lucide-react';
 import DiscussionIcon from '@assets/icons/create-discussion.svg';
 import QuickActionsIcon from '@assets/icons/quick-actions-icon.svg';
 import PreimageIcon from '@assets/icons/create-preimage.svg';
@@ -33,6 +33,7 @@ import CancelReferendaIcon from '@assets/icons/cancel-referenda-icon.svg';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
+import { Alert, AlertDescription } from '@/app/_shared-components/Alert';
 import TreasuryProposalLocal from './TreasuryProposaLocal/TreasuryProposalLocal';
 import TreasuryProposalAssethub from './TreasuryProposalAssethub/TreasuryProposalAssethub';
 import CancelReferendum from './CancelReferendum/CancelReferendum';
@@ -245,6 +246,17 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 					</p>
 				) : (
 					<>
+						{[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network) && (
+							<Alert
+								variant='info'
+								className='flex items-center gap-x-3'
+							>
+								<AlertCircle className='h-4 w-4' />
+								<AlertDescription className=''>
+									<p>{t('CreateProposal.postMigrationInfo')}</p>
+								</AlertDescription>
+							</Alert>
+						)}
 						{step === EProposalStep.CREATE_PREIMAGE && (
 							<ManualExtrinsic
 								onSuccess={(preimageHash) => {

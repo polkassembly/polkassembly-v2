@@ -30,7 +30,10 @@ import {
 	IPayout,
 	ISelectedAccount,
 	IVaultQrState,
-	IVoteCartItem
+	IVoteCartItem,
+	EProxyType,
+	IProxyRequest,
+	IProxyAddress
 } from '@shared/types';
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
 import { APPNAME } from '@/_shared/_constants/appName';
@@ -38,8 +41,8 @@ import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
 import { Dispatch, SetStateAction } from 'react';
 import { EthApiService } from './eth_api_service';
 import { BlockCalculationsService } from './block_calculations_service';
-import { isMimirDetected } from './isMimirDetected';
 import { VaultQrSigner } from './vault_qr_signer_service';
+import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
 
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
@@ -181,9 +184,7 @@ export class PolkadotApiService {
 	}) {
 		if (!this.api || !tx) return;
 
-		const isMimirIframe = await isMimirDetected();
-
-		if (isMimirIframe) {
+		if (wallet === EWallet.MIMIR) {
 			const { web3Enable, web3FromSource } = await import('@polkadot/extension-dapp');
 
 			await web3Enable(APPNAME);
@@ -248,6 +249,16 @@ export class PolkadotApiService {
 					onFailed(error?.toString?.() || errorMessageFallback);
 				});
 		} else {
+			const injected = await getInjectedWallet(wallet);
+
+			if (!injected) {
+				console.log('Signer not set, Please refresh and try again');
+				onFailed('Signer not set, Please refresh and try again');
+				return;
+			}
+
+			this.setSigner(injected.signer as Signer);
+
 			let extrinsic = tx;
 
 			// for pure proxy accounts, we need to get the multisig account
@@ -399,15 +410,8 @@ export class PolkadotApiService {
 				totalBalance = free.add(reserved);
 				freeBalance = free;
 
-				if (free.gt(frozen)) {
-					transferableBalance = free.sub(frozen);
-
-					if (transferableBalance.lt(existentialDeposit)) {
-						transferableBalance = BN_ZERO;
-					}
-				} else {
-					transferableBalance = BN_ZERO;
-				}
+				const frozenMinusReserved = frozen.sub(reserved);
+				transferableBalance = BN.max(free.sub(BN.max(frozenMinusReserved, existentialDeposit)), BN_ZERO);
 			})
 			.catch(() => {
 				// TODO: show notification
@@ -942,7 +946,9 @@ export class PolkadotApiService {
 								}
 							},
 							beneficiary.amount.toString(),
-							{ V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
+							[ENetwork.ASSETHUB_KUSAMA, ENetwork.KUSAMA].includes(this.network)
+								? { V4: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } }
+								: { V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
 							beneficiary.validFromBlock || null
 						)
 					);
@@ -1179,13 +1185,6 @@ export class PolkadotApiService {
 		return this.api?.registry;
 	}
 
-	async getCurrentBlockHeight() {
-		if (!this.api) {
-			return null;
-		}
-		return this.api.derive.chain.bestNumber();
-	}
-
 	async getTotalActiveIssuance() {
 		if (!this.api) return null;
 		try {
@@ -1371,10 +1370,10 @@ export class PolkadotApiService {
 		});
 	}
 
-	async getTreasurySpendsData() {
+	async getTreasurySpendsData({ relayChainBlockHeight }: { relayChainBlockHeight?: number }) {
 		if (!this.api) return null;
 
-		const currentBlockHeight = await this.getBlockHeight();
+		const currentBlockHeight = relayChainBlockHeight || (await this.getBlockHeight());
 
 		const proposals = await this.api?.query?.treasury?.spends?.entries();
 
@@ -1612,5 +1611,130 @@ export class PolkadotApiService {
 			waitTillFinalizedHash: true,
 			setVaultQrState
 		});
+	}
+
+	private static mapIndividualProxies(proxyArray: any[]): IProxyAddress[] {
+		return proxyArray
+			.map((proxyEntry: any) => {
+				const delayValue = proxyEntry?.delay ? parseInt(proxyEntry.delay.replace(/,/g, ''), 10) : 0;
+				if (!proxyEntry.delegate) {
+					return undefined;
+				}
+				return {
+					address: proxyEntry.delegate,
+					proxyType: (proxyEntry?.proxyType as EProxyType) || EProxyType.GOVERNANCE,
+					delay: delayValue
+				};
+			})
+			.filter((proxy) => proxy !== undefined) as IProxyAddress[];
+	}
+
+	private static processProxyInfo(delegator: string, proxyHuman: any): IProxyRequest | null {
+		if (!proxyHuman || !Array.isArray(proxyHuman)) return null;
+		const proxyArray = proxyHuman[0];
+		if (!proxyArray || !Array.isArray(proxyArray) || proxyArray.length === 0) return null;
+
+		const individualProxies = this.mapIndividualProxies(proxyArray);
+		const firstProxyDelay = individualProxies[0]?.delay || 0;
+
+		return {
+			id: `${delegator}`,
+			delegator,
+			delay: firstProxyDelay,
+			proxies: proxyArray.length,
+			proxyAddresses: individualProxies.map((p) => p.address),
+			individualProxies,
+			dateCreated: new Date()
+		};
+	}
+
+	async getProxyRequests({ page, limit, search }: { page: number; limit: number; search?: string }) {
+		if (!this.api) return { items: [], totalCount: 0 };
+
+		try {
+			// Get all proxy entries from the chain
+			const proxyEntries = await this.api.query.proxy.proxies.entries();
+			const proxies: IProxyRequest[] = [];
+
+			proxyEntries.forEach(([key, value]) => {
+				const delegator = key.args[0].toString();
+				const proxyData = value.toHuman() as any;
+
+				// Filter by search if provided
+				if (search && !delegator.toLowerCase().includes(search.toLowerCase())) {
+					return;
+				}
+
+				const proxyRequest = PolkadotApiService.processProxyInfo(delegator, proxyData);
+				if (proxyRequest) proxies.push(proxyRequest);
+			});
+
+			// Deterministic ordering
+			proxies.sort((a, b) => a.delegator.localeCompare(b.delegator));
+
+			// Apply pagination
+			const startIndex = (page - 1) * limit;
+			const endIndex = startIndex + limit;
+			const paginatedProxies = proxies.slice(startIndex, endIndex);
+
+			return {
+				items: paginatedProxies,
+				totalCount: proxies.length
+			};
+		} catch {
+			return { items: [], totalCount: 0 };
+		}
+	}
+
+	async getMyProxies({ page, limit, userAddress }: { page: number; limit: number; search?: string; userAddress: string }) {
+		if (!this.api) return { items: [], totalCount: 0 };
+
+		try {
+			// Get proxies for the specific user
+			const proxyData = await this.api.query.proxy.proxies(userAddress);
+			const proxies: IProxyRequest[] = [];
+
+			const proxyInfo = proxyData.toHuman() as any;
+
+			const proxyRequest = PolkadotApiService.processProxyInfo(userAddress, proxyInfo);
+			if (proxyRequest) proxies.push(proxyRequest);
+
+			// Sort by date created (newest first)
+			proxies.sort((a, b) => b.dateCreated.getTime() - a.dateCreated.getTime());
+
+			// Apply pagination
+			const startIndex = (page - 1) * limit;
+			const endIndex = startIndex + limit;
+			const paginatedProxies = proxies.slice(startIndex, endIndex);
+
+			return {
+				items: paginatedProxies,
+				totalCount: proxies.length
+			};
+		} catch {
+			return { items: [], totalCount: 0 };
+		}
+	}
+
+	async getAssethubTreasuryAssetsBalance(): Promise<{ [key: string]: BN }> {
+		const assetIds = Object.keys(NETWORKS_DETAILS[this.network].supportedAssets || {});
+		const treasuryAddress = TREASURY_NETWORK_CONFIG[this.network]?.assetHubTreasuryAddress;
+		const balances: { [key: string]: BN } = {};
+
+		await Promise.all(
+			assetIds.map(async (assetId) => {
+				const data: any = await this.api.query.assets.account(assetId, treasuryAddress);
+				const assetInfo = data.unwrap();
+				balances[`${assetId}`] = new BN(assetInfo.balance.toBigInt());
+			})
+		);
+
+		const nativeTokenData: any = await this.api?.query?.system?.account(treasuryAddress);
+		if (nativeTokenData?.data?.free) {
+			const freeTokenBalance = nativeTokenData.data.free.toBigInt();
+			balances[`${NETWORKS_DETAILS[this.network].tokenSymbol}`] = new BN(freeTokenBalance);
+		}
+
+		return balances;
 	}
 }

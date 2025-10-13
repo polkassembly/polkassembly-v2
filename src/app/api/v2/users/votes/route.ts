@@ -4,17 +4,28 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { MAX_LISTING_LIMIT, DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { fetchPostData } from '@/app/api/_api-utils/fetchPostData';
-import { EProposalType } from '@/_shared/types';
+import { EProposalStatus, EProposalType, IProfileVote, IPost } from '@/_shared/types';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { StatusCodes } from 'http-status-codes';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { RedisService } from '@/app/api/_api-services/redis_service';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+
+type UserVoteWithPostDetails = Omit<IProfileVote, 'postDetails'> & {
+	postDetails: IPost;
+};
+
+type UserVotesResponse = {
+	items: UserVoteWithPostDetails[];
+	totalCount: number;
+};
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
 	const network = await getNetworkFromHeaders();
@@ -28,18 +39,59 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 					message: ERROR_MESSAGES.INVALID_INPUTS
 				})
 			)
-		)
+		),
+		proposalStatus: z.preprocess((val) => (Array.isArray(val) ? val : typeof val === 'string' ? [val] : undefined), z.array(z.nativeEnum(EProposalStatus))).optional()
 	});
 
 	const searchParamsObject = Object.fromEntries(Array.from(req.nextUrl.searchParams.entries()).map(([key]) => [key, req.nextUrl.searchParams.getAll(key)]));
 
-	const { page, limit, address: addresses } = queryParamsSchema.parse(searchParamsObject);
+	const { page, limit, address: addresses, proposalStatus: proposalStatuses } = queryParamsSchema.parse(searchParamsObject);
 
 	if (!addresses?.length) {
 		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, ERROR_MESSAGES.NOT_FOUND);
 	}
-	const encodedAddresses = addresses.map((address) => getEncodedAddress(address, network) || '').filter(Boolean);
-	const userVotesResult = await OnChainDbService.GetVotesForAddresses({ network, voters: encodedAddresses, page, limit });
+	const substrateAddresses = addresses.map((address) => getSubstrateAddress(address) || '').filter(Boolean);
+
+	// Try to get cached data for each address
+	const cachePromises = substrateAddresses.map(async (address) => {
+		const cachedData = await RedisService.GetUserVotes<UserVotesResponse>({
+			network,
+			address,
+			page,
+			limit,
+			proposalStatuses
+		});
+		return { address, cachedData };
+	});
+
+	const cacheResults = await Promise.all(cachePromises);
+
+	// use forEach to filter the cachedData
+	const cachedResults: UserVotesResponse[] = [];
+	const uncachedAddresses: string[] = [];
+	cacheResults.forEach(({ cachedData, address }) => {
+		if (cachedData) {
+			cachedResults.push(cachedData!);
+		} else {
+			uncachedAddresses.push(address);
+		}
+	});
+
+	// If all addresses are cached, combine and return results
+	if (uncachedAddresses.length === 0) {
+		const combinedItems = cachedResults.flatMap((result) => result.items);
+		const totalCount = cachedResults.reduce((sum, result) => sum + result.totalCount, 0);
+
+		return NextResponse.json({
+			items: combinedItems,
+			totalCount
+		});
+	}
+
+	// If some addresses are not cached, fetch from database for uncached addresses
+	const encodedAddresses = uncachedAddresses.map((address) => getEncodedAddress(address, network) || '').filter(Boolean);
+	const userVotesResult = await OnChainDbService.GetVotesForAddresses({ network, voters: encodedAddresses, page, limit, proposalStatuses });
+
 	const votesPromises = userVotesResult.items.map(async (vote) => {
 		const postData = await fetchPostData({ network, indexOrHash: vote.proposalIndex.toString(), proposalType: vote.proposalType as EProposalType });
 		return {
@@ -49,8 +101,30 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	});
 	const votes = await Promise.all(votesPromises);
 
-	return NextResponse.json({
+	const responseData: UserVotesResponse = {
 		items: votes,
 		totalCount: userVotesResult.totalCount
+	};
+
+	// Cache the response for each uncached address
+	const cacheSetPromises = uncachedAddresses.map((address) =>
+		RedisService.SetUserVotes<UserVotesResponse>({
+			network,
+			address,
+			page,
+			limit,
+			proposalStatuses,
+			data: responseData
+		})
+	);
+	await Promise.all(cacheSetPromises);
+
+	// Combine cached and fresh results
+	const allItems = [...cachedResults.flatMap((result) => result.items), ...votes];
+	const totalCount = cachedResults.reduce((sum, result) => sum + result.totalCount, 0) + userVotesResult.totalCount;
+
+	return NextResponse.json({
+		items: allItems,
+		totalCount
 	});
 });

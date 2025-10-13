@@ -132,7 +132,12 @@ function ManualExtrinsic({ onSuccess }: { onSuccess: (preimageHash: string) => v
 			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
 				<SwitchWalletOrAddress
 					small
-					customAddressSelector={<AddressRelationsPicker withBalance />}
+					customAddressSelector={
+						<AddressRelationsPicker
+							withBalance
+							showTransferableBalance
+						/>
+					}
 				/>
 				<Extrinsic onChange={setExtrinsicFn} />
 			</div>

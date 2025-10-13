@@ -40,9 +40,6 @@
 		"About": "About",
 		"AboutDescription": "Polkadot is the all-in-one DeFi hub of Polkadot.",
 		"KnowMore": "Know More",
-		"VotedProposals": "Voted Proposals",
-		"ActiveProposals": "Active Proposals",
-		"Last15Days": "Last 15 days",
 		"Rank": "Rank",
 		"BatchVoting": "Batch Voting",
 		"BatchVotingDescription": "Vote on top proposals in a single transaction",
@@ -135,6 +132,8 @@
 		"contentWillBeAvailableSoon": "Content will be available soon..."
 	},
 	"Profile": {
+		"noAddresses": "No addresses linked",
+		"blacklistWarning": "This user account has been flagged for violating community guidelines.",
 		"settings": "Settings",
 		"login": "Login",
 		"loginFailed": "Failed to login",
@@ -170,6 +169,8 @@
 		"balance": "Balance",
 		"locked": "Locked",
 		"on": "on",
+		"noJudgements": "No Judgements",
+		"judgement": "Judgement",
 		"Delegations": {
 			"noDelegations": "No Delegations Found",
 			"delegation": "Delegation",
@@ -199,7 +200,10 @@
 			"status": "Status",
 			"showMore": "Show More",
 			"showLess": "Show Less",
-			"selectAddresses": "Select Addresses"
+			"selectAddresses": "Select Addresses",
+			"votedProposals": "Voted Proposals",
+			"activeProposals": "active proposals",
+			"last15Days": "Last 15 days"
 		},
 		"Activity": {
 			"voted_on_proposal": "Voted",
@@ -264,7 +268,7 @@
 			"noData": "No posts found"
 		},
 		"overview": "Overview",
-		"onchainIdentity": "Onchain Identity",
+		"onchainIdentity": "On-Chain Identity",
 		"linkAddress": "Link Address",
 		"badges": "Badges",
 		"badgesDescription": "Unlock, receive and earn badges as you engage in polkassembly",
@@ -448,6 +452,12 @@
 		"LeaseAdmin": "Lease Admin",
 		"GeneralAdmin": "General Admin",
 		"FastGeneralAdmin": "Fast General Admin",
+		"chatWithKlara": "Chat with Klara",
+		"more": "More",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "Analytics",
+		"treasuryAnalytics": "Treasury Analytics",
+		"proxies": "Proxies",
 		"Tag": {
 			"new": "New"
 		}
@@ -478,6 +488,8 @@
 		"post": "Post",
 		"cancel": "Cancel",
 		"reply": "Reply",
+		"edited": "Edited",
+		"commentHistory": "Comment History",
 		"remove": "Remove",
 		"removing": "Removing",
 		"removeVote": "Remove Vote",
@@ -488,6 +500,9 @@
 		"votingStarted": "Voting has Started",
 		"preparePeriod": "Prepare Period",
 		"decisionPeriod": "Decision Period",
+		"votingPeriod": "Voting Period",
+		"enactmentPeriod": "Enactment Period",
+		"enactmentDescription": "Ref execution after completion of this period",
 		"summary": "Summary",
 		"summarise": "SUMMARISE",
 		"analytics": "Analytics",
@@ -633,6 +648,7 @@
 			"proposer": "Proposer",
 			"createdAt": "Created At",
 			"createdAtBlock": "Created At Block",
+			"submittedAtBlock": "Submitted At Block",
 			"updatedAtBlock": "Updated At Block",
 			"enactmentAtBlock": "Enactment At Block",
 			"enactmentAfterBlock": "Enactment After Block",
@@ -1065,7 +1081,7 @@
 		"IdentityNotSet": "Identity Not Set",
 		"IdentityNotSetDescription": "To request a judgment, you need to have your on-chain identity set first.",
 		"IdentityNotSetDescription2": "Judgment is a way for registrars to verify your profile and provide a level of trustworthiness based on your identity information (such as display name, email, website, legal name, etc.).",
-		"IdentityNotSetDescription3": "Once you’ve set your identity, you can request a judgment from a registrar. This judgment will be visible to others and helps you build credibility on-chain.",
+		"IdentityNotSetDescription3": "Once you've set your identity, you can request a judgment from a registrar. This judgment will be visible to others and helps you build credibility on-chain.",
 		"IdentityVerified": "Your Identity has been verified.",
 		"edit": "Edit",
 		"resend": "Resend",
@@ -1222,7 +1238,8 @@
 		"redirectingToProposal": "Redirecting to proposal...",
 		"addContextToProposal": "Add Context to Proposal",
 		"redirectingToPost": "Redirecting to post...",
-		"discussion": "Discussion"
+		"discussion": "Discussion",
+		"postMigrationInfo": "Post-Migration Info: Relay chain block height is used for calculations."
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",
@@ -1473,7 +1490,8 @@
 		"useSuperSearchButton": "Use Super Search",
 		"poweredByPolkassembly": "Powered by Polkassembly.",
 		"enableSearchAndSuperSearch": "If you'd like to enable search and super search for your chain, please reach out to us on",
-		"clearFilters": "Clear Filters"
+		"clearFilters": "Clear Filters",
+		"searchTriggerLabel": "Search for proposals, discussions, and people"
 	},
 	"Parachains": {
 		"projects": "Projects",
@@ -1532,5 +1550,61 @@
 		"openVaultAppInYourPhone": "Open the Vault app in your phone",
 		"scanTheQRHere": "Scan the QR here from the Vault app",
 		"scanTheSignatureQRInYourApp": "Verify the signature QR in your app and sign the transaction"
+	},
+	"GovAnalytics": {
+		"governanceAnalytics": "Governance Analytics",
+		"governanceAnalyticsDescription": "Referenda are the core mechanism of Polkadot’s on-chain governance, allowing stakeholders (DOT holders) to make decisions about network upgrades, treasury spending, and other important matters.",
+		"overview": "Overview",
+		"voting": "Voting",
+		"votes": "Votes",
+		"capital": "Capital",
+		"delegator": "Delegator",
+		"delegatee": "Delegatee",
+		"delegation": "Delegation",
+		"trackDelegation": "Track Delegation",
+		"delegationSplit": "Delegation Split",
+		"totalProposals": "Total Proposals",
+		"approvedProposals": "Approved Proposals",
+		"monitoredTracks": "Monitored Tracks",
+		"referendumCount": "Referendum Count",
+		"referendumCountByStatus": "Referendum Count by Status",
+		"referendumCountByCategory": "Referendum Count by Category",
+		"monthlySpend": "Monthly DOT Spent",
+		"averageTurnoutPercentage": "Average Turnout Percentage"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "Decentralized Voice"
+	},
+	"Proxies": {
+		"proxyExplorer": "Proxy Explorer",
+		"createProxy": "Create Proxy",
+		"all": "All",
+		"myProxies": "My Proxies",
+		"delegator": "Delegator",
+		"proxyType": "Proxy Type",
+		"delay": "Delay",
+		"proxies": "Proxies",
+		"noProxiesFound": "No proxies found",
+		"searchByAddress": "Enter address to search",
+		"delayTooltip": "Delay acts as a security feature: after the proxy announces its intended action, there is a 24-hour window during which the action can be reviewed and, if necessary, canceled by the controlling account before it is executed. Since Polkadot has an average block time of about 6 seconds, a delay of 14,400 blocks translates to approximately 24 hours.",
+		"please": "Please",
+		"logIn": "log in",
+		"toViewMyProxies": "to view your proxies"
+	},
+	"ProxyType": {
+		"any": "Any",
+		"non_transfer": "Non Transfer",
+		"governance": "Governance",
+		"staking": "Staking",
+		"identity_judgement": "Identity Judgement",
+		"auction": "Auction",
+		"cancel_proxy": "Cancel Proxy",
+		"pararegistration": "Para Registration",
+		"nomination_pools": "Nomination Pools",
+		"sudo_balances": "Sudo Balances"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "Kusama is undergoing Assethub Migration scheduled at block 30423691, some functionality may be unavailable. For more information, visit",
+		"here": "here"
 	}
 }

@@ -20,10 +20,20 @@ interface Props {
 	isBalanceUpdated?: boolean;
 	setAvailableBalance?: (pre: string) => void;
 	classname?: string;
+	showTransferableBalance?: boolean;
 	showPeopleChainBalance?: boolean;
 	showVotingBalance?: boolean;
 }
-function Balance({ address, onChange, isBalanceUpdated = false, setAvailableBalance, classname, showPeopleChainBalance = false, showVotingBalance = false }: Props) {
+function Balance({
+	address,
+	onChange,
+	isBalanceUpdated = false,
+	setAvailableBalance,
+	classname,
+	showPeopleChainBalance = false,
+	showVotingBalance = false,
+	showTransferableBalance = false
+}: Props) {
 	const t = useTranslations();
 	const [balance, setBalance] = useState<string>('0');
 	const [loading, setLoading] = useState(false);
@@ -38,11 +48,11 @@ function Balance({ address, onChange, isBalanceUpdated = false, setAvailableBala
 		setLoading(true);
 
 		(async () => {
-			const { freeBalance, totalBalance } = await apiService.getUserBalances({
+			const { freeBalance, totalBalance, transferableBalance } = await apiService.getUserBalances({
 				address
 			});
 
-			const balanceToShow = showVotingBalance ? totalBalance : freeBalance;
+			const balanceToShow = showVotingBalance ? totalBalance : showTransferableBalance ? transferableBalance : freeBalance;
 
 			setAvailableBalance?.(balanceToShow.toString());
 			setBalance?.(balanceToShow.toString());

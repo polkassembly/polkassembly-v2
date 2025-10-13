@@ -231,7 +231,14 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 	const onVoteConfirm = async () => {
 		if (!apiService || !userPreferences.selectedAccount?.address || !userPreferences.wallet || !user?.id) return;
 
-		if (isInvalidAmount) return;
+		if (isInvalidAmount) {
+			toast({
+				title: 'Invalid Amount',
+				description: 'Please enter a valid amount to vote.',
+				status: ENotificationStatus.ERROR
+			});
+			return;
+		}
 
 		const userAddress = userPreferences.selectedAccount.address;
 
@@ -357,7 +364,7 @@ function VoteReferendum({ index, track, onClose, proposalType }: { index: string
 											}}
 											value={reuseLock && reuseLock.gt(BN_ZERO) ? reuseLock : undefined}
 										/>
-										<div className='flex items-center gap-x-2'>
+										<div className='flex flex-col items-center gap-2 sm:flex-row'>
 											{governanceLock && governanceLock.gt(BN_ZERO) && (
 												<Button
 													variant='ghost'

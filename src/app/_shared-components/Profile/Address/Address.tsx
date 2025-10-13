@@ -76,7 +76,9 @@ function Address({
 	useEffect(() => {
 		const initializeIdentity = async () => {
 			if (!encodedAddress) return;
-			setDisplayText(userData?.username || walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
+			const initial = userData?.username || walletAddressName || shortenAddress(encodedAddress, truncateCharLen);
+
+			setDisplayText(initial);
 
 			try {
 				const identityInfo = await getOnChainIdentity(encodedAddress);

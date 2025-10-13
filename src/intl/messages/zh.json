@@ -37,9 +37,6 @@
 		"About": "关于",
 		"AboutDescription": "Polkadot是Polkadot的一站式DeFi中心。",
 		"KnowMore": "了解更多",
-		"VotedProposals": "已投票提案",
-		"ActiveProposals": "活跃提案",
-		"Last15Days": "最近15天",
 		"Rank": "排名",
 		"BatchVoting": "批量投票",
 		"BatchVotingDescription": "在单个交易中对热门提案进行投票",
@@ -135,6 +132,8 @@
 		"contentWillBeAvailableSoon": "内容即将可用..."
 	},
 	"Profile": {
+		"noAddresses": "未找到链接地址",
+		"blacklistWarning": "此用户账户因违反社区准则而被标记。",
 		"settings": "设置",
 		"login": "登录",
 		"loginFailed": "登录失败",
@@ -166,6 +165,8 @@
 		"balance": "余额",
 		"locked": "已锁定",
 		"on": "于",
+		"noJudgements": "无判定",
+		"judgement": "判定",
 		"Delegations": {
 			"noDelegations": "未找到委托",
 			"delegation": "委托",
@@ -193,7 +194,10 @@
 			"status": "状态",
 			"showMore": "显示更多",
 			"showLess": "显示更少",
-			"selectAddresses": "选择地址"
+			"selectAddresses": "选择地址",
+			"votedProposals": "已投票提案",
+			"activeProposals": "活跃提案",
+			"last15Days": "最近15天"
 		},
 		"Activity": {
 			"voted_on_proposal": "已投票",
@@ -446,6 +450,12 @@
 		"LeaseAdmin": "租赁管理员",
 		"GeneralAdmin": "总管理员",
 		"FastGeneralAdmin": "快速总管理员",
+		"chatWithKlara": "与Klara聊天",
+		"more": "更多",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "分析",
+		"treasuryAnalytics": "国库分析",
+		"proxies": "代理",
 		"Tag": {
 			"new": "新"
 		}
@@ -474,6 +484,8 @@
 		"post": "发布",
 		"cancel": "取消",
 		"reply": "回复",
+		"edited": "编辑",
+		"commentHistory": "评论历史",
 		"remove": "删除",
 		"removing": "删除中",
 		"removeVote": "删除投票",
@@ -484,6 +496,9 @@
 		"votingStarted": "投票已开始",
 		"preparePeriod": "准备期",
 		"decisionPeriod": "决策期",
+		"votingPeriod": "投票期",
+		"enactmentPeriod": "执行期",
+		"enactmentDescription": "此期间完成后执行Ref",
 		"summary": "摘要",
 		"summarise": "摘要",
 		"aye": "赞成",
@@ -606,7 +621,16 @@
 			"showMore": "显示更多",
 			"showLess": "显示更少",
 			"call": "调用",
-			"timeline": "时间线"
+			"timeline": "时间线",
+			"submittedAtBlock": "提交于块",
+			"createdAtBlock": "创建于块",
+			"createdAt": "创建于",
+			"proposer": "提议者",
+			"updatedAtBlock": "更新于块",
+			"enactmentAtBlock": "执行于块",
+			"enactmentAfterBlock": "执行于块后",
+			"trackNumber": "轨道编号",
+			"hash": "哈希"
 		},
 		"onchainInfo": "链上信息",
 		"deleteComment": "删除评论",
@@ -1172,7 +1196,8 @@
 		"redirectingToProposal": "正在跳转到提案...",
 		"addContextToProposal": "为提案添加上下文",
 		"redirectingToPost": "正在跳转到帖子...",
-		"discussion": "讨论"
+		"discussion": "讨论",
+		"postMigrationInfo": "Post-Migration Info: 链上区块高度用于计算。"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",
@@ -1409,7 +1434,8 @@
 		"useSuperSearchButton": "使用超级搜索",
 		"poweredByPolkassembly": "由Polkassembly提供。",
 		"enableSearchAndSuperSearch": "如果您想为您的链启用搜索和超级搜索功能，请联系我们",
-		"clearFilters": "清除筛选"
+		"clearFilters": "清除筛选",
+		"searchTriggerLabel": "搜索提案、讨论和人员"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "赏金提案成功",
@@ -1495,5 +1521,61 @@
 		"openVaultAppInYourPhone": "在您的手机上打开Vault应用",
 		"scanTheQRHere": "使用Vault应用扫描此处的二维码",
 		"scanTheSignatureQRInYourApp": "在您的应用中验证签名二维码并签署交易"
+	},
+	"GovAnalytics": {
+		"governanceAnalytics": "治理分析",
+		"governanceAnalyticsDescription": "公投是Polkadot的链上治理的核心机制，允许投资者（DOT持有者）就网络升级、国库支出和其他重要事项做出决定。",
+		"overview": "概览",
+		"voting": "投票",
+		"votes": "投票",
+		"capital": "资本",
+		"delegator": "委任者",
+		"delegatee": "受任者",
+		"delegation": "委任",
+		"trackDelegation": "轨道委任",
+		"delegationSplit": "委任分割",
+		"totalProposals": "总提案数",
+		"approvedProposals": "已批准提案",
+		"monitoredTracks": "监控轨道",
+		"referendumCount": "公投数量",
+		"referendumCountByStatus": "公投数量（状态）",
+		"referendumCountByCategory": "公投数量（类别）",
+		"monthlySpend": "每月DOT支出",
+		"averageTurnoutPercentage": "平均投票率"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "分散化声音"
+	},
+	"Proxies": {
+		"proxyExplorer": "代理浏览器",
+		"createProxy": "创建代理",
+		"all": "全部",
+		"myProxies": "我的代理",
+		"delegator": "委托人",
+		"proxyType": "代理类型",
+		"delay": "延迟",
+		"proxies": "代理",
+		"noProxiesFound": "未找到代理",
+		"searchByAddress": "输入地址进行搜索",
+		"delayTooltip": "延迟作为安全功能：代理宣布其预期行动后，有24小时的窗口期，在此期间可以审查该行动，如有必要，控制账户可以在执行前取消该行动。由于Polkadot的平均区块时间约为6秒，14,400个区块的延迟相当于大约24小时。",
+		"please": "请",
+		"logIn": "登录",
+		"toViewMyProxies": "查看您的代理"
+	},
+	"ProxyType": {
+		"any": "任意",
+		"non_transfer": "非转账",
+		"governance": "治理",
+		"staking": "质押",
+		"identity_judgement": "身份判断",
+		"auction": "拍卖",
+		"cancel_proxy": "取消代理",
+		"pararegistration": "平行链注册",
+		"nomination_pools": "提名池",
+		"sudo_balances": "Sudo余额"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "Kusama正在进行Assethub迁移，计划在区块30423691进行，一些功能可能不可用。更多信息请访问",
+		"here": "这里"
 	}
 }

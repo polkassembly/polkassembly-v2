@@ -37,9 +37,6 @@
 		"About": "Acerca de",
 		"AboutDescription": "Polkadot es el centro DeFi todo en uno de Polkadot.",
 		"KnowMore": "Saber más",
-		"VotedProposals": "Propuestas Votadas",
-		"ActiveProposals": "Propuestas Activas",
-		"Last15Days": "Últimos 15 días",
 		"Rank": "Rango",
 		"BatchVoting": "Votación por Lotes",
 		"BatchVotingDescription": "Vote sobre las principales propuestas en una sola transacción",
@@ -135,6 +132,8 @@
 		"contentWillBeAvailableSoon": "El contenido estará disponible pronto..."
 	},
 	"Profile": {
+		"noAddresses": "No se encontraron direcciones vinculadas",
+		"blacklistWarning": "Esta cuenta de usuario ha sido marcada por violar las pautas de la comunidad.",
 		"settings": "Configuración",
 		"login": "Iniciar sesión",
 		"loginFailed": "Error al iniciar sesión",
@@ -166,6 +165,8 @@
 		"balance": "Saldo",
 		"locked": "Bloqueado",
 		"on": "el",
+		"noJudgements": "No hay juicios",
+		"judgement": "Juicio",
 		"Delegations": {
 			"noDelegations": "No se encontraron delegaciones",
 			"index": "Índice",
@@ -194,7 +195,10 @@
 			"status": "Estado",
 			"showMore": "Mostrar más",
 			"showLess": "Mostrar menos",
-			"selectAddresses": "Seleccionar direcciones"
+			"selectAddresses": "Seleccionar direcciones",
+			"votedProposals": "Propuestas Votadas",
+			"activeProposals": "propuestas activas",
+			"last15Days": "Últimos 15 días"
 		},
 		"Activity": {
 			"voted_on_proposal": "Votó",
@@ -259,7 +263,7 @@
 			"noData": "No se encontraron publicaciones"
 		},
 		"overview": "Resumen",
-		"onchainIdentity": "Identidad en cadena",
+		"onchainIdentity": "Identidad en Cadena",
 		"linkAddress": "Vincular dirección",
 		"badges": "Insignias",
 		"badgesDescription": "Desbloquea, recibe y gana insignias mientras participas en Polkassembly",
@@ -447,6 +451,12 @@
 		"LeaseAdmin": "Admin de Arrendamiento",
 		"GeneralAdmin": "Admin General",
 		"FastGeneralAdmin": "Administrador General Rápido",
+		"chatWithKlara": "Chat con Klara",
+		"more": "Más",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "Analíticas",
+		"treasuryAnalytics": "Analíticas de Tesorería",
+		"proxies": "Proxies",
 		"Tag": {
 			"new": "Nuevo"
 		}
@@ -463,6 +473,8 @@
 		"requested": "Solicitado",
 		"beneficiary": "Beneficiario",
 		"description": "Descripción",
+		"commentHistory": "Historial de Comentarios",
+		"edited": "Editado",
 		"noVotes": "No se encontraron votos",
 		"timeline": "Línea de Tiempo",
 		"more": "más",
@@ -485,6 +497,9 @@
 		"votingStarted": "La votación ha comenzado",
 		"preparePeriod": "Período de Preparación",
 		"decisionPeriod": "Período de Decisión",
+		"votingPeriod": "Período de Votación",
+		"enactmentPeriod": "Período de Promulgación",
+		"enactmentDescription": "Ejecución de Ref después de completar este período",
 		"summary": "Resumen",
 		"summarise": "Resumen",
 		"aye": "Sí",
@@ -608,7 +623,16 @@
 			"showMore": "Mostrar más",
 			"showLess": "Mostrar menos",
 			"call": "Llamada",
-			"timeline": "Línea de Tiempo"
+			"timeline": "Línea de Tiempo",
+			"submittedAtBlock": "Enviado en Block",
+			"createdAtBlock": "Creado en Block",
+			"createdAt": "Creado en",
+			"proposer": "Proposer",
+			"updatedAtBlock": "Actualizado en Block",
+			"enactmentAtBlock": "Ejecutado en Block",
+			"enactmentAfterBlock": "Ejecutado después de Block",
+			"trackNumber": "Número de Pista",
+			"hash": "Hash"
 		},
 		"deleteComment": "Eliminar comentario",
 		"deleteCommentConfirmation": "¿Está seguro de que desea eliminar este comentario?",
@@ -1150,7 +1174,8 @@
 		"redirectingToProposal": "Redirigiendo a la propuesta...",
 		"addContextToProposal": "Agregar contexto a la propuesta",
 		"redirectingToPost": "Redirigiendo a la publicación...",
-		"discussion": "Discusión"
+		"discussion": "Discusión",
+		"postMigrationInfo": "Información de post-migración: La altura de bloque de la cadena de relay se utiliza para cálculos."
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiario",
@@ -1387,7 +1412,8 @@
 		"useSuperSearchButton": "Usar Super Búsqueda",
 		"poweredByPolkassembly": "Desarrollado por Polkassembly.",
 		"enableSearchAndSuperSearch": "Si desea habilitar la búsqueda y super búsqueda para su cadena, contáctenos en",
-		"clearFilters": "Limpiar filtros"
+		"clearFilters": "Limpiar filtros",
+		"searchTriggerLabel": "Buscar propuestas, discusiones y personas"
 	},
 	"Bounties": {
 		"onchainBounties": "Recompensas en Cadena",
@@ -1496,5 +1522,61 @@
 		"openVaultAppInYourPhone": "Abra la aplicación Vault en su teléfono",
 		"scanTheQRHere": "Escanee el código QR aquí desde la aplicación Vault",
 		"scanTheSignatureQRInYourApp": "Verifique el código QR de firma en su aplicación y firme la transacción"
+	},
+	"GovAnalytics": {
+		"governanceAnalytics": "Analíticas de Gobernanza",
+		"governanceAnalyticsDescription": "Los referendos son el mecanismo central de la gobernanza en cadena de Polkadot, permitiendo a los inversores (poseedores de DOT) tomar decisiones sobre actualizaciones de red, gastos de tesorería y otras cuestiones importantes.",
+		"overview": "Resumen",
+		"voting": "Votación",
+		"votes": "Votos",
+		"capital": "Capital",
+		"delegator": "Delegator",
+		"delegatee": "Delegatee",
+		"delegation": "Delegación",
+		"trackDelegation": "Delegación de Track",
+		"delegationSplit": "Delegación Split",
+		"totalProposals": "Propuestas Totales",
+		"approvedProposals": "Propuestas Aprobadas",
+		"monitoredTracks": "Tracks Monitoreados",
+		"referendumCount": "Cantidad de Referendos",
+		"referendumCountByStatus": "Cantidad de Referendos por Estado",
+		"referendumCountByCategory": "Cantidad de Referendos por Categoría",
+		"monthlySpend": "Gasto Mensual de DOT",
+		"averageTurnoutPercentage": "Porcentaje de Asistencia Promedio"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "Voz Descentralizada"
+	},
+	"Proxies": {
+		"proxyExplorer": "Explorador de Proxies",
+		"createProxy": "Crear Proxy",
+		"all": "Todos",
+		"myProxies": "Mis Proxies",
+		"delegator": "Delegador",
+		"proxyType": "Tipo de Proxy",
+		"delay": "Retraso",
+		"proxies": "Proxies",
+		"noProxiesFound": "No se encontraron proxies",
+		"searchByAddress": "Ingrese dirección para buscar",
+		"delayTooltip": "El retraso actúa como una característica de seguridad: después de que el proxy anuncia su acción prevista, hay una ventana de 24 horas durante la cual la acción puede ser revisada y, si es necesario, cancelada por la cuenta controladora antes de que se ejecute. Como Polkadot tiene un tiempo de bloque promedio de aproximadamente 6 segundos, un retraso de 14,400 bloques se traduce en aproximadamente 24 horas.",
+		"please": "Por favor",
+		"logIn": "inicia sesión",
+		"toViewMyProxies": "para ver tus proxies"
+	},
+	"ProxyType": {
+		"any": "Cualquiera",
+		"non_transfer": "Sin Transferencia",
+		"governance": "Gobernanza",
+		"staking": "Staking",
+		"identity_judgement": "Juicio de Identidad",
+		"auction": "Subasta",
+		"cancel_proxy": "Cancelar Proxy",
+		"pararegistration": "Registro de Para",
+		"nomination_pools": "Pools de Nominación",
+		"sudo_balances": "Sudo Balances"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "Kusama está en curso la migración de Assethub programada en el bloque 30423691, algunas funcionalidades pueden estar no disponibles. Para más información, visite",
+		"here": "aquí"
 	}
 }

@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EPostOrigin, EProposalType, IVoteCurve, IStatusHistoryItem, EAnalyticsType, EVoteBubbleTabs } from '@/_shared/types';
+import { EProposalType, EAnalyticsType, EVoteBubbleTabs } from '@/_shared/types';
 import React, { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
@@ -14,11 +14,11 @@ import classes from './VotesData.module.scss';
 import VotesBubbleChart from '../VotesBubbleChart/VotesBubbleChart';
 
 function VotesDataDialog({
-	voteCurveData,
-	trackName,
-	timeline,
-	createdAt,
-	setThresholdValues,
+	chartLabels,
+	approvalData,
+	supportData,
+	approvalThresholdData,
+	supportThresholdData,
 	thresholdValues,
 	latestApproval,
 	latestSupport,
@@ -30,14 +30,14 @@ function VotesDataDialog({
 	isExpanded,
 	setIsExpanded
 }: {
-	voteCurveData: IVoteCurve[];
-	trackName: EPostOrigin;
-	timeline: IStatusHistoryItem[];
-	createdAt: Date;
-	setThresholdValues: (thresholdValues: { approvalThreshold: number; supportThreshold: number }) => void;
+	chartLabels: number[];
+	approvalData: { x: number; y: number }[];
+	supportData: { x: number; y: number }[];
+	approvalThresholdData: { x: number; y: number }[];
+	supportThresholdData: { x: number; y: number }[];
 	thresholdValues: { approvalThreshold: number; supportThreshold: number };
-	latestApproval: number | null;
-	latestSupport: number | null;
+	latestApproval?: number;
+	latestSupport?: number;
 	isFetching: boolean;
 	proposalType: EProposalType;
 	index: string;
@@ -88,11 +88,11 @@ function VotesDataDialog({
 					{activeTab === EVoteBubbleTabs.Graph ? (
 						<div className='mt-4 h-full'>
 							<VoteCurves
-								voteCurveData={voteCurveData || []}
-								trackName={trackName}
-								timeline={timeline}
-								createdAt={createdAt}
-								setThresholdValues={setThresholdValues}
+								chartLabels={chartLabels}
+								approvalData={approvalData}
+								supportData={supportData}
+								approvalThresholdData={approvalThresholdData}
+								supportThresholdData={supportThresholdData}
 							/>
 							<div className='mt-6'>
 								<VoteCurvesDetails

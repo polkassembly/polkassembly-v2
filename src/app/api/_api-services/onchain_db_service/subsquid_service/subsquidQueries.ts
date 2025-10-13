@@ -748,6 +748,7 @@ export class SubsquidQueries {
 				updatedAtBlock
 				createdAt
 				createdAtBlock
+				submittedAtBlock
 				hash
 			}
 		}
@@ -874,15 +875,15 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_ACTIVE_VOTED_PROPOSALS_COUNT = `
-		query GetActiveVotedProposalsCount($status_in: [ProposalStatus!]!, $voter_in: [String!]!) {
-			votedProposalsCount: convictionVotesConnection(orderBy: id_ASC, where: {proposal: {status_in: $status_in}, voter_in: $voter_in}) {
+		query GetActiveVotedProposalsCount($status_in: [ProposalStatus!]!, $voter_in: [String!]!, $createdAt_gte:DateTime) {
+			votedProposalsCount: flattenedConvictionVotesConnection(orderBy: id_ASC, where: {proposal: {status_in: $status_in}, voter_in: $voter_in, removedAtBlock_isNull: true, createdAt_gte: $createdAt_gte}) {
 				totalCount
 			}
 
-			activeProposalsCount: proposalsConnection(orderBy: id_ASC, where: {status_in: $status_in}) {
+			activeProposalsCount: proposalsConnection(orderBy: id_ASC, where: {status_in: $status_in, createdAt_gte: $createdAt_gte}) {
 				totalCount
 			}
-		}
+	}
 	`;
 
 	protected static GET_CHILD_BOUNTIES_REWARDS = `
@@ -1227,46 +1228,250 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_ALL_FLATTENED_VOTES_FOR_MULTIPLE_VOTERS = `
-	query MyQuery($limit: Int!, $offset: Int!, $voter_in: [String!]!) {
-		votes: flattenedConvictionVotes(
-			where: {
-				voter_in: $voter_in
-				removedAtBlock_isNull: true
-			}
-			limit: $limit
-			offset: $offset
-			orderBy: createdAt_DESC
+		query MyQuery(
+			$limit: Int!,
+			$offset: Int!,
+			$voter_in: [String!]!,
+			$status_in: [ProposalStatus!]
 		) {
-			proposalIndex
-			isDelegated
-			parentVote {
-				extrinsicIndex
-			}
-			type
-			voter
-			balance {
-				__typename
-				... on StandardVoteBalance {
-					value
+			votes: flattenedConvictionVotes(
+				where: {
+					voter_in: $voter_in,
+					removedAtBlock_isNull: true,
+					proposal: {
+						status_in: $status_in
+					}
+				},
+				limit: $limit,
+				offset: $offset,
+				orderBy: createdAt_DESC
+			) {
+				proposalIndex
+				isDelegated
+				parentVote {
+					extrinsicIndex
 				}
-				... on SplitVoteBalance {
-					aye
-					nay
-					abstain
+				type
+				voter
+				balance {
+					__typename
+					... on StandardVoteBalance {
+						value
+					}
+					... on SplitVoteBalance {
+						aye
+						nay
+						abstain
+					}
+				}
+				decision
+				createdAt
+				lockPeriod
+				proposal {
+					status
 				}
 			}
-			decision
-			createdAt
-			lockPeriod
+			totalCount: flattenedConvictionVotesConnection(
+				where: {
+					voter_in: $voter_in,
+					removedAtBlock_isNull: true,
+					proposal: {
+						status_in: $status_in
+					}
+				},
+				orderBy: createdAt_DESC
+			) {
+				totalCount
+			}
 		}
-		totalCount: flattenedConvictionVotesConnection(
-			where: {
-				voter_in: $voter_in
-				removedAtBlock_isNull: true
-			}
-			orderBy: createdAt_DESC
+
+	`;
+
+	protected static GET_ALL_FLATTENED_VOTES_WITHOUT_FILTERS = `
+		query GetAllFlattenedVotesWithoutFilters(
+			$limit: Int!,
+			$offset: Int!
 		) {
-			totalCount
+			votes: flattenedConvictionVotes(
+				where: {
+					removedAtBlock_isNull: true
+				},
+				limit: $limit,
+				offset: $offset,
+				orderBy: createdAt_DESC
+			) {
+				proposalIndex
+				isDelegated
+				parentVote {
+					extrinsicIndex
+				}
+				type
+				voter
+				balance {
+					__typename
+					... on StandardVoteBalance {
+						value
+					}
+					... on SplitVoteBalance {
+						aye
+						nay
+						abstain
+					}
+				}
+				decision
+				createdAt
+				lockPeriod
+				proposal {
+					status
+				}
+			}
+			totalCount: flattenedConvictionVotesConnection(
+				where: {
+					removedAtBlock_isNull: true
+				},
+				orderBy: createdAt_DESC
+			) {
+				totalCount
+			}
 		}
-	}`;
+
+	`;
+
+	protected static GET_GOV_ANALYTICS_STATS = `
+		query GetGovAnalyticsStats {
+			totalProposals: proposalsConnection(
+				where: { type_eq: ReferendumV2 }
+				orderBy: id_ASC
+			) {
+				totalCount
+			}
+			approvedProposals: proposalsConnection(
+				where: { 
+					type_eq: ReferendumV2,
+					status_in: [Confirmed, Approved, Executed]
+				}
+				orderBy: id_ASC
+			) {
+				totalCount
+			}
+		}
+	`;
+
+	protected static GET_GOV_ANALYTICS_REFERENDUM_OUTCOME = `
+		query GetGovAnalyticsReferendumOutcome($trackNo: Int) {
+			timeout: proposalsConnection(
+				where: {
+					status_in: [TimedOut],
+					trackNumber_eq: $trackNo,
+					type_eq: ReferendumV2
+				},
+				orderBy: id_ASC
+			) {
+				totalCount
+			}
+
+			ongoing: proposalsConnection(
+				where: {
+					status_in: [
+						DecisionDepositPlaced,
+						Deciding,
+						ConfirmAborted,
+						ConfirmStarted,
+						Submitted
+					],
+					trackNumber_eq: $trackNo,
+					type_eq: ReferendumV2
+				},
+				orderBy: id_ASC
+			) {
+				totalCount
+			}
+
+			approved: proposalsConnection(
+				where: {
+					status_in: [
+						Executed,
+						Approved,
+						Confirmed
+					],
+					trackNumber_eq: $trackNo,
+					type_eq: ReferendumV2
+				},
+				orderBy: id_ASC
+			) {
+				totalCount
+			}
+
+			rejected: proposalsConnection(
+				where: {
+					status_in: [
+						Rejected,
+						Killed,
+						ExecutionFailed
+					],
+					trackNumber_eq: $trackNo,
+					type_eq: ReferendumV2
+				},
+				orderBy: id_ASC
+			) {
+				totalCount
+			}
+
+			cancelled: proposalsConnection(
+				where: {
+					status_in: [
+						Cancelled,
+						ConfirmAborted
+					],
+					trackNumber_eq: $trackNo,
+					type_eq: ReferendumV2
+				},
+				orderBy: id_ASC
+			) {
+				totalCount
+			}
+		}
+	`;
+
+	protected static GET_TOTAL_CATEGORY_PROPOSALS = `
+		query GetTotalCategoryProposals($trackIds: [Int!]) {
+			count: proposalsConnection(where: { trackNumber_in: $trackIds, type_eq: ReferendumV2 }, orderBy: id_ASC) {
+				totalCount
+			}
+		}
+	`;
+
+	protected static GET_TURNOUT_DATA = `
+		query GetTurnoutData {
+			proposals(where: {type_eq: ReferendumV2, status_in: [Executed, Approved, Confirmed, Rejected, Killed, ExecutionFailed, TimedOut, Cancelled]}, orderBy: createdAt_DESC) {
+				index
+				trackNumber
+				convictionVoting(where: {removedAtBlock_isNull: true}) {
+					balance {
+						... on StandardVoteBalance {
+							value
+						}
+						... on SplitVoteBalance {
+							aye
+							nay
+							abstain
+						}
+					}
+					decision
+				}
+			}
+		}
+	`;
+
+	protected static GET_ALL_TRACK_LEVEL_ANALYTICS_DELEGATION_DATA = `
+		query GetAllTrackLevelAnalyticsDelegationData {
+			votingDelegations(where: { endedAtBlock_isNull: true, type_eq: OpenGov }) {
+				from
+				to
+				balance
+				lockPeriod
+				track
+			}
+		}
+	`;
 }

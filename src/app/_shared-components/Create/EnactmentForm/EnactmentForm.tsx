@@ -3,11 +3,12 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { useEffect, useRef, useState } from 'react';
 import { BN, BN_THOUSAND, BN_ZERO } from '@polkadot/util';
-import { EEnactment } from '@/_shared/types';
+import { EEnactment, ENetwork } from '@/_shared/types';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { ChevronDown } from 'lucide-react';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { useAssethubApiService } from '@/hooks/useAssethubApiService';
 import { RadioGroup, RadioGroupItem } from '../../RadioGroup/RadioGroup';
 import InputNumber from '../ManualExtrinsic/Params/InputNumber';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
@@ -28,13 +29,14 @@ function EnactmentForm({
 	const network = getCurrentNetwork();
 
 	const { apiService } = usePolkadotApiService();
+	const { assethubApiService } = useAssethubApiService();
 	const [enactment, setEnactment] = useState<EEnactment>(selectedEnactment);
 
 	const ref = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const getCurrentBlockNumber = async () => {
-			const blockHeight = await apiService?.getCurrentBlockHeight();
+			const blockHeight = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network) ? await assethubApiService?.getBlockHeight() : await apiService?.getBlockHeight();
 			if (blockHeight) {
 				onEnactmentValueChange({ ...advancedDetails, [EEnactment.At_Block_No]: new BN(blockHeight).add(BN_THOUSAND) });
 			}

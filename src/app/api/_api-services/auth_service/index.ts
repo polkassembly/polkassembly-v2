@@ -25,6 +25,7 @@ import { DEFAULT_PROFILE_DETAILS } from '@shared/_constants/defaultProfileDetail
 import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
 import { TOTP } from 'otpauth';
 import { cookies } from 'next/headers';
+import { USER_ID_BLACKLIST } from '@/_shared/_constants/userIdBlacklist';
 import { OffChainDbService } from '../offchain_db_service';
 import { RedisService } from '../redis_service';
 import { ACCESS_TOKEN_LIFE_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS } from '../../_api-constants/timeConstants';
@@ -46,6 +47,26 @@ if (!REFRESH_TOKEN_PRIVATE_KEY || !REFRESH_TOKEN_PUBLIC_KEY || !REFRESH_TOKEN_PA
 }
 
 export class AuthService {
+	/**
+	 * Check if a user ID is blacklisted
+	 * @param userId - The user ID to check
+	 * @returns true if the user is blacklisted, false otherwise
+	 */
+	static IsUserBlacklisted(userId: number): boolean {
+		return USER_ID_BLACKLIST.includes(userId);
+	}
+
+	/**
+	 * Validate user is not blacklisted and throw appropriate error if they are
+	 * @param userId - The user ID to validate
+	 * @throws {APIError} 403 - User is blacklisted
+	 */
+	private static ValidateUserNotBlacklisted(userId: number): void {
+		if (this.IsUserBlacklisted(userId)) {
+			throw new APIError(ERROR_CODES.USER_BLACKLISTED, StatusCodes.FORBIDDEN, ERROR_MESSAGES.USER_BLACKLISTED);
+		}
+	}
+
 	private static async CreateAndSendEmailVerificationToken(user: IUser, network: ENetwork): Promise<void> {
 		if (user.email) {
 			const verifyToken = createCuid();
@@ -137,6 +158,9 @@ export class AuthService {
 
 	static async GetUserWithAccessToken(token: string): Promise<IUser | null> {
 		const userId = this.GetUserIdFromAccessToken(token);
+
+		// Check if user is blacklisted before proceeding
+		this.ValidateUserNotBlacklisted(userId);
 
 		const user = await OffChainDbService.GetUserById(userId);
 		if (!user) return null;
@@ -244,6 +268,9 @@ export class AuthService {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, `User not found: ${emailOrUsername}`);
 		}
 
+		// Check if user is blacklisted before proceeding with login
+		this.ValidateUserNotBlacklisted(user.id);
+
 		const isCorrectPassword = await argon2.verify(user.password, password);
 
 		if (!isCorrectPassword) {
@@ -317,6 +344,8 @@ export class AuthService {
 
 		// if user exists, login
 		if (user) {
+			// Check if user is blacklisted before proceeding with login
+			this.ValidateUserNotBlacklisted(user.id);
 			const isTFAEnabled = user.twoFactorAuth?.enabled || false;
 
 			if (isTFAEnabled) {
@@ -669,6 +698,10 @@ export class AuthService {
 		const isValidAccessToken = accessToken && this.IsValidAccessToken(accessToken);
 
 		if (isValidAccessToken) {
+			// Even if access token is valid, check if user is blacklisted
+			const userId = this.GetUserIdFromAccessToken(accessToken);
+			this.ValidateUserNotBlacklisted(userId);
+
 			return {
 				newAccessToken: accessToken,
 				newRefreshToken: refreshToken
@@ -677,6 +710,10 @@ export class AuthService {
 
 		// If access token is invalid, try to generate a new one using refresh token
 		const refreshTokenPayload = this.GetRefreshTokenPayload(refreshToken);
+
+		// Check if user is blacklisted before proceeding with token refresh
+		this.ValidateUserNotBlacklisted(refreshTokenPayload.id);
+
 		const user = await OffChainDbService.GetUserById(refreshTokenPayload.id);
 
 		if (!user) {

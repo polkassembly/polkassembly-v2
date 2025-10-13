@@ -257,7 +257,7 @@ function AddComment({
 	return (
 		<div className='flex flex-col gap-2'>
 			<div
-				className='-ml-2 flex w-full'
+				className='flex w-full'
 				id={id}
 			>
 				<AddressSwitchButton
@@ -268,6 +268,7 @@ function AddComment({
 					iconSize={30}
 					switchButtonClassName='px-2 text-[8px] h-6'
 					action={EFeature.COMMENT}
+					hideAccountsAlert
 				/>
 			</div>
 			<div className='mb-2'>

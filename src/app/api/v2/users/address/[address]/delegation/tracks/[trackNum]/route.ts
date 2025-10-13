@@ -16,7 +16,7 @@ import { BN } from '@polkadot/util';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 
 // get delegation status and active proposals for all tracks
-export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ address: string }> }) => {
+export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ address: string; trackNum: string }> }) => {
 	const [network] = await Promise.all([getNetworkFromHeaders(), cryptoWaitReady()]);
 
 	const zodParamsSchema = z.object({

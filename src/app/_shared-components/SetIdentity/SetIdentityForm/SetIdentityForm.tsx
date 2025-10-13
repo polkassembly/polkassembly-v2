@@ -22,6 +22,7 @@ import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EthereumNetwork } from '@/_shared/_constants/networks';
 import { ENotificationStatus, EReactQueryKeys } from '@/_shared/types';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { Alert, AlertDescription } from '../../Alert';
 import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelationsPicker';
 import IdentityFeeCollaps from '../IdentityFeeCollaps/IdentityFeeCollaps';
@@ -67,6 +68,8 @@ function SetIdentityForm({
 	const { toast } = useToast();
 
 	const network = getCurrentNetwork();
+
+	const { setVaultQrState } = usePolkadotVault();
 
 	const { identityService } = useIdentityService();
 
@@ -130,6 +133,9 @@ function SetIdentityForm({
 
 		await identityService.setOnChainIdentity({
 			address: userPreferences.selectedAccount.address,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
+			selectedAccount: userPreferences.selectedAccount,
 			displayName,
 			email,
 			legalName,

@@ -36,6 +36,8 @@ function AddressDropdown({
 	disabled,
 	withRadioSelect,
 	onRadioSelect,
+	showTransferableBalance = false,
+	showVotingBalance = false,
 	showPeopleChainBalance = false,
 	showLinkedAccountBadge = false
 }: {
@@ -44,6 +46,8 @@ function AddressDropdown({
 	disabled?: boolean;
 	withRadioSelect?: boolean;
 	onRadioSelect?: (address: string) => void;
+	showTransferableBalance?: boolean;
+	showVotingBalance?: boolean;
 	showPeopleChainBalance?: boolean;
 	showLinkedAccountBadge?: boolean;
 }) {
@@ -244,6 +248,8 @@ function AddressDropdown({
 									<Balance
 										address={userPreferences?.selectedAccount?.address || ''}
 										showPeopleChainBalance={showPeopleChainBalance}
+										showTransferableBalance={showTransferableBalance}
+										showVotingBalance={showVotingBalance}
 									/>
 								)}
 							</div>
@@ -312,6 +318,8 @@ function AddressDropdown({
 								<Balance
 									address={userPreferences?.selectedAccount?.address || ''}
 									showPeopleChainBalance={showPeopleChainBalance}
+									showTransferableBalance={showTransferableBalance}
+									showVotingBalance={showVotingBalance}
 								/>
 							)}
 						</div>
