@@ -75,6 +75,7 @@ enum ERedisKeys {
 	REMARK_LOGIN_MESSAGE = 'RLM',
 	POST_ANALYTICS_DATA = 'PAD',
 	POST_BUBBLE_VOTES_DATA = 'PBVD',
+	PROFILE_VIEWS = 'PVW',
 	GOV_ANALYTICS_STATS = 'GAS',
 	GOV_ANALYTICS_REFERENDUM_OUTCOME = 'GAR',
 	GOV_ANALYTICS_REFERENDUM_COUNT = 'GAC',
@@ -172,7 +173,9 @@ export class RedisService {
 			const baseKey = `${ERedisKeys.USER_POSTS}-${network}-${address}-${page}-${limit}`;
 			const proposalTypePart = proposalType ? `-pt:${proposalType}` : '';
 			return baseKey + proposalTypePart;
-		}
+		},
+		[ERedisKeys.PROFILE_VIEWS]: (userId: string, network: string, startDate: string, endDate: string): string =>
+			`${ERedisKeys.PROFILE_VIEWS}-${network}-${userId}-${startDate}-${endDate}`
 	} as const;
 
 	// helper methods
@@ -311,6 +314,7 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.POST_ANALYTICS_DATA}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.PROFILE_VIEWS}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_STATS}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT}-${network}-*` }),
@@ -630,7 +634,8 @@ export class RedisService {
 			this.DeleteOverviewPageData({ network }),
 
 			// clear treasury stats
-			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` })
+			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.PROFILE_VIEWS}-${network}-*` })
 		]);
 	}
 
@@ -1061,5 +1066,44 @@ export class RedisService {
 	static async DeleteUserPostsByAddress({ network, address }: { network: ENetwork; address: string }): Promise<void> {
 		// Delete all user posts cache entries for this address
 		await this.DeleteKeys({ pattern: `${ERedisKeys.USER_POSTS}-${network}-${address}-*` });
+	}
+
+	static async GetProfileViews({
+		userId,
+		network,
+		startDate,
+		endDate
+	}: {
+		userId: number;
+		network: ENetwork;
+		startDate: string;
+		endDate: string;
+	}): Promise<{ total: number; unique: number; startDate: string; endDate: string } | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.PROFILE_VIEWS](userId.toString(), network, startDate, endDate) });
+		return data ? (deepParseJson(data) as { total: number; unique: number; startDate: string; endDate: string }) : null;
+	}
+
+	static async SetProfileViews({
+		userId,
+		network,
+		startDate,
+		endDate,
+		data
+	}: {
+		userId: number;
+		network: ENetwork;
+		startDate: string;
+		endDate: string;
+		data: { total: number; unique: number; startDate: string; endDate: string };
+	}): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.PROFILE_VIEWS](userId.toString(), network, startDate, endDate),
+			value: JSON.stringify(data),
+			ttlSeconds: 300 // Cache for 5 minutes
+		});
+	}
+
+	static async DeleteProfileViews({ userId, network }: { userId: number; network: ENetwork }): Promise<void> {
+		await this.DeleteKeys({ pattern: `${ERedisKeys.PROFILE_VIEWS}-${network}-${userId}-*` });
 	}
 }

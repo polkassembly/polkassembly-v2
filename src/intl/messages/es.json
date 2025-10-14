@@ -164,9 +164,20 @@
 		"follow": "Seguir",
 		"balance": "Saldo",
 		"locked": "Bloqueado",
+		"unlocked": "Desbloqueado",
 		"on": "el",
 		"noJudgements": "No hay juicios",
 		"judgement": "Juicio",
+		"self": "Propio",
+		"available": "Disponible",
+		"delegated": "Delegado",
+		"votingPower": "Poder de voto",
+		"profileViews": "Vistas de Perfil",
+		"availableBalanceText": "Los DOT en tu billetera que actualmente no están bloqueados o delegados — están libres para ser utilizados para votar o hacer staking.",
+		"delegatedBalanceText": "La cantidad de DOT que has delegado a otra persona para que vote en tu nombre.",
+		"totalVotingPowerText": "Poder de voto = Saldo bloqueado × Convicción (máx. 6x) + Delegaciones",
+		"selfVotingPowerText": "La cantidad de DOT que controlas personalmente y estás usando para votar en la cadena (sin delegación).",
+		"delegatedVotingPowerText": "Los DOT que otros te han delegado, dándote el poder para votar en su nombre.",
 		"Delegations": {
 			"noDelegations": "No se encontraron delegaciones",
 			"index": "Índice",
@@ -183,7 +194,10 @@
 			"multiple": "Múltiples",
 			"VP": "VP",
 			"CA": "CA",
-			"CO": "CO"
+			"CO": "CO",
+			"delegationMandate": "Mandato de delegación",
+			"delegationMandateDescription": "La delegación en Polkadot OpenGov le permite asignar su poder de voto a otros por pista, con convicción y cantidad elegidos. Los delegados votan en su nombre, pero no pueden acceder a sus fondos ni delegar más. Puede actualizar o eliminar en cualquier momento.",
+			"readMore": "Leer más"
 		},
 		"Votes": {
 			"noData": "No se encontraron votos",

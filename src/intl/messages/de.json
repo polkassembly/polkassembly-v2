@@ -164,9 +164,20 @@
 		"follow": "Folgen",
 		"balance": "Guthaben",
 		"locked": "Gesperrt",
+		"unlocked": "Entsperrt",
 		"on": "am",
 		"noJudgements": "Keine Beurteilungen",
 		"judgement": "Beurteilung",
+		"self": "Selbst",
+		"available": "Verfügbar",
+		"delegated": "Delegiert",
+		"votingPower": "Stimmgewicht",
+		"profileViews": "Profilansichten",
+		"availableBalanceText": "Die DOT in deiner Wallet, die derzeit nicht gesperrt oder delegiert sind — sie können frei für Abstimmungen oder Staking verwendet werden.",
+		"delegatedBalanceText": "Die Menge an DOT, die du an jemand anderen delegiert hast, um in deinem Namen abzustimmen.",
+		"totalVotingPowerText": "Stimmgewicht = Gesperrtes Guthaben × Überzeugung (max. 6x) + Delegationen",
+		"selfVotingPowerText": "Die Menge an DOT, die du persönlich kontrollierst und für On-Chain-Abstimmungen verwendest (ohne Delegation).",
+		"delegatedVotingPowerText": "Die DOT, die andere an dich delegiert haben und dir die Befugnis geben, in ihrem Namen abzustimmen.",
 		"Delegations": {
 			"noDelegations": "Keine Delegationen gefunden",
 			"delegation": "Delegation",
@@ -181,7 +192,10 @@
 			"multiple": "Mehrere",
 			"VP": "VP",
 			"CA": "CA",
-			"CO": "CO"
+			"CO": "CO",
+			"delegationMandate": "Delegationsmandat",
+			"delegationMandateDescription": "Delegation in Polkadot OpenGov ermöglicht es Ihnen, Ihre Stimme an andere pro Track zu delegieren, mit gewähltem Überzeugungssatz und Betrag. Delegierte stimmen für Sie ab, können aber nicht auf Ihre Mittel zugreifen oder weitere delegieren. Sie können dies jederzeit aktualisieren oder entfernen.",
+			"readMore": "Weiterlesen"
 		},
 		"Votes": {
 			"noData": "Keine Stimmen gefunden",

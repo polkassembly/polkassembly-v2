@@ -343,7 +343,7 @@ function ProfileHeader({
 					<UserBlacklistWarning />
 				</div>
 			)}
-			<TabsList className='flex w-full overflow-x-auto'>
+			<TabsList className='flex w-full justify-start overflow-x-auto'>
 				<TabsTrigger
 					className='uppercase'
 					value={EProfileTabs.OVERVIEW}

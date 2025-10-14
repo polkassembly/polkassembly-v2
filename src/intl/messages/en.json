@@ -168,9 +168,20 @@
 		"followers": "Followers",
 		"balance": "Balance",
 		"locked": "Locked",
+		"unlocked": "Unlocked",
 		"on": "on",
 		"noJudgements": "No Judgements",
 		"judgement": "Judgement",
+		"self": "Self",
+		"available": "Available",
+		"delegated": "Delegated",
+		"votingPower": "Voting Power",
+		"profileViews": "Profile Views",
+		"availableBalanceText": "The DOT in your wallet that's currently not locked or delegated — it's free to be used for voting or staking.",
+		"delegatedBalanceText": "The amount of DOT you've delegated to someone else to vote on your behalf.",
+		"totalVotingPowerText": " Voting Power = Locked Balance ×  Conviction ( max 6x ) + Delegations",
+		"selfVotingPowerText": "The amount of DOT you personally control and are using for on-chain voting (without delegation).",
+		"delegatedVotingPowerText": "The DOT that others have delegated to you, giving you the power to vote on their behalf.",
 		"Delegations": {
 			"noDelegations": "No Delegations Found",
 			"delegation": "Delegation",
@@ -188,7 +199,10 @@
 			"multiple": "Multiple",
 			"VP": "VP",
 			"CA": "CA",
-			"CO": "CO"
+			"CO": "CO",
+			"delegationMandate": "Delegation Mandate",
+			"delegationMandateDescription": "Delegation in Polkadot OpenGov lets you assign your voting power to others per track, with chosen conviction and amount. Delegates vote on your behalf, but can’t access your funds or delegate further. You can update or remove anytime.",
+			"readMore": "Read More"
 		},
 		"Votes": {
 			"noData": "No votes found",

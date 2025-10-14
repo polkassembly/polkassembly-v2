@@ -154,6 +154,8 @@ enum EApiRoute {
 	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES',
 	ADD_COMMENT_REACTION = 'ADD_COMMENT_REACTION',
 	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
+	GET_PROFILE_VIEWS = 'GET_PROFILE_VIEWS',
+	INCREMENT_PROFILE_VIEW = 'INCREMENT_PROFILE_VIEW',
 	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES',
 	GET_GOV_ANALYTICS = 'GET_GOV_ANALYTICS',
 	GET_TRACK_COUNTS = 'GET_TRACK_COUNTS'
@@ -286,6 +288,9 @@ export class NextApiClientService {
 			case EApiRoute.GET_GOV_ANALYTICS:
 				path = '/gov-analytics';
 				break;
+			case EApiRoute.GET_PROFILE_VIEWS:
+				path = '/users/id';
+				break;
 
 			// post routes
 			case EApiRoute.LOGOUT:
@@ -336,6 +341,7 @@ export class NextApiClientService {
 			case EApiRoute.FOLLOW_USER:
 			case EApiRoute.INIT_SOCIAL_VERIFICATION:
 			case EApiRoute.CONFIRM_SOCIAL_VERIFICATION:
+			case EApiRoute.INCREMENT_PROFILE_VIEW:
 				path = '/users/id';
 				method = 'POST';
 				break;
@@ -1022,6 +1028,29 @@ export class NextApiClientService {
 	static async getDelegateTracks({ address }: { address: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.PUBLIC_USER_DATA_BY_ADDRESS, routeSegments: [address, 'delegation', 'tracks'] });
 		return this.nextApiClientFetch<{ delegationStats: ITrackDelegationStats[] }>({ url, method });
+	}
+
+	static async getProfileViews({ userId, startDate, endDate }: { userId: number; startDate: string; endDate: string }) {
+		const queryParams = new URLSearchParams({
+			startDate,
+			endDate
+		});
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_PROFILE_VIEWS,
+			routeSegments: [userId.toString(), 'profile-views'],
+			queryParams
+		});
+
+		return this.nextApiClientFetch<{ total: number; unique: number; startDate: string; endDate: string }>({ url, method });
+	}
+
+	static async incrementProfileView({ userId }: { userId: number }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.INCREMENT_PROFILE_VIEW,
+			routeSegments: [userId.toString(), 'profile-views']
+		});
+
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
 	static async getDelegateTrack({ address, trackId }: { address: string; trackId: number }) {

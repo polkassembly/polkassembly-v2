@@ -13,6 +13,8 @@ import { BN } from '@polkadot/util';
 import { IoPersonAdd } from '@react-icons/all-files/io5/IoPersonAdd';
 import { useUser } from '@/hooks/useUser';
 import { useState } from 'react';
+import Link from 'next/link';
+import { ArrowUpRightFromSquare } from 'lucide-react';
 import classes from './Delegations.module.scss';
 import { Skeleton } from '../../Skeleton';
 import { MarkdownViewer } from '../../MarkdownViewer/MarkdownViewer';
@@ -126,7 +128,7 @@ function Delegations({ addresses }: { addresses: string[] }) {
 				<Skeleton className='h-[100px] w-full' />
 			) : (
 				<div className={classes.delegationsCardHeader}>
-					<div className='flex justify-between'>
+					<div className='flex justify-between border-b border-border_grey pb-2'>
 						<div className={classes.delegationsCardHeaderTitle}>
 							<Image
 								src={DelegationIcon}
@@ -164,6 +166,24 @@ function Delegations({ addresses }: { addresses: string[] }) {
 								</DialogContent>
 							</Dialog>
 						)}
+					</div>
+
+					<div className='mt-2 flex flex-col gap-y-3'>
+						<h2 className='text-sm font-normal text-basic_text'>{t('Delegations.delegationMandate')}</h2>
+						<p className='text-sm font-medium'>{t('Delegations.delegationMandateDescription')}</p>
+						<Link
+							href='https://wiki.polkadot.com/learn/learn-polkadot-opengov/#multirole-delegation'
+							className='flex items-center gap-x-1 text-sm font-medium text-text_pink underline'
+							target='_blank'
+							rel='noopener noreferrer'
+							aria-label={t('Delegations.readMore')}
+						>
+							{t('Delegations.readMore')}
+							<ArrowUpRightFromSquare
+								aria-hidden='true'
+								className='h-4 w-4 text-text_pink'
+							/>
+						</Link>
 					</div>
 
 					{isManifestoFetching ? (

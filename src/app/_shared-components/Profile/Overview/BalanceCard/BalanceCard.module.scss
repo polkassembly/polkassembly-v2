@@ -1,0 +1,47 @@
+.statCard {
+	@apply flex flex-col items-center rounded-xl border border-border_grey bg-bg_modal p-2 shadow-sm lg:items-start lg:p-3;
+}
+
+.statCardHeader {
+	@apply mb-1 flex items-center gap-2;
+}
+
+.statCardIcon {
+	@apply h-5 w-5 text-text_grey;
+}
+
+.statCardTitle {
+	@apply text-xs text-text_grey;
+}
+
+.statCardValue {
+	@apply flex items-end gap-1;
+}
+
+.value {
+	@apply text-xl font-semibold text-text_primary;
+}
+
+.unit {
+	@apply mb-1 text-xs text-text_grey;
+}
+
+.infoIcon {
+	@apply flex h-3 w-3 cursor-pointer items-center justify-center rounded-full bg-info_icon_bg text-[10px] font-medium text-white;
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+	.statCard {
+		@apply border-border_grey bg-bg_modal;
+	}
+
+	.value {
+		@apply text-text_primary;
+	}
+
+	.statCardTitle,
+	.unit {
+		@apply text-text_grey;
+	}
+}
