@@ -15,9 +15,10 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { useUser } from '@/hooks/useUser';
 import { useActiveChatId } from '@/hooks/useActiveChatId';
 import { useQuery } from '@tanstack/react-query';
-import { IConversationHistory } from '@/_shared/types';
+import { EChatState, IConversationHistory } from '@/_shared/types';
 import styles from './ExpandedChatModal.module.scss';
 import ChatInput from './ChatInput';
+import { ChatBanner } from '../ChatBanner';
 
 export default function ExpandedChatModal({ open }: { open: boolean }) {
 	const { chatState, setChatState } = useChatState();
@@ -115,7 +116,8 @@ export default function ExpandedChatModal({ open }: { open: boolean }) {
 						</div>
 
 						<div className='w-3/4'>
-							<div className='h-96 overflow-y-auto'>
+							<ChatBanner chatState={chatState ?? EChatState.EXPANDED} />
+							<div className={`${styles.hide_scrollbar} h-96 overflow-y-auto`}>
 								<ChatMessages
 									messages={messages}
 									streamingMessage={streamingMessage}

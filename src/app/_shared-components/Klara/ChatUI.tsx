@@ -14,6 +14,7 @@ import ChatHeader from './components/ChatHeader';
 import ChatMessages from './components/ChatMessages';
 import ChatInput from './components/ChatInput';
 import styles from './ChatUI.module.scss';
+import { ChatBanner } from './ChatBanner';
 import ExpandedChatModal from './components/ExpandedChatModal';
 
 function ChatUI() {
@@ -49,7 +50,8 @@ function ChatUI() {
 					/>
 					{chatState === EChatState.EXPANDED_SMALL && (
 						<>
-							<div className='h-80 overflow-y-auto'>
+							<ChatBanner chatState={chatState} />
+							<div className={`${styles.hide_scrollbar} h-80 overflow-y-auto`}>
 								<ChatMessages
 									messages={messages}
 									streamingMessage={streamingMessage}

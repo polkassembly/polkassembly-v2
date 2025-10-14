@@ -9,8 +9,10 @@ import { CgArrowsVAlt } from '@react-icons/all-files/cg/CgArrowsVAlt';
 import { IoClose } from '@react-icons/all-files/io5/IoClose';
 import { IoChevronDown } from '@react-icons/all-files/io5/IoChevronDown';
 import { IoChevronUp } from '@react-icons/all-files/io5/IoChevronUp';
+import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { EChatState } from '@/_shared/types';
+import { NotebookText } from 'lucide-react';
 import styles from '../ChatUI.module.scss';
 
 interface Props {
@@ -30,6 +32,16 @@ function ChatHeader({ chatState, setChatState }: Props) {
 			/>
 			<p className='text-xl font-semibold text-text_primary'>Klara</p>
 			<div className={styles.chatUIControls}>
+				{chatState === EChatState.EXPANDED && (
+					<Link
+						href='https://klara.polkassembly.io/guide'
+						target='_blank'
+						className='flex items-center gap-1 rounded-lg border border-text_pink px-3 py-1 text-sm font-medium text-text_pink'
+					>
+						<NotebookText className='size-4' />
+						Refer Usage Guide
+					</Link>
+				)}
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<button

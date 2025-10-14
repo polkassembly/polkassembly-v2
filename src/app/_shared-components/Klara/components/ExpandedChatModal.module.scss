@@ -12,6 +12,16 @@
 	@apply flex w-full cursor-pointer items-center justify-center gap-1 rounded-[10.5px] bg-bg_modal px-3 py-1 text-sm text-basic_text;
 }
 
+.hide_scrollbar {
+	@apply overflow-y-auto;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.hide_scrollbar::-webkit-scrollbar {
+	@apply hidden;
+}
+
 .conversations {
 	@apply flex flex-col overflow-hidden bg-bg_modal;
 }
