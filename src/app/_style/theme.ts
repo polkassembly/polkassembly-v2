@@ -183,7 +183,10 @@ export const THEME_COLORS = {
 		diff_added_text: '#0D7936',
 		diff_removed_bg: '#FFD6D9',
 		diff_removed_text: '#C53030',
-		empty_bar_bg: '#F3F3F3'
+		empty_bar_bg: '#F3F3F3',
+		mob_proposal_index_bg: '#EAEDF0',
+		mob_proposal_index_border: '#E9EBEF',
+		mob_discussion_comment_bg: '#FFE3BB'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -365,6 +368,9 @@ export const THEME_COLORS = {
 		diff_added_text: '#68D391',
 		diff_removed_bg: '#4A1E1E',
 		diff_removed_text: '#FC8181',
-		empty_bar_bg: '#2A2A2A'
+		empty_bar_bg: '#2A2A2A',
+		mob_proposal_index_bg: '#EAEDF0',
+		mob_proposal_index_border: '#E9EBEF',
+		mob_discussion_comment_bg: '#FFE3BB'
 	}
 };
