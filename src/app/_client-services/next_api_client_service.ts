@@ -160,7 +160,8 @@ enum EApiRoute {
 	GET_GOV_ANALYTICS = 'GET_GOV_ANALYTICS',
 	GET_TRACK_COUNTS = 'GET_TRACK_COUNTS',
 	GET_CONVERSATION_HISTORY = 'GET_CONVERSATION_HISTORY',
-	GET_CONVERSATION_MESSAGES = 'GET_CONVERSATION_MESSAGES'
+	GET_CONVERSATION_MESSAGES = 'GET_CONVERSATION_MESSAGES',
+	GET_KLARA_STATS = 'GET_KLARA_STATS'
 }
 
 export class NextApiClientService {
@@ -391,6 +392,7 @@ export class NextApiClientService {
 
 			case EApiRoute.GET_CONVERSATION_HISTORY:
 			case EApiRoute.GET_CONVERSATION_MESSAGES:
+			case EApiRoute.GET_KLARA_STATS:
 				path = '/klara';
 				method = 'GET';
 				break;
@@ -1374,5 +1376,10 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CONVERSATION_MESSAGES, routeSegments: ['messages'], queryParams });
 		return this.nextApiClientFetch<IConversationMessage[]>({ url, method });
+	}
+
+	static async getKlaraStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_KLARA_STATS, routeSegments: ['stats'] });
+		return this.nextApiClientFetch<{ totalUsers: number; totalConversations: number; lastUpdated: string }>({ url, method });
 	}
 }

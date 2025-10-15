@@ -19,6 +19,8 @@ function cleanUndefinedValues(obj: any): any {
 	}, {});
 }
 
+const DEFAULT_CONVERSATION_TITLE = 'New Conversation';
+
 export class KlaraDatabaseService extends FirestoreUtils {
 	// Read methods
 	static async GetUserConversations(userId: string): Promise<IConversationHistory[]> {
@@ -57,7 +59,7 @@ export class KlaraDatabaseService extends FirestoreUtils {
 	static async CreateConversation(userId: string, title?: string): Promise<string> {
 		try {
 			const conversationData = {
-				title: title || 'New Conversation',
+				title: title || DEFAULT_CONVERSATION_TITLE,
 				createdAt: dayjs().toDate(),
 				lastActivity: dayjs().toDate(),
 				messageCount: 0,
@@ -121,14 +123,40 @@ export class KlaraDatabaseService extends FirestoreUtils {
 					lastActivity: dayjs().toDate(),
 					lastMessage: message.text.substring(0, 100),
 					messageCount: (currentData?.messageCount || 0) + 1,
-					title:
-						currentData?.title === 'New Conversation' && message.sender === 'user' ? message.text.substring(0, 50) + (message.text.length > 50 ? '...' : '') : currentData?.title
+					title: this.getUpdatedTitle(currentData?.title, message)
 				});
 
 				await conversationDoc.ref.set(updateData, { merge: true });
 			}
 		} catch (error) {
 			console.error('Error saving message to conversation:', error);
+			throw error;
+		}
+	}
+
+	private static getUpdatedTitle(currentTitle: string | undefined, message: IConversationMessage): string {
+		if (currentTitle !== DEFAULT_CONVERSATION_TITLE || message.sender !== 'user') {
+			return currentTitle || DEFAULT_CONVERSATION_TITLE;
+		}
+
+		const truncatedText = message.text.substring(0, 50);
+		return message.text.length > 50 ? `${truncatedText}...` : truncatedText;
+	}
+
+	static async GetStats(): Promise<{ totalUsers: number; totalConversations: number }> {
+		try {
+			// Get total conversations
+			const conversationsSnapshot = await this.conversationsCollectionRef().count().get();
+			const totalConversations = conversationsSnapshot.data().count;
+
+			// Get total unique users
+			const usersSnapshot = await this.conversationsCollectionRef().select('userId').get();
+			const uniqueUsers = new Set(usersSnapshot.docs.map((doc) => doc.data().userId));
+			const totalUsers = uniqueUsers.size;
+
+			return { totalUsers, totalConversations };
+		} catch (error) {
+			console.error('Error getting Klara stats:', error);
 			throw error;
 		}
 	}

@@ -187,7 +187,9 @@ export const THEME_COLORS = {
 		klara_user_msg_bg: '#3B47DF',
 		klara_ai_msg_bg: '#D2D8E04D',
 		klara_active_chat_border: '#3473FFD1',
-		klara_active_chat_bg: '#F1F5FF'
+		klara_active_chat_bg: '#F1F5FF',
+		klara_stats_bg: '#EAE4FA',
+		klara_stats_text: '#5421E5'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -373,6 +375,8 @@ export const THEME_COLORS = {
 		klara_user_msg_bg: '#3B47DF',
 		klara_ai_msg_bg: '#D2D8E04D',
 		klara_active_chat_border: '#3473FFD1',
-		klara_active_chat_bg: '#F1F5FF'
+		klara_active_chat_bg: '#F1F5FF',
+		klara_stats_bg: '#EAE4FA',
+		klara_stats_text: '#5421E5'
 	}
 };
