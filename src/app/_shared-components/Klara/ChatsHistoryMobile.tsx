@@ -17,12 +17,13 @@ import { IConversationHistory } from '@/_shared/types';
 import { IoClose } from '@react-icons/all-files/io5/IoClose';
 import styles from './ChatsHistory.module.scss';
 import uiStyles from './ChatUI.module.scss';
+import { LoadingSpinner } from '../LoadingSpinner';
 
 function ChatsHistoryMobile({ onClose }: { onClose: () => void }) {
 	const { user } = useUser();
 	const { activeChatId, setActiveChatId } = useActiveChatId();
 
-	const { data: conversations } = useQuery({
+	const { data: conversations, isLoading } = useQuery({
 		queryKey: ['klara-conversations', user?.id],
 		queryFn: async () => {
 			const res = await NextApiClientService.getConversationHistory({ userId: user?.id.toString() ?? '' });
@@ -41,8 +42,18 @@ function ChatsHistoryMobile({ onClose }: { onClose: () => void }) {
 		[setActiveChatId]
 	);
 
+	if (isLoading) {
+		return (
+			<div className={styles.mobileContainer}>
+				<div className={styles.mobileContent}>
+					<LoadingSpinner message='Loading conversations...' />
+				</div>
+			</div>
+		);
+	}
+
 	return (
-		<div className={`${styles.mobileContainer} ${uiStyles.container}`}>
+		<div className={styles.mobileContainer}>
 			<div className={styles.mobileContent}>
 				<div className={uiStyles.chatUIHeader}>
 					<div className='flex items-center gap-2'>

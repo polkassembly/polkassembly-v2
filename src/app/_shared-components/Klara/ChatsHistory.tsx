@@ -16,12 +16,13 @@ import EmptyBox from '@assets/klara/empty-box.svg';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { IConversationHistory } from '@/_shared/types';
 import styles from './ChatsHistory.module.scss';
+import { LoadingSpinner } from '../LoadingSpinner';
 
 function ChatsHistory() {
 	const { user } = useUser();
 	const { activeChatId, setActiveChatId } = useActiveChatId();
 
-	const { data: conversations } = useQuery({
+	const { data: conversations, isLoading } = useQuery({
 		queryKey: ['klara-conversations', user?.id],
 		queryFn: async () => {
 			const res = await NextApiClientService.getConversationHistory({ userId: user?.id.toString() ?? '' });
@@ -39,6 +40,16 @@ function ChatsHistory() {
 		},
 		[setActiveChatId]
 	);
+
+	if (isLoading) {
+		return (
+			<div className={styles.container}>
+				<div className={styles.content}>
+					<LoadingSpinner message='Loading conversations...' />
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className={styles.container}>
