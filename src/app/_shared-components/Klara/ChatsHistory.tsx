@@ -69,7 +69,7 @@ function ChatsHistory() {
 						<div className='flex items-center justify-center p-2'>
 							<Image
 								src={EmptyBox}
-								alt='Klara Avatar'
+								alt='Empty HistoryBox'
 								width={160}
 								height={160}
 							/>
