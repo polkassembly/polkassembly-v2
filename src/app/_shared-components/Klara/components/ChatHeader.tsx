@@ -21,7 +21,7 @@ import styles from '../ChatUI.module.scss';
 interface Props {
 	chatState: EChatState | null;
 	setChatState: (state: EChatState) => void;
-	openMobileHistory: () => void;
+	openMobileHistory?: () => void;
 }
 
 function ChatHeader({ chatState, setChatState, openMobileHistory }: Props) {
