@@ -92,7 +92,7 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 
 	return (
 		<div className={styles.chatUIBody}>
-			<div className='flex h-72 flex-col items-center justify-center'>
+			<div className='flex h-[600px] flex-col items-center justify-center md:h-72'>
 				{!messages.length && !streamingMessage && !mascotType && <WelcomeMessage />}
 				{!messages.length && !streamingMessage && mascotType === 'welcome' && <ChatSuggestions onFollowUpClick={onFollowUpClick} />}
 			</div>

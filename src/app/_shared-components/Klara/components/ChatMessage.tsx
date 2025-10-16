@@ -40,7 +40,7 @@ function ChatMessage({ message, onFollowUpClick }: Props) {
 	const isUserMessage = message.sender === 'user';
 
 	return (
-		<div className={`flex ${isUserMessage ? 'justify-end' : 'justify-start'}`}>
+		<div className={`flex w-full ${isUserMessage ? 'justify-end' : 'justify-start'}`}>
 			<div className={`max-w-[80%] rounded-xl px-3 py-2 ${isUserMessage ? 'bg-klara_user_msg_bg text-white' : 'bg-klara_ai_msg_bg text-black'}`}>
 				{isUserMessage ? (
 					<p className='whitespace-pre-wrap text-sm'>{message.text}</p>

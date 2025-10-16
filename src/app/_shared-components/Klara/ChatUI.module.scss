@@ -1,5 +1,5 @@
 .chatUI {
-	@apply flex w-96 flex-col rounded-t-xl bg-bg_modal p-[1px] pb-0;
+	@apply flex w-full flex-1 flex-col rounded-t-xl bg-bg_modal p-[1px] pb-0 md:w-96;
 	background-image: linear-gradient(139.05deg, #e5007a 4.08%, #3473ff 41.41%, #ffd663 60.08%, #51d36e 78.75%);
 }
 
@@ -22,7 +22,7 @@
 }
 
 .chatUIControls {
-	@apply ml-auto flex items-center gap-4;
+	@apply ml-auto hidden items-center gap-4 md:flex;
 
 	&:hover {
 		.controlIcon {

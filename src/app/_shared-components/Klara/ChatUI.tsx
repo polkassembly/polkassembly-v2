@@ -17,7 +17,7 @@ import styles from './ChatUI.module.scss';
 import { ChatBanner } from './ChatBanner';
 import ExpandedChatModal from './components/ExpandedChatModal';
 
-function ChatUI() {
+function ChatUI({ setIsMobileHistoryOpen }: { setIsMobileHistoryOpen: (isOpen: boolean) => void }) {
 	const { chatState, setChatState } = useChatState();
 	const { inputText, isLoading, isLoadingMessages, messages, streamingMessage, mascotType, handleInputChange, submitMessage, handleStopGeneration, handleNewChat } = useChatLogic();
 
@@ -42,16 +42,17 @@ function ChatUI() {
 
 	return (
 		<>
-			<div className={styles.chatUI}>
+			<div className={`${styles.chatUI} ${chatState === EChatState.EXPANDED ? 'hidden' : ''}`}>
 				<div className={styles.container}>
 					<ChatHeader
+						openMobileHistory={() => setIsMobileHistoryOpen(true)}
 						chatState={chatState}
 						setChatState={setChatState}
 					/>
 					{chatState === EChatState.EXPANDED_SMALL && (
 						<>
 							<ChatBanner chatState={chatState} />
-							<div className={`${styles.hide_scrollbar} h-80 overflow-y-auto`}>
+							<div className={`${styles.hide_scrollbar} h-[650px] overflow-y-auto md:h-80`}>
 								<ChatMessages
 									messages={messages}
 									streamingMessage={streamingMessage}

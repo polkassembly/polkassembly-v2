@@ -4,18 +4,26 @@
 
 'use client';
 
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import React from 'react';
 import dynamic from 'next/dynamic';
 import { useSidebar } from '../Sidebar/Sidebar';
+import ChatsHistoryMobile from './ChatsHistoryMobile';
 
 const ChatUI = dynamic(() => import('@/app/_shared-components/Klara/ChatUI'), { ssr: false });
 
 function ChatPopup() {
 	const { state } = useSidebar();
+	const [isMobileHistoryOpen, setIsMobileHistoryOpen] = useState(false);
+
 	return (
-		<div className={cn('fixed bottom-0 left-6 z-50 hidden transition-all duration-200 ease-in-out md:block', state === 'collapsed' ? 'md:left-24' : 'md:left-[16.3rem]')}>
-			<ChatUI />
+		<div className={cn('fixed bottom-0 z-50 w-full transition-all duration-200 ease-in-out md:left-6', state === 'collapsed' ? 'md:left-24' : 'md:left-[16.3rem]')}>
+			<ChatUI setIsMobileHistoryOpen={setIsMobileHistoryOpen} />
+			{isMobileHistoryOpen && (
+				<div className='absolute inset-0 rounded-t-xl bg-black/75 pt-14 md:hidden'>
+					<ChatsHistoryMobile onClose={() => setIsMobileHistoryOpen(false)} />
+				</div>
+			)}
 		</div>
 	);
 }

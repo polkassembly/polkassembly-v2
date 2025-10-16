@@ -90,7 +90,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 				<NavMain sections={data} />
 			</SidebarContent>
 
-			<SidebarFooter className='mb-3 hidden px-3 md:block'>
+			<SidebarFooter className='mb-3 px-3'>
 				{state === 'expanded' ? (
 					chatState === EChatState.EXPANDED_SMALL ? (
 						<ChatsHistory />

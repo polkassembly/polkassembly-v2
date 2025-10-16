@@ -11,6 +11,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { useQuery } from '@tanstack/react-query';
 import { IoChevronDown } from '@react-icons/all-files/io5/IoChevronDown';
 import { IoChevronUp } from '@react-icons/all-files/io5/IoChevronUp';
+import HistoryIcon from '@assets/klara/history.svg';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { EChatState } from '@/_shared/types';
@@ -20,9 +21,10 @@ import styles from '../ChatUI.module.scss';
 interface Props {
 	chatState: EChatState | null;
 	setChatState: (state: EChatState) => void;
+	openMobileHistory: () => void;
 }
 
-function ChatHeader({ chatState, setChatState }: Props) {
+function ChatHeader({ chatState, setChatState, openMobileHistory }: Props) {
 	const { data: stats } = useQuery({
 		queryKey: ['klara-stats'],
 		queryFn: async () => {
@@ -110,6 +112,30 @@ function ChatHeader({ chatState, setChatState }: Props) {
 						<p>close</p>
 					</TooltipContent>
 				</Tooltip>
+			</div>
+			<div className='ml-auto flex items-center gap-2 text-text_pink md:hidden'>
+				<button
+					type='button'
+					aria-label='history'
+					className='cursor-pointer border-none outline-none focus:outline-none'
+					onClick={openMobileHistory}
+				>
+					<Image
+						src={HistoryIcon}
+						alt='history'
+						width={24}
+						height={24}
+						className='size-6'
+					/>
+				</button>
+				<button
+					type='button'
+					aria-label='close'
+					onClick={() => setChatState(EChatState.CLOSED)}
+					className='cursor-pointer border-none outline-none focus:outline-none'
+				>
+					<IoClose className='size-6 text-gray-500' />
+				</button>
 			</div>
 		</div>
 	);
