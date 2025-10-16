@@ -26,7 +26,7 @@ import CreateButton from '../CreateButton/CreateButton';
 import styles from './AppSidebar.module.scss';
 
 function AppSidebar(props: ComponentProps<typeof Sidebar>) {
-	const { state } = useSidebar();
+	const { state, setOpenMobile } = useSidebar();
 	const { chatState, setChatState } = useChatState();
 	const t = useTranslations();
 	const pathname = usePathname();
@@ -98,7 +98,10 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 						<button
 							type='button'
 							className={styles.chat_button}
-							onClick={() => setChatState(EChatState.EXPANDED_SMALL)}
+							onClick={() => {
+								setOpenMobile(false);
+								setChatState(EChatState.EXPANDED_SMALL);
+							}}
 							aria-label='Chat with Klara'
 						>
 							<div className={styles.chat_button_content}>
