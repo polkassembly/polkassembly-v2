@@ -59,6 +59,7 @@ function ChatHeader({ chatState, setChatState, openMobileHistory }: Props) {
 					<Link
 						href='https://klara.polkassembly.io/guide'
 						target='_blank'
+						rel='noopener noreferrer'
 						className='flex items-center gap-1 rounded-lg border border-text_pink px-3 py-1 text-sm font-medium text-text_pink'
 					>
 						<NotebookText className='size-4' />

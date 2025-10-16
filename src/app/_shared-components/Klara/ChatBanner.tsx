@@ -16,6 +16,7 @@ export function ChatBanner({ chatState }: { chatState: EChatState }) {
 					<Link
 						href='https://klara.polkassembly.io/feedback'
 						target='_blank'
+						rel='noopener noreferrer'
 						className='underline'
 					>
 						here!
@@ -27,6 +28,7 @@ export function ChatBanner({ chatState }: { chatState: EChatState }) {
 					href='https://klara.polkassembly.io/guide'
 					target='_blank'
 					className='flex items-center gap-1 text-sm text-white underline'
+					rel='noopener noreferrer'
 				>
 					<NotebookText className='size-4' />
 					Refer Usage Guide
