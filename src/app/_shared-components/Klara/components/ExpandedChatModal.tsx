@@ -105,7 +105,7 @@ export default function ExpandedChatModal({ open }: { open: boolean }) {
 									))}
 								</div>
 							) : (
-								<div className='flex items-center justify-center p-2'>
+								<div className='flex flex-col items-center justify-center p-2'>
 									<Image
 										src={EmptyBox}
 										alt='Empty HistoryBox'
