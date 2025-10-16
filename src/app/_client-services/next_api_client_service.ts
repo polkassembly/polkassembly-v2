@@ -1380,6 +1380,6 @@ export class NextApiClientService {
 
 	static async getKlaraStats() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_KLARA_STATS, routeSegments: ['stats'] });
-		return this.nextApiClientFetch<{ totalUsers: number; totalConversations: number; lastUpdated: string }>({ url, method });
+		return this.nextApiClientFetch<{ totalUsers: number; totalConversations: number }>({ url, method });
 	}
 }
