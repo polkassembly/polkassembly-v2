@@ -15,6 +15,7 @@ import KlaraAvatar from '@assets/klara/avatar.svg';
 import EmptyBox from '@assets/klara/empty-box.svg';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { IConversationHistory } from '@/_shared/types';
+import Link from 'next/link';
 import styles from './ChatsHistory.module.scss';
 import { LoadingSpinner } from '../LoadingSpinner';
 
@@ -85,14 +86,28 @@ function ChatsHistory() {
 								height={160}
 							/>
 						</div>
-						<div className='flex items-center gap-2'>
-							<Image
-								src={KlaraAvatar}
-								alt='Klara Avatar'
-								width={36}
-								height={36}
-							/>
-							<p className='text-left text-[11px] font-semibold text-text_primary'>Hi, I am Klara, ask me about your governance interests</p>
+						<div>
+							{user?.id ? (
+								<div className='flex items-center gap-2'>
+									<Image
+										src={KlaraAvatar}
+										alt='Klara Avatar'
+										width={36}
+										height={36}
+									/>
+									<p className='text-left text-[11px] font-semibold text-text_primary'>Hi, I am Klara, ask me about your governance interests</p>
+								</div>
+							) : (
+								<p className='flex items-center justify-center gap-1 text-left text-[11px] font-semibold text-text_primary'>
+									<Link
+										href='/login'
+										className='text-text_pink underline'
+									>
+										Login
+									</Link>
+									<span>to view your chat history</span>
+								</p>
+							)}
 						</div>
 					</div>
 				)}

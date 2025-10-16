@@ -16,6 +16,7 @@ import { useUser } from '@/hooks/useUser';
 import { useActiveChatId } from '@/hooks/useActiveChatId';
 import { useQuery } from '@tanstack/react-query';
 import { EChatState, IConversationHistory } from '@/_shared/types';
+import Link from 'next/link';
 import styles from './ExpandedChatModal.module.scss';
 import ChatInput from './ChatInput';
 import { ChatBanner } from '../ChatBanner';
@@ -107,10 +108,22 @@ export default function ExpandedChatModal({ open }: { open: boolean }) {
 								<div className='flex items-center justify-center p-2'>
 									<Image
 										src={EmptyBox}
-										alt='Klara Avatar'
+										alt='Empty HistoryBox'
 										width={160}
 										height={160}
 									/>
+
+									{!user?.id && (
+										<p className='flex items-center justify-center gap-1 text-left text-[11px] font-semibold text-text_primary'>
+											<Link
+												href='/login'
+												className='text-text_pink underline'
+											>
+												Login
+											</Link>
+											<span>to view your chat history</span>
+										</p>
+									)}
 								</div>
 							)}
 						</div>
