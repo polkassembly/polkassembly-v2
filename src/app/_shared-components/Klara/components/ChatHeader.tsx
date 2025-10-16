@@ -41,7 +41,7 @@ function ChatHeader({ chatState, setChatState, openMobileHistory }: Props) {
 			<div className='flex items-center gap-2'>
 				<Image
 					src={KlaraAvatar}
-					alt=''
+					alt='Klara AI Assistant'
 					width={24}
 					height={24}
 					className='h-6 w-6'

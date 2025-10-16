@@ -107,7 +107,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 							<div className={styles.chat_button_content}>
 								<Image
 									src={KlaraAvatar}
-									alt=''
+									alt='Klara AI Assistant'
 									width={36}
 									height={36}
 								/>
@@ -131,7 +131,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 						<div className={`${styles.chat_button_content} justify-center`}>
 							<Image
 								src={KlaraAvatar}
-								alt=''
+								alt='Klara AI Assistant'
 								width={36}
 								height={36}
 							/>
