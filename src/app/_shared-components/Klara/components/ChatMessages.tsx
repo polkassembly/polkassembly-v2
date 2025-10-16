@@ -8,7 +8,7 @@ import KlaraAvatar from '@assets/klara/avatar.svg';
 import { IConversationMessage } from '@/_shared/types';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
-import { KALRA_CHAT_SUGGESTIONS } from '@/_shared/_constants/klaraChatSuggestions';
+import { KLARA_CHAT_SUGGESTIONS } from '@/_shared/_constants/klaraChatSuggestions';
 import Mascot from '../Mascot';
 import ChatMessage from './ChatMessage';
 import styles from '../ChatUI.module.scss';
@@ -40,7 +40,7 @@ function WelcomeMessage() {
 function ChatSuggestions({ onFollowUpClick }: { onFollowUpClick: (suggestion: string) => void }) {
 	return (
 		<div className='flex flex-wrap items-center justify-center gap-3 p-3'>
-			{KALRA_CHAT_SUGGESTIONS.map((suggestion) => (
+			{KLARA_CHAT_SUGGESTIONS.map((suggestion) => (
 				<button
 					key={suggestion}
 					type='button'
