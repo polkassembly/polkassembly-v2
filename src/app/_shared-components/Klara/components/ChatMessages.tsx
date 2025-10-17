@@ -106,9 +106,12 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 					{streamingMessage && <StreamingMessage message={streamingMessage} />}
 				</div>
 			) : (
-				<div className='flex flex-1 flex-grow flex-col items-center justify-center md:h-72'>
-					{!streamingMessage && !mascotType && <WelcomeMessage />}
-					{!streamingMessage && mascotType === 'welcome' && <ChatSuggestions onFollowUpClick={onFollowUpClick} />}
+				<div className='flex flex-grow flex-col items-center justify-center gap-2'>
+					<h1 className='text-center text-lg font-bold text-text_primary'>Start New Conversation</h1>
+					<div className='flex flex-col items-center justify-center'>
+						{!streamingMessage && !mascotType && <WelcomeMessage />}
+						{!streamingMessage && mascotType === 'welcome' && <ChatSuggestions onFollowUpClick={onFollowUpClick} />}
+					</div>
 				</div>
 			)}
 		</div>
