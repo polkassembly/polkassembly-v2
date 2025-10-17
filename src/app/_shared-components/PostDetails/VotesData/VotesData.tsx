@@ -203,7 +203,9 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 								height={14}
 							/>
 						</TooltipTrigger>
-						<TooltipContent>{activeTab === EVoteBubbleTabs.Bubble ? t('Tooltips.votesBubble') : t('Tooltips.votesGraph')}</TooltipContent>
+						<TooltipContent className='bg-tooltip_background text-sm text-white'>
+							{activeTab === EVoteBubbleTabs.Bubble ? t('Tooltips.votesBubble') : t('Tooltips.votesGraph')}
+						</TooltipContent>
 					</Tooltip>
 				</h1>
 				<Button

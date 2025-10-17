@@ -77,7 +77,7 @@ function BeneficiariesDetails({ beneficiaries }: { beneficiaries: IBeneficiary[]
 								height={14}
 							/>
 						</TooltipTrigger>
-						<TooltipContent>{t('Tooltips.requestedAmount')}</TooltipContent>
+						<TooltipContent className='bg-tooltip_background text-sm text-white'>{t('Tooltips.requestedAmount')}</TooltipContent>
 					</Tooltip>
 				</p>
 				<Button

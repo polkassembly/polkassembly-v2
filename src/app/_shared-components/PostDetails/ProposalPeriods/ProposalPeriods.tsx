@@ -155,7 +155,7 @@ function ProposalPeriods({
 									height={14}
 								/>
 							</TooltipTrigger>
-							<TooltipContent>{getStatusTooltip()}</TooltipContent>
+							<TooltipContent className='bg-tooltip_background text-sm text-white'>{getStatusTooltip()}</TooltipContent>
 						</Tooltip>
 					)}
 				</div>

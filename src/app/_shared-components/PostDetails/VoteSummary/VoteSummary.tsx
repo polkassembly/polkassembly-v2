@@ -142,7 +142,7 @@ function VoteSummary({ voteMetrics, index, approvalThreshold }: { voteMetrics?: 
 							height={14}
 						/>
 					</TooltipTrigger>
-					<TooltipContent>{t('PostDetails.Tooltips.votingSummary')}</TooltipContent>
+					<TooltipContent className='bg-tooltip_background text-sm text-white'>{t('PostDetails.Tooltips.votingSummary')}</TooltipContent>
 				</Tooltip>
 			</p>
 
