@@ -810,7 +810,8 @@
 		"voteBalance": "投票残高",
 		"Balance": "残高",
 		"PeopleChainBalance": "ピープルチェーン残高",
-		"VotingBalance": "投票残高"
+		"VotingBalance": "投票残高",
+		"migrationInfo": "ユーザー残高はAssetHubに移行されました"
 	},
 	"EditPost": {
 		"edit": "編集",
@@ -1172,7 +1173,7 @@
 		"addContextToProposal": "提案にコンテキストを追加",
 		"redirectingToPost": "投稿にリダイレクト中...",
 		"discussion": "ディスカッション",
-		"postMigrationInfo": "Post-Migration Info: リレーチェーンのブロック高が計算に使用されます。"
+		"postMigrationInfo": "移行後の時間ロジックは、リレーチェーンのブロック高を参照します。AssetHubのブロック番号は、スケジューリングには無効です。"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",
@@ -1573,7 +1574,7 @@
 		"sudo_balances": "Sudoバランス"
 	},
 	"AnnouncementBanner": {
-		"assethubMigration": "Kusamaはブロック30423691で予定されているAssethub Migration中であり、いくつかの機能が利用できない場合があります。詳細については、",
-		"here": "こちら"
+		"assethubMigration": "KusamaはAssetHubに移行されました。残高、データ、国民投票、その他のオンチェーン活動はAssetHubに移行されました。",
+		"learnMore": "詳細を確認"
 	}
 }
