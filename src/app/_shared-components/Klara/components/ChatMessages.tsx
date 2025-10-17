@@ -91,7 +91,7 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 	}
 
 	return (
-		<div className={styles.chatUIBody}>
+		<div className={`${styles.chatUIBody} ${styles.hide_scrollbar}`}>
 			{messages?.length ? (
 				<div className='flex flex-grow flex-col gap-3'>
 					{messages.map((message) => (
