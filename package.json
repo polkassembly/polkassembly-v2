@@ -75,6 +75,7 @@
 		"dayjs": "^1.11.13",
 		"deep-parse-json": "^2.0.0",
 		"diff": "^8.0.2",
+		"drizzle-orm": "^0.44.6",
 		"embla-carousel-react": "^8.5.2",
 		"eth-sig-util": "^3.0.1",
 		"firebase-admin": "^13.2.0",
