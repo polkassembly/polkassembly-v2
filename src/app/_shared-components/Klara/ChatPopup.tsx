@@ -17,7 +17,12 @@ function ChatPopup() {
 	const [isMobileHistoryOpen, setIsMobileHistoryOpen] = useState(false);
 
 	return (
-		<div className={cn('fixed bottom-0 z-50 w-full transition-all duration-200 ease-in-out md:left-6', state === 'collapsed' ? 'md:left-24' : 'md:left-[16.3rem]')}>
+		<div
+			className={cn(
+				'fixed bottom-0 top-[15%] z-50 max-h-[85vh] w-full transition-all duration-200 ease-in-out md:left-6 md:top-auto',
+				state === 'collapsed' ? 'md:left-24' : 'md:left-[16.3rem]'
+			)}
+		>
 			<ChatUI setIsMobileHistoryOpen={setIsMobileHistoryOpen} />
 			{isMobileHistoryOpen && (
 				<div className='absolute inset-0 rounded-t-xl bg-black/75 pt-14 md:hidden'>

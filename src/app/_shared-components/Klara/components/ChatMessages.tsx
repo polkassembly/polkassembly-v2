@@ -92,23 +92,25 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 
 	return (
 		<div className={styles.chatUIBody}>
-			<div className='flex h-[600px] flex-col items-center justify-center md:h-72'>
-				{!messages.length && !streamingMessage && !mascotType && <WelcomeMessage />}
-				{!messages.length && !streamingMessage && mascotType === 'welcome' && <ChatSuggestions onFollowUpClick={onFollowUpClick} />}
-			</div>
+			{messages?.length ? (
+				<div className='flex flex-grow flex-col gap-3'>
+					{messages.map((message) => (
+						<ChatMessage
+							key={message.id}
+							message={message}
+							onFollowUpClick={onFollowUpClick}
+						/>
+					))}
 
-			<div className='flex flex-col gap-3'>
-				{messages.map((message) => (
-					<ChatMessage
-						key={message.id}
-						message={message}
-						onFollowUpClick={onFollowUpClick}
-					/>
-				))}
-
-				{mascotType && mascotType !== 'welcome' && <Mascot type={mascotType} />}
-				{streamingMessage && <StreamingMessage message={streamingMessage} />}
-			</div>
+					{mascotType && mascotType !== 'welcome' && <Mascot type={mascotType} />}
+					{streamingMessage && <StreamingMessage message={streamingMessage} />}
+				</div>
+			) : (
+				<div className='flex flex-1 flex-grow flex-col items-center justify-center md:h-72'>
+					{!streamingMessage && !mascotType && <WelcomeMessage />}
+					{!streamingMessage && mascotType === 'welcome' && <ChatSuggestions onFollowUpClick={onFollowUpClick} />}
+				</div>
+			)}
 		</div>
 	);
 }

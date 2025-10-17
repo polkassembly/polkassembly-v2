@@ -128,9 +128,9 @@ export default function ExpandedChatModal({ open }: { open: boolean }) {
 							)}
 						</div>
 
-						<div className='w-3/4'>
+						<div className='flex w-3/4 flex-col'>
 							<ChatBanner chatState={chatState ?? EChatState.EXPANDED} />
-							<div className={`${styles.hide_scrollbar} h-96 overflow-y-auto`}>
+							<div className={`${styles.hide_scrollbar} flex h-96 flex-grow flex-col overflow-y-auto`}>
 								<ChatMessages
 									messages={messages}
 									streamingMessage={streamingMessage}
