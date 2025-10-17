@@ -5,15 +5,17 @@ import { useEffect, useRef, useState } from 'react';
 import { BN, BN_THOUSAND, BN_ZERO } from '@polkadot/util';
 import { EEnactment, ENetwork } from '@/_shared/types';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, TriangleAlert } from 'lucide-react';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useAssethubApiService } from '@/hooks/useAssethubApiService';
+import { useTranslations } from 'next-intl';
 import { RadioGroup, RadioGroupItem } from '../../RadioGroup/RadioGroup';
 import InputNumber from '../ManualExtrinsic/Params/InputNumber';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../Collapsible';
 import { Separator } from '../../Separator';
 import BalanceInput from '../../BalanceInput/BalanceInput';
+import { Alert, AlertDescription } from '../../Alert';
 
 function EnactmentForm({
 	selectedEnactment,
@@ -27,6 +29,8 @@ function EnactmentForm({
 	onEnactmentValueChange: (details: { [key in EEnactment]: BN }) => void;
 }) {
 	const network = getCurrentNetwork();
+
+	const t = useTranslations();
 
 	const { apiService } = usePolkadotApiService();
 	const { assethubApiService } = useAssethubApiService();
@@ -60,6 +64,17 @@ function EnactmentForm({
 			<CollapsibleContent>
 				<Separator className='my-4' />
 				<div className='flex flex-col gap-y-2'>
+					{[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network) && (
+						<Alert
+							variant='warning'
+							className='flex items-start justify-start gap-x-2'
+						>
+							<TriangleAlert className='h-5 w-5' />
+							<AlertDescription className=''>
+								<p className='text-xs font-medium'>{t('CreateProposal.postMigrationInfo')}</p>
+							</AlertDescription>
+						</Alert>
+					)}
 					<p className='text-xs text-wallet_btn_text sm:text-sm'>Enactment Blocks</p>
 					<RadioGroup
 						className='flex items-center gap-x-4'

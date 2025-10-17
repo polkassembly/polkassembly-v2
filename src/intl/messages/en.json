@@ -839,7 +839,8 @@
 		"voteBalance": "Vote Balance",
 		"Balance": "Balance",
 		"PeopleChainBalance": "People Chain Balance",
-		"VotingBalance": "Voting Balance"
+		"VotingBalance": "Voting Balance",
+		"migrationInfo": "User balances have been migrated to AssetHub"
 	},
 	"EditPost": {
 		"edit": "Edit",
@@ -1237,7 +1238,7 @@
 		"addContextToProposal": "Add Context to Proposal",
 		"redirectingToPost": "Redirecting to post...",
 		"discussion": "Discussion",
-		"postMigrationInfo": "Post-Migration Info: Relay chain block height is used for calculations."
+		"postMigrationInfo": "Timing logic references relay chain block height after migration. AssetHub block numbers are no longer valid for scheduling."
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",
@@ -1602,7 +1603,7 @@
 		"sudo_balances": "Sudo Balances"
 	},
 	"AnnouncementBanner": {
-		"assethubMigration": "Kusama is undergoing Assethub Migration scheduled at block 30423691, some functionality may be unavailable. For more information, visit",
-		"here": "here"
+		"assethubMigration": "Notice: Kusama has migrated to AssetHub. Balances, data, referenda, and other on-chain activity has moved to AssetHub.",
+		"learnMore": "Learn more"
 	}
 }

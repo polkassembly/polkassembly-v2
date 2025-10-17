@@ -811,7 +811,8 @@
 		"voteBalance": "Saldo de votación",
 		"Balance": "Saldo",
 		"PeopleChainBalance": "Saldo de People Chain",
-		"VotingBalance": "Saldo de votación"
+		"VotingBalance": "Saldo de votación",
+		"migrationInfo": "Los saldos de los usuarios han sido migrados a AssetHub"
 	},
 	"EditPost": {
 		"edit": "Editar",
@@ -1173,7 +1174,7 @@
 		"addContextToProposal": "Agregar contexto a la propuesta",
 		"redirectingToPost": "Redirigiendo a la publicación...",
 		"discussion": "Discusión",
-		"postMigrationInfo": "Información de post-migración: La altura de bloque de la cadena de relay se utiliza para cálculos."
+		"postMigrationInfo": "La lógica de tiempo se refiere a la altura de bloque de la cadena de relay después de la migración. Los números de bloque de AssetHub ya no son válidos para la programación."
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiario",
@@ -1574,7 +1575,7 @@
 		"sudo_balances": "Sudo Balances"
 	},
 	"AnnouncementBanner": {
-		"assethubMigration": "Kusama está en curso la migración de Assethub programada en el bloque 30423691, algunas funcionalidades pueden estar no disponibles. Para más información, visite",
-		"here": "aquí"
+		"assethubMigration": "Nota: La cadena de relay de Kusama se ha migrado a AssetHub; todas las acciones de gobernanza en cadena han sido movidas.",
+		"learnMore": "Más información"
 	}
 }

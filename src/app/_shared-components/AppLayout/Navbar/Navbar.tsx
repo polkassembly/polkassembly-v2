@@ -375,12 +375,12 @@ function Navbar() {
 						<p className='flex flex-wrap items-center gap-x-1 text-sm'>
 							{t('AnnouncementBanner.assethubMigration')}
 							<Link
-								href='https://migration.paritytech.io/'
+								href='https://docs.google.com/document/d/1XR3vL2p4QV0wC7FrlC8eN-q62BqNFTFElbj21wEmMGg/edit?tab=t.0#heading=h.vxykbd6ai7n7'
 								className='underline'
 								target='_blank'
 								rel='noopener noreferrer'
 							>
-								{t('AnnouncementBanner.here')}
+								{t('AnnouncementBanner.learnMore')}
 							</Link>
 						</p>
 					}
