@@ -1362,9 +1362,10 @@ export class NextApiClientService {
 		});
 	}
 
-	static async getConversationHistory({ userId }: { userId: string }) {
+	static async getConversationHistory({ userId, limit }: { userId: string; limit: number }) {
 		const queryParams = new URLSearchParams({
-			userId
+			userId,
+			limit: limit?.toString()
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CONVERSATION_HISTORY, routeSegments: ['conversations'], queryParams });
 		return this.nextApiClientFetch<IConversationHistory[]>({ url, method });

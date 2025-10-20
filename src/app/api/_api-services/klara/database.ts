@@ -5,8 +5,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { IConversationHistory, IConversationMessage } from '@/_shared/types';
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { FirestoreUtils } from './firestoreUtils';
-
 // Helper function to clean undefined values from objects
 function cleanUndefinedValues(obj: any): any {
 	return Object.entries(obj).reduce((cleaned: any, [key, value]) => {
@@ -23,8 +23,8 @@ const DEFAULT_CONVERSATION_TITLE = 'New Conversation';
 
 export class KlaraDatabaseService extends FirestoreUtils {
 	// Read methods
-	static async GetUserConversations(userId: string): Promise<IConversationHistory[]> {
-		const querySnapshot = await this.conversationsCollectionRef().where('userId', '==', userId).where('messageCount', '>', 0).orderBy('lastActivity', 'desc').limit(5).get();
+	static async GetUserConversations(userId: string, limit: number = DEFAULT_LISTING_LIMIT): Promise<IConversationHistory[]> {
+		const querySnapshot = await this.conversationsCollectionRef().where('userId', '==', userId).where('messageCount', '>', 0).orderBy('lastActivity', 'desc').limit(limit).get();
 		const conversations: IConversationHistory[] = [];
 
 		querySnapshot.forEach((doc) => {

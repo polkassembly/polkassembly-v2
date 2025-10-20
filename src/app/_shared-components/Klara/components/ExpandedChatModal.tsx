@@ -31,7 +31,7 @@ export default function ExpandedChatModal({ open }: { open: boolean }) {
 	const { data: conversations } = useQuery({
 		queryKey: ['klara-conversations', user?.id],
 		queryFn: async () => {
-			const res = await NextApiClientService.getConversationHistory({ userId: user?.id.toString() ?? '' });
+			const res = await NextApiClientService.getConversationHistory({ userId: user?.id.toString() ?? '', limit: 10 });
 			if (!res.data) {
 				throw new Error('Network response was not ok');
 			}
