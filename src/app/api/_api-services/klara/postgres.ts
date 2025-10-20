@@ -1,38 +1,119 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { Pool, PoolClient } from 'pg';
 
-// PostgreSQL connection pool
-let pool: Pool | null = null;
+import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { pgTable, serial, text, timestamp, integer, varchar, index } from 'drizzle-orm/pg-core';
+import { desc, sql } from 'drizzle-orm';
+import { Pool } from 'pg';
+
+// Define the Klara QA schema
+const klaraQaDevColumns = {
+	id: serial('id').primaryKey(),
+	timestamp: timestamp('timestamp', { withTimezone: true }).defaultNow(),
+	query: text('query').notNull(),
+	response: text('response').notNull(),
+	status: varchar('status', { length: 50 }).default('success'),
+	userId: varchar('user_id', { length: 255 }),
+	conversationId: varchar('conversation_id', { length: 255 }),
+	responseTimeMs: integer('response_time_ms'),
+	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow()
+};
+
+// Define the Klara Feedback schema
+const klaraFeedbackDevColumns = {
+	id: serial('id').primaryKey(),
+	firstName: varchar('first_name', { length: 100 }).notNull(),
+	lastName: varchar('last_name', { length: 100 }).notNull(),
+	email: varchar('email', { length: 255 }).notNull(),
+	company: varchar('company', { length: 255 }),
+	feedbackText: text('feedback_text'),
+	userId: varchar('user_id', { length: 100 }),
+	conversationId: varchar('conversation_id', { length: 100 }),
+	messageId: varchar('message_id', { length: 100 }),
+	rating: integer('rating'),
+	feedbackType: varchar('feedback_type', { length: 50 }).default('form_submission'),
+	queryText: text('query_text'),
+	responseText: text('response_text'),
+	timestamp: timestamp('timestamp', { withTimezone: true }).defaultNow(),
+	createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow()
+};
+
+const klaraQaDev = pgTable('klara_qa_dev', klaraQaDevColumns, (table) => [
+	index('idx_klara_qa_dev_timestamp').on(table.timestamp),
+	index('idx_klara_qa_dev_user_id').on(table.userId),
+	index('idx_klara_qa_dev_conversation_id').on(table.conversationId),
+	index('idx_klara_qa_dev_status').on(table.status)
+]);
+
+const klaraQaProd = pgTable('klara_qa_prod', klaraQaDevColumns, (table) => [
+	index('idx_klara_qa_prod_timestamp').on(table.timestamp),
+	index('idx_klara_qa_prod_user_id').on(table.userId),
+	index('idx_klara_qa_prod_conversation_id').on(table.conversationId),
+	index('idx_klara_qa_prod_status').on(table.status)
+]);
+
+// Define feedback tables
+const klaraFeedbackDev = pgTable('klara_feedback_dev', klaraFeedbackDevColumns, (table) => [
+	index('idx_klara_feedback_dev_timestamp').on(table.timestamp),
+	index('idx_klara_feedback_dev_email').on(table.email),
+	index('idx_klara_feedback_dev_user_id').on(table.userId),
+	index('idx_klara_feedback_dev_conversation_id').on(table.conversationId),
+	index('idx_klara_feedback_dev_rating').on(table.rating)
+]);
+
+const klaraFeedbackProd = pgTable('klara_feedback_prod', klaraFeedbackDevColumns, (table) => [
+	index('idx_klara_feedback_prod_timestamp').on(table.timestamp),
+	index('idx_klara_feedback_prod_email').on(table.email),
+	index('idx_klara_feedback_prod_user_id').on(table.userId),
+	index('idx_klara_feedback_prod_conversation_id').on(table.conversationId),
+	index('idx_klara_feedback_prod_rating').on(table.rating)
+]);
 
 // Initialize PostgreSQL connection pool
-function getPool(): Pool {
-	if (!pool) {
-		pool = new Pool({
-			host: process.env.KLARA_POSTGRES_HOST || 'localhost',
-			port: parseInt(process.env.KLARA_POSTGRES_PORT || '5432', 10),
-			database: process.env.KLARA_POSTGRES_DATABASE || 'polkassembly',
-			user: process.env.KLARA_POSTGRES_USER || 'postgres',
-			password: process.env.KLARA_POSTGRES_PASSWORD || '',
-			ssl:
-				process.env.KLARA_POSTGRES_SSL === 'false'
-					? false
-					: {
-							rejectUnauthorized: false
-						},
-			max: 20, // Maximum number of clients in the pool
-			idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-			connectionTimeoutMillis: 10000 // Increased timeout for remote connections
-		});
-	}
-	return pool;
-}
+let pool: Pool | null = new Pool({
+	host: process.env.KLARA_POSTGRES_HOST || 'localhost',
+	port: Number.parseInt(process.env.KLARA_POSTGRES_PORT || '5432', 10),
+	database: process.env.KLARA_POSTGRES_DATABASE || 'polkassembly',
+	user: process.env.KLARA_POSTGRES_USER || 'postgres',
+	password: process.env.KLARA_POSTGRES_PASSWORD || '',
+	ssl:
+		process.env.KLARA_POSTGRES_SSL === 'false'
+			? false
+			: {
+					rejectUnauthorized: false
+				},
+	max: 20, // Maximum number of clients in the pool
+	idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
+	connectionTimeoutMillis: 10000 // Increased timeout for remote connections
+});
+
+const db: NodePgDatabase = drizzle(pool);
 
 // Get table name based on environment
 function getTableName(): string {
 	const env = process.env.KLARA_NODE_ENV || 'development';
 	return env === 'production' ? 'klara_qa_prod' : 'klara_qa_dev';
+}
+
+// Get the appropriate table based on environment
+function getTable() {
+	const env = process.env.KLARA_NODE_ENV || 'development';
+	return env === 'production' ? klaraQaProd : klaraQaDev;
+}
+
+// Get feedback table name based on environment
+function getFeedbackTableName(): string {
+	const env = process.env.KLARA_NODE_ENV || 'development';
+	return env === 'production' ? 'klara_feedback_prod' : 'klara_feedback_dev';
+}
+
+// Get the appropriate feedback table based on environment
+function getFeedbackTable() {
+	const env = process.env.KLARA_NODE_ENV || 'development';
+	return env === 'production' ? klaraFeedbackProd : klaraFeedbackDev;
 }
 
 // Check if table exists and create if it doesn't
@@ -42,66 +123,25 @@ export async function ensureTableExists(): Promise<void> {
 		console.log('PostgreSQL logging disabled via DISABLE_POSTGRES=true');
 		return;
 	}
-	const pool = getPool();
-	const tableName = getTableName();
 
 	try {
-		const client: PoolClient = await pool.connect();
+		const tableName = getTableName();
+		const table = getTable();
 
+		// Try to query the table to check if it exists
+		// This is a simple existence check using Drizzle
 		try {
-			// Check if table exists
-			const checkTableQuery = `
-        SELECT EXISTS (
-          SELECT FROM information_schema.tables 
-          WHERE table_schema = 'public' 
-          AND table_name = $1
-        );
-      `;
-
-			const result = await client.query(checkTableQuery, [tableName]);
-			const tableExists = result.rows[0].exists;
-
-			if (!tableExists) {
-				console.log(`Creating table: ${tableName}`);
-
-				// Create table with required columns
-				const createTableQuery = `
-          CREATE TABLE ${tableName} (
-            id SERIAL PRIMARY KEY,
-            timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            query TEXT NOT NULL,
-            response TEXT NOT NULL,
-            status VARCHAR(50) DEFAULT 'success',
-            user_id VARCHAR(255),
-            conversation_id VARCHAR(255),
-            response_time_ms INTEGER,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-          );
-        `;
-
-				await client.query(createTableQuery);
-
-				// Create indexes for better performance
-				const createIndexes = [
-					`CREATE INDEX idx_${tableName}_timestamp ON ${tableName} (timestamp);`,
-					`CREATE INDEX idx_${tableName}_user_id ON ${tableName} (user_id);`,
-					`CREATE INDEX idx_${tableName}_conversation_id ON ${tableName} (conversation_id);`,
-					`CREATE INDEX idx_${tableName}_status ON ${tableName} (status);`
-				];
-
-				await Promise.all(createIndexes.map((indexQuery) => client.query(indexQuery)));
-
-				console.log(`Table ${tableName} created successfully with indexes`);
-			} else {
-				console.log(`Table ${tableName} already exists`);
-			}
-		} finally {
-			client.release();
+			await db.select().from(table).limit(1);
+			console.log(`Table ${tableName} already exists`);
+		} catch {
+			// If the table doesn't exist, we'll get an error
+			console.log(`Table ${tableName} does not exist. Please run migrations or create the table manually.`);
+			console.log('The expected schema is defined in the Drizzle table definition.');
 		}
 	} catch (error) {
-		console.error('Error ensuring table exists:', error);
-		throw error;
+		console.error('Error checking table existence:', error);
+		// Don't throw error for table creation to avoid breaking the app
+		// Just log the error and continue
 	}
 }
 
@@ -118,35 +158,30 @@ export async function logQueryResponse(data: {
 	if (process.env.KLARA_DISABLE_POSTGRES === 'true') {
 		return;
 	}
-	const pool = getPool();
-	const tableName = getTableName();
 
 	try {
-		const client: PoolClient = await pool.connect();
+		const table = getTable();
 
-		try {
-			const insertQuery = `
-        INSERT INTO ${tableName} (
-          query, 
-          response, 
-          status, 
-          user_id, 
-          conversation_id, 
-          response_time_ms,
-          timestamp
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-        RETURNING id, timestamp;
-      `;
+		const result = await db
+			.insert(table)
+			.values({
+				query: data.query,
+				response: data.response,
+				status: data.status || 'success',
+				userId: data.userId || null,
+				conversationId: data.conversationId || null,
+				responseTimeMs: data.responseTimeMs || null,
+				timestamp: new Date()
+			})
+			.returning({
+				id: table.id,
+				timestamp: table.timestamp
+			});
 
-			const values = [data.query, data.response, data.status || 'success', data.userId || null, data.conversationId || null, data.responseTimeMs || null, new Date()];
+		const insertedRow = result[0];
+		const tableName = getTableName();
 
-			const result = await client.query(insertQuery, values);
-			const insertedRow = result.rows[0];
-
-			console.log(`Logged Q&A to ${tableName} - ID: ${insertedRow.id}, Timestamp: ${insertedRow.timestamp}`);
-		} finally {
-			client.release();
-		}
+		console.log(`Logged Q&A to ${tableName} - ID: ${insertedRow.id}, Timestamp: ${insertedRow.timestamp}`);
 	} catch (error) {
 		console.error('Error logging query-response to PostgreSQL:', error);
 		// Don't throw error to avoid breaking the chat flow
@@ -157,37 +192,109 @@ export async function logQueryResponse(data: {
 // Get recent query-response logs (for debugging/analytics)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getRecentLogs(limit: number = 10): Promise<any[]> {
-	const pool = getPool();
-	const tableName = getTableName();
-
 	try {
-		const client: PoolClient = await pool.connect();
+		const table = getTable();
 
-		try {
-			const selectQuery = `
-        SELECT 
-          id,
-          timestamp,
-          query,
-          response,
-          status,
-          user_id,
-          conversation_id,
-          response_time_ms,
-          created_at
-        FROM ${tableName}
-        ORDER BY timestamp DESC
-        LIMIT $1;
-      `;
-
-			const result = await client.query(selectQuery, [limit]);
-			return result.rows;
-		} finally {
-			client.release();
-		}
+		return await db
+			.select({
+				id: table.id,
+				timestamp: table.timestamp,
+				query: table.query,
+				response: table.response,
+				status: table.status,
+				userId: table.userId,
+				conversationId: table.conversationId,
+				responseTimeMs: table.responseTimeMs,
+				createdAt: table.createdAt
+			})
+			.from(table)
+			.orderBy(desc(table.timestamp))
+			.limit(limit);
 	} catch (error) {
 		console.error('Error fetching recent logs:', error);
 		return [];
+	}
+}
+
+// Check if feedback table exists and create if it doesn't
+export async function ensureFeedbackTableExists(): Promise<void> {
+	// Skip if PostgreSQL is disabled
+	if (process.env.KLARA_DISABLE_POSTGRES === 'true') {
+		console.log('PostgreSQL feedback table creation disabled via KLARA_DISABLE_POSTGRES=true');
+		return;
+	}
+
+	try {
+		const tableName = getFeedbackTableName();
+		const table = getFeedbackTable();
+
+		// Try to query the table to check if it exists
+		try {
+			await db.select().from(table).limit(1);
+			console.log(`Feedback table ${tableName} already exists`);
+		} catch {
+			console.log(`Feedback table ${tableName} does not exist. Please run migrations or create the table manually.`);
+			console.log('The expected schema is defined in the Drizzle table definition.');
+		}
+	} catch (error) {
+		console.error('Error checking feedback table existence:', error);
+		// Don't throw error for table creation to avoid breaking the app
+	}
+}
+
+// Save feedback data to PostgreSQL
+export async function saveFeedback(data: {
+	firstName: string;
+	lastName: string;
+	email: string;
+	company?: string;
+	feedbackText?: string;
+	userId?: string;
+	conversationId?: string;
+	messageId?: string;
+	rating?: number;
+	feedbackType?: string;
+	queryText?: string;
+	responseText?: string;
+}): Promise<void> {
+	// Skip if PostgreSQL is disabled
+	if (process.env.KLARA_DISABLE_POSTGRES === 'true') {
+		return;
+	}
+
+	try {
+		const table = getFeedbackTable();
+
+		const result = await db
+			.insert(table)
+			.values({
+				firstName: data.firstName,
+				lastName: data.lastName,
+				email: data.email,
+				company: data.company || null,
+				feedbackText: data.feedbackText || null,
+				userId: data.userId || null,
+				conversationId: data.conversationId || null,
+				messageId: data.messageId || null,
+				rating: data.rating || null,
+				feedbackType: data.feedbackType || 'form_submission',
+				queryText: data.queryText || null,
+				responseText: data.responseText || null,
+				timestamp: new Date()
+			})
+			.returning({
+				id: table.id,
+				timestamp: table.timestamp
+			});
+
+		const insertedRow = result[0];
+		const tableName = getFeedbackTableName();
+
+		console.log(`Feedback saved to ${tableName} - ID: ${insertedRow.id}, Timestamp: ${insertedRow.timestamp}`);
+	} catch (error) {
+		console.error('Error saving feedback to PostgreSQL:', error);
+		// Throw error for feedback form to handle
+		throw error;
 	}
 }
 
@@ -203,16 +310,10 @@ export async function closePool(): Promise<void> {
 // Test database connection
 export async function testConnection(): Promise<boolean> {
 	try {
-		const pool = getPool();
-		const client = await pool.connect();
-
-		try {
-			const result = await client.query('SELECT NOW() as current_time');
-			console.log('PostgreSQL connection successful:', result.rows[0].current_time);
-			return true;
-		} finally {
-			client.release();
-		}
+		// Test connection using Drizzle with a simple query
+		const result = await db.execute(sql`SELECT NOW() as current_time`);
+		console.log('PostgreSQL connection successful:', result.rows[0]?.current_time);
+		return true;
 	} catch (error) {
 		console.error('PostgreSQL connection failed:', error);
 		return false;
