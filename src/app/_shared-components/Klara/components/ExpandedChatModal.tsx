@@ -23,7 +23,8 @@ import { ChatBanner } from '../ChatBanner';
 
 export default function ExpandedChatModal({ open }: { open: boolean }) {
 	const { chatState, setChatState } = useChatState();
-	const { inputText, isLoading, isLoadingMessages, messages, streamingMessage, mascotType, handleInputChange, submitMessage, handleStopGeneration, handleNewChat } = useChatLogic();
+	const { inputText, isLoading, isLoadingMessages, messages, streamingMessage, mascotType, conversationId, handleInputChange, submitMessage, handleStopGeneration, handleNewChat } =
+		useChatLogic();
 	const { user } = useUser();
 	const { activeChatId, setActiveChatId } = useActiveChatId();
 
@@ -137,6 +138,8 @@ export default function ExpandedChatModal({ open }: { open: boolean }) {
 									mascotType={mascotType}
 									isLoadingMessages={isLoadingMessages}
 									onFollowUpClick={handleFollowUpClick}
+									userId={user?.id?.toString()}
+									conversationId={conversationId || undefined}
 								/>
 							</div>
 							<ChatInput

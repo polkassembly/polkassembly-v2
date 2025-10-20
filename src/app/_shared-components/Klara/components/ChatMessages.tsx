@@ -7,7 +7,6 @@ import Image from 'next/image';
 import KlaraAvatar from '@assets/klara/avatar.svg';
 import { IConversationMessage } from '@/_shared/types';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
-import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import { KLARA_CHAT_SUGGESTIONS } from '@/_shared/_constants/klaraChatSuggestions';
 import Mascot from '../Mascot';
 import ChatMessage from './ChatMessage';
@@ -19,6 +18,8 @@ interface Props {
 	mascotType: 'welcome' | 'loading' | 'error' | null;
 	isLoadingMessages: boolean;
 	onFollowUpClick: (question: string) => void;
+	userId?: string;
+	conversationId?: string;
 }
 
 function WelcomeMessage() {
@@ -54,27 +55,7 @@ function ChatSuggestions({ onFollowUpClick }: { onFollowUpClick: (suggestion: st
 	);
 }
 
-function StreamingMessage({ message }: { message: IConversationMessage }) {
-	return (
-		<div className='flex justify-start'>
-			<div className='bg-section_light_container max-w-[80%] rounded-lg p-3 text-text_primary'>
-				<MarkdownViewer
-					markdown={message.text}
-					className='text-sm [&_.markdown-body]:!m-0 [&_.markdown-body]:!p-0 [&_.markdown-body]:!text-sm [&_.markdown-body]:text-text_primary [&_.markdown-body_a]:!text-text_pink hover:[&_.markdown-body_a]:!underline [&_.markdown-body_blockquote]:!text-sm [&_.markdown-body_code]:!text-xs [&_.markdown-body_h1]:!text-base [&_.markdown-body_h2]:!text-base [&_.markdown-body_h3]:!text-sm [&_.markdown-body_h4]:!text-sm [&_.markdown-body_h5]:!text-xs [&_.markdown-body_h6]:!text-xs [&_.markdown-body_p]:!mb-2 [&_.markdown-body_pre]:!text-xs'
-				/>
-				{message.isStreaming && (
-					<div className='mt-1 flex items-center gap-1'>
-						<div className='h-1 w-1 animate-pulse rounded-full bg-primary' />
-						<div className='h-1 w-1 animate-pulse rounded-full bg-primary delay-100' />
-						<div className='h-1 w-1 animate-pulse rounded-full bg-primary delay-200' />
-					</div>
-				)}
-			</div>
-		</div>
-	);
-}
-
-function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessages, onFollowUpClick }: Props) {
+function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessages, onFollowUpClick, userId, conversationId }: Props) {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -99,11 +80,23 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 							key={message.id}
 							message={message}
 							onFollowUpClick={onFollowUpClick}
+							userId={userId}
+							conversationId={conversationId}
+							messages={messages}
 						/>
 					))}
 
 					{mascotType && mascotType !== 'welcome' && <Mascot type={mascotType} />}
-					{streamingMessage && <StreamingMessage message={streamingMessage} />}
+					{streamingMessage && (
+						<ChatMessage
+							message={streamingMessage}
+							onFollowUpClick={onFollowUpClick}
+							userId={userId}
+							conversationId={conversationId}
+							isStreaming
+							messages={messages}
+						/>
+					)}
 				</div>
 			) : (
 				<div className='flex flex-grow flex-col items-center justify-center gap-2'>

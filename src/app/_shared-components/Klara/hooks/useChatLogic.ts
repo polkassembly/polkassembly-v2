@@ -276,6 +276,7 @@ export const useChatLogic = () => {
 		messages,
 		streamingMessage,
 		mascotType,
+		conversationId,
 		handleInputChange,
 		submitMessage,
 		handleStopGeneration,
