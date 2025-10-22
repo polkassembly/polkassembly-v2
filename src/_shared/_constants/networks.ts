@@ -3380,7 +3380,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		ss58Format: 54,
 		subsquidUrl: 'https://polkassembly.squids.live/cere-polkassembly/graphql',
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.CERE],
-		tokenSymbol: 'BCERE',
+		tokenSymbol: 'CERE',
 		rpcEndpoints: [
 			{
 				name: 'via Cere Network',
