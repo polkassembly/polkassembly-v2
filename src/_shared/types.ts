@@ -1640,7 +1640,7 @@ export interface IConversationHistory {
 	messageCount: number;
 }
 
-export interface Source {
+export interface IChatDataSource {
 	title: string;
 	url: string;
 	source_type: string;
@@ -1653,7 +1653,7 @@ export interface IConversationMessage {
 	sender: 'user' | 'ai';
 	timestamp: number;
 	isStreaming?: boolean;
-	sources?: Source[];
+	sources?: IChatDataSource[];
 	followUpQuestions?: string[];
 }
 
@@ -1665,7 +1665,7 @@ export interface IConversationTurn {
 
 export interface IChatApiResponse {
 	answer: string; // AI-generated response
-	sources: Source[]; // Array of source documents
+	sources: IChatDataSource[]; // Array of source documents
 	follow_up_questions: string[]; // Array of suggested questions
 	remaining_requests: number; // Rate limit remaining count
 	confidence: number; // 0.0-1.0 confidence score
@@ -1677,29 +1677,10 @@ export interface IChatApiResponse {
 	search_method: string; // Method: "local_knowledge", "web_search", etc.
 }
 
-export interface IChatRequestBody {
-	message: string;
-	userId: string;
-	conversationId?: string;
-}
-
 export interface IChatResponse {
 	text: string;
-	sources?: Source[];
+	sources?: IChatDataSource[];
 	followUpQuestions?: string[];
 	isNewConversation?: boolean;
 	conversationId?: string;
-}
-
-export interface IChatStreamData {
-	content?: string;
-	conversationId?: string;
-	sources?: Source[];
-	followUpQuestions?: string[];
-}
-
-export interface IChatApiErrorResponse {
-	success: false;
-	error: string;
-	details?: unknown;
 }

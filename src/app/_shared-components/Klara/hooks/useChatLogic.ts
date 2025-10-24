@@ -3,9 +3,9 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { IConversationMessage, Source } from '@/_shared/types';
+import { IConversationMessage, IChatDataSource } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
-import { useActiveChatId } from '@/hooks/useActiveChatId';
+import { useKlara } from '@/hooks/useKlara';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -14,7 +14,7 @@ type MascotType = 'welcome' | 'loading' | 'error' | null;
 interface StreamingData {
 	conversationId?: string;
 	content?: string;
-	sources?: Source[];
+	sources?: IChatDataSource[];
 	followUpQuestions?: string[];
 }
 
@@ -25,7 +25,7 @@ interface StreamingState {
 
 export const useChatLogic = () => {
 	const { user } = useUser();
-	const { activeChatId, setActiveChatId } = useActiveChatId();
+	const { activeChatId, setActiveChatId } = useKlara();
 	const queryClient = useQueryClient();
 	const [inputText, setInputText] = useState('');
 	const [isLoading, setIsLoading] = useState(false);

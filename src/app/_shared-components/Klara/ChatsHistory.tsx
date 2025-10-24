@@ -10,7 +10,7 @@ import { IoChevronDown } from '@react-icons/all-files/io5/IoChevronDown';
 import { useUser } from '@/hooks/useUser';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
-import { useActiveChatId } from '@/hooks/useActiveChatId';
+import { useKlara } from '@/hooks/useKlara';
 import KlaraAvatar from '@assets/klara/avatar.svg';
 import EmptyBox from '@assets/klara/empty-box.svg';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
@@ -21,7 +21,7 @@ import { LoadingSpinner } from '../LoadingSpinner';
 
 function ChatsHistory() {
 	const { user } = useUser();
-	const { activeChatId, setActiveChatId } = useActiveChatId();
+	const { activeChatId, setActiveChatId } = useKlara();
 
 	const { data: conversations, isLoading } = useQuery({
 		queryKey: ['klara-conversations', user?.id],

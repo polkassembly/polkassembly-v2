@@ -4,4 +4,7 @@
 import { atom } from 'jotai';
 import { EChatState } from '@/_shared/types';
 
-export const chatStateAtom = atom<EChatState | null>(EChatState.CLOSED);
+export const chatStateAtom = atom<{ chatState: EChatState | null; activeChatId: string | null }>({
+	chatState: EChatState.CLOSED,
+	activeChatId: null
+});

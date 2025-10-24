@@ -11,7 +11,7 @@ import PaLogoDark from '@assets/logos/PALogoDark.svg';
 import PaLogo from '@ui/AppLayout/PaLogo';
 import { useTranslations } from 'next-intl';
 import KlaraAvatar from '@assets/klara/avatar.svg';
-import { useChatState } from '@/hooks/useChatState';
+import { useKlara } from '@/hooks/useKlara';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -27,7 +27,7 @@ import styles from './AppSidebar.module.scss';
 
 function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 	const { state, setOpenMobile } = useSidebar();
-	const { chatState, setChatState } = useChatState();
+	const { chatState, setChatState } = useKlara();
 	const t = useTranslations();
 	const pathname = usePathname();
 

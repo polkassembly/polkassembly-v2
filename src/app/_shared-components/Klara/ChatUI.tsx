@@ -6,7 +6,7 @@
 
 import React, { useCallback } from 'react';
 import { EChatState } from '@/_shared/types';
-import { useChatState } from '@/hooks/useChatState';
+import { useKlara } from '@/hooks/useKlara';
 import Image from 'next/image';
 import NewChatIcon from '@assets/klara/start-chat-icon.svg';
 import { useChatLogic } from './hooks/useChatLogic';
@@ -18,7 +18,7 @@ import { ChatBanner } from './ChatBanner';
 import ExpandedChatModal from './components/ExpandedChatModal';
 
 function ChatUI({ setIsMobileHistoryOpen }: { setIsMobileHistoryOpen: (isOpen: boolean) => void }) {
-	const { chatState, setChatState } = useChatState();
+	const { chatState, setChatState } = useKlara();
 	const { inputText, isLoading, isLoadingMessages, messages, streamingMessage, mascotType, handleInputChange, submitMessage, handleStopGeneration, handleNewChat } = useChatLogic();
 
 	const handleSubmit = useCallback(

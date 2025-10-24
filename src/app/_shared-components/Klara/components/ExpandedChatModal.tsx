@@ -4,7 +4,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@ui/Dialog/Dialog';
 import { useChatLogic } from '@/app/_shared-components/Klara/hooks/useChatLogic';
-import { useChatState } from '@/hooks/useChatState';
+import { useKlara } from '@/hooks/useKlara';
 import ChatHeader from '@/app/_shared-components/Klara/components/ChatHeader';
 import ChatMessages from '@/app/_shared-components/Klara/components/ChatMessages';
 import Image from 'next/image';
@@ -13,7 +13,6 @@ import EmptyBox from '@assets/klara/empty-box.svg';
 import React, { useCallback } from 'react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from '@/hooks/useUser';
-import { useActiveChatId } from '@/hooks/useActiveChatId';
 import { useQuery } from '@tanstack/react-query';
 import { EChatState, IConversationHistory } from '@/_shared/types';
 import Link from 'next/link';
@@ -23,11 +22,10 @@ import ChatInput from './ChatInput';
 import { ChatBanner } from '../ChatBanner';
 
 export default function ExpandedChatModal({ open }: { open: boolean }) {
-	const { chatState, setChatState } = useChatState();
+	const { chatState, setChatState, activeChatId, setActiveChatId } = useKlara();
 	const { inputText, isLoading, isLoadingMessages, messages, streamingMessage, mascotType, conversationId, handleInputChange, submitMessage, handleStopGeneration, handleNewChat } =
 		useChatLogic();
 	const { user } = useUser();
-	const { activeChatId, setActiveChatId } = useActiveChatId();
 
 	const { data: conversations } = useQuery({
 		queryKey: ['klara-conversations', user?.id],

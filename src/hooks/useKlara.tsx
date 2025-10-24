@@ -4,23 +4,32 @@
 
 'use client';
 
-import { chatStateAtom } from '@/app/_atoms/klara/chatStateAtom';
+import { chatStateAtom } from '@/app/_atoms/klara/klaraAtom';
 import { useAtom } from 'jotai';
 import { EChatState } from '@/_shared/types';
 import { useCallback } from 'react';
 
-export function useChatState() {
+export function useKlara() {
 	const [state, setState] = useAtom(chatStateAtom);
 
 	const setChatState = useCallback(
 		(value: EChatState | null) => {
-			setState(value);
+			setState((prevState) => ({ ...prevState, chatState: value }));
+		},
+		[setState]
+	);
+
+	const setActiveChatId = useCallback(
+		(value: string | null) => {
+			setState((prevState) => ({ ...prevState, activeChatId: value }));
 		},
 		[setState]
 	);
 
 	return {
-		chatState: state,
-		setChatState
+		chatState: state.chatState,
+		setChatState,
+		activeChatId: state.activeChatId,
+		setActiveChatId
 	};
 }

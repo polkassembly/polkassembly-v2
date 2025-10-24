@@ -2,12 +2,12 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { IChatApiResponse, IConversationTurn, Source } from '@/_shared/types';
+import { IChatApiResponse, IConversationTurn, IChatDataSource } from '@/_shared/types';
 import { fetchWithTimeout } from './utils/requestUtils';
 
 interface ApiResponse {
 	text: string;
-	sources?: Source[];
+	sources?: IChatDataSource[];
 	followUpQuestions?: string[];
 	remainingRequests?: number;
 }
@@ -54,7 +54,7 @@ export class ExternalApiService {
 	private static getIntelligentFallbackResponse(message: string): ApiResponse {
 		const messageKeywords = message.toLowerCase();
 		let fallbackText = '';
-		let fallbackSources: Source[] = [];
+		let fallbackSources: IChatDataSource[] = [];
 		let fallbackQuestions: string[] = [];
 
 		if (messageKeywords.includes('governance') || messageKeywords.includes('voting') || messageKeywords.includes('proposal') || messageKeywords.includes('referendum')) {

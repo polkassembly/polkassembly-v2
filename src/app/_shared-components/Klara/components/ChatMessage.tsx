@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useState } from 'react';
-import { IConversationMessage, Source } from '@/_shared/types';
+import { IConversationMessage, IChatDataSource } from '@/_shared/types';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
 
@@ -16,7 +16,7 @@ interface Props {
 	messages?: IConversationMessage[];
 }
 
-function SourceLink({ source }: { source: Source }) {
+function SourceLink({ source }: { source: IChatDataSource }) {
 	return (
 		<a
 			href={source.url}
