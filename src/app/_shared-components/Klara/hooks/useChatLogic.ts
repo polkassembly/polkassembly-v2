@@ -179,19 +179,15 @@ export const useChatLogic = () => {
 			setAbortController(controller);
 
 			try {
-				const response = await fetch('/api/v2/klara/send-message', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						message: userMessage.text,
-						userId: user?.id || 'guest_user',
-						conversationId: conversationId || undefined
-					}),
+				const { data: response } = await NextApiClientService.klaraSendMessage({
+					message: userMessage.text,
+					userId: user?.id?.toString() || 'guest_user',
+					conversationId: conversationId || '',
 					signal: controller.signal
 				});
 
-				if (!response.ok) {
-					throw new Error(`Failed to get response: ${response.status}`);
+				if (!response?.ok) {
+					throw new Error(`Failed to get response: ${response?.status}`);
 				}
 
 				await processStreamingResponse(response);

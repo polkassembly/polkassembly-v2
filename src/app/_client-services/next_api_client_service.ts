@@ -162,7 +162,8 @@ enum EApiRoute {
 	GET_CONVERSATION_HISTORY = 'GET_CONVERSATION_HISTORY',
 	GET_CONVERSATION_MESSAGES = 'GET_CONVERSATION_MESSAGES',
 	GET_KLARA_STATS = 'GET_KLARA_STATS',
-	KLARA_SEND_FEEDBACK = 'KLARA_SEND_FEEDBACK'
+	KLARA_SEND_FEEDBACK = 'KLARA_SEND_FEEDBACK',
+	KLARA_SEND_MESSAGE = 'KLARA_SEND_MESSAGE'
 }
 
 export class NextApiClientService {
@@ -397,6 +398,7 @@ export class NextApiClientService {
 				path = '/klara';
 				break;
 			case EApiRoute.KLARA_SEND_FEEDBACK:
+			case EApiRoute.KLARA_SEND_MESSAGE:
 				path = '/klara';
 				method = 'POST';
 				break;
@@ -438,12 +440,14 @@ export class NextApiClientService {
 		url,
 		method,
 		data,
-		skipCache = false
+		skipCache = false,
+		signal
 	}: {
 		url: URL;
 		method: Method;
 		data?: Record<string, unknown>;
 		skipCache?: boolean;
+		signal?: AbortSignal;
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
 		const currentNetwork = await this.getCurrentNetwork();
 
@@ -461,8 +465,13 @@ export class NextApiClientService {
 				[EHttpHeaderKey.NETWORK]: currentNetwork,
 				[EHttpHeaderKey.SKIP_CACHE]: skipCache.toString()
 			},
-			method
+			method,
+			signal
 		});
+
+		if (signal) {
+			return { data: response as T, error: null };
+		}
 
 		const resJSON = await response.json();
 
@@ -1386,6 +1395,12 @@ export class NextApiClientService {
 	static async getKlaraStats() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_KLARA_STATS, routeSegments: ['stats'] });
 		return this.nextApiClientFetch<{ totalUsers: number; totalConversations: number }>({ url, method });
+	}
+
+	static async klaraSendMessage({ message, userId, conversationId, signal }: { message: string; userId: string; conversationId: string; signal: AbortSignal }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.KLARA_SEND_MESSAGE, routeSegments: ['send-message'] });
+
+		return this.nextApiClientFetch<Response>({ url, method, signal, data: { message, userId, conversationId } });
 	}
 
 	static async submitKlaraFeedback({
