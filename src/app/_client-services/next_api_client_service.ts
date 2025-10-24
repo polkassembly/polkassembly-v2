@@ -161,7 +161,8 @@ enum EApiRoute {
 	GET_TRACK_COUNTS = 'GET_TRACK_COUNTS',
 	GET_CONVERSATION_HISTORY = 'GET_CONVERSATION_HISTORY',
 	GET_CONVERSATION_MESSAGES = 'GET_CONVERSATION_MESSAGES',
-	GET_KLARA_STATS = 'GET_KLARA_STATS'
+	GET_KLARA_STATS = 'GET_KLARA_STATS',
+	KLARA_SEND_FEEDBACK = 'KLARA_SEND_FEEDBACK'
 }
 
 export class NextApiClientService {
@@ -394,7 +395,10 @@ export class NextApiClientService {
 			case EApiRoute.GET_CONVERSATION_MESSAGES:
 			case EApiRoute.GET_KLARA_STATS:
 				path = '/klara';
-				method = 'GET';
+				break;
+			case EApiRoute.KLARA_SEND_FEEDBACK:
+				path = '/klara';
+				method = 'POST';
 				break;
 
 			default:
@@ -1382,5 +1386,50 @@ export class NextApiClientService {
 	static async getKlaraStats() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_KLARA_STATS, routeSegments: ['stats'] });
 		return this.nextApiClientFetch<{ totalUsers: number; totalConversations: number }>({ url, method });
+	}
+
+	static async submitKlaraFeedback({
+		firstName,
+		lastName,
+		email,
+		feedbackText,
+		userId,
+		conversationId,
+		messageId,
+		rating,
+		feedbackType,
+		queryText,
+		responseText
+	}: {
+		firstName: string;
+		lastName: string;
+		email: string;
+		feedbackText: string;
+		userId: string;
+		conversationId: string;
+		messageId: string;
+		rating: number;
+		feedbackType: string;
+		queryText: string;
+		responseText: string;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.KLARA_SEND_FEEDBACK, routeSegments: ['feedback'] });
+		return this.nextApiClientFetch<{ message: string }>({
+			url,
+			method,
+			data: {
+				firstName,
+				lastName,
+				email,
+				feedbackText,
+				userId,
+				conversationId,
+				messageId,
+				rating,
+				feedbackType,
+				queryText,
+				responseText
+			}
+		});
 	}
 }

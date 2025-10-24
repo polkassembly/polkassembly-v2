@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { IConversationMessage, IChatDataSource } from '@/_shared/types';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 
 interface Props {
 	message: IConversationMessage;
@@ -75,24 +76,18 @@ function ChatMessage({ message, onFollowUpClick, userId, conversationId, isStrea
 
 		// Record the dislike action in the database immediately
 		try {
-			await fetch('/api/v2/klara/feedback', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					firstName: 'Anonymous',
-					lastName: 'User',
-					email: 'anonymous@dislike.action',
-					feedbackText: 'User clicked dislike button',
-					userId,
-					conversationId,
-					messageId: message.id,
-					rating: 1, // 1 for dislike
-					feedbackType: 'dislike_click',
-					queryText: previousQueryText || 'Query not available',
-					responseText: message.text
-				})
+			await NextApiClientService.submitKlaraFeedback({
+				firstName: 'Anonymous',
+				lastName: 'User',
+				email: 'anonymous@dislike.action',
+				feedbackText: 'User clicked dislike button',
+				userId: userId || '',
+				conversationId: conversationId || '',
+				messageId: message.id,
+				rating: 1, // 1 for dislike
+				feedbackType: 'dislike_click',
+				queryText: previousQueryText || 'Query not available',
+				responseText: message.text
 			});
 			console.log('Dislike action recorded');
 		} catch (error) {
