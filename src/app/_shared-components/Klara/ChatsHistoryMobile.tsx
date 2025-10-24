@@ -81,7 +81,10 @@ function ChatsHistoryMobile({ onClose }: { onClose: () => void }) {
 						{conversations?.map((conversation: IConversationHistory) => (
 							<button
 								type='button'
-								onClick={() => openChat(conversation.id)}
+								onClick={() => {
+									openChat(conversation.id);
+									onClose();
+								}}
 								key={conversation.id}
 								className={`line-clamp-1 border-x border-b p-2 text-left text-sm font-semibold capitalize leading-loose text-text_primary last:border-b-0 ${activeChatId === conversation.id ? 'border-x-0 border-y border-klara_active_chat_border bg-klara_active_chat_bg first:rounded-t-xl' : 'border-primary_border'}`}
 							>
