@@ -100,7 +100,7 @@ export default function ExpandedChatModal({ open }: { open: boolean }) {
 											type='button'
 											onClick={() => openChat(conversation.id)}
 											key={conversation.id}
-											className={`line-clamp-1 border-b p-2 text-left text-sm font-semibold capitalize leading-loose text-text_primary first:border-t ${activeChatId === conversation.id ? 'border-y border-klara_active_chat_border bg-klara_active_chat_bg' : 'border-primary_border'}`}
+											className={`line-clamp-1 w-full border-b p-2 text-left text-sm font-semibold capitalize leading-loose text-text_primary first:border-t ${activeChatId === conversation.id ? 'border-y border-klara_active_chat_border bg-klara_active_chat_bg' : 'border-primary_border'}`}
 										>
 											{conversation.title}
 										</button>
@@ -137,6 +137,7 @@ export default function ExpandedChatModal({ open }: { open: boolean }) {
 								messages={messages}
 								streamingMessage={streamingMessage}
 								mascotType={mascotType}
+								chatState={chatState ?? EChatState.EXPANDED}
 								isLoadingMessages={isLoadingMessages}
 								onFollowUpClick={handleFollowUpClick}
 								userId={user?.id?.toString()}

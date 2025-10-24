@@ -38,7 +38,7 @@ function SendButton({ disabled }: { disabled: boolean }) {
 		<button
 			type='submit'
 			disabled={disabled}
-			className={`flex h-8 w-8 items-center justify-center rounded-full ${disabled ? 'border border-gray-500 bg-page_background' : 'border-none bg-bg_pink'}`}
+			className='flex items-center justify-center rounded-full border-none outline-none'
 			aria-label='send'
 		>
 			<div className={`flex h-7 w-7 items-center justify-center rounded-full ${disabled ? 'border border-gray-500 bg-page_background' : 'border-none bg-bg_pink'}`}>
@@ -54,7 +54,7 @@ function ChatInput({ inputText, isLoading, isLoadingMessages, isStreaming, chatS
 	return (
 		<form
 			onSubmit={onSubmit}
-			className={`${styles.chatUIInput} ${chatState === EChatState.EXPANDED ? '!shadow-none' : ''}`}
+			className={`${styles.chatUIInput} ${chatState === EChatState.EXPANDED ? '!shadow-none' : ''} mt-auto`}
 		>
 			<div className={`flex w-full items-center gap-2 ${chatState === EChatState.EXPANDED ? 'rounded-full border border-primary_border px-3 py-1' : ''}`}>
 				<input

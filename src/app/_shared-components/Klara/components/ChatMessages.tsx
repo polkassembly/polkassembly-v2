@@ -5,7 +5,7 @@
 import React, { useRef, useEffect } from 'react';
 import Image from 'next/image';
 import KlaraAvatar from '@assets/klara/avatar.svg';
-import { IConversationMessage } from '@/_shared/types';
+import { EChatState, IConversationMessage } from '@/_shared/types';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { KLARA_CHAT_SUGGESTIONS } from '@/_shared/_constants/klaraChatSuggestions';
 import Mascot from '../Mascot';
@@ -17,6 +17,7 @@ interface Props {
 	streamingMessage: IConversationMessage | null;
 	mascotType: 'welcome' | 'loading' | 'error' | null;
 	isLoadingMessages: boolean;
+	chatState?: EChatState;
 	onFollowUpClick: (question: string) => void;
 	userId?: string;
 	conversationId?: string;
@@ -55,7 +56,7 @@ function ChatSuggestions({ onFollowUpClick }: { onFollowUpClick: (suggestion: st
 	);
 }
 
-function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessages, onFollowUpClick, userId, conversationId }: Props) {
+function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessages, onFollowUpClick, userId, conversationId, chatState }: Props) {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -72,7 +73,7 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 	}
 
 	return (
-		<div className={`${styles.chatUIBody} ${styles.hide_scrollbar}`}>
+		<div className={`${chatState === EChatState.EXPANDED ? 'flex-grow p-4' : styles.chatUIBody} ${styles.hide_scrollbar}`}>
 			{messages?.length ? (
 				<div className='flex flex-grow flex-col gap-3'>
 					{messages.map((message) => (
@@ -99,7 +100,7 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 					)}
 				</div>
 			) : (
-				<div className='flex flex-grow flex-col items-center justify-center gap-2'>
+				<div className={`flex flex-grow flex-col items-center justify-center gap-2 ${chatState === EChatState.EXPANDED ? 'min-h-[400px]' : ''}`}>
 					<h1 className='text-center text-lg font-bold text-text_primary'>Start New Conversation</h1>
 					<div className='flex flex-col items-center justify-center'>
 						{!streamingMessage && !mascotType && <WelcomeMessage />}
