@@ -1,6 +1,10 @@
-.container {
-	@apply bg-bg_modal p-[1px];
+.chatModal {
+	@apply flex rounded-t-xl bg-bg_modal p-[1px];
 	background-image: conic-gradient(from 136.17deg at 53.41% 52.82%, #51d36e 0deg, #e5007a 77.42deg, #3473ff 158.47deg, #ffd663 270deg, #51d36e 360deg);
+}
+
+.container {
+	@apply flex h-full w-full flex-1 flex-col rounded-t-[10.5px] bg-bg_modal;
 }
 
 .newChatBtnContainer {

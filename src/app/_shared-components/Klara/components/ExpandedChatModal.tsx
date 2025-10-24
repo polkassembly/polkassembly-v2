@@ -17,6 +17,7 @@ import { useActiveChatId } from '@/hooks/useActiveChatId';
 import { useQuery } from '@tanstack/react-query';
 import { EChatState, IConversationHistory } from '@/_shared/types';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import styles from './ExpandedChatModal.module.scss';
 import ChatInput from './ChatInput';
 import { ChatBanner } from '../ChatBanner';
@@ -64,7 +65,7 @@ export default function ExpandedChatModal({ open }: { open: boolean }) {
 
 	return (
 		<Dialog open={open}>
-			<DialogContent className='max-w-4xl !gap-0 overflow-hidden rounded-xl [&>button]:hidden'>
+			<DialogContent className={cn(styles.chatModal, 'max-w-5xl !gap-0 rounded-xl [&>button]:hidden')}>
 				<div className={styles.container}>
 					<DialogHeader className='rounded-t-[10.5px] !border-b-0 bg-bg_modal !pb-0'>
 						<DialogTitle className='flex items-center gap-x-2 text-xl font-semibold text-text_primary'>
@@ -74,7 +75,7 @@ export default function ExpandedChatModal({ open }: { open: boolean }) {
 							/>
 						</DialogTitle>
 					</DialogHeader>
-					<div className='flex max-h-[80vh] w-full overflow-hidden rounded-b-[10.5px] bg-bg_modal'>
+					<div className='flex w-full flex-grow rounded-b-[10.5px] bg-bg_modal'>
 						<div className='w-1/4 border-r border-primary_border p-4'>
 							<div className={styles.newChatBtnContainer}>
 								<button
@@ -129,28 +130,31 @@ export default function ExpandedChatModal({ open }: { open: boolean }) {
 							)}
 						</div>
 
-						<div className='flex w-3/4 flex-col'>
+						<div className='flex h-[550px] w-3/4 flex-grow flex-col overflow-y-auto'>
 							<ChatBanner chatState={chatState ?? EChatState.EXPANDED} />
-							<div className={`${styles.hide_scrollbar} flex h-96 flex-grow flex-col overflow-y-auto`}>
-								<ChatMessages
-									messages={messages}
-									streamingMessage={streamingMessage}
-									mascotType={mascotType}
-									isLoadingMessages={isLoadingMessages}
-									onFollowUpClick={handleFollowUpClick}
-									userId={user?.id?.toString()}
-									conversationId={conversationId || undefined}
-								/>
-							</div>
+
+							<ChatMessages
+								messages={messages}
+								streamingMessage={streamingMessage}
+								mascotType={mascotType}
+								isLoadingMessages={isLoadingMessages}
+								onFollowUpClick={handleFollowUpClick}
+								userId={user?.id?.toString()}
+								conversationId={conversationId || undefined}
+							/>
 							<ChatInput
 								inputText={inputText}
 								isLoading={isLoading}
 								isLoadingMessages={isLoadingMessages}
 								isStreaming={!!streamingMessage?.isStreaming}
 								onInputChange={handleInputChange}
+								chatState={chatState ?? EChatState.EXPANDED}
 								onSubmit={handleSubmit}
 								onStopGeneration={handleStopGeneration}
 							/>
+							<div className='my-2 text-center text-xs text-text_primary'>
+								<b>Privacy Note:</b> Chats are monitored to improve Klara’s responses and user experience. No personal data is shared externally.
+							</div>
 						</div>
 					</div>
 				</div>
