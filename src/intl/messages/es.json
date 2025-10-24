@@ -622,7 +622,16 @@
 			"showMore": "Mostrar más",
 			"showLess": "Mostrar menos",
 			"call": "Llamada",
-			"timeline": "Línea de Tiempo"
+			"timeline": "Línea de Tiempo",
+			"submittedAtBlock": "Enviado en Block",
+			"createdAtBlock": "Creado en Block",
+			"createdAt": "Creado en",
+			"proposer": "Proposer",
+			"updatedAtBlock": "Actualizado en Block",
+			"enactmentAtBlock": "Ejecutado en Block",
+			"enactmentAfterBlock": "Ejecutado después de Block",
+			"trackNumber": "Número de Pista",
+			"hash": "Hash"
 		},
 		"deleteComment": "Eliminar comentario",
 		"deleteCommentConfirmation": "¿Está seguro de que desea eliminar este comentario?",
@@ -803,7 +812,8 @@
 		"voteBalance": "Saldo de votación",
 		"Balance": "Saldo",
 		"PeopleChainBalance": "Saldo de People Chain",
-		"VotingBalance": "Saldo de votación"
+		"VotingBalance": "Saldo de votación",
+		"migrationInfo": "Los saldos de los usuarios han sido migrados a AssetHub"
 	},
 	"EditPost": {
 		"edit": "Editar",
@@ -1164,7 +1174,8 @@
 		"redirectingToProposal": "Redirigiendo a la propuesta...",
 		"addContextToProposal": "Agregar contexto a la propuesta",
 		"redirectingToPost": "Redirigiendo a la publicación...",
-		"discussion": "Discusión"
+		"discussion": "Discusión",
+		"postMigrationInfo": "La lógica de tiempo se refiere a la altura de bloque de la cadena de relay después de la migración. Los números de bloque de AssetHub ya no son válidos para la programación."
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiario",
@@ -1563,5 +1574,9 @@
 		"pararegistration": "Registro de Para",
 		"nomination_pools": "Pools de Nominación",
 		"sudo_balances": "Sudo Balances"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "Nota: La cadena de relay de Kusama se ha migrado a AssetHub; todas las acciones de gobernanza en cadena han sido movidas.",
+		"learnMore": "Más información"
 	}
 }

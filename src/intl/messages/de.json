@@ -619,7 +619,16 @@
 			"showMore": "Mehr anzeigen",
 			"showLess": "Weniger anzeigen",
 			"call": "Aufruf",
-			"timeline": "Zeitlinie"
+			"timeline": "Zeitlinie",
+			"submittedAtBlock": "Eingereicht am Block",
+			"createdAtBlock": "Erstellt am Block",
+			"createdAt": "Erstellt am",
+			"proposer": "Proposer",
+			"updatedAtBlock": "Aktualisiert am Block",
+			"enactmentAtBlock": "Ausgeführt am Block",
+			"enactmentAfterBlock": "Ausgeführt nach Block",
+			"trackNumber": "Track Nummer",
+			"hash": "Hash"
 		},
 		"deleteComment": "Kommentar löschen",
 		"deleteCommentConfirmation": "Möchten Sie diesen Kommentar wirklich löschen?",
@@ -800,7 +809,8 @@
 		"voteBalance": "Abstimmungsguthaben",
 		"Balance": "Guthaben",
 		"PeopleChainBalance": "People Chain Guthaben",
-		"VotingBalance": "Abstimmungsguthaben"
+		"VotingBalance": "Abstimmungsguthaben",
+		"migrationInfo": "Benutzerbilanzen wurden zu AssetHub migriert"
 	},
 	"EditPost": {
 		"edit": "Bearbeiten",
@@ -1184,7 +1194,8 @@
 		"redirectingToProposal": "Weiterleitung zum Vorschlag...",
 		"addContextToProposal": "Kontext zum Vorschlag hinzufügen",
 		"redirectingToPost": "Weiterleitung zum Beitrag...",
-		"discussion": "Diskussion"
+		"discussion": "Diskussion",
+		"postMigrationInfo": "Zeitlogik bezieht sich auf die Blockhöhe der Relay-Kette nach der Migration. AssetHub-Blocknummern sind nicht mehr für Planung gültig."
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Begünstigter",
@@ -1561,5 +1572,9 @@
 		"pararegistration": "Para-Registrierung",
 		"nomination_pools": "Nominierungspools",
 		"sudo_balances": "Sudo-Balances"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "Hinweis: Kusama wurde zu AssetHub migriert. Bilanzen, Daten, Referenden und andere On-Chain-Aktivitäten wurden zu AssetHub verschoben.",
+		"learnMore": "Mehr erfahren"
 	}
 }

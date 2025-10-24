@@ -6,13 +6,14 @@ import { CalendarRange, ChevronUp, Minus, Pencil, Trash, X } from 'lucide-react'
 import { useTranslations } from 'next-intl';
 import { BN } from '@polkadot/util';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { IBeneficiaryInput } from '@/_shared/types';
+import { ENetwork, IBeneficiaryInput } from '@/_shared/types';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { cn } from '@/lib/utils';
 import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
+import { useAssethubApiService } from '@/hooks/useAssethubApiService';
 import AddressInput from '../../AddressInput/AddressInput';
 import BalanceInput from '../../BalanceInput/BalanceInput';
 import { Button } from '../../Button';
@@ -43,6 +44,7 @@ function BeneficiaryInputs({
 }) {
 	const t = useTranslations();
 	const { apiService } = usePolkadotApiService();
+	const { assethubApiService } = useAssethubApiService();
 	const network = getCurrentNetwork();
 
 	const [collapsed, setCollapsed] = useState(false);
@@ -55,9 +57,9 @@ function BeneficiaryInputs({
 
 	useEffect(() => {
 		const getCurrentBlockNumber = async () => {
-			const height = await apiService?.getCurrentBlockHeight();
+			const height = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network) ? await assethubApiService?.getBlockHeight() : await apiService?.getBlockHeight();
 			if (height) {
-				setBlockHeight(height);
+				setBlockHeight(new BN(height));
 			}
 		};
 		getCurrentBlockNumber();

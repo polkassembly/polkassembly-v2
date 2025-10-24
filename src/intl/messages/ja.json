@@ -621,7 +621,16 @@
 			"showMore": "もっと表示",
 			"showLess": "もっと少なく表示",
 			"call": "呼び出し",
-			"timeline": "タイムライン"
+			"timeline": "タイムライン",
+			"submittedAtBlock": "提出されたブロック",
+			"createdAtBlock": "作成されたブロック",
+			"createdAt": "作成された",
+			"proposer": "プロポーザー",
+			"updatedAtBlock": "更新されたブロック",
+			"enactmentAtBlock": "実行されたブロック",
+			"enactmentAfterBlock": "実行された後のブロック",
+			"trackNumber": "トラック番号",
+			"hash": "ハッシュ"
 		},
 		"deleteComment": "コメントを削除",
 		"deleteCommentConfirmation": "このコメントを削除してもよろしいですか？",
@@ -802,7 +811,8 @@
 		"voteBalance": "投票残高",
 		"Balance": "残高",
 		"PeopleChainBalance": "ピープルチェーン残高",
-		"VotingBalance": "投票残高"
+		"VotingBalance": "投票残高",
+		"migrationInfo": "ユーザー残高はAssetHubに移行されました"
 	},
 	"EditPost": {
 		"edit": "編集",
@@ -1163,7 +1173,8 @@
 		"redirectingToProposal": "提案にリダイレクト中...",
 		"addContextToProposal": "提案にコンテキストを追加",
 		"redirectingToPost": "投稿にリダイレクト中...",
-		"discussion": "ディスカッション"
+		"discussion": "ディスカッション",
+		"postMigrationInfo": "移行後の時間ロジックは、リレーチェーンのブロック高を参照します。AssetHubのブロック番号は、スケジューリングには無効です。"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",
@@ -1562,5 +1573,9 @@
 		"pararegistration": "パラレジストレーション",
 		"nomination_pools": "ノミネーションプール",
 		"sudo_balances": "Sudoバランス"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "KusamaはAssetHubに移行されました。残高、データ、国民投票、その他のオンチェーン活動はAssetHubに移行されました。",
+		"learnMore": "詳細を確認"
 	}
 }

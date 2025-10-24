@@ -922,7 +922,9 @@ export class PolkadotApiService {
 								}
 							},
 							beneficiary.amount.toString(),
-							{ V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
+							[ENetwork.ASSETHUB_KUSAMA, ENetwork.KUSAMA].includes(this.network)
+								? { V4: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } }
+								: { V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
 							beneficiary.validFromBlock || null
 						)
 					);
@@ -1159,13 +1161,6 @@ export class PolkadotApiService {
 		return this.api?.registry;
 	}
 
-	async getCurrentBlockHeight() {
-		if (!this.api) {
-			return null;
-		}
-		return this.api.derive.chain.bestNumber();
-	}
-
 	async getTotalActiveIssuance() {
 		if (!this.api) return null;
 		try {
@@ -1351,10 +1346,10 @@ export class PolkadotApiService {
 		});
 	}
 
-	async getTreasurySpendsData() {
+	async getTreasurySpendsData({ relayChainBlockHeight }: { relayChainBlockHeight?: number }) {
 		if (!this.api) return null;
 
-		const currentBlockHeight = await this.getBlockHeight();
+		const currentBlockHeight = relayChainBlockHeight || (await this.getBlockHeight());
 
 		const proposals = await this.api?.query?.treasury?.spends?.entries();
 
@@ -1695,5 +1690,27 @@ export class PolkadotApiService {
 		} catch {
 			return { items: [], totalCount: 0 };
 		}
+	}
+
+	async getAssethubTreasuryAssetsBalance(): Promise<{ [key: string]: BN }> {
+		const assetIds = Object.keys(NETWORKS_DETAILS[this.network].supportedAssets || {});
+		const treasuryAddress = TREASURY_NETWORK_CONFIG[this.network]?.assetHubTreasuryAddress;
+		const balances: { [key: string]: BN } = {};
+
+		await Promise.all(
+			assetIds.map(async (assetId) => {
+				const data: any = await this.api.query.assets.account(assetId, treasuryAddress);
+				const assetInfo = data.unwrap();
+				balances[`${assetId}`] = new BN(assetInfo.balance.toBigInt());
+			})
+		);
+
+		const nativeTokenData: any = await this.api?.query?.system?.account(treasuryAddress);
+		if (nativeTokenData?.data?.free) {
+			const freeTokenBalance = nativeTokenData.data.free.toBigInt();
+			balances[`${NETWORKS_DETAILS[this.network].tokenSymbol}`] = new BN(freeTokenBalance);
+		}
+
+		return balances;
 	}
 }

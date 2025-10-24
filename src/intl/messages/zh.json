@@ -620,7 +620,16 @@
 			"showMore": "显示更多",
 			"showLess": "显示更少",
 			"call": "调用",
-			"timeline": "时间线"
+			"timeline": "时间线",
+			"submittedAtBlock": "提交于块",
+			"createdAtBlock": "创建于块",
+			"createdAt": "创建于",
+			"proposer": "提议者",
+			"updatedAtBlock": "更新于块",
+			"enactmentAtBlock": "执行于块",
+			"enactmentAfterBlock": "执行于块后",
+			"trackNumber": "轨道编号",
+			"hash": "哈希"
 		},
 		"onchainInfo": "链上信息",
 		"deleteComment": "删除评论",
@@ -802,7 +811,8 @@
 		"voteBalance": "投票余额",
 		"Balance": "余额",
 		"PeopleChainBalance": "人民链余额",
-		"VotingBalance": "投票余额"
+		"VotingBalance": "投票余额",
+		"migrationInfo": "用户余额已迁移至AssetHub"
 	},
 	"EditPost": {
 		"edit": "编辑",
@@ -1186,7 +1196,8 @@
 		"redirectingToProposal": "正在跳转到提案...",
 		"addContextToProposal": "为提案添加上下文",
 		"redirectingToPost": "正在跳转到帖子...",
-		"discussion": "讨论"
+		"discussion": "讨论",
+		"postMigrationInfo": "迁移后的时间逻辑参考了迁移后的链上区块高度。AssetHub区块号不再有效用于调度。"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",
@@ -1562,5 +1573,9 @@
 		"pararegistration": "平行链注册",
 		"nomination_pools": "提名池",
 		"sudo_balances": "Sudo余额"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "Kusama已迁移至AssetHub。余额、数据、国民投票、以及其他链上活动已迁移至AssetHub。",
+		"learnMore": "了解更多"
 	}
 }
