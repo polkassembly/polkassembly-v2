@@ -5,7 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { algoliasearch } from 'algoliasearch';
-import { ESearchType } from '@/_shared/types';
+import { ESearchType, IPublicUser } from '@/_shared/types';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
@@ -15,6 +15,25 @@ import { StatusCodes } from 'http-status-codes';
 
 const MAX_SEARCH_LIMIT = 100;
 const DEFAULT_SEARCH_LIMIT = 10;
+
+/**
+ * Sanitize user data to only include public fields
+ * Removes sensitive information like email, password, salt, etc.
+ * @param userHit - Raw Algolia user hit
+ * @returns Sanitized user data matching IPublicUser interface
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function sanitizeUserHit(userHit: any): IPublicUser {
+	return {
+		id: userHit.id,
+		...(userHit.createdAt && { createdAt: userHit.createdAt }),
+		username: userHit.username || '',
+		profileScore: userHit.profileScore || 0,
+		addresses: userHit.addresses || [],
+		...(userHit.rank && { rank: userHit.rank }),
+		profileDetails: userHit.profileDetails || {}
+	};
+}
 
 // Initialize Algolia client
 const { NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY } = getSharedEnvVars();
@@ -38,6 +57,10 @@ const algoliaClient = algoliasearch(NEXT_PUBLIC_ALGOLIA_APP_ID, NEXT_PUBLIC_ALGO
  *
  * Headers:
  * - x-network: Network identifier (required for posts/discussions)
+ *
+ * Security:
+ * - User search results are sanitized to IPublicUser format
+ * - Sensitive fields (email, password, salt) are removed from response
  */
 export const GET = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
 	// Validate query parameters
@@ -86,12 +109,15 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 			}
 		});
 
+		// Sanitize user hits to remove sensitive information
+		const sanitizedHits = type === ESearchType.USERS ? searchResults.hits.map(sanitizeUserHit) : searchResults.hits;
+
 		// Format response
 		const response = {
 			query,
 			type,
 			network: type === ESearchType.USERS ? undefined : network,
-			hits: searchResults.hits,
+			hits: sanitizedHits,
 			totalHits: searchResults.nbHits,
 			page,
 			hitsPerPage: limit,
