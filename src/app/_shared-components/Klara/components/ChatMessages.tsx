@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
 import KlaraAvatar from '@assets/klara/avatar.svg';
 import { EChatState, IConversationMessage } from '@/_shared/types';
@@ -58,10 +58,45 @@ function ChatSuggestions({ onFollowUpClick }: { onFollowUpClick: (suggestion: st
 
 function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessages, onFollowUpClick, userId, conversationId, chatState }: Props) {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const messagesContainerRef = useRef<HTMLDivElement>(null);
+	const [isUserScrolling, setIsUserScrolling] = useState(false);
+
+	const scrollToBottom = () => {
+		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+	};
+
+	const isNearBottom = () => {
+		const container = messagesContainerRef.current;
+		if (!container) return true;
+
+		const { scrollTop, scrollHeight, clientHeight } = container;
+		// Consider "near bottom" if within 100px of the bottom
+		return scrollHeight - scrollTop - clientHeight < 100;
+	};
+
+	const handleScroll = () => {
+		if (isNearBottom()) {
+			setIsUserScrolling(false);
+		} else {
+			setIsUserScrolling(true);
+		}
+	};
 
 	useEffect(() => {
-		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-	}, [messages, streamingMessage]);
+		const container = messagesContainerRef.current;
+		if (container) {
+			container.addEventListener('scroll', handleScroll);
+			return () => container.removeEventListener('scroll', handleScroll);
+		}
+		return undefined;
+	}, []);
+
+	useEffect(() => {
+		// Only auto-scroll if user hasn't manually scrolled up
+		if (!isUserScrolling) {
+			scrollToBottom();
+		}
+	}, [messages, streamingMessage, isUserScrolling]);
 
 	if (isLoadingMessages) {
 		return (
@@ -73,7 +108,10 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 	}
 
 	return (
-		<div className={`${chatState === EChatState.EXPANDED ? 'flex-grow p-4' : styles.chatUIBody} ${styles.hide_scrollbar}`}>
+		<div
+			ref={messagesContainerRef}
+			className={`${chatState === EChatState.EXPANDED ? 'flex-grow p-4' : styles.chatUIBody} ${styles.hide_scrollbar}`}
+		>
 			{messages?.length ? (
 				<div className='flex flex-grow flex-col gap-3'>
 					{messages.map((message) => (
@@ -98,6 +136,7 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 							messages={messages}
 						/>
 					)}
+					<div ref={messagesEndRef} />
 				</div>
 			) : (
 				<div className={`flex flex-grow flex-col items-center justify-center gap-2 ${chatState === EChatState.EXPANDED ? 'min-h-[400px]' : ''}`}>
@@ -106,6 +145,7 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 						{!streamingMessage && !mascotType && <WelcomeMessage />}
 						{!streamingMessage && mascotType === 'welcome' && <ChatSuggestions onFollowUpClick={onFollowUpClick} />}
 					</div>
+					<div ref={messagesEndRef} />
 				</div>
 			)}
 		</div>
