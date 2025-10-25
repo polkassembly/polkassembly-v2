@@ -79,21 +79,18 @@ export class ChatService {
 
 		await KlaraDatabaseService.SaveMessageToConversation(activeConversationId, aiMessage);
 
-		// Log to PostgreSQL if enabled
-		if (process.env.KLARA_DISABLE_POSTGRES !== 'true') {
-			try {
-				await ensureTableExists();
-				await logQueryResponse({
-					query: message,
-					response: finalResponseText,
-					status: 'success',
-					userId: userId.toString(),
-					conversationId: activeConversationId,
-					responseTimeMs: Date.now() - startTime
-				});
-			} catch (error) {
-				console.warn('PostgreSQL logging failed:', error);
-			}
+		try {
+			await ensureTableExists();
+			await logQueryResponse({
+				query: message,
+				response: finalResponseText,
+				status: 'success',
+				userId: userId.toString(),
+				conversationId: activeConversationId,
+				responseTimeMs: Date.now() - startTime
+			});
+		} catch (error) {
+			console.warn('PostgreSQL logging failed:', error);
 		}
 
 		return {
