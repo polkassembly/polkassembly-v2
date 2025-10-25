@@ -183,7 +183,8 @@ export const useChatLogic = () => {
 					message: userMessage.text,
 					userId: user?.id?.toString() || 'guest_user',
 					conversationId: conversationId || '',
-					signal: controller.signal
+					signal: controller.signal,
+					address: user?.loginAddress || user?.addresses?.[0] || 'anonymous'
 				});
 
 				if (!response?.ok) {

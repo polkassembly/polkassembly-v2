@@ -51,7 +51,7 @@ export class ExternalApiService {
 		};
 	}
 
-	static async callExternalAPI(message: string, userId: string, clientIP: string, conversationHistory?: IConversationTurn[]): Promise<ApiResponse> {
+	static async callExternalAPI(message: string, userId: string, address: string, conversationHistory?: IConversationTurn[]): Promise<ApiResponse> {
 		const apiUrl = process.env.KLARA_API_BASE_URL;
 		const apiToken = process.env.KLARA_AI_TOKEN;
 
@@ -71,7 +71,7 @@ export class ExternalApiService {
 				body: JSON.stringify({
 					question: message.substring(0, 500),
 					user_id: userId.toString(),
-					client_ip: clientIP,
+					client_ip: address || userId.toString(),
 					max_chunks: 5,
 					include_sources: true,
 					conversation_history: conversationHistory || []

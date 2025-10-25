@@ -1397,10 +1397,22 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ totalUsers: number; totalConversations: number }>({ url, method });
 	}
 
-	static async klaraSendMessage({ message, userId, conversationId, signal }: { message: string; userId: string; conversationId: string; signal: AbortSignal }) {
+	static async klaraSendMessage({
+		message,
+		userId,
+		conversationId,
+		signal,
+		address
+	}: {
+		message: string;
+		userId: string;
+		conversationId: string;
+		signal: AbortSignal;
+		address: string;
+	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.KLARA_SEND_MESSAGE, routeSegments: ['send-message'] });
 
-		return this.nextApiClientFetch<Response>({ url, method, signal, data: { message, userId, conversationId } });
+		return this.nextApiClientFetch<Response>({ url, method, signal, data: { message, userId, conversationId, address } });
 	}
 
 	static async submitKlaraFeedback({

@@ -10,7 +10,6 @@ import { APIError } from '@/app/api/_api-utils/apiError';
 import { KlaraDatabaseService } from './database';
 import { ExternalApiService } from './externalApiService';
 import { validateRequestBody, shouldShowFollowUps, extractConversationHistory } from './utils/conversationUtils';
-import { normalizeClientIP } from './utils/requestUtils';
 import { ensureTableExists, logQueryResponse } from './postgres';
 
 export class ChatService {
@@ -24,7 +23,7 @@ export class ChatService {
 			throw new APIError(ERROR_CODES.INVALID_REQUIRED_FIELDS, StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_REQUIRED_FIELDS);
 		}
 
-		const { message, userId, conversationId } = requestBody;
+		const { message, userId, conversationId, address } = requestBody;
 
 		// Create or use existing conversation
 		let activeConversationId = conversationId;
@@ -34,8 +33,6 @@ export class ChatService {
 			activeConversationId = await KlaraDatabaseService.CreateConversation(userId);
 			isNewConversation = true;
 		}
-
-		const clientIP = normalizeClientIP(request);
 
 		// Save user message
 		const userMessage: IConversationMessage = {
@@ -52,7 +49,7 @@ export class ChatService {
 		const conversationHistory = extractConversationHistory(conversationMessages, historyLimit);
 
 		// Get AI response
-		const { text: aiResponseText, sources, followUpQuestions, remainingRequests } = await ExternalApiService.callExternalAPI(message, userId, clientIP, conversationHistory);
+		const { text: aiResponseText, sources, followUpQuestions, remainingRequests } = await ExternalApiService.callExternalAPI(message, userId, address, conversationHistory);
 
 		const followUpLogic = shouldShowFollowUps(aiResponseText, followUpQuestions || []);
 
