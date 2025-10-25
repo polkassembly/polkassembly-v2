@@ -94,36 +94,28 @@ const db: NodePgDatabase = drizzle(pool);
 
 // Get table name based on environment
 function getTableName(): string {
-	const env = process.env.KLARA_NODE_ENV || 'development';
-	return env === 'production' ? 'klara_qa_prod' : 'klara_qa_dev';
+	return process.env.KLARA_QA_TABLE || 'klara_qa_prod';
 }
 
 // Get the appropriate table based on environment
 function getTable() {
-	const env = process.env.KLARA_NODE_ENV || 'development';
-	return env === 'production' ? klaraQaProd : klaraQaDev;
+	const tableName = process.env.KLARA_QA_TABLE || 'klara_qa_prod';
+	return tableName === 'klara_qa_prod' ? klaraQaProd : klaraQaDev;
 }
 
 // Get feedback table name based on environment
 function getFeedbackTableName(): string {
-	const env = process.env.KLARA_NODE_ENV || 'development';
-	return env === 'production' ? 'klara_feedback_prod' : 'klara_feedback_dev';
+	return process.env.KLARA_FEEDBACK_TABLE || 'klara_feedback_prod';
 }
 
 // Get the appropriate feedback table based on environment
 function getFeedbackTable() {
-	const env = process.env.KLARA_NODE_ENV || 'development';
-	return env === 'production' ? klaraFeedbackProd : klaraFeedbackDev;
+	const tableName = process.env.KLARA_FEEDBACK_TABLE || 'klara_feedback_prod';
+	return tableName === 'klara_feedback_prod' ? klaraFeedbackProd : klaraFeedbackDev;
 }
 
 // Check if table exists and create if it doesn't
 export async function ensureTableExists(): Promise<void> {
-	// Skip if PostgreSQL is disabled
-	if (process.env.KLARA_DISABLE_POSTGRES === 'true') {
-		console.log('PostgreSQL logging disabled via DISABLE_POSTGRES=true');
-		return;
-	}
-
 	try {
 		const tableName = getTableName();
 		const table = getTable();
@@ -154,11 +146,6 @@ export async function logQueryResponse(data: {
 	conversationId?: string;
 	responseTimeMs?: number;
 }): Promise<void> {
-	// Skip if PostgreSQL is disabled
-	if (process.env.KLARA_DISABLE_POSTGRES === 'true') {
-		return;
-	}
-
 	try {
 		const table = getTable();
 
@@ -218,12 +205,6 @@ export async function getRecentLogs(limit: number = 10): Promise<any[]> {
 
 // Check if feedback table exists and create if it doesn't
 export async function ensureFeedbackTableExists(): Promise<void> {
-	// Skip if PostgreSQL is disabled
-	if (process.env.KLARA_DISABLE_POSTGRES === 'true') {
-		console.log('PostgreSQL feedback table creation disabled via KLARA_DISABLE_POSTGRES=true');
-		return;
-	}
-
 	try {
 		const tableName = getFeedbackTableName();
 		const table = getFeedbackTable();
@@ -257,11 +238,6 @@ export async function saveFeedback(data: {
 	queryText?: string;
 	responseText?: string;
 }): Promise<void> {
-	// Skip if PostgreSQL is disabled
-	if (process.env.KLARA_DISABLE_POSTGRES === 'true') {
-		return;
-	}
-
 	try {
 		const table = getFeedbackTable();
 
