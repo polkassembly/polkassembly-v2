@@ -67,8 +67,28 @@ function ChatMessage({ message, onFollowUpClick, userId, conversationId, isStrea
 
 	const previousQueryText = getPreviousUserMessage();
 
-	const handleLike = () => {
+	const handleLike = async () => {
 		setFeedback('like');
+
+		// Record the like action in the database immediately
+		try {
+			await NextApiClientService.submitKlaraFeedback({
+				firstName: 'Anonymous',
+				lastName: 'User',
+				email: 'anonymous@like.action',
+				feedbackText: 'User clicked like button',
+				userId: userId || '',
+				conversationId: conversationId || '',
+				messageId: message.id,
+				rating: 5,
+				feedbackType: 'like_click',
+				queryText: previousQueryText || 'Query not available',
+				responseText: message.text
+			});
+			console.log('Like action recorded');
+		} catch (error) {
+			console.error('Failed to record like:', error);
+		}
 	};
 
 	const handleDislike = async () => {
