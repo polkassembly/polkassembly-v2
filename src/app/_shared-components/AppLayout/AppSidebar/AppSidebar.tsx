@@ -12,6 +12,7 @@ import PaLogo from '@ui/AppLayout/PaLogo';
 import { useTranslations } from 'next-intl';
 import KlaraAvatar from '@assets/klara/avatar.svg';
 import { useKlara } from '@/hooks/useKlara';
+import { useUser } from '@/hooks/useUser';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -27,6 +28,7 @@ import styles from './AppSidebar.module.scss';
 
 function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 	const { state, setOpenMobile } = useSidebar();
+	const { user } = useUser();
 	const { chatState, setChatState } = useKlara();
 	const t = useTranslations();
 	const pathname = usePathname();
@@ -92,7 +94,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 
 			<SidebarFooter className='mb-3 px-3'>
 				{state === 'expanded' ? (
-					chatState === EChatState.EXPANDED_SMALL ? (
+					chatState === EChatState.EXPANDED_SMALL && user?.id ? (
 						<ChatsHistory />
 					) : (
 						<button

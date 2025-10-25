@@ -7,7 +7,10 @@
 import React, { useCallback } from 'react';
 import { EChatState } from '@/_shared/types';
 import { useKlara } from '@/hooks/useKlara';
+import { useUser } from '@/hooks/useUser';
 import Image from 'next/image';
+import KlaraAvatar from '@assets/klara/avatar.svg';
+import Link from 'next/link';
 import NewChatIcon from '@assets/klara/start-chat-icon.svg';
 import { useChatLogic } from './hooks/useChatLogic';
 import ChatHeader from './components/ChatHeader';
@@ -19,6 +22,7 @@ import ExpandedChatModal from './components/ExpandedChatModal';
 
 function ChatUI({ setIsMobileHistoryOpen }: { setIsMobileHistoryOpen: (isOpen: boolean) => void }) {
 	const { chatState, setChatState } = useKlara();
+	const { user } = useUser();
 	const { inputText, isLoading, isLoadingMessages, messages, streamingMessage, mascotType, handleInputChange, submitMessage, handleStopGeneration, handleNewChat } = useChatLogic();
 
 	const handleSubmit = useCallback(
@@ -38,6 +42,35 @@ function ChatUI({ setIsMobileHistoryOpen }: { setIsMobileHistoryOpen: (isOpen: b
 
 	if (chatState === EChatState.CLOSED) {
 		return null;
+	}
+
+	if (!user?.id) {
+		return (
+			<div className={styles.chatUI}>
+				<div className={styles.container}>
+					<div className='flex h-96 flex-col items-center justify-center gap-4 p-4'>
+						<div className='flex flex-col items-center gap-2'>
+							<Image
+								src={KlaraAvatar}
+								alt='Klara Avatar'
+								width={120}
+								height={120}
+							/>
+							<p className='text-center text-sm font-semibold text-text_primary'>Hi, I am Klara, ask me about your governance interests</p>
+						</div>
+						<p className='flex items-center justify-center gap-1 text-center text-lg font-semibold text-text_primary'>
+							<Link
+								href='/login'
+								className='text-text_pink underline'
+							>
+								Login
+							</Link>
+							<span>to begin conversations</span>
+						</p>
+					</div>
+				</div>
+			</div>
+		);
 	}
 
 	return (
