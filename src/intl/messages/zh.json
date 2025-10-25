@@ -812,7 +812,8 @@
 		"voteBalance": "投票余额",
 		"Balance": "余额",
 		"PeopleChainBalance": "人民链余额",
-		"VotingBalance": "投票余额"
+		"VotingBalance": "投票余额",
+		"migrationInfo": "用户余额已迁移至AssetHub"
 	},
 	"EditPost": {
 		"edit": "编辑",
@@ -1197,7 +1198,7 @@
 		"addContextToProposal": "为提案添加上下文",
 		"redirectingToPost": "正在跳转到帖子...",
 		"discussion": "讨论",
-		"postMigrationInfo": "Post-Migration Info: 链上区块高度用于计算。"
+		"postMigrationInfo": "迁移后的时间逻辑参考了迁移后的链上区块高度。AssetHub区块号不再有效用于调度。"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",
@@ -1575,7 +1576,7 @@
 		"sudo_balances": "Sudo余额"
 	},
 	"AnnouncementBanner": {
-		"assethubMigration": "Kusama正在进行Assethub迁移，计划在区块30423691进行，一些功能可能不可用。更多信息请访问",
-		"here": "这里"
+		"assethubMigration": "Kusama已迁移至AssetHub。余额、数据、国民投票、以及其他链上活动已迁移至AssetHub。",
+		"learnMore": "了解更多"
 	}
 }
