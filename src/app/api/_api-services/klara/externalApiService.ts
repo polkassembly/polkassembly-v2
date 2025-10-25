@@ -13,44 +13,6 @@ interface ApiResponse {
 }
 
 export class ExternalApiService {
-	private static lastHealthCheck = 0;
-
-	private static apiHealthy = false;
-
-	private static readonly HEALTH_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
-
-	private static async checkApiHealth(apiUrl: string, apiToken: string): Promise<boolean> {
-		try {
-			const response = await fetchWithTimeout(apiUrl, {
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${apiToken}`,
-					'Content-Type': 'application/json',
-					'User-Agent': 'Polkassembly-Klara/1.0',
-					Accept: 'application/json'
-				},
-				body: JSON.stringify({
-					question: 'health check',
-					user_id: 'system',
-					client_ip: '127.0.0.1',
-					max_chunks: 1,
-					include_sources: false,
-					conversation_history: []
-				}),
-				timeout: 10000
-			});
-
-			if (response.ok) {
-				await response.text();
-				return true;
-			}
-			return false;
-		} catch (error) {
-			console.error('Health check failed:', error);
-			return false;
-		}
-	}
-
 	private static getIntelligentFallbackResponse(message: string): ApiResponse {
 		const messageKeywords = message.toLowerCase();
 		let fallbackText = '';
@@ -93,18 +55,7 @@ export class ExternalApiService {
 		const apiUrl = process.env.KLARA_API_BASE_URL;
 		const apiToken = process.env.KLARA_AI_TOKEN;
 
-		// Check API health periodically
-		const now = Date.now();
-		if (now - this.lastHealthCheck > this.HEALTH_CHECK_INTERVAL) {
-			if (apiUrl && apiToken) {
-				this.apiHealthy = await this.checkApiHealth(apiUrl, apiToken);
-				this.lastHealthCheck = now;
-			} else {
-				this.apiHealthy = false;
-			}
-		}
-
-		if (!this.apiHealthy || !apiUrl || !apiToken || apiUrl.includes('example.com')) {
+		if (!apiUrl || !apiToken || apiUrl.includes('example.com')) {
 			return this.getIntelligentFallbackResponse(message);
 		}
 
@@ -138,9 +89,6 @@ export class ExternalApiService {
 				return this.getIntelligentFallbackResponse(message);
 			}
 
-			this.apiHealthy = true;
-			this.lastHealthCheck = Date.now();
-
 			return {
 				text: data.answer,
 				sources: data.sources || [],
@@ -148,8 +96,6 @@ export class ExternalApiService {
 				remainingRequests: data.remaining_requests || 0
 			};
 		} catch (error) {
-			this.apiHealthy = false;
-			this.lastHealthCheck = Date.now();
 			console.error('External API call failed:', error);
 			return this.getIntelligentFallbackResponse(message);
 		}
