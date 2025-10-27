@@ -3,10 +3,11 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NextResponse } from 'next/server';
+import { KLARA_API_BASE_URL, KLARA_AI_TOKEN } from '@/app/api/_api-constants/apiEnvVars';
 
 export async function GET() {
-	const apiUrl = process.env.KLARA_API_BASE_URL;
-	const apiToken = process.env.KLARA_AI_TOKEN;
+	const apiUrl = KLARA_API_BASE_URL;
+	const apiToken = KLARA_AI_TOKEN;
 
 	console.log('🧪 API Test Starting...');
 	console.log('Environment Check:');

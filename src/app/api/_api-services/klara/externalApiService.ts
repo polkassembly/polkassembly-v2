@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { IChatApiResponse, IConversationTurn, IChatDataSource } from '@/_shared/types';
+import { KLARA_API_BASE_URL, KLARA_AI_TOKEN } from '../../_api-constants/apiEnvVars';
 import { fetchWithTimeout } from './utils/requestUtils';
 
 interface ApiResponse {
@@ -112,10 +113,10 @@ export class ExternalApiService {
 		conversationHistory?: IConversationTurn[],
 		retryConfig: RetryConfig = this.DEFAULT_RETRY_CONFIG
 	): Promise<ApiResponse> {
-		const apiUrl = process.env.KLARA_API_BASE_URL;
-		const apiToken = process.env.KLARA_AI_TOKEN;
+		const apiUrl = KLARA_API_BASE_URL;
+		const apiToken = KLARA_AI_TOKEN;
 
-		if (!apiUrl || !apiToken || apiUrl.includes('example.com')) {
+		if (!apiUrl || !apiToken || apiUrl === 'https://example.com' || apiUrl.startsWith('http://example.com')) {
 			return this.getIntelligentFallbackResponse(message);
 		}
 
@@ -218,19 +219,5 @@ export class ExternalApiService {
 
 	static async callExternalAPI(message: string, userId: string, conversationHistory?: IConversationTurn[]): Promise<ApiResponse> {
 		return this.callExternalAPIWithRetry(message, userId, conversationHistory);
-	}
-
-	/**
-	 * Call external API with custom retry configuration
-	 */
-	static async callExternalAPIWithCustomRetry(
-		message: string,
-		userId: string,
-		address: string,
-		conversationHistory?: IConversationTurn[],
-		retryConfig?: Partial<RetryConfig>
-	): Promise<ApiResponse> {
-		const config = { ...this.DEFAULT_RETRY_CONFIG, ...retryConfig };
-		return this.callExternalAPIWithRetry(message, userId, conversationHistory, config);
 	}
 }

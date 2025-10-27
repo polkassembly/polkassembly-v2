@@ -11,6 +11,7 @@ import { KlaraDatabaseService } from './database';
 import { ExternalApiService } from './externalApiService';
 import { validateRequestBody, shouldShowFollowUps, extractConversationHistory } from './utils/conversationUtils';
 import { ensureTableExists, logQueryResponse } from './postgres';
+import { KLARA_CONVERSATION_HISTORY_LIMIT } from '../../_api-constants/apiEnvVars';
 
 export class ChatService {
 	static async processMessage(request: NextRequest): Promise<IChatResponse> {
@@ -55,7 +56,7 @@ export class ChatService {
 		await KlaraDatabaseService.SaveMessageToConversation(activeConversationId, userMessage);
 
 		// Get conversation history
-		const historyLimit = parseInt(process.env.KLARA_CONVERSATION_HISTORY_LIMIT || '5', 10);
+		const historyLimit = parseInt(KLARA_CONVERSATION_HISTORY_LIMIT || '5', 10);
 		const conversationMessages = await KlaraDatabaseService.GetConversationMessages(activeConversationId);
 		const conversationHistory = extractConversationHistory(conversationMessages, historyLimit);
 

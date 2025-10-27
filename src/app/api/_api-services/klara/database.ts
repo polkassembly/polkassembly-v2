@@ -57,6 +57,10 @@ export class KlaraDatabaseService extends FirestoreUtils {
 	}
 
 	static async CreateConversation(userId: string, title?: string): Promise<string> {
+		if (!userId?.trim()) {
+			throw new Error('userId is required');
+		}
+
 		try {
 			const conversationData = {
 				title: title || DEFAULT_CONVERSATION_TITLE,
@@ -144,6 +148,10 @@ export class KlaraDatabaseService extends FirestoreUtils {
 	}
 
 	static async verifyConversationOwnership(conversationId: string, userId: string): Promise<boolean> {
+		if (!conversationId?.trim() || !userId?.trim()) {
+			throw new Error('conversationId and userId are required');
+		}
+
 		try {
 			const conversationDoc = await this.conversationsCollectionRef().doc(conversationId).get();
 
