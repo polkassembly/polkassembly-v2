@@ -184,12 +184,13 @@ export const useChatLogic = () => {
 			setAbortController(controller);
 
 			try {
+				if (!user?.id) return;
+
 				const response = await NextApiClientService.klaraSendMessage({
 					message: userMessage.text,
-					userId: user?.id?.toString() || 'guest_user',
+					userId: user?.id?.toString(),
 					conversationId: conversationId || '',
-					signal: controller.signal,
-					address: user?.loginAddress || user?.addresses?.[0] || 'anonymous'
+					signal: controller.signal
 				});
 
 				if (!response?.ok) {

@@ -1424,22 +1424,10 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ totalUsers: number; totalConversations: number }>({ url, method });
 	}
 
-	static async klaraSendMessage({
-		message,
-		userId,
-		conversationId,
-		signal,
-		address
-	}: {
-		message: string;
-		userId: string;
-		conversationId: string;
-		signal: AbortSignal;
-		address: string;
-	}) {
+	static async klaraSendMessage({ message, userId, conversationId, signal }: { message: string; userId: string; conversationId: string; signal: AbortSignal }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.KLARA_SEND_MESSAGE, routeSegments: ['send-message'] });
 
-		return this.nextApiClientFetchStream({ url, method, signal, data: { message, userId, conversationId, address } });
+		return this.nextApiClientFetchStream({ url, method, signal, data: { message, userId, conversationId } });
 	}
 
 	static async submitKlaraFeedback({

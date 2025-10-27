@@ -29,7 +29,7 @@ export class ChatService {
 			throw new APIError(ERROR_CODES.INVALID_REQUIRED_FIELDS, StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_REQUIRED_FIELDS);
 		}
 
-		const { message, userId, conversationId, address } = requestBody;
+		const { message, userId, conversationId } = requestBody;
 
 		// Create or use existing conversation
 		let activeConversationId = conversationId;
@@ -60,7 +60,7 @@ export class ChatService {
 		const conversationHistory = extractConversationHistory(conversationMessages, historyLimit);
 
 		// Get AI response
-		const { text: aiResponseText, sources, followUpQuestions, remainingRequests } = await ExternalApiService.callExternalAPI(message, userId, address, conversationHistory);
+		const { text: aiResponseText, sources, followUpQuestions, remainingRequests } = await ExternalApiService.callExternalAPI(message, userId, conversationHistory);
 
 		const followUpLogic = shouldShowFollowUps(aiResponseText, followUpQuestions || []);
 
