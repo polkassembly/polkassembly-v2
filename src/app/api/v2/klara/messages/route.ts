@@ -13,10 +13,6 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
 
 	const { conversationId } = zodQuerySchema.parse(Object.fromEntries(request.nextUrl.searchParams));
 
-	if (!conversationId) {
-		return NextResponse.json({ error: 'Conversation ID is required' }, { status: 400 });
-	}
-
 	const messages = await KlaraDatabaseService.GetConversationMessages(conversationId);
 	return NextResponse.json(messages);
 });

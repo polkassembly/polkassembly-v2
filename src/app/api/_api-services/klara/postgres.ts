@@ -72,25 +72,37 @@ const klaraFeedbackProd = pgTable('klara_feedback_prod', klaraFeedbackDevColumns
 	index('idx_klara_feedback_prod_rating').on(table.rating)
 ]);
 
-// Initialize PostgreSQL connection pool
-let pool: Pool | null = new Pool({
-	host: process.env.KLARA_POSTGRES_HOST || 'localhost',
-	port: Number.parseInt(process.env.KLARA_POSTGRES_PORT || '5432', 10),
-	database: process.env.KLARA_POSTGRES_DATABASE || 'polkassembly',
-	user: process.env.KLARA_POSTGRES_USER || 'postgres',
-	password: process.env.KLARA_POSTGRES_PASSWORD || '',
-	ssl:
-		process.env.KLARA_POSTGRES_SSL === 'false'
-			? false
-			: {
-					rejectUnauthorized: false
-				},
-	max: 20, // Maximum number of clients in the pool
-	idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-	connectionTimeoutMillis: 10000 // Increased timeout for remote connections
-});
+let pool: Pool | null = null;
+let db: NodePgDatabase | null = null;
 
-const db: NodePgDatabase = drizzle(pool);
+function getPool(): Pool {
+	if (!pool) {
+		pool = new Pool({
+			host: process.env.KLARA_POSTGRES_HOST || 'localhost',
+			port: Number.parseInt(process.env.KLARA_POSTGRES_PORT || '5432', 10),
+			database: process.env.KLARA_POSTGRES_DATABASE || 'polkassembly',
+			user: process.env.KLARA_POSTGRES_USER || 'postgres',
+			password: process.env.KLARA_POSTGRES_PASSWORD || '',
+			ssl:
+				process.env.KLARA_POSTGRES_SSL === 'false'
+					? false
+					: {
+							rejectUnauthorized: false
+						},
+			max: 20, // Maximum number of clients in the pool
+			idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
+			connectionTimeoutMillis: 10000 // Increased timeout for remote connections
+		});
+	}
+	return pool;
+}
+
+function getDb(): NodePgDatabase {
+	if (!db) {
+		db = drizzle(getPool());
+	}
+	return db;
+}
 
 // Get table name based on environment
 function getTableName(): string {
@@ -123,7 +135,7 @@ export async function ensureTableExists(): Promise<void> {
 		// Try to query the table to check if it exists
 		// This is a simple existence check using Drizzle
 		try {
-			await db.select().from(table).limit(1);
+			await getDb().select().from(table).limit(1);
 			console.log(`Table ${tableName} already exists`);
 		} catch {
 			// If the table doesn't exist, we'll get an error
@@ -149,7 +161,7 @@ export async function logQueryResponse(data: {
 	try {
 		const table = getTable();
 
-		const result = await db
+		const result = await getDb()
 			.insert(table)
 			.values({
 				query: data.query,
@@ -157,8 +169,7 @@ export async function logQueryResponse(data: {
 				status: data.status || 'success',
 				userId: data.userId || null,
 				conversationId: data.conversationId || null,
-				responseTimeMs: data.responseTimeMs || null,
-				timestamp: new Date()
+				responseTimeMs: data.responseTimeMs || null
 			})
 			.returning({
 				id: table.id,
@@ -182,7 +193,7 @@ export async function getRecentLogs(limit: number = 10): Promise<any[]> {
 	try {
 		const table = getTable();
 
-		return await db
+		return await getDb()
 			.select({
 				id: table.id,
 				timestamp: table.timestamp,
@@ -211,7 +222,7 @@ export async function ensureFeedbackTableExists(): Promise<void> {
 
 		// Try to query the table to check if it exists
 		try {
-			await db.select().from(table).limit(1);
+			await getDb().select().from(table).limit(1);
 			console.log(`Feedback table ${tableName} already exists`);
 		} catch {
 			console.log(`Feedback table ${tableName} does not exist. Please run migrations or create the table manually.`);
@@ -241,7 +252,7 @@ export async function saveFeedback(data: {
 	try {
 		const table = getFeedbackTable();
 
-		const result = await db
+		const result = await getDb()
 			.insert(table)
 			.values({
 				firstName: data.firstName,
@@ -287,7 +298,7 @@ export async function closePool(): Promise<void> {
 export async function testConnection(): Promise<boolean> {
 	try {
 		// Test connection using Drizzle with a simple query
-		const result = await db.execute(sql`SELECT NOW() as current_time`);
+		const result = await getDb().execute(sql`SELECT NOW() as current_time`);
 		console.log('PostgreSQL connection successful:', result.rows[0]?.current_time);
 		return true;
 	} catch (error) {

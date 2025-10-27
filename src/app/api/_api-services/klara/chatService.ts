@@ -15,7 +15,13 @@ import { ensureTableExists, logQueryResponse } from './postgres';
 export class ChatService {
 	static async processMessage(request: NextRequest): Promise<IChatResponse> {
 		const startTime = Date.now();
-		const requestBody = await request.json();
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		let requestBody: any;
+		try {
+			requestBody = await request.json();
+		} catch {
+			throw new APIError(ERROR_CODES.INVALID_REQUIRED_FIELDS, StatusCodes.BAD_REQUEST, 'Invalid JSON payload');
+		}
 
 		// Validate request
 		const validation = validateRequestBody(requestBody);
@@ -32,6 +38,11 @@ export class ChatService {
 		if (!activeConversationId) {
 			activeConversationId = await KlaraDatabaseService.CreateConversation(userId);
 			isNewConversation = true;
+		} else {
+			const owns = await KlaraDatabaseService.verifyConversationOwnership(activeConversationId, userId);
+			if (!owns) {
+				throw new APIError('FORBIDDEN', StatusCodes.FORBIDDEN, 'Unauthorized conversation access');
+			}
 		}
 
 		// Save user message

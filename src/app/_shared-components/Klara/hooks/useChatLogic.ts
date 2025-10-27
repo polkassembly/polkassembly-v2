@@ -83,6 +83,11 @@ export const useChatLogic = () => {
 			}
 
 			newState.accumulatedText = state.accumulatedText + data.content;
+			newState.aiMessage = {
+				...newState.aiMessage,
+				sources: data.sources ?? newState.aiMessage?.sources,
+				followUpQuestions: data.followUpQuestions ?? newState.aiMessage?.followUpQuestions
+			};
 			setStreamingMessage({
 				...newState.aiMessage,
 				text: newState.accumulatedText,
@@ -179,7 +184,7 @@ export const useChatLogic = () => {
 			setAbortController(controller);
 
 			try {
-				const { data: response } = await NextApiClientService.klaraSendMessage({
+				const response = await NextApiClientService.klaraSendMessage({
 					message: userMessage.text,
 					userId: user?.id?.toString() || 'guest_user',
 					conversationId: conversationId || '',

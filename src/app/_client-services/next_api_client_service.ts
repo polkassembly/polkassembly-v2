@@ -440,14 +440,12 @@ export class NextApiClientService {
 		url,
 		method,
 		data,
-		skipCache = false,
-		signal
+		skipCache = false
 	}: {
 		url: URL;
 		method: Method;
 		data?: Record<string, unknown>;
 		skipCache?: boolean;
-		signal?: AbortSignal;
 	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
 		const currentNetwork = await this.getCurrentNetwork();
 
@@ -465,13 +463,8 @@ export class NextApiClientService {
 				[EHttpHeaderKey.NETWORK]: currentNetwork,
 				[EHttpHeaderKey.SKIP_CACHE]: skipCache.toString()
 			},
-			method,
-			signal
+			method
 		});
-
-		if (signal) {
-			return { data: response as T, error: null };
-		}
 
 		const resJSON = await response.json();
 
@@ -479,6 +472,40 @@ export class NextApiClientService {
 			return { data: resJSON as T, error: null };
 		}
 		return { data: null, error: resJSON as IErrorResponse };
+	}
+
+	private static async nextApiClientFetchStream({
+		url,
+		method,
+		data,
+		skipCache = false,
+		signal
+	}: {
+		url: URL;
+		method: Method;
+		data?: Record<string, unknown>;
+		skipCache?: boolean;
+		signal?: AbortSignal;
+	}): Promise<Response> {
+		const currentNetwork = await this.getCurrentNetwork();
+
+		// Detect if we're in an iframe and specifically from Mimir
+		const isMimir = await isMimirDetected();
+
+		return fetch(url, {
+			body: JSON.stringify(data),
+			credentials: 'include',
+			headers: {
+				...(!global.window ? await getCookieHeadersServer() : {}),
+				...(isMimir ? { 'x-iframe-context': 'mimir' } : {}),
+				[EHttpHeaderKey.CONTENT_TYPE]: 'application/json',
+				[EHttpHeaderKey.API_KEY]: getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
+				[EHttpHeaderKey.NETWORK]: currentNetwork,
+				[EHttpHeaderKey.SKIP_CACHE]: skipCache.toString()
+			},
+			method,
+			signal
+		});
 	}
 
 	// auth
@@ -1412,7 +1439,7 @@ export class NextApiClientService {
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.KLARA_SEND_MESSAGE, routeSegments: ['send-message'] });
 
-		return this.nextApiClientFetch<Response>({ url, method, signal, data: { message, userId, conversationId, address } });
+		return this.nextApiClientFetchStream({ url, method, signal, data: { message, userId, conversationId, address } });
 	}
 
 	static async submitKlaraFeedback({

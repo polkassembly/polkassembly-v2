@@ -143,6 +143,22 @@ export class KlaraDatabaseService extends FirestoreUtils {
 		return message.text.length > 50 ? `${truncatedText}...` : truncatedText;
 	}
 
+	static async verifyConversationOwnership(conversationId: string, userId: string): Promise<boolean> {
+		try {
+			const conversationDoc = await this.conversationsCollectionRef().doc(conversationId).get();
+
+			if (!conversationDoc.exists) {
+				return false;
+			}
+
+			const data = conversationDoc.data();
+			return data?.userId === userId.toString();
+		} catch (error) {
+			console.error('Error verifying conversation ownership:', error);
+			return false;
+		}
+	}
+
 	static async GetStats(): Promise<{ totalUsers: number; totalConversations: number }> {
 		try {
 			// Get total conversations
