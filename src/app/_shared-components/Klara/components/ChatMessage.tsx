@@ -7,6 +7,7 @@ import { IConversationMessage, IChatDataSource } from '@/_shared/types';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import Link from 'next/link';
 
 interface Props {
 	message: IConversationMessage;
@@ -198,14 +199,14 @@ function ChatMessage({ message, onFollowUpClick, userId, conversationId, isStrea
 					<div className='mt-3 rounded-lg border border-klara_active_chat_border bg-klara_active_chat_bg p-2'>
 						<p className='text-xs font-medium text-klara_active_chat_border'>
 							Help us improve! Send your feedback{' '}
-							<a
-								href={`https://klara.polkassembly.io/feedback?dislike=true&userId=${userId}&conversationId=${conversationId}&messageId=${message.id}`}
+							<Link
+								href={`/klara-feedback?dislike=true&userId=${userId}&conversationId=${conversationId}&messageId=${message.id}`}
 								target='_blank'
 								rel='noopener noreferrer'
 								className='font-medium text-klara_active_chat_border underline'
 							>
 								here
-							</a>
+							</Link>
 							.
 						</p>
 					</div>

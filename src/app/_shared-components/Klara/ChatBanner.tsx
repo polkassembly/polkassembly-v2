@@ -14,7 +14,7 @@ export function ChatBanner({ chatState }: { chatState: EChatState }) {
 				<div className='flex items-center gap-[3px] text-center text-xs'>
 					🚀 This is the beta version of Klara for testing. Please share any feedback or issues you encounter{' '}
 					<Link
-						href='https://klara.polkassembly.io/feedback'
+						href='/klara-feedback'
 						target='_blank'
 						rel='noopener noreferrer'
 						className='underline'
