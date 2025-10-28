@@ -7,6 +7,7 @@ import { IConversationMessage, IChatResponse } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest } from 'next/server';
 import { APIError } from '@/app/api/_api-utils/apiError';
+import { createId } from '@paralleldrive/cuid2';
 import { KlaraDatabaseService } from './database';
 import { ExternalApiService } from './externalApiService';
 import { validateRequestBody, shouldShowFollowUps, extractConversationHistory } from './utils/conversationUtils';
@@ -36,19 +37,19 @@ export class ChatService {
 		let activeConversationId = conversationId;
 		let isNewConversation = false;
 
-		if (!activeConversationId) {
-			activeConversationId = await KlaraDatabaseService.CreateConversation(userId);
-			isNewConversation = true;
-		} else {
+		if (activeConversationId) {
 			const owns = await KlaraDatabaseService.verifyConversationOwnership(activeConversationId, userId);
 			if (!owns) {
 				throw new APIError('FORBIDDEN', StatusCodes.FORBIDDEN, 'Unauthorized conversation access');
 			}
+		} else {
+			activeConversationId = await KlaraDatabaseService.CreateConversation(userId);
+			isNewConversation = true;
 		}
 
 		// Save user message
 		const userMessage: IConversationMessage = {
-			id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+			id: createId(),
 			text: message,
 			sender: 'user',
 			timestamp: Date.now()
@@ -56,7 +57,7 @@ export class ChatService {
 		await KlaraDatabaseService.SaveMessageToConversation(activeConversationId, userMessage);
 
 		// Get conversation history
-		const historyLimit = parseInt(KLARA_CONVERSATION_HISTORY_LIMIT || '5', 10);
+		const historyLimit = Number.parseInt(KLARA_CONVERSATION_HISTORY_LIMIT || '5', 10);
 		const conversationMessages = await KlaraDatabaseService.GetConversationMessages(activeConversationId);
 		const conversationHistory = extractConversationHistory(conversationMessages, historyLimit);
 
@@ -73,7 +74,7 @@ export class ChatService {
 
 		// Create AI message
 		const aiMessage: IConversationMessage = {
-			id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+			id: createId(),
 			text: finalResponseText,
 			sender: 'ai',
 			timestamp: Date.now()
