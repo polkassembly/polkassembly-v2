@@ -10,12 +10,13 @@ import { FirestoreUtils } from './firestoreUtils';
 // Helper function to clean undefined values from objects
 function cleanUndefinedValues(obj: any): any {
 	return Object.entries(obj).reduce((cleaned: any, [key, value]) => {
-		return value !== undefined
-			? {
-					...cleaned,
-					[key]: value && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Date) ? cleanUndefinedValues(value) : value
-				}
-			: cleaned;
+		if (value === undefined) {
+			return cleaned;
+		}
+		return {
+			...cleaned,
+			[key]: value && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Date) ? cleanUndefinedValues(value) : value
+		};
 	}, {});
 }
 
@@ -104,21 +105,33 @@ export class KlaraDatabaseService extends FirestoreUtils {
 			const messagesRef = this.messagesCollectionRef(conversationId);
 			await messagesRef.add(cleanMessage);
 
-			// Update conversation metadata
-			const conversationDoc = await this.conversationsCollectionRef().doc(conversationId).get();
+			// Update conversation metadata efficiently
+			const conversationRef = this.conversationsCollectionRef().doc(conversationId);
 
-			if (conversationDoc.exists) {
-				const currentData = conversationDoc.data();
-				const updateData = cleanUndefinedValues({
-					...currentData,
-					lastActivity: dayjs().toDate(),
+			await this.firestoreDb.runTransaction(async (tx) => {
+				const snap = await tx.get(conversationRef);
+				if (!snap.exists) return;
+
+				const data = snap.data() || {};
+				const currentTitle = data.title as string | undefined;
+				// messageCount is incremented atomically below
+
+				// Only compute a title if it's the first user message and title is default
+				let newTitle: string | undefined;
+				if ((currentTitle ?? DEFAULT_CONVERSATION_TITLE) === DEFAULT_CONVERSATION_TITLE && message.sender === 'user') {
+					const truncatedText = message.text.substring(0, 50);
+					newTitle = message.text.length > 50 ? `${truncatedText}...` : truncatedText;
+				}
+
+				const updates: Record<string, unknown> = {
+					lastActivity: this.serverTimestamp(),
 					lastMessage: message.text.substring(0, 100),
-					messageCount: (currentData?.messageCount || 0) + 1,
-					title: this.getUpdatedTitle(currentData?.title, message)
-				});
+					messageCount: this.increment(1)
+				};
+				if (newTitle) updates.title = newTitle;
 
-				await conversationDoc.ref.set(updateData, { merge: true });
-			}
+				tx.update(conversationRef, updates);
+			});
 		} catch (error) {
 			console.error('Error saving message to conversation:', error);
 			throw error;

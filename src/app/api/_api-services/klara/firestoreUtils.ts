@@ -39,6 +39,8 @@ export class FirestoreUtils {
 
 	protected static increment = firebaseAdmin.firestore.FieldValue.increment;
 
+	protected static serverTimestamp = firebaseAdmin.firestore.FieldValue.serverTimestamp;
+
 	// collection references
 	protected static conversationsCollectionRef = () => this.firestoreDb.collection('conversations');
 
