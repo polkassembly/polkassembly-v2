@@ -5,6 +5,7 @@
 import React, { useRef } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { EChatState } from '@/_shared/types';
+import { useUser } from '@/hooks/useUser';
 import styles from '../ChatUI.module.scss';
 
 interface Props {
@@ -50,6 +51,7 @@ function SendButton({ disabled }: { disabled: boolean }) {
 
 function ChatInput({ inputText, isLoading, isLoadingMessages, isStreaming, chatState, onInputChange, onSubmit, onStopGeneration }: Props) {
 	const inputRef = useRef<HTMLInputElement>(null);
+	const { user } = useUser();
 
 	return (
 		<form
@@ -63,7 +65,7 @@ function ChatInput({ inputText, isLoading, isLoadingMessages, isStreaming, chatS
 					value={inputText}
 					onChange={onInputChange}
 					placeholder='Ask Klara anything'
-					disabled={isLoading || isLoadingMessages}
+					disabled={!user?.id || isLoading || isLoadingMessages}
 					className='flex-grow bg-transparent !p-0 focus:border-transparent focus:outline-none focus:ring-0 disabled:opacity-50'
 				/>
 				{isLoading || isStreaming ? <StopButton onClick={onStopGeneration} /> : <SendButton disabled={!inputText.trim() || isLoading || isLoadingMessages} />}

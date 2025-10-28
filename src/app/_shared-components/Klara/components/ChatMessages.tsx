@@ -6,6 +6,8 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import KlaraAvatar from '@assets/klara/avatar.svg';
 import { EChatState, IConversationMessage } from '@/_shared/types';
+import { useUser } from '@/hooks/useUser';
+import Link from 'next/link';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { KLARA_CHAT_SUGGESTIONS } from '@/_shared/_constants/klaraChatSuggestions';
 import Mascot from '../Mascot';
@@ -60,6 +62,8 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const messagesContainerRef = useRef<HTMLDivElement>(null);
 	const [isUserScrolling, setIsUserScrolling] = useState(false);
+
+	const { user } = useUser();
 
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -140,11 +144,36 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 				</div>
 			) : (
 				<div className={`flex flex-grow flex-col items-center justify-center gap-2 ${chatState === EChatState.EXPANDED ? 'min-h-[400px]' : ''}`}>
-					<h1 className='text-center text-lg font-bold text-text_primary'>Start New Conversation</h1>
-					<div className='flex flex-col items-center justify-center'>
-						{!streamingMessage && !mascotType && <WelcomeMessage />}
-						{!streamingMessage && mascotType === 'welcome' && <ChatSuggestions onFollowUpClick={onFollowUpClick} />}
-					</div>
+					{user?.id ? (
+						<>
+							<h1 className='text-center text-lg font-bold text-text_primary'>Start New Conversation</h1>
+							<div className='flex flex-col items-center justify-center'>
+								{!streamingMessage && !mascotType && <WelcomeMessage />}
+								{!streamingMessage && mascotType === 'welcome' && <ChatSuggestions onFollowUpClick={onFollowUpClick} />}
+							</div>
+						</>
+					) : (
+						<div className='flex h-96 flex-col items-center justify-center gap-4 p-4'>
+							<div className='flex flex-col items-center gap-2'>
+								<Image
+									src={KlaraAvatar}
+									alt='Klara Avatar'
+									width={120}
+									height={120}
+								/>
+								<p className='text-center text-sm font-semibold text-text_primary'>Hi, I am Klara, ask me about your governance interests</p>
+							</div>
+							<p className='flex items-center justify-center gap-1 text-center text-lg font-semibold text-text_primary'>
+								<Link
+									href='/login'
+									className='text-text_pink underline'
+								>
+									Login
+								</Link>
+								<span>to begin conversations</span>
+							</p>
+						</div>
+					)}
 					<div ref={messagesEndRef} />
 				</div>
 			)}

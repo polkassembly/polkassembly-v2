@@ -17,6 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { EChatState, IConversationHistory } from '@/_shared/types';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { usePathname, useRouter } from 'next/navigation';
 import styles from './ExpandedChatModal.module.scss';
 import ChatInput from './ChatInput';
 import { ChatBanner } from '../ChatBanner';
@@ -28,6 +29,8 @@ export default function ExpandedChatModal({ open, chat }: { open: boolean; chat:
 	const { inputText, isLoading, isLoadingMessages, messages, streamingMessage, mascotType, conversationId, handleInputChange, submitMessage, handleStopGeneration, handleNewChat } =
 		chat;
 	const { user } = useUser();
+	const router = useRouter();
+	const pathname = usePathname();
 
 	const { data: conversations } = useQuery({
 		queryKey: ['klara-conversations', user?.id],
@@ -43,24 +46,36 @@ export default function ExpandedChatModal({ open, chat }: { open: boolean; chat:
 
 	const openChat = useCallback(
 		(id: string) => {
+			if (!user?.id) {
+				router.push(`/login?nextUrl=${pathname}`);
+				return;
+			}
 			setActiveChatId(id ?? null);
 		},
-		[setActiveChatId]
+		[setActiveChatId, user?.id, pathname, router]
 	);
 
 	const handleSubmit = useCallback(
 		async (e: React.FormEvent) => {
 			e.preventDefault();
+			if (!user?.id) {
+				router.push('/login');
+				return;
+			}
 			await submitMessage(inputText);
 		},
-		[submitMessage, inputText]
+		[submitMessage, inputText, user?.id, pathname, router]
 	);
 
 	const handleFollowUpClick = useCallback(
 		(question: string) => {
+			if (!user?.id) {
+				router.push('/login');
+				return;
+			}
 			setTimeout(() => submitMessage(question), 100);
 		},
-		[submitMessage]
+		[submitMessage, user?.id, pathname, router]
 	);
 
 	return (
@@ -80,8 +95,15 @@ export default function ExpandedChatModal({ open, chat }: { open: boolean; chat:
 							<div className={styles.newChatBtnContainer}>
 								<button
 									type='button'
-									onClick={handleNewChat}
+									onClick={() => {
+										if (!user?.id) {
+											router.push('/login');
+											return;
+										}
+										handleNewChat();
+									}}
 									className={styles.newChatBtn}
+									disabled={!user?.id}
 								>
 									<Image
 										src={NewChatIcon}
