@@ -6,6 +6,7 @@ import React from 'react';
 import Image from 'next/image';
 import KlaraAvatar from '@assets/klara/avatar.svg';
 import { CgArrowsVAlt } from '@react-icons/all-files/cg/CgArrowsVAlt';
+import { CgArrowsScrollV } from '@react-icons/all-files/cg/CgArrowsScrollV';
 import { IoClose } from '@react-icons/all-files/io5/IoClose';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
@@ -71,14 +72,14 @@ function ChatHeader({ chatState, setChatState, openMobileHistory }: Props) {
 						<button
 							type='button'
 							aria-label='expand'
-							onClick={() => setChatState(EChatState.EXPANDED)}
+							onClick={() => setChatState(chatState === EChatState.EXPANDED ? EChatState.EXPANDED_SMALL : EChatState.EXPANDED)}
 							className={`${styles.controlIcon} border-none bg-green-400 outline-none focus:outline-none`}
 						>
-							<CgArrowsVAlt className='size-4 rotate-45 text-white' />
+							{chatState === EChatState.EXPANDED ? <CgArrowsScrollV className='size-4 rotate-45 text-white' /> : <CgArrowsVAlt className='size-4 rotate-45 text-white' />}
 						</button>
 					</TooltipTrigger>
 					<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
-						<p>expand</p>
+						<p>{chatState === EChatState.EXPANDED ? 'minimize' : 'expand'}</p>
 					</TooltipContent>
 				</Tooltip>
 
