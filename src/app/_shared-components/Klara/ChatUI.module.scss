@@ -68,7 +68,7 @@
 }
 
 .klaraLoadingEllipsis > div {
-	@apply h-1.5 w-1.5 rounded-full bg-black;
+	@apply h-1.5 w-1.5 rounded-full bg-black dark:bg-white;
 	animation: klaraBounce 1.4s ease-in-out infinite both;
 }
 
