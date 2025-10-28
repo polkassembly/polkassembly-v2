@@ -7,6 +7,7 @@
 import React from 'react';
 import { mascotGifs, MascotGif } from '@/_shared/_constants/mascots';
 import Image from 'next/image';
+import styles from './ChatUI.module.scss';
 
 interface MascotProps {
 	type: 'welcome' | 'loading' | 'error' | null;
@@ -16,7 +17,8 @@ const getRandomGifUrl = (type: MascotProps['type']): string | null => {
 	const relevantGifs = mascotGifs.filter((gif: MascotGif) => gif.type === type);
 	if (relevantGifs.length === 0) return null;
 	const randomIndex = Math.floor(Math.random() * relevantGifs.length);
-	return relevantGifs[randomIndex].url;
+	const selectedGif = relevantGifs[randomIndex];
+	return selectedGif?.url ?? null;
 };
 
 function Mascot({ type }: MascotProps) {
@@ -28,8 +30,8 @@ function Mascot({ type }: MascotProps) {
 
 	return (
 		<div className='animate-fade-in mb-4 flex justify-start'>
-			<div className='flex items-end space-x-2'>
-				<div className='p-1'>
+			<div className='flex flex-col gap-2'>
+				<div className={`p-1 ${type === 'loading' ? styles.klaraBreathing : ''}`}>
 					<Image
 						src={mascotUrl}
 						alt={`${type} mascot`}
@@ -38,6 +40,15 @@ function Mascot({ type }: MascotProps) {
 						height={112}
 					/>
 				</div>
+				{type === 'loading' && (
+					<div className='mb-4 w-fit rounded-lg bg-klara_ai_msg_bg px-3 py-2'>
+						<div className={styles.klaraLoadingEllipsis}>
+							<div />
+							<div />
+							<div />
+						</div>
+					</div>
+				)}
 			</div>
 		</div>
 	);

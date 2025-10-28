@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import KlaraAvatar from '@assets/klara/avatar.svg';
 import { EChatState, IConversationMessage } from '@/_shared/types';
@@ -65,22 +65,22 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 	};
 
-	const isNearBottom = () => {
+	const isNearBottom = useCallback(() => {
 		const container = messagesContainerRef.current;
 		if (!container) return true;
 
 		const { scrollTop, scrollHeight, clientHeight } = container;
 		// Consider "near bottom" if within 100px of the bottom
 		return scrollHeight - scrollTop - clientHeight < 100;
-	};
+	}, []);
 
-	const handleScroll = () => {
+	const handleScroll = useCallback(() => {
 		if (isNearBottom()) {
 			setIsUserScrolling(false);
 		} else {
 			setIsUserScrolling(true);
 		}
-	};
+	}, [isNearBottom]);
 
 	useEffect(() => {
 		const container = messagesContainerRef.current;
@@ -89,7 +89,7 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 			return () => container.removeEventListener('scroll', handleScroll);
 		}
 		return undefined;
-	}, []);
+	}, [handleScroll]);
 
 	useEffect(() => {
 		// Only auto-scroll if user hasn't manually scrolled up
