@@ -123,7 +123,7 @@ export class KlaraDatabaseService extends FirestoreUtils {
 					newTitle = message.text.length > 50 ? `${truncatedText}...` : truncatedText;
 				}
 
-				const updates: Record<string, unknown> = {
+				const updates: Record<string, any> = {
 					lastActivity: this.serverTimestamp(),
 					lastMessage: message.text.substring(0, 100),
 					messageCount: this.increment(1)
