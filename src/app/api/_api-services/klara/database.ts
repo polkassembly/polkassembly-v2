@@ -92,19 +92,6 @@ export class KlaraDatabaseService extends FirestoreUtils {
 		await this.conversationsCollectionRef().doc(conversationId).set(cleanUpdates, { merge: true });
 	}
 
-	static async DeleteConversation(userId: string, conversationId: string): Promise<void> {
-		// Delete conversation metadata
-		await this.conversationsCollectionRef().doc(conversationId).delete();
-
-		// Delete all messages in the conversation
-		const messagesSnapshot = await this.messagesCollectionRef(conversationId).get();
-
-		const deletePromises = messagesSnapshot.docs.map((doc) => doc.ref.delete());
-		await Promise.all(deletePromises);
-
-		console.log(`Deleted conversation ${conversationId} for user: ${userId}`);
-	}
-
 	static async SaveMessageToConversation(conversationId: string, message: IConversationMessage): Promise<void> {
 		try {
 			// Clean the message object to remove undefined values before saving
