@@ -58,7 +58,7 @@ function ChatHeader({ chatState, setChatState, openMobileHistory }: Props) {
 			<div className={styles.chatUIControls}>
 				{chatState === EChatState.EXPANDED && (
 					<Link
-						href='https://klara.polkassembly.io/guide'
+						href='/klara-guide'
 						target='_blank'
 						rel='noopener noreferrer'
 						className='flex items-center gap-1 rounded-lg border border-text_pink px-3 py-1 text-sm font-medium text-text_pink'
