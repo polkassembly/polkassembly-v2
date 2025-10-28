@@ -63,6 +63,15 @@ export default function KlaraFeedbackForm({ userId, conversationId, messageId, i
 			setSubmitStatus('success');
 			setShowSuccessModal(true);
 
+			// Clear form data on success
+			setFormData({
+				firstName: '',
+				lastName: '',
+				email: '',
+				company: '',
+				feedbackText: ''
+			});
+
 			// Auto-close modal after 5 seconds
 			setTimeout(() => {
 				setShowSuccessModal(false);
