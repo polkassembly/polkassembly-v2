@@ -3,14 +3,14 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { KLARA_FIREBASE_SERVICE_ACC_CONFIG } from '@/app/api/_api-constants/apiEnvVars';
+import { FIREBASE_SERVICE_ACC_CONFIG } from '@/app/api/_api-constants/apiEnvVars';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import * as firebaseAdmin from 'firebase-admin';
 import { StatusCodes } from 'http-status-codes';
 
 // init firebase admin
-if (!KLARA_FIREBASE_SERVICE_ACC_CONFIG) {
-	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Internal Error: KLARA_FIREBASE_SERVICE_ACC_CONFIG missing.');
+if (!FIREBASE_SERVICE_ACC_CONFIG) {
+	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Internal Error: FIREBASE_SERVICE_ACC_CONFIG missing.');
 }
 
 let klaraApp: firebaseAdmin.app.App;
@@ -24,7 +24,7 @@ try {
 	} else {
 		klaraApp = firebaseAdmin.initializeApp(
 			{
-				credential: firebaseAdmin.credential.cert(JSON.parse(KLARA_FIREBASE_SERVICE_ACC_CONFIG))
+				credential: firebaseAdmin.credential.cert(JSON.parse(FIREBASE_SERVICE_ACC_CONFIG))
 			},
 			'klara'
 		); // Named app instance
