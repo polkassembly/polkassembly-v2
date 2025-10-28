@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { IChatApiResponse, IConversationTurn, IChatDataSource } from '@/_shared/types';
+import { StatusCodes } from 'http-status-codes';
 import { KLARA_API_BASE_URL, KLARA_AI_TOKEN } from '../../_api-constants/apiEnvVars';
 import { fetchWithTimeout } from './utils/requestUtils';
 
@@ -32,7 +33,14 @@ export class ExternalApiService {
 		baseDelay: 1000, // 1 second
 		maxDelay: 10000, // 10 seconds
 		backoffMultiplier: 2,
-		retryableStatusCodes: [408, 429, 500, 502, 503, 504] // Timeout, Rate Limit, Server Errors
+		retryableStatusCodes: [
+			StatusCodes.REQUEST_TIMEOUT,
+			StatusCodes.TOO_MANY_REQUESTS,
+			StatusCodes.INTERNAL_SERVER_ERROR,
+			StatusCodes.BAD_GATEWAY,
+			StatusCodes.SERVICE_UNAVAILABLE,
+			StatusCodes.GATEWAY_TIMEOUT
+		] // Timeout, Rate Limit, Server Errors
 	};
 
 	private static async sleep(ms: number): Promise<void> {
