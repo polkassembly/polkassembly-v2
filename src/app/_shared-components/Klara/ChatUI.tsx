@@ -23,7 +23,8 @@ import ExpandedChatModal from './components/ExpandedChatModal';
 function ChatUI({ setIsMobileHistoryOpen }: { setIsMobileHistoryOpen: (isOpen: boolean) => void }) {
 	const { chatState, setChatState } = useKlara();
 	const { user } = useUser();
-	const { inputText, isLoading, isLoadingMessages, messages, streamingMessage, mascotType, handleInputChange, submitMessage, handleStopGeneration, handleNewChat } = useChatLogic();
+	const chat = useChatLogic();
+	const { inputText, isLoading, isLoadingMessages, messages, streamingMessage, mascotType, handleInputChange, submitMessage, handleStopGeneration, handleNewChat } = chat;
 
 	const handleSubmit = useCallback(
 		async (e: React.FormEvent) => {
@@ -124,7 +125,10 @@ function ChatUI({ setIsMobileHistoryOpen }: { setIsMobileHistoryOpen: (isOpen: b
 					)}
 				</div>
 			</div>
-			<ExpandedChatModal open={chatState === EChatState.EXPANDED} />
+			<ExpandedChatModal
+				open={chatState === EChatState.EXPANDED}
+				chat={chat}
+			/>
 		</>
 	);
 }

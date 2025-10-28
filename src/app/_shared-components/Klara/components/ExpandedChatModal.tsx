@@ -21,10 +21,12 @@ import styles from './ExpandedChatModal.module.scss';
 import ChatInput from './ChatInput';
 import { ChatBanner } from '../ChatBanner';
 
-export default function ExpandedChatModal({ open }: { open: boolean }) {
+type ChatLogicProps = ReturnType<typeof useChatLogic>;
+
+export default function ExpandedChatModal({ open, chat }: { open: boolean; chat: ChatLogicProps }) {
 	const { chatState, setChatState, activeChatId, setActiveChatId } = useKlara();
 	const { inputText, isLoading, isLoadingMessages, messages, streamingMessage, mascotType, conversationId, handleInputChange, submitMessage, handleStopGeneration, handleNewChat } =
-		useChatLogic();
+		chat;
 	const { user } = useUser();
 
 	const { data: conversations } = useQuery({
