@@ -138,15 +138,6 @@ export class KlaraDatabaseService extends FirestoreUtils {
 		}
 	}
 
-	private static getUpdatedTitle(currentTitle: string | undefined, message: IConversationMessage): string {
-		if (currentTitle !== DEFAULT_CONVERSATION_TITLE || message.sender !== 'user') {
-			return currentTitle || DEFAULT_CONVERSATION_TITLE;
-		}
-
-		const truncatedText = message.text.substring(0, 50);
-		return message.text.length > 50 ? `${truncatedText}...` : truncatedText;
-	}
-
 	static async verifyConversationOwnership(conversationId: string, userId: string): Promise<boolean> {
 		if (!conversationId?.trim() || !userId?.trim()) {
 			throw new Error('conversationId and userId are required');

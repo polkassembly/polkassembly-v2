@@ -23,7 +23,6 @@ export default function KlaraFeedbackForm({ userId, conversationId, messageId, i
 		firstName: '',
 		lastName: '',
 		email: '',
-		company: '',
 		feedbackText: ''
 	});
 
@@ -39,6 +38,15 @@ export default function KlaraFeedbackForm({ userId, conversationId, messageId, i
 			[name]: value
 		}));
 	};
+
+	const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+	React.useEffect(() => {
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, []);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -68,12 +76,11 @@ export default function KlaraFeedbackForm({ userId, conversationId, messageId, i
 				firstName: '',
 				lastName: '',
 				email: '',
-				company: '',
 				feedbackText: ''
 			});
 
-			// Auto-close modal after 5 seconds
-			setTimeout(() => {
+			// Auto-close modal after 10 seconds
+			timeoutRef.current = setTimeout(() => {
 				setShowSuccessModal(false);
 				// Try to close the tab if it was opened in a new window
 				if (window.opener) {
@@ -171,24 +178,6 @@ export default function KlaraFeedbackForm({ userId, conversationId, messageId, i
 								onChange={handleInputChange}
 								required
 								placeholder='name@example.com'
-							/>
-						</div>
-
-						{/* Company */}
-						<div>
-							<Label
-								htmlFor='company'
-								className='mb-2 block text-sm font-medium text-text_primary'
-							>
-								Company
-							</Label>
-							<Input
-								type='text'
-								id='company'
-								name='company'
-								value={formData.company}
-								onChange={handleInputChange}
-								placeholder='Acme Corporation'
 							/>
 						</div>
 
