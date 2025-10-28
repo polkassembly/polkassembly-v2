@@ -6,7 +6,7 @@
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { IConversationHistory, IConversationMessage } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { FirestoreUtils } from './firestoreUtils';
+import { FirestoreUtils } from '../offchain_db_service/firestore_service/firestoreUtils';
 // Helper function to clean undefined values from objects
 function cleanUndefinedValues(obj: any): any {
 	return Object.entries(obj).reduce((cleaned: any, [key, value]) => {
