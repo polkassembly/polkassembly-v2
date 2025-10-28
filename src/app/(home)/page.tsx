@@ -9,7 +9,7 @@ import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMet
 import { ClientError } from '../_client-utils/clientError';
 import Overview from './Components/Overview';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
-import { getReferrerFromHeaders } from '../api/_api-utils/getReferrerFromHeaders';
+import { getReferrerFromHeaders } from '../../_shared/_utils/getReferrerFromHeaders';
 import KlaraAutoOpen from '../_shared-components/Klara/KlaraAutoOpen';
 
 export async function generateMetadata(): Promise<Metadata> {
