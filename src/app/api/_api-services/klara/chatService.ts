@@ -57,7 +57,7 @@ export class ChatService {
 		await KlaraDatabaseService.SaveMessageToConversation(activeConversationId, userMessage);
 
 		// Get conversation history
-		const historyLimit = Number.parseInt(KLARA_CONVERSATION_HISTORY_LIMIT || '5', 10);
+		const historyLimit = KLARA_CONVERSATION_HISTORY_LIMIT || 5;
 		const conversationMessages = await KlaraDatabaseService.GetConversationMessages(activeConversationId);
 		const conversationHistory = extractConversationHistory(conversationMessages, historyLimit);
 
