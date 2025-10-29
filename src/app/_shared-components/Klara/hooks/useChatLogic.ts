@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useState, useCallback, useEffect } from 'react';
+import { createId } from '@paralleldrive/cuid2';
 import { IConversationMessage, IChatDataSource } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
 import { useKlara } from '@/hooks/useKlara';
@@ -38,7 +39,7 @@ export const useChatLogic = () => {
 	const [hasUserStartedTyping, setHasUserStartedTyping] = useState(false);
 
 	const generateMessageId = useCallback(() => {
-		return Date.now().toString() + Math.random().toString(36).substring(2, 9);
+		return createId();
 	}, []);
 
 	const addMessage = useCallback((message: IConversationMessage) => {
