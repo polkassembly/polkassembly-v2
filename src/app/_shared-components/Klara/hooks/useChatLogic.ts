@@ -180,6 +180,11 @@ export const useChatLogic = () => {
 			setIsLoading(true);
 			setMascotType('loading');
 
+			// Clean up any existing controller before creating a new one to avoid leaks
+			if (abortController) {
+				abortController.abort();
+			}
+
 			const controller = new AbortController();
 			setAbortController(controller);
 
@@ -217,7 +222,7 @@ export const useChatLogic = () => {
 				}
 			}
 		},
-		[isLoading, generateMessageId, addMessage, user, conversationId, mascotType, processStreamingResponse]
+		[isLoading, generateMessageId, addMessage, user, conversationId, mascotType, processStreamingResponse, abortController]
 	);
 
 	const fetchMessages = useCallback(async (chatId: string) => {
