@@ -167,7 +167,7 @@ export const useChatLogic = () => {
 
 	const submitMessage = useCallback(
 		async (messageText: string) => {
-			if (!messageText.trim() || isLoading) return;
+			if (!user?.id || !messageText.trim() || isLoading) return;
 
 			const userMessage: IConversationMessage = {
 				id: generateMessageId(),
@@ -192,8 +192,6 @@ export const useChatLogic = () => {
 			setAbortController(controller);
 
 			try {
-				if (!user?.id) return;
-
 				const response = await NextApiClientService.klaraSendMessage({
 					message: userMessage.text,
 					userId: user?.id?.toString(),
@@ -238,7 +236,7 @@ export const useChatLogic = () => {
 				setMascotType(null);
 			}
 		} catch {
-			// Error handling is done by the error boundary
+			setMascotType('error');
 		} finally {
 			setIsLoadingMessages(false);
 		}
