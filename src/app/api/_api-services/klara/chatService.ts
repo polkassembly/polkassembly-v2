@@ -8,11 +8,11 @@ import { StatusCodes } from 'http-status-codes';
 import { NextRequest } from 'next/server';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { createId } from '@paralleldrive/cuid2';
+import { KLARA_CONVERSATION_HISTORY_LIMIT } from '@/_shared/_constants/klaraConstants';
 import { KlaraDatabaseService } from './database';
 import { ExternalApiService } from './externalApiService';
 import { validateRequestBody, shouldShowFollowUps, extractConversationHistory } from './utils/conversationUtils';
 import { ensureTableExists, logQueryResponse } from './postgres';
-import { KLARA_CONVERSATION_HISTORY_LIMIT } from '../../_api-constants/apiEnvVars';
 
 export class ChatService {
 	static async processMessage(request: NextRequest): Promise<IChatResponse> {
