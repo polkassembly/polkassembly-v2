@@ -43,7 +43,7 @@ export class KlaraDatabaseService extends FirestoreUtils {
 	}
 
 	static async GetConversationMessages(conversationId: string): Promise<IConversationMessage[]> {
-		const querySnapshot = await this.messagesCollectionRef(conversationId).orderBy('timestamp', 'asc').get();
+		const querySnapshot = await this.messagesCollectionRef().where('conversationId', '==', conversationId).orderBy('timestamp', 'asc').get();
 
 		const messages: IConversationMessage[] = [];
 		querySnapshot.forEach((doc) => {
@@ -98,11 +98,12 @@ export class KlaraDatabaseService extends FirestoreUtils {
 			// Clean the message object to remove undefined values before saving
 			const cleanMessage = cleanUndefinedValues({
 				...message,
+				conversationId,
 				timestamp: dayjs(message.timestamp).toDate()
 			});
 
 			// Save message to conversation
-			const messagesRef = this.messagesCollectionRef(conversationId);
+			const messagesRef = this.messagesCollectionRef();
 			await messagesRef.add(cleanMessage);
 
 			// Update conversation metadata efficiently

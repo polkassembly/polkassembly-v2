@@ -1652,6 +1652,7 @@ export interface IConversationMessage {
 	text: string;
 	sender: 'user' | 'ai';
 	timestamp: number;
+	conversationId: string;
 	isStreaming?: boolean;
 	sources?: IChatDataSource[];
 	followUpQuestions?: string[];

@@ -78,6 +78,7 @@ export const useChatLogic = () => {
 					id: generateMessageId(),
 					text: '',
 					sender: 'ai',
+					conversationId: data.conversationId || '',
 					timestamp: Date.now(),
 					isStreaming: true
 				};
@@ -172,6 +173,7 @@ export const useChatLogic = () => {
 				id: generateMessageId(),
 				text: messageText.trim(),
 				sender: 'user',
+				conversationId: conversationId || '',
 				timestamp: Date.now()
 			};
 
@@ -211,6 +213,7 @@ export const useChatLogic = () => {
 					id: generateMessageId(),
 					text: 'Sorry, I encountered an error. Please try again.',
 					sender: 'ai',
+					conversationId: conversationId || '',
 					timestamp: Date.now()
 				};
 				addMessage(errorMessage);

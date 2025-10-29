@@ -52,6 +52,7 @@ export class ChatService {
 			id: createId(),
 			text: message,
 			sender: 'user',
+			conversationId: activeConversationId,
 			timestamp: Date.now()
 		};
 		await KlaraDatabaseService.SaveMessageToConversation(activeConversationId, userMessage);
@@ -77,6 +78,7 @@ export class ChatService {
 			id: createId(),
 			text: finalResponseText,
 			sender: 'ai',
+			conversationId: activeConversationId,
 			timestamp: Date.now()
 		};
 

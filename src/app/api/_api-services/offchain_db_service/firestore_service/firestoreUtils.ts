@@ -69,5 +69,7 @@ export class FirestoreUtils {
 	// klara collection references
 	protected static conversationsCollectionRef = () => this.firestoreDb.collection('klara_conversations');
 
-	protected static messagesCollectionRef = (id: string) => this.firestoreDb.collection('klara_conversations').doc(id).collection('messages');
+	protected static messagesCollectionRef = () => this.firestoreDb.collection('klara_messages');
+
+	// protected static messagesCollectionRef = (id: string) => this.firestoreDb.collection('klara_conversations').doc(id).collection('messages');
 }
