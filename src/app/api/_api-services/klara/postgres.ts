@@ -6,6 +6,7 @@ import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { pgTable, serial, text, timestamp, integer, varchar, index } from 'drizzle-orm/pg-core';
 import { desc, sql } from 'drizzle-orm';
 import { Pool } from 'pg';
+import { KLARA_QA_TABLE, KLARA_FEEDBACK_TABLE } from '@/_shared/_constants/klaraConstants';
 
 // Define the Klara QA schema
 const klaraQaDevColumns = {
@@ -106,23 +107,23 @@ function getDb(): NodePgDatabase {
 
 // Get table name based on environment
 function getTableName(): string {
-	return process.env.KLARA_QA_TABLE || 'klara_qa_prod';
+	return KLARA_QA_TABLE || 'klara_qa_prod';
 }
 
 // Get the appropriate table based on environment
 function getTable() {
-	const tableName = process.env.KLARA_QA_TABLE || 'klara_qa_prod';
+	const tableName = KLARA_QA_TABLE || 'klara_qa_prod';
 	return tableName === 'klara_qa_prod' ? klaraQaProd : klaraQaDev;
 }
 
 // Get feedback table name based on environment
 function getFeedbackTableName(): string {
-	return process.env.KLARA_FEEDBACK_TABLE || 'klara_feedback_prod';
+	return KLARA_FEEDBACK_TABLE || 'klara_feedback_prod';
 }
 
 // Get the appropriate feedback table based on environment
 function getFeedbackTable() {
-	const tableName = process.env.KLARA_FEEDBACK_TABLE || 'klara_feedback_prod';
+	const tableName = KLARA_FEEDBACK_TABLE || 'klara_feedback_prod';
 	return tableName === 'klara_feedback_prod' ? klaraFeedbackProd : klaraFeedbackDev;
 }
 
