@@ -221,7 +221,7 @@ export class ExternalApiService {
 			text: fallbackText,
 			sources: fallbackSources,
 			followUpQuestions: fallbackQuestions,
-			remainingRequests: 999
+			remainingRequests: undefined
 		};
 	}
 
