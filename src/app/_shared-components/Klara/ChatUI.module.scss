@@ -14,7 +14,7 @@
 }
 
 .container {
-	@apply flex h-full cursor-pointer flex-col rounded-t-[10.5px] bg-bg_modal;
+	@apply flex h-full w-full cursor-pointer flex-col rounded-t-[10.5px] bg-bg_modal;
 }
 
 .chatUIHeader {

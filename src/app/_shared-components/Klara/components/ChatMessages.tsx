@@ -117,7 +117,7 @@ function ChatMessages({ messages, streamingMessage, mascotType, isLoadingMessage
 			className={`${chatState === EChatState.EXPANDED ? 'flex-grow p-4' : styles.chatUIBody} ${styles.hide_scrollbar}`}
 		>
 			{messages?.length ? (
-				<div className='flex flex-grow flex-col gap-3'>
+				<div className='flex w-full flex-grow flex-col gap-3'>
 					{messages.map((message) => (
 						<ChatMessage
 							key={message.id}

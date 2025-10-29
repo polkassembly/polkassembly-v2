@@ -66,7 +66,7 @@ function ChatUI({ setIsMobileHistoryOpen }: { setIsMobileHistoryOpen: (isOpen: b
 					{chatState === EChatState.EXPANDED_SMALL && (
 						<>
 							<ChatBanner chatState={chatState} />
-							<div className='flex flex-grow flex-col md:h-80'>
+							<div className='flex w-full flex-grow flex-col md:h-80'>
 								<ChatMessages
 									messages={messages}
 									streamingMessage={streamingMessage}
