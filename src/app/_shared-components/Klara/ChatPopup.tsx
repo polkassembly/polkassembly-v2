@@ -19,7 +19,7 @@ function ChatPopup() {
 	return (
 		<div
 			className={cn(
-				'fixed bottom-0 top-[15%] z-30 max-h-[85vh] w-full transition-all duration-200 ease-in-out md:left-6 md:top-auto md:z-50',
+				'fixed bottom-0 top-[15%] z-30 max-h-[85vh] transition-all duration-200 ease-in-out md:left-6 md:top-auto md:z-50',
 				state === 'collapsed' ? 'md:left-24' : 'md:left-[16.3rem]'
 			)}
 		>
