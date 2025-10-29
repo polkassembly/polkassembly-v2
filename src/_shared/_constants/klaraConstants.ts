@@ -5,3 +5,5 @@
 export const KLARA_QA_TABLE = 'klara_qa_prod';
 export const KLARA_FEEDBACK_TABLE = 'klara_feedback_prod';
 export const KLARA_CONVERSATION_HISTORY_LIMIT = 10;
+
+export const KLARA_POSTGRES_DATABASE = 'onchain-data';

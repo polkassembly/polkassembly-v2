@@ -6,7 +6,7 @@ import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { pgTable, serial, text, timestamp, integer, varchar, index } from 'drizzle-orm/pg-core';
 import { desc, sql } from 'drizzle-orm';
 import { Pool } from 'pg';
-import { KLARA_QA_TABLE, KLARA_FEEDBACK_TABLE } from '@/_shared/_constants/klaraConstants';
+import { KLARA_QA_TABLE, KLARA_FEEDBACK_TABLE, KLARA_POSTGRES_DATABASE } from '@/_shared/_constants/klaraConstants';
 
 // Define the Klara QA schema
 const klaraQaDevColumns = {
@@ -81,7 +81,7 @@ function getPool(): Pool {
 		pool = new Pool({
 			host: process.env.KLARA_POSTGRES_HOST || 'localhost',
 			port: Number.parseInt(process.env.KLARA_POSTGRES_PORT || '5432', 10),
-			database: process.env.KLARA_POSTGRES_DATABASE || 'polkassembly',
+			database: KLARA_POSTGRES_DATABASE || 'polkassembly',
 			user: process.env.KLARA_POSTGRES_USER || 'postgres',
 			password: process.env.KLARA_POSTGRES_PASSWORD || '',
 			ssl:
