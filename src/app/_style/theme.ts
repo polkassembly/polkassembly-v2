@@ -185,7 +185,13 @@ export const THEME_COLORS = {
 		diff_removed_bg: '#FFD6D9',
 		diff_removed_text: '#C53030',
 		empty_bar_bg: '#F3F3F3',
-		tooltip_trigger_yellow: '#FEC021'
+		tooltip_trigger_yellow: '#FEC021',
+		klara_user_msg_bg: '#3B47DF',
+		klara_ai_msg_bg: '#D2D8E04D',
+		klara_active_chat_border: '#3473FFD1',
+		klara_active_chat_bg: '#F1F5FF',
+		klara_stats_bg: '#EAE4FA',
+		klara_stats_text: '#5421E5'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -369,6 +375,12 @@ export const THEME_COLORS = {
 		diff_removed_bg: '#4A1E1E',
 		diff_removed_text: '#FC8181',
 		empty_bar_bg: '#2A2A2A',
-		tooltip_trigger_yellow: '#FEC021'
+		tooltip_trigger_yellow: '#FEC021',
+		klara_user_msg_bg: '#3B47DF',
+		klara_ai_msg_bg: '#D2D8E04D',
+		klara_active_chat_border: '#3473FFD1',
+		klara_active_chat_bg: '#F1F5FF',
+		klara_stats_bg: '#EAE4FA',
+		klara_stats_text: '#5421E5'
 	}
 };

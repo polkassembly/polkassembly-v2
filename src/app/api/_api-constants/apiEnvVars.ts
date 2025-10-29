@@ -22,9 +22,12 @@ export const {
 	VERIFICATION_CALLBACK_URL = '',
 	TWITTER_CONSUMER_API_KEY = '',
 	TWITTER_CONSUMER_API_SECRET_KEY = '',
-	ALGOLIA_WRITE_API_KEY = ''
+	ALGOLIA_WRITE_API_KEY = '',
+	KLARA_API_BASE_URL = '',
+	KLARA_AI_TOKEN = ''
 } = process.env;
 
 export const IS_CACHE_ENABLED = process.env.IS_CACHE_ENABLED === 'true';
 export const IS_AI_ENABLED = process.env.IS_AI_ENABLED === 'true';
 export const IS_NOTIFICATION_SERVICE_ENABLED = process.env.IS_NOTIFICATION_SERVICE_ENABLED === 'true';
+export const KLARA_CONVERSATION_HISTORY_LIMIT = Number.parseInt(process.env.KLARA_CONVERSATION_HISTORY_LIMIT || '5', 10);

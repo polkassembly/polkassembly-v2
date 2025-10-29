@@ -9,6 +9,7 @@ import CustomSidebarTrigger from './AppSidebar/CustomSidebarTrigger';
 import Footer from './Footer/Footer';
 import AppSidebar from './AppSidebar/AppSidebar';
 import SuccessModal from '../SuccessModal/SuccessModal';
+import ChatPopup from '../Klara/ChatPopup';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
 	return (
@@ -18,6 +19,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 			<CustomSidebarTrigger />
 
 			<SuccessModal />
+
+			<ChatPopup />
 
 			<SidebarInset>
 				<Navbar />

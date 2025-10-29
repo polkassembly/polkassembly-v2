@@ -9,6 +9,8 @@ import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMet
 import { ClientError } from '../_client-utils/clientError';
 import Overview from './Components/Overview';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
+import { getReferrerFromHeaders } from '../../_shared/_utils/getReferrerFromHeaders';
+import KlaraAutoOpen from '../_shared-components/Klara/KlaraAutoOpen';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
@@ -25,6 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 async function OverviewPage() {
 	const { allTracks, treasuryStats } = await NextApiClientService.fetchOverviewData();
+	const referer = await getReferrerFromHeaders();
 
 	if (allTracks.error || !allTracks.data) {
 		throw new ClientError(allTracks.error?.message || 'Failed to fetch data');
@@ -36,6 +39,7 @@ async function OverviewPage() {
 				allTracksData={allTracks.data}
 				treasuryStatsData={treasuryStats.error ? [] : treasuryStats.data || []}
 			/>
+			<KlaraAutoOpen referer={referer} />
 		</div>
 	);
 }

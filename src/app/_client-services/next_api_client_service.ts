@@ -61,7 +61,9 @@ import {
 	IGovAnalyticsReferendumOutcome,
 	IRawTurnoutData,
 	IGovAnalyticsDelegationStats,
-	IGovAnalyticsCategoryCounts
+	IGovAnalyticsCategoryCounts,
+	IConversationHistory,
+	IConversationMessage
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -156,7 +158,12 @@ enum EApiRoute {
 	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
 	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES',
 	GET_GOV_ANALYTICS = 'GET_GOV_ANALYTICS',
-	GET_TRACK_COUNTS = 'GET_TRACK_COUNTS'
+	GET_TRACK_COUNTS = 'GET_TRACK_COUNTS',
+	GET_CONVERSATION_HISTORY = 'GET_CONVERSATION_HISTORY',
+	GET_CONVERSATION_MESSAGES = 'GET_CONVERSATION_MESSAGES',
+	GET_KLARA_STATS = 'GET_KLARA_STATS',
+	KLARA_SEND_FEEDBACK = 'KLARA_SEND_FEEDBACK',
+	KLARA_SEND_MESSAGE = 'KLARA_SEND_MESSAGE'
 }
 
 export class NextApiClientService {
@@ -385,6 +392,17 @@ export class NextApiClientService {
 				method = 'DELETE';
 				break;
 
+			case EApiRoute.GET_CONVERSATION_HISTORY:
+			case EApiRoute.GET_CONVERSATION_MESSAGES:
+			case EApiRoute.GET_KLARA_STATS:
+				path = '/klara';
+				break;
+			case EApiRoute.KLARA_SEND_FEEDBACK:
+			case EApiRoute.KLARA_SEND_MESSAGE:
+				path = '/klara';
+				method = 'POST';
+				break;
+
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
 		}
@@ -454,6 +472,40 @@ export class NextApiClientService {
 			return { data: resJSON as T, error: null };
 		}
 		return { data: null, error: resJSON as IErrorResponse };
+	}
+
+	private static async nextApiClientFetchStream({
+		url,
+		method,
+		data,
+		skipCache = false,
+		signal
+	}: {
+		url: URL;
+		method: Method;
+		data?: Record<string, unknown>;
+		skipCache?: boolean;
+		signal?: AbortSignal;
+	}): Promise<Response> {
+		const currentNetwork = await this.getCurrentNetwork();
+
+		// Detect if we're in an iframe and specifically from Mimir
+		const isMimir = await isMimirDetected();
+
+		return fetch(url, {
+			body: JSON.stringify(data),
+			credentials: 'include',
+			headers: {
+				...(!global.window ? await getCookieHeadersServer() : {}),
+				...(isMimir ? { 'x-iframe-context': 'mimir' } : {}),
+				[EHttpHeaderKey.CONTENT_TYPE]: 'application/json',
+				[EHttpHeaderKey.API_KEY]: getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
+				[EHttpHeaderKey.NETWORK]: currentNetwork,
+				[EHttpHeaderKey.SKIP_CACHE]: skipCache.toString()
+			},
+			method,
+			signal
+		});
 	}
 
 	// auth
@@ -1347,6 +1399,79 @@ export class NextApiClientService {
 		}>({
 			method,
 			url
+		});
+	}
+
+	static async getConversationHistory({ userId, limit }: { userId: string; limit: number }) {
+		const queryParams = new URLSearchParams({
+			userId,
+			limit: limit?.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CONVERSATION_HISTORY, routeSegments: ['conversations'], queryParams });
+		return this.nextApiClientFetch<IConversationHistory[]>({ url, method });
+	}
+
+	static async getConversationMessages({ conversationId }: { conversationId: string }) {
+		const queryParams = new URLSearchParams({
+			conversationId
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CONVERSATION_MESSAGES, routeSegments: ['messages'], queryParams });
+		return this.nextApiClientFetch<IConversationMessage[]>({ url, method });
+	}
+
+	static async getKlaraStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_KLARA_STATS, routeSegments: ['stats'] });
+		return this.nextApiClientFetch<{ totalUsers: number; totalConversations: number }>({ url, method });
+	}
+
+	static async klaraSendMessage({ message, userId, conversationId, signal }: { message: string; userId: string; conversationId: string; signal: AbortSignal }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.KLARA_SEND_MESSAGE, routeSegments: ['send-message'] });
+
+		return this.nextApiClientFetchStream({ url, method, signal, data: { message, userId, conversationId } });
+	}
+
+	static async submitKlaraFeedback({
+		firstName,
+		lastName,
+		email,
+		feedbackText,
+		userId,
+		conversationId,
+		messageId,
+		rating,
+		feedbackType,
+		queryText,
+		responseText
+	}: {
+		firstName: string;
+		lastName: string;
+		email: string;
+		feedbackText: string;
+		userId: string;
+		conversationId: string;
+		messageId: string;
+		rating: number;
+		feedbackType: string;
+		queryText: string;
+		responseText: string;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.KLARA_SEND_FEEDBACK, routeSegments: ['feedback'] });
+		return this.nextApiClientFetch<{ message: string }>({
+			url,
+			method,
+			data: {
+				firstName,
+				lastName,
+				email,
+				feedbackText,
+				userId,
+				conversationId,
+				messageId,
+				rating,
+				feedbackType,
+				queryText,
+				responseText
+			}
 		});
 	}
 }
