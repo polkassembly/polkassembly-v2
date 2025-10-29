@@ -34,7 +34,6 @@ import RPCSwitchDropdown from '../RpcSwitch/RPCSwitchDropdown';
 import PaLogo from '../PaLogo';
 import ThemeToggleButton from '../../ThemeToggleButton';
 import AnnouncementBanner from './AnnouncementBanner';
-import { useMobileMenu } from '../MobileMenuContext';
 
 const Search = dynamic(() => import('../Search/Search'), { ssr: false });
 
@@ -51,7 +50,6 @@ function Navbar() {
 	const t = useTranslations();
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 	const [isModalOpen, setModalOpen] = useState(false);
-	const { setIsNavbarMenuOpen } = useMobileMenu();
 
 	const network = getCurrentNetwork();
 
@@ -62,12 +60,10 @@ function Navbar() {
 
 	const handleModalOpen = () => {
 		document.body.classList.add('no-scroll');
-		setIsNavbarMenuOpen(true);
 	};
 
 	const handleModalClose = () => {
 		document.body.classList.remove('no-scroll');
-		setIsNavbarMenuOpen(false);
 	};
 
 	const closeModal = () => {

@@ -13,7 +13,6 @@ import { AbstractIntlMessages, NextIntlClientProvider } from 'next-intl';
 import { getTimeZoneForLocale } from '@/_shared/_utils/getTimeZoneForLocale';
 import { SidebarProvider } from './Sidebar/Sidebar';
 import { ToastProviderWrapper } from './Toaster/ToastProviderWrapper';
-import { MobileMenuProvider } from './AppLayout/MobileMenuContext';
 
 const queryClient = new QueryClient();
 
@@ -42,9 +41,7 @@ export function Providers({
 						themes={[ETheme.LIGHT, ETheme.DARK]}
 						enableSystem={false}
 					>
-						<MobileMenuProvider>
-							<SidebarProvider>{children}</SidebarProvider>
-						</MobileMenuProvider>
+						<SidebarProvider>{children}</SidebarProvider>
 						<ToastProviderWrapper />
 					</ThemeProvider>
 				</QueryClientProvider>
