@@ -5,59 +5,37 @@ steps:
   # Build the container image with all required secrets as build arguments
   - name: 'gcr.io/cloud-builders/docker'
     id: Build
+    entrypoint: 'bash'
     args:
-      - 'build'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_APP_ENV=$$NEXT_PUBLIC_APP_ENV'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_DEFAULT_NETWORK=$$NEXT_PUBLIC_DEFAULT_NETWORK'
-      - '--build-arg'
-      - 'FIREBASE_SERVICE_ACC_CONFIG=$$FIREBASE_SERVICE_ACC_CONFIG'
-      - '--build-arg'
-      - 'REDIS_URL=$$REDIS_URL'
-      - '--build-arg'
-      - 'ACCESS_TOKEN_PRIVATE_KEY=$$ACCESS_TOKEN_PRIVATE_KEY'
-      - '--build-arg'
-      - 'ACCESS_TOKEN_PUBLIC_KEY=$$ACCESS_TOKEN_PUBLIC_KEY'
-      - '--build-arg'
-      - 'ACCESS_TOKEN_PASSPHRASE=$$ACCESS_TOKEN_PASSPHRASE'
-      - '--build-arg'
-      - 'REFRESH_TOKEN_PRIVATE_KEY=$$REFRESH_TOKEN_PRIVATE_KEY'
-      - '--build-arg'
-      - 'REFRESH_TOKEN_PUBLIC_KEY=$$REFRESH_TOKEN_PUBLIC_KEY'
-      - '--build-arg'
-      - 'REFRESH_TOKEN_PASSPHRASE=$$REFRESH_TOKEN_PASSPHRASE'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=$$NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_ALGOLIA_APP_ID=$$NEXT_PUBLIC_ALGOLIA_APP_ID'
-      - '--build-arg'
-      - 'SUBSCAN_API_KEY=$$SUBSCAN_API_KEY'
-      - '--build-arg'
-      - 'IS_CACHE_ENABLED=$$IS_CACHE_ENABLED'
-      - '--build-arg'
-      - 'IS_AI_ENABLED=$$IS_AI_ENABLED'
-      - '--build-arg'
-      - 'IS_NOTIFICATION_SERVICE_ENABLED=$$IS_NOTIFICATION_SERVICE_ENABLED'
-      - '--build-arg'
-      - 'AI_SERVICE_URL=$$AI_SERVICE_URL'
-      - '--build-arg'
-      - 'TOOLS_PASSPHRASE=$$TOOLS_PASSPHRASE'
-      - '--build-arg'
-      - 'NOTIFICATION_ENGINE_API_KEY=$$NOTIFICATION_ENGINE_API_KEY'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_IMBB_KEY=$$NEXT_PUBLIC_IMBB_KEY'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_POLKASSEMBLY_API_KEY=$$NEXT_PUBLIC_POLKASSEMBLY_API_KEY'
-      - '--build-arg'
-      - 'ALGOLIA_WRITE_API_KEY=$$ALGOLIA_WRITE_API_KEY'
-      - '--build-arg'
-      - 'NEXT_PUBLIC_GA_ID=$$NEXT_PUBLIC_GA_ID'
-      - '-t'
-      - 'gcr.io/$PROJECT_ID/polkassembly-v2-next-app:$COMMIT_SHA'
-      - '-t'
-      - 'gcr.io/$PROJECT_ID/polkassembly-v2-next-app:latest'
-      - '.'
+      - '-c'
+      - |
+        docker build \
+          --build-arg NEXT_PUBLIC_APP_ENV="$$NEXT_PUBLIC_APP_ENV" \
+          --build-arg NEXT_PUBLIC_DEFAULT_NETWORK="$$NEXT_PUBLIC_DEFAULT_NETWORK" \
+          --build-arg FIREBASE_SERVICE_ACC_CONFIG="$$FIREBASE_SERVICE_ACC_CONFIG" \
+          --build-arg REDIS_URL="$$REDIS_URL" \
+          --build-arg ACCESS_TOKEN_PRIVATE_KEY="$$ACCESS_TOKEN_PRIVATE_KEY" \
+          --build-arg ACCESS_TOKEN_PUBLIC_KEY="$$ACCESS_TOKEN_PUBLIC_KEY" \
+          --build-arg ACCESS_TOKEN_PASSPHRASE="$$ACCESS_TOKEN_PASSPHRASE" \
+          --build-arg REFRESH_TOKEN_PRIVATE_KEY="$$REFRESH_TOKEN_PRIVATE_KEY" \
+          --build-arg REFRESH_TOKEN_PUBLIC_KEY="$$REFRESH_TOKEN_PUBLIC_KEY" \
+          --build-arg REFRESH_TOKEN_PASSPHRASE="$$REFRESH_TOKEN_PASSPHRASE" \
+          --build-arg NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY="$$NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY" \
+          --build-arg NEXT_PUBLIC_ALGOLIA_APP_ID="$$NEXT_PUBLIC_ALGOLIA_APP_ID" \
+          --build-arg SUBSCAN_API_KEY="$$SUBSCAN_API_KEY" \
+          --build-arg IS_CACHE_ENABLED="$$IS_CACHE_ENABLED" \
+          --build-arg IS_AI_ENABLED="$$IS_AI_ENABLED" \
+          --build-arg IS_NOTIFICATION_SERVICE_ENABLED="$$IS_NOTIFICATION_SERVICE_ENABLED" \
+          --build-arg AI_SERVICE_URL="$$AI_SERVICE_URL" \
+          --build-arg TOOLS_PASSPHRASE="$$TOOLS_PASSPHRASE" \
+          --build-arg NOTIFICATION_ENGINE_API_KEY="$$NOTIFICATION_ENGINE_API_KEY" \
+          --build-arg NEXT_PUBLIC_IMBB_KEY="$$NEXT_PUBLIC_IMBB_KEY" \
+          --build-arg NEXT_PUBLIC_POLKASSEMBLY_API_KEY="$$NEXT_PUBLIC_POLKASSEMBLY_API_KEY" \
+          --build-arg ALGOLIA_WRITE_API_KEY="$$ALGOLIA_WRITE_API_KEY" \
+          --build-arg NEXT_PUBLIC_GA_ID="$$NEXT_PUBLIC_GA_ID" \
+          -t gcr.io/$PROJECT_ID/polkassembly-v2-next-app:$COMMIT_SHA \
+          -t gcr.io/$PROJECT_ID/polkassembly-v2-next-app:latest \
+          .
     secretEnv:
       - 'NEXT_PUBLIC_APP_ENV'
       - 'NEXT_PUBLIC_DEFAULT_NETWORK'
