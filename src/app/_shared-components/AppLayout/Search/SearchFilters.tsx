@@ -133,7 +133,7 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 
 	return (
 		<div>
-			<div className='mt-3 flex flex-wrap justify-between gap-6'>
+			<div className='mt-3 flex flex-wrap justify-between gap-2'>
 				<RadioGroup
 					value={activeIndex || ESearchType.POSTS}
 					onValueChange={(e) => onChange(e as ESearchType)}
