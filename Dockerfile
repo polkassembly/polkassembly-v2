@@ -55,6 +55,9 @@ ENV NEXT_PUBLIC_POLKASSEMBLY_API_KEY=$NEXT_PUBLIC_POLKASSEMBLY_API_KEY
 ENV ALGOLIA_WRITE_API_KEY=$ALGOLIA_WRITE_API_KEY
 ENV NEXT_PUBLIC_GA_ID=$NEXT_PUBLIC_GA_ID
 
+# Increase Node.js memory limit for the build step to prevent OOM errors
+ENV NODE_OPTIONS=--max_old_space_size=4096
+
 # 4. Install dependencies
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --production=false
