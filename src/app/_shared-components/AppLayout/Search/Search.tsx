@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { liteClient as algoliasearch } from 'algoliasearch/lite';
 import { Configure, InstantSearch } from 'react-instantsearch';
 import { useState, memo } from 'react';
-import { ESearchType } from '@/_shared/types';
+import { ESearchProposalType, ESearchType } from '@/_shared/types';
 import { searchEnabledNetworks } from '@/_shared/_constants/searchConstants';
 import { useSearchConfig } from '@/hooks/useSearchConfig';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -51,14 +51,36 @@ const searchClient = {
 function Search() {
 	const [activeIndex, setActiveIndex] = useState<ESearchType>(ESearchType.POSTS);
 	const [searchContext, setSearchContext] = useState<string | null>(null);
+	const [proposalTypeFilter, setProposalTypeFilter] = useState<ESearchProposalType>(ESearchProposalType.REFERENDA);
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const network = getCurrentNetwork();
 
-	const { networkFilterQuery, postFilterQuery, indexName } = useSearchConfig({ network, activeIndex: searchContext && searchContext.length > 2 ? activeIndex : null });
+	const { postFilterQuery, indexName } = useSearchConfig({
+		network,
+		activeIndex: searchContext && searchContext.length > 2 ? activeIndex : null,
+		proposalTypeFilter
+	});
 
-	const handleTypeChange = (type: ESearchType) => setActiveIndex(type);
+	const handleTypeChange = (type: ESearchType) => {
+		setActiveIndex(type);
+		if (type !== ESearchType.POSTS) {
+			setProposalTypeFilter(ESearchProposalType.REFERENDA);
+		}
+	};
+	const handleDialogOpenChange = (open: boolean) => {
+		setIsDialogOpen(open);
+		if (!open) {
+			setSearchContext(null);
+			setProposalTypeFilter(ESearchProposalType.REFERENDA);
+			setActiveIndex(ESearchType.POSTS);
+		}
+	};
 	const t = useTranslations('Search');
 	return (
-		<Dialog>
+		<Dialog
+			open={isDialogOpen}
+			onOpenChange={handleDialogOpenChange}
+		>
 			<DialogTrigger
 				className='text-text_primary'
 				asChild
@@ -82,6 +104,7 @@ function Search() {
 
 				{searchEnabledNetworks.includes(network.toUpperCase()) ? (
 					<InstantSearch
+						key={isDialogOpen ? 'open' : 'closed'}
 						searchClient={searchClient}
 						indexName={indexName}
 						insights
@@ -89,7 +112,7 @@ function Search() {
 						<Configure
 							hitsPerPage={10}
 							distinct
-							filters={`${networkFilterQuery}${postFilterQuery}`.trim()}
+							filters={postFilterQuery}
 						/>
 
 						<div>
@@ -97,11 +120,16 @@ function Search() {
 							<SearchFilters
 								activeIndex={activeIndex}
 								onChange={handleTypeChange}
+								proposalTypeFilter={proposalTypeFilter}
+								onProposalTypeChange={setProposalTypeFilter}
 							/>
 						</div>
 
 						<div className='w-full'>
-							<SearchResults activeIndex={activeIndex} />
+							<SearchResults
+								activeIndex={activeIndex}
+								proposalTypeFilter={proposalTypeFilter}
+							/>
 						</div>
 					</InstantSearch>
 				) : (

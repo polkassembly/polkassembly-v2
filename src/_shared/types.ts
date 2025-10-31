@@ -1685,3 +1685,9 @@ export interface IChatResponse {
 	isNewConversation?: boolean;
 	conversationId?: string;
 }
+
+export enum ESearchProposalType {
+	REFERENDA = 'referenda',
+	BOUNTIES = 'bounties',
+	OTHER = 'other'
+}

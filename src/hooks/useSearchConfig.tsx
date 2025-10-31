@@ -3,9 +3,17 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useMemo } from 'react';
-import { ESearchType } from '@/_shared/types';
+import { ESearchProposalType, ESearchType } from '@/_shared/types';
 
-export const useSearchConfig = ({ network, activeIndex }: { network: string; activeIndex: ESearchType | null }) => {
+export const useSearchConfig = ({
+	network,
+	activeIndex,
+	proposalTypeFilter = ESearchProposalType.REFERENDA
+}: {
+	network: string;
+	activeIndex: ESearchType | null;
+	proposalTypeFilter?: ESearchProposalType;
+}) => {
 	const networkFilterQuery = useMemo(() => {
 		if (!activeIndex || activeIndex === ESearchType.USERS) return '';
 
@@ -23,7 +31,13 @@ export const useSearchConfig = ({ network, activeIndex }: { network: string; act
 
 		switch (activeIndex) {
 			case ESearchType.POSTS:
-				filters.push('proposalType:ReferendumV2');
+				if (proposalTypeFilter === ESearchProposalType.REFERENDA) {
+					filters.push('proposalType:ReferendumV2');
+				} else if (proposalTypeFilter === ESearchProposalType.BOUNTIES) {
+					filters.push('(proposalType:Bounty OR proposalType:ChildBounty)');
+				} else if (proposalTypeFilter === ESearchProposalType.OTHER) {
+					filters.push('(NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS AND NOT proposalType:ReferendumV2 AND NOT proposalType:Bounty AND NOT proposalType:ChildBounty)');
+				}
 				break;
 			case ESearchType.DISCUSSIONS:
 				filters.push('(proposalType:DISCUSSION OR proposalType:GRANTS)');
@@ -33,7 +47,7 @@ export const useSearchConfig = ({ network, activeIndex }: { network: string; act
 		}
 
 		return filters.join(' AND ');
-	}, [activeIndex, networkFilterQuery]);
+	}, [activeIndex, networkFilterQuery, proposalTypeFilter]);
 
 	const indexName = useMemo(() => {
 		if (activeIndex === ESearchType.USERS) return 'polkassembly_v2_users';
