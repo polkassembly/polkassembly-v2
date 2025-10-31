@@ -15,16 +15,24 @@ export const useSearchConfig = ({ network, activeIndex }: { network: string; act
 	const postFilterQuery = useMemo(() => {
 		if (!activeIndex || activeIndex === ESearchType.USERS) return '';
 
-		const baseFilter = networkFilterQuery ? ' AND ' : '';
+		const filters: string[] = [];
+
+		if (networkFilterQuery) {
+			filters.push(networkFilterQuery);
+		}
 
 		switch (activeIndex) {
 			case ESearchType.POSTS:
-				return `${baseFilter}(NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS)`;
+				filters.push('proposalType:ReferendumV2');
+				break;
 			case ESearchType.DISCUSSIONS:
-				return `${baseFilter}(proposalType:DISCUSSION OR proposalType:GRANTS)`;
+				filters.push('(proposalType:DISCUSSION OR proposalType:GRANTS)');
+				break;
 			default:
-				return '';
+				break;
 		}
+
+		return filters.join(' AND ');
 	}, [activeIndex, networkFilterQuery]);
 
 	const indexName = useMemo(() => {

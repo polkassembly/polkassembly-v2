@@ -274,14 +274,14 @@ function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 							<div className='h-full overflow-y-auto pr-2'>
 								{activeIndex === ESearchType.POSTS ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters={`NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS AND network:${network}`} />
+										<Configure filters={`network:${network} AND proposalType:ReferendumV2`} />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>
 									</Index>
 								) : activeIndex === ESearchType.DISCUSSIONS ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters={`proposalType:DISCUSSION OR proposalType:GRANTS AND network:${network}`} />
+										<Configure filters={`network:${network} AND (proposalType:DISCUSSION OR proposalType:GRANTS)`} />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>
