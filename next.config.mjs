@@ -15,6 +15,8 @@ const NETWORKS = ['polkadot', 'kusama'];
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+	// Enable standalone output for Docker deployments
+	output: 'standalone',
 	async headers() {
 		return [
 			{
@@ -111,6 +113,11 @@ const nextConfig = {
 				pathname: '/**'
 			}
 		]
+	},
+	// Experimental features for better performance
+	experimental: {
+		// Optimize for both Vercel and Cloud Run
+		optimizePackageImports: ['@polkadot/api', '@polkadot/util', 'firebase-admin']
 	}
 };
 
