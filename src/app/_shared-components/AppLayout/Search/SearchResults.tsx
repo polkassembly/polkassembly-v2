@@ -19,6 +19,7 @@ import { AiOutlineDislike } from '@react-icons/all-files/ai/AiOutlineDislike';
 import { AiOutlineLike } from '@react-icons/all-files/ai/AiOutlineLike';
 import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { useSearchConfig } from '@/hooks/useSearchConfig';
 import PaLogo from '../PaLogo';
 import { Separator } from '../../Separator';
 import Address from '../../Profile/Address/Address';
@@ -200,6 +201,12 @@ function SearchResults({ activeIndex, proposalTypeFilter = ESearchType.POSTS }: 
 	const hasNoResults = results?.nbHits === 0 && query.length > 2;
 	const network = getCurrentNetwork();
 
+	const { postFilterQuery } = useSearchConfig({
+		network,
+		activeIndex,
+		proposalTypeFilter
+	});
+
 	return (
 		<div>
 			<div className='h-[50vh] overflow-hidden'>
@@ -274,22 +281,14 @@ function SearchResults({ activeIndex, proposalTypeFilter = ESearchType.POSTS }: 
 							<div className='h-full overflow-y-auto pr-2'>
 								{activeIndex === ESearchType.POSTS || activeIndex === ESearchType.BOUNTIES || activeIndex === ESearchType.OTHER ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure
-											filters={
-												proposalTypeFilter === ESearchType.POSTS
-													? `network:${network} AND (proposalType:Referendum OR proposalType:ReferendumV2)`
-													: proposalTypeFilter === ESearchType.BOUNTIES
-														? `network:${network} AND (proposalType:Bounty OR proposalType:ChildBounty)`
-														: `network:${network} AND (NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS AND NOT proposalType:Referendum AND NOT proposalType:ReferendumV2 AND NOT proposalType:Bounty AND NOT proposalType:ChildBounty)`
-											}
-										/>
+										<Configure filters={postFilterQuery} />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>
 									</Index>
 								) : activeIndex === ESearchType.DISCUSSIONS ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters={`network:${network} AND (proposalType:DISCUSSION OR proposalType:GRANTS)`} />
+										<Configure filters={postFilterQuery} />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>

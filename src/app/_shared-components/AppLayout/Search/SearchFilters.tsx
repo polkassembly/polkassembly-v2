@@ -80,10 +80,10 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 
 	const options = [
 		{ value: ESearchType.POSTS, label: t('referenda') },
+		{ value: ESearchType.DISCUSSIONS, label: t('discussions') },
 		{ value: ESearchType.BOUNTIES, label: t('bounties') },
 		{ value: ESearchType.OTHER, label: t('other') },
-		{ value: ESearchType.USERS, label: t('users') },
-		{ value: ESearchType.DISCUSSIONS, label: t('discussions') }
+		{ value: ESearchType.USERS, label: t('users') }
 	];
 
 	const trackItemsList = useMemo(() => {
