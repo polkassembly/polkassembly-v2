@@ -40,8 +40,6 @@ steps:
       - '--build-arg'
       - 'IS_NOTIFICATION_SERVICE_ENABLED=$$IS_NOTIFICATION_SERVICE_ENABLED'
       - '--build-arg'
-      - 'IS_SUBSCAN_ENABLED=$$IS_SUBSCAN_ENABLED'
-      - '--build-arg'
       - 'AI_SERVICE_URL=$$AI_SERVICE_URL'
       - '--build-arg'
       - 'TOOLS_PASSPHRASE=$$TOOLS_PASSPHRASE'
@@ -77,7 +75,6 @@ steps:
       - 'IS_CACHE_ENABLED'
       - 'IS_AI_ENABLED'
       - 'IS_NOTIFICATION_SERVICE_ENABLED'
-      - 'IS_SUBSCAN_ENABLED'
       - 'AI_SERVICE_URL'
       - 'TOOLS_PASSPHRASE'
       - 'NOTIFICATION_ENGINE_API_KEY'
@@ -146,8 +143,6 @@ availableSecrets:
       env: 'IS_AI_ENABLED'
     - versionName: projects/$PROJECT_ID/secrets/IS_NOTIFICATION_SERVICE_ENABLED/versions/latest
       env: 'IS_NOTIFICATION_SERVICE_ENABLED'
-    - versionName: projects/$PROJECT_ID/secrets/IS_SUBSCAN_ENABLED/versions/latest
-      env: 'IS_SUBSCAN_ENABLED'
     - versionName: projects/$PROJECT_ID/secrets/AI_SERVICE_URL/versions/latest
       env: 'AI_SERVICE_URL'
     - versionName: projects/$PROJECT_ID/secrets/TOOLS_PASSPHRASE/versions/latest
