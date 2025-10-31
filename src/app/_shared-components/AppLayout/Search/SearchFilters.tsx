@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from '@ui/RadioGroup/RadioGroup';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
-import { ESearchProposalType, ESearchType } from '@/_shared/types';
+import { ESearchType } from '@/_shared/types';
 import { parseCamelCase } from '@/app/_client-utils/parseCamelCase';
 import styles from './Search.module.scss';
 import { Checkbox } from '../../Checkbox';
@@ -18,8 +18,6 @@ import { Button } from '../../Button';
 interface SearchFiltersProps {
 	activeIndex: ESearchType;
 	onChange: (index: ESearchType) => void;
-	proposalTypeFilter: ESearchProposalType;
-	onProposalTypeChange: (filter: ESearchProposalType) => void;
 }
 
 interface RefinementItem {
@@ -29,7 +27,7 @@ interface RefinementItem {
 	isRefined: boolean;
 }
 
-export default function SearchFilters({ activeIndex, onChange, proposalTypeFilter, onProposalTypeChange }: SearchFiltersProps) {
+export default function SearchFilters({ activeIndex, onChange }: SearchFiltersProps) {
 	const t = useTranslations('Search');
 
 	const now = dayjs.utc();
@@ -82,6 +80,8 @@ export default function SearchFilters({ activeIndex, onChange, proposalTypeFilte
 
 	const options = [
 		{ value: ESearchType.POSTS, label: t('referenda') },
+		{ value: ESearchType.BOUNTIES, label: t('bounties') },
+		{ value: ESearchType.OTHER, label: t('other') },
 		{ value: ESearchType.USERS, label: t('users') },
 		{ value: ESearchType.DISCUSSIONS, label: t('discussions') }
 	];
@@ -133,179 +133,130 @@ export default function SearchFilters({ activeIndex, onChange, proposalTypeFilte
 
 	return (
 		<div>
-			<div className='flex flex-col gap-4'>
-				<div className='mt-3 flex flex-wrap justify-between gap-6'>
-					<RadioGroup
-						value={activeIndex || ESearchType.POSTS}
-						onValueChange={(e) => onChange(e as ESearchType)}
-						className='flex flex-row gap-3'
-						disabled={results.query.length < 3}
-					>
-						{options.map((option) => {
-							return (
-								<label
-									key={option.value}
-									htmlFor={option.value}
-									className={`${styles.radio_label} ${activeIndex === option.value ? styles.radio_label_active : ''}`}
-								>
-									<RadioGroupItem
-										value={option.value}
-										id={option.value}
-										className='h-4 w-4'
-									/>
-									<span className='text-xs text-text_primary'>{option.label}</span>
-								</label>
-							);
-						})}
-					</RadioGroup>
-					<div>
-						{(activeIndex === ESearchType.POSTS || activeIndex === ESearchType.DISCUSSIONS) && results.nbHits > 0 && (
-							<div className='flex items-center gap-x-2 md:gap-x-4'>
+			<div className='mt-3 flex flex-wrap justify-between gap-6'>
+				<RadioGroup
+					value={activeIndex || ESearchType.POSTS}
+					onValueChange={(e) => onChange(e as ESearchType)}
+					className='flex flex-row gap-3'
+					disabled={results.query.length < 3}
+				>
+					{options.map((option) => {
+						return (
+							<label
+								key={option.value}
+								htmlFor={option.value}
+								className={`${styles.radio_label} ${activeIndex === option.value ? styles.radio_label_active : ''}`}
+							>
+								<RadioGroupItem
+									value={option.value}
+									id={option.value}
+									className='h-4 w-4'
+								/>
+								<span className='text-xs text-text_primary'>{option.label}</span>
+							</label>
+						);
+					})}
+				</RadioGroup>
+				{(activeIndex === ESearchType.POSTS || activeIndex === ESearchType.BOUNTIES || activeIndex === ESearchType.OTHER || activeIndex === ESearchType.DISCUSSIONS) &&
+					results.nbHits > 0 && (
+						<div className='flex items-center gap-x-2 md:gap-x-4'>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>{t('date')}</DropdownMenuTrigger>
+								<DropdownMenuContent>
+									<div className='space-y-2'>
+										{dateItems.map((item) => (
+											<button
+												key={item.label}
+												type='button'
+												className={cn(styles.date_filter_label, item.isRefined ? styles.radio_label_active : 'whitespace-nowrap hover:bg-topic_tag_bg')}
+												onClick={() => refineDate(item.value)}
+											>
+												{item.label}
+											</button>
+										))}
+									</div>
+								</DropdownMenuContent>
+							</DropdownMenu>
+							{(activeIndex === ESearchType.POSTS || activeIndex === ESearchType.BOUNTIES || activeIndex === ESearchType.OTHER) && trackItems.length > 0 && (
 								<DropdownMenu>
-									<DropdownMenuTrigger asChild>{t('date')}</DropdownMenuTrigger>
-									<DropdownMenuContent>
-										<div className='space-y-2'>
-											{dateItems.map((item) => (
-												<button
-													key={item.label}
-													type='button'
-													className={cn(styles.date_filter_label, item.isRefined ? styles.radio_label_active : 'whitespace-nowrap hover:bg-topic_tag_bg')}
-													onClick={() => refineDate(item.value)}
+									<DropdownMenuTrigger asChild>{t('tracks')}</DropdownMenuTrigger>
+									<DropdownMenuContent className='p-2'>
+										{trackItemsList.map((item) => (
+											<div
+												key={item.value}
+												className='mb-2 flex flex-nowrap items-center gap-x-2'
+											>
+												<Checkbox
+													key={item.value}
+													id={item.value}
+													checked={item.isRefined}
+													onCheckedChange={() => refineTrack(item.value)}
+												/>
+												<label
+													htmlFor={item.value}
+													className='cursor-pointer whitespace-nowrap text-xs text-text_primary'
 												>
 													{item.label}
-												</button>
-											))}
-										</div>
+												</label>
+											</div>
+										))}
 									</DropdownMenuContent>
 								</DropdownMenu>
-								{activeIndex === ESearchType.POSTS && trackItems.length > 0 && (
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>{t('tracks')}</DropdownMenuTrigger>
-										<DropdownMenuContent className='p-2'>
-											{trackItemsList.map((item) => (
-												<div
+							)}
+							{topicItemsList.length > 0 && (
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>{t('topics')}</DropdownMenuTrigger>
+									<DropdownMenuContent className='p-2'>
+										{topicItemsList.map((item) => (
+											<div
+												key={item.value}
+												className='mb-2 flex flex-nowrap items-center gap-x-2'
+											>
+												<Checkbox
 													key={item.value}
-													className='mb-2 flex flex-nowrap items-center gap-x-2'
+													id={item.value}
+													checked={item.isRefined}
+													onCheckedChange={() => refineTopic(item.value)}
+												/>
+												<label
+													htmlFor={item.value}
+													className='cursor-pointer whitespace-nowrap text-xs text-text_primary'
 												>
-													<Checkbox
-														key={item.value}
-														id={item.value}
-														checked={item.isRefined}
-														onCheckedChange={() => refineTrack(item.value)}
-													/>
-													<label
-														htmlFor={item.value}
-														className='cursor-pointer whitespace-nowrap text-xs text-text_primary'
-													>
-														{item.label}
-													</label>
-												</div>
-											))}
-										</DropdownMenuContent>
-									</DropdownMenu>
-								)}
-								{topicItemsList.length > 0 && (
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>{t('topics')}</DropdownMenuTrigger>
-										<DropdownMenuContent className='p-2'>
-											{topicItemsList.map((item) => (
-												<div
+													{item.label}
+												</label>
+											</div>
+										))}
+									</DropdownMenuContent>
+								</DropdownMenu>
+							)}
+							{tagItemsList.length > 0 && (
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>{t('tags')}</DropdownMenuTrigger>
+									<DropdownMenuContent className='p-2'>
+										{tagItemsList.map((item) => (
+											<div
+												key={item.value}
+												className='mb-2 flex flex-nowrap items-center gap-x-2'
+											>
+												<Checkbox
 													key={item.value}
-													className='mb-2 flex flex-nowrap items-center gap-x-2'
+													id={item.value}
+													checked={item.isRefined}
+													onCheckedChange={() => refineTag(item.value)}
+												/>
+												<label
+													htmlFor={item.value}
+													className='cursor-pointer whitespace-nowrap text-xs text-text_primary'
 												>
-													<Checkbox
-														key={item.value}
-														id={item.value}
-														checked={item.isRefined}
-														onCheckedChange={() => refineTopic(item.value)}
-													/>
-													<label
-														htmlFor={item.value}
-														className='cursor-pointer whitespace-nowrap text-xs text-text_primary'
-													>
-														{item.label}
-													</label>
-												</div>
-											))}
-										</DropdownMenuContent>
-									</DropdownMenu>
-								)}
-
-								{tagItemsList.length > 0 && (
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>{t('tags')}</DropdownMenuTrigger>
-										<DropdownMenuContent className='p-2'>
-											{tagItemsList.map((item) => (
-												<div
-													key={item.value}
-													className='mb-2 flex flex-nowrap items-center gap-x-2'
-												>
-													<Checkbox
-														key={item.value}
-														id={item.value}
-														checked={item.isRefined}
-														onCheckedChange={() => refineTag(item.value)}
-													/>
-													<label
-														htmlFor={item.value}
-														className='cursor-pointer whitespace-nowrap text-xs text-text_primary'
-													>
-														{item.label}
-													</label>
-												</div>
-											))}
-										</DropdownMenuContent>
-									</DropdownMenu>
-								)}
-							</div>
-						)}
-					</div>
-				</div>
-				{activeIndex === ESearchType.POSTS && (
-					<div>
-						<p className='text-text_secondary mb-2 text-xs'>{t('proposalType')}</p>
-						<RadioGroup
-							value={proposalTypeFilter}
-							onValueChange={(e) => onProposalTypeChange(e as ESearchProposalType)}
-							className='flex flex-row gap-3'
-							disabled={results.query.length < 3}
-						>
-							<label
-								htmlFor={ESearchProposalType.REFERENDA}
-								className={`${styles.radio_label} ${proposalTypeFilter === ESearchProposalType.REFERENDA ? styles.radio_label_active : ''}`}
-							>
-								<RadioGroupItem
-									value={ESearchProposalType.REFERENDA}
-									id={ESearchProposalType.REFERENDA}
-									className='h-4 w-4'
-								/>
-								<span className='text-xs text-text_primary'>{t('referendumv2')}</span>
-							</label>
-							<label
-								htmlFor={ESearchProposalType.BOUNTIES}
-								className={`${styles.radio_label} ${proposalTypeFilter === ESearchProposalType.BOUNTIES ? styles.radio_label_active : ''}`}
-							>
-								<RadioGroupItem
-									value={ESearchProposalType.BOUNTIES}
-									id={ESearchProposalType.BOUNTIES}
-									className='h-4 w-4'
-								/>
-								<span className='text-xs text-text_primary'>{t('bounties')}</span>
-							</label>
-							<label
-								htmlFor={ESearchProposalType.OTHER}
-								className={`${styles.radio_label} ${proposalTypeFilter === ESearchProposalType.OTHER ? styles.radio_label_active : ''}`}
-							>
-								<RadioGroupItem
-									value={ESearchProposalType.OTHER}
-									id={ESearchProposalType.OTHER}
-									className='h-4 w-4'
-								/>
-								<span className='text-xs text-text_primary'>{t('other')}</span>
-							</label>
-						</RadioGroup>
-					</div>
-				)}
+													{item.label}
+												</label>
+											</div>
+										))}
+									</DropdownMenuContent>
+								</DropdownMenu>
+							)}
+						</div>
+					)}
 			</div>
 			<div className='mt-3 flex flex-wrap items-center gap-x-4'>
 				{refinedDateItems.length > 0 && (

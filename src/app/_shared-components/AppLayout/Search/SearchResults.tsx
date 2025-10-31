@@ -10,7 +10,7 @@ import userIcon from '@assets/profile/user-icon.svg';
 import { Hits, Index, useInstantSearch, useSearchBox, Configure, usePagination } from 'react-instantsearch';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Link from 'next/link';
-import { EProposalType, ESearchType, ENetwork, ESearchProposalType } from '@/_shared/types';
+import { EProposalType, ESearchType, ENetwork } from '@/_shared/types';
 import CommentIcon from '@assets/icons/Comment.svg';
 import { POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
 import { cn } from '@/lib/utils';
@@ -191,7 +191,7 @@ function UserHit({ hit }: { hit: User }) {
 }
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-function SearchResults({ activeIndex, proposalTypeFilter = ESearchProposalType.REFERENDA }: { activeIndex: ESearchType | null; proposalTypeFilter?: ESearchProposalType }) {
+function SearchResults({ activeIndex, proposalTypeFilter = ESearchType.POSTS }: { activeIndex: ESearchType | null; proposalTypeFilter?: ESearchType }) {
 	const { status, results } = useInstantSearch();
 	const { query } = useSearchBox();
 	const { currentRefinement, refine } = usePagination();
@@ -272,15 +272,15 @@ function SearchResults({ activeIndex, proposalTypeFilter = ESearchProposalType.R
 							</div>
 						) : (
 							<div className='h-full overflow-y-auto pr-2'>
-								{activeIndex === ESearchType.POSTS ? (
+								{activeIndex === ESearchType.POSTS || activeIndex === ESearchType.BOUNTIES || activeIndex === ESearchType.OTHER ? (
 									<Index indexName='polkassembly_v2_posts'>
 										<Configure
 											filters={
-												proposalTypeFilter === ESearchProposalType.REFERENDA
-													? `network:${network} AND proposalType:ReferendumV2`
-													: proposalTypeFilter === ESearchProposalType.BOUNTIES
+												proposalTypeFilter === ESearchType.POSTS
+													? `network:${network} AND (proposalType:Referendum OR proposalType:ReferendumV2)`
+													: proposalTypeFilter === ESearchType.BOUNTIES
 														? `network:${network} AND (proposalType:Bounty OR proposalType:ChildBounty)`
-														: `network:${network} AND (NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS AND NOT proposalType:ReferendumV2 AND NOT proposalType:Bounty AND NOT proposalType:ChildBounty)`
+														: `network:${network} AND (NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS AND NOT proposalType:Referendum AND NOT proposalType:ReferendumV2 AND NOT proposalType:Bounty AND NOT proposalType:ChildBounty)`
 											}
 										/>
 										<div className='space-y-4'>

@@ -1279,7 +1279,9 @@ export enum EPeriodType {
 export enum ESearchType {
 	POSTS = 'posts',
 	DISCUSSIONS = 'discussions',
-	USERS = 'users'
+	USERS = 'users',
+	BOUNTIES = 'bounties',
+	OTHER = 'other'
 }
 
 export enum ESearchDiscussionType {
@@ -1684,10 +1686,4 @@ export interface IChatResponse {
 	followUpQuestions?: string[];
 	isNewConversation?: boolean;
 	conversationId?: string;
-}
-
-export enum ESearchProposalType {
-	REFERENDA = 'referenda',
-	BOUNTIES = 'bounties',
-	OTHER = 'other'
 }
