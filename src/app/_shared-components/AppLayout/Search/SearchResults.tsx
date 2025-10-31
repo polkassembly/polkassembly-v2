@@ -19,6 +19,7 @@ import { AiOutlineDislike } from '@react-icons/all-files/ai/AiOutlineDislike';
 import { AiOutlineLike } from '@react-icons/all-files/ai/AiOutlineLike';
 import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { useSearchConfig } from '@/hooks/useSearchConfig';
 import PaLogo from '../PaLogo';
 import { Separator } from '../../Separator';
 import Address from '../../Profile/Address/Address';
@@ -191,7 +192,7 @@ function UserHit({ hit }: { hit: User }) {
 }
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
+function SearchResults({ activeIndex, proposalTypeFilter = ESearchType.POSTS }: { activeIndex: ESearchType | null; proposalTypeFilter?: ESearchType }) {
 	const { status, results } = useInstantSearch();
 	const { query } = useSearchBox();
 	const { currentRefinement, refine } = usePagination();
@@ -200,9 +201,15 @@ function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 	const hasNoResults = results?.nbHits === 0 && query.length > 2;
 	const network = getCurrentNetwork();
 
+	const { postFilterQuery } = useSearchConfig({
+		network,
+		activeIndex,
+		proposalTypeFilter
+	});
+
 	return (
 		<div>
-			<div className='h-[50vh] overflow-hidden md:h-[58vh]'>
+			<div className='h-[50vh] overflow-hidden'>
 				{isLoading ? (
 					<div className='flex h-full items-center justify-center'>
 						<Image
@@ -272,16 +279,16 @@ function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 							</div>
 						) : (
 							<div className='h-full overflow-y-auto pr-2'>
-								{activeIndex === ESearchType.POSTS ? (
+								{activeIndex === ESearchType.POSTS || activeIndex === ESearchType.BOUNTIES || activeIndex === ESearchType.OTHER ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters={`NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS AND network:${network}`} />
+										<Configure filters={postFilterQuery} />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>
 									</Index>
 								) : activeIndex === ESearchType.DISCUSSIONS ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters={`proposalType:DISCUSSION OR proposalType:GRANTS AND network:${network}`} />
+										<Configure filters={postFilterQuery} />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>

@@ -80,8 +80,10 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 
 	const options = [
 		{ value: ESearchType.POSTS, label: t('referenda') },
-		{ value: ESearchType.USERS, label: t('users') },
-		{ value: ESearchType.DISCUSSIONS, label: t('discussions') }
+		{ value: ESearchType.DISCUSSIONS, label: t('discussions') },
+		{ value: ESearchType.BOUNTIES, label: t('bounties') },
+		{ value: ESearchType.OTHER, label: t('other') },
+		{ value: ESearchType.USERS, label: t('users') }
 	];
 
 	const trackItemsList = useMemo(() => {
@@ -131,34 +133,32 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 
 	return (
 		<div>
-			<div className='mt-3 flex flex-wrap justify-between gap-6'>
-				<div>
-					<RadioGroup
-						value={activeIndex || ESearchType.POSTS}
-						onValueChange={(e) => onChange(e as ESearchType)}
-						className='flex flex-row gap-3'
-						disabled={results.query.length < 3}
-					>
-						{options.map((option) => {
-							return (
-								<label
-									key={option.value}
-									htmlFor={option.value}
-									className={`${styles.radio_label} ${activeIndex === option.value ? styles.radio_label_active : ''}`}
-								>
-									<RadioGroupItem
-										value={option.value}
-										id={option.value}
-										className='h-4 w-4'
-									/>
-									<span className='text-xs text-text_primary'>{option.label}</span>
-								</label>
-							);
-						})}
-					</RadioGroup>
-				</div>
-				<div>
-					{(activeIndex === ESearchType.POSTS || activeIndex === ESearchType.DISCUSSIONS) && results.nbHits > 0 && (
+			<div className='mt-3 flex flex-wrap justify-between gap-2'>
+				<RadioGroup
+					value={activeIndex || ESearchType.POSTS}
+					onValueChange={(e) => onChange(e as ESearchType)}
+					className='flex flex-row gap-3'
+					disabled={results.query.length < 3}
+				>
+					{options.map((option) => {
+						return (
+							<label
+								key={option.value}
+								htmlFor={option.value}
+								className={`${styles.radio_label} ${activeIndex === option.value ? styles.radio_label_active : ''}`}
+							>
+								<RadioGroupItem
+									value={option.value}
+									id={option.value}
+									className='h-4 w-4'
+								/>
+								<span className='text-xs text-text_primary'>{option.label}</span>
+							</label>
+						);
+					})}
+				</RadioGroup>
+				{(activeIndex === ESearchType.POSTS || activeIndex === ESearchType.BOUNTIES || activeIndex === ESearchType.OTHER || activeIndex === ESearchType.DISCUSSIONS) &&
+					results.nbHits > 0 && (
 						<div className='flex items-center gap-x-2 md:gap-x-4'>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>{t('date')}</DropdownMenuTrigger>
@@ -177,7 +177,7 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 									</div>
 								</DropdownMenuContent>
 							</DropdownMenu>
-							{activeIndex === ESearchType.POSTS && trackItems.length > 0 && (
+							{(activeIndex === ESearchType.POSTS || activeIndex === ESearchType.BOUNTIES || activeIndex === ESearchType.OTHER) && trackItems.length > 0 && (
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>{t('tracks')}</DropdownMenuTrigger>
 									<DropdownMenuContent className='p-2'>
@@ -229,7 +229,6 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 									</DropdownMenuContent>
 								</DropdownMenu>
 							)}
-
 							{tagItemsList.length > 0 && (
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>{t('tags')}</DropdownMenuTrigger>
@@ -258,7 +257,6 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 							)}
 						</div>
 					)}
-				</div>
 			</div>
 			<div className='mt-3 flex flex-wrap items-center gap-x-4'>
 				{refinedDateItems.length > 0 && (
