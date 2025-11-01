@@ -14,6 +14,10 @@
 	@apply text-2xl font-bold text-navbar_title;
 }
 
+.header_subtitle {
+	@apply text-sm text-text_primary;
+}
+
 .header_title_container {
 	@apply flex flex-col justify-between gap-y-4 md:flex-row md:items-center;
 }

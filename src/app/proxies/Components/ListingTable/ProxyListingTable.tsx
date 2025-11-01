@@ -8,9 +8,15 @@ import React, { useState } from 'react';
 import { IProxyRequest } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Address from '@/app/_shared-components/Profile/Address/Address';
-import { Info, ChevronDown, ChevronUp } from 'lucide-react';
+import { Info } from 'lucide-react';
+import Image from 'next/image';
+import { FaCaretDown } from '@react-icons/all-files/fa/FaCaretDown';
+import { FaCaretUp } from '@react-icons/all-files/fa/FaCaretUp';
+import TrailLine from '@assets/icons/trail-line.svg';
+import TrailLineEnd from '@assets/icons/trail-line-end.svg';
+import { SortDirection } from '@tanstack/react-table';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '../../../_shared-components/Table';
 import { PaginationWithLinks } from '../../../_shared-components/PaginationWithLinks';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../_shared-components/Tooltip';
@@ -19,10 +25,15 @@ import ProxyTypeBadge from '../../../_shared-components/ProxyTypeBadge/ProxyType
 import styles from './ListingTable.module.scss';
 
 function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyRequest[]; totalCount: number; isLoading?: boolean }) {
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const page = searchParams?.get('page') || 1;
 	const t = useTranslations('Proxies');
 	const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
+	// Get sort params from URL
+	const sortBy = searchParams?.get('sortBy');
+	const sortDirection = searchParams?.get('sortDirection') as SortDirection | null;
 
 	const toggleRow = (proxyId: string) => {
 		const newExpandedRows = new Set(expandedRows);
@@ -32,6 +43,30 @@ function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyReques
 			newExpandedRows.add(proxyId);
 		}
 		setExpandedRows(newExpandedRows);
+	};
+
+	const toggleSort = () => {
+		const newParams = new URLSearchParams(searchParams.toString());
+
+		// Simple direction cycling: null -> asc -> desc -> null
+		const nextDirection = !sortDirection ? 'asc' : sortDirection === 'asc' ? 'desc' : null;
+
+		// Update or remove sorting parameters
+		if (nextDirection) {
+			newParams.set('sortBy', 'proxies');
+			newParams.set('sortDirection', nextDirection);
+		} else {
+			newParams.delete('sortBy');
+			newParams.delete('sortDirection');
+		}
+
+		// Preserve other search parameters (if any)
+		['page', 'search', 'allSearch'].forEach((param) => {
+			const value = searchParams.get(param);
+			if (value) newParams.set(param, value);
+		});
+
+		router.push(`?${newParams.toString()}`);
 	};
 
 	if (isLoading) {
@@ -49,10 +84,11 @@ function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyReques
 		<div className='w-full'>
 			{data && data.length > 0 ? (
 				<>
-					<div className='w-full rounded-lg border border-primary_border bg-bg_modal p-6'>
+					<div className='w-full rounded-3xl border border-primary_border bg-bg_modal p-6'>
 						<Table>
 							<TableHeader>
-								<TableRow className={styles.tableRow}>
+								<TableRow className={styles.tableHeader}>
+									<TableHead className={`${styles.tableCell}`} />
 									<TableHead className={styles.tableCell_2}>{t('delegator')}</TableHead>
 									<TableHead className={styles.tableCell}>{t('proxyType')}</TableHead>
 									<TableHead className={styles.tableCell}>
@@ -70,7 +106,18 @@ function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyReques
 											</TooltipProvider>
 										</div>
 									</TableHead>
-									<TableHead className={styles.tableCell_last}>{t('proxies')}</TableHead>
+									<TableHead className={styles.tableCell_last}>
+										<button
+											type='button'
+											onClick={toggleSort}
+											className='flex items-center gap-x-2 focus:outline-none'
+										>
+											{t('proxies')}
+											{sortBy === 'proxies' && sortDirection === 'asc' && <FaCaretUp className='h-4 w-4 text-text_pink' />}
+											{sortBy === 'proxies' && sortDirection === 'desc' && <FaCaretDown className='h-4 w-4 text-text_pink' />}
+											{(!sortBy || sortBy !== 'proxies' || !sortDirection) && <FaCaretDown className='h-4 w-4 text-text_grey' />}
+										</button>
+									</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -84,26 +131,26 @@ function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyReques
 												className={`${hasChildProxies ? 'cursor-pointer hover:bg-section_dark_overlay' : ''}`}
 												onClick={() => hasChildProxies && toggleRow(proxy.id)}
 											>
-												<td className='px-6 py-5'>
-													<div className='flex items-center gap-2'>
-														{hasChildProxies && (
-															<button
-																type='button'
-																className='focus:outline-none'
-																onClick={(e) => {
-																	e.stopPropagation();
-																	toggleRow(proxy.id);
-																}}
-															>
-																{isExpanded ? <ChevronUp className='h-4 w-4 text-text_grey' /> : <ChevronDown className='h-4 w-4 text-text_grey' />}
-															</button>
-														)}
-														<Address
-															truncateCharLen={5}
-															address={proxy.delegator}
-															redirectToProfile={false}
-														/>
-													</div>
+												<td className='w-4 px-6 py-5'>
+													{hasChildProxies && (
+														<button
+															type='button'
+															className='focus:outline-none'
+															onClick={(e) => {
+																e.stopPropagation();
+																toggleRow(proxy.id);
+															}}
+														>
+															{isExpanded ? <FaCaretUp className='h-4 w-4 text-text_pink' /> : <FaCaretDown className='h-4 w-4 text-text_grey' />}
+														</button>
+													)}
+												</td>
+												<td className='px-4 py-5'>
+													<Address
+														truncateCharLen={5}
+														address={proxy.delegator}
+														redirectToProfile={false}
+													/>
 												</td>
 												<td className='px-6 py-5' />
 												<td className='px-6 py-5' />
@@ -114,24 +161,35 @@ function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyReques
 
 											{hasChildProxies &&
 												isExpanded &&
-												proxy.individualProxies.map((individualProxy) => (
+												proxy.individualProxies.map((individualProxy, index) => (
 													<TableRow
 														key={`${proxy.id}-child-${individualProxy.address}`}
-														className='border-l-4 border-pink-200 bg-pink-50 dark:border-pink-800 dark:bg-pink-950/20'
+														className='border-primary_border bg-sidebar_menu_active'
 													>
-														<td className='px-6 py-3'>
+														<td className='px-6 py-1 text-text_pink'>
+															<div className='flex h-10 w-4 items-start'>
+																<Image
+																	src={index === proxy.individualProxies.length - 1 ? TrailLineEnd : TrailLine}
+																	width={10}
+																	height={25}
+																	className='w-4'
+																	alt='trail line'
+																/>
+															</div>
+														</td>
+														<td className='px-6 py-1'>
 															<Address
 																truncateCharLen={5}
 																address={individualProxy.address}
 															/>
 														</td>
-														<td className='px-6 py-3'>
+														<td className='px-6 py-1'>
 															<ProxyTypeBadge proxyType={individualProxy.proxyType} />
 														</td>
-														<td className='px-6 py-3'>
+														<td className='px-6 py-1'>
 															<div className='truncate'>{individualProxy.delay || '-'}</div>
 														</td>
-														<td className='px-6 py-3' />
+														<td className='px-6 py-1' />
 													</TableRow>
 												))}
 										</React.Fragment>
@@ -140,7 +198,7 @@ function ProxyListingTable({ data, totalCount, isLoading }: { data: IProxyReques
 							</TableBody>
 						</Table>
 					</div>
-					{totalCount && totalCount > DEFAULT_LISTING_LIMIT && (
+					{Boolean(totalCount) && totalCount > DEFAULT_LISTING_LIMIT && (
 						<div className='mt-5 flex w-full justify-end'>
 							<PaginationWithLinks
 								page={Number(page)}

@@ -13,7 +13,7 @@ import styles from './Header.module.scss';
 function Header() {
 	const t = useTranslations();
 
-	const { totalCount } = useProxyData();
+	const { totalCount } = useProxyData({});
 
 	return (
 		<div className={styles.header}>
@@ -21,6 +21,7 @@ function Header() {
 				<div className={styles.header_title_container}>
 					<p className={styles.header_title}>{t('Proxies.proxyExplorer')}</p>
 				</div>
+				<p className={styles.header_subtitle}>{t('Proxies.proxyExplorerDescription')}</p>
 				<TabsList className={`w-fit max-w-full items-start overflow-auto pl-4 font-bold md:pl-0 ${styles.hideScrollbar}`}>
 					<TabsTrigger
 						className={styles.header_tab}
