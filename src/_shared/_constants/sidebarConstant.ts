@@ -126,7 +126,10 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 							title: t('Sidebar.analytics'),
 							url: '',
 							icon: AnalyticsIcon,
-							items: [{ title: t('Sidebar.govAnalytics'), url: '/gov-analytics' }]
+							items: [
+								{ title: t('Sidebar.govAnalytics'), url: '/gov-analytics' },
+								{ title: t('Sidebar.treasuryAnalytics'), url: '/treasury-analytics' }
+							]
 						},
 						{
 							title: t('Sidebar.community'),
