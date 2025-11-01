@@ -1606,5 +1606,11 @@
 	"AnnouncementBanner": {
 		"assethubMigration": "Notice: Kusama has migrated to AssetHub. Balances, data, referenda, and other on-chain activity has moved to AssetHub.",
 		"learnMore": "Learn more"
+	},
+	"TreasuryAnalytics": {
+		"overview": "Overview",
+		"spends": "Spends",
+		"coretime": "Coretime",
+		"description": "Treasury Analytics provides a transparent view of on-chain spending and allocations. Track budgets, payouts, and burn rates across proposals and bounties. Understand how treasury funds are managed and where resources are flowing."
 	}
 }

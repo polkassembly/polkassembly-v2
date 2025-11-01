@@ -1,0 +1,23 @@
+.header {
+	@apply flex w-full flex-col gap-y-4 bg-bg_modal shadow-lg;
+}
+
+.header_container {
+	@apply mx-auto w-full max-w-7xl px-4 lg:px-10;
+}
+
+.header_content {
+	@apply flex flex-col gap-y-4 py-5;
+}
+
+.header_title {
+	@apply text-2xl font-bold text-navbar_title;
+}
+
+.header_description {
+	@apply text-sm text-basic_text;
+}
+
+.header_tab {
+	@apply uppercase;
+}
