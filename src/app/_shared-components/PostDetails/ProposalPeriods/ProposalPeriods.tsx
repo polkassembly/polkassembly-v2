@@ -9,10 +9,12 @@ import { FAILED_PROPOSAL_STATUSES, PASSED_PROPOSAL_STATUSES } from '@/_shared/_c
 import { getPeriodProgressLabel } from '@/app/_client-utils/getPeriodProgressLabel';
 import { Minus, Plus } from 'lucide-react';
 import { Separator } from '@/app/_shared-components/Separator';
+import Image from 'next/image';
+import InfoQueryIcon from '@assets/icons/info-query-icon.svg';
 import { PeriodProgress } from './PeriodProgress';
 import { TimelineSection } from './TimelineSection';
-
 import classes from './ProposalPeriods.module.scss';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 
 function RenderPeriodProgress({
 	confirmationPeriodEnded,
@@ -108,6 +110,18 @@ function ProposalPeriods({
 		return t('PostDetails.preparePeriod');
 	};
 
+	const getStatusTooltip = () => {
+		if (decisionPeriodEnded) {
+			return t('PostDetails.Tooltips.enactmentPeriod');
+		}
+
+		if (preparePeriodEnded) {
+			return t('PostDetails.Tooltips.votingPeriod');
+		}
+
+		return t('PostDetails.Tooltips.preparePeriod');
+	};
+
 	// Get the current period progress label (e.g., "4/10 days")
 	const getCurrentPeriodLabel = () => {
 		if (!preparePeriodEnded) {
@@ -130,6 +144,20 @@ function ProposalPeriods({
 					<div className={classes.progressIndicator}>
 						<span className={classes.progressNumber}>{currentPeriodLabel}</span>
 					</div>
+					{!confirmationPeriodEnded && (
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Image
+									src={InfoQueryIcon}
+									alt='info query icon'
+									className='h-3.5 w-3.5'
+									width={14}
+									height={14}
+								/>
+							</TooltipTrigger>
+							<TooltipContent className='bg-tooltip_background text-sm text-white'>{getStatusTooltip()}</TooltipContent>
+						</Tooltip>
+					)}
 				</div>
 				<div className={classes.headerRight}>
 					<button
