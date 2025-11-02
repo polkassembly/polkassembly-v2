@@ -7,7 +7,7 @@
 import { useCallback, useState, useMemo } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useWalletService } from '@/hooks/useWalletService';
-import { EAccountType, EWallet, IMultisigAddress, IProxyAddress, ISelectedAccount, IVaultScannedAddress } from '@/_shared/types';
+import { EAccountType, EWallet, IMultisigAddress, IProxyAddress, ISelectedAccount, IVaultScannedAddress, EFeature } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
 import { AlertCircle, ChevronDown } from 'lucide-react';
 import { IoMdSync } from '@react-icons/all-files/io/IoMdSync';
@@ -200,6 +200,7 @@ function AddressSwitchButton({
 	disabled,
 	showLinkedAccountBadge = false,
 	className,
+	action,
 	switchButtonText,
 	showTransferableBalance = false,
 	showVotingBalance = false,
@@ -208,6 +209,7 @@ function AddressSwitchButton({
 	disabled?: boolean;
 	showLinkedAccountBadge?: boolean;
 	className?: string;
+	action?: EFeature;
 	switchButtonText?: string;
 	showTransferableBalance?: boolean;
 	showVotingBalance?: boolean;
@@ -251,6 +253,7 @@ function AddressSwitchButton({
 					showTransferableBalance={showTransferableBalance}
 					showVotingBalance={showVotingBalance}
 					showLinkedAccountBadge={showLinkedAccountBadge}
+					action={action}
 					showPeopleChainBalance={showPeopleChainBalance}
 				/>
 
@@ -293,6 +296,7 @@ export default function AddressRelationsPicker({
 	iconSize = 25,
 	className,
 	switchButtonClassName,
+	action,
 	hideAccountsAlert = false
 }: {
 	withBalance?: boolean;
@@ -304,6 +308,7 @@ export default function AddressRelationsPicker({
 	iconSize?: number;
 	className?: string;
 	switchButtonClassName?: string;
+	action?: EFeature;
 	hideAccountsAlert?: boolean;
 }) {
 	const { userPreferences, setUserPreferences } = useUserPreferences();
@@ -346,10 +351,17 @@ export default function AddressRelationsPicker({
 
 		const prevPreferredAccount = userPreferences.selectedAccount;
 
-		const selectedAccount =
-			prevPreferredAccount?.address && injectedAccounts.some((account) => getSubstrateAddress(account.address) === getSubstrateAddress(prevPreferredAccount.address))
-				? prevPreferredAccount
-				: injectedAccounts[0];
+		const getSelectedAccount = () => {
+			if (prevPreferredAccount?.address) {
+				if (prevPreferredAccount.address.startsWith('0x')) {
+					return injectedAccounts.find((account) => account.address === prevPreferredAccount.address) || injectedAccounts[0];
+				}
+				return injectedAccounts.find((account) => getSubstrateAddress(account.address) === getSubstrateAddress(prevPreferredAccount.address)) || injectedAccounts[0];
+			}
+			return injectedAccounts[0];
+		};
+
+		const selectedAccount = getSelectedAccount();
 
 		setUserPreferences({
 			...userPreferences,
@@ -484,6 +496,7 @@ export default function AddressRelationsPicker({
 							disabled={disabled}
 							showLinkedAccountBadge={showLinkedAccountBadge}
 							className={switchButtonClassName}
+							action={action}
 							showTransferableBalance={showTransferableBalance}
 							showVotingBalance={showVotingBalance}
 							showPeopleChainBalance={showPeopleChainBalance}

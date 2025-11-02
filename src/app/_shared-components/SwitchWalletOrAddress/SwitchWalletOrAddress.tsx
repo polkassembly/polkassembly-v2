@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EWallet } from '@/_shared/types';
+import { EWallet, EFeature } from '@/_shared/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { ReactNode } from 'react';
 import WalletButtons from '../WalletsUI/WalletButtons/WalletButtons';
@@ -23,6 +23,7 @@ interface Props {
 	showTransferableBalance?: boolean;
 	showVotingBalance?: boolean;
 	showLinkedAccountBadge?: boolean;
+	action?: EFeature;
 }
 
 function SwitchWalletOrAddress({
@@ -37,7 +38,8 @@ function SwitchWalletOrAddress({
 	showVotingBalance = false,
 	showPeopleChainBalance = false,
 	onRadioSelect,
-	showLinkedAccountBadge = false
+	showLinkedAccountBadge = false,
+	action
 }: Props) {
 	return (
 		<>
@@ -45,6 +47,7 @@ function SwitchWalletOrAddress({
 				small={small}
 				onWalletChange={onWalletChange}
 				disabled={disabled}
+				action={action}
 			/>
 			{customAddressSelector || (
 				<AddressDropdown

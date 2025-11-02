@@ -391,7 +391,8 @@
 		"TreasuryProposal": "国库提案",
 		"TreasuryProposalDescription": "这里是讨论国库提案的地方。链上帖子在链上创建后会自动生成。只有提案人可以编辑它们。",
 		"Tip": "小费",
-		"TipDescription": "这里是讨论小费的地方。链上帖子在链上创建后会自动生成。只有提案人可以编辑它们。"
+		"TipDescription": "这里是讨论小费的地方。链上帖子在链上创建后会自动生成。只有提案人可以编辑它们。",
+		"FastGeneralAdmin": "快速总管理员"
 	},
 	"Sidebar": {
 		"onChainIdentity": "链上身份",
@@ -448,6 +449,7 @@
 		"Treasury": "国库",
 		"LeaseAdmin": "租赁管理员",
 		"GeneralAdmin": "总管理员",
+		"FastGeneralAdmin": "快速总管理员",
 		"chatWithKlara": "与Klara聊天",
 		"klaraDesc": "AI 聊天机器人",
 		"more": "更多",
@@ -837,8 +839,8 @@
 		"docs": "文档",
 		"github": "Github",
 		"allRightsReserved": "版权所有。",
-		"polkaLabsPrivateLimited": "Polka Labs Private Limited",
-		"aHouseOfCommonsInitiative": "House of Commons 倡议。",
+		"polkaLabsPrivateLimited": "Polka Labs 私人有限公司",
+		"aHouseOfCommonsInitiative": "下议院倡议。",
 		"allRightsReservedYear": "版权所有。"
 	},
 	"Preimages": {
@@ -1087,7 +1089,7 @@
 		"claimants": "认领者",
 		"totalRewarded": "总奖励",
 		"totalBountyPool": "总赏金池",
-		"comingSoon": "Coming Soon",
+		"comingSoon": "即将推出",
 		"dashboard": "仪表板"
 	},
 	"ChildBounties": {

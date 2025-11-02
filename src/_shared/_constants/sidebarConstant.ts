@@ -20,8 +20,10 @@ import TreasuryTipIcon from '@assets/sidebar/tips-icon.svg';
 import CouncilMotionIcon from '@assets/sidebar/council-motion-icon.svg';
 import CouncilMemberIcon from '@assets/sidebar/council-members-icon.svg';
 import TechCommIcon from '@assets/sidebar/tech-comm-proposals-icon.svg';
+import { ValidatorService } from '../_services/validator_service';
 import { EGovType, ENetwork, ISidebarMenuItem, ITrackCounts } from '../types';
 import { NETWORKS_DETAILS } from './networks';
+import { BATCH_VOTING_SUPPORTED_FEATURES, BOUNTY_SUPPORTED_FEATURES } from './featureFlags';
 
 const ActiveItems = (items: ISidebarMenuItem[], pathname: string): ISidebarMenuItem[] =>
 	items.map((item) => ({
@@ -80,34 +82,42 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 					[
 						...baseConfig.initalItems,
 						{ title: t('Sidebar.delegation'), url: '/delegation', icon: Delegation },
-						{ title: t('Sidebar.batchVoting'), url: '/batch-voting', icon: BatchVoting }
+						...(BATCH_VOTING_SUPPORTED_FEATURES.includes(networkKey) ? [{ title: t('Sidebar.batchVoting'), url: '/batch-voting', icon: BatchVoting }] : [])
 					],
 					pathname
 				),
 				mainItems: ActiveItems(
 					[
-						{
-							title: t(TREASURY_KEY),
-							url: '',
-							icon: TreasuryIcon,
-							isNew: false,
-							items: [...getTrackItems(networkKey, 'Treasury', t, trackCounts)]
-						},
-						{
-							title: t('Sidebar.bounty'),
-							url: '',
-							icon: Bounty,
-							isNew: false,
-							items: [
-								{
-									title: t('Sidebar.bountyDashboard'),
-									url: '/bounty-dashboard',
-									count: trackCounts.bounty_dashboard || 0
-								},
-								{ title: t('Sidebar.onChainBounties'), url: '/bounties' },
-								{ title: t('Sidebar.childBounties'), url: '/child-bounties' }
-							]
-						},
+						...(ValidatorService.isValidEthereumNetwork(networkKey)
+							? []
+							: [
+									{
+										title: t(TREASURY_KEY),
+										url: '',
+										icon: TreasuryIcon,
+										isNew: false,
+										items: [...getTrackItems(networkKey, 'Treasury', t, trackCounts)]
+									}
+								]),
+						...(BOUNTY_SUPPORTED_FEATURES.includes(networkKey)
+							? [
+									{
+										title: t('Sidebar.bounty'),
+										url: '',
+										icon: Bounty,
+										isNew: false,
+										items: [
+											{
+												title: t('Sidebar.bountyDashboard'),
+												url: '/bounty-dashboard',
+												count: trackCounts.bounty_dashboard || 0
+											},
+											{ title: t('Sidebar.onChainBounties'), url: '/bounties' },
+											{ title: t('Sidebar.childBounties'), url: '/child-bounties' }
+										]
+									}
+								]
+							: []),
 						{
 							title: t(REFERENDA_KEY),
 							url: '',

@@ -13,6 +13,7 @@ import { W3F_DELEGATES_2025 } from '@/_shared/_constants/delegates2025';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import IdentityBadge from '../IdentityBadge';
 import styles from './AddressInline.module.scss';
+import EthIdenticon from '../EthIdenticon';
 import DVBadge from '../DVBadge';
 
 interface Props {
@@ -52,12 +53,21 @@ function AddressInline({
 			data-for={`tooltip-${address}`}
 		>
 			{showIdenticon && address && (
-				<Identicon
-					className='image identicon'
-					value={address}
-					size={iconSize}
-					theme='polkadot'
-				/>
+				<span>
+					{address.startsWith('0x') ? (
+						<EthIdenticon
+							address={address}
+							size={iconSize}
+						/>
+					) : (
+						<Identicon
+							className='image identicon'
+							value={address}
+							size={iconSize}
+							theme='polkadot'
+						/>
+					)}
+				</span>
 			)}
 			{!showOnlyIdenticon &&
 				(redirectToProfile && userProfileUrl ? (

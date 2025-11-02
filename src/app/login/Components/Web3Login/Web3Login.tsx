@@ -4,7 +4,7 @@
 
 'use client';
 
-import { ENotificationStatus, EWallet } from '@/_shared/types';
+import { EFeature, ENotificationStatus, EWallet } from '@/_shared/types';
 import React, { useState } from 'react';
 import { WEB3_AUTH_SIGN_MESSAGE } from '@/_shared/_constants/signMessage';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -224,6 +224,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 				<SwitchWalletOrAddress
 					small
 					disabled={loading}
+					action={EFeature.LOGIN}
 				/>
 			</div>
 

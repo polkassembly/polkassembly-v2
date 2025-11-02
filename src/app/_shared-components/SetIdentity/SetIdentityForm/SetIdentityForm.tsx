@@ -20,6 +20,7 @@ import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { EthereumNetwork } from '@/_shared/_constants/networks';
 import { ENotificationStatus, EReactQueryKeys } from '@/_shared/types';
 import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { Alert, AlertDescription } from '../../Alert';
@@ -174,22 +175,24 @@ function SetIdentityForm({
 				onSubmit={formData.handleSubmit(handleSetIdentity)}
 			>
 				<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
-					<Alert
-						variant='info'
-						className='flex items-center gap-x-3'
-					>
-						<AlertCircle className='h-4 w-4' />
-						<AlertDescription className='flex w-full items-center justify-between'>
-							<h2 className='text-sm font-medium'>{t('SetIdentity.TeleportFundsToPeopleChain')}</h2>
-							<Button
-								onClick={onTeleport}
-								size='sm'
-								className='h-6'
-							>
-								{t('SetIdentity.Teleport')}
-							</Button>
-						</AlertDescription>
-					</Alert>
+					{!Object.values(EthereumNetwork).includes(network as unknown as EthereumNetwork) && (
+						<Alert
+							variant='info'
+							className='flex items-center gap-x-3'
+						>
+							<AlertCircle className='h-4 w-4' />
+							<AlertDescription className='flex w-full items-center justify-between'>
+								<h2 className='text-sm font-medium'>{t('SetIdentity.TeleportFundsToPeopleChain')}</h2>
+								<Button
+									onClick={onTeleport}
+									size='sm'
+									className='h-6'
+								>
+									{t('SetIdentity.Teleport')}
+								</Button>
+							</AlertDescription>
+						</Alert>
+					)}
 
 					<SwitchWalletOrAddress
 						small

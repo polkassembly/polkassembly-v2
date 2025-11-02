@@ -2,10 +2,9 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-/* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-console */
+/* eslint-disable sonarjs/no-duplicate-string */
 
 import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
 import { ValidatorService } from '@/_shared/_services/validator_service';
@@ -40,6 +39,7 @@ import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateA
 import { APPNAME } from '@/_shared/_constants/appName';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
 import { Dispatch, SetStateAction } from 'react';
+import { EthApiService } from './eth_api_service';
 import { BlockCalculationsService } from './block_calculations_service';
 import { VaultQrSigner } from './vault_qr_signer_service';
 import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
@@ -164,7 +164,8 @@ export class PolkadotApiService {
 		setStatus,
 		setIsTxFinalized,
 		waitTillFinalizedHash = false,
-		selectedAccount
+		selectedAccount,
+		selectedWallet
 	}: {
 		tx: SubmittableExtrinsic<'promise'>;
 		address: string;
@@ -179,6 +180,7 @@ export class PolkadotApiService {
 		setIsTxFinalized?: (pre: string) => void;
 		waitTillFinalizedHash?: boolean;
 		selectedAccount?: ISelectedAccount;
+		selectedWallet?: EWallet;
 	}) {
 		if (!this.api || !tx) return;
 
@@ -219,6 +221,13 @@ export class PolkadotApiService {
 					console.error('ERROR:', error);
 					onFailed(error?.toString?.() || errorMessageFallback);
 				});
+		} else if (ValidatorService.isValidEthereumNetwork(this.network) && selectedWallet === EWallet.METAMASK) {
+			try {
+				(tx as unknown as any).wait();
+				onSuccess();
+			} catch (error) {
+				onFailed(error?.toString?.() || errorMessageFallback);
+			}
 		} else if (wallet === EWallet.POLKADOT_VAULT) {
 			const signer = new VaultQrSigner(this.api.registry, setVaultQrState);
 			await tx.signAsync(address, { nonce: -1, signer });
@@ -429,7 +438,8 @@ export class PolkadotApiService {
 		ayeVoteValue,
 		nayVoteValue,
 		abstainVoteValue,
-		selectedAccount
+		selectedAccount,
+		selectedWallet
 	}: {
 		address: string;
 		wallet: EWallet;
@@ -444,10 +454,23 @@ export class PolkadotApiService {
 		nayVoteValue?: BN;
 		abstainVoteValue?: BN;
 		selectedAccount?: ISelectedAccount;
+		selectedWallet?: EWallet;
 	}) {
 		let voteTx: SubmittableExtrinsic<'promise'> | null = null;
 
-		if ([EVoteDecision.AYE, EVoteDecision.NAY].includes(vote) && lockedBalance) {
+		if (ValidatorService.isValidEthereumNetwork(this.network) && selectedWallet === EWallet.METAMASK) {
+			voteTx = await EthApiService.vote(
+				vote,
+				referendumId,
+				conviction || 0,
+				selectedWallet || EWallet.METAMASK,
+				this.network,
+				lockedBalance,
+				ayeVoteValue,
+				nayVoteValue,
+				abstainVoteValue
+			);
+		} else if ([EVoteDecision.AYE, EVoteDecision.NAY].includes(vote) && lockedBalance) {
 			voteTx = this.api.tx.convictionVoting.vote(referendumId, { Standard: { balance: lockedBalance, vote: { aye: vote === EVoteDecision.AYE, conviction } } });
 		} else if (vote === EVoteDecision.SPLIT) {
 			voteTx = this.api.tx.convictionVoting.vote(referendumId, { Split: { aye: `${ayeVoteValue?.toString()}`, nay: `${nayVoteValue?.toString()}` } });
@@ -467,6 +490,7 @@ export class PolkadotApiService {
 				onSuccess,
 				onFailed,
 				selectedAccount,
+				selectedWallet,
 				setVaultQrState
 			});
 		}
