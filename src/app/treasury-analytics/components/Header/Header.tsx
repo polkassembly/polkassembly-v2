@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { ArrowUpRightFromSquareIcon } from 'lucide-react';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
-import { EGovAnalyticsTabs } from '@/_shared/types';
+import { ETreasuryAnalyticsTabs } from '@/_shared/types';
 import styles from './Header.module.scss';
 
 export function TreasuryAnalyticsHeader() {
@@ -31,19 +31,19 @@ export function TreasuryAnalyticsHeader() {
 				<TabsList className={`w-fit max-w-full items-start overflow-auto pl-4 font-bold md:pl-0 ${styles.hideScrollbar}`}>
 					<TabsTrigger
 						className={styles.header_tab}
-						value={EGovAnalyticsTabs.OVERVIEW}
+						value={ETreasuryAnalyticsTabs.OVERVIEW}
 					>
 						{t('TreasuryAnalytics.overview')}
 					</TabsTrigger>
 					<TabsTrigger
 						className={styles.header_tab}
-						value={EGovAnalyticsTabs.SPENDS}
+						value={ETreasuryAnalyticsTabs.SPENDS}
 					>
 						{t('TreasuryAnalytics.spends')}
 					</TabsTrigger>
 					<TabsTrigger
 						className={styles.header_tab}
-						value={EGovAnalyticsTabs.CORETIME}
+						value={ETreasuryAnalyticsTabs.CORETIME}
 					>
 						{t('TreasuryAnalytics.coretime')}
 					</TabsTrigger>
