@@ -369,6 +369,23 @@ function Navbar() {
 					</div>
 				)}
 			</nav>
+			{network === ENetwork.POLKADOT && (
+				<AnnouncementBanner
+					message={
+						<p className='flex flex-wrap items-center gap-x-1 text-sm'>
+							{t('AnnouncementBanner.polkadotMigration')}
+							<Link
+								href='https://migration.paritytech.io/'
+								className='underline'
+								target='_blank'
+								rel='noopener noreferrer'
+							>
+								{t('AnnouncementBanner.learnMore')}
+							</Link>
+						</p>
+					}
+				/>
+			)}
 			{[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network) && (
 				<AnnouncementBanner
 					message={
