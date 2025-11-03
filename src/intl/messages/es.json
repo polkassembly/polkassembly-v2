@@ -1579,6 +1579,7 @@
 	},
 	"AnnouncementBanner": {
 		"assethubMigration": "Nota: La cadena de relay de Kusama se ha migrado a AssetHub; todas las acciones de gobernanza en cadena han sido movidas.",
-		"learnMore": "Más información"
+		"learnMore": "Más información",
+		"polkadotMigration": "Nota: Polkadot está en proceso de migración a AssetHub programada para el 4 de noviembre, alrededor de las 8 AM UTC (número de bloque 28,490,502)."
 	}
 }
