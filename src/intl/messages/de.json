@@ -1576,7 +1576,7 @@
 		"sudo_balances": "Sudo-Balances"
 	},
 	"AnnouncementBanner": {
-		"assethubMigration": "Hinweis: Kusama wurde zu AssetHub migriert. Bilanzen, Daten, Referenden und andere On-Chain-Aktivitäten wurden zu AssetHub verschoben.",
+		"assethubMigration": "Hinweis: {network} wurde zu AssetHub migriert. Bilanzen, Daten, Referenden und andere On-Chain-Aktivitäten wurden zu AssetHub verschoben.",
 		"learnMore": "Mehr erfahren",
 		"polkadotMigration": "Hinweis: Polkadot erfolgt der AssetHub-Migration geplant für den 4. November, um 8 AM UTC (Blocknummer 28,490,502)."
 	}
