@@ -79,7 +79,7 @@ function BalanceInput({
 	});
 
 	// disable native token in multi asset for assethub kusama
-	if (![ENetwork.ASSETHUB_KUSAMA, ENetwork.KUSAMA].includes(network)) {
+	if (![ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network)) {
 		reorderedAssetOptions.push({ label: networkDetails.tokenSymbol, value: null });
 	}
 
