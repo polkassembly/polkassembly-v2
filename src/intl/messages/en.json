@@ -1608,6 +1608,6 @@
 	"AnnouncementBanner": {
 		"assethubMigration": "Notice: Kusama has migrated to AssetHub. Balances, data, referenda, and other on-chain activity has moved to AssetHub.",
 		"learnMore": "Learn more",
-		"polkadotMigration": "Notice: Polkadot is undergoing AssetHub migration scheduled for November 4, around 8 AM UTC (block number 28,490,502)."
+		"polkadotMigration": "Notice: Polkadot is undergoing AssetHub migration. Some features may be unavailable during the migration."
 	}
 }
