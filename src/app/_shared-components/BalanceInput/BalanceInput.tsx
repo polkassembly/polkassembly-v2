@@ -129,7 +129,7 @@ function BalanceInput({
 	useEffect(() => {
 		const fetchTreasuryBalance = async () => {
 			if (!showTreasuryBalance || !assethubApiService || !multiAsset) return;
-			const balances = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network)
+			const balances = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network)
 				? await apiService?.getAssethubTreasuryAssetsBalance()
 				: await assethubApiService?.getAssethubTreasuryAssetsBalance();
 			setTreasuryBalance(balances || null);
