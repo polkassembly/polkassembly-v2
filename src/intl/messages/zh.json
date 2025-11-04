@@ -1577,7 +1577,7 @@
 		"sudo_balances": "Sudo余额"
 	},
 	"AnnouncementBanner": {
-		"assethubMigration": "Kusama已迁移至AssetHub。余额、数据、国民投票、以及其他链上活动已迁移至AssetHub。",
+		"assethubMigration": "{network}已迁移至AssetHub。余额、数据、国民投票、以及其他链上活动已迁移至AssetHub。",
 		"learnMore": "了解更多",
 		"polkadotMigration": "Polkadot正在迁移至AssetHub。一些功能可能在迁移期间不可用。"
 	}

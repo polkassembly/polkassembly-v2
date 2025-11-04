@@ -26,6 +26,7 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { isMimirDetected } from '@/app/_client-services/isMimirDetected';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import classes from './Navbar.module.scss';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import Address from '../../Profile/Address/Address';
@@ -369,28 +370,13 @@ function Navbar() {
 					</div>
 				)}
 			</nav>
-			{network === ENetwork.POLKADOT && (
+			{[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) && (
 				<AnnouncementBanner
 					message={
 						<p className='flex flex-wrap items-center gap-x-1 text-sm'>
-							{t('AnnouncementBanner.polkadotMigration')}
-							<Link
-								href='https://migration.paritytech.io/'
-								className='underline'
-								target='_blank'
-								rel='noopener noreferrer'
-							>
-								{t('AnnouncementBanner.learnMore')}
-							</Link>
-						</p>
-					}
-				/>
-			)}
-			{[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network) && (
-				<AnnouncementBanner
-					message={
-						<p className='flex flex-wrap items-center gap-x-1 text-sm'>
-							{t('AnnouncementBanner.assethubMigration')}
+							{t('AnnouncementBanner.assethubMigration', {
+								network: network === ENetwork.ASSETHUB_KUSAMA ? NETWORKS_DETAILS[ENetwork.KUSAMA].name : NETWORKS_DETAILS[`${network}`].name
+							})}
 							<Link
 								href='https://docs.google.com/document/d/1XR3vL2p4QV0wC7FrlC8eN-q62BqNFTFElbj21wEmMGg/edit?tab=t.0#heading=h.vxykbd6ai7n7'
 								className='underline'

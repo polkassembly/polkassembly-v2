@@ -1577,7 +1577,7 @@
 		"sudo_balances": "Sudoバランス"
 	},
 	"AnnouncementBanner": {
-		"assethubMigration": "KusamaはAssetHubに移行されました。残高、データ、国民投票、その他のオンチェーン活動はAssetHubに移行されました。",
+		"assethubMigration": "{network}はAssetHubに移行されました。残高、データ、国民投票、その他のオンチェーン活動はAssetHubに移行されました。",
 		"learnMore": "詳細を確認",
 		"polkadotMigration": "PolkadotはAssetHub移行中です。一部の機能は移行中に利用できない場合があります。"
 	}
