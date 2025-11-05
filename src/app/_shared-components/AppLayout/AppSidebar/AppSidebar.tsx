@@ -10,24 +10,27 @@ import Link from 'next/link';
 import PaLogoDark from '@assets/logos/PALogoDark.svg';
 import PaLogo from '@ui/AppLayout/PaLogo';
 import { useTranslations } from 'next-intl';
-import KlaraAvatar from '@assets/klara/avatar.svg';
-import { useKlara } from '@/hooks/useKlara';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
+// import KlaraAvatar from '@assets/klara/avatar.svg';
+// import { useKlara } from '@/hooks/useKlara';
+// import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
+import { Sidebar, SidebarContent, SidebarHeader, useSidebar } from '@/app/_shared-components/Sidebar/Sidebar';
 import { getSidebarData } from '@/_shared/_constants/sidebarConstant';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { ComponentProps } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { IoChevronUp } from '@react-icons/all-files/io5/IoChevronUp';
-import ChatsHistory from '@/app/_shared-components/Klara/ChatsHistory';
+// import { IoChevronUp } from '@react-icons/all-files/io5/IoChevronUp';
+// import ChatsHistory from '@/app/_shared-components/Klara/ChatsHistory';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { ITrackCounts, EChatState } from '@/_shared/types';
+// import { ITrackCounts, EChatState } from '@/_shared/types';
+import { ITrackCounts } from '@/_shared/types';
 import { NavMain } from '../NavItems/NavItems';
 import CreateButton from '../CreateButton/CreateButton';
 import styles from './AppSidebar.module.scss';
 
 function AppSidebar(props: ComponentProps<typeof Sidebar>) {
-	const { state, setOpenMobile } = useSidebar();
-	const { chatState, setChatState } = useKlara();
+	const { state } = useSidebar();
+	// const { state, setOpenMobile } = useSidebar();
+	// const { chatState, setChatState } = useKlara();
 	const t = useTranslations();
 	const pathname = usePathname();
 
@@ -90,7 +93,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 				<NavMain sections={data} />
 			</SidebarContent>
 
-			<SidebarFooter className='mb-3 px-3'>
+			{/* <SidebarFooter className='mb-3 px-3'>
 				{state === 'expanded' ? (
 					chatState === EChatState.EXPANDED_SMALL ? (
 						<ChatsHistory />
@@ -138,7 +141,7 @@ function AppSidebar(props: ComponentProps<typeof Sidebar>) {
 						</div>
 					</button>
 				)}
-			</SidebarFooter>
+			</SidebarFooter> */}
 		</Sidebar>
 	);
 }
