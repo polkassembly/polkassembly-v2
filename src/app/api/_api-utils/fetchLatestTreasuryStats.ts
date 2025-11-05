@@ -214,7 +214,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			// Bounties data
 			(async () => {
 				try {
-					const deriveBounties = await relayChainApi.derive.bounties?.bounties();
+					const deriveBounties = await ([ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? assetHubApi : relayChainApi).derive.bounties?.bounties();
 					const activeBounties = (deriveBounties as unknown as unknown[]).filter((item) => {
 						const { isFunded, isCuratorProposed, isActive } =
 							(item as { bounty?: { status: { isFunded?: boolean; isCuratorProposed?: boolean; isActive?: boolean } } })?.bounty?.status || {};
