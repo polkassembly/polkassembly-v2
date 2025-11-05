@@ -158,8 +158,9 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 
 		// Initialize all API connections
 		const apiProviders = {
-			relayChain: new WsProvider(config.relayChainRpc),
-			assetHub: new WsProvider(config.assetHubRpc),
+			// TODO: MIGRATION UPDATE: here the rpc of relay chain and assethub are interchanged, update this.
+			relayChain: [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? new WsProvider(config.assetHubRpc) : new WsProvider(config.relayChainRpc),
+			assetHub: [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? new WsProvider(config.relayChainRpc) : new WsProvider(config.assetHubRpc),
 			hydration: config.hydrationRpc ? new WsProvider(config.hydrationRpc) : undefined
 		};
 
@@ -172,19 +173,21 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		// Fetch relay chain data
 		const relayChainTasks = [
 			// Treasury balance and next burn
-			relayChainApi.query.system.account(config.treasuryAccount).then((accountInfo) => {
-				const treasuryBalance = (accountInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
-				const nextBurn = new BN(treasuryBalance).mul(config.burnPercentage.numerator).div(config.burnPercentage.denominator).toString();
+			([ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? assetHubApi : relayChainApi).query.system
+				.account(config.treasuryAccount)
+				.then((accountInfo) => {
+					const treasuryBalance = (accountInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
+					const nextBurn = new BN(treasuryBalance).mul(config.burnPercentage.numerator).div(config.burnPercentage.denominator).toString();
 
-				treasuryStats = {
-					...treasuryStats,
-					relayChain: {
-						...treasuryStats.relayChain,
-						nativeToken: treasuryBalance,
-						nextBurn
-					}
-				};
-			}),
+					treasuryStats = {
+						...treasuryStats,
+						relayChain: {
+							...treasuryStats.relayChain,
+							nativeToken: treasuryBalance,
+							nextBurn
+						}
+					};
+				}),
 
 			// next spend at - calculate when the current spend period ends
 			relayChainApi.rpc.chain.getHeader().then((header) => {
@@ -211,7 +214,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			// Bounties data
 			(async () => {
 				try {
-					const deriveBounties = await relayChainApi.derive.bounties?.bounties();
+					const deriveBounties = await ([ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? assetHubApi : relayChainApi).derive.bounties?.bounties();
 					const activeBounties = (deriveBounties as unknown as unknown[]).filter((item) => {
 						const { isFunded, isCuratorProposed, isActive } =
 							(item as { bounty?: { status: { isFunded?: boolean; isCuratorProposed?: boolean; isActive?: boolean } } })?.bounty?.status || {};
@@ -242,7 +245,9 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 							}
 
 							try {
-								const accountData = await relayChainApi.query.system.account(address);
+								const accountData = await ([ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? assetHubApi : relayChainApi).query.system.account(
+									address
+								);
 								const accountInfo = accountData as unknown as {
 									data: { free: { toString: () => string }; reserved: { toString: () => string } };
 								};
