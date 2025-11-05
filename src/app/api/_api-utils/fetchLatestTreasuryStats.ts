@@ -160,7 +160,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		const apiProviders = {
 			// TODO: MIGRATION UPDATE: here the rpc of relay chain and assethub are interchanged, update this.
 			relayChain: [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? new WsProvider(config.assetHubRpc) : new WsProvider(config.relayChainRpc),
-			assetHub: [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? new WsProvider(config.relayChainRpc) : new WsProvider(config.assetHubRpc),
+			assetHub: new WsProvider(config.assetHubRpc),
 			hydration: config.hydrationRpc ? new WsProvider(config.hydrationRpc) : undefined
 		};
 
