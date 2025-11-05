@@ -158,8 +158,9 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 
 		// Initialize all API connections
 		const apiProviders = {
-			relayChain: new WsProvider(config.relayChainRpc),
-			assetHub: new WsProvider(config.assetHubRpc),
+			// TODO: MIGRATION UPDATE: here the rpc of relay chain and assethub are interchanged, update this.
+			relayChain: [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? new WsProvider(config.assetHubRpc) : new WsProvider(config.relayChainRpc),
+			assetHub: [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? new WsProvider(config.relayChainRpc) : new WsProvider(config.assetHubRpc),
 			hydration: config.hydrationRpc ? new WsProvider(config.hydrationRpc) : undefined
 		};
 
