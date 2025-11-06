@@ -1431,18 +1431,18 @@ export class PolkadotApiService {
 	getTeleportToPeopleChainTx({ beneficiaryAddress, amount }: { beneficiaryAddress: string; amount: BN }) {
 		if (!this.api) return null;
 
-		return this.api.tx.xcmPallet.limitedTeleportAssets(
+		return this.api.tx.polkadotXcm.limitedTeleportAssets(
 			{
-				V3: {
+				V4: {
 					interior: {
 						X1: { Parachain: NETWORKS_DETAILS[this.network]?.peopleChainParaId }
 					},
-					parents: 0
+					parents: 1
 				}
 			},
-			{ V3: { interior: { X1: { AccountId32: { id: decodeAddress(beneficiaryAddress), network: null } } } } },
+			{ V4: { interior: { X1: { AccountId32: { id: decodeAddress(beneficiaryAddress), network: null } } } } },
 			{
-				V3: [
+				V4: [
 					{
 						fun: {
 							Fungible: amount.toString()
@@ -1450,7 +1450,7 @@ export class PolkadotApiService {
 						id: {
 							Concrete: {
 								interior: 'Here',
-								parents: '0'
+								parents: 1
 							}
 						}
 					}
