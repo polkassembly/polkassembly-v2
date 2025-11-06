@@ -1437,7 +1437,7 @@ export class PolkadotApiService {
 					interior: {
 						X1: { Parachain: NETWORKS_DETAILS[this.network]?.peopleChainParaId }
 					},
-					parents: 0
+					parents: '1'
 				}
 			},
 			{ V3: { interior: { X1: { AccountId32: { id: decodeAddress(beneficiaryAddress), network: null } } } } },
@@ -1450,7 +1450,7 @@ export class PolkadotApiService {
 						id: {
 							Concrete: {
 								interior: 'Here',
-								parents: '0'
+								parents: '1'
 							}
 						}
 					}
