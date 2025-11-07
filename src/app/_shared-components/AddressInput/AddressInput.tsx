@@ -12,6 +12,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { Input } from '../Input';
 import Address from '../Profile/Address/Address';
 import { Button } from '../Button';
@@ -55,7 +56,7 @@ export default function AddressInput({ placeholder, onChange, className, disable
 	const onAccountChange = (a: InjectedAccount) => {
 		setSearchValue(a.address);
 
-		if (!getSubstrateAddress(a.address)) {
+		if (!ValidatorService.isValidEVMAddress(a.address) && !getSubstrateAddress(a.address)) {
 			setError(t('AddressInput.invalidAddress'));
 			onChange?.('');
 			return;
@@ -84,7 +85,7 @@ export default function AddressInput({ placeholder, onChange, className, disable
 			className='relative w-full'
 			ref={dropdownRef}
 		>
-			{getSubstrateAddress(searchValue) ? (
+			{getSubstrateAddress(searchValue) || ValidatorService.isValidEVMAddress(searchValue) ? (
 				<div className='flex w-full items-center justify-between gap-x-2 rounded-xl border border-border_grey bg-address_input_bg px-4 py-3'>
 					<Address
 						address={searchValue}

@@ -391,7 +391,8 @@
 		"TreasuryProposal": "財務提案",
 		"TreasuryProposalDescription": "ここはオンチェーン財務提案を議論する場所です。オンチェーン投稿は、チェーン上で作成されるとすぐに自動的に生成されます。提案者のみが編集できます。",
 		"Tip": "チップ",
-		"TipDescription": "ここはオンチェーンチップを議論する場所です。オンチェーン投稿は、チェーン上で作成されるとすぐに自動的に生成されます。提案者のみが編集できます。"
+		"TipDescription": "ここはオンチェーンチップを議論する場所です。オンチェーン投稿は、チェーン上で作成されるとすぐに自動的に生成されます。提案者のみが編集できます。",
+		"FastGeneralAdmin": "高速一般管理者"
 	},
 	"Sidebar": {
 		"onChainIdentity": "オンチェーンアイデンティティ",
@@ -448,6 +449,7 @@
 		"Treasury": "財務",
 		"LeaseAdmin": "リース管理者",
 		"GeneralAdmin": "一般管理者",
+		"FastGeneralAdmin": "高速一般管理者",
 		"chatWithKlara": "Klaraとチャット",
 		"klaraDesc": "AIチャットボット",
 		"more": "もっと",
@@ -936,7 +938,7 @@
 			"governance": "ガバナンス",
 			"root": "ルート",
 			"stakingadmin": "ステーキング管理者",
-			"treasury": "トレジャリー",
+			"treasury": "財務",
 			"fellowship": "フェローシップ",
 			"council": "カウンシル",
 			"democracy": "デモクラシー",
@@ -1108,7 +1110,7 @@
 		"claimants": "受益者",
 		"totalRewarded": "総報奨金",
 		"totalBountyPool": "総報奨金プール",
-		"comingSoon": "Coming Soon",
+		"comingSoon": "近日公開",
 		"dashboard": "ダッシュボード"
 	},
 	"BatchVote": {
@@ -1144,7 +1146,7 @@
 		"existingPreimage": "既にプリイメージを持っています",
 		"spend": "支出",
 		"from": "から",
-		"Treasury": "トレジャリー",
+		"Treasury": "財務",
 		"usdxProposal": "USDC/USDT提案を作成",
 		"cancelReferendum": "レファレンダムをキャンセル",
 		"killReferendum": "レファレンダムを終了",
