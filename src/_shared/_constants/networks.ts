@@ -290,32 +290,8 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 		]
 	},
 	[ENetwork.MOONBEAM]: {
-		identityMinDeposit: new BN('1258000000000000000000'),
+		identityMinDeposit: new BN('12580000000000000000'), // 12,580,000,000,000,000,000,
 		rpcEndpoints: [
-			{
-				name: VIA_DWELLIR,
-				url: 'wss://moonbeam-rpc.n.dwellir.com'
-			},
-			{
-				name: VIA_BLAST,
-				url: 'wss://moonbeam.public.blastapi.io'
-			},
-			{
-				name: VIA_MOONBEAM_FOUNDATION,
-				url: 'wss://wss.api.moonbeam.network'
-			},
-			{
-				name: VIA_ONFINALITY,
-				url: 'wss://moonbeam.api.onfinality.io/public-ws'
-			},
-			{
-				name: VIA_UNITEDBLOC,
-				url: 'wss://moonbeam.unitedbloc.com'
-			},
-			{
-				name: VIA_RADIUMBLOCK,
-				url: 'wss://moonbeam.public.curie.radiumblock.co/ws'
-			},
 			{
 				name: VIA_ALLNODES,
 				url: 'wss://moonbeam-rpc.publicnode.com'
@@ -327,11 +303,27 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 			{
 				name: VIA_IBP2,
 				url: 'wss://moonbeam.dotters.network'
+			},
+			{
+				name: VIA_MOONBEAM_FOUNDATION,
+				url: 'wss://wss.api.moonbeam.network'
+			},
+			{
+				name: VIA_ONFINALITY,
+				url: 'wss://moonbeam.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://moonbeam.public.curie.radiumblock.co/ws'
+			},
+			{
+				name: VIA_UNITEDBLOC,
+				url: 'wss://moonbeam.unitedbloc.com'
 			}
 		]
 	},
 	[ENetwork.MOONRIVER]: {
-		identityMinDeposit: new BN('1025800000000000000000'),
+		identityMinDeposit: new BN('1025800000000000000'),
 		rpcEndpoints: [
 			{
 				name: VIA_DWELLIR,
@@ -3912,30 +3904,6 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		chainId: 1284,
 		rpcEndpoints: [
 			{
-				name: VIA_DWELLIR,
-				url: 'wss://moonbeam-rpc.n.dwellir.com'
-			},
-			{
-				name: VIA_BLAST,
-				url: 'wss://moonbeam.public.blastapi.io'
-			},
-			{
-				name: VIA_MOONBEAM_FOUNDATION,
-				url: 'wss://wss.api.moonbeam.network'
-			},
-			{
-				name: VIA_ONFINALITY,
-				url: 'wss://moonbeam.api.onfinality.io/public-ws'
-			},
-			{
-				name: VIA_UNITEDBLOC,
-				url: 'wss://moonbeam.unitedbloc.com'
-			},
-			{
-				name: VIA_RADIUMBLOCK,
-				url: 'wss://moonbeam.public.curie.radiumblock.co/ws'
-			},
-			{
 				name: VIA_ALLNODES,
 				url: 'wss://moonbeam-rpc.publicnode.com'
 			},
@@ -3946,6 +3914,22 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 			{
 				name: VIA_IBP2,
 				url: 'wss://moonbeam.dotters.network'
+			},
+			{
+				name: VIA_MOONBEAM_FOUNDATION,
+				url: 'wss://wss.api.moonbeam.network'
+			},
+			{
+				name: VIA_ONFINALITY,
+				url: 'wss://moonbeam.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://moonbeam.public.curie.radiumblock.co/ws'
+			},
+			{
+				name: VIA_UNITEDBLOC,
+				url: 'wss://moonbeam.unitedbloc.com'
 			}
 		],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.MOONBEAM],
