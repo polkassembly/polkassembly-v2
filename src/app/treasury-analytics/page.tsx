@@ -6,6 +6,10 @@ import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
+import { ETreasuryAnalyticsTabs } from '@/_shared/types';
+import { Tabs, TabsContent } from '@ui/Tabs';
+import { TreasuryAnalyticsHeader } from './components/Header/Header';
+import InfoNudge from './components/InfoNudge/InfoNudge';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
@@ -21,7 +25,19 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 async function TreasuryAnalyticsPage() {
-	return <div className='w-full'>Treasury Analytics</div>;
+	return (
+		<div className='w-full'>
+			<Tabs defaultValue={ETreasuryAnalyticsTabs.OVERVIEW}>
+				<TreasuryAnalyticsHeader />
+				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-10'>
+					<TabsContent value={ETreasuryAnalyticsTabs.OVERVIEW}>Overview</TabsContent>
+					<TabsContent value={ETreasuryAnalyticsTabs.SPENDS}>Spends</TabsContent>
+					<TabsContent value={ETreasuryAnalyticsTabs.CORETIME}>Coretime</TabsContent>
+					<InfoNudge />
+				</div>
+			</Tabs>
+		</div>
+	);
 }
 
 export default TreasuryAnalyticsPage;
