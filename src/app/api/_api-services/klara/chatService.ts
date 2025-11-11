@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
-import { IConversationMessage, IChatResponse } from '@/_shared/types';
+import { IConversationMessage, IChatResponse, IConversationTurn } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest } from 'next/server';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -31,9 +31,9 @@ export class ChatService {
 			throw new APIError(ERROR_CODES.INVALID_REQUIRED_FIELDS, StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_REQUIRED_FIELDS);
 		}
 
-		const { message, userId, conversationId } = requestBody;
+		const { message, userId, conversationId, conversationHistory } = requestBody;
 
-		// Create or use existing conversation
+		// 1. Validate existing conversation ownership (if provided) - quick check only
 		let activeConversationId = conversationId;
 		let isNewConversation = false;
 
@@ -43,11 +43,50 @@ export class ChatService {
 				throw new APIError('FORBIDDEN', StatusCodes.FORBIDDEN, 'Unauthorized conversation access');
 			}
 		} else {
-			activeConversationId = await KlaraDatabaseService.CreateConversation(userId);
+			// Don't create conversation yet - will create after API success
 			isNewConversation = true;
 		}
 
-		// Save user message
+		// 2. Prepare conversation history (use client-provided or fetch from DB as fallback)
+		const historyLimit = KLARA_CONVERSATION_HISTORY_LIMIT || 5;
+		let finalHistory: IConversationTurn[] = [];
+
+		if (conversationHistory && Array.isArray(conversationHistory) && conversationHistory.length > 0) {
+			// Use client-provided history (preferred - no DB call needed)
+			finalHistory = conversationHistory.slice(-historyLimit);
+		} else if (activeConversationId) {
+			// Fallback: Fetch from DB (for backward compatibility with old clients)
+			const conversationMessages = await KlaraDatabaseService.GetConversationMessages(activeConversationId);
+			finalHistory = extractConversationHistory(conversationMessages, historyLimit);
+		}
+
+		// 3. CRITICAL PATH FIRST: Call external API before any DB writes
+		let apiResponse;
+		try {
+			apiResponse = await ExternalApiService.callExternalAPI(message, userId, finalHistory);
+		} catch (error) {
+			// If API fails, don't create conversation or save anything
+			// This prevents orphaned conversations and messages
+			console.error('External API call failed:', error);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to get AI response. Please try again.');
+		}
+
+		const { text: aiResponseText, sources, followUpQuestions, remainingRequests } = apiResponse;
+		const followUpLogic = shouldShowFollowUps(aiResponseText, followUpQuestions || []);
+
+		// 4. Add rate limit warning if needed
+		let finalResponseText = aiResponseText;
+		if (remainingRequests !== undefined && remainingRequests < 999 && remainingRequests < 5) {
+			finalResponseText += `\n\n⚠️ **Warning**: You are approaching the usage limit. You have ${remainingRequests} requests remaining this minute.`;
+		}
+
+		// 5. ONLY AFTER API SUCCESS: Create conversation (if new) and batch save messages
+		if (isNewConversation) {
+			// Create conversation now that we know API succeeded
+			activeConversationId = await KlaraDatabaseService.CreateConversation(userId);
+		}
+
+		// Prepare messages
 		const userMessage: IConversationMessage = {
 			id: createId(),
 			text: message,
@@ -55,25 +94,7 @@ export class ChatService {
 			conversationId: activeConversationId,
 			timestamp: Date.now()
 		};
-		await KlaraDatabaseService.SaveMessageToConversation(activeConversationId, userMessage);
 
-		// Get conversation history
-		const historyLimit = KLARA_CONVERSATION_HISTORY_LIMIT || 5;
-		const conversationMessages = await KlaraDatabaseService.GetConversationMessages(activeConversationId);
-		const conversationHistory = extractConversationHistory(conversationMessages, historyLimit);
-
-		// Get AI response
-		const { text: aiResponseText, sources, followUpQuestions, remainingRequests } = await ExternalApiService.callExternalAPI(message, userId, conversationHistory);
-
-		const followUpLogic = shouldShowFollowUps(aiResponseText, followUpQuestions || []);
-
-		// Add rate limit warning if needed
-		let finalResponseText = aiResponseText;
-		if (remainingRequests !== undefined && remainingRequests < 999 && remainingRequests < 5) {
-			finalResponseText += `\n\n⚠️ **Warning**: You are approaching the usage limit. You have ${remainingRequests} requests remaining this minute.`;
-		}
-
-		// Create AI message
 		const aiMessage: IConversationMessage = {
 			id: createId(),
 			text: finalResponseText,
@@ -89,21 +110,22 @@ export class ChatService {
 			aiMessage.followUpQuestions = followUpLogic.filtered;
 		}
 
-		await KlaraDatabaseService.SaveMessageToConversation(activeConversationId, aiMessage);
+		// Batch save both messages atomically (more efficient than two separate calls)
+		await KlaraDatabaseService.SaveMessagesToConversation(activeConversationId, [userMessage, aiMessage], userId);
 
-		try {
-			await ensureTableExists();
-			await logQueryResponse({
-				query: message,
-				response: finalResponseText,
-				status: 'success',
-				userId: userId.toString(),
-				conversationId: activeConversationId,
-				responseTimeMs: Date.now() - startTime
-			});
-		} catch (error) {
-			console.warn('PostgreSQL logging failed:', error);
-		}
+		// 6. Fire-and-forget PostgreSQL logging (non-blocking)
+		ensureTableExists()
+			.then(() =>
+				logQueryResponse({
+					query: message,
+					response: finalResponseText,
+					status: 'success',
+					userId: userId.toString(),
+					conversationId: activeConversationId,
+					responseTimeMs: Date.now() - startTime
+				})
+			)
+			.catch((error) => console.warn('PostgreSQL logging failed:', error));
 
 		return {
 			text: finalResponseText,

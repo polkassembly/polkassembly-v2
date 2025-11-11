@@ -37,7 +37,7 @@ export function shouldShowFollowUps(aiResponseText: string, followUpQuestions: s
 	return { show, filtered };
 }
 
-export function validateRequestBody(requestBody: { message: string; userId: string; conversationId: string }) {
+export function validateRequestBody(requestBody: { message: string; userId: string; conversationId?: string; conversationHistory?: IConversationTurn[] }) {
 	if (!requestBody.message || !requestBody.userId) {
 		return { valid: false, error: 'Message and username are required' };
 	}
@@ -48,6 +48,11 @@ export function validateRequestBody(requestBody: { message: string; userId: stri
 
 	if (requestBody.userId.length > 100) {
 		return { valid: false, error: 'Username too long (max 100 characters)' };
+	}
+
+	// Validate conversationHistory if provided
+	if (requestBody.conversationHistory && !Array.isArray(requestBody.conversationHistory)) {
+		return { valid: false, error: 'conversationHistory must be an array' };
 	}
 
 	return { valid: true };

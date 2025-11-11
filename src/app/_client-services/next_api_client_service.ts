@@ -63,7 +63,8 @@ import {
 	IGovAnalyticsDelegationStats,
 	IGovAnalyticsCategoryCounts,
 	IConversationHistory,
-	IConversationMessage
+	IConversationMessage,
+	IConversationTurn
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -1424,10 +1425,22 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ totalUsers: number; totalConversations: number }>({ url, method });
 	}
 
-	static async klaraSendMessage({ message, userId, conversationId, signal }: { message: string; userId: string; conversationId: string; signal: AbortSignal }) {
+	static async klaraSendMessage({
+		message,
+		userId,
+		conversationId,
+		conversationHistory,
+		signal
+	}: {
+		message: string;
+		userId: string;
+		conversationId: string;
+		conversationHistory?: IConversationTurn[];
+		signal: AbortSignal;
+	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.KLARA_SEND_MESSAGE, routeSegments: ['send-message'] });
 
-		return this.nextApiClientFetchStream({ url, method, signal, data: { message, userId, conversationId } });
+		return this.nextApiClientFetchStream({ url, method, signal, data: { message, userId, conversationId, conversationHistory } });
 	}
 
 	static async submitKlaraFeedback({

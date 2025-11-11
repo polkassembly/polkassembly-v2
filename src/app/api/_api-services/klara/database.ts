@@ -139,6 +139,86 @@ export class KlaraDatabaseService extends FirestoreUtils {
 		}
 	}
 
+	/**
+	 * Batch save multiple messages to a conversation atomically.
+	 * More efficient than calling SaveMessageToConversation multiple times.
+	 * Creates conversation if it doesn't exist.
+	 */
+	static async SaveMessagesToConversation(conversationId: string, messages: IConversationMessage[], userId: string): Promise<void> {
+		if (!messages || messages.length === 0) {
+			return;
+		}
+
+		try {
+			const batch = this.firestoreDb.batch();
+			const messagesRef = this.messagesCollectionRef();
+			const conversationRef = this.conversationsCollectionRef().doc(conversationId);
+
+			// Add all messages to batch
+			messages.forEach((message) => {
+				const cleanMessage = cleanUndefinedValues({
+					...message,
+					conversationId,
+					timestamp: dayjs(message.timestamp).toDate()
+				});
+				const messageRef = messagesRef.doc();
+				batch.set(messageRef, cleanMessage);
+			});
+
+			// Update conversation metadata in a transaction
+			await this.firestoreDb.runTransaction(async (tx) => {
+				const snap = await tx.get(conversationRef);
+				const { exists } = snap;
+				const data = snap.data() || {};
+
+				if (!exists) {
+					// Create conversation if it doesn't exist
+					const firstUserMessage = messages.find((m) => m.sender === 'user');
+					const title = firstUserMessage
+						? firstUserMessage.text.length > 50
+							? `${firstUserMessage.text.substring(0, 50)}...`
+							: firstUserMessage.text
+						: DEFAULT_CONVERSATION_TITLE;
+
+					const conversationData = {
+						title,
+						createdAt: dayjs().toDate(),
+						lastActivity: dayjs().toDate(),
+						messageCount: messages.length,
+						lastMessage: messages[messages.length - 1]?.text?.substring(0, 100) || '',
+						userId: userId.toString()
+					};
+					tx.set(conversationRef, conversationData);
+				} else {
+					// Update existing conversation
+					const currentTitle = data.title as string | undefined;
+					const firstUserMessage = messages.find((m) => m.sender === 'user');
+
+					let newTitle: string | undefined;
+					if (firstUserMessage && (currentTitle ?? DEFAULT_CONVERSATION_TITLE) === DEFAULT_CONVERSATION_TITLE) {
+						const truncatedText = firstUserMessage.text.substring(0, 50);
+						newTitle = firstUserMessage.text.length > 50 ? `${truncatedText}...` : truncatedText;
+					}
+
+					const updates: Record<string, any> = {
+						lastActivity: this.serverTimestamp(),
+						lastMessage: messages[messages.length - 1]?.text?.substring(0, 100) || '',
+						messageCount: this.increment(messages.length)
+					};
+					if (newTitle) updates.title = newTitle;
+
+					tx.update(conversationRef, updates);
+				}
+			});
+
+			// Commit batch
+			await batch.commit();
+		} catch (error) {
+			console.error('Error saving messages to conversation:', error);
+			throw error;
+		}
+	}
+
 	static async verifyConversationOwnership(conversationId: string, userId: string): Promise<boolean> {
 		if (!conversationId?.trim() || !userId?.trim()) {
 			throw new Error('conversationId and userId are required');
