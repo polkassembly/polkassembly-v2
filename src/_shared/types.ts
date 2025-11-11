@@ -1686,8 +1686,20 @@ export interface IChatResponse {
 	conversationId?: string;
 }
 
-export enum EGovAnalyticsTabs {
+export enum ETreasuryAnalyticsTabs {
 	OVERVIEW = 'overview',
 	SPENDS = 'spends',
 	CORETIME = 'coretime'
+}
+
+export interface ITreasurySpend {
+	treasurySpendIndex: number;
+	proposalTitle: string;
+	proposalIndex: string;
+	beneficiary: string;
+	assetId: string;
+	amount: string;
+	createdAt: Date;
+	category: string;
+	proposal: IOnChainPostInfo;
 }

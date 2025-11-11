@@ -10,6 +10,8 @@ import { ETreasuryAnalyticsTabs } from '@/_shared/types';
 import { Tabs, TabsContent } from '@ui/Tabs';
 import { TreasuryAnalyticsHeader } from './components/Header/Header';
 import InfoNudge from './components/InfoNudge/InfoNudge';
+import SpendsList from './components/SpendsList/SpendsList';
+import SpendsStats from './components/SpendsStats/SpendsStats';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
@@ -33,6 +35,8 @@ async function TreasuryAnalyticsPage() {
 					<TabsContent value={ETreasuryAnalyticsTabs.OVERVIEW}>Overview</TabsContent>
 					<TabsContent value={ETreasuryAnalyticsTabs.SPENDS}>Spends</TabsContent>
 					<TabsContent value={ETreasuryAnalyticsTabs.CORETIME}>Coretime</TabsContent>
+					<SpendsStats />
+					<SpendsList />
 					<InfoNudge />
 				</div>
 			</Tabs>
