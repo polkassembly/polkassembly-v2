@@ -931,7 +931,27 @@ export class PolkadotApiService {
 							},
 							beneficiary.amount.toString(),
 							isPostMigration
-								? { V4: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } }
+								? {
+										V4: {
+											location: {
+												parents: 0,
+												interior: 'Here'
+											},
+											accountId: {
+												parents: 0,
+												interior: {
+													X1: [
+														{
+															AccountId32: {
+																id: decodeAddress(beneficiary.address),
+																network: null
+															}
+														}
+													]
+												}
+											}
+										}
+									}
 								: { V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
 							beneficiary.validFromBlock || null
 						)
@@ -963,21 +983,41 @@ export class PolkadotApiService {
 								}
 							},
 							beneficiary.amount.toString(),
-							{
-								V4: {
-									parents: 0,
-									interior: {
-										X1: [
-											{
-												AccountId32: {
-													id: decodeAddress(beneficiary.address),
-													network: null
+							isPostMigration
+								? {
+										V4: {
+											location: {
+												parents: 0,
+												interior: 'Here'
+											},
+											accountId: {
+												parents: 0,
+												interior: {
+													X1: [
+														{
+															AccountId32: {
+																id: decodeAddress(beneficiary.address),
+																network: null
+															}
+														}
+													]
 												}
 											}
-										]
+										}
 									}
-								}
-							},
+								: {
+										V3: {
+											parents: 0,
+											interior: {
+												X1: {
+													AccountId32: {
+														id: decodeAddress(beneficiary.address),
+														network: null
+													}
+												}
+											}
+										}
+									},
 							beneficiary.validFromBlock || null
 						)
 					);
