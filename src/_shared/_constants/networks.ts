@@ -274,7 +274,7 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 } as const;
 
 const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
-	// TODO: MIGRATION UPDATE: here the rpc is of relay chain, update this.
+	// After AssetHub migration, this RPC is the relay chain endpoint (swapped with primary RPC)
 	[ENetwork.POLKADOT]: {
 		rpcEndpoints: [
 			{
@@ -347,7 +347,7 @@ const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
 			}
 		]
 	},
-	// TODO: MIGRATION UPDATE: here the rpc is of relay chain, update this.
+	// After AssetHub migration, this RPC is the relay chain endpoint (swapped with primary RPC)
 	[ENetwork.KUSAMA]: {
 		rpcEndpoints: [
 			{
@@ -3037,7 +3037,7 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 } as const;
 
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
-	// TODO: MIGRATION UPDATE: here the primary rpc is of assethub, update this.
+	// After AssetHub migration, the primary RPC is AssetHub (treasury operations moved to AssetHub)
 	[ENetwork.POLKADOT]: {
 		key: ENetwork.POLKADOT,
 		logo: PolkadotLogo,
@@ -3125,7 +3125,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fpolkassembly-small.jpg?alt=media&token=63accae8-ea14-4705-817b-92c7bf80ccce'
 		}
 	},
-	// TODO: MIGRATION UPDATE: here the primary rpc is of assethub, update this.
+	// After AssetHub migration, the primary RPC is AssetHub (treasury operations moved to AssetHub)
 	[ENetwork.KUSAMA]: {
 		key: ENetwork.KUSAMA,
 		logo: KusamaLogo,

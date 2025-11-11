@@ -158,7 +158,8 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 
 		// Initialize all API connections
 		const apiProviders = {
-			// TODO: MIGRATION UPDATE: here the rpc of relay chain and assethub are interchanged, update this.
+			// After AssetHub migration: relay chain and AssetHub RPCs are swapped for migrated networks
+			// The "relayChain" API actually connects to AssetHub for post-migration networks
 			relayChain: [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? new WsProvider(config.assetHubRpc) : new WsProvider(config.relayChainRpc),
 			assetHub: [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? new WsProvider(config.relayChainRpc) : new WsProvider(config.assetHubRpc),
 			hydration: config.hydrationRpc ? new WsProvider(config.hydrationRpc) : undefined
