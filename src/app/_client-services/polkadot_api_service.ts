@@ -891,6 +891,9 @@ export class PolkadotApiService {
 		}
 		const tx: SubmittableExtrinsic<'promise', ISubmittableResult>[] = [];
 
+		// After AssetHub migration, these networks execute treasury calls FROM AssetHub
+		const isPostMigration = [ENetwork.KUSAMA, ENetwork.POLKADOT].includes(this.network);
+
 		beneficiaries.forEach((beneficiary) => {
 			if (ValidatorService.isValidAmount(beneficiary.amount) && ValidatorService.isValidSubstrateAddress(beneficiary.address)) {
 				if (beneficiary.assetId && ValidatorService.isValidAssetId(beneficiary.assetId, this.network)) {
@@ -913,16 +916,21 @@ export class PolkadotApiService {
 											}
 										}
 									},
-									location: {
-										parents: 0,
-										interior: {
-											X1: { Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId }
-										}
-									}
+									location: isPostMigration
+										? {
+												parents: 0,
+												interior: 'Here'
+											}
+										: {
+												parents: 0,
+												interior: {
+													X1: { Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId }
+												}
+											}
 								}
 							},
 							beneficiary.amount.toString(),
-							[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(this.network)
+							isPostMigration
 								? { V4: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } }
 								: { V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
 							beneficiary.validFromBlock || null
@@ -933,16 +941,21 @@ export class PolkadotApiService {
 						this.api.tx?.treasury?.spend(
 							{
 								V4: {
-									location: {
-										parents: 0,
-										interior: {
-											X1: [
-												{
-													Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId
+									location: isPostMigration
+										? {
+												parents: 0,
+												interior: 'Here'
+											}
+										: {
+												parents: 0,
+												interior: {
+													X1: [
+														{
+															Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId
+														}
+													]
 												}
-											]
-										}
-									},
+											},
 									assetId: {
 										parents: 1,
 										interior: 'here'
