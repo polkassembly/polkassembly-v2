@@ -1619,6 +1619,17 @@
 		"track": "Track",
 		"amount": "AMT.",
 		"status": "Status",
-		"timestamp": "Timestamp"
+		"timestamp": "Timestamp",
+		"spendsFilter": {
+			"conditions": "Conditions",
+			"reset": "Reset",
+			"sortBy": "Sort By",
+			"latest": "Latest",
+			"oldest": "Oldest",
+			"amountASC": "Amount ASC",
+			"amountDESC": "Amount DESC",
+			"timestampASC": "Timestamp ASC",
+			"timestampDESC": "Timestamp DESC"
+		}
 	}
 }
