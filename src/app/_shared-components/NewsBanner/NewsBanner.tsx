@@ -12,27 +12,23 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 function NewsBanner() {
 	const [newsItems, setNewsItems] = useState<INewsItem[]>([]);
 	const [loading, setLoading] = useState(true);
-
 	useEffect(() => {
 		const fetchNews = async () => {
 			try {
-				const { data, error } = await NextApiClientService.getGoogleSheetNews({
+				const response = await NextApiClientService.getGoogleSheetNews({
 					sheetId: '1fJwOupuORTFnNT9X1JA7SKcqq8L7TfeasPxuXq2W37c',
 					sheetName: 'Sheet1'
 				});
 
-				if (error) {
-					console.error('Failed to fetch news:', error);
-					return;
-				}
+				const { data, error } = response;
 
 				if (data?.success && Array.isArray(data.data)) {
 					setNewsItems(data.data);
 				} else {
-					console.error('Unexpected data format:', data);
+					console.error('Unexpected response format:', error);
 				}
-			} catch (error) {
-				console.error('Failed to fetch news:', error);
+			} catch (err) {
+				console.error('Error fetching news:', err);
 			} finally {
 				setLoading(false);
 			}
@@ -40,8 +36,9 @@ function NewsBanner() {
 
 		fetchNews();
 
-		const interval = setInterval(fetchNews, 5 * 60 * 1000);
-		return () => clearInterval(interval);
+		const intervalId = setInterval(fetchNews, 5 * 60 * 1000);
+
+		return () => clearInterval(intervalId);
 	}, []);
 
 	if (loading || newsItems.length === 0) {
