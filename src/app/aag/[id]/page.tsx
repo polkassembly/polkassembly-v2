@@ -119,11 +119,11 @@ function VideoViewPage() {
 
 			<div className='mx-auto max-w-7xl p-4 md:p-6'>
 				<div className='flex flex-col gap-6 lg:flex-row'>
-					<div className='flex flex-1 flex-col'>
+					<div className='flex w-full flex-1 flex-col'>
 						<div className='flex flex-col overflow-hidden rounded-lg border border-border_grey bg-bg_modal shadow-sm'>
-							<div className='relative h-full w-full bg-bg_modal lg:aspect-video'>
+							<div className='relative aspect-[16/9] w-full bg-bg_modal sm:aspect-video'>
 								<iframe
-									src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&rel=0&origin=${window.location.origin}`}
+									src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&rel=0&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
 									title={currentVideo.title}
 									className='absolute inset-0 h-full w-full'
 									allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
@@ -131,18 +131,16 @@ function VideoViewPage() {
 								/>
 							</div>
 
-							<div className='p-4 md:p-6'>
-								<div className='mb-4 flex flex-col items-start gap-4 sm:flex-row sm:items-start sm:justify-between'>
-									<div className='flex-1'>
-										<h1 className='mb-2 text-xl font-bold text-text_primary md:text-2xl'>{currentVideo.title}</h1>
-									</div>
+							<div className='p-3 sm:p-4 md:p-6'>
+								<div className='mb-4 flex w-full flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
+									<h1 className='break-words text-lg font-bold leading-tight text-text_primary sm:text-xl md:text-2xl'>{currentVideo.title}</h1>
 
-									<div className='flex w-full items-center gap-2 sm:ml-4 sm:w-auto'>
-										<Button className='flex-1 rounded-full sm:flex-none'>View Agenda</Button>
+									<div className='flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap'>
+										<Button className='flex-1 rounded-full text-sm sm:flex-none'>View Agenda</Button>
 										<Button
 											variant='ghost'
 											size='icon'
-											className='rounded-lg border border-border_grey bg-network_dropdown_bg p-2'
+											className='rounded-lg border border-border_grey bg-network_dropdown_bg p-2 sm:p-2.5'
 											onClick={handleShare}
 											title='Share video'
 										>
@@ -152,37 +150,42 @@ function VideoViewPage() {
 								</div>
 
 								<div className='rounded-lg bg-page_background p-3 md:p-4'>
-									<div className='mb-3 flex flex-col gap-2 text-sm text-text_primary sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 md:mb-4'>
-										<span className='flex items-center gap-1'>
-											<Clock className='h-3 w-3 md:h-3.5 md:w-3.5' />
+									<div className='mb-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-text_primary sm:text-sm md:mb-4 md:gap-4'>
+										<span className='flex shrink-0 items-center gap-1'>
+											<Clock className='h-3 w-3 sm:h-3.5 sm:w-3.5' />
 											{currentVideo.duration}
 										</span>
-										<span className='flex items-center gap-1'>
-											<Calendar className='h-3 w-3 md:h-3.5 md:w-3.5' />
+
+										<span className='flex shrink-0 items-center gap-1'>
+											<Calendar className='h-3 w-3 sm:h-3.5 sm:w-3.5' />
 											{currentVideo.date}
 										</span>
+
 										{currentVideo.viewCount && (
-											<span className='flex items-center gap-1'>
-												<Eye className='h-3 w-3 md:h-3.5 md:w-3.5' />
+											<span className='flex shrink-0 items-center gap-1'>
+												<Eye className='h-3 w-3 sm:h-3.5 sm:w-3.5' />
 												{parseInt(currentVideo.viewCount, 10).toLocaleString()} views
 											</span>
 										)}
+
 										{network && (
-											<div className='flex items-center gap-2'>
+											<div className='flex shrink-0 items-center gap-2'>
 												<Image
 													src={network === 'polkadot' ? PolkadotLogo : KusamaLogo}
 													alt={network === 'polkadot' ? 'Polkadot' : 'Kusama'}
 													width={20}
 													height={20}
-													className='h-4 w-4 rounded-full md:h-5 md:w-5'
+													className='h-4 w-4 rounded-full sm:h-5 sm:w-5'
 												/>
-												<span className='text-xs capitalize text-text_primary'>{network}</span>
+												<span className='text-[11px] capitalize text-text_primary sm:text-xs'>{network}</span>
 											</div>
 										)}
 									</div>
 
 									{currentVideo.description && (
-										<div className='max-h-32 overflow-auto whitespace-pre-wrap text-sm leading-relaxed text-wallet_btn_text md:max-h-48'>{currentVideo.description}</div>
+										<div className='max-h-40 overflow-auto whitespace-pre-wrap text-xs leading-relaxed text-wallet_btn_text sm:max-h-48 sm:text-sm md:max-h-56'>
+											{currentVideo.description}
+										</div>
 									)}
 								</div>
 							</div>
