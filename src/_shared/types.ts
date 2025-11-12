@@ -1687,3 +1687,8 @@ export interface IChatResponse {
 	isNewConversation?: boolean;
 	conversationId?: string;
 }
+
+export interface INewsItem {
+	title: string;
+	link: string;
+}

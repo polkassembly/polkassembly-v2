@@ -63,7 +63,8 @@ import {
 	IGovAnalyticsDelegationStats,
 	IGovAnalyticsCategoryCounts,
 	IConversationHistory,
-	IConversationMessage
+	IConversationMessage,
+	INewsItem
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -163,7 +164,8 @@ enum EApiRoute {
 	GET_CONVERSATION_MESSAGES = 'GET_CONVERSATION_MESSAGES',
 	GET_KLARA_STATS = 'GET_KLARA_STATS',
 	KLARA_SEND_FEEDBACK = 'KLARA_SEND_FEEDBACK',
-	KLARA_SEND_MESSAGE = 'KLARA_SEND_MESSAGE'
+	KLARA_SEND_MESSAGE = 'KLARA_SEND_MESSAGE',
+	GET_GOOGLE_SHEET_NEWS = 'GET_GOOGLE_SHEET_NEWS'
 }
 
 export class NextApiClientService {
@@ -401,6 +403,10 @@ export class NextApiClientService {
 			case EApiRoute.KLARA_SEND_MESSAGE:
 				path = '/klara';
 				method = 'POST';
+				break;
+
+			case EApiRoute.GET_GOOGLE_SHEET_NEWS:
+				path = '/external-news';
 				break;
 
 			default:
@@ -1473,5 +1479,14 @@ export class NextApiClientService {
 				responseText
 			}
 		});
+	}
+
+	static async getGoogleSheetNews({ sheetId, sheetName }: { sheetId: string; sheetName: string }) {
+		const queryParams = new URLSearchParams({
+			sheetId,
+			sheetName
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOOGLE_SHEET_NEWS, queryParams });
+		return this.nextApiClientFetch<{ data: INewsItem[]; success: string }>({ url, method });
 	}
 }
