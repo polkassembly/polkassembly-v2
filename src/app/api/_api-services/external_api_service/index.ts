@@ -7,7 +7,7 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { type IYouTubeVideoMetadata, type IYouTubePlaylistMetadata, type IYouTubeCaption } from '@/_shared/types';
 import { APIError } from '../../_api-utils/apiError';
-import { YouTubeService } from '../youtube_service';
+import { YouTubeService } from './youtube_service';
 
 export class ExternalAPIService {
 	static async getYouTubeVideoMetadata(videoIdOrUrl: string, options: { includeCaptions?: boolean; language?: string } = {}): Promise<IYouTubeVideoMetadata | null> {

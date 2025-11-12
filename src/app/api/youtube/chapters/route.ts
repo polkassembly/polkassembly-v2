@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { IYouTubeChapter } from '@/_shared/types';
-import { YouTubeService } from '../../_api-services/youtube_service';
+import { YouTubeService } from '../../_api-services/external_api_service/youtube_service';
 import { APIError } from '../../_api-utils/apiError';
 
 export async function GET(request: NextRequest) {

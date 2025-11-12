@@ -25,7 +25,7 @@ export const {
 	ALGOLIA_WRITE_API_KEY = '',
 	KLARA_API_BASE_URL = '',
 	KLARA_AI_TOKEN = '',
-	YOUTUBE_API_KEY = ''
+	GOOGLE_API_KEY = ''
 } = process.env;
 
 export const IS_CACHE_ENABLED = process.env.IS_CACHE_ENABLED === 'true';

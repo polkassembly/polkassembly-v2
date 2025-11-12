@@ -7,11 +7,11 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { getSubtitles } from 'youtube-captions-scraper';
 import type { IYouTubeCaption, IYouTubeThumbnail, IYouTubeVideoMetadata, IYouTubePlaylistMetadata, IYouTubeChapter } from '@/_shared/types';
-import { YOUTUBE_API_KEY } from '../../_api-constants/apiEnvVars';
+import { GOOGLE_API_KEY } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 
-if (!YOUTUBE_API_KEY.trim()) {
-	console.warn('\n ⚠️  Warning: YOUTUBE_API_KEY is not set. YouTube video metadata will not be fetched.\n');
+if (!GOOGLE_API_KEY.trim()) {
+	console.warn('\n ⚠️  Warning: GOOGLE_API_KEY is not set. YouTube video metadata will not be fetched.\n');
 }
 
 interface IYouTubeApiVideoResponse {
@@ -175,14 +175,14 @@ export class YouTubeService {
 	}
 
 	private static async fetchVideoMetadata(videoIds: string[]): Promise<IYouTubeApiVideoResponse> {
-		if (!YOUTUBE_API_KEY.trim()) {
+		if (!GOOGLE_API_KEY.trim()) {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'YouTube API key not configured');
 		}
 
 		const url = new URL(`${this.YOUTUBE_API_BASE_URL}/videos`);
 		url.searchParams.set('part', 'snippet,contentDetails,statistics');
 		url.searchParams.set('id', videoIds.join(','));
-		url.searchParams.set('key', YOUTUBE_API_KEY);
+		url.searchParams.set('key', GOOGLE_API_KEY);
 
 		try {
 			const response = await fetch(url.toString());
@@ -204,14 +204,14 @@ export class YouTubeService {
 	}
 
 	private static async fetchPlaylistMetadata(playlistId: string): Promise<IYouTubeApiPlaylistResponse> {
-		if (!YOUTUBE_API_KEY.trim()) {
+		if (!GOOGLE_API_KEY.trim()) {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'YouTube API key is not configured');
 		}
 
 		const url = new URL(`${this.YOUTUBE_API_BASE_URL}/playlists`);
 		url.searchParams.set('part', 'snippet,contentDetails');
 		url.searchParams.set('id', playlistId);
-		url.searchParams.set('key', YOUTUBE_API_KEY);
+		url.searchParams.set('key', GOOGLE_API_KEY);
 
 		try {
 			const response = await fetch(url.toString());
@@ -233,7 +233,7 @@ export class YouTubeService {
 	}
 
 	private static async fetchPlaylistVideos(playlistId: string): Promise<string[]> {
-		if (!YOUTUBE_API_KEY.trim()) {
+		if (!GOOGLE_API_KEY.trim()) {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'YouTube API key is not configured');
 		}
 
@@ -245,7 +245,7 @@ export class YouTubeService {
 			url.searchParams.set('part', 'snippet');
 			url.searchParams.set('playlistId', playlistId);
 			url.searchParams.set('maxResults', this.MAX_RESULTS_PER_REQUEST.toString());
-			url.searchParams.set('key', YOUTUBE_API_KEY);
+			url.searchParams.set('key', GOOGLE_API_KEY);
 
 			if (pageToken) {
 				url.searchParams.set('pageToken', pageToken);
