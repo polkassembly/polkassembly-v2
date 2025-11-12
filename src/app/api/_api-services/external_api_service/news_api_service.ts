@@ -3,13 +3,12 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { INewsItem } from '@/_shared/types';
+import { GOOGLE_API_KEY } from '../../_api-constants/apiEnvVars';
 
 export class NewsService {
-	private static API_KEY = process.env.GOOGLE_SHEETS_API_KEY || '';
-
 	static async fetchActiveNews(sheetId: string, sheetName: string): Promise<INewsItem[]> {
 		try {
-			if (!this.API_KEY) {
+			if (!GOOGLE_API_KEY) {
 				throw new Error('Google Sheets API key not configured');
 			}
 
@@ -17,7 +16,7 @@ export class NewsService {
 				throw new Error('Sheet ID and Sheet Name are required');
 			}
 
-			const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}?key=${this.API_KEY}`;
+			const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}?key=${GOOGLE_API_KEY}`;
 
 			const response = await fetch(url, {
 				next: { revalidate: 300 }
