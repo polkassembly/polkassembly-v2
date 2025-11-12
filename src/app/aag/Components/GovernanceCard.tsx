@@ -9,28 +9,29 @@ import Image from 'next/image';
 import { Calendar, Clock, Share2 } from 'lucide-react';
 import { Button } from '@/app/_shared-components/Button';
 import { useToast } from '@/hooks/useToast';
-import { ENotificationStatus } from '@/_shared/types';
+import { ENotificationStatus, type IReferendaItem } from '@/_shared/types';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import { usePathname } from 'next/navigation';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 
 interface GovernanceCardProps {
 	title: string;
 	date: string;
 	duration: string;
 	thumbnail?: string;
-	referenda?: string[];
+	referenda?: IReferendaItem[];
 	votingOutcomes?: string[];
 	url?: string;
 	videoId?: string;
 	publishedAt?: string;
+	agendaUrl?: string;
 }
 
-function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOutcomes, url, videoId, publishedAt }: GovernanceCardProps) {
-	const tags = referenda || votingOutcomes;
-	const tagTitle = referenda ? 'Referenda' : 'Voting Outcomes';
+function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOutcomes, url, videoId, publishedAt, agendaUrl }: GovernanceCardProps) {
 	const { toast } = useToast();
 	const pathname = usePathname();
+	const currentNetwork = getCurrentNetwork();
 	const path = videoId ? `/aag/${videoId}` : pathname;
 	const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}${path}` : '';
 
@@ -65,6 +66,15 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 				title: 'Failed to copy link',
 				description: 'Could not copy link to clipboard'
 			});
+		}
+	};
+
+	const handleAgendaClick = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+
+		if (agendaUrl) {
+			window.open(agendaUrl, '_blank', 'noopener,noreferrer');
 		}
 	};
 
@@ -127,17 +137,38 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 					</p>
 
 					<div className='mb-3 flex flex-col gap-2 md:mb-4'>
-						<h4 className='text-sm text-text_primary'>{tagTitle}</h4>
 						<div className='flex flex-wrap gap-2'>
-							{tags &&
-								tags.map((tag: string) => (
-									<span
-										key={tag}
-										className='rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink md:text-sm'
-									>
-										{tag}
-									</span>
-								))}
+							{referenda
+								? referenda.slice(0, 7).map((ref) => {
+										const baseUrl = `https://${currentNetwork}.polkassembly.io`;
+										const refUrl = `${baseUrl}/referenda/${ref.referendaNo}`;
+
+										return (
+											<a
+												key={`${currentNetwork}-${ref.referendaNo}`}
+												href={refUrl}
+												target='_blank'
+												rel='noopener noreferrer'
+												className='inline-flex items-center gap-1.5 rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink transition-colors hover:bg-bg_light_pink/80'
+												onClick={(e) => {
+													e.preventDefault();
+													e.stopPropagation();
+													window.open(refUrl, '_blank', 'noopener,noreferrer');
+												}}
+											>
+												# {ref.referendaNo}
+											</a>
+										);
+									})
+								: votingOutcomes?.map((tag: string) => (
+										<span
+											key={tag}
+											className='rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink'
+										>
+											{tag}
+										</span>
+									))}
+							{referenda && referenda.length > 7 && <span className='rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink'>+{referenda.length - 7}</span>}
 						</div>
 					</div>
 
@@ -152,13 +183,16 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 									className='h-5 w-5 rounded-full md:h-6 md:w-6'
 								/>
 							)}
-							<Button
-								variant='ghost'
-								size='sm'
-								className='rounded-full border border-text_pink px-3 py-1.5 text-xs text-text_pink hover:bg-bg_light_pink md:px-4 md:py-2 md:text-sm'
-							>
-								View Agenda
-							</Button>
+							{agendaUrl && (
+								<Button
+									variant='ghost'
+									size='sm'
+									className='rounded-full border border-text_pink px-3 py-1.5 text-xs text-text_pink hover:bg-bg_light_pink md:px-4 md:py-2 md:text-sm'
+									onClick={handleAgendaClick}
+								>
+									View Agenda
+								</Button>
+							)}
 						</div>
 						<Button
 							variant='ghost'

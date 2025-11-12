@@ -4,8 +4,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
+import type { IReferendaItem } from '@/_shared/types';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { ExternalAPIService } from '../../_api-services/external_api_service';
+import { YouTubeService } from '../../_api-services/external_api_service/youtube_service';
 import { APIError } from '../../_api-utils/apiError';
 
 export async function GET(request: NextRequest) {
@@ -35,9 +37,34 @@ export async function GET(request: NextRequest) {
 			return NextResponse.json({ error: 'Playlist not found' }, { status: StatusCodes.NOT_FOUND });
 		}
 
+		// Fetch referenda from Google Sheets for each video that has an agenda URL
+		const videosWithReferenda = await Promise.all(
+			playlistInfo.videos.map(async (video) => {
+				const agendaUrl = YouTubeService.extractAgendaUrl(video.description);
+				let referenda: IReferendaItem[] = [];
+
+				if (agendaUrl) {
+					try {
+						referenda = await YouTubeService.extractReferendaFromSheet(agendaUrl);
+					} catch (error) {
+						console.error(`Error fetching referenda for video ${video.metadata.id}:`, error);
+					}
+				}
+
+				return {
+					...video,
+					referenda,
+					agendaUrl
+				};
+			})
+		);
+
 		return NextResponse.json({
 			success: true,
-			data: playlistInfo
+			data: {
+				playlist: playlistInfo.playlist,
+				videos: videosWithReferenda
+			}
 		});
 	} catch (error) {
 		console.error('Error in YouTube playlist API:', error);

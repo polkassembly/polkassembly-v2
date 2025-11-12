@@ -37,7 +37,7 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 
 		if (searchQuery.trim()) {
 			const query = searchQuery.toLowerCase();
-			filtered = filtered.filter((video) => video.title.toLowerCase().includes(query) || video.referenda?.some((ref) => ref.toLowerCase().includes(query)));
+			filtered = filtered.filter((video) => video.title.toLowerCase().includes(query) || video.referenda?.some((ref) => ref.referendaNo.toLowerCase().includes(query)));
 		}
 
 		if (filterBy !== FILTER_OPTIONS.ALL) {
@@ -163,6 +163,7 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 							url={video.url}
 							videoId={video.id}
 							referenda={video.referenda}
+							agendaUrl={video.agendaUrl}
 						/>
 					))}
 			</div>

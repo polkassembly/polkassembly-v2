@@ -5,7 +5,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import type { IAAGPlaylistData, IAAGVideoData, IYouTubePlaylistMetadata } from '@/_shared/types';
+import type { IAAGPlaylistData, IAAGVideoData, IYouTubePlaylistMetadata, IReferendaItem } from '@/_shared/types';
 
 interface UseYouTubeDataOptions {
 	playlistUrl: string;
@@ -40,48 +40,46 @@ function formatDuration(duration: string): string {
 	}
 }
 
-function extractReferendaFromText(text: string): string[] {
-	const referendaPattern = /#\d+/g;
-	const matches = text.match(referendaPattern) || [];
-
-	const unique = Array.from(new Set(matches));
-
-	if (unique.length <= 6) {
-		return unique;
-	}
-
-	return [...unique.slice(0, 5), `+${unique.length - 5}`];
-}
-
 export function useYouTubeData({ playlistUrl, includeCaptions = false, language = 'en', maxVideos }: UseYouTubeDataOptions): UseYouTubeDataReturn {
 	const [data, setData] = useState<IAAGPlaylistData | null>(null);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const transformVideoData = useCallback((videos: IYouTubePlaylistMetadata['videos']): IAAGVideoData[] => {
-		return videos.map((video: IYouTubePlaylistMetadata['videos'][0]) => ({
-			id: video.id,
-			title: video.title,
-			date: new Date(video.publishedAt)
-				.toLocaleDateString('en-GB', {
-					day: '2-digit',
-					month: 'short',
-					year: '2-digit'
-				})
-				.replace(/ /g, ' '),
-			duration: formatDuration(video.duration),
-			thumbnail: video.thumbnails.maxres?.url || video.thumbnails.high?.url || video.thumbnails.medium?.url || video.thumbnails.default?.url || '',
-			url: video.url,
-			description: video.description,
-			referenda: extractReferendaFromText(`${video.title} ${video.description}`),
-			publishedAt: video.publishedAt,
-			captions: video.captions,
-			viewCount: video.viewCount,
-			likeCount: video.likeCount,
-			commentCount: video.commentCount,
-			tags: video.tags
-		}));
-	}, []);
+	const transformVideoData = useCallback(
+		(
+			videos: Array<{
+				metadata: IYouTubePlaylistMetadata['videos'][0];
+				referenda?: IReferendaItem[];
+				agendaUrl?: string;
+			}>
+		): IAAGVideoData[] => {
+			return videos.map((video) => ({
+				id: video.metadata.id,
+				title: video.metadata.title,
+				date: new Date(video.metadata.publishedAt)
+					.toLocaleDateString('en-GB', {
+						day: '2-digit',
+						month: 'short',
+						year: '2-digit'
+					})
+					.replace(/ /g, ' '),
+				duration: formatDuration(video.metadata.duration),
+				thumbnail:
+					video.metadata.thumbnails.maxres?.url || video.metadata.thumbnails.high?.url || video.metadata.thumbnails.medium?.url || video.metadata.thumbnails.default?.url || '',
+				url: video.metadata.url,
+				description: video.metadata.description,
+				referenda: video.referenda || [],
+				publishedAt: video.metadata.publishedAt,
+				captions: video.metadata.captions,
+				viewCount: video.metadata.viewCount,
+				likeCount: video.metadata.likeCount,
+				commentCount: video.metadata.commentCount,
+				tags: video.metadata.tags,
+				agendaUrl: video.agendaUrl
+			}));
+		},
+		[]
+	);
 
 	const fetchData = useCallback(async () => {
 		if (!playlistUrl.trim()) {
@@ -123,7 +121,7 @@ export function useYouTubeData({ playlistUrl, includeCaptions = false, language 
 					channelTitle: playlist.channelTitle,
 					publishedAt: playlist.publishedAt,
 					itemCount: playlist.itemCount,
-					videos: transformVideoData(videos.map((v: { metadata: IYouTubePlaylistMetadata['videos'][0] }) => v.metadata))
+					videos: transformVideoData(videos)
 				};
 
 				setData(transformedData);

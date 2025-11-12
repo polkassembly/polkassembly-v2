@@ -6,7 +6,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { getSubtitles } from 'youtube-captions-scraper';
-import type { IYouTubeCaption, IYouTubeThumbnail, IYouTubeVideoMetadata, IYouTubePlaylistMetadata, IYouTubeChapter } from '@/_shared/types';
+import type { IYouTubeCaption, IYouTubeThumbnail, IYouTubeVideoMetadata, IYouTubePlaylistMetadata, IYouTubeChapter, IReferendaItem } from '@/_shared/types';
 import { GOOGLE_API_KEY } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 
@@ -773,5 +773,112 @@ export class YouTubeService {
 		}
 
 		return { isValid: false, type: null };
+	}
+
+	static extractAgendaUrl(description: string): string | undefined {
+		if (!description) return undefined;
+
+		const lines = description.split('\n');
+
+		for (let i = 0; i < lines.length; i += 1) {
+			const line = lines.at(i)?.trim() || '';
+
+			if (line.toLowerCase().includes("today's aagenda") || line.toLowerCase().includes('aagenda:')) {
+				const nextLine = lines.at(i + 1)?.trim();
+
+				if (nextLine?.startsWith('→') || nextLine?.startsWith('👉')) {
+					const urlMatch = nextLine.match(/https:\/\/docs\.google\.com\/spreadsheets\/[^\s]+/);
+					if (urlMatch) {
+						return urlMatch[0];
+					}
+				}
+
+				const currentLineMatch = line.match(/https:\/\/docs\.google\.com\/spreadsheets\/[^\s]+/);
+				if (currentLineMatch) {
+					return currentLineMatch[0];
+				}
+			}
+		}
+
+		const agendaMatch = description.match(/(?:today'?s?\s+aagenda|aagenda)[\s\S]{0,100}?(https:\/\/docs\.google\.com\/spreadsheets\/[^\s]+)/i);
+		if (agendaMatch?.[1]) {
+			return agendaMatch[1];
+		}
+
+		return undefined;
+	}
+
+	static extractSheetId(url: string): string | null {
+		const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+		return match ? match[1] : null;
+	}
+
+	static extractGid(url: string): string | null {
+		const match = url.match(/[#&]gid=(\d+)/);
+		return match ? match[1] : null;
+	}
+
+	static async extractReferendaFromSheet(agendaUrl: string): Promise<IReferendaItem[]> {
+		try {
+			const sheetId = this.extractSheetId(agendaUrl);
+			const gid = this.extractGid(agendaUrl);
+
+			if (!sheetId) {
+				console.warn('Could not extract sheet ID from agenda URL');
+				return [];
+			}
+
+			let sheetName = 'Sheet1';
+			if (gid) {
+				const sheetResponse = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?key=${GOOGLE_API_KEY}`);
+
+				if (sheetResponse.ok) {
+					const sheetData = await sheetResponse.json();
+					const sheet = sheetData.sheets?.find((s: { properties: { sheetId: number } }) => s.properties.sheetId === parseInt(gid, 10));
+					if (sheet?.properties?.title) {
+						sheetName = sheet.properties.title;
+					}
+				}
+			}
+
+			const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}?key=${GOOGLE_API_KEY}`;
+			const response = await fetch(url);
+
+			if (!response.ok) {
+				console.warn('Failed to fetch sheet values:', response.statusText);
+				return [];
+			}
+
+			const sheetResponse = await response.json();
+			const rows = sheetResponse.values || [];
+
+			if (!Array.isArray(rows) || rows.length === 0) {
+				return [];
+			}
+
+			const referenda: IReferendaItem[] = [];
+
+			rows.forEach((row: string[]) => {
+				if (!Array.isArray(row)) return;
+
+				row.forEach((cellValue) => {
+					const cell = String(cellValue || '').trim();
+					if (/^Ref\.?\s*\d+/i.test(cell)) {
+						const match = cell.match(/Ref\.?\s*(\d+)/i);
+						if (match) {
+							const [, referendaNo] = match;
+							if (!referenda.some((r) => r.referendaNo === referendaNo)) {
+								referenda.push({ referendaNo });
+							}
+						}
+					}
+				});
+			});
+
+			return referenda;
+		} catch (error) {
+			console.error('Error extracting referenda from sheet:', error);
+			return [];
+		}
 	}
 }

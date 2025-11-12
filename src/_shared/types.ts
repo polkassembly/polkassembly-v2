@@ -1742,6 +1742,10 @@ export interface IYouTubePlaylistMetadata {
 	url: string;
 }
 
+export interface IReferendaItem {
+	referendaNo: string;
+}
+
 export interface IAAGVideoData {
 	id: string;
 	title: string;
@@ -1750,13 +1754,15 @@ export interface IAAGVideoData {
 	thumbnail: string;
 	url: string;
 	description: string;
-	referenda: string[];
+	referenda: IReferendaItem[];
 	publishedAt: string;
 	captions?: IYouTubeCaption[];
 	viewCount?: string;
 	likeCount?: string;
 	commentCount?: string;
 	tags?: string[];
+	agendaUrl?: string;
+	chapters?: IYouTubeChapter[];
 }
 
 export interface IAAGPlaylistData {

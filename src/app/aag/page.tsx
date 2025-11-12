@@ -52,6 +52,7 @@ function AAG() {
 								videoId={video.id}
 								referenda={video.referenda}
 								publishedAt={video.publishedAt}
+								agendaUrl={video.agendaUrl}
 							/>
 						))}
 				</div>

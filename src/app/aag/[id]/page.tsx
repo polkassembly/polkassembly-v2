@@ -9,7 +9,7 @@ import { useParams, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import type { IAAGVideoData } from '@/_shared/types';
 import { useYouTubeData } from '@/hooks/useYouTubeData';
-import { useYouTubeChapters } from '@/hooks/useYouTubeChapters';
+import { useVideoData } from '@/hooks/useVideoData';
 import { useToast } from '@/hooks/useToast';
 import { ENotificationStatus } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
@@ -33,6 +33,15 @@ function VideoViewPage() {
 	const [activeChapter, setActiveChapter] = useState('1');
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
+	const { data: playlistData } = useYouTubeData({
+		playlistUrl: AAG_YOUTUBE_PLAYLIST_URL
+	});
+
+	const { data: videoData, loading: videoLoading } = useVideoData({
+		videoId: videoId || undefined,
+		enabled: Boolean(videoId)
+	});
+
 	const network = currentVideo
 		? (() => {
 				const date = new Date(currentVideo.publishedAt);
@@ -43,29 +52,31 @@ function VideoViewPage() {
 			})()
 		: null;
 
-	const { data: playlistData } = useYouTubeData({
-		playlistUrl: AAG_YOUTUBE_PLAYLIST_URL
-	});
-
-	const {
-		data: chaptersData,
-		loading: chaptersLoading,
-		error: chaptersError
-	} = useYouTubeChapters({
-		videoUrl: currentVideo?.url,
-		enabled: Boolean(currentVideo?.url)
-	});
-
 	useEffect(() => {
 		if (playlistData?.videos && videoId) {
 			const video = playlistData.videos.find((v: IAAGVideoData) => v.id === videoId);
-			setCurrentVideo(video || null);
+			if (video && videoData) {
+				setCurrentVideo({
+					...video,
+					agendaUrl: videoData.agendaUrl,
+					chapters: videoData.chapters
+				});
+			} else if (video) {
+				setCurrentVideo(video);
+			}
 		}
-	}, [playlistData, videoId]);
+	}, [playlistData, videoId, videoData]);
 
-	const chapters = chaptersData?.chapters || [];
+	const chapters = videoData?.chapters || currentVideo?.chapters || [];
+	const agendaUrl = videoData?.agendaUrl || currentVideo?.agendaUrl;
 
 	const suggestedVideos = playlistData?.videos?.filter((v: IAAGVideoData) => v.id !== videoId)?.slice(0, 5) || [];
+
+	const handleAgendaClick = () => {
+		if (agendaUrl) {
+			window.open(agendaUrl, '_blank', 'noopener,noreferrer');
+		}
+	};
 
 	const handleShare = async () => {
 		try {
@@ -102,7 +113,7 @@ function VideoViewPage() {
 		}
 	};
 
-	if (!currentVideo) {
+	if (!currentVideo || videoLoading) {
 		return (
 			<div className='flex h-screen items-center justify-center'>
 				<div className='text-center'>
@@ -136,7 +147,14 @@ function VideoViewPage() {
 									<h1 className='break-words text-lg font-bold leading-tight text-text_primary sm:text-xl md:text-2xl'>{currentVideo.title}</h1>
 
 									<div className='flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap'>
-										<Button className='flex-1 rounded-full text-sm sm:flex-none'>View Agenda</Button>
+										{agendaUrl && (
+											<Button
+												className='flex-1 rounded-full text-sm sm:flex-none'
+												onClick={handleAgendaClick}
+											>
+												View Agenda
+											</Button>
+										)}
 										<Button
 											variant='ghost'
 											size='icon'
@@ -196,10 +214,10 @@ function VideoViewPage() {
 						<div className='max-h-96 overflow-auto rounded-lg border border-border_grey bg-bg_modal p-3 shadow-sm md:p-4 lg:max-h-none'>
 							<h2 className='mb-3 flex items-center text-base font-semibold text-text_primary md:mb-4 md:text-lg'>
 								Chapters
-								{chaptersLoading && <div className='ml-2 h-3 w-3 animate-spin rounded-full border-b-2 border-bar_chart_purple md:h-4 md:w-4' />}
+								{videoLoading && <div className='ml-2 h-3 w-3 animate-spin rounded-full border-b-2 border-bar_chart_purple md:h-4 md:w-4' />}
 							</h2>
 
-							{chaptersLoading ? (
+							{videoLoading ? (
 								<div className='space-y-2'>
 									{[1, 2, 3].map((i) => (
 										<div
@@ -207,10 +225,6 @@ function VideoViewPage() {
 											className='bg-bg_grey h-12 animate-pulse rounded-lg md:h-16'
 										/>
 									))}
-								</div>
-							) : chaptersError ? (
-								<div className='rounded-lg border p-3'>
-									<p className='text-sm text-toast_warning_text'>Failed to load chapters: {chaptersError}</p>
 								</div>
 							) : chapters.length > 0 ? (
 								<div className='max-h-64 space-y-2 overflow-auto md:max-h-[450px]'>
