@@ -9,8 +9,11 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Button } from '@/app/_shared-components/Button';
 import { Input } from '@/app/_shared-components/Input';
 import { Label } from '@/app/_shared-components/Label';
-import { Mail, Send, Twitter, ExternalLink, CheckCircle } from 'lucide-react';
+import FileUploadIcon from '@assets/icons/file-upload.svg';
+
+import { Mail, Send, Twitter, ExternalLink, CheckCircle, Info } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface RequestToPresentModalProps {
 	isOpen: boolean;
@@ -75,7 +78,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 			open={isOpen}
 			onOpenChange={onClose}
 		>
-			<DialogContent className='max-h-[90vh] max-w-screen-md overflow-y-auto p-4 text-text_primary sm:p-6'>
+			<DialogContent className='max-h-[90vh] max-w-screen-md overflow-y-auto p-4 text-wallet_btn_text sm:p-6'>
 				<DialogHeader>
 					<DialogTitle className='text-xl font-bold'>Request to Present</DialogTitle>
 				</DialogHeader>
@@ -92,6 +95,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 								name='fullName'
 								type='text'
 								placeholder='Type Here'
+								className='text-text_primary'
 								value={formData.fullName}
 								onChange={handleInputChange}
 								required
@@ -104,6 +108,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 								name='organization'
 								type='text'
 								placeholder='Type Here'
+								className='text-text_primary'
 								value={formData.organization}
 								onChange={handleInputChange}
 							/>
@@ -120,7 +125,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 									value='yes'
 									checked={formData.hasProposal === 'yes'}
 									onChange={handleInputChange}
-									className='accent-pink-600'
+									className='accent-text_pink'
 								/>
 								<span>Yes</span>
 							</Label>
@@ -131,7 +136,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 									value='no'
 									checked={formData.hasProposal === 'no'}
 									onChange={handleInputChange}
-									className='accent-pink-600'
+									className='accent-text_pink'
 								/>
 								<span>No</span>
 							</Label>
@@ -145,17 +150,18 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 							name='referendumIndex'
 							type='text'
 							placeholder='e.g., 1462'
+							className='text-text_primary'
 							value={formData.referendumIndex}
 							onChange={handleInputChange}
 						/>
 						{formData.referendumIndex && (
-							<div className='flex items-center justify-between rounded-md bg-pink-50 p-2 text-sm text-pink-700'>
+							<div className='flex cursor-pointer items-center justify-between rounded-md bg-bg_pink p-2 text-sm text-text_pink'>
 								<span className='font-medium'>#{formData.referendumIndex} Vehicle Data on Asset Hub (We&apos;re All Gonna Own It)</span>
 								<Link
 									href='/'
 									target='_blank'
 									rel='noopener noreferrer'
-									className='flex items-center gap-1 text-pink-600 hover:underline'
+									className='flex items-center gap-1 text-text_pink hover:underline'
 								>
 									View Proposal <ExternalLink size={16} />
 								</Link>
@@ -169,7 +175,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 							id='description'
 							name='description'
 							rows={4}
-							className='flex w-full resize-none rounded-lg border border-border_grey bg-transparent px-2 py-2 text-base shadow-sm transition-colors placeholder:text-placeholder focus-visible:border-text_pink focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
+							className='flex w-full resize-none rounded-lg border border-border_grey bg-transparent px-2 py-2 text-base text-text_primary shadow-sm transition-colors placeholder:text-placeholder focus-visible:border-text_pink focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
 							placeholder='Type Here'
 							value={formData.description}
 							onChange={handleInputChange}
@@ -207,22 +213,15 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 					<div className='space-y-2'>
 						<div className='flex items-center justify-between'>
 							<Label htmlFor='supportingFile'>Supporting Materials</Label>
-							<span className='flex items-center gap-1 text-sm text-gray-500'>
+							<span className='flex items-center gap-1 text-sm'>
 								Upload File
-								<svg
-									xmlns='http://www.w3.org/2000/svg'
-									fill='none'
-									viewBox='0 0 24 24'
-									strokeWidth={2}
-									stroke='currentColor'
-									className='h-4 w-4 text-gray-500'
-								>
-									<path
-										strokeLinecap='round'
-										strokeLinejoin='round'
-										d='M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12'
-									/>
-								</svg>
+								<Image
+									src={FileUploadIcon}
+									alt='AAG Logo'
+									width={24}
+									height={24}
+									className='h-4 w-4'
+								/>
 							</span>
 						</div>
 
@@ -235,33 +234,33 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 								onChange={handleFileChange}
 								className='absolute inset-0 cursor-pointer opacity-0'
 							/>
-							<div className='flex w-full items-center justify-between rounded-lg border border-border_grey bg-transparent px-4 py-2 text-base text-gray-500'>
-								<span>Upload</span>
+							<div className='flex w-full items-center justify-between rounded-lg border border-border_grey bg-transparent px-4 py-2 text-base'>
+								<span>{formData.supportingFile ? formData.supportingFile.name : 'Upload'}</span>
 							</div>
 						</div>
 
-						<p className='text-sm text-gray-500'>Accepted formats: PDF, DOC, DOCX, PPT, PPTX (Max 10MB)</p>
+						<p className='text-sm'>Accepted formats: PDF, DOC, DOCX, PPT, PPTX (Max 10MB)</p>
 					</div>
 
 					<div className='space-y-2'>
 						<div className='flex items-center gap-2'>
-							<Label className='font-semibold text-gray-700'>Socials</Label>
-							<span className='cursor-help text-sm text-gray-400'>ℹ️</span>
+							<Label className='font-semibold'>Socials</Label>
+							<Info className='h-4 w-4' />
 						</div>
 
 						<div className='space-y-4'>
 							<div className='grid grid-cols-[auto_1fr] items-center gap-4'>
 								<div className='flex min-w-28 items-center gap-2'>
-									<div className='flex h-10 w-10 items-center justify-center rounded-full bg-green-500'>
+									<div className='flex h-10 w-10 items-center justify-center rounded-full bg-social_green'>
 										<Mail
-											className='text-white'
+											className='text-btn_primary_text'
 											size={18}
 										/>
 									</div>
-									<span className='font-medium text-gray-700'>Email</span>
+									<span className='font-medium'>Email</span>
 								</div>
 
-								<div className='flex items-center justify-between rounded-md border border-gray-300 px-4 py-2'>
+								<div className='flex items-center justify-between rounded-md border border-border_grey px-4 py-2'>
 									<input
 										id='email'
 										name='email'
@@ -269,9 +268,9 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 										placeholder='janedoe123@gmail.com'
 										value={formData.email}
 										onChange={handleInputChange}
-										className='w-full border-none bg-transparent text-gray-800 focus:outline-none focus:ring-0'
+										className='w-full border-none bg-transparent text-text_primary focus:outline-none focus:ring-0'
 									/>
-									<div className='flex items-center gap-1 whitespace-nowrap pl-3 text-sm font-medium text-green-500'>
+									<div className='flex items-center gap-1 whitespace-nowrap pl-3 text-sm font-medium text-social_green'>
 										<CheckCircle size={16} /> Verified
 									</div>
 								</div>
@@ -279,16 +278,16 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 
 							<div className='grid grid-cols-[auto_1fr] items-center gap-4'>
 								<div className='flex min-w-28 items-center gap-2'>
-									<div className='flex h-10 w-10 items-center justify-center rounded-full bg-green-500'>
+									<div className='flex h-10 w-10 items-center justify-center rounded-full bg-social_green'>
 										<Send
-											className='text-white'
+											className='text-btn_primary_text'
 											size={18}
 										/>
 									</div>
-									<span className='font-medium text-gray-700'>TG</span>
+									<span className='font-medium'>TG</span>
 								</div>
 
-								<div className='flex items-center justify-between rounded-md border border-gray-300 px-4 py-2'>
+								<div className='flex items-center justify-between rounded-md border border-border_grey px-4 py-2'>
 									<input
 										id='telegram'
 										name='telegram'
@@ -296,23 +295,23 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 										placeholder='@janedoe'
 										value={formData.telegram}
 										onChange={handleInputChange}
-										className='w-full border-none bg-transparent text-gray-800 focus:outline-none focus:ring-0'
+										className='w-full border-none bg-transparent text-text_primary focus:outline-none focus:ring-0'
 									/>
 								</div>
 							</div>
 
 							<div className='grid grid-cols-[auto_1fr] items-center gap-4'>
 								<div className='flex min-w-28 items-center gap-2'>
-									<div className='flex h-10 w-10 items-center justify-center rounded-full bg-green-500'>
+									<div className='flex h-10 w-10 items-center justify-center rounded-full bg-social_green'>
 										<Twitter
-											className='text-white'
+											className='text-btn_primary_text'
 											size={18}
 										/>
 									</div>
-									<span className='font-medium text-gray-700'>Twitter</span>
+									<span className='font-medium'>Twitter</span>
 								</div>
 
-								<div className='flex items-center justify-between rounded-md border border-gray-300 px-4 py-2'>
+								<div className='flex items-center justify-between rounded-md border border-border_grey px-4 py-2'>
 									<input
 										id='twitter'
 										name='twitter'
@@ -320,9 +319,9 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 										placeholder='@janedoe'
 										value={formData.twitter}
 										onChange={handleInputChange}
-										className='w-full border-none bg-transparent text-gray-800 focus:outline-none focus:ring-0'
+										className='w-full border-none bg-transparent text-text_primary focus:outline-none focus:ring-0'
 									/>
-									<div className='flex items-center gap-1 whitespace-nowrap pl-3 text-sm font-medium text-green-500'>
+									<div className='flex items-center gap-1 whitespace-nowrap pl-3 text-sm font-medium text-social_green'>
 										<CheckCircle size={16} /> Verified
 									</div>
 								</div>
@@ -336,14 +335,14 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 							variant='outline'
 							onClick={onClose}
 							disabled={isSubmitting}
-							className='border-pink-500 text-pink-600 hover:bg-pink-50'
+							className='border-bg_pink text-text_pink hover:bg-bg_pink/90'
 						>
 							Cancel
 						</Button>
 						<Button
 							type='submit'
 							disabled={isSubmitting}
-							className='bg-pink-600 text-white hover:bg-pink-700'
+							className='bg-bg_pink text-btn_primary_text hover:bg-bg_pink/90'
 						>
 							{isSubmitting ? 'Submitting...' : 'Submit'}
 						</Button>
