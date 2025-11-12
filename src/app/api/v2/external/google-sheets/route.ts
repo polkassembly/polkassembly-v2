@@ -3,8 +3,8 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { NextRequest, NextResponse } from 'next/server';
-import { NewsService } from '@/app/api/_api-services/external_api_service/news_api_service';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { GoogleSheetService } from '../../../_api-services/external_api_service/googlesheets_service';
 
 export async function GET(request: NextRequest) {
 	try {
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 		const sheetId = searchParams.get('sheetId') || '';
 		const sheetName = searchParams.get('sheetName') || '';
 
-		const newsItems = await NewsService.fetchActiveNews(sheetId, sheetName);
+		const newsItems = await GoogleSheetService.fetchSheetData(sheetId, sheetName);
 
 		return NextResponse.json(
 			{

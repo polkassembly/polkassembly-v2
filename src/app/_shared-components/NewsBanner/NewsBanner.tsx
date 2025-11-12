@@ -6,18 +6,22 @@
 
 import { useEffect, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
-import { INewsItem } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { NEWS_GOOGLE_SHEET_ID, NEWS_GOOGLE_SHEET_NAME } from '@/app/api/_api-constants/apiEnvVars';
 
+interface INewsItem {
+	title: string;
+	link: string;
+}
 function NewsBanner() {
 	const [newsItems, setNewsItems] = useState<INewsItem[]>([]);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState<boolean>(true);
 	useEffect(() => {
 		const fetchNews = async () => {
 			try {
-				const response = await NextApiClientService.getGoogleSheetNews({
-					sheetId: '1fJwOupuORTFnNT9X1JA7SKcqq8L7TfeasPxuXq2W37c',
-					sheetName: 'Sheet1'
+				const response = await NextApiClientService.getGoogleSheetData<INewsItem[]>({
+					sheetId: NEWS_GOOGLE_SHEET_ID,
+					sheetName: NEWS_GOOGLE_SHEET_NAME
 				});
 
 				const { data, error } = response;

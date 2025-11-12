@@ -63,8 +63,7 @@ import {
 	IGovAnalyticsDelegationStats,
 	IGovAnalyticsCategoryCounts,
 	IConversationHistory,
-	IConversationMessage,
-	INewsItem
+	IConversationMessage
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -406,7 +405,7 @@ export class NextApiClientService {
 				break;
 
 			case EApiRoute.GET_GOOGLE_SHEET_NEWS:
-				path = '/external-news';
+				path = '/external/google-sheets';
 				break;
 
 			default:
@@ -1481,12 +1480,17 @@ export class NextApiClientService {
 		});
 	}
 
-	static async getGoogleSheetNews({ sheetId, sheetName }: { sheetId: string; sheetName: string }) {
-		const queryParams = new URLSearchParams({
-			sheetId,
-			sheetName
+	static async getGoogleSheetData<T = Record<string, string>[]>({ sheetId, sheetName }: { sheetId: string; sheetName: string }) {
+		const queryParams = new URLSearchParams({ sheetId, sheetName });
+
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_GOOGLE_SHEET_NEWS,
+			queryParams
 		});
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOOGLE_SHEET_NEWS, queryParams });
-		return this.nextApiClientFetch<{ data: INewsItem[]; success: string }>({ url, method });
+
+		return this.nextApiClientFetch<{ data: T; success: boolean }>({
+			url,
+			method
+		});
 	}
 }
