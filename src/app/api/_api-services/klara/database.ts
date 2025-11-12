@@ -179,6 +179,8 @@ export class KlaraDatabaseService extends FirestoreUtils {
 			const conversationRef = this.conversationsCollectionRef().doc(conversationId);
 
 			await this.firestoreDb.runTransaction(async (tx) => {
+				const snap = await tx.get(conversationRef);
+
 				// Persist messages atomically with the metadata update
 				messages.forEach((message) => {
 					const cleanMessage = cleanUndefinedValues({
@@ -189,8 +191,6 @@ export class KlaraDatabaseService extends FirestoreUtils {
 					const messageRef = messagesRef.doc();
 					tx.set(messageRef, cleanMessage);
 				});
-
-				const snap = await tx.get(conversationRef);
 				const { exists } = snap;
 				const data = snap.data() || {};
 
