@@ -17,7 +17,9 @@ export enum ENetwork {
 	POLKADOT = 'polkadot',
 	WESTEND = 'westend',
 	PASEO = 'paseo',
-	CERE = 'cere'
+	CERE = 'cere',
+	MOONBEAM = 'moonbeam',
+	MOONRIVER = 'moonriver'
 }
 
 export enum ENetworkSocial {
@@ -169,6 +171,8 @@ export enum EWallet {
 	POLKAGATE = 'polkagate',
 	NOVAWALLET = 'nova',
 	MIMIR = 'mimir',
+	METAMASK = 'metamask',
+	// WALLETCONNECT = 'walletconnect',
 	POLKADOT_VAULT = 'polkadot-vault',
 	OTHER = ''
 	// METAMASK = 'metamask',
@@ -1503,6 +1507,20 @@ export type IPostBubbleVotes = {
 	};
 };
 
+export enum EFeature {
+	VOTE_ON_PROPOSAL = 'vote_on_proposal',
+	LOGIN = 'login',
+	SIGNUP = 'signup',
+	CREATE_PROPOSAL = 'create_proposal',
+	SET_IDENTITY = 'set_identity',
+	DELEGATE = 'delegate',
+	BOUNTY = 'bounty',
+	TIP = 'tip',
+	CHILD_BOUNTY = 'child_bounty',
+	REFERENDUM = 'referendum',
+	FELLOWSHIP_REFERENDUM = 'fellowship_referendum',
+	COMMENT = 'comment'
+}
 export interface IVaultScannedAddress {
 	content: string;
 	isAddress: boolean;
