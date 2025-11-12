@@ -25,10 +25,10 @@ function AAG() {
 	const listVideos = playlistData?.videos?.slice(3) || [];
 
 	return (
-		<div className='text-text_primary'>
+		<div className='min-h-screen bg-page_background text-text_primary'>
 			<AAGCard />
-			<div className='mx-auto max-w-6xl'>
-				<div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
+			<div className='mx-auto max-w-6xl px-4'>
+				<div className='grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3'>
 					{loading && (
 						<div className='col-span-full flex justify-center py-8'>
 							<div className='text-gray-500'>Loading YouTube playlist...</div>

@@ -26,8 +26,8 @@ function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, 
 
 	const network = publishedAt
 		? (() => {
-				const date = new Date(publishedAt);
-				const day = date.getUTCDay();
+				const publishDate = new Date(publishedAt);
+				const day = publishDate.getUTCDay();
 				if (day === 2) return 'kusama';
 				if (day === 5) return 'polkadot';
 				return null;
@@ -40,8 +40,8 @@ function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, 
 			className='block'
 		>
 			<div className='flex cursor-pointer items-start gap-4 rounded-lg p-[1px] transition-all duration-300 [background:linear-gradient(180deg,#D2D8E0_0%,#000000_100%)] hover:[background:linear-gradient(180deg,#D2D8E0_0%,#E5007A_100%)]'>
-				<div className='flex w-full items-start gap-4 rounded-lg bg-bg_modal p-4 shadow-sm transition-shadow hover:shadow-md'>
-					<div className='relative h-24 w-40 flex-shrink-0 overflow-hidden rounded-md'>
+				<div className='flex w-full flex-col items-start gap-4 rounded-lg bg-bg_modal p-4 shadow-sm transition-shadow hover:shadow-md sm:flex-row'>
+					<div className='relative h-48 w-full flex-shrink-0 overflow-hidden rounded-md sm:h-24 sm:w-40'>
 						{thumbnail ? (
 							<Image
 								src={thumbnail}
@@ -58,7 +58,7 @@ function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, 
 					<div className='flex-grow'>
 						<h3 className='text-lg font-bold'>{title}</h3>
 
-						<p className='mb-4 flex items-center gap-4 pt-1 text-sm text-wallet_btn_text'>
+						<p className='mb-4 flex flex-col items-start gap-2 pt-1 text-sm text-wallet_btn_text sm:flex-row sm:items-center sm:gap-4'>
 							<span className='flex items-center gap-1'>
 								<Calendar className='h-3.5 w-3.5' /> {date}
 							</span>
@@ -82,9 +82,9 @@ function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, 
 						</div>
 					</div>
 
-					<div className='flex flex-col items-end justify-between self-stretch'>
+					<div className='flex w-full flex-row items-center justify-between self-stretch sm:w-auto sm:flex-col sm:items-end sm:justify-between'>
 						<div className='flex flex-shrink-0 items-center gap-2'>
-							<Button className='rounded-full'>View Agenda</Button>
+							<Button className='rounded-full text-xs sm:text-sm'>View Agenda</Button>
 							{network && (
 								<Image
 									src={network === 'polkadot' ? PolkadotLogo : KusamaLogo}

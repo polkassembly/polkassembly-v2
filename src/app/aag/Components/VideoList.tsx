@@ -66,69 +66,71 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 	}, [videos, searchQuery, sortBy, filterBy]);
 
 	return (
-		<div className='my-16 max-w-7xl rounded-lg bg-bg_modal p-6'>
-			<div className='mb-4 flex items-center justify-between'>
+		<div className='my-8 max-w-7xl rounded-lg bg-bg_modal p-4 md:my-16 md:p-6'>
+			<div className='mb-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between'>
 				<h2 className='text-xl font-bold text-text_primary'>More Videos</h2>
 
-				<div className='flex items-center gap-3 text-wallet_btn_text'>
-					<div className='relative'>
+				<div className='flex w-full flex-col items-stretch gap-3 text-wallet_btn_text sm:w-auto sm:flex-row sm:items-center'>
+					<div className='relative w-full sm:w-auto'>
 						<input
 							type='text'
 							placeholder='Search for Video by # or Title'
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							className='w-72 rounded-md border border-border_grey py-2 pl-10 pr-4 text-sm'
+							className='w-full rounded-md border border-border_grey py-2 pl-10 pr-4 text-sm sm:w-72'
 						/>
 						<div className='absolute inset-y-0 left-0 flex items-center pl-3'>
 							<SearchIcon className='h-5 w-5' />
 						</div>
 					</div>
 
-					<DropdownMenu>
-						<DropdownMenuTrigger noArrow>
-							<Filter className='h-6 w-6' />
-						</DropdownMenuTrigger>
-						<DropdownMenuContent className='w-24 min-w-max'>
-							<DropdownMenuItem
-								onClick={() => setFilterBy(FILTER_OPTIONS.ALL)}
-								className={filterBy === FILTER_OPTIONS.ALL ? ACTIVE_ITEM_CLASS : ''}
-							>
-								All Networks
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								onClick={() => setFilterBy(FILTER_OPTIONS.POLKADOT)}
-								className={filterBy === FILTER_OPTIONS.POLKADOT ? ACTIVE_ITEM_CLASS : ''}
-							>
-								Polkadot
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								onClick={() => setFilterBy(FILTER_OPTIONS.KUSAMA)}
-								className={filterBy === FILTER_OPTIONS.KUSAMA ? ACTIVE_ITEM_CLASS : ''}
-							>
-								Kusama
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+					<div className='flex items-center gap-3'>
+						<DropdownMenu>
+							<DropdownMenuTrigger noArrow>
+								<Filter className='h-6 w-6' />
+							</DropdownMenuTrigger>
+							<DropdownMenuContent className='w-24 min-w-max'>
+								<DropdownMenuItem
+									onClick={() => setFilterBy(FILTER_OPTIONS.ALL)}
+									className={filterBy === FILTER_OPTIONS.ALL ? ACTIVE_ITEM_CLASS : ''}
+								>
+									All Networks
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => setFilterBy(FILTER_OPTIONS.POLKADOT)}
+									className={filterBy === FILTER_OPTIONS.POLKADOT ? ACTIVE_ITEM_CLASS : ''}
+								>
+									Polkadot
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => setFilterBy(FILTER_OPTIONS.KUSAMA)}
+									className={filterBy === FILTER_OPTIONS.KUSAMA ? ACTIVE_ITEM_CLASS : ''}
+								>
+									Kusama
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
 
-					<DropdownMenu>
-						<DropdownMenuTrigger noArrow>
-							<MenuIcon className='h-6 w-6' />
-						</DropdownMenuTrigger>
-						<DropdownMenuContent className='w-24 min-w-max'>
-							<DropdownMenuItem
-								onClick={() => setSortBy('latest')}
-								className={sortBy === 'latest' ? ACTIVE_ITEM_CLASS : ''}
-							>
-								Latest
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								onClick={() => setSortBy('oldest')}
-								className={sortBy === 'oldest' ? ACTIVE_ITEM_CLASS : ''}
-							>
-								Oldest
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+						<DropdownMenu>
+							<DropdownMenuTrigger noArrow>
+								<MenuIcon className='h-6 w-6' />
+							</DropdownMenuTrigger>
+							<DropdownMenuContent className='w-24 min-w-max'>
+								<DropdownMenuItem
+									onClick={() => setSortBy('latest')}
+									className={sortBy === 'latest' ? ACTIVE_ITEM_CLASS : ''}
+								>
+									Latest
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => setSortBy('oldest')}
+									className={sortBy === 'oldest' ? ACTIVE_ITEM_CLASS : ''}
+								>
+									Oldest
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
 				</div>
 			</div>
 

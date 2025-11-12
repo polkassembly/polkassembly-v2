@@ -90,7 +90,7 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 			tabIndex={0}
 			aria-label={`View video: ${title}`}
 		>
-			<div className='overflow-hidden rounded-lg bg-bg_modal px-6 pb-3 pt-6 shadow-md transition-shadow hover:shadow-lg'>
+			<div className='overflow-hidden rounded-lg bg-bg_modal px-4 pb-3 pt-4 shadow-md transition-shadow hover:shadow-lg md:px-6 md:pt-6'>
 				<div className='relative'>
 					{thumbnail && (
 						<Image
@@ -98,13 +98,13 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 							alt={title}
 							width={400}
 							height={192}
-							className='h-48 w-full rounded-lg object-cover'
+							className='h-32 w-full rounded-lg object-cover md:h-48'
 						/>
 					)}
 					<div className='absolute inset-0 flex items-center justify-center'>
-						<div className='flex h-16 w-16 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm'>
+						<div className='flex h-12 w-12 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm md:h-16 md:w-16'>
 							<svg
-								className='h-8 w-8 text-btn_primary_text'
+								className='h-6 w-6 text-btn_primary_text md:h-8 md:w-8'
 								fill='currentColor'
 								viewBox='0 0 24 24'
 							>
@@ -114,26 +114,26 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 					</div>
 				</div>
 
-				<div className='p-4'>
-					<h3 className='text-lg font-bold'>{title}</h3>
-					<p className='mb-4 flex items-center gap-3 text-xs text-wallet_btn_text'>
+				<div className='p-3 md:p-4'>
+					<h3 className='text-base font-bold md:text-lg'>{title}</h3>
+					<p className='mb-3 flex flex-col items-start gap-2 text-xs text-wallet_btn_text sm:flex-row sm:items-center sm:gap-3 md:mb-4'>
 						<span className='flex items-center gap-1'>
-							<Calendar className='h-3.5 w-3.5' /> {date}
+							<Calendar className='h-3 w-3 md:h-3.5 md:w-3.5' /> {date}
 						</span>
 						<span className='flex items-center gap-1'>
-							<Clock className='h-3.5 w-3.5' />
+							<Clock className='h-3 w-3 md:h-3.5 md:w-3.5' />
 							{duration}
 						</span>
 					</p>
 
-					<div className='mb-4 flex items-center gap-2'>
+					<div className='mb-3 flex flex-col gap-2 md:mb-4'>
 						<h4 className='text-sm text-text_primary'>{tagTitle}</h4>
 						<div className='flex flex-wrap gap-2'>
 							{tags &&
 								tags.map((tag: string) => (
 									<span
 										key={tag}
-										className='rounded-full bg-bg_light_pink px-2 py-0.5 text-sm font-medium text-text_pink'
+										className='rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink md:text-sm'
 									>
 										{tag}
 									</span>
@@ -141,21 +141,21 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 						</div>
 					</div>
 
-					<div className='flex items-center justify-between border-t border-border_grey pt-4'>
-						<div className='flex items-center gap-3'>
+					<div className='flex flex-row items-center justify-between gap-3 border-t border-border_grey pt-3 md:pt-4'>
+						<div className='flex items-center gap-2 md:gap-3'>
 							{network && (
 								<Image
 									src={network === 'polkadot' ? PolkadotLogo : KusamaLogo}
 									alt={network === 'polkadot' ? 'Polkadot' : 'Kusama'}
 									width={24}
 									height={24}
-									className='h-6 w-6 rounded-full'
+									className='h-5 w-5 rounded-full md:h-6 md:w-6'
 								/>
 							)}
 							<Button
 								variant='ghost'
 								size='sm'
-								className='rounded-full border border-text_pink px-4 py-2 text-text_pink hover:bg-bg_light_pink'
+								className='rounded-full border border-text_pink px-3 py-1.5 text-xs text-text_pink hover:bg-bg_light_pink md:px-4 md:py-2 md:text-sm'
 							>
 								View Agenda
 							</Button>
@@ -163,11 +163,11 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 						<Button
 							variant='ghost'
 							size='icon'
-							className='rounded-lg border border-border_grey bg-network_dropdown_bg p-2'
+							className='w-fit rounded-lg border border-border_grey bg-network_dropdown_bg p-1.5 md:p-2'
 							onClick={handleShare}
 							title='Share video'
 						>
-							<Share2 className='h-4 w-4 text-wallet_btn_text' />
+							<Share2 className='h-3.5 w-3.5 text-wallet_btn_text md:h-4 md:w-4' />
 						</Button>
 					</div>
 				</div>

@@ -117,11 +117,11 @@ function VideoViewPage() {
 		<div className='min-h-screen bg-page_background text-text_primary'>
 			<AAGCard />
 
-			<div className='mx-auto max-w-7xl p-6'>
+			<div className='mx-auto max-w-7xl p-4 md:p-6'>
 				<div className='flex flex-col gap-6 lg:flex-row'>
 					<div className='flex flex-1 flex-col'>
 						<div className='flex flex-col overflow-hidden rounded-lg border border-border_grey bg-bg_modal shadow-sm'>
-							<div className='relative aspect-video bg-bg_modal'>
+							<div className='relative h-full w-full bg-bg_modal lg:aspect-video'>
 								<iframe
 									src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&rel=0&origin=${window.location.origin}`}
 									title={currentVideo.title}
@@ -131,14 +131,14 @@ function VideoViewPage() {
 								/>
 							</div>
 
-							<div className='p-6'>
-								<div className='mb-4 flex items-start justify-between'>
+							<div className='p-4 md:p-6'>
+								<div className='mb-4 flex flex-col items-start gap-4 sm:flex-row sm:items-start sm:justify-between'>
 									<div className='flex-1'>
-										<h1 className='mb-2 text-2xl font-bold text-text_primary'>{currentVideo.title}</h1>
+										<h1 className='mb-2 text-xl font-bold text-text_primary md:text-2xl'>{currentVideo.title}</h1>
 									</div>
 
-									<div className='ml-4 flex items-center gap-2'>
-										<Button className='rounded-full'>View Agenda</Button>
+									<div className='flex w-full items-center gap-2 sm:ml-4 sm:w-auto'>
+										<Button className='flex-1 rounded-full sm:flex-none'>View Agenda</Button>
 										<Button
 											variant='ghost'
 											size='icon'
@@ -151,19 +151,19 @@ function VideoViewPage() {
 									</div>
 								</div>
 
-								<div className='rounded-lg bg-page_background p-4'>
-									<div className='mb-4 flex flex-wrap items-center gap-4 text-sm text-text_primary'>
+								<div className='rounded-lg bg-page_background p-3 md:p-4'>
+									<div className='mb-3 flex flex-col gap-2 text-sm text-text_primary sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 md:mb-4'>
 										<span className='flex items-center gap-1'>
-											<Clock className='h-3.5 w-3.5' />
+											<Clock className='h-3 w-3 md:h-3.5 md:w-3.5' />
 											{currentVideo.duration}
 										</span>
 										<span className='flex items-center gap-1'>
-											<Calendar className='h-3.5 w-3.5' />
+											<Calendar className='h-3 w-3 md:h-3.5 md:w-3.5' />
 											{currentVideo.date}
 										</span>
 										{currentVideo.viewCount && (
 											<span className='flex items-center gap-1'>
-												<Eye className='h-3.5 w-3.5' />
+												<Eye className='h-3 w-3 md:h-3.5 md:w-3.5' />
 												{parseInt(currentVideo.viewCount, 10).toLocaleString()} views
 											</span>
 										)}
@@ -174,7 +174,7 @@ function VideoViewPage() {
 													alt={network === 'polkadot' ? 'Polkadot' : 'Kusama'}
 													width={20}
 													height={20}
-													className='h-5 w-5 rounded-full'
+													className='h-4 w-4 rounded-full md:h-5 md:w-5'
 												/>
 												<span className='text-xs capitalize text-text_primary'>{network}</span>
 											</div>
@@ -182,7 +182,7 @@ function VideoViewPage() {
 									</div>
 
 									{currentVideo.description && (
-										<div className='max-h-48 overflow-auto whitespace-pre-wrap text-sm leading-relaxed text-wallet_btn_text'>{currentVideo.description}</div>
+										<div className='max-h-32 overflow-auto whitespace-pre-wrap text-sm leading-relaxed text-wallet_btn_text md:max-h-48'>{currentVideo.description}</div>
 									)}
 								</div>
 							</div>
@@ -190,10 +190,10 @@ function VideoViewPage() {
 					</div>
 
 					<div className='flex w-full flex-col lg:w-[350px]'>
-						<div className='overflow-auto rounded-lg border border-border_grey bg-bg_modal p-4 shadow-sm'>
-							<h2 className='mb-4 flex items-center text-lg font-semibold text-text_primary'>
+						<div className='max-h-96 overflow-auto rounded-lg border border-border_grey bg-bg_modal p-3 shadow-sm md:p-4 lg:max-h-none'>
+							<h2 className='mb-3 flex items-center text-base font-semibold text-text_primary md:mb-4 md:text-lg'>
 								Chapters
-								{chaptersLoading && <div className='ml-2 h-4 w-4 animate-spin rounded-full border-b-2 border-bar_chart_purple' />}
+								{chaptersLoading && <div className='ml-2 h-3 w-3 animate-spin rounded-full border-b-2 border-bar_chart_purple md:h-4 md:w-4' />}
 							</h2>
 
 							{chaptersLoading ? (
@@ -201,7 +201,7 @@ function VideoViewPage() {
 									{[1, 2, 3].map((i) => (
 										<div
 											key={i}
-											className='bg-bg_grey h-16 animate-pulse rounded-lg'
+											className='bg-bg_grey h-12 animate-pulse rounded-lg md:h-16'
 										/>
 									))}
 								</div>
@@ -210,22 +210,22 @@ function VideoViewPage() {
 									<p className='text-sm text-toast_warning_text'>Failed to load chapters: {chaptersError}</p>
 								</div>
 							) : chapters.length > 0 ? (
-								<div className='max-h-[450px] space-y-2 overflow-auto'>
+								<div className='max-h-64 space-y-2 overflow-auto md:max-h-[450px]'>
 									{chapters.map((chapter) => (
 										<button
 											key={chapter.id}
 											type='button'
 											onClick={() => handleChapterClick(chapter.id, chapter.start)}
-											className={`w-full rounded-lg p-3 text-left transition-colors ${
+											className={`w-full rounded-lg p-2 text-left transition-colors md:p-3 ${
 												activeChapter === chapter.id ? 'border border-bg_light_pink bg-border_grey/60' : 'border border-transparent hover:bg-bg_light_pink'
 											}`}
 										>
 											<div className='flex items-start justify-between'>
 												<div className='min-w-0 flex-1'>
 													<div className='mb-1 flex items-center gap-2'>
-														<span className='rounded bg-border_blue/15 px-2 py-1 font-mono text-xs text-border_blue'>{chapter.timestamp}</span>
+														<span className='rounded bg-border_blue/15 px-1.5 py-0.5 font-mono text-xs text-border_blue md:px-2 md:py-1'>{chapter.timestamp}</span>
 													</div>
-													<h3 className='mb-1 text-sm font-medium text-text_primary'>{chapter.title}</h3>
+													<h3 className='mb-1 text-xs font-medium text-text_primary md:text-sm'>{chapter.title}</h3>
 												</div>
 											</div>
 										</button>
@@ -238,7 +238,7 @@ function VideoViewPage() {
 					</div>
 				</div>
 
-				<div className='mt-6'>
+				<div className='mt-4 md:mt-6'>
 					<VideoList videos={suggestedVideos} />
 				</div>
 			</div>
