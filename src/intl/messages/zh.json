@@ -27,7 +27,8 @@
 		"bounties": "赏金",
 		"ambassador": "大使",
 		"loans": "贷款",
-		"address": "地址"
+		"address": "地址",
+		"assets": "资产"
 	},
 	"ActivityFeed": {
 		"title": "动态信息",

@@ -27,7 +27,8 @@
 		"bounties": "報奨金",
 		"ambassador": "アンバサダー",
 		"loans": "ローン",
-		"address": "アドレス"
+		"address": "アドレス",
+		"assets": "資産"
 	},
 	"ActivityFeed": {
 		"title": "アクティビティフィード",

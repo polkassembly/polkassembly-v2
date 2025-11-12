@@ -27,7 +27,8 @@
 		"bounties": "Recompensas",
 		"ambassador": "Embajador",
 		"loans": "Préstamos",
-		"address": "Dirección"
+		"address": "Dirección",
+		"assets": "Activos"
 	},
 	"ActivityFeed": {
 		"title": "Feed de Actividad",

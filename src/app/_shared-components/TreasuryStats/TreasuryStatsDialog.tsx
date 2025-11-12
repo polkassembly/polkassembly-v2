@@ -184,6 +184,84 @@ function AssetHubSection({
 	);
 }
 
+// Assets for Migrated Networks on Assethub
+function AssetsSection({
+	data,
+	network,
+	currentTokenPrice,
+	treasuryAccountAddress,
+	assetHubTreasuryAddress,
+	title
+}: {
+	data: ITreasuryStats;
+	network: ENetwork;
+	currentTokenPrice: string;
+	treasuryAccountAddress: string;
+	assetHubTreasuryAddress: string;
+	title: string;
+}) {
+	const t = useTranslations('TreasuryStats');
+	const hasTreasuryAccountAddress = treasuryAccountAddress?.trim();
+	const hasAssetHubTreasuryAddress = assetHubTreasuryAddress?.trim();
+
+	if (!hasTreasuryAccountAddress && !hasAssetHubTreasuryAddress) return null;
+
+	return (
+		<CategorySection title={title}>
+			<span className='text-base font-bold text-muted-foreground max-md:text-sm'>
+				~ $
+				{calculateTotalUSDValue({
+					amountsDetails: [
+						{ amount: data.relayChain?.nativeToken || null, asset: null },
+						{ amount: data.assetHub?.usdc || null, asset: EAssets.USDC },
+						{ amount: data.assetHub?.usdt || null, asset: EAssets.USDT }
+					],
+					currentTokenPrice,
+					network
+				})}
+			</span>
+			<div className='flex flex-wrap gap-2'>
+				{data.relayChain?.nativeToken && (
+					<AssetRow
+						amount={data.relayChain.nativeToken}
+						network={network}
+					/>
+				)}
+				{data.assetHub?.usdc && (
+					<AssetRow
+						amount={data.assetHub.usdc}
+						asset={EAssets.USDC}
+						network={network}
+					/>
+				)}
+				{data.assetHub?.usdt && (
+					<AssetRow
+						amount={data.assetHub.usdt}
+						asset={EAssets.USDT}
+						network={network}
+					/>
+				)}
+				<Link
+					href={`https://assethub-${network}.subscan.io/account/${treasuryAccountAddress}`}
+					className='flex items-center gap-1 text-xs text-text_pink'
+					target='_blank'
+				>
+					{t('address')} #1
+					<ExternalLink className='h-4 w-4' />
+				</Link>
+				<Link
+					href={`https://assethub-${network}.subscan.io/account/${assetHubTreasuryAddress}`}
+					className='flex items-center gap-1 text-xs text-text_pink'
+					target='_blank'
+				>
+					{t('address')} #2
+					<ExternalLink className='h-4 w-4' />
+				</Link>
+			</div>
+		</CategorySection>
+	);
+}
+
 // Hydration Section Component
 function HydrationSection({
 	data,
@@ -544,7 +622,7 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 	const { loanAmounts } = treasuryConfig;
 	const { ambassadorAddress } = treasuryConfig;
 	const { fellowshipAddress } = treasuryConfig;
-	const { assetHubTreasuryAddress } = treasuryConfig;
+	const { assetHubTreasuryAddress, treasuryAccount } = treasuryConfig;
 	const { hydrationAddresses } = treasuryConfig;
 	const currentTokenPrice = data?.nativeTokenUsdPrice || BN_ZERO?.toString();
 
@@ -559,20 +637,33 @@ export function TreasuryDetailsDialog({ isOpen, onClose, data }: { isOpen: boole
 				</DialogHeader>
 
 				<div className='max-h-[70vh] overflow-y-auto'>
-					<RelayChainSection
-						data={data}
-						network={network}
-						currentTokenPrice={currentTokenPrice}
-						title={t('relayChain')}
-					/>
+					{[ENetwork.KUSAMA, ENetwork.POLKADOT].includes(network) ? (
+						<AssetsSection
+							data={data}
+							network={network}
+							currentTokenPrice={currentTokenPrice}
+							assetHubTreasuryAddress={assetHubTreasuryAddress}
+							treasuryAccountAddress={treasuryAccount}
+							title={t('assets')}
+						/>
+					) : (
+						<>
+							<RelayChainSection
+								data={data}
+								network={network}
+								currentTokenPrice={currentTokenPrice}
+								title={t('relayChain')}
+							/>
 
-					<AssetHubSection
-						data={data}
-						network={network}
-						currentTokenPrice={currentTokenPrice}
-						assetHubTreasuryAddress={assetHubTreasuryAddress!}
-						title={t('assetHub')}
-					/>
+							<AssetHubSection
+								data={data}
+								network={network}
+								currentTokenPrice={currentTokenPrice}
+								assetHubTreasuryAddress={assetHubTreasuryAddress!}
+								title={t('assetHub')}
+							/>
+						</>
+					)}
 
 					<HydrationSection
 						data={data}

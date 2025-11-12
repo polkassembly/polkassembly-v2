@@ -27,7 +27,8 @@
 		"bounties": "Bounties",
 		"ambassador": "Ambassador",
 		"loans": "Loans",
-		"address": "Address"
+		"address": "Address",
+		"assets": "Assets"
 	},
 	"ActivityFeed": {
 		"please": "Please",
