@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 		console.error('Error in YouTube video API:', error);
 
 		if (error instanceof APIError) {
-			return NextResponse.json({ error: error.message }, { status: error.statusCode });
+			return NextResponse.json({ error: error.message }, { status: error.status });
 		}
 
 		return NextResponse.json({ error: 'Internal server error' }, { status: StatusCodes.INTERNAL_SERVER_ERROR });
