@@ -19,6 +19,7 @@
 		"node": "22"
 	},
 	"dependencies": {
+		"@danielxceron/youtube-transcript": "^1.2.3",
 		"@hookform/resolvers": "^3.9.1",
 		"@joplin/turndown-plugin-gfm": "^1.0.62",
 		"@mdxeditor/editor": "^3.29.1",
@@ -62,6 +63,7 @@
 		"@tanstack/react-table": "^8.20.6",
 		"@types/marked": "^6.0.0",
 		"@types/turndown": "^5.0.5",
+		"@types/youtube-captions-scraper": "^1.0.0",
 		"@urql/core": "^5.0.6",
 		"@urql/exchange-graphcache": "^7.1.3",
 		"algoliasearch": "^5.25.0",
@@ -120,6 +122,8 @@
 		"turndown": "^7.2.0",
 		"validator": "^13.12.0",
 		"vaul": "^1.1.2",
+		"youtube-captions-scraper": "^2.0.3",
+		"youtube-transcript": "^1.2.1",
 		"zod": "^3.24.1",
 		"zod-validation-error": "^3.4.0"
 	},
