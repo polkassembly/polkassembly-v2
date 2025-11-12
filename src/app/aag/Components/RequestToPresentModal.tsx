@@ -14,6 +14,8 @@ import FileUploadIcon from '@assets/icons/file-upload.svg';
 import { Mail, Send, Twitter, ExternalLink, CheckCircle, Info } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { ETheme } from '@/_shared/types';
 
 interface RequestToPresentModalProps {
 	isOpen: boolean;
@@ -34,6 +36,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 		telegram: '',
 		twitter: ''
 	});
+	const { userPreferences } = useUserPreferences();
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -220,7 +223,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 									alt='AAG Logo'
 									width={24}
 									height={24}
-									className='h-4 w-4'
+									className={`h-4 w-4 ${userPreferences.theme === ETheme.DARK ? 'darkIcon' : ''}`}
 								/>
 							</span>
 						</div>
@@ -335,7 +338,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 							variant='outline'
 							onClick={onClose}
 							disabled={isSubmitting}
-							className='border-bg_pink text-text_pink hover:bg-bg_pink/90'
+							className='border-bg_pink text-text_pink'
 						>
 							Cancel
 						</Button>
