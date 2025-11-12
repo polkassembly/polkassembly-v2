@@ -42,8 +42,22 @@ export class KlaraDatabaseService extends FirestoreUtils {
 		return conversations;
 	}
 
-	static async GetConversationMessages(conversationId: string): Promise<IConversationMessage[]> {
-		const querySnapshot = await this.messagesCollectionRef().where('conversationId', '==', conversationId).orderBy('timestamp', 'asc').get();
+	/**
+	 * Get conversation messages with optional limit.
+	 * If limit is provided, fetches only the most recent messages (more efficient for large conversations).
+	 * @param conversationId - The conversation ID
+	 * @param limit - Optional limit for number of message pairs (user+ai). Fetches limit * 2 messages.
+	 * @returns Array of conversation messages in chronological order
+	 */
+	static async GetConversationMessages(conversationId: string, limit?: number): Promise<IConversationMessage[]> {
+		let query = this.messagesCollectionRef().where('conversationId', '==', conversationId).orderBy('timestamp', 'desc'); // Order desc to get latest first
+
+		// If limit provided, fetch only what we need (limit * 2 for user+ai pairs)
+		if (limit && limit > 0) {
+			query = query.limit(limit * 2);
+		}
+
+		const querySnapshot = await query.get();
 
 		const messages: IConversationMessage[] = [];
 		querySnapshot.forEach((doc) => {
@@ -54,7 +68,18 @@ export class KlaraDatabaseService extends FirestoreUtils {
 			} as IConversationMessage);
 		});
 
-		return messages;
+		// Reverse to get chronological order (oldest first)
+		// Then sort by timestamp and sender to ensure user messages always come before AI messages with same timestamp
+		const reversed = messages.toReversed();
+		return reversed.sort((a, b) => {
+			if (a.timestamp !== b.timestamp) {
+				return a.timestamp - b.timestamp;
+			}
+			// If timestamps are equal, ensure user messages come before AI messages
+			if (a.sender === 'user' && b.sender === 'ai') return -1;
+			if (a.sender === 'ai' && b.sender === 'user') return 1;
+			return 0;
+		});
 	}
 
 	static async CreateConversation(userId: string, title?: string): Promise<string> {
@@ -236,6 +261,38 @@ export class KlaraDatabaseService extends FirestoreUtils {
 		} catch (error) {
 			console.error('Error verifying conversation ownership:', error);
 			return false;
+		}
+	}
+
+	/**
+	 * Combined method to verify ownership and get messages in parallel.
+	 * More efficient than calling both methods separately.
+	 * @param conversationId - The conversation ID
+	 * @param userId - The user ID to verify ownership
+	 * @param messageLimit - Optional limit for messages
+	 * @returns Object with ownership status and messages
+	 */
+	static async GetConversationWithMessages(conversationId: string, userId: string, messageLimit?: number): Promise<{ owns: boolean; messages: IConversationMessage[] }> {
+		if (!conversationId?.trim() || !userId?.trim()) {
+			throw new Error('conversationId and userId are required');
+		}
+
+		try {
+			// Fetch conversation doc and messages in parallel
+			const [conversationDoc, messages] = await Promise.all([
+				this.conversationsCollectionRef().doc(conversationId).get(),
+				this.GetConversationMessages(conversationId, messageLimit)
+			]);
+
+			const owns = conversationDoc.exists && conversationDoc.data()?.userId === userId.toString();
+
+			return {
+				owns,
+				messages
+			};
+		} catch (error) {
+			console.error('Error getting conversation with messages:', error);
+			throw error;
 		}
 	}
 

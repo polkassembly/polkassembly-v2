@@ -3,20 +3,35 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
-import { IConversationMessage, IChatResponse, IConversationTurn } from '@/_shared/types';
+import { IConversationMessage, IChatResponse, IConversationTurn, IChatDataSource } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { NextRequest } from 'next/server';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { createId } from '@paralleldrive/cuid2';
+import { createHash } from 'node:crypto';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { KLARA_CONVERSATION_HISTORY_LIMIT } from '@/_shared/_constants/klaraConstants';
 import { KlaraDatabaseService } from './database';
 import { ExternalApiService } from './externalApiService';
 import { validateRequestBody, shouldShowFollowUps, extractConversationHistory } from './utils/conversationUtils';
 import { ensureTableExists, logQueryResponse } from './postgres';
+import { RedisService } from '../redis_service';
 
 export class ChatService {
-	static async processMessage(request: NextRequest): Promise<IChatResponse> {
-		const startTime = Date.now();
+	/**
+	 * Hash message for deduplication purposes
+	 */
+	private static hashMessage(message: string, userId: string): string {
+		const input = `${userId}:${message.trim().toLowerCase()}`;
+		return createHash('sha256').update(input, 'utf8').digest('hex').substring(0, 16);
+	}
+
+	/**
+	 * Parse and validate request body
+	 */
+	private static async parseAndValidateRequest(
+		request: NextRequest
+	): Promise<{ message: string; userId: string; conversationId?: string; conversationHistory?: IConversationTurn[] }> {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		let requestBody: any;
 		try {
@@ -25,95 +40,174 @@ export class ChatService {
 			throw new APIError(ERROR_CODES.INVALID_REQUIRED_FIELDS, StatusCodes.BAD_REQUEST, 'Invalid JSON payload');
 		}
 
-		// Validate request
 		const validation = validateRequestBody(requestBody);
 		if (!validation.valid) {
 			throw new APIError(ERROR_CODES.INVALID_REQUIRED_FIELDS, StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_REQUIRED_FIELDS);
 		}
 
-		const { message, userId, conversationId, conversationHistory } = requestBody;
+		return requestBody;
+	}
 
-		// 1. Validate existing conversation ownership (if provided) - quick check only
-		let activeConversationId = conversationId;
-		let isNewConversation = false;
+	/**
+	 * Check and set request deduplication lock
+	 */
+	private static async handleRequestDedup(userId: string, messageHash: string): Promise<void> {
+		const isDuplicate = await RedisService.CheckKlaraRequestDedup(userId, messageHash);
+		if (isDuplicate) {
+			throw new APIError('DUPLICATE_REQUEST', StatusCodes.TOO_MANY_REQUESTS, 'Duplicate request detected. Please wait a moment before retrying.');
+		}
+		await RedisService.SetKlaraRequestDedup(userId, messageHash, 30);
+	}
 
-		if (activeConversationId) {
-			const owns = await KlaraDatabaseService.verifyConversationOwnership(activeConversationId, userId);
-			if (!owns) {
-				throw new APIError('FORBIDDEN', StatusCodes.FORBIDDEN, 'Unauthorized conversation access');
-			}
-		} else {
-			// Don't create conversation yet - will create after API success
-			isNewConversation = true;
+	/**
+	 * Validate conversation ownership and determine if new conversation
+	 */
+	private static async validateConversation(conversationId: string | undefined, userId: string): Promise<{ activeConversationId: string; isNewConversation: boolean }> {
+		if (!conversationId) {
+			return { activeConversationId: '', isNewConversation: true };
 		}
 
-		// 2. Prepare conversation history (use client-provided or fetch from DB as fallback)
+		const owns = await KlaraDatabaseService.verifyConversationOwnership(conversationId, userId);
+		if (!owns) {
+			throw new APIError('FORBIDDEN', StatusCodes.FORBIDDEN, 'Unauthorized conversation access');
+		}
+
+		return { activeConversationId: conversationId, isNewConversation: false };
+	}
+
+	/**
+	 * Prepare conversation history from cache, client-provided, or DB
+	 */
+	private static async prepareConversationHistory(conversationId: string | undefined, clientHistory: IConversationTurn[] | undefined): Promise<IConversationTurn[]> {
 		const historyLimit = KLARA_CONVERSATION_HISTORY_LIMIT || 5;
-		let finalHistory: IConversationTurn[] = [];
 
-		if (conversationHistory && Array.isArray(conversationHistory) && conversationHistory.length > 0) {
-			// Use client-provided history (preferred - no DB call needed)
-			finalHistory = conversationHistory.slice(-historyLimit);
-		} else if (activeConversationId) {
-			// Fallback: Fetch from DB (for backward compatibility with old clients)
-			const conversationMessages = await KlaraDatabaseService.GetConversationMessages(activeConversationId);
-			finalHistory = extractConversationHistory(conversationMessages, historyLimit);
+		if (clientHistory && Array.isArray(clientHistory) && clientHistory.length > 0) {
+			return clientHistory.slice(-historyLimit);
 		}
 
-		// 3. CRITICAL PATH FIRST: Call external API before any DB writes
-		let apiResponse;
+		if (!conversationId) {
+			return [];
+		}
+
+		// Try cache first
 		try {
-			apiResponse = await ExternalApiService.callExternalAPI(message, userId, finalHistory);
+			const cachedHistory = await RedisService.GetKlaraConversationHistory(conversationId);
+			if (cachedHistory) {
+				return JSON.parse(cachedHistory) as IConversationTurn[];
+			}
 		} catch (error) {
-			// If API fails, don't create conversation or save anything
-			// This prevents orphaned conversations and messages
+			console.warn('Failed to get cached history:', error);
+		}
+
+		// Fallback: Fetch from DB
+		const conversationMessages = await KlaraDatabaseService.GetConversationMessages(conversationId, historyLimit);
+		const finalHistory = extractConversationHistory(conversationMessages, historyLimit);
+
+		// Cache the history for future requests (5 minutes TTL)
+		if (finalHistory.length > 0) {
+			RedisService.SetKlaraConversationHistory(conversationId, JSON.stringify(finalHistory), 300).catch((error) => {
+				console.warn('Failed to cache conversation history:', error);
+			});
+		}
+
+		return finalHistory;
+	}
+
+	/**
+	 * Call external API with error handling and deduplication cleanup
+	 */
+	private static async callExternalAPIWithCleanup(
+		message: string,
+		userId: string,
+		history: IConversationTurn[],
+		messageHash: string
+	): Promise<{ text: string; sources?: IChatDataSource[]; followUpQuestions?: string[]; remainingRequests?: number }> {
+		try {
+			return await ExternalApiService.callExternalAPI(message, userId, history);
+		} catch (error) {
+			RedisService.DeleteKlaraRequestDedup(userId, messageHash).catch((err) => {
+				console.warn('Failed to clear deduplication lock on error:', err);
+			});
 			console.error('External API call failed:', error);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to get AI response. Please try again.');
 		}
+	}
 
-		const { text: aiResponseText, sources, followUpQuestions, remainingRequests } = apiResponse;
-		const followUpLogic = shouldShowFollowUps(aiResponseText, followUpQuestions || []);
-
-		// 4. Add rate limit warning if needed
-		let finalResponseText = aiResponseText;
-		if (remainingRequests !== undefined && remainingRequests < 999 && remainingRequests < 5) {
-			finalResponseText += `\n\n⚠️ **Warning**: You are approaching the usage limit. You have ${remainingRequests} requests remaining this minute.`;
-		}
-
-		// 5. ONLY AFTER API SUCCESS: Create conversation (if new) and batch save messages
-		if (isNewConversation) {
-			// Create conversation now that we know API succeeded
-			activeConversationId = await KlaraDatabaseService.CreateConversation(userId);
-		}
-
-		// Prepare messages
+	/**
+	 * Create AI and user messages with metadata
+	 */
+	private static createMessages(
+		message: string,
+		responseText: string,
+		conversationId: string,
+		sources?: IChatDataSource[],
+		followUpQuestions?: string[]
+	): { userMessage: IConversationMessage; aiMessage: IConversationMessage } {
+		const baseTimestamp = dayjs().valueOf();
+		// Ensure user message timestamp is slightly earlier than AI message to maintain correct order
 		const userMessage: IConversationMessage = {
 			id: createId(),
 			text: message,
 			sender: 'user',
-			conversationId: activeConversationId,
-			timestamp: Date.now()
+			conversationId,
+			timestamp: baseTimestamp - 5
 		};
 
 		const aiMessage: IConversationMessage = {
 			id: createId(),
-			text: finalResponseText,
+			text: responseText,
 			sender: 'ai',
-			conversationId: activeConversationId,
-			timestamp: Date.now()
+			conversationId,
+			timestamp: baseTimestamp
 		};
 
 		if (sources?.length) {
 			aiMessage.sources = sources;
 		}
-		if (followUpLogic.filtered?.length) {
-			aiMessage.followUpQuestions = followUpLogic.filtered;
+		if (followUpQuestions?.length) {
+			aiMessage.followUpQuestions = followUpQuestions;
 		}
 
-		// Batch save both messages atomically (more efficient than two separate calls)
-		await KlaraDatabaseService.SaveMessagesToConversation(activeConversationId, [userMessage, aiMessage], userId);
+		return { userMessage, aiMessage };
+	}
 
-		// 6. Fire-and-forget PostgreSQL logging (non-blocking)
+	/**
+	 * Cleanup cache and deduplication locks
+	 */
+	private static async cleanup(conversationId: string, userId: string, messageHash: string): Promise<void> {
+		await Promise.allSettled([RedisService.DeleteKlaraConversationHistory(conversationId), RedisService.DeleteKlaraRequestDedup(userId, messageHash)]);
+	}
+
+	static async processMessage(request: NextRequest): Promise<IChatResponse> {
+		const startTime = Date.now();
+		const requestBody = await this.parseAndValidateRequest(request);
+		const { message, userId, conversationId, conversationHistory } = requestBody;
+
+		const messageHash = this.hashMessage(message, userId);
+		await this.handleRequestDedup(userId, messageHash);
+
+		const { activeConversationId, isNewConversation } = await this.validateConversation(conversationId, userId);
+		const finalHistory = await this.prepareConversationHistory(activeConversationId || undefined, conversationHistory);
+
+		const apiResponse = await this.callExternalAPIWithCleanup(message, userId, finalHistory, messageHash);
+		const { text: aiResponseText, sources, followUpQuestions, remainingRequests } = apiResponse;
+		const followUpLogic = shouldShowFollowUps(aiResponseText, followUpQuestions || []);
+
+		let finalResponseText = aiResponseText;
+		if (remainingRequests !== undefined && remainingRequests < 999 && remainingRequests < 5) {
+			finalResponseText += `\n\n⚠️ **Warning**: You are approaching the usage limit. You have ${remainingRequests} requests remaining this minute.`;
+		}
+
+		let finalConversationId = activeConversationId;
+		if (isNewConversation) {
+			finalConversationId = await KlaraDatabaseService.CreateConversation(userId);
+		}
+
+		const { userMessage, aiMessage } = this.createMessages(message, finalResponseText, finalConversationId, sources, followUpLogic.filtered);
+		await KlaraDatabaseService.SaveMessagesToConversation(finalConversationId, [userMessage, aiMessage], userId);
+
+		await this.cleanup(finalConversationId, userId, messageHash);
+
 		ensureTableExists()
 			.then(() =>
 				logQueryResponse({
@@ -121,7 +215,7 @@ export class ChatService {
 					response: finalResponseText,
 					status: 'success',
 					userId: userId.toString(),
-					conversationId: activeConversationId,
+					conversationId: finalConversationId,
 					responseTimeMs: Date.now() - startTime
 				})
 			)
@@ -132,7 +226,7 @@ export class ChatService {
 			sources,
 			followUpQuestions: followUpLogic.filtered,
 			isNewConversation,
-			conversationId: isNewConversation ? activeConversationId : undefined
+			conversationId: isNewConversation ? finalConversationId : undefined
 		};
 	}
 }
