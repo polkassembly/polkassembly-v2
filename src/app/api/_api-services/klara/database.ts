@@ -70,7 +70,7 @@ export class KlaraDatabaseService extends FirestoreUtils {
 
 		// Reverse to get chronological order (oldest first)
 		// Then sort by timestamp and sender to ensure user messages always come before AI messages with same timestamp
-		const reversed = messages.toReversed();
+		const reversed = [...messages].reverse();
 		return reversed.sort((a, b) => {
 			if (a.timestamp !== b.timestamp) {
 				return a.timestamp - b.timestamp;
@@ -175,23 +175,21 @@ export class KlaraDatabaseService extends FirestoreUtils {
 		}
 
 		try {
-			const batch = this.firestoreDb.batch();
 			const messagesRef = this.messagesCollectionRef();
 			const conversationRef = this.conversationsCollectionRef().doc(conversationId);
 
-			// Add all messages to batch
-			messages.forEach((message) => {
-				const cleanMessage = cleanUndefinedValues({
-					...message,
-					conversationId,
-					timestamp: dayjs(message.timestamp).toDate()
-				});
-				const messageRef = messagesRef.doc();
-				batch.set(messageRef, cleanMessage);
-			});
-
-			// Update conversation metadata in a transaction
 			await this.firestoreDb.runTransaction(async (tx) => {
+				// Persist messages atomically with the metadata update
+				messages.forEach((message) => {
+					const cleanMessage = cleanUndefinedValues({
+						...message,
+						conversationId,
+						timestamp: dayjs(message.timestamp).toDate()
+					});
+					const messageRef = messagesRef.doc();
+					tx.set(messageRef, cleanMessage);
+				});
+
 				const snap = await tx.get(conversationRef);
 				const { exists } = snap;
 				const data = snap.data() || {};
@@ -235,9 +233,6 @@ export class KlaraDatabaseService extends FirestoreUtils {
 					tx.update(conversationRef, updates);
 				}
 			});
-
-			// Commit batch
-			await batch.commit();
 		} catch (error) {
 			console.error('Error saving messages to conversation:', error);
 			throw error;

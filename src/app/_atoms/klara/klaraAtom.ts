@@ -5,7 +5,7 @@ import { atom } from 'jotai';
 import { EChatState, IConversationMessage } from '@/_shared/types';
 
 export interface KlaraChatState {
-	chatState: EChatState | null;
+	chatState: EChatState;
 	activeChatId: string | null;
 	// Temporary conversation state (not yet persisted to DB)
 	temporaryConversationId: string | null;
