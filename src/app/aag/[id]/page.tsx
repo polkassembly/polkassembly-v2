@@ -10,16 +10,97 @@ import Image from 'next/image';
 import type { IAAGVideoData } from '@/_shared/types';
 import { useYouTubeData } from '@/hooks/useYouTubeData';
 import { useVideoData } from '@/hooks/useVideoData';
+import { useTranscript } from '@/hooks/useTranscript';
 import { useToast } from '@/hooks/useToast';
 import { ENotificationStatus } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
-import { Calendar, Clock, Eye, Share2 } from 'lucide-react';
+import { Calendar, Clock, Eye, Share2, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import PolkadotLogo from '@/_assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@/_assets/parachain-logos/kusama-logo.gif';
 import { AAG_YOUTUBE_PLAYLIST_URL } from '@/_shared/_constants/AAGPlaylist';
 import RequestToPresentModal from '../Components/RequestToPresentModal';
 import AAGCard from '../Components/AAGCard';
 import VideoList from '../Components/VideoList';
+
+interface TranscriptSegment {
+	text: string;
+	offset: number;
+	duration: number;
+}
+
+interface TranscriptSectionProps {
+	transcript: TranscriptSegment[];
+	loading?: boolean;
+}
+
+function TranscriptSection({ transcript, loading }: TranscriptSectionProps) {
+	const [isExpanded, setIsExpanded] = useState(false);
+	const initialDisplayCount = 10;
+	const displayTranscript = isExpanded ? transcript : transcript.slice(0, initialDisplayCount);
+
+	const formatTimestamp = (seconds: number) => {
+		const mins = Math.floor(seconds / 60);
+		const secs = Math.floor(seconds % 60);
+		return `${mins}:${secs.toString().padStart(2, '0')}`;
+	};
+
+	if (loading) {
+		return (
+			<div className='rounded-lg border border-border_grey bg-bg_modal p-4'>
+				<div className='mb-3 flex items-center gap-2'>
+					<div className='bg-bg_grey h-4 w-20 animate-pulse rounded' />
+				</div>
+				<div className='space-y-2'>
+					{[1, 2, 3].map((i) => (
+						<div
+							key={i}
+							className='bg-bg_grey h-8 animate-pulse rounded'
+						/>
+					))}
+				</div>
+			</div>
+		);
+	}
+
+	return (
+		<div className='rounded-lg border border-border_grey bg-bg_modal p-4'>
+			<div className='mb-3 flex items-center justify-between'>
+				<h3 className='text-sm font-semibold text-text_primary'>Transcript</h3>
+				<span className='text-xs text-wallet_btn_text'>{transcript.length} segments</span>
+			</div>
+			<div className='max-h-64 space-y-1.5 overflow-auto'>
+				{displayTranscript.map((segment) => (
+					<div
+						key={`${segment.offset}-${segment.text.substring(0, 20)}`}
+						className='hover:bg-bg_grey flex gap-3 rounded p-1.5'
+					>
+						<span className='min-w-[45px] text-xs font-medium text-bar_chart_purple'>{formatTimestamp(segment.offset)}</span>
+						<p className='text-xs leading-relaxed text-wallet_btn_text'>{segment.text}</p>
+					</div>
+				))}
+			</div>
+			{transcript.length > initialDisplayCount && (
+				<button
+					type='button'
+					onClick={() => setIsExpanded(!isExpanded)}
+					className='bg-bg_grey mt-3 flex w-full items-center justify-center gap-1 rounded-lg border border-border_grey px-3 py-2 text-xs font-medium text-text_primary transition-colors hover:bg-opacity-80'
+				>
+					{isExpanded ? (
+						<>
+							<span>View Less</span>
+							<ChevronUp className='h-3 w-3' />
+						</>
+					) : (
+						<>
+							<span>View More ({transcript.length - initialDisplayCount} more)</span>
+							<ChevronDown className='h-3 w-3' />
+						</>
+					)}
+				</button>
+			)}
+		</div>
+	);
+}
 
 function VideoViewPage() {
 	const params = useParams();
@@ -40,6 +121,12 @@ function VideoViewPage() {
 	const { data: videoData, loading: videoLoading } = useVideoData({
 		videoId: videoId || undefined,
 		enabled: Boolean(videoId)
+	});
+
+	const { data: transcriptData, loading: transcriptLoading } = useTranscript({
+		videoId: videoId || undefined,
+		enabled: Boolean(videoId),
+		generateSummary: true
 	});
 
 	const network = currentVideo
@@ -200,7 +287,24 @@ function VideoViewPage() {
 										)}
 									</div>
 
-									{currentVideo.description && (
+									{transcriptData?.summary && (
+										<div className='rounded-lg border border-border_grey bg-bg_modal p-4'>
+											<div className='mb-2 flex items-center gap-2'>
+												<Sparkles className='h-4 w-4 text-bar_chart_purple' />
+												<h3 className='text-sm font-semibold text-text_primary'>AI Summary</h3>
+											</div>
+											<div className='whitespace-pre-wrap text-xs leading-relaxed text-wallet_btn_text sm:text-sm'>{transcriptData.summary}</div>
+										</div>
+									)}
+
+									{transcriptData?.transcript && transcriptData.transcript.length > 0 && (
+										<TranscriptSection
+											transcript={transcriptData.transcript}
+											loading={transcriptLoading}
+										/>
+									)}
+
+									{!transcriptData?.summary && currentVideo.description && (
 										<div className='max-h-40 overflow-auto whitespace-pre-wrap text-xs leading-relaxed text-wallet_btn_text sm:max-h-48 sm:text-sm md:max-h-56'>
 											{currentVideo.description}
 										</div>

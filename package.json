@@ -19,7 +19,6 @@
 		"node": "22"
 	},
 	"dependencies": {
-		"@danielxceron/youtube-transcript": "^1.2.3",
 		"@hookform/resolvers": "^3.9.1",
 		"@joplin/turndown-plugin-gfm": "^1.0.62",
 		"@mdxeditor/editor": "^3.29.1",
@@ -122,6 +121,7 @@
 		"turndown": "^7.2.0",
 		"validator": "^13.12.0",
 		"vaul": "^1.1.2",
+		"youtube-caption-extractor": "^1.9.1",
 		"youtube-captions-scraper": "^2.0.3",
 		"youtube-transcript": "^1.2.1",
 		"zod": "^3.24.1",
