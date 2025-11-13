@@ -13,11 +13,11 @@ export const AAG_YOUTUBE_PLAYLIST_ID = 'PLtyd7v_I7PGkXbJmKojrZ1KXwspR1JkpV';
 const INVALID_RESPONSE_FORMAT = 'Invalid response format';
 
 const DEFAULT_RETRY_COUNT = 1;
-const PLAYLIST_STALE_TIME = 5 * 60 * 1000;
+const PLAYLIST_STALE_TIME = 2 * 60 * 1000;
 const VIDEO_STALE_TIME = 10 * 60 * 1000;
 const TRANSCRIPT_STALE_TIME = 15 * 60 * 1000;
 const VIDEO_GC_TIME = 30 * 60 * 1000;
-const PLAYLIST_GC_TIME = 10 * 60 * 1000;
+const PLAYLIST_GC_TIME = 5 * 60 * 1000;
 
 const DEFAULT_DATE_LOCALE = 'en-GB';
 const DEFAULT_DURATION_FALLBACK = '00:00';
@@ -229,7 +229,9 @@ export function useYouTubeData({ playlistUrl, playlistId, includeCaptions = fals
 		staleTime: PLAYLIST_STALE_TIME,
 		gcTime: PLAYLIST_GC_TIME,
 		refetchOnWindowFocus: false,
-		retry: DEFAULT_RETRY_COUNT
+		retry: DEFAULT_RETRY_COUNT,
+		retryDelay: 1000,
+		networkMode: 'online'
 	});
 
 	return {
@@ -258,7 +260,9 @@ export function useVideoData({ videoId, enabled = true }: UseVideoDataOptions): 
 		staleTime: VIDEO_STALE_TIME,
 		gcTime: VIDEO_GC_TIME,
 		refetchOnWindowFocus: false,
-		retry: DEFAULT_RETRY_COUNT
+		retry: DEFAULT_RETRY_COUNT,
+		retryDelay: 1000,
+		networkMode: 'online'
 	});
 
 	return {
@@ -287,7 +291,9 @@ export function useTranscript({ videoId, enabled = true, generateSummary = true 
 		staleTime: TRANSCRIPT_STALE_TIME,
 		gcTime: VIDEO_GC_TIME,
 		refetchOnWindowFocus: false,
-		retry: DEFAULT_RETRY_COUNT
+		retry: DEFAULT_RETRY_COUNT,
+		retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+		networkMode: 'online'
 	});
 
 	return {

@@ -39,7 +39,7 @@ function VideoDetailPage() {
 	const [selectedVideo, setSelectedVideo] = useState<IAAGVideoData | null>(null);
 	const [isPresentationModalOpen, setIsPresentationModalOpen] = useState(false);
 
-	const { data: playlistDataFromYouTube } = useYouTubeData({
+	const { data: playlistDataFromYouTube, loading: isPlaylistLoading } = useYouTubeData({
 		playlistId: AAG_YOUTUBE_PLAYLIST_ID
 	});
 
@@ -50,7 +50,7 @@ function VideoDetailPage() {
 
 	const { data: videoTranscriptData, loading: isTranscriptLoading } = useTranscript({
 		videoId: currentVideoId || undefined,
-		enabled: Boolean(currentVideoId),
+		enabled: Boolean(currentVideoId) && !isPlaylistLoading,
 		generateSummary: true
 	});
 
@@ -240,21 +240,25 @@ function VideoDetailPage() {
 													<Skeleton className='h-4 w-24' />
 												</div>
 												<div className='space-y-2'>
-													{[1, 2, 3, 4].map((i) => (
+													{[1, 2, 3, 4, 5].map((i) => (
 														<Skeleton
 															key={i}
 															className='h-4 w-full'
 														/>
 													))}
+													<Skeleton className='h-4 w-3/4' />
 												</div>
 											</div>
 											<Separator className='my-4' />
 											<div className='space-y-2'>
-												<Skeleton className='h-4 w-20' />
-												{[1, 2, 3].map((i) => (
+												<div className='mb-2 flex items-center gap-2'>
+													<Skeleton className='h-4 w-20' />
+													<Skeleton className='h-4 w-16' />
+												</div>
+												{[1, 2, 3, 4].map((i) => (
 													<Skeleton
 														key={i}
-														className='h-8'
+														className='h-12 w-full'
 													/>
 												))}
 											</div>

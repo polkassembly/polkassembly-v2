@@ -7,6 +7,10 @@ import { GOOGLE_API_KEY } from '../../_api-constants/apiEnvVars';
 export class GoogleSheetService {
 	private static GOOGLE_SHEET_API_BASE_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
 
+	static isConfigured(): boolean {
+		return Boolean(GOOGLE_API_KEY?.trim());
+	}
+
 	static extractSheetId(url: string): string | null {
 		const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
 		return match ? match[1] : null;
@@ -22,18 +26,24 @@ export class GoogleSheetService {
 	} | null> {
 		try {
 			if (!GOOGLE_API_KEY) {
-				throw new Error('Google Sheets API key not configured');
+				console.warn('Google Sheets: API key not configured, skipping sheet metadata fetch');
+				return null;
 			}
 
 			if (!sheetId) {
-				throw new Error('Sheet ID is required');
+				console.warn('Google Sheets: Sheet ID is required');
+				return null;
 			}
 
 			const url = `${this.GOOGLE_SHEET_API_BASE_URL}/${sheetId}?key=${GOOGLE_API_KEY}`;
 			const response = await fetch(url, { next: { revalidate: 300 } });
 
 			if (!response.ok) {
-				console.warn('Failed to fetch sheet metadata:', response.statusText);
+				if (response.status === 403) {
+					console.warn('Google Sheets: Access forbidden - check API key permissions and ensure Google Sheets API is enabled');
+				} else {
+					console.warn('Google Sheets: Failed to fetch sheet metadata:', response.statusText);
+				}
 				return null;
 			}
 
@@ -69,6 +79,9 @@ export class GoogleSheetService {
 
 			const response = await fetch(url, { next: { revalidate: 300 } });
 			if (!response.ok) {
+				if (response.status === 403) {
+					throw new Error('Google Sheets access forbidden - check API key permissions and ensure Google Sheets API is enabled');
+				}
 				throw new Error(`Failed to fetch sheet data: ${response.statusText}`);
 			}
 
