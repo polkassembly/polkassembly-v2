@@ -95,11 +95,12 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 		const { name, value } = e.target;
 
 		if (name === 'preferredDate') {
-			const selectedDate = new Date(value);
-			const today = new Date();
-			today.setHours(0, 0, 0, 0);
+			const now = new Date();
+			const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+			const [year, month, day] = value.split('-').map(Number);
+			const selectedDate = new Date(year, (month || 1) - 1, day || 1);
 
-			if (selectedDate < today) {
+			if (selectedDate < startOfToday) {
 				toast({
 					status: ENotificationStatus.ERROR,
 					title: 'Invalid Date',

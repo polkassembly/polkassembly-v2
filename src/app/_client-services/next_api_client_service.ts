@@ -408,19 +408,19 @@ export class NextApiClientService {
 				break;
 
 			case EApiRoute.YOUTUBE_PLAYLIST:
-				path = '/api/v2/external/youtube/playlist';
+				path = '/external/youtube/playlist';
 				method = 'GET';
 				break;
 			case EApiRoute.YOUTUBE_VIDEO:
-				path = '/api/v2/external/youtube/video';
+				path = '/external/youtube/video';
 				method = 'GET';
 				break;
 			case EApiRoute.YOUTUBE_TRANSCRIPT:
-				path = '/api/v2/external/youtube/transcript';
+				path = '/external/youtube/transcript';
 				method = 'GET';
 				break;
 			case EApiRoute.TELEGRAM_PRESENTATION_REQUEST:
-				path = '/api/v2/external/telegram/presentation-request';
+				path = '/external/telegram/presentation-request';
 				method = 'POST';
 				break;
 
