@@ -43,10 +43,7 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 		}
 
 		if (filterBy !== FILTER_OPTIONS.ALL) {
-			filtered = filtered.filter((video) => {
-				const network = getNetworkFromDate(video.publishedAt);
-				return network === filterBy;
-			});
+			filtered = filtered.filter((video) => getNetworkFromDate(video.publishedAt) === filterBy);
 		}
 
 		if (sortBy === 'latest') {

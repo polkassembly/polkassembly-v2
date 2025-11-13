@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useState, useRef, type ChangeEvent, type FormEvent } from 'react';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
 import { Input } from '@/app/_shared-components/Input';
@@ -48,6 +48,8 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 		error: string | null;
 	} | null>(null);
 
+	const referendumRequestIdRef = useRef(0);
+
 	const extractReferendumId = (input: string): string | null => {
 		if (!input.trim()) return null;
 
@@ -64,11 +66,17 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 	};
 
 	const fetchReferendumData = async (id: string) => {
+		const requestId = referendumRequestIdRef.current + 1;
+		referendumRequestIdRef.current = requestId;
 		setReferendumData({ id, title: '', loading: true, error: null });
 
 		try {
 			const response = await fetch(`/api/v2/${EProposalType.REFERENDUM_V2}/${id}`);
 			const data = await response.json();
+
+			if (requestId !== referendumRequestIdRef.current) {
+				return;
+			}
 
 			if (data && data.title) {
 				setReferendumData({ id, title: data.title, loading: false, error: null });
@@ -76,6 +84,9 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 				setReferendumData({ id, title: '', loading: false, error: 'Proposal not found' });
 			}
 		} catch {
+			if (requestId !== referendumRequestIdRef.current) {
+				return;
+			}
 			setReferendumData({ id, title: '', loading: false, error: 'Failed to fetch proposal' });
 		}
 	};

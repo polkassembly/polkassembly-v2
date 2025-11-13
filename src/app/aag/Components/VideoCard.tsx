@@ -79,27 +79,28 @@ function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, 
 
 						{referenda && referenda.length > 0 && (
 							<div className='mt-2 flex flex-wrap items-center gap-2'>
-								{referenda.slice(0, MAX_VISIBLE_REFERENDA).map((ref) => {
-									const baseUrl = `https://${currentNetwork}.polkassembly.io`;
-									const refUrl = `${baseUrl}/referenda/${ref.referendaNo}`;
+								{network &&
+									referenda.slice(0, 3).map((ref) => {
+										const baseUrl = `https://${network}.polkassembly.io`;
+										const refUrl = `${baseUrl}/referenda/${ref.referendaNo}`;
 
-									return (
-										<a
-											key={`${currentNetwork}-${ref.referendaNo}`}
-											href={refUrl}
-											target='_blank'
-											rel='noopener noreferrer'
-											className='inline-flex items-center gap-1.5 rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink transition-colors hover:bg-bg_light_pink/80'
-											onClick={(e) => {
-												e.preventDefault();
-												e.stopPropagation();
-												window.open(refUrl, '_blank', 'noopener,noreferrer');
-											}}
-										>
-											# {ref.referendaNo}
-										</a>
-									);
-								})}
+										return (
+											<a
+												key={`${currentNetwork}-${ref.referendaNo}`}
+												href={refUrl}
+												target='_blank'
+												rel='noopener noreferrer'
+												className='inline-flex items-center gap-1.5 rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink transition-colors hover:bg-bg_light_pink/80'
+												onClick={(e) => {
+													e.preventDefault();
+													e.stopPropagation();
+													window.open(refUrl, '_blank', 'noopener,noreferrer');
+												}}
+											>
+												# {ref.referendaNo}
+											</a>
+										);
+									})}
 								{referenda.length > MAX_VISIBLE_REFERENDA && (
 									<span className='rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink'>+{referenda.length - MAX_VISIBLE_REFERENDA} </span>
 								)}

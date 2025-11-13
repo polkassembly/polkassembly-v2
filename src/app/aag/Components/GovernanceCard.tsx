@@ -133,7 +133,7 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 
 					<div className='mb-3 flex flex-col gap-2 md:mb-4'>
 						<div className='flex flex-wrap gap-2'>
-							{referenda
+							{currentNetwork && referenda
 								? referenda.slice(0, MAX_VISIBLE_REFERENDA).map((ref) => {
 										const baseUrl = `https://${currentNetwork}.polkassembly.io`;
 										const refUrl = `${baseUrl}/referenda/${ref.referendaNo}`;
