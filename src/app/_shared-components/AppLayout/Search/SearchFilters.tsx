@@ -145,7 +145,7 @@ export default function SearchFilters({ activeIndex, onChange }: SearchFiltersPr
 							<label
 								key={option.value}
 								htmlFor={option.value}
-								className={`${styles.radio_label} text-xs sm:text-xs ${activeIndex === option.value ? styles.radio_label_active : ''}`}
+								className={`${styles.radio_label} text-xs sm:text-sm ${activeIndex === option.value ? styles.radio_label_active : ''}`}
 							>
 								<RadioGroupItem
 									value={option.value}
