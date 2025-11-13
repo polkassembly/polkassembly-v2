@@ -209,7 +209,7 @@ function SearchResults({ activeIndex, proposalTypeFilter = ESearchType.POSTS }: 
 
 	return (
 		<div>
-			<div className={`${!isLoading && query.length > 2 && !hasNoResults ? 'h-[40vh]' : 'h-[50vh]'} overflow-hidden`}>
+			<div className={`${!hasNoResults ? 'h-[40vh]' : 'h-[50vh]'} overflow-hidden`}>
 				{isLoading ? (
 					<div className='flex h-full items-center justify-center'>
 						<Image
