@@ -11,11 +11,11 @@ import { Input } from '@/app/_shared-components/Input';
 import { Label } from '@/app/_shared-components/Label';
 import FileUploadIcon from '@assets/icons/file-upload.svg';
 
-import { Mail, Send, Twitter, ExternalLink, CheckCircle, Info } from 'lucide-react';
+import { Mail, Send, Twitter, ExternalLink, Info } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { ETheme, ENotificationStatus } from '@/_shared/types';
+import { ETheme, ENotificationStatus, EProposalType } from '@/_shared/types';
 import { useToast } from '@/hooks/useToast';
 
 interface RequestToPresentModalProps {
@@ -41,9 +41,74 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 	const { toast } = useToast();
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [referendumData, setReferendumData] = useState<{
+		id: string;
+		title: string;
+		loading: boolean;
+		error: string | null;
+	} | null>(null);
+
+	const extractReferendumId = (input: string): string | null => {
+		if (!input.trim()) return null;
+
+		if (input.includes('/referenda/')) {
+			const match = input.match(/\/referenda\/(\d+)/);
+			return match ? match[1] : null;
+		}
+
+		if (/^\d+$/.test(input.trim())) {
+			return input.trim();
+		}
+
+		return null;
+	};
+
+	const fetchReferendumData = async (id: string) => {
+		setReferendumData({ id, title: '', loading: true, error: null });
+
+		try {
+			const response = await fetch(`/api/v2/${EProposalType.REFERENDUM_V2}/${id}`);
+			const data = await response.json();
+
+			if (data && data.title) {
+				setReferendumData({ id, title: data.title, loading: false, error: null });
+			} else {
+				setReferendumData({ id, title: '', loading: false, error: 'Proposal not found' });
+			}
+		} catch {
+			setReferendumData({ id, title: '', loading: false, error: 'Failed to fetch proposal' });
+		}
+	};
 
 	const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
 		const { name, value } = e.target;
+
+		if (name === 'preferredDate') {
+			const selectedDate = new Date(value);
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+
+			if (selectedDate < today) {
+				toast({
+					status: ENotificationStatus.ERROR,
+					title: 'Invalid Date',
+					description: 'Please select a future date.'
+				});
+				return;
+			}
+		}
+
+		if (name === 'referendumIndex') {
+			const referendumId = extractReferendumId(value);
+			if (referendumId) {
+				fetchReferendumData(referendumId);
+			} else if (value.trim() === '') {
+				setReferendumData(null);
+			} else {
+				setReferendumData({ id: '', title: '', loading: false, error: 'Invalid referendum ID or URL format' });
+			}
+		}
+
 		setFormData((prev) => ({ ...prev, [name]: value }));
 	};
 
@@ -106,6 +171,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 				telegram: '',
 				twitter: ''
 			});
+			setReferendumData(null);
 		} catch (error) {
 			toast({
 				status: ENotificationStatus.ERROR,
@@ -193,22 +259,32 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 							id='referendumIndex'
 							name='referendumIndex'
 							type='text'
-							placeholder='e.g., 1462'
+							placeholder='e.g., 1462 or https://polkadot.polkassembly.io/referenda/1462'
 							className='text-text_primary'
 							value={formData.referendumIndex}
 							onChange={handleInputChange}
 						/>
-						{formData.referendumIndex && (
-							<div className='flex cursor-pointer items-center justify-between rounded-md bg-bg_light_pink p-2 text-sm text-text_pink'>
-								<span className='font-medium'>#{formData.referendumIndex} Vehicle Data on Asset Hub (We&apos;re All Gonna Own It)</span>
-								<Link
-									href='/'
-									target='_blank'
-									rel='noopener noreferrer'
-									className='flex items-center gap-1 text-text_pink hover:underline'
-								>
-									View Proposal <ExternalLink size={16} />
-								</Link>
+						{referendumData && (
+							<div className={`rounded-md p-2 text-sm ${referendumData.error ? 'border border-red-200 bg-red-50 text-red-600' : 'bg-bg_light_pink text-text_pink'}`}>
+								{referendumData.loading ? (
+									<span>Loading proposal data...</span>
+								) : referendumData.error ? (
+									<span>{referendumData.error}</span>
+								) : (
+									<div className='flex items-center justify-between'>
+										<span className='font-medium'>
+											#{referendumData.id} {referendumData.title}
+										</span>
+										<Link
+											href={`/referenda/${referendumData.id}`}
+											target='_blank'
+											rel='noopener noreferrer'
+											className='flex items-center gap-1 text-text_pink hover:underline'
+										>
+											View Proposal <ExternalLink size={16} />
+										</Link>
+									</div>
+								)}
 							</div>
 						)}
 					</div>
@@ -248,6 +324,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 								id='preferredDate'
 								name='preferredDate'
 								type='date'
+								min={new Date().toISOString().split('T')[0]}
 								value={formData.preferredDate}
 								onChange={handleInputChange}
 							/>
@@ -314,9 +391,6 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 										onChange={handleInputChange}
 										className='w-full border-none bg-transparent text-text_primary focus:outline-none focus:ring-0'
 									/>
-									<div className='flex items-center gap-1 whitespace-nowrap pl-3 text-sm font-medium text-social_green'>
-										<CheckCircle size={16} /> Verified
-									</div>
 								</div>
 							</div>
 
@@ -365,9 +439,6 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 										onChange={handleInputChange}
 										className='w-full border-none bg-transparent text-text_primary focus:outline-none focus:ring-0'
 									/>
-									<div className='flex items-center gap-1 whitespace-nowrap pl-3 text-sm font-medium text-social_green'>
-										<CheckCircle size={16} /> Verified
-									</div>
 								</div>
 							</div>
 						</div>
