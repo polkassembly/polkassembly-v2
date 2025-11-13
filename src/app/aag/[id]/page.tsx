@@ -14,7 +14,7 @@ import { ENetwork, ENotificationStatus } from '@/_shared/types';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
 import { Button } from '@/app/_shared-components/Button';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
-import { Calendar, Clock, Eye, Share2, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, Clock, Eye, Share2, Sparkles } from 'lucide-react';
 import PolkadotLogo from '@/_assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@/_assets/parachain-logos/kusama-logo.gif';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
@@ -23,151 +23,71 @@ import { AAG_YOUTUBE_PLAYLIST_ID } from '@/app/api/_api-constants/apiEnvVars';
 import RequestToPresentModal from '../Components/RequestToPresentModal';
 import AAGCard from '../Components/AAGCard';
 import VideoList from '../Components/VideoList';
+import TranscriptSection from '../Components/TranscriptSection';
 
-const INITIAL_TRANSCRIPT_DISPLAY_COUNT = 10;
 const SUGGESTED_VIDEOS_LIMIT = 5;
 
-interface TranscriptSegment {
-	text: string;
-	offset: number;
-	duration: number;
-}
+function VideoDetailPage() {
+	const routeParams = useParams();
+	const currentVideoId = routeParams?.id as string;
+	const currentPathname = usePathname();
+	const videoDetailPath = currentVideoId ? `/aag/${currentVideoId}` : currentPathname;
+	const videoShareUrl = typeof window !== 'undefined' ? `${window.location.origin}${videoDetailPath}` : '';
+	const { toast: showToast } = useToast();
 
-interface TranscriptSectionProps {
-	transcript: TranscriptSegment[];
-	loading?: boolean;
-}
+	const [selectedVideo, setSelectedVideo] = useState<IAAGVideoData | null>(null);
+	const [isPresentationModalOpen, setIsPresentationModalOpen] = useState(false);
 
-function TranscriptSection({ transcript, loading }: TranscriptSectionProps) {
-	const [isExpanded, setIsExpanded] = useState(false);
-	const initialDisplayCount = INITIAL_TRANSCRIPT_DISPLAY_COUNT;
-	const displayTranscript = isExpanded ? transcript : transcript.slice(0, initialDisplayCount);
-
-	const formatTimestamp = (seconds: number) => {
-		const mins = Math.floor(seconds / 60);
-		const secs = Math.floor(seconds % 60);
-		return `${mins}:${secs.toString().padStart(2, '0')}`;
-	};
-
-	if (loading) {
-		return (
-			<div>
-				<div className='mb-3 flex items-center gap-2'>
-					<div className='bg-bg_grey h-4 w-20 animate-pulse rounded' />
-				</div>
-				<div className='space-y-2'>
-					{[1, 2, 3].map((i) => (
-						<div
-							key={i}
-							className='bg-bg_grey h-8 animate-pulse rounded'
-						/>
-					))}
-				</div>
-			</div>
-		);
-	}
-
-	return (
-		<div className='rounded-lg p-4'>
-			<div className='mb-3 flex items-center justify-between'>
-				<h3 className='text-sm font-semibold text-text_primary'>Transcript</h3>
-				<span className='text-xs text-wallet_btn_text'>{transcript.length} segments</span>
-			</div>
-			<div className='max-h-64 space-y-1.5 overflow-auto'>
-				{displayTranscript.map((segment) => (
-					<div
-						key={`${segment.offset}-${segment.text.substring(0, 20)}`}
-						className='hover:bg-bg_grey flex gap-3 rounded p-1.5'
-					>
-						<span className='min-w-[45px] text-xs font-medium text-bar_chart_purple'>{formatTimestamp(segment.offset)}</span>
-						<p className='text-xs leading-relaxed text-wallet_btn_text'>{segment.text}</p>
-					</div>
-				))}
-			</div>
-			{transcript.length > initialDisplayCount && (
-				<button
-					type='button'
-					onClick={() => setIsExpanded(!isExpanded)}
-					className='bg-bg_grey mt-3 flex w-full items-center justify-center gap-1 rounded-lg border border-border_grey px-3 py-2 text-xs font-medium text-text_primary transition-colors hover:bg-opacity-80'
-				>
-					{isExpanded ? (
-						<>
-							<span>View Less</span>
-							<ChevronUp className='h-3 w-3' />
-						</>
-					) : (
-						<>
-							<span>View More ({transcript.length - initialDisplayCount} more)</span>
-							<ChevronDown className='h-3 w-3' />
-						</>
-					)}
-				</button>
-			)}
-		</div>
-	);
-}
-
-function VideoViewPage() {
-	const params = useParams();
-	const videoId = params?.id as string;
-	const pathname = usePathname();
-	const path = videoId ? `/aag/${videoId}` : pathname;
-	const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}${path}` : '';
-	const { toast } = useToast();
-
-	const [currentVideo, setCurrentVideo] = useState<IAAGVideoData | null>(null);
-	const [isModalOpen, setIsModalOpen] = useState(false);
-
-	const { data: playlistData } = useYouTubeData({
+	const { data: playlistDataFromYouTube } = useYouTubeData({
 		playlistId: AAG_YOUTUBE_PLAYLIST_ID
 	});
 
-	const { data: videoData } = useVideoData({
-		videoId: videoId || undefined,
-		enabled: Boolean(videoId)
+	const { data: videoMetadata } = useVideoData({
+		videoId: currentVideoId || undefined,
+		enabled: Boolean(currentVideoId)
 	});
 
-	const { data: transcriptData, loading: transcriptLoading } = useTranscript({
-		videoId: videoId || undefined,
-		enabled: Boolean(videoId),
+	const { data: videoTranscriptData, loading: isTranscriptLoading } = useTranscript({
+		videoId: currentVideoId || undefined,
+		enabled: Boolean(currentVideoId),
 		generateSummary: true
 	});
 
-	const network = currentVideo ? getNetworkFromDate(currentVideo.publishedAt) : null;
+	const videoAssociatedNetwork = selectedVideo ? getNetworkFromDate(selectedVideo.publishedAt) : null;
 
 	useEffect(() => {
-		if (playlistData?.videos && videoId) {
-			const video = playlistData.videos.find((v: IAAGVideoData) => v.id === videoId);
-			if (video) {
-				setCurrentVideo({
-					...video,
-					agendaUrl: videoData?.agendaUrl || video.agendaUrl,
-					chapters: videoData?.chapters || video.chapters || []
+		if (playlistDataFromYouTube?.videos && currentVideoId) {
+			const matchingVideoFromPlaylist = playlistDataFromYouTube.videos.find((videoItem: IAAGVideoData) => videoItem.id === currentVideoId);
+			if (matchingVideoFromPlaylist) {
+				setSelectedVideo({
+					...matchingVideoFromPlaylist,
+					agendaUrl: videoMetadata?.agendaUrl || matchingVideoFromPlaylist.agendaUrl,
+					chapters: videoMetadata?.chapters || matchingVideoFromPlaylist.chapters || []
 				});
 			}
 		}
-	}, [playlistData, videoId, videoData]);
+	}, [playlistDataFromYouTube, currentVideoId, videoMetadata]);
 
-	const chapters = videoData?.chapters || currentVideo?.chapters || [];
-	const agendaUrl = videoData?.agendaUrl || currentVideo?.agendaUrl;
-	const suggestedVideos = playlistData?.videos?.filter((v: IAAGVideoData) => v.id !== videoId)?.slice(0, SUGGESTED_VIDEOS_LIMIT) || [];
+	const videoChaptersList = videoMetadata?.chapters || selectedVideo?.chapters || [];
+	const videoAgendaUrl = videoMetadata?.agendaUrl || selectedVideo?.agendaUrl;
+	const relatedVideosList = playlistDataFromYouTube?.videos?.filter((videoItem: IAAGVideoData) => videoItem.id !== currentVideoId)?.slice(0, SUGGESTED_VIDEOS_LIMIT) || [];
 
-	const handleAgendaClick = () => {
-		if (agendaUrl) {
-			window.open(agendaUrl, '_blank', 'noopener,noreferrer');
+	const handleVideoAgendaClick = () => {
+		if (videoAgendaUrl) {
+			window.open(videoAgendaUrl, '_blank', 'noopener,noreferrer');
 		}
 	};
 
-	const handleShare = async () => {
+	const handleVideoShare = async () => {
 		try {
-			await navigator.clipboard.writeText(shareUrl);
-			toast({
+			await navigator.clipboard.writeText(videoShareUrl);
+			showToast({
 				status: ENotificationStatus.SUCCESS,
 				title: 'Link copied!',
 				description: 'Video link has been copied to clipboard'
 			});
 		} catch {
-			toast({
+			showToast({
 				status: ENotificationStatus.ERROR,
 				title: 'Failed to copy link',
 				description: 'Could not copy link to clipboard'
@@ -175,15 +95,15 @@ function VideoViewPage() {
 		}
 	};
 
-	const handleChapterClick = (startTime?: number) => {
-		if (startTime !== undefined) {
-			const iframe = document.querySelector('iframe');
-			if (iframe?.contentWindow) {
-				iframe.contentWindow.postMessage(
+	const handleVideoChapterClick = (chapterStartTime?: number) => {
+		if (chapterStartTime !== undefined) {
+			const youTubeIframe = document.querySelector('iframe');
+			if (youTubeIframe?.contentWindow) {
+				youTubeIframe.contentWindow.postMessage(
 					JSON.stringify({
 						event: 'command',
 						func: 'seekTo',
-						args: [startTime, true]
+						args: [chapterStartTime, true]
 					}),
 					'*'
 				);
@@ -191,7 +111,7 @@ function VideoViewPage() {
 		}
 	};
 
-	if (!currentVideo) {
+	if (!selectedVideo) {
 		return (
 			<div className='min-h-screen bg-page_background'>
 				<AAGCard />
@@ -248,8 +168,8 @@ function VideoViewPage() {
 						<div className='flex flex-col overflow-hidden rounded-lg border border-border_grey bg-bg_modal shadow-sm'>
 							<div className='relative aspect-[16/9] w-full bg-bg_modal sm:aspect-video'>
 								<iframe
-									src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&rel=0&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
-									title={currentVideo.title}
+									src={`https://www.youtube.com/embed/${currentVideoId}?enablejsapi=1&autoplay=1&rel=0&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
+									title={selectedVideo.title}
 									className='absolute inset-0 h-full w-full'
 									allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
 									allowFullScreen
@@ -258,13 +178,13 @@ function VideoViewPage() {
 
 							<div className='p-3 sm:p-4 md:p-6'>
 								<div className='mb-4 flex w-full flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
-									<h1 className='break-words text-lg font-bold leading-tight text-text_primary sm:text-xl md:text-2xl'>{currentVideo.title}</h1>
+									<h1 className='break-words text-lg font-bold leading-tight text-text_primary sm:text-xl md:text-2xl'>{selectedVideo.title}</h1>
 
 									<div className='flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap'>
-										{agendaUrl && (
+										{videoAgendaUrl && (
 											<Button
 												className='flex-1 rounded-full text-sm sm:flex-none'
-												onClick={handleAgendaClick}
+												onClick={handleVideoAgendaClick}
 											>
 												View Agenda
 											</Button>
@@ -273,7 +193,7 @@ function VideoViewPage() {
 											variant='ghost'
 											size='icon'
 											className='rounded-lg border border-border_grey bg-network_dropdown_bg p-2 sm:p-2.5'
-											onClick={handleShare}
+											onClick={handleVideoShare}
 											title='Share video'
 										>
 											<Share2 className='h-4 w-4 text-wallet_btn_text' />
@@ -285,36 +205,36 @@ function VideoViewPage() {
 									<div className='mb-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-text_primary sm:text-sm md:mb-4 md:gap-4'>
 										<span className='flex shrink-0 items-center gap-1'>
 											<Clock className='h-3 w-3 sm:h-3.5 sm:w-3.5' />
-											{currentVideo.duration}
+											{selectedVideo.duration}
 										</span>
 
 										<span className='flex shrink-0 items-center gap-1'>
 											<Calendar className='h-3 w-3 sm:h-3.5 sm:w-3.5' />
-											{currentVideo.date}
+											{selectedVideo.date}
 										</span>
 
-										{currentVideo.viewCount && (
+										{selectedVideo.viewCount && (
 											<span className='flex shrink-0 items-center gap-1'>
 												<Eye className='h-3 w-3 sm:h-3.5 sm:w-3.5' />
-												{parseInt(currentVideo.viewCount, 10).toLocaleString()} views
+												{parseInt(selectedVideo.viewCount, 10).toLocaleString()} views
 											</span>
 										)}
 
-										{network && (
+										{videoAssociatedNetwork && (
 											<div className='flex shrink-0 items-center gap-2'>
 												<Image
-													src={network === ENetwork.POLKADOT ? PolkadotLogo : KusamaLogo}
-													alt={network === ENetwork.POLKADOT ? ENetwork.POLKADOT : ENetwork.KUSAMA}
+													src={videoAssociatedNetwork === ENetwork.POLKADOT ? PolkadotLogo : KusamaLogo}
+													alt={videoAssociatedNetwork === ENetwork.POLKADOT ? ENetwork.POLKADOT : ENetwork.KUSAMA}
 													width={20}
 													height={20}
 													className='h-4 w-4 rounded-full sm:h-5 sm:w-5'
 												/>
-												<span className='text-[11px] capitalize text-text_primary sm:text-xs'>{network}</span>
+												<span className='text-[11px] capitalize text-text_primary sm:text-xs'>{videoAssociatedNetwork}</span>
 											</div>
 										)}
 									</div>
 
-									{transcriptLoading ? (
+									{isTranscriptLoading ? (
 										<div className='space-y-4'>
 											<div className='space-y-2'>
 												<div className='mb-2 flex items-center gap-2'>
@@ -341,23 +261,23 @@ function VideoViewPage() {
 												))}
 											</div>
 										</div>
-									) : transcriptData?.transcript?.length ? (
+									) : videoTranscriptData?.transcript?.length ? (
 										<div>
-											{transcriptData.summary ? (
+											{videoTranscriptData.summary ? (
 												<div>
 													<div className='mb-2 flex items-center gap-2'>
 														<Sparkles className='h-4 w-4 text-bar_chart_purple' />
 														<h3 className='text-sm font-semibold text-text_primary'>AI Summary</h3>
 													</div>
 													<MarkdownViewer
-														markdown={transcriptData.summary}
+														markdown={videoTranscriptData.summary}
 														truncate
 													/>
 													<Separator className='my-4' />
 												</div>
 											) : null}
 											<TranscriptSection
-												transcript={transcriptData.transcript}
+												transcript={videoTranscriptData.transcript}
 												loading={false}
 											/>
 										</div>
@@ -371,21 +291,21 @@ function VideoViewPage() {
 						<div className='max-h-96 overflow-auto rounded-lg border border-border_grey bg-bg_modal p-3 shadow-sm md:p-4 lg:max-h-none'>
 							<h2 className='mb-3 text-base font-semibold text-text_primary md:mb-4 md:text-lg'>Chapters</h2>
 
-							{chapters.length > 0 ? (
+							{videoChaptersList.length > 0 ? (
 								<div className='max-h-64 space-y-2 overflow-auto md:max-h-[450px]'>
-									{chapters.map((chapter) => (
+									{videoChaptersList.map((chapterData) => (
 										<button
-											key={chapter.id}
+											key={chapterData.id}
 											type='button'
-											onClick={() => handleChapterClick(chapter.start)}
+											onClick={() => handleVideoChapterClick(chapterData.start)}
 											className='w-full rounded-lg border border-transparent p-2 text-left transition-colors hover:bg-bg_light_pink md:p-3'
 										>
 											<div className='flex items-start justify-between'>
 												<div className='min-w-0 flex-1'>
 													<div className='mb-1 flex items-center gap-2'>
-														<span className='rounded bg-border_blue/15 px-1.5 py-0.5 font-mono text-xs text-border_blue md:px-2 md:py-1'>{chapter.timestamp}</span>
+														<span className='rounded bg-border_blue/15 px-1.5 py-0.5 font-mono text-xs text-border_blue md:px-2 md:py-1'>{chapterData.timestamp}</span>
 													</div>
-													<h3 className='mb-1 text-xs font-medium text-text_primary md:text-sm'>{chapter.title}</h3>
+													<h3 className='mb-1 text-xs font-medium text-text_primary md:text-sm'>{chapterData.title}</h3>
 												</div>
 											</div>
 										</button>
@@ -399,16 +319,16 @@ function VideoViewPage() {
 				</div>
 
 				<div className='mt-4 md:mt-6'>
-					<VideoList videos={suggestedVideos} />
+					<VideoList videos={relatedVideosList} />
 				</div>
 			</div>
 
 			<RequestToPresentModal
-				isOpen={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
+				isOpen={isPresentationModalOpen}
+				onClose={() => setIsPresentationModalOpen(false)}
 			/>
 		</div>
 	);
 }
 
-export default VideoViewPage;
+export default VideoDetailPage;

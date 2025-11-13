@@ -10,7 +10,7 @@ import { ENetwork, type IAAGVideoData } from '@/_shared/types';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/_shared-components/DropdownMenu';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
-import VideoCard from './VideoCard';
+import AAGVideoCard from './VideoCard';
 
 const FILTER_OPTIONS = {
 	ALL: 'all',
@@ -29,10 +29,10 @@ interface VideoListProps {
 type SortOption = 'latest' | 'oldest';
 type FilterOption = 'all' | ENetwork.POLKADOT | ENetwork.KUSAMA;
 
-function VideoList({ videos = [], loading = false, error = null }: VideoListProps) {
+function AAGVideoListingComponent({ videos = [], loading: isVideosLoading = false, error: videosError = null }: VideoListProps) {
 	const [searchQuery, setSearchQuery] = useState('');
-	const [sortBy, setSortBy] = useState<SortOption>('latest');
-	const [filterBy, setFilterBy] = useState<FilterOption>(FILTER_OPTIONS.ALL);
+	const [selectedSortOption, setSelectedSortOption] = useState<SortOption>('latest');
+	const [selectedFilterOption, setSelectedFilterOption] = useState<FilterOption>(FILTER_OPTIONS.ALL);
 
 	const filteredAndSortedVideos = useMemo(() => {
 		let filtered = videos;
@@ -42,18 +42,18 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 			filtered = filtered.filter((video) => video.title.toLowerCase().includes(query) || video.referenda?.some((ref) => ref.referendaNo.toLowerCase().includes(query)));
 		}
 
-		if (filterBy !== FILTER_OPTIONS.ALL) {
-			filtered = filtered.filter((video) => getNetworkFromDate(video.publishedAt) === filterBy);
+		if (selectedFilterOption !== FILTER_OPTIONS.ALL) {
+			filtered = filtered.filter((video) => getNetworkFromDate(video.publishedAt) === selectedFilterOption);
 		}
 
-		if (sortBy === 'latest') {
+		if (selectedSortOption === 'latest') {
 			filtered = [...filtered].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
 		} else {
 			filtered = [...filtered].sort((a, b) => new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime());
 		}
 
 		return filtered;
-	}, [videos, searchQuery, sortBy, filterBy]);
+	}, [videos, searchQuery, selectedSortOption, selectedFilterOption]);
 
 	return (
 		<div className='my-8 max-w-7xl rounded-lg bg-bg_modal p-4 md:my-16 md:p-6'>
@@ -81,20 +81,20 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 							</DropdownMenuTrigger>
 							<DropdownMenuContent className='w-24 min-w-max'>
 								<DropdownMenuItem
-									onClick={() => setFilterBy(FILTER_OPTIONS.ALL)}
-									className={filterBy === FILTER_OPTIONS.ALL ? ACTIVE_ITEM_CLASS : ''}
+									onClick={() => setSelectedFilterOption(FILTER_OPTIONS.ALL)}
+									className={selectedFilterOption === FILTER_OPTIONS.ALL ? ACTIVE_ITEM_CLASS : ''}
 								>
 									All Networks
 								</DropdownMenuItem>
 								<DropdownMenuItem
-									onClick={() => setFilterBy(FILTER_OPTIONS.POLKADOT)}
-									className={filterBy === FILTER_OPTIONS.POLKADOT ? ACTIVE_ITEM_CLASS : ''}
+									onClick={() => setSelectedFilterOption(FILTER_OPTIONS.POLKADOT)}
+									className={selectedFilterOption === FILTER_OPTIONS.POLKADOT ? ACTIVE_ITEM_CLASS : ''}
 								>
 									Polkadot
 								</DropdownMenuItem>
 								<DropdownMenuItem
-									onClick={() => setFilterBy(FILTER_OPTIONS.KUSAMA)}
-									className={filterBy === FILTER_OPTIONS.KUSAMA ? ACTIVE_ITEM_CLASS : ''}
+									onClick={() => setSelectedFilterOption(FILTER_OPTIONS.KUSAMA)}
+									className={selectedFilterOption === FILTER_OPTIONS.KUSAMA ? ACTIVE_ITEM_CLASS : ''}
 								>
 									Kusama
 								</DropdownMenuItem>
@@ -107,14 +107,14 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 							</DropdownMenuTrigger>
 							<DropdownMenuContent className='w-24 min-w-max'>
 								<DropdownMenuItem
-									onClick={() => setSortBy('latest')}
-									className={sortBy === 'latest' ? ACTIVE_ITEM_CLASS : ''}
+									onClick={() => setSelectedSortOption('latest')}
+									className={selectedSortOption === 'latest' ? ACTIVE_ITEM_CLASS : ''}
 								>
 									Latest
 								</DropdownMenuItem>
 								<DropdownMenuItem
-									onClick={() => setSortBy('oldest')}
-									className={sortBy === 'oldest' ? ACTIVE_ITEM_CLASS : ''}
+									onClick={() => setSelectedSortOption('oldest')}
+									className={selectedSortOption === 'oldest' ? ACTIVE_ITEM_CLASS : ''}
 								>
 									Oldest
 								</DropdownMenuItem>
@@ -125,7 +125,7 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 			</div>
 
 			<div className='flex flex-col gap-4'>
-				{loading ? (
+				{isVideosLoading ? (
 					<>
 						{[1, 2, 3].map((i) => (
 							<div
@@ -143,9 +143,9 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 							</div>
 						))}
 					</>
-				) : error ? (
+				) : videosError ? (
 					<div className='flex justify-center py-8'>
-						<div className='text-toast_warning_text'>Error loading videos: {error}</div>
+						<div className='text-toast_warning_text'>Error loading videos: {videosError}</div>
 					</div>
 				) : filteredAndSortedVideos.length === 0 ? (
 					<div className='flex justify-center py-8'>
@@ -153,7 +153,7 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 					</div>
 				) : (
 					filteredAndSortedVideos.map((video) => (
-						<VideoCard
+						<AAGVideoCard
 							key={video.id}
 							title={video.title}
 							date={video.date}
@@ -172,4 +172,4 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 	);
 }
 
-export default VideoList;
+export default AAGVideoListingComponent;

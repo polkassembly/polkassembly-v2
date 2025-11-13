@@ -10,13 +10,13 @@ import { Button } from '@/app/_shared-components/Button';
 import { Input } from '@/app/_shared-components/Input';
 import { Label } from '@/app/_shared-components/Label';
 import FileUploadIcon from '@assets/icons/file-upload.svg';
-
 import { Mail, Send, Twitter, ExternalLink, Info } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ETheme, ENotificationStatus, EProposalType } from '@/_shared/types';
 import { useToast } from '@/hooks/useToast';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 
 interface RequestToPresentModalProps {
 	isOpen: boolean;
@@ -150,16 +150,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 				submitData.append('supportingFile', formData.supportingFile);
 			}
 
-			const response = await fetch('/api/telegram/presentation-request', {
-				method: 'POST',
-				body: submitData
-			});
-
-			const result = await response.json();
-
-			if (!result.success) {
-				throw new Error(result.error || 'Failed to submit request');
-			}
+			await NextApiClientService.submitTelegramPresentationRequest(submitData);
 
 			toast({
 				status: ENotificationStatus.SUCCESS,

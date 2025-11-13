@@ -163,7 +163,11 @@ enum EApiRoute {
 	GET_CONVERSATION_MESSAGES = 'GET_CONVERSATION_MESSAGES',
 	GET_KLARA_STATS = 'GET_KLARA_STATS',
 	KLARA_SEND_FEEDBACK = 'KLARA_SEND_FEEDBACK',
-	KLARA_SEND_MESSAGE = 'KLARA_SEND_MESSAGE'
+	KLARA_SEND_MESSAGE = 'KLARA_SEND_MESSAGE',
+	YOUTUBE_PLAYLIST = 'YOUTUBE_PLAYLIST',
+	YOUTUBE_VIDEO = 'YOUTUBE_VIDEO',
+	YOUTUBE_TRANSCRIPT = 'YOUTUBE_TRANSCRIPT',
+	TELEGRAM_PRESENTATION_REQUEST = 'TELEGRAM_PRESENTATION_REQUEST'
 }
 
 export class NextApiClientService {
@@ -400,6 +404,23 @@ export class NextApiClientService {
 			case EApiRoute.KLARA_SEND_FEEDBACK:
 			case EApiRoute.KLARA_SEND_MESSAGE:
 				path = '/klara';
+				method = 'POST';
+				break;
+
+			case EApiRoute.YOUTUBE_PLAYLIST:
+				path = '/api/v2/external/youtube/playlist';
+				method = 'GET';
+				break;
+			case EApiRoute.YOUTUBE_VIDEO:
+				path = '/api/v2/external/youtube/video';
+				method = 'GET';
+				break;
+			case EApiRoute.YOUTUBE_TRANSCRIPT:
+				path = '/api/v2/external/youtube/transcript';
+				method = 'GET';
+				break;
+			case EApiRoute.TELEGRAM_PRESENTATION_REQUEST:
+				path = '/api/v2/external/telegram/presentation-request';
 				method = 'POST';
 				break;
 
@@ -1473,5 +1494,78 @@ export class NextApiClientService {
 				responseText
 			}
 		});
+	}
+
+	static async fetchYouTubePlaylistData({
+		url,
+		includeCaptions = false,
+		language = 'en',
+		maxVideos
+	}: {
+		url: string;
+		includeCaptions?: boolean;
+		language?: string;
+		maxVideos?: number;
+	}) {
+		const queryParams = new URLSearchParams({
+			url,
+			includeCaptions: includeCaptions.toString(),
+			language
+		});
+
+		if (maxVideos !== undefined) {
+			queryParams.set('maxVideos', maxVideos.toString());
+		}
+
+		const { url: apiUrl, method } = await this.getRouteConfig({ route: EApiRoute.YOUTUBE_PLAYLIST, queryParams });
+		return this.nextApiClientFetch({
+			url: apiUrl,
+			method,
+			skipCache: true
+		});
+	}
+
+	static async fetchYouTubeVideoData({ videoId, includeCaptions = true }: { videoId: string; includeCaptions?: boolean }) {
+		const queryParams = new URLSearchParams({
+			videoId,
+			includeCaptions: includeCaptions.toString()
+		});
+
+		const { url: apiUrl, method } = await this.getRouteConfig({ route: EApiRoute.YOUTUBE_VIDEO, queryParams });
+		return this.nextApiClientFetch({
+			url: apiUrl,
+			method,
+			skipCache: true
+		});
+	}
+
+	static async fetchYouTubeTranscript({ videoId, generateSummary = true }: { videoId: string; generateSummary?: boolean }) {
+		const queryParams = new URLSearchParams({
+			videoId,
+			summary: generateSummary.toString()
+		});
+
+		const { url: apiUrl, method } = await this.getRouteConfig({ route: EApiRoute.YOUTUBE_TRANSCRIPT, queryParams });
+		return this.nextApiClientFetch({
+			url: apiUrl,
+			method,
+			skipCache: true
+		});
+	}
+
+	static async submitTelegramPresentationRequest(formData: FormData) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.TELEGRAM_PRESENTATION_REQUEST });
+
+		const response = await fetch(url, {
+			method,
+			body: formData
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+			throw new Error(errorData.error || 'Failed to submit presentation request');
+		}
+
+		return response.json();
 	}
 }

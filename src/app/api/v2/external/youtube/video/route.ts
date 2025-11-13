@@ -6,9 +6,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import type { IYouTubeChapter, IReferendaItem } from '@/_shared/types';
-import { ExternalAPIService } from '../../_api-services/external_api_service';
-import { YouTubeService } from '../../_api-services/external_api_service/youtube_service';
-import { APIError } from '../../_api-utils/apiError';
+import { YouTubeService } from '@/app/api/_api-services/external_api_service/youtube_service';
+import { ExternalAPIService } from '@/app/api/_api-services/external_api_service';
+import { APIError } from '@/app/api/_api-utils/apiError';
 
 interface VideoResponse {
 	id: string;

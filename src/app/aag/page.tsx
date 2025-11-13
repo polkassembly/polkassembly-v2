@@ -7,8 +7,8 @@
 import type { IAAGVideoData } from '@/_shared/types';
 import { useYouTubeData } from '@/hooks/useYouTubeData';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
-import GovernanceCard from './Components/GovernanceCard';
-import VideoList from './Components/VideoList';
+import GovernanceVideoCard from './Components/GovernanceCard';
+import AAGVideoListingComponent from './Components/VideoList';
 import AAGCard from './Components/AAGCard';
 import { AAG_YOUTUBE_PLAYLIST_ID } from '../api/_api-constants/apiEnvVars';
 
@@ -16,31 +16,31 @@ const FEATURED_VIDEOS_COUNT = 3;
 const MAX_VIDEOS_TO_FETCH = 10;
 const DURATION_FILTER_THRESHOLD = '00:00';
 
-function AAG() {
+function AttemptsAtGovernancePage() {
 	const {
-		data: playlistData,
-		loading,
-		error
+		data: youTubePlaylistData,
+		loading: isPlaylistLoading,
+		error: playlistError
 	} = useYouTubeData({
 		playlistId: AAG_YOUTUBE_PLAYLIST_ID,
 		maxVideos: MAX_VIDEOS_TO_FETCH
 	});
 
-	const refinedVideos = playlistData?.videos?.filter((video: IAAGVideoData) => video.duration !== DURATION_FILTER_THRESHOLD) || [];
+	const videosWithValidDuration = youTubePlaylistData?.videos?.filter((video: IAAGVideoData) => video.duration !== DURATION_FILTER_THRESHOLD) || [];
 
-	const featuredVideos = refinedVideos.slice(0, FEATURED_VIDEOS_COUNT);
-	const listVideos = refinedVideos.slice(FEATURED_VIDEOS_COUNT);
+	const featuredVideosList = videosWithValidDuration.slice(0, FEATURED_VIDEOS_COUNT);
+	const remainingVideosList = videosWithValidDuration.slice(FEATURED_VIDEOS_COUNT);
 
 	return (
 		<div className='min-h-screen bg-page_background text-text_primary'>
 			<AAGCard />
 			<div className='mx-auto max-w-6xl px-4'>
 				<div className='grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3'>
-					{loading ? (
+					{isPlaylistLoading ? (
 						<>
-							{[1, 2, 3].map((i) => (
+							{[1, 2, 3].map((skeletonIndex) => (
 								<div
-									key={i}
+									key={skeletonIndex}
 									className='overflow-hidden rounded-lg border border-border_grey bg-bg_modal shadow-sm'
 								>
 									<Skeleton className='aspect-video w-full' />
@@ -54,35 +54,35 @@ function AAG() {
 								</div>
 							))}
 						</>
-					) : error ? (
+					) : playlistError ? (
 						<div className='col-span-full flex justify-center py-8'>
-							<div className='text-toast_warning_text'>Error loading videos: {error}</div>
+							<div className='text-toast_warning_text'>Error loading videos: {playlistError}</div>
 						</div>
 					) : (
-						featuredVideos.map((video: IAAGVideoData) => (
-							<GovernanceCard
-								key={video.id}
-								title={video.title}
-								date={video.date}
-								duration={video.duration}
-								thumbnail={video.thumbnail}
-								url={video.url}
-								videoId={video.id}
-								referenda={video.referenda}
-								publishedAt={video.publishedAt}
-								agendaUrl={video.agendaUrl}
+						featuredVideosList.map((featuredVideo: IAAGVideoData) => (
+							<GovernanceVideoCard
+								key={featuredVideo.id}
+								title={featuredVideo.title}
+								date={featuredVideo.date}
+								duration={featuredVideo.duration}
+								thumbnail={featuredVideo.thumbnail}
+								url={featuredVideo.url}
+								videoId={featuredVideo.id}
+								referenda={featuredVideo.referenda}
+								publishedAt={featuredVideo.publishedAt}
+								agendaUrl={featuredVideo.agendaUrl}
 							/>
 						))
 					)}
 				</div>
-				<VideoList
-					videos={listVideos}
-					loading={loading}
-					error={error}
+				<AAGVideoListingComponent
+					videos={remainingVideosList}
+					loading={isPlaylistLoading}
+					error={playlistError}
 				/>
 			</div>
 		</div>
 	);
 }
 
-export default AAG;
+export default AttemptsAtGovernancePage;

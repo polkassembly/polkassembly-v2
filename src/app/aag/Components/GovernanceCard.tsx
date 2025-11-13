@@ -31,32 +31,32 @@ interface GovernanceCardProps {
 	agendaUrl?: string;
 }
 
-function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOutcomes, url, videoId, publishedAt, agendaUrl }: GovernanceCardProps) {
-	const { toast } = useToast();
-	const pathname = usePathname();
-	const currentNetwork = getCurrentNetwork();
-	const path = videoId ? `/aag/${videoId}` : pathname;
-	const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}${path}` : '';
+function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, votingOutcomes, url, videoId, publishedAt, agendaUrl }: GovernanceCardProps) {
+	const { toast: showToast } = useToast();
+	const currentPathname = usePathname();
+	const activeNetwork = getCurrentNetwork();
+	const videoDetailPath = videoId ? `/aag/${videoId}` : currentPathname;
+	const videoShareUrl = typeof window !== 'undefined' ? `${window.location.origin}${videoDetailPath}` : '';
 
-	const href = videoId ? `/aag/${videoId}` : url || '#';
+	const videoLinkHref = videoId ? `/aag/${videoId}` : url || '#';
 
-	const network = publishedAt ? getNetworkFromDate(publishedAt) : null;
+	const videoAssociatedNetwork = publishedAt ? getNetworkFromDate(publishedAt) : null;
 
-	const handleShare = async (e: React.MouseEvent) => {
+	const handleVideoShare = async (e: React.MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
 
 		if (!videoId) return;
 
 		try {
-			await navigator.clipboard.writeText(shareUrl);
-			toast({
+			await navigator.clipboard.writeText(videoShareUrl);
+			showToast({
 				status: ENotificationStatus.SUCCESS,
 				title: 'Link copied!',
 				description: 'Video link has been copied to clipboard'
 			});
 		} catch {
-			toast({
+			showToast({
 				status: ENotificationStatus.ERROR,
 				title: 'Failed to copy link',
 				description: 'Could not copy link to clipboard'
@@ -74,8 +74,8 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 	};
 
 	const handleCardClick = () => {
-		if (href !== '#') {
-			window.location.href = href;
+		if (videoLinkHref !== '#') {
+			window.location.href = videoLinkHref;
 		}
 	};
 
@@ -133,25 +133,25 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 
 					<div className='mb-3 flex flex-col gap-2 md:mb-4'>
 						<div className='flex flex-wrap gap-2'>
-							{currentNetwork && referenda
-								? referenda.slice(0, MAX_VISIBLE_REFERENDA).map((ref) => {
-										const baseUrl = `https://${currentNetwork}.polkassembly.io`;
-										const refUrl = `${baseUrl}/referenda/${ref.referendaNo}`;
+							{activeNetwork && referenda
+								? referenda.slice(0, MAX_VISIBLE_REFERENDA).map((referendaItem) => {
+										const networkBaseUrl = `https://${activeNetwork}.polkassembly.io`;
+										const referendumUrl = `${networkBaseUrl}/referenda/${referendaItem.referendaNo}`;
 
 										return (
 											<a
-												key={`${currentNetwork}-${ref.referendaNo}`}
-												href={refUrl}
+												key={`${activeNetwork}-${referendaItem.referendaNo}`}
+												href={referendumUrl}
 												target='_blank'
 												rel='noopener noreferrer'
 												className='inline-flex items-center gap-1.5 rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink transition-colors hover:bg-bg_light_pink/80'
 												onClick={(e) => {
 													e.preventDefault();
 													e.stopPropagation();
-													window.open(refUrl, '_blank', 'noopener,noreferrer');
+													window.open(referendumUrl, '_blank', 'noopener,noreferrer');
 												}}
 											>
-												# {ref.referendaNo}
+												# {referendaItem.referendaNo}
 											</a>
 										);
 									})
@@ -171,10 +171,10 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 
 					<div className='flex flex-row items-center justify-between gap-3 border-t border-border_grey pt-3 md:pt-4'>
 						<div className='flex items-center gap-2 md:gap-3'>
-							{network && (
+							{videoAssociatedNetwork && (
 								<Image
-									src={network === ENetwork.POLKADOT ? PolkadotLogo : KusamaLogo}
-									alt={network === ENetwork.POLKADOT ? ENetwork.POLKADOT : ENetwork.KUSAMA}
+									src={videoAssociatedNetwork === ENetwork.POLKADOT ? PolkadotLogo : KusamaLogo}
+									alt={videoAssociatedNetwork === ENetwork.POLKADOT ? ENetwork.POLKADOT : ENetwork.KUSAMA}
 									width={24}
 									height={24}
 									className='h-5 w-5 rounded-full md:h-6 md:w-6'
@@ -195,7 +195,7 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 							variant='ghost'
 							size='icon'
 							className='w-fit rounded-lg border border-border_grey bg-network_dropdown_bg p-1.5 md:p-2'
-							onClick={handleShare}
+							onClick={handleVideoShare}
 							title='Share video'
 						>
 							<Share2 className='h-3.5 w-3.5 text-wallet_btn_text md:h-4 md:w-4' />
@@ -207,4 +207,4 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 	);
 }
 
-export default GovernanceCard;
+export default GovernanceVideoCard;

@@ -6,8 +6,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import type { IAAGPlaylistData, IAAGVideoData, IYouTubePlaylistMetadata, IReferendaItem, IYouTubeVideoMetadata, ITranscriptData } from '@/_shared/types';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 
-const UNKNOWN_ERROR_MESSAGE = 'Unknown error';
 const INVALID_RESPONSE_FORMAT = 'Invalid response format';
 
 const DEFAULT_RETRY_COUNT = 1;
@@ -19,6 +19,11 @@ const PLAYLIST_GC_TIME = 10 * 60 * 1000;
 
 const DEFAULT_DATE_LOCALE = 'en-GB';
 const DEFAULT_DURATION_FALLBACK = '00:00';
+
+interface YouTubeApiResponse<T = unknown> {
+	success: boolean;
+	data: T;
+}
 
 interface UseYouTubeDataOptions {
 	playlistUrl?: string;
@@ -119,30 +124,35 @@ async function fetchPlaylistData(playlistUrl: string, includeCaptions: boolean, 
 		throw new Error('Playlist URL is required');
 	}
 
-	const params = new URLSearchParams({
+	const result = await NextApiClientService.fetchYouTubePlaylistData({
 		url: playlistUrl,
-		includeCaptions: includeCaptions.toString(),
-		language
+		includeCaptions,
+		language,
+		maxVideos
 	});
 
-	if (maxVideos) {
-		params.append('maxVideos', maxVideos.toString());
+	if (result.error) {
+		throw new Error(result.error.message || 'Failed to fetch playlist data');
 	}
 
-	const response = await fetch(`/api/youtube/playlist?${params.toString()}`);
-
-	if (!response.ok) {
-		const errorData = await response.json().catch(() => ({ error: UNKNOWN_ERROR_MESSAGE }));
-		throw new Error(errorData.error || 'Failed to fetch playlist data');
+	if (!result.data) {
+		throw new Error(INVALID_RESPONSE_FORMAT);
 	}
 
-	const result = await response.json();
+	const responseData = result.data as YouTubeApiResponse<{
+		playlist: IYouTubePlaylistMetadata;
+		videos: Array<{
+			metadata: IYouTubeVideoMetadata;
+			referenda?: IReferendaItem[];
+			agendaUrl?: string;
+		}>;
+	}>;
 
-	if (!result.success || !result.data) {
-		throw new Error('Invalid response format');
+	if (!responseData.success || !responseData.data) {
+		throw new Error(INVALID_RESPONSE_FORMAT);
 	}
 
-	const { playlist, videos } = result.data;
+	const { playlist, videos } = responseData.data;
 
 	return {
 		id: playlist.id,
@@ -157,47 +167,49 @@ async function fetchPlaylistData(playlistUrl: string, includeCaptions: boolean, 
 }
 
 async function fetchVideoData(videoId: string): Promise<IYouTubeVideoMetadata> {
-	const params = new URLSearchParams({
+	const result = await NextApiClientService.fetchYouTubeVideoData({
 		videoId,
-		includeCaptions: 'true'
+		includeCaptions: true
 	});
 
-	const response = await fetch(`/api/youtube/video?${params.toString()}`);
-
-	if (!response.ok) {
-		const errorData = await response.json().catch(() => ({ error: UNKNOWN_ERROR_MESSAGE }));
-		throw new Error(errorData.error || 'Failed to fetch video data');
+	if (result.error) {
+		throw new Error(result.error.message || 'Failed to fetch video data');
 	}
 
-	const result = await response.json();
-
-	if (!result.success || !result.data) {
+	if (!result.data) {
 		throw new Error(INVALID_RESPONSE_FORMAT);
 	}
 
-	return result.data;
+	const responseData = result.data as YouTubeApiResponse<IYouTubeVideoMetadata>;
+
+	if (!responseData.success || !responseData.data) {
+		throw new Error(INVALID_RESPONSE_FORMAT);
+	}
+
+	return responseData.data;
 }
 
 async function fetchTranscript(videoId: string, generateSummary: boolean): Promise<ITranscriptData> {
-	const params = new URLSearchParams({
+	const result = await NextApiClientService.fetchYouTubeTranscript({
 		videoId,
-		summary: generateSummary.toString()
+		generateSummary
 	});
 
-	const response = await fetch(`/api/youtube/transcript?${params.toString()}`);
-
-	if (!response.ok) {
-		const errorData = await response.json().catch(() => ({ error: UNKNOWN_ERROR_MESSAGE }));
-		throw new Error(errorData.error || 'Failed to fetch transcript');
+	if (result.error) {
+		throw new Error(result.error.message || 'Failed to fetch transcript');
 	}
 
-	const result = await response.json();
-
-	if (!result.success || !result.data) {
+	if (!result.data) {
 		throw new Error(INVALID_RESPONSE_FORMAT);
 	}
 
-	return result.data;
+	const responseData = result.data as YouTubeApiResponse<ITranscriptData>;
+
+	if (!responseData.success || !responseData.data) {
+		throw new Error(INVALID_RESPONSE_FORMAT);
+	}
+
+	return responseData.data;
 }
 
 export function useYouTubeData({ playlistUrl, playlistId, includeCaptions = false, language = 'en', maxVideos }: UseYouTubeDataOptions): UseYouTubeDataReturn {

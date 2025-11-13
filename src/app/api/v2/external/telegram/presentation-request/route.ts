@@ -5,9 +5,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } from '../../_api-constants/apiEnvVars';
-import { APIError } from '../../_api-utils/apiError';
-import { TelegramService } from '../../_api-services/external_api_service/telegram_service';
+import { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } from '../../../../_api-constants/apiEnvVars';
+import { APIError } from '../../../../_api-utils/apiError';
+import { TelegramService } from '../../../../_api-services/external_api_service/telegram_service';
 
 export async function POST(request: NextRequest) {
 	try {

@@ -16,7 +16,7 @@ import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
 const MAX_VISIBLE_REFERENDA = 3;
 const DEFAULT_IMAGE_ALT = 'No Image';
 
-interface VideoCardProps {
+interface AAGVideoCardProps {
 	title: string;
 	date: string;
 	duration: string;
@@ -29,12 +29,12 @@ interface VideoCardProps {
 	agendaUrl?: string;
 }
 
-function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, publishedAt, agendaUrl }: Omit<VideoCardProps, 'variant'>) {
-	const href = videoId ? `/aag/${videoId}` : url || '#';
-	const currentNetwork = getCurrentNetwork();
-	const network = publishedAt ? getNetworkFromDate(publishedAt) : null;
+function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoId, publishedAt, agendaUrl }: Omit<AAGVideoCardProps, 'variant'>) {
+	const videoLinkHref = videoId ? `/aag/${videoId}` : url || '#';
+	const activeNetwork = getCurrentNetwork();
+	const videoAssociatedNetwork = publishedAt ? getNetworkFromDate(publishedAt) : null;
 
-	const handleAgendaClick = (e: React.MouseEvent) => {
+	const handleVideoAgendaClick = (e: React.MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
 
@@ -45,7 +45,7 @@ function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, 
 
 	return (
 		<Link
-			href={href}
+			href={videoLinkHref}
 			className='block'
 		>
 			<div className='flex cursor-pointer items-start gap-4 rounded-lg p-[1px] transition-all duration-300 [background:linear-gradient(180deg,#D2D8E0_0%,#000000_100%)] hover:[background:linear-gradient(180deg,#D2D8E0_0%,#E5007A_100%)]'>
@@ -79,25 +79,25 @@ function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, 
 
 						{referenda && referenda.length > 0 && (
 							<div className='mt-2 flex flex-wrap items-center gap-2'>
-								{network &&
-									referenda.slice(0, 3).map((ref) => {
-										const baseUrl = `https://${network}.polkassembly.io`;
-										const refUrl = `${baseUrl}/referenda/${ref.referendaNo}`;
+								{videoAssociatedNetwork &&
+									referenda.slice(0, 3).map((referendaItem) => {
+										const networkBaseUrl = `https://${videoAssociatedNetwork}.polkassembly.io`;
+										const referendumUrl = `${networkBaseUrl}/referenda/${referendaItem.referendaNo}`;
 
 										return (
 											<a
-												key={`${currentNetwork}-${ref.referendaNo}`}
-												href={refUrl}
+												key={`${activeNetwork}-${referendaItem.referendaNo}`}
+												href={referendumUrl}
 												target='_blank'
 												rel='noopener noreferrer'
 												className='inline-flex items-center gap-1.5 rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink transition-colors hover:bg-bg_light_pink/80'
 												onClick={(e) => {
 													e.preventDefault();
 													e.stopPropagation();
-													window.open(refUrl, '_blank', 'noopener,noreferrer');
+													window.open(referendumUrl, '_blank', 'noopener,noreferrer');
 												}}
 											>
-												# {ref.referendaNo}
+												# {referendaItem.referendaNo}
 											</a>
 										);
 									})}
@@ -113,15 +113,15 @@ function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, 
 							{agendaUrl && (
 								<Button
 									className='rounded-full text-xs sm:text-sm'
-									onClick={handleAgendaClick}
+									onClick={handleVideoAgendaClick}
 								>
 									View Agenda
 								</Button>
 							)}
-							{network && (
+							{videoAssociatedNetwork && (
 								<Image
-									src={network === ENetwork.POLKADOT ? PolkadotLogo : KusamaLogo}
-									alt={network === ENetwork.POLKADOT ? ENetwork.POLKADOT : ENetwork.KUSAMA}
+									src={videoAssociatedNetwork === ENetwork.POLKADOT ? PolkadotLogo : KusamaLogo}
+									alt={videoAssociatedNetwork === ENetwork.POLKADOT ? ENetwork.POLKADOT : ENetwork.KUSAMA}
 									width={24}
 									height={24}
 									className='h-6 w-6 rounded-full'
@@ -135,4 +135,4 @@ function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, 
 	);
 }
 
-export default VideoCard;
+export default AAGVideoCard;
