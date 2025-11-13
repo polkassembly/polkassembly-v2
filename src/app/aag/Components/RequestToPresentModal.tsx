@@ -15,7 +15,8 @@ import { Mail, Send, Twitter, ExternalLink, CheckCircle, Info } from 'lucide-rea
 import Link from 'next/link';
 import Image from 'next/image';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { ETheme } from '@/_shared/types';
+import { ETheme, ENotificationStatus } from '@/_shared/types';
+import { useToast } from '@/hooks/useToast';
 
 interface RequestToPresentModalProps {
 	isOpen: boolean;
@@ -37,6 +38,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 		twitter: ''
 	});
 	const { userPreferences } = useUserPreferences();
+	const { toast } = useToast();
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -53,11 +55,44 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
 		setIsSubmitting(true);
+
 		try {
-			await new Promise<void>((resolve) => {
-				setTimeout(resolve, 1000);
+			const submitData = new FormData();
+
+			submitData.append('fullName', formData.fullName);
+			submitData.append('organization', formData.organization);
+			submitData.append('hasProposal', formData.hasProposal);
+			submitData.append('referendumIndex', formData.referendumIndex);
+			submitData.append('description', formData.description);
+			submitData.append('estimatedDuration', formData.estimatedDuration);
+			submitData.append('preferredDate', formData.preferredDate);
+			submitData.append('email', formData.email);
+			submitData.append('telegram', formData.telegram);
+			submitData.append('twitter', formData.twitter);
+
+			if (formData.supportingFile) {
+				submitData.append('supportingFile', formData.supportingFile);
+			}
+
+			const response = await fetch('/api/telegram/presentation-request', {
+				method: 'POST',
+				body: submitData
 			});
+
+			const result = await response.json();
+
+			if (!result.success) {
+				throw new Error(result.error || 'Failed to submit request');
+			}
+
+			toast({
+				status: ENotificationStatus.SUCCESS,
+				title: 'Request Submitted!',
+				description: 'Your presentation request has been submitted successfully.'
+			});
+
 			onClose();
+
 			setFormData({
 				fullName: '',
 				organization: '',
@@ -70,6 +105,12 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 				email: '',
 				telegram: '',
 				twitter: ''
+			});
+		} catch (error) {
+			toast({
+				status: ENotificationStatus.ERROR,
+				title: 'Submission Failed',
+				description: error instanceof Error ? error.message : 'Failed to submit request. Please try again.'
 			});
 		} finally {
 			setIsSubmitting(false);
@@ -158,7 +199,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 							onChange={handleInputChange}
 						/>
 						{formData.referendumIndex && (
-							<div className='flex cursor-pointer items-center justify-between rounded-md bg-bg_pink p-2 text-sm text-text_pink'>
+							<div className='flex cursor-pointer items-center justify-between rounded-md bg-bg_light_pink p-2 text-sm text-text_pink'>
 								<span className='font-medium'>#{formData.referendumIndex} Vehicle Data on Asset Hub (We&apos;re All Gonna Own It)</span>
 								<Link
 									href='/'

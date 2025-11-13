@@ -8,6 +8,7 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { type IYouTubeVideoMetadata, type IYouTubePlaylistMetadata, type IYouTubeCaption } from '@/_shared/types';
 import { APIError } from '../../_api-utils/apiError';
 import { YouTubeService } from './youtube_service';
+import { TelegramService } from './telegram_service';
 
 export class ExternalAPIService {
 	static async getYouTubeVideoMetadata(videoIdOrUrl: string, options: { includeCaptions?: boolean; language?: string } = {}): Promise<IYouTubeVideoMetadata | null> {
@@ -120,5 +121,37 @@ export class ExternalAPIService {
 			playlist: playlistMetadata,
 			videos
 		};
+	}
+
+	static async sendTelegramPresentationRequest(data: {
+		fullName: string;
+		organization?: string;
+		hasProposal: string;
+		referendumIndex?: string;
+		description: string;
+		estimatedDuration?: string;
+		preferredDate?: string;
+		supportingFile?: {
+			name: string;
+			size: number;
+			type: string;
+		} | null;
+		email?: string;
+		telegram?: string;
+		twitter?: string;
+	}) {
+		return TelegramService.sendPresentationRequest(data);
+	}
+
+	static async sendTelegramNotification(message: string, chatId?: string) {
+		if (!message?.trim()) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Message is required');
+		}
+
+		return TelegramService.sendNotification(message, chatId);
+	}
+
+	static async testTelegramConnection() {
+		return TelegramService.testConnection();
 	}
 }
