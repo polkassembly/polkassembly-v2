@@ -9,6 +9,7 @@ import { useState, useMemo } from 'react';
 import { ENetwork, type IAAGVideoData } from '@/_shared/types';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/_shared-components/DropdownMenu';
+import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
 import VideoCard from './VideoCard';
 
 const FILTER_OPTIONS = {
@@ -43,16 +44,7 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 
 		if (filterBy !== FILTER_OPTIONS.ALL) {
 			filtered = filtered.filter((video) => {
-				const network = video
-					? (() => {
-							const date = new Date(video.publishedAt);
-							const day = date.getUTCDay();
-							if (day === 2) return ENetwork.KUSAMA;
-							if (day === 5) return ENetwork.POLKADOT;
-							return null;
-						})()
-					: null;
-
+				const network = getNetworkFromDate(video.publishedAt);
 				return network === filterBy;
 			});
 		}

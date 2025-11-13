@@ -11,6 +11,7 @@ import type { IAAGVideoData } from '@/_shared/types';
 import { useYouTubeData, useVideoData, useTranscript } from '@/hooks/useYouTubeData';
 import { useToast } from '@/hooks/useToast';
 import { ENetwork, ENotificationStatus } from '@/_shared/types';
+import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
 import { Button } from '@/app/_shared-components/Button';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Calendar, Clock, Eye, Share2, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
@@ -22,6 +23,9 @@ import { AAG_YOUTUBE_PLAYLIST_ID } from '@/app/api/_api-constants/apiEnvVars';
 import RequestToPresentModal from '../Components/RequestToPresentModal';
 import AAGCard from '../Components/AAGCard';
 import VideoList from '../Components/VideoList';
+
+const INITIAL_TRANSCRIPT_DISPLAY_COUNT = 10;
+const SUGGESTED_VIDEOS_LIMIT = 5;
 
 interface TranscriptSegment {
 	text: string;
@@ -36,7 +40,7 @@ interface TranscriptSectionProps {
 
 function TranscriptSection({ transcript, loading }: TranscriptSectionProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
-	const initialDisplayCount = 10;
+	const initialDisplayCount = INITIAL_TRANSCRIPT_DISPLAY_COUNT;
 	const displayTranscript = isExpanded ? transcript : transcript.slice(0, initialDisplayCount);
 
 	const formatTimestamp = (seconds: number) => {
@@ -112,7 +116,6 @@ function VideoViewPage() {
 	const { toast } = useToast();
 
 	const [currentVideo, setCurrentVideo] = useState<IAAGVideoData | null>(null);
-	const [activeChapter, setActiveChapter] = useState('1');
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const { data: playlistData } = useYouTubeData({
@@ -130,13 +133,7 @@ function VideoViewPage() {
 		generateSummary: true
 	});
 
-	const network = currentVideo
-		? (() => {
-				const date = new Date(currentVideo.publishedAt);
-				const day = date.getUTCDay();
-				return day === 2 ? ENetwork.KUSAMA : day === 5 ? ENetwork.POLKADOT : null;
-			})()
-		: null;
+	const network = currentVideo ? getNetworkFromDate(currentVideo.publishedAt) : null;
 
 	useEffect(() => {
 		if (playlistData?.videos && videoId) {
@@ -153,7 +150,7 @@ function VideoViewPage() {
 
 	const chapters = videoData?.chapters || currentVideo?.chapters || [];
 	const agendaUrl = videoData?.agendaUrl || currentVideo?.agendaUrl;
-	const suggestedVideos = playlistData?.videos?.filter((v: IAAGVideoData) => v.id !== videoId)?.slice(0, 5) || [];
+	const suggestedVideos = playlistData?.videos?.filter((v: IAAGVideoData) => v.id !== videoId)?.slice(0, SUGGESTED_VIDEOS_LIMIT) || [];
 
 	const handleAgendaClick = () => {
 		if (agendaUrl) {
@@ -178,8 +175,7 @@ function VideoViewPage() {
 		}
 	};
 
-	const handleChapterClick = (chapterId: string, startTime?: number) => {
-		setActiveChapter(chapterId);
+	const handleChapterClick = (startTime?: number) => {
 		if (startTime !== undefined) {
 			const iframe = document.querySelector('iframe');
 			if (iframe?.contentWindow) {
@@ -381,10 +377,8 @@ function VideoViewPage() {
 										<button
 											key={chapter.id}
 											type='button'
-											onClick={() => handleChapterClick(chapter.id, chapter.start)}
-											className={`w-full rounded-lg p-2 text-left transition-colors md:p-3 ${
-												activeChapter === chapter.id ? 'border border-bg_light_pink bg-border_grey/60' : 'border border-transparent hover:bg-bg_light_pink'
-											}`}
+											onClick={() => handleChapterClick(chapter.start)}
+											className='w-full rounded-lg border border-transparent p-2 text-left transition-colors hover:bg-bg_light_pink md:p-3'
 										>
 											<div className='flex items-start justify-between'>
 												<div className='min-w-0 flex-1'>

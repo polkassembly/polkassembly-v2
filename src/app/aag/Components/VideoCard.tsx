@@ -11,6 +11,10 @@ import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import { ENetwork, type IReferendaItem } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
+
+const MAX_VISIBLE_REFERENDA = 3;
+const DEFAULT_IMAGE_ALT = 'No Image';
 
 interface VideoCardProps {
 	title: string;
@@ -28,15 +32,7 @@ interface VideoCardProps {
 function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, publishedAt, agendaUrl }: Omit<VideoCardProps, 'variant'>) {
 	const href = videoId ? `/aag/${videoId}` : url || '#';
 	const currentNetwork = getCurrentNetwork();
-	const network = publishedAt
-		? (() => {
-				const publishDate = new Date(publishedAt);
-				const day = publishDate.getUTCDay();
-				if (day === 2) return ENetwork.KUSAMA;
-				if (day === 5) return ENetwork.POLKADOT;
-				return null;
-			})()
-		: null;
+	const network = publishedAt ? getNetworkFromDate(publishedAt) : null;
 
 	const handleAgendaClick = (e: React.MouseEvent) => {
 		e.preventDefault();
@@ -64,7 +60,7 @@ function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, 
 								className='h-full w-full object-cover'
 							/>
 						) : (
-							<div className='text-text_secondary flex h-full items-center justify-center text-sm'>No Image</div>
+							<div className='text-text_secondary flex h-full items-center justify-center text-sm'>{DEFAULT_IMAGE_ALT}</div>
 						)}
 					</div>
 
@@ -83,7 +79,7 @@ function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, 
 
 						{referenda && referenda.length > 0 && (
 							<div className='mt-2 flex flex-wrap items-center gap-2'>
-								{referenda.slice(0, 3).map((ref) => {
+								{referenda.slice(0, MAX_VISIBLE_REFERENDA).map((ref) => {
 									const baseUrl = `https://${currentNetwork}.polkassembly.io`;
 									const refUrl = `${baseUrl}/referenda/${ref.referendaNo}`;
 
@@ -104,7 +100,9 @@ function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, 
 										</a>
 									);
 								})}
-								{referenda.length > 3 && <span className='rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink'>+{referenda.length - 3} </span>}
+								{referenda.length > MAX_VISIBLE_REFERENDA && (
+									<span className='rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink'>+{referenda.length - MAX_VISIBLE_REFERENDA} </span>
+								)}
 							</div>
 						)}
 					</div>

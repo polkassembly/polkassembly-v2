@@ -14,6 +14,9 @@ import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import { usePathname } from 'next/navigation';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
+
+const MAX_VISIBLE_REFERENDA = 7;
 
 interface GovernanceCardProps {
 	title: string;
@@ -37,15 +40,7 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 
 	const href = videoId ? `/aag/${videoId}` : url || '#';
 
-	const network = publishedAt
-		? (() => {
-				const pubdate = new Date(publishedAt);
-				const day = pubdate.getUTCDay();
-				if (day === 2) return ENetwork.KUSAMA;
-				if (day === 5) return ENetwork.POLKADOT;
-				return null;
-			})()
-		: null;
+	const network = publishedAt ? getNetworkFromDate(publishedAt) : null;
 
 	const handleShare = async (e: React.MouseEvent) => {
 		e.preventDefault();
@@ -139,7 +134,7 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 					<div className='mb-3 flex flex-col gap-2 md:mb-4'>
 						<div className='flex flex-wrap gap-2'>
 							{referenda
-								? referenda.slice(0, 7).map((ref) => {
+								? referenda.slice(0, MAX_VISIBLE_REFERENDA).map((ref) => {
 										const baseUrl = `https://${currentNetwork}.polkassembly.io`;
 										const refUrl = `${baseUrl}/referenda/${ref.referendaNo}`;
 
@@ -168,7 +163,9 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 											{tag}
 										</span>
 									))}
-							{referenda && referenda.length > 7 && <span className='rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink'>+{referenda.length - 7}</span>}
+							{referenda && referenda.length > MAX_VISIBLE_REFERENDA && (
+								<span className='rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink'>+{referenda.length - MAX_VISIBLE_REFERENDA}</span>
+							)}
 						</div>
 					</div>
 

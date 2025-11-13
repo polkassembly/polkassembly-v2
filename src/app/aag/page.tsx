@@ -12,6 +12,10 @@ import VideoList from './Components/VideoList';
 import AAGCard from './Components/AAGCard';
 import { AAG_YOUTUBE_PLAYLIST_ID } from '../api/_api-constants/apiEnvVars';
 
+const FEATURED_VIDEOS_COUNT = 3;
+const MAX_VIDEOS_TO_FETCH = 10;
+const DURATION_FILTER_THRESHOLD = '00:00';
+
 function AAG() {
 	const {
 		data: playlistData,
@@ -19,13 +23,13 @@ function AAG() {
 		error
 	} = useYouTubeData({
 		playlistId: AAG_YOUTUBE_PLAYLIST_ID,
-		maxVideos: 10
+		maxVideos: MAX_VIDEOS_TO_FETCH
 	});
 
-	const refinedVideos = playlistData?.videos?.filter((video: IAAGVideoData) => video.duration !== '00:00') || [];
+	const refinedVideos = playlistData?.videos?.filter((video: IAAGVideoData) => video.duration !== DURATION_FILTER_THRESHOLD) || [];
 
-	const featuredVideos = refinedVideos.slice(0, 3);
-	const listVideos = refinedVideos.slice(3);
+	const featuredVideos = refinedVideos.slice(0, FEATURED_VIDEOS_COUNT);
+	const listVideos = refinedVideos.slice(FEATURED_VIDEOS_COUNT);
 
 	return (
 		<div className='min-h-screen bg-page_background text-text_primary'>
