@@ -4,6 +4,7 @@
 
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 const INITIAL_TRANSCRIPT_DISPLAY_COUNT = 10;
 
@@ -18,6 +19,7 @@ interface TranscriptSectionProps {
 	loading?: boolean;
 }
 function TranscriptSection({ transcript, loading }: TranscriptSectionProps) {
+	const t = useTranslations('AAG');
 	const [isExpanded, setIsExpanded] = useState(false);
 	const initialDisplayCount = INITIAL_TRANSCRIPT_DISPLAY_COUNT;
 	const displayTranscript = isExpanded ? transcript : transcript.slice(0, initialDisplayCount);
@@ -49,8 +51,10 @@ function TranscriptSection({ transcript, loading }: TranscriptSectionProps) {
 	return (
 		<div className='rounded-lg p-4'>
 			<div className='mb-3 flex items-center justify-between'>
-				<h3 className='text-sm font-semibold text-text_primary'>Transcript</h3>
-				<span className='text-xs text-wallet_btn_text'>{transcript.length} segments</span>
+				<h3 className='text-sm font-semibold text-text_primary'>{t('transcript')}</h3>
+				<span className='text-xs text-wallet_btn_text'>
+					{transcript.length} {t('segments')}
+				</span>
 			</div>
 			<div className='max-h-64 space-y-1.5 overflow-auto'>
 				{displayTranscript.map((segment) => (
@@ -71,12 +75,14 @@ function TranscriptSection({ transcript, loading }: TranscriptSectionProps) {
 				>
 					{isExpanded ? (
 						<>
-							<span>View Less</span>
+							<span>{t('viewLess')}</span>
 							<ChevronUp className='h-3 w-3' />
 						</>
 					) : (
 						<>
-							<span>View More ({transcript.length - initialDisplayCount} more)</span>
+							<span>
+								{t('viewMore')} ({transcript.length - initialDisplayCount} {t('more')})
+							</span>
 							<ChevronDown className='h-3 w-3' />
 						</>
 					)}

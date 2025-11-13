@@ -16,6 +16,7 @@ import Image from 'next/image';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ETheme, ENotificationStatus, EProposalType } from '@/_shared/types';
 import { useToast } from '@/hooks/useToast';
+import { useTranslations } from 'next-intl';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 
 interface RequestToPresentModalProps {
@@ -24,6 +25,7 @@ interface RequestToPresentModalProps {
 }
 
 function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) {
+	const t = useTranslations('AAG.requestToPresentModal');
 	const [formData, setFormData] = useState({
 		fullName: '',
 		organization: '',
@@ -81,13 +83,13 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 			if (data && data.title) {
 				setReferendumData({ id, title: data.title, loading: false, error: null });
 			} else {
-				setReferendumData({ id, title: '', loading: false, error: 'Proposal not found' });
+				setReferendumData({ id, title: '', loading: false, error: t('proposalNotFound') });
 			}
 		} catch {
 			if (requestId !== referendumRequestIdRef.current) {
 				return;
 			}
-			setReferendumData({ id, title: '', loading: false, error: 'Failed to fetch proposal' });
+			setReferendumData({ id, title: '', loading: false, error: t('failedToFetchProposal') });
 		}
 	};
 
@@ -103,8 +105,8 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 			if (selectedDate < startOfToday) {
 				toast({
 					status: ENotificationStatus.ERROR,
-					title: 'Invalid Date',
-					description: 'Please select a future date.'
+					title: t('invalidDate'),
+					description: t('invalidDateDescription')
 				});
 				return;
 			}
@@ -117,7 +119,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 			} else if (value.trim() === '') {
 				setReferendumData(null);
 			} else {
-				setReferendumData({ id: '', title: '', loading: false, error: 'Invalid referendum ID or URL format' });
+				setReferendumData({ id: '', title: '', loading: false, error: t('invalidReferendum') });
 			}
 		}
 
@@ -155,8 +157,8 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 
 			toast({
 				status: ENotificationStatus.SUCCESS,
-				title: 'Request Submitted!',
-				description: 'Your presentation request has been submitted successfully.'
+				title: t('requestSubmitted'),
+				description: t('requestSubmittedDescription')
 			});
 
 			onClose();
@@ -178,8 +180,8 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 		} catch (error) {
 			toast({
 				status: ENotificationStatus.ERROR,
-				title: 'Submission Failed',
-				description: error instanceof Error ? error.message : 'Failed to submit request. Please try again.'
+				title: t('submissionFailed'),
+				description: error instanceof Error ? error.message : t('submissionFailedDescription')
 			});
 		} finally {
 			setIsSubmitting(false);
@@ -193,7 +195,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 		>
 			<DialogContent className='max-h-[90vh] max-w-screen-md overflow-y-auto p-4 text-wallet_btn_text sm:p-6'>
 				<DialogHeader>
-					<DialogTitle className='text-xl font-bold'>Request to Present</DialogTitle>
+					<DialogTitle className='text-xl font-bold'>{t('title')}</DialogTitle>
 				</DialogHeader>
 
 				<form
@@ -202,12 +204,12 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 				>
 					<div className='grid grid-cols-1 gap-4'>
 						<div className='space-y-2'>
-							<Label htmlFor='fullName'>Full Name</Label>
+							<Label htmlFor='fullName'>{t('fullName')}</Label>
 							<Input
 								id='fullName'
 								name='fullName'
 								type='text'
-								placeholder='Type Here'
+								placeholder={t('typeHere')}
 								className='text-text_primary'
 								value={formData.fullName}
 								onChange={handleInputChange}
@@ -215,12 +217,12 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 							/>
 						</div>
 						<div className='space-y-2'>
-							<Label htmlFor='organization'>Organization/Project</Label>
+							<Label htmlFor='organization'>{t('organization')}</Label>
 							<Input
 								id='organization'
 								name='organization'
 								type='text'
-								placeholder='Type Here'
+								placeholder={t('typeHere')}
 								className='text-text_primary'
 								value={formData.organization}
 								onChange={handleInputChange}
@@ -229,7 +231,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 					</div>
 
 					<div className='space-y-2'>
-						<Label>Do you have a proposal live?</Label>
+						<Label>{t('hasProposal')}</Label>
 						<div className='flex items-center gap-4'>
 							<Label className='flex cursor-pointer items-center gap-2'>
 								<input
@@ -240,7 +242,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 									onChange={handleInputChange}
 									className='accent-text_pink'
 								/>
-								<span>Yes</span>
+								<span>{t('yes')}</span>
 							</Label>
 							<Label className='flex cursor-pointer items-center gap-2'>
 								<input
@@ -251,18 +253,18 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 									onChange={handleInputChange}
 									className='accent-text_pink'
 								/>
-								<span>No</span>
+								<span>{t('no')}</span>
 							</Label>
 						</div>
 					</div>
 
 					<div className='space-y-2'>
-						<Label htmlFor='referendumIndex'>Paste URL or Enter Referendum Index</Label>
+						<Label htmlFor='referendumIndex'>{t('referendumIndex')}</Label>
 						<Input
 							id='referendumIndex'
 							name='referendumIndex'
 							type='text'
-							placeholder='e.g., 1462 or https://polkadot.polkassembly.io/referenda/1462'
+							placeholder={t('referendumPlaceholder')}
 							className='text-text_primary'
 							value={formData.referendumIndex}
 							onChange={handleInputChange}
@@ -270,7 +272,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 						{referendumData && (
 							<div className={`rounded-md p-2 text-sm ${referendumData.error ? 'border border-red-200 bg-red-50 text-red-600' : 'bg-bg_light_pink text-text_pink'}`}>
 								{referendumData.loading ? (
-									<span>Loading proposal data...</span>
+									<span>{t('loadingProposal')}</span>
 								) : referendumData.error ? (
 									<span>{referendumData.error}</span>
 								) : (
@@ -284,7 +286,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 											rel='noopener noreferrer'
 											className='flex items-center gap-1 text-text_pink hover:underline'
 										>
-											View Proposal <ExternalLink size={16} />
+											{t('viewProposal')} <ExternalLink size={16} />
 										</Link>
 									</div>
 								)}
@@ -293,13 +295,13 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 					</div>
 
 					<div className='space-y-2'>
-						<Label htmlFor='description'>Description & Objectives</Label>
+						<Label htmlFor='description'>{t('description')}</Label>
 						<textarea
 							id='description'
 							name='description'
 							rows={4}
 							className='flex w-full resize-none rounded-lg border border-border_grey bg-transparent px-2 py-2 text-base text-text_primary shadow-sm transition-colors placeholder:text-placeholder focus-visible:border-text_pink focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
-							placeholder='Type Here'
+							placeholder={t('typeHere')}
 							value={formData.description}
 							onChange={handleInputChange}
 						/>
@@ -307,7 +309,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 
 					<div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
 						<div className='space-y-2'>
-							<Label htmlFor='estimatedDuration'>Estimated Duration</Label>
+							<Label htmlFor='estimatedDuration'>{t('estimatedDuration')}</Label>
 							<select
 								id='estimatedDuration'
 								name='estimatedDuration'
@@ -315,14 +317,14 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 								value={formData.estimatedDuration}
 								onChange={handleInputChange}
 							>
-								<option value=''>Select Duration</option>
-								<option value='15 mins'>15 mins</option>
-								<option value='30 mins'>30 mins</option>
-								<option value='45 mins'>45 mins</option>
+								<option value=''>{t('selectDuration')}</option>
+								<option value='15 mins'>{t('duration15')}</option>
+								<option value='30 mins'>{t('duration30')}</option>
+								<option value='45 mins'>{t('duration45')}</option>
 							</select>
 						</div>
 						<div className='space-y-2'>
-							<Label htmlFor='preferredDate'>Preferred Date</Label>
+							<Label htmlFor='preferredDate'>{t('preferredDate')}</Label>
 							<Input
 								id='preferredDate'
 								name='preferredDate'
@@ -336,9 +338,9 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 
 					<div className='space-y-2'>
 						<div className='flex items-center justify-between'>
-							<Label htmlFor='supportingFile'>Supporting Materials</Label>
+							<Label htmlFor='supportingFile'>{t('supportingMaterials')}</Label>
 							<span className='flex items-center gap-1 text-sm'>
-								Upload File
+								{t('uploadFile')}
 								<Image
 									src={FileUploadIcon}
 									alt='AAG Logo'
@@ -359,16 +361,16 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 								className='absolute inset-0 cursor-pointer opacity-0'
 							/>
 							<div className='flex w-full items-center justify-between rounded-lg border border-border_grey bg-transparent px-4 py-2 text-base'>
-								<span>{formData.supportingFile ? formData.supportingFile.name : 'Upload'}</span>
+								<span>{formData.supportingFile ? formData.supportingFile.name : t('upload')}</span>
 							</div>
 						</div>
 
-						<p className='text-sm'>Accepted formats: PDF, DOC, DOCX, PPT, PPTX (Max 10MB)</p>
+						<p className='text-sm'>{t('acceptedFormats')}</p>
 					</div>
 
 					<div className='space-y-2'>
 						<div className='flex items-center gap-2'>
-							<Label className='font-semibold'>Socials</Label>
+							<Label className='font-semibold'>{t('socials')}</Label>
 							<Info className='h-4 w-4' />
 						</div>
 
@@ -381,7 +383,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 											size={18}
 										/>
 									</div>
-									<span className='font-medium'>Email</span>
+									<span className='font-medium'>{t('email')}</span>
 								</div>
 
 								<div className='flex items-center justify-between rounded-md border border-border_grey px-4 py-2'>
@@ -389,7 +391,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 										id='email'
 										name='email'
 										type='email'
-										placeholder='janedoe123@gmail.com'
+										placeholder={t('emailPlaceholder')}
 										value={formData.email}
 										onChange={handleInputChange}
 										className='w-full border-none bg-transparent text-text_primary focus:outline-none focus:ring-0'
@@ -405,7 +407,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 											size={18}
 										/>
 									</div>
-									<span className='font-medium'>TG</span>
+									<span className='font-medium'>{t('telegram')}</span>
 								</div>
 
 								<div className='flex items-center justify-between rounded-md border border-border_grey px-4 py-2'>
@@ -413,7 +415,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 										id='telegram'
 										name='telegram'
 										type='text'
-										placeholder='@janedoe'
+										placeholder={t('telegramPlaceholder')}
 										value={formData.telegram}
 										onChange={handleInputChange}
 										className='w-full border-none bg-transparent text-text_primary focus:outline-none focus:ring-0'
@@ -429,7 +431,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 											size={18}
 										/>
 									</div>
-									<span className='font-medium'>Twitter</span>
+									<span className='font-medium'>{t('twitter')}</span>
 								</div>
 
 								<div className='flex items-center justify-between rounded-md border border-border_grey px-4 py-2'>
@@ -437,7 +439,7 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 										id='twitter'
 										name='twitter'
 										type='text'
-										placeholder='@janedoe'
+										placeholder={t('twitterPlaceholder')}
 										value={formData.twitter}
 										onChange={handleInputChange}
 										className='w-full border-none bg-transparent text-text_primary focus:outline-none focus:ring-0'
@@ -455,14 +457,14 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 							disabled={isSubmitting}
 							className='border-bg_pink text-text_pink'
 						>
-							Cancel
+							{t('cancel')}
 						</Button>
 						<Button
 							type='submit'
 							disabled={isSubmitting}
 							className='bg-bg_pink text-btn_primary_text hover:bg-bg_pink/90'
 						>
-							{isSubmitting ? 'Submitting...' : 'Submit'}
+							{isSubmitting ? t('submitting') : t('submit')}
 						</Button>
 					</DialogFooter>
 				</form>

@@ -15,6 +15,7 @@ import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
 import { Button } from '@/app/_shared-components/Button';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Calendar, Clock, Eye, Share2, Sparkles } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import PolkadotLogo from '@/_assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@/_assets/parachain-logos/kusama-logo.gif';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
@@ -28,6 +29,7 @@ import TranscriptSection from '../Components/TranscriptSection';
 const SUGGESTED_VIDEOS_LIMIT = 5;
 
 function VideoDetailPage() {
+	const t = useTranslations('AAG');
 	const routeParams = useParams();
 	const currentVideoId = routeParams?.id as string;
 	const currentPathname = usePathname();
@@ -83,14 +85,14 @@ function VideoDetailPage() {
 			await navigator.clipboard.writeText(videoShareUrl);
 			showToast({
 				status: ENotificationStatus.SUCCESS,
-				title: 'Link copied!',
-				description: 'Video link has been copied to clipboard'
+				title: t('linkCopied'),
+				description: t('linkCopiedDescription')
 			});
 		} catch {
 			showToast({
 				status: ENotificationStatus.ERROR,
-				title: 'Failed to copy link',
-				description: 'Could not copy link to clipboard'
+				title: t('failedToCopyLink'),
+				description: t('failedToCopyLinkDescription')
 			});
 		}
 	};
@@ -186,7 +188,7 @@ function VideoDetailPage() {
 												className='flex-1 rounded-full text-sm sm:flex-none'
 												onClick={handleVideoAgendaClick}
 											>
-												View Agenda
+												{t('viewAgenda')}
 											</Button>
 										)}
 										<Button
@@ -194,7 +196,7 @@ function VideoDetailPage() {
 											size='icon'
 											className='rounded-lg border border-border_grey bg-network_dropdown_bg p-2 sm:p-2.5'
 											onClick={handleVideoShare}
-											title='Share video'
+											title={t('shareVideo')}
 										>
 											<Share2 className='h-4 w-4 text-wallet_btn_text' />
 										</Button>
@@ -207,19 +209,16 @@ function VideoDetailPage() {
 											<Clock className='h-3 w-3 sm:h-3.5 sm:w-3.5' />
 											{selectedVideo.duration}
 										</span>
-
 										<span className='flex shrink-0 items-center gap-1'>
 											<Calendar className='h-3 w-3 sm:h-3.5 sm:w-3.5' />
 											{selectedVideo.date}
 										</span>
-
 										{selectedVideo.viewCount && (
 											<span className='flex shrink-0 items-center gap-1'>
 												<Eye className='h-3 w-3 sm:h-3.5 sm:w-3.5' />
-												{parseInt(selectedVideo.viewCount, 10).toLocaleString()} views
+												{parseInt(selectedVideo.viewCount, 10).toLocaleString()} {t('views')}
 											</span>
-										)}
-
+										)}{' '}
 										{videoAssociatedNetwork && (
 											<div className='flex shrink-0 items-center gap-2'>
 												<Image
@@ -267,7 +266,7 @@ function VideoDetailPage() {
 												<div>
 													<div className='mb-2 flex items-center gap-2'>
 														<Sparkles className='h-4 w-4 text-bar_chart_purple' />
-														<h3 className='text-sm font-semibold text-text_primary'>AI Summary</h3>
+														<h3 className='text-sm font-semibold text-text_primary'>{t('aiSummary')}</h3>
 													</div>
 													<MarkdownViewer
 														markdown={videoTranscriptData.summary}
@@ -289,7 +288,7 @@ function VideoDetailPage() {
 
 					<div className='flex w-full flex-col lg:w-[350px]'>
 						<div className='max-h-96 overflow-auto rounded-lg border border-border_grey bg-bg_modal p-3 shadow-sm md:p-4 lg:max-h-none'>
-							<h2 className='mb-3 text-base font-semibold text-text_primary md:mb-4 md:text-lg'>Chapters</h2>
+							<h2 className='mb-3 text-base font-semibold text-text_primary md:mb-4 md:text-lg'>{t('chapters')}</h2>
 
 							{videoChaptersList.length > 0 ? (
 								<div className='max-h-64 space-y-2 overflow-auto md:max-h-[450px]'>
@@ -312,7 +311,7 @@ function VideoDetailPage() {
 									))}
 								</div>
 							) : (
-								<p className='text-sm text-text_primary'>No chapters available.</p>
+								<p className='text-sm text-text_primary'>{t('noChaptersAvailable')}</p>
 							)}
 						</div>
 					</div>

@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, Clock } from 'lucide-react';
 import { Button } from '@/app/_shared-components/Button';
+import { useTranslations } from 'next-intl';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import { ENetwork, type IReferendaItem } from '@/_shared/types';
@@ -30,6 +31,7 @@ interface AAGVideoCardProps {
 }
 
 function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoId, publishedAt, agendaUrl }: Omit<AAGVideoCardProps, 'variant'>) {
+	const t = useTranslations('AAG');
 	const videoLinkHref = videoId ? `/aag/${videoId}` : url || '#';
 	const activeNetwork = getCurrentNetwork();
 	const videoAssociatedNetwork = publishedAt ? getNetworkFromDate(publishedAt) : null;
@@ -115,7 +117,7 @@ function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoI
 									className='rounded-full text-xs sm:text-sm'
 									onClick={handleVideoAgendaClick}
 								>
-									View Agenda
+									{t('viewAgenda')}
 								</Button>
 							)}
 							{videoAssociatedNetwork && (

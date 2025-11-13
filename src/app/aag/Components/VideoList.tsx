@@ -9,6 +9,7 @@ import { useState, useMemo } from 'react';
 import { ENetwork, type IAAGVideoData } from '@/_shared/types';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/_shared-components/DropdownMenu';
+import { useTranslations } from 'next-intl';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
 import AAGVideoCard from './VideoCard';
 
@@ -30,6 +31,7 @@ type SortOption = 'latest' | 'oldest';
 type FilterOption = 'all' | ENetwork.POLKADOT | ENetwork.KUSAMA;
 
 function AAGVideoListingComponent({ videos = [], loading: isVideosLoading = false, error: videosError = null }: VideoListProps) {
+	const t = useTranslations('AAG');
 	const [searchQuery, setSearchQuery] = useState('');
 	const [selectedSortOption, setSelectedSortOption] = useState<SortOption>('latest');
 	const [selectedFilterOption, setSelectedFilterOption] = useState<FilterOption>(FILTER_OPTIONS.ALL);
@@ -58,13 +60,13 @@ function AAGVideoListingComponent({ videos = [], loading: isVideosLoading = fals
 	return (
 		<div className='my-8 max-w-7xl rounded-lg bg-bg_modal p-4 md:my-16 md:p-6'>
 			<div className='mb-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between'>
-				<h2 className='text-xl font-bold text-text_primary'>More Videos</h2>
+				<h2 className='text-xl font-bold text-text_primary'>{t('moreVideos')}</h2>
 
 				<div className='flex w-full flex-col items-stretch gap-3 text-wallet_btn_text sm:w-auto sm:flex-row sm:items-center'>
 					<div className='relative w-full sm:w-auto'>
 						<input
 							type='text'
-							placeholder='Search for Video by # or Title'
+							placeholder={t('searchPlaceholder')}
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
 							className='w-full rounded-md border border-border_grey py-2 pl-10 pr-4 text-sm sm:w-72'
@@ -84,19 +86,19 @@ function AAGVideoListingComponent({ videos = [], loading: isVideosLoading = fals
 									onClick={() => setSelectedFilterOption(FILTER_OPTIONS.ALL)}
 									className={selectedFilterOption === FILTER_OPTIONS.ALL ? ACTIVE_ITEM_CLASS : ''}
 								>
-									All Networks
+									{t('allNetworks')}
 								</DropdownMenuItem>
 								<DropdownMenuItem
 									onClick={() => setSelectedFilterOption(FILTER_OPTIONS.POLKADOT)}
 									className={selectedFilterOption === FILTER_OPTIONS.POLKADOT ? ACTIVE_ITEM_CLASS : ''}
 								>
-									Polkadot
+									{t('polkadot')}
 								</DropdownMenuItem>
 								<DropdownMenuItem
 									onClick={() => setSelectedFilterOption(FILTER_OPTIONS.KUSAMA)}
 									className={selectedFilterOption === FILTER_OPTIONS.KUSAMA ? ACTIVE_ITEM_CLASS : ''}
 								>
-									Kusama
+									{t('kusama')}
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
@@ -110,13 +112,13 @@ function AAGVideoListingComponent({ videos = [], loading: isVideosLoading = fals
 									onClick={() => setSelectedSortOption('latest')}
 									className={selectedSortOption === 'latest' ? ACTIVE_ITEM_CLASS : ''}
 								>
-									Latest
+									{t('latest')}
 								</DropdownMenuItem>
 								<DropdownMenuItem
 									onClick={() => setSelectedSortOption('oldest')}
 									className={selectedSortOption === 'oldest' ? ACTIVE_ITEM_CLASS : ''}
 								>
-									Oldest
+									{t('oldest')}
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
@@ -145,11 +147,13 @@ function AAGVideoListingComponent({ videos = [], loading: isVideosLoading = fals
 					</>
 				) : videosError ? (
 					<div className='flex justify-center py-8'>
-						<div className='text-toast_warning_text'>Error loading videos: {videosError}</div>
+						<div className='text-toast_warning_text'>
+							{t('errorLoadingVideos')}: {videosError}
+						</div>
 					</div>
 				) : filteredAndSortedVideos.length === 0 ? (
 					<div className='flex justify-center py-8'>
-						<div className='text-text_primary'>No videos found matching your criteria</div>
+						<div className='text-text_primary'>{t('noVideosFound')}</div>
 					</div>
 				) : (
 					filteredAndSortedVideos.map((video) => (

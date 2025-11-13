@@ -9,9 +9,11 @@ import Host from '@assets/icons/host.svg';
 import { useState } from 'react';
 import SocialLinks from '@/app/_shared-components/Profile/Address/SocialLinks';
 import { ESocial } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
 import RequestToPresentModal from './RequestToPresentModal';
 
 function AAGCard() {
+	const t = useTranslations('AAG');
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const socialLinks = [
 		{
@@ -42,12 +44,12 @@ function AAGCard() {
 					<div className='flex w-full flex-col gap-4 md:flex-row md:items-start md:justify-between'>
 						<div className='min-w-0 flex-1'>
 							<div className='mb-2 flex flex-col gap-2 sm:flex-row sm:items-center md:gap-4'>
-								<h1 className='text-xl font-semibold md:text-2xl'>Attempts At Governance (AAG)</h1>
+								<h1 className='text-xl font-semibold md:text-2xl'>{t('title')}</h1>
 								<Button
 									variant='secondary'
 									className='w-fit'
 								>
-									Add to Calendar
+									{t('addToCalendar')}
 								</Button>
 							</div>
 							<div className='mb-2 flex items-center gap-1'>
@@ -58,18 +60,18 @@ function AAGCard() {
 									height={24}
 									className='h-5 w-5 md:h-6 md:w-6'
 								/>
-								<p className='text-base font-medium md:text-lg'>Host: The KUS DAO</p>
+								<p className='text-base font-medium md:text-lg'>{t('host')}</p>
 							</div>
 							<div className='mt-1 flex flex-wrap items-center gap-2 text-sm'>
 								<p>
-									The #1 news resource on Polkadot. Daily news, insights & interviews with the top minds in the Polkadot ecosystem.{' '}
+									{t('description')}{' '}
 									<span>
 										<button
 											onClick={() => setIsModalOpen(true)}
 											type='button'
 											className='whitespace-nowrap font-semibold text-text_pink'
 										>
-											Request to Present
+											{t('requestToPresent')}
 										</button>
 									</span>
 								</p>

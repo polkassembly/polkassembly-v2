@@ -13,6 +13,7 @@ import { ENetwork, ENotificationStatus, type IReferendaItem } from '@/_shared/ty
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
 
@@ -32,6 +33,7 @@ interface GovernanceCardProps {
 }
 
 function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, votingOutcomes, url, videoId, publishedAt, agendaUrl }: GovernanceCardProps) {
+	const t = useTranslations('AAG');
 	const { toast: showToast } = useToast();
 	const currentPathname = usePathname();
 	const activeNetwork = getCurrentNetwork();
@@ -52,14 +54,14 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 			await navigator.clipboard.writeText(videoShareUrl);
 			showToast({
 				status: ENotificationStatus.SUCCESS,
-				title: 'Link copied!',
-				description: 'Video link has been copied to clipboard'
+				title: t('linkCopied'),
+				description: t('linkCopiedDescription')
 			});
 		} catch {
 			showToast({
 				status: ENotificationStatus.ERROR,
-				title: 'Failed to copy link',
-				description: 'Could not copy link to clipboard'
+				title: t('failedToCopyLink'),
+				description: t('failedToCopyLinkDescription')
 			});
 		}
 	};
@@ -187,7 +189,7 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 									className='rounded-full border border-text_pink px-3 py-1.5 text-xs text-text_pink hover:bg-bg_light_pink md:px-4 md:py-2 md:text-sm'
 									onClick={handleAgendaClick}
 								>
-									View Agenda
+									{t('viewAgenda')}
 								</Button>
 							)}
 						</div>
@@ -196,7 +198,7 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 							size='icon'
 							className='w-fit rounded-lg border border-border_grey bg-network_dropdown_bg p-1.5 md:p-2'
 							onClick={handleVideoShare}
-							title='Share video'
+							title={t('shareVideo')}
 						>
 							<Share2 className='h-3.5 w-3.5 text-wallet_btn_text md:h-4 md:w-4' />
 						</Button>

@@ -7,6 +7,7 @@
 import type { IAAGVideoData } from '@/_shared/types';
 import { useYouTubeData } from '@/hooks/useYouTubeData';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { useTranslations } from 'next-intl';
 import GovernanceVideoCard from './Components/GovernanceCard';
 import AAGVideoListingComponent from './Components/VideoList';
 import AAGCard from './Components/AAGCard';
@@ -17,6 +18,7 @@ const MAX_VIDEOS_TO_FETCH = 10;
 const DURATION_FILTER_THRESHOLD = '00:00';
 
 function AttemptsAtGovernancePage() {
+	const t = useTranslations('AAG');
 	const {
 		data: youTubePlaylistData,
 		loading: isPlaylistLoading,
@@ -56,7 +58,9 @@ function AttemptsAtGovernancePage() {
 						</>
 					) : playlistError ? (
 						<div className='col-span-full flex justify-center py-8'>
-							<div className='text-toast_warning_text'>Error loading videos: {playlistError}</div>
+							<div className='text-toast_warning_text'>
+								{t('errorLoadingVideos')}: {playlistError}
+							</div>
 						</div>
 					) : (
 						featuredVideosList.map((featuredVideo: IAAGVideoData) => (
