@@ -7,10 +7,10 @@
 import type { IAAGVideoData } from '@/_shared/types';
 import { useYouTubeData } from '@/hooks/useAAGData';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
-import { AAG_YOUTUBE_PLAYLIST_URL } from '@/_shared/_constants/AAGPlaylist';
 import GovernanceCard from './Components/GovernanceCard';
 import VideoList from './Components/VideoList';
 import AAGCard from './Components/AAGCard';
+import { AAG_YOUTUBE_PLAYLIST_ID } from '../api/_api-constants/apiEnvVars';
 
 function AAG() {
 	const {
@@ -18,7 +18,7 @@ function AAG() {
 		loading,
 		error
 	} = useYouTubeData({
-		playlistUrl: AAG_YOUTUBE_PLAYLIST_URL,
+		playlistId: AAG_YOUTUBE_PLAYLIST_ID,
 		maxVideos: 10
 	});
 

@@ -16,9 +16,9 @@ import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Calendar, Clock, Eye, Share2, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import PolkadotLogo from '@/_assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@/_assets/parachain-logos/kusama-logo.gif';
-import { AAG_YOUTUBE_PLAYLIST_URL } from '@/_shared/_constants/AAGPlaylist';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import { Separator } from '@/app/_shared-components/Separator';
+import { AAG_YOUTUBE_PLAYLIST_ID } from '@/app/api/_api-constants/apiEnvVars';
 import RequestToPresentModal from '../Components/RequestToPresentModal';
 import AAGCard from '../Components/AAGCard';
 import VideoList from '../Components/VideoList';
@@ -116,7 +116,7 @@ function VideoViewPage() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const { data: playlistData } = useYouTubeData({
-		playlistUrl: AAG_YOUTUBE_PLAYLIST_URL
+		playlistId: AAG_YOUTUBE_PLAYLIST_ID
 	});
 
 	const { data: videoData } = useVideoData({

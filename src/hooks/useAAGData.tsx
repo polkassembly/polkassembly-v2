@@ -64,7 +64,7 @@ function transformVideoData(
 // ============================================================================
 
 interface UseYouTubeDataOptions {
-	playlistUrl: string;
+	playlistId: string;
 	includeCaptions?: boolean;
 	language?: string;
 	maxVideos?: number;
@@ -119,8 +119,8 @@ async function fetchPlaylistData(playlistUrl: string, includeCaptions: boolean, 
 	};
 }
 
-export function useYouTubeData({ playlistUrl, includeCaptions = false, language = 'en', maxVideos }: UseYouTubeDataOptions): UseYouTubeDataReturn {
-	const playlistId = playlistUrl ? playlistUrl.split('list=')[1] : '';
+export function useYouTubeData({ playlistId, includeCaptions = false, language = 'en', maxVideos }: UseYouTubeDataOptions): UseYouTubeDataReturn {
+	const playlistUrl = `https://www.youtube.com/playlist?list=${playlistId}`;
 
 	const {
 		data,
