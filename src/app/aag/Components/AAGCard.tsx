@@ -1,6 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+
 import { Button } from '@/app/_shared-components/Button';
 import Image from 'next/image';
 import AAGLogo from '@assets/icons/AAG.svg';
