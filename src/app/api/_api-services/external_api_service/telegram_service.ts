@@ -34,6 +34,20 @@ interface ITelegramMessageData {
 	twitter?: string;
 }
 
+interface IPresentationRequestData {
+	fullName: string;
+	organization?: string;
+	hasProposal: string;
+	referendumIndex?: string;
+	description: string;
+	estimatedDuration?: string;
+	preferredDate?: string;
+	email?: string;
+	telegram?: string;
+	twitter?: string;
+	supportingFile?: File | null;
+}
+
 interface ITelegramApiResponse {
 	ok: boolean;
 	result?: {
@@ -66,6 +80,37 @@ export class TelegramService {
 	public static escapeHtml(text: string): string {
 		if (!text) return '';
 		return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	}
+
+	private static formatPresentationRequestHtml(data: IPresentationRequestData): string {
+		const contactInfo = [
+			data.email ? `📧 <b>Email:</b> ${this.escapeHtml(data.email)}` : '',
+			data.telegram ? `💬 <b>Telegram:</b> @${this.escapeHtml(data.telegram)}` : '',
+			data.twitter ? `🐦 <b>Twitter:</b> @${this.escapeHtml(data.twitter)}` : ''
+		]
+			.filter(Boolean)
+			.join('\n');
+
+		return [
+			'🎤 <b>New Presentation Request</b>',
+			'',
+			`👤 <b>Name:</b> ${this.escapeHtml(data.fullName)}`,
+			data.organization ? `🏢 <b>Organization:</b> ${this.escapeHtml(data.organization)}` : '',
+			'',
+			`📋 <b>Proposal Status:</b> ${data.hasProposal === 'yes' ? 'Yes ✅' : 'No ❌'}`,
+			data.referendumIndex ? `🔗 <b>Referendum Index:</b> ${this.escapeHtml(data.referendumIndex)}` : '',
+			'',
+			'📝 <b>Description:</b>',
+			`${this.escapeHtml(data.description)}`,
+			'',
+			`⏱️ <b>Duration:</b> ${this.escapeHtml(data.estimatedDuration || 'Not specified yet')}`,
+			`📅 <b>Preferred Date:</b> ${this.escapeHtml(data.preferredDate || 'Not specified yet')}`,
+			'',
+			contactInfo ? '📞 <b>Contact Information:</b>' : '',
+			contactInfo
+		]
+			.filter(Boolean)
+			.join('\n');
 	}
 
 	private static formatPresentationRequestMessage(data: ITelegramMessageData): string {
@@ -105,6 +150,32 @@ ${data.supportingFile ? `📎 Supporting file: ${this.escapeMarkdown(data.suppor
 			.replace(/\n{3,}/g, '\n\n');
 	}
 
+	private static validatePresentationFile(file: File): void {
+		const MAX_FILE_SIZE = 10 * 1024 * 1024;
+		const ALLOWED_MIME_TYPES = [
+			'application/pdf',
+			'application/msword',
+			'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+			'application/vnd.ms-powerpoint',
+			'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+		];
+		const ALLOWED_EXTENSIONS = ['.pdf', '.doc', '.docx', '.ppt', '.pptx'];
+
+		if (file.size > MAX_FILE_SIZE) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'File size must be less than 50MB');
+		}
+
+		if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid file type. Only PDF, DOC, DOCX, PPT, and PPTX files are allowed');
+		}
+
+		const fileName = file.name.toLowerCase();
+		const hasValidExtension = ALLOWED_EXTENSIONS.some((ext) => fileName.endsWith(ext));
+		if (!hasValidExtension) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid file extension. Only PDF, DOC, DOCX, PPT, and PPTX files are allowed');
+		}
+	}
+
 	private static validateTelegramConfig(): void {
 		if (!TELEGRAM_BOT_TOKEN?.trim()) {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Telegram bot token is not configured');
@@ -112,6 +183,41 @@ ${data.supportingFile ? `📎 Supporting file: ${this.escapeMarkdown(data.suppor
 
 		if (!TELEGRAM_CHAT_ID?.trim()) {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Telegram chat ID is not configured');
+		}
+	}
+
+	private static async sendTelegramDocument(file: File, caption: string, chatId?: string): Promise<ITelegramApiResponse> {
+		this.validateTelegramConfig();
+
+		const targetChatId = chatId || TELEGRAM_CHAT_ID;
+		const url = `${this.TELEGRAM_API_BASE_URL}/bot${TELEGRAM_BOT_TOKEN}/sendDocument`;
+
+		try {
+			const formData = new FormData();
+			formData.append('chat_id', targetChatId!);
+			formData.append('document', file);
+			formData.append('caption', caption);
+			formData.append('parse_mode', 'HTML');
+
+			const response = await fetch(url, {
+				method: 'POST',
+				body: formData
+			});
+
+			const data: ITelegramApiResponse = await response.json();
+
+			if (!response.ok || !data.ok) {
+				console.error('Telegrams API Error:', data);
+				throw new APIError(ERROR_CODES.API_FETCH_ERROR, response.status, `Telegram API error: ${data.description || 'Unknown errors'}`);
+			}
+
+			return data;
+		} catch (error) {
+			if (error instanceof APIError) {
+				throw error;
+			}
+			console.error('Error sending Telegram document:', error);
+			throw new APIError(ERROR_CODES.API_FETCH_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to send document to Telegram');
 		}
 	}
 
@@ -149,6 +255,67 @@ ${data.supportingFile ? `📎 Supporting file: ${this.escapeMarkdown(data.suppor
 			console.error('Error sending Telegram message:', error);
 			throw new APIError(ERROR_CODES.API_FETCH_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to send message to Telegram');
 		}
+	}
+
+	private static async sendTelegramHtmlMessage(message: string, chatId?: string): Promise<ITelegramApiResponse> {
+		this.validateTelegramConfig();
+
+		const targetChatId = chatId || TELEGRAM_CHAT_ID;
+		const url = `${this.TELEGRAM_API_BASE_URL}/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+		try {
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					chat_id: targetChatId,
+					text: message,
+					parse_mode: 'HTML'
+				})
+			});
+
+			const data: ITelegramApiResponse = await response.json();
+
+			if (!response.ok || !data.ok) {
+				console.error('Telegram API Error:', data);
+				throw new APIError(ERROR_CODES.API_FETCH_ERROR, response.status, `Telegram API error: ${data.description || 'Unknown error'}`);
+			}
+
+			return data;
+		} catch (error) {
+			if (error instanceof APIError) {
+				throw error;
+			}
+			console.error('Error sending Telegram message:', error);
+			throw new APIError(ERROR_CODES.API_FETCH_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to send message to Telegram');
+		}
+	}
+
+	static async sendPresentationRequestWithFile(data: IPresentationRequestData): Promise<ITelegramApiResponse> {
+		if (!data?.fullName?.trim()) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Full name is required');
+		}
+
+		if (!data?.description?.trim()) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Description is required');
+		}
+
+		if (data.email && !ValidatorService.isValidEmail(data.email)) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid email format');
+		}
+
+		if (data.supportingFile && data.supportingFile.size > 0) {
+			this.validatePresentationFile(data.supportingFile);
+		}
+
+		const caption = this.formatPresentationRequestHtml(data);
+
+		if (data.supportingFile && data.supportingFile.size > 0) {
+			return this.sendTelegramDocument(data.supportingFile, caption);
+		}
+		return this.sendTelegramHtmlMessage(caption);
 	}
 
 	static async sendPresentationRequest(data: ITelegramMessageData): Promise<ITelegramApiResponse> {

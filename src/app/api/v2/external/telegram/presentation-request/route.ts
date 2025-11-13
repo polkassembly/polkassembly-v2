@@ -4,8 +4,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
-import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } from '../../../../_api-constants/apiEnvVars';
 import { APIError } from '../../../../_api-utils/apiError';
 import { TelegramService } from '../../../../_api-services/external_api_service/telegram_service';
 
@@ -13,93 +11,21 @@ export async function POST(request: NextRequest) {
 	try {
 		const formData = await request.formData();
 
-		const fullName = formData.get('fullName') as string;
-		const organization = formData.get('organization') as string;
-		const hasProposal = formData.get('hasProposal') as string;
-		const referendumIndex = formData.get('referendumIndex') as string;
-		const description = formData.get('description') as string;
-		const estimatedDuration = formData.get('estimatedDuration') as string;
-		const preferredDate = formData.get('preferredDate') as string;
-		const email = formData.get('email') as string;
-		const telegram = formData.get('telegram') as string;
-		const twitter = formData.get('twitter') as string;
-		const supportingFile = formData.get('supportingFile') as File | null;
+		const presentationData = {
+			fullName: formData.get('fullName') as string,
+			organization: (formData.get('organization') as string) || undefined,
+			hasProposal: formData.get('hasProposal') as string,
+			referendumIndex: (formData.get('referendumIndex') as string) || undefined,
+			description: formData.get('description') as string,
+			estimatedDuration: (formData.get('estimatedDuration') as string) || undefined,
+			preferredDate: (formData.get('preferredDate') as string) || undefined,
+			email: (formData.get('email') as string) || undefined,
+			telegram: (formData.get('telegram') as string) || undefined,
+			twitter: (formData.get('twitter') as string) || undefined,
+			supportingFile: formData.get('supportingFile') as File | null
+		};
 
-		if (!fullName?.trim()) {
-			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Full name is required');
-		}
-
-		if (!description?.trim()) {
-			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Description is required');
-		}
-
-		const contactInfo = [
-			email ? `📧 <b>Email:</b> ${TelegramService.escapeHtml(email)}` : '',
-			telegram ? `💬 <b>Telegram:</b> @${TelegramService.escapeHtml(telegram)}` : '',
-			twitter ? `🐦 <b>Twitter:</b> @${TelegramService.escapeHtml(twitter)}` : ''
-		]
-			.filter(Boolean)
-			.join('\n');
-
-		const caption = [
-			'🎤 <b>New Presentation Request</b>',
-			'',
-			`👤 <b>Name:</b> ${TelegramService.escapeHtml(fullName)}`,
-			organization ? `🏢 <b>Organization:</b> ${TelegramService.escapeHtml(organization)}` : '',
-			'',
-			`📋 <b>Proposal Status:</b> ${hasProposal === 'yes' ? 'Yes ✅' : 'No ❌'}`,
-			referendumIndex ? `🔗 <b>Referendum Index:</b> ${TelegramService.escapeHtml(referendumIndex)}` : '',
-			'',
-			'📝 <b>Description:</b>',
-			`${TelegramService.escapeHtml(description)}`,
-			'',
-			`⏱️ <b>Duration:</b> ${TelegramService.escapeHtml(estimatedDuration || 'Not specified')}`,
-			`📅 <b>Preferred Date:</b> ${preferredDate || 'Not specified'}`,
-			'',
-			contactInfo ? '📞 <b>Contact Information:</b>' : '',
-			contactInfo
-		]
-			.filter(Boolean)
-			.join('\n');
-
-		if (supportingFile && supportingFile.size > 0) {
-			const telegramFormData = new FormData();
-			telegramFormData.append('chat_id', TELEGRAM_CHAT_ID!);
-			telegramFormData.append('document', supportingFile);
-			telegramFormData.append('caption', caption);
-			telegramFormData.append('parse_mode', 'HTML');
-
-			const telegramResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`, {
-				method: 'POST',
-				body: telegramFormData
-			});
-
-			const responseData = await telegramResponse.json();
-
-			if (!telegramResponse.ok || !responseData.ok) {
-				console.error('Telegram API Error:', responseData);
-				throw new APIError(ERROR_CODES.API_FETCH_ERROR, telegramResponse.status, `Telegram error: ${responseData.description}`);
-			}
-		} else {
-			const telegramResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					chat_id: TELEGRAM_CHAT_ID,
-					text: caption,
-					parse_mode: 'HTML'
-				})
-			});
-
-			const responseData = await telegramResponse.json();
-
-			if (!telegramResponse.ok || !responseData.ok) {
-				console.error('Telegram API Error:', responseData);
-				throw new APIError(ERROR_CODES.API_FETCH_ERROR, telegramResponse.status, `Telegram error: ${responseData.description}`);
-			}
-		}
+		await TelegramService.sendPresentationRequestWithFile(presentationData);
 
 		return NextResponse.json({
 			success: true,

@@ -218,7 +218,14 @@ async function fetchTranscript(videoId: string, generateSummary: boolean): Promi
 
 export function useYouTubeData({ playlistUrl, playlistId, includeCaptions = false, language = 'en', maxVideos }: UseYouTubeDataOptions): UseYouTubeDataReturn {
 	const finalPlaylistUrl = playlistUrl || (playlistId ? `https://www.youtube.com/playlist?list=${playlistId}` : '');
-	const finalPlaylistId = playlistUrl ? new URL(playlistUrl).searchParams.get('list') || '' : playlistId || '';
+	let finalPlaylistId = playlistId || '';
+	if (playlistUrl) {
+		try {
+			finalPlaylistId = new URL(playlistUrl).searchParams.get('list') || '';
+		} catch {
+			finalPlaylistId = '';
+		}
+	}
 	const {
 		data,
 		isLoading,

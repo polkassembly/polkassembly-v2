@@ -36,20 +36,32 @@ export class GoogleSheetService {
 			}
 
 			const url = `${this.GOOGLE_SHEET_API_BASE_URL}/${sheetId}?key=${GOOGLE_API_KEY}`;
-			const response = await fetch(url, { next: { revalidate: 300 } });
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), 10000);
+			try {
+				const response = await fetch(url, { next: { revalidate: 300 }, signal: controller.signal });
+				clearTimeout(timeoutId);
 
-			if (!response.ok) {
-				if (response.status === 403) {
-					console.warn('Google Sheets: Access forbidden - check API key permissions and ensure Google Sheets API is enabled');
-				} else {
-					console.warn('Google Sheets: Failed to fetch sheet metadata:', response.statusText);
+				if (!response.ok) {
+					if (response.status === 403) {
+						console.warn('Google Sheets: Access forbidden - check API key permissions and ensure Google Sheets API is enabled');
+					} else {
+						console.warn('Google Sheets: Failed to fetch sheet metadata:', response.statusText);
+					}
+					return null;
 				}
-				return null;
-			}
 
-			return await response.json();
+				return await response.json();
+			} catch (fetchError) {
+				clearTimeout(timeoutId);
+				throw fetchError;
+			}
 		} catch (error) {
-			console.error('Error fetching Google Sheet metadata:', error);
+			if (error instanceof Error && error.name === 'AbortError') {
+				console.warn('Google Sheets: Metadata fetch timeout');
+			} else {
+				console.error('Error fetching Google Sheet metadata:', error);
+			}
 			return null;
 		}
 	}
@@ -77,7 +89,10 @@ export class GoogleSheetService {
 
 			const url = `${this.GOOGLE_SHEET_API_BASE_URL}/${sheetId}/values/${encodeURIComponent(sheetName)}?key=${GOOGLE_API_KEY}`;
 
-			const response = await fetch(url, { next: { revalidate: 300 } });
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), 10000);
+			const response = await fetch(url, { next: { revalidate: 300 }, signal: controller.signal });
+			clearTimeout(timeoutId);
 			if (!response.ok) {
 				if (response.status === 403) {
 					throw new Error('Google Sheets access forbidden - check API key permissions and ensure Google Sheets API is enabled');
@@ -98,20 +113,29 @@ export class GoogleSheetService {
 
 			if (isValidHeaderRow) {
 				return rows.slice(1).map((row: string[]) => {
-					const obj: Record<string, string> = {};
-					headers.forEach((key: string, i: number) => {
-						const sanitizedKey = String(key).trim();
-						if (sanitizedKey) {
-							obj[sanitizedKey] = row[i]?.trim() || '';
-						}
-					});
-					return obj;
+					return (headers as string[]).reduce(
+						(acc: Record<string, string>, key: string, i: number) => {
+							const sanitizedKey = String(key).trim();
+							const isDangerous = sanitizedKey.startsWith('__') || sanitizedKey === 'constructor' || sanitizedKey === 'prototype' || sanitizedKey.includes('__proto__');
+
+							if (sanitizedKey && !isDangerous) {
+								const rawValue = i < row.length ? row[i] : '';
+								const value = rawValue ? String(rawValue).trim() : '';
+								return { ...acc, [sanitizedKey]: value };
+							}
+							return acc;
+						},
+						{} as Record<string, string>
+					);
 				});
 			}
 
 			return rows;
 		} catch (error) {
-			throw new Error(`Error fetching Google Sheet data: ${error}`);
+			if (error instanceof Error && error.name === 'AbortError') {
+				throw new Error('Google Sheets data fetch timeout');
+			}
+			throw error instanceof Error ? error : new Error(`Error fetching Google Sheet data: ${String(error)}`);
 		}
 	}
 }

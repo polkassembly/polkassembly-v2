@@ -5,7 +5,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
 import type { IYouTubeCaption } from '@/_shared/types';
-import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { YouTubeService } from '@/app/api/_api-services/external_api_service/youtube_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { AIService } from '@/app/api/_api-services/ai_service';
@@ -23,15 +22,15 @@ interface TranscriptResponse {
 
 export async function GET(request: NextRequest) {
 	const url = new URL(request.url);
-	const videoId = url.searchParams.get('videoId');
-	const videoUrl = url.searchParams.get('url');
+	const videoId = url.searchParams.get('videoId')?.trim() || null;
+	const videoUrl = url.searchParams.get('url')?.trim() || null;
 	const generateSummary = url.searchParams.get('summary') !== 'false';
 	const lang = url.searchParams.get('lang') || 'en';
 
-	const identifier = videoId || (videoUrl ? (videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)?.[1] ?? null) : null);
+	const identifier = videoId ?? videoUrl;
 
 	if (!identifier) {
-		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Video ID or URL is required');
+		return NextResponse.json({ error: 'Video ID or URL is required' }, { status: StatusCodes.BAD_REQUEST });
 	}
 
 	let rawSubtitles: IYouTubeCaption[];
