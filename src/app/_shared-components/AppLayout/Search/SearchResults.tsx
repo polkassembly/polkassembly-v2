@@ -80,7 +80,7 @@ function PostHit({ hit }: { hit: Post }) {
 			target='_blank'
 		>
 			<div className={`${styles.search_results_wrapper} ${backgroundColor} hover:bg-bg_pink/10`}>
-				<div className='flex'>
+				<div className='flex flex-col gap-2 sm:flex-row sm:items-start'>
 					{hit.proposer_address && (
 						<Address
 							address={hit.proposer_address}
