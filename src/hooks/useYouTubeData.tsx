@@ -5,10 +5,49 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import type { IAAGPlaylistData, IAAGVideoData, IYouTubePlaylistMetadata, IReferendaItem } from '@/_shared/types';
+import type { IAAGPlaylistData, IAAGVideoData, IYouTubePlaylistMetadata, IReferendaItem, IYouTubeChapter } from '@/_shared/types';
+
+interface ReferendaItem {
+	network?: string;
+	referendaNo?: string;
+	track?: string;
+	title?: string;
+	url?: string;
+}
+
+interface VideoData {
+	id: string;
+	title: string;
+	description: string;
+	thumbnails: Record<string, { url: string; width: number; height: number }>;
+	publishedAt: string;
+	channelId: string;
+	channelTitle: string;
+	duration: string;
+	url: string;
+	tags?: string[];
+	viewCount?: string;
+	likeCount?: string;
+	commentCount?: string;
+	agendaUrl?: string;
+	chapters: IYouTubeChapter[];
+	referenda: ReferendaItem[];
+}
+
+interface TranscriptSegment {
+	text: string;
+	offset: number;
+	duration: number;
+}
+
+interface TranscriptData {
+	transcript: TranscriptSegment[];
+	summary: string | null;
+}
 
 interface UseYouTubeDataOptions {
-	playlistUrl: string;
+	playlistUrl?: string;
+	playlistId?: string;
 	includeCaptions?: boolean;
 	language?: string;
 	maxVideos?: number;
@@ -16,6 +55,31 @@ interface UseYouTubeDataOptions {
 
 interface UseYouTubeDataReturn {
 	data: IAAGPlaylistData | null;
+	loading: boolean;
+	error: string | null;
+	refetch: () => void;
+}
+
+interface UseVideoDataOptions {
+	videoId?: string;
+	enabled?: boolean;
+}
+
+interface UseVideoDataReturn {
+	data: VideoData | null;
+	loading: boolean;
+	error: string | null;
+	refetch: () => void;
+}
+
+interface UseTranscriptOptions {
+	videoId?: string;
+	enabled?: boolean;
+	generateSummary?: boolean;
+}
+
+interface UseTranscriptReturn {
+	data: TranscriptData | null;
 	loading: boolean;
 	error: string | null;
 	refetch: () => void;
@@ -91,14 +155,14 @@ async function fetchPlaylistData(playlistUrl: string, includeCaptions: boolean, 
 	const response = await fetch(`/api/youtube/playlist?${params.toString()}`);
 
 	if (!response.ok) {
-		const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+		const errorData = await response.json().catch(() => ({ error: 'Unknown errors' }));
 		throw new Error(errorData.error || 'Failed to fetch playlist data');
 	}
 
 	const result = await response.json();
 
 	if (!result.success || !result.data) {
-		throw new Error('Invalid response format');
+		throw new Error('Invalid responses format');
 	}
 
 	const { playlist, videos } = result.data;
@@ -115,8 +179,53 @@ async function fetchPlaylistData(playlistUrl: string, includeCaptions: boolean, 
 	};
 }
 
-export function useYouTubeData({ playlistUrl, includeCaptions = false, language = 'en', maxVideos }: UseYouTubeDataOptions): UseYouTubeDataReturn {
-	const playlistId = playlistUrl ? playlistUrl.split('list=')[1] : '';
+async function fetchVideoData(videoId: string): Promise<VideoData> {
+	const params = new URLSearchParams({
+		videoId,
+		includeCaptions: 'true'
+	});
+
+	const response = await fetch(`/api/youtube/video?${params.toString()}`);
+
+	if (!response.ok) {
+		const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+		throw new Error(errorData.error || 'Failed to fetch video data');
+	}
+
+	const result = await response.json();
+
+	if (!result.success || !result.data) {
+		throw new Error('Invalid response format');
+	}
+
+	return result.data;
+}
+
+async function fetchTranscript(videoId: string, generateSummary: boolean): Promise<TranscriptData> {
+	const params = new URLSearchParams({
+		videoId,
+		summary: generateSummary.toString()
+	});
+
+	const response = await fetch(`/api/youtube/transcript?${params.toString()}`);
+
+	if (!response.ok) {
+		const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+		throw new Error(errorData.error || 'Failed to fetch transcript');
+	}
+
+	const result = await response.json();
+
+	if (!result.success || !result.data) {
+		throw new Error('Invalid response format');
+	}
+
+	return result.data;
+}
+
+export function useYouTubeData({ playlistUrl, playlistId, includeCaptions = false, language = 'en', maxVideos }: UseYouTubeDataOptions): UseYouTubeDataReturn {
+	const finalPlaylistUrl = playlistUrl || (playlistId ? `https://www.youtube.com/playlist?list=${playlistId}` : '');
+	const finalPlaylistId = playlistUrl ? playlistUrl.split('list=')[1] : playlistId || '';
 
 	const {
 		data,
@@ -124,11 +233,67 @@ export function useYouTubeData({ playlistUrl, includeCaptions = false, language 
 		error,
 		refetch: queryRefetch
 	} = useQuery({
-		queryKey: ['youtube-playlist', playlistId, includeCaptions, language, maxVideos],
-		queryFn: () => fetchPlaylistData(playlistUrl, includeCaptions, language, maxVideos),
-		enabled: Boolean(playlistUrl),
+		queryKey: ['youtube-playlist', finalPlaylistId, includeCaptions, language, maxVideos],
+		queryFn: () => fetchPlaylistData(finalPlaylistUrl, includeCaptions, language, maxVideos),
+		enabled: Boolean(finalPlaylistUrl),
 		staleTime: 5 * 60 * 1000,
 		gcTime: 10 * 60 * 1000,
+		refetchOnWindowFocus: false,
+		retry: 1
+	});
+
+	return {
+		data: data || null,
+		loading: isLoading,
+		error: error ? (error as Error).message : null,
+		refetch: () => {
+			queryRefetch();
+		}
+	};
+}
+
+// ============================================================================
+// VIDEO HOOK
+// ============================================================================
+
+export function useVideoData({ videoId, enabled = true }: UseVideoDataOptions): UseVideoDataReturn {
+	const {
+		data,
+		isLoading,
+		error,
+		refetch: queryRefetch
+	} = useQuery({
+		queryKey: ['youtube-video', videoId],
+		queryFn: () => fetchVideoData(videoId!),
+		enabled: Boolean(videoId) && enabled,
+		staleTime: 10 * 60 * 1000,
+		gcTime: 30 * 60 * 1000,
+		refetchOnWindowFocus: false,
+		retry: 1
+	});
+
+	return {
+		data: data || null,
+		loading: isLoading,
+		error: error ? (error as Error).message : null,
+		refetch: () => {
+			queryRefetch();
+		}
+	};
+}
+
+export function useTranscript({ videoId, enabled = true, generateSummary = true }: UseTranscriptOptions): UseTranscriptReturn {
+	const {
+		data,
+		isLoading,
+		error,
+		refetch: queryRefetch
+	} = useQuery({
+		queryKey: ['youtube-transcript', videoId, generateSummary],
+		queryFn: () => fetchTranscript(videoId!, generateSummary),
+		enabled: Boolean(videoId) && enabled,
+		staleTime: 15 * 60 * 1000,
+		gcTime: 30 * 60 * 1000,
 		refetchOnWindowFocus: false,
 		retry: 1
 	});

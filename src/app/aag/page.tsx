@@ -5,7 +5,7 @@
 'use client';
 
 import type { IAAGVideoData } from '@/_shared/types';
-import { useYouTubeData } from '@/hooks/useAAGData';
+import { useYouTubeData } from '@/hooks/useYouTubeData';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import GovernanceCard from './Components/GovernanceCard';
 import VideoList from './Components/VideoList';
@@ -22,7 +22,6 @@ function AAG() {
 		maxVideos: 10
 	});
 
-	// Filter out upcoming live streams (duration 00:00)
 	const refinedVideos = playlistData?.videos?.filter((video: IAAGVideoData) => video.duration !== '00:00') || [];
 
 	const featuredVideos = refinedVideos.slice(0, 3);

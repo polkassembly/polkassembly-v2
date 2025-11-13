@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { useParams, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import type { IAAGVideoData } from '@/_shared/types';
-import { useYouTubeData, useVideoData, useTranscript } from '@/hooks/useAAGData';
+import { useYouTubeData, useVideoData, useTranscript } from '@/hooks/useYouTubeData';
 import { useToast } from '@/hooks/useToast';
 import { ENotificationStatus } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
