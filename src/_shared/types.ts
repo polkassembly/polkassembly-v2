@@ -1721,6 +1721,8 @@ export interface IYouTubeVideoMetadata {
 	url: string;
 	captions?: IYouTubeCaption[];
 	tags?: string[];
+	agendaUrl?: string;
+	chapters?: IYouTubeChapter[];
 }
 
 export interface IYouTubePlaylistMetadata {
@@ -1783,4 +1785,15 @@ export interface IYouTubeChapter {
 	start: number;
 	description?: string;
 	duration?: string;
+}
+
+export interface ITranscriptSegment {
+	text: string;
+	offset: number;
+	duration: number;
+}
+
+export interface ITranscriptData {
+	transcript: ITranscriptSegment[];
+	summary: string | null;
 }

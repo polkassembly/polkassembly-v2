@@ -5,45 +5,10 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import type { IAAGPlaylistData, IAAGVideoData, IYouTubePlaylistMetadata, IReferendaItem, IYouTubeChapter } from '@/_shared/types';
+import type { IAAGPlaylistData, IAAGVideoData, IYouTubePlaylistMetadata, IReferendaItem, IYouTubeVideoMetadata, ITranscriptData } from '@/_shared/types';
 
-interface ReferendaItem {
-	network?: string;
-	referendaNo?: string;
-	track?: string;
-	title?: string;
-	url?: string;
-}
-
-interface VideoData {
-	id: string;
-	title: string;
-	description: string;
-	thumbnails: Record<string, { url: string; width: number; height: number }>;
-	publishedAt: string;
-	channelId: string;
-	channelTitle: string;
-	duration: string;
-	url: string;
-	tags?: string[];
-	viewCount?: string;
-	likeCount?: string;
-	commentCount?: string;
-	agendaUrl?: string;
-	chapters: IYouTubeChapter[];
-	referenda: ReferendaItem[];
-}
-
-interface TranscriptSegment {
-	text: string;
-	offset: number;
-	duration: number;
-}
-
-interface TranscriptData {
-	transcript: TranscriptSegment[];
-	summary: string | null;
-}
+const UNKNOWN_ERROR_MESSAGE = 'Unknown error';
+const INVALID_RESPONSE_FORMAT = 'Invalid response format';
 
 interface UseYouTubeDataOptions {
 	playlistUrl?: string;
@@ -66,7 +31,7 @@ interface UseVideoDataOptions {
 }
 
 interface UseVideoDataReturn {
-	data: VideoData | null;
+	data: IYouTubeVideoMetadata | null;
 	loading: boolean;
 	error: string | null;
 	refetch: () => void;
@@ -79,7 +44,7 @@ interface UseTranscriptOptions {
 }
 
 interface UseTranscriptReturn {
-	data: TranscriptData | null;
+	data: ITranscriptData | null;
 	loading: boolean;
 	error: string | null;
 	refetch: () => void;
@@ -155,14 +120,14 @@ async function fetchPlaylistData(playlistUrl: string, includeCaptions: boolean, 
 	const response = await fetch(`/api/youtube/playlist?${params.toString()}`);
 
 	if (!response.ok) {
-		const errorData = await response.json().catch(() => ({ error: 'Unknown errors' }));
+		const errorData = await response.json().catch(() => ({ error: UNKNOWN_ERROR_MESSAGE }));
 		throw new Error(errorData.error || 'Failed to fetch playlist data');
 	}
 
 	const result = await response.json();
 
 	if (!result.success || !result.data) {
-		throw new Error('Invalid responses format');
+		throw new Error('Invalid response format');
 	}
 
 	const { playlist, videos } = result.data;
@@ -179,7 +144,7 @@ async function fetchPlaylistData(playlistUrl: string, includeCaptions: boolean, 
 	};
 }
 
-async function fetchVideoData(videoId: string): Promise<VideoData> {
+async function fetchVideoData(videoId: string): Promise<IYouTubeVideoMetadata> {
 	const params = new URLSearchParams({
 		videoId,
 		includeCaptions: 'true'
@@ -188,20 +153,20 @@ async function fetchVideoData(videoId: string): Promise<VideoData> {
 	const response = await fetch(`/api/youtube/video?${params.toString()}`);
 
 	if (!response.ok) {
-		const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+		const errorData = await response.json().catch(() => ({ error: UNKNOWN_ERROR_MESSAGE }));
 		throw new Error(errorData.error || 'Failed to fetch video data');
 	}
 
 	const result = await response.json();
 
 	if (!result.success || !result.data) {
-		throw new Error('Invalid response format');
+		throw new Error(INVALID_RESPONSE_FORMAT);
 	}
 
 	return result.data;
 }
 
-async function fetchTranscript(videoId: string, generateSummary: boolean): Promise<TranscriptData> {
+async function fetchTranscript(videoId: string, generateSummary: boolean): Promise<ITranscriptData> {
 	const params = new URLSearchParams({
 		videoId,
 		summary: generateSummary.toString()
@@ -210,14 +175,14 @@ async function fetchTranscript(videoId: string, generateSummary: boolean): Promi
 	const response = await fetch(`/api/youtube/transcript?${params.toString()}`);
 
 	if (!response.ok) {
-		const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+		const errorData = await response.json().catch(() => ({ error: UNKNOWN_ERROR_MESSAGE }));
 		throw new Error(errorData.error || 'Failed to fetch transcript');
 	}
 
 	const result = await response.json();
 
 	if (!result.success || !result.data) {
-		throw new Error('Invalid response format');
+		throw new Error(INVALID_RESPONSE_FORMAT);
 	}
 
 	return result.data;
@@ -251,10 +216,6 @@ export function useYouTubeData({ playlistUrl, playlistId, includeCaptions = fals
 		}
 	};
 }
-
-// ============================================================================
-// VIDEO HOOK
-// ============================================================================
 
 export function useVideoData({ videoId, enabled = true }: UseVideoDataOptions): UseVideoDataReturn {
 	const {
