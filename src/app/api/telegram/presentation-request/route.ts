@@ -7,11 +7,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
-
-function escapeHtml(text: string): string {
-	if (!text) return '';
-	return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
+import { TelegramService } from '../../_api-services/external_api_service/telegram_service';
 
 export async function POST(request: NextRequest) {
 	try {
@@ -38,9 +34,9 @@ export async function POST(request: NextRequest) {
 		}
 
 		const contactInfo = [
-			email ? `📧 <b>Email:</b> ${escapeHtml(email)}` : '',
-			telegram ? `💬 <b>Telegram:</b> @${escapeHtml(telegram)}` : '',
-			twitter ? `🐦 <b>Twitter:</b> @${escapeHtml(twitter)}` : ''
+			email ? `📧 <b>Email:</b> ${TelegramService.escapeHtml(email)}` : '',
+			telegram ? `💬 <b>Telegram:</b> @${TelegramService.escapeHtml(telegram)}` : '',
+			twitter ? `🐦 <b>Twitter:</b> @${TelegramService.escapeHtml(twitter)}` : ''
 		]
 			.filter(Boolean)
 			.join('\n');
@@ -48,16 +44,16 @@ export async function POST(request: NextRequest) {
 		const caption = [
 			'🎤 <b>New Presentation Request</b>',
 			'',
-			`👤 <b>Name:</b> ${escapeHtml(fullName)}`,
-			organization ? `🏢 <b>Organization:</b> ${escapeHtml(organization)}` : '',
+			`👤 <b>Name:</b> ${TelegramService.escapeHtml(fullName)}`,
+			organization ? `🏢 <b>Organization:</b> ${TelegramService.escapeHtml(organization)}` : '',
 			'',
 			`📋 <b>Proposal Status:</b> ${hasProposal === 'yes' ? 'Yes ✅' : 'No ❌'}`,
-			referendumIndex ? `🔗 <b>Referendum Index:</b> ${escapeHtml(referendumIndex)}` : '',
+			referendumIndex ? `🔗 <b>Referendum Index:</b> ${TelegramService.escapeHtml(referendumIndex)}` : '',
 			'',
 			'📝 <b>Description:</b>',
-			`${escapeHtml(description)}`,
+			`${TelegramService.escapeHtml(description)}`,
 			'',
-			`⏱️ <b>Duration:</b> ${escapeHtml(estimatedDuration || 'Not specified')}`,
+			`⏱️ <b>Duration:</b> ${TelegramService.escapeHtml(estimatedDuration || 'Not specified')}`,
 			`📅 <b>Preferred Date:</b> ${preferredDate || 'Not specified'}`,
 			'',
 			contactInfo ? '📞 <b>Contact Information:</b>' : '',

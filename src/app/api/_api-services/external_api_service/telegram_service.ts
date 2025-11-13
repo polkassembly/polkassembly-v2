@@ -63,6 +63,11 @@ export class TelegramService {
 		return text.replace(/([_*[\]()~`>#+=|{}.!-])/g, '\\$1');
 	}
 
+	public static escapeHtml(text: string): string {
+		if (!text) return '';
+		return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	}
+
 	private static formatPresentationRequestMessage(data: ITelegramMessageData): string {
 		const escapedFullName = this.escapeMarkdown(data.fullName);
 		const escapedOrganization = data.organization ? this.escapeMarkdown(data.organization) : '';
