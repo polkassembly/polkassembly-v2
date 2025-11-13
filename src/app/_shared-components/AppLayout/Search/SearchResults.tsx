@@ -80,7 +80,7 @@ function PostHit({ hit }: { hit: Post }) {
 			target='_blank'
 		>
 			<div className={`${styles.search_results_wrapper} ${backgroundColor} hover:bg-bg_pink/10`}>
-				<div className='flex'>
+				<div className='flex flex-col gap-2 sm:flex-row sm:items-start'>
 					{hit.proposer_address && (
 						<Address
 							address={hit.proposer_address}
@@ -209,7 +209,7 @@ function SearchResults({ activeIndex, proposalTypeFilter = ESearchType.POSTS }: 
 
 	return (
 		<div>
-			<div className='h-[50vh] overflow-hidden'>
+			<div className={`${!isLoading && query.length > 2 && !hasNoResults ? 'h-[40vh] md:h-[50vh]' : 'h-[50vh]'} overflow-hidden`}>
 				{isLoading ? (
 					<div className='flex h-full items-center justify-center'>
 						<Image
