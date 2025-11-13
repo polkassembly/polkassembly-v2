@@ -7,6 +7,7 @@
 import { Filter, MenuIcon, SearchIcon } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import type { IAAGVideoData } from '@/_shared/types';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/_shared-components/DropdownMenu';
 import VideoCard from './VideoCard';
 
@@ -135,23 +136,33 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 			</div>
 
 			<div className='flex flex-col gap-4'>
-				{loading && (
-					<div className='flex justify-center py-8'>
-						<div className='text-text_primary'>Loading more videos...</div>
-					</div>
-				)}
-				{error && (
+				{loading ? (
+					<>
+						{[1, 2, 3].map((i) => (
+							<div
+								key={i}
+								className='flex flex-col gap-4 overflow-hidden rounded-lg border border-border_grey bg-bg_modal p-4 sm:flex-row'
+							>
+								<Skeleton className='aspect-video w-full rounded sm:w-64' />
+								<div className='flex flex-1 flex-col justify-between space-y-3'>
+									<Skeleton className='h-5 w-3/4' />
+									<div className='flex gap-4'>
+										<Skeleton className='h-4 w-20' />
+										<Skeleton className='h-4 w-16' />
+									</div>
+								</div>
+							</div>
+						))}
+					</>
+				) : error ? (
 					<div className='flex justify-center py-8'>
 						<div className='text-toast_warning_text'>Error loading videos: {error}</div>
 					</div>
-				)}
-				{!loading && !error && filteredAndSortedVideos.length === 0 && (
+				) : filteredAndSortedVideos.length === 0 ? (
 					<div className='flex justify-center py-8'>
 						<div className='text-text_primary'>No videos found matching your criteria</div>
 					</div>
-				)}
-				{!loading &&
-					!error &&
+				) : (
 					filteredAndSortedVideos.map((video) => (
 						<VideoCard
 							key={video.id}
@@ -165,7 +176,8 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 							referenda={video.referenda}
 							agendaUrl={video.agendaUrl}
 						/>
-					))}
+					))
+				)}
 			</div>
 		</div>
 	);

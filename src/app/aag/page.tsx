@@ -5,7 +5,8 @@
 'use client';
 
 import type { IAAGVideoData } from '@/_shared/types';
-import { useYouTubeData } from '@/hooks/useYouTubeData';
+import { useYouTubeData } from '@/hooks/useAAGData';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { AAG_YOUTUBE_PLAYLIST_URL } from '@/_shared/_constants/AAGPlaylist';
 import GovernanceCard from './Components/GovernanceCard';
 import VideoList from './Components/VideoList';
@@ -21,31 +22,40 @@ function AAG() {
 		maxVideos: 10
 	});
 
-	const refinedVideos =
-		playlistData?.videos?.filter((video: IAAGVideoData) => {
-			const isZeroDuration = video.duration === '00:00';
-			return !isZeroDuration;
-		}) || [];
+	// Filter out upcoming live streams (duration 00:00)
+	const refinedVideos = playlistData?.videos?.filter((video: IAAGVideoData) => video.duration !== '00:00') || [];
 
 	const featuredVideos = refinedVideos.slice(0, 3);
 	const listVideos = refinedVideos.slice(3);
+
 	return (
 		<div className='min-h-screen bg-page_background text-text_primary'>
 			<AAGCard />
 			<div className='mx-auto max-w-6xl px-4'>
 				<div className='grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3'>
-					{loading && (
-						<div className='col-span-full flex justify-center py-8'>
-							<div className='text-gray-500'>Loading YouTube playlist...</div>
-						</div>
-					)}
-					{error && (
+					{loading ? (
+						<>
+							{[1, 2, 3].map((i) => (
+								<div
+									key={i}
+									className='overflow-hidden rounded-lg border border-border_grey bg-bg_modal shadow-sm'
+								>
+									<Skeleton className='aspect-video w-full' />
+									<div className='space-y-3 p-4'>
+										<Skeleton className='h-5 w-3/4' />
+										<div className='flex gap-4'>
+											<Skeleton className='h-4 w-20' />
+											<Skeleton className='h-4 w-16' />
+										</div>
+									</div>
+								</div>
+							))}
+						</>
+					) : error ? (
 						<div className='col-span-full flex justify-center py-8'>
 							<div className='text-toast_warning_text'>Error loading videos: {error}</div>
 						</div>
-					)}
-					{!loading &&
-						!error &&
+					) : (
 						featuredVideos.map((video: IAAGVideoData) => (
 							<GovernanceCard
 								key={video.id}
@@ -59,7 +69,8 @@ function AAG() {
 								publishedAt={video.publishedAt}
 								agendaUrl={video.agendaUrl}
 							/>
-						))}
+						))
+					)}
 				</div>
 				<VideoList
 					videos={listVideos}

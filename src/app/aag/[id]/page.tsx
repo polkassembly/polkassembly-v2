@@ -8,12 +8,11 @@ import { useState, useEffect } from 'react';
 import { useParams, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import type { IAAGVideoData } from '@/_shared/types';
-import { useYouTubeData } from '@/hooks/useYouTubeData';
-import { useVideoData } from '@/hooks/useVideoData';
-import { useTranscript } from '@/hooks/useTranscript';
+import { useYouTubeData, useVideoData, useTranscript } from '@/hooks/useAAGData';
 import { useToast } from '@/hooks/useToast';
 import { ENotificationStatus } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Calendar, Clock, Eye, Share2, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import PolkadotLogo from '@/_assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@/_assets/parachain-logos/kusama-logo.gif';
@@ -120,7 +119,7 @@ function VideoViewPage() {
 		playlistUrl: AAG_YOUTUBE_PLAYLIST_URL
 	});
 
-	const { data: videoData, loading: videoLoading } = useVideoData({
+	const { data: videoData } = useVideoData({
 		videoId: videoId || undefined,
 		enabled: Boolean(videoId)
 	});
@@ -135,30 +134,25 @@ function VideoViewPage() {
 		? (() => {
 				const date = new Date(currentVideo.publishedAt);
 				const day = date.getUTCDay();
-				if (day === 2) return 'kusama';
-				if (day === 5) return 'polkadot';
-				return null;
+				return day === 2 ? 'kusama' : day === 5 ? 'polkadot' : null;
 			})()
 		: null;
 
 	useEffect(() => {
 		if (playlistData?.videos && videoId) {
 			const video = playlistData.videos.find((v: IAAGVideoData) => v.id === videoId);
-			if (video && videoData) {
+			if (video) {
 				setCurrentVideo({
 					...video,
-					agendaUrl: videoData.agendaUrl,
-					chapters: videoData.chapters
+					agendaUrl: videoData?.agendaUrl || video.agendaUrl,
+					chapters: videoData?.chapters || video.chapters || []
 				});
-			} else if (video) {
-				setCurrentVideo(video);
 			}
 		}
 	}, [playlistData, videoId, videoData]);
 
 	const chapters = videoData?.chapters || currentVideo?.chapters || [];
 	const agendaUrl = videoData?.agendaUrl || currentVideo?.agendaUrl;
-
 	const suggestedVideos = playlistData?.videos?.filter((v: IAAGVideoData) => v.id !== videoId)?.slice(0, 5) || [];
 
 	const handleAgendaClick = () => {
@@ -186,28 +180,63 @@ function VideoViewPage() {
 
 	const handleChapterClick = (chapterId: string, startTime?: number) => {
 		setActiveChapter(chapterId);
-
 		if (startTime !== undefined) {
 			const iframe = document.querySelector('iframe');
-			if (iframe && iframe.contentWindow) {
-				const message = {
-					event: 'command',
-					func: 'seekTo',
-					args: [startTime, true]
-				};
-				iframe.contentWindow.postMessage(JSON.stringify(message), '*');
+			if (iframe?.contentWindow) {
+				iframe.contentWindow.postMessage(
+					JSON.stringify({
+						event: 'command',
+						func: 'seekTo',
+						args: [startTime, true]
+					}),
+					'*'
+				);
 			}
-
-			setActiveChapter(chapterId);
 		}
 	};
 
-	if (!currentVideo || videoLoading) {
+	if (!currentVideo) {
 		return (
-			<div className='flex h-screen items-center justify-center'>
-				<div className='text-center'>
-					<div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-bg_pink' />
-					<p className='text-text_primary'>Loading video...</p>
+			<div className='min-h-screen bg-page_background'>
+				<AAGCard />
+				<div className='mx-auto max-w-7xl p-4 md:p-6'>
+					<div className='flex flex-col gap-6 lg:flex-row'>
+						<div className='flex w-full flex-1 flex-col'>
+							<div className='overflow-hidden rounded-lg border border-border_grey bg-bg_modal shadow-sm'>
+								<Skeleton className='aspect-video w-full' />
+								<div className='space-y-4 p-6'>
+									<Skeleton className='h-8 w-3/4' />
+									<div className='flex gap-4'>
+										<Skeleton className='h-10 w-32 rounded-full' />
+										<Skeleton className='h-10 w-10' />
+									</div>
+									<div className='space-y-3 rounded-lg bg-page_background p-4'>
+										<div className='flex gap-4'>
+											{[1, 2, 3].map((i) => (
+												<Skeleton
+													key={i}
+													className='h-4 w-20'
+												/>
+											))}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div className='w-full lg:w-[350px]'>
+							<div className='rounded-lg border border-border_grey bg-bg_modal p-4'>
+								<Skeleton className='mb-4 h-6 w-24' />
+								<div className='space-y-2'>
+									{[1, 2, 3].map((i) => (
+										<Skeleton
+											key={i}
+											className='h-16'
+										/>
+									))}
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		);
@@ -288,30 +317,56 @@ function VideoViewPage() {
 											</div>
 										)}
 									</div>
-									{transcriptData?.summary && transcriptData?.transcript && transcriptData.transcript.length > 0 && (
-										<div>
-											<div>
+
+									{transcriptLoading ? (
+										<div className='space-y-4'>
+											<div className='space-y-2'>
 												<div className='mb-2 flex items-center gap-2'>
 													<Sparkles className='h-4 w-4 text-bar_chart_purple' />
-													<h3 className='text-sm font-semibold text-text_primary'>AI Summary</h3>
+													<Skeleton className='h-4 w-24' />
 												</div>
-												<MarkdownViewer
-													markdown={transcriptData.summary}
-													truncate
-												/>
+												<div className='space-y-2'>
+													{[1, 2, 3, 4].map((i) => (
+														<Skeleton
+															key={i}
+															className='h-4 w-full'
+														/>
+													))}
+												</div>
 											</div>
 											<Separator className='my-4' />
-
-											<TranscriptSection
-												transcript={transcriptData.transcript}
-												loading={transcriptLoading}
-											/>
+											<div className='space-y-2'>
+												<Skeleton className='h-4 w-20' />
+												{[1, 2, 3].map((i) => (
+													<Skeleton
+														key={i}
+														className='h-8'
+													/>
+												))}
+											</div>
 										</div>
-									)}
-									{!transcriptData?.summary && currentVideo.description && (
-										<div className='max-h-40 overflow-auto whitespace-pre-wrap text-xs leading-relaxed text-wallet_btn_text sm:max-h-48 sm:text-sm md:max-h-56'>
-											{currentVideo.description}
-										</div>
+									) : (
+										transcriptData?.summary &&
+										transcriptData?.transcript &&
+										transcriptData.transcript.length > 0 && (
+											<div>
+												<div>
+													<div className='mb-2 flex items-center gap-2'>
+														<Sparkles className='h-4 w-4 text-bar_chart_purple' />
+														<h3 className='text-sm font-semibold text-text_primary'>AI Summary</h3>
+													</div>
+													<MarkdownViewer
+														markdown={transcriptData.summary}
+														truncate
+													/>
+												</div>
+												<Separator className='my-4' />
+												<TranscriptSection
+													transcript={transcriptData.transcript}
+													loading={false}
+												/>
+											</div>
+										)
 									)}
 								</div>
 							</div>
@@ -320,21 +375,9 @@ function VideoViewPage() {
 
 					<div className='flex w-full flex-col lg:w-[350px]'>
 						<div className='max-h-96 overflow-auto rounded-lg border border-border_grey bg-bg_modal p-3 shadow-sm md:p-4 lg:max-h-none'>
-							<h2 className='mb-3 flex items-center text-base font-semibold text-text_primary md:mb-4 md:text-lg'>
-								Chapters
-								{videoLoading && <div className='ml-2 h-3 w-3 animate-spin rounded-full border-b-2 border-bar_chart_purple md:h-4 md:w-4' />}
-							</h2>
+							<h2 className='mb-3 text-base font-semibold text-text_primary md:mb-4 md:text-lg'>Chapters</h2>
 
-							{videoLoading ? (
-								<div className='space-y-2'>
-									{[1, 2, 3].map((i) => (
-										<div
-											key={i}
-											className='bg-bg_grey h-12 animate-pulse rounded-lg md:h-16'
-										/>
-									))}
-								</div>
-							) : chapters.length > 0 ? (
+							{chapters.length > 0 ? (
 								<div className='max-h-64 space-y-2 overflow-auto md:max-h-[450px]'>
 									{chapters.map((chapter) => (
 										<button

@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import type { IYouTubeChapter } from '@/_shared/types';
 
 interface ReferendaItem {
@@ -46,55 +46,50 @@ interface UseVideoDataReturn {
 	refetch: () => void;
 }
 
+async function fetchVideoData(videoId: string): Promise<VideoData> {
+	const params = new URLSearchParams({
+		videoId,
+		includeCaptions: 'true'
+	});
+
+	const response = await fetch(`/api/youtube/video?${params.toString()}`);
+
+	if (!response.ok) {
+		const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+		throw new Error(errorData.error || 'Failed to fetch video data');
+	}
+
+	const result = await response.json();
+
+	if (!result.success || !result.data) {
+		throw new Error('Invalid response format');
+	}
+
+	return result.data;
+}
+
 export function useVideoData({ videoId, enabled = true }: UseVideoDataOptions): UseVideoDataReturn {
-	const [data, setData] = useState<VideoData | null>(null);
-	const [loading, setLoading] = useState<boolean>(false);
-	const [error, setError] = useState<string | null>(null);
+	const {
+		data,
+		isLoading,
+		error,
+		refetch: queryRefetch
+	} = useQuery({
+		queryKey: ['youtube-video', videoId],
+		queryFn: () => fetchVideoData(videoId!),
+		enabled: Boolean(videoId) && enabled,
+		staleTime: 10 * 60 * 1000,
+		gcTime: 30 * 60 * 1000,
+		refetchOnWindowFocus: false,
+		retry: 1
+	});
 
-	const fetchData = useCallback(async () => {
-		if (!videoId || !enabled) {
-			return;
+	return {
+		data: data || null,
+		loading: isLoading,
+		error: error ? (error as Error).message : null,
+		refetch: () => {
+			queryRefetch();
 		}
-
-		setLoading(true);
-		setError(null);
-
-		try {
-			const params = new URLSearchParams({
-				videoId,
-				includeCaptions: 'true'
-			});
-
-			const response = await fetch(`/api/youtube/video?${params.toString()}`);
-
-			if (!response.ok) {
-				const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-				throw new Error(errorData.error || 'Failed to fetch video data');
-			}
-
-			const result = await response.json();
-
-			if (result.success && result.data) {
-				setData(result.data);
-			} else {
-				throw new Error('Invalid response format');
-			}
-		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Failed to fetch data');
-		} finally {
-			setLoading(false);
-		}
-	}, [videoId, enabled]);
-
-	const refetch = useCallback(() => {
-		fetchData();
-	}, [fetchData]);
-
-	useEffect(() => {
-		if (videoId && enabled) {
-			fetchData();
-		}
-	}, [fetchData, videoId, enabled]);
-
-	return { data, loading, error, refetch };
+	};
 }
