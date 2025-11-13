@@ -3,8 +3,9 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
+import { useAutoScroll } from '@/hooks/useYouTubeData';
 
 const INITIAL_TRANSCRIPT_DISPLAY_COUNT = 10;
 
@@ -17,18 +18,56 @@ interface TranscriptSegment {
 interface TranscriptSectionProps {
 	transcript: TranscriptSegment[];
 	loading?: boolean;
+	currentTime?: number;
+	onSeek?: (time: number) => void;
+	isPlaying?: boolean;
 }
-function TranscriptSection({ transcript, loading }: TranscriptSectionProps) {
+
+function TranscriptSection({ transcript, loading, currentTime = 0, onSeek, isPlaying = false }: TranscriptSectionProps) {
 	const t = useTranslations('AAG');
 	const [isExpanded, setIsExpanded] = useState(false);
-	const initialDisplayCount = INITIAL_TRANSCRIPT_DISPLAY_COUNT;
-	const displayTranscript = isExpanded ? transcript : transcript.slice(0, initialDisplayCount);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const activeSegmentRef = useRef<HTMLDivElement>(null);
+	const { setShouldAutoScroll, scrollToElement } = useAutoScroll(containerRef);
 
-	const formatTimestamp = (seconds: number) => {
+	const displayTranscript = useMemo(() => {
+		return isExpanded ? transcript : transcript.slice(0, INITIAL_TRANSCRIPT_DISPLAY_COUNT);
+	}, [isExpanded, transcript]);
+
+	const activeSegmentIndex = useMemo(() => {
+		return transcript.findIndex((segment, index) => {
+			const nextSegment = transcript[index + 1];
+			const segmentStart = segment.offset;
+			const segmentEnd = nextSegment ? nextSegment.offset : segment.offset + segment.duration;
+			return currentTime >= segmentStart && currentTime < segmentEnd;
+		});
+	}, [transcript, currentTime]);
+
+	const formatTimestamp = useCallback((seconds: number) => {
 		const mins = Math.floor(seconds / 60);
 		const secs = Math.floor(seconds % 60);
 		return `${mins}:${secs.toString().padStart(2, '0')}`;
-	};
+	}, []);
+
+	const handleSeek = useCallback(
+		(offset: number) => {
+			onSeek?.(offset);
+			setShouldAutoScroll(true);
+		},
+		[onSeek, setShouldAutoScroll]
+	);
+
+	useEffect(() => {
+		if (!isExpanded && activeSegmentIndex >= INITIAL_TRANSCRIPT_DISPLAY_COUNT) {
+			setIsExpanded(true);
+		}
+	}, [activeSegmentIndex, isExpanded]);
+
+	useEffect(() => {
+		if (activeSegmentRef.current && activeSegmentIndex >= 0) {
+			scrollToElement(activeSegmentRef.current);
+		}
+	}, [activeSegmentIndex, scrollToElement]);
 
 	if (loading) {
 		return (
@@ -56,18 +95,34 @@ function TranscriptSection({ transcript, loading }: TranscriptSectionProps) {
 					{transcript.length} {t('segments')}
 				</span>
 			</div>
-			<div className='max-h-64 space-y-1.5 overflow-auto'>
-				{displayTranscript.map((segment) => (
-					<div
-						key={`${segment.offset}-${segment.text.substring(0, 20)}`}
-						className='hover:bg-bg_grey flex gap-3 rounded p-1.5'
-					>
-						<span className='min-w-[45px] text-xs font-medium text-bar_chart_purple'>{formatTimestamp(segment.offset)}</span>
-						<p className='text-xs leading-relaxed text-wallet_btn_text'>{segment.text}</p>
-					</div>
-				))}
+			<div
+				ref={containerRef}
+				className='max-h-64 space-y-1.5 overflow-auto'
+			>
+				{displayTranscript.map((segment) => {
+					const isActive = transcript.indexOf(segment) === activeSegmentIndex;
+					return (
+						<div
+							key={`${segment.offset}-${segment.text.substring(0, 20)}`}
+							ref={isActive ? activeSegmentRef : null}
+							className={`flex cursor-pointer gap-3 rounded p-1.5 transition-colors ${isActive ? 'border border-text_pink bg-bg_light_pink' : 'hover:bg-bg_grey'}`}
+							onClick={() => handleSeek(segment.offset)}
+							role='button'
+							tabIndex={0}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									handleSeek(segment.offset);
+								}
+							}}
+						>
+							<span className={`min-w-[45px] text-xs font-medium ${isActive ? 'text-text_pink' : 'text-bar_chart_purple'}`}>{formatTimestamp(segment.offset)}</span>
+							<p className={`text-xs leading-relaxed ${isActive ? 'font-medium text-text_primary' : 'text-wallet_btn_text'}`}>{segment.text}</p>
+						</div>
+					);
+				})}
 			</div>
-			{transcript.length > initialDisplayCount && (
+			{transcript.length > INITIAL_TRANSCRIPT_DISPLAY_COUNT && !isPlaying && (
 				<button
 					type='button'
 					onClick={() => setIsExpanded(!isExpanded)}
@@ -81,7 +136,7 @@ function TranscriptSection({ transcript, loading }: TranscriptSectionProps) {
 					) : (
 						<>
 							<span>
-								{t('viewMore')} ({transcript.length - initialDisplayCount} {t('more')})
+								{t('viewMore')} ({transcript.length - INITIAL_TRANSCRIPT_DISPLAY_COUNT} {t('more')})
 							</span>
 							<ChevronDown className='h-3 w-3' />
 						</>

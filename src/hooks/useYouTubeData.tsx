@@ -5,6 +5,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useState, useRef, useEffect, useCallback, RefObject } from 'react';
 import type { IAAGPlaylistData, IAAGVideoData, IYouTubePlaylistMetadata, IReferendaItem, IYouTubeVideoMetadata, ITranscriptData } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 
@@ -18,6 +19,7 @@ const VIDEO_STALE_TIME = 10 * 60 * 1000;
 const TRANSCRIPT_STALE_TIME = 15 * 60 * 1000;
 const VIDEO_GC_TIME = 30 * 60 * 1000;
 const PLAYLIST_GC_TIME = 5 * 60 * 1000;
+const AUTO_SCROLL_DELAY = 2000;
 
 const DEFAULT_DATE_LOCALE = 'en-GB';
 const DEFAULT_DURATION_FALLBACK = '00:00';
@@ -304,4 +306,176 @@ export function useTranscript({ videoId, enabled = true, generateSummary = true 
 			queryRefetch();
 		}
 	};
+}
+
+export function useAutoScroll(containerRef: RefObject<HTMLDivElement | null>) {
+	const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+	const timeoutRef = useRef<number | null>(null);
+
+	const handleUserInteraction = useCallback(() => {
+		setShouldAutoScroll(false);
+		if (timeoutRef.current) {
+			clearTimeout(timeoutRef.current);
+		}
+		timeoutRef.current = window.setTimeout(() => {
+			setShouldAutoScroll(true);
+		}, AUTO_SCROLL_DELAY);
+	}, []);
+
+	useEffect(() => {
+		const container = containerRef.current;
+		if (!container) return;
+
+		const handleScroll = () => {
+			handleUserInteraction();
+		};
+
+		container.addEventListener('scroll', handleScroll, { passive: true });
+		container.addEventListener('wheel', handleUserInteraction, { passive: true });
+		container.addEventListener('touchmove', handleUserInteraction, { passive: true });
+
+		// eslint-disable-next-line consistent-return
+		return () => {
+			container.removeEventListener('scroll', handleScroll);
+			container.removeEventListener('wheel', handleUserInteraction);
+			container.removeEventListener('touchmove', handleUserInteraction);
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, [handleUserInteraction, containerRef]);
+
+	const scrollToElement = useCallback(
+		(element: HTMLDivElement) => {
+			if (!shouldAutoScroll || !containerRef.current) return;
+
+			const container = containerRef.current;
+			const elementTop = element.offsetTop - container.offsetTop;
+
+			container.scrollTo({
+				top: elementTop,
+				behavior: 'smooth'
+			});
+		},
+		[shouldAutoScroll, containerRef]
+	);
+
+	return { setShouldAutoScroll, scrollToElement };
+}
+
+export function useChapterAutoScroll(containerRef: RefObject<HTMLDivElement | null>) {
+	const [shouldAutoScrollChapters, setShouldAutoScrollChapters] = useState(true);
+	const timeoutRef = useRef<number | null>(null);
+
+	const handleUserInteraction = useCallback(() => {
+		setShouldAutoScrollChapters(false);
+		if (timeoutRef.current) {
+			clearTimeout(timeoutRef.current);
+		}
+		timeoutRef.current = window.setTimeout(() => {
+			setShouldAutoScrollChapters(true);
+		}, AUTO_SCROLL_DELAY);
+	}, []);
+
+	useEffect(() => {
+		const container = containerRef.current;
+		if (!container) return;
+
+		const handleScroll = () => {
+			handleUserInteraction();
+		};
+
+		container.addEventListener('scroll', handleScroll, { passive: true });
+		container.addEventListener('wheel', handleUserInteraction, { passive: true });
+		container.addEventListener('touchmove', handleUserInteraction, { passive: true });
+
+		// eslint-disable-next-line consistent-return
+		return () => {
+			container.removeEventListener('scroll', handleScroll);
+			container.removeEventListener('wheel', handleUserInteraction);
+			container.removeEventListener('touchmove', handleUserInteraction);
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, [handleUserInteraction, containerRef]);
+
+	const scrollToChapter = useCallback(
+		(element: HTMLButtonElement) => {
+			if (!shouldAutoScrollChapters || !containerRef.current) return;
+
+			const container = containerRef.current;
+			const elementTop = element.offsetTop - container.offsetTop;
+
+			container.scrollTo({
+				top: elementTop,
+				behavior: 'smooth'
+			});
+		},
+		[shouldAutoScrollChapters, containerRef]
+	);
+
+	return { setShouldAutoScrollChapters, scrollToChapter };
+}
+
+export function useYouTubePlayer(currentVideoId: string, playerRef: RefObject<HTMLIFrameElement | null>) {
+	const [currentVideoTime, setCurrentVideoTime] = useState<number>(0);
+	const [isVideoPlaying, setIsVideoPlaying] = useState<boolean>(false);
+
+	const seekToTime = useCallback(
+		(timeInSeconds: number) => {
+			if (playerRef.current?.contentWindow) {
+				playerRef.current.contentWindow.postMessage(
+					JSON.stringify({
+						event: 'command',
+						func: 'seekTo',
+						args: [timeInSeconds, true]
+					}),
+					'*'
+				);
+			}
+		},
+		[playerRef]
+	);
+
+	useEffect(() => {
+		const handleMessage = (event: MessageEvent) => {
+			if (event.origin !== 'https://www.youtube.com') return;
+
+			try {
+				const data = JSON.parse(event.data);
+				if (data.event === 'infoDelivery' && data.info) {
+					if (data.info.currentTime !== undefined) {
+						setCurrentVideoTime(data.info.currentTime);
+					}
+					if (data.info.playerState !== undefined) {
+						setIsVideoPlaying(data.info.playerState === 1);
+					}
+				}
+			} catch {
+				console.error('Failed to parse message from YouTube iframe');
+			}
+		};
+
+		window.addEventListener('message', handleMessage);
+
+		const interval = setInterval(() => {
+			if (playerRef.current?.contentWindow) {
+				playerRef.current.contentWindow.postMessage(
+					JSON.stringify({
+						event: 'listening',
+						id: currentVideoId
+					}),
+					'*'
+				);
+			}
+		}, 500);
+
+		return () => {
+			window.removeEventListener('message', handleMessage);
+			clearInterval(interval);
+		};
+	}, [currentVideoId, playerRef]);
+
+	return { currentVideoTime, isVideoPlaying, seekToTime };
 }

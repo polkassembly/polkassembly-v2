@@ -4,11 +4,11 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useParams, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import type { IAAGVideoData } from '@/_shared/types';
-import { useYouTubeData, useVideoData, useTranscript, AAG_YOUTUBE_PLAYLIST_ID } from '@/hooks/useYouTubeData';
+import { useYouTubeData, useVideoData, useTranscript, useChapterAutoScroll, useYouTubePlayer, AAG_YOUTUBE_PLAYLIST_ID } from '@/hooks/useYouTubeData';
 import { useToast } from '@/hooks/useToast';
 import { ENetwork, ENotificationStatus } from '@/_shared/types';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
@@ -38,6 +38,12 @@ function VideoDetailPage() {
 
 	const [selectedVideo, setSelectedVideo] = useState<IAAGVideoData | null>(null);
 	const [isPresentationModalOpen, setIsPresentationModalOpen] = useState(false);
+	const playerRef = useRef<HTMLIFrameElement>(null);
+	const chaptersContainerRef = useRef<HTMLDivElement>(null);
+	const activeChapterRef = useRef<HTMLButtonElement>(null);
+
+	const { setShouldAutoScrollChapters, scrollToChapter } = useChapterAutoScroll(chaptersContainerRef);
+	const { currentVideoTime, isVideoPlaying, seekToTime } = useYouTubePlayer(currentVideoId, playerRef);
 
 	const { data: playlistDataFromYouTube, loading: isPlaylistLoading } = useYouTubeData({
 		playlistId: AAG_YOUTUBE_PLAYLIST_ID
@@ -54,7 +60,28 @@ function VideoDetailPage() {
 		generateSummary: true
 	});
 
-	const videoAssociatedNetwork = selectedVideo ? getNetworkFromDate(selectedVideo.publishedAt) : null;
+	const videoAssociatedNetwork = useMemo(() => {
+		return selectedVideo ? getNetworkFromDate(selectedVideo.publishedAt) : null;
+	}, [selectedVideo]);
+
+	const videoChaptersList = useMemo(() => {
+		return videoMetadata?.chapters || selectedVideo?.chapters || [];
+	}, [videoMetadata?.chapters, selectedVideo?.chapters]);
+
+	const videoAgendaUrl = useMemo(() => {
+		return videoMetadata?.agendaUrl || selectedVideo?.agendaUrl;
+	}, [videoMetadata?.agendaUrl, selectedVideo?.agendaUrl]);
+
+	const relatedVideosList = useMemo(() => {
+		return playlistDataFromYouTube?.videos?.filter((videoItem: IAAGVideoData) => videoItem.id !== currentVideoId)?.slice(0, SUGGESTED_VIDEOS_LIMIT) || [];
+	}, [playlistDataFromYouTube?.videos, currentVideoId]);
+
+	const activeChapterIndex = useMemo(() => {
+		return videoChaptersList.findIndex((chapterData, index) => {
+			const nextChapter = videoChaptersList[index + 1];
+			return currentVideoTime >= chapterData.start && (!nextChapter || currentVideoTime < nextChapter.start);
+		});
+	}, [currentVideoTime, videoChaptersList]);
 
 	useEffect(() => {
 		if (playlistDataFromYouTube?.videos && currentVideoId) {
@@ -69,17 +96,13 @@ function VideoDetailPage() {
 		}
 	}, [playlistDataFromYouTube, currentVideoId, videoMetadata]);
 
-	const videoChaptersList = videoMetadata?.chapters || selectedVideo?.chapters || [];
-	const videoAgendaUrl = videoMetadata?.agendaUrl || selectedVideo?.agendaUrl;
-	const relatedVideosList = playlistDataFromYouTube?.videos?.filter((videoItem: IAAGVideoData) => videoItem.id !== currentVideoId)?.slice(0, SUGGESTED_VIDEOS_LIMIT) || [];
-
-	const handleVideoAgendaClick = () => {
+	const handleVideoAgendaClick = useCallback(() => {
 		if (videoAgendaUrl) {
 			window.open(videoAgendaUrl, '_blank', 'noopener,noreferrer');
 		}
-	};
+	}, [videoAgendaUrl]);
 
-	const handleVideoShare = async () => {
+	const handleVideoShare = useCallback(async () => {
 		try {
 			await navigator.clipboard.writeText(videoShareUrl);
 			showToast({
@@ -94,23 +117,23 @@ function VideoDetailPage() {
 				description: t('failedToCopyLinkDescription')
 			});
 		}
-	};
+	}, [videoShareUrl, showToast, t]);
 
-	const handleVideoChapterClick = (chapterStartTime?: number) => {
-		if (chapterStartTime !== undefined) {
-			const youTubeIframe = document.querySelector('iframe');
-			if (youTubeIframe?.contentWindow) {
-				youTubeIframe.contentWindow.postMessage(
-					JSON.stringify({
-						event: 'command',
-						func: 'seekTo',
-						args: [chapterStartTime, true]
-					}),
-					'*'
-				);
+	const handleVideoChapterClick = useCallback(
+		(chapterStartTime?: number) => {
+			if (chapterStartTime !== undefined) {
+				seekToTime(chapterStartTime);
+				setShouldAutoScrollChapters(true);
 			}
+		},
+		[seekToTime, setShouldAutoScrollChapters]
+	);
+
+	useEffect(() => {
+		if (activeChapterRef.current && activeChapterIndex >= 0) {
+			scrollToChapter(activeChapterRef.current);
 		}
-	};
+	}, [activeChapterIndex, scrollToChapter]);
 
 	if (!selectedVideo) {
 		return (
@@ -169,14 +192,14 @@ function VideoDetailPage() {
 						<div className='flex flex-col overflow-hidden rounded-lg border border-border_grey bg-bg_modal shadow-sm'>
 							<div className='relative aspect-[16/9] w-full bg-bg_modal sm:aspect-video'>
 								<iframe
+									ref={playerRef}
 									src={`https://www.youtube.com/embed/${currentVideoId}?enablejsapi=1&autoplay=1&rel=0&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
 									title={selectedVideo.title}
 									className='absolute inset-0 h-full w-full'
 									allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
 									allowFullScreen
 								/>
-							</div>
-
+							</div>{' '}
 							<div className='p-3 sm:p-4 md:p-6'>
 								<div className='mb-4 flex w-full flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
 									<h1 className='break-words text-lg font-bold leading-tight text-text_primary sm:text-xl md:text-2xl'>{selectedVideo.title}</h1>
@@ -281,6 +304,9 @@ function VideoDetailPage() {
 											<TranscriptSection
 												transcript={videoTranscriptData.transcript}
 												loading={false}
+												currentTime={currentVideoTime}
+												onSeek={seekToTime}
+												isPlaying={isVideoPlaying}
 											/>
 										</div>
 									) : null}
@@ -290,28 +316,44 @@ function VideoDetailPage() {
 					</div>
 
 					<div className='flex w-full flex-col lg:w-[350px]'>
-						<div className='max-h-96 overflow-auto rounded-lg border border-border_grey bg-bg_modal p-3 shadow-sm md:p-4 lg:max-h-none'>
+						<div className='rounded-lg border border-border_grey bg-bg_modal p-3 shadow-sm md:p-4'>
 							<h2 className='mb-3 text-base font-semibold text-text_primary md:mb-4 md:text-lg'>{t('chapters')}</h2>
 
 							{videoChaptersList.length > 0 ? (
-								<div className='max-h-64 space-y-2 overflow-auto md:max-h-[450px]'>
-									{videoChaptersList.map((chapterData) => (
-										<button
-											key={chapterData.id}
-											type='button'
-											onClick={() => handleVideoChapterClick(chapterData.start)}
-											className='w-full rounded-lg border border-transparent p-2 text-left transition-colors hover:bg-bg_light_pink md:p-3'
-										>
-											<div className='flex items-start justify-between'>
-												<div className='min-w-0 flex-1'>
-													<div className='mb-1 flex items-center gap-2'>
-														<span className='rounded bg-border_blue/15 px-1.5 py-0.5 font-mono text-xs text-border_blue md:px-2 md:py-1'>{chapterData.timestamp}</span>
+								<div
+									ref={chaptersContainerRef}
+									className='max-h-64 space-y-2 overflow-y-auto overflow-x-hidden md:max-h-[450px]'
+								>
+									{videoChaptersList.map((chapterData, index) => {
+										const isActive = index === activeChapterIndex;
+
+										return (
+											<button
+												key={chapterData.id}
+												type='button'
+												ref={isActive ? activeChapterRef : null}
+												onClick={() => handleVideoChapterClick(chapterData.start)}
+												className={`w-full rounded-lg border p-2 text-left transition-colors md:p-3 ${
+													isActive ? 'border-text_pink bg-bg_light_pink' : 'border-transparent hover:bg-bg_light_pink'
+												}`}
+											>
+												<div className='flex items-start justify-between'>
+													<div className='min-w-0 flex-1'>
+														<div className='mb-1 flex items-center gap-2'>
+															<span
+																className={`rounded px-1.5 py-0.5 font-mono text-xs md:px-2 md:py-1 ${
+																	isActive ? 'bg-text_pink/20 text-text_pink' : 'bg-border_blue/15 text-border_blue'
+																}`}
+															>
+																{chapterData.timestamp}
+															</span>
+														</div>
+														<h3 className={`mb-1 text-xs font-medium md:text-sm ${isActive ? 'text-text_pink' : 'text-text_primary'}`}>{chapterData.title}</h3>
 													</div>
-													<h3 className='mb-1 text-xs font-medium text-text_primary md:text-sm'>{chapterData.title}</h3>
 												</div>
-											</div>
-										</button>
-									))}
+											</button>
+										);
+									})}
 								</div>
 							) : (
 								<p className='text-sm text-text_primary'>{t('noChaptersAvailable')}</p>

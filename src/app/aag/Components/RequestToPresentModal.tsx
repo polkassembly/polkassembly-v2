@@ -73,14 +73,18 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 		setReferendumData({ id, title: '', loading: true, error: null });
 
 		try {
-			const response = await fetch(`/api/v2/${EProposalType.REFERENDUM_V2}/${id}`);
-			const data = await response.json();
+			const { data, error } = await NextApiClientService.fetchProposalDetails({
+				proposalType: EProposalType.REFERENDUM_V2,
+				indexOrHash: id
+			});
 
 			if (requestId !== referendumRequestIdRef.current) {
 				return;
 			}
 
-			if (data && data.title) {
+			if (error || !data) {
+				setReferendumData({ id, title: '', loading: false, error: t('proposalNotFound') });
+			} else if (data.title) {
 				setReferendumData({ id, title: data.title, loading: false, error: null });
 			} else {
 				setReferendumData({ id, title: '', loading: false, error: t('proposalNotFound') });
