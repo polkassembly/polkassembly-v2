@@ -9,6 +9,7 @@ import { getSubtitles } from 'youtube-captions-scraper';
 import type { IYouTubeCaption, IYouTubeThumbnail, IYouTubeVideoMetadata, IYouTubePlaylistMetadata, IYouTubeChapter, IReferendaItem } from '@/_shared/types';
 import { GOOGLE_API_KEY } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
+import { GoogleSheetService } from './googlesheets_service';
 
 if (!GOOGLE_API_KEY.trim()) {
 	console.warn('\n ⚠️  Warning: GOOGLE_API_KEY is not set. YouTube video metadata will not be fetched.\n');
@@ -809,13 +810,11 @@ export class YouTubeService {
 	}
 
 	static extractSheetId(url: string): string | null {
-		const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-		return match ? match[1] : null;
+		return GoogleSheetService.extractSheetId(url);
 	}
 
 	static extractGid(url: string): string | null {
-		const match = url.match(/[#&]gid=(\d+)/);
-		return match ? match[1] : null;
+		return GoogleSheetService.extractGid(url);
 	}
 
 	static async extractReferendaFromSheet(agendaUrl: string): Promise<IReferendaItem[]> {
@@ -830,27 +829,10 @@ export class YouTubeService {
 
 			let sheetName = 'Sheet1';
 			if (gid) {
-				const sheetResponse = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?key=${GOOGLE_API_KEY}`);
-
-				if (sheetResponse.ok) {
-					const sheetData = await sheetResponse.json();
-					const sheet = sheetData.sheets?.find((s: { properties: { sheetId: number } }) => s.properties.sheetId === parseInt(gid, 10));
-					if (sheet?.properties?.title) {
-						sheetName = sheet.properties.title;
-					}
-				}
+				sheetName = await GoogleSheetService.getSheetNameFromGid(sheetId, gid);
 			}
 
-			const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}?key=${GOOGLE_API_KEY}`;
-			const response = await fetch(url);
-
-			if (!response.ok) {
-				console.warn('Failed to fetch sheet values:', response.statusText);
-				return [];
-			}
-
-			const sheetResponse = await response.json();
-			const rows = sheetResponse.values || [];
+			const rows = await GoogleSheetService.fetchSheetData(sheetId, sheetName);
 
 			if (!Array.isArray(rows) || rows.length === 0) {
 				return [];
@@ -858,10 +840,10 @@ export class YouTubeService {
 
 			const referenda: IReferendaItem[] = [];
 
-			rows.forEach((row: string[]) => {
-				if (!Array.isArray(row)) return;
+			rows.forEach((row) => {
+				const values = Array.isArray(row) ? row : Object.values(row);
 
-				row.forEach((cellValue) => {
+				values.forEach((cellValue) => {
 					const cell = String(cellValue || '').trim();
 					if (/^Ref\.?\s*\d+/i.test(cell)) {
 						const match = cell.match(/Ref\.?\s*(\d+)/i);

@@ -9,6 +9,7 @@ import { type IYouTubeVideoMetadata, type IYouTubePlaylistMetadata, type IYouTub
 import { APIError } from '../../_api-utils/apiError';
 import { YouTubeService } from './youtube_service';
 import { TelegramService } from './telegram_service';
+import { GoogleSheetService } from './googlesheets_service';
 
 export class ExternalAPIService {
 	static async getYouTubeVideoMetadata(videoIdOrUrl: string, options: { includeCaptions?: boolean; language?: string } = {}): Promise<IYouTubeVideoMetadata | null> {
@@ -84,6 +85,35 @@ export class ExternalAPIService {
 		}
 
 		return YouTubeService.isYouTubeUrl(url);
+	}
+
+	static extractSheetId(url: string): string | null {
+		return GoogleSheetService.extractSheetId(url);
+	}
+
+	static extractGid(url: string): string | null {
+		return GoogleSheetService.extractGid(url);
+	}
+
+	static async getSheetMetadata(sheetId: string) {
+		if (!sheetId?.trim()) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Sheet ID is required');
+		}
+		return GoogleSheetService.getSheetMetadata(sheetId);
+	}
+
+	static async getSheetNameFromGid(sheetId: string, gid: string): Promise<string> {
+		if (!sheetId?.trim() || !gid?.trim()) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Sheet ID and GID are required');
+		}
+		return GoogleSheetService.getSheetNameFromGid(sheetId, gid);
+	}
+
+	static async fetchSheetData(sheetId: string, sheetName: string): Promise<Record<string, string>[] | string[][]> {
+		if (!sheetId?.trim() || !sheetName?.trim()) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Sheet ID and Sheet Name are required');
+		}
+		return GoogleSheetService.fetchSheetData(sheetId, sheetName);
 	}
 
 	static async getYouTubePlaylistInfo(

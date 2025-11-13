@@ -5,6 +5,56 @@
 import { GOOGLE_API_KEY } from '../../_api-constants/apiEnvVars';
 
 export class GoogleSheetService {
+	private static GOOGLE_SHEET_API_BASE_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
+
+	static extractSheetId(url: string): string | null {
+		const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+		return match ? match[1] : null;
+	}
+
+	static extractGid(url: string): string | null {
+		const match = url.match(/[#&]gid=(\d+)/);
+		return match ? match[1] : null;
+	}
+
+	static async getSheetMetadata(sheetId: string): Promise<{
+		sheets: Array<{ properties: { sheetId: number; title: string } }>;
+	} | null> {
+		try {
+			if (!GOOGLE_API_KEY) {
+				throw new Error('Google Sheets API key not configured');
+			}
+
+			if (!sheetId) {
+				throw new Error('Sheet ID is required');
+			}
+
+			const url = `${this.GOOGLE_SHEET_API_BASE_URL}/${sheetId}?key=${GOOGLE_API_KEY}`;
+			const response = await fetch(url, { next: { revalidate: 300 } });
+
+			if (!response.ok) {
+				console.warn('Failed to fetch sheet metadata:', response.statusText);
+				return null;
+			}
+
+			return await response.json();
+		} catch (error) {
+			console.error('Error fetching Google Sheet metadata:', error);
+			return null;
+		}
+	}
+
+	static async getSheetNameFromGid(sheetId: string, gid: string): Promise<string> {
+		const metadata = await this.getSheetMetadata(sheetId);
+		if (metadata?.sheets) {
+			const sheet = metadata.sheets.find((s) => s.properties.sheetId === parseInt(gid, 10));
+			if (sheet?.properties?.title) {
+				return sheet.properties.title;
+			}
+		}
+		return 'Sheet1';
+	}
+
 	static async fetchSheetData(sheetId: string, sheetName: string): Promise<Record<string, string>[] | string[][]> {
 		try {
 			if (!GOOGLE_API_KEY) {
@@ -15,7 +65,7 @@ export class GoogleSheetService {
 				throw new Error('Sheet ID and Sheet Name are required');
 			}
 
-			const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}?key=${GOOGLE_API_KEY}`;
+			const url = `${this.GOOGLE_SHEET_API_BASE_URL}/${sheetId}/values/${encodeURIComponent(sheetName)}?key=${GOOGLE_API_KEY}`;
 
 			const response = await fetch(url, { next: { revalidate: 300 } });
 			if (!response.ok) {
@@ -34,7 +84,10 @@ export class GoogleSheetService {
 				return rows.slice(1).map((row: string[]) => {
 					const obj: Record<string, string> = {};
 					headers.forEach((key: string, i: number) => {
-						obj[key.trim()] = row[i]?.trim() || '';
+						const sanitizedKey = String(key).trim();
+						if (sanitizedKey) {
+							obj[sanitizedKey] = row[i]?.trim() || '';
+						}
 					});
 					return obj;
 				});
