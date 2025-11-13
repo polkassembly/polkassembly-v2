@@ -21,9 +21,14 @@ function AAG() {
 		maxVideos: 10
 	});
 
-	const featuredVideos = playlistData?.videos?.slice(0, 3) || [];
-	const listVideos = playlistData?.videos?.slice(3) || [];
+	const refinedVideos =
+		playlistData?.videos?.filter((video: IAAGVideoData) => {
+			const isZeroDuration = video.duration === '00:00';
+			return !isZeroDuration;
+		}) || [];
 
+	const featuredVideos = refinedVideos.slice(0, 3);
+	const listVideos = refinedVideos.slice(3);
 	return (
 		<div className='min-h-screen bg-page_background text-text_primary'>
 			<AAGCard />

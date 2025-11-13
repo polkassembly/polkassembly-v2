@@ -18,6 +18,8 @@ import { Calendar, Clock, Eye, Share2, Sparkles, ChevronDown, ChevronUp } from '
 import PolkadotLogo from '@/_assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@/_assets/parachain-logos/kusama-logo.gif';
 import { AAG_YOUTUBE_PLAYLIST_URL } from '@/_shared/_constants/AAGPlaylist';
+import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
+import { Separator } from '@/app/_shared-components/Separator';
 import RequestToPresentModal from '../Components/RequestToPresentModal';
 import AAGCard from '../Components/AAGCard';
 import VideoList from '../Components/VideoList';
@@ -46,7 +48,7 @@ function TranscriptSection({ transcript, loading }: TranscriptSectionProps) {
 
 	if (loading) {
 		return (
-			<div className='rounded-lg border border-border_grey bg-bg_modal p-4'>
+			<div>
 				<div className='mb-3 flex items-center gap-2'>
 					<div className='bg-bg_grey h-4 w-20 animate-pulse rounded' />
 				</div>
@@ -63,7 +65,7 @@ function TranscriptSection({ transcript, loading }: TranscriptSectionProps) {
 	}
 
 	return (
-		<div className='rounded-lg border border-border_grey bg-bg_modal p-4'>
+		<div className='rounded-lg p-4'>
 			<div className='mb-3 flex items-center justify-between'>
 				<h3 className='text-sm font-semibold text-text_primary'>Transcript</h3>
 				<span className='text-xs text-wallet_btn_text'>{transcript.length} segments</span>
@@ -286,24 +288,26 @@ function VideoViewPage() {
 											</div>
 										)}
 									</div>
-
-									{transcriptData?.summary && (
-										<div className='rounded-lg border border-border_grey bg-bg_modal p-4'>
-											<div className='mb-2 flex items-center gap-2'>
-												<Sparkles className='h-4 w-4 text-bar_chart_purple' />
-												<h3 className='text-sm font-semibold text-text_primary'>AI Summary</h3>
+									{transcriptData?.summary && transcriptData?.transcript && transcriptData.transcript.length > 0 && (
+										<div>
+											<div>
+												<div className='mb-2 flex items-center gap-2'>
+													<Sparkles className='h-4 w-4 text-bar_chart_purple' />
+													<h3 className='text-sm font-semibold text-text_primary'>AI Summary</h3>
+												</div>
+												<MarkdownViewer
+													markdown={transcriptData.summary}
+													truncate
+												/>
 											</div>
-											<div className='whitespace-pre-wrap text-xs leading-relaxed text-wallet_btn_text sm:text-sm'>{transcriptData.summary}</div>
+											<Separator className='my-4' />
+
+											<TranscriptSection
+												transcript={transcriptData.transcript}
+												loading={transcriptLoading}
+											/>
 										</div>
 									)}
-
-									{transcriptData?.transcript && transcriptData.transcript.length > 0 && (
-										<TranscriptSection
-											transcript={transcriptData.transcript}
-											loading={transcriptLoading}
-										/>
-									)}
-
 									{!transcriptData?.summary && currentVideo.description && (
 										<div className='max-h-40 overflow-auto whitespace-pre-wrap text-xs leading-relaxed text-wallet_btn_text sm:max-h-48 sm:text-sm md:max-h-56'>
 											{currentVideo.description}
