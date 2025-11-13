@@ -5,13 +5,12 @@
 'use client';
 
 import type { IAAGVideoData } from '@/_shared/types';
-import { useYouTubeData } from '@/hooks/useYouTubeData';
+import { AAG_YOUTUBE_PLAYLIST_ID, useYouTubeData } from '@/hooks/useYouTubeData';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { useTranslations } from 'next-intl';
 import GovernanceVideoCard from './Components/GovernanceCard';
 import AAGVideoListingComponent from './Components/VideoList';
 import AAGCard from './Components/AAGCard';
-import { AAG_YOUTUBE_PLAYLIST_ID } from '../api/_api-constants/apiEnvVars';
 
 const FEATURED_VIDEOS_COUNT = 3;
 const MAX_VIDEOS_TO_FETCH = 10;

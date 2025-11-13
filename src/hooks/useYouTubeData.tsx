@@ -8,6 +8,8 @@ import { useQuery } from '@tanstack/react-query';
 import type { IAAGPlaylistData, IAAGVideoData, IYouTubePlaylistMetadata, IReferendaItem, IYouTubeVideoMetadata, ITranscriptData } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 
+export const AAG_YOUTUBE_PLAYLIST_ID = 'PLtyd7v_I7PGkXbJmKojrZ1KXwspR1JkpV';
+
 const INVALID_RESPONSE_FORMAT = 'Invalid response format';
 
 const DEFAULT_RETRY_COUNT = 1;

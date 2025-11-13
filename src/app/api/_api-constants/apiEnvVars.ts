@@ -27,8 +27,7 @@ export const {
 	KLARA_AI_TOKEN = '',
 	GOOGLE_API_KEY = '',
 	TELEGRAM_BOT_TOKEN = '',
-	TELEGRAM_CHAT_ID = '',
-	AAG_YOUTUBE_PLAYLIST_ID = ''
+	TELEGRAM_CHAT_ID = ''
 } = process.env;
 
 export const IS_CACHE_ENABLED = process.env.IS_CACHE_ENABLED === 'true';
