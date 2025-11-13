@@ -10,6 +10,16 @@ import type { IAAGPlaylistData, IAAGVideoData, IYouTubePlaylistMetadata, IRefere
 const UNKNOWN_ERROR_MESSAGE = 'Unknown error';
 const INVALID_RESPONSE_FORMAT = 'Invalid response format';
 
+const DEFAULT_RETRY_COUNT = 1;
+const PLAYLIST_STALE_TIME = 5 * 60 * 1000;
+const VIDEO_STALE_TIME = 10 * 60 * 1000;
+const TRANSCRIPT_STALE_TIME = 15 * 60 * 1000;
+const VIDEO_GC_TIME = 30 * 60 * 1000;
+const PLAYLIST_GC_TIME = 10 * 60 * 1000;
+
+const DEFAULT_DATE_LOCALE = 'en-GB';
+const DEFAULT_DURATION_FALLBACK = '00:00';
+
 interface UseYouTubeDataOptions {
 	playlistUrl?: string;
 	playlistId?: string;
@@ -65,7 +75,7 @@ function formatDuration(duration: string): string {
 		}
 		return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 	} catch {
-		return '00:00';
+		return DEFAULT_DURATION_FALLBACK;
 	}
 }
 
@@ -80,7 +90,7 @@ function transformVideoData(
 		id: video.metadata.id,
 		title: video.metadata.title,
 		date: new Date(video.metadata.publishedAt)
-			.toLocaleDateString('en-GB', {
+			.toLocaleDateString(DEFAULT_DATE_LOCALE, {
 				day: '2-digit',
 				month: 'short',
 				year: '2-digit'
@@ -190,7 +200,7 @@ async function fetchTranscript(videoId: string, generateSummary: boolean): Promi
 
 export function useYouTubeData({ playlistUrl, playlistId, includeCaptions = false, language = 'en', maxVideos }: UseYouTubeDataOptions): UseYouTubeDataReturn {
 	const finalPlaylistUrl = playlistUrl || (playlistId ? `https://www.youtube.com/playlist?list=${playlistId}` : '');
-	const finalPlaylistId = playlistUrl ? playlistUrl.split('list=')[1] : playlistId || '';
+	const finalPlaylistId = playlistUrl ? playlistUrl.split('list=')[1] || '' : playlistId || '';
 
 	const {
 		data,
@@ -201,10 +211,10 @@ export function useYouTubeData({ playlistUrl, playlistId, includeCaptions = fals
 		queryKey: ['youtube-playlist', finalPlaylistId, includeCaptions, language, maxVideos],
 		queryFn: () => fetchPlaylistData(finalPlaylistUrl, includeCaptions, language, maxVideos),
 		enabled: Boolean(finalPlaylistUrl),
-		staleTime: 5 * 60 * 1000,
-		gcTime: 10 * 60 * 1000,
+		staleTime: PLAYLIST_STALE_TIME,
+		gcTime: PLAYLIST_GC_TIME,
 		refetchOnWindowFocus: false,
-		retry: 1
+		retry: DEFAULT_RETRY_COUNT
 	});
 
 	return {
@@ -227,10 +237,10 @@ export function useVideoData({ videoId, enabled = true }: UseVideoDataOptions): 
 		queryKey: ['youtube-video', videoId],
 		queryFn: () => fetchVideoData(videoId!),
 		enabled: Boolean(videoId) && enabled,
-		staleTime: 10 * 60 * 1000,
-		gcTime: 30 * 60 * 1000,
+		staleTime: VIDEO_STALE_TIME,
+		gcTime: VIDEO_GC_TIME,
 		refetchOnWindowFocus: false,
-		retry: 1
+		retry: DEFAULT_RETRY_COUNT
 	});
 
 	return {
@@ -253,10 +263,10 @@ export function useTranscript({ videoId, enabled = true, generateSummary = true 
 		queryKey: ['youtube-transcript', videoId, generateSummary],
 		queryFn: () => fetchTranscript(videoId!, generateSummary),
 		enabled: Boolean(videoId) && enabled,
-		staleTime: 15 * 60 * 1000,
-		gcTime: 30 * 60 * 1000,
+		staleTime: TRANSCRIPT_STALE_TIME,
+		gcTime: VIDEO_GC_TIME,
 		refetchOnWindowFocus: false,
-		retry: 1
+		retry: DEFAULT_RETRY_COUNT
 	});
 
 	return {
