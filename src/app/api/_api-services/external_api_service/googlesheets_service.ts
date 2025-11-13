@@ -93,7 +93,10 @@ export class GoogleSheetService {
 			const headers = rows[0];
 			const hasHeaders = headers.every((h: string) => typeof h === 'string' && h.trim().length > 0);
 
-			if (hasHeaders) {
+			const nonEmptyHeaders = headers.filter((h: string) => h && h.trim().length > 0);
+			const isValidHeaderRow = hasHeaders && headers.length > 1 && nonEmptyHeaders.length > 1;
+
+			if (isValidHeaderRow) {
 				return rows.slice(1).map((row: string[]) => {
 					const obj: Record<string, string> = {};
 					headers.forEach((key: string, i: number) => {
