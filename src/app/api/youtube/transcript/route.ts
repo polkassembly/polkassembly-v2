@@ -4,9 +4,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
-import { getSubtitles } from 'youtube-caption-extractor';
+import type { IYouTubeCaption } from '@/_shared/types';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { AIService } from '../../_api-services/ai_service';
+import { YouTubeService } from '../../_api-services/external_api_service/youtube_service';
 import { APIError } from '../../_api-utils/apiError';
 
 interface TranscriptSegment {
@@ -33,9 +34,9 @@ export async function GET(request: NextRequest) {
 		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Video ID or URL is required');
 	}
 
-	let rawSubtitles: Array<{ start: string; dur: string; text: string }>;
+	let rawSubtitles: IYouTubeCaption[];
 	try {
-		rawSubtitles = await getSubtitles({ videoID: identifier, lang });
+		rawSubtitles = await YouTubeService.getVideoCaptions(identifier, lang);
 	} catch (error) {
 		console.error('Error fetching YouTube transcript:', error);
 
@@ -62,8 +63,8 @@ export async function GET(request: NextRequest) {
 
 	const transcript: TranscriptSegment[] = rawSubtitles.map((subtitle) => ({
 		text: subtitle.text,
-		offset: parseFloat(subtitle.start),
-		duration: parseFloat(subtitle.dur)
+		offset: subtitle.start,
+		duration: subtitle.dur
 	}));
 
 	let summary: string | null = null;

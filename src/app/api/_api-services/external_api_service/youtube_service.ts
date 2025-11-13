@@ -5,7 +5,7 @@
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { getSubtitles } from 'youtube-captions-scraper';
+import { getSubtitles } from 'youtube-caption-extractor';
 import type { IYouTubeCaption, IYouTubeThumbnail, IYouTubeVideoMetadata, IYouTubePlaylistMetadata, IYouTubeChapter, IReferendaItem } from '@/_shared/types';
 import { GOOGLE_API_KEY } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
@@ -157,8 +157,8 @@ export class YouTubeService {
 			});
 
 			return captions.map((caption) => ({
-				start: caption.start,
-				dur: caption.dur,
+				start: parseFloat(caption.start),
+				dur: parseFloat(caption.dur),
 				text: caption.text
 			}));
 		} catch (error) {
