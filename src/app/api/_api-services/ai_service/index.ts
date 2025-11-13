@@ -230,7 +230,6 @@ export class AIService {
 			} else if (prompt.includes(this.BASE_PROMPTS.COMMENTS_SUMMARY)) {
 				cleanedResponse = this.cleanCommentsSummaryResponse(cleanedResponse);
 			} else if (prompt.includes(this.BASE_PROMPTS.YOUTUBE_TRANSCRIPT_SUMMARY)) {
-				// YouTube transcript summaries don't need special cleaning, just trim
 				cleanedResponse = cleanedResponse.trim();
 			}
 
@@ -570,11 +569,6 @@ export class AIService {
 		};
 	}
 
-	/**
-	 * Generate AI summary from YouTube video transcript
-	 * @param transcript - Array of transcript segments with text and timestamps
-	 * @returns AI-generated summary or null
-	 */
 	static async GenerateYouTubeTranscriptSummary(transcript: Array<{ text: string; offset: number; duration: number }>): Promise<string | null> {
 		if (!IS_AI_ENABLED) {
 			return null;
@@ -585,10 +579,8 @@ export class AIService {
 			return null;
 		}
 
-		// Combine all transcript text
 		const fullTranscript = transcript.map((segment) => segment.text).join(' ');
 
-		// Limit transcript length to avoid token limits (approx 8000 words / 10000 tokens)
 		const maxWords = 8000;
 		const words = fullTranscript.split(/\s+/);
 		const truncatedTranscript = words.slice(0, maxWords).join(' ');
