@@ -9,7 +9,7 @@ import { Calendar, Clock } from 'lucide-react';
 import { Button } from '@/app/_shared-components/Button';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
-import type { IReferendaItem } from '@/_shared/types';
+import { ENetwork, type IReferendaItem } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 
 interface VideoCardProps {
@@ -32,8 +32,8 @@ function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, 
 		? (() => {
 				const publishDate = new Date(publishedAt);
 				const day = publishDate.getUTCDay();
-				if (day === 2) return 'kusama';
-				if (day === 5) return 'polkadot';
+				if (day === 2) return ENetwork.KUSAMA;
+				if (day === 5) return ENetwork.POLKADOT;
 				return null;
 			})()
 		: null;
@@ -121,8 +121,8 @@ function VideoCard({ title, date, duration, referenda, thumbnail, url, videoId, 
 							)}
 							{network && (
 								<Image
-									src={network === 'polkadot' ? PolkadotLogo : KusamaLogo}
-									alt={network === 'polkadot' ? 'Polkadot' : 'Kusama'}
+									src={network === ENetwork.POLKADOT ? PolkadotLogo : KusamaLogo}
+									alt={network === ENetwork.POLKADOT ? ENetwork.POLKADOT : ENetwork.KUSAMA}
 									width={24}
 									height={24}
 									className='h-6 w-6 rounded-full'

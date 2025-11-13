@@ -6,15 +6,15 @@
 
 import { Filter, MenuIcon, SearchIcon } from 'lucide-react';
 import { useState, useMemo } from 'react';
-import type { IAAGVideoData } from '@/_shared/types';
+import { ENetwork, type IAAGVideoData } from '@/_shared/types';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/_shared-components/DropdownMenu';
 import VideoCard from './VideoCard';
 
 const FILTER_OPTIONS = {
 	ALL: 'all',
-	POLKADOT: 'polkadot',
-	KUSAMA: 'kusama'
+	POLKADOT: ENetwork.POLKADOT,
+	KUSAMA: ENetwork.KUSAMA
 } as const;
 
 const ACTIVE_ITEM_CLASS = 'bg-grey_bg';
@@ -26,7 +26,7 @@ interface VideoListProps {
 }
 
 type SortOption = 'latest' | 'oldest';
-type FilterOption = 'all' | 'polkadot' | 'kusama';
+type FilterOption = 'all' | ENetwork.POLKADOT | ENetwork.KUSAMA;
 
 function VideoList({ videos = [], loading = false, error = null }: VideoListProps) {
 	const [searchQuery, setSearchQuery] = useState('');
@@ -47,8 +47,8 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 					? (() => {
 							const date = new Date(video.publishedAt);
 							const day = date.getUTCDay();
-							if (day === 2) return 'kusama';
-							if (day === 5) return 'polkadot';
+							if (day === 2) return ENetwork.KUSAMA;
+							if (day === 5) return ENetwork.POLKADOT;
 							return null;
 						})()
 					: null;
@@ -58,9 +58,9 @@ function VideoList({ videos = [], loading = false, error = null }: VideoListProp
 		}
 
 		if (sortBy === 'latest') {
-			filtered = [...filtered].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+			filtered = [...filtered].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
 		} else {
-			filtered = [...filtered].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+			filtered = [...filtered].sort((a, b) => new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime());
 		}
 
 		return filtered;

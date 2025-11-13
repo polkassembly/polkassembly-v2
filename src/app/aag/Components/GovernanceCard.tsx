@@ -9,7 +9,7 @@ import Image from 'next/image';
 import { Calendar, Clock, Share2 } from 'lucide-react';
 import { Button } from '@/app/_shared-components/Button';
 import { useToast } from '@/hooks/useToast';
-import { ENotificationStatus, type IReferendaItem } from '@/_shared/types';
+import { ENetwork, ENotificationStatus, type IReferendaItem } from '@/_shared/types';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import { usePathname } from 'next/navigation';
@@ -41,8 +41,8 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 		? (() => {
 				const pubdate = new Date(publishedAt);
 				const day = pubdate.getUTCDay();
-				if (day === 2) return 'kusama';
-				if (day === 5) return 'polkadot';
+				if (day === 2) return ENetwork.KUSAMA;
+				if (day === 5) return ENetwork.POLKADOT;
 				return null;
 			})()
 		: null;
@@ -176,8 +176,8 @@ function GovernanceCard({ title, date, duration, thumbnail, referenda, votingOut
 						<div className='flex items-center gap-2 md:gap-3'>
 							{network && (
 								<Image
-									src={network === 'polkadot' ? PolkadotLogo : KusamaLogo}
-									alt={network === 'polkadot' ? 'Polkadot' : 'Kusama'}
+									src={network === ENetwork.POLKADOT ? PolkadotLogo : KusamaLogo}
+									alt={network === ENetwork.POLKADOT ? ENetwork.POLKADOT : ENetwork.KUSAMA}
 									width={24}
 									height={24}
 									className='h-5 w-5 rounded-full md:h-6 md:w-6'

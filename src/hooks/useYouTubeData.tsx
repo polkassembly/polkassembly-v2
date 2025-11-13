@@ -95,10 +95,12 @@ function transformVideoData(
 				month: 'short',
 				year: '2-digit'
 			})
-			.replace(/ /g, ' '),
+			.replace(/\u00A0/g, ' ')
+			.trim(),
+
 		duration: formatDuration(video.metadata.duration),
 		thumbnail:
-			video.metadata.thumbnails.maxres?.url || video.metadata.thumbnails.high?.url || video.metadata.thumbnails.medium?.url || video.metadata.thumbnails.default?.url || '',
+			video.metadata.thumbnails?.maxres?.url || video.metadata.thumbnails?.high?.url || video.metadata.thumbnails?.medium?.url || video.metadata.thumbnails?.default?.url || '',
 		url: video.metadata.url,
 		description: video.metadata.description,
 		referenda: video.referenda || [],
@@ -200,8 +202,7 @@ async function fetchTranscript(videoId: string, generateSummary: boolean): Promi
 
 export function useYouTubeData({ playlistUrl, playlistId, includeCaptions = false, language = 'en', maxVideos }: UseYouTubeDataOptions): UseYouTubeDataReturn {
 	const finalPlaylistUrl = playlistUrl || (playlistId ? `https://www.youtube.com/playlist?list=${playlistId}` : '');
-	const finalPlaylistId = playlistUrl ? playlistUrl.split('list=')[1] || '' : playlistId || '';
-
+	const finalPlaylistId = playlistUrl ? new URL(playlistUrl).searchParams.get('list') || '' : playlistId || '';
 	const {
 		data,
 		isLoading,
@@ -235,7 +236,10 @@ export function useVideoData({ videoId, enabled = true }: UseVideoDataOptions): 
 		refetch: queryRefetch
 	} = useQuery({
 		queryKey: ['youtube-video', videoId],
-		queryFn: () => fetchVideoData(videoId!),
+		queryFn: () => {
+			if (!videoId) throw new Error('Video ID is required');
+			return fetchVideoData(videoId);
+		},
 		enabled: Boolean(videoId) && enabled,
 		staleTime: VIDEO_STALE_TIME,
 		gcTime: VIDEO_GC_TIME,
@@ -261,7 +265,10 @@ export function useTranscript({ videoId, enabled = true, generateSummary = true 
 		refetch: queryRefetch
 	} = useQuery({
 		queryKey: ['youtube-transcript', videoId, generateSummary],
-		queryFn: () => fetchTranscript(videoId!, generateSummary),
+		queryFn: () => {
+			if (!videoId) throw new Error('Video ID is required');
+			return fetchTranscript(videoId, generateSummary);
+		},
 		enabled: Boolean(videoId) && enabled,
 		staleTime: TRANSCRIPT_STALE_TIME,
 		gcTime: VIDEO_GC_TIME,

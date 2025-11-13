@@ -17,14 +17,20 @@ export async function GET(request: NextRequest) {
 		const includeCaptions = url.searchParams.get('includeCaptions') !== 'false';
 		const language = url.searchParams.get('language') || 'en';
 		const maxVideosParam = url.searchParams.get('maxVideos');
-		const maxVideos = maxVideosParam ? parseInt(maxVideosParam, 10) : undefined;
+		let maxVideos: number | undefined;
+
+		if (maxVideosParam !== null) {
+			const parsedMaxVideos = Number.parseInt(maxVideosParam, 10);
+
+			if (Number.isNaN(parsedMaxVideos) || parsedMaxVideos < 1 || parsedMaxVideos > 200) {
+				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'maxVideos must be an integer between 1 and 200');
+			}
+
+			maxVideos = parsedMaxVideos;
+		}
 
 		if (!playlistUrl) {
 			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Playlist URL is required');
-		}
-
-		if (maxVideos && (maxVideos < 1 || maxVideos > 200)) {
-			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'maxVideos must be between 1 and 200');
 		}
 
 		const playlistInfo = await ExternalAPIService.getYouTubePlaylistInfo(playlistUrl, {
@@ -37,7 +43,6 @@ export async function GET(request: NextRequest) {
 			return NextResponse.json({ error: 'Playlist not found' }, { status: StatusCodes.NOT_FOUND });
 		}
 
-		// Fetch referenda from Google Sheets for each video that has an agenda URL
 		const videosWithReferenda = await Promise.all(
 			playlistInfo.videos.map(async (video) => {
 				const agendaUrl = YouTubeService.extractAgendaUrl(video.description);

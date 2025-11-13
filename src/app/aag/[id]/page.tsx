@@ -10,7 +10,7 @@ import Image from 'next/image';
 import type { IAAGVideoData } from '@/_shared/types';
 import { useYouTubeData, useVideoData, useTranscript } from '@/hooks/useYouTubeData';
 import { useToast } from '@/hooks/useToast';
-import { ENotificationStatus } from '@/_shared/types';
+import { ENetwork, ENotificationStatus } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Calendar, Clock, Eye, Share2, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
@@ -134,7 +134,7 @@ function VideoViewPage() {
 		? (() => {
 				const date = new Date(currentVideo.publishedAt);
 				const day = date.getUTCDay();
-				return day === 2 ? 'kusama' : day === 5 ? 'polkadot' : null;
+				return day === 2 ? ENetwork.KUSAMA : day === 5 ? ENetwork.POLKADOT : null;
 			})()
 		: null;
 
@@ -307,8 +307,8 @@ function VideoViewPage() {
 										{network && (
 											<div className='flex shrink-0 items-center gap-2'>
 												<Image
-													src={network === 'polkadot' ? PolkadotLogo : KusamaLogo}
-													alt={network === 'polkadot' ? 'Polkadot' : 'Kusama'}
+													src={network === ENetwork.POLKADOT ? PolkadotLogo : KusamaLogo}
+													alt={network === ENetwork.POLKADOT ? ENetwork.POLKADOT : ENetwork.KUSAMA}
 													width={20}
 													height={20}
 													className='h-4 w-4 rounded-full sm:h-5 sm:w-5'
@@ -345,11 +345,9 @@ function VideoViewPage() {
 												))}
 											</div>
 										</div>
-									) : (
-										transcriptData?.summary &&
-										transcriptData?.transcript &&
-										transcriptData.transcript.length > 0 && (
-											<div>
+									) : transcriptData?.transcript?.length ? (
+										<div>
+											{transcriptData.summary ? (
 												<div>
 													<div className='mb-2 flex items-center gap-2'>
 														<Sparkles className='h-4 w-4 text-bar_chart_purple' />
@@ -359,15 +357,15 @@ function VideoViewPage() {
 														markdown={transcriptData.summary}
 														truncate
 													/>
+													<Separator className='my-4' />
 												</div>
-												<Separator className='my-4' />
-												<TranscriptSection
-													transcript={transcriptData.transcript}
-													loading={false}
-												/>
-											</div>
-										)
-									)}
+											) : null}
+											<TranscriptSection
+												transcript={transcriptData.transcript}
+												loading={false}
+											/>
+										</div>
+									) : null}
 								</div>
 							</div>
 						</div>

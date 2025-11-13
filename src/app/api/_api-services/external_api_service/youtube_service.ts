@@ -387,7 +387,7 @@ export class YouTubeService {
 				const batchResults = await Promise.all(videoPromises);
 				results.push(...batchResults);
 			} catch (error) {
-				console.error('Error processing video batch:', error);
+				throw error instanceof APIError ? error : new APIError(ERROR_CODES.API_FETCH_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to process YouTube video batch');
 			}
 		};
 
