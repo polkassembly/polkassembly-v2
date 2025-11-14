@@ -7,6 +7,7 @@
 import { ExternalLink } from 'lucide-react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { useSidebar } from '../Sidebar/Sidebar';
 
 const getCategoryColor = (category: string): string => {
@@ -54,6 +55,7 @@ const fetchNewsItems = async (): Promise<INewsItem[]> => {
 
 function NewsBanner() {
 	const { state } = useSidebar();
+	const isMobileDevice = useIsMobile();
 	const { data: newsItems = [] } = useQuery({
 		queryKey: ['polkadot-news'],
 		queryFn: fetchNewsItems,
@@ -75,10 +77,10 @@ function NewsBanner() {
 
 	return (
 		<div
-			className='fixed bottom-0 z-[100] w-full shadow-lg'
+			className='fixed bottom-0 w-full shadow-lg transition-opacity duration-200 md:z-[100]'
 			style={{
 				backgroundColor: '#FFF6EC',
-				left: sidebarWidth,
+				left: isMobileDevice ? '0' : sidebarWidth,
 				right: '0'
 			}}
 		>
