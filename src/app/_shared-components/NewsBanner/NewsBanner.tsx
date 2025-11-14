@@ -4,94 +4,98 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { NEWS_GOOGLE_SHEET_ID, NEWS_GOOGLE_SHEET_NAME } from '@/app/api/_api-constants/apiEnvVars';
+import { useQuery } from '@tanstack/react-query';
+
+const getCategoryColor = (category: string): string => {
+	switch (category) {
+		case 'GOV':
+			return 'bg-blue-500/20 text-blue-200';
+		case 'CORE':
+			return 'bg-green-500/20 text-green-200';
+		case 'PARA':
+			return 'bg-purple-500/20 text-purple-200';
+		case 'ECO':
+			return 'bg-orange-500/20 text-orange-200';
+		case 'EVT':
+			return 'bg-pink-500/20 text-pink-200';
+		default:
+			return 'bg-white/20 text-white';
+	}
+};
 
 interface INewsItem {
-	title: string;
-	link: string;
+	Category: string;
+	Title: string;
+	URL: string;
+	Source: string;
+	Priority: string;
+	Status: string;
 }
+
+const fetchNewsItems = async (): Promise<INewsItem[]> => {
+	try {
+		const response = await NextApiClientService.getGoogleSheetData<INewsItem[]>();
+		const { data } = response;
+
+		if (data?.success && Array.isArray(data.data) && data.data.length > 0) {
+			const activeStatuses = ['active', 'deciding', 'executed', 'announced', 'upcoming', 'ongoing', 'submitted', 'pending', 'open', 'released', 'outlook'];
+			return data.data.filter((item: INewsItem) => item.Status && activeStatuses.includes(item.Status.toLowerCase()));
+		}
+
+		return [];
+	} catch (error) {
+		console.error('Error fetching news items', error);
+		return [];
+	}
+};
+
 function NewsBanner() {
-	const [newsItems, setNewsItems] = useState<INewsItem[]>([]);
-	const [loading, setLoading] = useState<boolean>(true);
-	useEffect(() => {
-		const fetchNews = async () => {
-			try {
-				const response = await NextApiClientService.getGoogleSheetData<INewsItem[]>({
-					sheetId: NEWS_GOOGLE_SHEET_ID,
-					sheetName: NEWS_GOOGLE_SHEET_NAME
-				});
+	const { data: newsItems = [] } = useQuery({
+		queryKey: ['polkadot-news'],
+		queryFn: fetchNewsItems,
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
+		refetchOnWindowFocus: false,
+		refetchOnMount: true,
+		retry: 3,
+		retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000)
+	});
 
-				const { data, error } = response;
-
-				if (data?.success && Array.isArray(data.data)) {
-					setNewsItems(data.data);
-				} else {
-					console.error('Unexpected response format:', error);
-				}
-			} catch (err) {
-				console.error('Error fetching news:', err);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchNews();
-
-		const intervalId = setInterval(fetchNews, 5 * 60 * 1000);
-
-		return () => clearInterval(intervalId);
-	}, []);
-
-	if (loading || newsItems.length === 0) {
+	if (!newsItems || newsItems.length === 0) {
 		return null;
 	}
+
+	const duplicatedNewsItems = [...newsItems, ...newsItems, ...newsItems];
 
 	return (
 		<div className='fixed bottom-0 left-0 right-0 z-[100] bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-lg'>
 			<div className='relative h-8 overflow-hidden'>
-				<div className='absolute inset-0 flex items-center'>
-					<div className='animate-marquee flex items-center whitespace-nowrap'>
-						{newsItems.map((item) => (
-							<div
-								key={`first-${item.title}`}
-								className='mx-8 flex items-center'
-							>
-								<span className='mr-3 rounded-full bg-white bg-opacity-20 px-2 py-1 text-xs font-semibold'>BREAKING</span>
+				<div className='animate-marquee flex items-center whitespace-nowrap pt-1'>
+					{duplicatedNewsItems.map((item: INewsItem) => (
+						<div
+							key={`news-item-${(item.URL ?? item.Title).replace(/[^a-zA-Z0-9-_]/g, '-')}`}
+							className='mx-6 inline-block'
+						>
+							<div className='flex items-center'>
+								<span className={`mr-3 rounded px-2 py-1 text-xs font-semibold ${getCategoryColor(item.Category)}`}>{item.Category}</span>
 								<a
-									href={item.link}
+									href={item.URL}
 									target='_blank'
 									rel='noopener noreferrer'
 									className='flex items-center gap-2 transition-colors duration-200 hover:text-yellow-200 hover:underline'
 								>
-									<span className='font-medium'>{item.title}</span>
-									<ExternalLink size={14} />
+									<span className='text-sm font-medium'>{item.Title}</span>
+									<ExternalLink size={12} />
 								</a>
-								<div className='mx-8 text-white/50'>•</div>
+								<div className='mx-6 text-white/50'>•</div>
 							</div>
-						))}
-						{newsItems.map((item) => (
-							<div
-								key={`duplicate-${item.title}`}
-								className='mx-8 flex items-center'
-							>
-								<span className='mr-3 rounded-full bg-white bg-opacity-20 px-2 py-1 text-xs font-semibold'>BREAKING</span>
-								<a
-									href={item.link}
-									target='_blank'
-									rel='noopener noreferrer'
-									className='flex items-center gap-2 transition-colors duration-200 hover:text-yellow-200 hover:underline'
-								>
-									<span className='font-medium'>{item.title}</span>
-									<ExternalLink size={14} />
-								</a>
-								<div className='mx-8 text-white/50'>•</div>
-							</div>
-						))}
-					</div>
+						</div>
+					))}
 				</div>
+				<div className='pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-16 bg-gradient-to-r from-pink-600 to-transparent' />
+				<div className='pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-16 bg-gradient-to-l from-purple-600 to-transparent' />
 			</div>
 		</div>
 	);
