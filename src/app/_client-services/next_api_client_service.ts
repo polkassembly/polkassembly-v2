@@ -405,7 +405,7 @@ export class NextApiClientService {
 				break;
 
 			case EApiRoute.GET_GOOGLE_SHEET_NEWS:
-				path = '/external/google-sheets';
+				path = '/external/news/google-sheets';
 				break;
 
 			default:
@@ -1480,12 +1480,9 @@ export class NextApiClientService {
 		});
 	}
 
-	static async getGoogleSheetData<T = Record<string, string>[]>({ sheetId, sheetName }: { sheetId: string; sheetName: string }) {
-		const queryParams = new URLSearchParams({ sheetId, sheetName });
-
+	static async getGoogleSheetData<T = Record<string, unknown>[]>() {
 		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.GET_GOOGLE_SHEET_NEWS,
-			queryParams
+			route: EApiRoute.GET_GOOGLE_SHEET_NEWS
 		});
 
 		return this.nextApiClientFetch<{ data: T; success: boolean }>({
