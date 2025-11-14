@@ -15,32 +15,50 @@ export class GoogleSheetService {
 				throw new Error('Sheet ID and Sheet Name are required');
 			}
 
-			const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(sheetName)}?key=${GOOGLE_API_KEY}`;
+			const url = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(sheetId)}/values/${encodeURIComponent(sheetName)}?key=${GOOGLE_API_KEY}`;
 
-			const response = await fetch(url, { next: { revalidate: 300 } });
-			if (!response.ok) {
-				throw new Error(`Failed to fetch sheet data: ${response.statusText}`);
-			}
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-			const data = await response.json();
-			const rows = data.values || [];
-
-			if (rows.length === 0) return [];
-
-			const headers = rows[0];
-			const hasHeaders = headers.every((h: string) => typeof h === 'string' && h.trim().length > 0);
-
-			if (hasHeaders) {
-				return rows.slice(1).map((row: string[]) => {
-					const obj: Record<string, string> = {};
-					headers.forEach((key: string, i: number) => {
-						obj[key.trim()] = row[i]?.trim() || '';
-					});
-					return obj;
+			try {
+				const response = await fetch(url, {
+					next: { revalidate: 300 },
+					signal: controller.signal
 				});
-			}
 
-			return rows;
+				clearTimeout(timeoutId);
+
+				if (!response.ok) {
+					throw new Error(`Failed to fetch sheet data: ${response.statusText}`);
+				}
+
+				const data = await response.json();
+				const rows = data.values || [];
+
+				if (rows.length === 0) return [];
+
+				const headers = rows[0];
+				const hasHeaders = headers.every((h: string) => typeof h === 'string' && h.trim().length > 0);
+
+				if (hasHeaders) {
+					return rows.slice(1).map((row: string[]) => {
+						const obj: Record<string, string> = {};
+						headers.forEach((key: string, i: number) => {
+							obj[key.trim()] = row[i]?.trim() || '';
+						});
+						return obj;
+					});
+				}
+
+				return rows;
+			} catch (err) {
+				clearTimeout(timeoutId);
+
+				if (err instanceof Error && err.name === 'AbortError') {
+					throw new Error('Request to Google Sheets timed out');
+				}
+				throw err;
+			}
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
 			console.error('Error fetching Google Sheet data:', error);
