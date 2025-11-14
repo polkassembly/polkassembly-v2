@@ -15,6 +15,8 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { getTrackFunctions } from '@/app/_client-utils/trackCurvesUtils';
+import Image from 'next/image';
+import InfoQueryIcon from '@assets/icons/info-query-icon.svg';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import { Button } from '../../Button';
 import VoteHistory from '../VoteSummary/VoteHistory/VoteHistory';
@@ -24,6 +26,7 @@ import { Tabs, TabsContent } from '../../Tabs';
 import classes from './VotesData.module.scss';
 import VotesDataDialog from './VotesDataDialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../Select/Select';
+import { Tooltip, TooltipTrigger, TooltipContent } from '../../Tooltip';
 
 interface IVotesDataProps {
 	proposalType: EProposalType;
@@ -36,7 +39,7 @@ interface IVotesDataProps {
 }
 
 function VotesData({ proposalType, index, trackName, createdAt, timeline, setThresholdValues, thresholdValues }: IVotesDataProps) {
-	const t = useTranslations('PostDetails.VotesData');
+	const t = useTranslations('PostDetails');
 	const [activeTab, setActiveTab] = useState<EVoteBubbleTabs>(EVoteBubbleTabs.Bubble);
 	const [votesDisplayType, setVotesDisplayType] = useState<EVotesDisplayType>(EVotesDisplayType.NESTED);
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -188,7 +191,23 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 	return (
 		<div className={classes.card}>
 			<div className='flex w-full items-center justify-between'>
-				<h1 className={classes.header}>{t('votes')}</h1>
+				<h1 className={classes.header}>
+					{t('VotesData.votes')}
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Image
+								src={InfoQueryIcon}
+								alt='info query icon'
+								className='h-3.5 w-3.5'
+								width={14}
+								height={14}
+							/>
+						</TooltipTrigger>
+						<TooltipContent className='bg-tooltip_background text-sm text-white'>
+							{activeTab === EVoteBubbleTabs.Bubble ? t('Tooltips.votesBubble') : t('Tooltips.votesGraph')}
+						</TooltipContent>
+					</Tooltip>
+				</h1>
 				<Button
 					variant='ghost'
 					className='mr-6 flex justify-between rounded-sm px-1.5 py-0.5 text-xs font-normal text-text_pink'
@@ -228,7 +247,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 								onClick={() => setActiveTab(tab)}
 								className={cn(classes.tab, 'h-7', activeTab === tab ? classes.activeTab : classes.inactiveTab)}
 							>
-								{t(tab)}
+								{t(`VotesData.${tab}`)}
 							</Button>
 						))}
 					</div>
@@ -280,7 +299,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 							variant='outline'
 							className='flex w-full justify-between text-xs font-normal text-text_pink'
 						>
-							{t('voteHistory')}
+							{t('VotesData.voteHistory')}
 							<ChevronRight className='h-4 w-4 text-xs text-text_pink' />
 						</Button>
 					</DialogTrigger>
@@ -296,14 +315,14 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 										hideChevron
 									>
 										<SelectValue
-											placeholder={t('voteHistory')}
+											placeholder={t('VotesData.voteHistory')}
 											className='-mt-2 text-lg font-semibold text-text_primary'
 										/>
 										<ChevronDown className='h-5 w-5 text-xs font-semibold' />
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value={EVotesDisplayType.NESTED}>{t('nestedVotes')}</SelectItem>
-										<SelectItem value={EVotesDisplayType.FLATTENED}>{t('flattenedVotes')}</SelectItem>
+										<SelectItem value={EVotesDisplayType.NESTED}>{t('VotesData.nestedVotes')}</SelectItem>
+										<SelectItem value={EVotesDisplayType.FLATTENED}>{t('VotesData.flattenedVotes')}</SelectItem>
 									</SelectContent>
 								</Select>
 							</DialogTitle>
