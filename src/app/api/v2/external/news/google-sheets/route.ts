@@ -25,7 +25,8 @@ export const GET = withErrorHandling(async () => {
 				}
 			}
 		);
-	} catch {
+	} catch (error) {
+		console.error('Error fetching news from Google Sheets:', error);
 		return NextResponse.json(
 			{
 				success: false,
