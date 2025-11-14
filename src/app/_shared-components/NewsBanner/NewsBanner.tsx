@@ -7,21 +7,22 @@
 import { ExternalLink } from 'lucide-react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
+import { useSidebar } from '../Sidebar/Sidebar';
 
 const getCategoryColor = (category: string): string => {
 	switch (category) {
 		case 'GOV':
-			return 'bg-blue-500/20 text-blue-200';
+			return 'bg-blue-500/20 text-blue-600';
 		case 'CORE':
-			return 'bg-green-500/20 text-green-200';
+			return 'bg-green-500/20 text-green-600';
 		case 'PARA':
-			return 'bg-purple-500/20 text-purple-200';
+			return 'bg-purple-500/20 text-purple-600';
 		case 'ECO':
-			return 'bg-orange-500/20 text-orange-200';
+			return 'bg-orange-500/20 text-orange-600';
 		case 'EVT':
-			return 'bg-pink-500/20 text-pink-200';
+			return 'bg-pink-500/20 text-pink-600';
 		default:
-			return 'bg-white/20 text-white';
+			return 'bg-gray-500/20 text-gray-600';
 	}
 };
 
@@ -52,6 +53,7 @@ const fetchNewsItems = async (): Promise<INewsItem[]> => {
 };
 
 function NewsBanner() {
+	const { state } = useSidebar();
 	const { data: newsItems = [] } = useQuery({
 		queryKey: ['polkadot-news'],
 		queryFn: fetchNewsItems,
@@ -69,8 +71,17 @@ function NewsBanner() {
 
 	const duplicatedNewsItems = [...newsItems, ...newsItems, ...newsItems];
 
+	const sidebarWidth = state === 'expanded' ? '15.4rem' : '5rem';
+
 	return (
-		<div className='fixed bottom-0 left-0 right-0 z-[100] bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-lg'>
+		<div
+			className='fixed bottom-0 z-[100] w-full shadow-lg'
+			style={{
+				backgroundColor: '#FFF6EC',
+				left: sidebarWidth,
+				right: '0'
+			}}
+		>
 			<div className='relative h-8 overflow-hidden'>
 				<div className='animate-marquee flex items-center whitespace-nowrap pt-1'>
 					{duplicatedNewsItems.map((item: INewsItem) => (
@@ -84,18 +95,30 @@ function NewsBanner() {
 									href={item.URL}
 									target='_blank'
 									rel='noopener noreferrer'
-									className='flex items-center gap-2 transition-colors duration-200 hover:text-yellow-200 hover:underline'
+									style={{ color: '#FF8000' }}
+									className='flex items-center gap-2 transition-colors duration-200 hover:text-orange-600 hover:underline'
 								>
 									<span className='text-sm font-medium'>{item.Title}</span>
 									<ExternalLink size={12} />
 								</a>
-								<div className='mx-6 text-white/50'>•</div>
+								<div
+									className='mx-6'
+									style={{ color: '#FF8000', opacity: 0.5 }}
+								>
+									•
+								</div>
 							</div>
 						</div>
 					))}
 				</div>
-				<div className='pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-16 bg-gradient-to-r from-pink-600 to-transparent' />
-				<div className='pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-16 bg-gradient-to-l from-purple-600 to-transparent' />
+				<div
+					className='pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-16'
+					style={{ background: 'linear-gradient(to right, #FFF6EC, transparent)' }}
+				/>
+				<div
+					className='pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-16'
+					style={{ background: 'linear-gradient(to left, #FFF6EC, transparent)' }}
+				/>
 			</div>
 		</div>
 	);

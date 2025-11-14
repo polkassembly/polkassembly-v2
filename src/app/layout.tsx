@@ -18,7 +18,6 @@ import Initializers from './Initializers';
 import AppLayout from './_shared-components/AppLayout/AppLayout';
 import { CookieService } from '../_shared/_services/cookie_service';
 import { THEME_COLORS } from './_style/theme';
-import NewsBannerWrapper from './_shared-components/NewsBanner/NewsBannerWrapper';
 
 export const metadata: Metadata = {
 	title: OPENGRAPH_METADATA.title,
@@ -84,7 +83,6 @@ export default async function RootLayout({
 					/>
 					{modal}
 					<AppLayout>{children}</AppLayout>
-					<NewsBannerWrapper />
 				</Providers>
 				{NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={NEXT_PUBLIC_GA_ID} />}
 			</body>

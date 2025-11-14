@@ -26,11 +26,13 @@ export const GET = withErrorHandling(async () => {
 			}
 		);
 	} catch {
-		return NextResponse.json({
-			status: 500,
-			success: false,
-			error: ERROR_CODES.API_FETCH_ERROR,
-			data: []
-		});
+		return NextResponse.json(
+			{
+				success: false,
+				error: ERROR_CODES.API_FETCH_ERROR,
+				data: []
+			},
+			{ status: 500 }
+		);
 	}
 });
