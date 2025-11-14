@@ -1480,7 +1480,7 @@ export class NextApiClientService {
 		});
 	}
 
-	static async getGoogleSheetData<T = Record<string, unknown>[]>() {
+	static async getGoogleSheetData<T = Record<string, string>[]>() {
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.GET_GOOGLE_SHEET_NEWS
 		});

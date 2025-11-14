@@ -42,7 +42,9 @@ export class GoogleSheetService {
 
 			return rows;
 		} catch (error) {
-			throw new Error(`Error fetching Google Sheet data: ${error}`);
+			const message = error instanceof Error ? error.message : String(error);
+			console.error('Error fetching Google Sheet data:', error);
+			throw new Error(`Error fetching Google Sheet data: ${message}`);
 		}
 	}
 }
