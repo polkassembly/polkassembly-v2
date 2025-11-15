@@ -5,10 +5,17 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { ENetwork } from '@/_shared/types';
 import NewsBanner from './NewsBanner';
 
 function NewsBannerWrapper() {
 	const pathname = usePathname();
+	const network = getCurrentNetwork();
+
+	if (network !== ENetwork.POLKADOT) {
+		return null;
+	}
 
 	const hideOnDetailPages = [/^\/post\/[^/]+$/, /^\/proposal\/[^/]+$/, /^\/referenda\/[^/]+$/, /^\/bounty\/[^/]+$/, /^\/child-bounty\/[^/]+$/];
 
