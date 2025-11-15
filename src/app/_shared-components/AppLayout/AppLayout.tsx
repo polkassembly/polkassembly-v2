@@ -14,22 +14,23 @@ import NewsBannerWrapper from '../NewsBanner/NewsBannerWrapper';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<main className='relative flex flex-1'>
-			<AppSidebar />
+		<>
+			<main className='relative flex flex-1'>
+				<AppSidebar />
 
-			<CustomSidebarTrigger />
+				<CustomSidebarTrigger />
 
-			<SuccessModal />
+				<SuccessModal />
 
-			<ChatPopup />
+				<ChatPopup />
 
-			<SidebarInset>
-				<Navbar />
-				<main className='flex flex-1 flex-col bg-page_background'>{children}</main>
-				<Footer />
-			</SidebarInset>
-
+				<SidebarInset>
+					<Navbar />
+					<main className='flex flex-1 flex-col bg-page_background'>{children}</main>
+					<Footer />
+				</SidebarInset>
+			</main>
 			<NewsBannerWrapper />
-		</main>
+		</>
 	);
 }

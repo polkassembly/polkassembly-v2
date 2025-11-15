@@ -80,14 +80,9 @@ function NewsBanner() {
 
 	return (
 		<div
-			className='fixed bottom-0 z-10 w-full shadow-lg transition-opacity duration-200 md:z-[100]'
+			className='fixed bottom-0 right-0 z-10 h-8 w-full bg-[#FEC021] shadow-lg transition-opacity duration-200 md:z-[100]'
 			style={{
-				backgroundColor: '#FEC021',
 				left: isMobileDevice ? '0' : sidebarWidth,
-				right: '0',
-				height: '32px',
-				maxHeight: '32px',
-				minHeight: '32px',
 				WebkitTransform: 'translate3d(0,0,0)',
 				WebkitOverflowScrolling: 'touch'
 			}}
