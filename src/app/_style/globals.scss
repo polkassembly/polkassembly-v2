@@ -117,49 +117,12 @@
 	animation: slide 20s linear infinite;
 	-webkit-animation: slide 20s linear infinite;
 	will-change: transform;
-	backface-visibility: hidden;
-	-webkit-backface-visibility: hidden;
-	-webkit-transform-style: preserve-3d;
-	transform-style: preserve-3d;
-	-webkit-perspective: 1000;
-	perspective: 1000;
-	-webkit-transform: translate3d(0, 0, 0);
-	transform: translate3d(0, 0, 0);
+	backface-visibility: visible;
 }
 
 @media (prefers-reduced-motion: reduce) {
 	.animate-marquee {
 		animation: none;
 		-webkit-animation: none;
-	}
-}
-
-@supports (-webkit-touch-callout: none) {
-	.animate-marquee {
-		-webkit-transform: translateZ(0);
-		transform: translateZ(0);
-		-webkit-font-smoothing: antialiased;
-	}
-
-	.safari-mobile-banner {
-		position: -webkit-sticky !important;
-		position: sticky !important;
-		z-index: 1000 !important;
-		-webkit-transform: none !important;
-		transform: none !important;
-		bottom: 0 !important;
-		margin-top: auto !important;
-	}
-
-	[data-sidebar] {
-		min-height: 100vh;
-		display: flex;
-		flex-direction: column;
-	}
-}
-
-@media screen and (-webkit-min-device-pixel-ratio: 1) and (max-width: 768px) {
-	body {
-		padding-bottom: 0;
 	}
 }

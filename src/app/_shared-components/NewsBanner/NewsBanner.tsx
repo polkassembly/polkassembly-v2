@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ExternalLink } from 'lucide-react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
@@ -59,14 +59,6 @@ const fetchNewsItems = async (): Promise<INewsItem[]> => {
 function NewsBanner() {
 	const { state } = useSidebar();
 	const isMobileDevice = useIsMobile();
-	const [isSafariMobile, setIsSafariMobile] = useState(false);
-
-	useEffect(() => {
-		const { userAgent } = navigator;
-		const isMobileSafari = /iPad|iPhone|iPod/.test(userAgent) && /Safari/.test(userAgent) && !/CriOS/.test(userAgent) && !/FxiOS/.test(userAgent);
-		setIsSafariMobile(isMobileSafari);
-	}, []);
-
 	const { data: newsItems = [] } = useQuery({
 		queryKey: ['polkadot-news'],
 		queryFn: fetchNewsItems,
@@ -88,39 +80,18 @@ function NewsBanner() {
 
 	return (
 		<div
-			className={`${
-				isSafariMobile ? 'absolute' : 'fixed'
-			} bottom-0 right-0 z-10 h-8 w-full bg-[#FEC021] shadow-lg transition-opacity duration-200 md:z-[100] ${isSafariMobile ? 'safari-mobile-banner' : ''}`}
+			className='fixed bottom-0 right-0 z-10 h-8 w-full bg-[#FEC021] shadow-lg transition-opacity duration-200 md:z-[100]'
 			style={{
 				left: isMobileDevice ? '0' : sidebarWidth,
-				...(isSafariMobile
-					? {
-							position: 'sticky',
-							bottom: '0',
-							marginTop: 'auto'
-						}
-					: {
-							WebkitTransform: 'translateZ(0)',
-							transform: 'translateZ(0)'
-						}),
-				WebkitOverflowScrolling: 'touch',
-				WebkitBackfaceVisibility: 'hidden',
-				backfaceVisibility: 'hidden',
-				minHeight: '32px',
-				maxHeight: '32px',
-				height: '32px',
-				WebkitFontSmoothing: 'antialiased'
+				WebkitTransform: 'translate3d(0,0,0)',
+				WebkitOverflowScrolling: 'touch'
 			}}
 		>
 			<div
 				className='relative h-8 overflow-hidden'
 				style={{
 					height: '32px',
-					maxHeight: '32px',
-					minHeight: '32px',
-					WebkitBackfaceVisibility: 'hidden',
-					backfaceVisibility: 'hidden',
-					position: 'relative'
+					maxHeight: '32px'
 				}}
 			>
 				<div

@@ -27,8 +27,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 				<Navbar />
 				<main className='flex flex-1 flex-col bg-page_background'>{children}</main>
 				<Footer />
-				<NewsBannerWrapper />
 			</SidebarInset>
+
+			<NewsBannerWrapper />
 		</main>
 	);
 }
