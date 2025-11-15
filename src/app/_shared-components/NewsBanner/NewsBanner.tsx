@@ -8,6 +8,7 @@ import { ExternalLink } from 'lucide-react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useEffect, useRef, useState } from 'react';
 import { useSidebar } from '../Sidebar/Sidebar';
 import styles from './NewsBanner.module.scss';
 
@@ -66,6 +67,9 @@ const fetchNewsItems = async (): Promise<INewsItem[]> => {
 function NewsBanner() {
 	const { state } = useSidebar();
 	const isMobileDevice = useIsMobile();
+	const marqueeRef = useRef<HTMLDivElement>(null);
+	const [animationDuration, setAnimationDuration] = useState(60);
+
 	const { data: newsItems = [] } = useQuery({
 		queryKey: ['polkadot-news'],
 		queryFn: fetchNewsItems,
@@ -77,11 +81,19 @@ function NewsBanner() {
 		retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000)
 	});
 
+	useEffect(() => {
+		if (!marqueeRef.current) return;
+
+		const width = marqueeRef.current.scrollWidth;
+		const duration = width / 80;
+		setAnimationDuration(duration);
+	}, [newsItems]);
+
 	if (!newsItems || newsItems.length === 0) {
 		return null;
 	}
 
-	const duplicatedNewsItems = [...newsItems, ...newsItems, ...newsItems];
+	const duplicatedNewsItems = [...newsItems, ...newsItems];
 
 	const sidebarWidth = state === 'expanded' ? '15.4rem' : '5rem';
 
@@ -102,10 +114,9 @@ function NewsBanner() {
 				}}
 			>
 				<div
+					ref={marqueeRef}
 					className={`${styles.animateMarquee} flex items-center whitespace-nowrap pt-1`}
-					style={{
-						willChange: 'transform'
-					}}
+					style={{ animationDuration: `${animationDuration}s` }}
 				>
 					{duplicatedNewsItems.map((item: INewsItem) => (
 						<div

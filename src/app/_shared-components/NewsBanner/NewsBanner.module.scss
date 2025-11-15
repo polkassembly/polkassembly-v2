@@ -2,38 +2,19 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-@keyframes slide {
-	0% {
-		transform: translate3d(0%, 0, 0);
-	}
-
-	100% {
-		transform: translate3d(-100%, 0, 0);
-	}
-}
-
-@-webkit-keyframes slide {
-	0% {
-		-webkit-transform: translate3d(0%, 0, 0);
-		transform: translate3d(0%, 0, 0);
-	}
-
-	100% {
-		-webkit-transform: translate3d(-100%, 0, 0);
-		transform: translate3d(-100%, 0, 0);
-	}
-}
-
 .animateMarquee {
-	animation: slide 20s linear infinite;
-	-webkit-animation: slide 20s linear infinite;
+	display: inline-flex;
+	width: max-content;
+	animation: marquee linear infinite;
 	will-change: transform;
-	backface-visibility: visible;
 }
 
-@media (prefers-reduced-motion: reduce) {
-	.animateMarquee {
-		animation: none;
-		-webkit-animation: none;
+@keyframes marquee {
+	0% {
+		transform: translateX(0);
+	}
+
+	100% {
+		transform: translateX(-50%);
 	}
 }
