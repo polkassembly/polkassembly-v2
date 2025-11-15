@@ -80,7 +80,7 @@ function NewsBanner() {
 
 	return (
 		<div
-			className='fixed bottom-0 w-full shadow-lg transition-opacity duration-200 md:z-[100]'
+			className='fixed bottom-0 z-10 w-full shadow-lg transition-opacity duration-200 md:z-[100]'
 			style={{
 				backgroundColor: '#FEC021',
 				left: isMobileDevice ? '0' : sidebarWidth,
