@@ -4,7 +4,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
@@ -59,6 +59,14 @@ const fetchNewsItems = async (): Promise<INewsItem[]> => {
 function NewsBanner() {
 	const { state } = useSidebar();
 	const isMobileDevice = useIsMobile();
+	const [isSafariMobile, setIsSafariMobile] = useState(false);
+
+	useEffect(() => {
+		const { userAgent } = navigator;
+		const isMobileSafari = /iPad|iPhone|iPod/.test(userAgent) && /Safari/.test(userAgent) && !/CriOS/.test(userAgent) && !/FxiOS/.test(userAgent);
+		setIsSafariMobile(isMobileSafari);
+	}, []);
+
 	const { data: newsItems = [] } = useQuery({
 		queryKey: ['polkadot-news'],
 		queryFn: fetchNewsItems,
@@ -80,23 +88,27 @@ function NewsBanner() {
 
 	return (
 		<div
-			className='fixed bottom-0 right-0 z-10 h-8 w-full bg-[#FEC021] shadow-lg transition-opacity duration-200 md:z-[100]'
+			className={`${
+				isSafariMobile ? 'absolute' : 'fixed'
+			} bottom-0 right-0 z-10 h-8 w-full bg-[#FEC021] shadow-lg transition-opacity duration-200 md:z-[100] ${isSafariMobile ? 'safari-mobile-banner' : ''}`}
 			style={{
 				left: isMobileDevice ? '0' : sidebarWidth,
-				// Safari mobile fixes - using translateZ for hardware acceleration
-				WebkitTransform: 'translateZ(0)',
-				transform: 'translateZ(0)',
+				...(isSafariMobile
+					? {
+							position: 'sticky',
+							bottom: '0',
+							marginTop: 'auto'
+						}
+					: {
+							WebkitTransform: 'translateZ(0)',
+							transform: 'translateZ(0)'
+						}),
 				WebkitOverflowScrolling: 'touch',
 				WebkitBackfaceVisibility: 'hidden',
 				backfaceVisibility: 'hidden',
-				WebkitPerspective: '1000',
-				perspective: '1000',
 				minHeight: '32px',
 				maxHeight: '32px',
-				// Prevent elastic scrolling issues
-				WebkitTransformStyle: 'preserve-3d',
-				transformStyle: 'preserve-3d',
-				// Additional Safari fixes
+				height: '32px',
 				WebkitFontSmoothing: 'antialiased'
 			}}
 		>
@@ -106,7 +118,6 @@ function NewsBanner() {
 					height: '32px',
 					maxHeight: '32px',
 					minHeight: '32px',
-					// Additional Safari mobile fixes
 					WebkitBackfaceVisibility: 'hidden',
 					backfaceVisibility: 'hidden',
 					position: 'relative'

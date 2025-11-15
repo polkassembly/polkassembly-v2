@@ -23,7 +23,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
 			<ChatPopup />
 
-			<SidebarInset className='pb-8 md:pb-0'>
+			<SidebarInset>
 				<Navbar />
 				<main className='flex flex-1 flex-col bg-page_background'>{children}</main>
 				<Footer />

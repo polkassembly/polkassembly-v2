@@ -123,7 +123,6 @@
 	transform-style: preserve-3d;
 	-webkit-perspective: 1000;
 	perspective: 1000;
-	/* Safari mobile specific fixes */
 	-webkit-transform: translate3d(0, 0, 0);
 	transform: translate3d(0, 0, 0);
 }
@@ -135,19 +134,32 @@
 	}
 }
 
-/* Safari mobile specific fixes */
 @supports (-webkit-touch-callout: none) {
 	.animate-marquee {
 		-webkit-transform: translateZ(0);
 		transform: translateZ(0);
 		-webkit-font-smoothing: antialiased;
 	}
+
+	.safari-mobile-banner {
+		position: -webkit-sticky !important;
+		position: sticky !important;
+		z-index: 1000 !important;
+		-webkit-transform: none !important;
+		transform: none !important;
+		bottom: 0 !important;
+		margin-top: auto !important;
+	}
+
+	[data-sidebar] {
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+	}
 }
 
-/* iOS Safari specific fixes for fixed positioning */
 @media screen and (-webkit-min-device-pixel-ratio: 1) and (max-width: 768px) {
 	body {
-		/* Prevent content overlap with news banner on mobile */
-		padding-bottom: env(safe-area-inset-bottom, 32px);
+		padding-bottom: 0;
 	}
 }
