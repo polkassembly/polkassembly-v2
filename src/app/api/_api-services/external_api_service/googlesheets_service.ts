@@ -15,7 +15,7 @@ export class GoogleSheetService {
 				throw new Error('Sheet ID and Sheet Name are required');
 			}
 
-			const url = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(sheetId)}/values/${encodeURIComponent(sheetName)}?key=${GOOGLE_API_KEY}`;
+			const url = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(sheetId)}/values/${encodeURIComponent(sheetName)}?key=${encodeURIComponent(GOOGLE_API_KEY)}`;
 
 			const controller = new AbortController();
 			const timeoutId = setTimeout(() => controller.abort(), 10000);
