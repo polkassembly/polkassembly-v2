@@ -4,19 +4,31 @@
 
 import { IConversationMessage, IConversationTurn } from '@/_shared/types';
 
+/**
+ * Extract conversation history from messages, optimized with reverse iteration.
+ * Stops early when limit is reached, avoiding processing all messages.
+ * @param messages - Array of conversation messages in chronological order
+ * @param limit - Maximum number of conversation turns to return
+ * @returns Array of conversation turns (query-response pairs)
+ */
 export function extractConversationHistory(messages: IConversationMessage[], limit: number): IConversationTurn[] {
-	return messages
-		.reduce<IConversationTurn[]>((history, message, index, array) => {
-			if (message.sender === 'user' && index + 1 < array.length && array[index + 1].sender === 'ai') {
-				history.push({
-					query: message.text,
-					response: array[index + 1].text,
-					timestamp: new Date(message.timestamp).toISOString()
-				});
-			}
-			return history;
-		}, [])
-		.slice(-limit);
+	if (!messages || messages.length === 0 || limit <= 0) {
+		return [];
+	}
+
+	const pairs: IConversationTurn[] = [];
+	// Iterate backwards to get the most recent pairs first, stop when limit reached
+	for (let i = messages.length - 1; i > 0 && pairs.length < limit; i -= 1) {
+		if (messages[i].sender === 'ai' && messages[i - 1].sender === 'user') {
+			pairs.unshift({
+				query: messages[i - 1].text,
+				response: messages[i].text,
+				timestamp: new Date(messages[i - 1].timestamp).toISOString()
+			});
+		}
+	}
+
+	return pairs;
 }
 
 export function shouldShowFollowUps(aiResponseText: string, followUpQuestions: string[]): { show: boolean; filtered: string[] } {
@@ -37,7 +49,7 @@ export function shouldShowFollowUps(aiResponseText: string, followUpQuestions: s
 	return { show, filtered };
 }
 
-export function validateRequestBody(requestBody: { message: string; userId: string; conversationId: string }) {
+export function validateRequestBody(requestBody: { message: string; userId: string; conversationId?: string; conversationHistory?: IConversationTurn[] }) {
 	if (!requestBody.message || !requestBody.userId) {
 		return { valid: false, error: 'Message and username are required' };
 	}
@@ -48,6 +60,11 @@ export function validateRequestBody(requestBody: { message: string; userId: stri
 
 	if (requestBody.userId.length > 100) {
 		return { valid: false, error: 'Username too long (max 100 characters)' };
+	}
+
+	// Validate conversationHistory if provided
+	if (requestBody.conversationHistory && !Array.isArray(requestBody.conversationHistory)) {
+		return { valid: false, error: 'conversationHistory must be an array' };
 	}
 
 	return { valid: true };

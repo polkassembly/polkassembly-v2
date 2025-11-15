@@ -84,7 +84,9 @@ enum ERedisKeys {
 	GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK = 'GAR_TRACK',
 	USER_VOTES = 'UVT',
 	USER_POSTS = 'UPS',
-	TRACK_COUNTS = 'TC'
+	TRACK_COUNTS = 'TC',
+	KLARA_CONVERSATION_HISTORY = 'KCH',
+	KLARA_REQUEST_DEDUP = 'KRD'
 }
 
 export class RedisService {
@@ -172,7 +174,9 @@ export class RedisService {
 			const baseKey = `${ERedisKeys.USER_POSTS}-${network}-${address}-${page}-${limit}`;
 			const proposalTypePart = proposalType ? `-pt:${proposalType}` : '';
 			return baseKey + proposalTypePart;
-		}
+		},
+		[ERedisKeys.KLARA_CONVERSATION_HISTORY]: (conversationId: string): string => `${ERedisKeys.KLARA_CONVERSATION_HISTORY}-${conversationId}`,
+		[ERedisKeys.KLARA_REQUEST_DEDUP]: (userId: string, messageHash: string): string => `${ERedisKeys.KLARA_REQUEST_DEDUP}-${userId}-${messageHash}`
 	} as const;
 
 	// helper methods
@@ -1061,5 +1065,41 @@ export class RedisService {
 	static async DeleteUserPostsByAddress({ network, address }: { network: ENetwork; address: string }): Promise<void> {
 		// Delete all user posts cache entries for this address
 		await this.DeleteKeys({ pattern: `${ERedisKeys.USER_POSTS}-${network}-${address}-*` });
+	}
+
+	// Klara caching methods
+	static async GetKlaraConversationHistory(conversationId: string): Promise<string | null> {
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.KLARA_CONVERSATION_HISTORY](conversationId) });
+	}
+
+	static async SetKlaraConversationHistory(conversationId: string, history: string, ttlSeconds: number = 300): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.KLARA_CONVERSATION_HISTORY](conversationId),
+			value: history,
+			ttlSeconds
+		});
+	}
+
+	static async DeleteKlaraConversationHistory(conversationId: string): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.KLARA_CONVERSATION_HISTORY](conversationId) });
+	}
+
+	static async CheckKlaraRequestDedup(userId: string, messageHash: string): Promise<boolean> {
+		const key = this.redisKeysMap[ERedisKeys.KLARA_REQUEST_DEDUP](userId, messageHash);
+		const exists = await this.Get({ key, forceCache: true });
+		return exists !== null;
+	}
+
+	static async SetKlaraRequestDedup(userId: string, messageHash: string, ttlSeconds: number = 30): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.KLARA_REQUEST_DEDUP](userId, messageHash),
+			value: 'processing',
+			ttlSeconds,
+			forceCache: true
+		});
+	}
+
+	static async DeleteKlaraRequestDedup(userId: string, messageHash: string): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.KLARA_REQUEST_DEDUP](userId, messageHash), forceCache: true });
 	}
 }

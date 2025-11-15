@@ -85,34 +85,43 @@ export class ExternalApiService {
 		requestBody: Record<string, unknown>,
 		timeout: number
 	): Promise<{ response: Response; data: IChatApiResponse }> {
-		const response = await fetchWithTimeout(apiUrl, {
-			method: 'POST',
-			headers: {
-				Authorization: `Bearer ${apiToken}`,
-				'Content-Type': 'application/json',
-				'User-Agent': 'Polkassembly-Klara/1.0',
-				Accept: 'application/json'
-			},
-			body: JSON.stringify(requestBody),
-			timeout
-		});
+		try {
+			const response = await fetchWithTimeout(apiUrl, {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${apiToken}`,
+					'Content-Type': 'application/json',
+					'User-Agent': 'Polkassembly-Klara/1.0',
+					Accept: 'application/json'
+				},
+				body: JSON.stringify(requestBody),
+				timeout
+			});
 
-		if (!response.ok) {
-			const error = new Error(`HTTP ${response.status}: ${response.statusText}`) as RetryableError;
-			error.isRetryable = this.isRetryableError(error, response.status);
-			error.statusCode = response.status;
-			throw error;
+			if (!response.ok) {
+				const error = new Error(`HTTP ${response.status}: ${response.statusText}`) as RetryableError;
+				error.isRetryable = this.isRetryableError(error, response.status);
+				error.statusCode = response.status;
+				throw error;
+			}
+
+			const data = (await response.json()) as IChatApiResponse;
+
+			if (!data.answer) {
+				const error = new Error('No answer in response data') as RetryableError;
+				error.isRetryable = false; // Don't retry if response format is wrong
+				throw error;
+			}
+
+			return { response, data };
+		} catch (error) {
+			// Wrap any fetch errors (including AbortError/timeouts) as RetryableError
+			const wrappedError = error as RetryableError;
+			if (!wrappedError.isRetryable) {
+				wrappedError.isRetryable = this.isRetryableError(error);
+			}
+			throw wrappedError;
 		}
-
-		const data = (await response.json()) as IChatApiResponse;
-
-		if (!data.answer) {
-			const error = new Error('No answer in response data') as RetryableError;
-			error.isRetryable = false; // Don't retry if response format is wrong
-			throw error;
-		}
-
-		return { response, data };
 	}
 
 	private static async callExternalAPIWithRetry(
