@@ -15,6 +15,7 @@ import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import dynamic from 'next/dynamic';
 import { canVote } from '@/_shared/_utils/canVote';
+import { useUser } from '@/hooks/useUser';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -132,6 +133,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 	const [showSpamModal, setShowSpamModal] = useState(postData.contentSummary?.isSpam ?? false);
 
 	const [thresholdValues, setThresholdValues] = useState({ approvalThreshold: 0, supportThreshold: 0 });
+	const { user } = useUser();
 
 	const queryClient = useQueryClient();
 
@@ -209,6 +211,16 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									isModalOpen={isModalOpen ?? false}
 								/>
 							</div>
+							<div className={classes.commentsBox}>
+								<PostComments
+									proposalType={post.proposalType}
+									index={index}
+									contentSummary={post.contentSummary}
+									comments={post.comments}
+									allowedCommentor={post.allowedCommentor}
+									postUserId={post.userId}
+								/>
+							</div>
 						</TabsContent>
 						<TabsContent
 							value={EPostDetailsTab.ONCHAIN_INFO}
@@ -259,16 +271,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								)}
 							</div>
 						)}
-						<div className={classes.commentsBox}>
-							<PostComments
-								proposalType={post.proposalType}
-								index={index}
-								contentSummary={post.contentSummary}
-								comments={post.comments}
-								allowedCommentor={post.allowedCommentor}
-								postUserId={post.userId}
-							/>
-						</div>
 					</div>
 
 					{isModalOpen && !isOffchainPost && (
@@ -287,7 +289,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
 							{/* Place Decision Deposit */}
-							{post.proposalType === EProposalType.REFERENDUM_V2 &&
+							{user &&
+								post.proposalType === EProposalType.REFERENDUM_V2 &&
 								post.onChainInfo?.status &&
 								post.onChainInfo?.status === EProposalStatus.Submitted &&
 								post.index &&
