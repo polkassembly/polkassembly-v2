@@ -49,9 +49,7 @@ const fetchNewsItems = async (): Promise<INewsItem[]> => {
 
 		return [];
 	} catch (error) {
-		// Log error for debugging in development
 		if (process.env.NODE_ENV === 'development') {
-			// eslint-disable-next-line no-console
 			console.error('Error fetching news items', error);
 		}
 		return [];
@@ -80,12 +78,6 @@ function NewsBanner() {
 
 	const sidebarWidth = state === 'expanded' ? '15.4rem' : '5rem';
 
-	// Safari mobile scroll optimization styles
-	const safariOptimizationStyles = {
-		WebkitTransform: 'translateZ(0)' as const,
-		transform: 'translateZ(0)' as const
-	};
-
 	return (
 		<div
 			className='fixed bottom-0 w-full shadow-lg transition-opacity duration-200 md:z-[100]'
@@ -93,25 +85,24 @@ function NewsBanner() {
 				backgroundColor: '#FEC021',
 				left: isMobileDevice ? '0' : sidebarWidth,
 				right: '0',
-				...safariOptimizationStyles,
 				height: '32px',
 				maxHeight: '32px',
-				minHeight: '32px'
+				minHeight: '32px',
+				WebkitTransform: 'translate3d(0,0,0)',
+				WebkitOverflowScrolling: 'touch'
 			}}
 		>
 			<div
 				className='relative h-8 overflow-hidden'
 				style={{
 					height: '32px',
-					maxHeight: '32px',
-					...safariOptimizationStyles
+					maxHeight: '32px'
 				}}
 			>
 				<div
 					className='animate-marquee flex items-center whitespace-nowrap pt-1'
 					style={{
-						willChange: 'transform',
-						...safariOptimizationStyles
+						willChange: 'transform'
 					}}
 				>
 					{duplicatedNewsItems.map((item: INewsItem) => (
