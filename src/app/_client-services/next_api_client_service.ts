@@ -163,7 +163,8 @@ enum EApiRoute {
 	GET_CONVERSATION_MESSAGES = 'GET_CONVERSATION_MESSAGES',
 	GET_KLARA_STATS = 'GET_KLARA_STATS',
 	KLARA_SEND_FEEDBACK = 'KLARA_SEND_FEEDBACK',
-	KLARA_SEND_MESSAGE = 'KLARA_SEND_MESSAGE'
+	KLARA_SEND_MESSAGE = 'KLARA_SEND_MESSAGE',
+	GET_GOOGLE_SHEET_NEWS = 'GET_GOOGLE_SHEET_NEWS'
 }
 
 export class NextApiClientService {
@@ -401,6 +402,10 @@ export class NextApiClientService {
 			case EApiRoute.KLARA_SEND_MESSAGE:
 				path = '/klara';
 				method = 'POST';
+				break;
+
+			case EApiRoute.GET_GOOGLE_SHEET_NEWS:
+				path = '/external/news/google-sheets';
 				break;
 
 			default:
@@ -1472,6 +1477,17 @@ export class NextApiClientService {
 				queryText,
 				responseText
 			}
+		});
+	}
+
+	static async getGoogleSheetData<T = Record<string, string>[]>() {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_GOOGLE_SHEET_NEWS
+		});
+
+		return this.nextApiClientFetch<{ data: T; success: boolean }>({
+			url,
+			method
 		});
 	}
 }

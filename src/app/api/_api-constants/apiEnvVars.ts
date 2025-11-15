@@ -24,7 +24,10 @@ export const {
 	TWITTER_CONSUMER_API_SECRET_KEY = '',
 	ALGOLIA_WRITE_API_KEY = '',
 	KLARA_API_BASE_URL = '',
-	KLARA_AI_TOKEN = ''
+	KLARA_AI_TOKEN = '',
+	GOOGLE_API_KEY = '',
+	NEWS_GOOGLE_SHEET_ID = '',
+	NEWS_GOOGLE_SHEET_NAME = ''
 } = process.env;
 
 export const IS_CACHE_ENABLED = process.env.IS_CACHE_ENABLED === 'true';
