@@ -10,7 +10,9 @@ import NewsBanner from './NewsBanner';
 function NewsBannerWrapper() {
 	const pathname = usePathname();
 
-	const showBanner = pathname === '/' || pathname.startsWith('/activity-feed');
+	const hideOnDetailPages = [/^\/post\/[^/]+$/, /^\/proposal\/[^/]+$/, /^\/referenda\/[^/]+$/, /^\/bounty\/[^/]+$/, /^\/child-bounty\/[^/]+$/];
+
+	const showBanner = !hideOnDetailPages.some((pattern) => pattern.test(pathname));
 
 	if (!showBanner) {
 		return null;

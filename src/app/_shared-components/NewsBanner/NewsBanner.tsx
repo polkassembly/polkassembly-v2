@@ -79,7 +79,7 @@ function NewsBanner() {
 		<div
 			className='fixed bottom-0 w-full shadow-lg transition-opacity duration-200 md:z-[100]'
 			style={{
-				backgroundColor: '#FFF6EC',
+				backgroundColor: '#FEC021',
 				left: isMobileDevice ? '0' : sidebarWidth,
 				right: '0'
 			}}
@@ -89,7 +89,7 @@ function NewsBanner() {
 					{duplicatedNewsItems.map((item: INewsItem) => (
 						<div
 							key={`news-item-${(item.URL ?? item.Title).replace(/[^a-zA-Z0-9-_]/g, '-')}`}
-							className='mx-6 inline-block'
+							className='mr-6 inline-block'
 						>
 							<div className='flex items-center'>
 								<span className={`mr-3 rounded px-2 py-1 text-xs font-semibold ${getCategoryColor(item.Category)}`}>{item.Category}</span>
@@ -97,15 +97,15 @@ function NewsBanner() {
 									href={item.URL}
 									target='_blank'
 									rel='noopener noreferrer'
-									style={{ color: '#FF8000' }}
+									style={{ color: '#000000' }}
 									className='flex items-center gap-2 transition-colors duration-200 hover:text-orange-600 hover:underline'
 								>
 									<span className='text-sm font-medium'>{item.Title}</span>
 									<ExternalLink size={12} />
 								</a>
 								<div
-									className='mx-6'
-									style={{ color: '#FF8000', opacity: 0.5 }}
+									className='ml-6'
+									style={{ color: '#000000', opacity: 0.5 }}
 								>
 									•
 								</div>
@@ -115,11 +115,11 @@ function NewsBanner() {
 				</div>
 				<div
 					className='pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-16'
-					style={{ background: 'linear-gradient(to right, #FFF6EC, transparent)' }}
+					style={{ background: 'linear-gradient(to right, #FEC021, transparent)' }}
 				/>
 				<div
 					className='pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-16'
-					style={{ background: 'linear-gradient(to left, #FFF6EC, transparent)' }}
+					style={{ background: 'linear-gradient(to left, #FEC021, transparent)' }}
 				/>
 			</div>
 		</div>
