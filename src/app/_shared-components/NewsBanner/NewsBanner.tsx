@@ -40,7 +40,12 @@ interface INewsItem {
 const fetchNewsItems = async (): Promise<INewsItem[]> => {
 	try {
 		const response = await NextApiClientService.getGoogleSheetData<INewsItem[]>();
-		const { data } = response;
+		const { data, error } = response;
+
+		if (error || !data) {
+			console.error('Error fetching news items', error);
+			return [];
+		}
 
 		if (Array.isArray(data) && data.length > 0) {
 			const activeStatuses = ['active', 'deciding', 'executed', 'announced', 'upcoming', 'ongoing', 'submitted', 'pending', 'open', 'released', 'outlook'];
