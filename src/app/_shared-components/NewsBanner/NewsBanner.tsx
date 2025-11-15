@@ -4,6 +4,7 @@
 
 'use client';
 
+import React from 'react';
 import { ExternalLink } from 'lucide-react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
@@ -48,7 +49,11 @@ const fetchNewsItems = async (): Promise<INewsItem[]> => {
 
 		return [];
 	} catch (error) {
-		console.error('Error fetching news items', error);
+		// Log error for debugging in development
+		if (process.env.NODE_ENV === 'development') {
+			// eslint-disable-next-line no-console
+			console.error('Error fetching news items', error);
+		}
 		return [];
 	}
 };
@@ -75,17 +80,40 @@ function NewsBanner() {
 
 	const sidebarWidth = state === 'expanded' ? '15.4rem' : '5rem';
 
+	// Safari mobile scroll optimization styles
+	const safariOptimizationStyles = {
+		WebkitTransform: 'translateZ(0)' as const,
+		transform: 'translateZ(0)' as const
+	};
+
 	return (
 		<div
 			className='fixed bottom-0 w-full shadow-lg transition-opacity duration-200 md:z-[100]'
 			style={{
 				backgroundColor: '#FEC021',
 				left: isMobileDevice ? '0' : sidebarWidth,
-				right: '0'
+				right: '0',
+				...safariOptimizationStyles,
+				height: '32px',
+				maxHeight: '32px',
+				minHeight: '32px'
 			}}
 		>
-			<div className='relative h-8 overflow-hidden'>
-				<div className='animate-marquee flex items-center whitespace-nowrap pt-1'>
+			<div
+				className='relative h-8 overflow-hidden'
+				style={{
+					height: '32px',
+					maxHeight: '32px',
+					...safariOptimizationStyles
+				}}
+			>
+				<div
+					className='animate-marquee flex items-center whitespace-nowrap pt-1'
+					style={{
+						willChange: 'transform',
+						...safariOptimizationStyles
+					}}
+				>
 					{duplicatedNewsItems.map((item: INewsItem) => (
 						<div
 							key={`news-item-${(item.URL ?? item.Title).replace(/[^a-zA-Z0-9-_]/g, '-')}`}

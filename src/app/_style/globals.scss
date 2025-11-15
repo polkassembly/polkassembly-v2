@@ -101,12 +101,37 @@
 	}
 }
 
+@-webkit-keyframes slide {
+	0% {
+		-webkit-transform: translate3d(0%, 0, 0);
+		transform: translate3d(0%, 0, 0);
+	}
+
+	100% {
+		-webkit-transform: translate3d(-100%, 0, 0);
+		transform: translate3d(-100%, 0, 0);
+	}
+}
+
 .animate-marquee {
 	animation: slide 20s linear infinite;
+	-webkit-animation: slide 20s linear infinite;
+	will-change: transform;
+	-webkit-will-change: transform;
+	-webkit-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+
+	-webkit-perspective: 1000;
+	perspective: 1000;
+	-webkit-transform-style: preserve-3d;
+	transform-style: preserve-3d;
 }
 
 @media (prefers-reduced-motion: reduce) {
 	.animate-marquee {
 		animation: none;
+		-webkit-animation: none;
 	}
 }
