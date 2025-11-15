@@ -117,12 +117,37 @@
 	animation: slide 20s linear infinite;
 	-webkit-animation: slide 20s linear infinite;
 	will-change: transform;
-	backface-visibility: visible;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+	-webkit-transform-style: preserve-3d;
+	transform-style: preserve-3d;
+	-webkit-perspective: 1000;
+	perspective: 1000;
+	/* Safari mobile specific fixes */
+	-webkit-transform: translate3d(0, 0, 0);
+	transform: translate3d(0, 0, 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
 	.animate-marquee {
 		animation: none;
 		-webkit-animation: none;
+	}
+}
+
+/* Safari mobile specific fixes */
+@supports (-webkit-touch-callout: none) {
+	.animate-marquee {
+		-webkit-transform: translateZ(0);
+		transform: translateZ(0);
+		-webkit-font-smoothing: antialiased;
+	}
+}
+
+/* iOS Safari specific fixes for fixed positioning */
+@media screen and (-webkit-min-device-pixel-ratio: 1) and (max-width: 768px) {
+	body {
+		/* Prevent content overlap with news banner on mobile */
+		padding-bottom: env(safe-area-inset-bottom, 32px);
 	}
 }
