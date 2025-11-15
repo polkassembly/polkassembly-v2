@@ -4,12 +4,12 @@
 
 'use client';
 
-import React from 'react';
 import { ExternalLink } from 'lucide-react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useSidebar } from '../Sidebar/Sidebar';
+import styles from './NewsBanner.module.scss';
 
 const getCategoryColor = (category: string): string => {
 	switch (category) {
@@ -33,25 +33,27 @@ interface INewsItem {
 	Title: string;
 	URL: string;
 	Source: string;
-	Priority: string;
+	Priority: string | number;
 	Status: string;
 }
 
 const fetchNewsItems = async (): Promise<INewsItem[]> => {
 	try {
 		const response = await NextApiClientService.getGoogleSheetData<INewsItem[]>();
-		const { data } = response;
+		const data = response;
 
-		if (data?.success && Array.isArray(data.data) && data.data.length > 0) {
+		if (Array.isArray(data) && data.length > 0) {
 			const activeStatuses = ['active', 'deciding', 'executed', 'announced', 'upcoming', 'ongoing', 'submitted', 'pending', 'open', 'released', 'outlook'];
-			return data.data.filter((item: INewsItem) => item.Status && activeStatuses.includes(item.Status.toLowerCase()));
+			const filtered = data.filter((item: INewsItem) => {
+				return item.Status && activeStatuses.includes(item.Status.toLowerCase());
+			});
+
+			return filtered.sort((a, b) => Number(a.Priority) - Number(b.Priority));
 		}
 
 		return [];
 	} catch (error) {
-		if (process.env.NODE_ENV === 'development') {
-			console.error('Error fetching news items', error);
-		}
+		console.error('Error fetching news items', error);
 		return [];
 	}
 };
@@ -95,7 +97,7 @@ function NewsBanner() {
 				}}
 			>
 				<div
-					className='animate-marquee flex items-center whitespace-nowrap pt-1'
+					className={`${styles.animateMarquee} flex items-center whitespace-nowrap pt-1`}
 					style={{
 						willChange: 'transform'
 					}}

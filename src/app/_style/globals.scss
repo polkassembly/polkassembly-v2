@@ -90,39 +90,3 @@
 .radix-tooltip-content {
 	@apply relative z-50;
 }
-
-@keyframes slide {
-	0% {
-		transform: translate3d(0%, 0, 0);
-	}
-
-	100% {
-		transform: translate3d(-100%, 0, 0);
-	}
-}
-
-@-webkit-keyframes slide {
-	0% {
-		-webkit-transform: translate3d(0%, 0, 0);
-		transform: translate3d(0%, 0, 0);
-	}
-
-	100% {
-		-webkit-transform: translate3d(-100%, 0, 0);
-		transform: translate3d(-100%, 0, 0);
-	}
-}
-
-.animate-marquee {
-	animation: slide 20s linear infinite;
-	-webkit-animation: slide 20s linear infinite;
-	will-change: transform;
-	backface-visibility: visible;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.animate-marquee {
-		animation: none;
-		-webkit-animation: none;
-	}
-}
