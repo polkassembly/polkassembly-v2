@@ -22,6 +22,5 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		return NextResponse.json(null, { status: StatusCodes.NOT_FOUND });
 	}
 
-	// Return the video metadata directly - frontend can handle date conversion if needed
 	return NextResponse.json(video);
 });
