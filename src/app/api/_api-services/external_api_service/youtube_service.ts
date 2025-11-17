@@ -282,11 +282,16 @@ export class YouTubeService {
 			}
 		};
 
-		await fetchPage();
-		while (nextPageToken) {
-			// eslint-disable-next-line no-await-in-loop
-			await fetchPage(nextPageToken);
-		}
+		const fetchAllPages = async (pageToken?: string): Promise<void> => {
+			await fetchPage(pageToken);
+
+			if (nextPageToken) {
+				return fetchAllPages(nextPageToken);
+			}
+			return Promise.resolve();
+		};
+
+		await fetchAllPages();
 
 		return videoIds;
 	}
@@ -395,11 +400,10 @@ export class YouTubeService {
 			}
 		};
 
-		// eslint-disable-next-line no-restricted-syntax
-		for (const batch of batches) {
-			// eslint-disable-next-line no-await-in-loop
-			await processBatch(batch);
-		}
+		await batches.reduce(async (previousBatch, currentBatch) => {
+			await previousBatch;
+			return processBatch(currentBatch);
+		}, Promise.resolve());
 
 		return results;
 	}
