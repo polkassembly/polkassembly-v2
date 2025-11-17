@@ -29,11 +29,9 @@ export interface IAAGVideoMetadata {
 		startTime: number;
 		endTime: number;
 		description?: string;
-		aiSummary?: string;
 	}>;
 	transcript: {
 		language: string;
-		fullText: string;
 		captions: Array<{
 			start: number;
 			dur: number;
@@ -74,33 +72,33 @@ export class AAGIndexingService extends FirestoreService {
 				console.log(`Video ${videoData.id} already indexed, updating if needed`);
 			}
 
-			let transcript: { language: string; fullText: string; captions: Array<{ start: number; dur: number; text: string }> } | undefined;
+			let transcript: { language: string; captions: Array<{ start: number; dur: number; text: string }> } | undefined;
 			try {
+				console.log(`Processing transcript for video ${videoData.id}. Captions available: ${videoData.captions ? 'yes' : 'no'}`);
+				if (videoData.captions) {
+					console.log(`Captions length: ${videoData.captions.length}`);
+				}
 				transcript = await this.ProcessVideoTranscriptForConsolidated(videoData);
+				console.log(`Transcript result: ${transcript ? 'success' : 'no transcript'}, captions: ${transcript?.captions?.length || 0}`);
 			} catch (error) {
 				console.warn(`Failed to process transcript for video ${videoData.id}:`, error);
 			}
 
-			let chapters: Array<{ id: string; title: string; startTime: number; endTime: number; description?: string; aiSummary?: string }> = [];
+			let chapters: Array<{ id: string; title: string; startTime: number; endTime: number; description?: string }> = [];
 			try {
 				chapters = await this.ProcessVideoChaptersForConsolidated(videoData, transcript);
 			} catch (error) {
 				console.warn(`Failed to process chapters for video ${videoData.id}:`, error);
 			}
 
-			let aiSummary: string | undefined;
-			try {
-				aiSummary = await this.GenerateVideoAISummary(videoData, transcript);
-			} catch (error) {
-				console.warn(`Failed to generate AI summary for video ${videoData.id}:`, error);
-			}
+			const aiSummary = await this.GenerateVideoAISummary(videoData, transcript);
 
 			const consolidatedMetadata: IAAGVideoMetadata = {
 				id: videoData.id,
 				title: videoData.title,
 				description: videoData.description,
 				publishedAt: new Date(videoData.publishedAt),
-				duration: videoData.duration,
+				duration: this.convertDurationToReadable(videoData.duration),
 				thumbnail: videoData.thumbnail,
 				url: videoData.url,
 				network: getNetworkFromDate(videoData.publishedAt),
@@ -111,11 +109,14 @@ export class AAGIndexingService extends FirestoreService {
 				aiSummary: aiSummary || '',
 				referenda: videoData.referenda || [],
 				chapters,
-				transcript: transcript || { language: 'en', fullText: '', captions: [] },
+				transcript: transcript || { language: 'en', captions: [] },
 				createdAt: existingVideo?.createdAt || new Date(),
 				updatedAt: new Date(),
 				isIndexed: true
 			};
+
+			console.log(`Created metadata with publishedAt: ${consolidatedMetadata.publishedAt.toISOString()}`);
+			console.log(`Transcript captions count: ${consolidatedMetadata.transcript?.captions?.length || 0}`);
 
 			await this.SaveAAGVideoMetadata(consolidatedMetadata);
 
@@ -259,7 +260,7 @@ export class AAGIndexingService extends FirestoreService {
 		}
 	}
 
-	private static async GenerateVideoAISummary(videoData: IAAGVideoData, transcript?: IAAGVideoMetadata['transcript']): Promise<string | undefined> {
+	private static async GenerateVideoAISummary(videoData: IAAGVideoData, transcript?: IAAGVideoMetadata['transcript']): Promise<string> {
 		if (transcript && transcript.captions && transcript.captions.length > 0) {
 			const transcriptData = transcript.captions.map((cap: { start: number; dur: number; text: string }) => ({
 				text: cap.text,
@@ -269,9 +270,11 @@ export class AAGIndexingService extends FirestoreService {
 
 			try {
 				const summary = await AIService.GenerateYouTubeTranscriptSummary(transcriptData);
-				return summary || undefined;
+				if (summary && summary.trim()) {
+					return summary;
+				}
 			} catch (error) {
-				console.error('Failed to generate transcript summary:', error);
+				console.warn(`AI service unavailable for video ${videoData.id}, using fallback summary`, error);
 			}
 		}
 
@@ -279,7 +282,7 @@ export class AAGIndexingService extends FirestoreService {
 			return `Video Summary:\n${videoData.title}\n\n${videoData.description.substring(0, 500)}${videoData.description.length > 500 ? '...' : ''}`;
 		}
 
-		return undefined;
+		return `Video: ${videoData.title}`;
 	}
 
 	static async SaveIndexingBatch(batch: IAAGIndexingBatch): Promise<void> {
@@ -296,11 +299,26 @@ export class AAGIndexingService extends FirestoreService {
 	}
 
 	static async SaveAAGVideoMetadata(metadata: IAAGVideoMetadata): Promise<void> {
-		const cleanMetadata = this.removeUndefinedValues(metadata) as IAAGVideoMetadata;
 		const youtubeVideoId = metadata.id;
 		if (!youtubeVideoId) {
 			throw new Error('YouTube video ID is required for saving metadata');
 		}
+
+		const cleanMetadata = this.removeUndefinedValues(metadata) as IAAGVideoMetadata;
+
+		const safeToISOString = (date: unknown): string => {
+			if (date instanceof Date && !isNaN(date.getTime())) {
+				return date.toISOString();
+			}
+			return String(date || 'Invalid Date');
+		};
+
+		console.log(`Saving metadata for video ${youtubeVideoId}:`);
+		console.log(`- Duration: ${cleanMetadata.duration}`);
+		console.log(`- PublishedAt: ${safeToISOString(metadata.publishedAt)}`);
+		console.log(`- CreatedAt: ${safeToISOString(metadata.createdAt)}`);
+		console.log(`- Transcript captions: ${cleanMetadata.transcript?.captions?.length || 0}`);
+
 		await this.aagVideoMetadataCollectionRef().doc(youtubeVideoId).set(cleanMetadata, { merge: true });
 	}
 
@@ -316,7 +334,14 @@ export class AAGIndexingService extends FirestoreService {
 			return null;
 		}
 
-		return data as IAAGVideoMetadata;
+		const processedData = {
+			...data,
+			publishedAt: data.publishedAt?.toDate ? data.publishedAt.toDate() : new Date(data.publishedAt || Date.now()),
+			createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+			updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now())
+		};
+
+		return processedData as IAAGVideoMetadata;
 	}
 
 	static async GetAllAAGVideos(): Promise<IAAGVideoMetadata[]> {
@@ -335,13 +360,17 @@ export class AAGIndexingService extends FirestoreService {
 
 	private static async ProcessVideoTranscriptForConsolidated(
 		videoData: IAAGVideoData
-	): Promise<{ language: string; fullText: string; captions: Array<{ start: number; dur: number; text: string }> } | undefined> {
+	): Promise<{ language: string; captions: Array<{ start: number; dur: number; text: string }> } | undefined> {
 		if (!videoData.captions || videoData.captions.length === 0) {
+			console.log(`No captions found for video ${videoData.id}`);
 			return undefined;
 		}
 
-		const primaryCaption = videoData.captions[0];
-		if (!primaryCaption) {
+		const captionsArray = videoData.captions;
+		console.log(`Processing ${captionsArray.length} captions for video ${videoData.id}`);
+
+		if (captionsArray.length === 0) {
+			console.log(`Captions array is empty for video ${videoData.id}`);
 			return undefined;
 		}
 
@@ -351,28 +380,29 @@ export class AAGIndexingService extends FirestoreService {
 			text?: string;
 		}
 
+		const captions = captionsArray.map((c: RawCaption) => ({
+			start: c.start || 0,
+			dur: c.dur || 0,
+			text: c.text || ''
+		}));
+
+		console.log(`Processed transcript for video ${videoData.id}: ${captions.length} captions`);
+
 		return {
 			language: 'en',
-			fullText: Array.isArray(primaryCaption) ? primaryCaption.map((c: RawCaption) => c.text).join(' ') : '',
-			captions: Array.isArray(primaryCaption)
-				? primaryCaption.map((c: RawCaption) => ({
-						start: c.start || 0,
-						dur: c.dur || 0,
-						text: c.text || ''
-					}))
-				: []
+			captions
 		};
 	}
 
 	private static async ProcessVideoChaptersForConsolidated(
 		videoData: IAAGVideoData,
-		transcript?: { language: string; fullText: string; captions: Array<{ start: number; dur: number; text: string }> }
-	): Promise<Array<{ id: string; title: string; startTime: number; endTime: number; description?: string; aiSummary?: string }>> {
+		transcript?: { language: string; captions: Array<{ start: number; dur: number; text: string }> }
+	): Promise<Array<{ id: string; title: string; startTime: number; endTime: number; description?: string }>> {
 		if (!videoData.chapters || videoData.chapters.length === 0) {
 			return [];
 		}
 
-		const chapters: Array<{ id: string; title: string; startTime: number; endTime: number; description?: string; aiSummary?: string }> = [];
+		const chapters: Array<{ id: string; title: string; startTime: number; endTime: number; description?: string }> = [];
 
 		videoData.chapters.forEach((currentChapter, index) => {
 			if (!currentChapter || typeof currentChapter.title !== 'string') {
@@ -394,8 +424,7 @@ export class AAGIndexingService extends FirestoreService {
 				title: currentChapter.title || 'Untitled Chapter',
 				startTime: currentChapter.start || 0,
 				endTime: nextChapter ? nextChapter.start || 0 : 0,
-				description: chapterText.substring(0, 500),
-				aiSummary: ''
+				description: chapterText.substring(0, 500)
 			});
 		});
 
@@ -498,6 +527,10 @@ export class AAGIndexingService extends FirestoreService {
 			return obj;
 		}
 
+		if (obj instanceof Date) {
+			return obj;
+		}
+
 		if (Array.isArray(obj)) {
 			return obj.map((item) => this.removeUndefinedValues(item)).filter((item) => item !== undefined);
 		}
@@ -507,6 +540,25 @@ export class AAGIndexingService extends FirestoreService {
 			.map(([key, value]) => [key, this.removeUndefinedValues(value)] as const);
 
 		return Object.fromEntries(entries);
+	}
+
+	private static convertDurationToReadable(duration: string): string {
+		try {
+			const hoursMatch = duration.match(/(\d+)H/);
+			const minutesMatch = duration.match(/(\d+)M/);
+			const secondsMatch = duration.match(/(\d+)S/);
+
+			const hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0;
+			const minutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
+			const seconds = secondsMatch ? parseInt(secondsMatch[1], 10) : 0;
+
+			if (hours > 0) {
+				return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+			}
+			return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+		} catch {
+			return '00:00';
+		}
 	}
 
 	private static chunkArray<T>(array: T[], chunkSize: number): T[][] {

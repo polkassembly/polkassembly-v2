@@ -2,16 +2,16 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ValidatorService } from '@/_shared/_services/validator_service';
 import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getSubtitles } from 'youtube-caption-extractor';
 import type { IYouTubeCaption, IYouTubeThumbnail, IYouTubeVideoMetadata, IYouTubePlaylistMetadata, IYouTubeChapter, IReferendaItem } from '@/_shared/types';
 import { GOOGLE_API_KEY } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { GoogleSheetService } from './googlesheets_service';
 
-if (!GOOGLE_API_KEY.trim()) {
+if (!GOOGLE_API_KEY?.trim()) {
 	console.warn('\n ⚠️  Warning: GOOGLE_API_KEY is not set. YouTube video metadata will not be fetched.\n');
 }
 
@@ -114,6 +114,16 @@ export class YouTubeService {
 
 	private static DEFAULT_LANGUAGE = 'en';
 
+	private static MIN_CHAPTER_INTERVAL = 30;
+
+	private static MAX_CHAPTERS = 8;
+
+	private static validateApiKey(): void {
+		if (!GOOGLE_API_KEY?.trim()) {
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'YouTube API key is not configured');
+		}
+	}
+
 	static extractVideoId(url: string): string | null {
 		if (!ValidatorService.isUrl(url)) {
 			if (/^[a-zA-Z0-9_-]{11}$/.test(url)) {
@@ -176,9 +186,7 @@ export class YouTubeService {
 	}
 
 	private static async fetchVideoMetadata(videoIds: string[]): Promise<IYouTubeApiVideoResponse> {
-		if (!GOOGLE_API_KEY.trim()) {
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'YouTube API key not configured');
-		}
+		this.validateApiKey();
 
 		const url = new URL(`${this.YOUTUBE_API_BASE_URL}/videos`);
 		url.searchParams.set('part', 'snippet,contentDetails,statistics');
@@ -205,9 +213,7 @@ export class YouTubeService {
 	}
 
 	private static async fetchPlaylistMetadata(playlistId: string): Promise<IYouTubeApiPlaylistResponse> {
-		if (!GOOGLE_API_KEY.trim()) {
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'YouTube API key is not configured');
-		}
+		this.validateApiKey();
 
 		const url = new URL(`${this.YOUTUBE_API_BASE_URL}/playlists`);
 		url.searchParams.set('part', 'snippet,contentDetails');
@@ -234,9 +240,7 @@ export class YouTubeService {
 	}
 
 	private static async fetchPlaylistVideos(playlistId: string): Promise<string[]> {
-		if (!GOOGLE_API_KEY.trim()) {
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'YouTube API key is not configured');
-		}
+		this.validateApiKey();
 
 		const videoIds: string[] = [];
 		let nextPageToken: string | undefined;
@@ -657,7 +661,7 @@ export class YouTubeService {
 
 		const uniqueChapters = chaptersWithDuration.filter((chapter, index, arr) => index === 0 || Math.abs(chapter.start - arr[index - 1].start) > 30);
 
-		return uniqueChapters.sort((a, b) => a.start - b.start).slice(0, 8);
+		return uniqueChapters.sort((a, b) => a.start - b.start).slice(0, this.MAX_CHAPTERS);
 	}
 
 	private static findContentBreaks(captions: IYouTubeCaption[]): Array<{
@@ -702,7 +706,7 @@ export class YouTubeService {
 		];
 
 		let lastBreakTime = 0;
-		const minBreakInterval = 300;
+		const minBreakInterval = this.MIN_CHAPTER_INTERVAL * 10;
 
 		captions.forEach((caption) => {
 			const text = caption.text.toLowerCase();
@@ -758,7 +762,7 @@ export class YouTubeService {
 			breaks.push(...additionalBreaks);
 		}
 
-		return breaks.slice(0, 8);
+		return breaks.slice(0, this.MAX_CHAPTERS);
 	}
 
 	static isYouTubeUrl(url: string): { isValid: boolean; type: 'video' | 'playlist' | null } {

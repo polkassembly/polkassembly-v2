@@ -4,8 +4,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
+import { z } from 'zod';
 import { AAGIndexingService } from '@/app/api/_api-services/external_api_service/aag/indexing_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
+import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { AAG_YOUTUBE_PLAYLIST_ID } from '@/hooks/useYouTubeData';
 
@@ -30,38 +32,47 @@ interface DailyWebhookResponse {
 	};
 }
 
-const WEBHOOK_SECRET = process.env.VIDEO_INDEXING_WEBHOOK_SECRET || 'polkassembly-aag-indexing-2024';
+const zodWebhookSchema = z.object({
+	secretKey: z.string().optional(),
+	playlistId: z.string().optional(),
+	dryRun: z.boolean().optional(),
+	maxVideos: z.number().optional()
+});
 
-export async function POST(request: NextRequest): Promise<NextResponse<DailyWebhookResponse>> {
+const WEBHOOK_SECRET = process.env.VIDEO_INDEXING_WEBHOOK_SECRET || '';
+
+export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResponse<DailyWebhookResponse>> => {
 	const startTime = Date.now();
 	const timestamp = new Date().toISOString();
 
+	let body: DailyWebhookRequest = {};
 	try {
-		let body: DailyWebhookRequest = {};
-		try {
-			body = await request.json();
-		} catch {
-			body = {};
+		body = await req.json();
+	} catch {
+		body = {};
+	}
+
+	if (Object.keys(body).length > 0) {
+		const validation = zodWebhookSchema.safeParse(body);
+		if (!validation.success) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, validation.error.errors[0]?.message || 'Invalid webhook data');
 		}
+		body = validation.data;
+	}
 
-		const providedSecret = body.secretKey || request.headers.get('x-webhook-secret');
-		if (process.env.NODE_ENV === 'production' && providedSecret !== WEBHOOK_SECRET) {
-			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Invalid webhook secret');
-		}
+	const providedSecret = body.secretKey || req.headers.get('x-webhook-secret');
+	if (process.env.NODE_ENV === 'production' && providedSecret !== WEBHOOK_SECRET) {
+		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Invalid webhook secret');
+	}
 
-		const playlistId = body.playlistId || AAG_YOUTUBE_PLAYLIST_ID;
-		if (!playlistId?.trim()) {
-			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'No playlist ID available');
-		}
+	const playlistId = body.playlistId || AAG_YOUTUBE_PLAYLIST_ID;
+	if (!playlistId?.trim()) {
+		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'No playlist ID available');
+	}
 
-		console.log(`🎬 Daily AAG indexing webhook started at ${timestamp}`);
-		console.log(`📺 Processing playlist: ${playlistId}`);
-		console.log(`🔄 Dry run mode: ${body.dryRun || false}`);
-
-		if (body.dryRun) {
-			console.log('🔍 DRY RUN MODE - Simulating video check process...');
-
-			const mockResponse: DailyWebhookResponse = {
+	if (body.dryRun) {
+		return NextResponse.json(
+			{
 				success: true,
 				message: 'Dry run completed successfully',
 				data: {
@@ -73,111 +84,59 @@ export async function POST(request: NextRequest): Promise<NextResponse<DailyWebh
 					playlistId,
 					duration: Date.now() - startTime
 				}
-			};
-
-			return NextResponse.json(mockResponse, { status: StatusCodes.OK });
-		}
-
-		const result = await AAGIndexingService.CheckForNewVideos(playlistId);
-
-		const endTime = Date.now();
-		const duration = endTime - startTime;
-
-		console.log(`✅ Daily AAG indexing completed in ${duration}ms`);
-		console.log(`📊 Results: ${result.newVideos} new, ${result.updatedVideos} updated`);
-
-		const response: DailyWebhookResponse = {
-			success: true,
-			message: `Daily video check completed: ${result.newVideos} new videos, ${result.updatedVideos} updated videos`,
-			data: {
-				newVideos: result.newVideos,
-				updatedVideos: result.updatedVideos,
-				errors: [],
-				processed: result.newVideos + result.updatedVideos,
-				timestamp,
-				playlistId,
-				duration
-			}
-		};
-
-		if (result.newVideos > 0 || result.updatedVideos > 0) {
-			console.log('📢 AAG indexing summary:', JSON.stringify(response.data, null, 2));
-		} else {
-			console.log('😴 No new videos or updates found');
-		}
-
-		return NextResponse.json(response, { status: StatusCodes.OK });
-	} catch (error) {
-		const endTime = Date.now();
-		const duration = endTime - startTime;
-
-		console.error('❌ Daily AAG indexing webhook failed:', error);
-
-		const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-		const statusCode = error instanceof APIError ? error.status : StatusCodes.INTERNAL_SERVER_ERROR;
-
-		const errorResponse: DailyWebhookResponse = {
-			success: false,
-			message: `Daily AAG indexing failed: ${errorMessage}`,
-			data: {
-				newVideos: 0,
-				updatedVideos: 0,
-				errors: [errorMessage],
-				processed: 0,
-				timestamp,
-				playlistId: 'unknown',
-				duration
-			}
-		};
-
-		return NextResponse.json(errorResponse, { status: statusCode });
-	}
-}
-
-export async function GET(request: NextRequest): Promise<NextResponse> {
-	try {
-		const { searchParams } = new URL(request.url);
-		const dryRun = searchParams.get('dry_run') === 'true';
-		const playlistId = searchParams.get('playlist_id');
-		const secretKey = searchParams.get('secret') || request.headers.get('x-webhook-secret');
-
-		const mockBody: DailyWebhookRequest = {
-			dryRun,
-			...(playlistId && { playlistId }),
-			...(secretKey && { secretKey })
-		};
-
-		const mockRequest = new Request(request.url, {
-			method: 'POST',
-			body: JSON.stringify(mockBody),
-			headers: {
-				'Content-Type': 'application/json',
-				...(secretKey && { 'x-webhook-secret': secretKey })
-			}
-		});
-
-		return POST(mockRequest as NextRequest);
-	} catch (error) {
-		console.error('GET webhook error:', error);
-		return NextResponse.json(
-			{
-				success: false,
-				message: 'Webhook GET request failed',
-				error: error instanceof Error ? error.message : 'Unknown error'
 			},
-			{ status: StatusCodes.INTERNAL_SERVER_ERROR }
+			{ status: StatusCodes.OK }
 		);
 	}
-}
 
-export async function HEAD(): Promise<NextResponse> {
-	return NextResponse.json(
-		{
-			status: 'healthy',
-			service: 'aag-indexing-webhook',
-			timestamp: new Date().toISOString(),
-			version: '1.0.0'
-		},
-		{ status: StatusCodes.OK }
-	);
-}
+	const result = await AAGIndexingService.CheckForNewVideos(playlistId);
+
+	const endTime = Date.now();
+	const duration = endTime - startTime;
+
+	const response: DailyWebhookResponse = {
+		success: true,
+		message: `Daily video check completed: ${result.newVideos} new videos, ${result.updatedVideos} updated videos`,
+		data: {
+			newVideos: result.newVideos,
+			updatedVideos: result.updatedVideos,
+			errors: [],
+			processed: result.newVideos + result.updatedVideos,
+			timestamp,
+			playlistId,
+			duration
+		}
+	};
+
+	if (result.newVideos > 0 || result.updatedVideos > 0) {
+		console.log('📢 AAG indexing summary:', JSON.stringify(response.data, null, 2));
+	} else {
+		console.log('😴 No new videos or updates found');
+	}
+
+	return NextResponse.json(response);
+});
+
+export const GET = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
+	const { searchParams } = new URL(req.url);
+	const dryRun = searchParams.get('dry_run') === 'true';
+	const playlistId = searchParams.get('playlist_id');
+	const secretKey = searchParams.get('secret') || req.headers.get('x-webhook-secret');
+
+	const requestBody: DailyWebhookRequest = {
+		dryRun,
+		...(playlistId && { playlistId }),
+		...(secretKey && { secretKey })
+	};
+
+	const postRequest = new Request(req.url, {
+		method: 'POST',
+		body: JSON.stringify(requestBody),
+		headers: {
+			'Content-Type': 'application/json',
+			...(secretKey && { 'x-webhook-secret': secretKey })
+		}
+	});
+
+	return POST(postRequest as NextRequest);
+});

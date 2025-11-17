@@ -4,52 +4,55 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
+import { z } from 'zod';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { APIError } from '../../../../_api-utils/apiError';
+import { withErrorHandling } from '../../../../_api-utils/withErrorHandling';
 import { TelegramService } from '../../../../_api-services/external_api_service/telegram_service';
 
-export async function POST(request: NextRequest) {
-	try {
-		const formData = await request.formData();
+const zodPresentationRequestSchema = z.object({
+	fullName: z.string().min(1, 'Full name is required'),
+	organization: z.string().optional(),
+	hasProposal: z.string().min(1, 'Has proposal field is required'),
+	referendumIndex: z.string().optional(),
+	description: z.string().min(1, 'Description is required'),
+	estimatedDuration: z.string().optional(),
+	preferredDate: z.string().optional(),
+	email: z.string().email().optional(),
+	telegram: z.string().optional(),
+	twitter: z.string().optional()
+});
 
-		const presentationData = {
-			fullName: formData.get('fullName') as string,
-			organization: (formData.get('organization') as string) || undefined,
-			hasProposal: formData.get('hasProposal') as string,
-			referendumIndex: (formData.get('referendumIndex') as string) || undefined,
-			description: formData.get('description') as string,
-			estimatedDuration: (formData.get('estimatedDuration') as string) || undefined,
-			preferredDate: (formData.get('preferredDate') as string) || undefined,
-			email: (formData.get('email') as string) || undefined,
-			telegram: (formData.get('telegram') as string) || undefined,
-			twitter: (formData.get('twitter') as string) || undefined,
-			supportingFile: formData.get('supportingFile') as File | null
-		};
+export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResponse> => {
+	const formData = await req.formData();
 
-		await TelegramService.sendPresentationRequestWithFile(presentationData);
+	const formFields = {
+		fullName: formData.get('fullName'),
+		organization: formData.get('organization'),
+		hasProposal: formData.get('hasProposal'),
+		referendumIndex: formData.get('referendumIndex'),
+		description: formData.get('description'),
+		estimatedDuration: formData.get('estimatedDuration'),
+		preferredDate: formData.get('preferredDate'),
+		email: formData.get('email'),
+		telegram: formData.get('telegram'),
+		twitter: formData.get('twitter')
+	};
 
-		return NextResponse.json({
-			success: true,
-			message: 'Presentation request submitted successfully'
-		});
-	} catch (error) {
-		console.error('Error processing presentation request:', error);
-
-		if (error instanceof APIError) {
-			return NextResponse.json(
-				{
-					success: false,
-					error: error.message
-				},
-				{ status: error.status }
-			);
-		}
-
-		return NextResponse.json(
-			{
-				success: false,
-				error: 'Internal server error'
-			},
-			{ status: StatusCodes.INTERNAL_SERVER_ERROR }
-		);
+	const validation = zodPresentationRequestSchema.safeParse(formFields);
+	if (!validation.success) {
+		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, validation.error.errors[0]?.message || 'Invalid form data');
 	}
-}
+
+	const presentationData = {
+		...validation.data,
+		supportingFile: formData.get('supportingFile') as File | null
+	};
+
+	await TelegramService.sendPresentationRequestWithFile(presentationData);
+
+	return NextResponse.json({
+		success: true,
+		message: 'Presentation request submitted successfully'
+	});
+});

@@ -72,6 +72,28 @@ interface ITelegramApiResponse {
 export class TelegramService {
 	private static TELEGRAM_API_BASE_URL = 'https://api.telegram.org';
 
+	private static MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+	private static ALLOWED_MIME_TYPES = [
+		'application/pdf',
+		'application/msword',
+		'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		'application/vnd.ms-powerpoint',
+		'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+	];
+
+	private static ALLOWED_EXTENSIONS = ['.pdf', '.doc', '.docx', '.ppt', '.pptx'];
+
+	private static validateTelegramConfig(): void {
+		if (!TELEGRAM_BOT_TOKEN?.trim()) {
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Telegram bot token is not configured');
+		}
+
+		if (!TELEGRAM_CHAT_ID?.trim()) {
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Telegram chat ID is not configured');
+		}
+	}
+
 	private static escapeMarkdown(text: string): string {
 		if (!text) return '';
 		return text.replace(/([_*[\]()~`>#+=|{}.!-])/g, '\\$1');
@@ -151,38 +173,18 @@ ${data.supportingFile ? `📎 Supporting file: ${this.escapeMarkdown(data.suppor
 	}
 
 	private static validatePresentationFile(file: File): void {
-		const MAX_FILE_SIZE = 10 * 1024 * 1024;
-		const ALLOWED_MIME_TYPES = [
-			'application/pdf',
-			'application/msword',
-			'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-			'application/vnd.ms-powerpoint',
-			'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-		];
-		const ALLOWED_EXTENSIONS = ['.pdf', '.doc', '.docx', '.ppt', '.pptx'];
-
-		if (file.size > MAX_FILE_SIZE) {
-			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'File size must be less than 50MB');
+		if (file.size > this.MAX_FILE_SIZE) {
+			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'File size must be less than 10MB');
 		}
 
-		if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+		if (!this.ALLOWED_MIME_TYPES.includes(file.type)) {
 			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid file type. Only PDF, DOC, DOCX, PPT, and PPTX files are allowed');
 		}
 
 		const fileName = file.name.toLowerCase();
-		const hasValidExtension = ALLOWED_EXTENSIONS.some((ext) => fileName.endsWith(ext));
+		const hasValidExtension = this.ALLOWED_EXTENSIONS.some((ext) => fileName.endsWith(ext));
 		if (!hasValidExtension) {
 			throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid file extension. Only PDF, DOC, DOCX, PPT, and PPTX files are allowed');
-		}
-	}
-
-	private static validateTelegramConfig(): void {
-		if (!TELEGRAM_BOT_TOKEN?.trim()) {
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Telegram bot token is not configured');
-		}
-
-		if (!TELEGRAM_CHAT_ID?.trim()) {
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Telegram chat ID is not configured');
 		}
 	}
 
