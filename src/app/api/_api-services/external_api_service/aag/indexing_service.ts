@@ -3,13 +3,10 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { ENetwork, IAAGVideoData, IYouTubeChapter, IYouTubeVideoMetadata } from '@/_shared/types';
-import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { StatusCodes } from 'http-status-codes';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
-import { YouTubeService } from '../external_api_service/youtube_service';
-import { AIService } from '../ai_service';
-import { FirestoreService } from '../offchain_db_service/firestore_service';
-import { APIError } from '../../_api-utils/apiError';
+import { YouTubeService } from '../youtube_service';
+import { AIService } from '../../ai_service';
+import { FirestoreService } from '../../offchain_db_service/firestore_service';
 
 export interface IAAGVideoMetadata {
 	id: string;
@@ -48,7 +45,7 @@ export interface IAAGVideoMetadata {
 	isIndexed: boolean;
 }
 
-export interface IVideoIndexingBatch {
+export interface IAAGIndexingBatch {
 	batchId: string;
 	videosProcessed: number;
 	videosSuccessful: number;
@@ -59,14 +56,14 @@ export interface IVideoIndexingBatch {
 	status: 'processing' | 'completed' | 'failed';
 }
 
-export class VideoIndexingService extends FirestoreService {
+export class AAGIndexingService extends FirestoreService {
 	private static readonly BATCH_SIZE = 5;
+
+	private static readonly UNKNOWN_ERROR_MESSAGE = 'Unknown error';
 
 	protected static aagVideoMetadataCollectionRef = () => this.firestoreDb.collection('aag_video_metadata');
 
-	protected static videoIndexingBatchCollectionRef = () => this.firestoreDb.collection('video_indexing_batches');
-
-	private static readonly UNKNOWN_ERROR_MESSAGE = 'Unknown error';
+	protected static aagIndexingBatchCollectionRef = () => this.firestoreDb.collection('aag_indexing_batches');
 
 	public static async IndexVideoMetadata(videoData: IAAGVideoData): Promise<{ success: boolean; videoId: string; message: string; error?: string }> {
 		try {
@@ -140,9 +137,6 @@ export class VideoIndexingService extends FirestoreService {
 		}
 	}
 
-	/**
-	 * Index all videos from a YouTube playlist
-	 */
 	static async IndexPlaylistVideos(
 		playlistId: string,
 		options?: {
@@ -150,9 +144,9 @@ export class VideoIndexingService extends FirestoreService {
 			maxVideos?: number;
 			startFromVideo?: string;
 		}
-	): Promise<IVideoIndexingBatch> {
+	): Promise<IAAGIndexingBatch> {
 		const batchId = this.generateId();
-		const batch: IVideoIndexingBatch = {
+		const batch: IAAGIndexingBatch = {
 			batchId,
 			videosProcessed: 0,
 			videosSuccessful: 0,
@@ -167,14 +161,14 @@ export class VideoIndexingService extends FirestoreService {
 
 			const playlistData = await YouTubeService.getPlaylistMetadata(playlistId, { includeCaptions: true, maxVideos: options?.maxVideos });
 			if (!playlistData || !playlistData.videos) {
-				throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Playlist not found or has no videos');
+				throw new Error('Failed to fetch playlist data or no videos found');
 			}
 
 			let videosToProcess = playlistData.videos;
 
 			if (options?.startFromVideo) {
 				const startIndex = videosToProcess.findIndex((v) => v.id === options.startFromVideo);
-				if (startIndex !== -1) {
+				if (startIndex >= 0) {
 					videosToProcess = videosToProcess.slice(startIndex);
 				}
 			}
@@ -201,9 +195,10 @@ export class VideoIndexingService extends FirestoreService {
 							}
 						}
 
-						const aagVideoData = await this.convertYouTubeVideoToAAGFormat(video);
+						const aagVideoData = await this.ConvertYouTubeVideoToAAGFormat(video);
 						const result = await this.IndexVideoMetadata(aagVideoData);
 						batch.videosProcessed += 1;
+
 						if (result.success) {
 							batch.videosSuccessful += 1;
 						} else {
@@ -287,18 +282,17 @@ export class VideoIndexingService extends FirestoreService {
 		return undefined;
 	}
 
-	static async SaveIndexingBatch(batch: IVideoIndexingBatch): Promise<void> {
-		await this.videoIndexingBatchCollectionRef().doc(batch.batchId).set(batch);
+	static async SaveIndexingBatch(batch: IAAGIndexingBatch): Promise<void> {
+		await this.aagIndexingBatchCollectionRef().doc(batch.batchId).set(batch);
 	}
 
-	static async UpdateIndexingBatch(batchId: string, updates: Partial<IVideoIndexingBatch>): Promise<void> {
-		await this.videoIndexingBatchCollectionRef().doc(batchId).set(updates, { merge: true });
+	static async UpdateIndexingBatch(batchId: string, updates: Partial<IAAGIndexingBatch>): Promise<void> {
+		await this.aagIndexingBatchCollectionRef().doc(batchId).set(updates, { merge: true });
 	}
 
-	static async GetIndexingBatch(batchId: string): Promise<IVideoIndexingBatch | null> {
-		const doc = await this.videoIndexingBatchCollectionRef().doc(batchId).get();
-
-		return doc.exists ? (doc.data() as IVideoIndexingBatch) : null;
+	static async GetIndexingBatch(batchId: string): Promise<IAAGIndexingBatch | null> {
+		const doc = await this.aagIndexingBatchCollectionRef().doc(batchId).get();
+		return doc.exists ? (doc.data() as IAAGIndexingBatch) : null;
 	}
 
 	static async SaveAAGVideoMetadata(metadata: IAAGVideoMetadata): Promise<void> {
@@ -308,24 +302,6 @@ export class VideoIndexingService extends FirestoreService {
 			throw new Error('YouTube video ID is required for saving metadata');
 		}
 		await this.aagVideoMetadataCollectionRef().doc(youtubeVideoId).set(cleanMetadata, { merge: true });
-	}
-
-	private static removeUndefinedValues(obj: unknown): unknown {
-		if (obj === null || typeof obj !== 'object') {
-			return obj;
-		}
-
-		if (Array.isArray(obj)) {
-			return obj.map((item) => this.removeUndefinedValues(item)).filter((item) => item !== undefined);
-		}
-
-		const cleaned: Record<string, unknown> = {};
-		Object.entries(obj as Record<string, unknown>)
-			.filter(([, value]) => value !== undefined)
-			.forEach(([key, value]) => {
-				cleaned[key] = this.removeUndefinedValues(value);
-			});
-		return cleaned;
 	}
 
 	static async GetAAGVideoMetadata(youtubeVideoId: string): Promise<IAAGVideoMetadata | null> {
@@ -349,7 +325,6 @@ export class VideoIndexingService extends FirestoreService {
 		return snapshot.docs
 			.map((doc) => {
 				const data = doc.data();
-				// Validate that the data has required fields
 				if (!data || typeof data.id !== 'string' || typeof data.title !== 'string') {
 					return null;
 				}
@@ -358,9 +333,6 @@ export class VideoIndexingService extends FirestoreService {
 			.filter((item): item is IAAGVideoMetadata => item !== null);
 	}
 
-	/**
-	 * Consolidated processing methods for single collection
-	 */
 	private static async ProcessVideoTranscriptForConsolidated(
 		videoData: IAAGVideoData
 	): Promise<{ language: string; fullText: string; captions: Array<{ start: number; dur: number; text: string }> } | undefined> {
@@ -430,32 +402,7 @@ export class VideoIndexingService extends FirestoreService {
 		return chapters;
 	}
 
-	/**
-	 * Utility methods
-	 */
-	private static chunkArray<T>(array: T[], chunkSize: number): T[][] {
-		const chunks: T[][] = [];
-		for (let i = 0; i < array.length; i += chunkSize) {
-			chunks.push(array.slice(i, i + chunkSize));
-		}
-		return chunks;
-	}
-
-	private static delay(ms: number): Promise<void> {
-		return new Promise((resolve) => {
-			setTimeout(resolve, ms);
-		});
-	}
-
-	private static generateId(): string {
-		return `vid_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-	}
-
 	public static async ConvertYouTubeVideoToAAGFormat(video: IYouTubeVideoMetadata): Promise<IAAGVideoData> {
-		return this.convertYouTubeVideoToAAGFormat(video);
-	}
-
-	private static async convertYouTubeVideoToAAGFormat(video: IYouTubeVideoMetadata): Promise<IAAGVideoData> {
 		const agendaUrl = YouTubeService.extractAgendaUrl(video.description);
 
 		let referenda: { referendaNo: string }[] = [];
@@ -507,7 +454,7 @@ export class VideoIndexingService extends FirestoreService {
 
 			const playlistData = await YouTubeService.getPlaylistMetadata(playlistId, { includeCaptions: true });
 			if (!playlistData || !playlistData.videos) {
-				throw new Error('Failed to fetch playlist data');
+				throw new Error('Failed to fetch playlist data or no videos found');
 			}
 
 			let newVideos = 0;
@@ -517,52 +464,66 @@ export class VideoIndexingService extends FirestoreService {
 				try {
 					const existingMetadata = await this.GetAAGVideoMetadata(video.id);
 
-					if (!existingMetadata || !existingMetadata.isIndexed) {
-						console.log(`Found new video: ${video.id} - ${video.title}`);
-						const aagVideoData = await this.convertYouTubeVideoToAAGFormat(video);
-						const result = await this.IndexVideoMetadata(aagVideoData);
-						if (result.success) {
-							return { type: 'new', success: true };
-						}
+					if (!existingMetadata) {
+						const aagVideoData = await this.ConvertYouTubeVideoToAAGFormat(video);
+						await this.IndexVideoMetadata(aagVideoData);
+						newVideos += 1;
+						console.log(`Indexed new video: ${video.title}`);
 					} else {
-						const needsUpdate =
-							existingMetadata.title !== video.title ||
-							existingMetadata.description !== video.description ||
-							(video.viewCount && parseInt(video.viewCount, 10) !== existingMetadata.viewCount);
-
-						if (needsUpdate) {
-							console.log(`Updating metadata for video: ${video.id}`);
-							const aagVideoData = await this.convertYouTubeVideoToAAGFormat(video);
-							const result = await this.IndexVideoMetadata(aagVideoData);
-							if (result.success) {
-								return { type: 'updated', success: true };
-							}
+						const videoPublishedAt = new Date(video.publishedAt);
+						if (!existingMetadata.updatedAt || videoPublishedAt > existingMetadata.updatedAt) {
+							const aagVideoData = await this.ConvertYouTubeVideoToAAGFormat(video);
+							await this.IndexVideoMetadata(aagVideoData);
+							updatedVideos += 1;
+							console.log(`Updated video: ${video.title}`);
 						}
 					}
 				} catch (error) {
 					console.error(`Error processing video ${video.id}:`, error);
 				}
-				return { type: 'error', success: false };
 			});
 
-			const results = await Promise.allSettled(videoPromises);
+			await Promise.all(videoPromises);
 
-			results.forEach((result) => {
-				if (result.status === 'fulfilled' && result.value.success) {
-					if (result.value.type === 'new') {
-						newVideos += 1;
-					} else if (result.value.type === 'updated') {
-						updatedVideos += 1;
-					}
-				}
-			});
-
-			console.log(`Completed check: ${newVideos} new videos, ${updatedVideos} updated videos`);
-
+			console.log(`Check completed: ${newVideos} new videos, ${updatedVideos} updated videos`);
 			return { newVideos, updatedVideos };
 		} catch (error) {
-			console.error('Failed to check for new videos:', error);
+			console.error('Error checking for new videos:', error);
 			throw error;
 		}
+	}
+
+	private static removeUndefinedValues(obj: unknown): unknown {
+		if (obj === null || typeof obj !== 'object') {
+			return obj;
+		}
+
+		if (Array.isArray(obj)) {
+			return obj.map((item) => this.removeUndefinedValues(item)).filter((item) => item !== undefined);
+		}
+
+		const entries = Object.entries(obj as Record<string, unknown>)
+			.filter(([, value]) => value !== undefined)
+			.map(([key, value]) => [key, this.removeUndefinedValues(value)] as const);
+
+		return Object.fromEntries(entries);
+	}
+
+	private static chunkArray<T>(array: T[], chunkSize: number): T[][] {
+		const chunks: T[][] = [];
+		for (let i = 0; i < array.length; i += chunkSize) {
+			chunks.push(array.slice(i, i + chunkSize));
+		}
+		return chunks;
+	}
+
+	private static delay(ms: number): Promise<void> {
+		return new Promise((resolve) => {
+			setTimeout(resolve, ms);
+		});
+	}
+
+	private static generateId(): string {
+		return `aag_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 	}
 }

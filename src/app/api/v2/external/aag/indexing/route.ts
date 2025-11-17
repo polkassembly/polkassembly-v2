@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
-import { VideoIndexingService } from '@/app/api/_api-services/video_indexing_service';
+import { AAGIndexingService } from '@/app/api/_api-services/external_api_service/aag/indexing_service';
 import { YouTubeService } from '@/app/api/_api-services/external_api_service/youtube_service';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
@@ -24,7 +24,6 @@ interface IndexVideoRequest {
 export async function POST(request: NextRequest) {
 	try {
 		const body: IndexVideoRequest = await request.json();
-
 		const { action, videoId, playlistId, options } = body;
 
 		if (!action) {
@@ -42,9 +41,8 @@ export async function POST(request: NextRequest) {
 					throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Video not found');
 				}
 
-				const aagVideoData = await VideoIndexingService.ConvertYouTubeVideoToAAGFormat(videoData);
-
-				const result = await VideoIndexingService.IndexVideoMetadata(aagVideoData);
+				const aagVideoData = await AAGIndexingService.ConvertYouTubeVideoToAAGFormat(videoData);
+				const result = await AAGIndexingService.IndexVideoMetadata(aagVideoData);
 
 				return NextResponse.json(
 					{
@@ -62,7 +60,7 @@ export async function POST(request: NextRequest) {
 					throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Valid playlistId is required for index_playlist action');
 				}
 
-				const batch = await VideoIndexingService.IndexPlaylistVideos(targetPlaylistId, options);
+				const batch = await AAGIndexingService.IndexPlaylistVideos(targetPlaylistId, options);
 
 				return NextResponse.json(
 					{
@@ -73,7 +71,7 @@ export async function POST(request: NextRequest) {
 							videosSuccessful: batch.videosSuccessful,
 							videosFailed: batch.videosFailed,
 							status: batch.status,
-							errors: batch.errors.slice(0, 10) // Limit errors in response
+							errors: batch.errors.slice(0, 10)
 						}
 					},
 					{ status: StatusCodes.OK }
@@ -87,7 +85,7 @@ export async function POST(request: NextRequest) {
 					throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Valid playlistId is required for check_new_videos action');
 				}
 
-				const result = await VideoIndexingService.CheckForNewVideos(targetPlaylistId);
+				const result = await AAGIndexingService.CheckForNewVideos(targetPlaylistId);
 
 				return NextResponse.json(
 					{
@@ -102,7 +100,7 @@ export async function POST(request: NextRequest) {
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid action. Supported actions: index_video, index_playlist, check_new_videos');
 		}
 	} catch (error) {
-		console.error('Video indexing API error:', error);
+		console.error('AAG indexing API error:', error);
 
 		if (error instanceof APIError) {
 			return NextResponse.json({ message: error.message }, { status: error.status });
@@ -125,7 +123,7 @@ export async function GET(request: NextRequest) {
 					throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Valid videoId is required');
 				}
 
-				const metadata = await VideoIndexingService.GetAAGVideoMetadata(videoId);
+				const metadata = await AAGIndexingService.GetAAGVideoMetadata(videoId);
 
 				if (!metadata) {
 					throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Video not found');
@@ -145,7 +143,7 @@ export async function GET(request: NextRequest) {
 					throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Valid batchId is required');
 				}
 
-				const batch = await VideoIndexingService.GetIndexingBatch(batchId);
+				const batch = await AAGIndexingService.GetIndexingBatch(batchId);
 
 				if (!batch) {
 					throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Batch not found');
@@ -164,7 +162,7 @@ export async function GET(request: NextRequest) {
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, 'Invalid action. Supported actions: get_video_metadata, get_batch_status');
 		}
 	} catch (error) {
-		console.error('Video indexing API error:', error);
+		console.error('AAG indexing API error:', error);
 
 		if (error instanceof APIError) {
 			return NextResponse.json({ message: error.message }, { status: error.status });
