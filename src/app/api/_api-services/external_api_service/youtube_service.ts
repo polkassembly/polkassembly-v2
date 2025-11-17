@@ -545,7 +545,8 @@ export class YouTubeService {
 	static extractChaptersFromCaptions(captions: IYouTubeCaption[]): Array<IYouTubeChapter> {
 		if (!captions?.length) return [];
 
-		const totalDuration = captions[captions.length - 1]?.start || 0;
+		const last = captions[captions.length - 1];
+		const totalDuration = last ? last.start + last.dur : 0;
 		const segmentDuration = totalDuration / this.MAX_CHAPTERS;
 		const chapters: Array<IYouTubeChapter> = [];
 
