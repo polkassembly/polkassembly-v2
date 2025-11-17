@@ -67,6 +67,7 @@ export interface IAAGIndexingBatch {
 	videosProcessed: number;
 	videosSuccessful: number;
 	videosFailed: number;
+	videosSkipped: number;
 	errors: string[];
 	startTime: Date;
 	endTime?: Date;
@@ -167,6 +168,7 @@ export class AAGVideoService extends FirestoreService {
 			videosProcessed: 0,
 			videosSuccessful: 0,
 			videosFailed: 0,
+			videosSkipped: 0,
 			errors: [],
 			startTime: new Date(),
 			status: 'processing'
@@ -175,25 +177,88 @@ export class AAGVideoService extends FirestoreService {
 		try {
 			await this.SaveIndexingBatch(batch);
 
-			const playlistData = await YouTubeService.getPlaylistMetadata(playlistId, { includeCaptions: true, maxVideos: options?.maxVideos });
+			const initialCount = await this.GetAAGVideoCount();
+			console.log(`📊 Starting indexing - Current AAG video collection count: ${initialCount}`);
+
+			const fetchCount = options?.maxVideos ? Math.min(options.maxVideos * 3, 300) : 100;
+			const maxVideosNeeded = options?.maxVideos || 50;
+
+			console.log(`🔍 Smart indexing: Fetching ${fetchCount} videos to find ${maxVideosNeeded} unindexed videos...`);
+
+			const playlistData = await YouTubeService.getPlaylistMetadata(playlistId, {
+				includeCaptions: true,
+				maxVideos: fetchCount
+			});
 			if (!playlistData || !playlistData.videos) {
 				throw new Error('Failed to fetch playlist data or no videos found');
 			}
 
-			let videosToProcess = playlistData.videos;
+			console.log(`📥 Fetched ${playlistData.videos.length} videos from playlist`);
 
-			if (options?.startFromVideo) {
-				const startIndex = videosToProcess.findIndex((v) => v.id === options.startFromVideo);
-				if (startIndex >= 0) {
-					videosToProcess = videosToProcess.slice(startIndex);
+			const videosToProcess: IYouTubeVideoMetadata[] = [];
+			let skippedCount = 0;
+
+			console.log('🔍 Checking which videos are already indexed...');
+
+			const processVideo = async (video: IYouTubeVideoMetadata): Promise<{ video: IYouTubeVideoMetadata | null; wasSkipped: boolean }> => {
+				if (videosToProcess.length >= maxVideosNeeded) {
+					return { video: null, wasSkipped: true };
 				}
-			}
 
-			if (options?.maxVideos) {
-				videosToProcess = videosToProcess.slice(0, options.maxVideos);
-			}
+				if (options?.skipExisting) {
+					const existing = await this.GetAAGVideoMetadata(video.id);
+					if (existing?.isIndexed) {
+						console.log(`⏭️  Already indexed: ${video.title?.substring(0, 50)}... (${video.id})`);
+						return { video: null, wasSkipped: true };
+					}
+				}
 
-			console.log(`Starting to index ${videosToProcess.length} videos from playlist ${playlistId}`);
+				console.log(`✨ Found unindexed video: ${video.title?.substring(0, 50)}... (${video.id})`);
+				return { video, wasSkipped: false };
+			};
+
+			const results = await playlistData.videos.reduce(
+				async (previousPromise, video) => {
+					const acc = await previousPromise;
+					const result = await processVideo(video);
+
+					if (result.video) {
+						acc.videosToProcess.push(result.video);
+					}
+					if (result.wasSkipped) {
+						acc.skippedCount += 1;
+					}
+
+					return acc;
+				},
+				Promise.resolve({ videosToProcess: [] as IYouTubeVideoMetadata[], skippedCount: 0 })
+			);
+
+			videosToProcess.push(...results.videosToProcess);
+			skippedCount = results.skippedCount;
+			console.log(`🎯 Found ${videosToProcess.length} unindexed videos (${skippedCount} already indexed)`);
+
+			if (videosToProcess.length === 0) {
+				const totalChecked = videosToProcess.length + skippedCount;
+				console.log(`✅ All ${totalChecked} videos checked are already indexed!`);
+
+				const finalCount = await this.GetAAGVideoCount();
+				console.log(`📊 Final AAG video collection count: ${finalCount}`);
+
+				batch.videosProcessed = totalChecked;
+				batch.videosSkipped = skippedCount;
+				batch.endTime = new Date();
+				batch.status = 'completed';
+
+				await this.UpdateIndexingBatch(batchId, {
+					endTime: batch.endTime,
+					status: batch.status,
+					videosProcessed: batch.videosProcessed,
+					videosSkipped: batch.videosSkipped
+				});
+
+				return batch;
+			}
 
 			const batches: IYouTubeVideoMetadata[][] = [];
 			for (let i = 0; i < videosToProcess.length; i += this.BATCH_SIZE) {
@@ -234,22 +299,26 @@ export class AAGVideoService extends FirestoreService {
 
 					if (result.status === 'fulfilled') {
 						const videoResult = result.value;
-						if (videoResult.success && !('skipped' in videoResult)) {
+						if (videoResult.success) {
 							batch.videosSuccessful += 1;
-						} else if (!videoResult.success) {
+							console.log(`✅ Successfully indexed new video: ${videoResult.videoId}`);
+						} else {
 							batch.videosFailed += 1;
-							const error = 'error' in videoResult ? videoResult.error : videoResult.message;
+							const error = 'error' in videoResult ? videoResult.error : 'Unknown error';
 							batch.errors.push(`Video ${videoResult.videoId}: ${error}`);
+							console.error(`❌ Failed to index video: ${videoResult.videoId} - ${error}`);
 						}
 					} else {
 						batch.videosFailed += 1;
 						batch.errors.push(`Batch processing error: ${result.reason}`);
+						console.error(`❌ Batch processing error: ${result.reason}`);
 					}
 				});
 
 				await this.UpdateIndexingBatch(batchId, {
 					videosProcessed: batch.videosProcessed,
 					videosSuccessful: batch.videosSuccessful,
+					videosSkipped: batch.videosSkipped + skippedCount,
 					videosFailed: batch.videosFailed,
 					errors: batch.errors
 				});
@@ -258,14 +327,37 @@ export class AAGVideoService extends FirestoreService {
 					await this.delay(2000);
 				}
 			}, Promise.resolve());
+
+			const finalCount = await this.GetAAGVideoCount();
+			const newVideosAdded = finalCount - initialCount;
+			batch.videosSkipped += skippedCount;
+
 			batch.endTime = new Date();
 			batch.status = batch.videosFailed === 0 ? 'completed' : 'failed';
+
+			console.log(`📊 Indexing completed - Final AAG video collection count: ${finalCount}`);
+			console.log(`✨ New videos added to collection: ${newVideosAdded}`);
+			console.log(`📈 Collection growth: ${initialCount} → ${finalCount} (+${newVideosAdded})`);
+			console.log('📋 Batch Summary:');
+			console.log(`  • Total processed: ${batch.videosProcessed}`);
+			console.log(`  • ✅ New videos indexed: ${batch.videosSuccessful}`);
+			console.log(`  • ⏭️  Existing videos skipped: ${batch.videosSkipped}`);
+			console.log(`  • ❌ Failed: ${batch.videosFailed}`);
+			if (batch.videosProcessed > 0) {
+				console.log(
+					`🎯 Efficiency: ${batch.videosSkipped}/${batch.videosProcessed + batch.videosSkipped} videos already existed (${(
+						(batch.videosSkipped / (batch.videosProcessed + batch.videosSkipped)) *
+						100
+					).toFixed(1)}% skip rate)`
+				);
+			}
 
 			await this.UpdateIndexingBatch(batchId, {
 				endTime: batch.endTime,
 				status: batch.status,
 				videosProcessed: batch.videosProcessed,
 				videosSuccessful: batch.videosSuccessful,
+				videosSkipped: batch.videosSkipped,
 				videosFailed: batch.videosFailed,
 				errors: batch.errors
 			});
@@ -386,6 +478,11 @@ export class AAGVideoService extends FirestoreService {
 				return data as IAAGVideoMetadata;
 			})
 			.filter((item): item is IAAGVideoMetadata => item !== null);
+	}
+
+	static async GetAAGVideoCount(): Promise<number> {
+		const snapshot = await this.aagVideoMetadataCollectionRef().where('isIndexed', '==', true).get();
+		return snapshot.size;
 	}
 
 	private static ProcessVideoTranscript(videoData: IAAGVideoData): { language: string; captions: Array<{ start: number; dur: number; text: string }> } {
