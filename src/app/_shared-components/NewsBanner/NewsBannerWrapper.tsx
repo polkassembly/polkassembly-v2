@@ -13,7 +13,7 @@ function NewsBannerWrapper() {
 	const pathname = usePathname();
 	const network = getCurrentNetwork();
 
-	if (network !== ENetwork.POLKADOT) {
+	if (network !== ENetwork.POLKADOT && network !== ENetwork.KUSAMA) {
 		return null;
 	}
 
