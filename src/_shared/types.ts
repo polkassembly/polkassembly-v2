@@ -1725,29 +1725,6 @@ export interface IYouTubeVideoMetadata {
 	chapters?: IYouTubeChapter[];
 }
 
-export interface IYouTubePlaylistMetadata {
-	id: string;
-	title: string;
-	description: string;
-	publishedAt: string;
-	channelId: string;
-	channelTitle: string;
-	thumbnails: {
-		default?: IYouTubeThumbnail;
-		medium?: IYouTubeThumbnail;
-		high?: IYouTubeThumbnail;
-		standard?: IYouTubeThumbnail;
-		maxres?: IYouTubeThumbnail;
-	};
-	itemCount: number;
-	videos: IYouTubeVideoMetadata[];
-	url: string;
-}
-
-export interface IReferendaItem {
-	referendaNo: string;
-}
-
 export interface IYouTubeChapter {
 	id: string;
 	title: string;
@@ -1755,4 +1732,51 @@ export interface IYouTubeChapter {
 	start: number;
 	description?: string;
 	duration?: string;
+}
+
+export interface IAAGVideoSummary {
+	id: string;
+	title: string;
+	thumbnail: string;
+	referenda: { referendaNo: string }[];
+	publishedAt: string;
+	duration: string;
+	agendaUrl: string;
+	network: string | null;
+	url: string;
+}
+
+export interface IAAGVideoMetadata {
+	id: string;
+	title: string;
+	publishedAt: Date;
+	duration: string;
+	description: string;
+	thumbnail: string;
+	url: string;
+	network: ENetwork | null;
+	viewCount: number;
+	likeCount: number;
+	commentCount?: number;
+	agendaUrl?: string;
+	aiSummary: string;
+	referenda?: { referendaNo: string }[];
+	chapters: Array<{
+		id: string;
+		title: string;
+		startTime: number;
+		endTime: number;
+		description?: string;
+	}>;
+	transcript: {
+		language: string;
+		captions: Array<{
+			start: number;
+			dur: number;
+			text: string;
+		}>;
+	};
+	createdAt: Date;
+	updatedAt: Date;
+	isIndexed: boolean;
 }

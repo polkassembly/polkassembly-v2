@@ -6,7 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getSubtitles } from 'youtube-caption-extractor';
-import type { IYouTubeCaption, IYouTubeThumbnail, IYouTubeVideoMetadata, IYouTubePlaylistMetadata, IYouTubeChapter, IReferendaItem } from '@/_shared/types';
+import type { IYouTubeCaption, IYouTubeThumbnail, IYouTubeVideoMetadata, IYouTubeChapter } from '@/_shared/types';
 import { GOOGLE_API_KEY } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { GoogleSheetService } from './googlesheets_service';
@@ -15,6 +15,24 @@ if (!GOOGLE_API_KEY?.trim()) {
 	console.warn('\n ⚠️  Warning: GOOGLE_API_KEY is not set. YouTube video metadata will not be fetched.\n');
 }
 
+interface IYouTubePlaylistMetadata {
+	id: string;
+	title: string;
+	description: string;
+	publishedAt: string;
+	channelId: string;
+	channelTitle: string;
+	thumbnails: {
+		default?: IYouTubeThumbnail;
+		medium?: IYouTubeThumbnail;
+		high?: IYouTubeThumbnail;
+		standard?: IYouTubeThumbnail;
+		maxres?: IYouTubeThumbnail;
+	};
+	itemCount: number;
+	videos: IYouTubeVideoMetadata[];
+	url: string;
+}
 interface IYouTubeApiVideoResponse {
 	kind: string;
 	etag: string;
@@ -636,7 +654,7 @@ export class YouTubeService {
 		return GoogleSheetService.extractGid(url);
 	}
 
-	static async extractReferendaFromSheet(agendaUrl: string): Promise<IReferendaItem[]> {
+	static async extractReferendaFromSheet(agendaUrl: string): Promise<{ referendaNo: string }[]> {
 		try {
 			const sheetId = this.extractSheetId(agendaUrl);
 			const gid = this.extractGid(agendaUrl);
@@ -657,7 +675,7 @@ export class YouTubeService {
 				return [];
 			}
 
-			const referenda: IReferendaItem[] = [];
+			const referenda: { referendaNo: string }[] = [];
 
 			rows.forEach((row) => {
 				const values = Array.isArray(row) ? row : Object.values(row);

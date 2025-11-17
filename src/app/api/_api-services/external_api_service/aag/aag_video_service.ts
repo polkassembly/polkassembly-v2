@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { IYouTubeChapter, IYouTubeVideoMetadata, IYouTubeCaption, IReferendaItem, ENetwork } from '@/_shared/types';
+import { IYouTubeChapter, IYouTubeVideoMetadata, IYouTubeCaption, IAAGVideoSummary, IAAGVideoMetadata, ENetwork } from '@/_shared/types';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
 import { YouTubeService } from '../youtube_service';
 import { AIService } from '../../ai_service';
@@ -16,7 +16,7 @@ interface IAAGVideoData {
 	thumbnail: string;
 	url: string;
 	description: string;
-	referenda: IReferendaItem[];
+	referenda: { referendaNo: string }[];
 	publishedAt: string;
 	captions?: IYouTubeCaption[];
 	viewCount?: string;
@@ -25,41 +25,6 @@ interface IAAGVideoData {
 	tags?: string[];
 	agendaUrl?: string;
 	chapters?: IYouTubeChapter[];
-}
-
-interface IAAGVideoMetadata {
-	id: string;
-	title: string;
-	publishedAt: Date;
-	duration: string;
-	description: string;
-	thumbnail: string;
-	url: string;
-	network: ENetwork | null;
-	viewCount: number;
-	likeCount: number;
-	commentCount?: number;
-	agendaUrl?: string;
-	aiSummary: string;
-	referenda?: { referendaNo: string }[];
-	chapters: Array<{
-		id: string;
-		title: string;
-		startTime: number;
-		endTime: number;
-		description?: string;
-	}>;
-	transcript: {
-		language: string;
-		captions: Array<{
-			start: number;
-			dur: number;
-			text: string;
-		}>;
-	};
-	createdAt: Date;
-	updatedAt: Date;
-	isIndexed: boolean;
 }
 
 export class AAGVideoService extends FirestoreUtils {
@@ -387,6 +352,113 @@ export class AAGVideoService extends FirestoreUtils {
 
 	private static generateId(): string {
 		return `aag_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+	}
+
+	static async GetLatestAAGVideos(limit: number = 10): Promise<IAAGVideoMetadata[]> {
+		const snapshot = await this.aagVideoMetadataCollectionRef().where('isIndexed', '==', true).orderBy('publishedAt', 'desc').limit(limit).get();
+
+		return snapshot.docs
+			.map((doc) => {
+				const data = doc.data();
+				if (!data || typeof data.id !== 'string' || typeof data.title !== 'string') {
+					return null;
+				}
+
+				const processedData = {
+					...data,
+					publishedAt: data.publishedAt?.toDate ? data.publishedAt.toDate() : new Date(data.publishedAt || Date.now()),
+					createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+					updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now())
+				};
+
+				return processedData as IAAGVideoMetadata;
+			})
+			.filter((item): item is IAAGVideoMetadata => item !== null);
+	}
+
+	static async SearchAAGVideosByTitle(
+		searchQuery: string,
+		limit: number = 20,
+		sortBy: 'latest' | 'oldest' = 'latest',
+		network: ENetwork | null = null
+	): Promise<IAAGVideoMetadata[]> {
+		const sortOrder = sortBy === 'latest' ? 'desc' : 'asc';
+		const snapshot = await this.aagVideoMetadataCollectionRef().where('isIndexed', '==', true).orderBy('publishedAt', sortOrder).limit(200).get();
+
+		const searchTerms = searchQuery
+			.toLowerCase()
+			.split(' ')
+			.filter((term) => term.length > 2);
+
+		return snapshot.docs
+			.map((doc) => {
+				const data = doc.data();
+				if (!data || typeof data.id !== 'string' || typeof data.title !== 'string') {
+					return null;
+				}
+
+				const processedData = {
+					...data,
+					publishedAt: data.publishedAt?.toDate ? data.publishedAt.toDate() : new Date(data.publishedAt || Date.now()),
+					createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+					updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now())
+				};
+
+				return processedData as IAAGVideoMetadata;
+			})
+			.filter((item): item is IAAGVideoMetadata => item !== null)
+			.filter((video) => {
+				const title = video.title.toLowerCase();
+				const description = (video.description || '').toLowerCase();
+
+				return searchTerms.some((term) => title.includes(term) || description.includes(term));
+			})
+			.filter((video) => {
+				if (network === null) return true;
+				return video.network === network;
+			})
+			.slice(0, limit);
+	}
+
+	static async GetAAGVideosByReferenda(referendaId: string, limit: number = 20): Promise<IAAGVideoMetadata[]> {
+		const snapshot = await this.aagVideoMetadataCollectionRef()
+			.where('isIndexed', '==', true)
+			.where('referenda', 'array-contains', { referendaNo: referendaId })
+			.orderBy('publishedAt', 'desc')
+			.limit(limit)
+			.get();
+
+		return snapshot.docs
+			.map((doc) => {
+				const data = doc.data();
+				if (!data || typeof data.id !== 'string' || typeof data.title !== 'string') {
+					return null;
+				}
+
+				const processedData = {
+					...data,
+					publishedAt: data.publishedAt?.toDate ? data.publishedAt.toDate() : new Date(data.publishedAt || Date.now()),
+					createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+					updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now())
+				};
+
+				return processedData as IAAGVideoMetadata;
+			})
+			.filter((item): item is IAAGVideoMetadata => item !== null);
+	}
+
+	static formatAAGVideoSummary(video: IAAGVideoMetadata): IAAGVideoSummary {
+		return {
+			id: video.id,
+			title: video.title,
+			thumbnail: video.thumbnail,
+			referenda: video.referenda || [],
+			publishedAt: video.publishedAt.toISOString(),
+			duration: video.duration,
+			agendaUrl: video.agendaUrl || '',
+			network: video.network,
+			url: video.url
+		};
 	}
 
 	private static delay(ms: number): Promise<void> {
