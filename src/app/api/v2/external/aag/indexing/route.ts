@@ -36,7 +36,7 @@ export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResp
 		throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, validation.error.errors[0]?.message || 'Invalid request data');
 	}
 
-	const { action, videoId, maxVideos, startFrom, includeMetadata, includeCaptions, language } = validation.data;
+	const { action, videoId, maxVideos, includeCaptions } = validation.data;
 
 	switch (action) {
 		case EAAGIndexingAction.INDEX_VIDEO: {
@@ -49,23 +49,7 @@ export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResp
 				throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Video not found');
 			}
 
-			const aagVideoData = {
-				id: videoData.id,
-				title: videoData.title,
-				date: videoData.publishedAt,
-				duration: videoData.duration,
-				thumbnail: videoData.thumbnails?.medium?.url || videoData.thumbnails?.high?.url || '',
-				url: videoData.url,
-				description: videoData.description,
-				referenda: [],
-				publishedAt: videoData.publishedAt,
-				captions: videoData.captions,
-				viewCount: videoData.viewCount,
-				likeCount: videoData.likeCount,
-				commentCount: videoData.commentCount,
-				tags: videoData.tags
-			};
-
+			const aagVideoData = await AAGVideoService.ConvertYouTubeVideoToAAGFormat(videoData);
 			const result = await AAGVideoService.IndexVideoMetadata(aagVideoData);
 			return NextResponse.json(
 				{
@@ -84,10 +68,7 @@ export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResp
 
 			const indexingOptions = {
 				maxVideos: maxVideos || 50,
-				startFrom: startFrom || 0,
-				includeMetadata: includeMetadata ?? true,
-				includeCaptions: includeCaptions ?? true,
-				language: language || 'en'
+				skipExisting: true
 			};
 
 			const batch = await AAGVideoService.IndexPlaylistVideos(AAG_YOUTUBE_PLAYLIST_ID, indexingOptions);

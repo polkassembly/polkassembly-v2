@@ -506,267 +506,77 @@ export class YouTubeService {
 		}> = [];
 
 		const lines = description.split(/\n/);
+		const timestampPattern = /^(\d{1,2}):(\d{2})\s*[-–—]?\s*(.+)$/;
 
 		lines.forEach((line) => {
-			const trimmedLine = line.trim();
+			const match = line.trim().match(timestampPattern);
+			if (match) {
+				const [, minutesStr, secondsStr, title] = match;
+				const minutes = parseInt(minutesStr, 10);
+				const seconds = parseInt(secondsStr, 10);
+				const totalSeconds = minutes * 60 + seconds;
+				const timestamp = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-			const timestampPatterns = [/^(\d{1,2}):(\d{2})\s*[-–—]?\s*(.+)$/, /^\[(\d{1,2}):(\d{2})\]\s*(.+)$/, /^(\d{1,2}):(\d{2}):(\d{2})\s*[-–—]?\s*(.+)$/];
-
-			timestampPatterns.forEach((pattern) => {
-				const match = trimmedLine.match(pattern);
-				if (match) {
-					let minutes: number;
-					let seconds: number;
-					let title: string;
-
-					if (match.length === 4) {
-						minutes = parseInt(match[1], 10);
-						seconds = parseInt(match[2], 10);
-						title = match[3].trim();
-					} else if (match.length === 5) {
-						const hours = parseInt(match[1], 10);
-						minutes = parseInt(match[2], 10) + hours * 60;
-						seconds = parseInt(match[3], 10);
-						title = match[4].trim();
-					} else {
-						return;
-					}
-
-					if (!Number.isNaN(minutes) && !Number.isNaN(seconds) && title.length > 0) {
-						const totalSeconds = minutes * 60 + seconds;
-						const timestamp = `${Math.floor(totalSeconds / 60)}:${(totalSeconds % 60).toString().padStart(2, '0')}`;
-
-						title = title.replace(/^[-–—\s]+|[-–—\s]+$/g, '').trim();
-
-						if (title.length > 2) {
-							chapters.push({
-								id: (chapters.length + 1).toString(),
-								title: title.slice(0, 60),
-								timestamp,
-								start: totalSeconds,
-								description: 'Chapter from video description'
-							});
-						}
-					}
+				if (title.trim().length > 2) {
+					chapters.push({
+						id: (chapters.length + 1).toString(),
+						title: title.trim().slice(0, 60),
+						timestamp,
+						start: totalSeconds,
+						description: 'Chapter from video description'
+					});
 				}
-			});
+			}
 		});
 
-		const uniqueChapters = chapters.sort((a, b) => a.start - b.start).filter((chapter, index, arr) => index === 0 || chapter.start !== arr[index - 1].start);
-
-		return uniqueChapters.map((currentChapter, index) => {
-			const nextChapter = uniqueChapters[index + 1];
-			let duration: string | undefined;
-
+		return chapters.map((chapter, index) => {
+			const nextChapter = chapters[index + 1];
 			if (nextChapter) {
-				const durationTime = nextChapter.start - currentChapter.start;
+				const durationTime = nextChapter.start - chapter.start;
 				const durationMinutes = Math.floor(durationTime / 60);
 				const durationSeconds = Math.floor(durationTime % 60);
-				duration = `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
+				const duration = `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
+				return { ...chapter, duration };
 			}
-
-			return {
-				...currentChapter,
-				duration
-			};
+			return chapter;
 		});
 	}
 
 	static extractChaptersFromCaptions(captions: IYouTubeCaption[]): Array<IYouTubeChapter> {
-		if (!captions || captions.length === 0) return [];
+		if (!captions?.length) return [];
 
-		const chapters: Array<{
-			id: string;
-			title: string;
-			timestamp: string;
-			start: number;
-			description?: string;
-			duration?: string;
-		}> = [];
+		const totalDuration = captions[captions.length - 1]?.start || 0;
+		const segmentDuration = totalDuration / this.MAX_CHAPTERS;
+		const chapters: Array<IYouTubeChapter> = [];
 
-		const fullText = captions.map((cap) => cap.text).join(' ');
+		for (let i = 0; i < this.MAX_CHAPTERS; i += 1) {
+			const start = i * segmentDuration;
+			const end = (i + 1) * segmentDuration;
+			const minutes = Math.floor(start / 60);
+			const seconds = Math.floor(start % 60);
+			const timestamp = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-		const timestampPattern = /(\d{1,2}):(\d{2})/g;
-		const lines = fullText.split(/[.!?]\s+/);
+			const segmentCaptions = captions.filter((cap) => cap.start >= start && cap.start < end);
+			const segmentText = segmentCaptions
+				.slice(0, 5)
+				.map((cap) => cap.text)
+				.join(' ');
 
-		lines.forEach((line) => {
-			const timestampMatches = Array.from(line.matchAll(timestampPattern));
+			const title = segmentText.split(' ').slice(0, 3).join(' ').trim() || `Chapter ${i + 1}`;
 
-			if (timestampMatches.length > 0) {
-				timestampMatches.forEach((match) => {
-					const minutesStr = match[1];
-					const secondsStr = match[2];
-					const minutes = parseInt(minutesStr, 10);
-					const seconds = parseInt(secondsStr, 10);
-
-					if (!Number.isNaN(minutes) && !Number.isNaN(seconds)) {
-						const totalSeconds = minutes * 60 + seconds;
-						const timestamp = `${minutesStr}:${secondsStr}`;
-
-						let title = line.replace(match[0], '').trim();
-						title = title.replace(/[-–—]\s*$/, '').trim();
-						title = title.replace(/^\s*[-–—]\s*/, '').trim();
-
-						if (title.length > 3) {
-							chapters.push({
-								id: (chapters.length + 1).toString(),
-								title: title.slice(0, 50),
-								timestamp,
-								start: totalSeconds,
-								description: `Chapter starting at ${timestamp}`
-							});
-						}
-					}
-				});
-			}
-		});
-
-		if (chapters.length === 0) {
-			const significantBreaks = this.findContentBreaks(captions);
-			significantBreaks.forEach((breakPoint, index) => {
-				const minutes = Math.floor(breakPoint.start / 60);
-				const seconds = Math.floor(breakPoint.start % 60);
-				const timestamp = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-				chapters.push({
-					id: (index + 1).toString(),
-					title: breakPoint.title || `Chapter ${index + 1}`,
-					timestamp,
-					start: breakPoint.start,
-					description: breakPoint.description
-				});
+			chapters.push({
+				id: (i + 1).toString(),
+				title: title.slice(0, 50),
+				timestamp,
+				start,
+				description: `Chapter ${i + 1}`,
+				duration: `${Math.floor(segmentDuration / 60)}:${Math.floor(segmentDuration % 60)
+					.toString()
+					.padStart(2, '0')}`
 			});
 		}
 
-		const chaptersWithDuration = chapters.map((currentChapter, index) => {
-			const nextChapter = chapters[index + 1];
-			let duration: string | undefined;
-
-			if (nextChapter) {
-				const durationTime = nextChapter.start - currentChapter.start;
-				const durationMinutes = Math.floor(durationTime / 60);
-				const durationSeconds = Math.floor(durationTime % 60);
-				duration = `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
-			} else {
-				const lastCaption = captions[captions.length - 1];
-				if (lastCaption) {
-					const durationTime = lastCaption.start + lastCaption.dur - currentChapter.start;
-					const durationMinutes = Math.floor(durationTime / 60);
-					const durationSeconds = Math.floor(durationTime % 60);
-					duration = `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
-				}
-			}
-
-			return {
-				...currentChapter,
-				duration
-			};
-		});
-
-		const uniqueChapters = chaptersWithDuration.filter((chapter, index, arr) => index === 0 || Math.abs(chapter.start - arr[index - 1].start) > 30);
-
-		return uniqueChapters.sort((a, b) => a.start - b.start).slice(0, this.MAX_CHAPTERS);
-	}
-
-	private static findContentBreaks(captions: IYouTubeCaption[]): Array<{
-		start: number;
-		title?: string;
-		description?: string;
-	}> {
-		const breaks: Array<{ start: number; title?: string; description?: string }> = [];
-
-		breaks.push({
-			start: 0,
-			title: 'Introduction',
-			description: 'Video introduction and overview'
-		});
-
-		const keywordTriggers = [
-			'welcome',
-			'introduction',
-			'overview',
-			'agenda',
-			'today',
-			'first',
-			'second',
-			'third',
-			'next',
-			'now',
-			'moving on',
-			"let's talk about",
-			"let's discuss",
-			"let's look at",
-			'treasury',
-			'governance',
-			'referendum',
-			'proposal',
-			'voting',
-			'question',
-			'answer',
-			'q&a',
-			'summary',
-			'conclusion',
-			'wrap up'
-		];
-
-		let lastBreakTime = 0;
-		const minBreakInterval = this.MIN_CHAPTER_INTERVAL * 10;
-
-		captions.forEach((caption) => {
-			const text = caption.text.toLowerCase();
-			const timeSinceLastBreak = caption.start - lastBreakTime;
-
-			if (timeSinceLastBreak > minBreakInterval) {
-				const foundKeyword = keywordTriggers.find((keyword) => text.includes(keyword));
-
-				if (foundKeyword) {
-					let title = 'Chapter';
-					const words = text.split(' ');
-					const keywordIndex = words.findIndex((word) => word.includes(foundKeyword));
-
-					if (keywordIndex >= 0 && keywordIndex < words.length - 2) {
-						const contextWords = words.slice(keywordIndex, Math.min(keywordIndex + 4, words.length));
-						title = contextWords
-							.join(' ')
-							.replace(/[^\w\s]/g, '')
-							.trim();
-						title = title.charAt(0).toUpperCase() + title.slice(1);
-					}
-
-					const minutes = Math.floor(caption.start / 60);
-					const seconds = Math.floor(caption.start % 60);
-					const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-					breaks.push({
-						start: caption.start,
-						title: title || `Section at ${timeString}`,
-						description: `Content section starting at ${timeString}`
-					});
-
-					lastBreakTime = caption.start;
-				}
-			}
-		});
-
-		if (breaks.length < 3 && captions.length > 0) {
-			const totalDuration = captions[captions.length - 1]?.start || 0;
-			const intervalDuration = totalDuration / 4;
-
-			const additionalBreaks = [];
-			for (let i = 1; i < 4; i += 1) {
-				const breakTime = intervalDuration * i;
-				if (!breaks.some((b) => Math.abs(b.start - breakTime) < 120)) {
-					additionalBreaks.push({
-						start: breakTime,
-						title: `Part ${i + 1}`,
-						description: `Video section ${i + 1}`
-					});
-				}
-			}
-			breaks.push(...additionalBreaks);
-		}
-
-		return breaks.slice(0, this.MAX_CHAPTERS);
+		return chapters;
 	}
 
 	static isYouTubeUrl(url: string): { isValid: boolean; type: 'video' | 'playlist' | null } {
