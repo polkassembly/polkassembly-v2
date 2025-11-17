@@ -1687,3 +1687,148 @@ export interface IChatResponse {
 	isNewConversation?: boolean;
 	conversationId?: string;
 }
+
+export interface IYouTubeCaption {
+	start: number;
+	dur: number;
+	text: string;
+}
+
+export interface IYouTubeThumbnail {
+	url: string;
+	width: number;
+	height: number;
+}
+
+export interface IYouTubeVideoMetadata {
+	id: string;
+	title: string;
+	description: string;
+	thumbnails: {
+		default?: IYouTubeThumbnail;
+		medium?: IYouTubeThumbnail;
+		high?: IYouTubeThumbnail;
+		standard?: IYouTubeThumbnail;
+		maxres?: IYouTubeThumbnail;
+	};
+	publishedAt: string;
+	channelId: string;
+	channelTitle: string;
+	duration: string;
+	viewCount?: string;
+	likeCount?: string;
+	commentCount?: string;
+	url: string;
+	captions?: IYouTubeCaption[];
+	tags?: string[];
+	agendaUrl?: string;
+	chapters?: IYouTubeChapter[];
+}
+
+export interface IYouTubePlaylistMetadata {
+	id: string;
+	title: string;
+	description: string;
+	publishedAt: string;
+	channelId: string;
+	channelTitle: string;
+	thumbnails: {
+		default?: IYouTubeThumbnail;
+		medium?: IYouTubeThumbnail;
+		high?: IYouTubeThumbnail;
+		standard?: IYouTubeThumbnail;
+		maxres?: IYouTubeThumbnail;
+	};
+	itemCount: number;
+	videos: IYouTubeVideoMetadata[];
+	url: string;
+}
+
+export interface IReferendaItem {
+	referendaNo: string;
+}
+
+export interface IAAGVideoData {
+	id: string;
+	title: string;
+	date: string;
+	duration: string;
+	thumbnail: string;
+	url: string;
+	description: string;
+	referenda: IReferendaItem[];
+	publishedAt: string;
+	captions?: IYouTubeCaption[];
+	viewCount?: string;
+	likeCount?: string;
+	commentCount?: string;
+	tags?: string[];
+	agendaUrl?: string;
+	chapters?: IYouTubeChapter[];
+}
+
+export interface IAAGPlaylistData {
+	id: string;
+	title: string;
+	description: string;
+	url: string;
+	channelTitle: string;
+	publishedAt: string;
+	itemCount: number;
+	videos: IAAGVideoData[];
+}
+
+export interface IYouTubeChapter {
+	id: string;
+	title: string;
+	timestamp: string;
+	start: number;
+	description?: string;
+	duration?: string;
+}
+
+export interface ITranscriptSegment {
+	text: string;
+	offset: number;
+	duration: number;
+}
+
+export interface ITranscriptData {
+	transcript: ITranscriptSegment[];
+	summary: string | null;
+}
+
+export interface IAAGVideoMetadata {
+	id: string;
+	title: string;
+	publishedAt: Date;
+	duration: string;
+	description: string;
+	thumbnail: string;
+	url: string;
+	network: ENetwork | null;
+	viewCount: number;
+	likeCount: number;
+	commentCount?: number;
+	agendaUrl?: string;
+	aiSummary: string;
+	referenda?: { referendaNo: string }[];
+	chapters: Array<{
+		id: string;
+		title: string;
+		startTime: number;
+		endTime: number;
+		description?: string;
+	}>;
+	transcript: {
+		language: string;
+		captions: Array<{
+			start: number;
+			dur: number;
+			text: string;
+		}>;
+	};
+	createdAt: Date;
+	updatedAt: Date;
+	isIndexed: boolean;
+}
