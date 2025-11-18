@@ -261,6 +261,28 @@ export class OffChainDbService {
 		return buildCommentTree(null);
 	}
 
+	static async GetAllNetworkComments({ network, page, limit }: { network: ENetwork; page: number; limit: number }): Promise<IGenericListingResponse<ICommentResponse>> {
+		const commentsResponse = await FirestoreService.GetAllNetworkComments({ network, page, limit });
+
+		// Get reactions for each comment
+		const commentsWithReactions: ICommentResponse[] = await Promise.all(
+			commentsResponse.items.map(async (comment) => {
+				const reactions = await this.GetCommentReactions({
+					network,
+					indexOrHash: comment.indexOrHash,
+					proposalType: comment.proposalType,
+					id: comment.id
+				});
+				return { ...comment, reactions };
+			})
+		);
+
+		return {
+			...commentsResponse,
+			items: commentsWithReactions
+		};
+	}
+
 	static async GetCommentById(id: string): Promise<IComment | null> {
 		return FirestoreService.GetCommentById(id);
 	}
