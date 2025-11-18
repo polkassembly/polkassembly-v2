@@ -18,7 +18,7 @@ import PolkadotLogo from '@/_assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@/_assets/parachain-logos/kusama-logo.gif';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import { Separator } from '@/app/_shared-components/Separator';
-import { useAAGVideoById, useAAGVideos, useChapterAutoScroll, useYouTubePlayer } from '@/hooks/useAAGVideos';
+import { useAAGVideoById, useAAGVideos, useYouTubePlayer } from '@/hooks/useAAGVideos';
 import RequestToPresentModal from '../Components/RequestToPresentModal';
 import AAGCard from '../Components/AAGCard';
 import VideoList from '../Components/VideoList';
@@ -52,8 +52,7 @@ function VideoDetailPage() {
 	const chaptersContainerRef = useRef<HTMLDivElement>(null);
 	const activeChapterRef = useRef<HTMLButtonElement>(null);
 
-	const { setShouldAutoScroll: setShouldAutoScrollChapters, scrollToChapter, enableAutoScroll } = useChapterAutoScroll(chaptersContainerRef);
-	const { currentVideoTime, isVideoPlaying, seekToTime } = useYouTubePlayer(currentVideoId || '', playerRef);
+	const { currentVideoTime, seekToTime } = useYouTubePlayer(currentVideoId || '', playerRef);
 
 	const { data: videoMetadata } = useAAGVideoById({
 		videoId: currentVideoId || '',
@@ -108,10 +107,34 @@ function VideoDetailPage() {
 	}, [relatedVideosData?.items, currentVideoId]);
 
 	const activeChapterIndex = useMemo(() => {
-		return videoChaptersList.findIndex((chapterData, index) => {
-			const nextChapter = videoChaptersList[index + 1];
-			return currentVideoTime >= chapterData.start && (!nextChapter || currentVideoTime < nextChapter.start);
-		});
+		if (!videoChaptersList.length) {
+			return -1;
+		}
+
+		if (currentVideoTime <= 0) {
+			return 0;
+		}
+
+		let foundIndex = -1;
+		for (let i = 0; i < videoChaptersList.length; i += 1) {
+			const currentChapter = videoChaptersList[i];
+			const nextChapter = videoChaptersList[i + 1];
+
+			if (currentVideoTime >= currentChapter.start && (!nextChapter || currentVideoTime < nextChapter.start)) {
+				foundIndex = i;
+				break;
+			}
+		}
+
+		if (foundIndex === -1 && videoChaptersList.length > 0) {
+			if (currentVideoTime < videoChaptersList[0].start) {
+				foundIndex = 0;
+			} else {
+				foundIndex = videoChaptersList.length - 1;
+			}
+		}
+
+		return foundIndex;
 	}, [currentVideoTime, videoChaptersList]);
 
 	useEffect(() => {
@@ -156,24 +179,35 @@ function VideoDetailPage() {
 	const handleVideoChapterClick = useCallback(
 		(chapterStartTime?: number) => {
 			if (chapterStartTime !== undefined) {
-				enableAutoScroll();
 				seekToTime(chapterStartTime);
-				setTimeout(() => {
-					setShouldAutoScrollChapters(true);
-				}, 100);
 			}
 		},
-		[seekToTime, setShouldAutoScrollChapters, enableAutoScroll]
+		[seekToTime]
 	);
 
 	useEffect(() => {
-		if (activeChapterRef.current && activeChapterIndex >= 0) {
-			if (process.env.NODE_ENV === 'development') {
-				console.log('Auto-scrolling to chapter:', activeChapterIndex, 'at time:', currentVideoTime);
-			}
-			scrollToChapter(activeChapterRef.current);
-		}
-	}, [activeChapterIndex, scrollToChapter, currentVideoTime]);
+		if (!chaptersContainerRef.current || !activeChapterRef.current || activeChapterIndex < 0) return undefined;
+
+		const scrollTimeout = setTimeout(() => {
+			const container = chaptersContainerRef.current;
+			const activeElement = activeChapterRef.current;
+			if (!container || !activeElement) return;
+
+			const containerRect = container.getBoundingClientRect();
+			const elementRect = activeElement.getBoundingClientRect();
+			const padding = 10;
+
+			const delta = elementRect.top - containerRect.top;
+			const targetTop = container.scrollTop + delta - padding;
+
+			container.scrollTo({
+				top: Math.max(0, targetTop),
+				behavior: 'smooth'
+			});
+		}, 50);
+
+		return () => clearTimeout(scrollTimeout);
+	}, [activeChapterIndex]);
 
 	if (!selectedVideo) {
 		return (
@@ -234,18 +268,12 @@ function VideoDetailPage() {
 								<iframe
 									ref={playerRef}
 									id='youtube-player'
-									src={`https://www.youtube.com/embed/${currentVideoId}?enablejsapi=1&autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
+									src={`https://www.youtube.com/embed/${currentVideoId}?enablejsapi=1&autoplay=1&rel=0&origin=${window.location.origin}`}
 									title={selectedVideo.title}
 									className='absolute inset-0 h-full w-full'
 									allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
 									allowFullScreen
 								/>
-								{/* Debug info - remove in production */}
-								{process.env.NODE_ENV === 'development' && (
-									<div className='absolute bottom-4 left-4 rounded bg-black/70 p-2 font-mono text-xs text-white'>
-										Time: {currentVideoTime.toFixed(1)}s | Playing: {isVideoPlaying ? 'Yes' : 'No'} | Active Chapter: {activeChapterIndex}
-									</div>
-								)}
 							</div>{' '}
 							<div className='p-3 sm:p-4 md:p-6'>
 								<div className='mb-4 flex w-full flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
@@ -353,7 +381,6 @@ function VideoDetailPage() {
 												loading={false}
 												currentTime={currentVideoTime}
 												onSeek={seekToTime}
-												isPlaying={isVideoPlaying}
 											/>
 										</div>
 									) : null}

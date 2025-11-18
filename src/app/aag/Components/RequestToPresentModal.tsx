@@ -157,12 +157,16 @@ function RequestToPresentModal({ isOpen, onClose }: RequestToPresentModalProps) 
 				submitData.append('supportingFile', formData.supportingFile);
 			}
 
-			await NextApiClientService.postAAGRequest(submitData);
+			const { data, error } = await NextApiClientService.postAAGRequest(submitData);
+
+			if (error) {
+				throw new Error(error.message || 'Failed to submit request');
+			}
 
 			toast({
 				status: ENotificationStatus.SUCCESS,
 				title: t('requestSubmitted'),
-				description: t('requestSubmittedDescription')
+				description: data?.message || t('requestSubmittedDescription')
 			});
 
 			onClose();

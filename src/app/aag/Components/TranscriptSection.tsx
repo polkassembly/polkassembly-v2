@@ -2,12 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { useRef, useEffect, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAutoScroll } from '@/hooks/useAAGVideos';
-
-const INITIAL_TRANSCRIPT_DISPLAY_COUNT = 10;
 
 interface TranscriptSegment {
 	text: string;
@@ -20,19 +16,12 @@ interface TranscriptSectionProps {
 	loading?: boolean;
 	currentTime?: number;
 	onSeek?: (time: number) => void;
-	isPlaying?: boolean;
 }
 
-function TranscriptSection({ transcript, loading, currentTime = 0, onSeek, isPlaying = false }: TranscriptSectionProps) {
+function TranscriptSection({ transcript, loading, currentTime = 0, onSeek }: TranscriptSectionProps) {
 	const t = useTranslations('AAG');
-	const [isExpanded, setIsExpanded] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const activeSegmentRef = useRef<HTMLDivElement>(null);
-	const { setShouldAutoScroll, scrollToElement, enableAutoScroll } = useAutoScroll(containerRef);
-
-	const displayTranscript = useMemo(() => {
-		return isExpanded ? transcript : transcript.slice(0, INITIAL_TRANSCRIPT_DISPLAY_COUNT);
-	}, [isExpanded, transcript]);
 
 	const activeSegmentIndex = useMemo(() => {
 		return transcript.findIndex((segment, index) => {
@@ -51,32 +40,34 @@ function TranscriptSection({ transcript, loading, currentTime = 0, onSeek, isPla
 
 	const handleSeek = useCallback(
 		(offset: number) => {
-			// Enable auto-scroll when user clicks on a transcript segment
-			enableAutoScroll();
 			onSeek?.(offset);
-			// Small delay to ensure the seek happens before auto-scroll
-			setTimeout(() => {
-				setShouldAutoScroll(true);
-			}, 100);
 		},
-		[onSeek, setShouldAutoScroll, enableAutoScroll]
+		[onSeek]
 	);
 
 	useEffect(() => {
-		if (!isExpanded && activeSegmentIndex >= INITIAL_TRANSCRIPT_DISPLAY_COUNT) {
-			setIsExpanded(true);
-		}
-	}, [activeSegmentIndex, isExpanded]);
+		if (!containerRef.current || !activeSegmentRef.current || activeSegmentIndex < 0) return undefined;
 
-	useEffect(() => {
-		if (activeSegmentRef.current && activeSegmentIndex >= 0) {
-			// Debug logging in development
-			if (process.env.NODE_ENV === 'development') {
-				console.log('Auto-scrolling to transcript segment:', activeSegmentIndex, 'at time:', currentTime);
-			}
-			scrollToElement(activeSegmentRef.current);
-		}
-	}, [activeSegmentIndex, scrollToElement, currentTime]);
+		const scrollTimeout = setTimeout(() => {
+			const container = containerRef.current;
+			const activeElement = activeSegmentRef.current;
+			if (!container || !activeElement) return;
+
+			const containerRect = container.getBoundingClientRect();
+			const elementRect = activeElement.getBoundingClientRect();
+			const padding = 10;
+
+			const delta = elementRect.top - containerRect.top;
+			const targetTop = container.scrollTop + delta - padding;
+
+			container.scrollTo({
+				top: Math.max(0, targetTop),
+				behavior: 'smooth'
+			});
+		}, 50);
+
+		return () => clearTimeout(scrollTimeout);
+	}, [activeSegmentIndex]);
 
 	if (loading) {
 		return (
@@ -108,7 +99,7 @@ function TranscriptSection({ transcript, loading, currentTime = 0, onSeek, isPla
 				ref={containerRef}
 				className='max-h-64 space-y-1.5 overflow-auto'
 			>
-				{displayTranscript.map((segment) => {
+				{transcript.map((segment) => {
 					const isActive = transcript.indexOf(segment) === activeSegmentIndex;
 					return (
 						<div
@@ -131,27 +122,6 @@ function TranscriptSection({ transcript, loading, currentTime = 0, onSeek, isPla
 					);
 				})}
 			</div>
-			{transcript.length > INITIAL_TRANSCRIPT_DISPLAY_COUNT && !isPlaying && (
-				<button
-					type='button'
-					onClick={() => setIsExpanded(!isExpanded)}
-					className='bg-bg_grey mt-3 flex w-full items-center justify-center gap-1 rounded-lg border border-border_grey px-3 py-2 text-xs font-medium text-text_primary transition-colors hover:bg-opacity-80'
-				>
-					{isExpanded ? (
-						<>
-							<span>{t('viewLess')}</span>
-							<ChevronUp className='h-3 w-3' />
-						</>
-					) : (
-						<>
-							<span>
-								{t('viewMore')} ({transcript.length - INITIAL_TRANSCRIPT_DISPLAY_COUNT} {t('more')})
-							</span>
-							<ChevronDown className='h-3 w-3' />
-						</>
-					)}
-				</button>
-			)}
 		</div>
 	);
 }

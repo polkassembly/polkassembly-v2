@@ -534,6 +534,38 @@ export class NextApiClientService {
 		});
 	}
 
+	private static async nextApiClientFetchFormData<T>({
+		url,
+		method,
+		formData
+	}: {
+		url: URL;
+		method: Method;
+		formData: FormData;
+	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
+		const currentNetwork = await this.getCurrentNetwork();
+		const isMimir = await isMimirDetected();
+
+		const response = await fetch(url, {
+			body: formData,
+			credentials: 'include',
+			headers: {
+				...(!global.window ? await getCookieHeadersServer() : {}),
+				...(isMimir ? { 'x-iframe-context': 'mimir' } : {}),
+				[EHttpHeaderKey.API_KEY]: getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
+				[EHttpHeaderKey.NETWORK]: currentNetwork
+			},
+			method
+		});
+
+		const resJSON = await response.json();
+
+		if (response.status === StatusCodes.OK) {
+			return { data: resJSON as T, error: null };
+		}
+		return { data: null, error: resJSON as IErrorResponse };
+	}
+
 	// auth
 	protected static async refreshAccessTokenApi() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.REFRESH_ACCESS_TOKEN });
@@ -1573,15 +1605,10 @@ export class NextApiClientService {
 		});
 	}
 
-	static async postAAGRequest({ email, message }: { email: string; message: string }) {
+	static async postAAGRequest(formData: FormData) {
 		const { url, method } = await this.getRouteConfig({
 			route: EApiRoute.POST_AAG_REQUEST
 		});
-
-		return this.nextApiClientFetch<{ message: string }>({
-			url,
-			method,
-			data: { email, message }
-		});
+		return this.nextApiClientFetchFormData<{ success: boolean; message: string }>({ url, method, formData });
 	}
 }
