@@ -63,7 +63,10 @@ import {
 	IGovAnalyticsDelegationStats,
 	IGovAnalyticsCategoryCounts,
 	IConversationHistory,
-	IConversationMessage
+	IConversationMessage,
+	IAAGVideoSummary,
+	IAAGVideoMetadata,
+	ENetwork
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -164,7 +167,11 @@ enum EApiRoute {
 	GET_KLARA_STATS = 'GET_KLARA_STATS',
 	KLARA_SEND_FEEDBACK = 'KLARA_SEND_FEEDBACK',
 	KLARA_SEND_MESSAGE = 'KLARA_SEND_MESSAGE',
-	GET_GOOGLE_SHEET_NEWS = 'GET_GOOGLE_SHEET_NEWS'
+	GET_GOOGLE_SHEET_NEWS = 'GET_GOOGLE_SHEET_NEWS',
+	GET_AAG_VIDEO_BY_ID = 'GET_AAG_VIDEO_BY_ID',
+	GET_AAG_VIDEOS = 'GET_AAG_VIDEOS',
+	GET_AAG_VIDEO_BY_REFERENDUM = 'GET_AAG_VIDEO_BY_REFERENDUM',
+	POST_AAG_REQUEST = 'POST_AAG_REQUEST'
 }
 
 export class NextApiClientService {
@@ -406,6 +413,20 @@ export class NextApiClientService {
 
 			case EApiRoute.GET_GOOGLE_SHEET_NEWS:
 				path = '/external/news/google-sheets';
+				break;
+
+			case EApiRoute.GET_AAG_VIDEOS:
+				path = '/aag/videos';
+				break;
+			case EApiRoute.GET_AAG_VIDEO_BY_ID:
+				path = '/aag/videos';
+				break;
+			case EApiRoute.GET_AAG_VIDEO_BY_REFERENDUM:
+				path = '/aag/referenda';
+				break;
+			case EApiRoute.POST_AAG_REQUEST:
+				path = '/aag/request';
+				method = 'POST';
 				break;
 
 			default:
@@ -1488,6 +1509,79 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ data: T; success: boolean }>({
 			url,
 			method
+		});
+	}
+
+	static async getAAGVideos({ q, limit, sort, network }: { q?: string; limit?: number; sort?: 'latest' | 'oldest'; network?: ENetwork | null }) {
+		const queryParams = new URLSearchParams();
+
+		if (q) {
+			queryParams.set('q', q);
+		}
+
+		if (limit) {
+			queryParams.set('limit', limit.toString());
+		}
+
+		if (sort) {
+			queryParams.set('sort', sort);
+		}
+
+		if (network) {
+			queryParams.set('network', network);
+		}
+
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_AAG_VIDEOS,
+			queryParams
+		});
+
+		return this.nextApiClientFetch<IGenericListingResponse<IAAGVideoSummary>>({
+			url,
+			method
+		});
+	}
+
+	static async getAAGVideoById({ videoId }: { videoId: string }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_AAG_VIDEO_BY_ID,
+			routeSegments: [videoId]
+		});
+
+		return this.nextApiClientFetch<IAAGVideoMetadata | null>({
+			url,
+			method
+		});
+	}
+
+	static async getAAGVideosByReferendum({ referendaId, limit }: { referendaId: string; limit?: number }) {
+		const queryParams = new URLSearchParams();
+
+		if (limit) {
+			queryParams.set('limit', limit.toString());
+		}
+
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_AAG_VIDEO_BY_REFERENDUM,
+			routeSegments: [referendaId],
+			queryParams
+		});
+
+		return this.nextApiClientFetch<IGenericListingResponse<IAAGVideoSummary>>({
+			url,
+			method
+		});
+	}
+
+	static async postAAGRequest({ email, message }: { email: string; message: string }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.POST_AAG_REQUEST
+		});
+
+		return this.nextApiClientFetch<{ message: string }>({
+			url,
+			method,
+			data: { email, message }
 		});
 	}
 }
