@@ -22,7 +22,7 @@ import { useAtom } from 'jotai';
 import { delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import DelegateXBotGif from '@assets/delegation/delegationX.gif';
+import DelegateXBotGif from '@assets/delegation/klara/klara.gif';
 import DelegateSearchInput from './DelegateSearchInput/DelegateSearchInput';
 import styles from './TrendingDelegates.module.scss';
 import DelegateCard from './DelegateCard/DelegateCard';
