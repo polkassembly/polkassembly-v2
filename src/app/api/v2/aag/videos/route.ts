@@ -11,7 +11,7 @@ import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/l
 
 export const GET = withErrorHandling(async (req: NextRequest): Promise<NextResponse<IGenericListingResponse<IAAGVideoSummary>>> => {
 	const zodQuerySchema = z.object({
-		q: z.string().min(3, 'Search query must be at least 3 characters long'),
+		q: z.string().min(3, 'Search query must be at least 3 characters long').optional(),
 		limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT),
 		sort: z.enum(['latest', 'oldest']).optional().default('latest'),
 		network: z.nativeEnum(ENetwork).optional().nullable()
@@ -20,7 +20,13 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 	const searchParamsObject = Object.fromEntries(req.nextUrl.searchParams);
 	const { q: query, limit, sort: sortBy, network } = zodQuerySchema.parse(searchParamsObject);
 
-	const videos = await AAGVideoService.SearchAAGVideosByTitle(query, limit, sortBy, network);
+	let videos;
+
+	if (query) {
+		videos = await AAGVideoService.SearchAAGVideosByTitle(query, limit, sortBy, network);
+	} else {
+		videos = await AAGVideoService.GetLatestAAGVideos(limit);
+	}
 
 	const formattedVideos = videos.map((video) => AAGVideoService.formatAAGVideoSummary(video));
 
