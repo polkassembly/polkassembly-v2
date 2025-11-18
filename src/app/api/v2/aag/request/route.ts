@@ -6,9 +6,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { APIError } from '../../../../_api-utils/apiError';
-import { withErrorHandling } from '../../../../_api-utils/withErrorHandling';
-import { TelegramService } from '../../../../_api-services/external_api_service/telegram_service';
+import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { TelegramService } from '@/app/api/_api-services/external_api_service/telegram_service';
 
 const zodPresentationRequestSchema = z.object({
 	fullName: z.string().min(1, 'Full name is required'),
