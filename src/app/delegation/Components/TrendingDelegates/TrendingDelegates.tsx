@@ -186,7 +186,7 @@ function TrendingDelegates() {
 						<>
 							<div className='my-5 grid w-full grid-cols-1 items-stretch gap-5 lg:grid-cols-2'>
 								<DelegateXCard data={delegateXData} />
-								{orderedFilteredDelegates.map((delegate: IDelegateDetails) => (
+								{orderedFilteredDelegates.slice(0, 9).map((delegate: IDelegateDetails) => (
 									<DelegateCard
 										key={delegate.address}
 										delegate={delegate}
