@@ -151,6 +151,7 @@ export class PolkadotApiService {
 		}
 	}
 
+	// eslint-disable-next-line sonarjs/cognitive-complexity
 	private async executeTx({
 		tx,
 		address,
@@ -283,9 +284,25 @@ export class PolkadotApiService {
 				withSignedTransaction: true
 			};
 
+			let signerAddress = address;
+			if (selectedAccount?.accountType === EAccountType.MULTISIG) {
+				signerAddress = selectedAccount.parent?.address || '';
+			} else if (selectedAccount?.accountType === EAccountType.PROXY) {
+				if (selectedAccount.parent?.accountType === EAccountType.MULTISIG) {
+					signerAddress = selectedAccount.parent?.parent?.address || '';
+				} else {
+					signerAddress = selectedAccount.parent?.address || '';
+				}
+			}
+
+			if (!signerAddress) {
+				onFailed('Invalid account type');
+				return;
+			}
+
 			extrinsic
 				// eslint-disable-next-line sonarjs/cognitive-complexity
-				.signAndSend(address, signerOptions, async ({ status, events, txHash }) =>
+				.signAndSend(signerAddress, signerOptions, async ({ status, events, txHash }) =>
 					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
 				)
 				.catch((error: unknown) => {
