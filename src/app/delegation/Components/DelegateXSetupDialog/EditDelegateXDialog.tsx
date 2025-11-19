@@ -22,13 +22,15 @@ interface EditDelegateXDialogProps {
 
 function Card({ children, onClick }: { children: ReactNode; onClick: () => void }) {
 	return (
-		<button
-			type='button'
-			onClick={onClick}
-			className='flex h-full w-full cursor-pointer flex-col items-center gap-3 rounded-xl border border-border_grey bg-white p-6 text-left hover:border-text_pink'
-		>
-			{children}
-		</button>
+		<div className='group rounded-xl bg-gradient-to-b from-delegatebotx_border to-transparent p-[1px] transition-colors'>
+			<button
+				type='button'
+				onClick={onClick}
+				className='flex h-full w-full cursor-pointer flex-col items-center gap-3 rounded-xl border border-transparent bg-bg_modal p-6 text-left group-hover:border-text_pink'
+			>
+				{children}
+			</button>
+		</div>
 	);
 }
 
