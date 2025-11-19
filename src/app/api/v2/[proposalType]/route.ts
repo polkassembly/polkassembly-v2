@@ -13,6 +13,7 @@ import {
 	EDataSource,
 	EHttpHeaderKey,
 	EOffChainPostTopic,
+	EPollVotesType,
 	EPostOrigin,
 	EProposalStatus,
 	EProposalType,
@@ -28,6 +29,7 @@ import { z } from 'zod';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
+import { MAX_POLL_OPTION_LENGTH, MAX_POLL_OPTIONS_COUNT, MIN_POLL_OPTIONS_COUNT } from '@/_shared/_constants/pollLimits';
 import { APIError } from '../../_api-utils/apiError';
 import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
@@ -198,10 +200,21 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		content: z.string().min(1, 'Content is required'),
 		allowedCommentor: z.nativeEnum(EAllowedCommentor).optional().default(EAllowedCommentor.ALL),
 		tags: z.array(z.custom<ITag>()).optional(),
-		topic: z.nativeEnum(EOffChainPostTopic).optional().default(EOffChainPostTopic.GENERAL)
+		topic: z.nativeEnum(EOffChainPostTopic).optional().default(EOffChainPostTopic.GENERAL),
+		poll: z
+			.object({
+				title: z.string().min(1, 'Title is required'),
+				options: z
+					.array(z.string().max(MAX_POLL_OPTION_LENGTH, `Poll option must not exceed ${MAX_POLL_OPTION_LENGTH} characters`))
+					.min(MIN_POLL_OPTIONS_COUNT, `At least ${MIN_POLL_OPTIONS_COUNT} options are required`)
+					.max(MAX_POLL_OPTIONS_COUNT, `At most ${MAX_POLL_OPTIONS_COUNT} options are allowed`),
+				voteTypes: z.array(z.nativeEnum(EPollVotesType)).optional().default([]),
+				endsAt: z.coerce.date()
+			})
+			.optional()
 	});
 
-	const { content, title, allowedCommentor, topic, tags } = zodBodySchema.parse(await getReqBody(req));
+	const { content, title, allowedCommentor, topic, tags, poll } = zodBodySchema.parse(await getReqBody(req));
 
 	if (ValidatorService.isValidOnChainProposalType(proposalType) || !ValidatorService.isValidOffChainProposalType(proposalType)) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid proposal type, cannot create on-chain posts, you can only edit them.');
@@ -215,7 +228,8 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 		title,
 		tags: tags || [],
 		topic: topic || EOffChainPostTopic.GENERAL,
-		allowedCommentor
+		allowedCommentor,
+		poll
 	});
 
 	// Invalidate post listings since a new post was added

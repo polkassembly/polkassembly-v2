@@ -29,6 +29,7 @@ interface AddressProps {
 	textClassName?: string;
 	redirectToProfile?: boolean;
 	disableTooltip?: boolean;
+	showOnlyIdenticon?: boolean;
 	wrapperClassName?: string;
 }
 
@@ -42,6 +43,7 @@ function Address({
 	textClassName,
 	redirectToProfile,
 	disableTooltip = false,
+	showOnlyIdenticon = false,
 	wrapperClassName
 }: AddressProps) {
 	const network = getCurrentNetwork();
@@ -74,7 +76,9 @@ function Address({
 	useEffect(() => {
 		const initializeIdentity = async () => {
 			if (!encodedAddress) return;
-			setDisplayText(walletAddressName || shortenAddress(encodedAddress, truncateCharLen));
+			const initial = userData?.username || walletAddressName || shortenAddress(encodedAddress, truncateCharLen);
+
+			setDisplayText(initial);
 
 			try {
 				const identityInfo = await getOnChainIdentity(encodedAddress);
@@ -90,7 +94,7 @@ function Address({
 		};
 
 		initializeIdentity();
-	}, [encodedAddress, getOnChainIdentity, truncateCharLen, walletAddressName]);
+	}, [encodedAddress, getOnChainIdentity, truncateCharLen, walletAddressName, userData]);
 
 	if (disableTooltip) {
 		return (
@@ -104,6 +108,7 @@ function Address({
 				showIdenticon={showIdenticon}
 				textClassName={textClassName}
 				redirectToProfile={redirectToProfile}
+				showOnlyIdenticon={showOnlyIdenticon}
 			/>
 		);
 	}
@@ -124,6 +129,7 @@ function Address({
 								showIdenticon={showIdenticon}
 								textClassName={textClassName}
 								redirectToProfile={redirectToProfile}
+								showOnlyIdenticon={showOnlyIdenticon}
 							/>
 						</div>
 					</TooltipTrigger>

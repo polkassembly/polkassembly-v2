@@ -20,10 +20,8 @@ export const useWalletService = () => {
 		// Todo: reload(notification) if service is null;
 
 		const initWalletService = async () => {
-			if (apiService) {
-				const service = await WalletClientService.Init(network, apiService, identityService || undefined);
-				setWalletService(service);
-			}
+			const service = await WalletClientService.Init(network, apiService || undefined, identityService || undefined);
+			setWalletService(service);
 		};
 
 		initWalletService();

@@ -8,12 +8,48 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./src/intl/intlRequest.ts');
 
+// Change src/_shared/_constants/allowedOutboundIFrameDomains.ts if you change this
+export const ALLOWED_OUTBOUND_IFRAME_DOMAINS = ['https://app.mimir.global'];
+
+const NETWORKS = ['polkadot', 'kusama'];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+	// Enable standalone output for Docker deployments
+	output: 'standalone',
 	async headers() {
 		return [
 			{
-				// matching all API routes
+				// Comprehensive security headers for all pages
+				source: '/(.*)',
+				headers: [
+					{ key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+					{ key: 'X-XSS-Protection', value: '1; mode=block' },
+					{ key: 'X-Content-Type-Options', value: 'nosniff' },
+					{ key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+					{ key: 'Permissions-Policy', value: 'camera=self, microphone=(), geolocation=self' },
+					{
+						key: 'Content-Security-Policy',
+						value: [
+							"default-src 'self'",
+							"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.sentry-cdn.com",
+							"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+							"font-src 'self' https://fonts.gstatic.com",
+							"img-src 'self' data: blob: https:",
+							"media-src 'self' data: blob:",
+							"object-src 'none'",
+							"base-uri 'self'",
+							"form-action 'self'",
+							"connect-src 'self' https://api.github.com https://*.polkassembly.io https://*.firebaseapp.com https://*.googleapis.com https://sentry.io https://o4504609384013824.ingest.sentry.io wss: https://www.google-analytics.com https://*.algolia.net https://*.algolianet.com https://*.algolia.io https://api.imgbb.com https://www.googletagmanager.com",
+							`frame-src 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')}`,
+							`frame-ancestors 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')}`,
+							'upgrade-insecure-requests'
+						].join('; ')
+					}
+				]
+			},
+			{
+				// Additional headers for API routes
 				source: '/api/:path*',
 				headers: [
 					{ key: 'Access-Control-Allow-Credentials', value: 'true' },
@@ -23,62 +59,51 @@ const nextConfig = {
 						key: 'Access-Control-Allow-Headers',
 						value: '*'
 					},
-					{ key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-					{ key: 'X-XSS-Protection', value: '1; mode=block' },
-					{ key: 'X-Content-Type-Options', value: 'nosniff' },
-					{ key: 'Content-Security-Policy', value: "default-src 'self'; img-src '*' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';" },
 					{ key: 'Cache-Control', value: 's-maxage=60, stale-while-revalidate=59' }
 				]
 			}
 		];
 	},
 	async redirects() {
+		const ARCHIVE_ROUTES = ['proposal', 'referendum', 'treasury', 'tip', 'motion', 'tech'];
+
+		const dynamicNetworkRedirects = NETWORKS.flatMap((network) =>
+			ARCHIVE_ROUTES.map((route) => ({
+				source: `/${route}/:id`,
+				has: [
+					{
+						type: 'host',
+						value: `${network}.polkassembly.io`
+					}
+				],
+				destination: `https://${network}-old.polkassembly.io/${route}/:id`,
+				permanent: true
+			}))
+		);
+
 		return [
 			{
 				source: '/opengov',
 				destination: '/',
 				permanent: true
 			},
-			// Archive proposal types redirects
-			{
-				source: '/proposal/:id',
-				destination: 'https://polkadot-old.polkassembly.io/proposal/:id',
-				permanent: true
-			},
-			{
-				source: '/referendum/:id',
-				destination: 'https://polkadot-old.polkassembly.io/referendum/:id',
-				permanent: true
-			},
-			{
-				source: '/treasury/:id',
-				destination: 'https://polkadot-old.polkassembly.io/treasury/:id',
-				permanent: true
-			},
-			{
-				source: '/tip/:id',
-				destination: 'https://polkadot-old.polkassembly.io/tip/:id',
-				permanent: true
-			},
-			{
-				source: '/motion/:id',
-				destination: 'https://polkadot-old.polkassembly.io/motion/:id',
-				permanent: true
-			},
-			{
-				source: '/tech/:id',
-				destination: 'https://polkadot-old.polkassembly.io/tech/:id',
-				permanent: true
-			}
+			// Archive proposal types redirects (host-conditional per network)
+			...dynamicNetworkRedirects
 		];
 	},
 	async rewrites() {
-		return [
-			{
-				source: '/api/v1/:path*',
-				destination: 'https://polkadot-old.polkassembly.io/api/v1/:path*'
-			}
-		];
+		const dynamicNetworkRewrites = NETWORKS.map((network) => ({
+			source: '/api/v1/:path*',
+			has: [
+				{
+					type: 'host',
+					value: `${network}.polkassembly.io`
+				}
+			],
+			destination: `https://${network}-old.polkassembly.io/api/v1/:path*`
+		}));
+
+		return [...dynamicNetworkRewrites];
 	},
 	images: {
 		remotePatterns: [
@@ -88,6 +113,11 @@ const nextConfig = {
 				pathname: '/**'
 			}
 		]
+	},
+	// Experimental features for better performance
+	experimental: {
+		// Optimize for both Vercel and Cloud Run
+		optimizePackageImports: ['@polkadot/api', '@polkadot/util', 'firebase-admin']
 	}
 };
 

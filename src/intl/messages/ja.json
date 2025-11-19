@@ -27,7 +27,8 @@
 		"bounties": "報奨金",
 		"ambassador": "アンバサダー",
 		"loans": "ローン",
-		"address": "アドレス"
+		"address": "アドレス",
+		"assets": "資産"
 	},
 	"ActivityFeed": {
 		"title": "アクティビティフィード",
@@ -37,9 +38,6 @@
 		"About": "概要",
 		"AboutDescription": "Polkadotは、Polkadotのオールインワンのデファイハブです。",
 		"KnowMore": "詳細を見る",
-		"VotedProposals": "投票済み提案",
-		"ActiveProposals": "アクティブな提案",
-		"Last15Days": "過去15日間",
 		"Rank": "ランク",
 		"BatchVoting": "一括投票",
 		"BatchVotingDescription": "単一のトランザクションでトップ提案に投票",
@@ -97,23 +95,28 @@
 	},
 	"AddressDropdown": {
 		"fallbackText": "ウォレットを選択してください",
-		"chooseLinkedAccount": "リンクされたアカウントを選択",
+		"chooseLinkedAccount": "アカウントを選択",
 		"noAccountsFound": "アカウントが見つかりません",
 		"selectWallet": "ウォレットを選択してください",
-		"fetchingAddresses": "アドレスを取得するには、Polkassemblyがウォレット拡張機能へのアクセスを必要とします。このトランザクションを承認してください。",
+		"fetchingAddresses": "アドレスを取得するには、Polkassemblyがウォレット拡張機能にアクセスする必要があります。このトランザクションを承認してください。",
 		"goBack": "戻る",
 		"gotIt": "了解",
-		"hidePassword": "パスワードを隠す",
+		"hidePassword": "パスワードを非表示",
 		"showPassword": "パスワードを表示",
-		"pleaseConnectWallet": "Polkassemblyにウォレットを接続してください。",
-		"pleaseCheckConnectedAccounts": "拡張機能で接続されたアカウントを確認してください。"
+		"pleaseConnectWallet": "ウォレットをPolkassemblyに接続してください。",
+		"pleaseCheckConnectedAccounts": "拡張機能で接続されているアカウントを確認してください。",
+		"scanYourAddressQr": "アドレスQRコードをスキャン",
+		"scanYourAddressQrDescription1": "Polkadot Vaultアプリにログインしてください。",
+		"scanYourAddressQrDescription2": "{network}のアドレスQRコードをスキャンしてください。",
+		"linkedAccount": "リンクされたアカウント"
 	},
 	"AddressRelationsPicker": {
 		"Switch": "切り替え",
 		"switchWallet": "ウォレットを切り替え",
 		"noData": "データがありません",
 		"found": "見つかりました",
-		"confirm": "確認"
+		"confirm": "確認",
+		"noAccountSelected": "アカウントを選択"
 	},
 	"CreateProposalDropdownButton": {
 		"treasuryProposal": "財務提案",
@@ -130,6 +133,8 @@
 		"contentWillBeAvailableSoon": "コンテンツはまもなく利用可能になります..."
 	},
 	"Profile": {
+		"noAddresses": "リンクされたアドレスが見つかりません",
+		"blacklistWarning": "このユーザーアカウントはコミュニティガイドライン違反のためフラグが立てられています。",
 		"settings": "設定",
 		"login": "ログイン",
 		"loginFailed": "ログインに失敗しました",
@@ -163,10 +168,12 @@
 		"on": "日時",
 		"judgements": "判定",
 		"since": "日時",
+		"noJudgements": "判定がありません",
+		"judgement": "判定",
 		"Delegations": {
 			"noDelegations": "委任が見つかりません",
 			"delegation": "委任",
-			"receivedDelegations": "受け取った委任",
+			"delegators": "委任者",
 			"delegatedDelegations": "委任した委任",
 			"delegatedBy": "委任した",
 			"delegatedTo": "委任された",
@@ -179,6 +186,21 @@
 			"CA": "CA",
 			"CO": "CO",
 			"index": "インデックス"
+		},
+		"Votes": {
+			"noData": "投票が見つかりません",
+			"votes": "投票",
+			"proposal": "提案",
+			"voteFor": "投票する",
+			"voter": "投票者",
+			"action": "アクション",
+			"status": "ステータス",
+			"showMore": "もっと表示",
+			"showLess": "表示を減らす",
+			"selectAddresses": "アドレスを選択",
+			"votedProposals": "投票済み提案",
+			"activeProposals": "アクティブな提案",
+			"last15Days": "過去15日間"
 		},
 		"Activity": {
 			"voted_on_proposal": "投票済み",
@@ -427,13 +449,25 @@
 		"Treasury": "財務",
 		"LeaseAdmin": "リース管理者",
 		"GeneralAdmin": "一般管理者",
+		"chatWithKlara": "Klaraとチャット",
+		"klaraDesc": "AIチャットボット",
+		"more": "もっと",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "分析",
+		"treasuryAnalytics": "財務分析",
+		"proxies": "プロキシ",
 		"Tag": {
 			"new": "新規"
 		}
 	},
 	"PostDetails": {
+		"selectYourVoterAddress": "投票者アドレスを選択",
+		"address": "アドレス",
 		"castVote": "投票する",
+		"changeVote": "投票を変更する",
+		"myVote": "私の投票",
 		"castYourVote": "投票してください",
+		"copyLink": "リンクをコピー",
 		"loginToVote": "投票するにはログイン",
 		"requested": "リクエスト済み",
 		"beneficiary": "受益者",
@@ -450,13 +484,23 @@
 		"post": "投稿",
 		"cancel": "キャンセル",
 		"reply": "返信",
+		"edited": "編集",
+		"commentHistory": "コメント履歴",
+		"remove": "削除",
+		"removing": "削除中",
+		"removeVote": "投票を削除",
+		"removeVoteConfirmation": "本当に投票を削除しますか？",
 		"proposalPassed": "提案が可決されました",
 		"proposalFailed": "提案が否決されました",
 		"confirmationPeriod": "確認期間",
 		"votingStarted": "投票が開始されました",
 		"preparePeriod": "準備期間",
 		"decisionPeriod": "決定期間",
+		"votingPeriod": "投票期間",
+		"enactmentPeriod": "施行期間",
+		"enactmentDescription": "この期間完了後のRef実行",
 		"summary": "要約",
+		"summarise": "要約",
 		"aye": "賛成",
 		"nay": "反対",
 		"split": "分割",
@@ -465,12 +509,41 @@
 		"issuance": "発行",
 		"viewVoteHistory": "投票履歴を表示",
 		"voteHistory": "投票履歴",
+		"delegations": "委任",
 		"delegated": "委任済み",
 		"votingPower": "投票力",
+		"voteRemoved": "投票が正常に削除されました",
+		"voteRemoveFailed": "投票の削除に失敗しました",
+		"voteRemoveFailedTitle": "投票削除に失敗しました",
+		"voteRemovedTitle": "投票削除",
 		"capital": "資本",
 		"account": "アカウント",
 		"abstain": "棄権",
 		"onchainInfo": "オンチェーン情報",
+		"BeneficiariesDetails": {
+			"requested": "リクエスト済み",
+			"details": "詳細",
+			"immediately": "すぐに",
+			"in": "で",
+			"to": "に",
+			"totalEstimatedUSD": "合計推定USD相当",
+			"more": "もっと",
+			"requestedAmountDetails": "リクエストされた金額の詳細",
+			"showMore": "もっと表示",
+			"showLess": "もっと少なく表示"
+		},
+		"Poll": {
+			"endsOn": "終了日",
+			"endedOn": "終了日",
+			"noVotes": "まだ投票がありません",
+			"anonVotes": "匿名投票",
+			"viewPollVotes": "投票を表示",
+			"pollVotesList": "投票リスト",
+			"seeMore": "もっと見る",
+			"seeLess": "もっと見る"
+		},
+		"nestedVotes": "ネストされた投票",
+		"flattenedVotes": "フラット化された投票",
 		"VotesBubble": {
 			"nested": "ネスト",
 			"flattened": "フラット",
@@ -484,6 +557,17 @@
 			"nay": "反対",
 			"abstain": "棄権",
 			"noVotesFound": "投票が見つかりません"
+		},
+		"VotesData": {
+			"Votes": "投票",
+			"bubble": "バブル",
+			"graph": "グラフ",
+			"voteHistory": "投票履歴 (ネストされた投票とフラット化された投票)",
+			"votes": "投票",
+			"voteGraph": "投票グラフ",
+			"voteBubble": "投票バブル",
+			"nestedVotes": "ネストされた投票",
+			"flattenedVotes": "フラット化された投票"
 		},
 		"Analytics": {
 			"totalVotesCasted": "総投票数",
@@ -521,6 +605,7 @@
 			"method": "メソッド",
 			"proposalHash": "提案ハッシュ",
 			"preimage": "プレイメージ",
+			"details": "詳細",
 			"description": "説明",
 			"section": "セクション",
 			"name": "名前",
@@ -531,7 +616,22 @@
 			"fee": "料金",
 			"parentBountyIndex": "親報奨金インデックス",
 			"payee": "受益者",
-			"curator": "クレジット"
+			"curator": "クレジット",
+			"requested": "リクエスト済み",
+			"calls": "呼び出し",
+			"showMore": "もっと表示",
+			"showLess": "もっと少なく表示",
+			"call": "呼び出し",
+			"timeline": "タイムライン",
+			"submittedAtBlock": "提出されたブロック",
+			"createdAtBlock": "作成されたブロック",
+			"createdAt": "作成された",
+			"proposer": "プロポーザー",
+			"updatedAtBlock": "更新されたブロック",
+			"enactmentAtBlock": "実行されたブロック",
+			"enactmentAfterBlock": "実行された後のブロック",
+			"trackNumber": "トラック番号",
+			"hash": "ハッシュ"
 		},
 		"deleteComment": "コメントを削除",
 		"deleteCommentConfirmation": "このコメントを削除してもよろしいですか？",
@@ -542,8 +642,19 @@
 		"viewReplies": "返信を表示",
 		"commentSummary": "コメントの要約",
 		"aiSummary": "AI要約",
+		"showingVotesFor": "投票を表示中：",
+		"switchWallet": "ウォレットを切り替え",
+		"errorLoadingVote": "投票データの読み込みエラー",
+		"noVoteForAddress": "このアドレスの投票が見つかりません",
 		"showLikelySpam": "疑わしいスパムを表示",
 		"hideLikelySpam": "疑わしいスパムを非表示",
+		"HighlightMenu": {
+			"quote": "引用",
+			"share": "共有",
+			"copy": "コピー",
+			"textCopiedToClipboard": "テキストがクリップボードにコピーされました",
+			"failedToCopyText": "テキストのコピーに失敗しました"
+		},
 		"voted": "投票済み",
 		"votes": "投票",
 		"vote": "投票",
@@ -555,13 +666,13 @@
 		"delegatedVotes": "委任された投票",
 		"delegatedVotingPower": "委任された投票力",
 		"delegationList": "委任リスト",
+		"threshold": "閾値",
+		"onlyVerifiedCommentsVisible": "コメントはオンチェーンで本人確認済みのアカウントに制限されています。",
 		"VoteCurves": {
 			"approval": "承認",
 			"support": "サポート",
-			"threshold": "閾値",
-			"votingData": "投票データ"
+			"threshold": "閾値"
 		},
-		"threshold": "しきい値",
 		"DecisionDeposit": {
 			"description": "提案がタイムアウトするのを防ぐため、14日以内に返金可能なデポジットを配置してください。",
 			"details": "詳細",
@@ -583,7 +694,14 @@
 			"payoutClaimFailedDescription": "もう一度お試しください"
 		},
 		"commentsDisabled": "この投稿のコメントは無効になっています。",
-		"commentsDisabledForNonVerifiedUsers": "未認証ユーザーのコメントは無効になっています。"
+		"commentsDisabledForNonVerifiedUsers": "未認証ユーザーのコメントは無効になっています。",
+		"RefundDeposits": {
+			"refund": "返金",
+			"refundDeposits": "デポジットの返金",
+			"description": "このプロポーザルのデポジットを返金するにはここをクリックしてください",
+			"decisionDeposit": "決定デポジット",
+			"submissionDeposit": "提出デポジット"
+		}
 	},
 	"ListingPage_Status": {
 		"Cancelled": "キャンセル済み",
@@ -665,30 +783,37 @@
 	},
 	"VoteReferendum": {
 		"chooseYourVote": "投票を選択",
-		"conviction": "確信度",
-		"lockBalance": "残高をロック",
+		"conviction": "コンビクション",
+		"lockBalance": "ロック残高",
 		"abstainVoteValue": "棄権票の値",
 		"ayeVoteValue": "賛成票の値",
 		"nayVoteValue": "反対票の値",
 		"confirm": "確認",
-		"voteSuccess": "投票が成功しました",
-		"voteFailed": "投票が失敗しました",
+		"existingVote": "既存の投票",
+		"existingVoteDescription": "すでにこの提案に投票しています。投票を再送信すると、現在の投票記録が上書きされます。",
+		"voteSuccess": "投票が正常に行われました",
+		"voteFailed": "投票が正常に行われませんでした",
 		"voteSuccessTitle": "投票成功",
 		"voteFailedTitle": "投票失敗",
-		"delegatedPower": "委任された投票力",
+		"delegatedPower": "委任された権限",
 		"commentSuccessTitle": "コメントが正常に追加されました",
 		"commentSuccess": "コメントが正常に追加されました",
 		"voted": "投票済み",
 		"successfully": "正常に",
-		"with": "で",
-		"yourVoteIsIn": "あなたの投票が完了しました！なぜこれを支持するのかコメントで共有しませんか？",
+		"with": "と",
+		"yourVoteIsIn": "投票が完了しました！コメントでサポートする理由を共有しませんか？",
 		"your": "あなたの",
-		"voteIsIn": "投票が完了しました！なぜこれを支持するのかコメントで共有しませんか？"
+		"voteIsIn": "投票が完了しました！コメントでサポートする理由を共有しませんか？",
+		"reuseGovernanceLock": "ガバナンスロックを再利用",
+		"reuseAllLocks": "すべてのロックを再利用",
+		"changeVote": "投票を変更"
 	},
 	"Balance": {
 		"voteBalance": "投票残高",
 		"Balance": "残高",
-		"PeopleChainBalance": "ピープルチェーン残高"
+		"PeopleChainBalance": "ピープルチェーン残高",
+		"VotingBalance": "投票残高",
+		"migrationInfo": "ユーザー残高はAssetHubに移行されました"
 	},
 	"EditPost": {
 		"edit": "編集",
@@ -720,6 +845,10 @@
 	"Preimages": {
 		"hash": "ハッシュ",
 		"author": "作成者",
+		"all": "すべて",
+		"myPreimages": "マイプレイメージ",
+		"noUserPreimages": "プレイメージがありません！",
+		"createOneNow": "今すぐ作成！",
 		"deposit": "デポジット",
 		"arguments": "引数",
 		"size": "サイズ",
@@ -736,7 +865,16 @@
 		"unnoted_description": "プレイメージは記録されていません",
 		"failed": "失敗",
 		"unrequest": "リクエストを取り消す",
-		"unnote": "記録を削除"
+		"unnote": "記録を削除",
+		"unnoteOrUnrequestPreimageDescription": "このプレイメージの記録を削除またはリクエストを取り消してもよろしいですか？",
+		"loadingYourPreimages": "プレイメージを読み込み中...",
+		"please": "プレイメージを表示するには",
+		"toViewPreimages": "してください",
+		"logIn": "ログイン",
+		"failedToFetchUserPreimages": "ユーザーのプレイメージの取得に失敗しました",
+		"tryAgain": "再試行",
+		"showingPreimagesFor": "プレイメージを表示中:",
+		"switchWallet": "ウォレットを切り替え"
 	},
 	"Create": {
 		"createDiscussionTitle": "ディスカッションを作成",
@@ -767,11 +905,30 @@
 			"failedToUploadImage": "画像のアップロードに失敗しました"
 		},
 		"AllowedCommentors": {
+			"advanced": "詳細",
 			"title": "誰がコメントできますか？",
 			"all": "全員",
 			"onchainVerified": "オンチェーン認証済み",
 			"none": "なし",
 			"tooltip": "この投稿にコメントや返信ができる人を選択"
+		},
+		"AddPoll": {
+			"addPoll": "投票を追加",
+			"title": "タイトル",
+			"options": "オプション",
+			"titleRequired": "有効なタイトルを入力してください。",
+			"settings": "設定",
+			"anonymousPolls": "匿名投票（投票者の名前は表示されません）",
+			"maskedPolls": "マスクされた投票（投票が終了した後にのみ結果が表示されます）",
+			"addAnotherOption": "別のオプションを追加..",
+			"pollEndsIn": "投票は",
+			"optionDuplicated": "このオプションは重複しています",
+			"optionsDuplicated": "投票オプションは重複できません",
+			"optionsRequired": "少なくとも {min} 個のオプションを入力してください",
+			"maxOptions": "最大 {max} 個のオプションを入力できます",
+			"endDateRequired": "投票の終了日を選択してください",
+			"endDateInFuture": "投票の終了日は未来の日付にする必要があります",
+			"titlePlaceholder": "投票のタイトルを入力"
 		},
 		"Topic": {
 			"general": "一般",
@@ -891,7 +1048,13 @@
 		"verify": "確認",
 		"verified": "確認済み",
 		"pending": "保留中",
-		"CurrentJudgement": "現在の判定"
+		"CurrentJudgement": "現在の判定",
+		"clearIdentity": "アイデンティティをクリア",
+		"clearIdentitySuccess": "アイデンティティがクリアされました！",
+		"clearIdentitySuccessDescription": "アイデンティティが正常にクリアされました",
+		"clearIdentityFailed": "アイデンティティのクリアに失敗しました",
+		"clearIdentityFailedDescription": "アイデンティティのクリア中にエラーが発生しました",
+		"clearIdentityDescription": "アイデンティティをクリアしてもよろしいですか？"
 	},
 	"Overview": {
 		"month": "月",
@@ -1011,7 +1174,8 @@
 		"redirectingToProposal": "提案にリダイレクト中...",
 		"addContextToProposal": "提案にコンテキストを追加",
 		"redirectingToPost": "投稿にリダイレクト中...",
-		"discussion": "ディスカッション"
+		"discussion": "ディスカッション",
+		"postMigrationInfo": "移行後の時間ロジックは、リレーチェーンのブロック高を参照します。AssetHubのブロック番号は、スケジューリングには無効です。"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",
@@ -1098,9 +1262,9 @@
 		"delegate": "委任者",
 		"noBio": "バイオがありません",
 		"readMore": "もっと読む",
-		"votingPower": "投票力",
+		"maxDelegated": "最大委任",
 		"votedProposals": "投票された提案",
-		"receivedDelegations": "受け取った委任",
+		"delegators": "受け取った委任",
 		"past30Days": "過去30日間",
 		"trendingDelegates": "トレンディングな委任者",
 		"pleaseLoginToContinue": "続けるにはログインしてください",
@@ -1223,6 +1387,8 @@
 		"referenda": "レファレンダム",
 		"users": "ユーザー",
 		"discussions": "ディスカッション",
+		"bounties": "報奨金",
+		"other": "その他",
 		"today": "今日",
 		"last_7_days": "過去7日間",
 		"last_30_days": "過去30日間",
@@ -1248,7 +1414,8 @@
 		"useSuperSearchButton": "スーパー検索を使用",
 		"poweredByPolkassembly": "Polkassembly提供。",
 		"enableSearchAndSuperSearch": "チェーンの検索とスーパー検索を有効にしたい場合は、こちらまでご連絡ください",
-		"clearFilters": "フィルターをクリア"
+		"clearFilters": "フィルターをクリア",
+		"searchTriggerLabel": "提案、議論、人を検索"
 	},
 	"Bounties": {
 		"onchainBounties": "オンチェーン報奨金",
@@ -1385,5 +1552,75 @@
 		"pending": "保留中",
 		"approved": "承認済み",
 		"rejected": "拒否"
+	},
+	"ConvictionSelector": {
+		"votes": "投票",
+		"lockingPeriod": "ロック期間",
+		"lockingPeriodDescription": "選択した乗数に応じて、投票後も{tokenSymbol}は追加の期間ロックされます。"
+	},
+	"PolkadotVault": {
+		"signTransaction": "トランザクションに署名",
+		"addVaultAddress": "Polkadot Vaultアドレスを追加",
+		"scan": "スキャン",
+		"openVaultAppInYourPhone": "スマートフォンでVaultアプリを開いてください",
+		"scanTheQRHere": "VaultアプリでここのQRコードをスキャンしてください",
+		"scanTheSignatureQRInYourApp": "アプリで署名QRコードを確認し、トランザクションに署名してください"
+	},
+	"GovAnalytics": {
+		"governanceAnalytics": "ガバナンス分析",
+		"governanceAnalyticsDescription": "レファレンダムはPolkadotのオンチェーンガバナンスの中心メカニズムであり、投資家（DOT保有者）がネットワークアップグレード、トレジャリー支出、その他の重要な事項について決定することを可能にします。",
+		"overview": "概要",
+		"voting": "投票",
+		"votes": "投票",
+		"capital": "資本",
+		"delegator": "委任者",
+		"delegatee": "受任者",
+		"delegation": "委任",
+		"trackDelegation": "トラック委任",
+		"delegationSplit": "委任分割",
+		"totalProposals": "総提案数",
+		"approvedProposals": "承認された提案",
+		"monitoredTracks": "監視中のトラック",
+		"referendumCount": "レファレンダム数",
+		"referendumCountByStatus": "レファレンダム数（ステータス別）",
+		"referendumCountByCategory": "レファレンダム数（カテゴリ別）",
+		"monthlySpend": "月間DOT支出",
+		"averageTurnoutPercentage": "平均投票率"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "分散化された声"
+	},
+	"Proxies": {
+		"proxyExplorer": "プロキシエクスプローラー",
+		"createProxy": "プロキシを作成",
+		"all": "すべて",
+		"myProxies": "マイプロキシ",
+		"delegator": "委任者",
+		"proxyType": "プロキシタイプ",
+		"delay": "遅延",
+		"proxies": "プロキシ",
+		"noProxiesFound": "プロキシが見つかりません",
+		"searchByAddress": "検索するアドレスを入力",
+		"delayTooltip": "遅延はセキュリティ機能として機能します：プロキシが意図したアクションを発表した後、アクションが実行される前に制御アカウントによってアクションをレビューし、必要に応じてキャンセルできる24時間のウィンドウがあります。Polkadotの平均ブロック時間は約6秒であるため、14,400ブロックの遅延は約24時間に相当します。",
+		"please": "お願いします",
+		"logIn": "ログイン",
+		"toViewMyProxies": "プロキシを表示するには"
+	},
+	"ProxyType": {
+		"any": "任意",
+		"non_transfer": "非転送",
+		"governance": "ガバナンス",
+		"staking": "ステーキング",
+		"identity_judgement": "アイデンティティ判断",
+		"auction": "オークション",
+		"cancel_proxy": "プロキシキャンセル",
+		"pararegistration": "パラレジストレーション",
+		"nomination_pools": "ノミネーションプール",
+		"sudo_balances": "Sudoバランス"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "{network}はAssetHubに移行されました。残高、データ、国民投票、その他のオンチェーン活動はAssetHubに移行されました。",
+		"learnMore": "詳細を確認",
+		"polkadotMigration": "PolkadotはAssetHub移行中です。一部の機能は移行中に利用できない場合があります。"
 	}
 }

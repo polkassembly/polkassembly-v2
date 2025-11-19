@@ -3,11 +3,7 @@
 }
 
 .chartWrapper {
-	@apply h-[500px];
-
 	width: 100% !important;
-	min-height: 500px;
-
 	rect {
 		rx: 8 !important;
 		ry: 8 !important;
@@ -104,17 +100,7 @@
 }
 
 .card {
-	@apply mx-auto min-h-[600px] w-full flex-1 rounded-2xl border-[1px] border-solid border-border_grey bg-transparent p-4 text-basic_text;
-
-	@media (max-width: 768px) {
-		max-height: 520px;
-		padding: 12px;
-	}
-
-	@media (max-width: 480px) {
-		max-height: 550px;
-		padding: 8px;
-	}
+	@apply mx-auto h-full w-full flex-1 rounded-2xl border-[1px] border-solid border-border_grey bg-transparent p-4 text-basic_text;
 }
 
 .description {
@@ -122,11 +108,11 @@
 }
 
 .header {
-	@apply flex flex-col items-start;
+	@apply mt-0 flex flex-col items-start;
 }
 
 .buttonContainer {
-	@apply my-4 flex w-full items-center justify-between rounded-lg bg-bg_code p-1.5;
+	@apply mt-4 flex w-full items-center justify-between rounded-lg bg-bg_code p-1.5;
 }
 
 .tooltip {
@@ -145,7 +131,7 @@
 	@apply flex items-center gap-2 rounded-lg border-[1px] border-solid px-4 py-2 text-sm text-text_primary dark:text-white;
 }
 .decisionsContainer {
-	@apply mt-6 flex items-center justify-center gap-2;
+	@apply mt-4 flex items-center justify-center gap-2 pb-4;
 }
 
 .tooltipContentValue {

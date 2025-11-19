@@ -23,3 +23,15 @@
 .chevron {
 	@apply ml-auto mr-4 text-sidebar_title transition-transform duration-200;
 }
+
+.iconWrapper {
+	@apply flex h-8 w-8 items-center justify-center fill-none;
+}
+
+.darkIcon {
+	filter: none;
+}
+
+:global(.dark) .darkIcon {
+	filter: brightness(101%) contrast(93%) saturate(15%) hue-rotate(141deg) invert(56%) sepia(0);
+}

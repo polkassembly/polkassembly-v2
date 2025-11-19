@@ -15,7 +15,7 @@ const zodParamsSchema = z.object({
 	address: z.string().refine((address) => ValidatorService.isValidWeb3Address(address), { message: 'Address must be a valid web3 address' })
 });
 
-export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> => {
+export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ address: string }> }): Promise<NextResponse> => {
 	const { address } = zodParamsSchema.parse(await params);
 
 	const user = await OffChainDbService.GetPublicUserByAddress(address);

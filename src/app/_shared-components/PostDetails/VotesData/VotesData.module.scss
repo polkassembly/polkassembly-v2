@@ -1,0 +1,47 @@
+.card {
+	@apply flex flex-col rounded-xl border border-primary_border bg-bg_modal;
+}
+.header {
+	@apply px-6 pt-6 text-xl font-semibold text-text_primary;
+}
+.tabs {
+	@apply mx-6 mt-2 flex items-center gap-1 rounded-sm bg-bg_code p-1.5;
+}
+.tab {
+	@apply h-7 w-full rounded-sm px-3 text-sm font-bold tracking-wide transition-all;
+}
+.activeTab {
+	@apply bg-bg_modal text-text_pink shadow-sm;
+}
+.inactiveTab {
+	@apply bg-transparent text-toggle_btn_inactive_text hover:bg-primary_border;
+}
+
+.voteHistoryButtonIcon {
+	@apply h-4 w-4 text-sm font-semibold text-text_pink;
+}
+.voteHistoryDialogHeader {
+	@apply text-xl font-semibold text-text_primary;
+}
+.voteHistoryContainer {
+	@apply -mt-1 px-6 pb-6;
+}
+.voteHistoryDialogContent {
+	@apply w-[500px] p-3 max-lg:w-full sm:p-6 lg:w-[600px] xl:w-[700px] 2xl:w-[900px];
+}
+
+.dialogTitle {
+	@apply text-lg font-semibold text-text_primary dark:text-white;
+}
+.dialogContent {
+	@apply w-[500px] max-lg:w-full lg:w-[600px] xl:w-[700px] 2xl:w-[900px];
+}
+.dialogHeader {
+	@apply p-4;
+}
+.dialogTitle {
+	@apply flex items-center gap-x-1;
+}
+.dialogTabsContent {
+	@apply px-6 pb-6;
+}

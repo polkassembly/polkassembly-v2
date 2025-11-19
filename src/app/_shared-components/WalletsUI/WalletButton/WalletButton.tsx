@@ -4,12 +4,13 @@
 
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { EWallet } from '@/_shared/types';
 import { Button } from '@ui/Button';
 import { WalletIcon } from '@ui/WalletsUI/WalletsIcon';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { cn } from '@/lib/utils';
+import { isMimirDetected } from '@/app/_client-services/isMimirDetected';
 import classes from './WalletButton.module.scss';
 
 // Type for the Nova wallet extension
@@ -41,7 +42,6 @@ function WalletButton({
 }) {
 	const walletName = wallet === EWallet.NOVAWALLET ? EWallet.POLKADOT : wallet;
 	const { userPreferences, setUserPreferences } = useUserPreferences();
-
 	const onWalletSelect = (selectedWallet: EWallet) => {
 		setUserPreferences({
 			...userPreferences,
@@ -50,6 +50,16 @@ function WalletButton({
 		onClick?.(selectedWallet);
 	};
 
+	const [showMimirWallet, setShowMimirWallet] = useState(false);
+
+	useEffect(() => {
+		const checkMimirWallet = async () => {
+			const isMimirIframe = await isMimirDetected();
+			setShowMimirWallet(!!isMimirIframe);
+		};
+		checkMimirWallet();
+	}, []);
+
 	// If we're server-side rendering or this is a Nova wallet but the extension isn't available, don't render
 	const isBrowser = typeof window !== 'undefined';
 	if (!isBrowser) {
@@ -57,6 +67,10 @@ function WalletButton({
 		// Return the component but it will re-render properly on the client
 	} else if (wallet === EWallet.NOVAWALLET && !window.walletExtension?.isNovaWallet) {
 		// Only check for Nova wallet if we're in the browser
+		return null;
+	}
+
+	if (wallet === EWallet.MIMIR && !showMimirWallet) {
 		return null;
 	}
 

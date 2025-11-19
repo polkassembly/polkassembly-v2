@@ -8,6 +8,7 @@ import { EProfileTabs, IPublicUser } from '@/_shared/types';
 import Image from 'next/image';
 import ProfileRect from '@assets/profile/profile-rect.png';
 import { useState } from 'react';
+import { useUser } from '@/hooks/useUser';
 import { Tabs, TabsContent } from '../Tabs';
 import ProfileHeader from './ProfileHeader/ProfileHeader';
 import classes from './Profile.module.scss';
@@ -15,8 +16,11 @@ import Accounts from './Accounts/Accounts';
 import Overview from './Overview/Overview';
 import Settings from './Settings/Settings';
 import Posts from './Posts/Posts';
+import UserActivity from './UserActivity/UserActivity';
 
 function Profile({ profileData, address }: { profileData?: IPublicUser; address?: string }) {
+	const { user } = useUser();
+
 	const [userProfileData, setUserProfileData] = useState<IPublicUser | undefined>(profileData);
 	const handleUserProfileDataChange = (data: IPublicUser) => {
 		setUserProfileData((prev) => ({ ...prev, ...data }));
@@ -48,15 +52,18 @@ function Profile({ profileData, address }: { profileData?: IPublicUser; address?
 					/>
 				</TabsContent>
 				<TabsContent value={EProfileTabs.POSTS}>
-					<Posts addresses={address ? [address] : profileData?.addresses || []} />
+					<Posts addresses={profileData?.addresses?.length ? profileData?.addresses : address ? [address] : []} />
 				</TabsContent>
-				{/* <TabsContent value={EProfileTabs.ACTIVITY}>
-					<UserActivity userId={profileData.id} />
-				</TabsContent> */}
+				<TabsContent value={EProfileTabs.ACTIVITY}>
+					<UserActivity
+						addresses={address ? [address] : profileData?.addresses || []}
+						userId={userProfileData?.id}
+					/>
+				</TabsContent>
 				<TabsContent value={EProfileTabs.ACCOUNTS}>
 					<Accounts addresses={profileData?.addresses.length ? profileData.addresses : address ? [address] : []} />
 				</TabsContent>
-				{userProfileData && (
+				{userProfileData && user?.id === userProfileData.id && (
 					<TabsContent value={EProfileTabs.SETTINGS}>
 						<Settings
 							userProfileData={userProfileData}

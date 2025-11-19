@@ -6,7 +6,7 @@ import {
 	EAnalyticsType,
 	ENetwork,
 	EPostOrigin,
-	EPostBubbleVotesType,
+	EVotesDisplayType,
 	EProposalStatus,
 	EProposalType,
 	EVoteDecision,
@@ -27,7 +27,13 @@ import {
 	ITrackAnalyticsStats,
 	IVoteCurve,
 	IVoteData,
-	IVoteMetrics
+	IVoteMetrics,
+	IProfileVote,
+	IGovAnalyticsStats,
+	IGovAnalyticsReferendumOutcome,
+	IRawTurnoutData,
+	IGovAnalyticsDelegationStats,
+	IGovAnalyticsCategoryCounts
 } from '@shared/types';
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
@@ -38,9 +44,15 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { BN, BN_ZERO } from '@polkadot/util';
+import { encodeAddress } from '@polkadot/util-crypto';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { dayjs } from '@shared/_utils/dayjsInit';
+import { getTrackGroups } from '@/_shared/_constants/trackGroups';
+// import { getTrackNameFromId } from '@/_shared/_utils/getTrackNameFromId'; // Moved to frontend
 import { SubsquidUtils } from './subsquidUtils';
+import { SubsquidQueries } from './subsquidQueries';
+
+const VOTING_POWER_DIVISOR = new BN('10');
 
 export class SubsquidService extends SubsquidUtils {
 	private static subsquidGqlClient = (network: ENetwork) => {
@@ -302,6 +314,39 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
+	private static getVotesQuery({
+		proposalType,
+		subsquidDecision,
+		votesType
+	}: {
+		proposalType: EProposalType;
+		subsquidDecision: string | null;
+		votesType?: EVotesDisplayType;
+	}): string {
+		// Handle TIP proposal type
+		if (proposalType === EProposalType.TIP) {
+			return subsquidDecision ? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION() : this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH();
+		}
+
+		// Handle REFERENDUM_V2 and FELLOWSHIP_REFERENDUM
+		const isConvictionVoteType = [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType);
+
+		if (isConvictionVoteType) {
+			const isFlattened = votesType === EVotesDisplayType.FLATTENED;
+
+			if (subsquidDecision) {
+				return isFlattened
+					? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION()
+					: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION();
+			}
+
+			return isFlattened ? this.GET_FLATTENED_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX() : this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX();
+		}
+
+		// Handle other proposal types
+		return subsquidDecision ? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION() : this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX();
+	}
+
 	// FIXME: refactor this function
 	// eslint-disable-next-line sonarjs/cognitive-complexity
 	static async GetPostVoteData({
@@ -311,8 +356,9 @@ export class SubsquidService extends SubsquidUtils {
 		page,
 		limit,
 		decision,
-		voterAddress: address,
-		orderBy
+		voterAddresses: addresses,
+		orderBy,
+		votesType
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -320,28 +366,24 @@ export class SubsquidService extends SubsquidUtils {
 		page: number;
 		limit: number;
 		decision?: EVoteDecision;
-		voterAddress?: string;
+		voterAddresses?: string[];
 		orderBy?: EVoteSortOptions;
+		votesType?: EVotesDisplayType;
 	}) {
-		const voterAddress = address ? (getEncodedAddress(address, network) ?? undefined) : undefined;
+		const voterAddresses = addresses?.length ? addresses.map((address) => getEncodedAddress(address, network)) : undefined;
 
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const subsquidDecision = decision ? this.convertVoteDecisionToSubsquidFormat({ decision }) : null;
-		const subsquidDecisionIn = decision ? this.convertVoteDecisionToSubsquidFormatArray({ decision }) : null;
+		const subsquidDecisionIn = decision ? (votesType === EVotesDisplayType.NESTED ? this.convertVoteDecisionToSubsquidFormatArray({ decision }) : [subsquidDecision]) : null;
 
-		const query =
-			proposalType === EProposalType.TIP
-				? subsquidDecision
-					? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH_AND_DECISION({ voter: voterAddress })
-					: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_HASH({ voter: voterAddress })
-				: [EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)
-					? subsquidDecision
-						? this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
-						: this.GET_CONVICTION_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress })
-					: subsquidDecision
-						? this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX_AND_DECISION({ voter: voterAddress })
-						: this.GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX({ voter: voterAddress });
+		const addressesWithoutUndefined = voterAddresses?.filter((address) => address !== undefined && address !== null);
+
+		const query = this.getVotesQuery({
+			proposalType,
+			subsquidDecision,
+			votesType
+		});
 
 		const variables =
 			proposalType === EProposalType.TIP
@@ -350,6 +392,7 @@ export class SubsquidService extends SubsquidUtils {
 						type_eq: proposalType,
 						limit,
 						offset: (page - 1) * limit,
+						voter_in: addressesWithoutUndefined,
 						...(subsquidDecision && { decision_in: subsquidDecisionIn })
 					}
 				: {
@@ -357,10 +400,11 @@ export class SubsquidService extends SubsquidUtils {
 						type_eq: proposalType,
 						limit,
 						offset: (page - 1) * limit,
+						voter_in: addressesWithoutUndefined,
 						orderBy: this.getOrderByForSubsquid({ orderBy }),
 						...(subsquidDecision && { decision_in: subsquidDecisionIn }),
-						...(subsquidDecision === 'yes' && { aye_not_eq: BN_ZERO.toString(), value_isNull: false }),
-						...(subsquidDecision === 'no' && { nay_not_eq: BN_ZERO.toString(), value_isNull: false })
+						...(subsquidDecision === 'yes' && votesType === EVotesDisplayType.NESTED && { aye_not_eq: BN_ZERO.toString(), value_isNull: false }),
+						...(subsquidDecision === 'no' && votesType === EVotesDisplayType.NESTED && { nay_not_eq: BN_ZERO.toString(), value_isNull: false })
 					};
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
@@ -400,6 +444,7 @@ export class SubsquidService extends SubsquidUtils {
 					selfVotingPower: this.getSelfVotingPower({ balance: balanceValue, selfVotingPower: vote.selfVotingPower || null, lockPeriod: vote.lockPeriod }),
 					totalVotingPower: vote.totalVotingPower,
 					delegatedVotingPower: vote.delegatedVotingPower,
+					...(votesType === EVotesDisplayType.FLATTENED && { votingPower: this.getVotingPower(balanceValue, vote.lockPeriod) }),
 					delegatedVotes: vote.delegatedVotes?.map((delegatedVote) => ({
 						voterAddress: delegatedVote.voter,
 						totalVotingPower: delegatedVote.votingPower,
@@ -468,6 +513,7 @@ export class SubsquidService extends SubsquidUtils {
 			proposedCall: data.proposalArguments,
 			proposer: getSubstrateAddress(proposer) || undefined,
 			trackNumber: data.trackNumber,
+			submittedAtBlock: data.submittedAtBlock,
 			updatedAtBlock: data.updatedAtBlock,
 			enactmentAtBlock: data.enactmentAtBlock,
 			enactmentAfterBlock: data.enactmentAfterBlock
@@ -495,6 +541,44 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
+	static async GetPreimagesByAddress({
+		network,
+		page,
+		limit,
+		address
+	}: {
+		network: ENetwork;
+		page: number;
+		limit: number;
+		address: string;
+	}): Promise<IGenericListingResponse<IPreimage>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		// Convert address to substrate format for querying
+		const formattedAddress = ValidatorService.isValidSubstrateAddress(address) ? encodeAddress(address, NETWORKS_DETAILS[network as ENetwork].ss58Format) : address;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient
+			.query(this.GET_USER_PREIMAGES_LISTING, {
+				limit,
+				offset: (page - 1) * limit,
+				proposer_eq: formattedAddress
+			})
+			.toPromise();
+
+		if (subsquidErr || !subsquidData || !subsquidData.preimages) {
+			console.error(`Error fetching on-chain user preimage listing from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain user preimage listing from Subsquid');
+		}
+
+		return {
+			items: subsquidData.preimages.map((preimage: IPreimage) => ({
+				...preimage,
+				...(preimage.proposer && { proposer: getSubstrateAddress(preimage.proposer) })
+			})),
+			totalCount: subsquidData.preimagesConnection.totalCount
+		};
+	}
+
 	static async GetPreimageByHash({ network, hash }: { network: ENetwork; hash: string }): Promise<IPreimage | null> {
 		const gqlClient = this.subsquidGqlClient(network);
 
@@ -510,16 +594,24 @@ export class SubsquidService extends SubsquidUtils {
 
 	static async GetActiveVotedProposalsCount({
 		addresses,
-		network
+		network,
+		last15days
 	}: {
 		addresses: string[];
 		network: ENetwork;
+		last15days?: boolean;
 	}): Promise<{ activeProposalsCount: number; votedProposalsCount: number }> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_ACTIVE_VOTED_PROPOSALS_COUNT;
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { status_in: ACTIVE_PROPOSAL_STATUSES, voter_in: addresses }).toPromise();
+		const variables: { status_in: EProposalStatus[]; voter_in: string[]; createdAt_gte?: string } = { status_in: ACTIVE_PROPOSAL_STATUSES, voter_in: addresses };
+
+		if (last15days) {
+			variables.createdAt_gte = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString();
+		}
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain active voted proposals count from Subsquid: ${subsquidErr}`);
@@ -707,7 +799,9 @@ export class SubsquidService extends SubsquidUtils {
 		return subsquidData.convictionVotesConnection.totalCount;
 	}
 
-	static async GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(network: ENetwork): Promise<Record<string, { votingPower: string; receivedDelegationsCount: number }>> {
+	static async GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(
+		network: ENetwork
+	): Promise<Record<string, { maxDelegated: string; delegators: string[]; receivedDelegationsCount: number }>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const query = this.GET_ALL_DELEGATES_CONVICTION_VOTING_POWER_AND_DELEGATIONS_COUNT;
@@ -723,14 +817,35 @@ export class SubsquidService extends SubsquidUtils {
 			);
 		}
 
-		const result: Record<string, { votingPower: string; receivedDelegationsCount: number }> = {};
+		const result: Record<string, { maxDelegated: string; delegators: string[]; receivedDelegationsCount: number }> = {};
 
-		subsquidData.votingDelegations.forEach((delegation: { to: string; balance: string; lockPeriod: number }) => {
-			result[delegation.to] = {
-				votingPower: result[delegation.to]?.votingPower
-					? new BN(result[delegation.to].votingPower).add(this.getVotingPower(delegation.balance, delegation.lockPeriod)).toString()
-					: this.getVotingPower(delegation.balance, delegation.lockPeriod).toString(),
-				receivedDelegationsCount: result[delegation.to]?.receivedDelegationsCount ? result[delegation.to].receivedDelegationsCount + 1 : 1
+		// Use Map for optimized grouping by delegate
+		const delegateMap = new Map<string, Array<{ balance: string; lockPeriod: number; from: string; track?: number; trackNumber?: number }>>();
+
+		// Single pass grouping - O(n) complexity
+		subsquidData.votingDelegations.forEach((delegation: { to: string; balance: string; lockPeriod: number; from: string; track?: number; trackNumber?: number }) => {
+			const delegate = delegation.to;
+			const existing = delegateMap.get(delegate);
+
+			if (existing) {
+				existing.push(delegation);
+			} else {
+				delegateMap.set(delegate, [delegation]);
+			}
+		});
+
+		// Calculate results for each delegate - optimized iteration
+		delegateMap.forEach((delegations, delegate) => {
+			const maxDelegated = this.calculateMaxTrackVotingPower(delegations);
+
+			// Use Set for efficient deduplication
+			const uniqueDelegators = new Set<string>();
+			delegations.forEach((d) => uniqueDelegators.add(d.from));
+
+			result[`${delegate}`] = {
+				maxDelegated,
+				delegators: Array.from(uniqueDelegators),
+				receivedDelegationsCount: delegations.length
 			};
 		});
 
@@ -738,7 +853,8 @@ export class SubsquidService extends SubsquidUtils {
 	}
 
 	static async GetDelegateDetails({ network, address }: { network: ENetwork; address: string }): Promise<{
-		votingPower: string;
+		maxDelegated: string;
+		delegators: string[];
 		receivedDelegationsCount: number;
 		last30DaysVotedProposalsCount: number;
 	}> {
@@ -755,14 +871,20 @@ export class SubsquidService extends SubsquidUtils {
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain delegate details from Subsquid');
 		}
 
-		const votingPower = subsquidData.votingDelegations.reduce((acc: BN, delegation: { balance: string }) => {
-			return new BN(acc).add(new BN(delegation.balance));
-		}, BN_ZERO);
+		// Filter delegations for this specific delegate
+		const delegateDelegations = subsquidData.votingDelegations.filter((d: { to: string }) => d.to === address);
+
+		// Calculate max track voting power for this delegate
+		const maxDelegated = this.calculateMaxTrackVotingPower(delegateDelegations);
+
+		// Calculate delegators and count
+		const uniqueDelegators = new Set(delegateDelegations.map((d: { from: string }) => d.from));
 
 		return {
-			votingPower: votingPower.toString(),
-			receivedDelegationsCount: subsquidData.votingDelegations.length,
-			last30DaysVotedProposalsCount: subsquidData.convictionVotesConnection.totalCount
+			maxDelegated,
+			receivedDelegationsCount: delegateDelegations.length,
+			last30DaysVotedProposalsCount: subsquidData.convictionVotesConnection.totalCount,
+			delegators: Array.from(uniqueDelegators) as string[]
 		};
 	}
 
@@ -1108,11 +1230,11 @@ export class SubsquidService extends SubsquidUtils {
 		proposalType: EProposalType;
 		index: number;
 		analyticsType: EAnalyticsType;
-		votesType: EPostBubbleVotesType;
+		votesType: EVotesDisplayType;
 	}): Promise<IPostBubbleVotes | null> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = votesType === EPostBubbleVotesType.FLATTENED ? this.GET_ALL_FLATTENED_VOTES_WITH_POST_INDEX : this.GET_ALL_NESTED_VOTES_WITH_POST_INDEX;
+		const query = votesType === EVotesDisplayType.FLATTENED ? this.GET_ALL_FLATTENED_VOTES_WITH_POST_INDEX : this.GET_ALL_NESTED_VOTES_WITH_POST_INDEX;
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { vote_type: proposalType, index_eq: index, type_eq: proposalType }).toPromise();
 
 		if (subsquidErr || !subsquidData) {
@@ -1152,7 +1274,7 @@ export class SubsquidService extends SubsquidUtils {
 				const balance = new BN(vote.balance?.value || vote.balance?.abstain || vote.balance?.aye || vote.balance?.nay || BN_ZERO.toString());
 				const votingPower =
 					analyticsType === EAnalyticsType.CONVICTIONS
-						? votesType === EPostBubbleVotesType.FLATTENED
+						? votesType === EVotesDisplayType.FLATTENED
 							? this.getVotingPower(balance?.toString(), vote?.lockPeriod)
 							: this.getNestedVoteVotingPower(
 									vote?.parentVote?.delegatedVotingPower || vote?.delegatedVotingPower || BN_ZERO.toString(),
@@ -1164,7 +1286,7 @@ export class SubsquidService extends SubsquidUtils {
 					balanceValue: balance.toString(),
 					voterAddress: vote.voter,
 					lockPeriod: vote?.lockPeriod || 0,
-					votingPower: votingPower?.toString() || null,
+					votingPower: votingPower?.toString(),
 					isDelegated: vote?.isDelegated || false,
 					delegatorsCount: vote?.delegatedVotes?.length || 0,
 					decision
@@ -1172,5 +1294,279 @@ export class SubsquidService extends SubsquidUtils {
 			}
 		);
 		return votesData;
+	}
+
+	static async GetVotesForAddresses({
+		network,
+		voters,
+		page,
+		limit,
+		proposalStatuses
+	}: {
+		network: ENetwork;
+		voters: string[];
+		page: number;
+		limit: number;
+		proposalStatuses?: EProposalStatus[];
+	}): Promise<IGenericListingResponse<IProfileVote>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_ALL_FLATTENED_VOTES_FOR_MULTIPLE_VOTERS;
+
+		const variables = {
+			limit,
+			offset: (page - 1) * limit,
+			voter_in: voters,
+			...(proposalStatuses && { status_in: proposalStatuses })
+		};
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain votes for multiple voters from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain votes for multiple voters from Subsquid');
+		}
+
+		const { votes, totalCount } = subsquidData;
+
+		if (totalCount.totalCount === 0) {
+			return {
+				items: [],
+				totalCount: totalCount.totalCount
+			};
+		}
+
+		const votesData: IProfileVote[] = votes.map((vote: { decision: string; voter: string; proposalIndex: number; type: EProposalType; parentVote: { extrinsicIndex: string } }) => {
+			return {
+				...vote,
+				decision: this.convertSubsquidVoteDecisionToVoteDecision({ decision: vote.decision }),
+				voterAddress: vote.voter,
+				proposalType: vote.type as EProposalType,
+				extrinsicIndex: vote.parentVote?.extrinsicIndex || ''
+			};
+		});
+
+		return {
+			items: votesData,
+			totalCount: totalCount.totalCount
+		};
+	}
+
+	static async GetAllFlattenedVotesWithoutFilters({ network, page, limit }: { network: ENetwork; page: number; limit: number }): Promise<IGenericListingResponse<IProfileVote>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_ALL_FLATTENED_VOTES_WITHOUT_FILTERS;
+
+		const variables = {
+			limit,
+			offset: (page - 1) * limit
+		};
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching all flattened votes from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching all flattened votes from Subsquid');
+		}
+
+		const { votes, totalCount } = subsquidData;
+
+		if (totalCount.totalCount === 0) {
+			return {
+				items: [],
+				totalCount: totalCount.totalCount
+			};
+		}
+
+		const votesData: IProfileVote[] = votes.map((vote: { decision: string; voter: string; proposalIndex: number; type: EProposalType; parentVote: { extrinsicIndex: string } }) => {
+			return {
+				...vote,
+				decision: this.convertSubsquidVoteDecisionToVoteDecision({ decision: vote.decision }),
+				voterAddress: vote.voter,
+				proposalType: vote.type as EProposalType,
+				extrinsicIndex: vote.parentVote?.extrinsicIndex || ''
+			};
+		});
+
+		return {
+			items: votesData,
+			totalCount: totalCount.totalCount
+		};
+	}
+
+	static async GetGovAnalyticsStats({ network }: { network: ENetwork }): Promise<IGovAnalyticsStats> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_GOV_ANALYTICS_STATS;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, {}).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching network governance analytics stats from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching network governance analytics stats from Subsquid');
+		}
+
+		return {
+			totalProposals: subsquidData.totalProposals.totalCount,
+			approvedProposals: subsquidData.approvedProposals.totalCount
+		};
+	}
+
+	static async GetGovAnalyticsReferendumOutcome({ network, trackNo }: { network: ENetwork; trackNo?: number }): Promise<IGovAnalyticsReferendumOutcome> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_GOV_ANALYTICS_REFERENDUM_OUTCOME;
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { trackNo }).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching referendum outcome data from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching referendum outcome data from Subsquid');
+		}
+
+		return {
+			approved: subsquidData.approved.totalCount,
+			rejected: subsquidData.rejected.totalCount,
+			timeout: subsquidData.timeout.totalCount,
+			ongoing: subsquidData.ongoing.totalCount,
+			cancelled: subsquidData.cancelled.totalCount
+		};
+	}
+
+	static async GetGovAnalyticsReferendumCount({ network }: { network: ENetwork }): Promise<{ categoryCounts: IGovAnalyticsCategoryCounts }> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_TOTAL_CATEGORY_PROPOSALS;
+
+		const trackGroups = getTrackGroups(network);
+		const promises = Object.entries(trackGroups).map(async ([group, trackIds]) => {
+			try {
+				const response = await gqlClient
+					.query(query, {
+						trackIds
+					})
+					.toPromise();
+
+				return {
+					group,
+					count: response.data.count.totalCount
+				};
+			} catch (error) {
+				console.error(`Error fetching count for group ${group}:`, error);
+				return {
+					group,
+					count: null
+				};
+			}
+		});
+
+		const results = await Promise.all(promises);
+		const groupResults = results.reduce(
+			(acc, { group, count }) => {
+				acc[group] = count;
+				return acc;
+			},
+			{} as Record<string, number | null>
+		);
+
+		return {
+			categoryCounts: {
+				governance: groupResults.Governance ?? null,
+				main: groupResults.Main ?? null,
+				treasury: groupResults.Treasury ?? null,
+				whiteList: groupResults.Whitelist ?? null
+			}
+		};
+	}
+
+	static async GetTurnoutData({ network }: { network: ENetwork }): Promise<IRawTurnoutData> {
+		try {
+			const { data: subsquidData, error: subsquidErr } = await this.subsquidGqlClient(network).query(SubsquidQueries.GET_TURNOUT_DATA, {}).toPromise();
+
+			if (subsquidErr) {
+				console.error('Subsquid Error:', subsquidErr);
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching turnout data from Subsquid');
+			}
+
+			if (!subsquidData?.proposals) {
+				console.error('No proposals found in response');
+				return { proposals: [] };
+			}
+
+			return {
+				proposals: subsquidData.proposals
+			};
+		} catch (error) {
+			console.error('Error in GetTurnoutData:', error);
+			throw error;
+		}
+	}
+
+	static async GetTrackDelegationAnalyticsStats({ network }: { network: ENetwork }): Promise<Record<string, IGovAnalyticsDelegationStats>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(SubsquidQueries.GET_ALL_TRACK_LEVEL_ANALYTICS_DELEGATION_DATA, {}).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching track delegation analytics stats from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching track delegation analytics stats from Subsquid');
+		}
+
+		const trackStats: Record<
+			string,
+			{
+				totalCapital: string;
+				totalVotesBalance: string;
+				totalDelegates: number;
+				totalDelegators: number;
+				delegateesData: Record<string, { count: number }>;
+				delegatorsData: Record<string, { count: number }>;
+			}
+		> = {};
+
+		if (subsquidData.votingDelegations?.length) {
+			subsquidData.votingDelegations.forEach((delegation: { lockPeriod: number; balance: string; from: string; to: string; track: number }) => {
+				const { track } = delegation;
+				const bnBalance = new BN(delegation.balance);
+				const bnConviction = new BN(delegation.lockPeriod || 1);
+				const vote = delegation.lockPeriod ? bnBalance.mul(bnConviction) : bnBalance.div(VOTING_POWER_DIVISOR);
+
+				if (!trackStats[track]) {
+					trackStats[track] = {
+						totalCapital: '0',
+						totalDelegates: 0,
+						totalDelegators: 0,
+						totalVotesBalance: '0',
+						delegateesData: {},
+						delegatorsData: {}
+					};
+				}
+
+				trackStats[track].totalVotesBalance = new BN(trackStats[track].totalVotesBalance).add(vote).toString();
+				trackStats[track].totalCapital = new BN(trackStats[track].totalCapital).add(bnBalance).toString();
+
+				// Handle delegates
+				if (!trackStats[track].delegateesData[delegation.to]) {
+					trackStats[track].delegateesData[delegation.to] = {
+						count: 1
+					};
+					trackStats[track].totalDelegates += 1;
+				} else {
+					trackStats[track].delegateesData[delegation.to].count += 1;
+				}
+
+				// Handle delegators
+				if (!trackStats[track].delegatorsData[delegation.from]) {
+					trackStats[track].delegatorsData[delegation.from] = {
+						count: 1
+					};
+					trackStats[track].totalDelegators += 1;
+				} else {
+					trackStats[track].delegatorsData[delegation.from].count += 1;
+				}
+			});
+		}
+
+		return trackStats;
 	}
 }

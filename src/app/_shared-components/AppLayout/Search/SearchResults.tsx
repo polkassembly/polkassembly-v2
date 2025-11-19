@@ -10,13 +10,16 @@ import userIcon from '@assets/profile/user-icon.svg';
 import { Hits, Index, useInstantSearch, useSearchBox, Configure, usePagination } from 'react-instantsearch';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Link from 'next/link';
-import { EProposalType, ESearchType } from '@/_shared/types';
+import { EProposalType, ESearchType, ENetwork } from '@/_shared/types';
 import CommentIcon from '@assets/icons/Comment.svg';
 import { POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { AiOutlineDislike } from '@react-icons/all-files/ai/AiOutlineDislike';
 import { AiOutlineLike } from '@react-icons/all-files/ai/AiOutlineLike';
+import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { useSearchConfig } from '@/hooks/useSearchConfig';
 import PaLogo from '../PaLogo';
 import { Separator } from '../../Separator';
 import Address from '../../Profile/Address/Address';
@@ -65,13 +68,19 @@ function PostHit({ hit }: { hit: Post }) {
 	const topic = hit.topic_id ? Object.entries(POST_TOPIC_MAP).find(([, value]) => value === hit.topic_id)?.[0] : null;
 	const backgroundColor = position ? (position % 2 !== 0 ? 'bg-listing_card1' : 'bg-section_dark_overlay') : '';
 
+	const postUrl = getPostTypeUrl({
+		proposalType: hit.proposalType,
+		indexOrHash: hit.index,
+		network: hit.network as ENetwork
+	});
+
 	return (
 		<Link
-			href={hit.proposalType !== EProposalType.DISCUSSION ? `/referenda/${hit.index}` : `/post/${hit.index}`}
+			href={postUrl}
 			target='_blank'
 		>
 			<div className={`${styles.search_results_wrapper} ${backgroundColor} hover:bg-bg_pink/10`}>
-				<div className='flex'>
+				<div className='flex flex-col gap-2 sm:flex-row sm:items-start'>
 					{hit.proposer_address && (
 						<Address
 							address={hit.proposer_address}
@@ -183,17 +192,24 @@ function UserHit({ hit }: { hit: User }) {
 }
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
+function SearchResults({ activeIndex, proposalTypeFilter = ESearchType.POSTS }: { activeIndex: ESearchType | null; proposalTypeFilter?: ESearchType }) {
 	const { status, results } = useInstantSearch();
 	const { query } = useSearchBox();
 	const { currentRefinement, refine } = usePagination();
 	const t = useTranslations();
 	const isLoading = results?.nbHits === 0 && (status === 'loading' || status === 'stalled');
 	const hasNoResults = results?.nbHits === 0 && query.length > 2;
+	const network = getCurrentNetwork();
+
+	const { postFilterQuery } = useSearchConfig({
+		network,
+		activeIndex,
+		proposalTypeFilter
+	});
 
 	return (
 		<div>
-			<div className='h-[50vh] overflow-hidden md:h-[58vh]'>
+			<div className={`${!isLoading && query.length > 2 && !hasNoResults ? 'h-[40vh] md:h-[50vh]' : 'h-[50vh]'} overflow-hidden`}>
 				{isLoading ? (
 					<div className='flex h-full items-center justify-center'>
 						<Image
@@ -263,16 +279,16 @@ function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 							</div>
 						) : (
 							<div className='h-full overflow-y-auto pr-2'>
-								{activeIndex === ESearchType.POSTS ? (
+								{activeIndex === ESearchType.POSTS || activeIndex === ESearchType.BOUNTIES || activeIndex === ESearchType.OTHER ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters='NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS' />
+										<Configure filters={postFilterQuery} />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>
 									</Index>
 								) : activeIndex === ESearchType.DISCUSSIONS ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters='proposalType:DISCUSSION OR proposalType:GRANTS' />
+										<Configure filters={postFilterQuery} />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>

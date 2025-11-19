@@ -1,0 +1,25 @@
+.container {
+	@apply relative z-10 hidden w-56 rounded-xl bg-empty_bar_bg p-[2px] md:block;
+	background-image: linear-gradient(139.05deg, #e5007a 4.08%, #3473ff 41.41%, #ffd663 60.08%, #51d36e 78.75%);
+}
+
+.content {
+	@apply cursor-pointer rounded-[10.5px] bg-empty_bar_bg p-3;
+}
+
+.conversations {
+	@apply mt-3 flex flex-col overflow-hidden rounded-xl border border-primary_border bg-bg_modal;
+}
+
+.mobileContainer {
+	@apply z-20 h-full w-full rounded-t-xl bg-empty_bar_bg p-[1px];
+	background-image: linear-gradient(180deg, #e5007a 0%, #8c39bd 50%, #ffd663 75%, #51d36e 87.5%, #3473ff 100%);
+}
+
+.mobileContent {
+	@apply h-full cursor-pointer rounded-t-[10.5px] bg-empty_bar_bg p-3;
+}
+
+.mobileConversations {
+	@apply mt-5 flex flex-col overflow-hidden rounded-t-xl border-t border-primary_border;
+}

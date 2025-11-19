@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ECookieNames } from '@/_shared/types';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
@@ -29,6 +29,11 @@ export const GET = withErrorHandling(async () => {
 
 	// 3. generate new access token
 	const payload = AuthService.GetRefreshTokenPayload(refreshToken);
+
+	// Check if user is blacklisted before generating new access token
+	if (AuthService.IsUserBlacklisted(payload.id)) {
+		throw new APIError(ERROR_CODES.USER_BLACKLISTED, StatusCodes.FORBIDDEN, ERROR_MESSAGES.USER_BLACKLISTED);
+	}
 
 	const user = await OffChainDbService.GetUserById(payload.id);
 

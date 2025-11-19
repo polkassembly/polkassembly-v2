@@ -29,6 +29,8 @@ export class FirestoreUtils {
 
 	protected static increment = firebaseAdmin.firestore.FieldValue.increment;
 
+	protected static serverTimestamp = firebaseAdmin.firestore.FieldValue.serverTimestamp;
+
 	// collection references
 	protected static usersCollectionRef = () => firebaseAdmin.firestore().collection('users');
 
@@ -61,4 +63,11 @@ export class FirestoreUtils {
 	protected static delegatesCollectionRef = () => this.firestoreDb.collection('delegates');
 
 	protected static userSocialsCollectionRef = () => this.firestoreDb.collection('user_socials');
+
+	protected static pollsCollectionRef = () => this.firestoreDb.collection('polls');
+
+	// klara collection references
+	protected static conversationsCollectionRef = () => this.firestoreDb.collection('klara_conversations');
+
+	protected static messagesCollectionRef = () => this.firestoreDb.collection('klara_messages');
 }

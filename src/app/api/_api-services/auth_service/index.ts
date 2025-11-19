@@ -5,7 +5,7 @@
 import jwt from 'jsonwebtoken';
 import { StatusCodes } from 'http-status-codes';
 import { APIError } from '@app/api/_api-utils/apiError';
-import { ACCESS_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from '@app/api/_api-constants/jwt';
+import { ACCESS_TOKEN_COOKIE_OPTIONS, IFRAME_ACCESS_TOKEN_COOKIE_OPTIONS, IFRAME_REFRESH_TOKEN_COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_OPTIONS } from '@app/api/_api-constants/jwt';
 import { ERROR_CODES, ERROR_MESSAGES } from '@shared/_constants/errorLiterals';
 import {
 	ACCESS_TOKEN_PASSPHRASE,
@@ -25,11 +25,14 @@ import { DEFAULT_PROFILE_DETAILS } from '@shared/_constants/defaultProfileDetail
 import { getSubstrateAddress } from '@shared/_utils/getSubstrateAddress';
 import { TOTP } from 'otpauth';
 import { cookies } from 'next/headers';
+import { USER_ID_BLACKLIST } from '@/_shared/_constants/userIdBlacklist';
 import { OffChainDbService } from '../offchain_db_service';
 import { RedisService } from '../redis_service';
 import { ACCESS_TOKEN_LIFE_IN_SECONDS, REFRESH_TOKEN_LIFE_IN_SECONDS } from '../../_api-constants/timeConstants';
 import { NotificationService } from '../notification_service';
 import { generateRandomBase32 } from '../../_api-utils/generateRandomBase32';
+import { OnChainDbService } from '../onchain_db_service';
+import { validateRemarkLogin } from '../../_api-utils/validateRemarkLogin';
 
 if (!ACCESS_TOKEN_PRIVATE_KEY || !ACCESS_TOKEN_PUBLIC_KEY || !ACCESS_TOKEN_PASSPHRASE) {
 	throw new APIError(
@@ -44,6 +47,26 @@ if (!REFRESH_TOKEN_PRIVATE_KEY || !REFRESH_TOKEN_PUBLIC_KEY || !REFRESH_TOKEN_PA
 }
 
 export class AuthService {
+	/**
+	 * Check if a user ID is blacklisted
+	 * @param userId - The user ID to check
+	 * @returns true if the user is blacklisted, false otherwise
+	 */
+	static IsUserBlacklisted(userId: number): boolean {
+		return USER_ID_BLACKLIST.includes(userId);
+	}
+
+	/**
+	 * Validate user is not blacklisted and throw appropriate error if they are
+	 * @param userId - The user ID to validate
+	 * @throws {APIError} 403 - User is blacklisted
+	 */
+	private static ValidateUserNotBlacklisted(userId: number): void {
+		if (this.IsUserBlacklisted(userId)) {
+			throw new APIError(ERROR_CODES.USER_BLACKLISTED, StatusCodes.FORBIDDEN, ERROR_MESSAGES.USER_BLACKLISTED);
+		}
+	}
+
 	private static async CreateAndSendEmailVerificationToken(user: IUser, network: ENetwork): Promise<void> {
 		if (user.email) {
 			const verifyToken = createCuid();
@@ -135,6 +158,9 @@ export class AuthService {
 
 	static async GetUserWithAccessToken(token: string): Promise<IUser | null> {
 		const userId = this.GetUserIdFromAccessToken(token);
+
+		// Check if user is blacklisted before proceeding
+		this.ValidateUserNotBlacklisted(userId);
 
 		const user = await OffChainDbService.GetUserById(userId);
 		if (!user) return null;
@@ -242,6 +268,9 @@ export class AuthService {
 			throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, `User not found: ${emailOrUsername}`);
 		}
 
+		// Check if user is blacklisted before proceeding with login
+		this.ValidateUserNotBlacklisted(user.id);
+
 		const isCorrectPassword = await argon2.verify(user.password, password);
 
 		if (!isCorrectPassword) {
@@ -299,12 +328,65 @@ export class AuthService {
 		};
 	}
 
-	static async GetRefreshTokenCookie(refreshToken: string) {
-		return serialize(ECookieNames.REFRESH_TOKEN, refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
+	static async GetRefreshTokenCookie(refreshToken: string, isIframe: boolean = false) {
+		const options = isIframe ? IFRAME_REFRESH_TOKEN_COOKIE_OPTIONS : REFRESH_TOKEN_COOKIE_OPTIONS;
+		return serialize(ECookieNames.REFRESH_TOKEN, refreshToken, options);
 	}
 
-	static async GetAccessTokenCookie(accessToken: string) {
-		return serialize(ECookieNames.ACCESS_TOKEN, accessToken, ACCESS_TOKEN_COOKIE_OPTIONS);
+	static async GetAccessTokenCookie(accessToken: string, isIframe: boolean = false) {
+		const options = isIframe ? IFRAME_ACCESS_TOKEN_COOKIE_OPTIONS : ACCESS_TOKEN_COOKIE_OPTIONS;
+		return serialize(ECookieNames.ACCESS_TOKEN, accessToken, options);
+	}
+
+	private static async CreateWeb3UserAndTokenPayload({ loginAddress, loginWallet, network }: { loginAddress: string; loginWallet: EWallet; network: ENetwork }) {
+		// find if user exists
+		const user = await OffChainDbService.GetUserByAddress(loginAddress);
+
+		// if user exists, login
+		if (user) {
+			// Check if user is blacklisted before proceeding with login
+			this.ValidateUserNotBlacklisted(user.id);
+			const isTFAEnabled = user.twoFactorAuth?.enabled || false;
+
+			if (isTFAEnabled) {
+				const tfaToken = createCuid();
+				await RedisService.SetTfaToken({ tfaToken, userId: user.id });
+
+				return {
+					isTFAEnabled,
+					tfaToken
+				};
+			}
+
+			return {
+				isTFAEnabled,
+				refreshToken: await this.GetRefreshToken({ userId: user.id, loginAddress, loginWallet }),
+				accessToken: await this.GetSignedAccessToken({
+					...user,
+					loginAddress,
+					loginWallet
+				})
+			};
+		}
+
+		// user does not exist, register
+		const username = `${loginAddress.substring(0, 6)}...${loginAddress.substring(loginAddress.length - 4)}`; // example: 5Grwva...KpZf3 or 0x0000...0001
+		const password = createCuid();
+
+		const newUser = await this.CreateUser({
+			email: '',
+			newPassword: password,
+			username,
+			isWeb3Signup: true,
+			network,
+			address: loginAddress,
+			wallet: loginWallet
+		});
+
+		return {
+			accessToken: await this.GetSignedAccessToken(newUser),
+			refreshToken: await this.GetRefreshToken({ userId: newUser.id })
+		};
 	}
 
 	static async Web3LoginOrRegister({ address, wallet, signature, network }: { address: string; wallet: EWallet; signature: string; network: ENetwork }): Promise<IAuthResponse> {
@@ -331,52 +413,51 @@ export class AuthService {
 
 		const formattedAddress = isEvmAddress ? address : getSubstrateAddress(address)!;
 
-		// find if user exists
-		const user = await OffChainDbService.GetUserByAddress(formattedAddress);
+		return this.CreateWeb3UserAndTokenPayload({ loginAddress: formattedAddress, loginWallet: wallet, network });
+	}
 
-		// if user exists, login
-		if (user) {
-			const isTFAEnabled = user.twoFactorAuth?.enabled || false;
-
-			if (isTFAEnabled) {
-				const tfaToken = createCuid();
-				await RedisService.SetTfaToken({ tfaToken, userId: user.id });
-
-				return {
-					isTFAEnabled,
-					tfaToken
-				};
-			}
-
-			return {
-				isTFAEnabled,
-				refreshToken: await this.GetRefreshToken({ userId: user.id, loginAddress: formattedAddress, loginWallet: wallet }),
-				accessToken: await this.GetSignedAccessToken({
-					...user,
-					loginAddress: formattedAddress,
-					loginWallet: wallet
-				})
-			};
+	static async Web3LoginOrRegisterWithRemark({
+		address,
+		wallet,
+		network,
+		remarkHash
+	}: {
+		address: string;
+		wallet: EWallet;
+		network: ENetwork;
+		remarkHash: string;
+	}): Promise<IAuthResponse> {
+		if (!ValidatorService.isValidNetwork(network)) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid network');
 		}
 
-		// user does not exist, register
-		const username = `${formattedAddress.substring(0, 6)}...${formattedAddress.substring(formattedAddress.length - 4)}`; // example: 5Grwva...KpZf3 or 0x0000...0001
-		const password = createCuid();
+		const isEvmAddress = ValidatorService.isValidEVMAddress(address);
 
-		const newUser = await this.CreateUser({
-			email: '',
-			newPassword: password,
-			username,
-			isWeb3Signup: true,
-			network,
-			address: formattedAddress,
-			wallet
-		});
+		if (!isEvmAddress && !ValidatorService.isValidSubstrateAddress(address)) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Invalid address');
+		}
 
-		return {
-			accessToken: await this.GetSignedAccessToken(newUser),
-			refreshToken: await this.GetRefreshToken({ userId: newUser.id })
-		};
+		const formattedAddress = isEvmAddress ? address : getSubstrateAddress(address)!;
+
+		const extrinsicDetails = await OnChainDbService.GetExtrinsicDetails({ network, hash: remarkHash });
+
+		if (extrinsicDetails.message !== 'Success') {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Could not get transaction data. Please try again.');
+		}
+
+		const remarkLoginMessage = await RedisService.GetRemarkLoginMessage(formattedAddress);
+		if (!remarkLoginMessage) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Sign message not found. Please try again.');
+		}
+
+		// check tx data if it has the remark with user id (supports nested calls)
+		const remarkExists = validateRemarkLogin({ extrinsicData: extrinsicDetails.data, remarkLoginMessage });
+
+		if (!remarkExists || !extrinsicDetails.data.account_id) {
+			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'The remark does not exist in this transaction hash. Please provide a different hash.');
+		}
+
+		return this.CreateWeb3UserAndTokenPayload({ loginAddress: formattedAddress, loginWallet: wallet, network });
 	}
 
 	static async IsValidRefreshToken(token: string) {
@@ -617,6 +698,10 @@ export class AuthService {
 		const isValidAccessToken = accessToken && this.IsValidAccessToken(accessToken);
 
 		if (isValidAccessToken) {
+			// Even if access token is valid, check if user is blacklisted
+			const userId = this.GetUserIdFromAccessToken(accessToken);
+			this.ValidateUserNotBlacklisted(userId);
+
 			return {
 				newAccessToken: accessToken,
 				newRefreshToken: refreshToken
@@ -625,6 +710,10 @@ export class AuthService {
 
 		// If access token is invalid, try to generate a new one using refresh token
 		const refreshTokenPayload = this.GetRefreshTokenPayload(refreshToken);
+
+		// Check if user is blacklisted before proceeding with token refresh
+		this.ValidateUserNotBlacklisted(refreshTokenPayload.id);
+
 		const user = await OffChainDbService.GetUserById(refreshTokenPayload.id);
 
 		if (!user) {

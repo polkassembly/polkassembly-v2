@@ -28,6 +28,8 @@ function ConvictionsAnalytics({ convictionsAnalytics, proposalType, index }: { c
 					proposalType={proposalType}
 					analyticsType={EAnalyticsType.CONVICTIONS}
 					index={index}
+					enableTitle
+					enableFilter
 				/>
 			</div>
 			<Separator className='dashed my-4' />

@@ -28,6 +28,7 @@ import { SquareArrowOutUpRight, TriangleAlert } from 'lucide-react';
 import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddress/SwitchWalletOrAddress';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import AddressRelationsPicker from '@/app/_shared-components/AddressRelationsPicker/AddressRelationsPicker';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 
 function CancelReferendum({ onSuccess }: { onSuccess: (proposalId: number) => void }) {
 	const t = useTranslations();
@@ -42,6 +43,8 @@ function CancelReferendum({ onSuccess }: { onSuccess: (proposalId: number) => vo
 
 	const { toast } = useToast();
 	const [loading, setLoading] = useState(false);
+
+	const { setVaultQrState } = usePolkadotVault();
 
 	const fetchProposalDetails = async (refId?: number) => {
 		if (!refId) return null;
@@ -95,7 +98,7 @@ function CancelReferendum({ onSuccess }: { onSuccess: (proposalId: number) => vo
 	);
 
 	const createProposal = async () => {
-		if (!apiService || !userPreferences.selectedAccount?.address || !tx) {
+		if (!apiService || !userPreferences.selectedAccount?.address || !userPreferences.wallet || !tx) {
 			return;
 		}
 
@@ -103,6 +106,9 @@ function CancelReferendum({ onSuccess }: { onSuccess: (proposalId: number) => vo
 
 		apiService.createProposal({
 			address: userPreferences.selectedAccount.address,
+			selectedAccount: userPreferences.selectedAccount,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
 			track: EPostOrigin.REFERENDUM_CANCELLER,
 			extrinsicFn: tx,
 			enactment: selectedEnactment,
@@ -132,7 +138,12 @@ function CancelReferendum({ onSuccess }: { onSuccess: (proposalId: number) => vo
 			<div className='flex flex-1 flex-col gap-y-4 overflow-y-auto'>
 				<SwitchWalletOrAddress
 					small
-					customAddressSelector={<AddressRelationsPicker withBalance />}
+					customAddressSelector={
+						<AddressRelationsPicker
+							withBalance
+							showTransferableBalance
+						/>
+					}
 				/>
 				<div className='flex flex-col gap-y-2'>
 					<p className='text-sm text-wallet_btn_text'>{t('KillCancelReferendum.referendumId')}</p>

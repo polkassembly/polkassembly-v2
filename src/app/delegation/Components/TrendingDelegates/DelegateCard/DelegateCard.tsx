@@ -52,26 +52,26 @@ function DelegateStats({ delegate }: { delegate: IDelegateDetails }) {
 		<div className={styles.delegationCardStats}>
 			<div className={styles.delegationCardStatsItem}>
 				<div>
-					<div className='text-sm text-btn_secondary_text lg:whitespace-nowrap'>
+					<div className='text-sm text-btn_secondary_text xl:whitespace-nowrap'>
 						<span className='font-semibold md:text-2xl'>
 							{' '}
-							{formatUSDWithUnits(formatBnBalance(delegate?.votingPower, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
+							{formatUSDWithUnits(formatBnBalance(delegate?.maxDelegated, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
 						</span>{' '}
 					</div>
-					<span className={styles.delegationCardStatsItemText}>{t('votingPower')}</span>
+					<span className={styles.delegationCardStatsItemText}>{t('maxDelegated')}</span>
 				</div>
 			</div>
 			<div className={styles.delegationCardStatsItem}>
 				<div>
-					<div className='font-semibold md:text-2xl'>{delegate?.last30DaysVotedProposalsCount}</div>
+					<div className='font-semibold text-btn_secondary_text md:text-2xl'>{delegate?.last30DaysVotedProposalsCount}</div>
 					<span className={styles.delegationCardStatsItemText}>{t('votedProposals')}</span>
 					<span className={styles.delegationCardStatsItemTextPast30Days}>({t('past30Days')})</span>
 				</div>
 			</div>
 			<div className='p-5 text-center'>
 				<div>
-					<div className='font-semibold md:text-2xl'>{delegate?.receivedDelegationsCount}</div>
-					<span className={styles.delegationCardStatsItemText}>{t('receivedDelegations')}</span>
+					<div className='font-semibold text-btn_secondary_text md:text-2xl'>{delegate?.delegators?.length || 0}</div>
+					<span className={styles.delegationCardStatsItemText}>{t('delegators')}</span>
 				</div>
 			</div>
 		</div>
@@ -84,7 +84,7 @@ const DelegateCard = memo(({ delegate }: { delegate: IDelegateDetails }) => {
 	const { user } = useUser();
 
 	const [openModal, setOpenModal] = useState(false);
-
+	const [openDelegateDialog, setOpenDelegateDialog] = useState(false);
 	return (
 		<div className={styles.delegationCard}>
 			<div className={`flex gap-2 rounded-t-md border py-1 ${getPlatformStyles(delegate.sources)}`}>
@@ -96,7 +96,10 @@ const DelegateCard = memo(({ delegate }: { delegate: IDelegateDetails }) => {
 						<Address address={delegate.address} />
 					</div>
 					{user?.id ? (
-						<Dialog>
+						<Dialog
+							open={openDelegateDialog}
+							onOpenChange={setOpenDelegateDialog}
+						>
 							<DialogTrigger asChild>
 								<Button
 									variant='ghost'
@@ -113,7 +116,10 @@ const DelegateCard = memo(({ delegate }: { delegate: IDelegateDetails }) => {
 										<span>{t('delegate')}</span>
 									</DialogTitle>
 								</DialogHeader>
-								<DelegateVotingPower delegate={delegate} />
+								<DelegateVotingPower
+									delegate={delegate}
+									onClose={() => setOpenDelegateDialog(false)}
+								/>
 							</DialogContent>
 						</Dialog>
 					) : (

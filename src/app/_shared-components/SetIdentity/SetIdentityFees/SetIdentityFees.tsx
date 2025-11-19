@@ -15,43 +15,18 @@ function SetIdentityFees({ onNext, onRequestJudgement, registrarFee }: { onNext:
 
 	return (
 		<div className={classes.wrapper}>
-			<div className={classes.illustration}>
-				<Image
-					src={SetIdentityIllustration}
-					alt='Set Identity Illustration'
-				/>
+			<div className='flex flex-1 flex-col overflow-y-auto'>
+				<div className={classes.illustration}>
+					<Image
+						src={SetIdentityIllustration}
+						alt='Set Identity Illustration'
+					/>
+				</div>
+				<ul className={classes.description}>
+					<li>{t('SetIdentity.identityDescription1')}</li>
+					<li>{t('SetIdentity.identityDescription2')}</li>
+				</ul>
 			</div>
-			<ul className={classes.description}>
-				<li>{t('SetIdentity.identityDescription1')}</li>
-				<li>{t('SetIdentity.identityDescription2')}</li>
-			</ul>
-			{/* <Collapsible className={classes.collapsible}>
-				<CollapsibleTrigger className={classes.collapsibleTrigger}>
-					<div className={classes.collapsibleTriggerContent}>
-						<span className='text-sm'>{t('SetIdentity.totalAmountRequired')}</span>
-						<div className={classes.collapsibleTriggerContentInner}>
-							<p className={classes.collapsibleTriggerContentInnerText}>
-								<span className='font-semibold'>{formatBnBalance(minDeposit.add(registrarFee), { compactNotation: true, withUnit: true, numberAfterComma: 1 }, network)} </span>
-								<span className='text-[10px] text-wallet_btn_text'>{t('SetIdentity.viewAmountBreakup')}</span>
-							</p>
-							<ChevronDown className='font-semibold text-text_primary' />
-						</div>
-					</div>
-				</CollapsibleTrigger>
-				<CollapsibleContent>
-					<Separator className='my-2' />
-					<div className={classes.feeWrapper}>
-						<div className={classes.feeItem}>
-							<p className={classes.feeItemText}>{t('SetIdentity.minimumDeposit')}</p>
-							<p className={classes.feeItemValue}>{formatBnBalance(minDeposit, { compactNotation: true, withUnit: true, numberAfterComma: 1 }, network)}</p>
-						</div>
-						<div className={classes.feeItem}>
-							<p className={classes.feeItemText}>{t('SetIdentity.registrarFees')}</p>
-							<p className={classes.feeItemValue}>{formatBnBalance(registrarFee, { compactNotation: true, withUnit: true, numberAfterComma: 1 }, network)}</p>
-						</div>
-					</div>
-				</CollapsibleContent>
-			</Collapsible> */}
 			<IdentityFeeCollaps registrarFee={registrarFee} />
 			<Separator />
 			<Button onClick={onNext}>{t('SetIdentity.letBegin')}</Button>

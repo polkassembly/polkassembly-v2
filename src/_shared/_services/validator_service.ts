@@ -308,8 +308,8 @@ export class ValidatorService {
 		// Twitter handle rules:
 		// - 4-15 characters long
 		// - Only alphanumeric characters and underscores
-		// - Cannot start with a number
-		const twitterHandleRegex = /^[a-zA-Z][a-zA-Z0-9_]{3,14}$/;
+		// - Can start with a letter or number or underscore (@0x, @_abc)
+		const twitterHandleRegex = /^[a-zA-Z0-9_][a-zA-Z0-9_]{3,14}$/;
 
 		return twitterHandleRegex.test(cleanHandle);
 	}
@@ -342,5 +342,9 @@ export class ValidatorService {
 		const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]*(\.[a-zA-Z0-9][a-zA-Z0-9-]*)*\.[a-zA-Z]{2,}$/;
 
 		return usernameRegex.test(username) && domainRegex.test(domain);
+	}
+
+	static isValidImageSrc(imageSrc: string): boolean {
+		return imageSrc.startsWith('https://i.ibb.co/');
 	}
 }

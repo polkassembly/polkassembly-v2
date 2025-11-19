@@ -22,15 +22,23 @@ import {
 	IPost,
 	IPostAnalytics,
 	IPostListing,
-	EPostBubbleVotesType,
+	EVotesDisplayType,
 	IPostBubbleVotes,
 	ITrackAnalyticsDelegations,
 	ITrackAnalyticsStats,
-	ITreasuryStats
+	ITreasuryStats,
+	IGovAnalyticsStats,
+	IGovAnalyticsReferendumOutcome,
+	IRawTurnoutData,
+	IGovAnalyticsDelegationStats,
+	IGovAnalyticsCategoryCounts,
+	IUserPosts
 } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { createId as createCuid } from '@paralleldrive/cuid2';
+import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
+import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
 import {
 	FIVE_MIN,
 	HALF_HOUR_IN_SECONDS,
@@ -64,8 +72,19 @@ enum ERedisKeys {
 	TRACK_ANALYTICS_STATS = 'TAS',
 	TREASURY_STATS = 'TRS',
 	OVERVIEW_PAGE_DATA = 'OPD',
+	REMARK_LOGIN_MESSAGE = 'RLM',
 	POST_ANALYTICS_DATA = 'PAD',
-	POST_BUBBLE_VOTES_DATA = 'PBVD'
+	POST_BUBBLE_VOTES_DATA = 'PBVD',
+	GOV_ANALYTICS_STATS = 'GAS',
+	GOV_ANALYTICS_REFERENDUM_OUTCOME = 'GAR',
+	GOV_ANALYTICS_REFERENDUM_COUNT = 'GAC',
+	TRACK_LEVEL_PROPOSALS_ANALYTICS = 'TLP',
+	TURNOUT_DATA = 'TOD',
+	TRACK_DELEGATION_ANALYTICS = 'TDA',
+	GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK = 'GAR_TRACK',
+	USER_VOTES = 'UVT',
+	USER_POSTS = 'UPS',
+	TRACK_COUNTS = 'TC'
 }
 
 export class RedisService {
@@ -131,94 +150,149 @@ export class RedisService {
 		[ERedisKeys.TRACK_ANALYTICS_STATS]: (network: string, origin: EPostOrigin | 'all'): string => `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-${origin}`,
 		[ERedisKeys.TREASURY_STATS]: ({ network, from, to }: { network: string; from: string; to: string }): string => `${ERedisKeys.TREASURY_STATS}-${network}-${from}-${to}`,
 		[ERedisKeys.OVERVIEW_PAGE_DATA]: (network: string): string => `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}`,
+		[ERedisKeys.REMARK_LOGIN_MESSAGE]: (address: string): string => `${ERedisKeys.REMARK_LOGIN_MESSAGE}-${address}`,
 		[ERedisKeys.POST_ANALYTICS_DATA]: (network: ENetwork, proposalType: EProposalType, index: number): string =>
 			`${ERedisKeys.POST_ANALYTICS_DATA}-${network}-${proposalType}-${index}`,
-		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: ENetwork, proposalType: EProposalType, index: number, votesType: EPostBubbleVotesType, analyticsType: EAnalyticsType): string =>
-			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${index}-${votesType}-${analyticsType}`
+		[ERedisKeys.POST_BUBBLE_VOTES_DATA]: (network: ENetwork, proposalType: EProposalType, index: number, votesType: EVotesDisplayType, analyticsType: EAnalyticsType): string =>
+			`${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-${proposalType}-${index}-${votesType}-${analyticsType}`,
+		[ERedisKeys.TRACK_COUNTS]: (network: string): string => `${ERedisKeys.TRACK_COUNTS}-${network}`,
+		[ERedisKeys.GOV_ANALYTICS_STATS]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_STATS}-${network}`,
+		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME}-${network}`,
+		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT]: (network: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT}-${network}`,
+		[ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS]: (network: string): string => `${ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS}-${network}`,
+		[ERedisKeys.TURNOUT_DATA]: (network: string): string => `${ERedisKeys.TURNOUT_DATA}-${network}`,
+		[ERedisKeys.TRACK_DELEGATION_ANALYTICS]: (network: string): string => `${ERedisKeys.TRACK_DELEGATION_ANALYTICS}-${network}`,
+		[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK]: (network: string, trackNo: string): string => `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK}-${network}-${trackNo}`,
+		[ERedisKeys.USER_VOTES]: (network: string, address: string, page: number, limit: number, proposalStatuses?: string[]): string => {
+			const baseKey = `${ERedisKeys.USER_VOTES}-${network}-${address}-${page}-${limit}`;
+			const statusesPart = proposalStatuses?.length ? `-s:${proposalStatuses.sort().join(',')}` : '';
+			return baseKey + statusesPart;
+		},
+		[ERedisKeys.USER_POSTS]: (network: string, address: string, page: number, limit: number, proposalType?: EProposalType): string => {
+			const baseKey = `${ERedisKeys.USER_POSTS}-${network}-${address}-${page}-${limit}`;
+			const proposalTypePart = proposalType ? `-pt:${proposalType}` : '';
+			return baseKey + proposalTypePart;
+		}
 	} as const;
 
 	// helper methods
 
 	private static async Get({ key, forceCache = false }: { key: string; forceCache?: boolean }): Promise<string | null> {
 		if (!IS_CACHE_ENABLED && !forceCache) return null;
-		return this.client.get(key);
+
+		try {
+			return this.client.get(key);
+		} catch (error) {
+			console.error('Error getting key:', error);
+			return null;
+		}
 	}
 
 	private static async Set({ key, value, ttlSeconds, forceCache = false }: { key: string; value: string; ttlSeconds?: number; forceCache?: boolean }): Promise<string | null> {
 		if (!IS_CACHE_ENABLED && !forceCache) return null;
 
-		if (ttlSeconds) {
-			return this.client.set(key, value, 'EX', ttlSeconds);
-		}
+		try {
+			if (ttlSeconds) {
+				return this.client.set(key, value, 'EX', ttlSeconds);
+			}
 
-		return this.client.set(key, value);
+			return this.client.set(key, value);
+		} catch (error) {
+			console.error('Error setting key:', error);
+			return null;
+		}
 	}
 
 	private static async Delete({ key, forceCache = false }: { key: string; forceCache?: boolean }): Promise<number> {
 		if (!IS_CACHE_ENABLED && !forceCache) return 0;
 
-		return this.client.del(key);
+		try {
+			return this.client.del(key);
+		} catch (error) {
+			console.error('Error deleting key:', error);
+			return 0;
+		}
 	}
 
 	private static async DeleteKeys({ pattern, forceCache = false }: { pattern: string; forceCache?: boolean }): Promise<void> {
 		if (!IS_CACHE_ENABLED && !forceCache) return Promise.resolve();
 
-		return new Promise((resolve, reject) => {
-			const stream = this.client.scanStream({
-				count: 200,
-				match: pattern
-			});
+		try {
+			return new Promise((resolve, reject) => {
+				const stream = this.client.scanStream({
+					count: 200,
+					match: pattern
+				});
 
-			let hasError = false;
+				let hasError = false;
 
-			stream.on('data', async (keys) => {
-				if (keys.length && !hasError) {
-					try {
-						const pipeline = this.client.pipeline();
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
-						keys.forEach((key: any) => {
-							pipeline.del(key);
-						});
-						await pipeline.exec();
-					} catch (error) {
-						hasError = true;
-						console.error('Error deleting keys:', error);
-						reject(error);
+				stream.on('data', async (keys) => {
+					if (keys.length && !hasError) {
+						try {
+							const pipeline = this.client.pipeline();
+							// eslint-disable-next-line @typescript-eslint/no-explicit-any
+							keys.forEach((key: any) => {
+								pipeline.del(key);
+							});
+							await pipeline.exec();
+						} catch (error) {
+							hasError = true;
+							console.error('Error deleting keys:', error);
+							reject(error);
+						}
 					}
-				}
-			});
+				});
 
-			stream.on('end', () => {
-				if (!hasError) {
-					console.log(`All keys matching pattern ${pattern} deleted.`);
-					resolve();
-				}
-			});
+				stream.on('end', () => {
+					if (!hasError) {
+						console.log(`All keys matching pattern ${pattern} deleted.`);
+						resolve();
+					}
+				});
 
-			stream.on('error', (error) => {
-				hasError = true;
-				console.error('Stream error:', error);
-				reject(error);
+				stream.on('error', (error) => {
+					hasError = true;
+					console.error('Stream error:', error);
+					reject(error);
+				});
 			});
-		});
+		} catch (error) {
+			console.error('Error deleting keys:', error);
+			return Promise.reject(error);
+		}
 	}
 
 	private static async AddToSet({ key, value, forceCache = false }: { key: string; value: string; forceCache?: boolean }): Promise<number> {
 		if (!IS_CACHE_ENABLED && !forceCache) return 0;
 
-		return this.client.sadd(key, value);
+		try {
+			return this.client.sadd(key, value);
+		} catch (error) {
+			console.error('Error adding to set:', error);
+			return 0;
+		}
 	}
 
 	private static async RemoveFromSet({ key, value, forceCache = false }: { key: string; value: string; forceCache?: boolean }): Promise<number> {
 		if (!IS_CACHE_ENABLED && !forceCache) return 0;
 
-		return this.client.srem(key, value);
+		try {
+			return this.client.srem(key, value);
+		} catch (error) {
+			console.error('Error removing from set:', error);
+			return 0;
+		}
 	}
 
 	private static async GetSetMembers({ key, forceCache = false }: { key: string; forceCache?: boolean }): Promise<string[]> {
 		if (!IS_CACHE_ENABLED && !forceCache) return [];
 
-		return this.client.smembers(key);
+		try {
+			return this.client.smembers(key);
+		} catch (error) {
+			console.error('Error getting set members:', error);
+			return [];
+		}
 	}
 
 	static async DeleteAllCacheForNetwork(network: ENetwork): Promise<void> {
@@ -234,9 +308,16 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_ANALYTICS_DELEGATION}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_ANALYTICS_STATS}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_STATS}-${network}-*` }),
-			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.OVERVIEW_PAGE_DATA}-${network}` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.POST_ANALYTICS_DATA}-${network}-*` }),
-			this.DeleteKeys({ pattern: `${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-*` })
+			this.DeleteKeys({ pattern: `${ERedisKeys.POST_BUBBLE_VOTES_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_STATS}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.TURNOUT_DATA}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_DELEGATION_ANALYTICS}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK}-${network}-*` })
 		]);
 	}
 
@@ -344,7 +425,22 @@ export class RedisService {
 	// Posts caching methods
 	static async GetPostData({ network, proposalType, indexOrHash }: { network: string; proposalType: EProposalType; indexOrHash: string }): Promise<IPost | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_DATA](network, proposalType, indexOrHash) });
-		return data ? (deepParseJson(data) as IPost) : null;
+		const parsedData = data ? (deepParseJson(data) as IPost) : null;
+
+		if (parsedData && parsedData.title !== undefined && typeof parsedData.title !== 'string') {
+			parsedData.title = String(parsedData.title || DEFAULT_POST_TITLE);
+		}
+		if (parsedData && parsedData.content !== undefined && typeof parsedData.content !== 'string') {
+			parsedData.content = String(parsedData.content || getDefaultPostContent(proposalType));
+		}
+
+		if (parsedData && parsedData.comments && Array.isArray(parsedData.comments)) {
+			parsedData.comments = parsedData.comments.map((comment) => ({
+				...comment,
+				content: comment.content !== undefined && typeof comment.content !== 'string' ? String(comment.content || '') : comment.content
+			}));
+		}
+		return parsedData as IPost | null;
 	}
 
 	static async SetPostData({ network, proposalType, indexOrHash, data }: { network: string; proposalType: EProposalType; indexOrHash: string; data: IPost }): Promise<void> {
@@ -613,6 +709,20 @@ export class RedisService {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TRACK_ANALYTICS_STATS](network, origin) });
 	}
 
+	// Track counts caching methods
+	static async GetTrackCounts({ network }: { network: string }): Promise<Record<string, number> | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TRACK_COUNTS](network) });
+		return data ? (deepParseJson(data) as Record<string, number>) : null;
+	}
+
+	static async SetTrackCounts({ network, data }: { network: string; data: Record<string, number> }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TRACK_COUNTS](network), value: JSON.stringify(data), ttlSeconds: HALF_HOUR_IN_SECONDS });
+	}
+
+	static async DeleteTrackCounts({ network }: { network: string }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TRACK_COUNTS](network) });
+	}
+
 	// Treasury stats caching methods
 	static async GetTreasuryStats({ network, from, to }: { network: ENetwork; from: string; to: string }): Promise<ITreasuryStats[] | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TREASURY_STATS]({ network, from, to }) });
@@ -645,6 +755,19 @@ export class RedisService {
 
 	static async DeleteOverviewPageData({ network }: { network: ENetwork }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
+	}
+
+	// Remark login message caching methods
+	static async SetRemarkLoginMessage({ address, message }: { address: string; message: string }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.REMARK_LOGIN_MESSAGE](address), value: message, ttlSeconds: FIVE_MIN, forceCache: true });
+	}
+
+	static async GetRemarkLoginMessage(address: string): Promise<string | null> {
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.REMARK_LOGIN_MESSAGE](address), forceCache: true });
+	}
+
+	static async DeleteRemarkLoginMessage(address: string): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.REMARK_LOGIN_MESSAGE](address), forceCache: true });
 	}
 
 	static async SetPostAnalyticsData({
@@ -691,7 +814,7 @@ export class RedisService {
 		proposalType: EProposalType;
 		index: number;
 		data: IPostBubbleVotes;
-		votesType: EPostBubbleVotesType;
+		votesType: EVotesDisplayType;
 		analyticsType: EAnalyticsType;
 		proposalStatus: EProposalStatus;
 	}): Promise<void> {
@@ -713,7 +836,7 @@ export class RedisService {
 		network: ENetwork;
 		proposalType: EProposalType;
 		index: number;
-		votesType: EPostBubbleVotesType;
+		votesType: EVotesDisplayType;
 		analyticsType: EAnalyticsType;
 	}): Promise<IPostBubbleVotes | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });
@@ -730,9 +853,213 @@ export class RedisService {
 		network: ENetwork;
 		proposalType: EProposalType;
 		index: number;
-		votesType: EPostBubbleVotesType;
+		votesType: EVotesDisplayType;
 		analyticsType: EAnalyticsType;
 	}): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.POST_BUBBLE_VOTES_DATA](network, proposalType, index, votesType, analyticsType) });
+	}
+
+	// Network governance analytics stats caching methods
+	static async GetGovAnalyticsStats(network: string): Promise<IGovAnalyticsStats | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_STATS](network) });
+		return data ? (deepParseJson(data) as IGovAnalyticsStats) : null;
+	}
+
+	static async SetGovAnalyticsStats({ network, data }: { network: string; data: IGovAnalyticsStats }): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_STATS](network),
+			value: JSON.stringify(data),
+			ttlSeconds: ONE_DAY_IN_SECONDS
+		});
+	}
+
+	static async DeleteGovAnalyticsStats(network: string): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_STATS](network) });
+	}
+
+	// Referendum outcome caching methods
+	static async GetGovAnalyticsReferendumOutcome(network: string): Promise<IGovAnalyticsReferendumOutcome | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME](network) });
+		return data ? (deepParseJson(data) as IGovAnalyticsReferendumOutcome) : null;
+	}
+
+	static async SetGovAnalyticsReferendumOutcome({ network, data }: { network: string; data: IGovAnalyticsReferendumOutcome }): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME](network),
+			value: JSON.stringify(data),
+			ttlSeconds: ONE_DAY_IN_SECONDS
+		});
+	}
+
+	static async DeleteGovAnalyticsReferendumOutcome(network: string): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME](network) });
+	}
+
+	// Track-specific referendum outcome caching methods
+	static async GetGovAnalyticsReferendumOutcomeByTrack(network: string, trackNo: number): Promise<IGovAnalyticsReferendumOutcome | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK](network, trackNo.toString()) });
+		return data ? (deepParseJson(data) as IGovAnalyticsReferendumOutcome) : null;
+	}
+
+	static async SetGovAnalyticsReferendumOutcomeByTrack({ network, data, trackNo }: { network: string; data: IGovAnalyticsReferendumOutcome; trackNo: number }): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK](network, trackNo.toString()),
+			value: JSON.stringify(data),
+			ttlSeconds: ONE_DAY_IN_SECONDS
+		});
+	}
+
+	static async GetGovAnalyticsReferendumCount(network: string): Promise<{ categoryCounts: IGovAnalyticsCategoryCounts } | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT](network) });
+		return data ? (deepParseJson(data) as { categoryCounts: IGovAnalyticsCategoryCounts }) : null;
+	}
+
+	static async SetGovAnalyticsReferendumCount({ network, data }: { network: string; data: { categoryCounts: IGovAnalyticsCategoryCounts } }): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.GOV_ANALYTICS_REFERENDUM_COUNT](network),
+			value: JSON.stringify(data),
+			ttlSeconds: ONE_DAY_IN_SECONDS
+		});
+	}
+
+	static async GetTrackLevelProposalsAnalytics(network: ENetwork) {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS](network) });
+		return data ? (deepParseJson(data) as { data: Record<number, number>; totalProposals: number }) : null;
+	}
+
+	static async SetTrackLevelProposalsAnalytics({ network, data }: { network: ENetwork; data: { data: Record<number, number>; totalProposals: number } }) {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS](network), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
+	}
+
+	static async GetTrackDelegationAnalytics({ network }: { network: ENetwork }) {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TRACK_DELEGATION_ANALYTICS](network) });
+		return data ? (deepParseJson(data) as Record<string, IGovAnalyticsDelegationStats>) : null;
+	}
+
+	static async SetTrackDelegationAnalytics({ network, data }: { network: ENetwork; data: Record<string, IGovAnalyticsDelegationStats> }) {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TRACK_DELEGATION_ANALYTICS](network), value: JSON.stringify(data), ttlSeconds: 3600 }); // Cache for 1 hour
+	}
+
+	// Turnout data caching methods
+	static async GetTurnoutData(network: ENetwork): Promise<IRawTurnoutData | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.TURNOUT_DATA](network) });
+		return data ? (deepParseJson(data) as IRawTurnoutData) : null;
+	}
+
+	static async SetTurnoutData({ network, data }: { network: ENetwork; data: IRawTurnoutData }): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.TURNOUT_DATA](network),
+			value: JSON.stringify(data),
+			ttlSeconds: 21600 // Cache for 6 hours - turnout data is historical and doesn't change frequently
+		});
+	}
+
+	static async DeleteTurnoutData(network: ENetwork): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TURNOUT_DATA](network) });
+	}
+
+	// User votes caching methods
+	static async GetUserVotes<T>({
+		network,
+		address,
+		page,
+		limit,
+		proposalStatuses
+	}: {
+		network: ENetwork;
+		address: string;
+		page: number;
+		limit: number;
+		proposalStatuses?: EProposalStatus[];
+	}): Promise<T | null> {
+		const data = await this.Get({
+			key: this.redisKeysMap[ERedisKeys.USER_VOTES](
+				network,
+				address,
+				page,
+				limit,
+				proposalStatuses?.map((s) => s.toString())
+			)
+		});
+		return data ? (deepParseJson(data) as T) : null;
+	}
+
+	static async SetUserVotes<T>({
+		network,
+		address,
+		page,
+		limit,
+		proposalStatuses,
+		data
+	}: {
+		network: ENetwork;
+		address: string;
+		page: number;
+		limit: number;
+		proposalStatuses?: EProposalStatus[];
+		data: T;
+	}): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.USER_VOTES](
+				network,
+				address,
+				page,
+				limit,
+				proposalStatuses?.map((s) => s.toString())
+			),
+			value: JSON.stringify(data),
+			ttlSeconds: ONE_DAY_IN_SECONDS
+		});
+	}
+
+	static async GetUserPosts({
+		network,
+		address,
+		page,
+		limit,
+		proposalType
+	}: {
+		network: string;
+		address: string;
+		page: number;
+		limit: number;
+		proposalType?: EProposalType;
+	}): Promise<IUserPosts | null> {
+		const data = await this.Get({
+			key: this.redisKeysMap[ERedisKeys.USER_POSTS](network, address, page, limit, proposalType)
+		});
+		return data ? (deepParseJson(data) as IUserPosts) : null;
+	}
+
+	static async SetUserPosts({
+		network,
+		address,
+		page,
+		limit,
+		proposalType,
+		data
+	}: {
+		network: string;
+		address: string;
+		page: number;
+		limit: number;
+		proposalType?: EProposalType;
+		data: IUserPosts;
+	}): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.USER_POSTS](network, address, page, limit, proposalType),
+			value: JSON.stringify(data),
+			ttlSeconds: ONE_DAY_IN_SECONDS // Cache for 5 minutes - user posts can change frequently
+		});
+	}
+
+	static async DeleteUserVotesByAddress({ network, address }: { network: ENetwork; address: string }): Promise<void> {
+		// Delete all user votes cache entries for this address
+		await this.DeleteKeys({ pattern: `${ERedisKeys.USER_VOTES}-${network}-${address}-*` });
+	}
+
+	static async DeleteUserPostsByAddress({ network, address }: { network: ENetwork; address: string }): Promise<void> {
+		// Delete all user posts cache entries for this address
+		await this.DeleteKeys({ pattern: `${ERedisKeys.USER_POSTS}-${network}-${address}-*` });
 	}
 }

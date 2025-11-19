@@ -9,6 +9,8 @@ import CustomSidebarTrigger from './AppSidebar/CustomSidebarTrigger';
 import Footer from './Footer/Footer';
 import AppSidebar from './AppSidebar/AppSidebar';
 import SuccessModal from '../SuccessModal/SuccessModal';
+import ChatPopup from '../Klara/ChatPopup';
+import NewsBannerWrapper from '../NewsBanner/NewsBannerWrapper';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
 	return (
@@ -19,11 +21,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
 			<SuccessModal />
 
+			<ChatPopup />
+
 			<SidebarInset>
 				<Navbar />
 				<main className='flex flex-1 flex-col bg-page_background'>{children}</main>
 				<Footer />
 			</SidebarInset>
+
+			<NewsBannerWrapper />
 		</main>
 	);
 }
