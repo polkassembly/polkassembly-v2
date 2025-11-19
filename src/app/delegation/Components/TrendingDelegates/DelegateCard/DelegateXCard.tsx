@@ -26,7 +26,6 @@ interface IDelegateXCardProps {
 		maxDelegated: string;
 		votedProposals: number;
 		delegatorsCount: number;
-		manifesto?: string;
 	};
 }
 

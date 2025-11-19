@@ -26,7 +26,7 @@ function Card({ children, onClick }: { children: ReactNode; onClick: () => void 
 			<button
 				type='button'
 				onClick={onClick}
-				className='flex h-full w-full cursor-pointer flex-col items-center gap-3 rounded-xl border border-transparent bg-bg_modal p-6 text-left group-hover:border-text_pink'
+				className='flex h-full w-full cursor-pointer flex-col items-center gap-3 rounded-xl border border-transparent bg-bg_modal p-4 text-left group-hover:border-text_pink sm:p-6'
 			>
 				{children}
 			</button>
@@ -54,7 +54,7 @@ const EditDelegateXDialog = memo(({ open, onOpenChange, onEditStrategy, onEditPe
 						<span className='rounded-full bg-delegation_bgcard p-1 px-2 text-xs'>CyberGov</span>
 					</div>
 				</div>
-				<div className='grid grid-cols-1 gap-4 p-6 md:grid-cols-3'>
+				<div className='grid grid-cols-1 gap-4 p-4 sm:p-6 md:grid-cols-3'>
 					<Card onClick={onUndelegate}>
 						<div className='flex h-24 w-24 items-center justify-center rounded-full bg-delegation_bgcard'>
 							<Image

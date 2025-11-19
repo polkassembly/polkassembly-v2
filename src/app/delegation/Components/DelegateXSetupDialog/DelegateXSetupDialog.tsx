@@ -7,9 +7,7 @@
 import { memo, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Dialog, DialogContent } from '@/app/_shared-components/Dialog/Dialog';
-import { Button } from '@/app/_shared-components/Button';
 import Klara from '@assets/delegation/klara/klara.svg';
-import { ArrowRight } from 'lucide-react';
 import DelegateXSuccessDialog from './DelegateXSuccessDialog';
 import EditDelegateXDialog from './EditDelegateXDialog';
 import WelcomeStep from './components/WelcomeStep';
@@ -44,17 +42,19 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	const [openEdit, setOpenEdit] = useState(false);
 	const [includeComment, setIncludeComment] = useState(initialData.includeComment ?? true);
 	const [personaTab, setPersonaTab] = useState<'prompt' | 'preview'>('prompt');
+	const [currentEditMode, setCurrentEditMode] = useState(isEditMode);
 
 	useEffect(() => {
-		if (open && !isEditMode) {
+		if (open && !currentEditMode) {
 			setStep(1);
-		} else if (open && isEditMode) {
+			setCurrentEditMode(false);
+		} else if (open && currentEditMode) {
 			setStep(initialStep);
 		}
-	}, [open, isEditMode, initialStep]);
+	}, [open, currentEditMode, initialStep]);
 
 	const handleComplete = () => {
-		if (isEditMode) {
+		if (currentEditMode) {
 			onOpenChange(false);
 		} else {
 			onOpenChange(false);
@@ -63,14 +63,14 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	};
 
 	const getStepCount = () => {
-		if (isEditMode) {
+		if (currentEditMode) {
 			return 1;
 		}
 		return 5;
 	};
 
 	const getCurrentStepNumber = () => {
-		if (isEditMode) {
+		if (currentEditMode) {
 			return 1;
 		}
 		return step;
@@ -82,7 +82,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 				open={open}
 				onOpenChange={onOpenChange}
 			>
-				<DialogContent className='max-w-4xl rounded-xl p-0'>
+				<DialogContent className='mx-4 rounded-xl p-0 sm:mx-auto md:max-w-4xl'>
 					<div className='flex items-center justify-between gap-3 border-b border-border_grey px-4 py-3'>
 						<div className='flex items-center gap-2'>
 							<Image
@@ -101,15 +101,20 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 						<StepIndicator
 							currentStep={getCurrentStepNumber()}
 							totalSteps={getStepCount()}
-							isEditMode={isEditMode}
+							isEditMode={currentEditMode}
 						/>
 
-						{step === 1 && <WelcomeStep isEditMode={isEditMode} />}
+						{step === 1 && (
+							<WelcomeStep
+								onNext={() => setStep(2)}
+								isEditMode={currentEditMode}
+							/>
+						)}
 
 						{step === 2 && (
 							<CostEstimateStep
 								onNext={() => setStep(3)}
-								isEditMode={isEditMode}
+								isEditMode={currentEditMode}
 							/>
 						)}
 
@@ -118,7 +123,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 								onNext={() => setStep(4)}
 								selectedStrategy={selectedStrategy}
 								onStrategySelect={setSelectedStrategy}
-								isEditMode={isEditMode}
+								isEditMode={currentEditMode}
 							/>
 						)}
 
@@ -135,7 +140,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 								onIncludeCommentChange={setIncludeComment}
 								personaTab={personaTab}
 								onPersonaTabChange={setPersonaTab}
-								isEditMode={isEditMode}
+								isEditMode={currentEditMode}
 							/>
 						)}
 
@@ -144,19 +149,8 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 								onConfirm={handleComplete}
 								displayName={initialData.displayName || ''}
 								selectedStrategy={selectedStrategy}
-								isEditMode={isEditMode}
+								isEditMode={currentEditMode}
 							/>
-						)}
-
-						{step === 1 && !isEditMode && (
-							<div className='flex items-center justify-end'>
-								<Button
-									onClick={() => setStep(2)}
-									className='px-5'
-								>
-									Let&apos;s Begin <ArrowRight />
-								</Button>
-							</div>
 						)}
 					</div>
 				</DialogContent>
@@ -179,13 +173,15 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 				}}
 				onEditStrategy={() => {
 					setOpenEdit(false);
-					onOpenChange(true);
+					setCurrentEditMode(true);
 					setStep(3);
+					onOpenChange(true);
 				}}
 				onEditPersonality={() => {
 					setOpenEdit(false);
-					onOpenChange(true);
+					setCurrentEditMode(true);
 					setStep(4);
+					onOpenChange(true);
 				}}
 			/>
 		</>
