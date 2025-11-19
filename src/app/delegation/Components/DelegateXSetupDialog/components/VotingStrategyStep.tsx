@@ -112,7 +112,7 @@ function VotingStrategyStep({ onNext, selectedStrategy = 'strategy-1', onStrateg
 
 					<div
 						ref={scrollRef}
-						className='hide_scrollbar flex max-h-[400px] flex-col gap-3 overflow-y-auto px-2 py-2 sm:max-h-none sm:flex-row sm:overflow-x-auto sm:overflow-y-visible sm:px-4 sm:py-4 md:max-w-3xl md:px-10'
+						className='hide_scrollbar flex max-h-[360px] flex-col gap-3 overflow-y-auto px-2 py-2 sm:max-h-none sm:flex-row sm:overflow-x-auto sm:overflow-y-visible sm:px-4 sm:py-4 md:max-w-3xl md:px-10'
 					>
 						{strategies.map((strategy) => (
 							<div

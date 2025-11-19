@@ -12,70 +12,70 @@ import Image from 'next/image';
 import { EProposalStatus } from '@/_shared/types';
 import VotingHistoryTable from './Components/VotingHistoryTable';
 
+const POLKASSEMBLY_URL = 'https://polkassembly.io';
+
+const votingHistory = [
+	{
+		id: 45,
+		title: 'Standard Guidelines Standard Guidelines ...',
+		track: 'Medium Spender',
+		decision: 'Nay',
+		decisionIcon: 'nay',
+		timestamp: "12th June'25, 23:23:12",
+		status: EProposalStatus.Rejected,
+		criteria: [
+			{ met: true, text: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.' },
+			{ met: true, text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
+			{ met: false, text: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.' },
+			{ met: true, text: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' },
+			{ met: false, text: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' }
+		],
+		keyReason: 'Milestones defined and budget within track range.',
+		commentUrl: POLKASSEMBLY_URL,
+		expanded: true
+	},
+	{
+		id: 46,
+		title: 'Accessibility Standards Ensuring all users ...',
+		track: 'Small Spender',
+		decision: 'Aye',
+		decisionIcon: 'aye',
+		timestamp: "13th June'25, 09:15:45",
+		status: EProposalStatus.Deciding,
+		criteria: [
+			{ met: true, text: 'Requirements scoped and community feedback incorporated.' },
+			{ met: true, text: 'Budget justified with milestones.' },
+			{ met: true, text: 'Risks identified and mitigations proposed.' },
+			{ met: false, text: 'Security audit pending.' },
+			{ met: true, text: 'KPIs and success metrics clearly defined.' }
+		],
+		keyReason: 'Clear milestones and strong community support.',
+		commentUrl: POLKASSEMBLY_URL,
+		expanded: false
+	},
+	{
+		id: 47,
+		title: 'Responsive Design Adapting layouts for var ...',
+		track: 'Big Spender',
+		decision: 'Abstain',
+		decisionIcon: 'abstain',
+		timestamp: "14th June'25, 14:30:11",
+		status: EProposalStatus.Approved,
+		criteria: [
+			{ met: true, text: 'Team experience verified.' },
+			{ met: true, text: 'Budget within reasonable limits.' },
+			{ met: true, text: 'Detailed roadmap provided.' },
+			{ met: true, text: 'Community feedback addressed.' },
+			{ met: false, text: 'Maintenance plan to be refined.' }
+		],
+		keyReason: 'Overall strong proposal; abstained due to conflict of interest.',
+		commentUrl: POLKASSEMBLY_URL,
+		expanded: false
+	}
+];
+
 function VotingHistoryPage() {
 	const t = useTranslations();
-
-	const POLKASSEMBLY_URL = 'https://polkassembly.io';
-
-	const votingHistory = [
-		{
-			id: 45,
-			title: 'Standard Guidelines Standard Guidelines ...',
-			track: 'Medium Spender',
-			decision: 'Nay',
-			decisionIcon: 'nay',
-			timestamp: "12th June'25, 23:23:12",
-			status: EProposalStatus.Rejected,
-			criteria: [
-				{ met: true, text: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.' },
-				{ met: true, text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
-				{ met: false, text: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.' },
-				{ met: true, text: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' },
-				{ met: false, text: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' }
-			],
-			keyReason: 'Milestones defined and budget within track range.',
-			commentUrl: POLKASSEMBLY_URL,
-			expanded: true
-		},
-		{
-			id: 46,
-			title: 'Accessibility Standards Ensuring all users ...',
-			track: 'Small Spender',
-			decision: 'Aye',
-			decisionIcon: 'aye',
-			timestamp: "13th June'25, 09:15:45",
-			status: EProposalStatus.Deciding,
-			criteria: [
-				{ met: true, text: 'Requirements scoped and community feedback incorporated.' },
-				{ met: true, text: 'Budget justified with milestones.' },
-				{ met: true, text: 'Risks identified and mitigations proposed.' },
-				{ met: false, text: 'Security audit pending.' },
-				{ met: true, text: 'KPIs and success metrics clearly defined.' }
-			],
-			keyReason: 'Clear milestones and strong community support.',
-			commentUrl: POLKASSEMBLY_URL,
-			expanded: false
-		},
-		{
-			id: 47,
-			title: 'Responsive Design Adapting layouts for var ...',
-			track: 'Big Spender',
-			decision: 'Abstain',
-			decisionIcon: 'abstain',
-			timestamp: "14th June'25, 14:30:11",
-			status: EProposalStatus.Approved,
-			criteria: [
-				{ met: true, text: 'Team experience verified.' },
-				{ met: true, text: 'Budget within reasonable limits.' },
-				{ met: true, text: 'Detailed roadmap provided.' },
-				{ met: true, text: 'Community feedback addressed.' },
-				{ met: false, text: 'Maintenance plan to be refined.' }
-			],
-			keyReason: 'Overall strong proposal; abstained due to conflict of interest.',
-			commentUrl: POLKASSEMBLY_URL,
-			expanded: false
-		}
-	];
 
 	return (
 		<div className='min-h-screen'>
