@@ -61,7 +61,7 @@ function PersonalityStep({
 									/>
 								</TooltipTrigger>
 								<TooltipContent className='bg-tooltip_background p-2 text-white'>
-									<p className='max-w-xs text-xs text-text_primary'>
+									<p className='max-w-xs text-xs'>
 										Enable this option to have DelegateX automatically add a comment with your vote, explaining the reason behind it. You can customize the comment to reflect your
 										personal style and message.
 									</p>

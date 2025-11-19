@@ -36,7 +36,7 @@ function CostEstimateStep({ onNext, estimatedCost = '≈ 5 DOT', isEditMode = fa
 								/>
 							</TooltipTrigger>
 							<TooltipContent className='bg-tooltip_background p-2 text-white'>
-								<p className='max-w-xs text-xs text-text_primary'>
+								<p className='max-w-xs text-xs'>
 									This is an estimate of the costs involved in setting up your delegate. The exact amount will be confirmed when you sign the transaction.
 								</p>
 							</TooltipContent>

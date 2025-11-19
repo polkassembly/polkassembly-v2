@@ -39,7 +39,7 @@ function ConfirmationStep({ onConfirm, displayName, selectedStrategy, estimatedF
 									/>
 								</TooltipTrigger>
 								<TooltipContent className='bg-tooltip_background p-2 text-white'>
-									<p className='max-w-xs text-xs text-text_primary'>
+									<p className='max-w-xs text-xs'>
 										By confirming, you agree to create your delegate wallet and register it on-chain. You will be prompted to sign two transactions: one for delegation and another
 										for gas deposit.
 									</p>

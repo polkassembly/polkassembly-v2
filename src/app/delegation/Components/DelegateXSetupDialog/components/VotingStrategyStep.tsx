@@ -99,7 +99,7 @@ function VotingStrategyStep({ onNext, selectedStrategy = 'strategy-1', onStrateg
 									/>
 								</TooltipTrigger>
 								<TooltipContent className='bg-tooltip_background p-2 text-white'>
-									<p className='max-w-xs text-xs text-text_primary'>
+									<p className='max-w-xs text-xs'>
 										Pick the voting strategy that best matches your approach. Each template represents how Delegate X weighs different factors before voting.
 									</p>
 								</TooltipContent>
