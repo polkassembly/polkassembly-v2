@@ -115,7 +115,7 @@ function VotingHistoryPage() {
 					</div>
 				</div>
 			) : (
-				<div className='px-20 py-6'>
+				<div className='px-4 py-6 md:px-20'>
 					<VotingHistoryTable votingHistory={votingHistory} />
 				</div>
 			)}

@@ -4,7 +4,7 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 import { useState, Fragment } from 'react';
-import { CheckCircle2, XCircle, Menu } from 'lucide-react';
+import { CheckCircle2, XCircle, Menu, ChevronDown, ChevronUp } from 'lucide-react';
 import AbstainIcon from '@assets/icons/abstainGray.svg';
 import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
 import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
@@ -14,6 +14,7 @@ import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseTo
 import listingStyles from '@/app/_shared-components/ListingComponent/ListingCard/ListingCard.module.scss';
 import { EProposalStatus } from '@/_shared/types';
 import Image from 'next/image';
+import { Button } from '@/app/_shared-components/Button';
 
 interface IVotingHistoryTableProps {
 	votingHistory: {
@@ -21,13 +22,11 @@ interface IVotingHistoryTableProps {
 		title: string;
 		track: string;
 		decision: string;
-		decisionIcon: string;
 		timestamp: string;
 		status: EProposalStatus;
 		criteria: { met: boolean; text: string }[];
 		keyReason: string;
 		commentUrl: string;
-		expanded: boolean;
 	}[];
 }
 
@@ -35,16 +34,16 @@ function VotingHistoryTable({ votingHistory }: IVotingHistoryTableProps) {
 	const [expandedRow, setExpandedRow] = useState<number | null>(null);
 
 	return (
-		<div className='rounded-2xl border border-border_grey bg-bg_modal'>
-			<div className='px-3 pt-3'>
+		<div className='overflow-hidden rounded-2xl border border-border_grey bg-bg_modal'>
+			<div className='hidden px-4 pt-4 md:block'>
 				<Table className='w-full border-t border-border_grey'>
 					<TableHeader className='bg-page_background'>
 						<TableRow className='border-b border-border_grey hover:bg-transparent'>
-							<TableHead className='!px-0 !py-4 text-text_primary first:pl-6 last:pr-6'>REFERENDUM</TableHead>
-							<TableHead className='!px-0 !py-4 text-text_primary first:pl-6 last:pr-6'>TRACK</TableHead>
-							<TableHead className='!px-0 !py-4 text-text_primary first:pl-6 last:pr-6'>DECISION</TableHead>
-							<TableHead className='!px-0 !py-4 text-text_primary first:pl-6 last:pr-6'>TIMESTAMP</TableHead>
-							<TableHead className='!px-0 !py-4 text-text_primary first:pl-6 last:pr-6'>STATUS</TableHead>
+							<TableHead className='px-3 py-3 text-text_primary md:px-4 md:py-4 md:pr-6'>REFERENDUM</TableHead>
+							<TableHead className='px-3 py-3 text-text_primary md:px-4 md:py-4 md:pr-6'>TRACK</TableHead>
+							<TableHead className='px-3 py-3 text-text_primary md:px-4 md:py-4 md:pr-6'>DECISION</TableHead>
+							<TableHead className='px-3 py-3 text-text_primary md:px-4 md:py-4 md:pr-6'>TIMESTAMP</TableHead>
+							<TableHead className='px-3 py-3 text-text_primary md:px-4 md:py-4 md:pr-6'>STATUS</TableHead>
 						</TableRow>
 					</TableHeader>
 
@@ -52,10 +51,8 @@ function VotingHistoryTable({ votingHistory }: IVotingHistoryTableProps) {
 						{votingHistory.map((row, idx) => (
 							<Fragment key={row.id}>
 								<TableRow className='cursor-pointer border-b border-border_grey last:border-b-0 hover:bg-bg_modal'>
-									<TableCell className='px-6 py-4'>
-										<span className='line-clamp-1 font-medium'>
-											#{row.id} {row.title}
-										</span>
+									<TableCell className='max-w-40 px-6 py-4 font-medium'>
+										#{row.id} {row.title}
 									</TableCell>
 									<TableCell className='px-6 py-4'>
 										<span className={`${getSpanStyle(row.track || '', 1)} ${listingStyles.originStyle}`}>{convertCamelCaseToTitleCase(row.track || '')}</span>
@@ -68,57 +65,61 @@ function VotingHistoryTable({ votingHistory }: IVotingHistoryTableProps) {
 												<Image
 													src={AbstainIcon}
 													alt='abstain'
-													className='h-5 w-5'
-													width={24}
-													height={24}
+													width={20}
+													height={20}
 												/>
 											)}
 											{row.decision === '-' && <span className='font-bold text-wallet_btn_text'>-</span>}
 											<span className='font-medium'>{row.decision}</span>
 										</div>
 									</TableCell>
-									<TableCell className='px-6 py-4'>{row.timestamp}</TableCell>
+									<TableCell className='text-text_secondary px-6 py-4'>{row.timestamp}</TableCell>
 									<TableCell className='px-6 py-4'>
 										<div className='flex items-center justify-between'>
 											<StatusTag status={row.status} />
-											<Menu
-												className='text-sidebar_text'
-												onClick={() => setExpandedRow(expandedRow === idx ? null : idx)}
-											/>
+											<Button
+												onClick={(e) => {
+													e.stopPropagation();
+													setExpandedRow(expandedRow === idx ? null : idx);
+												}}
+												variant='ghost'
+											>
+												<Menu className='text-text-primary h-5 w-5' />
+											</Button>
 										</div>
 									</TableCell>
 								</TableRow>
+
 								{expandedRow === idx && (
 									<TableRow>
 										<TableCell
 											colSpan={5}
 											className='bg-page_background p-6'
 										>
-											<div className='flex items-center justify-between'>
+											<div className='mb-4 flex items-center justify-between'>
 												<span className='text-sm font-semibold text-wallet_btn_text'>CRITERIA CHECKLIST: (3/5)</span>
 												<a
 													href={row.commentUrl}
 													target='_blank'
 													rel='noopener noreferrer'
-													className='text-xs font-semibold text-text_pink underline'
+													className='text-xs font-semibold text-text_pink hover:underline'
 												>
 													VIEW COMMENT ON POLKASSEMBLY
 												</a>
 											</div>
-											<ul className='space-y-1 py-3'>
+											<ul className='space-y-2'>
 												{row.criteria.map((c) => (
 													<li
 														key={c.text}
-														className='flex items-center gap-2 text-sm'
+														className='flex items-center gap-3 text-sm'
 													>
 														{c.met ? <CheckCircle2 className='h-5 w-5 text-social_green' /> : <XCircle className='h-5 w-5 text-toast_error_text' />}
 														<span className='text-text_primary'>{c.text}</span>
 													</li>
 												))}
 											</ul>
-
-											<div className='rounded-lg border border-klara_active_chat_border bg-bg_modal px-4 py-2 text-sm text-wallet_btn_text'>
-												<span className='font-semibold'>Key Reason:</span> {row.keyReason}
+											<div className='mt-4 rounded-lg border border-klara_active_chat_border bg-bg_modal px-4 py-3 text-sm'>
+												<span className='font-semibold text-wallet_btn_text'>Key Reason:</span> <span className='text-text_primary'>{row.keyReason}</span>
 											</div>
 										</TableCell>
 									</TableRow>
@@ -127,6 +128,79 @@ function VotingHistoryTable({ votingHistory }: IVotingHistoryTableProps) {
 						))}
 					</TableBody>
 				</Table>
+			</div>
+
+			<div className='md:hidden'>
+				{votingHistory.map((row, idx) => (
+					<div
+						key={row.id}
+						className='border-b border-border_grey bg-bg_modal last:border-b-0'
+					>
+						<div className='flex cursor-pointer items-center justify-between px-4 py-4'>
+							<div className='min-w-0 flex-1'>
+								<div className='flex items-center gap-3'>
+									<span className='text-lg font-semibold text-text_primary'>#{row.id}</span>
+									<StatusTag status={row.status} />
+								</div>
+								<p className='mt-1 max-w-60 truncate font-medium text-text_primary'>{row.title}</p>
+								<div className='text-text_secondary mt-3 flex items-center gap-4 text-sm'>
+									<span className={`${getSpanStyle(row.track || '', 1)} ${listingStyles.originStyle} rounded px-2 py-0.5`}>{convertCamelCaseToTitleCase(row.track || '')}</span>
+									<div className='flex items-center gap-1.5'>
+										{row.decision === 'Aye' && <AiFillLike className='h-4 w-4 text-social_green' />}
+										{row.decision === 'Nay' && <AiFillDislike className='h-4 w-4 text-toast_error_text' />}
+										{row.decision === 'Abstain' && (
+											<Image
+												src={AbstainIcon}
+												alt='abstain'
+												width={16}
+												height={16}
+											/>
+										)}
+										<span className='font-medium'>{row.decision}</span>
+									</div>
+									<span className='text-xs'>{row.timestamp}</span>
+								</div>
+							</div>
+							<Button
+								variant='ghost'
+								onClick={() => setExpandedRow(expandedRow === idx ? null : idx)}
+								className='ml-2'
+							>
+								{expandedRow === idx ? <ChevronUp className='h-6 w-6 text-sidebar_text' /> : <ChevronDown className='h-6 w-6 text-sidebar_text' />}
+							</Button>
+						</div>
+
+						{expandedRow === idx && (
+							<div className='border-t border-border_grey bg-page_background px-4 pb-5'>
+								<div className='mb-4 flex items-center justify-between pt-4'>
+									<span className='text-sm font-semibold text-wallet_btn_text'>CRITERIA CHECKLIST: (3/5)</span>
+									<a
+										href={row.commentUrl}
+										target='_blank'
+										rel='noopener noreferrer'
+										className='text-xs font-semibold text-text_pink hover:underline'
+									>
+										VIEW COMMENT
+									</a>
+								</div>
+								<ul className='mb-4 space-y-2'>
+									{row.criteria.map((c) => (
+										<li
+											key={c.text}
+											className='flex items-start gap-3 text-sm'
+										>
+											{c.met ? <CheckCircle2 className='mt-0.5 h-5 w-5 text-social_green' /> : <XCircle className='mt-0.5 h-5 w-5 text-toast_error_text' />}
+											<span className='text-text_primary'>{c.text}</span>
+										</li>
+									))}
+								</ul>
+								<div className='rounded-lg border border-klara_active_chat_border bg-bg_modal px-4 py-3 text-sm'>
+									<span className='font-semibold text-wallet_btn_text'>Key Reason:</span> <span className='text-text_primary'>{row.keyReason}</span>
+								</div>
+							</div>
+						)}
+					</div>
+				))}
 			</div>
 		</div>
 	);
