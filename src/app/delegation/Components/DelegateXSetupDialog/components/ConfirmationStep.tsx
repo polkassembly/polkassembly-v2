@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { memo } from 'react';
 import Image from 'next/image';
 import { Button } from '@/app/_shared-components/Button';
@@ -24,42 +22,46 @@ function ConfirmationStep({ onConfirm, displayName, selectedStrategy, estimatedF
 	}
 
 	return (
-		<div className='space-y-4 rounded-lg bg-delegation_bgcard p-4'>
-			<div>
-				<div className='mb-2 flex items-center gap-2'>
-					<p className='font-semibold text-text_primary'>Confirm Delegation & Gas Deposit</p>
-					<Image
-						src={QuestionIcon}
-						alt='Question Icon'
-						width={16}
-						height={16}
-					/>
+		<div className='space-y-4'>
+			<div className='rounded-lg bg-delegation_bgcard p-4 sm:p-6'>
+				<div>
+					<div className='mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2'>
+						<div className='flex items-center gap-2'>
+							<p className='font-semibold text-text_primary'>Confirm Delegation & Gas Deposit</p>
+							<Image
+								src={QuestionIcon}
+								alt='Question Icon'
+								width={16}
+								height={16}
+							/>
+						</div>
+					</div>
+					<p className='text-text_secondary text-sm'>
+						We&apos;ll now create your delegate wallet and register it on-chain. You&apos;ll be asked to sign two transactions: delegation and gas deposit.
+					</p>
 				</div>
-				<p className='text-text_secondary text-sm'>
-					We&apos;ll now create your delegate wallet and register it on-chain. You&apos;ll be asked to sign two transactions: delegation and gas deposit.
-				</p>
+
+				<div className='mt-4'>
+					<div className='space-y-3'>
+						<div className='flex flex-col gap-1 rounded-md bg-bg_modal px-3 py-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:py-2'>
+							<span className='text-text_secondary'>Template:</span>
+							<span className='font-medium'>{selectedStrategy}</span>
+						</div>
+						<div className='flex flex-col gap-1 rounded-md bg-bg_modal px-3 py-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:py-2'>
+							<span className='text-text_secondary'>Personality Name:</span>
+							<span className='font-medium'>{displayName || 'Alice'}</span>
+						</div>
+						<div className='flex flex-col gap-1 rounded-md bg-bg_modal px-3 py-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:py-2'>
+							<span className='text-text_secondary'>Estimated Fee:</span>
+							<span className='font-medium'>{estimatedFee}</span>
+						</div>
+					</div>
+				</div>
 			</div>
 
-			<div>
-				<div className='space-y-3'>
-					<div className='flex items-center justify-between rounded-md bg-bg_modal px-3 py-2 text-sm'>
-						<span className='text-text_secondary'>Template:</span>
-						<span className='font-medium'>{selectedStrategy}</span>
-					</div>
-					<div className='flex items-center justify-between rounded-md bg-bg_modal px-3 py-2 text-sm'>
-						<span className='text-text_secondary'>Personality Name:</span>
-						<span className='font-medium'>{displayName || 'Alice'}</span>
-					</div>
-					<div className='flex items-center justify-between rounded-md bg-bg_modal px-3 py-2 text-sm'>
-						<span className='text-text_secondary'>Estimated Fee:</span>
-						<span className='font-medium'>{estimatedFee}</span>
-					</div>
-				</div>
-			</div>
-
-			<div className='flex items-center justify-end'>
+			<div className='flex items-center justify-center sm:justify-end'>
 				<Button
-					className='px-5'
+					className='w-full px-5 sm:w-auto'
 					onClick={onConfirm}
 				>
 					Confirm & Delegate <ArrowRight />

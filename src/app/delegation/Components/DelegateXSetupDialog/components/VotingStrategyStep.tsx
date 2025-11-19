@@ -2,15 +2,16 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
-import { memo } from 'react';
+import { memo, useRef } from 'react';
 import Image from 'next/image';
 import { Button } from '@/app/_shared-components/Button';
-import { ArrowRight } from 'lucide-react';
-import { Separator } from '@/app/_shared-components/Separator';
+import { ArrowRight, ChevronRight, ChevronLeft } from 'lucide-react';
 import QuestionIcon from '@assets/delegation/question.svg';
 import Strategy1 from '@assets/delegation/klara/Strategy1.svg';
+import Strategy2 from '@assets/delegation/klara/Strategy2.svg';
+import Strategy3 from '@assets/delegation/klara/Strategy3.svg';
+import Strategy4 from '@assets/delegation/klara/Strategy4.svg';
+import { Separator } from '@/app/_shared-components/Separator';
 
 interface VotingStrategy {
 	id: string;
@@ -24,103 +25,163 @@ interface VotingStrategyStepProps {
 	onNext: () => void;
 	selectedStrategy?: string;
 	onStrategySelect?: (strategyId: string) => void;
-	strategies?: VotingStrategy[];
 	isEditMode?: boolean;
+	strategies?: VotingStrategy[];
 }
 
 const defaultStrategies: VotingStrategy[] = [
 	{
-		id: 'aggressive-innovator',
+		id: 'strategy-1',
 		name: 'Aggressive Innovator',
 		description: 'Backs bold ideas with potential network-wide impact.',
 		icon: Strategy1,
 		tags: ['Optimistic', 'Fast-moving']
+	},
+	{
+		id: 'strategy-2',
+		name: 'Aggressive Pioneer',
+		description: 'Explores new opportunities with a focus on growth.',
+		icon: Strategy2,
+		tags: ['Visionary', 'Persistent']
+	},
+	{
+		id: 'strategy-3',
+		name: 'Aggressive Trader',
+		description: 'Seeks high returns through calculated risks and market trends.',
+		icon: Strategy3,
+		tags: ['Analytical', 'Performance-driven']
+	},
+	{
+		id: 'strategy-4',
+		name: 'Aggressive Innovator',
+		description: 'Backs bold ideas with potential network-wide impact.',
+		icon: Strategy4,
+		tags: ['Optimistic', 'Fast-moving']
 	}
 ];
 
-function VotingStrategyStep({ onNext, selectedStrategy = 'aggressive-innovator', onStrategySelect, strategies = defaultStrategies, isEditMode = false }: VotingStrategyStepProps) {
+function VotingStrategyStep({ onNext, selectedStrategy = 'strategy-1', onStrategySelect, strategies = defaultStrategies, isEditMode = false }: VotingStrategyStepProps) {
+	const scrollRef = useRef<HTMLDivElement>(null);
+
 	const handleStrategySelect = (strategyId: string) => {
 		if (onStrategySelect) {
 			onStrategySelect(strategyId);
 		}
 	};
 
+	const scrollRight = () => {
+		if (scrollRef.current) {
+			scrollRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+		}
+	};
+
+	const scrollLeft = () => {
+		if (scrollRef.current) {
+			scrollRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+		}
+	};
+
 	return (
-		<div className='space-y-4 rounded-lg bg-delegation_bgcard p-4'>
-			<div>
-				<div className='mb-2 flex items-center gap-2'>
-					<p className='font-semibold text-text_primary'>{isEditMode ? 'Update Voting Strategy' : 'Voting Strategy'}</p>
-					<Image
-						src={QuestionIcon}
-						alt='Question Icon'
-						width={16}
-						height={16}
-					/>
+		<div className='space-y-4'>
+			<div className='rounded-lg bg-delegation_bgcard p-4 sm:p-6'>
+				<div>
+					<div className='mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2'>
+						<div className='flex items-center gap-2'>
+							<p className='font-semibold text-text_primary'>{isEditMode ? 'Update Voting Strategy' : 'Choose Voting Strategy'}</p>
+							<Image
+								src={QuestionIcon}
+								alt='Question Icon'
+								width={16}
+								height={16}
+							/>
+						</div>
+					</div>
+					<p className='text-sm text-text_primary'>
+						Pick the voting strategy that best matches your approach. Each template represents how Delegate X weighs different factors before voting.
+					</p>
 				</div>
-				<p className='text-sm text-text_primary'>
-					Pick the voting strategy that best matches your approach. Each template represents how DelegateX weighs different factors before voting.
-				</p>
-			</div>
 
-			<div className='space-y-3'>
-				{strategies.map((strategy) => (
-					<div
-						aria-hidden
-						key={strategy.id}
-						className={`cursor-pointer rounded-xl bg-gradient-to-b from-delegatebotx_border to-transparent p-[1px] ${
-							selectedStrategy === strategy.id ? 'ring-2 ring-text_pink' : ''
-						}`}
-						onClick={() => handleStrategySelect(strategy.id)}
+				<div className='relative mt-4 w-full'>
+					<button
+						type='button'
+						onClick={scrollLeft}
+						className='absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black p-1 shadow-md hover:bg-gray-800'
 					>
-						<div className='flex w-full flex-col items-start rounded-xl bg-bg_modal p-4'>
-							<div className='flex items-center gap-4'>
-								<Image
-									src={strategy.icon}
-									alt='Strategy Icon'
-									width={120}
-									height={120}
-									className='shrink-0'
-								/>
+						<ChevronLeft className='h-5 w-5 text-white' />
+					</button>
 
-								<div className='flex w-full flex-col'>
-									<p className='text-base font-semibold'>{strategy.name}</p>
-									<p className='mt-1 text-sm text-text_primary'>{strategy.description}</p>
+					<div
+						ref={scrollRef}
+						className='hide_scrollbar flex max-w-3xl gap-3 overflow-x-auto px-10 py-4'
+					>
+						{strategies.map((strategy) => (
+							<div
+								aria-hidden
+								key={strategy.id}
+								className={`flex w-[250px] shrink-0 cursor-pointer rounded-xl border border-solid ${
+									selectedStrategy === strategy.id ? 'scale-105 border-text_pink' : 'border-[#D2D8E0] dark:border-[#3B444F]'
+								}`}
+								onClick={() => handleStrategySelect(strategy.id)}
+							>
+								<div className='flex w-full flex-col items-start rounded-xl bg-bg_modal p-4'>
+									<div className='flex w-full flex-col items-center gap-4'>
+										<Image
+											src={strategy.icon}
+											alt='Strategy Icon'
+											width={80}
+											height={80}
+											className='shrink-0'
+										/>
 
-									<div className='mt-3 flex items-center gap-2 text-wallet_btn_text'>
-										{strategy.tags.map((tag) => (
-											<span
-												key={tag}
-												className='rounded-md bg-delegation_bgcard px-2 py-1 text-[11px]'
-											>
-												{tag}
-											</span>
-										))}
+										<div className='flex w-full flex-col text-center'>
+											<p className='text-base font-semibold text-text_primary'>{strategy.name}</p>
+											<p className='mt-1 text-xs text-text_primary'>{strategy.description}</p>
+
+											<div className='mt-3 flex items-center justify-center gap-2 text-wallet_btn_text'>
+												{strategy.tags.map((tag: string) => (
+													<span
+														key={tag}
+														className='text-text_secondary rounded-full bg-delegation_bgcard px-3 py-1 text-[10px] font-medium'
+													>
+														{tag}
+													</span>
+												))}
+											</div>
+										</div>
+									</div>
+
+									<Separator className='mt-3' />
+
+									<div className='mx-auto'>
+										<Button
+											variant='ghost'
+											size='sm'
+											className='mt-2 px-0 text-sm font-medium text-text_pink hover:bg-transparent hover:text-text_pink hover:underline'
+										>
+											View Logic
+										</Button>
 									</div>
 								</div>
 							</div>
-
-							<Separator className='mt-3' />
-
-							<div className='mx-auto'>
-								<Button
-									variant='ghost'
-									size='sm'
-									className='mt-2 px-0 text-sm font-medium text-text_pink hover:underline'
-								>
-									View Logic
-								</Button>
-							</div>
-						</div>
+						))}
 					</div>
-				))}
+
+					<button
+						type='button'
+						onClick={scrollRight}
+						className='absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black p-1 shadow-md hover:bg-gray-800'
+					>
+						<ChevronRight className='h-5 w-5 text-white' />
+					</button>
+				</div>
 			</div>
 
-			<div className='flex items-center justify-end'>
+			<div className='flex items-center justify-center sm:justify-end'>
 				<Button
-					className='px-5'
+					className='w-full bg-text_pink px-5 text-white hover:bg-pink-600 sm:w-auto'
 					onClick={onNext}
 				>
-					{isEditMode ? 'Update Strategy' : 'Set Personality'} <ArrowRight />
+					{isEditMode ? 'Update Strategy' : 'Set Personality'} <ArrowRight className='ml-2 h-4 w-4' />
 				</Button>
 			</div>
 		</div>

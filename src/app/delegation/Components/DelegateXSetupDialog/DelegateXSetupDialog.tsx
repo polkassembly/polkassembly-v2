@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { memo, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Dialog, DialogContent } from '@/app/_shared-components/Dialog/Dialog';
@@ -37,29 +35,40 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	const [signature, setSignature] = useState(initialData.signature || '');
 	const [contact, setContact] = useState(initialData.contact || '');
 	const [persona, setPersona] = useState<'friendly' | 'technical' | 'formal' | 'concise' | 'others'>(initialData.persona || 'friendly');
-	const [selectedStrategy, setSelectedStrategy] = useState(initialData.selectedStrategy || 'aggressive-innovator');
+	const [selectedStrategy, setSelectedStrategy] = useState(initialData.selectedStrategy || 'strategy-1');
 	const [openSuccess, setOpenSuccess] = useState(false);
 	const [openEdit, setOpenEdit] = useState(false);
 	const [includeComment, setIncludeComment] = useState(initialData.includeComment ?? true);
 	const [personaTab, setPersonaTab] = useState<'prompt' | 'preview'>('prompt');
 	const [currentEditMode, setCurrentEditMode] = useState(isEditMode);
+	const [isEditingFromDialog, setIsEditingFromDialog] = useState(false);
 
 	useEffect(() => {
-		if (open && !currentEditMode) {
+		if (open && isEditMode) {
+			setStep(initialStep);
+			setCurrentEditMode(true);
+		} else if (open && !isEditMode && !currentEditMode && !isEditingFromDialog) {
 			setStep(1);
 			setCurrentEditMode(false);
-		} else if (open && currentEditMode) {
-			setStep(initialStep);
 		}
-	}, [open, currentEditMode, initialStep]);
+	}, [open, isEditMode, initialStep, currentEditMode, isEditingFromDialog]);
 
 	const handleComplete = () => {
 		if (currentEditMode) {
+			setCurrentEditMode(false);
 			onOpenChange(false);
 		} else {
 			onOpenChange(false);
 			setOpenSuccess(true);
 		}
+	};
+
+	const handleDialogClose = (isOpen: boolean) => {
+		if (!isOpen) {
+			setCurrentEditMode(false);
+			setIsEditingFromDialog(false);
+		}
+		onOpenChange(isOpen);
 	};
 
 	const getStepCount = () => {
@@ -80,9 +89,9 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 		<>
 			<Dialog
 				open={open}
-				onOpenChange={onOpenChange}
+				onOpenChange={handleDialogClose}
 			>
-				<DialogContent className='mx-4 rounded-xl p-0 sm:mx-auto md:max-w-4xl'>
+				<DialogContent className='mx-4 max-h-[90vh] rounded-xl p-0 sm:mx-auto md:max-w-4xl'>
 					<div className='flex items-center justify-between gap-3 border-b border-border_grey px-4 py-3'>
 						<div className='flex items-center gap-2'>
 							<Image
@@ -97,7 +106,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 						</div>
 					</div>
 
-					<div className='flex w-full flex-col gap-6 px-6 py-5'>
+					<div className='flex w-full flex-col gap-4 px-4 py-4 sm:gap-6 sm:px-6 sm:py-5'>
 						<StepIndicator
 							currentStep={getCurrentStepNumber()}
 							totalSteps={getStepCount()}
@@ -173,12 +182,14 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 				}}
 				onEditStrategy={() => {
 					setOpenEdit(false);
+					setIsEditingFromDialog(true);
 					setCurrentEditMode(true);
 					setStep(3);
 					onOpenChange(true);
 				}}
 				onEditPersonality={() => {
 					setOpenEdit(false);
+					setIsEditingFromDialog(true);
 					setCurrentEditMode(true);
 					setStep(4);
 					onOpenChange(true);

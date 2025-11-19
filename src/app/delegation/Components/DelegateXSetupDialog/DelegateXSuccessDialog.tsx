@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { memo } from 'react';
 import Image from 'next/image';
 import { Dialog, DialogContent } from '@/app/_shared-components/Dialog/Dialog';
@@ -23,7 +21,7 @@ function DelegateXSuccessDialog({ open, onOpenChange, onViewDashboard, onEditBot
 			open={open}
 			onOpenChange={onOpenChange}
 		>
-			<DialogContent className='max-w-md border-none p-0'>
+			<DialogContent className='max-w-md border-none p-0 dark:border dark:border-border_grey'>
 				<div className='overflow-hidden rounded-xl bg-bg_modal p-6 text-center'>
 					<Image
 						src={KlaraBot}
