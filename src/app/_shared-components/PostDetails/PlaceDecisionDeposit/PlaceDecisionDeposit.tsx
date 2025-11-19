@@ -51,6 +51,7 @@ function PlaceDecisionDeposit({ postId, track, status, onSuccess }: { postId: nu
 		apiService.submitDecisionDeposit({
 			postId,
 			address: userPreferences.selectedAccount.address,
+			selectedAccount: userPreferences.selectedAccount,
 			wallet: userPreferences.wallet,
 			setVaultQrState,
 			onSuccess: () => {
