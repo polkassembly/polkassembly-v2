@@ -7,14 +7,14 @@
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { EStatusTagType, EProposalStatus } from '@/_shared/types';
+import { EStatusTagType, EProposalStatus, EJudgementStatus } from '@/_shared/types';
 import { DECIDING_PROPOSAL_STATUSES } from '@/_shared/_constants/decidingProposalStatuses';
 
 import styles from './StatusTag.module.scss';
 
 interface Props {
 	className?: string;
-	status?: EProposalStatus;
+	status?: EProposalStatus | EJudgementStatus;
 	colorInverted?: boolean;
 	type?: EStatusTagType;
 }
@@ -25,12 +25,12 @@ function StatusTag({ className = '', status, colorInverted = false, type = EStat
 	const normalizedStatus = useMemo(() => {
 		if (!status) return undefined;
 
-		if (DECIDING_PROPOSAL_STATUSES.includes(status)) {
+		if (type === EStatusTagType.PROPOSAL && DECIDING_PROPOSAL_STATUSES.includes(status as EProposalStatus)) {
 			return EProposalStatus.Deciding.toLowerCase();
 		}
 
 		return status.toLowerCase().replace(/\s+/g, '_');
-	}, [status]);
+	}, [status, type]);
 
 	const translationKey = type === EStatusTagType.JUDGEMENT ? 'JudgementStatus' : 'ProposalStatus';
 
