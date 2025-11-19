@@ -11,10 +11,10 @@ import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import Address from '@/app/_shared-components/Profile/Address/Address';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/app/_shared-components/Dialog/Dialog';
 import { Button } from '@/app/_shared-components/Button';
-import DelegateVotingPower from '@/app/_shared-components/DelegateVotingPower/DelegateVotingPower';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
+import DelegateXSetupDialog from '../../DelegateXSetupDialog/DelegateXSetupDialog';
 import styles from './DelegateCard.module.scss';
 
 interface IDelegateXCardProps {
@@ -65,7 +65,7 @@ const DelegateXCard = memo(({ data }: IDelegateXCardProps) => {
 	const t = useTranslations('Delegation');
 
 	const [openModal, setOpenModal] = useState(false);
-	const [openDelegateDialog, setOpenDelegateDialog] = useState(false);
+	const [openSetupDialog, setOpenSetupDialog] = useState(false);
 
 	return (
 		<div className={styles.delegateXCardWrapper}>
@@ -92,32 +92,20 @@ const DelegateXCard = memo(({ data }: IDelegateXCardProps) => {
 						</div>
 
 						{user?.id ? (
-							<Dialog
-								open={openDelegateDialog}
-								onOpenChange={setOpenDelegateDialog}
-							>
-								<DialogTrigger asChild>
-									<Button
-										variant='ghost'
-										className='flex items-center gap-x-2 text-sm font-medium text-text_pink'
-									>
-										<IoPersonAdd />
-										<span>{t('delegate')}</span>
-									</Button>
-								</DialogTrigger>
-								<DialogContent className='max-w-screen-md p-6'>
-									<DialogHeader>
-										<DialogTitle className='flex items-center gap-x-2'>
-											<IoPersonAdd />
-											<span>{t('delegate')}</span>
-										</DialogTitle>
-									</DialogHeader>
-									<DelegateVotingPower
-										delegate={{ address: data.address }}
-										onClose={() => setOpenDelegateDialog(false)}
-									/>
-								</DialogContent>
-							</Dialog>
+							<>
+								<Button
+									variant='ghost'
+									className='flex items-center gap-x-2 text-sm font-medium text-text_pink'
+									onClick={() => setOpenSetupDialog(true)}
+								>
+									<IoPersonAdd />
+									<span>{t('delegate')}</span>
+								</Button>
+								<DelegateXSetupDialog
+									open={openSetupDialog}
+									onOpenChange={setOpenSetupDialog}
+								/>
+							</>
 						) : (
 							<Link
 								href='/login'
