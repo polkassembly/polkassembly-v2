@@ -19,3 +19,5 @@ export const chatStateAtom = atom<KlaraChatState>({
 	temporaryConversationId: null,
 	localMessages: []
 });
+
+export const failedImageUrlsAtom = atom<Set<string>>(new Set<string>());
