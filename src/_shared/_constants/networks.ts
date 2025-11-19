@@ -3339,6 +3339,10 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		tokenSymbol: 'PAS',
 		rpcEndpoints: [
 			{
+				name: 'via Dotters',
+				url: 'wss://paseo.dotters.network'
+			},
+			{
 				name: VIA_DWELLIR,
 				url: 'wss://paseo-rpc.dwellir.com'
 			},

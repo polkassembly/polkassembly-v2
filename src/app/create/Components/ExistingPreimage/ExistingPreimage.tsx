@@ -91,6 +91,7 @@ function ExistingPreimage({ createdPreimageHash, onSuccess }: { createdPreimageH
 
 		apiService.createProposal({
 			address: userPreferences.selectedAccount.address,
+			selectedAccount: userPreferences.selectedAccount,
 			wallet: userPreferences.wallet,
 			setVaultQrState,
 			track: selectedTrack.name,
