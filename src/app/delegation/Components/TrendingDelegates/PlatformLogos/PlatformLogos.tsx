@@ -17,7 +17,8 @@ const logoMap: { [key in EDelegateSource]: StaticImageData | ReactNode } = {
 	[EDelegateSource.PARITY]: ParityLogo,
 	[EDelegateSource.POLKASSEMBLY]: PALOGO,
 	[EDelegateSource.W3F]: W3FLogo,
-	[EDelegateSource.INDIVIDUAL]: <FaUser className='text-text_primary' />
+	[EDelegateSource.INDIVIDUAL]: <FaUser className='text-text_primary' />,
+	[EDelegateSource.DELEGATEX]: null
 };
 
 function PlatformLogos({ platforms }: { platforms: EDelegateSource[] }) {
