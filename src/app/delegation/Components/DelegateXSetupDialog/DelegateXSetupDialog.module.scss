@@ -1,0 +1,21 @@
+.PreviewWrapper {
+	position: relative;
+	padding: 1px;
+	border-radius: 6px;
+	@apply flex h-full flex-col;
+}
+
+.PreviewWrapper::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	padding: 1px;
+	background: linear-gradient(90deg, #e5007a 0%, #51d36e 50%, #3473ff 75%, #ffd669 100%);
+	mask:
+		linear-gradient(#fff 0 0) content-box,
+		linear-gradient(#fff 0 0);
+	mask-composite: exclude;
+	-webkit-mask-composite: xor;
+	pointer-events: none;
+}
