@@ -6,6 +6,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { IdentityService } from '@/app/_client-services/identity_service';
+import { getRegistrarsWithStats } from '@/app/_client-utils/identityUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { ENetwork } from '@/_shared/types';
 import { z } from 'zod';
@@ -26,7 +27,9 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 	}
 
 	const identityService = await IdentityService.Init(network as ENetwork);
-	const registrars = await identityService.getRegistrarsWithStats({ search });
+	const registrarsData = await identityService.getRegistrars();
+	const judgements = await identityService.getAllIdentityJudgements();
+	const registrars = getRegistrarsWithStats({ registrars: registrarsData, judgements, search });
 
 	return NextResponse.json({
 		items: registrars,
