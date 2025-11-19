@@ -79,7 +79,14 @@ const DelegateXCard = memo(({ data }: IDelegateXCardProps) => {
 			<div className='flex gap-2 rounded-t-md border-b border-wallet_btn_text py-1'>
 				<div className='flex items-center gap-1 px-2 lg:gap-2 lg:px-4'>
 					<p className='text-medium pl-12 text-xs text-btn_secondary_text'>
-						Built on <span className='cursor-pointer text-text_pink underline'>CyberGov</span> Powered by <span className='font-semibold'>Klara</span>
+						Built on{' '}
+						<Link
+							href='/'
+							className='cursor-pointer text-text_pink underline'
+						>
+							CyberGov
+						</Link>{' '}
+						Powered by <span className='font-semibold'>Klara</span>
 					</p>
 				</div>{' '}
 			</div>

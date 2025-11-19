@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { Button } from '@/app/_shared-components/Button';
 import { ArrowRight } from 'lucide-react';
 import QuestionIcon from '@assets/delegation/question.svg';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 
 interface CostEstimateStepProps {
 	onNext: () => void;
@@ -25,12 +26,21 @@ function CostEstimateStep({ onNext, estimatedCost = '≈ 5 DOT', isEditMode = fa
 				<div className='mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2'>
 					<div className='flex items-center gap-2'>
 						<p className='font-semibold text-text_primary'>Cost Estimate</p>
-						<Image
-							src={QuestionIcon}
-							alt='Question Icon'
-							width={16}
-							height={16}
-						/>
+						<Tooltip>
+							<TooltipTrigger>
+								<Image
+									src={QuestionIcon}
+									alt='Question Icon'
+									width={16}
+									height={16}
+								/>
+							</TooltipTrigger>
+							<TooltipContent className='bg-tooltip_background p-2 text-white'>
+								<p className='max-w-xs text-xs text-text_primary'>
+									This is an estimate of the costs involved in setting up your delegate. The exact amount will be confirmed when you sign the transaction.
+								</p>
+							</TooltipContent>
+						</Tooltip>
 					</div>
 				</div>
 				<p className='text-sm text-text_primary'>To activate your delegate, we&apos;ll create a wallet and reserve a small amount of DOT for gas fees.</p>

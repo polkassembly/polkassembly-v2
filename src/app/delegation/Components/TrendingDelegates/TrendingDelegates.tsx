@@ -138,10 +138,7 @@ function TrendingDelegates() {
 		itemsPerPage
 	} = useDelegateFiltering(delegates);
 
-	const orderedFilteredDelegates = [
-		...filteredDelegates.filter((d) => d.sources?.includes(EDelegateSource.DELEGATEX)),
-		...filteredDelegates.filter((d) => !d.sources?.includes(EDelegateSource.DELEGATEX))
-	];
+	const orderedFilteredDelegates = [...filteredDelegates.filter((d) => !d.sources?.includes(EDelegateSource.DELEGATEX))];
 	return (
 		<div className={styles.delegationDetailsCard}>
 			<div className='mb-4 flex items-center justify-between'>

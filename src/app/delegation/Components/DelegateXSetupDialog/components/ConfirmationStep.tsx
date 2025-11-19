@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { Button } from '@/app/_shared-components/Button';
 import { ArrowRight } from 'lucide-react';
 import QuestionIcon from '@assets/delegation/question.svg';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 
 interface ConfirmationStepProps {
 	onConfirm: () => void;
@@ -28,12 +29,22 @@ function ConfirmationStep({ onConfirm, displayName, selectedStrategy, estimatedF
 					<div className='mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2'>
 						<div className='flex items-center gap-2'>
 							<p className='font-semibold text-text_primary'>Confirm Delegation & Gas Deposit</p>
-							<Image
-								src={QuestionIcon}
-								alt='Question Icon'
-								width={16}
-								height={16}
-							/>
+							<Tooltip>
+								<TooltipTrigger>
+									<Image
+										src={QuestionIcon}
+										alt='Question Icon'
+										width={16}
+										height={16}
+									/>
+								</TooltipTrigger>
+								<TooltipContent className='bg-tooltip_background p-2 text-white'>
+									<p className='max-w-xs text-xs text-text_primary'>
+										By confirming, you agree to create your delegate wallet and register it on-chain. You will be prompted to sign two transactions: one for delegation and another
+										for gas deposit.
+									</p>
+								</TooltipContent>
+							</Tooltip>
 						</div>
 					</div>
 					<p className='text-text_secondary text-sm'>

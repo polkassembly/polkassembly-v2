@@ -8,6 +8,7 @@ import { Button } from '@/app/_shared-components/Button';
 import { ArrowRight } from 'lucide-react';
 import { Switch } from '@/app/_shared-components/Switch';
 import QuestionIcon from '@assets/delegation/question.svg';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import styles from '../DelegateXSetupDialog.module.scss';
 
 interface PersonalityStepProps {
@@ -50,12 +51,22 @@ function PersonalityStep({
 						/>
 						<div className='flex items-center gap-2'>
 							<p className='font-semibold text-text_primary'>{isEditMode ? 'Update Comment Settings' : 'Include Comment with Vote'}</p>
-							<Image
-								src={QuestionIcon}
-								alt='Question Icon'
-								width={16}
-								height={16}
-							/>
+							<Tooltip>
+								<TooltipTrigger>
+									<Image
+										src={QuestionIcon}
+										alt='Question Icon'
+										width={16}
+										height={16}
+									/>
+								</TooltipTrigger>
+								<TooltipContent className='bg-tooltip_background p-2 text-white'>
+									<p className='max-w-xs text-xs text-text_primary'>
+										Enable this option to have DelegateX automatically add a comment with your vote, explaining the reason behind it. You can customize the comment to reflect your
+										personal style and message.
+									</p>
+								</TooltipContent>
+							</Tooltip>
 						</div>
 					</div>
 				</div>
@@ -92,9 +103,17 @@ function PersonalityStep({
 
 										<div className={`${styles.PreviewWrapper} mt-3 rounded-xl p-[1px]`}>
 											<div className='flex min-h-[100px] flex-col rounded-xl bg-bg_modal p-4 sm:min-h-[160px] md:min-h-[140px]'>
-												<div className='mb-3 flex gap-2'>
+												<div
+													className='mb-3 flex gap-2'
+													role='tablist'
+													aria-label='Persona customization tabs'
+												>
+													{' '}
 													<button
 														type='button'
+														role='tab'
+														aria-selected={personaTab === 'prompt'}
+														aria-controls='prompt-panel'
 														className={`rounded-full px-4 py-1 text-xs font-medium transition-colors ${personaTab === 'prompt' ? 'bg-border_grey text-text_primary' : ''}`}
 														onClick={() => onPersonaTabChange('prompt')}
 													>
@@ -102,26 +121,41 @@ function PersonalityStep({
 													</button>
 													<button
 														type='button'
+														role='tab'
+														aria-selected={personaTab === 'preview'}
+														aria-controls='preview-panel'
 														className={`rounded-full px-4 py-1 text-xs font-medium transition-colors ${personaTab === 'preview' ? 'bg-border_grey text-text_primary' : ''}`}
 														onClick={() => onPersonaTabChange('preview')}
 													>
 														PREVIEW
 													</button>
 												</div>
-
-												{personaTab === 'prompt' ? (
-													<textarea
-														className='placeholder:text-text_secondary w-full flex-1 resize-none bg-transparent text-sm outline-none'
-														placeholder='Enter your custom prompt here...'
-														value={persona}
-														onChange={(e) => onPersonaChange(e.target.value)}
-													/>
-												) : (
-													<div className='flex-1 overflow-y-auto'>
-														<p className='text-xs font-bold italic text-text_primary'>This is how the comment will appear on the vote:</p>
-														<p className='mt-2 text-xs italic text-text_primary'>Voted Aye — Proposal meets defined criteria. – {signature || 'Alice for Growth Advocate'}</p>
-													</div>
-												)}
+												<div
+													id='prompt-panel'
+													role='tabpanel'
+													hidden={personaTab !== 'prompt'}
+												>
+													{personaTab === 'prompt' && (
+														<textarea
+															className='placeholder:text-text_secondary w-full flex-1 resize-none bg-transparent text-sm outline-none'
+															placeholder='Enter your custom prompt here...'
+															value={persona}
+															onChange={(e) => onPersonaChange(e.target.value)}
+														/>
+													)}
+												</div>
+												<div
+													id='preview-panel'
+													role='tabpanel'
+													hidden={personaTab !== 'preview'}
+												>
+													{personaTab === 'preview' && (
+														<div className='flex-1 overflow-y-auto'>
+															<p className='text-xs font-bold italic text-text_primary'>This is how the comment will appear on the vote:</p>
+															<p className='mt-2 text-xs italic text-text_primary'>Voted Aye — Proposal meets defined criteria. – {signature || 'Alice for Growth Advocate'}</p>
+														</div>
+													)}
+												</div>
 											</div>
 										</div>
 									</div>

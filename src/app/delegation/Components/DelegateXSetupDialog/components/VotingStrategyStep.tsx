@@ -12,6 +12,7 @@ import Strategy2 from '@assets/delegation/klara/Strategy2.svg';
 import Strategy3 from '@assets/delegation/klara/Strategy3.svg';
 import Strategy4 from '@assets/delegation/klara/Strategy4.svg';
 import { Separator } from '@/app/_shared-components/Separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 
 interface VotingStrategy {
 	id: string;
@@ -88,12 +89,21 @@ function VotingStrategyStep({ onNext, selectedStrategy = 'strategy-1', onStrateg
 					<div className='mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2'>
 						<div className='flex items-center gap-2'>
 							<p className='font-semibold text-text_primary'>{isEditMode ? 'Update Voting Strategy' : 'Choose Voting Strategy'}</p>
-							<Image
-								src={QuestionIcon}
-								alt='Question Icon'
-								width={16}
-								height={16}
-							/>
+							<Tooltip>
+								<TooltipTrigger>
+									<Image
+										src={QuestionIcon}
+										alt='Question Icon'
+										width={16}
+										height={16}
+									/>
+								</TooltipTrigger>
+								<TooltipContent className='bg-tooltip_background p-2 text-white'>
+									<p className='max-w-xs text-xs text-text_primary'>
+										Pick the voting strategy that best matches your approach. Each template represents how Delegate X weighs different factors before voting.
+									</p>
+								</TooltipContent>
+							</Tooltip>
 						</div>
 					</div>
 					<p className='text-[10px] text-text_primary md:text-sm'>
