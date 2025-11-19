@@ -148,6 +148,7 @@ function CreateBounty({ onSuccess }: { onSuccess: (proposalId: number) => void }
 		setLoading(true);
 		apiService.createProposal({
 			address: userPreferences.selectedAccount.address,
+			selectedAccount: userPreferences.selectedAccount,
 			wallet: userPreferences.wallet,
 			setVaultQrState,
 			track: selectedTrack.name,

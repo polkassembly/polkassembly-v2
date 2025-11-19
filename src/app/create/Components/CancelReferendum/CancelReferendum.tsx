@@ -106,6 +106,7 @@ function CancelReferendum({ onSuccess }: { onSuccess: (proposalId: number) => vo
 
 		apiService.createProposal({
 			address: userPreferences.selectedAccount.address,
+			selectedAccount: userPreferences.selectedAccount,
 			wallet: userPreferences.wallet,
 			setVaultQrState,
 			track: EPostOrigin.REFERENDUM_CANCELLER,
