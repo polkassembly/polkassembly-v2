@@ -58,7 +58,7 @@ function DelegateXSetupDialog({ open, onOpenChange }: DelegateXSetupDialogProps)
 							/>
 							<span className='text-xl font-semibold'>DelegateX</span>
 							<span className='text-xs text-btn_secondary_text'>Powered by</span>
-							<span className='rounded-full bg-delegation_bgcard/80 p-1 text-xs'>CyberGov</span>
+							<span className='rounded-full bg-delegation_bgcard p-1 px-2 text-xs'>CyberGov</span>
 						</div>
 					</div>
 
