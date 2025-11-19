@@ -24,7 +24,7 @@ interface DelegateXSetupDialogProps {
 		displayName?: string;
 		signature?: string;
 		contact?: string;
-		persona?: 'friendly' | 'technical' | 'formal' | 'concise' | 'others';
+		persona?: string;
 		selectedStrategy?: string;
 		includeComment?: boolean;
 	};
@@ -34,7 +34,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	const [step, setStep] = useState<number>(initialStep);
 	const [signature, setSignature] = useState(initialData.signature || '');
 	const [contact, setContact] = useState(initialData.contact || '');
-	const [persona, setPersona] = useState<'friendly' | 'technical' | 'formal' | 'concise' | 'others'>(initialData.persona || 'friendly');
+	const [persona, setPersona] = useState<string>(initialData.persona || '');
 	const [selectedStrategy, setSelectedStrategy] = useState(initialData.selectedStrategy || 'strategy-1');
 	const [openSuccess, setOpenSuccess] = useState(false);
 	const [openEdit, setOpenEdit] = useState(false);
@@ -91,7 +91,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 				open={open}
 				onOpenChange={handleDialogClose}
 			>
-				<DialogContent className='mx-4 max-h-[90vh] rounded-xl p-0 sm:mx-auto md:max-w-4xl'>
+				<DialogContent className='max-h-[90vh] w-[95vw] rounded-xl p-0 sm:mx-auto md:max-w-4xl'>
 					<div className='flex items-center justify-between gap-3 border-b border-border_grey px-4 py-3'>
 						<div className='flex items-center gap-2'>
 							<Image

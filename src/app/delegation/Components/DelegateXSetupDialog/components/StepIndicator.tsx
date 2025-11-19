@@ -25,7 +25,7 @@ function StepIndicator({ currentStep, totalSteps, isEditMode = false }: StepIndi
 					className='flex items-center'
 				>
 					<span className={`h-2 w-2 rounded-full ${step <= currentStep ? 'bg-aye_color' : 'bg-border_grey'}`} />
-					{idx !== steps.length - 1 && <div className={`mx-1 h-[2px] w-48 rounded ${step < currentStep ? 'bg-aye_color' : 'bg-border_grey'}`} />}
+					{idx !== steps.length - 1 && <div className={`mx-1 h-[2px] w-12 rounded sm:w-24 md:w-48 ${step < currentStep ? 'bg-aye_color' : 'bg-border_grey'}`} />}
 				</div>
 			))}
 		</div>

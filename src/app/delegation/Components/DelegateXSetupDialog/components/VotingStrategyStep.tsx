@@ -96,52 +96,52 @@ function VotingStrategyStep({ onNext, selectedStrategy = 'strategy-1', onStrateg
 							/>
 						</div>
 					</div>
-					<p className='text-sm text-text_primary'>
+					<p className='text-[10px] text-text_primary md:text-sm'>
 						Pick the voting strategy that best matches your approach. Each template represents how Delegate X weighs different factors before voting.
 					</p>
 				</div>
 
-				<div className='relative mt-4 w-full'>
+				<div className='relative mt-2 w-full md:mt-4'>
 					<button
 						type='button'
 						onClick={scrollLeft}
-						className='absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black p-1 shadow-md hover:bg-gray-800'
+						className='absolute left-0 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-black p-1 shadow-md hover:bg-gray-800 sm:block'
 					>
 						<ChevronLeft className='h-5 w-5 text-white' />
 					</button>
 
 					<div
 						ref={scrollRef}
-						className='hide_scrollbar flex max-w-3xl gap-3 overflow-x-auto px-10 py-4'
+						className='hide_scrollbar flex max-h-[400px] flex-col gap-3 overflow-y-auto px-2 py-2 sm:max-h-none sm:flex-row sm:overflow-x-auto sm:overflow-y-visible sm:px-4 sm:py-4 md:max-w-3xl md:px-10'
 					>
 						{strategies.map((strategy) => (
 							<div
 								aria-hidden
 								key={strategy.id}
-								className={`flex w-[250px] shrink-0 cursor-pointer rounded-xl border border-solid ${
+								className={`flex w-full shrink-0 cursor-pointer rounded-xl border border-solid sm:w-[250px] ${
 									selectedStrategy === strategy.id ? 'scale-105 border-text_pink' : 'border-[#D2D8E0] dark:border-[#3B444F]'
 								}`}
 								onClick={() => handleStrategySelect(strategy.id)}
 							>
-								<div className='flex w-full flex-col items-start rounded-xl bg-bg_modal p-4'>
-									<div className='flex w-full flex-col items-center gap-4'>
+								<div className='flex w-full flex-col items-start rounded-xl bg-bg_modal p-3 sm:p-4'>
+									<div className='flex w-full flex-col items-center gap-3 sm:gap-4'>
 										<Image
 											src={strategy.icon}
 											alt='Strategy Icon'
 											width={80}
 											height={80}
-											className='shrink-0'
+											className='h-16 w-16 shrink-0 sm:h-20 sm:w-20'
 										/>
 
 										<div className='flex w-full flex-col text-center'>
-											<p className='text-base font-semibold text-text_primary'>{strategy.name}</p>
-											<p className='mt-1 text-xs text-text_primary'>{strategy.description}</p>
+											<p className='text-sm font-semibold text-text_primary sm:text-base'>{strategy.name}</p>
+											<p className='mt-1 text-[11px] leading-tight text-text_primary sm:text-xs'>{strategy.description}</p>
 
-											<div className='mt-3 flex items-center justify-center gap-2 text-wallet_btn_text'>
+											<div className='mt-2 flex items-center justify-center gap-1 text-wallet_btn_text sm:mt-3 sm:gap-2'>
 												{strategy.tags.map((tag: string) => (
 													<span
 														key={tag}
-														className='text-text_secondary rounded-full bg-delegation_bgcard px-3 py-1 text-[10px] font-medium'
+														className='text-text_secondary rounded-full bg-delegation_bgcard px-2 py-0.5 text-[9px] font-medium sm:px-3 sm:py-1 sm:text-[10px]'
 													>
 														{tag}
 													</span>
@@ -150,13 +150,13 @@ function VotingStrategyStep({ onNext, selectedStrategy = 'strategy-1', onStrateg
 										</div>
 									</div>
 
-									<Separator className='mt-3' />
+									<Separator className='mt-2 sm:mt-3' />
 
 									<div className='mx-auto'>
 										<Button
 											variant='ghost'
 											size='sm'
-											className='mt-2 px-0 text-sm font-medium text-text_pink hover:bg-transparent hover:text-text_pink hover:underline'
+											className='mt-1 px-0 text-xs font-medium text-text_pink hover:bg-transparent hover:text-text_pink hover:underline sm:mt-2 sm:text-sm'
 										>
 											View Logic
 										</Button>
@@ -169,7 +169,7 @@ function VotingStrategyStep({ onNext, selectedStrategy = 'strategy-1', onStrateg
 					<button
 						type='button'
 						onClick={scrollRight}
-						className='absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black p-1 shadow-md hover:bg-gray-800'
+						className='absolute right-0 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-black p-1 shadow-md hover:bg-gray-800 sm:block'
 					>
 						<ChevronRight className='h-5 w-5 text-white' />
 					</button>

@@ -25,7 +25,7 @@ function WelcomeStep({ onNext, isEditMode = false }: WelcomeStepProps) {
 							alt='Klara'
 							width={450}
 							height={450}
-							className='h-[150px] w-[350px] md:h-[200px] md:w-[400px]'
+							className='h-[120px] w-[280px] md:h-[200px] md:w-[400px]'
 						/>
 					</div>
 					<div>
@@ -37,7 +37,7 @@ function WelcomeStep({ onNext, isEditMode = false }: WelcomeStepProps) {
 							</DialogTitle>
 						</DialogHeader>
 
-						<div className='text-text_secondary space-y-2 pt-5 text-sm'>
+						<div className='text-text_secondary max-h-32 space-y-2 overflow-y-auto pt-5 text-sm md:max-h-none'>
 							<p>DelegateX combines Klara&apos;s AI layer with Cybergov&apos;s onchain-voting system.</p>
 							<p>It is a custom voting agent setup for individual users:</p>
 							<ul className='ml-5 space-y-1 md:list-disc'>

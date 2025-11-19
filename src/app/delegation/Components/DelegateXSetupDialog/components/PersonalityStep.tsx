@@ -43,7 +43,7 @@ function PersonalityStep({
 		<div className='space-y-4'>
 			<div className='rounded-lg bg-delegation_bgcard p-4 sm:p-6'>
 				<div className='text-text_primary'>
-					<div className='flex flex-col gap-3 sm:flex-row sm:gap-2'>
+					<div className='flex gap-3 sm:gap-2'>
 						<Switch
 							checked={includeComment}
 							onCheckedChange={onIncludeCommentChange}
@@ -63,12 +63,12 @@ function PersonalityStep({
 				<div>
 					{includeComment && (
 						<>
-							<p className='mt-3 text-sm'>DelegateX adds a comment with your vote explaining the reason behind it. You can customise the comment below:</p>
+							<p className='mt-3 text-[10px] md:text-sm'>DelegateX adds a comment with your vote explaining the reason behind it. You can customise the comment below:</p>
 
 							<div className='mt-3 rounded-lg border border-border_grey p-3 sm:p-4'>
 								<div className='space-y-4'>
 									<div>
-										<p className='mb-2 block text-sm font-medium'>Signature Line</p>
+										<p className='mb-2 block text-[10px] font-medium md:text-sm'>Signature Line</p>
 										<input
 											className='placeholder:text-text_secondary w-full rounded-md border border-border_grey bg-bg_modal px-3 py-2 text-sm outline-none'
 											placeholder='eg. Alice for Growth Advocate'
@@ -78,7 +78,7 @@ function PersonalityStep({
 									</div>
 
 									<div>
-										<p className='mb-2 block text-sm font-medium'>Contact Link (optional)</p>
+										<p className='mb-2 block text-[10px] font-medium md:text-sm'>Contact Link (optional)</p>
 										<input
 											className='placeholder:text-text_secondary w-full rounded-md border border-border_grey bg-bg_modal px-3 py-2 text-sm outline-none'
 											placeholder='URL or Handle'
@@ -88,10 +88,10 @@ function PersonalityStep({
 									</div>
 
 									<div>
-										<p className='mb-2 block text-sm font-medium'>Customise the prompt to modify comment style.</p>
+										<p className='mb-2 block text-[10px] font-medium md:text-sm'>Customise the prompt to modify comment style.</p>
 
 										<div className={`${styles.PreviewWrapper} mt-3 rounded-xl p-[1px]`}>
-											<div className='flex min-h-[160px] flex-col rounded-xl bg-bg_modal p-4'>
+											<div className='flex min-h-[100px] flex-col rounded-xl bg-bg_modal p-4 sm:min-h-[160px] md:min-h-[140px]'>
 												<div className='mb-3 flex gap-2'>
 													<button
 														type='button'
