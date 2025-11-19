@@ -669,20 +669,36 @@ export class IdentityService {
 		}
 	}
 
-	async becomeRegistrar({ address, onSuccess, onFailed }: { address: string; onSuccess?: () => void; onFailed?: (errorMessageFallback?: string) => void }) {
+	async becomeRegistrar({
+		address,
+		wallet,
+		setVaultQrState,
+		selectedAccount,
+		onSuccess,
+		onFailed
+	}: {
+		address: string;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+		selectedAccount?: ISelectedAccount;
+		onSuccess?: () => void;
+		onFailed?: (errorMessageFallback?: string) => void;
+	}) {
 		const encodedAddress = getEncodedAddress(address, this.network) || address;
 		const becomeRegistrarTx = this.peopleChainApi.tx.identity.addRegistrar(encodedAddress);
 
 		await this.executeTx({
 			tx: becomeRegistrarTx,
 			address: encodedAddress,
+			wallet,
+			setVaultQrState,
+			selectedAccount,
 			errorMessageFallback: 'Failed to become registrar',
 			waitTillFinalizedHash: true,
 			onSuccess: () => {
 				onSuccess?.();
 			},
 			onFailed: (errorMessageFallback: string) => {
-				console.log(errorMessageFallback, 'errorMessageFallback');
 				onFailed?.(errorMessageFallback);
 			}
 		});
