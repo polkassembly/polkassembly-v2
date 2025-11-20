@@ -648,6 +648,7 @@
 		"noVoteForAddress": "未找到此地址的投票",
 		"showLikelySpam": "显示疑似垃圾评论",
 		"hideLikelySpam": "隐藏疑似垃圾评论",
+		"aag": "AAG",
 		"HighlightMenu": {
 			"quote": "引用",
 			"share": "分享",
@@ -1612,6 +1613,13 @@
 		"oldest": "最旧",
 		"errorLoadingVideos": "加载视频错误",
 		"noVideosFound": "没有找到符合条件的视频",
+		"noVideosLinked": "There are no AAG Videos linked to this Proposal.",
+		"aboutAAG": "About AAG",
+		"klarafound": "Klara found",
+		"wherethisrefismentioned": "where this ref is mentioned:",
+		"aagfound": "AAG",
+		"video": "video",
+		"videos": "videos",
 		"requestToPresentModal": {
 			"title": "申请演示",
 			"fullName": "全名",

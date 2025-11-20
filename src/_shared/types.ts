@@ -779,7 +779,8 @@ export enum EPostDetailsTab {
 	DESCRIPTION = 'description',
 	ONCHAIN_INFO = 'onchain_info',
 	SUMMARISE = 'summarise',
-	POST_ANALYTICS = 'post_analytics'
+	POST_ANALYTICS = 'post_analytics',
+	AAG = 'aag'
 }
 
 export enum EActivityName {

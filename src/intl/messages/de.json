@@ -646,6 +646,7 @@
 		"noVoteForAddress": "Keine Abstimmung für diese Adresse gefunden",
 		"showLikelySpam": "Wahrscheinlichen Spam anzeigen",
 		"hideLikelySpam": "Wahrscheinlichen Spam ausblenden",
+		"aag": "AAG",
 		"HighlightMenu": {
 			"quote": "Zitieren",
 			"share": "Teilen",
@@ -1611,6 +1612,13 @@
 		"oldest": "Älteste",
 		"errorLoadingVideos": "Fehler beim Laden der Videos",
 		"noVideosFound": "Keine Videos gefunden, die Ihren Kriterien entsprechen",
+		"noVideosLinked": "There are no AAG Videos linked to this Proposal.",
+		"aboutAAG": "About AAG",
+		"klarafound": "Klara found",
+		"wherethisrefismentioned": "where this ref is mentioned:",
+		"aagfound": "AAG",
+		"video": "video",
+		"videos": "videos",
 		"requestToPresentModal": {
 			"title": "Präsentation Anfragen",
 			"fullName": "Vollständiger Name",

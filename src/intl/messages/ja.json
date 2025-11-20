@@ -648,6 +648,7 @@
 		"noVoteForAddress": "このアドレスの投票が見つかりません",
 		"showLikelySpam": "疑わしいスパムを表示",
 		"hideLikelySpam": "疑わしいスパムを非表示",
+		"aag": "AAG",
 		"HighlightMenu": {
 			"quote": "引用",
 			"share": "共有",
@@ -1612,6 +1613,13 @@
 		"oldest": "古い順",
 		"errorLoadingVideos": "動画の読み込みエラー",
 		"noVideosFound": "条件に一致する動画が見つかりません",
+		"noVideosLinked": "There are no AAG Videos linked to this Proposal.",
+		"aboutAAG": "About AAG",
+		"klarafound": "Klara found",
+		"wherethisrefismentioned": "where this ref is mentioned:",
+		"aagfound": "AAG",
+		"video": "video",
+		"videos": "videos",
 		"requestToPresentModal": {
 			"title": "プレゼンテーション申請",
 			"fullName": "フルネーム",

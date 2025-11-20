@@ -173,6 +173,13 @@ function PostHeader({ postData, isModalOpen }: { postData: IPost; isModalOpen: b
 					)}
 
 					<TabsTrigger
+						className='flex-shrink-0 px-1 py-1 text-[11px] sm:px-3 sm:py-2 sm:text-sm'
+						value={EPostDetailsTab.AAG}
+					>
+						{t('PostDetails.aag')}
+					</TabsTrigger>
+
+					<TabsTrigger
 						value={EPostDetailsTab.SUMMARISE}
 						className={cn('flex-shrink-0 px-1 py-1 text-[11px] capitalize sm:px-3 sm:py-2 sm:text-sm', classes.tabTrigger)}
 					>

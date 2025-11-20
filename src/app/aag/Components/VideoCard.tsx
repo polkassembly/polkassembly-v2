@@ -45,6 +45,14 @@ function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoI
 		}
 	};
 
+	const formatVideoDate = (dateString: string): string => {
+		const pubdate = new Date(dateString);
+		const day = pubdate.getDate();
+		const month = pubdate.toLocaleDateString('en-US', { month: 'short' });
+		const year = pubdate.getFullYear().toString().slice(-2);
+		return `${day} ${month} '${year}`;
+	};
+
 	return (
 		<Link
 			href={videoLinkHref}
@@ -71,7 +79,7 @@ function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoI
 
 						<p className='mb-4 flex flex-col items-start gap-2 pt-1 text-sm text-wallet_btn_text sm:flex-row sm:items-center sm:gap-4'>
 							<span className='flex items-center gap-1'>
-								<Calendar className='h-3.5 w-3.5' /> {date}
+								<Calendar className='h-3.5 w-3.5' /> {formatVideoDate(date)}
 							</span>
 							<span className='flex items-center gap-1'>
 								<Clock className='h-3.5 w-3.5' />

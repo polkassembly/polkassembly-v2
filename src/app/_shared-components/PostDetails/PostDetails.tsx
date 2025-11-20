@@ -29,6 +29,7 @@ import { Skeleton } from '../Skeleton';
 import Poll from './Poll/Poll';
 import BeneficiariesDetails from './BeneficiariesDetails/BeneficiariesDetails';
 import UserVoteStatus from './UserVoteStatus/UserVoteStatus';
+import AAGVideosTab from './AAGVideosTab/AAGVideosTab';
 
 const AISummary = dynamic(() => import('../AISummary/AISummary'), {
 	ssr: false,
@@ -246,6 +247,14 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									proposalType={postData.proposalType}
 									initialData={postData?.contentSummary}
 								/>
+							</div>
+						</TabsContent>
+						<TabsContent
+							value={EPostDetailsTab.AAG}
+							className='mt-0'
+						>
+							<div className={classes.descBox}>
+								<AAGVideosTab referendaId={index} />
 							</div>
 						</TabsContent>
 						{isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
