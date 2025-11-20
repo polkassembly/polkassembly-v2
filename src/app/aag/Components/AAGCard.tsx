@@ -30,6 +30,28 @@ function AAGCard() {
 		}
 	];
 
+	const handleAddToCalendar = () => {
+		const title = 'Attempts At Governance (AAG) Call';
+		const details = 'Join the weekly AAG call to discuss Polkadot and Kusama governance. Link: https://x.com/KusDAO';
+		const location = 'https://x.com/KusDAO';
+
+		const now = new Date();
+		const nextThursday = new Date(now);
+		nextThursday.setDate(now.getDate() + ((4 + 7 - now.getDay()) % 7));
+		nextThursday.setUTCHours(15, 0, 0, 0);
+
+		if (now.getDay() === 4 && now.getTime() > nextThursday.getTime()) {
+			nextThursday.setDate(nextThursday.getDate() + 7);
+		}
+
+		const startDate = nextThursday.toISOString().replace(/-|:|\.\d+/g, '');
+		const endDate = new Date(nextThursday.getTime() + 60 * 60 * 1000).toISOString().replace(/-|:|\.\d+/g, '');
+
+		const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}&dates=${startDate}/${endDate}&recur=RRULE:FREQ=WEEKLY`;
+
+		window.open(googleCalendarUrl, '_blank');
+	};
+
 	return (
 		<div className='mb-4 w-full bg-bg_modal p-4 md:mb-8 md:p-8 md:px-20'>
 			<div className='flex w-full gap-4'>
@@ -48,6 +70,7 @@ function AAGCard() {
 								<Button
 									variant='secondary'
 									className='w-fit'
+									onClick={handleAddToCalendar}
 								>
 									{t('addToCalendar')}
 								</Button>
