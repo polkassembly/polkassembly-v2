@@ -4,13 +4,15 @@
 
 'use client';
 
-import { Filter, MenuIcon, SearchIcon } from 'lucide-react';
+import { Filter, MenuIcon, SearchIcon, X } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { ENetwork, type IAAGVideoSummary } from '@/_shared/types';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/_shared-components/DropdownMenu';
 import { useTranslations } from 'next-intl';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
+import { useAAGVideos } from '@/hooks/useAAGVideos';
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import AAGVideoCard from './VideoCard';
 
 const FILTER_OPTIONS = {
@@ -36,13 +38,22 @@ function AAGVideoListingComponent({ videos = [], loading: isVideosLoading = fals
 	const [selectedSortOption, setSelectedSortOption] = useState<SortOption>('latest');
 	const [selectedFilterOption, setSelectedFilterOption] = useState<FilterOption>(FILTER_OPTIONS.ALL);
 
-	const filteredAndSortedVideos = useMemo(() => {
-		let filtered = videos;
+	const isSearchActive = searchQuery.length > 2;
+	const { data: searchResultsData, isLoading: isSearchLoading } = useAAGVideos({
+		q: isSearchActive ? searchQuery : undefined,
+		limit: DEFAULT_LISTING_LIMIT,
+		sort: 'latest',
+		enabled: isSearchActive
+	});
 
-		if (searchQuery.trim()) {
-			const query = searchQuery.toLowerCase();
-			filtered = filtered.filter((video) => video.title.toLowerCase().includes(query) || video.referenda?.some((ref) => ref.referendaNo.toLowerCase().includes(query)));
-		}
+	const videosToDisplay = useMemo(() => {
+		return isSearchActive ? searchResultsData?.items || [] : videos;
+	}, [isSearchActive, searchResultsData?.items, videos]);
+
+	const isLoading = isSearchActive ? isSearchLoading : isVideosLoading;
+
+	const filteredAndSortedVideos = useMemo(() => {
+		let filtered = videosToDisplay;
 
 		if (selectedFilterOption !== FILTER_OPTIONS.ALL) {
 			filtered = filtered.filter((video) => getNetworkFromDate(video.publishedAt) === selectedFilterOption);
@@ -55,7 +66,11 @@ function AAGVideoListingComponent({ videos = [], loading: isVideosLoading = fals
 		}
 
 		return filtered;
-	}, [videos, searchQuery, selectedSortOption, selectedFilterOption]);
+	}, [videosToDisplay, selectedSortOption, selectedFilterOption]);
+
+	const clearSearch = () => {
+		setSearchQuery('');
+	};
 
 	return (
 		<div className='my-8 max-w-7xl rounded-lg bg-bg_modal p-4 md:my-16 md:p-6'>
@@ -64,16 +79,26 @@ function AAGVideoListingComponent({ videos = [], loading: isVideosLoading = fals
 
 				<div className='flex w-full flex-col items-stretch gap-3 text-wallet_btn_text sm:w-auto sm:flex-row sm:items-center'>
 					<div className='relative w-full sm:w-auto'>
+						<div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
+							<SearchIcon className={`h-5 w-5 ${searchQuery ? 'text-text_pink' : 'text-wallet_btn_text'}`} />
+						</div>
 						<input
 							type='text'
-							placeholder={t('searchPlaceholder')}
+							placeholder={t('searchPlaceholder') || 'Search by title or referenda number...'}
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							className='w-full rounded-md border border-border_grey py-2 pl-10 pr-4 text-sm sm:w-72'
+							className='w-full rounded-md border border-border_grey bg-bg_modal py-2 pl-10 pr-10 text-sm text-text_primary placeholder:text-wallet_btn_text focus:border-text_pink focus:outline-none focus:ring-1 focus:ring-text_pink sm:w-72'
 						/>
-						<div className='absolute inset-y-0 left-0 flex items-center pl-3'>
-							<SearchIcon className='h-5 w-5' />
-						</div>
+						{searchQuery && (
+							<button
+								type='button'
+								onClick={clearSearch}
+								className='absolute inset-y-0 right-0 flex items-center pr-3 text-wallet_btn_text hover:text-text_primary'
+								aria-label='Clear search'
+							>
+								<X className='h-5 w-5' />
+							</button>
+						)}
 					</div>
 
 					<div className='flex items-center gap-3'>
@@ -127,7 +152,7 @@ function AAGVideoListingComponent({ videos = [], loading: isVideosLoading = fals
 			</div>
 
 			<div className='flex flex-col gap-4'>
-				{isVideosLoading ? (
+				{isLoading ? (
 					<>
 						{[1, 2, 3].map((i) => (
 							<div
