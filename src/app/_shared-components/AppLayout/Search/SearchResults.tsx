@@ -10,7 +10,7 @@ import userIcon from '@assets/profile/user-icon.svg';
 import { Hits, Index, useInstantSearch, useSearchBox, Configure, usePagination } from 'react-instantsearch';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Link from 'next/link';
-import { EProposalType, ESearchType, ENetwork } from '@/_shared/types';
+import { EProposalType, ESearchType, ENetwork, IPublicUser } from '@/_shared/types';
 import CommentIcon from '@assets/icons/Comment.svg';
 import { POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
 import { cn } from '@/lib/utils';
@@ -20,6 +20,9 @@ import { AiOutlineLike } from '@react-icons/all-files/ai/AiOutlineLike';
 import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useSearchConfig } from '@/hooks/useSearchConfig';
+import { useState, useEffect } from 'react';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import PaLogo from '../PaLogo';
 import { Separator } from '../../Separator';
 import Address from '../../Profile/Address/Address';
@@ -191,14 +194,52 @@ function UserHit({ hit }: { hit: User }) {
 	);
 }
 
+function useAddressSearch(query: string, activeIndex: ESearchType | null) {
+	const [user, setUser] = useState<IPublicUser | null>(null);
+	const [loading, setLoading] = useState(false);
+
+	useEffect(() => {
+		if (activeIndex !== ESearchType.USERS || query.length < 3) {
+			setUser(null);
+			setLoading(false);
+			return;
+		}
+
+		const isAddress = ValidatorService.isValidWeb3Address(query);
+		if (!isAddress) {
+			setUser(null);
+			setLoading(false);
+			return;
+		}
+
+		const fetchUserByAddress = async () => {
+			setLoading(true);
+			try {
+				const { data } = await UserProfileClientService.fetchPublicUserByAddress({ address: query });
+				setUser(data ?? null);
+			} catch (error) {
+				console.error('Error fetching user by address:', error);
+				setUser(null);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchUserByAddress();
+	}, [query, activeIndex]);
+
+	return { user, loading };
+}
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function SearchResults({ activeIndex, proposalTypeFilter = ESearchType.POSTS }: { activeIndex: ESearchType | null; proposalTypeFilter?: ESearchType }) {
 	const { status, results } = useInstantSearch();
 	const { query } = useSearchBox();
 	const { currentRefinement, refine } = usePagination();
 	const t = useTranslations();
-	const isLoading = results?.nbHits === 0 && (status === 'loading' || status === 'stalled');
-	const hasNoResults = results?.nbHits === 0 && query.length > 2;
+	const addressSearchResult = useAddressSearch(query, activeIndex);
+	const isLoading = (results?.nbHits === 0 && (status === 'loading' || status === 'stalled')) || addressSearchResult.loading;
+	const hasNoResults = results?.nbHits === 0 && query.length > 2 && !addressSearchResult.user;
 	const network = getCurrentNetwork();
 
 	const { postFilterQuery } = useSearchConfig({
@@ -294,12 +335,25 @@ function SearchResults({ activeIndex, proposalTypeFilter = ESearchType.POSTS }: 
 										</div>
 									</Index>
 								) : (
-									<Index indexName='polkassembly_v2_users'>
-										<Configure />
-										<div className='space-y-4'>
-											<Hits hitComponent={UserHit} />
-										</div>
-									</Index>
+									<>
+										{addressSearchResult.user && (
+											<div className='mb-4'>
+												<UserHit
+													hit={{
+														objectID: addressSearchResult.user.id.toString(),
+														username: addressSearchResult.user.username,
+														profile: addressSearchResult.user.profileDetails
+													}}
+												/>
+											</div>
+										)}
+										<Index indexName='polkassembly_v2_users'>
+											<Configure />
+											<div className='space-y-4'>
+												<Hits hitComponent={UserHit} />
+											</div>
+										</Index>
+									</>
 								)}
 							</div>
 						)}
