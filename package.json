@@ -6,7 +6,7 @@
 		"dev": "next dev",
 		"dev:turbo": "next dev --turbopack",
 		"dev:classic": "next dev",
-		"build": "next build",
+		"build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
 		"start": "next start",
 		"lint": "next lint",
 		"lint:fix": "next lint --fix",
@@ -16,7 +16,7 @@
 		"api-bump:polkadot": "yarn add @polkadot/api @polkadot/api-augment @polkadot/extension-dapp @polkadot/extension-inject @polkadot/react-identicon @polkadot/react-qr @polkadot/types @polkadot/util @polkadot/util-crypto"
 	},
 	"engines": {
-		"node": "22"
+		"node": ">=22"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^3.9.1",

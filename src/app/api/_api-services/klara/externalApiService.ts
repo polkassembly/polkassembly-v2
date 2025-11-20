@@ -40,15 +40,7 @@ export class ExternalApiService {
 		});
 
 		if (!response.ok) {
-			let errorDetails = '';
-			try {
-				const errorResponse = await response.text();
-				errorDetails = ` - Response: ${errorResponse}`;
-			} catch (error) {
-				errorDetails = ` - ${error instanceof Error ? error.message : String(error)}`;
-			}
-
-			throw new Error(`API responded with status: ${response.status}${errorDetails}`);
+			throw new Error(`API responded with status: ${response.status} ${response.statusText || ''}`.trim());
 		}
 
 		const data: IChatApiResponse = await response.json();

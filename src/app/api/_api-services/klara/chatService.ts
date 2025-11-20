@@ -174,8 +174,14 @@ export class ChatService {
 	/**
 	 * Cleanup cache and deduplication locks
 	 */
-	private static async cleanup(conversationId: string, userId: string, messageHash: string): Promise<void> {
-		await Promise.allSettled([RedisService.DeleteKlaraConversationHistory(conversationId), RedisService.DeleteKlaraRequestDedup(userId, messageHash)]);
+	private static async cleanup(conversationId: string | undefined, userId: string, messageHash: string): Promise<void> {
+		const tasks: Promise<unknown>[] = [RedisService.DeleteKlaraRequestDedup(userId, messageHash)];
+
+		if (conversationId) {
+			tasks.push(RedisService.DeleteKlaraConversationHistory(conversationId));
+		}
+
+		await Promise.allSettled(tasks);
 	}
 
 	static async processMessage(request: NextRequest): Promise<IChatResponse> {
@@ -187,46 +193,49 @@ export class ChatService {
 		await this.handleRequestDedup(userId, messageHash);
 
 		const { activeConversationId, isNewConversation } = await this.validateConversation(conversationId, userId);
-		const finalHistory = await this.prepareConversationHistory(activeConversationId || undefined, conversationHistory);
-
-		const apiResponse = await this.callExternalAPIWithCleanup(message, userId, finalHistory, messageHash);
-		const { text: aiResponseText, sources, followUpQuestions, remainingRequests } = apiResponse;
-		const followUpLogic = shouldShowFollowUps(aiResponseText, followUpQuestions || []);
-
-		let finalResponseText = aiResponseText;
-		if (remainingRequests !== undefined && remainingRequests < 999 && remainingRequests < 5) {
-			finalResponseText += `\n\n⚠️ **Warning**: You are approaching the usage limit. You have ${remainingRequests} requests remaining this minute.`;
-		}
-
 		let finalConversationId = activeConversationId;
-		if (isNewConversation) {
-			finalConversationId = await KlaraDatabaseService.CreateConversation(userId);
+
+		try {
+			const finalHistory = await this.prepareConversationHistory(activeConversationId || undefined, conversationHistory);
+
+			const apiResponse = await this.callExternalAPIWithCleanup(message, userId, finalHistory, messageHash);
+			const { text: aiResponseText, sources, followUpQuestions, remainingRequests } = apiResponse;
+			const followUpLogic = shouldShowFollowUps(aiResponseText, followUpQuestions || []);
+
+			let finalResponseText = aiResponseText;
+			if (remainingRequests !== undefined && remainingRequests < 999 && remainingRequests < 5) {
+				finalResponseText += `\n\n⚠️ **Warning**: You are approaching the usage limit. You have ${remainingRequests} requests remaining this minute.`;
+			}
+
+			if (isNewConversation) {
+				finalConversationId = await KlaraDatabaseService.CreateConversation(userId);
+			}
+
+			const { userMessage, aiMessage } = this.createMessages(message, finalResponseText, finalConversationId, sources, followUpLogic.filtered);
+			await KlaraDatabaseService.SaveMessagesToConversation(finalConversationId, [userMessage, aiMessage], userId);
+
+			ensureTableExists()
+				.then(() =>
+					logQueryResponse({
+						query: message,
+						response: finalResponseText,
+						status: 'success',
+						userId: userId.toString(),
+						conversationId: finalConversationId,
+						responseTimeMs: Date.now() - startTime
+					})
+				)
+				.catch((error) => console.warn('PostgreSQL logging failed:', error));
+
+			return {
+				text: finalResponseText,
+				sources,
+				followUpQuestions: followUpLogic.filtered,
+				isNewConversation,
+				conversationId: isNewConversation ? finalConversationId : undefined
+			};
+		} finally {
+			await this.cleanup(finalConversationId, userId, messageHash);
 		}
-
-		const { userMessage, aiMessage } = this.createMessages(message, finalResponseText, finalConversationId, sources, followUpLogic.filtered);
-		await KlaraDatabaseService.SaveMessagesToConversation(finalConversationId, [userMessage, aiMessage], userId);
-
-		await this.cleanup(finalConversationId, userId, messageHash);
-
-		ensureTableExists()
-			.then(() =>
-				logQueryResponse({
-					query: message,
-					response: finalResponseText,
-					status: 'success',
-					userId: userId.toString(),
-					conversationId: finalConversationId,
-					responseTimeMs: Date.now() - startTime
-				})
-			)
-			.catch((error) => console.warn('PostgreSQL logging failed:', error));
-
-		return {
-			text: finalResponseText,
-			sources,
-			followUpQuestions: followUpLogic.filtered,
-			isNewConversation,
-			conversationId: isNewConversation ? finalConversationId : undefined
-		};
 	}
 }
