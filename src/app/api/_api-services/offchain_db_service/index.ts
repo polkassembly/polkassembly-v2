@@ -1010,10 +1010,17 @@ export class OffChainDbService {
 		return FirestoreService.GetPollVotes({ network, proposalType, index, pollId });
 	}
 
-	static async GetBeneficiariesWithUsdAmount({ network, beneficiaries }: { network: ENetwork; beneficiaries: IBeneficiary[] }) {
-		const treasuryStats = await FirestoreService.GetTreasuryStats({ network, from: dayjs().subtract(1, 'hour').toDate(), to: dayjs().toDate(), limit: 1, page: 1 });
+	static async GetBeneficiariesWithUsdAmount({ network, beneficiaries, proposalCreatedAt }: { network: ENetwork; beneficiaries: IBeneficiary[]; proposalCreatedAt: Date }) {
+		const treasuryStats = await FirestoreService.GetTreasuryStats({
+			network,
+			from: dayjs(proposalCreatedAt).startOf('day').toDate(),
+			to: dayjs(proposalCreatedAt).endOf('day').toDate(),
+			limit: 1,
+			page: 1
+		});
 
-		if (!treasuryStats) {
+		if (!treasuryStats.length) {
+			// TODO: if no treasury stats found make a call to fetch and store stats for the day of the proposal creation
 			return beneficiaries;
 		}
 
