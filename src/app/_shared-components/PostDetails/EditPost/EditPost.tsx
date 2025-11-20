@@ -63,7 +63,11 @@ function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClo
 		);
 	}, [proposerAddress, user?.addressRelations]);
 
-	const canEdit = canEditOffChain || canEditOnChain || canEditSignatories;
+	const canEditProxy = useMemo(() => {
+		return proposerAddress && user?.addressRelations?.some((relation) => relation.proxyAddresses.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress));
+	}, [proposerAddress, user?.addressRelations]);
+
+	const canEdit = canEditOffChain || canEditOnChain || canEditSignatories || canEditProxy;
 
 	const editPost = async () => {
 		if (!title.trim() || !content || !ValidatorService.isValidNumber(postData?.index) || !postData?.proposalType || !user || !canEdit) return;

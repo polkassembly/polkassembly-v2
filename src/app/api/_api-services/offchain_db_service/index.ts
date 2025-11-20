@@ -820,13 +820,11 @@ export class OffChainDbService {
 			const hasProposerControl = allAddressRelations.some((addressRelations) => {
 				// Check if proposerAddress is in user's multisig addresses
 				const isMultisigMatch = addressRelations.multisigAddresses.some(
-					(multisig) =>
-						getSubstrateAddress(multisig.address) === getSubstrateAddress(proposerAddress) ||
-						multisig.pureProxies.some((proxy) => getSubstrateAddress(proxy.address) === getSubstrateAddress(proposerAddress))
+					(multisig) => getSubstrateAddress(multisig.address) === proposerAddress || multisig.pureProxies.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress)
 				);
 
 				// Check if proposerAddress is in user's proxy addresses (addresses user has keys for)
-				const isProxyMatch = addressRelations.proxyAddresses.some((proxy) => getSubstrateAddress(proxy.address) === getSubstrateAddress(proposerAddress));
+				const isProxyMatch = addressRelations.proxyAddresses.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress);
 
 				return isMultisigMatch || isProxyMatch;
 			});

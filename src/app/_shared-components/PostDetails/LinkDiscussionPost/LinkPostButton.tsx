@@ -30,7 +30,12 @@ function LinkPostButton({ postData, className }: { postData: IPostListing | IPos
 		);
 	}, [proposerAddress, user?.addressRelations]);
 
-	const canLink = (user && proposerAddress && user.addresses.includes(proposerAddress) && !OFF_CHAIN_PROPOSAL_TYPES.includes(postData.proposalType)) || canEditSignatories;
+	const canEditProxy = useMemo(() => {
+		return proposerAddress && user?.addressRelations?.some((relation) => relation.proxyAddresses.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress));
+	}, [proposerAddress, user?.addressRelations]);
+
+	const canLink =
+		(user && proposerAddress && user.addresses.includes(proposerAddress) && !OFF_CHAIN_PROPOSAL_TYPES.includes(postData.proposalType)) || canEditSignatories || canEditProxy;
 
 	if (!canLink) return null;
 

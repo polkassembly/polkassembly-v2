@@ -34,7 +34,11 @@ function EditPostButton({ postData, className }: { postData: IPostListing | IPos
 		);
 	}, [proposerAddress, user?.addressRelations]);
 
-	const canEdit = canEditOffChain || canEditOnChain || canEditSignatories;
+	const canEditProxy = useMemo(() => {
+		return proposerAddress && user?.addressRelations?.some((relation) => relation.proxyAddresses.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress));
+	}, [proposerAddress, user?.addressRelations]);
+
+	const canEdit = canEditOffChain || canEditOnChain || canEditSignatories || canEditProxy;
 
 	if (!canEdit) return null;
 	return (
