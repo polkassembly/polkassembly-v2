@@ -192,10 +192,14 @@ export class ChatService {
 		const messageHash = this.hashMessage(message, userId);
 		await this.handleRequestDedup(userId, messageHash);
 
-		const { activeConversationId, isNewConversation } = await this.validateConversation(conversationId, userId);
-		let finalConversationId = activeConversationId;
+		let finalConversationId: string | undefined;
+		let isNewConversation = false;
 
 		try {
+			const { activeConversationId, isNewConversation: validatedIsNewConversation } = await this.validateConversation(conversationId, userId);
+			finalConversationId = activeConversationId;
+			isNewConversation = validatedIsNewConversation;
+
 			const finalHistory = await this.prepareConversationHistory(activeConversationId || undefined, conversationHistory);
 
 			const apiResponse = await this.callExternalAPIWithCleanup(message, userId, finalHistory, messageHash);
