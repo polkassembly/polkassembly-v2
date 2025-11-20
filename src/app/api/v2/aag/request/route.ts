@@ -28,15 +28,15 @@ export const POST = withErrorHandling(async (req: NextRequest): Promise<NextResp
 
 	const formFields = {
 		fullName: formData.get('fullName'),
-		organization: formData.get('organization'),
+		organization: formData.get('organization') ?? undefined,
 		hasProposal: formData.get('hasProposal'),
-		referendumIndex: formData.get('referendumIndex'),
+		referendumIndex: formData.get('referendumIndex') ?? undefined,
 		description: formData.get('description'),
-		estimatedDuration: formData.get('estimatedDuration'),
-		preferredDate: formData.get('preferredDate'),
-		email: formData.get('email'),
-		telegram: formData.get('telegram'),
-		twitter: formData.get('twitter')
+		estimatedDuration: formData.get('estimatedDuration') ?? undefined,
+		preferredDate: formData.get('preferredDate') ?? undefined,
+		email: formData.get('email') ?? undefined,
+		telegram: formData.get('telegram') ?? undefined,
+		twitter: formData.get('twitter') ?? undefined
 	};
 
 	const validation = zodPresentationRequestSchema.safeParse(formFields);
