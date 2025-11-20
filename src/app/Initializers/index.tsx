@@ -242,7 +242,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 	// set address relations
 	useEffect(() => {
-		if (!userDataClient || user?.addressRelations) return;
+		if (!userDataClient || (user?.addressRelations && user.id === userDataClient.id)) return;
 		const fetchAddressRelations = async () => {
 			const userAddresses = userDataClient?.addresses;
 			if (!userAddresses?.length) return;
