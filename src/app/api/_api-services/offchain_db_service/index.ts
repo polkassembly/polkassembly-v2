@@ -53,6 +53,7 @@ import { OFF_CHAIN_PROPOSAL_TYPES } from '@/_shared/_constants/offChainProposalT
 import dayjs from 'dayjs';
 import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
 import { convertAssetToUSD } from '@/app/_client-utils/convertAssetToUSD';
+import { fetchHistoricalTreasuryStats } from '@/app/api/_api-utils/fetchHistoricalTreasuryStats';
 import { APIError } from '../../_api-utils/apiError';
 import { SubsquareOffChainService } from './subsquare_offchain_service';
 import { FirestoreService } from './firestore_service';
@@ -1011,7 +1012,7 @@ export class OffChainDbService {
 	}
 
 	static async GetBeneficiariesWithUsdAmount({ network, beneficiaries, proposalCreatedAt }: { network: ENetwork; beneficiaries: IBeneficiary[]; proposalCreatedAt: Date }) {
-		const treasuryStats = await FirestoreService.GetTreasuryStats({
+		let treasuryStats = await FirestoreService.GetTreasuryStats({
 			network,
 			from: dayjs(proposalCreatedAt).startOf('day').toDate(),
 			to: dayjs(proposalCreatedAt).endOf('day').toDate(),
@@ -1020,11 +1021,14 @@ export class OffChainDbService {
 		});
 
 		if (!treasuryStats.length) {
-			// TODO: if no treasury stats found make a call to fetch and store stats for the day of the proposal creation
-			return beneficiaries;
+			const historicalStats = await fetchHistoricalTreasuryStats({ network, date: proposalCreatedAt });
+			if (historicalStats) {
+				await FirestoreService.SaveTreasuryStats({ treasuryStats: historicalStats });
+				treasuryStats = [historicalStats];
+			}
 		}
 
-		if (!treasuryStats[0]?.nativeTokenUsdPrice && !treasuryStats[0]?.dedTokenUsdPrice) {
+		if (!treasuryStats.length || (!treasuryStats[0]?.nativeTokenUsdPrice && !treasuryStats[0]?.dedTokenUsdPrice)) {
 			return beneficiaries;
 		}
 		return beneficiaries?.map((beneficiary) => {
