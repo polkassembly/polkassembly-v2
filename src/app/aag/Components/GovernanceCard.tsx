@@ -2,9 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
-import React from 'react';
 import Image from 'next/image';
 import { Calendar, Clock, Share2 } from 'lucide-react';
 import { Button } from '@/app/_shared-components/Button';
@@ -16,6 +13,7 @@ import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
+import { KeyboardEvent, MouseEvent } from 'react';
 
 const MAX_VISIBLE_REFERENDA = 7;
 
@@ -44,7 +42,7 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 
 	const videoAssociatedNetwork = publishedAt ? getNetworkFromDate(publishedAt) : null;
 
-	const handleVideoShare = async (e: React.MouseEvent) => {
+	const handleVideoShare = async (e: MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
 
@@ -66,7 +64,7 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 		}
 	};
 
-	const handleAgendaClick = (e: React.MouseEvent) => {
+	const handleAgendaClick = (e: MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
 
@@ -81,7 +79,7 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 		}
 	};
 
-	const handleKeyDown = (e: React.KeyboardEvent) => {
+	const handleKeyDown = (e: KeyboardEvent) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
 			handleCardClick();

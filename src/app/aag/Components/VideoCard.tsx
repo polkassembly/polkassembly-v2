@@ -2,7 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, Clock } from 'lucide-react';
@@ -13,6 +12,7 @@ import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import { ENetwork } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
+import { MouseEvent } from 'react';
 
 const MAX_VISIBLE_REFERENDA = 3;
 const DEFAULT_IMAGE_ALT = 'No Image';
@@ -36,7 +36,7 @@ function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoI
 	const activeNetwork = getCurrentNetwork();
 	const videoAssociatedNetwork = publishedAt ? getNetworkFromDate(publishedAt) : null;
 
-	const handleVideoAgendaClick = (e: React.MouseEvent) => {
+	const handleVideoAgendaClick = (e: MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
 

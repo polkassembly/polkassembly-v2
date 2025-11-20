@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { Filter, MenuIcon, SearchIcon, X } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { ENetwork, type IAAGVideoSummary } from '@/_shared/types';
