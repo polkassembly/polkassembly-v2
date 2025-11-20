@@ -288,9 +288,10 @@ export class AAGVideoService extends FirestoreUtils {
 						newVideos += 1;
 						console.log(`Indexed new video: ${video.title}`);
 					} else {
-						const videoPublishedAt = new Date(video.publishedAt);
-						if (!existingMetadata.updatedAt || videoPublishedAt > existingMetadata.updatedAt) {
-							const aagVideoData = await this.ConvertYouTubeVideoToAAGFormat(video);
+						const aagVideoData = await this.ConvertYouTubeVideoToAAGFormat(video);
+						const hasChanges = this.hasMetadataChanges(existingMetadata, aagVideoData);
+
+						if (hasChanges) {
 							await this.IndexVideoMetadata(aagVideoData);
 							updatedVideos += 1;
 							console.log(`Updated video: ${video.title}`);
@@ -309,6 +310,25 @@ export class AAGVideoService extends FirestoreUtils {
 			console.error('Error checking for new videos:', error);
 			throw error;
 		}
+	}
+
+	private static hasMetadataChanges(existingMetadata: IAAGVideoMetadata, newVideoData: IAAGVideoData): boolean {
+		const titleChanged = existingMetadata.title !== newVideoData.title;
+		const descriptionChanged = existingMetadata.description !== newVideoData.description;
+		const durationChanged = existingMetadata.duration !== this.convertDurationToReadable(newVideoData.duration);
+		const agendaUrlChanged = (existingMetadata.agendaUrl || '') !== (newVideoData.agendaUrl || '');
+
+		if (titleChanged || descriptionChanged || durationChanged || agendaUrlChanged) {
+			console.log(`Metadata changes detected for video ${newVideoData.id}:`, {
+				titleChanged,
+				descriptionChanged,
+				durationChanged,
+				agendaUrlChanged
+			});
+			return true;
+		}
+
+		return false;
 	}
 
 	private static removeUndefinedValues(obj: unknown): unknown {
