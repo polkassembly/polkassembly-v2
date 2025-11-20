@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { EAllowedCommentor, ENotificationStatus, EProposalType, EReactQueryKeys, IPost, IPostListing } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useUser } from '@/hooks/useUser';
@@ -52,7 +52,22 @@ function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClo
 	const proposerAddress = postData.onChainInfo?.proposer && getSubstrateAddress(postData.onChainInfo?.proposer);
 	const canEditOnChain = user && proposerAddress && user.addresses.includes(proposerAddress);
 
-	const canEdit = canEditOffChain || canEditOnChain;
+	const canEditSignatories = useMemo(() => {
+		return (
+			proposerAddress &&
+			user?.addressRelations?.some((relation) =>
+				relation.multisigAddresses.some(
+					(multisig) => getSubstrateAddress(multisig.address) === proposerAddress || multisig.pureProxies.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress)
+				)
+			)
+		);
+	}, [proposerAddress, user?.addressRelations]);
+
+	const canEditProxy = useMemo(() => {
+		return proposerAddress && user?.addressRelations?.some((relation) => relation.proxyAddresses.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress));
+	}, [proposerAddress, user?.addressRelations]);
+
+	const canEdit = canEditOffChain || canEditOnChain || canEditSignatories || canEditProxy;
 
 	const editPost = async () => {
 		if (!title.trim() || !content || !ValidatorService.isValidNumber(postData?.index) || !postData?.proposalType || !user || !canEdit) return;

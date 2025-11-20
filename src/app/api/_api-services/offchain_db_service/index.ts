@@ -58,6 +58,7 @@ import { APIError } from '../../_api-utils/apiError';
 import { SubsquareOffChainService } from './subsquare_offchain_service';
 import { FirestoreService } from './firestore_service';
 import { OnChainDbService } from '../onchain_db_service';
+import { SubscanOnChainService } from '../onchain_db_service/subscan_onchain_service';
 
 export class OffChainDbService {
 	// Read methods
@@ -809,7 +810,30 @@ export class OffChainDbService {
 
 		// check if the user is the proposer
 		const userAddresses = await this.GetAddressesForUserId(userId);
-		if (!userAddresses.find((address) => address.address === proposerAddress)) throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+		const isDirectProposer = userAddresses.find((address) => address.address === proposerAddress);
+
+		if (!isDirectProposer) {
+			// Check if user has control over the proposer through multisig or proxy
+			// Get relations for all user addresses
+			const allAddressRelations = await Promise.all(userAddresses.map((userAddr) => SubscanOnChainService.GetAccountRelations({ address: userAddr.address, network })));
+
+			// Check if proposerAddress is in any user's multisig or proxy addresses
+			const hasProposerControl = allAddressRelations.some((addressRelations) => {
+				// Check if proposerAddress is in user's multisig addresses
+				const isMultisigMatch = addressRelations.multisigAddresses.some(
+					(multisig) => getSubstrateAddress(multisig.address) === proposerAddress || multisig.pureProxies.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress)
+				);
+
+				// Check if proposerAddress is in user's proxy addresses (addresses user has keys for)
+				const isProxyMatch = addressRelations.proxyAddresses.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress);
+
+				return isMultisigMatch || isProxyMatch;
+			});
+
+			if (!hasProposerControl) {
+				throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+			}
+		}
 
 		// check if offchain post context exists
 		const offChainPostData = await FirestoreService.GetOffChainPostData({ network, indexOrHash, proposalType });
