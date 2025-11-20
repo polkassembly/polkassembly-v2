@@ -14,7 +14,7 @@ interface CoinGeckoHistoryResponse {
 	};
 }
 
-const networkToCoinGeckoId: Record<ENetwork, string> = {
+const networkToCoinGeckoId: Record<string, string> = {
 	[ENetwork.POLKADOT]: 'polkadot',
 	[ENetwork.KUSAMA]: 'kusama',
 	[ENetwork.ASSETHUB_KUSAMA]: 'kusama',
@@ -23,10 +23,59 @@ const networkToCoinGeckoId: Record<ENetwork, string> = {
 	[ENetwork.CERE]: 'cere-network'
 };
 
+const networkToCryptoCompareSymbol: Record<string, string> = {
+	[ENetwork.POLKADOT]: 'DOT',
+	[ENetwork.KUSAMA]: 'KSM',
+	[ENetwork.ASSETHUB_KUSAMA]: 'KSM',
+	[ENetwork.WESTEND]: 'WND',
+	[ENetwork.PASEO]: 'PAS',
+	[ENetwork.CERE]: 'CERE'
+};
+
+async function fetchCryptoComparePrice(network: ENetwork, date: Date): Promise<string | undefined> {
+	try {
+		const symbol = networkToCryptoCompareSymbol[network];
+		if (!symbol) return undefined;
+
+		const timestamp = dayjs(date).unix();
+		const url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${symbol}&tsym=USD&limit=1&toTs=${timestamp}`;
+		const response = await fetch(url);
+
+		if (!response.ok) return undefined;
+
+		const data = await response.json();
+		if (data?.Data?.Data?.length > 0) {
+			const candle = data.Data.Data[data.Data.Data.length - 1];
+			return candle.close?.toString();
+		}
+	} catch (error) {
+		console.error('CryptoCompare API error:', error);
+	}
+	return undefined;
+}
+
 export async function fetchHistoricalTreasuryStats({ network, date }: { network: ENetwork; date: Date }): Promise<ITreasuryStats | null> {
 	try {
+		const isOldDate = dayjs().diff(dayjs(date), 'day') > 364;
+
+		if (isOldDate) {
+			const price = await fetchCryptoComparePrice(network, date);
+			if (price) {
+				return {
+					network,
+					createdAt: date,
+					updatedAt: new Date(),
+					relayChain: {},
+					total: {},
+					nativeTokenUsdPrice: price
+				} as ITreasuryStats;
+			}
+			console.warn(`Historical data > 365 days not found for ${network} on ${date}`);
+			return null;
+		}
+
 		const formattedDate = dayjs(date).format('DD-MM-YYYY');
-		const coinId = networkToCoinGeckoId[network as ENetwork];
+		const coinId = networkToCoinGeckoId[network];
 
 		if (!coinId) {
 			return null;
@@ -35,7 +84,23 @@ export async function fetchHistoricalTreasuryStats({ network, date }: { network:
 		const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/history?date=${formattedDate}`);
 
 		if (!response.ok) {
-			console.error(`CoinGecko API error: ${response.statusText}`);
+			if (response.status === 401) {
+				console.warn(`CoinGecko API 401: Likely historical data limit exceeded (>365 days) for ${formattedDate} or invalid key. Trying fallback.`);
+			} else {
+				console.error(`CoinGecko API error: ${response.status} ${response.statusText}`);
+			}
+			// Fallback to CryptoCompare on any CoinGecko failure
+			const price = await fetchCryptoComparePrice(network, date);
+			if (price) {
+				return {
+					network,
+					createdAt: date,
+					updatedAt: new Date(),
+					relayChain: {},
+					total: {},
+					nativeTokenUsdPrice: price
+				} as ITreasuryStats;
+			}
 			return null;
 		}
 
@@ -43,6 +108,18 @@ export async function fetchHistoricalTreasuryStats({ network, date }: { network:
 		const nativeTokenUsdPrice = data?.market_data?.current_price?.usd?.toString();
 
 		if (!nativeTokenUsdPrice) {
+			// Try fallback if CoinGecko returns no price
+			const price = await fetchCryptoComparePrice(network, date);
+			if (price) {
+				return {
+					network,
+					createdAt: date,
+					updatedAt: new Date(),
+					relayChain: {},
+					total: {},
+					nativeTokenUsdPrice: price
+				} as ITreasuryStats;
+			}
 			return null;
 		}
 
