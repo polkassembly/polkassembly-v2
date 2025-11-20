@@ -283,7 +283,7 @@ export class KlaraDatabaseService extends FirestoreUtils {
 
 			return {
 				owns,
-				messages
+				messages: owns ? messages : []
 			};
 		} catch (error) {
 			console.error('Error getting conversation with messages:', error);
