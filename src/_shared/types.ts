@@ -1184,7 +1184,8 @@ export enum EDelegateSource {
 	NOVA = 'nova',
 	PARITY = 'parity',
 	POLKASSEMBLY = 'polkassembly',
-	INDIVIDUAL = 'individual'
+	INDIVIDUAL = 'individual',
+	DELEGATEX = 'delegateX'
 }
 
 export interface IDelegate {
