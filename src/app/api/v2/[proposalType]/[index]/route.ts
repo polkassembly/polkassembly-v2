@@ -92,7 +92,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	if (post?.onChainInfo && post.onChainInfo.beneficiaries && post.onChainInfo.beneficiaries.length > 0) {
 		const updatedBeneficiaries = await OffChainDbService.GetBeneficiariesWithUsdAmount({
 			network,
-			beneficiaries: post.onChainInfo?.beneficiaries || []
+			beneficiaries: post.onChainInfo?.beneficiaries || [],
+			proposalCreatedAt: post.onChainInfo?.createdAt || post.createdAt || new Date()
 		});
 		if (updatedBeneficiaries) {
 			post = { ...post, onChainInfo: { ...post.onChainInfo, beneficiaries: updatedBeneficiaries } };

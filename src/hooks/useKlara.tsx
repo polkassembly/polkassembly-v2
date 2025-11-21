@@ -13,7 +13,7 @@ export function useKlara() {
 	const [state, setState] = useAtom(chatStateAtom);
 
 	const setChatState = useCallback(
-		(value: EChatState | null) => {
+		(value: EChatState) => {
 			setState((prevState) => ({ ...prevState, chatState: value }));
 		},
 		[setState]

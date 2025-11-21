@@ -1411,6 +1411,7 @@ export class PolkadotApiService {
 		postId,
 		address,
 		wallet,
+		selectedAccount,
 		onSuccess,
 		onFailed,
 		setVaultQrState
@@ -1418,6 +1419,7 @@ export class PolkadotApiService {
 		postId: number;
 		address: string;
 		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
 		onSuccess: () => void;
 		onFailed: (error: string) => void;
 		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
@@ -1433,7 +1435,8 @@ export class PolkadotApiService {
 			onSuccess,
 			onFailed,
 			waitTillFinalizedHash: true,
-			setVaultQrState
+			setVaultQrState,
+			selectedAccount
 		});
 	}
 

@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { IPost, IPostListing } from '@/_shared/types';
 import { Pencil } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
@@ -15,6 +15,7 @@ import EditPost from './EditPost';
 function EditPostButton({ postData, className }: { postData: IPostListing | IPost; className?: string }) {
 	const t = useTranslations();
 	const { user } = useUser();
+
 	const [isOpen, setIsOpen] = useState(false);
 
 	const canEditOffChain = user && user.id === postData.userId;
@@ -22,7 +23,22 @@ function EditPostButton({ postData, className }: { postData: IPostListing | IPos
 	const proposerAddress = postData.onChainInfo?.proposer && getSubstrateAddress(postData.onChainInfo?.proposer);
 	const canEditOnChain = user && proposerAddress && user.addresses.includes(proposerAddress);
 
-	const canEdit = canEditOffChain || canEditOnChain;
+	const canEditSignatories = useMemo(() => {
+		return (
+			proposerAddress &&
+			user?.addressRelations?.some((relation) =>
+				relation.multisigAddresses.some(
+					(multisig) => getSubstrateAddress(multisig.address) === proposerAddress || multisig.pureProxies.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress)
+				)
+			)
+		);
+	}, [proposerAddress, user?.addressRelations]);
+
+	const canEditProxy = useMemo(() => {
+		return proposerAddress && user?.addressRelations?.some((relation) => relation.proxyAddresses.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress));
+	}, [proposerAddress, user?.addressRelations]);
+
+	const canEdit = canEditOffChain || canEditOnChain || canEditSignatories || canEditProxy;
 
 	if (!canEdit) return null;
 	return (
