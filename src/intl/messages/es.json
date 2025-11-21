@@ -1552,7 +1552,8 @@
 	"JudgementStatus": {
 		"pending": "Pendiente",
 		"approved": "Aprobado",
-		"rejected": "Rechazado"
+		"rejected": "Rechazado",
+		"requested": "Solicitado"
 	},
 	"ConvictionSelector": {
 		"votes": "Votos",

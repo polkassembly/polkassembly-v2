@@ -7,7 +7,7 @@
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 
-import { EStatusTagType, EProposalStatus } from '@/_shared/types';
+import { EProposalStatus } from '@/_shared/types';
 import { DECIDING_PROPOSAL_STATUSES } from '@/_shared/_constants/decidingProposalStatuses';
 
 import styles from './StatusTag.module.scss';
@@ -16,21 +16,20 @@ interface Props {
 	className?: string;
 	status?: EProposalStatus;
 	colorInverted?: boolean;
-	type?: EStatusTagType;
 }
 
-function StatusTag({ className = '', status, colorInverted = false, type = EStatusTagType.PROPOSAL }: Props) {
+function StatusTag({ className = '', status, colorInverted = false }: Props) {
 	const t = useTranslations();
 
 	const normalizedStatus = useMemo(() => {
 		if (!status) return undefined;
 
-		if (type === EStatusTagType.PROPOSAL && DECIDING_PROPOSAL_STATUSES.includes(status as EProposalStatus)) {
+		if (DECIDING_PROPOSAL_STATUSES.includes(status as EProposalStatus)) {
 			return EProposalStatus.Deciding.toLowerCase();
 		}
 
 		return status.toLowerCase().replace(/\s+/g, '_');
-	}, [status, type]);
+	}, [status]);
 
 	return (
 		<div className={` ${styles.base} ${normalizedStatus ? styles[String(normalizedStatus)] : ''} ${colorInverted ? styles.inverted : ''} ${className} `}>

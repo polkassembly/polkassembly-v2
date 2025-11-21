@@ -1551,7 +1551,8 @@
 	"JudgementStatus": {
 		"pending": "保留中",
 		"approved": "承認済み",
-		"rejected": "拒否"
+		"rejected": "拒否されました",
+		"requested": "リクエスト済み"
 	},
 	"ConvictionSelector": {
 		"votes": "投票",

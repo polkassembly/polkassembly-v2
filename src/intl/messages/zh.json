@@ -1551,7 +1551,8 @@
 	"JudgementStatus": {
 		"pending": "待定",
 		"approved": "已批准",
-		"rejected": "已拒绝"
+		"rejected": "已拒绝",
+		"requested": "已请求"
 	},
 	"ConvictionSelector": {
 		"votes": "投票",

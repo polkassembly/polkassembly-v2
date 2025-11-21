@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 async function Judgements() {
 	return (
-		<div className='flex flex-col gap-y-8'>
+		<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 			<Tabs
 				defaultValue={EJudgementDashboardTabs.DASHBOARD}
 				className='w-full'

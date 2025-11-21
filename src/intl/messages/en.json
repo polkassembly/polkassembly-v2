@@ -1580,7 +1580,8 @@
 	"JudgementStatus": {
 		"pending": "Pending",
 		"approved": "Approved",
-		"rejected": "Rejected"
+		"rejected": "Rejected",
+		"requested": "Requested"
 	},
 	"ConvictionSelector": {
 		"votes": "Votes",

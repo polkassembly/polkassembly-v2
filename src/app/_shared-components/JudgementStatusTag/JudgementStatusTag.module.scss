@@ -13,3 +13,7 @@
 .rejected {
 	@apply border-red-500 bg-red-500 dark:border-red-700 dark:bg-red-700;
 }
+
+.requested {
+	@apply border-yellow-500 bg-yellow-500 dark:border-yellow-700 dark:bg-yellow-700;
+}

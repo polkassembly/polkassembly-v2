@@ -1700,14 +1700,6 @@ export enum EJudgementStatus {
 	PENDING = 'Pending'
 }
 
-export enum EJudgementStatusType {
-	REASONABLE = 'Reasonable',
-	KNOWN_GOOD = 'KnownGood',
-	OUT_OF_DATE = 'OutOfDate',
-	LOW_QUALITY = 'LowQuality',
-	ERRONEOUS = 'Erroneous'
-}
-
 export interface IJudgementRequest {
 	id: string;
 	address: string;
@@ -1726,21 +1718,3 @@ export interface IJudgementStats {
 	percentageIncreaseFromLastMonth: number;
 	percentageCompletedThisMonth: number;
 }
-
-export interface IRegistrarInfo {
-	address: string;
-	latestJudgementDate?: Date;
-	totalReceivedRequests: number;
-	totalJudgementsGiven: number;
-	registrarFee: string;
-	registrarIndex: number;
-}
-
-export enum EStatusTagType {
-	PROPOSAL = 'proposal',
-	JUDGEMENT = 'judgement'
-}
-
-export type IJudgementListingResponse = IGenericListingResponse<IJudgementRequest>;
-
-export type IRegistrarsListingResponse = IGenericListingResponse<IRegistrarInfo>;

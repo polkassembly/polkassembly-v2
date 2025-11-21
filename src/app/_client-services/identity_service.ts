@@ -651,7 +651,7 @@ export class IdentityService {
 							email,
 							twitter: identity.twitter?.Raw || identity.twitter || '',
 							status,
-							dateInitiated: new Date(), // We'll improve this with actual block data later
+							dateInitiated: new Date(),
 							registrarIndex: registrarIndexNum,
 							registrarAddress: registrar.account,
 							judgementHash: key.hash.toString()
@@ -685,6 +685,15 @@ export class IdentityService {
 		onFailed?: (errorMessageFallback?: string) => void;
 	}) {
 		const encodedAddress = getEncodedAddress(address, this.network) || address;
+
+		const registrars = await this.getRegistrars();
+		const isAlreadyRegistrar = registrars.some((r) => r.account === encodedAddress);
+
+		if (isAlreadyRegistrar) {
+			onFailed?.('Address is already a registrar');
+			return;
+		}
+
 		const becomeRegistrarTx = this.peopleChainApi.tx.identity.addRegistrar(encodedAddress);
 
 		await this.executeTx({

@@ -23,18 +23,14 @@ function DashboardSummary() {
 	const t = useTranslations();
 
 	const { identityService } = useIdentityService();
-
-	const { data: stats, isLoading } = useQuery<IJudgementStats>({
-		queryKey: ['judgementStats', identityService],
+	const {
+		data: stats,
+		isLoading,
+		isError
+	} = useQuery<IJudgementStats>({
+		queryKey: ['judgementStats'],
 		queryFn: async () => {
-			if (!identityService) {
-				return {
-					totalRequestedThisMonth: 0,
-					percentageIncreaseFromLastMonth: 0,
-					percentageCompletedThisMonth: 0
-				};
-			}
-			const allJudgements = await identityService.getAllIdentityJudgements();
+			const allJudgements = await identityService!.getAllIdentityJudgements();
 			return getJudgementStats(allJudgements);
 		},
 		staleTime: FIVE_MIN_IN_MILLI,
@@ -63,6 +59,8 @@ function DashboardSummary() {
 						<p className={styles.statsValue}>
 							{isLoading ? (
 								<Skeleton className='h-6 w-20' />
+							) : isError ? (
+								<span className={styles.statsNumber}>-</span>
 							) : (
 								<>
 									<span className={styles.statsNumber}>{totalRequested}</span>
@@ -96,7 +94,9 @@ function DashboardSummary() {
 					/>
 					<div className={styles.statsContent}>
 						<p className={styles.statsLabel}>{t('Judgements.judgementsCompleted')}</p>
-						<p className={styles.completedValue}>{isLoading ? <Skeleton className='h-6 w-20' /> : `${percentageCompleted.toFixed(1)}%`}</p>
+						<p className={styles.completedValue}>
+							{isLoading ? <Skeleton className='h-6 w-20' /> : isError ? <span className={styles.statsNumber}>-</span> : `${percentageCompleted.toFixed(1)}%`}
+						</p>
 					</div>
 				</div>
 			</div>

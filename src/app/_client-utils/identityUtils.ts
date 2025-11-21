@@ -2,8 +2,23 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EJudgementStatus, EJudgementStatusType, IJudgementStats, IJudgementRequest, IJudgementListingResponse, IRegistrarInfo } from '@shared/types';
+import { EJudgementStatus, IJudgementStats, IJudgementRequest, IGenericListingResponse } from '@shared/types';
 
+interface IRegistrarInfo {
+	address: string;
+	latestJudgementDate?: Date;
+	totalReceivedRequests: number;
+	totalJudgementsGiven: number;
+	registrarFee: string;
+	registrarIndex: number;
+}
+enum EJudgementStatusType {
+	REASONABLE = 'Reasonable',
+	KNOWN_GOOD = 'KnownGood',
+	OUT_OF_DATE = 'OutOfDate',
+	LOW_QUALITY = 'LowQuality',
+	ERRONEOUS = 'Erroneous'
+}
 export function mapJudgementStatus(judgementData: string): EJudgementStatus {
 	switch (judgementData) {
 		case EJudgementStatusType.REASONABLE:
@@ -39,8 +54,8 @@ export function getJudgementStats(allJudgements: IJudgementRequest[]): IJudgemen
 		const totalRequestedThisMonth = currentMonthRequests.length;
 		const totalRequestedLastMonth = previousMonthRequests.length;
 
-		const percentageIncreaseFromLastMonth = totalRequestedLastMonth === 0 ? 100 : ((totalRequestedThisMonth - totalRequestedLastMonth) / totalRequestedLastMonth) * 100;
-
+		const percentageIncreaseFromLastMonth =
+			totalRequestedLastMonth === 0 ? (totalRequestedThisMonth === 0 ? 0 : 100) : ((totalRequestedThisMonth - totalRequestedLastMonth) / totalRequestedLastMonth) * 100;
 		const completedThisMonth = currentMonthRequests.filter((judgement) => judgement.status === EJudgementStatus.APPROVED || judgement.status === EJudgementStatus.REJECTED).length;
 
 		const percentageCompletedThisMonth = totalRequestedThisMonth === 0 ? 0 : (completedThisMonth / totalRequestedThisMonth) * 100;
@@ -70,7 +85,7 @@ export function getJudgementRequests({
 	page: number;
 	limit: number;
 	search?: string;
-}): IJudgementListingResponse {
+}): IGenericListingResponse<IJudgementRequest> {
 	let filteredJudgements = allJudgements;
 	if (search && search.trim().length > 0) {
 		const searchLower = search.trim().toLowerCase();

@@ -54,9 +54,6 @@ import {
 	IPostAnalytics,
 	IPostBubbleVotes,
 	EAnalyticsType,
-	IJudgementStats,
-	IJudgementListingResponse,
-	IRegistrarsListingResponse,
 	EVotesDisplayType,
 	IProfileVote,
 	EProposalStatus,
@@ -158,9 +155,6 @@ enum EApiRoute {
 	DELETE_POLL_VOTE = 'DELETE_POLL_VOTE',
 	GET_POST_ANALYTICS = 'GET_POST_ANALYTICS',
 	GET_POST_BUBBLE_VOTES = 'GET_POST_BUBBLE_VOTES',
-	FETCH_JUDGEMENT_STATS = 'FETCH_JUDGEMENT_STATS',
-	FETCH_JUDGEMENT_REQUESTS = 'FETCH_JUDGEMENT_REQUESTS',
-	FETCH_REGISTRARS = 'FETCH_REGISTRARS',
 	ADD_COMMENT_REACTION = 'ADD_COMMENT_REACTION',
 	DELETE_COMMENT_REACTION = 'DELETE_COMMENT_REACTION',
 	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES',
@@ -294,15 +288,6 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.GET_TRACK_ANALYTICS:
 				path = '/track-analytics';
-				break;
-			case EApiRoute.FETCH_JUDGEMENT_STATS:
-				path = '/judgements/stats';
-				break;
-			case EApiRoute.FETCH_JUDGEMENT_REQUESTS:
-				path = '/judgements/requests';
-				break;
-			case EApiRoute.FETCH_REGISTRARS:
-				path = '/judgements/registrars';
 				break;
 			case EApiRoute.GET_TRACK_COUNTS:
 				path = '/track-counts';
@@ -1316,56 +1301,6 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_BUBBLE_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-bubble'], queryParams });
 		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method });
-	}
-
-	static async fetchJudgementStats() {
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.FETCH_JUDGEMENT_STATS
-		});
-
-		return this.nextApiClientFetch<IJudgementStats>({
-			url,
-			method
-		});
-	}
-
-	static async fetchJudgementRequests({ page, limit, search }: { page: number; limit: number; search?: string }) {
-		const queryParams = new URLSearchParams({
-			page: page.toString(),
-			limit: limit.toString()
-		});
-
-		if (search) {
-			queryParams.set('search', search);
-		}
-
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.FETCH_JUDGEMENT_REQUESTS,
-			queryParams
-		});
-
-		return this.nextApiClientFetch<IJudgementListingResponse>({
-			url,
-			method
-		});
-	}
-
-	static async fetchRegistrars({ search }: { search?: string } = {}) {
-		const queryParams = new URLSearchParams();
-
-		if (search) {
-			queryParams.set('search', search);
-		}
-
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.FETCH_REGISTRARS,
-			queryParams
-		});
-
-		return this.nextApiClientFetch<IRegistrarsListingResponse>({
-			url,
-			method
-		});
 	}
 
 	static async addCommentReaction(proposalType: EProposalType, index: string, commentId: string, reactionType: EReaction) {
