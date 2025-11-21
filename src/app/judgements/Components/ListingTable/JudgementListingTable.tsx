@@ -4,26 +4,53 @@
 
 'use client';
 
-import React from 'react';
-import { EStatusTagType, IJudgementRequest } from '@/_shared/types';
+import { IJudgementRequest } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import Address from '@/app/_shared-components/Profile/Address/Address';
+import { useIdentityService } from '@/hooks/useIdentityService';
+import { useQuery } from '@tanstack/react-query';
+import { getJudgementRequests } from '@/app/_client-utils/identityUtils';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '../../../_shared-components/Table';
 import { PaginationWithLinks } from '../../../_shared-components/PaginationWithLinks';
-import StatusTag from '../../../_shared-components/StatusTag/StatusTag';
+import JudgementStatusTag from '../../../_shared-components/JudgementStatusTag/JudgementStatusTag';
 import styles from './ListingTable.module.scss';
-// TODO: Create JudgementRequestRow component
 
-function JudgementListingTable({ data, totalCount }: { data: IJudgementRequest[]; totalCount: number }) {
+function JudgementListingTable() {
 	const searchParams = useSearchParams();
-	const page = searchParams?.get('page') || 1;
+	const page = Number(searchParams?.get('page')) || 1;
+	const search = searchParams?.get('dashboardSearch') || '';
 	const t = useTranslations('Judgements');
+	const { identityService } = useIdentityService();
+
+	const { data, isLoading } = useQuery({
+		queryKey: ['judgementRequests', page, search, identityService],
+		queryFn: async () => {
+			if (!identityService) return { items: [], totalCount: 0 };
+			const allJudgements = await identityService.getAllIdentityJudgements();
+			return getJudgementRequests({ allJudgements, page, limit: DEFAULT_LISTING_LIMIT, search });
+		},
+		enabled: !!identityService
+	});
+
+	const judgementData = data?.items || [];
+	const totalCount = data?.totalCount || 0;
+
+	if (isLoading) {
+		return (
+			<div className='flex flex-col gap-4'>
+				<Skeleton className='h-12 w-full' />
+				<Skeleton className='h-12 w-full' />
+				<Skeleton className='h-12 w-full' />
+			</div>
+		);
+	}
 
 	return (
 		<div className='w-full'>
-			{data && data.length > 0 ? (
+			{judgementData && judgementData.length > 0 ? (
 				<>
 					<div className='w-full rounded-lg border border-primary_border bg-bg_modal p-6'>
 						<Table>
@@ -39,9 +66,9 @@ function JudgementListingTable({ data, totalCount }: { data: IJudgementRequest[]
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{data.map((judgement: IJudgementRequest, index: number) => (
+								{judgementData.map((judgement: IJudgementRequest, index: number) => (
 									<TableRow key={judgement?.id}>
-										<td className={styles.table_content_cell}>{index + 1}</td>
+										<td className={styles.table_content_cell}>{(page - 1) * DEFAULT_LISTING_LIMIT + index + 1}</td>
 										<td className='px-6 py-5'>
 											<Address
 												truncateCharLen={5}
@@ -58,10 +85,7 @@ function JudgementListingTable({ data, totalCount }: { data: IJudgementRequest[]
 											<div className='truncate'>{judgement.twitter || '-'}</div>
 										</td>
 										<td className='px-6 py-5'>
-											<StatusTag
-												status={judgement.status}
-												type={EStatusTagType.JUDGEMENT}
-											/>
+											<JudgementStatusTag status={judgement.status} />
 										</td>
 										<td className='px-6 py-5'>
 											<Address
