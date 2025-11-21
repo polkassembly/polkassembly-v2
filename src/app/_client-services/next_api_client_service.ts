@@ -1304,16 +1304,8 @@ export class NextApiClientService {
 	}
 
 	static async addCommentReaction(proposalType: EProposalType, index: string, commentId: string, reactionType: EReaction) {
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.ADD_COMMENT_REACTION,
-			routeSegments: [proposalType, index, 'comments', commentId, 'reactions']
-		});
-
-		return this.nextApiClientFetch<{ message: string; reactionId: string }>({
-			url,
-			method,
-			data: { reaction: reactionType }
-		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.ADD_COMMENT_REACTION, routeSegments: [proposalType, index, 'comments', commentId, 'reactions'] });
+		return this.nextApiClientFetch<{ message: string; reactionId: string }>({ url, method, data: { reaction: reactionType } });
 	}
 
 	static async deleteCommentReaction(proposalType: EProposalType, index: string, commentId: string, reactionId: string) {
@@ -1321,11 +1313,7 @@ export class NextApiClientService {
 			route: EApiRoute.DELETE_COMMENT_REACTION,
 			routeSegments: [proposalType, index, 'comments', commentId, 'reactions', reactionId]
 		});
-
-		return this.nextApiClientFetch<{ message: string }>({
-			url,
-			method
-		});
+		return this.nextApiClientFetch<{ message: string }>({ url, method });
 	}
 
 	static async getVotesByAddresses({ addresses, page, limit, proposalStatuses }: { addresses: string[]; page: number; limit: number; proposalStatuses?: EProposalStatus[] }) {
@@ -1334,74 +1322,44 @@ export class NextApiClientService {
 			limit: limit.toString()
 		});
 
-		if (addresses?.length) {
-			addresses.forEach((addr) => queryParams.append('address', addr));
+		if (addresses.length) {
+			addresses.forEach((address) => queryParams.append('address', address));
 		}
 
 		if (proposalStatuses?.length) {
-			proposalStatuses.forEach((st) => queryParams.append('proposalStatus', st));
+			proposalStatuses.forEach((status) => queryParams.append('proposalStatus', status));
 		}
 
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.GET_VOTES_BY_ADDRESSES,
-			queryParams
-		});
-
-		return this.nextApiClientFetch<IGenericListingResponse<IProfileVote>>({
-			url,
-			method
-		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_VOTES_BY_ADDRESSES, queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IProfileVote>>({ url, method });
 	}
 
 	static async getGovAnalyticsStats() {
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.GET_GOV_ANALYTICS,
-			routeSegments: ['stats']
-		});
-
-		return this.nextApiClientFetch<IGovAnalyticsStats>({
-			url,
-			method
-		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['stats'] });
+		return this.nextApiClientFetch<IGovAnalyticsStats>({ url, method });
 	}
 
 	static async getGovAnalyticsReferendumOutcome({ trackNo }: { trackNo?: number }) {
+		// Validate trackNo if provided, but allow 0 (ROOT track)
 		if (trackNo !== undefined && trackNo !== null) {
 			const network = getCurrentNetwork();
 
+			// Check if it's a valid number first
 			if (!ValidatorService.isValidNumber(trackNo)) {
 				throw new Error('Invalid track number: must be a valid number');
 			}
 
-			if (
-				!ValidatorService.isValidTrackNumber({
-					trackNum: trackNo,
-					network
-				})
-			) {
+			// Check if it's a valid track number for the network
+			if (!ValidatorService.isValidTrackNumber({ trackNum: trackNo, network })) {
 				throw new Error(`Track number ${trackNo} is not valid for network ${network}`);
 			}
 
-			const { url, method } = await this.getRouteConfig({
-				route: EApiRoute.GET_GOV_ANALYTICS,
-				routeSegments: ['referendum-outcome', 'track', trackNo.toString()]
-			});
-
-			return this.nextApiClientFetch<IGovAnalyticsReferendumOutcome>({
-				url,
-				method
-			});
+			const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['referendum-outcome', 'track', trackNo.toString()] });
+			return this.nextApiClientFetch<IGovAnalyticsReferendumOutcome>({ url, method });
 		}
 
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.GET_GOV_ANALYTICS,
-			routeSegments: ['referendum-outcome']
-		});
-
-		return this.nextApiClientFetch<IGovAnalyticsReferendumOutcome>({
-			url,
-			method
-		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['referendum-outcome'] });
+		return this.nextApiClientFetch<IGovAnalyticsReferendumOutcome>({ url, method });
 	}
 
 	static async getGovAnalyticsReferendumCount() {
@@ -1413,8 +1371,8 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{
 			categoryCounts: IGovAnalyticsCategoryCounts;
 		}>({
-			url,
-			method
+			method,
+			url
 		});
 	}
 
@@ -1425,21 +1383,14 @@ export class NextApiClientService {
 		});
 
 		return this.nextApiClientFetch<IRawTurnoutData>({
-			url,
-			method
+			method,
+			url
 		});
 	}
 
 	static async getTrackDelegationAnalyticsStats() {
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.GET_GOV_ANALYTICS,
-			routeSegments: ['track-delegation']
-		});
-
-		return this.nextApiClientFetch<IGovAnalyticsDelegationStats[]>({
-			url,
-			method
-		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_GOV_ANALYTICS, routeSegments: ['track-delegation'] });
+		return this.nextApiClientFetch<IGovAnalyticsDelegationStats[]>({ url, method });
 	}
 
 	static async getTrackLevelProposalsAnalytics() {
@@ -1452,57 +1403,31 @@ export class NextApiClientService {
 			data: Record<number, number>;
 			totalProposals: number;
 		}>({
-			url,
-			method
+			method,
+			url
 		});
 	}
 
 	static async getConversationHistory({ userId, limit }: { userId: string; limit: number }) {
 		const queryParams = new URLSearchParams({
 			userId,
-			limit: limit.toString()
+			limit: limit?.toString()
 		});
-
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.GET_CONVERSATION_HISTORY,
-			routeSegments: ['conversations'],
-			queryParams
-		});
-
-		return this.nextApiClientFetch<IConversationHistory[]>({
-			url,
-			method
-		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CONVERSATION_HISTORY, routeSegments: ['conversations'], queryParams });
+		return this.nextApiClientFetch<IConversationHistory[]>({ url, method });
 	}
 
 	static async getConversationMessages({ conversationId }: { conversationId: string }) {
-		const queryParams = new URLSearchParams({ conversationId });
-
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.GET_CONVERSATION_MESSAGES,
-			routeSegments: ['messages'],
-			queryParams
+		const queryParams = new URLSearchParams({
+			conversationId
 		});
-
-		return this.nextApiClientFetch<IConversationMessage[]>({
-			url,
-			method
-		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CONVERSATION_MESSAGES, routeSegments: ['messages'], queryParams });
+		return this.nextApiClientFetch<IConversationMessage[]>({ url, method });
 	}
 
 	static async getKlaraStats() {
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.GET_KLARA_STATS,
-			routeSegments: ['stats']
-		});
-
-		return this.nextApiClientFetch<{
-			totalUsers: number;
-			totalConversations: number;
-		}>({
-			url,
-			method
-		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_KLARA_STATS, routeSegments: ['stats'] });
+		return this.nextApiClientFetch<{ totalUsers: number; totalConversations: number }>({ url, method });
 	}
 
 	static async klaraSendMessage({
@@ -1523,7 +1448,19 @@ export class NextApiClientService {
 		return this.nextApiClientFetchStream({ url, method, signal, data: { message, userId, conversationId, conversationHistory } });
 	}
 
-	static async submitKlaraFeedback(payload: {
+	static async submitKlaraFeedback({
+		firstName,
+		lastName,
+		email,
+		feedbackText,
+		userId,
+		conversationId,
+		messageId,
+		rating,
+		feedbackType,
+		queryText,
+		responseText
+	}: {
 		firstName: string;
 		lastName: string;
 		email: string;
@@ -1536,15 +1473,23 @@ export class NextApiClientService {
 		queryText: string;
 		responseText: string;
 	}) {
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.KLARA_SEND_FEEDBACK,
-			routeSegments: ['feedback']
-		});
-
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.KLARA_SEND_FEEDBACK, routeSegments: ['feedback'] });
 		return this.nextApiClientFetch<{ message: string }>({
 			url,
 			method,
-			data: payload
+			data: {
+				firstName,
+				lastName,
+				email,
+				feedbackText,
+				userId,
+				conversationId,
+				messageId,
+				rating,
+				feedbackType,
+				queryText,
+				responseText
+			}
 		});
 	}
 
