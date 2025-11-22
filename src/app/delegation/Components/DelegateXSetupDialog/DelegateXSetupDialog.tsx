@@ -66,11 +66,23 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 		if (open && isEditMode) {
 			setStep(initialStep);
 			setCurrentEditMode(true);
+			setSignature(initialData.signature || '');
+			setContact(initialData.contact || '');
+			setPersona(initialData.persona || '');
+			setSelectedStrategy(initialData.selectedStrategy || '');
+			setIncludeComment(initialData.includeComment ?? true);
+			setVotingPower('');
 		} else if (open && !isEditMode && !currentEditMode && !isEditingFromDialog) {
 			setStep(1);
 			setCurrentEditMode(false);
+			setSignature('');
+			setContact('');
+			setPersona('');
+			setSelectedStrategy('');
+			setIncludeComment(true);
+			setVotingPower('');
 		}
-	}, [open, isEditMode, initialStep, currentEditMode, isEditingFromDialog]);
+	}, [open, isEditMode, initialStep, currentEditMode, isEditingFromDialog, initialData]);
 
 	const handleComplete = async () => {
 		setIsLoading(true);

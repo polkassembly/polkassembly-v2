@@ -48,7 +48,7 @@ function PersonalityStep({
 		<div className='space-y-4'>
 			<div className='rounded-lg bg-delegation_bgcard p-4 sm:p-6'>
 				<div className='mb-4'>
-					<p className='mb-2 block text-[10px] font-medium md:text-sm'>Voting Power</p>
+					<p className='mb-2 block text-[10px] font-medium md:text-sm'>Enter the voting power of your delegation</p>
 					<input
 						className='placeholder:text-text_secondary w-full rounded-md border border-border_grey bg-bg_modal px-3 py-2 text-sm outline-none'
 						placeholder='Enter voting power'
