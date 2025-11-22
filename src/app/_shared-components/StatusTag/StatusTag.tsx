@@ -4,10 +4,12 @@
 
 'use client';
 
-import { useTranslations } from 'next-intl';
-import { EProposalStatus } from '@/_shared/types';
 import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
+
+import { EProposalStatus } from '@/_shared/types';
 import { DECIDING_PROPOSAL_STATUSES } from '@/_shared/_constants/decidingProposalStatuses';
+
 import styles from './StatusTag.module.scss';
 
 interface Props {
@@ -16,16 +18,22 @@ interface Props {
 	colorInverted?: boolean;
 }
 
-function StatusTag({ className = '', status, colorInverted }: Props) {
+function StatusTag({ className = '', status, colorInverted = false }: Props) {
 	const t = useTranslations();
 
-	const finalStatus = useMemo(() => {
-		return status && DECIDING_PROPOSAL_STATUSES.includes(status) ? EProposalStatus.Deciding.toLowerCase() : status?.toLowerCase().replace(/\s+/g, '_');
+	const normalizedStatus = useMemo(() => {
+		if (!status) return undefined;
+
+		if (DECIDING_PROPOSAL_STATUSES.includes(status as EProposalStatus)) {
+			return EProposalStatus.Deciding.toLowerCase();
+		}
+
+		return status.toLowerCase().replace(/\s+/g, '_');
 	}, [status]);
 
 	return (
-		<div className={`${styles.base} ${finalStatus ? styles[String(finalStatus)] : ''} ${colorInverted ? styles.inverted : ''} ${className}`}>
-			{t(`ProposalStatus.${finalStatus}`)}
+		<div className={` ${styles.base} ${normalizedStatus ? styles[String(normalizedStatus)] : ''} ${colorInverted ? styles.inverted : ''} ${className} `}>
+			{normalizedStatus && t(`ProposalStatus.${normalizedStatus}`)}
 		</div>
 	);
 }
