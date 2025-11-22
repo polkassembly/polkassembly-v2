@@ -21,4 +21,28 @@ export class DelegateXClientService extends NextApiClientService {
 	}): Promise<{ data: { success: boolean; delegateXAccount: IDelegateXAccount } | null; error: IErrorResponse | null }> {
 		return NextApiClientService.createDelegateXAccount({ strategyId, contactLink, signatureLink, includeComment, votingPower });
 	}
+
+	static async getDelegateXDetails() {
+		return NextApiClientService.getDelegateXDetails();
+	}
+
+	static async getDelegateXVoteHistory({ page = 1, limit }: { page?: number; limit?: number }) {
+		return NextApiClientService.getDelegateXVoteHistory({ page, limit });
+	}
+
+	static async updateDelegateXAccount({
+		strategyId,
+		contactLink,
+		signatureLink,
+		includeComment,
+		votingPower
+	}: {
+		strategyId?: string;
+		contactLink?: string;
+		signatureLink?: string;
+		includeComment?: boolean;
+		votingPower?: string;
+	}): Promise<{ data: { success: boolean; delegateXAccount: IDelegateXAccount } | null; error: IErrorResponse | null }> {
+		return NextApiClientService.updateDelegateXAccount({ strategyId, contactLink, signatureLink, includeComment, votingPower });
+	}
 }

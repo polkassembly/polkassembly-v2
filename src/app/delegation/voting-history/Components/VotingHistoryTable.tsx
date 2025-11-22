@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
-import { useState, Fragment } from 'react';
+import { useState, Fragment, useMemo } from 'react';
 import { CheckCircle2, XCircle, Menu, ChevronDown, ChevronUp } from 'lucide-react';
 import AbstainIcon from '@assets/icons/abstainGray.svg';
 import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
@@ -12,26 +12,32 @@ import StatusTag from '@ui/StatusTag/StatusTag';
 import { getSpanStyle } from '@ui/TopicTag/TopicTag';
 import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
 import listingStyles from '@/app/_shared-components/ListingComponent/ListingCard/ListingCard.module.scss';
-import { EProposalStatus } from '@/_shared/types';
+import { EProposalStatus, IDelegateXVoteData } from '@/_shared/types';
 import Image from 'next/image';
 import { Button } from '@/app/_shared-components/Button';
 
 interface IVotingHistoryTableProps {
-	votingHistory: {
-		id: number;
-		title: string;
-		track: string;
-		decision: string;
-		timestamp: string;
-		status: EProposalStatus;
-		criteria: { met: boolean; text: string }[];
-		keyReason: string;
-		commentUrl: string;
-	}[];
+	votingHistory: (IDelegateXVoteData & { status: EProposalStatus })[];
 }
 
 function VotingHistoryTable({ votingHistory }: IVotingHistoryTableProps) {
 	const [expandedRow, setExpandedRow] = useState<number | null>(null);
+
+	const transformedVotingHistory = useMemo(
+		() =>
+			votingHistory.map((vote) => ({
+				id: parseInt(vote.proposalId, 10),
+				title: `Proposal ${vote.proposalId}`,
+				track: vote.proposalType,
+				decision: vote.decision === 1 ? 'Aye' : vote.decision === 0 ? 'Nay' : 'Abstain',
+				timestamp: new Date(vote.createdAt).toLocaleDateString(),
+				status: vote.status,
+				criteria: vote.reason.map((r, idx) => ({ met: idx < 3, text: r })),
+				keyReason: vote.comment || vote.reason[0] || '',
+				commentUrl: `https://polkadot.polkassembly.io/referenda/${vote.proposalId}`
+			})),
+		[votingHistory]
+	);
 
 	return (
 		<div className='overflow-hidden rounded-2xl border border-border_grey bg-bg_modal'>
@@ -48,7 +54,7 @@ function VotingHistoryTable({ votingHistory }: IVotingHistoryTableProps) {
 					</TableHeader>
 
 					<TableBody>
-						{votingHistory.map((row, idx) => (
+						{transformedVotingHistory.map((row, idx) => (
 							<Fragment key={row.id}>
 								<TableRow className='cursor-pointer border-b border-border_grey last:border-b-0 hover:bg-bg_modal'>
 									<TableCell className='max-w-40 px-6 py-4 font-medium'>
@@ -131,7 +137,7 @@ function VotingHistoryTable({ votingHistory }: IVotingHistoryTableProps) {
 			</div>
 
 			<div className='md:hidden'>
-				{votingHistory.map((row, idx) => (
+				{transformedVotingHistory.map((row, idx) => (
 					<div
 						key={row.id}
 						className='border-b border-border_grey bg-bg_modal last:border-b-0'

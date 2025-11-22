@@ -9,79 +9,39 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import NoActivity from '@assets/activityfeed/gifs/noactivity.gif';
 import Image from 'next/image';
-import { EProposalStatus } from '@/_shared/types';
+import { useEffect, useState } from 'react';
+import { DelegateXClientService } from '@/app/_client-services/delegate_x_client_service';
+import { IDelegateXVoteData, EProposalStatus } from '@/_shared/types';
+import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
+import { useSearchParams } from 'next/navigation';
 import VotingHistoryTable from './Components/VotingHistoryTable';
-
-const POLKASSEMBLY_URL = 'https://polkassembly.io';
-
-const votingHistory = [
-	{
-		id: 45,
-		title: 'Standard Guidelines Standard Guidelines ...',
-		track: 'Medium Spender',
-		decision: 'Nay',
-		decisionIcon: 'nay',
-		timestamp: "12th June'25, 23:23:12",
-		status: EProposalStatus.Rejected,
-		criteria: [
-			{ met: true, text: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.' },
-			{ met: true, text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
-			{ met: false, text: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.' },
-			{ met: true, text: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' },
-			{ met: false, text: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' }
-		],
-		keyReason: 'Milestones defined and budget within track range.',
-		commentUrl: POLKASSEMBLY_URL,
-		expanded: true
-	},
-	{
-		id: 46,
-		title: 'Accessibility Standards Ensuring all users ...',
-		track: 'Small Spender',
-		decision: 'Aye',
-		decisionIcon: 'aye',
-		timestamp: "13th June'25, 09:15:45",
-		status: EProposalStatus.Deciding,
-		criteria: [
-			{ met: true, text: 'Requirements scoped and community feedback incorporated.' },
-			{ met: true, text: 'Budget justified with milestones.' },
-			{ met: true, text: 'Risks identified and mitigations proposed.' },
-			{ met: false, text: 'Security audit pending.' },
-			{ met: true, text: 'KPIs and success metrics clearly defined.' }
-		],
-		keyReason: 'Clear milestones and strong community support.',
-		commentUrl: POLKASSEMBLY_URL,
-		expanded: false
-	},
-	{
-		id: 47,
-		title: 'Responsive Design Adapting layouts for var ...',
-		track: 'Big Spender',
-		decision: 'Abstain',
-		decisionIcon: 'abstain',
-		timestamp: "14th June'25, 14:30:11",
-		status: EProposalStatus.Approved,
-		criteria: [
-			{ met: true, text: 'Team experience verified.' },
-			{ met: true, text: 'Budget within reasonable limits.' },
-			{ met: true, text: 'Detailed roadmap provided.' },
-			{ met: true, text: 'Community feedback addressed.' },
-			{ met: false, text: 'Maintenance plan to be refined.' }
-		],
-		keyReason: 'Overall strong proposal; abstained due to conflict of interest.',
-		commentUrl: POLKASSEMBLY_URL,
-		expanded: false
-	}
-];
 
 function VotingHistoryPage() {
 	const t = useTranslations();
+	const [votingHistory, setVotingHistory] = useState<(IDelegateXVoteData & { status: EProposalStatus })[]>([]);
+	const [totalCount, setTotalCount] = useState(0);
+	const searchParams = useSearchParams();
+	const page = Number(searchParams?.get('page')) || 1;
+
+	useEffect(() => {
+		(async () => {
+			const { data, error } = await DelegateXClientService.getDelegateXVoteHistory({ page, limit: 10 });
+			if (error || !data) {
+				console.error('Error fetching vote history', error);
+				return;
+			}
+			if (data.success && data.voteData) {
+				setVotingHistory(data.voteData as (IDelegateXVoteData & { status: EProposalStatus })[]);
+				setTotalCount(data.totalCount);
+			}
+		})();
+	}, [page]);
 
 	return (
 		<div className='min-h-screen'>
 			<div className='flex flex-col gap-2 bg-bg_modal px-20 py-8 text-text_primary shadow-lg'>
 				<p className='text-[28px] font-semibold'>Voting History</p>
-				<p className='text-sm font-medium'>Every vote is auditable. Click a proposal to see which criteria were met and the delegate’s reasoning.</p>
+				<p className='text-sm font-medium'>Every vote is auditable. Click a proposal to see which criteria were met and the delegate&apos;s reasoning.</p>
 				<Link
 					href='https://wiki.polkadot.com/general/glossary/#referendum'
 					target='_blank'
@@ -117,6 +77,14 @@ function VotingHistoryPage() {
 			) : (
 				<div className='px-4 py-6 md:px-20'>
 					<VotingHistoryTable votingHistory={votingHistory} />
+					<div className='mt-6 flex justify-end'>
+						<PaginationWithLinks
+							page={page}
+							pageSize={10}
+							totalCount={totalCount}
+							pageSearchParam='page'
+						/>
+					</div>
 				</div>
 			)}
 		</div>

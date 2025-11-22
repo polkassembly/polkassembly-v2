@@ -64,7 +64,8 @@ import {
 	IGovAnalyticsCategoryCounts,
 	IConversationHistory,
 	IConversationMessage,
-	IDelegateXAccount
+	IDelegateXAccount,
+	IDelegateXVoteData
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -166,7 +167,10 @@ enum EApiRoute {
 	KLARA_SEND_FEEDBACK = 'KLARA_SEND_FEEDBACK',
 	KLARA_SEND_MESSAGE = 'KLARA_SEND_MESSAGE',
 	GET_GOOGLE_SHEET_NEWS = 'GET_GOOGLE_SHEET_NEWS',
-	CREATE_DELEGATE_X_BOT = 'CREATE_DELEGATE_X_BOT'
+	CREATE_DELEGATE_X_BOT = 'CREATE_DELEGATE_X_BOT',
+	UPDATE_DELEGATE_X_BOT = 'UPDATE_DELEGATE_X_BOT',
+	GET_DELEGATE_X_DETAILS = 'GET_DELEGATE_X_DETAILS',
+	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY'
 }
 
 export class NextApiClientService {
@@ -413,6 +417,21 @@ export class NextApiClientService {
 			case EApiRoute.CREATE_DELEGATE_X_BOT:
 				path = '/delegate-x';
 				method = 'POST';
+				break;
+
+			case EApiRoute.UPDATE_DELEGATE_X_BOT:
+				path = '/delegate-x';
+				method = 'PUT';
+				break;
+
+			case EApiRoute.GET_DELEGATE_X_DETAILS:
+				path = '/delegate-x';
+				method = 'GET';
+				break;
+
+			case EApiRoute.GET_DELEGATE_X_VOTE_HISTORY:
+				path = '/delegate-x/vote-history';
+				method = 'GET';
 				break;
 
 			default:
@@ -1517,5 +1536,43 @@ export class NextApiClientService {
 			method,
 			data: { strategyId, contactLink, signatureLink, includeComment, votingPower }
 		});
+	}
+
+	static async updateDelegateXAccount({
+		strategyId,
+		contactLink,
+		signatureLink,
+		includeComment,
+		votingPower
+	}: {
+		strategyId?: string;
+		contactLink?: string;
+		signatureLink?: string;
+		includeComment?: boolean;
+		votingPower?: string;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.UPDATE_DELEGATE_X_BOT });
+		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount }>({
+			url,
+			method,
+			data: { strategyId, contactLink, signatureLink, includeComment, votingPower }
+		});
+	}
+
+	static async getDelegateXDetails() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_DETAILS });
+		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount; totalVotingPower: string; totalVotes: number; totalDelegators: number }>({
+			url,
+			method
+		});
+	}
+
+	static async getDelegateXVoteHistory({ page = 1, limit = DEFAULT_LISTING_LIMIT }: { page?: number; limit?: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_VOTE_HISTORY, queryParams });
+		return this.nextApiClientFetch<{ success: boolean; voteData: IDelegateXVoteData[]; totalCount: number }>({ url, method });
 	}
 }

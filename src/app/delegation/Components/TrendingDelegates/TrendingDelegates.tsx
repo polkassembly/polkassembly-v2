@@ -2,9 +2,9 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { memo, RefObject, useRef } from 'react';
+import { memo, RefObject, useRef, useEffect, useState } from 'react';
 import { IoMdTrendingUp } from '@react-icons/all-files/io/IoMdTrendingUp';
-import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
+import { EDelegateSource, IDelegateDetails, IDelegateXAccount } from '@/_shared/types';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { Label } from '@/app/_shared-components/Label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
@@ -23,6 +23,8 @@ import { delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import DelegateXBotGif from '@assets/delegation/klara/klara.gif';
+import { DelegateXClientService } from '@/app/_client-services/delegate_x_client_service';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import DelegateSearchInput from './DelegateSearchInput/DelegateSearchInput';
 import styles from './TrendingDelegates.module.scss';
 import DelegateCard from './DelegateCard/DelegateCard';
@@ -30,9 +32,8 @@ import DelegateXCard from './DelegateCard/DelegateXCard';
 
 const PA_ADDRESS = '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t';
 
-const delegateXData = {
+const defaultDelegateXData = {
 	address: '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t',
-	name: 'DelegateX',
 	bio: 'An AI powered custom agent that votes just like you would. Setup bot suited to your evaluation criterias and simplify voting with reason',
 	image: DelegateXBotGif,
 	maxDelegated: '1k DOT',
@@ -87,6 +88,31 @@ const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedS
 
 function TrendingDelegates() {
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
+	const { userPreferences } = useUserPreferences();
+	const [delegateXData, setDelegateXData] = useState(defaultDelegateXData);
+	const [delegateXAccount, setDelegateXAccount] = useState<IDelegateXAccount | null>(null);
+
+	useEffect(() => {
+		if (!userPreferences.selectedAccount?.address) return;
+		(async () => {
+			const { data, error } = await DelegateXClientService.getDelegateXDetails();
+			if (error || !data) {
+				console.error('Error fetching delegate x details', error);
+				return;
+			}
+
+			if (data.success && data.delegateXAccount) {
+				setDelegateXAccount(data.delegateXAccount);
+				setDelegateXData((prev) => ({
+					...prev,
+					address: data.delegateXAccount.address,
+					maxDelegated: `${data.totalVotingPower || 0} DOT`,
+					votedProposals: data.totalVotes || 0,
+					delegatorsCount: data.totalDelegators || 0
+				}));
+			}
+		})();
+	}, [userPreferences.selectedAccount?.address]);
 
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const t = useTranslations('Delegation');
@@ -185,7 +211,10 @@ function TrendingDelegates() {
 					{filteredDelegates.length > 0 ? (
 						<>
 							<div className='my-5 grid w-full grid-cols-1 items-stretch gap-5 lg:grid-cols-2'>
-								<DelegateXCard data={delegateXData} />
+								<DelegateXCard
+									data={delegateXData}
+									delegateXAccount={delegateXAccount}
+								/>
 								{orderedFilteredDelegates.slice(0, 9).map((delegate: IDelegateDetails) => (
 									<DelegateCard
 										key={delegate.address}

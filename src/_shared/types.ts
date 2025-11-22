@@ -1700,6 +1700,9 @@ export interface IDelegateXAccount {
 	includeComment: boolean;
 	network: ENetwork;
 	votingPower: string;
+	strategyId?: string;
+	contactLink?: string;
+	signatureLink?: string;
 }
 
 export interface IDelegateXVoteData {

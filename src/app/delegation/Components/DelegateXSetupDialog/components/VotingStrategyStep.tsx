@@ -4,9 +4,9 @@
 
 import { memo, useRef, useState } from 'react';
 import Image from 'next/image';
-import { Button } from '@/app/_shared-components/Button';
 import { ArrowRight, ChevronRight, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import QuestionIcon from '@assets/delegation/question.svg';
+import { Button } from '@/app/_shared-components/Button';
 import { Separator } from '@/app/_shared-components/Separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
@@ -18,6 +18,8 @@ interface VotingStrategyStepProps {
 	onStrategySelect?: (strategyId: string) => void;
 	isEditMode?: boolean;
 	strategies?: VotingStrategy[];
+	onSubmit?: () => Promise<void>;
+	isLoading?: boolean;
 }
 
 function StrategyCard({ strategy, isSelected, onSelect }: { strategy: VotingStrategy; isSelected: boolean; onSelect: (id: string) => void }) {
@@ -86,12 +88,20 @@ function StrategyCard({ strategy, isSelected, onSelect }: { strategy: VotingStra
 	);
 }
 
-function VotingStrategyStep({ onNext, selectedStrategy, onStrategySelect, strategies, isEditMode = false }: VotingStrategyStepProps) {
+function VotingStrategyStep({ onNext, selectedStrategy, onStrategySelect, strategies, isEditMode = false, onSubmit, isLoading = false }: VotingStrategyStepProps) {
 	const scrollRef = useRef<HTMLDivElement>(null);
 
 	const handleStrategySelect = (strategyId: string) => {
 		if (onStrategySelect) {
 			onStrategySelect(strategyId);
+		}
+	};
+
+	const handleNext = async () => {
+		if (isEditMode && onSubmit) {
+			await onSubmit();
+		} else {
+			onNext();
 		}
 	};
 
@@ -172,11 +182,11 @@ function VotingStrategyStep({ onNext, selectedStrategy, onStrategySelect, strate
 
 			<div className='flex items-center justify-center sm:justify-end'>
 				<Button
-					className={`w-full px-5 text-white sm:w-auto ${!selectedStrategy ? 'cursor-not-allowed bg-gray-400' : 'bg-text_pink hover:bg-pink-600'}`}
-					onClick={onNext}
-					disabled={!selectedStrategy}
+					className={`w-full px-5 text-white sm:w-auto ${!selectedStrategy || isLoading ? 'cursor-not-allowed bg-gray-400' : 'bg-text_pink hover:bg-pink-600'}`}
+					onClick={handleNext}
+					disabled={!selectedStrategy || isLoading}
 				>
-					{isEditMode ? 'Update Strategy' : 'Set Personality'} <ArrowRight className='ml-2 h-4 w-4' />
+					{isLoading ? 'Updating...' : isEditMode ? 'Update Strategy' : 'Set Personality'} <ArrowRight className='ml-2 h-4 w-4' />
 				</Button>
 			</div>
 		</div>

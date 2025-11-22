@@ -25,6 +25,14 @@ const zodParamsSchema = z.object({
 	votingPower: z.string()
 });
 
+const zodUpdateParamsSchema = z.object({
+	strategyId: z.string().optional(),
+	contactLink: z.string().optional(),
+	signatureLink: z.string().optional(),
+	includeComment: z.boolean().optional(),
+	votingPower: z.string().optional()
+});
+
 export const POST = withErrorHandling(async (req: NextRequest) => {
 	const { strategyId, contactLink, signatureLink, includeComment = false, votingPower } = zodParamsSchema.parse(await getReqBody(req));
 
@@ -60,7 +68,10 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		userId: Number(userId),
 		network,
 		includeComment,
-		votingPower
+		votingPower,
+		strategyId,
+		contactLink,
+		signatureLink
 	});
 
 	// create DelegateX Bot (disabled for now)
@@ -73,6 +84,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	return response;
 });
 
+// Get DelegateX Account by user id
 // Get DelegateX Account by user id
 export const GET = withErrorHandling(async () => {
 	const network = await getNetworkFromHeaders();
@@ -94,13 +106,51 @@ export const GET = withErrorHandling(async () => {
 	const voteData = await OffChainDbService.GetDelegateXVotesMatrixByDelegateXAccountId({
 		delegateXAccountId: `${delegateXAccount.userId}-${delegateXAccount.network}-${delegateXAccount.address}`
 	});
-	if (!voteData) {
-		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Vote data not found');
-	}
 
 	return NextResponse.json({
 		success: true,
 		delegateXAccount,
 		...voteData
 	});
+});
+
+export const PUT = withErrorHandling(async (req: NextRequest) => {
+	const updateData = zodUpdateParamsSchema.parse(await getReqBody(req));
+
+	const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
+
+	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
+	if (!userId) {
+		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Unauthorized');
+	}
+
+	const network = await getNetworkFromHeaders();
+
+	const existingAccount = await OffChainDbService.GetDelegateXAccountByUserId({ userId: Number(userId), network });
+	if (!existingAccount) {
+		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'DelegateX account not found. Please create an account first.');
+	}
+
+	const updatedAccount = await OffChainDbService.UpdateDelegateXAccount({
+		address: existingAccount.address,
+		userId: Number(userId),
+		network,
+		includeComment: updateData.includeComment ?? existingAccount.includeComment,
+		votingPower: updateData.votingPower ?? existingAccount.votingPower,
+		strategyId: updateData.strategyId ?? existingAccount.strategyId,
+		contactLink: updateData.contactLink ?? existingAccount.contactLink,
+		signatureLink: updateData.signatureLink ?? existingAccount.signatureLink
+	});
+
+	// (disabled for now)
+	if (updateData.strategyId || updateData.contactLink || updateData.signatureLink) {
+		await DelegateXService.createDelegateXBot(
+			Number(userId),
+			updateData.strategyId ?? existingAccount.strategyId ?? '',
+			updateData.contactLink ?? existingAccount.contactLink,
+			updateData.signatureLink ?? existingAccount.signatureLink
+		);
+	}
+
+	return NextResponse.json({ success: true, delegateXAccount: updatedAccount });
 });

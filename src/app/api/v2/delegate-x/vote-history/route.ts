@@ -12,6 +12,8 @@ import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { MAX_LISTING_LIMIT, DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { z } from 'zod';
+import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
+import { EProposalStatus } from '@/_shared/types';
 
 const zodQuerySchema = z.object({
 	page: z.coerce.number().optional().default(1),
@@ -38,5 +40,20 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		page,
 		limit
 	});
-	return NextResponse.json({ success: true, voteData: voteData?.votes || [], totalCount: voteData?.totalCount || 0 });
+
+	const votesWithStatus = await Promise.all(
+		(voteData?.votes || []).map(async (vote) => {
+			const onChainPostInfo = await OnChainDbService.GetOnChainPostInfo({
+				network,
+				indexOrHash: vote.proposalId,
+				proposalType: vote.proposalType
+			});
+			return {
+				...vote,
+				status: onChainPostInfo?.status || EProposalStatus.Active
+			};
+		})
+	);
+
+	return NextResponse.json({ success: true, voteData: votesWithStatus, totalCount: voteData?.totalCount || 0 });
 });

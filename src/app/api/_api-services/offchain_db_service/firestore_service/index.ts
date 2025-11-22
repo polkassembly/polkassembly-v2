@@ -1895,6 +1895,30 @@ export class FirestoreService extends FirestoreUtils {
 		await delegateXAccountDoc.set({ ...delegateXAccount }, { merge: true });
 	}
 
+	static async UpdateDelegateXAccount({
+		address,
+		userId,
+		network,
+		includeComment,
+		votingPower,
+		strategyId,
+		contactLink,
+		signatureLink
+	}: {
+		address: string;
+		userId: number;
+		network: ENetwork;
+		includeComment?: boolean;
+		votingPower?: string;
+		strategyId?: string;
+		contactLink?: string;
+		signatureLink?: string;
+	}) {
+		const id = `${userId}-${network}-${address}`;
+		const delegateXAccountDoc = this.delegateXAccountsCollectionRef().doc(id);
+		await delegateXAccountDoc.set({ includeComment, votingPower, strategyId, contactLink, signatureLink }, { merge: true });
+	}
+
 	static async CreateVote({
 		delegateXAccountId,
 		proposalId,

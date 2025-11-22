@@ -4,10 +4,10 @@
 
 import { memo } from 'react';
 import Image from 'next/image';
-import { Button } from '@/app/_shared-components/Button';
 import { ArrowRight } from 'lucide-react';
-import { Switch } from '@/app/_shared-components/Switch';
 import QuestionIcon from '@assets/delegation/question.svg';
+import { Button } from '@/app/_shared-components/Button';
+import { Switch } from '@/app/_shared-components/Switch';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import styles from '../DelegateXSetupDialog.module.scss';
 
@@ -26,6 +26,8 @@ interface PersonalityStepProps {
 	isEditMode?: boolean;
 	votingPower?: string;
 	onVotingPowerChange?: (value: string) => void;
+	onSubmit?: () => Promise<void>;
+	isLoading?: boolean;
 }
 
 function PersonalityStep({
@@ -42,8 +44,18 @@ function PersonalityStep({
 	onPersonaTabChange,
 	isEditMode = false,
 	votingPower,
-	onVotingPowerChange
+	onVotingPowerChange,
+	onSubmit,
+	isLoading = false
 }: PersonalityStepProps) {
+	const handleNext = async () => {
+		if (isEditMode && onSubmit) {
+			await onSubmit();
+		} else {
+			onNext();
+		}
+	};
+
 	return (
 		<div className='space-y-4'>
 			<div className='rounded-lg bg-delegation_bgcard p-4 sm:p-6'>
@@ -180,11 +192,11 @@ function PersonalityStep({
 			</div>
 			<div className='flex items-center justify-center sm:justify-end'>
 				<Button
-					disabled={!votingPower}
+					disabled={!votingPower || isLoading}
 					className='w-full bg-text_pink px-5 text-white hover:bg-pink-600 sm:w-auto'
-					onClick={onNext}
+					onClick={handleNext}
 				>
-					{isEditMode ? 'Update Personality' : 'Save and Continue'} <ArrowRight className='ml-2 h-4 w-4' />
+					{isLoading ? 'Updating...' : isEditMode ? 'Update Personality' : 'Save and Continue'} <ArrowRight className='ml-2 h-4 w-4' />
 				</Button>
 			</div>
 		</div>

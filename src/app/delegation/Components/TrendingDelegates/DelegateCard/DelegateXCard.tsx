@@ -14,19 +14,21 @@ import Address from '@/app/_shared-components/Profile/Address/Address';
 import { Button } from '@/app/_shared-components/Button';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
+import { IDelegateXAccount } from '@/_shared/types';
+import EditDelegateXDialog from '../../DelegateXSetupDialog/EditDelegateXDialog';
 import DelegateXSetupDialog from '../../DelegateXSetupDialog/DelegateXSetupDialog';
 import styles from './DelegateCard.module.scss';
 
 interface IDelegateXCardProps {
 	data: {
 		address: string;
-		name: string;
 		bio: string;
 		image: StaticImageData;
 		maxDelegated: string;
 		votedProposals: number;
 		delegatorsCount: number;
 	};
+	delegateXAccount: IDelegateXAccount | null;
 }
 
 function DelegateXStats({ data }: { data: IDelegateXCardProps['data'] }) {
@@ -59,19 +61,41 @@ function DelegateXStats({ data }: { data: IDelegateXCardProps['data'] }) {
 	);
 }
 
-const DelegateXCard = memo(({ data }: IDelegateXCardProps) => {
+const DelegateXCard = memo(({ data, delegateXAccount }: IDelegateXCardProps) => {
 	const { user } = useUser();
 	const t = useTranslations('Delegation');
 
 	const [openModal, setOpenModal] = useState(false);
 	const [openSetupDialog, setOpenSetupDialog] = useState(false);
+	const [openEditDialog, setOpenEditDialog] = useState(false);
+	const [editStep, setEditStep] = useState(1);
+	const [isEditMode, setIsEditMode] = useState(false);
+
+	const handleEditStrategy = () => {
+		setOpenEditDialog(false);
+		setEditStep(3);
+		setIsEditMode(true);
+		setOpenSetupDialog(true);
+	};
+
+	const handleEditPersonality = () => {
+		setOpenEditDialog(false);
+		setEditStep(4);
+		setIsEditMode(true);
+		setOpenSetupDialog(true);
+	};
+
+	const handleUndelegate = () => {
+		// TODO: Implement undelegate
+		setOpenEditDialog(false);
+	};
 
 	return (
 		<div className={styles.delegateXCardWrapper}>
 			<Image
 				className={styles.delegateXGif}
 				src={data.image}
-				alt={data.name}
+				alt={data.address}
 				width={95}
 				height={95}
 				priority
@@ -102,14 +126,42 @@ const DelegateXCard = memo(({ data }: IDelegateXCardProps) => {
 								<Button
 									variant='ghost'
 									className='flex items-center gap-x-2 text-sm font-medium text-text_pink'
-									onClick={() => setOpenSetupDialog(true)}
+									onClick={() => {
+										if (delegateXAccount) {
+											setOpenEditDialog(true);
+										} else {
+											setIsEditMode(false);
+											setEditStep(1);
+											setOpenSetupDialog(true);
+										}
+									}}
 								>
 									<IoPersonAdd />
-									<span>{t('delegate')}</span>
+									<span>{delegateXAccount ? 'Edit' : t('delegate')}</span>
 								</Button>
 								<DelegateXSetupDialog
 									open={openSetupDialog}
 									onOpenChange={setOpenSetupDialog}
+									isEditMode={isEditMode}
+									initialStep={editStep}
+									initialData={
+										delegateXAccount
+											? {
+													selectedStrategy: delegateXAccount.strategyId,
+													contact: delegateXAccount.contactLink,
+													signature: delegateXAccount.signatureLink,
+													includeComment: delegateXAccount.includeComment,
+													votingPower: delegateXAccount.votingPower
+												}
+											: {}
+									}
+								/>
+								<EditDelegateXDialog
+									open={openEditDialog}
+									onOpenChange={setOpenEditDialog}
+									onEditStrategy={handleEditStrategy}
+									onEditPersonality={handleEditPersonality}
+									onUndelegate={handleUndelegate}
 								/>
 							</>
 						) : (

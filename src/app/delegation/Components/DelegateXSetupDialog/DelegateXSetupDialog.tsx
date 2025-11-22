@@ -40,6 +40,7 @@ interface DelegateXSetupDialogProps {
 		persona?: string;
 		selectedStrategy?: string;
 		includeComment?: boolean;
+		votingPower?: string;
 	};
 }
 
@@ -71,7 +72,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 			setPersona(initialData.persona || '');
 			setSelectedStrategy(initialData.selectedStrategy || '');
 			setIncludeComment(initialData.includeComment ?? true);
-			setVotingPower('');
+			setVotingPower(initialData.votingPower || '');
 		} else if (open && !isEditMode && !currentEditMode && !isEditingFromDialog) {
 			setStep(1);
 			setCurrentEditMode(false);
@@ -87,14 +88,46 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	const handleComplete = async () => {
 		setIsLoading(true);
 
-		// call api to create delegate x account
-		const { data, error } = await DelegateXClientService.createDelegateXAccount({
-			strategyId: selectedStrategy,
-			contactLink: contact,
-			signatureLink: signature || '',
-			includeComment: includeComment || false,
-			votingPower: new BN(0).toString()
-		});
+		let data;
+		let error;
+
+		if (currentEditMode) {
+			const updatePayload: {
+				strategyId?: string;
+				contactLink?: string;
+				signatureLink?: string;
+				includeComment?: boolean;
+				votingPower?: string;
+			} = {};
+
+			if (initialStep === 3 && selectedStrategy) {
+				updatePayload.strategyId = selectedStrategy;
+			}
+
+			if (initialStep === 4) {
+				updatePayload.contactLink = contact;
+				updatePayload.signatureLink = signature || '';
+				updatePayload.includeComment = includeComment;
+				if (votingPower) {
+					updatePayload.votingPower = votingPower;
+				}
+			}
+
+			const result = await DelegateXClientService.updateDelegateXAccount(updatePayload);
+			data = result.data;
+			error = result.error;
+		} else {
+			const result = await DelegateXClientService.createDelegateXAccount({
+				strategyId: selectedStrategy,
+				contactLink: contact,
+				signatureLink: signature || '',
+				includeComment: includeComment || false,
+				votingPower: votingPower || new BN(0).toString()
+			});
+			data = result.data;
+			error = result.error;
+		}
+
 		if (error || !data) {
 			setIsLoading(false);
 			throw new ClientError(ERROR_CODES.CLIENT_ERROR, ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
@@ -224,6 +257,8 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 								strategies={defaultStrategies}
 								onStrategySelect={setSelectedStrategy}
 								isEditMode={currentEditMode}
+								onSubmit={handleComplete}
+								isLoading={isLoading}
 							/>
 						)}
 
@@ -243,6 +278,8 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 								isEditMode={currentEditMode}
 								votingPower={votingPower}
 								onVotingPowerChange={setVotingPower}
+								onSubmit={handleComplete}
+								isLoading={isLoading}
 							/>
 						)}
 
