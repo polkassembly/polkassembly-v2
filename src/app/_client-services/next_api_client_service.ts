@@ -1502,14 +1502,20 @@ export class NextApiClientService {
 		strategyId,
 		contactLink,
 		signatureLink,
-		includeComment
+		includeComment,
+		votingPower
 	}: {
 		strategyId: string;
 		contactLink: string;
 		signatureLink: string;
 		includeComment: boolean;
+		votingPower: string;
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_DELEGATE_X_BOT });
-		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount }>({ url, method, data: { strategyId, contactLink, signatureLink, includeComment } });
+		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount }>({
+			url,
+			method,
+			data: { strategyId, contactLink, signatureLink, includeComment, votingPower }
+		});
 	}
 }

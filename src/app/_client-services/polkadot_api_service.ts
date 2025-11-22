@@ -1796,8 +1796,10 @@ export class PolkadotApiService {
 		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 	}) {
 		if (!this.api) return;
+
+		await this.api.isReady;
 		// 5 DOT fee
-		const feeTx = this.api.tx.balances.transfer(delegateAddress, new BN(5000000000000000000));
+		const feeTx = this.api.tx.balances.transfer(delegateAddress, '5000000000000000000');
 		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, delegateAddress, conviction, balance));
 		txs.push(feeTx);
 

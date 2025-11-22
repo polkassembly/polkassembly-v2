@@ -41,7 +41,8 @@ import {
 	IOffChainPollPayload,
 	IBeneficiary,
 	EAssets,
-	IDelegateXAccount
+	IDelegateXAccount,
+	IDelegateXVoteData
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -1027,7 +1028,8 @@ export class OffChainDbService {
 		nonce,
 		userId,
 		network,
-		includeComment
+		includeComment,
+		votingPower
 	}: {
 		address: string;
 		encryptedMnemonic: string;
@@ -1035,6 +1037,7 @@ export class OffChainDbService {
 		userId: number;
 		network: ENetwork;
 		includeComment: boolean;
+		votingPower: string;
 	}) {
 		// check if account already exists
 		const existingAccount = await FirestoreService.GetDelegateXAccountByUserId({ userId, network });
@@ -1051,7 +1054,8 @@ export class OffChainDbService {
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			network,
-			includeComment
+			includeComment,
+			votingPower
 		};
 		console.log('delegateXAccount', delegateXAccount);
 		await FirestoreService.CreateDelegateXAccount(delegateXAccount);
@@ -1070,7 +1074,8 @@ export class OffChainDbService {
 		decision,
 		reason,
 		comment,
-		proposalType
+		proposalType,
+		votingPower
 	}: {
 		delegateXAccountId: string;
 		proposalId: string;
@@ -1079,7 +1084,28 @@ export class OffChainDbService {
 		reason: string[];
 		comment: string;
 		proposalType: EProposalType;
+		votingPower: string;
 	}) {
-		return FirestoreService.CreateVote({ delegateXAccountId, proposalId, hash, decision, reason, comment, proposalType });
+		return FirestoreService.CreateVote({ delegateXAccountId, proposalId, hash, decision, reason, comment, proposalType, votingPower });
+	}
+
+	static async GetVoteDataByDelegateXAccountId({
+		delegateXAccountId,
+		page,
+		limit
+	}: {
+		delegateXAccountId: string;
+		page: number;
+		limit: number;
+	}): Promise<{ votes: IDelegateXVoteData[]; totalCount: number } | null> {
+		return FirestoreService.GetVoteDataByDelegateXAccountId({ delegateXAccountId, page, limit });
+	}
+
+	static async GetDelegateXVotesMatrixByDelegateXAccountId({
+		delegateXAccountId
+	}: {
+		delegateXAccountId: string;
+	}): Promise<{ totalCount: number; yesCount: number; noCount: number; abstainCount: number; votingPower: string }> {
+		return FirestoreService.GetDelegateXVotesMatrixByDelegateXAccountId({ delegateXAccountId });
 	}
 }

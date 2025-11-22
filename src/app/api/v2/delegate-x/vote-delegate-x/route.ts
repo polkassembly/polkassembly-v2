@@ -47,7 +47,12 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 
 	const hash = await DelegateXService.voteOnProposal(delegateXAccount, proposalId, decision);
 	const delegateXAccountId = `${delegateXAccount.userId}-${delegateXAccount.network}-${delegateXAccount.address}`;
-	const vote = await DelegateXService.saveVote(delegateXAccountId, proposalId, hash, decision, reason, comment, EProposalType.REFERENDUM_V2);
+	// get voting power from delegatex account
+	const { votingPower } = delegateXAccount;
+	if (!votingPower) {
+		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to get voting power');
+	}
+	const vote = await DelegateXService.saveVote(delegateXAccountId, proposalId, hash, decision, reason, comment, EProposalType.REFERENDUM_V2, votingPower);
 	if (!vote) {
 		throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to save vote');
 	}

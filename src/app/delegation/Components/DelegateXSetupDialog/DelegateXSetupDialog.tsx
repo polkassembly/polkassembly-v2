@@ -70,20 +70,13 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	}, [open, isEditMode, initialStep, currentEditMode, isEditingFromDialog]);
 
 	const handleComplete = async () => {
-		if (currentEditMode) {
-			setCurrentEditMode(false);
-			onOpenChange(false);
-		} else {
-			onOpenChange(false);
-			setOpenSuccess(true);
-		}
-
 		// call api to create delegate x account
 		const { data, error } = await DelegateXClientService.createDelegateXAccount({
 			strategyId: selectedStrategy,
 			contactLink: contact,
 			signatureLink: signature || '',
-			includeComment: includeComment || false
+			includeComment: includeComment || false,
+			votingPower: new BN(0).toString()
 		});
 		if (error || !data) {
 			throw new ClientError(ERROR_CODES.CLIENT_ERROR, ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
@@ -123,6 +116,13 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 				});
 			}
 		});
+		if (currentEditMode) {
+			setCurrentEditMode(false);
+			onOpenChange(false);
+		} else {
+			onOpenChange(false);
+			setOpenSuccess(true);
+		}
 	};
 
 	const handleDialogClose = (isOpen: boolean) => {

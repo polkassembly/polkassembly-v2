@@ -21,11 +21,12 @@ const zodParamsSchema = z.object({
 	strategyId: z.string().min(1, 'Strategy ID is required'),
 	contactLink: z.string().optional(),
 	signatureLink: z.string().optional(),
-	includeComment: z.boolean().optional()
+	includeComment: z.boolean().optional(),
+	votingPower: z.string()
 });
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
-	const { strategyId, contactLink, signatureLink, includeComment = false } = zodParamsSchema.parse(await getReqBody(req));
+	const { strategyId, contactLink, signatureLink, includeComment = false, votingPower } = zodParamsSchema.parse(await getReqBody(req));
 
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
@@ -52,17 +53,14 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	const secretKey = blake2AsU8a(stringToU8a(secret), 256);
 	const { encrypted, nonce } = naclEncrypt(stringToU8a(mnemonic), secretKey);
 
-	console.log('encrypted', encrypted);
-	console.log('nonce', nonce);
-	console.log('secretKey', secretKey);
-
 	const delegateXAccount = await OffChainDbService.CreateDelegateXAccount({
 		address,
 		encryptedMnemonic: u8aToString(encrypted),
 		nonce: u8aToString(nonce),
 		userId: Number(userId),
 		network,
-		includeComment
+		includeComment,
+		votingPower
 	});
 
 	// create DelegateX Bot (disabled for now)
@@ -73,4 +71,36 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	response.headers.append('Set-Cookie', await AuthService.GetAccessTokenCookie(newAccessToken));
 	response.headers.append('Set-Cookie', await AuthService.GetRefreshTokenCookie(newRefreshToken));
 	return response;
+});
+
+// Get DelegateX Account by user id
+export const GET = withErrorHandling(async () => {
+	const network = await getNetworkFromHeaders();
+	const { newAccessToken } = await AuthService.ValidateAuthAndRefreshTokens();
+	if (!newAccessToken) {
+		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Unauthorized');
+	}
+	const userId = AuthService.GetUserIdFromAccessToken(newAccessToken);
+	if (!userId) {
+		throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED, 'Unauthorized');
+	}
+
+	const delegateXAccount = await OffChainDbService.GetDelegateXAccountByUserId({ userId, network });
+	if (!delegateXAccount) {
+		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'DelegateX account not found');
+	}
+
+	// get the vote data for the delegatex account
+	const voteData = await OffChainDbService.GetDelegateXVotesMatrixByDelegateXAccountId({
+		delegateXAccountId: `${delegateXAccount.userId}-${delegateXAccount.network}-${delegateXAccount.address}`
+	});
+	if (!voteData) {
+		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Vote data not found');
+	}
+
+	return NextResponse.json({
+		success: true,
+		delegateXAccount,
+		...voteData
+	});
 });

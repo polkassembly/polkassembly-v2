@@ -1699,4 +1699,19 @@ export interface IDelegateXAccount {
 	updatedAt: Date;
 	includeComment: boolean;
 	network: ENetwork;
+	votingPower: string;
+}
+
+export interface IDelegateXVoteData {
+	delegateXAccountId: string;
+	proposalId: string;
+	hash: string;
+	decision: number;
+	reason: string[];
+	comment?: string;
+	proposalType: EProposalType;
+	createdAt: Date;
+	updatedAt: Date;
+	votingPower: string;
+	conviction: EConvictionAmount;
 }

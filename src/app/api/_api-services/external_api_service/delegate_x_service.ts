@@ -119,10 +119,11 @@ export class DelegateXService {
 		decision: number,
 		reason: string[],
 		comment: string,
-		proposalType: EProposalType
+		proposalType: EProposalType,
+		votingPower: string
 	): Promise<unknown> {
 		try {
-			return await OffChainDbService.CreateVote({ delegateXAccountId, proposalId, hash, decision, reason, comment, proposalType });
+			return await OffChainDbService.CreateVote({ delegateXAccountId, proposalId, hash, decision, reason, comment, proposalType, votingPower });
 		} catch (error) {
 			console.error('Error saving vote:', error);
 			throw error;

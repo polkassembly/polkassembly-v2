@@ -43,7 +43,8 @@ import {
 	EPollVotesType,
 	IOffChainPollPayload,
 	ICommentHistoryItem,
-	IDelegateXAccount
+	IDelegateXAccount,
+	IDelegateXVoteData
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -1901,7 +1902,8 @@ export class FirestoreService extends FirestoreUtils {
 		decision,
 		reason,
 		proposalType,
-		comment
+		comment,
+		votingPower
 	}: {
 		delegateXAccountId: string;
 		proposalId: string;
@@ -1910,20 +1912,93 @@ export class FirestoreService extends FirestoreUtils {
 		reason: string[];
 		comment: string;
 		proposalType: EProposalType;
+		votingPower: string;
 	}) {
 		const voteDoc = this.delegateXVotesCollectionRef().doc();
-		const delegateXVote = {
+		const delegateXVote: IDelegateXVoteData = {
 			delegateXAccountId,
 			proposalId,
 			hash,
 			proposalType,
 			decision,
+			votingPower,
 			reason,
 			comment,
+			conviction: EConvictionAmount.ZERO,
 			createdAt: new Date(),
 			updatedAt: new Date()
 		};
 		await voteDoc.set(delegateXVote, { merge: true });
 		return delegateXVote;
+	}
+
+	static async GetVoteDataByDelegateXAccountId({
+		delegateXAccountId,
+		page,
+		limit
+	}: {
+		delegateXAccountId: string;
+		page: number;
+		limit: number;
+	}): Promise<{ votes: IDelegateXVoteData[]; totalCount: number } | null> {
+		const voteDoc = await this.delegateXVotesCollectionRef()
+			.where('delegateXAccountId', '==', delegateXAccountId)
+			.orderBy('createdAt', 'desc')
+			.limit(limit)
+			.offset((page - 1) * limit)
+			.get();
+
+		if (voteDoc.empty) {
+			return { votes: [], totalCount: 0 };
+		}
+
+		// get the total count of votes
+		const totalCount = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).count().get();
+		const totalCountData = totalCount.data();
+		const totalCountValue = totalCountData.count;
+
+		return {
+			votes: voteDoc.docs.map((doc) => doc.data() as IDelegateXVoteData).filter((vote): vote is IDelegateXVoteData => vote !== null) as IDelegateXVoteData[],
+			totalCount: totalCountValue
+		} as unknown as { votes: IDelegateXVoteData[]; totalCount: number };
+	}
+
+	static async GetDelegateXVotesMatrixByDelegateXAccountId({
+		delegateXAccountId
+	}: {
+		delegateXAccountId: string;
+	}): Promise<{ totalCount: number; yesCount: number; noCount: number; abstainCount: number; votingPower: string }> {
+		// get the total count of votes
+		const totalCount = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).count().get();
+		const totalCountData = totalCount.data();
+		const totalCountValue = totalCountData.count;
+
+		// get All the votes with decision of 1 and count the total count of votes
+		const yesCount = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).where('decision', '==', 1).count().get();
+		const yesCountData = yesCount.data();
+		const yesCountValue = yesCountData.count;
+
+		// get All the votes with decision of 0 and count the total count of votes
+		const noCount = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).where('decision', '==', 0).count().get();
+		const noCountData = noCount.data();
+		const noCountValue = noCountData.count;
+
+		// get All the votes with decision of abstain and count the total count of votes
+		const abstainCount = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).where('decision', '==', 2).count().get();
+		const abstainCountData = abstainCount.data();
+		const abstainCountValue = abstainCountData.count;
+
+		// get a single vote with decision of 1 and return the voting power
+		const yesVote = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).where('decision', '==', 1).limit(1).get();
+		const yesVoteData = yesVote.docs[0].data() as IDelegateXVoteData;
+		const yesVoteValue = yesVoteData.votingPower;
+
+		return {
+			totalCount: totalCountValue,
+			yesCount: yesCountValue,
+			noCount: noCountValue,
+			abstainCount: abstainCountValue,
+			votingPower: yesVoteValue
+		} as { totalCount: number; yesCount: number; noCount: number; abstainCount: number; votingPower: string };
 	}
 }
