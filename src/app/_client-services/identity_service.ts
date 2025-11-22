@@ -612,8 +612,6 @@ export class IdentityService {
 	}
 
 	async getAllIdentityJudgements(): Promise<IJudgementRequest[]> {
-		console.log('Getting identity judgements for network:', this.network);
-
 		try {
 			const registrars = await this.getRegistrars();
 			const judgements: IJudgementRequest[] = [];
@@ -636,7 +634,7 @@ export class IdentityService {
 					const registrarIndexNum = Number(registrarIndex);
 
 					if (registrarIndexNum >= 0 && registrarIndexNum < registrars.length) {
-						const registrar = registrars[registrarIndexNum];
+						const registrar = registrars[`${registrarIndexNum}`];
 						const status = mapJudgementStatus(judgementData);
 
 						const displayRaw = identity.display?.Raw ?? identity.display;
@@ -667,49 +665,5 @@ export class IdentityService {
 			console.error('Error fetching identity judgements:', error);
 			return [];
 		}
-	}
-
-	async becomeRegistrar({
-		address,
-		wallet,
-		setVaultQrState,
-		selectedAccount,
-		onSuccess,
-		onFailed
-	}: {
-		address: string;
-		wallet: EWallet;
-		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
-		selectedAccount?: ISelectedAccount;
-		onSuccess?: () => void;
-		onFailed?: (errorMessageFallback?: string) => void;
-	}) {
-		const encodedAddress = getEncodedAddress(address, this.network) || address;
-
-		const registrars = await this.getRegistrars();
-		const isAlreadyRegistrar = registrars.some((r) => r.account === encodedAddress);
-
-		if (isAlreadyRegistrar) {
-			onFailed?.('Address is already a registrar');
-			return;
-		}
-
-		const becomeRegistrarTx = this.peopleChainApi.tx.identity.addRegistrar(encodedAddress);
-
-		await this.executeTx({
-			tx: becomeRegistrarTx,
-			address: encodedAddress,
-			wallet,
-			setVaultQrState,
-			selectedAccount,
-			errorMessageFallback: 'Failed to become registrar',
-			waitTillFinalizedHash: true,
-			onSuccess: () => {
-				onSuccess?.();
-			},
-			onFailed: (errorMessageFallback: string) => {
-				onFailed?.(errorMessageFallback);
-			}
-		});
 	}
 }
