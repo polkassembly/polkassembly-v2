@@ -34,9 +34,9 @@ function RegistrarsListingTable() {
 		enabled: !!identityService
 	});
 
-	if (isLoading) {
+	if (isLoading || !identityService) {
 		return (
-			<div className='flex flex-col gap-4'>
+			<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
 				<Skeleton className='h-12 w-full' />
 				<Skeleton className='h-12 w-full' />
 				<Skeleton className='h-12 w-full' />
