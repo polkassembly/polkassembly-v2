@@ -6,6 +6,18 @@ import { memo, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Dialog, DialogContent } from '@/app/_shared-components/Dialog/Dialog';
 import Klara from '@assets/delegation/klara/klara.svg';
+import { DelegateXClientService } from '@/app/_client-services/delegate_x_client_service';
+import { ClientError } from '@/app/_client-utils/clientError';
+import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
+import { BN } from '@polkadot/util';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { ENotificationStatus, EPostOrigin, EWallet } from '@/_shared/types';
+import { useToast } from '@/hooks/useToast';
+import { useTranslations } from 'next-intl';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import DelegateXSuccessDialog from './DelegateXSuccessDialog';
 import EditDelegateXDialog from './EditDelegateXDialog';
 import WelcomeStep from './components/WelcomeStep';
@@ -32,6 +44,8 @@ interface DelegateXSetupDialogProps {
 
 function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialStep = 1, initialData = {} }: DelegateXSetupDialogProps) {
 	const [step, setStep] = useState<number>(initialStep);
+	const { apiService } = usePolkadotApiService();
+	const { setVaultQrState } = usePolkadotVault();
 	const [signature, setSignature] = useState(initialData.signature || '');
 	const [contact, setContact] = useState(initialData.contact || '');
 	const [persona, setPersona] = useState<string>(initialData.persona || '');
@@ -42,7 +56,9 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	const [personaTab, setPersonaTab] = useState<'prompt' | 'preview'>('prompt');
 	const [currentEditMode, setCurrentEditMode] = useState(isEditMode);
 	const [isEditingFromDialog, setIsEditingFromDialog] = useState(false);
-
+	const { userPreferences } = useUserPreferences();
+	const { toast } = useToast();
+	const t = useTranslations();
 	useEffect(() => {
 		if (open && isEditMode) {
 			setStep(initialStep);
@@ -53,7 +69,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 		}
 	}, [open, isEditMode, initialStep, currentEditMode, isEditingFromDialog]);
 
-	const handleComplete = () => {
+	const handleComplete = async () => {
 		if (currentEditMode) {
 			setCurrentEditMode(false);
 			onOpenChange(false);
@@ -61,6 +77,52 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 			onOpenChange(false);
 			setOpenSuccess(true);
 		}
+
+		// call api to create delegate x account
+		const { data, error } = await DelegateXClientService.createDelegateXAccount({
+			strategyId: selectedStrategy,
+			contactLink: contact,
+			signatureLink: signature || '',
+			includeComment: includeComment || false
+		});
+		if (error || !data) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+		}
+
+		if (!data?.success) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
+		}
+
+		const { delegateXAccount } = data;
+
+		const { address } = delegateXAccount;
+		console.log('delegateXAccount', delegateXAccount);
+		// delegate user voting to the address
+		await apiService?.delegateForDelegateX({
+			address: userPreferences.selectedAccount?.address || '',
+			wallet: userPreferences.wallet as EWallet,
+			setVaultQrState,
+			delegateAddress: address,
+			balance: new BN(0), // change later after adding balance, now we are not adding any balance
+			conviction: 0,
+			tracks: Object.keys(NETWORKS_DETAILS[`${getCurrentNetwork()}`].trackDetails)
+				.map((track) => NETWORKS_DETAILS[`${getCurrentNetwork()}`].trackDetails[track as EPostOrigin]?.trackId)
+				.filter((id): id is number => id !== undefined),
+			onSuccess: () => {
+				toast({
+					title: t('delegateXCreatedSuccessfully'),
+					description: t('delegateXCreatedSuccessfullyDescription'),
+					status: ENotificationStatus.SUCCESS
+				});
+			},
+			onFailed: (error: string) => {
+				toast({
+					title: t('errorCreatingDelegateX'),
+					description: error,
+					status: ENotificationStatus.ERROR
+				});
+			}
+		});
 	};
 
 	const handleDialogClose = (isOpen: boolean) => {

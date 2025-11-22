@@ -738,6 +738,7 @@ export interface IComment {
 	history?: ICommentHistoryItem[];
 	disabled?: boolean;
 	authorAddress?: string;
+	isDelegateXVote?: boolean;
 }
 
 export interface ICommentResponse extends IComment {
@@ -1687,4 +1688,15 @@ export interface IChatResponse {
 	followUpQuestions?: string[];
 	isNewConversation?: boolean;
 	conversationId?: string;
+}
+
+export interface IDelegateXAccount {
+	address: string;
+	encryptedMnemonic: string;
+	nonce: string;
+	userId: number;
+	createdAt: Date;
+	updatedAt: Date;
+	includeComment: boolean;
+	network: ENetwork;
 }

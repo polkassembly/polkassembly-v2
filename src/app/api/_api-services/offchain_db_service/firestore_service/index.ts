@@ -42,7 +42,8 @@ import {
 	IPoll,
 	EPollVotesType,
 	IOffChainPollPayload,
-	ICommentHistoryItem
+	ICommentHistoryItem,
+	IDelegateXAccount
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -1028,7 +1029,8 @@ export class FirestoreService extends FirestoreUtils {
 		content,
 		parentCommentId,
 		sentiment,
-		authorAddress
+		authorAddress,
+		isDelegateXVote = false
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -1039,6 +1041,7 @@ export class FirestoreService extends FirestoreUtils {
 		address?: string;
 		sentiment?: ECommentSentiment;
 		authorAddress?: string;
+		isDelegateXVote?: boolean;
 	}) {
 		const newCommentId = this.commentsCollectionRef().doc().id;
 
@@ -1056,7 +1059,8 @@ export class FirestoreService extends FirestoreUtils {
 			parentCommentId: parentCommentId || null,
 			dataSource: EDataSource.POLKASSEMBLY,
 			...(sentiment && { sentiment }),
-			...(authorAddress && { authorAddress })
+			...(authorAddress && { authorAddress }),
+			...(isDelegateXVote && { isDelegateXVote })
 		};
 
 		await this.commentsCollectionRef().doc(newCommentId).set(newComment);
@@ -1870,5 +1874,56 @@ export class FirestoreService extends FirestoreUtils {
 				})
 				.filter((vote): vote is IPollVote => vote !== null);
 		});
+	}
+
+	static async GetDelegateXAccountByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<IDelegateXAccount | null> {
+		const delegateXAccountSnapshot = await this.delegateXAccountsCollectionRef().where('userId', '==', userId).where('network', '==', network).limit(1).get();
+
+		if (delegateXAccountSnapshot.docs.length) {
+			return delegateXAccountSnapshot.docs[0].data() as IDelegateXAccount;
+		}
+
+		return null;
+	}
+
+	static async CreateDelegateXAccount(delegateXAccount: IDelegateXAccount) {
+		console.log('delegateXAccount', delegateXAccount);
+		const id = `${delegateXAccount.userId}-${delegateXAccount.network}-${delegateXAccount.address}`;
+		console.log('id', id);
+		const delegateXAccountDoc = this.delegateXAccountsCollectionRef().doc(id);
+		await delegateXAccountDoc.set({ ...delegateXAccount }, { merge: true });
+	}
+
+	static async CreateVote({
+		delegateXAccountId,
+		proposalId,
+		hash,
+		decision,
+		reason,
+		proposalType,
+		comment
+	}: {
+		delegateXAccountId: string;
+		proposalId: string;
+		hash: string;
+		decision: number;
+		reason: string[];
+		comment: string;
+		proposalType: EProposalType;
+	}) {
+		const voteDoc = this.delegateXVotesCollectionRef().doc();
+		const delegateXVote = {
+			delegateXAccountId,
+			proposalId,
+			hash,
+			proposalType,
+			decision,
+			reason,
+			comment,
+			createdAt: new Date(),
+			updatedAt: new Date()
+		};
+		await voteDoc.set(delegateXVote, { merge: true });
+		return delegateXVote;
 	}
 }

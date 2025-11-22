@@ -66,6 +66,10 @@ export class FirestoreUtils {
 
 	protected static pollsCollectionRef = () => this.firestoreDb.collection('polls');
 
+	protected static delegateXAccountsCollectionRef = () => this.firestoreDb.collection('delegate_x_accounts');
+
+	protected static delegateXVotesCollectionRef = () => this.firestoreDb.collection('delegate_x_votes');
+
 	// klara collection references
 	protected static conversationsCollectionRef = () => this.firestoreDb.collection('klara_conversations');
 

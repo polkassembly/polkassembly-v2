@@ -63,7 +63,8 @@ import {
 	IGovAnalyticsDelegationStats,
 	IGovAnalyticsCategoryCounts,
 	IConversationHistory,
-	IConversationMessage
+	IConversationMessage,
+	IDelegateXAccount
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -164,7 +165,8 @@ enum EApiRoute {
 	GET_KLARA_STATS = 'GET_KLARA_STATS',
 	KLARA_SEND_FEEDBACK = 'KLARA_SEND_FEEDBACK',
 	KLARA_SEND_MESSAGE = 'KLARA_SEND_MESSAGE',
-	GET_GOOGLE_SHEET_NEWS = 'GET_GOOGLE_SHEET_NEWS'
+	GET_GOOGLE_SHEET_NEWS = 'GET_GOOGLE_SHEET_NEWS',
+	CREATE_DELEGATE_X_BOT = 'CREATE_DELEGATE_X_BOT'
 }
 
 export class NextApiClientService {
@@ -406,6 +408,11 @@ export class NextApiClientService {
 
 			case EApiRoute.GET_GOOGLE_SHEET_NEWS:
 				path = '/external/news/google-sheets';
+				break;
+
+			case EApiRoute.CREATE_DELEGATE_X_BOT:
+				path = '/delegate-x';
+				method = 'POST';
 				break;
 
 			default:
@@ -1489,5 +1496,20 @@ export class NextApiClientService {
 			url,
 			method
 		});
+	}
+
+	static async createDelegateXAccount({
+		strategyId,
+		contactLink,
+		signatureLink,
+		includeComment
+	}: {
+		strategyId: string;
+		contactLink: string;
+		signatureLink: string;
+		includeComment: boolean;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_DELEGATE_X_BOT });
+		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount }>({ url, method, data: { strategyId, contactLink, signatureLink, includeComment } });
 	}
 }

@@ -40,7 +40,8 @@ import {
 	IPostLink,
 	IOffChainPollPayload,
 	IBeneficiary,
-	EAssets
+	EAssets,
+	IDelegateXAccount
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -531,7 +532,8 @@ export class OffChainDbService {
 		content,
 		parentCommentId,
 		sentiment,
-		authorAddress
+		authorAddress,
+		isDelegateXVote = false
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -541,6 +543,7 @@ export class OffChainDbService {
 		parentCommentId?: string;
 		sentiment?: ECommentSentiment;
 		authorAddress?: string;
+		isDelegateXVote?: boolean;
 	}) {
 		// check if the post is allowed to be commented on
 		const post = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
@@ -549,7 +552,7 @@ export class OffChainDbService {
 		}
 		// TODO: implement on-chain check
 
-		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, sentiment, authorAddress });
+		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, sentiment, authorAddress, isDelegateXVote });
 
 		await this.saveUserActivity({
 			userId,
@@ -1016,5 +1019,67 @@ export class OffChainDbService {
 
 			return { ...beneficiary, usdAmount };
 		});
+	}
+
+	static async CreateDelegateXAccount({
+		address,
+		encryptedMnemonic,
+		nonce,
+		userId,
+		network,
+		includeComment
+	}: {
+		address: string;
+		encryptedMnemonic: string;
+		nonce: string;
+		userId: number;
+		network: ENetwork;
+		includeComment: boolean;
+	}) {
+		// check if account already exists
+		const existingAccount = await FirestoreService.GetDelegateXAccountByUserId({ userId, network });
+		if (existingAccount) {
+			console.log('delegateXAccount already exists');
+			return existingAccount;
+		}
+
+		const delegateXAccount: IDelegateXAccount = {
+			address,
+			encryptedMnemonic,
+			nonce,
+			userId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			network,
+			includeComment
+		};
+		console.log('delegateXAccount', delegateXAccount);
+		await FirestoreService.CreateDelegateXAccount(delegateXAccount);
+		console.log('delegateXAccount created');
+		return delegateXAccount;
+	}
+
+	static async GetDelegateXAccountByUserId({ userId, network }: { userId: number; network: ENetwork }) {
+		return FirestoreService.GetDelegateXAccountByUserId({ userId, network });
+	}
+
+	static async CreateVote({
+		delegateXAccountId,
+		proposalId,
+		hash,
+		decision,
+		reason,
+		comment,
+		proposalType
+	}: {
+		delegateXAccountId: string;
+		proposalId: string;
+		hash: string;
+		decision: number;
+		reason: string[];
+		comment: string;
+		proposalType: EProposalType;
+	}) {
+		return FirestoreService.CreateVote({ delegateXAccountId, proposalId, hash, decision, reason, comment, proposalType });
 	}
 }
