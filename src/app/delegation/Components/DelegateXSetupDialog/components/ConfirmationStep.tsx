@@ -15,9 +15,11 @@ interface ConfirmationStepProps {
 	selectedStrategy: string;
 	estimatedFee?: string;
 	isEditMode?: boolean;
+	votingPower?: string;
+	isLoading?: boolean;
 }
 
-function ConfirmationStep({ onConfirm, displayName, selectedStrategy, estimatedFee = '≈ 5 DOT', isEditMode = false }: ConfirmationStepProps) {
+function ConfirmationStep({ onConfirm, displayName, selectedStrategy, estimatedFee = '≈ 5 DOT', isEditMode = false, votingPower, isLoading }: ConfirmationStepProps) {
 	if (isEditMode) {
 		return null;
 	}
@@ -60,7 +62,15 @@ function ConfirmationStep({ onConfirm, displayName, selectedStrategy, estimatedF
 						</div>
 						<div className='flex flex-col gap-1 rounded-md bg-bg_modal px-3 py-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:py-2'>
 							<span className='text-text_secondary'>Personality Name:</span>
-							<span className='font-medium'>{displayName || 'Alice'}</span>
+							<span className='font-medium'>{displayName || '-'}</span>
+						</div>
+						<div className='flex flex-col gap-1 rounded-md bg-bg_modal px-3 py-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:py-2'>
+							<span className='text-text_secondary'>Voting Power:</span>
+							<span className='font-medium'>{votingPower}</span>
+						</div>
+						<div className='flex flex-col gap-1 rounded-md bg-bg_modal px-3 py-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:py-2'>
+							<span className='text-text_secondary'>Conviction:</span>
+							<span className='font-medium'>0.1x</span>
 						</div>
 						<div className='flex flex-col gap-1 rounded-md bg-bg_modal px-3 py-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:py-2'>
 							<span className='text-text_secondary'>Estimated Fee:</span>
@@ -72,6 +82,7 @@ function ConfirmationStep({ onConfirm, displayName, selectedStrategy, estimatedF
 
 			<div className='flex items-center justify-center sm:justify-end'>
 				<Button
+					isLoading={isLoading}
 					className='w-full px-5 sm:w-auto'
 					onClick={onConfirm}
 				>

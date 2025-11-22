@@ -18,6 +18,7 @@ import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { defaultStrategies } from '@/_shared/_constants/delegatexDefaultStrategies';
 import DelegateXSuccessDialog from './DelegateXSuccessDialog';
 import EditDelegateXDialog from './EditDelegateXDialog';
 import WelcomeStep from './components/WelcomeStep';
@@ -49,13 +50,15 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	const [signature, setSignature] = useState(initialData.signature || '');
 	const [contact, setContact] = useState(initialData.contact || '');
 	const [persona, setPersona] = useState<string>(initialData.persona || '');
-	const [selectedStrategy, setSelectedStrategy] = useState(initialData.selectedStrategy || 'strategy-1');
+	const [selectedStrategy, setSelectedStrategy] = useState(initialData.selectedStrategy || '');
 	const [openSuccess, setOpenSuccess] = useState(false);
 	const [openEdit, setOpenEdit] = useState(false);
 	const [includeComment, setIncludeComment] = useState(initialData.includeComment ?? true);
 	const [personaTab, setPersonaTab] = useState<'prompt' | 'preview'>('prompt');
 	const [currentEditMode, setCurrentEditMode] = useState(isEditMode);
 	const [isEditingFromDialog, setIsEditingFromDialog] = useState(false);
+	const [votingPower, setVotingPower] = useState<string>('');
+	const [isLoading, setIsLoading] = useState(false);
 	const { userPreferences } = useUserPreferences();
 	const { toast } = useToast();
 	const t = useTranslations();
@@ -70,13 +73,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	}, [open, isEditMode, initialStep, currentEditMode, isEditingFromDialog]);
 
 	const handleComplete = async () => {
-		if (currentEditMode) {
-			setCurrentEditMode(false);
-			onOpenChange(false);
-		} else {
-			onOpenChange(false);
-			setOpenSuccess(true);
-		}
+		setIsLoading(true);
 
 		// call api to create delegate x account
 		const { data, error } = await DelegateXClientService.createDelegateXAccount({
@@ -86,10 +83,12 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 			includeComment: includeComment || false
 		});
 		if (error || !data) {
+			setIsLoading(false);
 			throw new ClientError(ERROR_CODES.CLIENT_ERROR, ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 		}
 
 		if (!data?.success) {
+			setIsLoading(false);
 			throw new ClientError(ERROR_CODES.CLIENT_ERROR, ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
 		}
 
@@ -103,12 +102,20 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 			wallet: userPreferences.wallet as EWallet,
 			setVaultQrState,
 			delegateAddress: address,
-			balance: new BN(0), // change later after adding balance, now we are not adding any balance
+			balance: new BN(votingPower || 0),
 			conviction: 0,
 			tracks: Object.keys(NETWORKS_DETAILS[`${getCurrentNetwork()}`].trackDetails)
 				.map((track) => NETWORKS_DETAILS[`${getCurrentNetwork()}`].trackDetails[track as EPostOrigin]?.trackId)
 				.filter((id): id is number => id !== undefined),
 			onSuccess: () => {
+				setIsLoading(false);
+				if (currentEditMode) {
+					setCurrentEditMode(false);
+					onOpenChange(false);
+				} else {
+					onOpenChange(false);
+					setOpenSuccess(true);
+				}
 				toast({
 					title: t('delegateXCreatedSuccessfully'),
 					description: t('delegateXCreatedSuccessfullyDescription'),
@@ -116,6 +123,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 				});
 			},
 			onFailed: (error: string) => {
+				setIsLoading(false);
 				toast({
 					title: t('errorCreatingDelegateX'),
 					description: error,
@@ -193,6 +201,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 							<VotingStrategyStep
 								onNext={() => setStep(4)}
 								selectedStrategy={selectedStrategy}
+								strategies={defaultStrategies}
 								onStrategySelect={setSelectedStrategy}
 								isEditMode={currentEditMode}
 							/>
@@ -212,15 +221,19 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 								personaTab={personaTab}
 								onPersonaTabChange={setPersonaTab}
 								isEditMode={currentEditMode}
+								votingPower={votingPower}
+								onVotingPowerChange={setVotingPower}
 							/>
 						)}
 
 						{step === 5 && (
 							<ConfirmationStep
 								onConfirm={handleComplete}
-								displayName={initialData.displayName || ''}
+								displayName={signature || initialData.displayName || ''}
 								selectedStrategy={selectedStrategy}
 								isEditMode={currentEditMode}
+								votingPower={votingPower}
+								isLoading={isLoading}
 							/>
 						)}
 					</div>

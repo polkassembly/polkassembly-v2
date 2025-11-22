@@ -1700,3 +1700,17 @@ export interface IDelegateXAccount {
 	includeComment: boolean;
 	network: ENetwork;
 }
+
+export interface VotingStrategy {
+	id: string;
+	name: string;
+	description: string;
+	icon: string;
+	tags: string[];
+	logic: string;
+	weights: {
+		balthazar: number;
+		caspar: number;
+		melchior: number;
+	};
+}
