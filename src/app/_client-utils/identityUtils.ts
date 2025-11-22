@@ -119,7 +119,8 @@ export function getRegistrarsWithStats({
 			);
 		}
 
-		return filteredRegistrars.map((registrar, index) => {
+		return filteredRegistrars.map((registrar) => {
+			const index = registrars.indexOf(registrar);
 			const registrarJudgements = judgements.filter((j) => Number(j?.registrarIndex) === index);
 			const totalReceivedRequests = registrarJudgements.length;
 			const totalJudgementsGiven = registrarJudgements.filter((j) => j.status === EJudgementStatus.APPROVED || j.status === EJudgementStatus.REJECTED).length;
