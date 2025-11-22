@@ -24,6 +24,8 @@ interface PersonalityStepProps {
 	personaTab: 'prompt' | 'preview';
 	onPersonaTabChange: (tab: 'prompt' | 'preview') => void;
 	isEditMode?: boolean;
+	votingPower?: string;
+	onVotingPowerChange?: (value: string) => void;
 }
 
 function PersonalityStep({
@@ -38,11 +40,22 @@ function PersonalityStep({
 	onIncludeCommentChange,
 	personaTab,
 	onPersonaTabChange,
-	isEditMode = false
+	isEditMode = false,
+	votingPower,
+	onVotingPowerChange
 }: PersonalityStepProps) {
 	return (
 		<div className='space-y-4'>
 			<div className='rounded-lg bg-delegation_bgcard p-4 sm:p-6'>
+				<div className='mb-4'>
+					<p className='mb-2 block text-[10px] font-medium md:text-sm'>Enter the voting power of your delegation</p>
+					<input
+						className='placeholder:text-text_secondary w-full rounded-md border border-border_grey bg-bg_modal px-3 py-2 text-sm outline-none'
+						placeholder='Enter voting power'
+						value={votingPower}
+						onChange={(e) => onVotingPowerChange?.(e.target.value)}
+					/>
+				</div>
 				<div className='text-text_primary'>
 					<div className='flex gap-3 sm:gap-2'>
 						<Switch
@@ -167,6 +180,7 @@ function PersonalityStep({
 			</div>
 			<div className='flex items-center justify-center sm:justify-end'>
 				<Button
+					disabled={!votingPower}
 					className='w-full bg-text_pink px-5 text-white hover:bg-pink-600 sm:w-auto'
 					onClick={onNext}
 				>
