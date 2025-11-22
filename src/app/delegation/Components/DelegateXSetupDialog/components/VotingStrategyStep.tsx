@@ -172,8 +172,9 @@ function VotingStrategyStep({ onNext, selectedStrategy, onStrategySelect, strate
 
 			<div className='flex items-center justify-center sm:justify-end'>
 				<Button
-					className='w-full bg-text_pink px-5 text-white hover:bg-pink-600 sm:w-auto'
+					className={`w-full px-5 text-white sm:w-auto ${!selectedStrategy ? 'cursor-not-allowed bg-gray-400' : 'bg-text_pink hover:bg-pink-600'}`}
 					onClick={onNext}
+					disabled={!selectedStrategy}
 				>
 					{isEditMode ? 'Update Strategy' : 'Set Personality'} <ArrowRight className='ml-2 h-4 w-4' />
 				</Button>
