@@ -5,6 +5,7 @@
 'use client';
 
 import { IJudgementRequest } from '@/_shared/types';
+import { useMemo } from 'react';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -25,15 +26,20 @@ function JudgementListingTable() {
 	const t = useTranslations('Judgements');
 	const { identityService } = useIdentityService();
 
-	const { data, isLoading } = useQuery({
-		queryKey: ['judgementRequests', page, search, identityService],
+	const { data: allJudgements, isLoading } = useQuery({
+		queryKey: ['allJudgementRequests', identityService],
 		queryFn: async () => {
-			if (!identityService) return { items: [], totalCount: 0 };
-			const allJudgements = await identityService.getAllIdentityJudgements();
-			return getJudgementRequests({ allJudgements, page, limit: DEFAULT_LISTING_LIMIT, search });
+			if (!identityService) return [];
+			return identityService.getAllIdentityJudgements();
 		},
-		enabled: !!identityService
+		enabled: !!identityService,
+		staleTime: 60000
 	});
+
+	const data = useMemo(() => {
+		if (!allJudgements) return { items: [], totalCount: 0 };
+		return getJudgementRequests({ allJudgements, page, limit: DEFAULT_LISTING_LIMIT, search });
+	}, [allJudgements, page, search]);
 
 	const judgementData = data?.items || [];
 	const totalCount = data?.totalCount || 0;

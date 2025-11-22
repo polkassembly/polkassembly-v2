@@ -5,6 +5,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { useMemo } from 'react';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useIdentityService } from '@/hooks/useIdentityService';
@@ -23,16 +24,22 @@ function RegistrarsListingTable() {
 	const searchParams = useSearchParams();
 	const search = searchParams?.get('registrarSearch') || '';
 
-	const { data: registrars, isLoading } = useQuery({
-		queryKey: ['registrars', search, identityService],
+	const { data: allRegistrarsData, isLoading } = useQuery({
+		queryKey: ['allRegistrarsData', identityService],
 		queryFn: async () => {
-			if (!identityService) return [];
+			if (!identityService) return { registrars: [], judgements: [] };
 			const registrarsData = await identityService.getRegistrars();
 			const judgements = await identityService.getAllIdentityJudgements();
-			return getRegistrarsWithStats({ registrars: registrarsData, judgements, search });
+			return { registrars: registrarsData, judgements };
 		},
-		enabled: !!identityService
+		enabled: !!identityService,
+		staleTime: 60000
 	});
+
+	const registrars = useMemo(() => {
+		if (!allRegistrarsData?.registrars) return [];
+		return getRegistrarsWithStats({ registrars: allRegistrarsData.registrars, judgements: allRegistrarsData.judgements, search });
+	}, [allRegistrarsData, search]);
 
 	if (isLoading || !identityService) {
 		return (
