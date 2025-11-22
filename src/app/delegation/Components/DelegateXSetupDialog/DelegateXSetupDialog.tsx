@@ -82,7 +82,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 			setIncludeComment(true);
 			setVotingPower('');
 		}
-	}, [open, isEditMode, initialStep, currentEditMode, isEditingFromDialog, initialData]);
+	}, [open, isEditMode, initialStep, currentEditMode, isEditingFromDialog]);
 
 	const handleComplete = async () => {
 		setIsLoading(true);
