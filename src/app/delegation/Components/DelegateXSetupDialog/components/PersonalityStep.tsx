@@ -180,6 +180,7 @@ function PersonalityStep({
 			</div>
 			<div className='flex items-center justify-center sm:justify-end'>
 				<Button
+					disabled={!votingPower}
 					className='w-full bg-text_pink px-5 text-white hover:bg-pink-600 sm:w-auto'
 					onClick={onNext}
 				>
