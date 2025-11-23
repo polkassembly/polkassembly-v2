@@ -34,3 +34,7 @@ export const {
 export const IS_CACHE_ENABLED = process.env.IS_CACHE_ENABLED === 'true';
 export const IS_AI_ENABLED = process.env.IS_AI_ENABLED === 'true';
 export const IS_NOTIFICATION_SERVICE_ENABLED = process.env.IS_NOTIFICATION_SERVICE_ENABLED === 'true';
+
+if (!KUSAMA_ASSETHUB_UNIFIED_SQUID_URL) {
+	throw new Error('KUSAMA_ASSETHUB_UNIFIED_SQUID_URL is not set in the environment variables');
+}

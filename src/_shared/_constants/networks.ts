@@ -26,10 +26,6 @@ import MYTHIcon from '@/_assets/icons/myth.svg';
 import DEDIcon from '@/_assets/icons/ded.png';
 import { KUSAMA_ASSETHUB_UNIFIED_SQUID_URL } from '@/app/api/_api-constants/apiEnvVars';
 
-if (!KUSAMA_ASSETHUB_UNIFIED_SQUID_URL) {
-	throw new Error('KUSAMA_ASSETHUB_UNIFIED_SQUID_URL is not set in the environment variables');
-}
-
 interface ISocialLink {
 	id: string;
 	icon: IconType;
