@@ -40,6 +40,7 @@ interface IDelegateXCardProps {
 		totalDelegators: number;
 	};
 	delegateXAccount: IDelegateXAccount | null;
+	onRefresh?: (delegateXAccount: IDelegateXAccount) => void;
 }
 
 function DelegateXStats({ data, networkSymbol, isBotSetup }: { data: IDelegateXCardProps['data']; networkSymbol: string; isBotSetup: boolean }) {
@@ -127,7 +128,7 @@ function DelegateXStats({ data, networkSymbol, isBotSetup }: { data: IDelegateXC
 	);
 }
 
-const DelegateXCard = memo(({ data, delegateXAccount }: IDelegateXCardProps) => {
+const DelegateXCard = memo(({ data, delegateXAccount, onRefresh }: IDelegateXCardProps) => {
 	const { user } = useUser();
 	const t = useTranslations('Delegation');
 	const currentNetwork = getCurrentNetwork();
@@ -213,6 +214,7 @@ const DelegateXCard = memo(({ data, delegateXAccount }: IDelegateXCardProps) => 
 									isEditMode={isEditMode}
 									initialStep={editStep}
 									networkSymbol={network?.tokenSymbol}
+									onSuccess={onRefresh}
 									initialData={
 										delegateXAccount
 											? {

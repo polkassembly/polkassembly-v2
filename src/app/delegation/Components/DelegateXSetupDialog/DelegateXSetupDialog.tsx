@@ -11,7 +11,7 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { BN } from '@polkadot/util';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { EConvictionAmount, ENotificationStatus, EPostOrigin, EWallet } from '@/_shared/types';
+import { EConvictionAmount, ENotificationStatus, EPostOrigin, EWallet, IDelegateXAccount } from '@/_shared/types';
 import { useToast } from '@/hooks/useToast';
 import { useTranslations } from 'next-intl';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -44,9 +44,10 @@ interface DelegateXSetupDialogProps {
 		votingPower?: string;
 	};
 	networkSymbol?: string;
+	onSuccess?: (delegateXAccount: IDelegateXAccount) => void;
 }
 
-function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialStep = 1, initialData = {}, networkSymbol }: DelegateXSetupDialogProps) {
+function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialStep = 1, initialData = {}, networkSymbol, onSuccess }: DelegateXSetupDialogProps) {
 	const [step, setStep] = useState<number>(initialStep);
 	const { apiService } = usePolkadotApiService();
 	const { setVaultQrState } = usePolkadotVault();
@@ -143,7 +144,6 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 		const { delegateXAccount } = data;
 
 		const { address } = delegateXAccount;
-		console.log('delegateXAccount', delegateXAccount);
 		// delegate user voting to the address
 		await apiService?.delegateForDelegateX({
 			address: userPreferences.selectedAccount?.address || '',
@@ -169,6 +169,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 					description: t('delegateXCreatedSuccessfullyDescription'),
 					status: ENotificationStatus.SUCCESS
 				});
+				onSuccess?.(delegateXAccount);
 			},
 			onFailed: (error: string) => {
 				setIsLoading(false);

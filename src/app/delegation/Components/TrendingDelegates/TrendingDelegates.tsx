@@ -97,36 +97,53 @@ function TrendingDelegates() {
 	const [delegateXData, setDelegateXData] = useState(defaultDelegateXData);
 	const [delegateXAccount, setDelegateXAccount] = useState<IDelegateXAccount | null>(null);
 
-	useEffect(() => {
+	const fetchDelegateXData = async () => {
 		if (!userPreferences.selectedAccount?.address) return;
-		(async () => {
-			const { data, error } = await DelegateXClientService.getDelegateXDetails();
-			if (error || !data) {
-				console.error('Error fetching delegate x details', error);
-				return;
-			}
 
-			if (data.success) {
-				setDelegateXData((prev) => ({
-					...prev,
-					totalVotesPast30Days: data.totalVotesPast30Days || 0,
-					totalVotingPower: data.totalVotingPower || '0',
-					totalDelegators: data.totalDelegators || 0,
-					...(data.delegateXAccount
-						? {
-								address: data.delegateXAccount.address,
-								votingPower: data.votingPower || '0',
-								ayeCount: data.yesCount || 0,
-								nayCount: data.noCount || 0,
-								abstainCount: data.abstainCount || 0,
-								votesPast30Days: data.votesPast30Days || 0
-							}
-						: {})
-				}));
+		const { data, error } = await DelegateXClientService.getDelegateXDetails();
+		if (error || !data) {
+			console.error('Error fetching delegate x details', error);
+			return;
+		}
 
-				setDelegateXAccount(data.delegateXAccount);
-			}
-		})();
+		if (data.success) {
+			setDelegateXData((prev) => ({
+				...prev,
+				totalVotesPast30Days: data.totalVotesPast30Days || 0,
+				totalVotingPower: data.totalVotingPower || '0',
+				totalDelegators: data.totalDelegators || 0,
+				...(data.delegateXAccount
+					? {
+							address: data.delegateXAccount.address,
+							votingPower: data.votingPower || '0',
+							ayeCount: data.yesCount || 0,
+							nayCount: data.noCount || 0,
+							abstainCount: data.abstainCount || 0,
+							votesPast30Days: data.votesPast30Days || 0
+						}
+					: {})
+			}));
+
+			setDelegateXAccount(data.delegateXAccount);
+		}
+	};
+
+	const handleDelegateXSuccess = (newAccount: IDelegateXAccount) => {
+		setDelegateXAccount(newAccount);
+		setDelegateXData((prev) => ({
+			...prev,
+			address: newAccount.address,
+			votingPower: newAccount.votingPower || '0',
+			ayeCount: 0,
+			nayCount: 0,
+			abstainCount: 0,
+			votesPast30Days: 0
+		}));
+		fetchDelegateXData();
+	};
+
+	useEffect(() => {
+		fetchDelegateXData();
 	}, [userPreferences.selectedAccount?.address]);
 
 	const searchInputRef = useRef<HTMLInputElement>(null);
@@ -229,6 +246,7 @@ function TrendingDelegates() {
 									<DelegateXCard
 										data={delegateXData}
 										delegateXAccount={delegateXAccount}
+										onRefresh={handleDelegateXSuccess}
 									/>
 								)}
 
