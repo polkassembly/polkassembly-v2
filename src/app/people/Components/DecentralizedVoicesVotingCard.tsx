@@ -160,7 +160,7 @@ function DecentralizedVoicesVotingCard() {
 	};
 
 	return (
-		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6 shadow-md'>
+		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
 			<div className='mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
 				<div>
 					<h2 className='text-2xl font-semibold text-navbar_title'>Decentralized Voices Voting</h2>

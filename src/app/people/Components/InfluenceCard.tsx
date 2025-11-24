@@ -71,7 +71,7 @@ const referendaData = [
 
 function InfluenceCard() {
 	return (
-		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6 shadow-md'>
+		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
 			<div className='mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
 				<div className='flex items-center gap-2'>
 					<Activity className='text-decision_bar_indicator' />

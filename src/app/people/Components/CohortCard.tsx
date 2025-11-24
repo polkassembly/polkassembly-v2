@@ -2,7 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { Activity, Filter } from 'lucide-react';
 import delegates from '@assets/delegation/delegates.svg';
 import delegatees from '@assets/delegation/delegatees.svg';
 import timer from '@assets/icons/timer.svg';
@@ -11,18 +10,8 @@ import Image from 'next/image';
 
 function CohortCard() {
 	return (
-		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6 shadow-md'>
-			<div className='flex items-center justify-between'>
-				<div className='flex items-center gap-2'>
-					<Activity className='text-border_blue' />
-					<h2 className='flex items-center gap-2 text-2xl font-semibold text-navbar_title'>
-						Cohort #5 <span className='rounded-full bg-border_blue px-2 py-0.5 text-xs text-btn_primary_text'>Ongoing</span>
-					</h2>
-				</div>
-				<Filter className='h-4 w-4 text-wallet_btn_text' />
-			</div>
-
-			<div className='mt-6 grid grid-cols-1 gap-6 md:grid-cols-3'>
+		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
+			<div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
 				<div className='flex items-start gap-4'>
 					<Image
 						src={delegatees}
