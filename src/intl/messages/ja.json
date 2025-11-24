@@ -456,7 +456,7 @@
 		"analytics": "分析",
 		"treasuryAnalytics": "財務分析",
 		"proxies": "プロキシ",
-		"judgementdashboard": "判定ダッシュボード",
+		"identityAndJudgement": "身分と判断",
 		"Tag": {
 			"new": "新規"
 		}
@@ -1514,12 +1514,13 @@
 		"Amount": "金額"
 	},
 	"Judgements": {
-		"judgement": "判断",
+		"identityAndJudgement": "身分と判断",
 		"requestJudgement": "判断を要求",
 		"becomeARegistrar": "登録者になる",
 		"dashboard": "ダッシュボード",
 		"registrar": "登録者",
 		"registrars": "登録者",
+		"judgementsGranted": "判断許可",
 		"judgementsRequested": "判断要求",
 		"judgementsCompleted": "判断完了",
 		"thisMonth": "今月",

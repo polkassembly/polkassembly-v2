@@ -455,7 +455,7 @@
 		"analytics": "Analysen",
 		"treasuryAnalytics": "Finanzverwaltungsanalysen",
 		"proxies": "Proxies",
-		"judgementdashboard": "Judgement Dashboard",
+		"identityAndJudgement": "Identität und Urteil",
 		"Tag": {
 			"new": "Neu"
 		}
@@ -1513,12 +1513,13 @@
 		"Amount": "Betrag"
 	},
 	"Judgements": {
-		"judgement": "Urteil",
+		"identityAndJudgement": "Identität und Urteil",
 		"requestJudgement": "Urteil anfordern",
 		"becomeARegistrar": "Registrar werden",
 		"dashboard": "Dashboard",
 		"registrar": "Registrar",
 		"registrars": "Registrars",
+		"judgementsGranted": "Urteile vergeben",
 		"judgementsRequested": "Urteile angefordert",
 		"judgementsCompleted": "Urteile abgeschlossen",
 		"thisMonth": "dieser Monat",
