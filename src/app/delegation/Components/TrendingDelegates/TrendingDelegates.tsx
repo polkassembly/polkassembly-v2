@@ -25,6 +25,8 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import DelegateXBotGif from '@assets/delegation/klara/klara.gif';
 import { DelegateXClientService } from '@/app/_client-services/delegate_x_client_service';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import DelegateSearchInput from './DelegateSearchInput/DelegateSearchInput';
 import styles from './TrendingDelegates.module.scss';
 import DelegateCard from './DelegateCard/DelegateCard';
@@ -36,7 +38,7 @@ const defaultDelegateXData = {
 	address: '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t',
 	bio: 'An AI powered custom agent that votes just like you would. Setup bot suited to your evaluation criterias and simplify voting with reason',
 	image: DelegateXBotGif,
-	maxDelegated: '0 DOT',
+	maxDelegated: '0',
 	votedProposals: 0,
 	delegatorsCount: 0
 };
@@ -91,6 +93,8 @@ function TrendingDelegates() {
 	const { userPreferences } = useUserPreferences();
 	const [delegateXData, setDelegateXData] = useState(defaultDelegateXData);
 	const [delegateXAccount, setDelegateXAccount] = useState<IDelegateXAccount | null>(null);
+	const currentNetwork = getCurrentNetwork();
+	const network = NETWORKS_DETAILS[currentNetwork];
 
 	useEffect(() => {
 		if (!userPreferences.selectedAccount?.address) return;
@@ -106,7 +110,7 @@ function TrendingDelegates() {
 				setDelegateXData((prev) => ({
 					...prev,
 					address: data.delegateXAccount.address,
-					maxDelegated: `${data.totalVotingPower || 0} DOT`,
+					maxDelegated: `${data.totalVotingPower || 0}`,
 					votedProposals: data.totalVotes || 0,
 					delegatorsCount: data.totalDelegators || 0
 				}));
@@ -195,7 +199,7 @@ function TrendingDelegates() {
 							<MdSort className='text-xl text-text_pink' />
 						</SelectTrigger>
 						<SelectContent className={styles.selectContent}>
-							<SelectItem value='MAX_DELEGATED'>{t('maxDelegated')}</SelectItem>
+							<SelectItem value='MAX_DELEGATED'>{`${t('maxDelegated')} ${network.tokenSymbol}`}</SelectItem>
 							<SelectItem value='VOTED_PROPOSALS'>{t('votedProposals')}</SelectItem>
 							<SelectItem value='DELEGATORS'>{t('delegators')}</SelectItem>
 						</SelectContent>
