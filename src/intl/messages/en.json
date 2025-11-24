@@ -458,7 +458,7 @@
 		"analytics": "Analytics",
 		"treasuryAnalytics": "Treasury Analytics",
 		"proxies": "Proxies",
-		"judgementdashboard": "Judgement Dashboard",
+		"identityAndJudgement": "Identity and Judgement",
 		"Tag": {
 			"new": "New"
 		}
@@ -1543,7 +1543,7 @@
 		"Amount": "Amount"
 	},
 	"Judgements": {
-		"judgement": "Judgement",
+		"identityAndJudgement": "Identity and Judgement",
 		"requestJudgement": "Request Judgement",
 		"becomeARegistrar": "Become a Registrar",
 		"dashboard": "Dashboard",

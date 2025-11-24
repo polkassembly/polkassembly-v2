@@ -36,7 +36,7 @@ function Header() {
 		<div className={styles.header}>
 			<div className={styles.header_container}>
 				<div className={styles.header_title_container}>
-					<p className={styles.header_title}>{t('Judgements.judgement')}</p>
+					<p className={styles.header_title}>{t('Judgements.identityAndJudgement')}</p>
 					<div className={styles.header_button_container}>
 						<Link href={`/set-identity?open=${ESetIdentityStep.REQUEST_JUDGEMENT}`}>
 							<Button>{t('Judgements.requestJudgement')}</Button>
