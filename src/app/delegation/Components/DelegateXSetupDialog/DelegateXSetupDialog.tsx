@@ -43,9 +43,10 @@ interface DelegateXSetupDialogProps {
 		includeComment?: boolean;
 		votingPower?: string;
 	};
+	networkSymbol?: string;
 }
 
-function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialStep = 1, initialData = {} }: DelegateXSetupDialogProps) {
+function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialStep = 1, initialData = {}, networkSymbol }: DelegateXSetupDialogProps) {
 	const [step, setStep] = useState<number>(initialStep);
 	const { apiService } = usePolkadotApiService();
 	const { setVaultQrState } = usePolkadotVault();
@@ -64,8 +65,6 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	const { userPreferences } = useUserPreferences();
 	const { toast } = useToast();
 	const t = useTranslations();
-	const currentNetwork = getCurrentNetwork();
-	const network = NETWORKS_DETAILS[currentNetwork];
 	useEffect(() => {
 		if (open && isEditMode) {
 			setStep(initialStep);
@@ -244,8 +243,8 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 							<CostEstimateStep
 								onNext={() => setStep(3)}
 								isEditMode={currentEditMode}
-								estimatedCost={`≈ 5 ${network.tokenSymbol}`}
-								networkSymbol={network.tokenSymbol}
+								estimatedCost={`≈ 5 ${networkSymbol}`}
+								networkSymbol={networkSymbol}
 							/>
 						)}
 
@@ -290,7 +289,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 								isEditMode={currentEditMode}
 								votingPower={votingPower}
 								isLoading={isLoading}
-								estimatedFee={`≈ 5 ${network.tokenSymbol}`}
+								estimatedFee={`≈ 5 ${networkSymbol}`}
 							/>
 						)}
 					</div>

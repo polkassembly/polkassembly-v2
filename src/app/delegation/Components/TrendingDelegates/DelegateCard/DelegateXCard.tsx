@@ -15,6 +15,8 @@ import { Button } from '@/app/_shared-components/Button';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { IDelegateXAccount } from '@/_shared/types';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import EditDelegateXDialog from '../../DelegateXSetupDialog/EditDelegateXDialog';
 import DelegateXSetupDialog from '../../DelegateXSetupDialog/DelegateXSetupDialog';
 import styles from './DelegateCard.module.scss';
@@ -31,13 +33,15 @@ interface IDelegateXCardProps {
 	delegateXAccount: IDelegateXAccount | null;
 }
 
-function DelegateXStats({ data }: { data: IDelegateXCardProps['data'] }) {
+function DelegateXStats({ data, networkSymbol }: { data: IDelegateXCardProps['data']; networkSymbol: string }) {
 	return (
 		<div className={styles.delegationCardStats}>
 			<div className={styles.delegationCardStatsItem}>
 				<div>
 					<div className='text-sm text-btn_secondary_text xl:whitespace-nowrap'>
-						<span className='font-semibold md:text-2xl'>{data.maxDelegated}</span>
+						<span className='font-semibold md:text-2xl'>
+							{data.maxDelegated} {networkSymbol}
+						</span>
 					</div>
 					<span className={styles.delegationCardStatsItemText}>Total Voting Power</span>
 				</div>
@@ -64,6 +68,8 @@ function DelegateXStats({ data }: { data: IDelegateXCardProps['data'] }) {
 const DelegateXCard = memo(({ data, delegateXAccount }: IDelegateXCardProps) => {
 	const { user } = useUser();
 	const t = useTranslations('Delegation');
+	const currentNetwork = getCurrentNetwork();
+	const network = NETWORKS_DETAILS[currentNetwork];
 
 	const [openModal, setOpenModal] = useState(false);
 	const [openSetupDialog, setOpenSetupDialog] = useState(false);
@@ -144,6 +150,7 @@ const DelegateXCard = memo(({ data, delegateXAccount }: IDelegateXCardProps) => 
 									onOpenChange={setOpenSetupDialog}
 									isEditMode={isEditMode}
 									initialStep={editStep}
+									networkSymbol={network?.tokenSymbol}
 									initialData={
 										delegateXAccount
 											? {
@@ -185,7 +192,10 @@ const DelegateXCard = memo(({ data, delegateXAccount }: IDelegateXCardProps) => 
 					/>
 				</div>
 
-				<DelegateXStats data={data} />
+				<DelegateXStats
+					data={data}
+					networkSymbol={network?.tokenSymbol}
+				/>
 
 				<Dialog
 					open={openModal}
@@ -203,7 +213,10 @@ const DelegateXCard = memo(({ data, delegateXAccount }: IDelegateXCardProps) => 
 							markdown={data.bio}
 						/>
 
-						<DelegateXStats data={data} />
+						<DelegateXStats
+							data={data}
+							networkSymbol={network?.tokenSymbol}
+						/>
 					</DialogContent>
 				</Dialog>
 			</div>
