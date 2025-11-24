@@ -1937,10 +1937,13 @@ export class FirestoreService extends FirestoreUtils {
 		strategyId?: string;
 		contactLink?: string;
 		signatureLink?: string;
-	}) {
+	}): Promise<IDelegateXAccount> {
 		const id = `${userId}-${network}-${address}`;
 		const delegateXAccountDoc = this.delegateXAccountsCollectionRef().doc(id);
 		await delegateXAccountDoc.set({ includeComment, votingPower, strategyId, contactLink, signatureLink }, { merge: true });
+
+		const updatedDoc = await delegateXAccountDoc.get();
+		return updatedDoc.data() as IDelegateXAccount;
 	}
 
 	static async CreateVote({

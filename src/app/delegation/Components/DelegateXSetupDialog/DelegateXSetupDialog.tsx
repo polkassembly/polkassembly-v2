@@ -144,6 +144,22 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 		const { delegateXAccount } = data;
 
 		const { address } = delegateXAccount;
+
+		const needsRedelegation = !currentEditMode || (votingPower && votingPower !== initialData.votingPower);
+
+		if (!needsRedelegation) {
+			setIsLoading(false);
+			setCurrentEditMode(false);
+			onOpenChange(false);
+			toast({
+				title: t('delegateXUpdatedSuccessfully'),
+				description: t('delegateXUpdatedSuccessfullyDescription'),
+				status: ENotificationStatus.SUCCESS
+			});
+			onSuccess?.(delegateXAccount);
+			return;
+		}
+
 		// delegate user voting to the address
 		await apiService?.delegateForDelegateX({
 			address: userPreferences.selectedAccount?.address || '',

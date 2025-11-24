@@ -1090,7 +1090,7 @@ export class OffChainDbService {
 		strategyId?: string;
 		contactLink?: string;
 		signatureLink?: string;
-	}) {
+	}): Promise<IDelegateXAccount> {
 		return FirestoreService.UpdateDelegateXAccount({
 			address,
 			userId,
