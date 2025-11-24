@@ -63,6 +63,8 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	const { userPreferences } = useUserPreferences();
 	const { toast } = useToast();
 	const t = useTranslations();
+	const currentNetwork = getCurrentNetwork();
+	const network = NETWORKS_DETAILS[currentNetwork];
 	useEffect(() => {
 		if (open && isEditMode) {
 			setStep(initialStep);
@@ -175,15 +177,9 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 					description: error,
 					status: ENotificationStatus.ERROR
 				});
+				onOpenChange(false);
 			}
 		});
-		if (currentEditMode) {
-			setCurrentEditMode(false);
-			onOpenChange(false);
-		} else {
-			onOpenChange(false);
-			setOpenSuccess(true);
-		}
 	};
 
 	const handleDialogClose = (isOpen: boolean) => {
@@ -247,6 +243,8 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 							<CostEstimateStep
 								onNext={() => setStep(3)}
 								isEditMode={currentEditMode}
+								estimatedCost={`≈ 5 ${network.tokenSymbol}`}
+								networkSymbol={network.tokenSymbol}
 							/>
 						)}
 
@@ -291,6 +289,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 								isEditMode={currentEditMode}
 								votingPower={votingPower}
 								isLoading={isLoading}
+								estimatedFee={`≈ 5 ${network.tokenSymbol}`}
 							/>
 						)}
 					</div>

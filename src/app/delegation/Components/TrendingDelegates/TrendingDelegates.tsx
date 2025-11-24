@@ -36,9 +36,9 @@ const defaultDelegateXData = {
 	address: '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t',
 	bio: 'An AI powered custom agent that votes just like you would. Setup bot suited to your evaluation criterias and simplify voting with reason',
 	image: DelegateXBotGif,
-	maxDelegated: '1k DOT',
-	votedProposals: 24,
-	delegatorsCount: 12
+	maxDelegated: '0 DOT',
+	votedProposals: 0,
+	delegatorsCount: 0
 };
 
 const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedSources: EDelegateSource[]; setSelectedSources: (sources: EDelegateSource[]) => void }) => {
