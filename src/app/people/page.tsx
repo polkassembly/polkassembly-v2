@@ -8,6 +8,7 @@ import TabCard from './Components/TabCard';
 import CohortCard from './Components/CohortCard';
 import InfluenceCard from './Components/InfluenceCard';
 import DecentralisedVoicesCard from './Components/DecentralisedVoicesCard';
+import DecentralizedVoicesVotingCard from './Components/DecentralizedVoicesVotingCard';
 import CohortsTableCard from './Components/CohortsTableCard';
 
 function PeoplePage() {
@@ -18,6 +19,7 @@ function PeoplePage() {
 				<CohortCard />
 				<DecentralisedVoicesCard />
 				<InfluenceCard />
+				<DecentralizedVoicesVotingCard />
 				<CohortsTableCard />
 			</div>
 		</div>
