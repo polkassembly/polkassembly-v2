@@ -11,7 +11,7 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { BN } from '@polkadot/util';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { ENotificationStatus, EPostOrigin, EWallet } from '@/_shared/types';
+import { EConvictionAmount, ENotificationStatus, EPostOrigin, EWallet } from '@/_shared/types';
 import { useToast } from '@/hooks/useToast';
 import { useTranslations } from 'next-intl';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -19,6 +19,7 @@ import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { defaultStrategies } from '@/_shared/_constants/delegatexDefaultStrategies';
+import { inputToBn } from '@/app/_client-utils/inputToBn';
 import DelegateXSuccessDialog from './DelegateXSuccessDialog';
 import EditDelegateXDialog from './EditDelegateXDialog';
 import WelcomeStep from './components/WelcomeStep';
@@ -150,8 +151,8 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 			wallet: userPreferences.wallet as EWallet,
 			setVaultQrState,
 			delegateAddress: address,
-			balance: new BN(votingPower || 0),
-			conviction: 0,
+			balance: inputToBn(votingPower || '0', getCurrentNetwork()).bnValue,
+			conviction: EConvictionAmount.ZERO,
 			tracks: Object.keys(NETWORKS_DETAILS[`${getCurrentNetwork()}`].trackDetails)
 				.map((track) => NETWORKS_DETAILS[`${getCurrentNetwork()}`].trackDetails[track as EPostOrigin]?.trackId)
 				.filter((id): id is number => id !== undefined),

@@ -43,6 +43,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { BlockCalculationsService } from './block_calculations_service';
 import { VaultQrSigner } from './vault_qr_signer_service';
 import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
+import { inputToBn } from '../_client-utils/inputToBn';
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
 // const blockHeight = await apiService.getBlockHeight();
@@ -1795,15 +1796,24 @@ export class PolkadotApiService {
 		onFailed: (error: string) => void;
 		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
 	}) {
-		if (!this.api) return;
+		if (!this.api) {
+			onFailed('API not ready');
+			return;
+		}
 
-		await this.api.isReady;
-		// 5 DOT fee
-		const feeTx = this.api.tx.balances.transfer(delegateAddress, '5000000000000000000');
+		// Validate balance - cannot delegate zero balance
+		if (!balance || balance.isZero()) {
+			onFailed('Balance cannot be zero. Please specify a voting power amount.');
+			return;
+		}
+
+		const feeAmount = inputToBn('5', this.network).bnValue;
+
+		const feeTx = this.api.tx.balances.transferKeepAlive(delegateAddress, feeAmount);
+
 		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, delegateAddress, conviction, balance));
-		txs.push(feeTx);
 
-		const tx = txs.length === 1 ? txs[0] : this.api.tx.utility.batchAll(txs);
+		const tx = this.api.tx.utility.batchAll([feeTx, ...txs]);
 
 		await this.executeTx({
 			tx,
