@@ -1544,6 +1544,7 @@
 	},
 	"Judgements": {
 		"judgement": "Judgement",
+		"judgementDescription": "An entity or individual authorized to verify and validate the identity of accounts. Registrars can set a fee for their services and limit their attestation to certain fields.",
 		"requestJudgement": "Request Judgement",
 		"becomeARegistrar": "Become a Registrar",
 		"dashboard": "Dashboard",

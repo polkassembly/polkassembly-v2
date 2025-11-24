@@ -1514,6 +1514,7 @@
 	},
 	"Judgements": {
 		"judgement": "Urteil",
+		"judgementDescription": "Eine Entität oder ein Individuum, die/der autorisiert ist, die Identität von Konten zu verifizieren und zu validieren. Registrars können einen Gebührensatz für ihre Dienstleistungen festlegen und ihre Attestation auf bestimmte Felder beschränken.",
 		"requestJudgement": "Urteil anfordern",
 		"becomeARegistrar": "Registrar werden",
 		"dashboard": "Dashboard",

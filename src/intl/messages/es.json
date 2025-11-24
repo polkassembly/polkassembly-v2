@@ -1516,6 +1516,7 @@
 	},
 	"Judgements": {
 		"judgement": "Juicio",
+		"judgementDescription": "Una entidad o individuo autorizado para verificar y validar la identidad de cuentas. Los registradores pueden establecer un cargo por sus servicios y limitar su atestación a ciertos campos.",
 		"requestJudgement": "Solicitar Juicio",
 		"becomeARegistrar": "Convertirse en Registrador",
 		"dashboard": "Panel de control",
