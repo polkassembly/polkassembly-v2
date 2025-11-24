@@ -17,8 +17,8 @@ interface PersonalityStepProps {
 	onSignatureChange: (value: string) => void;
 	contact: string;
 	onContactChange: (value: string) => void;
-	persona: string;
-	onPersonaChange: (value: string) => void;
+	prompt: string;
+	onPromptChange: (value: string) => void;
 	includeComment: boolean;
 	onIncludeCommentChange: (value: boolean) => void;
 	personaTab: 'prompt' | 'preview';
@@ -36,8 +36,8 @@ function PersonalityStep({
 	onSignatureChange,
 	contact,
 	onContactChange,
-	persona,
-	onPersonaChange,
+	prompt,
+	onPromptChange,
 	includeComment,
 	onIncludeCommentChange,
 	personaTab,
@@ -164,8 +164,8 @@ function PersonalityStep({
 														<textarea
 															className='placeholder:text-text_secondary w-full flex-1 resize-none bg-transparent text-sm outline-none'
 															placeholder='Enter your custom prompt here...'
-															value={persona}
-															onChange={(e) => onPersonaChange(e.target.value)}
+															value={prompt}
+															onChange={(e) => onPromptChange(e.target.value)}
 														/>
 													)}
 												</div>

@@ -22,7 +22,8 @@ const zodParamsSchema = z.object({
 	contactLink: z.string().optional(),
 	signatureLink: z.string().optional(),
 	includeComment: z.boolean().optional(),
-	votingPower: z.string()
+	votingPower: z.string(),
+	prompt: z.string().optional()
 });
 
 const zodUpdateParamsSchema = z.object({
@@ -30,11 +31,12 @@ const zodUpdateParamsSchema = z.object({
 	contactLink: z.string().optional(),
 	signatureLink: z.string().optional(),
 	includeComment: z.boolean().optional(),
-	votingPower: z.string().optional()
+	votingPower: z.string().optional(),
+	prompt: z.string().optional()
 });
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
-	const { strategyId, contactLink, signatureLink, includeComment = false, votingPower } = zodParamsSchema.parse(await getReqBody(req));
+	const { strategyId, contactLink, signatureLink, includeComment = false, votingPower, prompt } = zodParamsSchema.parse(await getReqBody(req));
 
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
@@ -71,11 +73,12 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		votingPower,
 		strategyId,
 		contactLink,
-		signatureLink
+		signatureLink,
+		prompt
 	});
 
 	// create DelegateX Bot (disabled for now)
-	await DelegateXService.createDelegateXBot(Number(userId), strategyId, contactLink, signatureLink);
+	await DelegateXService.createDelegateXBot(Number(userId), strategyId, contactLink, signatureLink, prompt);
 
 	const response = NextResponse.json({ success: true, delegateXAccount });
 
@@ -151,16 +154,18 @@ export const PUT = withErrorHandling(async (req: NextRequest) => {
 		votingPower: updateData.votingPower ?? existingAccount.votingPower,
 		strategyId: updateData.strategyId ?? existingAccount.strategyId,
 		contactLink: updateData.contactLink ?? existingAccount.contactLink,
-		signatureLink: updateData.signatureLink ?? existingAccount.signatureLink
+		signatureLink: updateData.signatureLink ?? existingAccount.signatureLink,
+		prompt: updateData.prompt ?? existingAccount.prompt
 	});
 
 	// (disabled for now)
-	if (updateData.strategyId || updateData.contactLink || updateData.signatureLink) {
+	if (updateData.strategyId || updateData.contactLink || updateData.signatureLink || updateData.prompt) {
 		await DelegateXService.createDelegateXBot(
 			Number(userId),
 			updateData.strategyId ?? existingAccount.strategyId ?? '',
 			updateData.contactLink ?? existingAccount.contactLink,
-			updateData.signatureLink ?? existingAccount.signatureLink
+			updateData.signatureLink ?? existingAccount.signatureLink,
+			updateData.prompt ?? existingAccount.prompt
 		);
 	}
 

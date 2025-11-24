@@ -38,10 +38,10 @@ interface DelegateXSetupDialogProps {
 		displayName?: string;
 		signature?: string;
 		contact?: string;
-		persona?: string;
 		selectedStrategy?: string;
 		includeComment?: boolean;
 		votingPower?: string;
+		prompt?: string;
 	};
 	networkSymbol?: string;
 	onSuccess?: (delegateXAccount: IDelegateXAccount) => void;
@@ -53,7 +53,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	const { setVaultQrState } = usePolkadotVault();
 	const [signature, setSignature] = useState(initialData.signature || '');
 	const [contact, setContact] = useState(initialData.contact || '');
-	const [persona, setPersona] = useState<string>(initialData.persona || '');
+	const [prompt, setPrompt] = useState<string>(initialData.prompt || '');
 	const [selectedStrategy, setSelectedStrategy] = useState(initialData.selectedStrategy || '');
 	const [openSuccess, setOpenSuccess] = useState(false);
 	const [openEdit, setOpenEdit] = useState(false);
@@ -72,7 +72,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 			setCurrentEditMode(true);
 			setSignature(initialData.signature || '');
 			setContact(initialData.contact || '');
-			setPersona(initialData.persona || '');
+			setPrompt(initialData.prompt || '');
 			setSelectedStrategy(initialData.selectedStrategy || '');
 			setIncludeComment(initialData.includeComment ?? true);
 			setVotingPower(initialData.votingPower || '');
@@ -81,7 +81,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 			setCurrentEditMode(false);
 			setSignature('');
 			setContact('');
-			setPersona('');
+			setPrompt('');
 			setSelectedStrategy('');
 			setIncludeComment(true);
 			setVotingPower('');
@@ -101,6 +101,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 				signatureLink?: string;
 				includeComment?: boolean;
 				votingPower?: string;
+				prompt?: string;
 			} = {};
 
 			if (initialStep === 3 && selectedStrategy) {
@@ -111,6 +112,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 				updatePayload.contactLink = contact;
 				updatePayload.signatureLink = signature || '';
 				updatePayload.includeComment = includeComment;
+				updatePayload.prompt = prompt;
 				if (votingPower) {
 					updatePayload.votingPower = votingPower;
 				}
@@ -125,7 +127,8 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 				contactLink: contact,
 				signatureLink: signature || '',
 				includeComment: includeComment || false,
-				votingPower: votingPower || new BN(0).toString()
+				votingPower: votingPower || new BN(0).toString(),
+				prompt: prompt || ''
 			});
 			data = result.data;
 			error = result.error;
@@ -284,8 +287,8 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 								onSignatureChange={setSignature}
 								contact={contact}
 								onContactChange={setContact}
-								persona={persona}
-								onPersonaChange={setPersona}
+								prompt={prompt}
+								onPromptChange={setPrompt}
 								includeComment={includeComment}
 								onIncludeCommentChange={setIncludeComment}
 								personaTab={personaTab}

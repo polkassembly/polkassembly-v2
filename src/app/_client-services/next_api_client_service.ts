@@ -1522,19 +1522,21 @@ export class NextApiClientService {
 		contactLink,
 		signatureLink,
 		includeComment,
-		votingPower
+		votingPower,
+		prompt
 	}: {
 		strategyId: string;
 		contactLink: string;
 		signatureLink: string;
 		includeComment: boolean;
 		votingPower: string;
+		prompt: string;
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_DELEGATE_X_BOT });
 		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount }>({
 			url,
 			method,
-			data: { strategyId, contactLink, signatureLink, includeComment, votingPower }
+			data: { strategyId, contactLink, signatureLink, includeComment, votingPower, prompt }
 		});
 	}
 
@@ -1543,19 +1545,21 @@ export class NextApiClientService {
 		contactLink,
 		signatureLink,
 		includeComment,
-		votingPower
+		votingPower,
+		prompt
 	}: {
 		strategyId?: string;
 		contactLink?: string;
 		signatureLink?: string;
 		includeComment?: boolean;
 		votingPower?: string;
+		prompt?: string;
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.UPDATE_DELEGATE_X_BOT });
 		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount }>({
 			url,
 			method,
-			data: { strategyId, contactLink, signatureLink, includeComment, votingPower }
+			data: { strategyId, contactLink, signatureLink, includeComment, votingPower, prompt }
 		});
 	}
 

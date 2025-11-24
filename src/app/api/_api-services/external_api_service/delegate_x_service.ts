@@ -37,7 +37,7 @@ export class DelegateXService {
 	}
 
 	// create DelegateX Bot
-	static async createDelegateXBot(userId: number, strategyId: string, contactLink?: string, signatureLink?: string): Promise<null | unknown> {
+	static async createDelegateXBot(userId: number, strategyId: string, contactLink?: string, signatureLink?: string, prompt?: string): Promise<null | unknown> {
 		if (this.DELEGATE_X_API_BASE_URL === 'https://api.delegatex.com') {
 			return null;
 		}
@@ -55,7 +55,8 @@ export class DelegateXService {
 					userId,
 					strategyId,
 					contactLink,
-					signatureLink
+					signatureLink,
+					prompt
 				})
 			});
 
