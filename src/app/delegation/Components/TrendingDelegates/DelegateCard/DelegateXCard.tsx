@@ -97,25 +97,31 @@ function DelegateXStats({ data, networkSymbol, isBotSetup }: { data: IDelegateXC
 	}
 
 	return (
-		<div className='border-section_light_border mt-5 flex items-center justify-between rounded-xl border py-4'>
-			<div className='border-section_light_border flex w-1/3 flex-col items-center border-r px-2'>
-				<span className='text-2xl font-semibold text-text_primary'>
-					{formatBnBalance(data.totalVotingPower, { compactNotation: true, numberAfterComma: 1, withUnit: false }, currentNetwork)} {networkSymbol}
-					<span className='text-text_secondary text-sm font-normal'>{networkSymbol}</span>
-				</span>
-				<span className='text-text_secondary text-center text-xs'>Total Voting power</span>
+		<div className={styles.delegationCardStats}>
+			<div className={styles.delegationCardStatsItem}>
+				<div className='flex flex-col gap-2'>
+					<span className='text-2xl font-semibold text-text_primary'>
+						{formatBnBalance(data.totalVotingPower, { compactNotation: true, numberAfterComma: 1, withUnit: false }, currentNetwork)}{' '}
+						<span className='text-text_secondary text-sm font-normal'> {networkSymbol}</span>
+					</span>
+					<span className='text-text_secondary text-center text-xs'>Total Voting power</span>
+				</div>
 			</div>
-			<div className='border-section_light_border flex w-1/3 flex-col items-center border-r px-2'>
-				<span className='text-2xl font-semibold text-text_primary'>{data.totalVotesPast30Days}</span>
-				<span className='text-text_secondary text-center text-xs'>
-					Total Voted proposals
-					<br />
-					(Past 30 days)
-				</span>
+			<div className={styles.delegationCardStatsItem}>
+				<div className='flex flex-col gap-2'>
+					<span className='text-2xl font-semibold text-text_primary'>{data.totalVotesPast30Days}</span>
+					<span className='text-text_secondary text-center text-xs'>
+						Total Voted proposals
+						<br />
+						(Past 30 days)
+					</span>
+				</div>
 			</div>
-			<div className='flex w-1/3 flex-col items-center px-2'>
-				<span className='text-2xl font-semibold text-text_primary'>{data.totalDelegators}</span>
-				<span className='text-text_secondary text-center text-xs'>Number of Users</span>
+			<div className={styles.delegationCardStatsItem}>
+				<div className='flex flex-col gap-2'>
+					<span className='text-2xl font-semibold text-text_primary'>{data.totalDelegators}</span>
+					<span className='text-text_secondary text-center text-xs'>Number of Users</span>
+				</div>
 			</div>
 		</div>
 	);
