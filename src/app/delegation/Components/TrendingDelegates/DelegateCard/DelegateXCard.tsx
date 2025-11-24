@@ -17,6 +17,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-
 import { IDelegateXAccount } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
+import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
+import { Ban } from 'lucide-react';
 import EditDelegateXDialog from '../../DelegateXSetupDialog/EditDelegateXDialog';
 import DelegateXSetupDialog from '../../DelegateXSetupDialog/DelegateXSetupDialog';
 import styles from './DelegateCard.module.scss';
@@ -27,8 +30,11 @@ interface IDelegateXCardProps {
 		bio: string;
 		image: StaticImageData;
 		maxDelegated: string;
-		votedProposals: number;
 		delegatorsCount: number;
+		ayeCount: number;
+		nayCount: number;
+		abstainCount: number;
+		votesPast30Days: number;
 	};
 	delegateXAccount: IDelegateXAccount | null;
 }
@@ -43,22 +49,36 @@ function DelegateXStats({ data, networkSymbol }: { data: IDelegateXCardProps['da
 							{data.maxDelegated} {networkSymbol}
 						</span>
 					</div>
-					<span className={styles.delegationCardStatsItemText}>Total Voting Power</span>
+					<span className={styles.delegationCardStatsItemText}>Voting Power</span>
 				</div>
 			</div>
 
 			<div className={styles.delegationCardStatsItem}>
 				<div>
-					<div className='font-semibold text-btn_secondary_text md:text-2xl'>{data.votedProposals}</div>
-					<span className={styles.delegationCardStatsItemText}>Voted Proposals</span>
-					<span className={styles.delegationCardStatsItemTextPast30Days}>(Past 30 Days)</span>
+					<div className='flex items-center gap-4'>
+						<div className='flex items-center gap-1 text-success'>
+							<AiFillLike className='fill-current text-sm' />
+							<span className='font-medium'>{data.ayeCount}</span>
+						</div>
+						<div className='flex items-center gap-1 text-toast_error_text'>
+							<AiFillDislike className='fill-current text-sm' />
+							<span className='font-medium'>{data.nayCount}</span>
+						</div>
+						<div className='flex items-center gap-1 text-bg_blue'>
+							<Ban size={14} />
+							<span className='font-medium'>{data.abstainCount}</span>
+						</div>
+					</div>
+					<span className={styles.delegationCardStatsItemText}>All Votes Casted</span> <br />
+					<span className='cursor-pointer text-xs font-semibold text-text_pink hover:underline'>View History</span>
 				</div>
 			</div>
 
 			<div className='p-5 text-center'>
 				<div>
-					<div className='font-semibold text-btn_secondary_text md:text-2xl'>{data.delegatorsCount}</div>
-					<span className={styles.delegationCardStatsItemText}>Number of Users</span>
+					<div className='font-semibold text-btn_secondary_text md:text-2xl'>{data.votesPast30Days}</div>
+					<span className={styles.delegationCardStatsItemText}>Votes Casted </span>
+					<span className={styles.delegationCardStatsItemTextPast30Days}>(Past 30 Days)</span>
 				</div>
 			</div>
 		</div>

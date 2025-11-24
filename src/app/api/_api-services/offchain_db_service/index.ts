@@ -1145,7 +1145,7 @@ export class OffChainDbService {
 		delegateXAccountId
 	}: {
 		delegateXAccountId: string;
-	}): Promise<{ totalCount: number; yesCount: number; noCount: number; abstainCount: number; votingPower: string }> {
+	}): Promise<{ yesCount: number; noCount: number; abstainCount: number; votingPower: string; votesPast30Days: number }> {
 		return FirestoreService.GetDelegateXVotesMatrixByDelegateXAccountId({ delegateXAccountId });
 	}
 }

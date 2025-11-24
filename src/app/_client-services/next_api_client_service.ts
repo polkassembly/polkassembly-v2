@@ -1561,7 +1561,17 @@ export class NextApiClientService {
 
 	static async getDelegateXDetails() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_DETAILS });
-		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount; totalVotingPower: string; totalVotes: number; totalDelegators: number }>({
+		return this.nextApiClientFetch<{
+			success: boolean;
+			delegateXAccount: IDelegateXAccount;
+			totalVotingPower: string;
+			totalVotes: number;
+			totalDelegators: number;
+			yesCount: number;
+			noCount: number;
+			abstainCount: number;
+			votesPast30Days: number;
+		}>({
 			url,
 			method
 		});

@@ -1991,12 +1991,7 @@ export class FirestoreService extends FirestoreUtils {
 		delegateXAccountId
 	}: {
 		delegateXAccountId: string;
-	}): Promise<{ totalCount: number; yesCount: number; noCount: number; abstainCount: number; votingPower: string }> {
-		// get the total count of votes
-		const totalCount = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).count().get();
-		const totalCountData = totalCount.data();
-		const totalCountValue = totalCountData.count;
-
+	}): Promise<{ votesPast30Days: number; yesCount: number; noCount: number; abstainCount: number; votingPower: string }> {
 		// get All the votes with decision of 1 and count the total count of votes
 		const yesCount = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).where('decision', '==', 1).count().get();
 		const yesCountData = yesCount.data();
@@ -2017,12 +2012,18 @@ export class FirestoreService extends FirestoreUtils {
 		const yesVoteData = yesVote.docs[0].data() as IDelegateXVoteData;
 		const yesVoteValue = yesVoteData.votingPower;
 
+		const thirtyDaysAgo = new Date();
+		thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+		const votesPast30Days = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).where('createdAt', '>=', thirtyDaysAgo).count().get();
+		const votesPast30DaysValue = votesPast30Days.data().count;
+
 		return {
-			totalCount: totalCountValue,
 			yesCount: yesCountValue,
 			noCount: noCountValue,
 			abstainCount: abstainCountValue,
-			votingPower: yesVoteValue
-		} as { totalCount: number; yesCount: number; noCount: number; abstainCount: number; votingPower: string };
+			votingPower: yesVoteValue || '0',
+			votesPast30Days: votesPast30DaysValue
+		} as { totalCount: number; yesCount: number; noCount: number; abstainCount: number; votingPower: string; votesPast30Days: number };
 	}
 }

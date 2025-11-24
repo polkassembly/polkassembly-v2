@@ -37,8 +37,11 @@ const defaultDelegateXData = {
 	bio: 'An AI powered custom agent that votes just like you would. Setup bot suited to your evaluation criterias and simplify voting with reason',
 	image: DelegateXBotGif,
 	maxDelegated: '0',
-	votedProposals: 0,
-	delegatorsCount: 0
+	delegatorsCount: 0,
+	ayeCount: 0,
+	nayCount: 0,
+	abstainCount: 0,
+	votesPast30Days: 0
 };
 
 const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedSources: EDelegateSource[]; setSelectedSources: (sources: EDelegateSource[]) => void }) => {
@@ -107,8 +110,11 @@ function TrendingDelegates() {
 					...prev,
 					address: data.delegateXAccount.address,
 					maxDelegated: `${data.totalVotingPower || 0}`,
-					votedProposals: data.totalVotes || 0,
-					delegatorsCount: data.totalDelegators || 0
+					delegatorsCount: data.totalDelegators || 0,
+					ayeCount: data.yesCount || 0,
+					nayCount: data.noCount || 0,
+					abstainCount: data.abstainCount || 0,
+					votesPast30Days: data.votesPast30Days || 0
 				}));
 			}
 		})();
