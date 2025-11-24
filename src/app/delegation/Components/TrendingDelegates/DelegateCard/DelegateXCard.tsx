@@ -19,7 +19,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
 import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
-import { Ban, Pencil } from 'lucide-react';
+import { Ban, Pencil, UserPlus } from 'lucide-react';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import EditDelegateXDialog from '../../DelegateXSetupDialog/EditDelegateXDialog';
 import DelegateXSetupDialog from '../../DelegateXSetupDialog/DelegateXSetupDialog';
@@ -198,7 +198,7 @@ const DelegateXCard = memo(({ data, delegateXAccount }: IDelegateXCardProps) => 
 										}
 									}}
 								>
-									<Pencil />
+									{delegateXAccount ? <Pencil /> : <UserPlus />}
 									<span>{delegateXAccount ? 'Edit' : t('delegate')}</span>
 								</Button>
 								<DelegateXSetupDialog

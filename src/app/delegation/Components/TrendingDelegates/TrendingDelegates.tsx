@@ -106,20 +106,25 @@ function TrendingDelegates() {
 				return;
 			}
 
-			if (data.success && data.delegateXAccount) {
-				setDelegateXAccount(data.delegateXAccount);
+			if (data.success) {
 				setDelegateXData((prev) => ({
 					...prev,
-					address: data.delegateXAccount.address,
-					votingPower: data.votingPower || '0',
-					ayeCount: data.yesCount || 0,
-					nayCount: data.noCount || 0,
-					abstainCount: data.abstainCount || 0,
-					votesPast30Days: data.votesPast30Days || 0,
 					totalVotesPast30Days: data.totalVotesPast30Days || 0,
 					totalVotingPower: data.totalVotingPower || '0',
-					totalDelegators: data.totalDelegators || 0
+					totalDelegators: data.totalDelegators || 0,
+					...(data.delegateXAccount
+						? {
+								address: data.delegateXAccount.address,
+								votingPower: data.votingPower || '0',
+								ayeCount: data.yesCount || 0,
+								nayCount: data.noCount || 0,
+								abstainCount: data.abstainCount || 0,
+								votesPast30Days: data.votesPast30Days || 0
+							}
+						: {})
 				}));
+
+				setDelegateXAccount(data.delegateXAccount);
 			}
 		})();
 	}, [userPreferences.selectedAccount?.address]);
