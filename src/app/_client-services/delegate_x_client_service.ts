@@ -11,15 +11,17 @@ export class DelegateXClientService extends NextApiClientService {
 		contactLink,
 		signatureLink,
 		includeComment,
-		votingPower
+		votingPower,
+		prompt
 	}: {
 		strategyId: string;
 		contactLink: string;
 		signatureLink: string;
 		includeComment: boolean;
 		votingPower: string;
+		prompt: string;
 	}): Promise<{ data: { success: boolean; delegateXAccount: IDelegateXAccount } | null; error: IErrorResponse | null }> {
-		return NextApiClientService.createDelegateXAccount({ strategyId, contactLink, signatureLink, includeComment, votingPower });
+		return NextApiClientService.createDelegateXAccount({ strategyId, contactLink, signatureLink, includeComment, votingPower, prompt });
 	}
 
 	static async getDelegateXDetails() {
@@ -35,14 +37,16 @@ export class DelegateXClientService extends NextApiClientService {
 		contactLink,
 		signatureLink,
 		includeComment,
-		votingPower
+		votingPower,
+		prompt
 	}: {
 		strategyId?: string;
 		contactLink?: string;
 		signatureLink?: string;
 		includeComment?: boolean;
 		votingPower?: string;
+		prompt?: string;
 	}): Promise<{ data: { success: boolean; delegateXAccount: IDelegateXAccount } | null; error: IErrorResponse | null }> {
-		return NextApiClientService.updateDelegateXAccount({ strategyId, contactLink, signatureLink, includeComment, votingPower });
+		return NextApiClientService.updateDelegateXAccount({ strategyId, contactLink, signatureLink, includeComment, votingPower, prompt });
 	}
 }

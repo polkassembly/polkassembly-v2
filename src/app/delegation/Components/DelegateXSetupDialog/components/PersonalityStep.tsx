@@ -17,8 +17,8 @@ interface PersonalityStepProps {
 	onSignatureChange: (value: string) => void;
 	contact: string;
 	onContactChange: (value: string) => void;
-	persona: string;
-	onPersonaChange: (value: string) => void;
+	prompt: string;
+	onPromptChange: (value: string) => void;
 	includeComment: boolean;
 	onIncludeCommentChange: (value: boolean) => void;
 	personaTab: 'prompt' | 'preview';
@@ -36,8 +36,8 @@ function PersonalityStep({
 	onSignatureChange,
 	contact,
 	onContactChange,
-	persona,
-	onPersonaChange,
+	prompt,
+	onPromptChange,
 	includeComment,
 	onIncludeCommentChange,
 	personaTab,
@@ -66,6 +66,7 @@ function PersonalityStep({
 						placeholder='Enter voting power'
 						value={votingPower}
 						onChange={(e) => onVotingPowerChange?.(e.target.value)}
+						type='number'
 					/>
 				</div>
 				<div className='text-text_primary'>
@@ -104,7 +105,7 @@ function PersonalityStep({
 							<div className='mt-3 rounded-lg border border-border_grey p-3 sm:p-4'>
 								<div className='space-y-4'>
 									<div>
-										<p className='mb-2 block text-[10px] font-medium md:text-sm'>Signature Line</p>
+										<p className='mb-2 block text-[10px] font-medium md:text-sm'>Signature Line (optional)</p>
 										<input
 											className='placeholder:text-text_secondary w-full rounded-md border border-border_grey bg-bg_modal px-3 py-2 text-sm outline-none'
 											placeholder='eg. Alice for Growth Advocate'
@@ -164,8 +165,8 @@ function PersonalityStep({
 														<textarea
 															className='placeholder:text-text_secondary w-full flex-1 resize-none bg-transparent text-sm outline-none'
 															placeholder='Enter your custom prompt here...'
-															value={persona}
-															onChange={(e) => onPersonaChange(e.target.value)}
+															value={prompt}
+															onChange={(e) => onPromptChange(e.target.value)}
 														/>
 													)}
 												</div>

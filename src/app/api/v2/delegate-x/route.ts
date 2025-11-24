@@ -22,7 +22,8 @@ const zodParamsSchema = z.object({
 	contactLink: z.string().optional(),
 	signatureLink: z.string().optional(),
 	includeComment: z.boolean().optional(),
-	votingPower: z.string()
+	votingPower: z.string(),
+	prompt: z.string().optional()
 });
 
 const zodUpdateParamsSchema = z.object({
@@ -30,11 +31,12 @@ const zodUpdateParamsSchema = z.object({
 	contactLink: z.string().optional(),
 	signatureLink: z.string().optional(),
 	includeComment: z.boolean().optional(),
-	votingPower: z.string().optional()
+	votingPower: z.string().optional(),
+	prompt: z.string().optional()
 });
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
-	const { strategyId, contactLink, signatureLink, includeComment = false, votingPower } = zodParamsSchema.parse(await getReqBody(req));
+	const { strategyId, contactLink, signatureLink, includeComment = false, votingPower, prompt } = zodParamsSchema.parse(await getReqBody(req));
 
 	const { newAccessToken, newRefreshToken } = await AuthService.ValidateAuthAndRefreshTokens();
 
@@ -72,11 +74,11 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		votingPower,
 		strategyId,
 		contactLink,
-		signatureLink
+		signatureLink,
+		prompt
 	});
 
 	// create DelegateX Bot (disabled for now)
-	console.log('setting up delegatex bot');
 	await DelegateXService.createDelegateXBot(Number(userId), strategyId, contactLink, signatureLink);
 
 	const response = NextResponse.json({ success: true, delegateXAccount });
@@ -100,11 +102,23 @@ export const GET = withErrorHandling(async () => {
 	}
 
 	const delegateXAccount = await OffChainDbService.GetDelegateXAccountByUserId({ userId, network });
+
+	const totalDelegators = await OffChainDbService.GetTotalDelegateXAccountsCount();
+
+	const totalVotesPast30Days = await OffChainDbService.GetTotalDelegateXVotesPast30Days();
+
+	const totalVotingPower = await OffChainDbService.GetTotalDelegateXVotingPower();
+
 	if (!delegateXAccount) {
-		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'DelegateX account not found');
+		return NextResponse.json({
+			success: true,
+			delegateXAccount: null,
+			totalVotingPower,
+			totalVotesPast30Days,
+			totalDelegators
+		});
 	}
 
-	// get the vote data for the delegatex account
 	const voteData = await OffChainDbService.GetDelegateXVotesMatrixByDelegateXAccountId({
 		delegateXAccountId: `${delegateXAccount.userId}-${delegateXAccount.network}-${delegateXAccount.address}`
 	});
@@ -145,7 +159,7 @@ export const PUT = withErrorHandling(async (req: NextRequest) => {
 	});
 
 	// (disabled for now)
-	if (updateData.strategyId || updateData.contactLink || updateData.signatureLink) {
+	if (updateData.strategyId || updateData.contactLink || updateData.signatureLink || updateData.prompt) {
 		await DelegateXService.createDelegateXBot(
 			Number(userId),
 			updateData.strategyId ?? existingAccount.strategyId ?? '',

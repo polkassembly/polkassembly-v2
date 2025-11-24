@@ -11,7 +11,7 @@ import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { BN } from '@polkadot/util';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { EConvictionAmount, ENotificationStatus, EPostOrigin, EWallet } from '@/_shared/types';
+import { EConvictionAmount, ENotificationStatus, EPostOrigin, EWallet, IDelegateXAccount } from '@/_shared/types';
 import { useToast } from '@/hooks/useToast';
 import { useTranslations } from 'next-intl';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -38,20 +38,22 @@ interface DelegateXSetupDialogProps {
 		displayName?: string;
 		signature?: string;
 		contact?: string;
-		persona?: string;
 		selectedStrategy?: string;
 		includeComment?: boolean;
 		votingPower?: string;
+		prompt?: string;
 	};
+	networkSymbol?: string;
+	onSuccess?: (delegateXAccount: IDelegateXAccount) => void;
 }
 
-function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialStep = 1, initialData = {} }: DelegateXSetupDialogProps) {
+function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialStep = 1, initialData = {}, networkSymbol, onSuccess }: DelegateXSetupDialogProps) {
 	const [step, setStep] = useState<number>(initialStep);
 	const { apiService } = usePolkadotApiService();
 	const { setVaultQrState } = usePolkadotVault();
 	const [signature, setSignature] = useState(initialData.signature || '');
 	const [contact, setContact] = useState(initialData.contact || '');
-	const [persona, setPersona] = useState<string>(initialData.persona || '');
+	const [prompt, setPrompt] = useState<string>(initialData.prompt || '');
 	const [selectedStrategy, setSelectedStrategy] = useState(initialData.selectedStrategy || '');
 	const [openSuccess, setOpenSuccess] = useState(false);
 	const [openEdit, setOpenEdit] = useState(false);
@@ -70,7 +72,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 			setCurrentEditMode(true);
 			setSignature(initialData.signature || '');
 			setContact(initialData.contact || '');
-			setPersona(initialData.persona || '');
+			setPrompt(initialData.prompt || '');
 			setSelectedStrategy(initialData.selectedStrategy || '');
 			setIncludeComment(initialData.includeComment ?? true);
 			setVotingPower(initialData.votingPower || '');
@@ -79,7 +81,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 			setCurrentEditMode(false);
 			setSignature('');
 			setContact('');
-			setPersona('');
+			setPrompt('');
 			setSelectedStrategy('');
 			setIncludeComment(true);
 			setVotingPower('');
@@ -99,6 +101,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 				signatureLink?: string;
 				includeComment?: boolean;
 				votingPower?: string;
+				prompt?: string;
 			} = {};
 
 			if (initialStep === 3 && selectedStrategy) {
@@ -109,6 +112,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 				updatePayload.contactLink = contact;
 				updatePayload.signatureLink = signature || '';
 				updatePayload.includeComment = includeComment;
+				updatePayload.prompt = prompt;
 				if (votingPower) {
 					updatePayload.votingPower = votingPower;
 				}
@@ -123,7 +127,8 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 				contactLink: contact,
 				signatureLink: signature || '',
 				includeComment: includeComment || false,
-				votingPower: votingPower || new BN(0).toString()
+				votingPower: votingPower || new BN(0).toString(),
+				prompt: prompt || ''
 			});
 			data = result.data;
 			error = result.error;
@@ -142,7 +147,22 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 		const { delegateXAccount } = data;
 
 		const { address } = delegateXAccount;
-		console.log('delegateXAccount', delegateXAccount);
+
+		const needsRedelegation = !currentEditMode || (votingPower && votingPower !== initialData.votingPower);
+
+		if (!needsRedelegation) {
+			setIsLoading(false);
+			setCurrentEditMode(false);
+			onOpenChange(false);
+			toast({
+				title: t('delegateXUpdatedSuccessfully'),
+				description: t('delegateXUpdatedSuccessfullyDescription'),
+				status: ENotificationStatus.SUCCESS
+			});
+			onSuccess?.(delegateXAccount);
+			return;
+		}
+
 		// delegate user voting to the address
 		await apiService?.delegateForDelegateX({
 			address: userPreferences.selectedAccount?.address || '',
@@ -168,6 +188,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 					description: t('delegateXCreatedSuccessfullyDescription'),
 					status: ENotificationStatus.SUCCESS
 				});
+				onSuccess?.(delegateXAccount);
 			},
 			onFailed: (error: string) => {
 				setIsLoading(false);
@@ -176,15 +197,10 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 					description: error,
 					status: ENotificationStatus.ERROR
 				});
+				onOpenChange(false);
+				onSuccess?.(delegateXAccount);
 			}
 		});
-		if (currentEditMode) {
-			setCurrentEditMode(false);
-			onOpenChange(false);
-		} else {
-			onOpenChange(false);
-			setOpenSuccess(true);
-		}
 	};
 
 	const handleDialogClose = (isOpen: boolean) => {
@@ -248,6 +264,8 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 							<CostEstimateStep
 								onNext={() => setStep(3)}
 								isEditMode={currentEditMode}
+								estimatedCost={`≈ 5 ${networkSymbol}`}
+								networkSymbol={networkSymbol}
 							/>
 						)}
 
@@ -270,8 +288,8 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 								onSignatureChange={setSignature}
 								contact={contact}
 								onContactChange={setContact}
-								persona={persona}
-								onPersonaChange={setPersona}
+								prompt={prompt}
+								onPromptChange={setPrompt}
 								includeComment={includeComment}
 								onIncludeCommentChange={setIncludeComment}
 								personaTab={personaTab}
@@ -292,6 +310,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 								isEditMode={currentEditMode}
 								votingPower={votingPower}
 								isLoading={isLoading}
+								estimatedFee={`≈ 5 ${networkSymbol}`}
 							/>
 						)}
 					</div>

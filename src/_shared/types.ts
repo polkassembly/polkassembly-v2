@@ -1703,6 +1703,7 @@ export interface IDelegateXAccount {
 	strategyId?: string;
 	contactLink?: string;
 	signatureLink?: string;
+	prompt?: string;
 }
 
 export interface IDelegateXVoteData {

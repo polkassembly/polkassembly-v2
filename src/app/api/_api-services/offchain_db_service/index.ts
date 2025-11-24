@@ -1032,7 +1032,8 @@ export class OffChainDbService {
 		votingPower,
 		strategyId,
 		contactLink,
-		signatureLink
+		signatureLink,
+		prompt
 	}: {
 		address: string;
 		encryptedMnemonic: string;
@@ -1044,6 +1045,7 @@ export class OffChainDbService {
 		strategyId?: string;
 		contactLink?: string;
 		signatureLink?: string;
+		prompt?: string;
 	}) {
 		// check if account already exists
 		const existingAccount = await FirestoreService.GetDelegateXAccountByUserId({ userId, network });
@@ -1064,7 +1066,8 @@ export class OffChainDbService {
 			votingPower,
 			strategyId,
 			contactLink,
-			signatureLink
+			signatureLink,
+			prompt
 		};
 		console.log('delegateXAccount', delegateXAccount);
 		await FirestoreService.CreateDelegateXAccount(delegateXAccount);
@@ -1080,7 +1083,8 @@ export class OffChainDbService {
 		votingPower,
 		strategyId,
 		contactLink,
-		signatureLink
+		signatureLink,
+		prompt
 	}: {
 		address: string;
 		userId: number;
@@ -1090,7 +1094,8 @@ export class OffChainDbService {
 		strategyId?: string;
 		contactLink?: string;
 		signatureLink?: string;
-	}) {
+		prompt?: string;
+	}): Promise<IDelegateXAccount> {
 		return FirestoreService.UpdateDelegateXAccount({
 			address,
 			userId,
@@ -1099,7 +1104,8 @@ export class OffChainDbService {
 			votingPower,
 			strategyId,
 			contactLink,
-			signatureLink
+			signatureLink,
+			prompt
 		});
 	}
 
@@ -1141,11 +1147,23 @@ export class OffChainDbService {
 		return FirestoreService.GetVoteDataByDelegateXAccountId({ delegateXAccountId, page, limit });
 	}
 
+	static async GetTotalDelegateXAccountsCount(): Promise<number> {
+		return FirestoreService.GetTotalDelegateXAccountsCount();
+	}
+
+	static async GetTotalDelegateXVotesPast30Days(): Promise<number> {
+		return FirestoreService.GetTotalDelegateXVotesPast30Days();
+	}
+
+	static async GetTotalDelegateXVotingPower(): Promise<string> {
+		return FirestoreService.GetTotalDelegateXVotingPower();
+	}
+
 	static async GetDelegateXVotesMatrixByDelegateXAccountId({
 		delegateXAccountId
 	}: {
 		delegateXAccountId: string;
-	}): Promise<{ totalCount: number; yesCount: number; noCount: number; abstainCount: number; votingPower: string }> {
+	}): Promise<{ votesPast30Days: number; yesCount: number; noCount: number; abstainCount: number; votingPower: string }> {
 		return FirestoreService.GetDelegateXVotesMatrixByDelegateXAccountId({ delegateXAccountId });
 	}
 }

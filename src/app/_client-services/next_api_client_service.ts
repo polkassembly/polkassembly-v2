@@ -1522,19 +1522,21 @@ export class NextApiClientService {
 		contactLink,
 		signatureLink,
 		includeComment,
-		votingPower
+		votingPower,
+		prompt
 	}: {
 		strategyId: string;
 		contactLink: string;
 		signatureLink: string;
 		includeComment: boolean;
 		votingPower: string;
+		prompt: string;
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_DELEGATE_X_BOT });
 		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount }>({
 			url,
 			method,
-			data: { strategyId, contactLink, signatureLink, includeComment, votingPower }
+			data: { strategyId, contactLink, signatureLink, includeComment, votingPower, prompt }
 		});
 	}
 
@@ -1543,25 +1545,39 @@ export class NextApiClientService {
 		contactLink,
 		signatureLink,
 		includeComment,
-		votingPower
+		votingPower,
+		prompt
 	}: {
 		strategyId?: string;
 		contactLink?: string;
 		signatureLink?: string;
 		includeComment?: boolean;
 		votingPower?: string;
+		prompt?: string;
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.UPDATE_DELEGATE_X_BOT });
 		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount }>({
 			url,
 			method,
-			data: { strategyId, contactLink, signatureLink, includeComment, votingPower }
+			data: { strategyId, contactLink, signatureLink, includeComment, votingPower, prompt }
 		});
 	}
 
 	static async getDelegateXDetails() {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_DETAILS });
-		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount; totalVotingPower: string; totalVotes: number; totalDelegators: number }>({
+		return this.nextApiClientFetch<{
+			success: boolean;
+			delegateXAccount: IDelegateXAccount;
+			totalVotingPower: string;
+			totalVotes: number;
+			totalDelegators: number;
+			yesCount: number;
+			noCount: number;
+			abstainCount: number;
+			votesPast30Days: number;
+			votingPower: string;
+			totalVotesPast30Days: number;
+		}>({
 			url,
 			method
 		});

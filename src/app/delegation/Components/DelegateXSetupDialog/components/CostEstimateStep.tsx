@@ -13,9 +13,10 @@ interface CostEstimateStepProps {
 	onNext: () => void;
 	estimatedCost?: string;
 	isEditMode?: boolean;
+	networkSymbol?: string;
 }
 
-function CostEstimateStep({ onNext, estimatedCost = '≈ 5 DOT', isEditMode = false }: CostEstimateStepProps) {
+function CostEstimateStep({ onNext, estimatedCost, isEditMode = false, networkSymbol }: CostEstimateStepProps) {
 	if (isEditMode) {
 		return null;
 	}
@@ -43,7 +44,7 @@ function CostEstimateStep({ onNext, estimatedCost = '≈ 5 DOT', isEditMode = fa
 						</Tooltip>
 					</div>
 				</div>
-				<p className='text-sm text-text_primary'>To activate your delegate, we&apos;ll create a wallet and reserve a small amount of DOT for gas fees.</p>
+				<p className='text-sm text-text_primary'>To activate your delegate, we&apos;ll create a wallet and reserve a small amount of {networkSymbol} for gas fees.</p>
 
 				<div className='relative pt-4'>
 					<input
@@ -67,7 +68,7 @@ function CostEstimateStep({ onNext, estimatedCost = '≈ 5 DOT', isEditMode = fa
 					id='est-setup-help'
 					className='mt-2 text-xs italic text-wallet_btn_text'
 				>
-					Insufficient Funds, 2 DOT is needed to cover up gas fee for delegate setup
+					Insufficient Funds, 2 {networkSymbol} is needed to cover up gas fee for delegate setup
 				</p>
 			</div>
 

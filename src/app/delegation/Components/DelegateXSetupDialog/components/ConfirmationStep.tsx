@@ -4,9 +4,9 @@
 
 import { memo } from 'react';
 import Image from 'next/image';
-import { Button } from '@/app/_shared-components/Button';
 import { ArrowRight } from 'lucide-react';
 import QuestionIcon from '@assets/delegation/question.svg';
+import { Button } from '@/app/_shared-components/Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 
 interface ConfirmationStepProps {
@@ -19,7 +19,7 @@ interface ConfirmationStepProps {
 	isLoading?: boolean;
 }
 
-function ConfirmationStep({ onConfirm, displayName, selectedStrategy, estimatedFee = '≈ 5 DOT', isEditMode = false, votingPower, isLoading }: ConfirmationStepProps) {
+function ConfirmationStep({ onConfirm, displayName, selectedStrategy, estimatedFee, isEditMode = false, votingPower, isLoading }: ConfirmationStepProps) {
 	if (isEditMode) {
 		return null;
 	}
