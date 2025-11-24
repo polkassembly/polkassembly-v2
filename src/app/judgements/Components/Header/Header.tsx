@@ -44,7 +44,7 @@ function Header() {
 						<BecomeRegistrarModal />
 					</div>
 				</div>
-				<p>{t('Judgements.judgementDescription')}</p>
+				<p>{t('Judgements.registrarDescription')}</p>
 				<TabsList className={`w-fit max-w-full items-start overflow-auto pl-4 font-bold md:pl-0 ${styles.hideScrollbar}`}>
 					<TabsTrigger
 						className={styles.header_tab}
