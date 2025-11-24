@@ -198,6 +198,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 					status: ENotificationStatus.ERROR
 				});
 				onOpenChange(false);
+				onSuccess?.(delegateXAccount);
 			}
 		});
 	};

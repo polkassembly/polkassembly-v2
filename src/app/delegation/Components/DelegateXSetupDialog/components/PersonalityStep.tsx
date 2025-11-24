@@ -66,6 +66,7 @@ function PersonalityStep({
 						placeholder='Enter voting power'
 						value={votingPower}
 						onChange={(e) => onVotingPowerChange?.(e.target.value)}
+						type='number'
 					/>
 				</div>
 				<div className='text-text_primary'>
@@ -104,7 +105,7 @@ function PersonalityStep({
 							<div className='mt-3 rounded-lg border border-border_grey p-3 sm:p-4'>
 								<div className='space-y-4'>
 									<div>
-										<p className='mb-2 block text-[10px] font-medium md:text-sm'>Signature Line</p>
+										<p className='mb-2 block text-[10px] font-medium md:text-sm'>Signature Line (optional)</p>
 										<input
 											className='placeholder:text-text_secondary w-full rounded-md border border-border_grey bg-bg_modal px-3 py-2 text-sm outline-none'
 											placeholder='eg. Alice for Growth Advocate'

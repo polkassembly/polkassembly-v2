@@ -209,7 +209,7 @@ const DelegateXCard = memo(({ data, delegateXAccount, onRefresh }: IDelegateXCar
 									<span>{delegateXAccount ? 'Edit' : t('delegate')}</span>
 								</Button>
 								<DelegateXSetupDialog
-									key={`${delegateXAccount?.strategyId}-${delegateXAccount?.contactLink}-${delegateXAccount?.signatureLink}-${delegateXAccount?.votingPower}`}
+									key={`${delegateXAccount?.strategyId}-${delegateXAccount?.contactLink}-${delegateXAccount?.signatureLink}-${delegateXAccount?.votingPower}-${delegateXAccount?.prompt}`}
 									open={openSetupDialog}
 									onOpenChange={setOpenSetupDialog}
 									isEditMode={isEditMode}
@@ -223,7 +223,8 @@ const DelegateXCard = memo(({ data, delegateXAccount, onRefresh }: IDelegateXCar
 													contact: delegateXAccount.contactLink,
 													signature: delegateXAccount.signatureLink,
 													includeComment: delegateXAccount.includeComment,
-													votingPower: delegateXAccount.votingPower
+													votingPower: delegateXAccount.votingPower,
+													prompt: delegateXAccount.prompt
 												}
 											: {}
 									}
