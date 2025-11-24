@@ -1887,6 +1887,30 @@ export class FirestoreService extends FirestoreUtils {
 		return null;
 	}
 
+	static async GetTotalDelegateXAccountsCount(): Promise<number> {
+		const countSnapshot = await this.delegateXAccountsCollectionRef().count().get();
+		return countSnapshot.data().count || 0;
+	}
+
+	static async GetTotalDelegateXVotesPast30Days(): Promise<number> {
+		const thirtyDaysAgo = new Date();
+		thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+		const countSnapshot = await this.delegateXVotesCollectionRef().where('createdAt', '>=', thirtyDaysAgo).count().get();
+		return countSnapshot.data().count || 0;
+	}
+
+	static async GetTotalDelegateXVotingPower(): Promise<string> {
+		const snapshot = await this.delegateXAccountsCollectionRef().get();
+		let total = BigInt(0);
+		snapshot.forEach((doc) => {
+			const data = doc.data() as IDelegateXAccount;
+			if (data.votingPower) {
+				total += BigInt(data.votingPower);
+			}
+		});
+		return total.toString();
+	}
+
 	static async CreateDelegateXAccount(delegateXAccount: IDelegateXAccount) {
 		console.log('delegateXAccount', delegateXAccount);
 		const id = `${delegateXAccount.userId}-${delegateXAccount.network}-${delegateXAccount.address}`;
@@ -2009,8 +2033,8 @@ export class FirestoreService extends FirestoreUtils {
 
 		// get a single vote with decision of 1 and return the voting power
 		const yesVote = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).where('decision', '==', 1).limit(1).get();
-		const yesVoteData = yesVote.docs[0].data() as IDelegateXVoteData;
-		const yesVoteValue = yesVoteData.votingPower;
+		const yesVoteData = yesVote.docs[0]?.data() as IDelegateXVoteData;
+		const yesVoteValue = yesVoteData?.votingPower;
 
 		const thirtyDaysAgo = new Date();
 		thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -2024,6 +2048,6 @@ export class FirestoreService extends FirestoreUtils {
 			abstainCount: abstainCountValue,
 			votingPower: yesVoteValue || '0',
 			votesPast30Days: votesPast30DaysValue
-		} as { totalCount: number; yesCount: number; noCount: number; abstainCount: number; votingPower: string; votesPast30Days: number };
+		};
 	}
 }

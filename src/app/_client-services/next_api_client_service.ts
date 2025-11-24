@@ -1571,6 +1571,8 @@ export class NextApiClientService {
 			noCount: number;
 			abstainCount: number;
 			votesPast30Days: number;
+			votingPower: string;
+			totalVotesPast30Days: number;
 		}>({
 			url,
 			method

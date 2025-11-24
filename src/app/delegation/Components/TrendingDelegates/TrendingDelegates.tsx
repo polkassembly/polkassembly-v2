@@ -36,12 +36,14 @@ const defaultDelegateXData = {
 	address: '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t',
 	bio: 'An AI powered custom agent that votes just like you would. Setup bot suited to your evaluation criterias and simplify voting with reason',
 	image: DelegateXBotGif,
-	maxDelegated: '0',
-	delegatorsCount: 0,
+	votingPower: '0',
 	ayeCount: 0,
 	nayCount: 0,
 	abstainCount: 0,
-	votesPast30Days: 0
+	votesPast30Days: 0,
+	totalVotingPower: '0',
+	totalVotesPast30Days: 0,
+	totalDelegators: 0
 };
 
 const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedSources: EDelegateSource[]; setSelectedSources: (sources: EDelegateSource[]) => void }) => {
@@ -109,12 +111,14 @@ function TrendingDelegates() {
 				setDelegateXData((prev) => ({
 					...prev,
 					address: data.delegateXAccount.address,
-					maxDelegated: `${data.totalVotingPower || 0}`,
-					delegatorsCount: data.totalDelegators || 0,
+					votingPower: data.votingPower || '0',
 					ayeCount: data.yesCount || 0,
 					nayCount: data.noCount || 0,
 					abstainCount: data.abstainCount || 0,
-					votesPast30Days: data.votesPast30Days || 0
+					votesPast30Days: data.votesPast30Days || 0,
+					totalVotesPast30Days: data.totalVotesPast30Days || 0,
+					totalVotingPower: data.totalVotingPower || '0',
+					totalDelegators: data.totalDelegators || 0
 				}));
 			}
 		})();
@@ -170,7 +174,6 @@ function TrendingDelegates() {
 		itemsPerPage
 	} = useDelegateFiltering(delegates);
 
-	const orderedFilteredDelegates = [...filteredDelegates.filter((d) => !d.sources?.includes(EDelegateSource.DELEGATEX))];
 	return (
 		<div className={styles.delegationDetailsCard}>
 			<div className='mb-4 flex items-center justify-between'>
@@ -217,11 +220,14 @@ function TrendingDelegates() {
 					{filteredDelegates.length > 0 ? (
 						<>
 							<div className='my-5 grid w-full grid-cols-1 items-stretch gap-5 lg:grid-cols-2'>
-								<DelegateXCard
-									data={delegateXData}
-									delegateXAccount={delegateXAccount}
-								/>
-								{orderedFilteredDelegates.slice(0, 9).map((delegate: IDelegateDetails) => (
+								{userPreferences.selectedAccount?.address && (
+									<DelegateXCard
+										data={delegateXData}
+										delegateXAccount={delegateXAccount}
+									/>
+								)}
+
+								{filteredDelegates.map((delegate: IDelegateDetails) => (
 									<DelegateCard
 										key={delegate.address}
 										delegate={delegate}

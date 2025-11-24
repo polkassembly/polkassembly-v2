@@ -1141,11 +1141,23 @@ export class OffChainDbService {
 		return FirestoreService.GetVoteDataByDelegateXAccountId({ delegateXAccountId, page, limit });
 	}
 
+	static async GetTotalDelegateXAccountsCount(): Promise<number> {
+		return FirestoreService.GetTotalDelegateXAccountsCount();
+	}
+
+	static async GetTotalDelegateXVotesPast30Days(): Promise<number> {
+		return FirestoreService.GetTotalDelegateXVotesPast30Days();
+	}
+
+	static async GetTotalDelegateXVotingPower(): Promise<string> {
+		return FirestoreService.GetTotalDelegateXVotingPower();
+	}
+
 	static async GetDelegateXVotesMatrixByDelegateXAccountId({
 		delegateXAccountId
 	}: {
 		delegateXAccountId: string;
-	}): Promise<{ yesCount: number; noCount: number; abstainCount: number; votingPower: string; votesPast30Days: number }> {
+	}): Promise<{ votesPast30Days: number; yesCount: number; noCount: number; abstainCount: number; votingPower: string }> {
 		return FirestoreService.GetDelegateXVotesMatrixByDelegateXAccountId({ delegateXAccountId });
 	}
 }

@@ -98,11 +98,23 @@ export const GET = withErrorHandling(async () => {
 	}
 
 	const delegateXAccount = await OffChainDbService.GetDelegateXAccountByUserId({ userId, network });
+
+	const totalDelegators = await OffChainDbService.GetTotalDelegateXAccountsCount();
+
+	const totalVotesPast30Days = await OffChainDbService.GetTotalDelegateXVotesPast30Days();
+
+	const totalVotingPower = await OffChainDbService.GetTotalDelegateXVotingPower();
+
 	if (!delegateXAccount) {
-		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'DelegateX account not found');
+		return NextResponse.json({
+			success: true,
+			delegateXAccount: null,
+			totalVotingPower,
+			totalVotesPast30Days,
+			totalDelegators
+		});
 	}
 
-	// get the vote data for the delegatex account
 	const voteData = await OffChainDbService.GetDelegateXVotesMatrixByDelegateXAccountId({
 		delegateXAccountId: `${delegateXAccount.userId}-${delegateXAccount.network}-${delegateXAccount.address}`
 	});
