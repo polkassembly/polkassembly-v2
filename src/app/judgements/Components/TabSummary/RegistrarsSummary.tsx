@@ -18,7 +18,7 @@ import styles from './TabSummary.module.scss';
 import SearchBar from '../SearchBar/SearchBar';
 
 function RegistrarsSummary() {
-	const t = useTranslations();
+	const t = useTranslations('Judgements');
 
 	const { identityService } = useIdentityService();
 	const {
