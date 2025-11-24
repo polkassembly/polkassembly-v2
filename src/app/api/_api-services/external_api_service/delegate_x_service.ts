@@ -4,13 +4,13 @@
 
 import { EConvictionAmount, EProposalType, IDelegateXAccount } from '@/_shared/types';
 import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
-import { naclDecrypt, blake2AsU8a } from '@polkadot/util-crypto';
+import { naclDecrypt, blake2AsU8a, cryptoWaitReady } from '@polkadot/util-crypto';
 import { stringToU8a, u8aToString } from '@polkadot/util';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { OffChainDbService } from '../offchain_db_service';
 
 export class DelegateXService {
-	static DELEGATE_X_API_BASE_URL = 'https://api.delegatex.com';
+	static DELEGATE_X_API_BASE_URL = 'https://web-production-225c.up.railway.app/api';
 
 	// fetch data from DelegateX API
 	static async fetchDelegateXStrategy(): Promise<unknown> {
@@ -37,10 +37,7 @@ export class DelegateXService {
 	}
 
 	// create DelegateX Bot
-	static async createDelegateXBot(userId: number, strategyId: string, contactLink?: string, signatureLink?: string, prompt?: string): Promise<null | unknown> {
-		if (this.DELEGATE_X_API_BASE_URL === 'https://api.delegatex.com') {
-			return null;
-		}
+	static async createDelegateXBot(userId: number, strategyId: string, contactLink?: string, signatureLink?: string): Promise<null | unknown> {
 		try {
 			const url = new URL(`${this.DELEGATE_X_API_BASE_URL}/create-bot`);
 
@@ -52,11 +49,10 @@ export class DelegateXService {
 					'x-passcode': process.env.DELEGATE_X_SECRET || ''
 				},
 				body: JSON.stringify({
-					userId,
-					strategyId,
-					contactLink,
-					signatureLink,
-					prompt
+					user_id: userId,
+					strategy_id: strategyId,
+					contact_link: contactLink,
+					signature_link: signatureLink
 				})
 			});
 
@@ -74,13 +70,26 @@ export class DelegateXService {
 	// vote on Proposal using polkadot.js api
 	static async voteOnProposal(delegateXAccount: IDelegateXAccount, proposalId: string, decision: number): Promise<string> {
 		try {
-			// decrypt mnemonic
-			const encryptedMnemonicU8a = stringToU8a(delegateXAccount.encryptedMnemonic);
-			const nonceU8a = stringToU8a(delegateXAccount.nonce);
+			// decrypt mnemonic - use base64 decoding for binary data to preserve exact byte sizes
+			const encryptedMnemonicU8a = new Uint8Array(Buffer.from(delegateXAccount.encryptedMnemonic, 'base64'));
+			const nonceU8a = new Uint8Array(Buffer.from(delegateXAccount.nonce, 'base64'));
+
+			// Validate nonce size (must be exactly 24 bytes for naclDecrypt)
+			if (nonceU8a.length !== 24) {
+				throw new Error(`Invalid nonce size: expected 24 bytes, got ${nonceU8a.length} bytes`);
+			}
+
 			// Hash the secret to ensure it's exactly 32 bytes (required by naclDecrypt)
 			const secret = process.env.DELEGATE_X_SECRET || '';
 			const secretKey = blake2AsU8a(stringToU8a(secret), 256);
 			const mnemonic = naclDecrypt(encryptedMnemonicU8a, nonceU8a, secretKey);
+			console.log('Decrypted mnemonic:', u8aToString(mnemonic));
+			console.log('delegateXAccount.network', delegateXAccount.network);
+			console.log('delegateXAccount.address', delegateXAccount.address);
+			console.log('proposalId', proposalId);
+			console.log('decision', decision);
+			// Initialize WASM crypto before creating keyring
+			await cryptoWaitReady();
 			// create keyring
 			const keyring = new Keyring({ type: 'sr25519' });
 			const pair = keyring.addFromUri(u8aToString(mnemonic));

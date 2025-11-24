@@ -13,7 +13,7 @@ import { StatusCodes } from 'http-status-codes';
 import { PolkadotApiService } from '@/app/_client-services/polkadot_api_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { naclEncrypt, blake2AsU8a } from '@polkadot/util-crypto';
-import { stringToU8a, u8aToString } from '@polkadot/util';
+import { stringToU8a } from '@polkadot/util';
 import { DelegateXService } from '@/app/api/_api-services/external_api_service/delegate_x_service';
 import { AuthService } from '@/app/api/_api-services/auth_service';
 
@@ -63,10 +63,11 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	const secretKey = blake2AsU8a(stringToU8a(secret), 256);
 	const { encrypted, nonce } = naclEncrypt(stringToU8a(mnemonic), secretKey);
 
+	// Use base64 encoding for binary data to preserve exact byte sizes (nonce must be exactly 24 bytes)
 	const delegateXAccount = await OffChainDbService.CreateDelegateXAccount({
 		address,
-		encryptedMnemonic: u8aToString(encrypted),
-		nonce: u8aToString(nonce),
+		encryptedMnemonic: Buffer.from(encrypted).toString('base64'),
+		nonce: Buffer.from(nonce).toString('base64'),
 		userId: Number(userId),
 		network,
 		includeComment,
@@ -78,7 +79,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 	});
 
 	// create DelegateX Bot (disabled for now)
-	await DelegateXService.createDelegateXBot(Number(userId), strategyId, contactLink, signatureLink, prompt);
+	await DelegateXService.createDelegateXBot(Number(userId), strategyId, contactLink, signatureLink);
 
 	const response = NextResponse.json({ success: true, delegateXAccount });
 
@@ -154,8 +155,7 @@ export const PUT = withErrorHandling(async (req: NextRequest) => {
 		votingPower: updateData.votingPower ?? existingAccount.votingPower,
 		strategyId: updateData.strategyId ?? existingAccount.strategyId,
 		contactLink: updateData.contactLink ?? existingAccount.contactLink,
-		signatureLink: updateData.signatureLink ?? existingAccount.signatureLink,
-		prompt: updateData.prompt ?? existingAccount.prompt
+		signatureLink: updateData.signatureLink ?? existingAccount.signatureLink
 	});
 
 	// (disabled for now)
@@ -164,8 +164,7 @@ export const PUT = withErrorHandling(async (req: NextRequest) => {
 			Number(userId),
 			updateData.strategyId ?? existingAccount.strategyId ?? '',
 			updateData.contactLink ?? existingAccount.contactLink,
-			updateData.signatureLink ?? existingAccount.signatureLink,
-			updateData.prompt ?? existingAccount.prompt
+			updateData.signatureLink ?? existingAccount.signatureLink
 		);
 	}
 
