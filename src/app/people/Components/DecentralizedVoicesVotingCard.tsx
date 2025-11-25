@@ -6,16 +6,18 @@ import { useState } from 'react';
 import { Check, X, Minus, LayoutList, LayoutGrid, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { IDVDelegateVotingMatrix, IDVCohort } from '@/_shared/types';
 import Address from '@/app/_shared-components/Profile/Address/Address';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 
 interface DecentralizedVoicesVotingCardProps {
 	votingMatrix: IDVDelegateVotingMatrix[];
 	referendumIndices: number[];
-	cohort: IDVCohort;
+	cohort: IDVCohort | null;
+	loading?: boolean;
 }
 
 type SortOption = 'name' | 'participation' | 'supportRate' | 'activity';
 
-function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort }: DecentralizedVoicesVotingCardProps) {
+function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort, loading }: DecentralizedVoicesVotingCardProps) {
 	const referendums = referendumIndices.length > 0 ? referendumIndices : [0];
 	const [viewMode, setViewMode] = useState<'compact' | 'heatmap'>('compact');
 	const [expandedRows, setExpandedRows] = useState<string[]>(votingMatrix.length > 0 ? [votingMatrix[0].address] : []); // Default first one expanded
@@ -23,7 +25,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 
 	const minRef = referendums.length > 0 ? Math.min(...referendums) : 0;
 	const maxRef = referendums.length > 0 ? Math.max(...referendums) : 0;
-	const daoCount = cohort.delegatesCount;
+	const daoCount = cohort?.delegatesCount ?? 0;
 
 	const sortedVoicesData = [...votingMatrix].sort((a, b) => {
 		switch (sortBy) {
@@ -145,7 +147,40 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 			</div>
 
 			<div className='grid grid-cols-1 gap-4'>
-				{viewMode === 'compact' ? (
+				{loading ? (
+					[1, 2, 3, 4].map((i) => (
+						<div
+							key={i}
+							className='rounded-xl border border-border_grey bg-white p-4 dark:bg-black'
+						>
+							<div className='flex items-center justify-between'>
+								<div className='flex items-center gap-3'>
+									<Skeleton className='h-8 w-8 rounded-full' />
+									<div className='space-y-2'>
+										<Skeleton className='h-4 w-32' />
+										<Skeleton className='h-3 w-24' />
+									</div>
+								</div>
+								<Skeleton className='h-5 w-5' />
+							</div>
+							<div className='mt-4 grid grid-cols-3 gap-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-900/50'>
+								<div className='space-y-2'>
+									<Skeleton className='h-3 w-16' />
+									<Skeleton className='h-6 w-12' />
+								</div>
+								<div className='space-y-2'>
+									<Skeleton className='h-3 w-16' />
+									<Skeleton className='h-6 w-12' />
+								</div>
+								<div className='space-y-2'>
+									<Skeleton className='h-3 w-16' />
+									<Skeleton className='h-6 w-12' />
+								</div>
+							</div>
+							<Skeleton className='mt-4 h-2 w-full rounded-full' />
+						</div>
+					))
+				) : viewMode === 'compact' ? (
 					sortedVoicesData.map((item) => (
 						<div
 							key={item.address}
