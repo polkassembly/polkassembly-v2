@@ -59,7 +59,7 @@ export class DVDelegateService {
 				network,
 				voters: delegateAddresses,
 				startBlock,
-				endBlock: endBlock || 2147483647,
+				endBlock: endBlock || (await OnChainDbService.GetLatestBlockNumber(network)),
 				limit,
 				page
 			});
@@ -139,7 +139,7 @@ export class DVDelegateService {
 					page,
 					limit: 1000,
 					startBlock: startBlock || 0,
-					endBlock: endBlock || 2147483647
+					endBlock: endBlock || (await OnChainDbService.GetLatestBlockNumber(network))
 				});
 				return response.items || [];
 			}, 1000);

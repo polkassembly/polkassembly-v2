@@ -1700,4 +1700,16 @@ export class SubsquidService extends SubsquidUtils {
 
 		return trackStats;
 	}
+
+	static async GetLatestBlockNumber(network: ENetwork): Promise<number> {
+		const gqlClient = this.subsquidGqlClient(network);
+		const { data, error } = await gqlClient.query(SubsquidService.GET_LATEST_BLOCK_NUMBER, {}).toPromise();
+
+		if (error || !data || !data.proposals || data.proposals.length === 0) {
+			console.error('Error fetching latest block number:', error);
+			return 0;
+		}
+
+		return data.proposals[0].createdAtBlock || 0;
+	}
 }
