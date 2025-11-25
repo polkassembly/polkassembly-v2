@@ -69,7 +69,6 @@ function PeoplePage() {
 									className='flex items-center gap-2 rounded-md border border-border_grey px-3 py-2 text-sm text-text_primary hover:bg-sidebar_footer'
 								>
 									<Filter className='h-4 w-4 text-wallet_btn_text' />
-									<span>Count by</span>
 									<ChevronDown className='h-4 w-4 text-wallet_btn_text' />
 								</button>
 							</PopoverTrigger>

@@ -120,7 +120,6 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 								className={`flex items-center gap-1 rounded-md border p-2 ${selectedTracks.length > 0 ? 'border-text_pink bg-text_pink/10' : 'border-border_grey'}`}
 							>
 								<Filter className='h-4 w-4 text-wallet_btn_text' />
-								<span className='text-xs text-wallet_btn_text'>Track</span>
 								{selectedTracks.length > 0 && <span className='ml-1 rounded-full bg-text_pink px-1.5 text-xs text-white'>{selectedTracks.length}</span>}
 								<ChevronDown className='h-3 w-3 text-wallet_btn_text' />
 							</button>
@@ -160,7 +159,6 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 								className={`flex items-center gap-1 rounded-md border p-2 ${selectedInfluence.length > 0 ? 'border-text_pink bg-text_pink/10' : 'border-border_grey'}`}
 							>
 								<Filter className='h-4 w-4 text-wallet_btn_text' />
-								<span className='text-xs text-wallet_btn_text'>Vote</span>
 								{selectedInfluence.length > 0 && <span className='ml-1 rounded-full bg-text_pink px-1.5 text-xs text-white'>{selectedInfluence.length}</span>}
 								<ChevronDown className='h-3 w-3 text-wallet_btn_text' />
 							</button>
@@ -200,7 +198,6 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 								className='flex items-center gap-1 rounded-md border border-border_grey p-2'
 							>
 								<ArrowUpDown className='h-4 w-4 text-wallet_btn_text' />
-								<span className='text-xs text-wallet_btn_text'>Sort</span>
 								<ChevronDown className='h-3 w-3 text-wallet_btn_text' />
 							</button>
 						</PopoverTrigger>
