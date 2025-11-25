@@ -55,7 +55,7 @@ function CohortCard({ cohort, loading }: CohortCardProps) {
 
 	return (
 		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
-			<div className='grid grid-cols-1 gap-6 md:grid-cols-4'>
+			<div className='flex flex-col justify-between gap-6 md:flex-row'>
 				<div className='flex items-start gap-4'>
 					<Image
 						src={delegatees}
