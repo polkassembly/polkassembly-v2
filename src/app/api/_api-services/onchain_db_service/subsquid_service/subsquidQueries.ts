@@ -272,65 +272,6 @@ export class SubsquidQueries {
 		}
 	`;
 
-	protected static GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES_AND_ORIGINS_AND_DATE_RANGE = `
-	query GetProposalsListingByTypeAndStatusesAndOriginsAndDateRange(
-		$limit: Int!,
-		$offset: Int!,
-		$type_eq: ProposalType!,
-		$status_in: [ProposalStatus!],
-		$origin_in: [String!],
-		$createdAt_gte: DateTime!,
-		$createdAt_lte: DateTime!
-	) {
-		proposals(
-			limit: $limit,
-			offset: $offset,
-			where: {
-				type_eq: $type_eq,
-				status_in: $status_in,
-				origin_in: $origin_in,
-				createdAt_gte: $createdAt_gte,
-				createdAt_lte: $createdAt_lte
-			},
-			orderBy: index_DESC
-		) {
-			createdAt
-			description
-			index
-			origin
-			proposer
-			reward
-			status
-			curator
-			hash
-			preimage {
-				proposedCall {
-					args
-				}
-			}
-			statusHistory {
-				status
-				timestamp
-			}
-			createdAtBlock
-			updatedAtBlock
-		}
-
-		proposalsConnection(
-			orderBy: id_ASC,
-			where: {
-				type_eq: $type_eq,
-				status_in: $status_in,
-				origin_in: $origin_in,
-				createdAt_gte: $createdAt_gte,
-				createdAt_lte: $createdAt_lte
-			}
-		) {
-			totalCount
-		}
-	}
-`;
-
 	// vote metrics queries
 
 	protected static GET_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_HASH = `
@@ -1346,18 +1287,99 @@ export class SubsquidQueries {
 
 	`;
 
+	protected static GET_VOTES_BY_VOTER_AND_BLOCK_RANGE = `
+		query GetVotesByVoterAndBlockRange(
+			$limit: Int!,
+			$offset: Int!,
+			$voter_in: [String!]!,
+			$createdAtBlock_gte: Int!,
+			$createdAtBlock_lte: Int!
+		) {
+			votes: flattenedConvictionVotes(
+				where: {
+					voter_in: $voter_in,
+					removedAtBlock_isNull: true,
+					createdAtBlock_gte: $createdAtBlock_gte,
+					createdAtBlock_lte: $createdAtBlock_lte
+				},
+				limit: $limit,
+				offset: $offset,
+				orderBy: createdAtBlock_DESC
+			) {
+				proposalIndex
+				isDelegated
+				parentVote {
+					extrinsicIndex
+				}
+				type
+				voter
+				balance {
+					__typename
+					... on StandardVoteBalance {
+						value
+					}
+					... on SplitVoteBalance {
+						aye
+						nay
+						abstain
+					}
+				}
+				decision
+				createdAt
+				lockPeriod
+				proposal {
+					createdAt
+					description
+					index
+					origin
+					proposer
+					reward
+					status
+					curator
+					hash
+					preimage {
+						proposedCall {
+							args
+						}
+					}
+					statusHistory {
+						status
+						timestamp
+					}
+					createdAtBlock
+					updatedAtBlock
+				}
+			}
+			totalCount: flattenedConvictionVotesConnection(
+				where: {
+					voter_in: $voter_in,
+					removedAtBlock_isNull: true,
+					createdAtBlock_gte: $createdAtBlock_gte,
+					createdAtBlock_lte: $createdAtBlock_lte
+				},
+				orderBy: createdAtBlock_DESC
+			) {
+				totalCount
+			}
+		}
+	`;
+
 	protected static GET_VOTES_FOR_ADDRESSES_AND_PROPOSAL_INDICES = `
 		query GetVotesForAddressesAndProposalIndices(
 			$limit: Int!,
 			$offset: Int!,
 			$voter_in: [String!]!,
-			$proposalIndex_in: [Int!]!
+			$proposalIndex_in: [Int!],
+			$createdAtBlock_gte: Int!,
+			$createdAtBlock_lte: Int!
 		) {
 			votes: flattenedConvictionVotes(
 				where: {
 					voter_in: $voter_in,
 					proposalIndex_in: $proposalIndex_in,
-					removedAtBlock_isNull: true
+					removedAtBlock_isNull: true,
+					createdAtBlock_gte: $createdAtBlock_gte,
+					createdAtBlock_lte: $createdAtBlock_lte
 				},
 				limit: $limit,
 				offset: $offset,
@@ -1385,14 +1407,35 @@ export class SubsquidQueries {
 				createdAt
 				lockPeriod
 				proposal {
+					createdAt
+					description
+					index
+					origin
+					proposer
+					reward
 					status
+					curator
+					hash
+					preimage {
+						proposedCall {
+							args
+						}
+					}
+					statusHistory {
+						status
+						timestamp
+					}
+					createdAtBlock
+					updatedAtBlock
 				}
 			}
 			totalCount: flattenedConvictionVotesConnection(
 				where: {
 					voter_in: $voter_in,
 					proposalIndex_in: $proposalIndex_in,
-					removedAtBlock_isNull: true
+					removedAtBlock_isNull: true,
+					createdAtBlock_gte: $createdAtBlock_gte,
+					createdAtBlock_lte: $createdAtBlock_lte
 				},
 				orderBy: createdAt_DESC
 			) {

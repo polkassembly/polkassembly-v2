@@ -4,10 +4,10 @@
 
 import { useState } from 'react';
 import { Activity, HelpCircle, Filter, Ban } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuCheckboxItem, DropdownMenuSeparator } from '@/app/_shared-components/DropdownMenu';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
 import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuCheckboxItem, DropdownMenuSeparator } from '@/app/_shared-components/DropdownMenu';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { IDVDelegateWithStats, IDVCohort, EDVDelegateType } from '@/_shared/types';
 
@@ -48,22 +48,24 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort }: DecentralisedVo
 						<Activity className='text-decision_bar_indicator' />
 						<h2 className='text-2xl font-semibold text-navbar_title'>Decentralised Voices</h2>
 					</div>
-					<div className='flex rounded-lg bg-sidebar_footer p-1'>
-						<button
-							type='button'
-							onClick={() => setActiveTab('DAO')}
-							className={`rounded px-3 py-0.5 text-sm text-navbar_title transition-colors ${activeTab === 'DAO' && 'bg-section_dark_overlay font-semibold'}`}
-						>
-							DAO ({cohort.delegatesCount})
-						</button>
-						<button
-							type='button'
-							onClick={() => setActiveTab('GUARDIAN')}
-							className={`py-0.6 rounded px-3 text-sm font-medium text-navbar_title transition-colors ${activeTab === 'GUARDIAN' && 'bg-section_dark_overlay font-semibold'}`}
-						>
-							GUARDIAN ({cohort.guardiansCount})
-						</button>
-					</div>
+					{cohort.guardiansCount > 0 && (
+						<div className='flex rounded-lg bg-sidebar_footer p-1'>
+							<button
+								type='button'
+								onClick={() => setActiveTab('DAO')}
+								className={`rounded px-3 py-0.5 text-sm text-navbar_title transition-colors ${activeTab === 'DAO' && 'bg-section_dark_overlay font-semibold'}`}
+							>
+								DAO ({cohort.delegatesCount})
+							</button>
+							<button
+								type='button'
+								onClick={() => setActiveTab('GUARDIAN')}
+								className={`py-0.6 rounded px-3 text-sm font-medium text-navbar_title transition-colors ${activeTab === 'GUARDIAN' && 'bg-section_dark_overlay font-semibold'}`}
+							>
+								GUARDIAN ({cohort.guardiansCount})
+							</button>
+						</div>
+					)}
 				</div>
 				<div className='flex gap-2'>
 					<DropdownMenu>

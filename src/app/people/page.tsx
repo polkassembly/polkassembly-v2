@@ -141,7 +141,7 @@ function PeoplePage() {
 		<div className='min-h-screen bg-page_background'>
 			<TabCard />
 			<div className='mb-4 w-full p-4 md:mb-8 md:px-20'>
-				<div className='mb-4 w-full rounded-2xl border border-border_grey bg-bg_modal p-6 shadow-md md:mb-8'>
+				<div className='mb-4 w-full overflow-hidden rounded-2xl border border-border_grey bg-bg_modal p-6 shadow-md md:mb-8'>
 					<div className='flex items-center justify-between'>
 						<div className='flex items-center gap-2'>
 							<Activity className='text-border_blue' />

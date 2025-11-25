@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { Check, X, Minus, LayoutList, LayoutGrid, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { IDVDelegateVotingMatrix, IDVCohort } from '@/_shared/types';
+import Address from '@/app/_shared-components/Profile/Address/Address';
 
 interface DecentralizedVoicesVotingCardProps {
 	votingMatrix: IDVDelegateVotingMatrix[];
@@ -82,7 +83,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 	};
 
 	return (
-		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
+		<div className='my-4 w-full max-w-full overflow-hidden rounded-3xl border border-border_grey bg-bg_modal p-6'>
 			<div className='mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
 				<div>
 					<h2 className='text-2xl font-semibold text-navbar_title'>Decentralized Voices Voting</h2>
@@ -143,9 +144,9 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 				})}
 			</div>
 
-			<div className='flex flex-col gap-4'>
+			<div className='grid grid-cols-1 gap-4'>
 				{viewMode === 'compact' ? (
-					sortedVoicesData.map((item, idx) => (
+					sortedVoicesData.map((item) => (
 						<div
 							key={item.address}
 							className='rounded-xl border border-border_grey bg-white p-4 dark:bg-black'
@@ -156,10 +157,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 								onClick={() => toggleRow(item.address)}
 							>
 								<div className='flex items-center gap-3'>
-									<div className='flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-xl dark:bg-gray-800'>
-										{/* Placeholder Icon */}
-										{idx === 0 ? '🌐' : idx === 1 ? '🏛️' : idx === 2 ? '⚡' : '🎓'}
-									</div>
+									<Address address={item.address} />
 									<div>
 										<p className='text-text_secondary text-xs'>
 											{item.activeCount} of {item.totalRefs} referendums
@@ -179,7 +177,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 									<p className='text-lg font-bold text-green-600'>{item.ayeRate.toFixed(1)}%</p>
 								</div>
 								<div>
-									<p className='text-text_secondary text-xs'>Active</p>
+									<p className='text-text_secondary text-xs'>Total</p>
 									<p className='text-lg font-bold text-blue-600'>{item.activeCount}</p>
 								</div>
 							</div>
@@ -223,48 +221,51 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 						</div>
 					))
 				) : (
-					<div className='overflow-x-auto'>
-						<table className='w-full min-w-[800px] table-auto border-collapse'>
-							<thead>
-								<tr className='border-b border-border_grey text-left text-xs font-semibold text-text_primary'>
-									<th className='w-64 py-4 pl-4 uppercase'>DAO</th>
-									{referendums.map((ref) => (
-										<th
-											key={ref}
-											className='text-text_secondary px-2 py-4 text-center'
-										>
-											#{ref}
-										</th>
-									))}
-								</tr>
-							</thead>
-							<tbody>
-								{sortedVoicesData.map((item) => (
-									<tr
-										key={item.address}
-										className='border-b border-border_grey hover:bg-gray-50 dark:hover:bg-gray-900'
-									>
-										<td className='py-4 pl-4'>
-											<div className='flex flex-col'>
-												<span className='text-text_secondary text-xs'>{item.participation.toFixed(1)}% active</span>
-											</div>
-										</td>
-										{referendums.map((ref) => {
-											const vote = item.votes[ref] || 'novote';
-											return (
-												<td
-													key={ref}
-													className='p-2 text-center'
-												>
-													<div className={`mx-auto flex h-8 w-8 items-center justify-center rounded ${getVoteColor(vote)}`}>{getVoteIcon(vote)}</div>
-												</td>
-											);
-										})}
+					<div className='flex flex-col gap-4'>
+						<div className='hide_scrollbar block w-full overflow-x-auto'>
+							<table className='w-full table-auto border-collapse'>
+								<thead>
+									<tr className='border-b border-border_grey text-left text-xs font-semibold text-text_primary'>
+										<th className='sticky left-0 z-10 w-64 bg-white py-4 pl-4 uppercase dark:bg-black'>DAO</th>
+										{referendums.map((ref) => (
+											<th
+												key={ref}
+												className='text-text_secondary px-2 py-4 text-center'
+											>
+												#{ref}
+											</th>
+										))}
 									</tr>
-								))}
-							</tbody>
-						</table>
-						<div className='mt-4 flex items-center gap-6 rounded-lg border border-border_grey bg-gray-50 p-4 dark:bg-gray-900/50'>
+								</thead>
+								<tbody>
+									{sortedVoicesData.map((item) => (
+										<tr
+											key={item.address}
+											className='border-b border-border_grey hover:bg-gray-50 dark:hover:bg-gray-900'
+										>
+											<td className='sticky left-0 z-10 bg-white px-4 py-4 dark:bg-black'>
+												<div className='flex flex-col'>
+													<Address address={item.address} />
+													<span className='text-text_secondary text-xs'>{item.participation.toFixed(1)}% active</span>
+												</div>
+											</td>
+											{referendums.map((ref) => {
+												const vote = item.votes[ref] || 'novote';
+												return (
+													<td
+														key={ref}
+														className='p-2 text-center'
+													>
+														<div className={`mx-auto flex h-8 w-8 items-center justify-center rounded ${getVoteColor(vote)}`}>{getVoteIcon(vote)}</div>
+													</td>
+												);
+											})}
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+						<div className='flex items-center gap-6 rounded-lg border border-border_grey bg-gray-50 p-4 dark:bg-gray-900/50'>
 							<span className='font-semibold text-text_primary'>Legend</span>
 							<div className='flex items-center gap-2'>
 								<div className='flex h-6 w-6 items-center justify-center rounded bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'>

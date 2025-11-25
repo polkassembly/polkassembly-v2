@@ -45,18 +45,20 @@ function CohortCard({ cohort }: CohortCardProps) {
 					</div>
 				</div>
 
-				<div className='flex items-start gap-4'>
-					<Image
-						src={delegates}
-						alt='Delegates'
-						className='h-10 w-10'
-					/>
-					<div>
-						<p className='text-xs font-medium uppercase text-community_text'>GUARDIANS</p>
-						<p className='text-2xl font-semibold text-text_primary'>{cohort.guardiansCount}</p>
-						<p className='text-xs text-wallet_btn_text'>{cohort.guardiansCount > 0 ? `${formatNumber(cohort.delegationPerGuardian)} delegations each` : 'N/A'}</p>
+				{cohort.guardiansCount > 0 && (
+					<div className='flex items-start gap-4'>
+						<Image
+							src={delegates}
+							alt='Delegates'
+							className='h-10 w-10'
+						/>
+						<div>
+							<p className='text-xs font-medium uppercase text-community_text'>GUARDIANS</p>
+							<p className='text-2xl font-semibold text-text_primary'>{cohort.guardiansCount}</p>
+							<p className='text-xs text-wallet_btn_text'>{cohort.guardiansCount > 0 ? `${formatNumber(cohort.delegationPerGuardian)} delegations each` : 'N/A'}</p>
+						</div>
 					</div>
-				</div>
+				)}
 
 				<div className='flex items-start gap-4'>
 					<Image
@@ -82,7 +84,7 @@ function CohortCard({ cohort }: CohortCardProps) {
 						/>
 						<div>
 							<p className='text-xs font-medium uppercase text-community_text'>END TIME</p>
-							<p className='text-lg font-semibold text-text_primary'>
+							<p className='whitespace-nowrap text-lg font-semibold text-text_primary'>
 								{endDateTime.date} <span className='text-wallet_btn_text'>{endDateTime.time}</span>
 							</p>
 							<p className='text-xs text-wallet_btn_text'>#{cohort.endBlock?.toLocaleString()}</p>
