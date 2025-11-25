@@ -272,6 +272,65 @@ export class SubsquidQueries {
 		}
 	`;
 
+	protected static GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES_AND_ORIGINS_AND_DATE_RANGE = `
+	query GetProposalsListingByTypeAndStatusesAndOriginsAndDateRange(
+		$limit: Int!,
+		$offset: Int!,
+		$type_eq: ProposalType!,
+		$status_in: [ProposalStatus!],
+		$origin_in: [String!],
+		$createdAt_gte: DateTime!,
+		$createdAt_lte: DateTime!
+	) {
+		proposals(
+			limit: $limit,
+			offset: $offset,
+			where: {
+				type_eq: $type_eq,
+				status_in: $status_in,
+				origin_in: $origin_in,
+				createdAt_gte: $createdAt_gte,
+				createdAt_lte: $createdAt_lte
+			},
+			orderBy: index_DESC
+		) {
+			createdAt
+			description
+			index
+			origin
+			proposer
+			reward
+			status
+			curator
+			hash
+			preimage {
+				proposedCall {
+					args
+				}
+			}
+			statusHistory {
+				status
+				timestamp
+			}
+			createdAtBlock
+			updatedAtBlock
+		}
+
+		proposalsConnection(
+			orderBy: id_ASC,
+			where: {
+				type_eq: $type_eq,
+				status_in: $status_in,
+				origin_in: $origin_in,
+				createdAt_gte: $createdAt_gte,
+				createdAt_lte: $createdAt_lte
+			}
+		) {
+			totalCount
+		}
+	}
+`;
+
 	// vote metrics queries
 
 	protected static GET_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_HASH = `
@@ -1285,6 +1344,61 @@ export class SubsquidQueries {
 			}
 		}
 
+	`;
+
+	protected static GET_VOTES_FOR_ADDRESSES_AND_PROPOSAL_INDICES = `
+		query GetVotesForAddressesAndProposalIndices(
+			$limit: Int!,
+			$offset: Int!,
+			$voter_in: [String!]!,
+			$proposalIndex_in: [Int!]!
+		) {
+			votes: flattenedConvictionVotes(
+				where: {
+					voter_in: $voter_in,
+					proposalIndex_in: $proposalIndex_in,
+					removedAtBlock_isNull: true
+				},
+				limit: $limit,
+				offset: $offset,
+				orderBy: createdAt_DESC
+			) {
+				proposalIndex
+				isDelegated
+				parentVote {
+					extrinsicIndex
+				}
+				type
+				voter
+				balance {
+					__typename
+					... on StandardVoteBalance {
+						value
+					}
+					... on SplitVoteBalance {
+						aye
+						nay
+						abstain
+					}
+				}
+				decision
+				createdAt
+				lockPeriod
+				proposal {
+					status
+				}
+			}
+			totalCount: flattenedConvictionVotesConnection(
+				where: {
+					voter_in: $voter_in,
+					proposalIndex_in: $proposalIndex_in,
+					removedAtBlock_isNull: true
+				},
+				orderBy: createdAt_DESC
+			) {
+				totalCount
+			}
+		}
 	`;
 
 	protected static GET_ALL_FLATTENED_VOTES_WITHOUT_FILTERS = `

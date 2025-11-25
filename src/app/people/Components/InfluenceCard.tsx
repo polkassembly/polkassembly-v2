@@ -2,95 +2,238 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { Activity, Filter, Menu, Check, X, Minus } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Activity, Filter, ArrowUpDown, Check, X, Minus, ChevronDown, MoreHorizontal } from 'lucide-react';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import VotingBar from '@/app/_shared-components/ListingComponent/VotingBar/VotingBar';
 import { getSpanStyle } from '@/app/_shared-components/TopicTag/TopicTag';
 import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
 import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
-import { EProposalStatus } from '@/_shared/types';
+import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
+import { Checkbox } from '@/app/_shared-components/Checkbox';
+import { IDVReferendumInfluence, EInfluenceStatus } from '@/_shared/types';
 
-const referendaData = [
-	{
-		id: 45,
-		title: 'Standard Guidelines Standard Guidelines ....',
-		track: 'Medium Spender',
-		status: EProposalStatus.Rejected,
-		influence: 'rejected'
-	},
-	{
-		id: 46,
-		title: 'Accessibility Standards Ensuring all users ...',
-		track: 'Small Spenders',
-		status: EProposalStatus.Active,
-		influence: 'approved'
-	},
-	{
-		id: 47,
-		title: 'Responsive Design Adapting layouts for var..',
-		track: 'Big Spender',
-		status: EProposalStatus.Approved,
-		influence: 'abstain'
-	},
-	{
-		id: 48,
-		title: 'Color Contrast Guidelines Improving read..',
-		track: 'Medium Spender',
-		status: EProposalStatus.Deciding,
-		influence: 'approved'
-	},
-	{
-		id: 49,
-		title: 'Typography Standards Establishing font ..',
-		track: 'Small Spenders',
-		status: EProposalStatus.Executed,
-		influence: 'abstain'
-	},
-	{
-		id: 50,
-		title: 'Component Library Creating reusable design..',
-		track: 'Big Spender',
-		status: EProposalStatus.DecisionDepositPlaced,
-		influence: 'rejected'
-	},
-	{
-		id: 51,
-		title: 'User Feedback Integration Incorporating us..',
-		track: 'Small Spender',
-		status: EProposalStatus.ConfirmStarted,
-		influence: 'rejected'
-	},
-	{
-		id: 52,
-		title: 'Prototyping Best Practices Streamlining the..',
-		track: 'Big Spenders',
-		status: EProposalStatus.Closed,
-		influence: 'approved'
-	}
-];
+interface InfluenceCardProps {
+	referendaInfluence: IDVReferendumInfluence[];
+}
 
-function InfluenceCard() {
+type SortOption = 'index' | 'status' | 'influence' | 'votes';
+type SortDirection = 'asc' | 'desc';
+
+function InfluenceCard({ referendaInfluence }: InfluenceCardProps) {
+	const [page, setPage] = useState(1);
+	const [sortBy, setSortBy] = useState<SortOption>('index');
+	const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+	const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
+	const [selectedInfluence, setSelectedInfluence] = useState<string[]>([]);
+	const pageSize = 10;
+
+	const availableTracks = useMemo(() => {
+		const tracks = [...new Set(referendaInfluence.map((r) => r.track))];
+		return tracks.sort();
+	}, [referendaInfluence]);
+
+	const filteredAndSortedData = useMemo(() => {
+		let data = [...referendaInfluence];
+
+		if (selectedTracks.length > 0) {
+			data = data.filter((r) => selectedTracks.includes(r.track));
+		}
+
+		if (selectedInfluence.length > 0) {
+			data = data.filter((r) => selectedInfluence.includes(r.influence));
+		}
+
+		data.sort((a, b) => {
+			let comparison = 0;
+			switch (sortBy) {
+				case 'index':
+					comparison = a.index - b.index;
+					break;
+				case 'status':
+					comparison = a.status.localeCompare(b.status);
+					break;
+				case 'influence':
+					comparison = a.influence.localeCompare(b.influence);
+					break;
+				case 'votes':
+					comparison = Number(a.dvTotalVotingPower) - Number(b.dvTotalVotingPower);
+					break;
+				default:
+					comparison = 0;
+			}
+			return sortDirection === 'asc' ? comparison : -comparison;
+		});
+
+		return data;
+	}, [referendaInfluence, selectedTracks, selectedInfluence, sortBy, sortDirection]);
+
+	const outcomeChangedCount = filteredAndSortedData.filter((r) => r.influence === EInfluenceStatus.APPROVED || r.influence === EInfluenceStatus.REJECTED).length;
+	const totalCount = filteredAndSortedData.length;
+	const outcomePercent = totalCount > 0 ? ((outcomeChangedCount / totalCount) * 100).toFixed(2) : '0';
+
+	const paginatedData = filteredAndSortedData.slice((page - 1) * pageSize, page * pageSize);
+
+	const handleSort = (option: SortOption) => {
+		if (sortBy === option) {
+			setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+		} else {
+			setSortBy(option);
+			setSortDirection('desc');
+		}
+		setPage(1);
+	};
+
+	const handleTrackToggle = (track: string) => {
+		setSelectedTracks((prev) => (prev.includes(track) ? prev.filter((t) => t !== track) : [...prev, track]));
+		setPage(1);
+	};
+
+	const handleInfluenceToggle = (influence: string) => {
+		setSelectedInfluence((prev) => (prev.includes(influence) ? prev.filter((i) => i !== influence) : [...prev, influence]));
+		setPage(1);
+	};
+
+	const clearFilters = () => {
+		setSelectedTracks([]);
+		setSelectedInfluence([]);
+		setPage(1);
+	};
+
 	return (
 		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
 			<div className='mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
 				<div className='flex items-center gap-2'>
 					<Activity className='text-decision_bar_indicator' />
 					<h2 className='text-2xl font-semibold text-navbar_title'>Influence by Referenda</h2>
-					<span className='ml-2 rounded-lg bg-bounty_dash_bg p-2 text-xs font-medium text-wallet_btn_text'>Outcome changed 1 (1.54%) | Total 65</span>
+					<span className='ml-2 rounded-lg bg-bounty_dash_bg p-2 text-xs font-medium text-wallet_btn_text'>
+						Outcome changed {outcomeChangedCount} ({outcomePercent}%) | Total {totalCount}
+					</span>
 				</div>
 				<div className='flex gap-2'>
-					<button
-						type='button'
-						className='rounded-md border border-border_grey p-2'
-					>
-						<Filter className='h-4 w-4 text-wallet_btn_text' />
-					</button>
-					<button
-						type='button'
-						className='rounded-md border border-border_grey p-2'
-					>
-						<Menu className='h-4 w-4 text-wallet_btn_text' />
-					</button>
+					<Popover>
+						<PopoverTrigger asChild>
+							<button
+								type='button'
+								className={`flex items-center gap-1 rounded-md border p-2 ${selectedTracks.length > 0 ? 'border-text_pink bg-text_pink/10' : 'border-border_grey'}`}
+							>
+								<Filter className='h-4 w-4 text-wallet_btn_text' />
+								<span className='text-xs text-wallet_btn_text'>Track</span>
+								{selectedTracks.length > 0 && <span className='ml-1 rounded-full bg-text_pink px-1.5 text-xs text-white'>{selectedTracks.length}</span>}
+								<ChevronDown className='h-3 w-3 text-wallet_btn_text' />
+							</button>
+						</PopoverTrigger>
+						<PopoverContent className='max-h-64 w-56 overflow-y-auto border-border_grey p-3'>
+							<div className='mb-2 flex items-center justify-between'>
+								<span className='text-xs font-semibold text-text_primary'>Filter by Track</span>
+								<button
+									type='button'
+									onClick={() => setSelectedTracks([])}
+									className='text-xs text-text_pink'
+								>
+									Clear
+								</button>
+							</div>
+							<div className='space-y-2'>
+								{availableTracks.map((track) => (
+									<div
+										key={track}
+										className='flex items-center gap-2'
+									>
+										<Checkbox
+											checked={selectedTracks.includes(track)}
+											onCheckedChange={() => handleTrackToggle(track)}
+										/>
+										<span className='text-xs text-text_primary'>{convertCamelCaseToTitleCase(track)}</span>
+									</div>
+								))}
+							</div>
+						</PopoverContent>
+					</Popover>
+
+					<Popover>
+						<PopoverTrigger asChild>
+							<button
+								type='button'
+								className={`flex items-center gap-1 rounded-md border p-2 ${selectedInfluence.length > 0 ? 'border-text_pink bg-text_pink/10' : 'border-border_grey'}`}
+							>
+								<Filter className='h-4 w-4 text-wallet_btn_text' />
+								<span className='text-xs text-wallet_btn_text'>Vote</span>
+								{selectedInfluence.length > 0 && <span className='ml-1 rounded-full bg-text_pink px-1.5 text-xs text-white'>{selectedInfluence.length}</span>}
+								<ChevronDown className='h-3 w-3 text-wallet_btn_text' />
+							</button>
+						</PopoverTrigger>
+						<PopoverContent className='w-48 border-border_grey p-3'>
+							<div className='mb-2 flex items-center justify-between'>
+								<span className='text-xs font-semibold text-text_primary'>Filter by Influence</span>
+								<button
+									type='button'
+									onClick={() => setSelectedInfluence([])}
+									className='text-xs text-text_pink'
+								>
+									Clear
+								</button>
+							</div>
+							<div className='space-y-2'>
+								{Object.values(EInfluenceStatus).map((influence) => (
+									<div
+										key={influence}
+										className='flex items-center gap-2'
+									>
+										<Checkbox
+											checked={selectedInfluence.includes(influence)}
+											onCheckedChange={() => handleInfluenceToggle(influence)}
+										/>
+										<span className='text-xs capitalize text-text_primary'>{influence.replace('_', ' ')}</span>
+									</div>
+								))}
+							</div>
+						</PopoverContent>
+					</Popover>
+
+					<Popover>
+						<PopoverTrigger asChild>
+							<button
+								type='button'
+								className='flex items-center gap-1 rounded-md border border-border_grey p-2'
+							>
+								<ArrowUpDown className='h-4 w-4 text-wallet_btn_text' />
+								<span className='text-xs text-wallet_btn_text'>Sort</span>
+								<ChevronDown className='h-3 w-3 text-wallet_btn_text' />
+							</button>
+						</PopoverTrigger>
+						<PopoverContent className='w-48 border-border_grey p-3'>
+							<div className='mb-2 text-xs font-semibold text-text_primary'>Sort by</div>
+							<div className='space-y-1'>
+								{[
+									{ value: 'index', label: 'Referendum #' },
+									{ value: 'status', label: 'Status' },
+									{ value: 'influence', label: 'Influence' },
+									{ value: 'votes', label: 'Voting Power' }
+								].map((option) => (
+									<button
+										key={option.value}
+										type='button'
+										onClick={() => handleSort(option.value as SortOption)}
+										className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-xs ${sortBy === option.value ? 'bg-text_pink/10 text-text_pink' : 'text-text_primary hover:bg-sidebar_footer'}`}
+									>
+										{option.label}
+										{sortBy === option.value && <span className='text-[10px]'>{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+									</button>
+								))}
+							</div>
+						</PopoverContent>
+					</Popover>
+
+					{(selectedTracks.length > 0 || selectedInfluence.length > 0) && (
+						<button
+							type='button'
+							onClick={clearFilters}
+							className='rounded-md border border-toast_error_text px-3 py-2 text-xs text-toast_error_text'
+						>
+							Clear All
+						</button>
+					)}
 				</div>
 			</div>
 
@@ -107,45 +250,45 @@ function InfluenceCard() {
 						</tr>
 					</thead>
 					<tbody>
-						{referendaData.map((item) => (
+						{paginatedData.map((item) => (
 							<tr
-								key={item.id}
+								key={item.index}
 								className='cursor-pointer border-b border-border_grey text-sm font-semibold hover:border-border_grey/90'
 							>
 								<td className='py-4 pl-4 font-medium text-text_primary'>
-									#{item.id} {item.title}
+									#{item.index} {item.title}
 								</td>
 								<td className='py-4'>
 									<span className={`${getSpanStyle(item.track || '', 1)} rounded-md px-1.5 py-1 text-xs`}>{convertCamelCaseToTitleCase(item.track || '')}</span>
 								</td>
 								<td className='py-4'>
 									<div className='flex'>
-										<StatusTag status={item.status} />{' '}
+										<StatusTag status={item.status} />
 									</div>
 								</td>
 								<td className='py-4'>
 									<VotingBar
-										ayePercent={10}
-										nayPercent={90}
+										ayePercent={item.ayePercent}
+										nayPercent={item.nayPercent}
 									/>
 								</td>
 								<td className='py-4'>
 									<div className='flex items-center gap-2'>
 										<div
 											className={`flex h-5 w-5 items-center justify-center rounded-sm ${
-												item.influence === 'rejected'
+												item.influence === EInfluenceStatus.REJECTED
 													? 'bg-toast_error_bg text-toast_error_text'
-													: item.influence === 'approved'
+													: item.influence === EInfluenceStatus.APPROVED
 														? 'bg-success_vote_bg text-success'
 														: 'bg-toast_info_bg text-toast_info_text'
 											}`}
 										>
-											{item.influence === 'rejected' ? <X size={12} /> : item.influence === 'approved' ? <Check size={12} /> : <Minus size={12} />}
+											{item.influence === EInfluenceStatus.REJECTED ? <X size={12} /> : item.influence === EInfluenceStatus.APPROVED ? <Check size={12} /> : <Minus size={12} />}
 										</div>
 									</div>
 								</td>
 								<td className='py-4 pr-4 text-right'>
-									<Menu className='h-4 w-4 text-wallet_btn_text' />
+									<MoreHorizontal className='h-4 w-4 text-wallet_btn_text' />
 								</td>
 							</tr>
 						))}
@@ -153,13 +296,16 @@ function InfluenceCard() {
 				</table>
 			</div>
 
-			<div className='mt-6 flex justify-center gap-2'>
-				<PaginationWithLinks
-					totalCount={30}
-					pageSize={4}
-					page={1}
-				/>
-			</div>
+			{totalCount > pageSize && (
+				<div className='mt-6 flex justify-center gap-2'>
+					<PaginationWithLinks
+						totalCount={totalCount}
+						pageSize={pageSize}
+						page={page}
+						onPageChange={setPage}
+					/>
+				</div>
+			)}
 		</div>
 	);
 }

@@ -32,7 +32,8 @@ import {
 	IRawTurnoutData,
 	IGovAnalyticsDelegationStats,
 	IGovAnalyticsCategoryCounts,
-	IUserPosts
+	IUserPosts,
+	IDVDelegateWithStats
 } from '@/_shared/types';
 import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
@@ -86,7 +87,8 @@ enum ERedisKeys {
 	USER_POSTS = 'UPS',
 	TRACK_COUNTS = 'TC',
 	KLARA_CONVERSATION_HISTORY = 'KCH',
-	KLARA_REQUEST_DEDUP = 'KRD'
+	KLARA_REQUEST_DEDUP = 'KRD',
+	DV_DELEGATES = 'DVD'
 }
 
 export class RedisService {
@@ -176,7 +178,8 @@ export class RedisService {
 			return baseKey + proposalTypePart;
 		},
 		[ERedisKeys.KLARA_CONVERSATION_HISTORY]: (conversationId: string): string => `${ERedisKeys.KLARA_CONVERSATION_HISTORY}-${conversationId}`,
-		[ERedisKeys.KLARA_REQUEST_DEDUP]: (userId: string, messageHash: string): string => `${ERedisKeys.KLARA_REQUEST_DEDUP}-${userId}-${messageHash}`
+		[ERedisKeys.KLARA_REQUEST_DEDUP]: (userId: string, messageHash: string): string => `${ERedisKeys.KLARA_REQUEST_DEDUP}-${userId}-${messageHash}`,
+		[ERedisKeys.DV_DELEGATES]: (network: string, cohortId: string): string => `${ERedisKeys.DV_DELEGATES}-${network}-${cohortId}`
 	} as const;
 
 	// helper methods
@@ -799,6 +802,15 @@ export class RedisService {
 	static async GetPostAnalyticsData({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<IPostAnalytics | null> {
 		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.POST_ANALYTICS_DATA](network, proposalType, index) });
 		return data ? (deepParseJson(data) as IPostAnalytics) : null;
+	}
+
+	static async GetDVDelegates({ network, cohortId }: { network: ENetwork; cohortId: string }): Promise<IDVDelegateWithStats[] | null> {
+		const data = await this.Get({ key: this.redisKeysMap[ERedisKeys.DV_DELEGATES](network, cohortId) });
+		return data ? (deepParseJson(data) as IDVDelegateWithStats[]) : null;
+	}
+
+	static async SetDVDelegates({ network, cohortId, data }: { network: ENetwork; cohortId: string; data: IDVDelegateWithStats[] }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.DV_DELEGATES](network, cohortId), value: JSON.stringify(data), ttlSeconds: SIX_HOURS_IN_SECONDS });
 	}
 
 	static async DeletePostAnalyticsData({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }): Promise<void> {

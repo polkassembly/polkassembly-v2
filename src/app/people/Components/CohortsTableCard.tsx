@@ -2,20 +2,60 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import { Activity, HelpCircle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
+import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { getDVCohortsByNetwork } from '@/_shared/_utils/dvDelegateUtils';
+import dayjs from 'dayjs';
+import { ENetwork, IDVCohort, ECohortStatus } from '@/_shared/types';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 
-const cohortsData = [
-	{ index: 5, tenure: 'Dec 1 - Dec 29', days: '28 days', delegates: 12, w3fDelegation: '30k DOT', status: 'Ongoing' },
-	{ index: 4, tenure: 'Jan 1 - Jan 28', days: '28 days', delegates: 6, w3fDelegation: '50k DOT', status: 'Closed' },
-	{ index: 3, tenure: 'Feb 1 - Feb 28', days: '28 days', delegates: 8, w3fDelegation: '75k DOT', status: 'Closed' },
-	{ index: 2, tenure: 'Dec 1 - Dec 29', days: '28 days', delegates: 13, w3fDelegation: '400k DOT', status: 'Closed' },
-	{ index: 1, tenure: 'Mar 1 - Mar 31', days: '31 days', delegates: 11, w3fDelegation: '500k DOT', status: 'Closed' }
-];
+function formatNumber(num: number): string {
+	if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+	if (num >= 1000) return `${(num / 1000).toFixed(0)}K`;
+	return num.toString();
+}
+
+const formatDateWithYear = (date: Date): string => {
+	return dayjs(date).format("MMM D 'YY");
+};
+
+function formatDateRange(startDate: Date, endDate?: Date, isOngoing?: boolean): string {
+	const startStr = formatDateWithYear(startDate);
+	if (isOngoing) {
+		return startStr;
+	}
+	const endStr = endDate ? formatDateWithYear(endDate) : '';
+	return `${startStr} - ${endStr}`;
+}
 
 function CohortsTableCard() {
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const selectedCohortIndex = searchParams.get('cohort');
+
+	const network = getCurrentNetwork();
+	const cohorts = getDVCohortsByNetwork(network).slice().reverse();
+	const isPolkadot = network === ENetwork.POLKADOT;
+	const networkLogo = isPolkadot ? PolkadotLogo : KusamaLogo;
+	const { tokenSymbol } = NETWORKS_DETAILS[network];
+
+	const handleCohortClick = (cohortIndex: number) => {
+		const params = new URLSearchParams(searchParams.toString());
+		params.set('cohort', cohortIndex.toString());
+		router.push(`/people?${params.toString()}`);
+	};
+
+	function getCohortTenureDays(cohort: IDVCohort): number {
+		const endDate = cohort.endTime || new Date();
+		return Math.floor((endDate.getTime() - cohort.startTime.getTime()) / (1000 * 60 * 60 * 24));
+	}
 	return (
 		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6 shadow-md'>
 			<div className='mb-6 flex items-center gap-2'>
@@ -52,38 +92,45 @@ function CohortsTableCard() {
 						</tr>
 					</thead>
 					<tbody>
-						{cohortsData.map((item) => (
-							<tr
-								key={item.index}
-								className='cursor-pointer border-b border-border_grey text-sm font-semibold hover:border-border_grey/90'
-							>
-								<td className='py-4 pl-4 text-text_primary'>{item.index}</td>
-								<td className='py-4'>
-									<span className='text-text_primary'>{item.tenure}</span>
-									<span className='ml-2 text-wallet_btn_text'>{item.days}</span>
-								</td>
-								<td className='py-4 text-text_primary'>{item.delegates}</td>
-								<td className='py-4'>
-									<div className='flex items-center gap-2'>
-										<Image
-											src={PolkadotLogo}
-											alt='polkadot logo'
-											className='h-8 w-8 rounded-full'
-											width={32}
-											height={32}
-										/>
-										<span className='font-medium text-text_primary'>{item.w3fDelegation}</span>
-									</div>
-								</td>
-								<td className='py-4'>
-									<span
-										className={`rounded-full px-4 py-1 text-xs font-medium text-btn_primary_text ${item.status === 'Ongoing' ? 'bg-decision_bar_indicator' : 'bg-progress_nay'}`}
-									>
-										{item.status}
-									</span>
-								</td>
-							</tr>
-						))}
+						{cohorts.map((cohort) => {
+							const isSelected = selectedCohortIndex === cohort.index.toString();
+							const delegationAmount = cohort.delegationPerDelegate;
+							return (
+								<tr
+									key={cohort.index}
+									onClick={() => handleCohortClick(cohort.index)}
+									className={`cursor-pointer border-b border-border_grey text-sm font-semibold hover:bg-sidebar_footer ${isSelected ? 'bg-sidebar_footer' : ''}`}
+								>
+									<td className='py-4 pl-4 text-text_primary'>{cohort.index}</td>
+									<td className='py-4'>
+										<span className='text-text_primary'>{formatDateRange(cohort.startTime, cohort.endTime, cohort.status === ECohortStatus.ONGOING)}</span>
+										<span className='ml-2 text-wallet_btn_text'>{getCohortTenureDays(cohort)} days</span>
+									</td>
+									<td className='py-4 text-text_primary'>{cohort.delegatesCount + cohort.guardiansCount}</td>
+									<td className='py-4'>
+										<div className='flex items-center gap-2'>
+											<Image
+												src={networkLogo}
+												alt='network logo'
+												className='h-8 w-8 rounded-full'
+												width={32}
+												height={32}
+											/>
+											<span className='font-medium text-text_primary'>
+												{formatNumber(delegationAmount)} {tokenSymbol}
+											</span>
+										</div>
+									</td>
+									<td className='py-4'>
+										<span
+											className={`rounded-full px-4 py-1 text-xs font-medium text-btn_primary_text ${cohort.status === ECohortStatus.ONGOING ? 'bg-decision_bar_indicator' : 'bg-progress_nay'}`}
+										>
+											{cohort.status}
+										</span>
+									</td>
+								</tr>
+							);
+						})}
 					</tbody>
 				</table>
 			</div>

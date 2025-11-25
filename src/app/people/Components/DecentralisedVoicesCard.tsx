@@ -9,22 +9,35 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/
 import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
 import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
 import Address from '@/app/_shared-components/Profile/Address/Address';
+import { IDVDelegateWithStats, IDVCohort, EDVDelegateType } from '@/_shared/types';
 
-const voicesData = [
-	{ id: 1, name: 'Noob', address: '1z...ho', votes: 1, aye: 11, nay: 23, abstain: 78, participation: 87.5, winRate: 85.3, voted: 22, total: 55, won: 22, participated: 55 },
-	{ id: 2, name: 'Pro', address: '3a...jklYq', votes: 2, aye: 12, nay: 24, abstain: 79, participation: 90.0, winRate: 90.0, voted: 22, total: 55, won: 22, participated: 55 },
-	{ id: 3, name: 'Expert', address: '5b...Zr', votes: 3, aye: 13, nay: 25, abstain: 80, participation: 85.3, winRate: 85.3, voted: 22, total: 55, won: 22, participated: 55 },
-	{ id: 4, name: 'Master', address: '2c...ts', votes: 4, aye: 14, nay: 26, abstain: 81, participation: 92.7, winRate: 92.7, voted: 22, total: 55, won: 22, participated: 55 },
-	{ id: 5, name: 'Veteran', address: '9...vu', votes: 5, aye: 15, nay: 27, abstain: 82, participation: 88.1, winRate: 88.1, voted: 22, total: 55, won: 22, participated: 55 },
-	{ id: 6, name: 'Champion', address: '1...x', votes: 6, aye: 16, nay: 28, abstain: 83, participation: 91.5, winRate: 91.5, voted: 22, total: 55, won: 22, participated: 55 }
-];
+interface DecentralisedVoicesCardProps {
+	delegatesWithStats: IDVDelegateWithStats[];
+	cohort: IDVCohort;
+}
 
-function DecentralisedVoicesCard() {
+function DecentralisedVoicesCard({ delegatesWithStats, cohort }: DecentralisedVoicesCardProps) {
 	const [activeTab, setActiveTab] = useState<'DAO' | 'GUARDIAN'>('DAO');
 	const [sortOptions, setSortOptions] = useState({
 		newestToOldest: false,
 		participationHighToLow: false,
 		votesCastedHighToLow: true
+	});
+
+	const daos = delegatesWithStats.filter((d) => d.type === EDVDelegateType.DAO);
+	const guardians = delegatesWithStats.filter((d) => d.type === EDVDelegateType.GUARDIAN);
+	const filteredDelegates = activeTab === 'DAO' ? daos : guardians;
+
+	const sortedDelegates = [...filteredDelegates].sort((a, b) => {
+		if (sortOptions.participationHighToLow) {
+			return b.voteStats.participation - a.voteStats.participation;
+		}
+		if (sortOptions.votesCastedHighToLow) {
+			const aTotal = a.voteStats.ayeCount + a.voteStats.nayCount + a.voteStats.abstainCount;
+			const bTotal = b.voteStats.ayeCount + b.voteStats.nayCount + b.voteStats.abstainCount;
+			return bTotal - aTotal;
+		}
+		return 0;
 	});
 
 	return (
@@ -41,14 +54,14 @@ function DecentralisedVoicesCard() {
 							onClick={() => setActiveTab('DAO')}
 							className={`rounded px-3 py-0.5 text-sm text-navbar_title transition-colors ${activeTab === 'DAO' && 'bg-section_dark_overlay font-semibold'}`}
 						>
-							DAO (7)
+							DAO ({cohort.delegatesCount})
 						</button>
 						<button
 							type='button'
 							onClick={() => setActiveTab('GUARDIAN')}
 							className={`py-0.6 rounded px-3 text-sm font-medium text-navbar_title transition-colors ${activeTab === 'GUARDIAN' && 'bg-section_dark_overlay font-semibold'}`}
 						>
-							GUARDIAN (5)
+							GUARDIAN ({cohort.guardiansCount})
 						</button>
 					</div>
 				</div>
@@ -123,59 +136,58 @@ function DecentralisedVoicesCard() {
 						</tr>
 					</thead>
 					<tbody>
-						{voicesData.map((item) => (
-							<tr
-								key={item.id}
-								className='cursor-pointer border-b border-border_grey text-sm font-semibold hover:border-border_grey/90'
-							>
-								<td className='py-4 pl-4'>
-									<div className='flex items-center gap-2'>
-										<Address address={item.address} />
-									</div>
-								</td>
-								<td className='text-bodyBlue dark:text-blue-dark-high py-4 font-medium'>{item.votes}</td>
-								<td className='py-4'>
-									<div className='flex items-center gap-4'>
-										<div className='flex items-center gap-1 text-success'>
-											<AiFillLike className='fill-current text-sm' />
-											<span className='font-medium'>{item.aye}</span>
+						{sortedDelegates.map((delegate) => {
+							const totalVotes = delegate.voteStats.ayeCount + delegate.voteStats.nayCount + delegate.voteStats.abstainCount;
+							return (
+								<tr
+									key={delegate.address}
+									className='cursor-pointer border-b border-border_grey text-sm font-semibold hover:border-border_grey/90'
+								>
+									<td className='py-4 pl-4'>
+										<div className='flex items-center gap-2'>
+											<Address address={delegate.address} />
 										</div>
-										<div className='flex items-center gap-1 text-toast_error_text'>
-											<AiFillDislike className='fill-current text-sm' />
-											<span className='font-medium'>{item.nay}</span>
+									</td>
+									<td className='text-bodyBlue dark:text-blue-dark-high py-4 font-medium'>{totalVotes}</td>
+									<td className='py-4'>
+										<div className='flex items-center gap-4'>
+											<div className='flex items-center gap-1 text-success'>
+												<AiFillLike className='fill-current text-sm' />
+												<span className='font-medium'>{delegate.voteStats.ayeCount}</span>
+											</div>
+											<div className='flex items-center gap-1 text-toast_error_text'>
+												<AiFillDislike className='fill-current text-sm' />
+												<span className='font-medium'>{delegate.voteStats.nayCount}</span>
+											</div>
+											<div className='flex items-center gap-1 text-bg_blue'>
+												<Ban size={14} />
+												<span className='font-medium'>{delegate.voteStats.abstainCount}</span>
+											</div>
 										</div>
-										<div className='flex items-center gap-1 text-bg_blue'>
-											<Ban size={14} />
-											<span className='font-medium'>{item.abstain}</span>
-										</div>
-									</div>
-								</td>
-								<td className='py-4'>
-									<TooltipProvider>
-										<Tooltip>
-											<TooltipTrigger className='text-bodyBlue dark:text-blue-dark-high cursor-help font-medium'>{item.participation} %</TooltipTrigger>
-											<TooltipContent className='bg-gray-800 text-white'>
-												<p>
-													Voted/Total: {item.voted}/{item.total}
-												</p>
-											</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
-								</td>
-								<td className='py-4'>
-									<TooltipProvider>
-										<Tooltip>
-											<TooltipTrigger className='cursor-help font-medium text-green-500'>{item.winRate} %</TooltipTrigger>
-											<TooltipContent className='bg-gray-800 text-white'>
-												<p>
-													Won/Participated: {item.won}/{item.participated}
-												</p>
-											</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
-								</td>
-							</tr>
-						))}
+									</td>
+									<td className='py-4'>
+										<TooltipProvider>
+											<Tooltip>
+												<TooltipTrigger className='text-bodyBlue dark:text-blue-dark-high cursor-help font-medium'>{delegate.voteStats.participation.toFixed(2)} %</TooltipTrigger>
+												<TooltipContent className='bg-gray-800 text-white'>
+													<p>Votes Cast / Total Eligible Referenda</p>
+												</TooltipContent>
+											</Tooltip>
+										</TooltipProvider>
+									</td>
+									<td className='py-4'>
+										<TooltipProvider>
+											<Tooltip>
+												<TooltipTrigger className='cursor-help font-medium text-green-500'>{delegate.voteStats.winRate.toFixed(2)} %</TooltipTrigger>
+												<TooltipContent className='bg-gray-800 text-white'>
+													<p>Winning Votes / Total Non-Abstain Votes</p>
+												</TooltipContent>
+											</Tooltip>
+										</TooltipProvider>
+									</td>
+								</tr>
+							);
+						})}
 					</tbody>
 				</table>
 			</div>

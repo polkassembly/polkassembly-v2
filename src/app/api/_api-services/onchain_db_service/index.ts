@@ -63,7 +63,9 @@ export class OnChainDbService {
 		page,
 		statuses,
 		origins,
-		notVotedByAddresses
+		notVotedByAddresses,
+		startDate,
+		endDate
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -72,6 +74,8 @@ export class OnChainDbService {
 		statuses?: EProposalStatus[];
 		origins?: EPostOrigin[];
 		notVotedByAddresses?: string[];
+		startDate?: string;
+		endDate?: string;
 	}): Promise<IGenericListingResponse<IOnChainPostListing>> {
 		if (ValidatorService.isValidOffChainProposalType(proposalType)) {
 			throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST);
@@ -89,7 +93,9 @@ export class OnChainDbService {
 			page,
 			statuses,
 			origins,
-			notVotedByAddresses
+			notVotedByAddresses,
+			startDate,
+			endDate
 		});
 
 		if (subsquidOnChainPostsListing) return subsquidOnChainPostsListing;
@@ -375,6 +381,22 @@ export class OnChainDbService {
 		proposalStatuses?: EProposalStatus[];
 	}) {
 		return SubsquidService.GetVotesForAddresses({ network, voters, page, limit, proposalStatuses });
+	}
+
+	static async GetVotesForAddressesAndReferenda({
+		network,
+		voters,
+		referendumIndices,
+		page,
+		limit
+	}: {
+		network: ENetwork;
+		voters: string[];
+		referendumIndices: number[];
+		page: number;
+		limit: number;
+	}) {
+		return SubsquidService.GetVotesForAddressesAndReferenda({ network, voters, referendumIndices, page, limit });
 	}
 
 	static async GetAllFlattenedVotesWithoutFilters({ network, page, limit }: { network: ENetwork; page: number; limit: number }) {

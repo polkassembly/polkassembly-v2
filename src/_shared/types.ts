@@ -637,6 +637,9 @@ export interface IOnChainPostListing {
 	reward?: string;
 	decisionPeriodEndsAt?: Date;
 	preparePeriodEndsAt?: Date;
+	statusHistory?: IStatusHistoryItem[];
+	createdAtBlock?: number;
+	updatedAtBlock?: number;
 }
 
 export interface IPostListing extends IOffChainPost {
@@ -1717,4 +1720,109 @@ export interface IJudgementStats {
 	totalRequestedThisMonth: number;
 	percentageIncreaseFromLastMonth: number;
 	percentageCompletedThisMonth: number;
+}
+
+export interface IDVDelegateVoteStats {
+	ayeCount: number;
+	nayCount: number;
+	abstainCount: number;
+	participation: number;
+	winRate: number;
+}
+
+export enum EDVDelegateType {
+	DAO = 'DAO',
+	GUARDIAN = 'GUARDIAN'
+}
+
+export enum ECohortStatus {
+	ONGOING = 'Ongoing',
+	CLOSED = 'Closed'
+}
+
+interface IDVCohortDelegate {
+	address: string;
+	type: EDVDelegateType;
+	startBlock: number;
+	endBlock: number | null;
+	subsquareUrl?: string;
+}
+
+export interface IDVCohort {
+	index: number;
+	network: ENetwork;
+	status: ECohortStatus;
+	startTime: Date;
+	startBlock: number;
+	endTime?: Date;
+	endBlock?: number;
+	delegatesCount: number;
+	guardiansCount: number;
+	delegationPerDelegate: number;
+	delegationPerGuardian: number;
+	delegates: IDVCohortDelegate[];
+	tracks: EPostOrigin[];
+}
+
+export interface IDVDelegateWithStats extends IDVCohortDelegate {
+	voteStats: IDVDelegateVoteStats;
+}
+
+export interface IDVDelegateVote {
+	address: string;
+	decision: EVoteDecision | 'novote';
+	votingPower?: string;
+	percentage?: number;
+}
+
+export enum EInfluenceStatus {
+	APPROVED = 'approved',
+	REJECTED = 'rejected',
+	ABSTAIN = 'abstain',
+	NO_IMPACT = 'no_impact'
+}
+
+export enum EDVTrackFilter {
+	DV_TRACKS = 'dv_tracks',
+	ALL = 'all'
+}
+
+export interface IDVReferendumInfluence {
+	index: number;
+	title: string;
+	track: string;
+	status: EProposalStatus;
+	ayePercent: number;
+	nayPercent: number;
+	dvTotalVotingPower: string;
+	dvAyeVotingPower: string;
+	dvNayVotingPower: string;
+	dvPercentage: number;
+	influence: EInfluenceStatus;
+	delegateVotes: IDVDelegateVote[];
+	guardianVotes: IDVDelegateVote[];
+}
+
+export interface IDVDelegateVotingMatrix {
+	address: string;
+	type: EDVDelegateType;
+	votes: Record<number, EVoteDecision | 'novote'>;
+	participation: number;
+	ayeRate: number;
+	activeCount: number;
+	totalRefs: number;
+}
+
+export interface IDVDelegatesResponse {
+	cohort: IDVCohort;
+	delegatesWithStats: IDVDelegateWithStats[];
+}
+
+export interface IDVReferendaInfluenceResponse {
+	referenda: IDVReferendumInfluence[];
+}
+
+export interface IDVVotingMatrixResponse {
+	referendumIndices: number[];
+	delegates: IDVDelegateVotingMatrix[];
 }

@@ -4,120 +4,42 @@
 
 import { useState } from 'react';
 import { Check, X, Minus, LayoutList, LayoutGrid, ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { IDVDelegateVotingMatrix, IDVCohort } from '@/_shared/types';
 
-const referendums = [1695, 1697, 1698, 1699, 1701, 1702, 1703, 1705, 1706, 1708, 1709, 1710, 1712, 1714];
+interface DecentralizedVoicesVotingCardProps {
+	votingMatrix: IDVDelegateVotingMatrix[];
+	referendumIndices: number[];
+	cohort: IDVCohort;
+}
 
-const voicesData = [
-	{
-		id: 1,
-		name: 'Le Nexus',
-		active: 14,
-		totalRefs: 14,
-		participation: 100,
-		ayeRate: 58,
-		votes: {
-			1695: 'aye',
-			1697: 'nay',
-			1698: 'nay',
-			1699: 'abstain',
-			1701: 'aye',
-			1702: 'aye',
-			1703: 'nay',
-			1705: 'abstain',
-			1706: 'aye',
-			1708: 'aye',
-			1709: 'nay',
-			1710: 'aye',
-			1712: 'aye',
-			1714: 'nay'
-		}
-	},
-	{
-		id: 2,
-		name: 'PERMANENCE DAO/DV',
-		active: 14,
-		totalRefs: 14,
-		participation: 100,
-		ayeRate: 70,
-		votes: {
-			1695: 'aye',
-			1697: 'aye',
-			1698: 'aye',
-			1699: 'abstain',
-			1701: 'nay',
-			1702: 'nay',
-			1703: 'aye',
-			1705: 'abstain',
-			1706: 'aye',
-			1708: 'aye',
-			1709: 'abstain',
-			1710: 'abstain',
-			1712: 'aye',
-			1714: 'nay'
-		}
-	},
-	{
-		id: 3,
-		name: 'SAXEMBERG/Governance',
-		active: 14,
-		totalRefs: 14,
-		participation: 100,
-		ayeRate: 33,
-		votes: {
-			1695: 'aye',
-			1697: 'nay',
-			1698: 'nay',
-			1699: 'nay',
-			1701: 'aye',
-			1702: 'aye',
-			1703: 'aye',
-			1705: 'nay',
-			1706: 'novote',
-			1708: 'novote',
-			1709: 'nay',
-			1710: 'nay',
-			1712: 'nay',
-			1714: 'nay'
-		}
-	},
-	{
-		id: 4,
-		name: 'PBA_TIM/ALUMNI VOTING',
-		active: 14,
-		totalRefs: 14,
-		participation: 100,
-		ayeRate: 45,
-		votes: {
-			1695: 'abstain',
-			1697: 'abstain',
-			1698: 'abstain',
-			1699: 'aye',
-			1701: 'abstain',
-			1702: 'abstain',
-			1703: 'abstain',
-			1705: 'nay',
-			1706: 'aye',
-			1708: 'abstain',
-			1709: 'nay',
-			1710: 'aye',
-			1712: 'aye',
-			1714: 'aye'
-		}
-	}
-];
+type SortOption = 'name' | 'participation' | 'supportRate' | 'activity';
 
-function DecentralizedVoicesVotingCard() {
+function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort }: DecentralizedVoicesVotingCardProps) {
+	const referendums = referendumIndices.length > 0 ? referendumIndices : [0];
 	const [viewMode, setViewMode] = useState<'compact' | 'heatmap'>('compact');
-	const [expandedRows, setExpandedRows] = useState<number[]>([1]); // Default first one expanded
-	// const [sortOptions, setSortOptions] = useState({
-	// name: false,
-	// participation: false,
-	// supportRate: false,
-	// activity: true
-	// });
+	const [expandedRows, setExpandedRows] = useState<string[]>(votingMatrix.length > 0 ? [votingMatrix[0].address] : []); // Default first one expanded
+	const [sortBy, setSortBy] = useState<SortOption>('activity');
 
-	const toggleRow = (id: number) => {
-		setExpandedRows((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
+	const minRef = referendums.length > 0 ? Math.min(...referendums) : 0;
+	const maxRef = referendums.length > 0 ? Math.max(...referendums) : 0;
+	const daoCount = cohort.delegatesCount;
+
+	const sortedVoicesData = [...votingMatrix].sort((a, b) => {
+		switch (sortBy) {
+			case 'name':
+				return a.address.localeCompare(b.address);
+			case 'participation':
+				return b.participation - a.participation;
+			case 'supportRate':
+				return b.ayeRate - a.ayeRate;
+			case 'activity':
+			default:
+				return b.activeCount - a.activeCount;
+		}
+	});
+
+	const toggleRow = (address: string) => {
+		setExpandedRows((prev) => (prev.includes(address) ? prev.filter((rowAddr) => rowAddr !== address) : [...prev, address]));
 	};
 
 	const getVoteColor = (vote: string) => {
@@ -164,7 +86,9 @@ function DecentralizedVoicesVotingCard() {
 			<div className='mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
 				<div>
 					<h2 className='text-2xl font-semibold text-navbar_title'>Decentralized Voices Voting</h2>
-					<p className='text-text_secondary text-sm'>7 DAOs across 14 referendums (#1695 - #1714)</p>
+					<p className='text-text_secondary text-sm'>
+						{daoCount} DAOs across {referendums.length} referendums (#{minRef} - #{maxRef})
+					</p>
 				</div>
 				<div className='flex items-center gap-4'>
 					<div className='flex items-center rounded-lg border border-border_grey bg-white p-1 dark:bg-black'>
@@ -197,66 +121,74 @@ function DecentralizedVoicesVotingCard() {
 					<Filter size={14} />
 					<span>Sort by:</span>
 				</div>
-				{['Name', 'Participation', 'Support Rate', 'Activity'].map((option) => (
-					<button
-						type='button'
-						key={option}
-						className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
-							option === 'Activity' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : 'text-text_secondary hover:bg-gray-100 dark:hover:bg-gray-800'
-						}`}
-					>
-						{option}
-					</button>
-				))}
+				{(['name', 'participation', 'supportRate', 'activity'] as SortOption[]).map((option) => {
+					const labels: Record<SortOption, string> = {
+						name: 'Name',
+						participation: 'Participation',
+						supportRate: 'Support Rate',
+						activity: 'Activity'
+					};
+					return (
+						<button
+							type='button'
+							key={option}
+							onClick={() => setSortBy(option)}
+							className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
+								sortBy === option ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : 'text-text_secondary hover:bg-gray-100 dark:hover:bg-gray-800'
+							}`}
+						>
+							{labels[option]}
+						</button>
+					);
+				})}
 			</div>
 
 			<div className='flex flex-col gap-4'>
 				{viewMode === 'compact' ? (
-					voicesData.map((item) => (
+					sortedVoicesData.map((item, idx) => (
 						<div
-							key={item.id}
+							key={item.address}
 							className='rounded-xl border border-border_grey bg-white p-4 dark:bg-black'
 						>
 							<div
 								aria-hidden
 								className='flex cursor-pointer items-center justify-between'
-								onClick={() => toggleRow(item.id)}
+								onClick={() => toggleRow(item.address)}
 							>
 								<div className='flex items-center gap-3'>
 									<div className='flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-xl dark:bg-gray-800'>
 										{/* Placeholder Icon */}
-										{item.id === 1 ? '🌐' : item.id === 2 ? '🏛️' : item.id === 3 ? '⚡' : '🎓'}
+										{idx === 0 ? '🌐' : idx === 1 ? '🏛️' : idx === 2 ? '⚡' : '🎓'}
 									</div>
 									<div>
-										<h3 className='font-semibold text-text_primary'>{item.name}</h3>
 										<p className='text-text_secondary text-xs'>
-											{item.totalRefs} of {item.totalRefs} referendums
+											{item.activeCount} of {item.totalRefs} referendums
 										</p>
 									</div>
 								</div>
-								<div className='text-text_secondary'>{expandedRows.includes(item.id) ? <ChevronUp size={20} /> : <ChevronDown size={20} />}</div>
+								<div className='text-text_secondary'>{expandedRows.includes(item.address) ? <ChevronUp size={20} /> : <ChevronDown size={20} />}</div>
 							</div>
 
 							<div className='mt-4 grid grid-cols-3 gap-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-900/50'>
 								<div>
 									<p className='text-text_secondary text-xs'>Participation</p>
-									<p className='text-lg font-bold text-text_primary'>{item.participation}%</p>
+									<p className='text-lg font-bold text-text_primary'>{item.participation.toFixed(1)}%</p>
 								</div>
 								<div>
 									<p className='text-text_secondary text-xs'>Aye Rate</p>
-									<p className='text-lg font-bold text-green-600'>{item.ayeRate}%</p>
+									<p className='text-lg font-bold text-green-600'>{item.ayeRate.toFixed(1)}%</p>
 								</div>
 								<div>
 									<p className='text-text_secondary text-xs'>Active</p>
-									<p className='text-lg font-bold text-blue-600'>{item.active}</p>
+									<p className='text-lg font-bold text-blue-600'>{item.activeCount}</p>
 								</div>
 							</div>
 
-							{expandedRows.includes(item.id) ? (
+							{expandedRows.includes(item.address) ? (
 								<div className='mt-4'>
 									<div className='grid grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-8'>
 										{referendums.map((ref) => {
-											const vote = item.votes[ref as keyof typeof item.votes];
+											const vote = item.votes[ref] || 'novote';
 											return (
 												<div
 													key={ref}
@@ -273,7 +205,7 @@ function DecentralizedVoicesVotingCard() {
 										{referendums.map((ref) => (
 											<div
 												key={ref}
-												className={`flex-1 ${getVoteBarColor(item.votes[ref as keyof typeof item.votes])} border-r border-white last:border-0 dark:border-black`}
+												className={`flex-1 ${getVoteBarColor(item.votes[ref] || 'novote')} border-r border-white last:border-0 dark:border-black`}
 											/>
 										))}
 									</div>
@@ -283,7 +215,7 @@ function DecentralizedVoicesVotingCard() {
 									{referendums.map((ref) => (
 										<div
 											key={ref}
-											className={`flex-1 ${getVoteBarColor(item.votes[ref as keyof typeof item.votes])} border-r border-white last:border-0 dark:border-black`}
+											className={`flex-1 ${getVoteBarColor(item.votes[ref] || 'novote')} border-r border-white last:border-0 dark:border-black`}
 										/>
 									))}
 								</div>
@@ -307,19 +239,18 @@ function DecentralizedVoicesVotingCard() {
 								</tr>
 							</thead>
 							<tbody>
-								{voicesData.map((item) => (
+								{sortedVoicesData.map((item) => (
 									<tr
-										key={item.id}
+										key={item.address}
 										className='border-b border-border_grey hover:bg-gray-50 dark:hover:bg-gray-900'
 									>
 										<td className='py-4 pl-4'>
 											<div className='flex flex-col'>
-												<span className='font-semibold text-text_primary'>{item.name}</span>
-												<span className='text-text_secondary text-xs'>{item.participation}% active</span>
+												<span className='text-text_secondary text-xs'>{item.participation.toFixed(1)}% active</span>
 											</div>
 										</td>
 										{referendums.map((ref) => {
-											const vote = item.votes[ref as keyof typeof item.votes];
+											const vote = item.votes[ref] || 'novote';
 											return (
 												<td
 													key={ref}

@@ -172,7 +172,9 @@ export class SubsquidService extends SubsquidUtils {
 		page,
 		statuses,
 		origins,
-		notVotedByAddresses
+		notVotedByAddresses,
+		startDate,
+		endDate
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -181,12 +183,16 @@ export class SubsquidService extends SubsquidUtils {
 		statuses?: EProposalStatus[];
 		origins?: EPostOrigin[];
 		notVotedByAddresses?: string[];
+		startDate?: string;
+		endDate?: string;
 	}): Promise<IGenericListingResponse<IOnChainPostListing>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		let gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE;
 
-		if (statuses?.length && origins?.length) {
+		if (startDate && endDate) {
+			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES_AND_ORIGINS_AND_DATE_RANGE;
+		} else if (statuses?.length && origins?.length) {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES_AND_ORIGINS;
 		} else if (statuses?.length) {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES;
@@ -209,7 +215,9 @@ export class SubsquidService extends SubsquidUtils {
 				status_in: statuses,
 				type_eq: proposalType,
 				origin_in: origins,
-				voters: notVotedByAddresses
+				voters: notVotedByAddresses,
+				createdAt_gte: startDate,
+				createdAt_lte: endDate
 			})
 			.toPromise();
 
@@ -259,6 +267,8 @@ export class SubsquidService extends SubsquidUtils {
 						status: EProposalStatus;
 						timestamp: string;
 					}>;
+					createdAtBlock?: number;
+					updatedAtBlock?: number;
 				},
 				index: number
 			) => {
@@ -1325,6 +1335,62 @@ export class SubsquidService extends SubsquidUtils {
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching on-chain votes for multiple voters from Subsquid: ${subsquidErr}`);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain votes for multiple voters from Subsquid');
+		}
+
+		const { votes, totalCount } = subsquidData;
+
+		if (totalCount.totalCount === 0) {
+			return {
+				items: [],
+				totalCount: totalCount.totalCount
+			};
+		}
+
+		const votesData: IProfileVote[] = votes.map((vote: { decision: string; voter: string; proposalIndex: number; type: EProposalType; parentVote: { extrinsicIndex: string } }) => {
+			return {
+				...vote,
+				decision: this.convertSubsquidVoteDecisionToVoteDecision({ decision: vote.decision }),
+				voterAddress: vote.voter,
+				proposalType: vote.type as EProposalType,
+				extrinsicIndex: vote.parentVote?.extrinsicIndex || ''
+			};
+		});
+
+		return {
+			items: votesData,
+			totalCount: totalCount.totalCount
+		};
+	}
+
+	static async GetVotesForAddressesAndReferenda({
+		network,
+		voters,
+		referendumIndices,
+		page,
+		limit
+	}: {
+		network: ENetwork;
+		voters: string[];
+		referendumIndices: number[];
+		page: number;
+		limit: number;
+	}): Promise<IGenericListingResponse<IProfileVote>> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const query = this.GET_VOTES_FOR_ADDRESSES_AND_PROPOSAL_INDICES;
+
+		const variables = {
+			limit,
+			offset: (page - 1) * limit,
+			voter_in: voters,
+			proposalIndex_in: referendumIndices
+		};
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching on-chain votes for multiple voters and referenda from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain votes for multiple voters and referenda from Subsquid');
 		}
 
 		const { votes, totalCount } = subsquidData;
