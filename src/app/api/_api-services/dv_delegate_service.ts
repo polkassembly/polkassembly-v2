@@ -4,7 +4,6 @@
 import {
 	ENetwork,
 	EProposalStatus,
-	EProposalType,
 	EVoteDecision,
 	EPostOrigin,
 	IDVCohort,
@@ -16,10 +15,12 @@ import {
 	IProfileVote,
 	EDVDelegateType,
 	EDVTrackFilter,
-	EInfluenceStatus
+	EInfluenceStatus,
+	IStatusHistoryItem,
+	IVoteMetrics
 } from '@/_shared/types';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
-import { RedisService } from '@/app/api/_api-services/redis_service';
+import { RedisService } from './redis_service';
 
 export class DVDelegateService {
 	private static async fetchAllPages<T>(fetcher: (page: number) => Promise<T[]>, maxPages = 10, page = 1, acc: T[] = []): Promise<T[]> {
@@ -35,8 +36,7 @@ export class DVDelegateService {
 
 	static async getCohortReferenda(
 		network: ENetwork,
-		startTime: Date,
-		endTime?: Date,
+		cohort: IDVCohort,
 		allowedTracks: EPostOrigin[] | null = null
 	): Promise<
 		{
@@ -44,70 +44,67 @@ export class DVDelegateService {
 			status: EProposalStatus;
 			origin: string;
 			description: string;
-			voteMetrics: Record<string, { value: string }>;
+			voteMetrics: Partial<IVoteMetrics>;
 			createdAtBlock?: number;
 			updatedAtBlock?: number;
+			timeline?: IStatusHistoryItem[];
 		}[]
 	> {
-		const startTimestamp = startTime.getTime();
-		const endTimestamp = endTime ? endTime.getTime() : Date.now();
-
-		const lookBackWindow = 300 * 24 * 60 * 60 * 1000;
-		const queryStartDate = new Date(startTime.getTime() - lookBackWindow);
-		const queryEndDate = endTime || new Date();
+		const { startBlock, endBlock } = cohort;
 		const limit = 1000;
 
-		const allItems = await this.fetchAllPages<IOnChainPostListing>(async (page) => {
-			const postsListing = await OnChainDbService.GetOnChainPostsListing({
+		const delegateAddresses = cohort.delegates.map((d) => d.address);
+		const votedProposalsPromise = this.fetchAllPages<IOnChainPostListing>(async (page) => {
+			const votesListing = await OnChainDbService.GetVotesForAddressesAndReferenda({
 				network,
-				proposalType: EProposalType.REFERENDUM_V2,
+				voters: delegateAddresses,
+				startBlock,
+				endBlock: endBlock || 2147483647,
 				limit,
-				page,
-				startDate: queryStartDate.toISOString(),
-				endDate: queryEndDate.toISOString()
+				page
 			});
-			return postsListing.items || [];
-		}, 10);
 
-		return allItems
+			return (
+				votesListing.items?.map((vote) => {
+					return vote.proposal as IOnChainPostListing;
+				}) || []
+			);
+		}, limit);
+
+		const votedProposals = await votedProposalsPromise;
+
+		const allItemsMap = new Map<number, IOnChainPostListing>();
+		votedProposals.forEach((item) => {
+			if (item && item.index !== undefined && !allItemsMap.has(item.index)) {
+				allItemsMap.set(item.index, item);
+			}
+		});
+
+		const allItems = Array.from(allItemsMap.values());
+		console.log('first item', allItems[0]);
+		console.log('last item', allItems[allItems.length - 1]);
+
+		const filteredItems = allItems
 			.filter((r) => {
-				if (r.index === undefined) return false;
 				if (allowedTracks && r.origin && !allowedTracks.includes(r.origin as EPostOrigin)) return false;
-
-				const createdAt = new Date(r.createdAt).getTime();
-				if (createdAt >= startTimestamp && createdAt <= endTimestamp) return true;
-
-				if (r.statusHistory && r.statusHistory.length > 0) {
-					const terminalStatuses = [
-						EProposalStatus.Executed,
-						EProposalStatus.Approved,
-						EProposalStatus.Rejected,
-						EProposalStatus.TimedOut,
-						EProposalStatus.Cancelled,
-						EProposalStatus.Confirmed
-					];
-
-					const terminalStatusItem = r.statusHistory.find((h) => terminalStatuses.includes(h.status as EProposalStatus));
-
-					if (terminalStatusItem && terminalStatusItem.timestamp) {
-						const referendumEndTimestamp = new Date(terminalStatusItem.timestamp).getTime();
-						if (referendumEndTimestamp < startTimestamp) {
-							return false;
-						}
-					}
-				}
-
-				return true;
+				if (r.createdAtBlock && r.createdAtBlock < startBlock) return false;
+				return !(endBlock && r.createdAtBlock && r.createdAtBlock > endBlock);
 			})
 			.map((r) => ({
 				index: r.index || 0,
-				status: r.status || EProposalStatus.Unknown,
-				origin: r.origin || 'Unknown',
-				description: r.description || '',
-				voteMetrics: r.voteMetrics || {},
+				status: r.status,
+				origin: r.origin,
+				description: r.description,
+				voteMetrics: (r.voteMetrics || {}) as Partial<IVoteMetrics>,
 				createdAtBlock: r.createdAtBlock,
-				updatedAtBlock: r.updatedAtBlock
+				updatedAtBlock: r.updatedAtBlock,
+				timeline: r.statusHistory
 			}));
+
+		console.log('filteredItems', filteredItems[0]);
+		console.log('filteredItems', filteredItems[filteredItems.length - 1]);
+
+		return filteredItems;
 	}
 
 	static filterReferendaForDelegate(
@@ -116,59 +113,59 @@ export class DVDelegateService {
 		delegateEndBlock: number | null
 	): number[] {
 		const endBlock = delegateEndBlock ?? Number.MAX_SAFE_INTEGER;
-
 		return referenda
 			.filter((r) => {
-				if (!r.createdAtBlock && !r.updatedAtBlock) return true;
-
-				if (r.createdAtBlock && r.createdAtBlock >= delegateStartBlock && r.createdAtBlock <= endBlock) {
-					return true;
-				}
-
-				return !!(r.updatedAtBlock && r.updatedAtBlock >= delegateStartBlock && r.updatedAtBlock <= endBlock);
+				return (
+					(r.createdAtBlock && r.createdAtBlock >= delegateStartBlock && r.createdAtBlock <= endBlock) ||
+					(r.updatedAtBlock && r.updatedAtBlock >= delegateStartBlock && r.updatedAtBlock <= endBlock)
+				);
 			})
 			.map((r) => r.index);
 	}
 
-	static async getDelegateVoteStats(network: ENetwork, address: string, eligibleReferendumIndices: number[]): Promise<IDVDelegateVoteStats> {
+	static async getDelegateVoteStats(
+		network: ENetwork,
+		address: string,
+		eligibleReferendumIndices: number[],
+		cohortEndTime?: Date,
+		startBlock?: number,
+		endBlock?: number | null
+	): Promise<IDVDelegateVoteStats> {
 		try {
-			const votesResponse = await OnChainDbService.GetVotesForAddresses({
-				network,
-				voters: [address],
-				page: 1,
-				limit: 500
-			});
+			const votes = await this.fetchAllPages<IProfileVote>(async (page) => {
+				const response = await OnChainDbService.GetVotesForAddressesAndReferenda({
+					network,
+					voters: [address],
+					page,
+					limit: 1000,
+					startBlock: startBlock || 0,
+					endBlock: endBlock || 2147483647
+				});
+				return response.items || [];
+			}, 1000);
 
-			const allVotes = votesResponse.items || [];
-			const votes = allVotes.filter((v) => v.proposalIndex !== undefined && eligibleReferendumIndices.includes(v.proposalIndex));
+			const validVotes = votes.filter((v) => v.proposalIndex !== undefined && eligibleReferendumIndices.includes(v.proposalIndex));
 
 			let ayeCount = 0;
 			let nayCount = 0;
 			let abstainCount = 0;
 			let winningVotes = 0;
 
-			const referendumIndices = [...new Set(votes.map((v) => v.proposalIndex).filter((i): i is number => i !== undefined))];
+			validVotes.forEach((vote) => {
+				const proposal = vote.proposal as IOnChainPostListing | undefined;
+				let status = proposal?.status;
+				const timeline: IStatusHistoryItem[] = (proposal?.statusHistory || []) as IStatusHistoryItem[];
 
-			const referendaDetails = await Promise.all(
-				referendumIndices.slice(0, 100).map(async (index) => {
-					try {
-						const postInfo = await OnChainDbService.GetOnChainPostInfo({
-							network,
-							proposalType: EProposalType.REFERENDUM_V2,
-							indexOrHash: String(index)
-						});
+				if (cohortEndTime && timeline.length > 0) {
+					const validHistory = timeline
+						.filter((h: IStatusHistoryItem) => new Date(h.timestamp).getTime() <= cohortEndTime.getTime())
+						.sort((a: IStatusHistoryItem, b: IStatusHistoryItem) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-						return { index, status: postInfo?.status };
-					} catch {
-						return { index, status: undefined };
+					if (validHistory.length > 0) {
+						status = validHistory[0].status;
 					}
-				})
-			);
+				}
 
-			const statusMap = new Map(referendaDetails.map((r) => [r.index, r.status]));
-
-			votes.forEach((vote) => {
-				const status = statusMap.get(vote.proposalIndex);
 				const isClosed = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Rejected, EProposalStatus.TimedOut, EProposalStatus.Cancelled].includes(
 					status as EProposalStatus
 				);
@@ -204,27 +201,30 @@ export class DVDelegateService {
 	}
 
 	static async getDelegatesWithStats(network: ENetwork, cohort: IDVCohort, trackFilter = EDVTrackFilter.DV_TRACKS): Promise<IDVDelegateWithStats[]> {
-		const cachedData = await RedisService.GetDVDelegates({ network, cohortId: cohort.index.toString() });
+		const cachedData = await RedisService.GetDVDelegates({ network, cohortId: cohort.index.toString(), trackFilter });
 		if (cachedData) return cachedData;
 
 		const allowedTracks = trackFilter === EDVTrackFilter.DV_TRACKS ? cohort.tracks : null;
-		const cohortReferenda = await this.getCohortReferenda(network, cohort.startTime, cohort.endTime, allowedTracks);
+		const cohortReferenda = await this.getCohortReferenda(network, cohort, allowedTracks);
 
 		const statsPromises = cohort.delegates.map(async (delegate) => {
 			const delegateReferendumIndices = this.filterReferendaForDelegate(cohortReferenda, delegate.startBlock, delegate.endBlock);
-			const voteStats = await this.getDelegateVoteStats(network, delegate.address, delegateReferendumIndices);
+			const voteStats = await this.getDelegateVoteStats(network, delegate.address, delegateReferendumIndices, cohort.endTime, delegate.startBlock, delegate.endBlock);
 			return { ...delegate, voteStats } as IDVDelegateWithStats;
 		});
 
-		const result = await Promise.all(statsPromises);
-		await RedisService.SetDVDelegates({ network, cohortId: cohort.index.toString(), data: result });
+		const delegatesWithStats = await Promise.all(statsPromises);
+		await RedisService.SetDVDelegates({ network, cohortId: cohort.index.toString(), trackFilter, data: delegatesWithStats });
 
-		return result;
+		return delegatesWithStats;
 	}
 
 	static async getInfluence(network: ENetwork, cohort: IDVCohort, trackFilter = EDVTrackFilter.DV_TRACKS): Promise<IDVReferendumInfluence[]> {
+		const cachedData = await RedisService.GetDVInfluence({ network, cohortId: cohort.index.toString(), trackFilter });
+		if (cachedData) return cachedData;
+
 		const allowedTracks = trackFilter === EDVTrackFilter.DV_TRACKS ? cohort.tracks : null;
-		const cohortReferenda = await this.getCohortReferenda(network, cohort.startTime, cohort.endTime, allowedTracks);
+		const cohortReferenda = await this.getCohortReferenda(network, cohort, allowedTracks);
 		const referendaItems = cohortReferenda.slice(0, 1000);
 		const referendumIndices = referendaItems.map((r) => r.index);
 
@@ -238,14 +238,16 @@ export class DVDelegateService {
 				voters: uniqueAddresses,
 				referendumIndices,
 				page,
-				limit: 1000
+				limit: 1000,
+				startBlock: cohort.startBlock,
+				endBlock: cohort.endBlock
 			});
 			return res.items || [];
 		}, 50);
 
-		return referendaItems.map((referendum) => {
+		const influenceData = referendaItems.map((referendum) => {
 			try {
-				const dvVotes = allVotes.filter((v) => v.proposalIndex === referendum.index);
+				const dvVotes = allVotes.filter((v) => v.proposalIndex === referendum.index && !(cohort.endTime && new Date(v.createdAt).getTime() > cohort.endTime.getTime()));
 				let dvAyeTotal = BigInt(0);
 				let dvNayTotal = BigInt(0);
 
@@ -295,21 +297,36 @@ export class DVDelegateService {
 					};
 				});
 
+				let influence = EInfluenceStatus.NO_IMPACT;
+				const totalAye = BigInt(referendum.voteMetrics?.aye?.value || '0');
+				const totalNay = BigInt(referendum.voteMetrics?.nay?.value || '0');
+
+				const ayeWithoutDV = totalAye - dvAyeTotal;
+				const nayWithoutDV = totalNay - dvNayTotal;
+
+				const { status } = referendum;
+				const isPassed = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed].includes(status as EProposalStatus);
+				const isFailed = [EProposalStatus.Rejected, EProposalStatus.TimedOut, EProposalStatus.Cancelled].includes(status as EProposalStatus);
+
+				let wouldPassWithoutDv = isPassed;
+
+				if (isPassed && ayeWithoutDV <= nayWithoutDV) {
+					wouldPassWithoutDv = false;
+				} else if (isFailed && ayeWithoutDV > nayWithoutDV) {
+					wouldPassWithoutDv = true;
+				}
+
+				if (isPassed && !wouldPassWithoutDv) {
+					influence = EInfluenceStatus.APPROVED;
+				} else if (isFailed && wouldPassWithoutDv) {
+					influence = EInfluenceStatus.REJECTED;
+				}
+
 				const dvTotal = dvAyeTotal + dvNayTotal;
 				const tally = referendum.voteMetrics;
-				const ayeValue = BigInt(tally?.ayes?.value || '0');
-				const nayValue = BigInt(tally?.nays?.value || '0');
+				const ayeValue = BigInt(tally?.[EVoteDecision.AYE]?.value || '0');
+				const nayValue = BigInt(tally?.[EVoteDecision.NAY]?.value || '0');
 				const totalValue = ayeValue + nayValue;
-				const isPass = ayeValue > nayValue;
-
-				const noDvAye = ayeValue - dvAyeTotal;
-				const noDvNay = nayValue - dvNayTotal;
-				const noDvIsPass = noDvAye > noDvNay;
-
-				let influence = EInfluenceStatus.NO_IMPACT;
-				if (isPass !== noDvIsPass) {
-					influence = isPass ? EInfluenceStatus.APPROVED : EInfluenceStatus.REJECTED;
-				}
 
 				return {
 					index: referendum.index || 0,
@@ -345,6 +362,9 @@ export class DVDelegateService {
 				} as IDVReferendumInfluence;
 			}
 		});
+
+		await RedisService.SetDVInfluence({ network, cohortId: cohort.index.toString(), trackFilter, data: influenceData });
+		return influenceData;
 	}
 
 	static async getVotingMatrix(
@@ -352,8 +372,11 @@ export class DVDelegateService {
 		cohort: IDVCohort,
 		trackFilter = EDVTrackFilter.DV_TRACKS
 	): Promise<{ referendumIndices: number[]; delegates: IDVDelegateVotingMatrix[] }> {
+		const cachedData = await RedisService.GetDVVotingMatrix({ network, cohortId: cohort.index.toString(), trackFilter });
+		if (cachedData) return cachedData;
+
 		const allowedTracks = trackFilter === EDVTrackFilter.DV_TRACKS ? cohort.tracks : null;
-		const cohortReferenda = await this.getCohortReferenda(network, cohort.startTime, cohort.endTime, allowedTracks);
+		const cohortReferenda = await this.getCohortReferenda(network, cohort, allowedTracks);
 
 		const matrixPromises = cohort.delegates.map(async (delegate) => {
 			const delegateReferendumIndices = this.filterReferendaForDelegate(cohortReferenda, delegate.startBlock, delegate.endBlock);
@@ -375,6 +398,8 @@ export class DVDelegateService {
 
 			votesResponse.items.forEach((vote) => {
 				if (vote.proposalIndex !== undefined && delegateReferendumIndices.includes(vote.proposalIndex)) {
+					if (cohort.endTime && new Date(vote.createdAt).getTime() > cohort.endTime.getTime()) return;
+
 					votes[vote.proposalIndex] = vote.decision;
 					totalVoted += 1;
 					if (vote.decision === EVoteDecision.AYE) ayeCount += 1;
@@ -404,9 +429,12 @@ export class DVDelegateService {
 			});
 		});
 
-		return {
+		const result = {
 			referendumIndices: Array.from(allDelegateReferendumIndices).sort((a, b) => a - b),
 			delegates
 		};
+
+		await RedisService.SetDVVotingMatrix({ network, cohortId: cohort.index.toString(), trackFilter, data: result });
+		return result;
 	}
 }
