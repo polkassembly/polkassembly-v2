@@ -178,7 +178,8 @@ function PersonalityStep({
 													{personaTab === 'preview' && (
 														<div className='flex-1 overflow-y-auto'>
 															<p className='text-xs font-bold italic text-text_primary'>This is how the comment will appear on the vote:</p>
-															<p className='mt-2 text-xs italic text-text_primary'>Voted Aye — Proposal meets defined criteria. – {signature || 'Alice for Growth Advocate'}</p>
+															<p className='mt-2 text-xs italic text-text_primary'>Voted Aye — Proposal meets defined criteria. – {signature || ''}</p>
+															<p className='text-xs italic text-text_primary'>{contact ? `Contact Link: ${contact}` : ''}</p>
 														</div>
 													)}
 												</div>
