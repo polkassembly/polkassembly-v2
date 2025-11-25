@@ -10,13 +10,15 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuChe
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { IDVDelegateWithStats, IDVCohort, EDVDelegateType } from '@/_shared/types';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 
 interface DecentralisedVoicesCardProps {
 	delegatesWithStats: IDVDelegateWithStats[];
-	cohort: IDVCohort;
+	cohort: IDVCohort | null;
+	loading?: boolean;
 }
 
-function DecentralisedVoicesCard({ delegatesWithStats, cohort }: DecentralisedVoicesCardProps) {
+function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: DecentralisedVoicesCardProps) {
 	const [activeTab, setActiveTab] = useState<'DAO' | 'GUARDIAN'>('DAO');
 	const [sortOptions, setSortOptions] = useState({
 		newestToOldest: false,
@@ -40,6 +42,8 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort }: DecentralisedVo
 		return 0;
 	});
 
+	const showSkeleton = loading || !cohort;
+
 	return (
 		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
 			<div className='mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
@@ -48,7 +52,7 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort }: DecentralisedVo
 						<Activity className='text-decision_bar_indicator' />
 						<h2 className='text-2xl font-semibold text-navbar_title'>Decentralised Voices</h2>
 					</div>
-					{cohort.guardiansCount > 0 && (
+					{cohort && cohort.guardiansCount > 0 && (
 						<div className='flex rounded-lg bg-sidebar_footer p-1'>
 							<button
 								type='button'
@@ -138,58 +142,87 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort }: DecentralisedVo
 						</tr>
 					</thead>
 					<tbody>
-						{sortedDelegates.map((delegate) => {
-							const totalVotes = delegate.voteStats.ayeCount + delegate.voteStats.nayCount + delegate.voteStats.abstainCount;
-							return (
-								<tr
-									key={delegate.address}
-									className='cursor-pointer border-b border-border_grey text-sm font-semibold hover:border-border_grey/90'
-								>
-									<td className='py-4 pl-4'>
-										<div className='flex items-center gap-2'>
-											<Address address={delegate.address} />
-										</div>
-									</td>
-									<td className='text-bodyBlue dark:text-blue-dark-high py-4 font-medium'>{totalVotes}</td>
-									<td className='py-4'>
-										<div className='flex items-center gap-4'>
-											<div className='flex items-center gap-1 text-success'>
-												<AiFillLike className='fill-current text-sm' />
-												<span className='font-medium'>{delegate.voteStats.ayeCount}</span>
+						{showSkeleton
+							? [1, 2, 3, 4, 5].map((i) => (
+									<tr
+										key={i}
+										className='border-b border-border_grey'
+									>
+										<td className='py-4 pl-4'>
+											<Skeleton className='h-6 w-40' />
+										</td>
+										<td className='py-4'>
+											<Skeleton className='h-5 w-12' />
+										</td>
+										<td className='py-4'>
+											<div className='flex gap-4'>
+												<Skeleton className='h-5 w-10' />
+												<Skeleton className='h-5 w-10' />
+												<Skeleton className='h-5 w-10' />
 											</div>
-											<div className='flex items-center gap-1 text-toast_error_text'>
-												<AiFillDislike className='fill-current text-sm' />
-												<span className='font-medium'>{delegate.voteStats.nayCount}</span>
-											</div>
-											<div className='flex items-center gap-1 text-bg_blue'>
-												<Ban size={14} />
-												<span className='font-medium'>{delegate.voteStats.abstainCount}</span>
-											</div>
-										</div>
-									</td>
-									<td className='py-4'>
-										<TooltipProvider>
-											<Tooltip>
-												<TooltipTrigger className='text-bodyBlue dark:text-blue-dark-high cursor-help font-medium'>{delegate.voteStats.participation.toFixed(2)} %</TooltipTrigger>
-												<TooltipContent className='bg-gray-800 text-white'>
-													<p>Votes Cast / Total Eligible Referenda</p>
-												</TooltipContent>
-											</Tooltip>
-										</TooltipProvider>
-									</td>
-									<td className='py-4'>
-										<TooltipProvider>
-											<Tooltip>
-												<TooltipTrigger className='cursor-help font-medium text-green-500'>{delegate.voteStats.winRate.toFixed(2)} %</TooltipTrigger>
-												<TooltipContent className='bg-gray-800 text-white'>
-													<p>Winning Votes / Total Non-Abstain Votes</p>
-												</TooltipContent>
-											</Tooltip>
-										</TooltipProvider>
-									</td>
-								</tr>
-							);
-						})}
+										</td>
+										<td className='py-4'>
+											<Skeleton className='h-5 w-16' />
+										</td>
+										<td className='py-4'>
+											<Skeleton className='h-5 w-16' />
+										</td>
+									</tr>
+								))
+							: sortedDelegates.map((delegate) => {
+									const totalVotes = delegate.voteStats.ayeCount + delegate.voteStats.nayCount + delegate.voteStats.abstainCount;
+									return (
+										<tr
+											key={delegate.address}
+											className='cursor-pointer border-b border-border_grey text-sm font-semibold hover:border-border_grey/90'
+										>
+											<td className='py-4 pl-4'>
+												<div className='flex items-center gap-2'>
+													<Address address={delegate.address} />
+												</div>
+											</td>
+											<td className='text-bodyBlue dark:text-blue-dark-high py-4 font-medium'>{totalVotes}</td>
+											<td className='py-4'>
+												<div className='flex items-center gap-4'>
+													<div className='flex items-center gap-1 text-success'>
+														<AiFillLike className='fill-current text-sm' />
+														<span className='font-medium'>{delegate.voteStats.ayeCount}</span>
+													</div>
+													<div className='flex items-center gap-1 text-toast_error_text'>
+														<AiFillDislike className='fill-current text-sm' />
+														<span className='font-medium'>{delegate.voteStats.nayCount}</span>
+													</div>
+													<div className='flex items-center gap-1 text-bg_blue'>
+														<Ban size={14} />
+														<span className='font-medium'>{delegate.voteStats.abstainCount}</span>
+													</div>
+												</div>
+											</td>
+											<td className='py-4'>
+												<TooltipProvider>
+													<Tooltip>
+														<TooltipTrigger className='text-bodyBlue dark:text-blue-dark-high cursor-help font-medium'>
+															{delegate.voteStats.participation.toFixed(2)} %
+														</TooltipTrigger>
+														<TooltipContent className='bg-gray-800 text-white'>
+															<p>Votes Cast / Total Eligible Referenda</p>
+														</TooltipContent>
+													</Tooltip>
+												</TooltipProvider>
+											</td>
+											<td className='py-4'>
+												<TooltipProvider>
+													<Tooltip>
+														<TooltipTrigger className='cursor-help font-medium text-green-500'>{delegate.voteStats.winRate.toFixed(2)} %</TooltipTrigger>
+														<TooltipContent className='bg-gray-800 text-white'>
+															<p>Winning Votes / Total Non-Abstain Votes</p>
+														</TooltipContent>
+													</Tooltip>
+												</TooltipProvider>
+											</td>
+										</tr>
+									);
+								})}
 					</tbody>
 				</table>
 			</div>

@@ -12,15 +12,17 @@ import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
 import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { IDVReferendumInfluence, EInfluenceStatus } from '@/_shared/types';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 
 interface InfluenceCardProps {
 	referendaInfluence: IDVReferendumInfluence[];
+	loading?: boolean;
 }
 
 type SortOption = 'index' | 'status' | 'influence' | 'votes';
 type SortDirection = 'asc' | 'desc';
 
-function InfluenceCard({ referendaInfluence }: InfluenceCardProps) {
+function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 	const [page, setPage] = useState(1);
 	const [sortBy, setSortBy] = useState<SortOption>('index');
 	const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -250,48 +252,80 @@ function InfluenceCard({ referendaInfluence }: InfluenceCardProps) {
 						</tr>
 					</thead>
 					<tbody>
-						{paginatedData.map((item) => (
-							<tr
-								key={item.index}
-								className='cursor-pointer border-b border-border_grey text-sm font-semibold hover:border-border_grey/90'
-							>
-								<td className='py-4 pl-4 font-medium text-text_primary'>
-									#{item.index} {item.title}
-								</td>
-								<td className='py-4'>
-									<span className={`${getSpanStyle(item.track || '', 1)} rounded-md px-1.5 py-1 text-xs`}>{convertCamelCaseToTitleCase(item.track || '')}</span>
-								</td>
-								<td className='py-4'>
-									<div className='flex'>
-										<StatusTag status={item.status} />
-									</div>
-								</td>
-								<td className='py-4'>
-									<VotingBar
-										ayePercent={item.ayePercent}
-										nayPercent={item.nayPercent}
-									/>
-								</td>
-								<td className='py-4'>
-									<div className='flex items-center gap-2'>
-										<div
-											className={`flex h-5 w-5 items-center justify-center rounded-sm ${
-												item.influence === EInfluenceStatus.REJECTED
-													? 'bg-toast_error_bg text-toast_error_text'
-													: item.influence === EInfluenceStatus.APPROVED
-														? 'bg-success_vote_bg text-success'
-														: 'bg-toast_info_bg text-toast_info_text'
-											}`}
-										>
-											{item.influence === EInfluenceStatus.REJECTED ? <X size={12} /> : item.influence === EInfluenceStatus.APPROVED ? <Check size={12} /> : <Minus size={12} />}
-										</div>
-									</div>
-								</td>
-								<td className='py-4 pr-4 text-right'>
-									<MoreHorizontal className='h-4 w-4 text-wallet_btn_text' />
-								</td>
-							</tr>
-						))}
+						{loading
+							? [1, 2, 3, 4, 5].map((i) => (
+									<tr
+										key={i}
+										className='border-b border-border_grey'
+									>
+										<td className='py-4 pl-4'>
+											<Skeleton className='h-5 w-48' />
+										</td>
+										<td className='py-4'>
+											<Skeleton className='h-5 w-24' />
+										</td>
+										<td className='py-4'>
+											<Skeleton className='h-5 w-20' />
+										</td>
+										<td className='py-4'>
+											<Skeleton className='h-5 w-32' />
+										</td>
+										<td className='py-4'>
+											<Skeleton className='h-5 w-20' />
+										</td>
+										<td className='py-4'>
+											<Skeleton className='h-5 w-6' />
+										</td>
+									</tr>
+								))
+							: paginatedData.map((item) => (
+									<tr
+										key={item.index}
+										className='cursor-pointer border-b border-border_grey text-sm font-semibold hover:border-border_grey/90'
+									>
+										<td className='py-4 pl-4 font-medium text-text_primary'>
+											#{item.index} {item.title}
+										</td>
+										<td className='py-4'>
+											<span className={`${getSpanStyle(item.track || '', 1)} rounded-md px-1.5 py-1 text-xs`}>{convertCamelCaseToTitleCase(item.track || '')}</span>
+										</td>
+										<td className='py-4'>
+											<div className='flex'>
+												<StatusTag status={item.status} />
+											</div>
+										</td>
+										<td className='py-4'>
+											<VotingBar
+												ayePercent={item.ayePercent}
+												nayPercent={item.nayPercent}
+											/>
+										</td>
+										<td className='py-4'>
+											<div className='flex items-center gap-2'>
+												<div
+													className={`flex h-5 w-5 items-center justify-center rounded-sm ${
+														item.influence === EInfluenceStatus.REJECTED
+															? 'bg-toast_error_bg text-toast_error_text'
+															: item.influence === EInfluenceStatus.APPROVED
+																? 'bg-success_vote_bg text-success'
+																: 'bg-toast_info_bg text-toast_info_text'
+													}`}
+												>
+													{item.influence === EInfluenceStatus.REJECTED ? (
+														<X size={12} />
+													) : item.influence === EInfluenceStatus.APPROVED ? (
+														<Check size={12} />
+													) : (
+														<Minus size={12} />
+													)}
+												</div>
+											</div>
+										</td>
+										<td className='py-4 pr-4 text-right'>
+											<MoreHorizontal className='h-4 w-4 text-wallet_btn_text' />
+										</td>
+									</tr>
+								))}
 					</tbody>
 				</table>
 			</div>

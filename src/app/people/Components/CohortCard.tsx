@@ -8,9 +8,11 @@ import timer from '@assets/icons/timer.svg';
 import Image from 'next/image';
 import dayjs from 'dayjs';
 import { IDVCohort, ECohortStatus } from '@/_shared/types';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 
 interface CohortCardProps {
-	cohort: IDVCohort;
+	cohort: IDVCohort | null;
+	loading?: boolean;
 }
 
 function formatNumber(num: number): string {
@@ -24,10 +26,32 @@ function formatDate(date: Date): { date: string; time: string } {
 	return { date: d.format("MMM D 'YY"), time: d.format('HH:mm:ss') };
 }
 
-function CohortCard({ cohort }: CohortCardProps) {
-	const startDateTime = formatDate(cohort.startTime);
-	const endDateTime = cohort.endTime ? formatDate(cohort.endTime) : null;
-	const isOngoing = cohort.status === ECohortStatus.ONGOING;
+function CohortCard({ cohort, loading }: CohortCardProps) {
+	const startDateTime = cohort ? formatDate(cohort.startTime) : null;
+	const endDateTime = cohort?.endTime ? formatDate(cohort.endTime) : null;
+	const isOngoing = cohort?.status === ECohortStatus.ONGOING;
+
+	if (loading || !cohort) {
+		return (
+			<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
+				<div className='grid grid-cols-1 gap-6 md:grid-cols-4'>
+					{[1, 2, 3, 4].map((i) => (
+						<div
+							key={i}
+							className='flex items-start gap-4'
+						>
+							<Skeleton className='h-10 w-10 rounded-full' />
+							<div className='space-y-2'>
+								<Skeleton className='h-3 w-20' />
+								<Skeleton className='h-7 w-16' />
+								<Skeleton className='h-3 w-24' />
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
@@ -69,7 +93,7 @@ function CohortCard({ cohort }: CohortCardProps) {
 					<div>
 						<p className='text-xs font-medium uppercase text-community_text'>START TIME</p>
 						<p className='text-lg font-semibold text-text_primary'>
-							{startDateTime.date} <span className='text-wallet_btn_text'>{startDateTime.time}</span>
+							{startDateTime?.date} <span className='text-wallet_btn_text'>{startDateTime?.time}</span>
 						</p>
 						<p className='text-xs text-wallet_btn_text'>#{cohort.startBlock.toLocaleString()}</p>
 					</div>
