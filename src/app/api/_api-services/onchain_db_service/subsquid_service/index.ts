@@ -172,9 +172,7 @@ export class SubsquidService extends SubsquidUtils {
 		page,
 		statuses,
 		origins,
-		notVotedByAddresses,
-		startDate,
-		endDate
+		notVotedByAddresses
 	}: {
 		network: ENetwork;
 		proposalType: EProposalType;
@@ -183,16 +181,12 @@ export class SubsquidService extends SubsquidUtils {
 		statuses?: EProposalStatus[];
 		origins?: EPostOrigin[];
 		notVotedByAddresses?: string[];
-		startDate?: string;
-		endDate?: string;
 	}): Promise<IGenericListingResponse<IOnChainPostListing>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		let gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE;
 
-		if (startDate && endDate) {
-			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES_AND_ORIGINS_AND_DATE_RANGE;
-		} else if (statuses?.length && origins?.length) {
+		if (statuses?.length && origins?.length) {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES_AND_ORIGINS;
 		} else if (statuses?.length) {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES;
@@ -215,9 +209,7 @@ export class SubsquidService extends SubsquidUtils {
 				status_in: statuses,
 				type_eq: proposalType,
 				origin_in: origins,
-				voters: notVotedByAddresses,
-				createdAt_gte: startDate,
-				createdAt_lte: endDate
+				voters: notVotedByAddresses
 			})
 			.toPromise();
 
@@ -267,8 +259,6 @@ export class SubsquidService extends SubsquidUtils {
 						status: EProposalStatus;
 						timestamp: string;
 					}>;
-					createdAtBlock?: number;
-					updatedAtBlock?: number;
 				},
 				index: number
 			) => {
@@ -1367,25 +1357,41 @@ export class SubsquidService extends SubsquidUtils {
 		voters,
 		referendumIndices,
 		page,
-		limit
+		limit,
+		startBlock,
+		endBlock
 	}: {
 		network: ENetwork;
 		voters: string[];
-		referendumIndices: number[];
+		referendumIndices?: number[];
 		page: number;
 		limit: number;
+		startBlock?: number;
+		endBlock?: number;
 	}): Promise<IGenericListingResponse<IProfileVote>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
-		const query = this.GET_VOTES_FOR_ADDRESSES_AND_PROPOSAL_INDICES;
-
-		const variables = {
+		let query = this.GET_VOTES_FOR_ADDRESSES_AND_PROPOSAL_INDICES;
+		const variables: {
+			limit: number;
+			offset: number;
+			voter_in: string[];
+			createdAtBlock_gte: number;
+			createdAtBlock_lte: number;
+			proposalIndex_in?: number[];
+		} = {
 			limit,
 			offset: (page - 1) * limit,
-			voter_in: voters,
-			proposalIndex_in: referendumIndices
+			voter_in: voters.map((address) => getEncodedAddress(address, network)).filter((addr): addr is string => addr !== null),
+			createdAtBlock_gte: startBlock || 0,
+			createdAtBlock_lte: endBlock || 2147483647
 		};
 
+		if (referendumIndices && referendumIndices.length > 0) {
+			variables.proposalIndex_in = referendumIndices;
+		} else {
+			query = this.GET_VOTES_BY_VOTER_AND_BLOCK_RANGE;
+		}
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
 
 		if (subsquidErr || !subsquidData) {
@@ -1402,13 +1408,72 @@ export class SubsquidService extends SubsquidUtils {
 			};
 		}
 
-		const votesData: IProfileVote[] = votes.map((vote: { decision: string; voter: string; proposalIndex: number; type: EProposalType; parentVote: { extrinsicIndex: string } }) => {
+		interface ISubsquidVoteResponse {
+			decision: string;
+			voter: string;
+			type: string;
+			proposalIndex: number;
+			isDelegated: boolean;
+			lockPeriod: number;
+			createdAt: string;
+			balance: {
+				__typename: string;
+				value?: string;
+				aye?: string;
+				nay?: string;
+				abstain?: string;
+			};
+			parentVote?: {
+				extrinsicIndex: string;
+			};
+			proposal?: {
+				createdAt: string;
+				description?: string;
+				index: number;
+				origin: EPostOrigin;
+				proposer?: string;
+				status?: EProposalStatus;
+				hash?: string;
+				preimage?: {
+					proposedCall?: {
+						args?: Record<string, unknown>;
+					};
+				};
+				statusHistory?: Array<{
+					status: EProposalStatus;
+					timestamp: string;
+					block?: number;
+				}>;
+				createdAtBlock?: number;
+				updatedAtBlock?: number;
+			};
+		}
+
+		const votesData: IProfileVote[] = votes.map((vote: ISubsquidVoteResponse) => {
 			return {
 				...vote,
 				decision: this.convertSubsquidVoteDecisionToVoteDecision({ decision: vote.decision }),
 				voterAddress: vote.voter,
 				proposalType: vote.type as EProposalType,
-				extrinsicIndex: vote.parentVote?.extrinsicIndex || ''
+				extrinsicIndex: vote.parentVote?.extrinsicIndex || '',
+				proposal: vote.proposal
+					? {
+							createdAt: new Date(vote.proposal.createdAt),
+							description: vote.proposal.description || '',
+							index: vote.proposal.index,
+							origin: vote.proposal.origin,
+							proposer: vote.proposal.proposer || '',
+							status: vote.proposal.status || EProposalStatus.Unknown,
+							type: EProposalType.REFERENDUM_V2,
+							hash: vote.proposal.hash || '',
+							voteMetrics: {},
+							beneficiaries: vote.proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(vote.proposal.preimage?.proposedCall?.args) : undefined,
+							timeline: (vote.proposal.statusHistory || []).map((h) => ({ ...h, block: h.block || 0, timestamp: new Date(h.timestamp) })) as IStatusHistoryItem[],
+							statusHistory: (vote.proposal.statusHistory || []).map((h) => ({ ...h, block: h.block || 0, timestamp: new Date(h.timestamp) })) as IStatusHistoryItem[],
+							createdAtBlock: vote.proposal.createdAtBlock,
+							updatedAtBlock: vote.proposal.updatedAtBlock
+						}
+					: undefined
 			};
 		});
 
