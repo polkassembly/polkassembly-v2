@@ -9,6 +9,7 @@ import QuestionIcon from '@assets/delegation/question.svg';
 import { Button } from '@/app/_shared-components/Button';
 import { Switch } from '@/app/_shared-components/Switch';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
+import { VotingStrategy } from '@/_shared/types';
 import styles from '../DelegateXSetupDialog.module.scss';
 
 interface PersonalityStepProps {
@@ -17,17 +18,15 @@ interface PersonalityStepProps {
 	onSignatureChange: (value: string) => void;
 	contact: string;
 	onContactChange: (value: string) => void;
-	prompt: string;
-	onPromptChange: (value: string) => void;
 	includeComment: boolean;
 	onIncludeCommentChange: (value: boolean) => void;
-	personaTab: 'prompt' | 'preview';
-	onPersonaTabChange: (tab: 'prompt' | 'preview') => void;
 	isEditMode?: boolean;
 	votingPower?: string;
 	onVotingPowerChange?: (value: string) => void;
 	onSubmit?: () => Promise<void>;
 	isLoading?: boolean;
+	selectedStrategy?: string;
+	strategies?: VotingStrategy[];
 }
 
 function PersonalityStep({
@@ -36,17 +35,15 @@ function PersonalityStep({
 	onSignatureChange,
 	contact,
 	onContactChange,
-	prompt,
-	onPromptChange,
 	includeComment,
 	onIncludeCommentChange,
-	personaTab,
-	onPersonaTabChange,
 	isEditMode = false,
 	votingPower,
 	onVotingPowerChange,
 	onSubmit,
-	isLoading = false
+	isLoading = false,
+	selectedStrategy,
+	strategies
 }: PersonalityStepProps) {
 	const handleNext = async () => {
 		if (isEditMode && onSubmit) {
@@ -56,10 +53,12 @@ function PersonalityStep({
 		}
 	};
 
+	const currentStrategy = strategies?.find((s) => s.id === selectedStrategy);
+
 	return (
-		<div className='space-y-4'>
+		<div className='space-y-3'>
 			<div className='rounded-lg bg-delegation_bgcard p-4 sm:p-6'>
-				<div className='mb-4'>
+				<div className='mb-3'>
 					<p className='mb-2 block text-[10px] font-medium md:text-sm'>Enter the voting power of your delegation</p>
 					<input
 						className='placeholder:text-text_secondary w-full rounded-md border border-border_grey bg-bg_modal px-3 py-2 text-sm outline-none'
@@ -100,10 +99,10 @@ function PersonalityStep({
 				<div>
 					{includeComment && (
 						<>
-							<p className='mt-3 text-[10px] md:text-sm'>DelegateX adds a comment with your vote explaining the reason behind it. You can customise the comment below:</p>
+							<p className='mt-2 text-[10px] md:text-sm'>DelegateX adds a comment with your vote explaining the reason behind it. You can customise the comment below:</p>
 
-							<div className='mt-3 rounded-lg border border-border_grey p-3 sm:p-4'>
-								<div className='space-y-4'>
+							<div className='mt-2 rounded-lg border border-border_grey p-3 sm:p-4'>
+								<div className='space-y-2'>
 									<div>
 										<p className='mb-2 block text-[10px] font-medium md:text-sm'>Signature Line (optional)</p>
 										<input
@@ -125,63 +124,23 @@ function PersonalityStep({
 									</div>
 
 									<div>
-										<p className='mb-2 block text-[10px] font-medium md:text-sm'>Customise the prompt to modify comment style.</p>
+										<p className='mb-2 block text-[10px] font-medium md:text-sm'>Comment Preview</p>
+										<p className='text-text_secondary mb-2 text-xs'>This is how the comment will appear based on your selected strategy:</p>
 
-										<div className={`${styles.PreviewWrapper} mt-3 rounded-xl p-[1px]`}>
-											<div className='flex min-h-[100px] flex-col rounded-xl bg-bg_modal p-4 sm:min-h-[160px] md:min-h-[140px]'>
+										<div className={`${styles.PreviewWrapper} rounded-xl p-[1px]`}>
+											<div className='hide_scrollbar flex max-h-[100px] flex-col overflow-y-auto rounded-xl bg-bg_modal p-2 sm:max-h-[120px]'>
 												<div
-													className='mb-3 flex gap-2'
+													className='mb-1 flex gap-2'
 													role='tablist'
 													aria-label='Persona customization tabs'
 												>
-													{' '}
-													<button
-														type='button'
-														role='tab'
-														aria-selected={personaTab === 'prompt'}
-														aria-controls='prompt-panel'
-														className={`rounded-full px-4 py-1 text-xs font-medium transition-colors ${personaTab === 'prompt' ? 'bg-border_grey text-text_primary' : ''}`}
-														onClick={() => onPersonaTabChange('prompt')}
-													>
-														PROMPT
-													</button>
-													<button
-														type='button'
-														role='tab'
-														aria-selected={personaTab === 'preview'}
-														aria-controls='preview-panel'
-														className={`rounded-full px-4 py-1 text-xs font-medium transition-colors ${personaTab === 'preview' ? 'bg-border_grey text-text_primary' : ''}`}
-														onClick={() => onPersonaTabChange('preview')}
-													>
-														PREVIEW
-													</button>
+													<p className='rounded-full bg-border_grey px-3 py-0.5 text-xs font-medium text-text_primary transition-colors'>PREVIEW</p>
 												</div>
-												<div
-													id='prompt-panel'
-													role='tabpanel'
-													hidden={personaTab !== 'prompt'}
-												>
-													{personaTab === 'prompt' && (
-														<textarea
-															className='placeholder:text-text_secondary w-full flex-1 resize-none bg-transparent text-sm outline-none'
-															placeholder='Enter your custom prompt here...'
-															value={prompt}
-															onChange={(e) => onPromptChange(e.target.value)}
-														/>
-													)}
-												</div>
-												<div
-													id='preview-panel'
-													role='tabpanel'
-													hidden={personaTab !== 'preview'}
-												>
-													{personaTab === 'preview' && (
-														<div className='flex-1 overflow-y-auto'>
-															<p className='text-xs font-bold italic text-text_primary'>This is how the comment will appear on the vote:</p>
-															<p className='mt-2 text-xs italic text-text_primary'>Voted Aye — Proposal meets defined criteria. – {signature || ''}</p>
-															<p className='text-xs italic text-text_primary'>{contact ? `Contact Link: ${contact}` : ''}</p>
-														</div>
-													)}
+												<div className='flex-1 overflow-y-auto'>
+													<p className='text-xs font-bold italic text-text_primary'>Comment Preview:</p>
+													<p className='mt-2 whitespace-pre-line text-xs italic text-text_primary'>
+														{currentStrategy ? currentStrategy.commentPreview(signature, contact) : 'Please select a voting strategy to see the comment preview.'}
+													</p>
 												</div>
 											</div>
 										</div>

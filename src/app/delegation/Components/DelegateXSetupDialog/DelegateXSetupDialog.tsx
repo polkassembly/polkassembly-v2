@@ -20,6 +20,8 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { defaultStrategies } from '@/_shared/_constants/delegatexDefaultStrategies';
 import { inputToBn } from '@/app/_client-utils/inputToBn';
 import { DELEGATE_X_TRACKS } from '@/_shared/_constants/delegateXTracks';
+import { useAtom } from 'jotai';
+import { delegateXAtom } from '@/app/_atoms/delegateX/delegateXAtom';
 import DelegateXSuccessDialog from './DelegateXSuccessDialog';
 import EditDelegateXDialog from './EditDelegateXDialog';
 import WelcomeStep from './components/WelcomeStep';
@@ -53,12 +55,10 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	const { setVaultQrState } = usePolkadotVault();
 	const [signature, setSignature] = useState(initialData.signature || '');
 	const [contact, setContact] = useState(initialData.contact || '');
-	const [prompt, setPrompt] = useState<string>(initialData.prompt || '');
 	const [selectedStrategy, setSelectedStrategy] = useState(initialData.selectedStrategy || '');
 	const [openSuccess, setOpenSuccess] = useState(false);
 	const [openEdit, setOpenEdit] = useState(false);
 	const [includeComment, setIncludeComment] = useState(initialData.includeComment ?? true);
-	const [personaTab, setPersonaTab] = useState<'prompt' | 'preview'>('prompt');
 	const [currentEditMode, setCurrentEditMode] = useState(isEditMode);
 	const [isEditingFromDialog, setIsEditingFromDialog] = useState(false);
 	const [votingPower, setVotingPower] = useState<string>('');
@@ -66,13 +66,13 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	const { userPreferences } = useUserPreferences();
 	const { toast } = useToast();
 	const t = useTranslations();
+	const [, setDelegateXState] = useAtom(delegateXAtom);
 	useEffect(() => {
 		if (open && isEditMode) {
 			setStep(initialStep);
 			setCurrentEditMode(true);
 			setSignature(initialData.signature || '');
 			setContact(initialData.contact || '');
-			setPrompt(initialData.prompt || '');
 			setSelectedStrategy(initialData.selectedStrategy || '');
 			setIncludeComment(initialData.includeComment ?? true);
 			setVotingPower(initialData.votingPower || '');
@@ -81,7 +81,6 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 			setCurrentEditMode(false);
 			setSignature('');
 			setContact('');
-			setPrompt('');
 			setSelectedStrategy('');
 			setIncludeComment(true);
 			setVotingPower('');
@@ -112,7 +111,6 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 				updatePayload.contactLink = contact;
 				updatePayload.signatureLink = signature || '';
 				updatePayload.includeComment = includeComment;
-				updatePayload.prompt = prompt;
 				if (votingPower) {
 					updatePayload.votingPower = votingPower;
 				}
@@ -127,8 +125,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 				contactLink: contact,
 				signatureLink: signature || '',
 				includeComment: includeComment || false,
-				votingPower: votingPower || new BN(0).toString(),
-				prompt: prompt || ''
+				votingPower: votingPower || new BN(0).toString()
 			});
 			data = result.data;
 			error = result.error;
@@ -147,6 +144,18 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 		const { delegateXAccount } = data;
 
 		const { address } = delegateXAccount;
+
+		setDelegateXState((prev) => ({
+			...prev,
+			account: delegateXAccount,
+			data: prev.data
+				? {
+						...prev.data,
+						address: delegateXAccount.address,
+						votingPower: delegateXAccount.votingPower || prev.data.votingPower
+					}
+				: null
+		}));
 
 		const needsRedelegation = !currentEditMode || (votingPower && votingPower !== initialData.votingPower);
 
@@ -286,17 +295,15 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 								onSignatureChange={setSignature}
 								contact={contact}
 								onContactChange={setContact}
-								prompt={prompt}
-								onPromptChange={setPrompt}
 								includeComment={includeComment}
 								onIncludeCommentChange={setIncludeComment}
-								personaTab={personaTab}
-								onPersonaTabChange={setPersonaTab}
 								isEditMode={currentEditMode}
 								votingPower={votingPower}
 								onVotingPowerChange={setVotingPower}
 								onSubmit={handleComplete}
 								isLoading={isLoading}
+								selectedStrategy={selectedStrategy}
+								strategies={defaultStrategies}
 							/>
 						)}
 

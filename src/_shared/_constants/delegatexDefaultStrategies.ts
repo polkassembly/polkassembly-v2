@@ -19,6 +19,11 @@ export const defaultStrategies: VotingStrategy[] = [
 			balthazar: 0.3,
 			caspar: 0.2,
 			melchior: 0.5
+		},
+		commentPreview: (signature: string, contact: string) => {
+			const signaturePart = signature ? ` – ${signature}` : '';
+			const contactPart = contact ? `\nContact: ${contact}` : '';
+			return `Voted based on aggressive growth strategy. This proposal aligns with ecosystem expansion goals and bold initiatives that drive adoption forward.${signaturePart}${contactPart}`;
 		}
 	},
 	{
@@ -32,6 +37,11 @@ export const defaultStrategies: VotingStrategy[] = [
 			balthazar: 0.2,
 			caspar: 0.6,
 			melchior: 0.2
+		},
+		commentPreview: (signature: string, contact: string) => {
+			const signaturePart = signature ? ` – ${signature}` : '';
+			const contactPart = contact ? `\nContact: ${contact}` : '';
+			return `Voted with risk-averse strategy prioritizing treasury sustainability. This decision emphasizes fiscal responsibility and proven track records.${signaturePart}${contactPart}`;
 		}
 	},
 	{
@@ -45,6 +55,11 @@ export const defaultStrategies: VotingStrategy[] = [
 			balthazar: 0.3,
 			caspar: 0.5,
 			melchior: 0.2
+		},
+		commentPreview: (signature: string, contact: string) => {
+			const signaturePart = signature ? ` – ${signature}` : '';
+			const contactPart = contact ? `\nContact: ${contact}` : '';
+			return `Voted using conservative strategy with balanced approach. This proposal meets stability criteria while maintaining fiscal prudence.${signaturePart}${contactPart}`;
 		}
 	},
 	{
@@ -58,6 +73,11 @@ export const defaultStrategies: VotingStrategy[] = [
 			balthazar: 0.3,
 			caspar: 0.2,
 			melchior: 0.5
+		},
+		commentPreview: (signature: string, contact: string) => {
+			const signaturePart = signature ? ` – ${signature}` : '';
+			const contactPart = contact ? `\nContact: ${contact}` : '';
+			return `Voted with growth-oriented strategy. This proposal demonstrates strong potential for long-term ecosystem value and sustainable development.${signaturePart}${contactPart}`;
 		}
 	},
 	{
@@ -71,6 +91,11 @@ export const defaultStrategies: VotingStrategy[] = [
 			balthazar: 0.4,
 			caspar: 0.4,
 			melchior: 0.2
+		},
+		commentPreview: (signature: string, contact: string) => {
+			const signaturePart = signature ? ` – ${signature}` : '';
+			const contactPart = contact ? `\nContact: ${contact}` : '';
+			return `Voted based on technical excellence criteria. This proposal demonstrates strong technical merit, innovation, and sound implementation approach.${signaturePart}${contactPart}`;
 		}
 	},
 	{
@@ -84,6 +109,11 @@ export const defaultStrategies: VotingStrategy[] = [
 			balthazar: 0.2,
 			caspar: 0.3,
 			melchior: 0.5
+		},
+		commentPreview: (signature: string, contact: string) => {
+			const signaturePart = signature ? ` – ${signature}` : '';
+			const contactPart = contact ? `\nContact: ${contact}` : '';
+			return `Voted with community-focused strategy. This proposal shows strong community engagement potential and supports grassroots ecosystem development.${signaturePart}${contactPart}`;
 		}
 	},
 	{
@@ -97,6 +127,11 @@ export const defaultStrategies: VotingStrategy[] = [
 			balthazar: 0.2,
 			caspar: 0.6,
 			melchior: 0.2
+		},
+		commentPreview: (signature: string, contact: string) => {
+			const signaturePart = signature ? ` – ${signature}` : '';
+			const contactPart = contact ? `\nContact: ${contact}` : '';
+			return `Voted as treasury watchdog with strict fiscal oversight. This proposal meets rigorous financial criteria and demonstrates responsible resource allocation.${signaturePart}${contactPart}`;
 		}
 	},
 	{
@@ -110,6 +145,11 @@ export const defaultStrategies: VotingStrategy[] = [
 			balthazar: 0.4,
 			caspar: 0.4,
 			melchior: 0.2
+		},
+		commentPreview: (signature: string, contact: string) => {
+			const signaturePart = signature ? ` – ${signature}` : '';
+			const contactPart = contact ? `\nContact: ${contact}` : '';
+			return `Voted with validator-aligned strategy. This proposal supports network security, infrastructure improvements, and validator ecosystem health.${signaturePart}${contactPart}`;
 		}
 	},
 	{
@@ -123,6 +163,11 @@ export const defaultStrategies: VotingStrategy[] = [
 			balthazar: 0.33,
 			caspar: 0.33,
 			melchior: 0.34
+		},
+		commentPreview: (signature: string, contact: string) => {
+			const signaturePart = signature ? ` – ${signature}` : '';
+			const contactPart = contact ? `\nContact: ${contact}` : '';
+			return `Voted with neutral strategy applying equal weight to all evaluation criteria. This proposal meets balanced assessment standards across all perspectives.${signaturePart}${contactPart}`;
 		}
 	},
 	{
@@ -136,6 +181,11 @@ export const defaultStrategies: VotingStrategy[] = [
 			balthazar: 0.25,
 			caspar: 0.15,
 			melchior: 0.6
+		},
+		commentPreview: (signature: string, contact: string) => {
+			const signaturePart = signature ? ` – ${signature}` : '';
+			const contactPart = contact ? `\nContact: ${contact}` : '';
+			return `Voted with experimental strategy favoring innovation. This proposal represents cutting-edge thinking and has potential for breakthrough impact on the ecosystem.${signaturePart}${contactPart}`;
 		}
 	}
 ];

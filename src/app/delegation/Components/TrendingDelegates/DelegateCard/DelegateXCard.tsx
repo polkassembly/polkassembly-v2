@@ -5,7 +5,7 @@
 'use client';
 
 import { memo, useState } from 'react';
-import Image, { StaticImageData } from 'next/image';
+import Image from 'next/image';
 import { IoPersonAdd } from '@react-icons/all-files/io5/IoPersonAdd';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/hooks/useUser';
@@ -18,6 +18,8 @@ import { IDelegateXAccount } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Pencil } from 'lucide-react';
+import DelegateXBotGif from '@assets/delegation/klara/klara.gif';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import EditDelegateXDialog from '../../DelegateXSetupDialog/EditDelegateXDialog';
 import DelegateXSetupDialog from '../../DelegateXSetupDialog/DelegateXSetupDialog';
 import styles from './DelegateCard.module.scss';
@@ -27,7 +29,6 @@ interface IDelegateXCardProps {
 	data: {
 		address: string;
 		bio: string;
-		image: StaticImageData;
 		votesPast30Days: number;
 		votingPower: string;
 		ayeCount: number;
@@ -39,9 +40,10 @@ interface IDelegateXCardProps {
 	};
 	delegateXAccount: IDelegateXAccount | null;
 	onRefresh?: (delegateXAccount: IDelegateXAccount) => void;
+	isLoading?: boolean;
 }
 
-const DelegateXCard = memo(({ data, delegateXAccount, onRefresh }: IDelegateXCardProps) => {
+const DelegateXCard = memo(({ data, delegateXAccount, onRefresh, isLoading = false }: IDelegateXCardProps) => {
 	const { user } = useUser();
 	const t = useTranslations('Delegation');
 	const currentNetwork = getCurrentNetwork();
@@ -76,7 +78,7 @@ const DelegateXCard = memo(({ data, delegateXAccount, onRefresh }: IDelegateXCar
 		<div className={styles.delegateXCardWrapper}>
 			<Image
 				className={styles.delegateXGif}
-				src={data.image}
+				src={DelegateXBotGif}
 				alt={data.address}
 				width={95}
 				height={95}
@@ -99,14 +101,13 @@ const DelegateXCard = memo(({ data, delegateXAccount, onRefresh }: IDelegateXCar
 			<div className={styles.delegateXCard}>
 				<div className='px-4 pt-4'>
 					<div className={styles.delegationDialog}>
-						<div className='min-w-32'>
-							<Address address={data.address} />
-						</div>
+						<div className='min-w-32'>{isLoading ? <Skeleton className='h-6 w-32' /> : <Address address={data.address} />}</div>
 
 						{user?.id ? (
 							<>
 								<Button
 									variant='ghost'
+									disabled={isLoading}
 									className='flex items-center gap-x-2 text-sm font-medium text-text_pink'
 									onClick={() => {
 										if (delegateXAccount) {
@@ -163,18 +164,26 @@ const DelegateXCard = memo(({ data, delegateXAccount, onRefresh }: IDelegateXCar
 				</div>
 
 				<div className='px-4 pb-2 pt-2'>
-					<MarkdownViewer
-						markdown={data.bio}
-						truncate
-						onShowMore={() => setOpenModal(true)}
-						className='line-clamp-2'
-					/>
+					{isLoading ? (
+						<div className='space-y-2'>
+							<Skeleton className='h-4 w-full' />
+							<Skeleton className='h-4 w-3/4' />
+						</div>
+					) : (
+						<MarkdownViewer
+							markdown={data.bio}
+							truncate
+							onShowMore={() => setOpenModal(true)}
+							className='line-clamp-2'
+						/>
+					)}
 				</div>
 
 				<DelegateXStats
 					data={data}
 					networkSymbol={network?.tokenSymbol}
 					isBotSetup={!!delegateXAccount}
+					isLoading={isLoading}
 				/>
 
 				<Dialog

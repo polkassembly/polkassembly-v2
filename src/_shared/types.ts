@@ -1732,4 +1732,5 @@ export interface VotingStrategy {
 		caspar: number;
 		melchior: number;
 	};
+	commentPreview: (signature: string, contact: string) => string;
 }

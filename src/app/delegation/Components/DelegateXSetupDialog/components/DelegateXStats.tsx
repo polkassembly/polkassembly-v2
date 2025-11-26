@@ -8,6 +8,7 @@ import { Ban } from 'lucide-react';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import styles from '../../TrendingDelegates/DelegateCard/DelegateCard.module.scss';
 
 interface IDelegateXCardProps {
@@ -23,10 +24,48 @@ interface IDelegateXCardProps {
 	};
 	networkSymbol: string;
 	isBotSetup: boolean;
+	isLoading?: boolean;
 }
 
-function DelegateXStats({ data, networkSymbol, isBotSetup }: { data: IDelegateXCardProps['data']; networkSymbol: string; isBotSetup: boolean }) {
+function DelegateXStats({
+	data,
+	networkSymbol,
+	isBotSetup,
+	isLoading = false
+}: {
+	data: IDelegateXCardProps['data'];
+	networkSymbol: string;
+	isBotSetup: boolean;
+	isLoading?: boolean;
+}) {
 	const currentNetwork = getCurrentNetwork();
+
+	if (isLoading) {
+		return (
+			<div className={styles.delegationCardStats}>
+				<div className={styles.delegationCardStatsItem}>
+					<div>
+						<Skeleton className='mb-2 h-8 w-24' />
+						<Skeleton className='h-4 w-20' />
+					</div>
+				</div>
+				<div className={styles.delegationCardStatsItem}>
+					<div className='w-full text-center'>
+						<div className='mb-2 flex items-center justify-center gap-4'>
+							<Skeleton className='h-6 w-12' />
+							<Skeleton className='h-6 w-12' />
+							<Skeleton className='h-6 w-12' />
+						</div>
+						<Skeleton className='mx-auto h-4 w-24' />
+					</div>
+				</div>
+				<div className='p-5 text-center'>
+					<Skeleton className='mx-auto mb-2 h-8 w-16' />
+					<Skeleton className='mx-auto h-4 w-32' />
+				</div>
+			</div>
+		);
+	}
 
 	if (isBotSetup) {
 		return (
@@ -73,6 +112,31 @@ function DelegateXStats({ data, networkSymbol, isBotSetup }: { data: IDelegateXC
 						<div className='font-semibold text-btn_secondary_text md:text-2xl'>{data.votesPast30Days}</div>
 						<span className={styles.delegationCardStatsItemText}>Votes Casted </span>
 						<span className={styles.delegationCardStatsItemTextPast30Days}>(Past 30 Days)</span>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	if (isLoading) {
+		return (
+			<div className={styles.delegationCardStats}>
+				<div className={styles.delegationCardStatsItem}>
+					<div className='flex flex-col gap-2'>
+						<Skeleton className='mx-auto h-8 w-24' />
+						<Skeleton className='mx-auto h-4 w-32' />
+					</div>
+				</div>
+				<div className={styles.delegationCardStatsItem}>
+					<div className='flex flex-col gap-2'>
+						<Skeleton className='mx-auto h-8 w-16' />
+						<Skeleton className='mx-auto h-4 w-32' />
+					</div>
+				</div>
+				<div className={styles.delegationCardStatsItem}>
+					<div className='flex flex-col gap-2'>
+						<Skeleton className='mx-auto h-8 w-16' />
+						<Skeleton className='mx-auto h-4 w-24' />
 					</div>
 				</div>
 			</div>

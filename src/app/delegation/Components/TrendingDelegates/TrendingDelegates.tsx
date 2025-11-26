@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { memo, RefObject, useRef, useEffect, useState } from 'react';
+import { memo, RefObject, useRef, useEffect } from 'react';
 import { IoMdTrendingUp } from '@react-icons/all-files/io/IoMdTrendingUp';
 import { EDelegateSource, IDelegateDetails, IDelegateXAccount } from '@/_shared/types';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
@@ -22,9 +22,9 @@ import { useAtom } from 'jotai';
 import { delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import DelegateXBotGif from '@assets/delegation/klara/klara.gif';
 import { DelegateXClientService } from '@/app/_client-services/delegate_x_client_service';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { delegateXAtom } from '@/app/_atoms/delegateX/delegateXAtom';
 import DelegateSearchInput from './DelegateSearchInput/DelegateSearchInput';
 import styles from './TrendingDelegates.module.scss';
 import DelegateCard from './DelegateCard/DelegateCard';
@@ -35,7 +35,6 @@ const PA_ADDRESS = '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t';
 const defaultDelegateXData = {
 	address: '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t',
 	bio: 'An AI powered custom agent that votes just like you would. Setup bot suited to your evaluation criterias and simplify voting with reason',
-	image: DelegateXBotGif,
 	votingPower: '0',
 	ayeCount: 0,
 	nayCount: 0,
@@ -94,50 +93,68 @@ const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedS
 function TrendingDelegates() {
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
 	const { userPreferences } = useUserPreferences();
-	const [delegateXData, setDelegateXData] = useState(defaultDelegateXData);
-	const [delegateXAccount, setDelegateXAccount] = useState<IDelegateXAccount | null>(null);
+	const [delegateXState, setDelegateXState] = useAtom(delegateXAtom);
 
 	const fetchDelegateXData = async () => {
 		if (!userPreferences.selectedAccount?.address) return;
 
+		setDelegateXState((prev) => ({
+			...prev,
+			isLoading: true,
+			error: null
+		}));
+
 		const { data, error } = await DelegateXClientService.getDelegateXDetails();
+
 		if (error || !data) {
 			console.error('Error fetching delegate x details', error);
+			setDelegateXState((prev) => ({
+				...prev,
+				isLoading: false,
+				error: typeof error === 'string' ? error : 'Failed to fetch DelegateX details'
+			}));
 			return;
 		}
 
 		if (data.success) {
-			setDelegateXData((prev) => ({
-				...prev,
+			const delegateXData = {
+				address: data.delegateXAccount?.address || PA_ADDRESS,
+				bio: 'An AI powered custom agent that votes just like you would. Setup bot suited to your evaluation criterias and simplify voting with reason',
 				totalVotesPast30Days: data.totalVotesPast30Days || 0,
 				totalVotingPower: data.totalVotingPower || '0',
 				totalDelegators: data.totalDelegators || 0,
-				...(data.delegateXAccount
-					? {
-							address: data.delegateXAccount.address,
-							votingPower: data.votingPower || '0',
-							ayeCount: data.yesCount || 0,
-							nayCount: data.noCount || 0,
-							abstainCount: data.abstainCount || 0,
-							votesPast30Days: data.votesPast30Days || 0
-						}
-					: {})
-			}));
+				votingPower: data.votingPower || '0',
+				ayeCount: data.yesCount || 0,
+				nayCount: data.noCount || 0,
+				abstainCount: data.abstainCount || 0,
+				votesPast30Days: data.votesPast30Days || 0
+			};
 
-			setDelegateXAccount(data.delegateXAccount);
+			setDelegateXState({
+				data: delegateXData,
+				account: data.delegateXAccount || null,
+				isLoading: false,
+				error: null
+			});
+		} else {
+			setDelegateXState((prev) => ({
+				...prev,
+				isLoading: false
+			}));
 		}
 	};
 
 	const handleDelegateXSuccess = (newAccount: IDelegateXAccount) => {
-		setDelegateXAccount(newAccount);
-		setDelegateXData((prev) => ({
+		setDelegateXState((prev) => ({
 			...prev,
-			address: newAccount.address,
-			votingPower: newAccount.votingPower || '0',
-			ayeCount: 0,
-			nayCount: 0,
-			abstainCount: 0,
-			votesPast30Days: 0
+			account: newAccount,
+			data: prev.data
+				? {
+						...prev.data,
+						address: newAccount.address,
+						votingPower: newAccount.votingPower || '0'
+					}
+				: null
 		}));
 		fetchDelegateXData();
 	};
@@ -244,9 +261,10 @@ function TrendingDelegates() {
 							<div className='my-5 grid w-full grid-cols-1 items-stretch gap-5 lg:grid-cols-2'>
 								{userPreferences.selectedAccount?.address && (
 									<DelegateXCard
-										data={delegateXData}
-										delegateXAccount={delegateXAccount}
+										data={delegateXState.data || defaultDelegateXData}
+										delegateXAccount={delegateXState.account}
 										onRefresh={handleDelegateXSuccess}
+										isLoading={delegateXState.isLoading}
 									/>
 								)}
 

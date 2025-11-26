@@ -19,7 +19,7 @@ export class DelegateXClientService extends NextApiClientService {
 		signatureLink: string;
 		includeComment: boolean;
 		votingPower: string;
-		prompt: string;
+		prompt?: string;
 	}): Promise<{ data: { success: boolean; delegateXAccount: IDelegateXAccount } | null; error: IErrorResponse | null }> {
 		return NextApiClientService.createDelegateXAccount({ strategyId, contactLink, signatureLink, includeComment, votingPower, prompt });
 	}

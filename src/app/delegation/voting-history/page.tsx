@@ -14,26 +14,31 @@ import { DelegateXClientService } from '@/app/_client-services/delegate_x_client
 import { IDelegateXVoteData, EProposalStatus } from '@/_shared/types';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { useSearchParams } from 'next/navigation';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import VotingHistoryTable from './Components/VotingHistoryTable';
 
 function VotingHistoryPage() {
 	const t = useTranslations();
 	const [votingHistory, setVotingHistory] = useState<(IDelegateXVoteData & { status: EProposalStatus })[]>([]);
 	const [totalCount, setTotalCount] = useState(0);
+	const [isLoading, setIsLoading] = useState(false);
 	const searchParams = useSearchParams();
 	const page = Number(searchParams?.get('page')) || 1;
 
 	useEffect(() => {
 		(async () => {
+			setIsLoading(true);
 			const { data, error } = await DelegateXClientService.getDelegateXVoteHistory({ page, limit: 10 });
 			if (error || !data) {
 				console.error('Error fetching vote history', error);
+				setIsLoading(false);
 				return;
 			}
 			if (data.success && data.voteData) {
 				setVotingHistory(data.voteData as (IDelegateXVoteData & { status: EProposalStatus })[]);
 				setTotalCount(data.totalCount);
 			}
+			setIsLoading(false);
 		})();
 	}, [page]);
 
@@ -52,7 +57,17 @@ function VotingHistoryPage() {
 				</Link>{' '}
 			</div>
 
-			{votingHistory && votingHistory.length === 0 ? (
+			{isLoading ? (
+				<div className='px-4 py-6 md:px-20'>
+					<div className='space-y-4'>
+						<Skeleton className='h-12 w-full' />
+						<Skeleton className='h-12 w-full' />
+						<Skeleton className='h-12 w-full' />
+						<Skeleton className='h-12 w-full' />
+						<Skeleton className='h-12 w-full' />
+					</div>
+				</div>
+			) : votingHistory && votingHistory.length === 0 ? (
 				<div className='flex flex-col items-center justify-center pt-6'>
 					<div className='flex max-w-3xl flex-col items-center text-center'>
 						<Image
