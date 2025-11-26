@@ -97,7 +97,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 
 	if (!data) return null;
 
-	const { dvPercentage, delegateVotes, guardianVotes } = data;
+	const { delegateVotes, guardianVotes } = data;
 
 	const activeVotes = activeTab === EDVDelegateType.DAO ? delegateVotes : guardianVotes;
 
@@ -123,12 +123,19 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 	const allVotes = [...delegateVotes, ...guardianVotes];
 	const totalStats = getStats(allVotes);
 
+	const dvAyePower = totalStats.ayePower;
+	const dvNayPower = totalStats.nayPower;
+	const dvAbstainPower = totalStats.abstainPower;
+	const dvTotalPower = dvAyePower + dvNayPower + dvAbstainPower;
+
+	const dvDecidingPower = dvAyePower + dvNayPower;
+	const ayePercentBar = dvDecidingPower > 0 ? Number((dvAyePower * BigInt(100)) / dvDecidingPower) : 0;
+	const nayPercentBar = dvDecidingPower > 0 ? Number((dvNayPower * BigInt(100)) / dvDecidingPower) : 0;
+
 	const totalChainAyePower = BigInt(data.ayeVotingPower || '0');
 	const totalChainNayPower = BigInt(data.nayVotingPower || '0');
 	const totalChainPower = totalChainAyePower + totalChainNayPower;
-
-	const ayePercentBar = totalChainPower > 0 ? Number((totalChainAyePower * BigInt(100)) / totalChainPower) : 0;
-	const nayPercentBar = totalChainPower > 0 ? Number((totalChainNayPower * BigInt(100)) / totalChainPower) : 0;
+	const dvPercentOfTotal = totalChainPower > 0 ? Number((dvDecidingPower * BigInt(10000)) / totalChainPower) / 100 : 0;
 
 	return (
 		<Dialog
@@ -156,11 +163,10 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 						<div className='flex items-center justify-between'>
 							<span className='text-sm text-text_primary'>Overall Vote Distribution</span>
 							<span className='text-lg font-bold text-text_primary'>
-								~{formatUSDWithUnits(formatBnBalance(totalChainPower.toString(), { withUnit: true, numberAfterComma: 1 }, network))}
+								~{formatUSDWithUnits(formatBnBalance(dvTotalPower.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
 							</span>
 						</div>
 
-						{/* Progress Bar */}
 						<div className='flex h-8 w-full overflow-hidden rounded-full'>
 							{ayePercentBar > 0 && (
 								<div
@@ -179,7 +185,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 								</div>
 							)}
 						</div>
-						<p className='text-text_secondary text-sm'>{dvPercentage}% of referendum voting power</p>
+						<p className='text-text_secondary text-sm'>{dvPercentOfTotal.toFixed(2)}% of referendum voting power</p>
 					</div>
 
 					<div className='grid grid-cols-3 gap-4'>
@@ -187,7 +193,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 							<div className='flex items-center justify-between'>
 								<span className='font-semibold text-success'>AYE</span>
 								<span className='text-xl font-bold text-success'>
-									{formatUSDWithUnits(formatBnBalance(totalChainAyePower.toString(), { withUnit: true, numberAfterComma: 1 }, network))}
+									{formatUSDWithUnits(formatBnBalance(dvAyePower.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
 								</span>
 							</div>
 							<div className='text-text_secondary text-xs'>{totalStats.ayeCount} Voters</div>
@@ -196,7 +202,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 							<div className='flex items-center justify-between'>
 								<span className='text-failure_vote_text font-semibold'>NAY</span>
 								<span className='text-failure_vote_text text-xl font-bold'>
-									{formatUSDWithUnits(formatBnBalance(totalChainNayPower.toString(), { withUnit: true, numberAfterComma: 1 }, network))}
+									{formatUSDWithUnits(formatBnBalance(dvNayPower.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
 								</span>
 							</div>
 							<div className='text-text_secondary text-xs'>{totalStats.nayCount} Voters</div>
@@ -205,7 +211,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 							<div className='flex items-center justify-between'>
 								<span className='font-semibold text-blue-500'>DV ABSTAIN</span>
 								<span className='text-xl font-bold text-blue-500'>
-									{formatUSDWithUnits(formatBnBalance(totalStats.abstainPower.toString(), { withUnit: true, numberAfterComma: 1 }, network))}
+									{formatUSDWithUnits(formatBnBalance(dvAbstainPower.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
 								</span>
 							</div>
 							<div className='text-text_secondary text-xs'>{totalStats.abstainCount} Voters</div>
