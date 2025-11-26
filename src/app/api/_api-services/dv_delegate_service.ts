@@ -20,8 +20,9 @@ import {
 	IStatusHistoryItem,
 	IVoteMetrics
 } from '@/_shared/types';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
-// import { RedisService } from './redis_service';
+import { RedisService } from './redis_service';
 
 export class DVDelegateService {
 	private static async fetchAllPages<T>(fetcher: (page: number) => Promise<T[]>, maxPages = 10, page = 1, acc: T[] = []): Promise<T[]> {
@@ -52,7 +53,7 @@ export class DVDelegateService {
 		}[]
 	> {
 		const { startBlock, endBlock } = cohort;
-		const limit = 1000;
+		const latestBlock = await OnChainDbService.GetLatestBlockNumber(network);
 
 		const delegateAddresses = cohort.delegates.map((d) => d.address);
 		const votedProposalsPromise = this.fetchAllPages<IOnChainPostListing>(async (page) => {
@@ -60,8 +61,8 @@ export class DVDelegateService {
 				network,
 				voters: delegateAddresses,
 				startBlock,
-				endBlock: endBlock || (await OnChainDbService.GetLatestBlockNumber(network)),
-				limit,
+				endBlock: endBlock || latestBlock,
+				limit: 1000,
 				page
 			});
 
@@ -70,9 +71,40 @@ export class DVDelegateService {
 					return vote.proposal as IOnChainPostListing;
 				}) || []
 			);
-		}, limit);
+		}, 1000);
 
 		const votedProposals = await votedProposalsPromise;
+
+		const recentProposalsMap = new Map<number, IOnChainPostListing>();
+		if (!allowedTracks) return [];
+		const trackIds = allowedTracks
+			.map((track) => {
+				const trackDetails = NETWORKS_DETAILS[network]?.trackDetails;
+				return trackDetails?.[track]?.trackId;
+			})
+			.filter((id) => id !== undefined) as number[];
+
+		const recentProposalsPromises = trackIds.map(async (trackId) => {
+			try {
+				const activeProposals = await OnChainDbService.GetActiveProposalListingsWithVoteForAddressByTrackId({
+					network,
+					trackId,
+					voterAddress: ''
+				});
+
+				return activeProposals.items || [];
+			} catch (error) {
+				console.warn(`Failed to fetch proposals for track ${trackId}:`, error);
+				return [];
+			}
+		});
+
+		const recentProposalsResults = await Promise.all(recentProposalsPromises);
+		recentProposalsResults.flat().forEach((proposal) => {
+			if (proposal.index !== undefined) {
+				recentProposalsMap.set(proposal.index, proposal);
+			}
+		});
 
 		const allItemsMap = new Map<number, IOnChainPostListing>();
 		votedProposals.forEach((item) => {
@@ -81,25 +113,36 @@ export class DVDelegateService {
 			}
 		});
 
-		const allItems = Array.from(allItemsMap.values());
-		console.log('startBlock:', startBlock, 'endBlock:', endBlock);
+		recentProposalsMap.forEach((proposal, index) => {
+			if (!allItemsMap.has(index)) {
+				allItemsMap.set(index, proposal);
+			}
+		});
 
-		const filteredItems = allItems
+		const allProposals = Array.from(allItemsMap.values());
+
+		return allProposals
 			.filter((r) => {
 				if (allowedTracks && r.origin && !allowedTracks.includes(r.origin as EPostOrigin)) return false;
 
-				const end = endBlock || Number.MAX_SAFE_INTEGER;
+				const end = endBlock || latestBlock;
+				const proposalStart = r.createdAtBlock || 0;
+				const proposalEnd = r.updatedAtBlock || 0;
+				const isOngoingCohort = !endBlock;
 
-				if (!r.createdAtBlock && !r.updatedAtBlock) return true;
-
-				const effectiveEnd = r.updatedAtBlock || r.createdAtBlock || 0;
-				const isIncluded = effectiveEnd >= startBlock && effectiveEnd <= end;
-
-				if (r.index === 1720 || r.index === 1499) {
-					console.log(`Ref #${r.index}: effectiveEnd ${effectiveEnd}, startBlock ${startBlock}, endBlock ${end}, Included: ${isIncluded}`);
+				if (!r.createdAtBlock && !r.updatedAtBlock) {
+					return isOngoingCohort;
 				}
 
-				return isIncluded;
+				if (isOngoingCohort) {
+					return true;
+				}
+
+				if (proposalEnd > 0) {
+					return proposalEnd >= startBlock && proposalEnd <= end;
+				}
+
+				return proposalStart <= end;
 			})
 			.map((r) => ({
 				index: r.index || 0,
@@ -110,12 +153,8 @@ export class DVDelegateService {
 				createdAtBlock: r.createdAtBlock,
 				updatedAtBlock: r.updatedAtBlock,
 				timeline: r.statusHistory
-			}));
-
-		console.log('filteredItems', filteredItems[0]);
-		console.log('filteredItems', filteredItems[filteredItems.length - 1]);
-
-		return filteredItems;
+			}))
+			.sort((a, b) => (b.index || 0) - (a.index || 0));
 	}
 
 	static filterReferendaForDelegate(
@@ -124,10 +163,22 @@ export class DVDelegateService {
 		delegateEndBlock: number | null
 	): number[] {
 		const endBlock = delegateEndBlock ?? Number.MAX_SAFE_INTEGER;
+		const isOngoingDelegate = delegateEndBlock === null;
+
 		return referenda
 			.filter((r) => {
-				const effectiveEnd = r.updatedAtBlock || r.createdAtBlock || 0;
-				return effectiveEnd >= delegateStartBlock && effectiveEnd <= endBlock;
+				const proposalStart = r.createdAtBlock || 0;
+				const proposalEnd = r.updatedAtBlock || 0;
+
+				if (isOngoingDelegate) {
+					return true;
+				}
+
+				if (proposalEnd > 0) {
+					return proposalEnd >= delegateStartBlock && proposalEnd <= endBlock;
+				}
+
+				return proposalStart <= endBlock;
 			})
 			.map((r) => r.index);
 	}
@@ -141,6 +192,7 @@ export class DVDelegateService {
 		endBlock?: number | null
 	): Promise<IDVDelegateVoteStats> {
 		try {
+			const latestBlock = await OnChainDbService.GetLatestBlockNumber(network);
 			const votes = await this.fetchAllPages<IProfileVote>(async (page) => {
 				const response = await OnChainDbService.GetVotesForAddressesAndReferenda({
 					network,
@@ -148,7 +200,7 @@ export class DVDelegateService {
 					page,
 					limit: 1000,
 					startBlock: startBlock || 0,
-					endBlock: endBlock || (await OnChainDbService.GetLatestBlockNumber(network))
+					endBlock: endBlock || latestBlock
 				});
 				return response.items || [];
 			}, 1000);
@@ -210,8 +262,8 @@ export class DVDelegateService {
 	}
 
 	static async getDelegatesWithStats(network: ENetwork, cohort: IDVCohort, trackFilter = EDVTrackFilter.DV_TRACKS): Promise<IDVDelegateWithStats[]> {
-		// const cachedData = await RedisService.GetDVDelegates({ network, cohortId: cohort.index.toString(), trackFilter });
-		// if (cachedData) return cachedData;
+		const cachedData = await RedisService.GetDVDelegates({ network, cohortId: cohort.index.toString(), trackFilter });
+		if (cachedData) return cachedData;
 
 		const allowedTracks = trackFilter === EDVTrackFilter.DV_TRACKS ? cohort.tracks : null;
 		const cohortReferenda = await this.getCohortReferenda(network, cohort, allowedTracks);
@@ -222,9 +274,11 @@ export class DVDelegateService {
 			return { ...delegate, voteStats } as IDVDelegateWithStats;
 		});
 
-		// await RedisService.SetDVDelegates({ network, cohortId: cohort.index.toString(), trackFilter, data: delegatesWithStats });
+		const delegatesWithStats = await Promise.all(statsPromises);
 
-		return Promise.all(statsPromises);
+		await RedisService.SetDVDelegates({ network, cohortId: cohort.index.toString(), trackFilter, data: delegatesWithStats });
+
+		return delegatesWithStats;
 	}
 
 	private static isReferendumActiveForDelegate(referendum: { createdAtBlock?: number; updatedAtBlock?: number }, delegate: IDVCohort['delegates'][0]): boolean {
@@ -280,7 +334,7 @@ export class DVDelegateService {
 			return {
 				address: delegate.address,
 				decision: vote.decision,
-				votingPower: vote.totalVotingPower && vote.totalVotingPower !== '0' ? vote.totalVotingPower : vote.balance?.value || '0',
+				votingPower: power.toString(),
 				percentage: 0
 			} as IDVDelegateVote;
 		});
@@ -321,8 +375,8 @@ export class DVDelegateService {
 	}
 
 	static async getInfluence(network: ENetwork, cohort: IDVCohort, trackFilter = EDVTrackFilter.DV_TRACKS): Promise<IDVReferendumInfluence[]> {
-		// const cachedData = await RedisService.GetDVInfluence({ network, cohortId: cohort.index.toString(), trackFilter });
-		// if (cachedData) return cachedData;
+		const cachedData = await RedisService.GetDVInfluence({ network, cohortId: cohort.index.toString(), trackFilter });
+		if (cachedData) return cachedData;
 
 		const allowedTracks = trackFilter === EDVTrackFilter.DV_TRACKS ? cohort.tracks : null;
 		const cohortReferenda = await this.getCohortReferenda(network, cohort, allowedTracks);
@@ -346,8 +400,7 @@ export class DVDelegateService {
 			return res.items || [];
 		}, 50);
 
-		// await RedisService.SetDVInfluence({ network, cohortId: cohort.index.toString(), trackFilter, data: influenceData });
-		return referendaItems.map((referendum) => {
+		const influenceData = referendaItems.map((referendum) => {
 			try {
 				const dvVotes = allVotes.filter((v) => v.proposalIndex === referendum.index && !(cohort.endTime && new Date(v.createdAt).getTime() > cohort.endTime.getTime()));
 
@@ -412,6 +465,9 @@ export class DVDelegateService {
 				} as IDVReferendumInfluence;
 			}
 		});
+
+		await RedisService.SetDVInfluence({ network, cohortId: cohort.index.toString(), trackFilter, data: influenceData });
+		return influenceData;
 	}
 
 	static async getVotingMatrix(
@@ -419,8 +475,8 @@ export class DVDelegateService {
 		cohort: IDVCohort,
 		trackFilter = EDVTrackFilter.DV_TRACKS
 	): Promise<{ referendumIndices: number[]; delegates: IDVDelegateVotingMatrix[] }> {
-		// const cachedData = await RedisService.GetDVVotingMatrix({ network, cohortId: cohort.index.toString(), trackFilter });
-		// if (cachedData) return cachedData;
+		const cachedData = await RedisService.GetDVVotingMatrix({ network, cohortId: cohort.index.toString(), trackFilter });
+		if (cachedData) return cachedData;
 
 		const allowedTracks = trackFilter === EDVTrackFilter.DV_TRACKS ? cohort.tracks : null;
 		const cohortReferenda = await this.getCohortReferenda(network, cohort, allowedTracks);
@@ -476,10 +532,12 @@ export class DVDelegateService {
 			});
 		});
 
-		// await RedisService.SetDVVotingMatrix({ network, cohortId: cohort.index.toString(), trackFilter, data: result });
-		return {
+		const result = {
 			referendumIndices: Array.from(allDelegateReferendumIndices).sort((a, b) => a - b),
 			delegates
 		};
+
+		await RedisService.SetDVVotingMatrix({ network, cohortId: cohort.index.toString(), trackFilter, data: result });
+		return result;
 	}
 }

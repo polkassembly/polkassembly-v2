@@ -1634,8 +1634,9 @@ export class SubsquidQueries {
 
 	protected static GET_LATEST_BLOCK_NUMBER = `
 		query GetLatestBlockNumber {
-			proposals(limit: 1, orderBy: createdAtBlock_DESC) {
+			proposals(limit: 1, orderBy: createdAtBlock_DESC, where: {type_eq: ReferendumV2}) {
 				createdAtBlock
+				updatedAtBlock
 			}
 		}
 	`;
