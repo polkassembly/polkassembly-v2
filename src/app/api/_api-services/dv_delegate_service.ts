@@ -21,7 +21,7 @@ import {
 	IVoteMetrics
 } from '@/_shared/types';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
-import { RedisService } from './redis_service';
+// import { RedisService } from './redis_service';
 
 export class DVDelegateService {
 	private static async fetchAllPages<T>(fetcher: (page: number) => Promise<T[]>, maxPages = 10, page = 1, acc: T[] = []): Promise<T[]> {
@@ -82,14 +82,24 @@ export class DVDelegateService {
 		});
 
 		const allItems = Array.from(allItemsMap.values());
-		console.log('first item', allItems[0]);
-		console.log('last item', allItems[allItems.length - 1]);
+		console.log('startBlock:', startBlock, 'endBlock:', endBlock);
 
 		const filteredItems = allItems
 			.filter((r) => {
 				if (allowedTracks && r.origin && !allowedTracks.includes(r.origin as EPostOrigin)) return false;
-				if (r.createdAtBlock && r.createdAtBlock < startBlock) return false;
-				return !(endBlock && r.createdAtBlock && r.createdAtBlock > endBlock);
+
+				const end = endBlock || Number.MAX_SAFE_INTEGER;
+
+				if (!r.createdAtBlock && !r.updatedAtBlock) return true;
+
+				const effectiveEnd = r.updatedAtBlock || r.createdAtBlock || 0;
+				const isIncluded = effectiveEnd >= startBlock && effectiveEnd <= end;
+
+				if (r.index === 1720 || r.index === 1499) {
+					console.log(`Ref #${r.index}: effectiveEnd ${effectiveEnd}, startBlock ${startBlock}, endBlock ${end}, Included: ${isIncluded}`);
+				}
+
+				return isIncluded;
 			})
 			.map((r) => ({
 				index: r.index || 0,
@@ -116,10 +126,8 @@ export class DVDelegateService {
 		const endBlock = delegateEndBlock ?? Number.MAX_SAFE_INTEGER;
 		return referenda
 			.filter((r) => {
-				return (
-					(r.createdAtBlock && r.createdAtBlock >= delegateStartBlock && r.createdAtBlock <= endBlock) ||
-					(r.updatedAtBlock && r.updatedAtBlock >= delegateStartBlock && r.updatedAtBlock <= endBlock)
-				);
+				const effectiveEnd = r.updatedAtBlock || r.createdAtBlock || 0;
+				return effectiveEnd >= delegateStartBlock && effectiveEnd <= endBlock;
 			})
 			.map((r) => r.index);
 	}
@@ -202,8 +210,8 @@ export class DVDelegateService {
 	}
 
 	static async getDelegatesWithStats(network: ENetwork, cohort: IDVCohort, trackFilter = EDVTrackFilter.DV_TRACKS): Promise<IDVDelegateWithStats[]> {
-		const cachedData = await RedisService.GetDVDelegates({ network, cohortId: cohort.index.toString(), trackFilter });
-		if (cachedData) return cachedData;
+		// const cachedData = await RedisService.GetDVDelegates({ network, cohortId: cohort.index.toString(), trackFilter });
+		// if (cachedData) return cachedData;
 
 		const allowedTracks = trackFilter === EDVTrackFilter.DV_TRACKS ? cohort.tracks : null;
 		const cohortReferenda = await this.getCohortReferenda(network, cohort, allowedTracks);
@@ -214,20 +222,17 @@ export class DVDelegateService {
 			return { ...delegate, voteStats } as IDVDelegateWithStats;
 		});
 
-		const delegatesWithStats = await Promise.all(statsPromises);
-		await RedisService.SetDVDelegates({ network, cohortId: cohort.index.toString(), trackFilter, data: delegatesWithStats });
+		// await RedisService.SetDVDelegates({ network, cohortId: cohort.index.toString(), trackFilter, data: delegatesWithStats });
 
-		return delegatesWithStats;
+		return Promise.all(statsPromises);
 	}
 
 	private static isReferendumActiveForDelegate(referendum: { createdAtBlock?: number; updatedAtBlock?: number }, delegate: IDVCohort['delegates'][0]): boolean {
 		const endBlock = delegate.endBlock ?? Number.MAX_SAFE_INTEGER;
 		if (!referendum.createdAtBlock && !referendum.updatedAtBlock) return true;
 
-		const isCreatedInRange = !!(referendum.createdAtBlock && referendum.createdAtBlock >= delegate.startBlock && referendum.createdAtBlock <= endBlock);
-		const isUpdatedInRange = !!(referendum.updatedAtBlock && referendum.updatedAtBlock >= delegate.startBlock && referendum.updatedAtBlock <= endBlock);
-
-		return isCreatedInRange || isUpdatedInRange;
+		const effectiveEnd = referendum.updatedAtBlock || referendum.createdAtBlock || 0;
+		return effectiveEnd >= delegate.startBlock && effectiveEnd <= endBlock;
 	}
 
 	private static getVotePower(vote: IProfileVote): bigint {
@@ -316,8 +321,8 @@ export class DVDelegateService {
 	}
 
 	static async getInfluence(network: ENetwork, cohort: IDVCohort, trackFilter = EDVTrackFilter.DV_TRACKS): Promise<IDVReferendumInfluence[]> {
-		const cachedData = await RedisService.GetDVInfluence({ network, cohortId: cohort.index.toString(), trackFilter });
-		if (cachedData) return cachedData;
+		// const cachedData = await RedisService.GetDVInfluence({ network, cohortId: cohort.index.toString(), trackFilter });
+		// if (cachedData) return cachedData;
 
 		const allowedTracks = trackFilter === EDVTrackFilter.DV_TRACKS ? cohort.tracks : null;
 		const cohortReferenda = await this.getCohortReferenda(network, cohort, allowedTracks);
@@ -341,7 +346,8 @@ export class DVDelegateService {
 			return res.items || [];
 		}, 50);
 
-		const influenceData = referendaItems.map((referendum) => {
+		// await RedisService.SetDVInfluence({ network, cohortId: cohort.index.toString(), trackFilter, data: influenceData });
+		return referendaItems.map((referendum) => {
 			try {
 				const dvVotes = allVotes.filter((v) => v.proposalIndex === referendum.index && !(cohort.endTime && new Date(v.createdAt).getTime() > cohort.endTime.getTime()));
 
@@ -406,9 +412,6 @@ export class DVDelegateService {
 				} as IDVReferendumInfluence;
 			}
 		});
-
-		await RedisService.SetDVInfluence({ network, cohortId: cohort.index.toString(), trackFilter, data: influenceData });
-		return influenceData;
 	}
 
 	static async getVotingMatrix(
@@ -416,8 +419,8 @@ export class DVDelegateService {
 		cohort: IDVCohort,
 		trackFilter = EDVTrackFilter.DV_TRACKS
 	): Promise<{ referendumIndices: number[]; delegates: IDVDelegateVotingMatrix[] }> {
-		const cachedData = await RedisService.GetDVVotingMatrix({ network, cohortId: cohort.index.toString(), trackFilter });
-		if (cachedData) return cachedData;
+		// const cachedData = await RedisService.GetDVVotingMatrix({ network, cohortId: cohort.index.toString(), trackFilter });
+		// if (cachedData) return cachedData;
 
 		const allowedTracks = trackFilter === EDVTrackFilter.DV_TRACKS ? cohort.tracks : null;
 		const cohortReferenda = await this.getCohortReferenda(network, cohort, allowedTracks);
@@ -473,12 +476,10 @@ export class DVDelegateService {
 			});
 		});
 
-		const result = {
+		// await RedisService.SetDVVotingMatrix({ network, cohortId: cohort.index.toString(), trackFilter, data: result });
+		return {
 			referendumIndices: Array.from(allDelegateReferendumIndices).sort((a, b) => a - b),
 			delegates
 		};
-
-		await RedisService.SetDVVotingMatrix({ network, cohortId: cohort.index.toString(), trackFilter, data: result });
-		return result;
 	}
 }
