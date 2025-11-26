@@ -1881,7 +1881,7 @@ export class FirestoreService extends FirestoreUtils {
 		const delegateXAccountSnapshot = await this.delegateXAccountsCollectionRef().where('userId', '==', userId).where('network', '==', network).limit(1).get();
 
 		if (delegateXAccountSnapshot.docs.length) {
-			return delegateXAccountSnapshot.docs[0].data() as IDelegateXAccount;
+			return delegateXAccountSnapshot.docs?.[0]?.data() as IDelegateXAccount;
 		}
 
 		return null;
