@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useState, useMemo } from 'react';
-import { Activity, Filter, ArrowUpDown, Check, X, Minus, ChevronDown, MoreHorizontal } from 'lucide-react';
+import { Activity, Filter, ArrowUpDown, Check, X, Minus, ChevronDown, Menu } from 'lucide-react';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import VotingBar from '@/app/_shared-components/ListingComponent/VotingBar/VotingBar';
 import { getSpanStyle } from '@/app/_shared-components/TopicTag/TopicTag';
@@ -13,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-component
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { IDVReferendumInfluence, EInfluenceStatus } from '@/_shared/types';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import DVVotesDialog from './DVVotesDialog';
 
 interface InfluenceCardProps {
 	referendaInfluence: IDVReferendumInfluence[];
@@ -28,6 +29,8 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 	const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 	const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
 	const [selectedInfluence, setSelectedInfluence] = useState<string[]>([]);
+	const [selectedReferendum, setSelectedReferendum] = useState<IDVReferendumInfluence | null>(null);
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const pageSize = 10;
 
 	const availableTracks = useMemo(() => {
@@ -319,7 +322,16 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 											</div>
 										</td>
 										<td className='py-4 pr-4 text-right'>
-											<MoreHorizontal className='h-4 w-4 text-wallet_btn_text' />
+											<button
+												type='button'
+												onClick={() => {
+													setSelectedReferendum(item);
+													setIsDialogOpen(true);
+												}}
+												className='hover:bg-bg_secondary rounded-full p-1'
+											>
+												<Menu className='h-4 w-4 text-wallet_btn_text' />
+											</button>
 										</td>
 									</tr>
 								))}
@@ -337,6 +349,12 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 					/>
 				</div>
 			)}
+
+			<DVVotesDialog
+				open={isDialogOpen}
+				onOpenChange={setIsDialogOpen}
+				data={selectedReferendum}
+			/>
 		</div>
 	);
 }

@@ -9,6 +9,7 @@ import {
 	IDVCohort,
 	IDVDelegateVoteStats,
 	IDVReferendumInfluence,
+	IDVDelegateVote,
 	IDVDelegateVotingMatrix,
 	IDVDelegateWithStats,
 	IOnChainPostListing,
@@ -219,6 +220,101 @@ export class DVDelegateService {
 		return delegatesWithStats;
 	}
 
+	private static isReferendumActiveForDelegate(referendum: { createdAtBlock?: number; updatedAtBlock?: number }, delegate: IDVCohort['delegates'][0]): boolean {
+		const endBlock = delegate.endBlock ?? Number.MAX_SAFE_INTEGER;
+		if (!referendum.createdAtBlock && !referendum.updatedAtBlock) return true;
+
+		const isCreatedInRange = !!(referendum.createdAtBlock && referendum.createdAtBlock >= delegate.startBlock && referendum.createdAtBlock <= endBlock);
+		const isUpdatedInRange = !!(referendum.updatedAtBlock && referendum.updatedAtBlock >= delegate.startBlock && referendum.updatedAtBlock <= endBlock);
+
+		return isCreatedInRange || isUpdatedInRange;
+	}
+
+	private static getVotePower(vote: IProfileVote): bigint {
+		let power = BigInt(vote.totalVotingPower || '0');
+
+		if (power === BigInt(0) && vote.balance) {
+			const { balance, decision } = vote;
+			const value = balance.value || '0';
+
+			if (decision === EVoteDecision.AYE) {
+				power = BigInt(balance.aye || value);
+			} else if (decision === EVoteDecision.NAY) {
+				power = BigInt(balance.nay || value);
+			} else if (decision === EVoteDecision.ABSTAIN || decision === EVoteDecision.SPLIT_ABSTAIN) {
+				power = BigInt(balance.abstain || value);
+			}
+		}
+		return power;
+	}
+
+	private static processDelegateVotes(delegates: IDVCohort['delegates'], referendum: { createdAtBlock?: number; updatedAtBlock?: number }, dvVotes: IProfileVote[]) {
+		let ayeTotal = BigInt(0);
+		let nayTotal = BigInt(0);
+		let abstainTotal = BigInt(0);
+
+		const votes = delegates.map((delegate) => {
+			const isReferendumActive = this.isReferendumActiveForDelegate(referendum, delegate);
+			const vote = dvVotes.find((v) => v.voterAddress === delegate.address);
+
+			if (!vote || !isReferendumActive) {
+				return {
+					address: delegate.address,
+					decision: 'novote',
+					votingPower: undefined,
+					percentage: 0
+				} as IDVDelegateVote;
+			}
+
+			const power = this.getVotePower(vote);
+
+			if (vote.decision === EVoteDecision.AYE) ayeTotal += power;
+			else if (vote.decision === EVoteDecision.NAY) nayTotal += power;
+			else if (vote.decision === EVoteDecision.ABSTAIN || vote.decision === EVoteDecision.SPLIT_ABSTAIN) abstainTotal += power;
+
+			return {
+				address: delegate.address,
+				decision: vote.decision,
+				votingPower: vote.totalVotingPower && vote.totalVotingPower !== '0' ? vote.totalVotingPower : vote.balance?.value || '0',
+				percentage: 0
+			} as IDVDelegateVote;
+		});
+
+		return { votes, ayeTotal, nayTotal, abstainTotal };
+	}
+
+	private static calculateInfluenceStatus(
+		referendum: { status: string | EProposalStatus; voteMetrics?: Partial<IVoteMetrics> },
+		dvAyeTotal: bigint,
+		dvNayTotal: bigint
+	): EInfluenceStatus {
+		let influence = EInfluenceStatus.NO_IMPACT;
+		const totalAye = BigInt(referendum.voteMetrics?.aye?.value || '0');
+		const totalNay = BigInt(referendum.voteMetrics?.nay?.value || '0');
+
+		const ayeWithoutDV = totalAye - dvAyeTotal;
+		const nayWithoutDV = totalNay - dvNayTotal;
+
+		const isPassed = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed].includes(referendum.status as EProposalStatus);
+		const isFailed = [EProposalStatus.Rejected, EProposalStatus.TimedOut, EProposalStatus.Cancelled].includes(referendum.status as EProposalStatus);
+
+		let wouldPassWithoutDv = isPassed;
+
+		if (isPassed && ayeWithoutDV <= nayWithoutDV) {
+			wouldPassWithoutDv = false;
+		} else if (isFailed && ayeWithoutDV > nayWithoutDV) {
+			wouldPassWithoutDv = true;
+		}
+
+		if (isPassed && !wouldPassWithoutDv) {
+			influence = EInfluenceStatus.APPROVED;
+		} else if (isFailed && wouldPassWithoutDv) {
+			influence = EInfluenceStatus.REJECTED;
+		}
+
+		return influence;
+	}
+
 	static async getInfluence(network: ENetwork, cohort: IDVCohort, trackFilter = EDVTrackFilter.DV_TRACKS): Promise<IDVReferendumInfluence[]> {
 		const cachedData = await RedisService.GetDVInfluence({ network, cohortId: cohort.index.toString(), trackFilter });
 		if (cachedData) return cachedData;
@@ -248,85 +344,33 @@ export class DVDelegateService {
 		const influenceData = referendaItems.map((referendum) => {
 			try {
 				const dvVotes = allVotes.filter((v) => v.proposalIndex === referendum.index && !(cohort.endTime && new Date(v.createdAt).getTime() > cohort.endTime.getTime()));
-				let dvAyeTotal = BigInt(0);
-				let dvNayTotal = BigInt(0);
 
-				const delegateVotes = daos.map((dao) => {
-					const endBlock = dao.endBlock ?? Number.MAX_SAFE_INTEGER;
-					const isReferendumActiveForDelegate =
-						(referendum.createdAtBlock && referendum.createdAtBlock >= dao.startBlock && referendum.createdAtBlock <= endBlock) ||
-						(referendum.updatedAtBlock && referendum.updatedAtBlock >= dao.startBlock && referendum.updatedAtBlock <= endBlock) ||
-						(!referendum.createdAtBlock && !referendum.updatedAtBlock);
+				const daoResult = this.processDelegateVotes(daos, referendum, dvVotes);
+				const guardianResult = this.processDelegateVotes(guardians, referendum, dvVotes);
 
-					const vote = dvVotes.find((v) => v.voterAddress === dao.address);
+				const dvAyeTotal = daoResult.ayeTotal + guardianResult.ayeTotal;
+				const dvNayTotal = daoResult.nayTotal + guardianResult.nayTotal;
+				const dvAbstainTotal = daoResult.abstainTotal + guardianResult.abstainTotal;
 
-					if (vote && isReferendumActiveForDelegate) {
-						const power = BigInt(vote.totalVotingPower || '0');
-						if (vote.decision === EVoteDecision.AYE) dvAyeTotal += power;
-						else if (vote.decision === EVoteDecision.NAY) dvNayTotal += power;
-					}
+				const dvTotal = dvAyeTotal + dvNayTotal + dvAbstainTotal;
 
-					return {
-						address: dao.address,
-						decision: vote && isReferendumActiveForDelegate ? vote.decision : 'novote',
-						votingPower: vote && isReferendumActiveForDelegate ? vote.totalVotingPower : undefined,
-						percentage: 0
-					};
-				});
+				const updatePercentages = (items: IDVDelegateVote[]) =>
+					items.map((item) => ({
+						...item,
+						percentage: item.votingPower && dvTotal > BigInt(0) ? Number((BigInt(item.votingPower) * BigInt(10000)) / dvTotal) / 100 : 0
+					}));
 
-				const guardianVotes = guardians.map((guardian) => {
-					const endBlock = guardian.endBlock ?? Number.MAX_SAFE_INTEGER;
-					const isReferendumActiveForDelegate =
-						(referendum.createdAtBlock && referendum.createdAtBlock >= guardian.startBlock && referendum.createdAtBlock <= endBlock) ||
-						(referendum.updatedAtBlock && referendum.updatedAtBlock >= guardian.startBlock && referendum.updatedAtBlock <= endBlock) ||
-						(!referendum.createdAtBlock && !referendum.updatedAtBlock);
+				const delegateVotes = updatePercentages(daoResult.votes);
+				const guardianVotes = updatePercentages(guardianResult.votes);
 
-					const vote = dvVotes.find((v) => v.voterAddress === guardian.address);
+				const influence = this.calculateInfluenceStatus(referendum, dvAyeTotal, dvNayTotal);
 
-					if (vote && isReferendumActiveForDelegate) {
-						const power = BigInt(vote.totalVotingPower || '0');
-						if (vote.decision === EVoteDecision.AYE) dvAyeTotal += power;
-						else if (vote.decision === EVoteDecision.NAY) dvNayTotal += power;
-					}
-
-					return {
-						address: guardian.address,
-						decision: vote && isReferendumActiveForDelegate ? vote.decision : 'novote',
-						votingPower: vote && isReferendumActiveForDelegate ? vote.totalVotingPower : undefined,
-						percentage: 0
-					};
-				});
-
-				let influence = EInfluenceStatus.NO_IMPACT;
-				const totalAye = BigInt(referendum.voteMetrics?.aye?.value || '0');
-				const totalNay = BigInt(referendum.voteMetrics?.nay?.value || '0');
-
-				const ayeWithoutDV = totalAye - dvAyeTotal;
-				const nayWithoutDV = totalNay - dvNayTotal;
-
-				const { status } = referendum;
-				const isPassed = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed].includes(status as EProposalStatus);
-				const isFailed = [EProposalStatus.Rejected, EProposalStatus.TimedOut, EProposalStatus.Cancelled].includes(status as EProposalStatus);
-
-				let wouldPassWithoutDv = isPassed;
-
-				if (isPassed && ayeWithoutDV <= nayWithoutDV) {
-					wouldPassWithoutDv = false;
-				} else if (isFailed && ayeWithoutDV > nayWithoutDV) {
-					wouldPassWithoutDv = true;
-				}
-
-				if (isPassed && !wouldPassWithoutDv) {
-					influence = EInfluenceStatus.APPROVED;
-				} else if (isFailed && wouldPassWithoutDv) {
-					influence = EInfluenceStatus.REJECTED;
-				}
-
-				const dvTotal = dvAyeTotal + dvNayTotal;
 				const tally = referendum.voteMetrics;
 				const ayeValue = BigInt(tally?.[EVoteDecision.AYE]?.value || '0');
 				const nayValue = BigInt(tally?.[EVoteDecision.NAY]?.value || '0');
 				const totalValue = ayeValue + nayValue;
+
+				const dvDecidingTotal = dvAyeTotal + dvNayTotal;
 
 				return {
 					index: referendum.index || 0,
@@ -338,7 +382,7 @@ export class DVDelegateService {
 					dvTotalVotingPower: dvTotal.toString(),
 					dvAyeVotingPower: dvAyeTotal.toString(),
 					dvNayVotingPower: dvNayTotal.toString(),
-					dvPercentage: totalValue > 0 ? Number((dvTotal * BigInt(1000)) / totalValue) / 10 : 0,
+					dvPercentage: totalValue > 0 ? Number((dvDecidingTotal * BigInt(1000)) / totalValue) / 10 : 0,
 					influence,
 					delegateVotes,
 					guardianVotes
@@ -393,7 +437,7 @@ export class DVDelegateService {
 			let totalVoted = 0;
 
 			delegateReferendumIndices.forEach((idx) => {
-				votes[idx] = 'novote';
+				votes[idx || 0] = 'novote';
 			});
 
 			votesResponse.items.forEach((vote) => {
