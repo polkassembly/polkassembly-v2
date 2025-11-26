@@ -23,7 +23,7 @@ import {
 } from '@/_shared/types';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
-import { RedisService } from './redis_service';
+import { RedisService } from '@/app/api/_api-services/redis_service';
 
 type ProposalWithTally = {
 	tally?: {
@@ -334,11 +334,10 @@ export class DVDelegateService {
 			const voteStats = await this.getDelegateVoteStats(network, delegate.address, delegateReferendumIndices, cohort.endTime, delegate.startBlock, delegate.endBlock);
 			return { ...delegate, voteStats } as IDVDelegateWithStats;
 		});
+		const stats = await Promise.all(statsPromises);
+		await RedisService.SetDVDelegates({ network, cohortId: cohort.index.toString(), trackFilter, data: stats });
 
-		const delegatesWithStats = await Promise.all(statsPromises);
-		await RedisService.SetDVDelegates({ network, cohortId: cohort.index.toString(), trackFilter, data: delegatesWithStats });
-
-		return delegatesWithStats;
+		return stats;
 	}
 
 	private static isReferendumActiveForDelegate(referendum: { createdAtBlock?: number; updatedAtBlock?: number }, delegate: IDVCohort['delegates'][0]): boolean {
@@ -420,35 +419,85 @@ export class DVDelegateService {
 	}
 
 	private static calculateInfluenceStatus(
-		referendum: { status: string | EProposalStatus; voteMetrics?: Partial<IVoteMetrics> },
+		referendum: { status: string | EProposalStatus; voteMetrics?: Partial<IVoteMetrics>; index?: number },
 		dvAyeTotal: bigint,
 		dvNayTotal: bigint
 	): EInfluenceStatus {
-		let influence = EInfluenceStatus.NO_IMPACT;
+		const status = referendum.status as EProposalStatus;
+
+		const noNeedComparison = [
+			EProposalStatus.TimedOut,
+			EProposalStatus.Submitted,
+			EProposalStatus.Added,
+			EProposalStatus.Killed,
+			EProposalStatus.Cancelled,
+			EProposalStatus.Unknown,
+			EProposalStatus.Noted,
+			EProposalStatus.Proposed,
+			EProposalStatus.Tabled,
+			EProposalStatus.Started
+		].includes(status);
+
+		if (noNeedComparison) {
+			return EInfluenceStatus.NO_IMPACT;
+		}
+
 		const totalAye = BigInt(referendum.voteMetrics?.aye?.value || '0');
 		const totalNay = BigInt(referendum.voteMetrics?.nay?.value || '0');
 
-		const ayeWithoutDV = totalAye - dvAyeTotal;
-		const nayWithoutDV = totalNay - dvNayTotal;
-
-		const isPassed = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed].includes(referendum.status as EProposalStatus);
-		const isFailed = [EProposalStatus.Rejected, EProposalStatus.TimedOut, EProposalStatus.Cancelled].includes(referendum.status as EProposalStatus);
-
-		let wouldPassWithoutDv = isPassed;
-
-		if (isPassed && ayeWithoutDV <= nayWithoutDV) {
-			wouldPassWithoutDv = false;
-		} else if (isFailed && ayeWithoutDV > nayWithoutDV) {
-			wouldPassWithoutDv = true;
+		if (!referendum.voteMetrics || (totalAye === BigInt(0) && totalNay === BigInt(0))) {
+			const isFinalState = [
+				EProposalStatus.Executed,
+				EProposalStatus.Deciding,
+				EProposalStatus.Active,
+				EProposalStatus.Confirmed,
+				EProposalStatus.DecisionDepositPlaced,
+				EProposalStatus.Rejected
+			].includes(status);
+			if (!isFinalState) {
+				return EInfluenceStatus.NO_IMPACT;
+			}
 		}
 
-		if (isPassed && !wouldPassWithoutDv) {
-			influence = EInfluenceStatus.APPROVED;
-		} else if (isFailed && wouldPassWithoutDv) {
-			influence = EInfluenceStatus.REJECTED;
+		const approval = 0.5;
+
+		const denominator = totalAye + totalNay;
+		const noDvAye = totalAye >= dvAyeTotal ? totalAye - dvAyeTotal : BigInt(0);
+		const noDvNay = totalNay >= dvNayTotal ? totalNay - dvNayTotal : BigInt(0);
+		const noDvDenominator = noDvAye + noDvNay;
+
+		let isPass = false;
+		if (denominator > BigInt(0)) {
+			const ayeRatio = Number(totalAye * BigInt(1000000)) / Number(denominator * BigInt(1000000));
+			isPass = ayeRatio > approval;
 		}
 
-		return influence;
+		let noDvIsPass = false;
+		if (noDvDenominator > BigInt(0)) {
+			const noDvAyeRatio = Number(noDvAye * BigInt(1000000)) / Number(noDvDenominator * BigInt(1000000));
+			noDvIsPass = noDvAyeRatio > approval;
+		}
+
+		const hasInfluence = isPass !== noDvIsPass;
+
+		const dvDecidingTotal = dvAyeTotal + dvNayTotal;
+		const dvParticipated = dvDecidingTotal > BigInt(0);
+
+		if (!hasInfluence) {
+			if (dvParticipated) {
+				return EInfluenceStatus.FAILED;
+			}
+			return EInfluenceStatus.NO_IMPACT;
+		}
+
+		if (isPass && !noDvIsPass) {
+			return EInfluenceStatus.APPROVED;
+		}
+		if (!isPass && noDvIsPass) {
+			return EInfluenceStatus.REJECTED;
+		}
+
+		return EInfluenceStatus.NO_IMPACT;
 	}
 
 	static async getInfluence(network: ENetwork, cohort: IDVCohort, trackFilter = EDVTrackFilter.DV_TRACKS): Promise<IDVReferendumInfluence[]> {
@@ -489,31 +538,20 @@ export class DVDelegateService {
 				const dvAbstainTotal = daoResult.abstainTotal + guardianResult.abstainTotal;
 
 				const dvTotal = dvAyeTotal + dvNayTotal + dvAbstainTotal;
-
-				const updatePercentages = (items: IDVDelegateVote[]) =>
-					items.map((item) => ({
-						...item,
-						percentage: item.votingPower && dvTotal > BigInt(0) ? Number((BigInt(item.votingPower) * BigInt(10000)) / dvTotal) / 100 : 0
-					}));
-
-				const delegateVotes = updatePercentages(daoResult.votes);
-				const guardianVotes = updatePercentages(guardianResult.votes);
+				const dvDecidingTotal = dvAyeTotal + dvNayTotal;
 
 				const influence = this.calculateInfluenceStatus(referendum, dvAyeTotal, dvNayTotal);
 
-				const tally = referendum.voteMetrics;
-				const ayeValue = BigInt(tally?.[EVoteDecision.AYE]?.value || '0');
-				const nayValue = BigInt(tally?.[EVoteDecision.NAY]?.value || '0');
-				const totalValue = ayeValue + nayValue;
-
-				const dvDecidingTotal = dvAyeTotal + dvNayTotal;
+				const totalValue = BigInt(referendum.voteMetrics?.aye?.value || '0') + BigInt(referendum.voteMetrics?.nay?.value || '0');
+				const ayeValue = BigInt(referendum.voteMetrics?.aye?.value || '0');
+				const nayValue = BigInt(referendum.voteMetrics?.nay?.value || '0');
 
 				let ayePercent = 0;
 				let nayPercent = 0;
 
 				if (totalValue > 0) {
-					ayePercent = Number((ayeValue * BigInt(100)) / totalValue);
-					nayPercent = Number((nayValue * BigInt(100)) / totalValue);
+					ayePercent = Number((ayeValue * BigInt(1000000)) / totalValue) / 10000;
+					nayPercent = Number((nayValue * BigInt(1000000)) / totalValue) / 10000;
 				} else if (dvDecidingTotal > 0) {
 					ayePercent = Number((dvAyeTotal * BigInt(100)) / dvDecidingTotal);
 					nayPercent = Number((dvNayTotal * BigInt(100)) / dvDecidingTotal);
@@ -533,8 +571,8 @@ export class DVDelegateService {
 					dvNayVotingPower: dvNayTotal.toString(),
 					dvPercentage: totalValue > 0 ? Number((dvDecidingTotal * BigInt(1000)) / totalValue) / 10 : 0,
 					influence,
-					delegateVotes,
-					guardianVotes
+					delegateVotes: daoResult.votes,
+					guardianVotes: guardianResult.votes
 				} as IDVReferendumInfluence;
 			} catch (error) {
 				console.error(`Error processing influence data for referendum ${referendum.index}:`, error);
@@ -557,7 +595,6 @@ export class DVDelegateService {
 				} as IDVReferendumInfluence;
 			}
 		});
-
 		await RedisService.SetDVInfluence({ network, cohortId: cohort.index.toString(), trackFilter, data: influenceData });
 		return influenceData;
 	}
@@ -628,7 +665,6 @@ export class DVDelegateService {
 			referendumIndices: Array.from(allDelegateReferendumIndices).sort((a, b) => a - b),
 			delegates
 		};
-
 		await RedisService.SetDVVotingMatrix({ network, cohortId: cohort.index.toString(), trackFilter, data: result });
 		return result;
 	}

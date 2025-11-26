@@ -1778,7 +1778,7 @@ export interface IDVDelegateVote {
 export enum EInfluenceStatus {
 	APPROVED = 'approved',
 	REJECTED = 'rejected',
-	ABSTAIN = 'abstain',
+	FAILED = 'failed',
 	NO_IMPACT = 'no_impact'
 }
 

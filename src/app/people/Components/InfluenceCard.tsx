@@ -79,6 +79,7 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 	}, [referendaInfluence, selectedTracks, selectedInfluence, sortBy, sortDirection]);
 
 	const outcomeChangedCount = filteredAndSortedData.filter((r) => r.influence === EInfluenceStatus.APPROVED || r.influence === EInfluenceStatus.REJECTED).length;
+
 	const totalCount = filteredAndSortedData.length;
 	const outcomePercent = totalCount > 0 ? ((outcomeChangedCount / totalCount) * 100).toFixed(2) : '0';
 
@@ -330,17 +331,19 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 											<div className='flex items-center gap-2'>
 												<div
 													className={`flex h-5 w-5 items-center justify-center rounded-sm ${
-														item.influence === EInfluenceStatus.REJECTED
-															? 'bg-toast_error_bg text-toast_error_text'
-															: item.influence === EInfluenceStatus.APPROVED
-																? 'bg-success_vote_bg text-success'
-																: 'bg-toast_info_bg text-toast_info_text'
+														item.influence === EInfluenceStatus.APPROVED
+															? 'bg-success_vote_bg text-success'
+															: item.influence === EInfluenceStatus.REJECTED
+																? 'bg-toast_error_bg text-toast_error_text'
+																: item.influence === EInfluenceStatus.FAILED
+																	? 'bg-toast_error_bg text-toast_error_text'
+																	: 'bg-toast_info_bg text-toast_info_text'
 													}`}
 												>
-													{item.influence === EInfluenceStatus.REJECTED ? (
-														<X size={12} />
-													) : item.influence === EInfluenceStatus.APPROVED ? (
+													{item.influence === EInfluenceStatus.APPROVED ? (
 														<Check size={12} />
+													) : item.influence === EInfluenceStatus.REJECTED || item.influence === EInfluenceStatus.FAILED ? (
+														<X size={12} />
 													) : (
 														<Minus size={12} />
 													)}
