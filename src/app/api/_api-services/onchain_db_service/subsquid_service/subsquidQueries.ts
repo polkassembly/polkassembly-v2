@@ -330,6 +330,19 @@ export class SubsquidQueries {
 		}
 	`;
 
+	protected static GET_VOTE_METRICS_FOR_PROPOSALS = `
+		query GetVoteMetricsForProposals($index_in: [Int!]!, $type_eq: ProposalType!) {
+			proposals(where: {index_in: $index_in, type_eq: $type_eq}) {
+				index
+				tally {
+					ayes
+					nays
+					support
+				}
+			}
+		}
+	`;
+
 	protected static GET_CONVICTION_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX = `
 		query GetConvictionVoteMetricsByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!) {
 			noCount: convictionVotesConnection(where: {decision_eq: no, proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
@@ -1070,6 +1083,11 @@ export class SubsquidQueries {
 							status
 							timestamp
 						}
+						tally {
+							ayes
+							nays
+							support
+						}
 						convictionVoting(where: {voter_eq: $voter_eq, removedAtBlock_isNull: true}) {
 							balance {
 								... on StandardVoteBalance {
@@ -1310,6 +1328,8 @@ export class SubsquidQueries {
 				isDelegated
 				parentVote {
 					extrinsicIndex
+					selfVotingPower
+					delegatedVotingPower
 				}
 				type
 				voter
@@ -1348,6 +1368,11 @@ export class SubsquidQueries {
 					}
 					createdAtBlock
 					updatedAtBlock
+					tally {
+						ayes
+						nays
+						support
+					}
 				}
 			}
 			totalCount: flattenedConvictionVotesConnection(
@@ -1389,6 +1414,8 @@ export class SubsquidQueries {
 				isDelegated
 				parentVote {
 					extrinsicIndex
+					selfVotingPower
+					delegatedVotingPower
 				}
 				type
 				voter
@@ -1427,6 +1454,11 @@ export class SubsquidQueries {
 					}
 					createdAtBlock
 					updatedAtBlock
+					tally {
+						ayes
+						nays
+						support
+					}
 				}
 			}
 			totalCount: flattenedConvictionVotesConnection(

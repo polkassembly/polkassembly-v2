@@ -165,6 +165,36 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
+	static async GetVoteMetricsForProposals({
+		network,
+		proposalIndices,
+		proposalType
+	}: {
+		network: ENetwork;
+		proposalIndices: number[];
+		proposalType: EProposalType;
+	}): Promise<Map<number, { ayes: string; nays: string; support: string; bareAyes: string }>> {
+		const gqlClient = this.subsquidGqlClient(network);
+		const query = this.GET_VOTE_METRICS_FOR_PROPOSALS;
+		const variables = { index_in: proposalIndices, type_eq: proposalType };
+
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching vote metrics for proposals from Subsquid: ${subsquidErr}`);
+			return new Map();
+		}
+
+		const metricsMap = new Map<number, { ayes: string; nays: string; support: string; bareAyes: string }>();
+		subsquidData.proposals.forEach((p: { index: number; tally: { ayes: string; nays: string; support: string; bareAyes: string } }) => {
+			if (p.index !== undefined && p.tally) {
+				metricsMap.set(p.index, p.tally);
+			}
+		});
+
+		return metricsMap;
+	}
+
 	static async GetOnChainPostsListing({
 		network,
 		proposalType,
@@ -1425,6 +1455,8 @@ export class SubsquidService extends SubsquidUtils {
 			};
 			parentVote?: {
 				extrinsicIndex: string;
+				selfVotingPower?: string;
+				delegatedVotingPower?: string;
 			};
 			proposal?: {
 				createdAt: string;
@@ -1450,12 +1482,17 @@ export class SubsquidService extends SubsquidUtils {
 		}
 
 		const votesData: IProfileVote[] = votes.map((vote: ISubsquidVoteResponse) => {
+			const selfVotingPower = new BN(vote.parentVote?.selfVotingPower || '0');
+			const delegatedVotingPower = new BN(vote.parentVote?.delegatedVotingPower || '0');
+			const totalVotingPower = selfVotingPower.add(delegatedVotingPower).toString();
+
 			return {
 				...vote,
 				decision: this.convertSubsquidVoteDecisionToVoteDecision({ decision: vote.decision }),
 				voterAddress: vote.voter,
 				proposalType: vote.type as EProposalType,
 				extrinsicIndex: vote.parentVote?.extrinsicIndex || '',
+				totalVotingPower,
 				proposal: vote.proposal
 					? {
 							createdAt: new Date(vote.proposal.createdAt),

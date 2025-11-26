@@ -1794,6 +1794,8 @@ export interface IDVReferendumInfluence {
 	status: EProposalStatus;
 	ayePercent: number;
 	nayPercent: number;
+	ayeVotingPower: string;
+	nayVotingPower: string;
 	dvTotalVotingPower: string;
 	dvAyeVotingPower: string;
 	dvNayVotingPower: string;

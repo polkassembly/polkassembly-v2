@@ -18,12 +18,23 @@ import {
 	EDVTrackFilter,
 	EInfluenceStatus,
 	IStatusHistoryItem,
-	IVoteMetrics
+	IVoteMetrics,
+	EProposalType
 } from '@/_shared/types';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { RedisService } from './redis_service';
 
+type ProposalWithTally = {
+	tally?: {
+		ayes: number;
+		nays: number;
+	};
+	voteMetrics?: {
+		aye: { value: number };
+		nay: { value: number };
+	};
+};
 export class DVDelegateService {
 	private static async fetchAllPages<T>(fetcher: (page: number) => Promise<T[]>, maxPages = 10, page = 1, acc: T[] = []): Promise<T[]> {
 		if (page > maxPages) return acc;
@@ -68,7 +79,14 @@ export class DVDelegateService {
 
 			return (
 				votesListing.items?.map((vote) => {
-					return vote.proposal as IOnChainPostListing;
+					const proposal = vote.proposal as ProposalWithTally;
+					if (proposal && proposal.tally) {
+						proposal.voteMetrics = {
+							aye: { value: proposal.tally.ayes },
+							nay: { value: proposal.tally.nays }
+						};
+					}
+					return proposal as IOnChainPostListing;
 				}) || []
 			);
 		}, 1000);
@@ -102,6 +120,15 @@ export class DVDelegateService {
 		const recentProposalsResults = await Promise.all(recentProposalsPromises);
 		recentProposalsResults.flat().forEach((proposal) => {
 			if (proposal.index !== undefined) {
+				const p = proposal as ProposalWithTally;
+
+				if (p.tally) {
+					p.voteMetrics = {
+						aye: { value: p.tally.ayes },
+						nay: { value: p.tally.nays }
+					};
+				}
+
 				recentProposalsMap.set(proposal.index, proposal);
 			}
 		});
@@ -119,7 +146,41 @@ export class DVDelegateService {
 			}
 		});
 
-		const allProposals = Array.from(allItemsMap.values());
+		let allProposals = Array.from(allItemsMap.values());
+
+		const missingMetricsIndices = allProposals
+			.filter((p) => !p.voteMetrics || !p.voteMetrics.aye)
+			.map((p) => p.index)
+			.filter((index): index is number => index !== undefined);
+
+		if (missingMetricsIndices.length > 0) {
+			try {
+				const metricsMap = await OnChainDbService.GetVoteMetricsForProposals({
+					network,
+					proposalIndices: missingMetricsIndices,
+					proposalType: EProposalType.REFERENDUM_V2
+				});
+
+				allProposals = allProposals.map((p: IOnChainPostListing) => {
+					if (p.index !== undefined && metricsMap.has(p.index)) {
+						const tally = metricsMap.get(p.index);
+						if (!tally) return p;
+						return {
+							...p,
+							voteMetrics: {
+								aye: { value: tally.ayes, count: 0 },
+								nay: { value: tally.nays, count: 0 },
+								support: { value: tally.support },
+								bareAyes: { value: tally.ayes }
+							}
+						};
+					}
+					return p;
+				});
+			} catch (error) {
+				console.error('Error fetching missing vote metrics:', error);
+			}
+		}
 
 		return allProposals
 			.filter((r) => {
@@ -275,7 +336,6 @@ export class DVDelegateService {
 		});
 
 		const delegatesWithStats = await Promise.all(statsPromises);
-
 		await RedisService.SetDVDelegates({ network, cohortId: cohort.index.toString(), trackFilter, data: delegatesWithStats });
 
 		return delegatesWithStats;
@@ -303,18 +363,27 @@ export class DVDelegateService {
 			} else if (decision === EVoteDecision.ABSTAIN || decision === EVoteDecision.SPLIT_ABSTAIN) {
 				power = BigInt(balance.abstain || value);
 			}
+
+			const lockPeriod = vote.lockPeriod ?? 0;
+			if (lockPeriod === 0) {
+				power /= BigInt(10);
+			} else {
+				power *= BigInt(lockPeriod);
+			}
 		}
 		return power;
 	}
 
-	private static processDelegateVotes(delegates: IDVCohort['delegates'], referendum: { createdAtBlock?: number; updatedAtBlock?: number }, dvVotes: IProfileVote[]) {
+	private static processDelegateVotes(delegates: IDVCohort['delegates'], referendum: { index: number; createdAtBlock?: number; updatedAtBlock?: number }, dvVotes: IProfileVote[]) {
 		let ayeTotal = BigInt(0);
 		let nayTotal = BigInt(0);
 		let abstainTotal = BigInt(0);
+		let ayeSupport = BigInt(0);
+		let abstainSupport = BigInt(0);
 
 		const votes = delegates.map((delegate) => {
 			const isReferendumActive = this.isReferendumActiveForDelegate(referendum, delegate);
-			const vote = dvVotes.find((v) => v.voterAddress === delegate.address);
+			const vote = dvVotes.find((v) => v.voterAddress === delegate.address && v.proposalIndex === referendum.index);
 
 			if (!vote || !isReferendumActive) {
 				return {
@@ -326,10 +395,18 @@ export class DVDelegateService {
 			}
 
 			const power = this.getVotePower(vote);
+			const { balance } = vote;
+			const value = balance?.value || '0';
 
-			if (vote.decision === EVoteDecision.AYE) ayeTotal += power;
-			else if (vote.decision === EVoteDecision.NAY) nayTotal += power;
-			else if (vote.decision === EVoteDecision.ABSTAIN || vote.decision === EVoteDecision.SPLIT_ABSTAIN) abstainTotal += power;
+			if (vote.decision === EVoteDecision.AYE) {
+				ayeTotal += power;
+				ayeSupport += BigInt(balance?.aye || value);
+			} else if (vote.decision === EVoteDecision.NAY) {
+				nayTotal += power;
+			} else if (vote.decision === EVoteDecision.ABSTAIN || vote.decision === EVoteDecision.SPLIT_ABSTAIN) {
+				abstainTotal += power;
+				abstainSupport += BigInt(balance?.abstain || value);
+			}
 
 			return {
 				address: delegate.address,
@@ -339,7 +416,7 @@ export class DVDelegateService {
 			} as IDVDelegateVote;
 		});
 
-		return { votes, ayeTotal, nayTotal, abstainTotal };
+		return { votes, ayeTotal, nayTotal, abstainTotal, ayeSupport, abstainSupport };
 	}
 
 	private static calculateInfluenceStatus(
@@ -431,13 +508,26 @@ export class DVDelegateService {
 
 				const dvDecidingTotal = dvAyeTotal + dvNayTotal;
 
+				let ayePercent = 0;
+				let nayPercent = 0;
+
+				if (totalValue > 0) {
+					ayePercent = Number((ayeValue * BigInt(100)) / totalValue);
+					nayPercent = Number((nayValue * BigInt(100)) / totalValue);
+				} else if (dvDecidingTotal > 0) {
+					ayePercent = Number((dvAyeTotal * BigInt(100)) / dvDecidingTotal);
+					nayPercent = Number((dvNayTotal * BigInt(100)) / dvDecidingTotal);
+				}
+
 				return {
 					index: referendum.index || 0,
 					title: referendum.description?.substring(0, 50) || `Referendum #${referendum.index}`,
 					track: referendum.origin || 'Unknown',
 					status: referendum.status || EProposalStatus.Unknown,
-					ayePercent: totalValue > 0 ? Number((ayeValue * BigInt(100)) / totalValue) : 50,
-					nayPercent: totalValue > 0 ? Number((nayValue * BigInt(100)) / totalValue) : 50,
+					ayePercent,
+					nayPercent,
+					ayeVotingPower: ayeValue.toString(),
+					nayVotingPower: nayValue.toString(),
 					dvTotalVotingPower: dvTotal.toString(),
 					dvAyeVotingPower: dvAyeTotal.toString(),
 					dvNayVotingPower: dvNayTotal.toString(),
@@ -453,8 +543,10 @@ export class DVDelegateService {
 					title: `Referendum #${referendum.index}`,
 					track: referendum.origin || 'Unknown',
 					status: referendum.status || EProposalStatus.Unknown,
-					ayePercent: 50,
-					nayPercent: 50,
+					ayePercent: 0,
+					nayPercent: 0,
+					ayeVotingPower: '0',
+					nayVotingPower: '0',
 					dvTotalVotingPower: '0',
 					dvAyeVotingPower: '0',
 					dvNayVotingPower: '0',

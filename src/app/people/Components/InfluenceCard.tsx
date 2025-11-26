@@ -13,6 +13,10 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-component
 import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { IDVReferendumInfluence, EInfluenceStatus } from '@/_shared/types';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import DVVotesDialog from './DVVotesDialog';
 
 interface InfluenceCardProps {
@@ -32,6 +36,7 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 	const [selectedReferendum, setSelectedReferendum] = useState<IDVReferendumInfluence | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const pageSize = 10;
+	const network = getCurrentNetwork();
 
 	const availableTracks = useMemo(() => {
 		const tracks = [...new Set(referendaInfluence.map((r) => r.track))];
@@ -295,10 +300,31 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 											</div>
 										</td>
 										<td className='py-4'>
-											<VotingBar
-												ayePercent={item.ayePercent}
-												nayPercent={item.nayPercent}
-											/>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<div>
+														<VotingBar
+															ayePercent={item.ayePercent}
+															nayPercent={item.nayPercent}
+														/>
+													</div>
+												</TooltipTrigger>
+												<TooltipContent
+													side='top'
+													align='center'
+												>
+													<div className='flex flex-col gap-1'>
+														<p>
+															Aye = {formatUSDWithUnits(formatBnBalance(item.ayeVotingPower, { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
+															{item.ayePercent.toFixed(2)}%)
+														</p>
+														<p>
+															Nay = {formatUSDWithUnits(formatBnBalance(item.nayVotingPower, { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
+															{item.nayPercent.toFixed(2)}%)
+														</p>
+													</div>
+												</TooltipContent>
+											</Tooltip>
 										</td>
 										<td className='py-4'>
 											<div className='flex items-center gap-2'>
