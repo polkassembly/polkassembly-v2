@@ -56,7 +56,7 @@ function PeoplePage() {
 						<div className='flex items-center gap-2'>
 							<Activity className='text-border_blue' />
 							<h2 className='flex items-center gap-2 text-2xl font-semibold text-navbar_title'>
-								Cohort #{cohort?.index ?? '...'}{' '}
+								Cohort #{delegatesLoading ? '...' : (cohort?.index ?? '...')}{' '}
 								<span className={`rounded-full px-2 py-0.5 text-xs text-btn_primary_text ${cohort?.status === 'Ongoing' ? 'bg-border_blue' : 'bg-text_secondary'}`}>
 									{cohort?.status ?? 'Loading'}
 								</span>

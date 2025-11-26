@@ -90,7 +90,13 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 				<div>
 					<h2 className='text-2xl font-semibold text-navbar_title'>Decentralized Voices Voting</h2>
 					<p className='text-text_secondary text-sm'>
-						{daoCount} DAOs across {referendums.length} referendums (#{minRef} - #{maxRef})
+						{loading ? (
+							'...'
+						) : (
+							<>
+								{daoCount} DAOs across {referendums.length} referendums (#{minRef} - #{maxRef})
+							</>
+						)}
 					</p>
 				</div>
 				<div className='flex items-center gap-4'>
