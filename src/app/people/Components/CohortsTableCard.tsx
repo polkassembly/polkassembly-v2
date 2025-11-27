@@ -14,6 +14,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getDVCohortsByNetwork } from '@/_shared/_utils/dvDelegateUtils';
 import dayjs from 'dayjs';
 import { ENetwork, IDVCohort, ECohortStatus } from '@/_shared/types';
+import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 
 function formatNumber(num: number): string {
@@ -36,6 +37,7 @@ function formatDateRange(startDate: Date, endDate?: Date, isOngoing?: boolean): 
 }
 
 function CohortsTableCard() {
+	const t = useTranslations('DecentralizedVoices');
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const selectedCohortIndex = searchParams.get('cohort');
@@ -60,17 +62,17 @@ function CohortsTableCard() {
 		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6 shadow-md'>
 			<div className='mb-6 flex items-center gap-2'>
 				<Activity className='text-decision_bar_indicator' />
-				<h2 className='text-2xl font-semibold text-navbar_title'>Cohorts</h2>
+				<h2 className='text-2xl font-semibold text-navbar_title'>{t('Cohorts')}</h2>
 			</div>
 
 			<div className='overflow-x-auto'>
 				<table className='w-full min-w-[800px] table-auto'>
 					<thead>
 						<tr className='border-b border-t border-border_grey bg-bounty_table_bg pt-3 text-left text-xs font-semibold uppercase text-text_primary'>
-							<th className='py-4 pl-4'>INDEX</th>
+							<th className='py-4 pl-4'>{t('Index')}</th>
 							<th className='py-4'>
 								<div className='flex items-center gap-1'>
-									TENURE
+									{t('Tenure')}
 									<TooltipProvider>
 										<Tooltip>
 											<TooltipTrigger>
@@ -80,15 +82,15 @@ function CohortsTableCard() {
 												/>
 											</TooltipTrigger>
 											<TooltipContent className='bg-tooltip_background p-2 text-btn_primary_text'>
-												<p>Duration of the cohort</p>
+												<p>{t('DurationOfCohort')}</p>
 											</TooltipContent>
 										</Tooltip>
 									</TooltipProvider>
 								</div>
 							</th>
-							<th className='py-4'>DELEGATES</th>
-							<th className='py-4'>W3F DELEGATION</th>
-							<th className='py-4'>STATUS</th>
+							<th className='py-4'>{t('Delegates')}</th>
+							<th className='py-4'>{t('W3FDelegation')}</th>
+							<th className='py-4'>{t('Status').toUpperCase()}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -104,7 +106,9 @@ function CohortsTableCard() {
 									<td className='py-4 pl-4 text-text_primary'>{cohort.index}</td>
 									<td className='py-4'>
 										<span className='text-text_primary'>{formatDateRange(cohort.startTime, cohort.endTime, cohort.status === ECohortStatus.ONGOING)}</span>
-										<span className='ml-2 text-wallet_btn_text'>{getCohortTenureDays(cohort)} days</span>
+										<span className='ml-2 text-wallet_btn_text'>
+											{getCohortTenureDays(cohort)} {t('Days')}
+										</span>
 									</td>
 									<td className='py-4 text-text_primary'>{cohort.delegatesCount + cohort.guardiansCount}</td>
 									<td className='py-4'>

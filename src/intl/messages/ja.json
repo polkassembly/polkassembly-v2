@@ -1682,6 +1682,15 @@
 		"DVAbstain": "DV ABSTAIN",
 		"Voters": "Voters",
 		"NoVotesInCategory": "No votes in this category",
-		"DecentralizedVoicesTitle": "Decentralized Voices"
+		"DecentralizedVoicesTitle": "Decentralized Voices",
+		"Cohorts": "Cohorts",
+		"Index": "INDEX",
+		"Tenure": "TENURE",
+		"Delegates": "DELEGATES",
+		"W3FDelegation": "W3F DELEGATION",
+		"Days": "days",
+		"People": "People",
+		"PeopleDescription": "The Decentralized Voices program empowers broader community participation in OpenGov by delegating millions of DOT. The latest DV cohort is 5 with 7 delegates and 5 guardians. The latest DV cohort supports 7 tracks",
+		"PercentOfDV": "% of DV"
 	}
 }

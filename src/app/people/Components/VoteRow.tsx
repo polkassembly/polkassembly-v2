@@ -8,8 +8,9 @@ import Address from '@/app/_shared-components/Profile/Address/Address';
 import { cn } from '@/lib/utils';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
+import { useTranslations } from 'next-intl';
 
-const getVoteStyles = (decision: EVoteDecision | 'novote' | string) => {
+const getVoteStyles = (decision: EVoteDecision | 'novote' | string, t: (key: string) => string) => {
 	switch (decision) {
 		case 'novote':
 			return {
@@ -17,7 +18,7 @@ const getVoteStyles = (decision: EVoteDecision | 'novote' | string) => {
 				icon: <Minus size={12} />,
 				iconBg: 'bg-text_secondary/20 text-text_secondary',
 				statusColor: 'text-text_secondary',
-				statusText: ''
+				statusText: t('NoVote')
 			};
 		case EVoteDecision.AYE:
 			return {
@@ -25,7 +26,7 @@ const getVoteStyles = (decision: EVoteDecision | 'novote' | string) => {
 				icon: <Check size={12} />,
 				iconBg: 'bg-aye_color text-white',
 				statusColor: 'text-success',
-				statusText: 'Aye'
+				statusText: t('Aye')
 			};
 		case EVoteDecision.NAY:
 			return {
@@ -33,7 +34,7 @@ const getVoteStyles = (decision: EVoteDecision | 'novote' | string) => {
 				icon: <X size={12} />,
 				iconBg: 'bg-nay_color text-white',
 				statusColor: 'text-failure_vote_text',
-				statusText: 'Nay'
+				statusText: t('Nay')
 			};
 		case EVoteDecision.ABSTAIN:
 			return {
@@ -41,7 +42,7 @@ const getVoteStyles = (decision: EVoteDecision | 'novote' | string) => {
 				icon: <Ban size={12} />,
 				iconBg: 'bg-abstain_color text-white',
 				statusColor: 'text-blue-500',
-				statusText: 'Abstain'
+				statusText: t('Abstain')
 			};
 		default:
 			return {
@@ -49,15 +50,16 @@ const getVoteStyles = (decision: EVoteDecision | 'novote' | string) => {
 				icon: <Minus size={12} />,
 				iconBg: 'bg-abstain_color text-white',
 				statusColor: 'text-blue-500',
-				statusText: 'Abstain'
+				statusText: t('Abstain')
 			};
 	}
 };
 
 function VoteRow({ vote, network }: { vote: IDVDelegateVote; network: ENetwork }) {
+	const t = useTranslations('DecentralizedVoices');
 	const { decision } = vote;
 	const isNoVote = decision === 'novote';
-	const { statusColor, statusText, iconBg, containerBg, icon } = getVoteStyles(decision);
+	const { statusColor, statusText, iconBg, containerBg, icon } = getVoteStyles(decision, t);
 
 	return (
 		<div className={cn('flex items-center justify-between rounded-lg p-3', containerBg)}>
@@ -70,7 +72,12 @@ function VoteRow({ vote, network }: { vote: IDVDelegateVote; network: ENetwork }
 			<div className='flex items-center gap-8'>
 				<div className='flex items-center gap-2'>
 					<span className={cn('text-sm font-medium', statusColor)}>{statusText}</span>
-					{!isNoVote && <span className='text-text_secondary text-sm'>{vote.percentage?.toFixed(2)}% of DV</span>}
+					{!isNoVote && (
+						<span className='text-text_secondary text-sm'>
+							{vote.percentage?.toFixed(2)}
+							{t('PercentOfDV')}
+						</span>
+					)}
 					<div className={cn('flex h-5 w-5 items-center justify-center rounded-full', iconBg)}>{icon}</div>
 				</div>
 				<span className={cn('min-w-[80px] text-right text-sm font-medium', isNoVote ? 'text-text_secondary' : 'text-success')}>
