@@ -58,9 +58,9 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 			case 'nay':
 				return 'bg-failure_vote_bg text-nay_color';
 			case 'abstain':
-				return 'bg-voting_bar_bg text-abstain_color';
+				return 'bg-activity_selected_tab text-abstain_color';
 			default:
-				return 'bg-voting_bar_bg text-abstain_color';
+				return 'bg-activity_selected_tab text-text_primary';
 		}
 	};
 
@@ -80,13 +80,13 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 	const getVoteBarColor = (vote: string) => {
 		switch (vote) {
 			case 'aye':
-				return 'bg-success_vote_bg';
+				return 'bg-success';
 			case 'nay':
-				return 'bg-failure_vote_bg';
+				return 'bg-failure';
 			case 'abstain':
-				return 'bg-voting_bar_bg';
+				return 'bg-activity_selected_tab';
 			default:
-				return 'bg-voting_bar_bg';
+				return 'bg-activity_selected_tab';
 		}
 	};
 
@@ -343,13 +343,13 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 								<span className='text-sm text-text_primary'>{t('Nay')}</span>
 							</div>
 							<div className='flex items-center gap-2'>
-								<div className='flex h-6 w-6 items-center justify-center rounded bg-voting_bar_bg text-abstain_color'>
+								<div className='flex h-6 w-6 items-center justify-center rounded bg-activity_selected_tab text-abstain_color'>
 									<Minus size={14} />
 								</div>
 								<span className='text-sm text-text_primary'>{t('Abstain')}</span>
 							</div>
 							<div className='flex items-center gap-2'>
-								<div className='flex h-6 w-6 items-center justify-center rounded bg-transparent text-text_primary'>
+								<div className='flex h-6 w-6 items-center justify-center rounded bg-activity_selected_tab text-text_primary'>
 									<div className='h-1 w-1 rounded-full bg-current' />
 								</div>
 								<span className='text-sm text-text_primary'>{t('NoVote')}</span>

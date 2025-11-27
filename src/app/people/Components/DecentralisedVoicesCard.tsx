@@ -51,36 +51,36 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 	const showSkeleton = loading || !cohort;
 
 	return (
-		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
-			<div className='mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
-				<div className='flex flex-col gap-4 md:flex-row md:items-center'>
+		<div className='my-3 w-full rounded-2xl border border-border_grey bg-bg_modal p-4 sm:my-4 sm:p-5 md:rounded-3xl md:p-6'>
+			<div className='mb-4 flex flex-col justify-between gap-3 sm:mb-5 sm:gap-4 md:mb-6 md:flex-row md:items-center'>
+				<div className='flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center'>
 					<div className='flex items-center gap-2'>
-						<Activity className='text-decision_bar_indicator' />
-						<h2 className='text-2xl font-semibold text-navbar_title'>{t('DecentralisedVoices')}</h2>
+						<Activity className='h-5 w-5 text-decision_bar_indicator sm:h-6 sm:w-6' />
+						<h2 className='text-xl font-semibold text-navbar_title sm:text-2xl lg:text-3xl'>{t('DecentralisedVoices')}</h2>
 					</div>
 					{cohort && cohort.guardiansCount > 0 && (
-						<div className='flex rounded-lg bg-sidebar_footer p-1'>
+						<div className='flex w-full rounded-lg bg-sidebar_footer p-1 md:w-auto'>
 							<button
 								type='button'
 								onClick={() => setActiveTab(EDVDelegateType.DAO)}
-								className={`rounded px-3 py-0.5 text-sm text-navbar_title transition-colors ${activeTab === EDVDelegateType.DAO && 'bg-section_dark_overlay font-semibold'}`}
+								className={`flex-1 rounded px-2 py-1 text-xs text-navbar_title transition-colors sm:px-3 sm:py-1.5 sm:text-sm md:flex-none ${activeTab === EDVDelegateType.DAO && 'bg-section_dark_overlay font-semibold'}`}
 							>
 								{t('DAO')} ({cohort.delegatesCount})
 							</button>
 							<button
 								type='button'
 								onClick={() => setActiveTab(EDVDelegateType.GUARDIAN)}
-								className={`py-0.6 rounded px-3 text-sm font-medium text-navbar_title transition-colors ${activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay font-semibold'}`}
+								className={`flex-1 rounded px-2 py-1 text-xs font-medium text-navbar_title transition-colors sm:px-3 sm:py-1.5 sm:text-sm md:flex-none ${activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay font-semibold'}`}
 							>
 								{t('Guardian').toUpperCase()} ({cohort.guardiansCount})
 							</button>
 						</div>
 					)}
 				</div>
-				<div className='flex gap-2'>
+				<div className='flex w-full gap-2 md:w-auto'>
 					<DropdownMenu>
-						<DropdownMenuTrigger className='flex items-center gap-2 rounded-md border border-border_grey p-2'>
-							<Filter className='h-4 w-4 text-wallet_btn_text' />
+						<DropdownMenuTrigger className='flex flex-1 items-center justify-center gap-2 rounded-md border border-border_grey p-2 md:flex-none'>
+							<Filter className='h-3.5 w-3.5 text-wallet_btn_text sm:h-4 sm:w-4' />
 						</DropdownMenuTrigger>
 
 						<DropdownMenuContent
