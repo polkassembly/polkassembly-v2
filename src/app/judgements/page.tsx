@@ -33,7 +33,7 @@ async function Judgements() {
 	return (
 		<div>
 			<Tabs
-				defaultValue={EJudgementDashboardTabs.DASHBOARD}
+				defaultValue={EJudgementDashboardTabs.OVERVIEW}
 				className='w-full'
 			>
 				<Header />
