@@ -97,7 +97,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 						<div className='flex h-8 w-full overflow-hidden rounded-full'>
 							{ayePercentBar > 0 && (
 								<div
-									className='flex items-center justify-center bg-aye_color text-xs font-semibold text-white'
+									className='flex items-center justify-center bg-aye_color text-xs font-semibold text-btn_primary_text'
 									style={{ width: `${ayePercentBar}%` }}
 								>
 									{ayePercentBar}%
@@ -105,14 +105,14 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 							)}
 							{nayPercentBar > 0 && (
 								<div
-									className='flex items-center justify-center bg-nay_color text-xs font-semibold text-white'
+									className='flex items-center justify-center bg-nay_color text-xs font-semibold text-btn_primary_text'
 									style={{ width: `${nayPercentBar}%` }}
 								>
 									{nayPercentBar}%
 								</div>
 							)}
 						</div>
-						<p className='text-text_secondary text-sm'>{dvPercentOfTotal.toFixed(2)}% of referendum voting power</p>
+						<p className='text-sm text-text_primary'>{dvPercentOfTotal.toFixed(2)}% of referendum voting power</p>
 					</div>
 
 					<div className='grid grid-cols-3 gap-4'>
@@ -123,7 +123,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 									{formatUSDWithUnits(formatBnBalance(dvAyePower.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
 								</span>
 							</div>
-							<div className='text-text_secondary text-xs'>{totalStats.ayeCount} Voters</div>
+							<div className='text-xs text-text_primary'>{totalStats.ayeCount} Voters</div>
 						</div>
 						<div className='rounded-xl border border-border_grey bg-nay_color/10 p-4'>
 							<div className='flex items-center justify-between'>
@@ -132,36 +132,37 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 									{formatUSDWithUnits(formatBnBalance(dvNayPower.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
 								</span>
 							</div>
-							<div className='text-text_secondary text-xs'>{totalStats.nayCount} Voters</div>
+							<div className='text-xs text-text_primary'>{totalStats.nayCount} Voters</div>
 						</div>
 						<div className='rounded-xl border border-border_grey bg-abstain_color/10 p-4'>
 							<div className='flex items-center justify-between'>
-								<span className='font-semibold text-blue-500'>DV ABSTAIN</span>
-								<span className='text-xl font-bold text-blue-500'>
+								<span className='font-semibold text-abstain_color'>DV ABSTAIN</span>
+								<span className='text-xl font-bold text-abstain_color'>
 									{formatUSDWithUnits(formatBnBalance(dvAbstainPower.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
 								</span>
 							</div>
-							<div className='text-text_secondary text-xs'>{totalStats.abstainCount} Voters</div>
+							<div className='text-xs text-text_primary'>{totalStats.abstainCount} Voters</div>
 						</div>
 					</div>
 
-					<div className='bg-bg_secondary flex gap-4 rounded-lg p-1'>
+					<div className='flex gap-4 rounded-lg bg-sidebar_footer p-1'>
 						<button
 							type='button'
 							onClick={() => setActiveTab(EDVDelegateType.DAO)}
 							className={cn(
 								'flex-1 rounded-md py-2 text-sm font-medium transition-colors',
-								activeTab === EDVDelegateType.DAO ? 'bg-white text-text_primary shadow-sm' : 'text-text_secondary hover:text-text_primary'
+								activeTab === EDVDelegateType.DAO && 'bg-section_dark_overlay text-text_primary shadow-sm'
 							)}
 						>
 							DAO ({delegateVotes.length})
 						</button>
+
 						<button
 							type='button'
 							onClick={() => setActiveTab(EDVDelegateType.GUARDIAN)}
 							className={cn(
-								'flex-1 rounded-md py-2 text-sm font-medium transition-colors',
-								activeTab === EDVDelegateType.GUARDIAN ? 'bg-white text-text_primary shadow-sm' : 'text-text_secondary hover:text-text_primary'
+								'flex-1 rounded-md py-2 text-sm font-medium text-wallet_btn_text transition-colors',
+								activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay text-text_primary shadow-sm'
 							)}
 						>
 							GUARDIAN ({guardianVotes.length})
@@ -178,7 +179,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 								/>
 							))
 						) : (
-							<div className='text-text_secondary py-8 text-center'>No votes in this category</div>
+							<div className='py-8 text-center text-text_primary'>No votes in this category</div>
 						)}
 					</div>
 				</div>

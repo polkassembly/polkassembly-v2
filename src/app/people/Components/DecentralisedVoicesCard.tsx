@@ -3,10 +3,10 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useState } from 'react';
-import { Activity, HelpCircle, Filter, Ban } from 'lucide-react';
+import { Activity, HelpCircle, Filter, Ban, Check } from 'lucide-react';
 import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
 import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuCheckboxItem, DropdownMenuSeparator } from '@/app/_shared-components/DropdownMenu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuSeparator } from '@/app/_shared-components/DropdownMenu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { IDVDelegateWithStats, IDVCohort, EDVDelegateType } from '@/_shared/types';
@@ -41,7 +41,11 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 		}
 		return 0;
 	});
-
+	const sortItems = [
+		{ key: 'newestToOldest', label: 'Newest to Oldest' },
+		{ key: 'participationHighToLow', label: 'Participation % (High to Low)' },
+		{ key: 'votesCastedHighToLow', label: 'Votes Casted (High to Low)' }
+	];
 	const showSkeleton = loading || !cohort;
 
 	return (
@@ -76,38 +80,52 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 						<DropdownMenuTrigger className='flex items-center gap-2 rounded-md border border-border_grey p-2'>
 							<Filter className='h-4 w-4 text-wallet_btn_text' />
 						</DropdownMenuTrigger>
+
 						<DropdownMenuContent
 							align='end'
 							className='w-64'
 						>
 							<div className='flex items-center justify-between px-2 py-2'>
 								<span className='text-sm font-semibold text-wallet_btn_text'>Sort By</span>
+
 								<button
 									type='button'
+									onClick={() =>
+										setSortOptions({
+											newestToOldest: false,
+											participationHighToLow: false,
+											votesCastedHighToLow: true
+										})
+									}
 									className='text-xs font-medium text-text_pink'
 								>
 									Reset
 								</button>
 							</div>
+
 							<DropdownMenuSeparator />
-							<DropdownMenuCheckboxItem
-								checked={sortOptions.newestToOldest}
-								onCheckedChange={(checked) => setSortOptions((prev) => ({ ...prev, newestToOldest: !!checked }))}
-							>
-								Newest to Oldest
-							</DropdownMenuCheckboxItem>
-							<DropdownMenuCheckboxItem
-								checked={sortOptions.participationHighToLow}
-								onCheckedChange={(checked) => setSortOptions((prev) => ({ ...prev, participationHighToLow: !!checked }))}
-							>
-								Participation % (High to Low)
-							</DropdownMenuCheckboxItem>
-							<DropdownMenuCheckboxItem
-								checked={sortOptions.votesCastedHighToLow}
-								onCheckedChange={(checked) => setSortOptions((prev) => ({ ...prev, votesCastedHighToLow: !!checked }))}
-							>
-								Votes Casted (High to Low)
-							</DropdownMenuCheckboxItem>
+
+							{sortItems.map(({ key, label }) => {
+								const active = sortOptions[key as keyof typeof sortOptions];
+
+								return (
+									<DropdownMenuItem
+										key={key}
+										className='flex cursor-pointer items-center justify-between'
+										onClick={() => setSortOptions((prev) => ({ ...prev, [key]: !prev[key as keyof typeof sortOptions] }))}
+									>
+										<span className={active ? 'font-medium text-text_pink' : 'text-basic_text'}>{label}</span>
+
+										<span className={`flex items-center justify-center rounded-md border p-0.5 ${active ? 'border-text_pink' : 'border-basic_text'}`}>
+											<Check
+												size={10}
+												strokeWidth={3}
+												className={active ? 'text-text_pink' : 'text-basic_text'}
+											/>
+										</span>
+									</DropdownMenuItem>
+								);
+							})}
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
