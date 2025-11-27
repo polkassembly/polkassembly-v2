@@ -24,9 +24,11 @@ function PeoplePage() {
 
 	const [trackFilter, setTrackFilter] = useState<EDVTrackFilter>(EDVTrackFilter.DV_TRACKS);
 
-	const { data: delegatesData, isLoading: delegatesLoading, error: delegatesError } = useDVDelegates({ cohortId, trackFilter });
-	const { data: influenceData, isLoading: influenceLoading, error: influenceError } = useDVInfluence({ cohortId, trackFilter });
-	const { data: votingMatrixData, isLoading: votingMatrixLoading, error: votingMatrixError } = useDVVotingMatrix({ cohortId, trackFilter });
+	const { data: delegatesData, isLoading: delegatesLoading, isFetching: delegatesFetching, error: delegatesError } = useDVDelegates({ cohortId, trackFilter });
+	const { data: influenceData, isLoading: influenceLoading, isFetching: influenceFetching, error: influenceError } = useDVInfluence({ cohortId, trackFilter });
+	const { data: votingMatrixData, isLoading: votingMatrixLoading, isFetching: votingMatrixFetching, error: votingMatrixError } = useDVVotingMatrix({ cohortId, trackFilter });
+
+	const isFetchingData = delegatesFetching || influenceFetching || votingMatrixFetching;
 
 	const cohort = delegatesData?.cohort || null;
 	const delegatesWithStats = delegatesData?.delegatesWithStats || [];
@@ -68,7 +70,7 @@ function PeoplePage() {
 									type='button'
 									className='flex items-center gap-2 rounded-md border border-border_grey px-3 py-2 text-sm text-text_primary hover:bg-sidebar_footer'
 								>
-									<Filter className='h-4 w-4 text-wallet_btn_text' />
+									<Filter className={`h-4 w-4 ${isFetchingData ? 'animate-pulse text-text_pink' : 'text-wallet_btn_text'}`} />
 									<ChevronDown className='h-4 w-4 text-wallet_btn_text' />
 								</button>
 							</PopoverTrigger>

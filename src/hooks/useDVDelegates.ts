@@ -6,7 +6,6 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { IDVDelegatesResponse, IDVReferendaInfluenceResponse, IDVVotingMatrixResponse, EDVTrackFilter } from '@/_shared/types';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 
 interface UseDVDelegatesProps {
 	cohortId?: number;
@@ -22,7 +21,8 @@ export const useDVDelegates = ({ cohortId, trackFilter = EDVTrackFilter.DV_TRACK
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: false,
 		refetchOnMount: true,
-		staleTime: FIVE_MIN_IN_MILLI,
+		staleTime: 0,
+		placeholderData: (previousData) => previousData,
 		queryFn: async () => {
 			const { data, error } = await NextApiClientService.fetchDVDelegates({ cohortId, trackFilter });
 
@@ -54,7 +54,8 @@ export const useDVInfluence = ({ cohortId, sortBy, trackFilter = EDVTrackFilter.
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: false,
 		refetchOnMount: true,
-		staleTime: FIVE_MIN_IN_MILLI,
+		staleTime: 0,
+		placeholderData: (previousData) => previousData,
 		queryFn: async () => {
 			const { data, error } = await NextApiClientService.fetchDVInfluence({ cohortId, trackFilter, sortBy });
 
@@ -85,7 +86,8 @@ export const useDVVotingMatrix = ({ cohortId, trackFilter = EDVTrackFilter.DV_TR
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: false,
 		refetchOnMount: true,
-		staleTime: FIVE_MIN_IN_MILLI,
+		staleTime: 0,
+		placeholderData: (previousData) => previousData,
 		queryFn: async () => {
 			const { data, error } = await NextApiClientService.fetchDVVotingMatrix({ cohortId, trackFilter });
 
