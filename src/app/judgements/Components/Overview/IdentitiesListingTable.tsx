@@ -68,6 +68,9 @@ function IdentitiesListingTable() {
 
 			const identitiesPromises = identityEntries.map(async ([key, value]) => {
 				const address = key.args[0].toString();
+				const blockHash = value.createdAtHash || (await api.rpc.chain.getBlockHash());
+				const timestamp = await api.query.timestamp.now.at(blockHash);
+				const lastUpdatedDate = new Date(Number(timestamp.toString()));
 				const identityInfo = value.toHuman() as {
 					info?: {
 						display?: { Raw?: string };
@@ -141,7 +144,7 @@ function IdentitiesListingTable() {
 								count: approvedSubJudgements.length,
 								quality: 'Reasonable'
 							},
-							lastUpdated: new Date(),
+							lastUpdated: lastUpdatedDate,
 							subIdentities: [],
 							subIdentityCount: 0
 						};
@@ -159,7 +162,7 @@ function IdentitiesListingTable() {
 						count: judgementCount,
 						quality: judgementCount > 0 ? 'Good Quality, Known Good' : 'Reasonable'
 					},
-					lastUpdated: new Date(),
+					lastUpdated: lastUpdatedDate,
 					subIdentities,
 					subIdentityCount: subIdentities.length
 				};
