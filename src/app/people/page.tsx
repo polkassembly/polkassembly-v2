@@ -58,9 +58,9 @@ function PeoplePage() {
 	return (
 		<div className='min-h-screen bg-page_background'>
 			<TabCard />
-			<div className='mb-4 w-full px-3 py-4 sm:px-6 md:mb-8 md:px-12 lg:px-20'>
+			<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 				<div className='mb-4 w-full overflow-hidden rounded-2xl border border-border_grey bg-bg_modal p-4 shadow-md sm:p-5 md:mb-8 md:p-6 lg:p-8'>
-					<div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+					<div className='flex items-center justify-between gap-3'>
 						<div className='flex items-center gap-2'>
 							<Activity className='h-5 w-5 text-border_blue sm:h-6 sm:w-6' />
 							<h2 className='flex flex-wrap items-center gap-2 text-xl font-semibold text-navbar_title sm:text-2xl lg:text-3xl'>
@@ -74,7 +74,7 @@ function PeoplePage() {
 							<PopoverTrigger asChild>
 								<button
 									type='button'
-									className='flex w-full items-center justify-center gap-2 rounded-md border border-border_grey px-3 py-2 text-sm text-text_primary hover:bg-sidebar_footer sm:w-auto'
+									className='flex items-center justify-center gap-2 rounded-md border border-border_grey px-3 py-2 text-sm text-text_primary hover:bg-sidebar_footer sm:w-auto'
 								>
 									<Filter className='h-3.5 w-3.5 text-wallet_btn_text sm:h-4 sm:w-4' />
 									<ChevronDown className='h-3.5 w-3.5 text-wallet_btn_text sm:h-4 sm:w-4' />

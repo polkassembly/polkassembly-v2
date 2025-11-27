@@ -219,7 +219,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 								className='flex cursor-pointer items-center justify-between'
 								onClick={() => toggleRow(item.address)}
 							>
-								<div className='flex items-center gap-3'>
+								<div className='flex flex-col items-center gap-3 md:flex-row'>
 									<Address address={item.address} />
 									<div>
 										<p className='text-xs text-text_primary'>
@@ -230,7 +230,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 								<div className='text-text_primary'>{expandedRows.includes(item.address) ? <ChevronUp size={20} /> : <ChevronDown size={20} />}</div>
 							</div>
 
-							<div className='mt-4 grid grid-cols-3 gap-4 rounded-lg bg-bg_modal/70 p-4'>
+							<div className='mt-4 grid grid-cols-2 gap-4 rounded-lg bg-bg_modal/70 p-4 md:grid-cols-3'>
 								<div>
 									<p className='text-xs text-text_primary'>{t('Participation')}</p>
 									<p className='text-lg font-bold text-text_primary'>{item.participation.toFixed(1)}%</p>
@@ -307,7 +307,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 											className='border-b border-border_grey hover:bg-bg_modal/70'
 										>
 											<td className='sticky left-0 z-10 bg-bg_modal px-4 py-4'>
-												<div className='flex flex-col'>
+												<div className='flex max-w-28 flex-col md:max-w-full'>
 													<Address address={item.address} />
 													<span className='text-xs text-text_primary'>{item.participation.toFixed(1)}% active</span>
 												</div>
@@ -328,7 +328,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 								</tbody>
 							</table>
 						</div>
-						<div className='flex items-center gap-6 rounded-lg border border-border_grey bg-bg_modal p-4'>
+						<div className='flex flex-wrap items-center gap-6 rounded-lg border border-border_grey bg-bg_modal p-4'>
 							<span className='font-semibold text-text_primary'>{t('Legend')}</span>
 							<div className='flex items-center gap-2'>
 								<div className='flex h-6 w-6 items-center justify-center rounded bg-success_vote_bg text-aye_color'>

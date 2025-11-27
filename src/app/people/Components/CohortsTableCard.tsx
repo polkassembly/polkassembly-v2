@@ -13,6 +13,7 @@ import { getDVCohortsByNetwork, formatNumber, formatDateRange, getCohortTenureDa
 import { ENetwork, ECohortStatus } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 
 function CohortsTableCard() {
 	const t = useTranslations('DecentralizedVoices');
@@ -33,18 +34,18 @@ function CohortsTableCard() {
 	};
 
 	return (
-		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6 shadow-md'>
-			<div className='mb-6 flex items-center gap-2'>
-				<Activity className='text-decision_bar_indicator' />
-				<h2 className='text-2xl font-semibold text-navbar_title'>{t('Cohorts')}</h2>
+		<div className='my-3 w-full rounded-2xl border border-border_grey bg-bg_modal p-4 shadow-md sm:my-4 sm:p-5 md:rounded-3xl md:p-6'>
+			<div className='mb-4 flex items-center gap-2 sm:mb-5 md:mb-6'>
+				<Activity className='h-5 w-5 text-decision_bar_indicator sm:h-6 sm:w-6' />
+				<h2 className='text-xl font-semibold text-navbar_title sm:text-2xl lg:text-3xl'>{t('Cohorts')}</h2>
 			</div>
 
-			<div className='overflow-x-auto'>
-				<table className='w-full min-w-[800px] table-auto'>
-					<thead>
-						<tr className='border-b border-t border-border_grey bg-bounty_table_bg pt-3 text-left text-xs font-semibold uppercase text-text_primary'>
-							<th className='py-4 pl-4'>{t('Index')}</th>
-							<th className='py-4'>
+			<div className='-mx-4 sm:-mx-5 md:-mx-6'>
+				<Table className='table-auto'>
+					<TableHeader>
+						<TableRow className='border-b border-t border-border_grey bg-bounty_table_bg pt-3 text-left text-xs font-semibold uppercase text-text_primary'>
+							<TableHead className='whitespace-nowrap py-3 pl-4 sm:pl-5 md:pl-6'>{t('Index')}</TableHead>
+							<TableHead className='whitespace-nowrap py-3'>
 								<div className='flex items-center gap-1'>
 									{t('Tenure')}
 									<TooltipProvider>
@@ -61,31 +62,31 @@ function CohortsTableCard() {
 										</Tooltip>
 									</TooltipProvider>
 								</div>
-							</th>
-							<th className='py-4'>{t('Delegates')}</th>
-							<th className='py-4'>{t('W3FDelegation')}</th>
-							<th className='py-4'>{t('Status').toUpperCase()}</th>
-						</tr>
-					</thead>
-					<tbody>
+							</TableHead>
+							<TableHead className='whitespace-nowrap py-4'>{t('Delegates')}</TableHead>
+							<TableHead className='whitespace-nowrap py-4'>{t('W3FDelegation')}</TableHead>
+							<TableHead className='whitespace-nowrap py-4'>{t('Status').toUpperCase()}</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
 						{cohorts.map((cohort) => {
 							const isSelected = selectedCohortIndex === cohort.index.toString();
 							const delegationAmount = cohort.delegationPerDelegate;
 							return (
-								<tr
+								<TableRow
 									key={cohort.index}
 									onClick={() => handleCohortClick(cohort.index)}
 									className={`cursor-pointer border-b border-border_grey text-sm font-semibold hover:bg-sidebar_footer ${isSelected ? 'bg-sidebar_footer' : ''}`}
 								>
-									<td className='py-4 pl-4 text-text_primary'>{cohort.index}</td>
-									<td className='py-4'>
+									<TableCell className='whitespace-nowrap py-4 pl-4 text-text_primary sm:pl-5 md:pl-6'>{cohort.index}</TableCell>
+									<TableCell className='whitespace-nowrap py-4'>
 										<span className='text-text_primary'>{formatDateRange(cohort.startTime, cohort.endTime, cohort.status === ECohortStatus.ONGOING)}</span>
 										<span className='ml-2 text-wallet_btn_text'>
 											{getCohortTenureDays(cohort)} {t('Days')}
 										</span>
-									</td>
-									<td className='py-4 text-text_primary'>{cohort.delegatesCount + cohort.guardiansCount}</td>
-									<td className='py-4'>
+									</TableCell>
+									<TableCell className='whitespace-nowrap py-4 text-text_primary'>{cohort.delegatesCount + cohort.guardiansCount}</TableCell>
+									<TableCell className='whitespace-nowrap py-4'>
 										<div className='flex items-center gap-2'>
 											<Image
 												src={networkLogo}
@@ -98,19 +99,19 @@ function CohortsTableCard() {
 												{formatNumber(delegationAmount)} {tokenSymbol}
 											</span>
 										</div>
-									</td>
-									<td className='py-4'>
+									</TableCell>
+									<TableCell className='whitespace-nowrap py-4'>
 										<span
 											className={`rounded-full px-4 py-1 text-xs font-medium text-btn_primary_text ${cohort.status === ECohortStatus.ONGOING ? 'bg-decision_bar_indicator' : 'bg-progress_nay'}`}
 										>
 											{cohort.status}
 										</span>
-									</td>
-								</tr>
+									</TableCell>
+								</TableRow>
 							);
 						})}
-					</tbody>
-				</table>
+					</TableBody>
+				</Table>
 			</div>
 		</div>
 	);

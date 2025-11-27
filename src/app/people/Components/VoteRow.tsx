@@ -62,12 +62,12 @@ function VoteRow({ vote, network }: { vote: IDVDelegateVote; network: ENetwork }
 	const { statusColor, statusText, iconBg, containerBg, icon } = getVoteStyles(decision, t);
 
 	return (
-		<div className={cn('flex items-center justify-between rounded-lg p-3', containerBg)}>
+		<div className={cn('flex flex-col items-center justify-between rounded-lg p-3 md:flex-row', containerBg)}>
 			<Address
 				address={vote.address}
 				disableTooltip
 				iconSize={24}
-				textClassName='font-semibold text-text_primary'
+				textClassName='font-semibold max-w-20 text-text_primary'
 			/>
 			<div className='flex items-center gap-8'>
 				<div className='flex items-center gap-2'>

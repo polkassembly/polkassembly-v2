@@ -78,7 +78,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 			open={open}
 			onOpenChange={onOpenChange}
 		>
-			<DialogContent className='max-w-3xl p-0'>
+			<DialogContent className='p-0 md:max-w-3xl'>
 				<DialogHeader className='p-6 pb-2'>
 					<DialogTitle className='flex items-center gap-2 text-xl font-bold'>
 						<span className='flex items-center gap-2'>
@@ -126,7 +126,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 						</p>
 					</div>
 
-					<div className='grid grid-cols-3 gap-4'>
+					<div className='grid max-h-[150px] grid-cols-1 gap-4 overflow-y-auto md:max-h-full md:grid-cols-3'>
 						<div className='rounded-xl border border-border_grey bg-aye_color/10 p-4'>
 							<div className='flex items-center justify-between'>
 								<span className='font-semibold text-success'>{t('Aye').toUpperCase()}</span>
@@ -187,7 +187,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 						</div>
 					)}
 
-					<div className='flex max-h-[300px] flex-col gap-3 overflow-y-auto'>
+					<div className='flex max-h-[150px] flex-col gap-3 overflow-y-auto md:max-h-full'>
 						{activeVotes.length > 0 ? (
 							activeVotes.map((vote) => (
 								<VoteRow
