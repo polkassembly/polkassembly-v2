@@ -19,6 +19,22 @@ enum EJudgementStatusType {
 	LOW_QUALITY = 'LowQuality',
 	ERRONEOUS = 'Erroneous'
 }
+
+interface IdentityField {
+	Raw?: string;
+}
+
+interface IdentityData {
+	twitter?: IdentityField;
+	email?: IdentityField;
+	discord?: IdentityField;
+	matrix?: IdentityField;
+	riot?: IdentityField;
+	github?: IdentityField;
+	web?: IdentityField;
+	[key: string]: IdentityField | undefined;
+}
+
 export function mapJudgementStatus(judgementData: string): EJudgementStatus {
 	switch (judgementData) {
 		case EJudgementStatusType.REASONABLE:
@@ -140,4 +156,26 @@ export function getRegistrarsWithStats({
 		console.error('Error fetching registrar stats:', error);
 		return [];
 	}
+}
+
+export function countSocialsFromIdentity(identity: IdentityData): number {
+	let count = 0;
+	if (identity.twitter?.Raw) count += 1;
+	if (identity.email?.Raw) count += 1;
+	if (identity.discord?.Raw) count += 1;
+	if (identity.matrix?.Raw || identity.riot?.Raw) count += 1;
+	if (identity.github?.Raw) count += 1;
+	if (identity.web?.Raw) count += 1;
+	return count;
+}
+
+export function getSocialsFromIdentity(identity: IdentityData) {
+	return {
+		twitter: identity.twitter?.Raw || '',
+		email: identity.email?.Raw || '',
+		discord: identity.discord?.Raw || '',
+		matrix: identity.matrix?.Raw || identity.riot?.Raw || '',
+		github: identity.github?.Raw || '',
+		web: identity.web?.Raw || ''
+	};
 }

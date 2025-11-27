@@ -13,6 +13,8 @@ import RegistrarsSummary from './Components/TabSummary/RegistrarsSummary';
 import DashboardSummary from './Components/TabSummary/DashboardSummary';
 import JudgementListingTable from './Components/ListingTable/JudgementListingTable';
 import RegistrarsListingTable from './Components/ListingTable/RegistrarsListingTable';
+import OverviewStats from './Components/Overview/OverviewStats';
+import MyIdentitiesDashboard from './Components/MyDashboard/MyIdentitiesDashboard';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
@@ -36,6 +38,11 @@ async function Judgements() {
 			>
 				<Header />
 				<div className='w-full'>
+					<TabsContent value={EJudgementDashboardTabs.OVERVIEW}>
+						<div className='flex flex-col gap-y-4'>
+							<OverviewStats />
+						</div>
+					</TabsContent>
 					<TabsContent value={EJudgementDashboardTabs.DASHBOARD}>
 						<div className='flex flex-col gap-y-4'>
 							<DashboardSummary />
@@ -46,6 +53,11 @@ async function Judgements() {
 						<div className='flex flex-col gap-y-4'>
 							<RegistrarsSummary />
 							<RegistrarsListingTable />
+						</div>
+					</TabsContent>
+					<TabsContent value={EJudgementDashboardTabs.MY_IDENTITIES}>
+						<div className='flex flex-col gap-y-4'>
+							<MyIdentitiesDashboard />
 						</div>
 					</TabsContent>
 				</div>

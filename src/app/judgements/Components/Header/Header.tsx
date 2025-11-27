@@ -47,6 +47,12 @@ function Header() {
 				<TabsList className={`w-fit max-w-full items-start overflow-auto pl-4 font-bold md:pl-0 ${styles.hideScrollbar}`}>
 					<TabsTrigger
 						className={styles.header_tab}
+						value={EJudgementDashboardTabs.OVERVIEW}
+					>
+						Overview
+					</TabsTrigger>
+					<TabsTrigger
+						className={styles.header_tab}
 						value={EJudgementDashboardTabs.DASHBOARD}
 					>
 						{t('Judgements.dashboard')}
@@ -56,6 +62,12 @@ function Header() {
 						value={EJudgementDashboardTabs.REGISTRARS}
 					>
 						{t('Judgements.registrars')} ({registrarsCount})
+					</TabsTrigger>
+					<TabsTrigger
+						className={styles.header_tab}
+						value={EJudgementDashboardTabs.MY_IDENTITIES}
+					>
+						My Identities
 					</TabsTrigger>
 				</TabsList>
 			</div>

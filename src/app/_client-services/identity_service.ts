@@ -150,6 +150,10 @@ export class IdentityService {
 		return this.peopleChainApi.genesisHash.toHex();
 	}
 
+	getApi() {
+		return this.peopleChainApi;
+	}
+
 	// eslint-disable-next-line sonarjs/cognitive-complexity
 	private async executeTxCallback({
 		status,
@@ -665,5 +669,28 @@ export class IdentityService {
 			console.error('Error fetching identity judgements:', error);
 			return [];
 		}
+	}
+
+	async getSubIdentities(address: string) {
+		const encodedAddress = getEncodedAddress(address, this.network) || address;
+		const subsOf = await this.peopleChainApi.query.identity.subsOf(encodedAddress);
+		const subsData = subsOf.toJSON() as any;
+
+		if (!subsData || !Array.isArray(subsData[1])) {
+			return [];
+		}
+
+		return subsData[1] as string[];
+	}
+
+	async getSubIdentityInfo(subAddress: string) {
+		const encodedAddress = getEncodedAddress(subAddress, this.network) || subAddress;
+		const superOf = await this.peopleChainApi.query.identity.superOf(encodedAddress);
+		const superData = superOf.toHuman() as any;
+
+		return {
+			parentAddress: superData?.[0] || '',
+			displayName: superData?.[1]?.Raw || ''
+		};
 	}
 }
