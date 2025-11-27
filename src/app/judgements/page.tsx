@@ -31,13 +31,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 async function Judgements() {
 	return (
-		<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
+		<div>
 			<Tabs
 				defaultValue={EJudgementDashboardTabs.DASHBOARD}
 				className='w-full'
 			>
 				<Header />
-				<div className='w-full'>
+				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 					<TabsContent value={EJudgementDashboardTabs.OVERVIEW}>
 						<div className='flex flex-col gap-y-4'>
 							<OverviewStats />
