@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { IDVReferendumInfluence, EDVDelegateType, IDVDelegateVote, EVoteDecision } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
@@ -19,6 +20,7 @@ interface DVVotesDialogProps {
 }
 
 export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialogProps) {
+	const t = useTranslations('DecentralizedVoices');
 	const [activeTab, setActiveTab] = useState<EDVDelegateType>(EDVDelegateType.DAO);
 	const network = getCurrentNetwork();
 
@@ -80,7 +82,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 								height={24}
 								className='h-6 w-6 rounded-full'
 							/>
-							Decentralized Voices
+							{t('DecentralizedVoicesTitle')}
 						</span>
 					</DialogTitle>
 				</DialogHeader>
@@ -88,7 +90,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 				<div className='flex flex-col gap-6 px-6 pb-6'>
 					<div className='space-y-2'>
 						<div className='flex items-center justify-between'>
-							<span className='text-sm text-text_primary'>Overall Vote Distribution</span>
+							<span className='text-sm text-text_primary'>{t('OverallVoteDistribution')}</span>
 							<span className='text-lg font-bold text-text_primary'>
 								~{formatUSDWithUnits(formatBnBalance(dvTotalPower.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
 							</span>
@@ -112,62 +114,71 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 								</div>
 							)}
 						</div>
-						<p className='text-sm text-text_primary'>{dvPercentOfTotal.toFixed(2)}% of referendum voting power</p>
+						<p className='text-sm text-text_primary'>
+							{dvPercentOfTotal.toFixed(2)}% {t('ReferendumVotingPower')}
+						</p>
 					</div>
 
 					<div className='grid grid-cols-3 gap-4'>
 						<div className='rounded-xl border border-border_grey bg-aye_color/10 p-4'>
 							<div className='flex items-center justify-between'>
-								<span className='font-semibold text-success'>AYE</span>
+								<span className='font-semibold text-success'>{t('Aye').toUpperCase()}</span>
 								<span className='text-xl font-bold text-success'>
 									{formatUSDWithUnits(formatBnBalance(dvAyePower.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
 								</span>
 							</div>
-							<div className='text-xs text-text_primary'>{totalStats.ayeCount} Voters</div>
+							<div className='text-xs text-text_primary'>
+								{totalStats.ayeCount} {t('Voters')}
+							</div>
 						</div>
 						<div className='rounded-xl border border-border_grey bg-nay_color/10 p-4'>
 							<div className='flex items-center justify-between'>
-								<span className='text-failure_vote_text font-semibold'>NAY</span>
+								<span className='text-failure_vote_text font-semibold'>{t('Nay').toUpperCase()}</span>
 								<span className='text-failure_vote_text text-xl font-bold'>
 									{formatUSDWithUnits(formatBnBalance(dvNayPower.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
 								</span>
 							</div>
-							<div className='text-xs text-text_primary'>{totalStats.nayCount} Voters</div>
+							<div className='text-xs text-text_primary'>
+								{totalStats.nayCount} {t('Voters')}
+							</div>
 						</div>
 						<div className='rounded-xl border border-border_grey bg-abstain_color/10 p-4'>
 							<div className='flex items-center justify-between'>
-								<span className='font-semibold text-abstain_color'>DV ABSTAIN</span>
+								<span className='font-semibold text-abstain_color'>{t('DVAbstain')}</span>
 								<span className='text-xl font-bold text-abstain_color'>
 									{formatUSDWithUnits(formatBnBalance(dvAbstainPower.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
 								</span>
 							</div>
-							<div className='text-xs text-text_primary'>{totalStats.abstainCount} Voters</div>
+							<div className='text-xs text-text_primary'>
+								{totalStats.abstainCount} {t('Voters')}
+							</div>
 						</div>
 					</div>
+					{guardianVotes.length > 0 && (
+						<div className='flex gap-4 rounded-lg bg-sidebar_footer p-1'>
+							<button
+								type='button'
+								onClick={() => setActiveTab(EDVDelegateType.DAO)}
+								className={cn(
+									'flex-1 rounded-md py-2 text-sm font-medium transition-colors',
+									activeTab === EDVDelegateType.DAO && 'bg-section_dark_overlay text-text_primary shadow-sm'
+								)}
+							>
+								{t('DAO')} ({delegateVotes.length})
+							</button>
 
-					<div className='flex gap-4 rounded-lg bg-sidebar_footer p-1'>
-						<button
-							type='button'
-							onClick={() => setActiveTab(EDVDelegateType.DAO)}
-							className={cn(
-								'flex-1 rounded-md py-2 text-sm font-medium transition-colors',
-								activeTab === EDVDelegateType.DAO && 'bg-section_dark_overlay text-text_primary shadow-sm'
-							)}
-						>
-							DAO ({delegateVotes.length})
-						</button>
-
-						<button
-							type='button'
-							onClick={() => setActiveTab(EDVDelegateType.GUARDIAN)}
-							className={cn(
-								'flex-1 rounded-md py-2 text-sm font-medium text-wallet_btn_text transition-colors',
-								activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay text-text_primary shadow-sm'
-							)}
-						>
-							GUARDIAN ({guardianVotes.length})
-						</button>
-					</div>
+							<button
+								type='button'
+								onClick={() => setActiveTab(EDVDelegateType.GUARDIAN)}
+								className={cn(
+									'flex-1 rounded-md py-2 text-sm font-medium text-wallet_btn_text transition-colors',
+									activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay text-text_primary shadow-sm'
+								)}
+							>
+								{t('Guardian').toUpperCase()} ({guardianVotes.length})
+							</button>
+						</div>
+					)}
 
 					<div className='flex max-h-[300px] flex-col gap-3 overflow-y-auto'>
 						{activeVotes.length > 0 ? (
@@ -179,7 +190,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 								/>
 							))
 						) : (
-							<div className='py-8 text-center text-text_primary'>No votes in this category</div>
+							<div className='py-8 text-center text-text_primary'>{t('NoVotesInCategory')}</div>
 						)}
 					</div>
 				</div>

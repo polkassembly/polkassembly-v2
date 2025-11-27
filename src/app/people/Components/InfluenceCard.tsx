@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Activity, Filter, ArrowUpDown, Check, X, Minus, ChevronDown, Menu } from 'lucide-react';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import VotingBar from '@/app/_shared-components/ListingComponent/VotingBar/VotingBar';
@@ -29,6 +30,7 @@ type SortOption = 'index' | 'status' | 'influence' | 'votes';
 type SortDirection = 'asc' | 'desc';
 
 function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
+	const t = useTranslations('DecentralizedVoices');
 	const [page, setPage] = useState(1);
 	const [sortBy, setSortBy] = useState<SortOption>('index');
 	const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -112,9 +114,9 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 			<div className='mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
 				<div className='flex items-center gap-2'>
 					<Activity className='text-decision_bar_indicator' />
-					<h2 className='text-2xl font-semibold text-navbar_title'>Influence by Referenda</h2>
+					<h2 className='text-2xl font-semibold text-navbar_title'>{t('InfluenceByReferenda')}</h2>
 					<span className='ml-2 rounded-lg bg-bounty_dash_bg p-2 text-xs font-medium text-wallet_btn_text'>
-						Outcome changed {outcomeChangedCount} ({outcomePercent}%) | Total {totalCount}
+						{t('OutcomeChanged')} {outcomeChangedCount} ({outcomePercent}%) | {t('Total')} {totalCount}
 					</span>
 				</div>
 				<div className='flex gap-2'>
@@ -131,13 +133,13 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 						</PopoverTrigger>
 						<PopoverContent className='max-h-64 w-56 overflow-y-auto border-border_grey p-3'>
 							<div className='mb-2 flex items-center justify-between'>
-								<span className='text-xs font-semibold text-text_primary'>Filter by Track</span>
+								<span className='text-xs font-semibold text-text_primary'>{t('FilterByTrack')}</span>
 								<button
 									type='button'
 									onClick={() => setSelectedTracks([])}
 									className='text-xs text-text_pink'
 								>
-									Clear
+									{t('Clear')}
 								</button>
 							</div>
 							<div className='space-y-2'>
@@ -168,13 +170,13 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 							</button>
 						</PopoverTrigger>
 						<PopoverContent className='w-48 border-border_grey p-3'>
-							<div className='mb-2 text-xs font-semibold text-text_primary'>Sort by</div>
+							<div className='mb-2 text-xs font-semibold text-text_primary'>{t('SortBy')}</div>
 							<div className='space-y-1'>
 								{[
-									{ value: 'index', label: 'Referendum #' },
-									{ value: 'status', label: 'Status' },
-									{ value: 'influence', label: 'Influence' },
-									{ value: 'votes', label: 'Voting Power' }
+									{ value: 'index', label: `${t('Referendum')} #` },
+									{ value: 'status', label: t('Status') },
+									{ value: 'influence', label: t('Influence') },
+									{ value: 'votes', label: t('VotingPower') }
 								].map((option) => (
 									<button
 										key={option.value}
@@ -196,7 +198,7 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 							onClick={clearFilters}
 							className='rounded-md border border-toast_error_text px-3 py-2 text-xs text-toast_error_text'
 						>
-							Clear All
+							{t('ClearAll')}
 						</button>
 					)}
 				</div>
@@ -206,11 +208,11 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 				<table className='w-full min-w-[800px] table-auto'>
 					<thead>
 						<tr className='border-b border-t border-border_grey bg-bounty_table_bg pt-3 text-left text-xs font-semibold uppercase text-text_primary'>
-							<th className='py-4 pl-4'>REFERENDUM</th>
-							<th className='py-4'>TRACK</th>
-							<th className='py-4'>STATUS</th>
-							<th className='py-4'>VOTING BAR</th>
-							<th className='py-4'>INFLUENCE</th>
+							<th className='py-4 pl-4'>{t('Referendum').toUpperCase()}</th>
+							<th className='py-4'>{t('Track').toUpperCase()}</th>
+							<th className='py-4'>{t('Status').toUpperCase()}</th>
+							<th className='py-4'>{t('VotingBar').toUpperCase()}</th>
+							<th className='py-4'>{t('Influence').toUpperCase()}</th>
 							<th className='py-4' />
 						</tr>
 					</thead>
@@ -276,11 +278,13 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 												>
 													<div className='flex flex-col gap-1'>
 														<p>
-															Aye = {formatUSDWithUnits(formatBnBalance(item.ayeVotingPower, { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
+															{t('Aye')} ={' '}
+															{formatUSDWithUnits(formatBnBalance(item.ayeVotingPower, { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
 															{item.ayePercent.toFixed(2)}%)
 														</p>
 														<p>
-															Nay = {formatUSDWithUnits(formatBnBalance(item.nayVotingPower, { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
+															{t('Nay')} ={' '}
+															{formatUSDWithUnits(formatBnBalance(item.nayVotingPower, { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
 															{item.nayPercent.toFixed(2)}%)
 														</p>
 													</div>

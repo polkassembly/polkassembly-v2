@@ -6,6 +6,7 @@
 
 import { Activity, Filter, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useDVDelegates, useDVInfluence, useDVVotingMatrix } from '@/hooks/useDVDelegates';
 import { EDVTrackFilter } from '@/_shared/types';
@@ -18,6 +19,7 @@ import DecentralizedVoicesVotingCard from './Components/DecentralizedVoicesVotin
 import CohortsTableCard from './Components/CohortsTableCard';
 
 function PeoplePage() {
+	const t = useTranslations('DecentralizedVoices');
 	const searchParams = useSearchParams();
 	const cohortIndexParam = searchParams.get('cohort');
 	const cohortId = cohortIndexParam ? parseInt(cohortIndexParam, 10) : 5;
@@ -56,7 +58,7 @@ function PeoplePage() {
 						<div className='flex items-center gap-2'>
 							<Activity className='text-border_blue' />
 							<h2 className='flex items-center gap-2 text-2xl font-semibold text-navbar_title'>
-								Cohort #{delegatesLoading ? '...' : (cohort?.index ?? '...')}{' '}
+								{t('Cohort')} #{delegatesLoading ? '...' : (cohort?.index ?? '...')}{' '}
 								<span className={`rounded-full px-2 py-0.5 text-xs text-btn_primary_text ${cohort?.status === 'Ongoing' ? 'bg-border_blue' : 'bg-text_secondary'}`}>
 									{cohort?.status ?? 'Loading'}
 								</span>
@@ -79,14 +81,14 @@ function PeoplePage() {
 										onClick={() => setTrackFilter(EDVTrackFilter.DV_TRACKS)}
 										className={`flex w-full items-center rounded px-3 py-2 text-sm ${trackFilter === EDVTrackFilter.DV_TRACKS ? 'bg-text_pink/10 text-text_pink' : 'text-text_primary hover:bg-sidebar_footer'}`}
 									>
-										Only DV tracks referenda
+										{t('OnlyDVTracksReferenda')}
 									</button>
 									<button
 										type='button'
 										onClick={() => setTrackFilter(EDVTrackFilter.ALL)}
 										className={`flex w-full items-center rounded px-3 py-2 text-sm ${trackFilter === EDVTrackFilter.ALL ? 'bg-text_pink/10 text-text_pink' : 'text-text_primary hover:bg-sidebar_footer'}`}
 									>
-										All referenda
+										{t('AllReferenda')}
 									</button>
 								</div>
 							</PopoverContent>

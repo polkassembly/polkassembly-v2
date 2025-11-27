@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Activity, HelpCircle, Filter, Ban, Check } from 'lucide-react';
 import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
 import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
@@ -19,7 +20,8 @@ interface DecentralisedVoicesCardProps {
 }
 
 function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: DecentralisedVoicesCardProps) {
-	const [activeTab, setActiveTab] = useState<'DAO' | 'GUARDIAN'>('DAO');
+	const t = useTranslations('DecentralizedVoices');
+	const [activeTab, setActiveTab] = useState<EDVDelegateType>(EDVDelegateType.DAO);
 	const [sortOptions, setSortOptions] = useState({
 		newestToOldest: false,
 		participationHighToLow: false,
@@ -28,7 +30,7 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 
 	const daos = delegatesWithStats.filter((d) => d.type === EDVDelegateType.DAO);
 	const guardians = delegatesWithStats.filter((d) => d.type === EDVDelegateType.GUARDIAN);
-	const filteredDelegates = activeTab === 'DAO' ? daos : guardians;
+	const filteredDelegates = activeTab === EDVDelegateType.DAO ? daos : guardians;
 
 	const sortedDelegates = [...filteredDelegates].sort((a, b) => {
 		if (sortOptions.participationHighToLow) {
@@ -42,9 +44,9 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 		return 0;
 	});
 	const sortItems = [
-		{ key: 'newestToOldest', label: 'Newest to Oldest' },
-		{ key: 'participationHighToLow', label: 'Participation % (High to Low)' },
-		{ key: 'votesCastedHighToLow', label: 'Votes Casted (High to Low)' }
+		{ key: 'newestToOldest', label: t('NewestToOldest') },
+		{ key: 'participationHighToLow', label: t('ParticipationHighToLow') },
+		{ key: 'votesCastedHighToLow', label: t('VotesCastedHighToLow') }
 	];
 	const showSkeleton = loading || !cohort;
 
@@ -54,23 +56,23 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 				<div className='flex flex-col gap-4 md:flex-row md:items-center'>
 					<div className='flex items-center gap-2'>
 						<Activity className='text-decision_bar_indicator' />
-						<h2 className='text-2xl font-semibold text-navbar_title'>Decentralised Voices</h2>
+						<h2 className='text-2xl font-semibold text-navbar_title'>{t('DecentralisedVoices')}</h2>
 					</div>
 					{cohort && cohort.guardiansCount > 0 && (
 						<div className='flex rounded-lg bg-sidebar_footer p-1'>
 							<button
 								type='button'
-								onClick={() => setActiveTab('DAO')}
-								className={`rounded px-3 py-0.5 text-sm text-navbar_title transition-colors ${activeTab === 'DAO' && 'bg-section_dark_overlay font-semibold'}`}
+								onClick={() => setActiveTab(EDVDelegateType.DAO)}
+								className={`rounded px-3 py-0.5 text-sm text-navbar_title transition-colors ${activeTab === EDVDelegateType.DAO && 'bg-section_dark_overlay font-semibold'}`}
 							>
-								DAO ({cohort.delegatesCount})
+								{t('DAO')} ({cohort.delegatesCount})
 							</button>
 							<button
 								type='button'
-								onClick={() => setActiveTab('GUARDIAN')}
-								className={`py-0.6 rounded px-3 text-sm font-medium text-navbar_title transition-colors ${activeTab === 'GUARDIAN' && 'bg-section_dark_overlay font-semibold'}`}
+								onClick={() => setActiveTab(EDVDelegateType.GUARDIAN)}
+								className={`py-0.6 rounded px-3 text-sm font-medium text-navbar_title transition-colors ${activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay font-semibold'}`}
 							>
-								GUARDIAN ({cohort.guardiansCount})
+								{t('Guardian').toUpperCase()} ({cohort.guardiansCount})
 							</button>
 						</div>
 					)}
@@ -86,7 +88,7 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 							className='w-64'
 						>
 							<div className='flex items-center justify-between px-2 py-2'>
-								<span className='text-sm font-semibold text-wallet_btn_text'>Sort By</span>
+								<span className='text-sm font-semibold text-wallet_btn_text'>{t('SortBy')}</span>
 
 								<button
 									type='button'
@@ -99,7 +101,7 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 									}
 									className='text-xs font-medium text-text_pink'
 								>
-									Reset
+									{t('Reset')}
 								</button>
 							</div>
 
@@ -135,12 +137,12 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 				<table className='w-full min-w-[800px] table-auto'>
 					<thead>
 						<tr className='border-b border-t border-border_grey bg-bounty_table_bg pt-3 text-left text-xs font-semibold uppercase text-text_primary'>
-							<th className='py-4 pl-4'>NAME</th>
-							<th className='py-4'>VOTES CASTED</th>
-							<th className='py-4'>VOTE COUNT</th>
+							<th className='py-4 pl-4'>{t('Name').toUpperCase()}</th>
+							<th className='py-4'>{t('VotesCasted').toUpperCase()}</th>
+							<th className='py-4'>{t('VoteCount').toUpperCase()}</th>
 							<th className='py-4'>
 								<div className='flex items-center gap-1'>
-									PARTICIPATION
+									{t('Participation').toUpperCase()}
 									<TooltipProvider>
 										<Tooltip>
 											<TooltipTrigger>
@@ -150,13 +152,13 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 												/>
 											</TooltipTrigger>
 											<TooltipContent className='bg-tooltip_background p-2 text-btn_primary_text'>
-												<p>Duration of the cohort</p>
+												<p>{t('DurationOfCohort')}</p>
 											</TooltipContent>
 										</Tooltip>
 									</TooltipProvider>
 								</div>
 							</th>
-							<th className='py-4'>WIN RATE</th>
+							<th className='py-4'>{t('WinRate').toUpperCase()}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -192,14 +194,14 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 									return (
 										<tr
 											key={delegate.address}
-											className='cursor-pointer border-b border-border_grey text-sm font-semibold hover:border-border_grey/90'
+											className='cursor-pointer border-b border-border_grey text-sm font-semibold text-text_primary hover:border-border_grey/90'
 										>
 											<td className='py-4 pl-4'>
 												<div className='flex items-center gap-2'>
 													<Address address={delegate.address} />
 												</div>
 											</td>
-											<td className='text-bodyBlue dark:text-blue-dark-high py-4 font-medium'>{totalVotes}</td>
+											<td className='py-4 font-medium'>{totalVotes}</td>
 											<td className='py-4'>
 												<div className='flex items-center gap-4'>
 													<div className='flex items-center gap-1 text-success'>
@@ -219,11 +221,9 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 											<td className='py-4'>
 												<TooltipProvider>
 													<Tooltip>
-														<TooltipTrigger className='text-bodyBlue dark:text-blue-dark-high cursor-help font-medium'>
-															{delegate.voteStats.participation.toFixed(2)} %
-														</TooltipTrigger>
+														<TooltipTrigger className='cursor-pointer font-medium text-text_primary'>{delegate.voteStats.participation.toFixed(2)} %</TooltipTrigger>
 														<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
-															<p>Votes Cast / Total Eligible Referenda</p>
+															<p>{t('VotesCastTotalEligibleReferenda')}</p>
 														</TooltipContent>
 													</Tooltip>
 												</TooltipProvider>
@@ -231,9 +231,9 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 											<td className='py-4'>
 												<TooltipProvider>
 													<Tooltip>
-														<TooltipTrigger className='cursor-help font-medium text-green-500'>{delegate.voteStats.winRate.toFixed(2)} %</TooltipTrigger>
+														<TooltipTrigger className='cursor-pointer font-medium text-success'>{delegate.voteStats.winRate.toFixed(2)} %</TooltipTrigger>
 														<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
-															<p>Winning Votes / Total Non-Abstain Votes</p>
+															<p>{t('WinningVotesTotalNonAbstainVotes')}</p>
 														</TooltipContent>
 													</Tooltip>
 												</TooltipProvider>

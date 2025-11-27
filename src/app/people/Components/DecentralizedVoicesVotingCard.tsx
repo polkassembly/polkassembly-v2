@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Check, X, Minus, LayoutList, LayoutGrid, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { IDVDelegateVotingMatrix, IDVCohort, EDVDelegateType } from '@/_shared/types';
 import Address from '@/app/_shared-components/Profile/Address/Address';
@@ -18,10 +19,11 @@ interface DecentralizedVoicesVotingCardProps {
 type SortOption = 'name' | 'participation' | 'supportRate' | 'activity';
 
 function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort, loading }: DecentralizedVoicesVotingCardProps) {
+	const t = useTranslations('DecentralizedVoices');
 	const referendums = referendumIndices.length > 0 ? referendumIndices : [0];
 	const [viewMode, setViewMode] = useState<'compact' | 'heatmap'>('compact');
 	const [activeTab, setActiveTab] = useState<EDVDelegateType>(EDVDelegateType.DAO);
-	const [expandedRows, setExpandedRows] = useState<string[]>(votingMatrix.length > 0 ? [votingMatrix[0].address] : []); // Default first one expanded
+	const [expandedRows, setExpandedRows] = useState<string[]>(votingMatrix.length > 0 ? [votingMatrix[0].address] : []);
 	const [sortBy, setSortBy] = useState<SortOption>('activity');
 
 	const minRef = referendums.length > 0 ? Math.min(...referendums) : 0;
@@ -93,14 +95,14 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 			<div className='mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
 				<div className='flex flex-col gap-4 md:flex-row md:items-center'>
 					<div>
-						<h2 className='text-2xl font-semibold text-navbar_title'>Decentralized Voices Voting</h2>
+						<h2 className='text-2xl font-semibold text-navbar_title'>{t('DecentralizedVoicesVoting')}</h2>
 						<p className='text-sm text-text_primary'>
 							{loading ? (
 								'...'
 							) : (
 								<>
-									{activeTab === EDVDelegateType.DAO ? daos.length : guardians.length} {activeTab === EDVDelegateType.DAO ? 'DAOs' : 'Guardians'} across {referendums.length}{' '}
-									referendums (#
+									{activeTab === EDVDelegateType.DAO ? daos.length : guardians.length} {activeTab === EDVDelegateType.DAO ? t('DAOs') : t('Guardians')} {t('Across')}{' '}
+									{referendums.length} {t('Referendums')} (#
 									{minRef} - #{maxRef})
 								</>
 							)}
@@ -113,14 +115,14 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 								onClick={() => setActiveTab(EDVDelegateType.DAO)}
 								className={`rounded px-3 py-0.5 text-sm text-navbar_title transition-colors ${activeTab === EDVDelegateType.DAO && 'bg-section_dark_overlay font-semibold'}`}
 							>
-								DAO ({daos.length})
+								{t('DAO')} ({daos.length})
 							</button>
 							<button
 								type='button'
 								onClick={() => setActiveTab(EDVDelegateType.GUARDIAN)}
 								className={`py-0.6 rounded px-3 text-sm font-medium text-navbar_title transition-colors ${activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay font-semibold'}`}
 							>
-								GUARDIAN ({guardians.length})
+								{t('Guardian').toUpperCase()} ({guardians.length})
 							</button>
 						</div>
 					)}
@@ -133,7 +135,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 							className={`flex items-center gap-2 rounded px-3 py-1.5 text-sm font-medium transition-colors ${viewMode === 'compact' ? 'bg-info text-btn_primary_text' : 'text-text_primary'}`}
 						>
 							<LayoutList size={16} />
-							Compact
+							{t('Compact')}
 						</button>
 						<button
 							type='button'
@@ -141,7 +143,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 							className={`flex items-center gap-2 rounded px-3 py-1.5 text-sm font-medium transition-colors ${viewMode === 'heatmap' ? 'bg-info text-btn_primary_text' : 'text-text_primary'}`}
 						>
 							<LayoutGrid size={16} />
-							Heatmap
+							{t('Heatmap')}
 						</button>
 					</div>
 				</div>
@@ -150,14 +152,14 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 			<div className='mb-4 flex flex-wrap items-center gap-4 rounded-lg border border-border_grey p-3'>
 				<div className='flex items-center gap-2 text-sm text-text_primary'>
 					<Filter size={14} />
-					<span>Sort by:</span>
+					<span>{t('SortBy')}</span>
 				</div>
 				{(['name', 'participation', 'supportRate', 'activity'] as SortOption[]).map((option) => {
 					const labels: Record<SortOption, string> = {
-						name: 'Name',
-						participation: 'Participation',
-						supportRate: 'Support Rate',
-						activity: 'Activity'
+						name: t('Name'),
+						participation: t('Participation'),
+						supportRate: t('SupportRate'),
+						activity: t('Activity')
 					};
 					return (
 						<button
@@ -221,7 +223,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 									<Address address={item.address} />
 									<div>
 										<p className='text-xs text-text_primary'>
-											{item.activeCount} of {item.totalRefs} referendums
+											{item.activeCount} {t('Of')} {item.totalRefs} {t('Referendums')}
 										</p>
 									</div>
 								</div>
@@ -230,15 +232,15 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 
 							<div className='mt-4 grid grid-cols-3 gap-4 rounded-lg bg-bg_modal/70 p-4'>
 								<div>
-									<p className='text-xs text-text_primary'>Participation</p>
+									<p className='text-xs text-text_primary'>{t('Participation')}</p>
 									<p className='text-lg font-bold text-text_primary'>{item.participation.toFixed(1)}%</p>
 								</div>
 								<div>
-									<p className='text-xs text-text_primary'>Aye Rate</p>
+									<p className='text-xs text-text_primary'>{t('AyeRate')}</p>
 									<p className='text-lg font-bold text-aye_color'>{item.ayeRate.toFixed(1)}%</p>
 								</div>
 								<div>
-									<p className='text-xs text-text_primary'>Total</p>
+									<p className='text-xs text-text_primary'>{t('Total')}</p>
 									<p className='text-lg font-bold text-abstain_color'>{item.activeCount}</p>
 								</div>
 							</div>
@@ -255,7 +257,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 												>
 													<div className='mb-1'>{getVoteIcon(vote)}</div>
 													<span className='text-xs font-medium'>#{ref}</span>
-													<span className='text-[10px] capitalize opacity-70'>{vote === 'novote' ? 'No Vote' : vote}</span>
+													<span className='text-[10px] capitalize opacity-70'>{vote === 'novote' ? t('NoVote') : vote}</span>
 												</div>
 											);
 										})}
@@ -287,7 +289,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 							<table className='w-full table-auto border-collapse'>
 								<thead>
 									<tr className='border-b border-border_grey text-left text-xs font-semibold text-text_primary'>
-										<th className='sticky left-0 z-10 w-64 bg-bg_modal py-4 pl-4 uppercase'>DAO</th>
+										<th className='sticky left-0 z-10 w-64 bg-bg_modal py-4 pl-4 uppercase'>{t('DAO')}</th>
 										{referendums.map((ref) => (
 											<th
 												key={ref}
@@ -327,30 +329,30 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 							</table>
 						</div>
 						<div className='flex items-center gap-6 rounded-lg border border-border_grey bg-bg_modal p-4'>
-							<span className='font-semibold text-text_primary'>Legend</span>
+							<span className='font-semibold text-text_primary'>{t('Legend')}</span>
 							<div className='flex items-center gap-2'>
 								<div className='flex h-6 w-6 items-center justify-center rounded bg-success_vote_bg text-aye_color'>
 									<Check size={14} />
 								</div>
-								<span className='text-sm text-text_primary'>Aye</span>
+								<span className='text-sm text-text_primary'>{t('Aye')}</span>
 							</div>
 							<div className='flex items-center gap-2'>
 								<div className='flex h-6 w-6 items-center justify-center rounded bg-failure_vote_bg text-nay_color'>
 									<X size={14} />
 								</div>
-								<span className='text-sm text-text_primary'>Nay</span>
+								<span className='text-sm text-text_primary'>{t('Nay')}</span>
 							</div>
 							<div className='flex items-center gap-2'>
 								<div className='flex h-6 w-6 items-center justify-center rounded bg-voting_bar_bg text-abstain_color'>
 									<Minus size={14} />
 								</div>
-								<span className='text-sm text-text_primary'>Abstain</span>
+								<span className='text-sm text-text_primary'>{t('Abstain')}</span>
 							</div>
 							<div className='flex items-center gap-2'>
 								<div className='flex h-6 w-6 items-center justify-center rounded bg-transparent text-text_primary'>
 									<div className='h-1 w-1 rounded-full bg-current' />
 								</div>
-								<span className='text-sm text-text_primary'>No Vote</span>
+								<span className='text-sm text-text_primary'>{t('NoVote')}</span>
 							</div>
 						</div>
 					</div>
