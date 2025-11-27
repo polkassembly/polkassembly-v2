@@ -182,7 +182,7 @@ export class SubsquidService extends SubsquidUtils {
 
 		if (subsquidErr || !subsquidData) {
 			console.error(`Error fetching vote metrics for proposals from Subsquid: ${subsquidErr}`);
-			return new Map();
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching vote metrics for proposals from Subsquid');
 		}
 
 		const metricsMap = new Map<number, { ayes: string; nays: string; support: string; bareAyes: string }>();

@@ -4,12 +4,27 @@
 
 import { useTranslations } from 'next-intl';
 
-function TabCard() {
+interface TabCardProps {
+	cohortNumber: number;
+	delegates: number;
+	guardians: number;
+	tracks: number;
+}
+
+function TabCard({ cohortNumber, delegates, guardians, tracks }: TabCardProps) {
 	const t = useTranslations('DecentralizedVoices');
+
 	return (
 		<div className='mb-4 w-full bg-bg_modal p-4 md:mb-8 md:p-8 md:px-20'>
 			<p className='text-[28px] font-semibold text-text_primary'>{t('People')}</p>
-			<p className='pt-2 text-sm font-medium text-text_primary'>{t('PeopleDescription')}</p>
+			<p className='pt-2 text-sm font-medium text-text_primary'>
+				{t('PeopleDescription', {
+					cohortNumber,
+					delegates,
+					guardians,
+					tracks
+				})}
+			</p>
 		</div>
 	);
 }

@@ -87,22 +87,21 @@ export function filterReferendaForDelegate(
 	delegateEndBlock: number | null
 ): number[] {
 	const endBlock = delegateEndBlock ?? Number.MAX_SAFE_INTEGER;
-	const isOngoingDelegate = delegateEndBlock === null;
 
 	return referenda
 		.filter((r) => {
-			const proposalStart = r.createdAtBlock || 0;
-			const proposalEnd = r.updatedAtBlock || 0;
+			const createdAt = r.createdAtBlock || 0;
+			const updatedAt = r.updatedAtBlock;
 
-			if (isOngoingDelegate) {
-				return true;
+			if (!createdAt && !updatedAt) {
+				return delegateEndBlock === null;
 			}
 
-			if (proposalEnd > 0) {
-				return proposalEnd >= delegateStartBlock && proposalEnd <= endBlock;
+			if (!updatedAt || updatedAt === 0) {
+				return createdAt >= delegateStartBlock && createdAt <= endBlock;
 			}
 
-			return proposalStart <= endBlock;
+			return updatedAt >= delegateStartBlock && updatedAt <= endBlock;
 		})
 		.map((r) => r.index);
 }
@@ -179,9 +178,14 @@ export function calculateVoteStats(votes: IProfileVote[], cohortEndTime?: Date):
 			}
 		}
 
-		const isClosed = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Rejected, EProposalStatus.TimedOut, EProposalStatus.Cancelled].includes(
-			status as EProposalStatus
-		);
+		const isClosed = [
+			EProposalStatus.Executed,
+			EProposalStatus.Approved,
+			EProposalStatus.Rejected,
+			EProposalStatus.TimedOut,
+			EProposalStatus.Cancelled,
+			EProposalStatus.Confirmed
+		].includes(status as EProposalStatus);
 
 		if (decision === EVoteDecision.AYE) {
 			ayeCount += 1;

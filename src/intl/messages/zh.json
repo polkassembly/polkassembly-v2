@@ -1691,7 +1691,7 @@
 		"W3FDelegation": "W3F 代表团",
 		"Days": "天",
 		"People": "人员",
-		"PeopleDescription": "去中心化声音计划通过委托数百万 DOT 来增强社区在 OpenGov 中的广泛参与。最新的 DV 群组是第 5 期，有 7 名代表和 5 名监护人。最新的 DV 群组支持 7 个轨道",
+		"PeopleDescription": "去中心化声音计划通过委托数百万 DOT 来增强社区在 OpenGov 中的广泛参与。最新的 DV 群组是第 {cohortNumber} 期，有 {delegates} 名代表和 {guardians} 名监护人。最新的 DV 群组支持 {tracks} 个轨道",
 		"PercentOfDV": "% 的 DV"
 	}
 }

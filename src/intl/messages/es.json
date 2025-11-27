@@ -1692,7 +1692,7 @@
 		"W3FDelegation": "DELEGACIÓN W3F",
 		"Days": "días",
 		"People": "Personas",
-		"PeopleDescription": "El programa Voces Descentralizadas empodera una participación comunitaria más amplia en OpenGov mediante la delegación de millones de DOT. La última cohorte de DV es la 5 con 7 delegados y 5 guardianes. La última cohorte de DV apoya 7 pistas",
+		"PeopleDescription": "El programa Voces Descentralizadas empodera una participación comunitaria más amplia en OpenGov mediante la delegación de millones de DOT. La última cohorte de DV es la {cohortNumber} con {delegates} delegados y {guardians} guardianes. La última cohorte de DV apoya {tracks} pistas",
 		"PercentOfDV": "% de DV"
 	}
 }

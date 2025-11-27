@@ -74,8 +74,7 @@ function VoteRow({ vote, network }: { vote: IDVDelegateVote; network: ENetwork }
 					<span className={cn('text-sm font-medium', statusColor)}>{statusText}</span>
 					{!isNoVote && (
 						<span className='text-text_secondary text-sm'>
-							{vote.percentage?.toFixed(2)}
-							{t('PercentOfDV')}
+							{vote.percentage?.toFixed(2)} {t('PercentOfDV')}
 						</span>
 					)}
 					<div className={cn('flex h-5 w-5 items-center justify-center rounded-full', iconBg)}>{icon}</div>

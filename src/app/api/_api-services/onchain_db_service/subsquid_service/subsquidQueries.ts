@@ -336,6 +336,7 @@ export class SubsquidQueries {
 				index
 				tally {
 					ayes
+					bareAyes
 					nays
 					support
 				}

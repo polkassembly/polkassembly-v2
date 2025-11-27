@@ -289,7 +289,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 							<table className='w-full table-auto border-collapse'>
 								<thead>
 									<tr className='border-b border-border_grey text-left text-xs font-semibold text-text_primary'>
-										<th className='sticky left-0 z-10 w-64 bg-bg_modal py-4 pl-4 uppercase'>{t('DAO')}</th>
+										<th className='sticky left-0 z-10 w-64 bg-bg_modal py-4 pl-4 uppercase'>{activeTab === EDVDelegateType.DAO ? t('DAO') : t('Guardian').toUpperCase()}</th>{' '}
 										{referendums.map((ref) => (
 											<th
 												key={ref}

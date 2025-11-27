@@ -1664,9 +1664,9 @@
 		"Reset": "Reset",
 		"NewestToOldest": "Newest to Oldest",
 		"ParticipationHighToLow": "Participation % (High to Low)",
-		"VotesCastedHighToLow": "Votes Casted (High to Low)",
+		"VotesCastedHighToLow": "Votes Cast (High to Low)",
 		"Name": "Name",
-		"VotesCasted": "Votes Casted",
+		"VotesCasted": "Votes Cast",
 		"VoteCount": "Vote Count",
 		"Participation": "Participation",
 		"WinRate": "Win Rate",
@@ -1675,7 +1675,7 @@
 		"WinningVotesTotalNonAbstainVotes": "Winning Votes / Total Non-Abstain Votes",
 		"DecentralizedVoicesVoting": "Decentralized Voices Voting",
 		"Across": "across",
-		"Referendums": "referendums",
+		"Referendums": "referenda",
 		"Compact": "Compact",
 		"Heatmap": "Heatmap",
 		"SupportRate": "Support Rate",
@@ -1720,7 +1720,7 @@
 		"W3FDelegation": "W3F DELEGATION",
 		"Days": "days",
 		"People": "People",
-		"PeopleDescription": "The Decentralized Voices program empowers broader community participation in OpenGov by delegating millions of DOT. The latest DV cohort is 5 with 7 delegates and 5 guardians. The latest DV cohort supports 7 tracks",
+		"PeopleDescription": "The Decentralized Voices program empowers broader community participation in OpenGov by delegating millions of DOT. The latest DV cohort is {cohortNumber} with {delegates} delegates and {guardians} guardians. The latest DV cohort supports {tracks} tracks",
 		"PercentOfDV": "% of DV"
 	}
 }

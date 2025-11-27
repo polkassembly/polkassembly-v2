@@ -22,7 +22,7 @@ const KUSAMA_COHORT_1: IDVCohort = {
 	startBlock: 22045831,
 	endTime: new Date('2024-06-10T16:57:42Z'),
 	endBlock: 23551323,
-	delegatesCount: 6,
+	delegatesCount: 5,
 	guardiansCount: 0,
 	delegationPerDelegate: 30000,
 	delegationPerGuardian: 0,
@@ -57,7 +57,8 @@ const KUSAMA_COHORT_2: IDVCohort = {
 		{ address: 'H1qzURXmYGLfwMsviLpMeN8S9zjAPmc1LBCSeQkCAieKUFs', type: EDVDelegateType.DAO, startBlock: 23749289, endBlock: 25266038 },
 		{ address: 'FDL99LDYERjevxPnXBjNGHZv13FxCGHrqh2N5zWQXx1finf', type: EDVDelegateType.DAO, startBlock: 23706462, endBlock: 25266052 },
 		{ address: 'CpjsLDC1JFyrhm3ftC9Gs4QoyrkHKhZKtK7YqGTRFtTafgp', type: EDVDelegateType.DAO, startBlock: 23694996, endBlock: 25266027 },
-		{ address: 'Ftuq9bHvQb5NiU5JA7q79fxYn9FVBeRjNBHL3RH5raN9qck', type: EDVDelegateType.DAO, startBlock: 23706476, endBlock: 25266052 }
+		{ address: 'Ftuq9bHvQb5NiU5JA7q79fxYn9FVBeRjNBHL3RH5raN9qck', type: EDVDelegateType.DAO, startBlock: 23706476, endBlock: 25266052 },
+		{ address: 'GqC37KSFFeGAoL7YxSeP1YDwr85WJvLmDDQiSaprTDAm8Jj', type: EDVDelegateType.DAO, startBlock: 23694996, endBlock: 25266027 }
 	]
 };
 

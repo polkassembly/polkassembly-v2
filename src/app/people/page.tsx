@@ -9,11 +9,10 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useDVDelegates, useDVInfluence, useDVVotingMatrix } from '@/hooks/useDVDelegates';
-import { EDVTrackFilter } from '@/_shared/types';
+import { ECohortStatus, EDVTrackFilter, EDVDelegateType } from '@/_shared/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getCurrentDVCohort } from '@/_shared/_utils/dvDelegateUtils';
-import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import TabCard from './Components/TabCard';
 import CohortCard from './Components/CohortCard';
 import InfluenceCard from './Components/InfluenceCard';
@@ -28,7 +27,7 @@ function PeoplePage() {
 
 	const network = getCurrentNetwork();
 	const currentCohort = getCurrentDVCohort(network);
-	const cohortId = cohortIndexParam ? parseInt(cohortIndexParam, DEFAULT_LISTING_LIMIT) : (currentCohort?.index ?? 5);
+	const cohortId = cohortIndexParam ? parseInt(cohortIndexParam, 10) : (currentCohort?.index ?? 5);
 
 	const [trackFilter, setTrackFilter] = useState<EDVTrackFilter>(EDVTrackFilter.DV_TRACKS);
 
@@ -42,12 +41,21 @@ function PeoplePage() {
 	const votingMatrix = votingMatrixData?.delegates || [];
 	const referendumIndices = votingMatrixData?.referendumIndices || [];
 
+	const delegates = cohort?.delegates?.filter((d) => d.type === EDVDelegateType.DAO).length;
+	const guardians = cohort?.delegates?.filter((d) => d.type === EDVDelegateType.GUARDIAN).length;
+	const tracks = cohort?.tracks?.length;
+
 	const error = delegatesError || influenceError || votingMatrixError;
 
 	if (error || (!delegatesLoading && !cohort)) {
 		return (
 			<div className='min-h-screen bg-page_background'>
-				<TabCard />
+				<TabCard
+					cohortNumber={cohortId}
+					delegates={delegates || 0}
+					guardians={guardians || 0}
+					tracks={tracks || 0}
+				/>
 				<div className='flex h-96 items-center justify-center'>
 					<p className='text-text_secondary'>{(typeof error === 'string' ? error : error?.message) || 'No active DV cohort found for this network'}</p>
 				</div>
@@ -57,7 +65,12 @@ function PeoplePage() {
 
 	return (
 		<div className='min-h-screen bg-page_background'>
-			<TabCard />
+			<TabCard
+				cohortNumber={cohort?.index ?? cohortId}
+				delegates={delegates || 0}
+				guardians={guardians || 0}
+				tracks={tracks || 0}
+			/>
 			<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 				<div className='mb-4 w-full overflow-hidden rounded-2xl border border-border_grey bg-bg_modal p-4 shadow-md sm:p-5 md:mb-8 md:p-6 lg:p-8'>
 					<div className='flex items-center justify-between gap-3'>
@@ -65,7 +78,9 @@ function PeoplePage() {
 							<Activity className='h-5 w-5 text-border_blue sm:h-6 sm:w-6' />
 							<h2 className='flex flex-wrap items-center gap-2 text-xl font-semibold text-navbar_title sm:text-2xl lg:text-3xl'>
 								{t('Cohort')} #{delegatesLoading ? '...' : (cohort?.index ?? '...')}{' '}
-								<span className={`rounded-full px-2 py-0.5 text-[10px] text-btn_primary_text sm:text-xs ${cohort?.status === 'Ongoing' ? 'bg-border_blue' : 'bg-progress_nay'}`}>
+								<span
+									className={`rounded-full px-2 py-0.5 text-[10px] text-btn_primary_text sm:text-xs ${cohort?.status === ECohortStatus.ONGOING ? 'bg-border_blue' : 'bg-progress_nay'}`}
+								>
 									{cohort?.status ?? 'Loading'}
 								</span>
 							</h2>

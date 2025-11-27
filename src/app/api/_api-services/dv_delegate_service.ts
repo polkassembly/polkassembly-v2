@@ -36,6 +36,7 @@ import {
 	calculateVoteStats,
 	getAdjustedStartBlock
 } from '@/_shared/_utils/dvDelegateUtils';
+import { getTrackFunctions } from '@/app/_client-utils/trackCurvesUtils';
 
 export class DVDelegateService {
 	static async GetCohortReferenda(
@@ -335,23 +336,44 @@ export class DVDelegateService {
 	}
 
 	private static CalculateInfluenceStatus(
-		referendum: { status: string | EProposalStatus; voteMetrics?: Partial<IVoteMetrics>; index?: number },
+		referendum: { status: string | EProposalStatus; voteMetrics?: Partial<IVoteMetrics>; index?: number; origin?: string },
 		dvAyeTotal: bigint,
-		dvNayTotal: bigint
+		dvNayTotal: bigint,
+		network: ENetwork
 	): EInfluenceStatus {
 		const status = referendum.status as EProposalStatus;
 
-		const noNeedComparison = [EProposalStatus.TimedOut, EProposalStatus.Killed, EProposalStatus.Cancelled, EProposalStatus.Unknown].includes(status);
+		if (this.shouldSkipInfluenceCalculation(status)) {
+			return EInfluenceStatus.NO_IMPACT;
+		}
 
-		if (noNeedComparison) {
+		if (!this.hasValidVoteData(referendum, status)) {
 			return EInfluenceStatus.NO_IMPACT;
 		}
 
 		const totalAye = BigInt(referendum.voteMetrics?.aye?.value || '0');
 		const totalNay = BigInt(referendum.voteMetrics?.nay?.value || '0');
+		const denominator = totalAye + totalNay;
+
+		const approval = this.calculateApprovalThreshold(referendum, network, denominator);
+
+		const isPass = this.calculateVoteOutcome(totalAye, denominator, approval);
+		const noDvIsPass = this.calculateVoteOutcomeWithoutDV(totalAye, totalNay, dvAyeTotal, dvNayTotal, approval);
+
+		return this.determineInfluenceStatus(isPass, noDvIsPass, dvAyeTotal, dvNayTotal);
+	}
+
+	private static shouldSkipInfluenceCalculation(status: EProposalStatus): boolean {
+		const noNeedComparison = [EProposalStatus.TimedOut, EProposalStatus.Killed, EProposalStatus.Cancelled, EProposalStatus.Unknown];
+		return noNeedComparison.includes(status);
+	}
+
+	private static hasValidVoteData(referendum: { voteMetrics?: Partial<IVoteMetrics> }, status: EProposalStatus): boolean {
+		const totalAye = BigInt(referendum.voteMetrics?.aye?.value || '0');
+		const totalNay = BigInt(referendum.voteMetrics?.nay?.value || '0');
 
 		if (!referendum.voteMetrics || (totalAye === BigInt(0) && totalNay === BigInt(0))) {
-			const isFinalState = [
+			return [
 				EProposalStatus.Executed,
 				EProposalStatus.Deciding,
 				EProposalStatus.Active,
@@ -359,40 +381,52 @@ export class DVDelegateService {
 				EProposalStatus.DecisionDepositPlaced,
 				EProposalStatus.Rejected
 			].includes(status);
-			if (!isFinalState) {
-				return EInfluenceStatus.NO_IMPACT;
-			}
+		}
+		return true;
+	}
+
+	private static calculateApprovalThreshold(referendum: { origin?: string; voteMetrics?: Partial<IVoteMetrics> }, network: ENetwork, denominator: bigint): number {
+		if (!referendum.origin) {
+			return 0.5;
 		}
 
-		const approval = 0.5;
+		const { approvalCalc } = getTrackFunctions({ network, trackName: referendum.origin as EPostOrigin });
+		if (!approvalCalc) {
+			return 0.5;
+		}
 
-		const denominator = totalAye + totalNay;
+		const totalSupport = BigInt(referendum.voteMetrics?.support?.value || '0');
+		const supportPercentage = totalSupport > BigInt(0) ? Number(denominator * BigInt(10000)) / Number(totalSupport) / 100 : 0;
+		return approvalCalc(Math.min(supportPercentage, 100)) / 100;
+	}
+
+	private static calculateVoteOutcome(totalAye: bigint, denominator: bigint, approval: number): boolean {
+		if (denominator <= BigInt(0)) {
+			return false;
+		}
+		const ayeRatio = Number(totalAye * BigInt(1000000)) / Number(denominator * BigInt(1000000));
+		return ayeRatio > approval;
+	}
+
+	private static calculateVoteOutcomeWithoutDV(totalAye: bigint, totalNay: bigint, dvAyeTotal: bigint, dvNayTotal: bigint, approval: number): boolean {
 		const noDvAye = totalAye >= dvAyeTotal ? totalAye - dvAyeTotal : BigInt(0);
 		const noDvNay = totalNay >= dvNayTotal ? totalNay - dvNayTotal : BigInt(0);
 		const noDvDenominator = noDvAye + noDvNay;
 
-		let isPass = false;
-		if (denominator > BigInt(0)) {
-			const ayeRatio = Number(totalAye * BigInt(1000000)) / Number(denominator * BigInt(1000000));
-			isPass = ayeRatio > approval;
+		if (noDvDenominator <= BigInt(0)) {
+			return false;
 		}
+		const noDvAyeRatio = Number(noDvAye * BigInt(1000000)) / Number(noDvDenominator * BigInt(1000000));
+		return noDvAyeRatio > approval;
+	}
 
-		let noDvIsPass = false;
-		if (noDvDenominator > BigInt(0)) {
-			const noDvAyeRatio = Number(noDvAye * BigInt(1000000)) / Number(noDvDenominator * BigInt(1000000));
-			noDvIsPass = noDvAyeRatio > approval;
-		}
-
+	private static determineInfluenceStatus(isPass: boolean, noDvIsPass: boolean, dvAyeTotal: bigint, dvNayTotal: bigint): EInfluenceStatus {
 		const hasInfluence = isPass !== noDvIsPass;
-
 		const dvDecidingTotal = dvAyeTotal + dvNayTotal;
 		const dvParticipated = dvDecidingTotal > BigInt(0);
 
 		if (!hasInfluence) {
-			if (dvParticipated) {
-				return EInfluenceStatus.FAILED;
-			}
-			return EInfluenceStatus.NO_IMPACT;
+			return dvParticipated ? EInfluenceStatus.FAILED : EInfluenceStatus.NO_IMPACT;
 		}
 
 		if (isPass && !noDvIsPass) {
@@ -447,7 +481,7 @@ export class DVDelegateService {
 				const dvTotal = dvAyeTotal + dvNayTotal + dvAbstainTotal;
 				const dvDecidingTotal = dvAyeTotal + dvNayTotal;
 
-				const influence = this.CalculateInfluenceStatus(referendum, dvAyeTotal, dvNayTotal);
+				const influence = this.CalculateInfluenceStatus(referendum, dvAyeTotal, dvNayTotal, network);
 
 				const totalValue = BigInt(referendum.voteMetrics?.aye?.value || '0') + BigInt(referendum.voteMetrics?.nay?.value || '0');
 				const ayeValue = BigInt(referendum.voteMetrics?.aye?.value || '0');

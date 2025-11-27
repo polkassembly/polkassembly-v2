@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { getCurrentDVCohort, getDVCohortByIndex } from '@/_shared/_utils/dvDelegateUtils';
-import { EDVTrackFilter } from '@/_shared/types';
+import { EDVTrackFilter, EInfluenceStatus } from '@/_shared/types';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { NextRequest, NextResponse } from 'next/server';
@@ -17,7 +17,7 @@ const querySchema = z.object({
 	cohortId: z.coerce.number().optional(),
 	trackFilter: z.nativeEnum(EDVTrackFilter).optional().default(EDVTrackFilter.DV_TRACKS),
 	sortBy: z.enum(['status', 'votes']).optional(),
-	filterStatus: z.enum(['all', 'aye', 'nay', 'abstain', 'novote']).optional()
+	filterStatus: z.nativeEnum(EInfluenceStatus).optional()
 });
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
@@ -25,7 +25,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	const { searchParams } = new URL(req.url);
 	const queryParams = Object.fromEntries(searchParams.entries());
-	const { cohortId, trackFilter, sortBy } = querySchema.parse(queryParams);
+	const { cohortId, trackFilter, sortBy, filterStatus } = querySchema.parse(queryParams);
 
 	let cohort;
 	if (cohortId !== undefined) {
@@ -38,7 +38,11 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'No DV cohort found for this network');
 	}
 
-	const referenda = await DVDelegateService.GetInfluence(network, cohort, trackFilter);
+	let referenda = await DVDelegateService.GetInfluence(network, cohort, trackFilter);
+
+	if (filterStatus) {
+		referenda = referenda.filter((r) => r.influence === filterStatus);
+	}
 
 	if (sortBy === 'status') {
 		referenda.sort((a, b) => a.status.localeCompare(b.status));

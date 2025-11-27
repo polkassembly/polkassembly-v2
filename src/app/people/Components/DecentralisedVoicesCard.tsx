@@ -33,6 +33,9 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 	const filteredDelegates = activeTab === EDVDelegateType.DAO ? daos : guardians;
 
 	const sortedDelegates = [...filteredDelegates].sort((a, b) => {
+		if (sortOptions.newestToOldest) {
+			return b.startBlock - a.startBlock;
+		}
 		if (sortOptions.participationHighToLow) {
 			return b.voteStats.participation - a.voteStats.participation;
 		}

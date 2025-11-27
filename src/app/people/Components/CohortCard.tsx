@@ -92,7 +92,7 @@ function CohortCard({ cohort, loading }: CohortCardProps) {
 					</div>
 				</div>
 
-				{!isOngoing && endDateTime && (
+				{!isOngoing && endDateTime && cohort.endBlock && (
 					<div className='flex items-start gap-4'>
 						<Image
 							src={timer}
@@ -104,7 +104,7 @@ function CohortCard({ cohort, loading }: CohortCardProps) {
 							<p className='whitespace-nowrap text-lg font-semibold text-text_primary'>
 								{endDateTime.date} <span className='text-wallet_btn_text'>{endDateTime.time}</span>
 							</p>
-							<p className='text-xs text-wallet_btn_text'>#{cohort.endBlock?.toLocaleString()}</p>
+							<p className='text-xs text-wallet_btn_text'>#{cohort.endBlock.toLocaleString()}</p>
 						</div>
 					</div>
 				)}

@@ -65,8 +65,10 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 	const dvTotalPower = dvAyePower + dvNayPower + dvAbstainPower;
 
 	const dvDecidingPower = dvAyePower + dvNayPower;
-	const ayePercentBar = dvDecidingPower > 0 ? Number((dvAyePower * BigInt(100)) / dvDecidingPower) : 0;
-	const nayPercentBar = dvDecidingPower > 0 ? Number((dvNayPower * BigInt(100)) / dvDecidingPower) : 0;
+
+	const ayePercentBar = dvTotalPower > 0 ? Number((dvAyePower * BigInt(10000)) / dvTotalPower) / 100 : 0;
+	const nayPercentBar = dvTotalPower > 0 ? Number((dvNayPower * BigInt(10000)) / dvTotalPower) / 100 : 0;
+	const abstainPercentBar = dvTotalPower > 0 ? Number((dvAbstainPower * BigInt(10000)) / dvTotalPower) / 100 : 0;
 
 	const totalChainAyePower = BigInt(data.ayeVotingPower || '0');
 	const totalChainNayPower = BigInt(data.nayVotingPower || '0');
@@ -107,17 +109,25 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 							{ayePercentBar > 0 && (
 								<div
 									className='flex items-center justify-center bg-aye_color text-xs font-semibold text-btn_primary_text'
-									style={{ width: `${ayePercentBar}%` }}
+									style={{ width: `${ayePercentBar.toFixed(1)}%` }}
 								>
-									{ayePercentBar}%
+									{ayePercentBar.toFixed(1)}%
 								</div>
 							)}
 							{nayPercentBar > 0 && (
 								<div
 									className='flex items-center justify-center bg-nay_color text-xs font-semibold text-btn_primary_text'
-									style={{ width: `${nayPercentBar}%` }}
+									style={{ width: `${nayPercentBar.toFixed(1)}%` }}
 								>
-									{nayPercentBar}%
+									{nayPercentBar.toFixed(1)}%
+								</div>
+							)}
+							{abstainPercentBar > 0 && (
+								<div
+									className='flex items-center justify-center bg-abstain_color text-xs font-semibold text-btn_primary_text'
+									style={{ width: `${abstainPercentBar.toFixed(1)}%` }}
+								>
+									{abstainPercentBar.toFixed(1)}%
 								</div>
 							)}
 						</div>
