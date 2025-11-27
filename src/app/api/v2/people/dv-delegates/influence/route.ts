@@ -9,9 +9,11 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { NextRequest, NextResponse } from 'next/server';
 import { DVDelegateService } from '@/app/api/_api-services/dv_delegate_service';
 import { z } from 'zod';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { StatusCodes } from 'http-status-codes';
 
 const querySchema = z.object({
-	cohortIndex: z.coerce.number().optional(),
 	cohortId: z.coerce.number().optional(),
 	trackFilter: z.nativeEnum(EDVTrackFilter).optional().default(EDVTrackFilter.DV_TRACKS),
 	sortBy: z.enum(['status', 'votes']).optional(),
@@ -23,19 +25,17 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	const { searchParams } = new URL(req.url);
 	const queryParams = Object.fromEntries(searchParams.entries());
-	const { cohortIndex: cohortIndexParam, cohortId, trackFilter, sortBy } = querySchema.parse(queryParams);
-
-	const cohortParam = cohortId ?? cohortIndexParam;
+	const { cohortId, trackFilter, sortBy } = querySchema.parse(queryParams);
 
 	let cohort;
-	if (cohortParam !== undefined) {
-		cohort = getDVCohortByIndex(network, cohortParam);
+	if (cohortId !== undefined) {
+		cohort = getDVCohortByIndex(network, cohortId);
 	} else {
 		cohort = getCurrentDVCohort(network);
 	}
 
 	if (!cohort) {
-		return NextResponse.json({ error: 'No DV cohort found for this network' }, { status: 404 });
+		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'No DV cohort found for this network');
 	}
 
 	const referenda = await DVDelegateService.getInfluence(network, cohort, trackFilter);
