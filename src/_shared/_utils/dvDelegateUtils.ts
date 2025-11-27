@@ -2,9 +2,39 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import dayjs from 'dayjs';
 import { DV_COHORTS_KUSAMA, DV_COHORTS_POLKADOT } from '../_constants/dvCohorts';
 import { NETWORKS_DETAILS } from '../_constants/networks';
 import { ECohortStatus, ENetwork, IDVCohort, EDVDelegateType, EVoteDecision, IProfileVote, EProposalStatus, IStatusHistoryItem, IOnChainPostListing } from '../types';
+
+export function formatNumber(num: number): string {
+	if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+	if (num >= 1000) return `${(num / 1000).toFixed(0)}K`;
+	return num.toString();
+}
+
+export function formatDate(date: Date): { date: string; time: string } {
+	const d = dayjs(date);
+	return { date: d.format("MMM D 'YY"), time: d.format('HH:mm:ss') };
+}
+
+export function formatDateWithYear(date: Date): string {
+	return dayjs(date).format("MMM D 'YY");
+}
+
+export function formatDateRange(startDate: Date, endDate?: Date, isOngoing?: boolean): string {
+	const startStr = formatDateWithYear(startDate);
+	if (isOngoing) {
+		return startStr;
+	}
+	const endStr = endDate ? formatDateWithYear(endDate) : '';
+	return `${startStr} - ${endStr}`;
+}
+
+export function getCohortTenureDays(cohort: IDVCohort): number {
+	const endDate = cohort.endTime || new Date();
+	return Math.floor((endDate.getTime() - cohort.startTime.getTime()) / (1000 * 60 * 60 * 24));
+}
 
 export function getDVCohortsByNetwork(network: ENetwork): IDVCohort[] {
 	if (network === ENetwork.KUSAMA) return DV_COHORTS_KUSAMA;

@@ -6,25 +6,14 @@ import delegates from '@assets/delegation/delegates.svg';
 import delegatees from '@assets/delegation/delegatees.svg';
 import timer from '@assets/icons/timer.svg';
 import Image from 'next/image';
-import dayjs from 'dayjs';
 import { useTranslations } from 'next-intl';
 import { IDVCohort, ECohortStatus } from '@/_shared/types';
+import { formatNumber, formatDate } from '@/_shared/_utils/dvDelegateUtils';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 
 interface CohortCardProps {
 	cohort: IDVCohort | null;
 	loading?: boolean;
-}
-
-function formatNumber(num: number): string {
-	if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-	if (num >= 1000) return `${(num / 1000).toFixed(0)}K`;
-	return num.toString();
-}
-
-function formatDate(date: Date): { date: string; time: string } {
-	const d = dayjs(date);
-	return { date: d.format("MMM D 'YY"), time: d.format('HH:mm:ss') };
 }
 
 function CohortCard({ cohort, loading }: CohortCardProps) {

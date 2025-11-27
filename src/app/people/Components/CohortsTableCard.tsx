@@ -11,30 +11,10 @@ import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { getDVCohortsByNetwork } from '@/_shared/_utils/dvDelegateUtils';
-import dayjs from 'dayjs';
-import { ENetwork, IDVCohort, ECohortStatus } from '@/_shared/types';
+import { getDVCohortsByNetwork, formatNumber, formatDateRange, getCohortTenureDays } from '@/_shared/_utils/dvDelegateUtils';
+import { ENetwork, ECohortStatus } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-
-function formatNumber(num: number): string {
-	if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-	if (num >= 1000) return `${(num / 1000).toFixed(0)}K`;
-	return num.toString();
-}
-
-const formatDateWithYear = (date: Date): string => {
-	return dayjs(date).format("MMM D 'YY");
-};
-
-function formatDateRange(startDate: Date, endDate?: Date, isOngoing?: boolean): string {
-	const startStr = formatDateWithYear(startDate);
-	if (isOngoing) {
-		return startStr;
-	}
-	const endStr = endDate ? formatDateWithYear(endDate) : '';
-	return `${startStr} - ${endStr}`;
-}
 
 function CohortsTableCard() {
 	const t = useTranslations('DecentralizedVoices');
@@ -54,10 +34,6 @@ function CohortsTableCard() {
 		router.push(`/people?${params.toString()}`);
 	};
 
-	function getCohortTenureDays(cohort: IDVCohort): number {
-		const endDate = cohort.endTime || new Date();
-		return Math.floor((endDate.getTime() - cohort.startTime.getTime()) / (1000 * 60 * 60 * 24));
-	}
 	return (
 		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6 shadow-md'>
 			<div className='mb-6 flex items-center gap-2'>
