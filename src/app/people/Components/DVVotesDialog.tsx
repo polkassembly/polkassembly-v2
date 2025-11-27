@@ -3,92 +3,19 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
-import { IDVReferendumInfluence, EDVDelegateType, IDVDelegateVote, EVoteDecision, ENetwork } from '@/_shared/types';
+import { IDVReferendumInfluence, EDVDelegateType, IDVDelegateVote, EVoteDecision } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { Ban, Check, Minus, X } from 'lucide-react';
 import TwoUser from '@assets/icons/2User.svg';
 import Image from 'next/image';
-import Address from '@/app/_shared-components/Profile/Address/Address';
 import { cn } from '@/lib/utils';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
+import VoteRow from './VoteRow';
 
 interface DVVotesDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	data: IDVReferendumInfluence | null;
-}
-
-const getVoteStyles = (decision: EVoteDecision | 'novote' | string) => {
-	switch (decision) {
-		case 'novote':
-			return {
-				containerBg: 'bg-text_secondary/20',
-				icon: <Minus size={12} />,
-				iconBg: 'bg-text_secondary/20 text-text_secondary',
-				statusColor: 'text-text_secondary',
-				statusText: ''
-			};
-		case EVoteDecision.AYE:
-			return {
-				containerBg: 'bg-aye_color/10',
-				icon: <Check size={12} />,
-				iconBg: 'bg-aye_color text-white',
-				statusColor: 'text-success',
-				statusText: 'Aye'
-			};
-		case EVoteDecision.NAY:
-			return {
-				containerBg: 'bg-nay_color/10',
-				icon: <X size={12} />,
-				iconBg: 'bg-nay_color text-white',
-				statusColor: 'text-failure_vote_text',
-				statusText: 'Nay'
-			};
-		case EVoteDecision.ABSTAIN:
-			return {
-				containerBg: 'bg-abstain_color/10',
-				icon: <Ban size={12} />,
-				iconBg: 'bg-abstain_color text-white',
-				statusColor: 'text-blue-500',
-				statusText: 'Abstain'
-			};
-		default:
-			return {
-				containerBg: 'bg-text_secondary/20',
-				icon: <Minus size={12} />,
-				iconBg: 'bg-abstain_color text-white',
-				statusColor: 'text-blue-500',
-				statusText: 'Abstain'
-			};
-	}
-};
-
-function VoteRow({ vote, network }: { vote: IDVDelegateVote; network: ENetwork }) {
-	const { decision } = vote;
-	const isNoVote = decision === 'novote';
-	const { statusColor, statusText, iconBg, containerBg, icon } = getVoteStyles(decision);
-
-	return (
-		<div className={cn('flex items-center justify-between rounded-lg p-3', containerBg)}>
-			<Address
-				address={vote.address}
-				disableTooltip
-				iconSize={24}
-				textClassName='font-semibold text-text_primary'
-			/>
-			<div className='flex items-center gap-8'>
-				<div className='flex items-center gap-2'>
-					<span className={cn('text-sm font-medium', statusColor)}>{statusText}</span>
-					{!isNoVote && <span className='text-text_secondary text-sm'>{vote.percentage?.toFixed(2)}% of DV</span>}
-					<div className={cn('flex h-5 w-5 items-center justify-center rounded-full', iconBg)}>{icon}</div>
-				</div>
-				<span className={cn('min-w-[80px] text-right text-sm font-medium', isNoVote ? 'text-text_secondary' : 'text-success')}>
-					{isNoVote ? '-' : `(~${formatUSDWithUnits(formatBnBalance(vote.votingPower || '0', { withUnit: true, numberAfterComma: 2 }, network))})`}
-				</span>
-			</div>
-		</div>
-	);
 }
 
 export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialogProps) {
