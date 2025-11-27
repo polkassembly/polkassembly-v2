@@ -222,7 +222,7 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 														<TooltipTrigger className='text-bodyBlue dark:text-blue-dark-high cursor-help font-medium'>
 															{delegate.voteStats.participation.toFixed(2)} %
 														</TooltipTrigger>
-														<TooltipContent className='bg-gray-800 text-white'>
+														<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
 															<p>Votes Cast / Total Eligible Referenda</p>
 														</TooltipContent>
 													</Tooltip>
@@ -232,7 +232,7 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 												<TooltipProvider>
 													<Tooltip>
 														<TooltipTrigger className='cursor-help font-medium text-green-500'>{delegate.voteStats.winRate.toFixed(2)} %</TooltipTrigger>
-														<TooltipContent className='bg-gray-800 text-white'>
+														<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
 															<p>Winning Votes / Total Non-Abstain Votes</p>
 														</TooltipContent>
 													</Tooltip>
