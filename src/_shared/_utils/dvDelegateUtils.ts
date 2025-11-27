@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { DV_COHORTS_KUSAMA, DV_COHORTS_POLKADOT } from '../_constants/dvCohorts';
+import { NETWORKS_DETAILS } from '../_constants/networks';
 import { ECohortStatus, ENetwork, IDVCohort, EDVDelegateType, EVoteDecision, IProfileVote, EProposalStatus, IStatusHistoryItem, IOnChainPostListing } from '../types';
 
 export function getDVCohortsByNetwork(network: ENetwork): IDVCohort[] {
@@ -19,6 +20,17 @@ export function getCurrentDVCohort(network: ENetwork): IDVCohort | null {
 export function getDVCohortByIndex(network: ENetwork, index: number): IDVCohort | null {
 	const cohorts = getDVCohortsByNetwork(network);
 	return cohorts.find((c) => c.index === index) || null;
+}
+
+export function getOneMonthBufferInBlocks(network: ENetwork): number {
+	const { blockTime } = NETWORKS_DETAILS[network];
+	const oneMonthInMs = 30 * 24 * 60 * 60 * 1000;
+	return Math.floor(oneMonthInMs / blockTime);
+}
+
+export function getAdjustedStartBlock(network: ENetwork, startBlock: number): number {
+	const buffer = getOneMonthBufferInBlocks(network);
+	return Math.max(0, startBlock - buffer);
 }
 
 export function getDelegatesByType(cohort: IDVCohort, type: EDVDelegateType) {
@@ -59,11 +71,21 @@ export function filterReferendaForDelegate(
 }
 
 export function isReferendumActiveForDelegate(referendum: { createdAtBlock?: number; updatedAtBlock?: number }, delegate: IDVCohort['delegates'][0]): boolean {
-	const endBlock = delegate.endBlock ?? Number.MAX_SAFE_INTEGER;
-	if (!referendum.createdAtBlock && !referendum.updatedAtBlock) return true;
+	const isOngoingDelegate = delegate.endBlock === null;
 
-	const effectiveEnd = referendum.updatedAtBlock || referendum.createdAtBlock || 0;
-	return effectiveEnd >= delegate.startBlock && effectiveEnd <= endBlock;
+	if (!referendum.createdAtBlock && !referendum.updatedAtBlock) {
+		return isOngoingDelegate;
+	}
+
+	const endBlock = delegate.endBlock ?? Number.MAX_SAFE_INTEGER;
+	const createdAt = referendum.createdAtBlock || 0;
+	const updatedAt = referendum.updatedAtBlock;
+
+	if (!updatedAt || updatedAt === 0) {
+		return createdAt >= delegate.startBlock && createdAt <= endBlock;
+	}
+
+	return updatedAt >= delegate.startBlock && updatedAt <= endBlock;
 }
 
 export function getVotePower(vote: IProfileVote): bigint {

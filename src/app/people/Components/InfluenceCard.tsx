@@ -17,6 +17,7 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
+import Link from 'next/link';
 import DVVotesDialog from './DVVotesDialog';
 
 interface InfluenceCardProps {
@@ -289,9 +290,12 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 										key={item.index}
 										className='cursor-pointer border-b border-border_grey text-sm font-semibold hover:border-border_grey/90'
 									>
-										<td className='py-4 pl-4 font-medium text-text_primary'>
-											#{item.index} {item.title}
+										<td className='max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap py-4 pr-10 font-medium text-text_primary'>
+											<Link href={`/referenda/${item.index}`}>
+												#{item?.index} {item?.title}
+											</Link>
 										</td>
+
 										<td className='py-4'>
 											<span className={`${getSpanStyle(item.track || '', 1)} rounded-md px-1.5 py-1 text-xs`}>{convertCamelCaseToTitleCase(item.track || '')}</span>
 										</td>

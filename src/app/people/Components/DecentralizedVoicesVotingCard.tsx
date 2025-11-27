@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { Check, X, Minus, LayoutList, LayoutGrid, ChevronDown, ChevronUp, Filter } from 'lucide-react';
-import { IDVDelegateVotingMatrix, IDVCohort } from '@/_shared/types';
+import { IDVDelegateVotingMatrix, IDVCohort, EDVDelegateType } from '@/_shared/types';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 
@@ -20,14 +20,18 @@ type SortOption = 'name' | 'participation' | 'supportRate' | 'activity';
 function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort, loading }: DecentralizedVoicesVotingCardProps) {
 	const referendums = referendumIndices.length > 0 ? referendumIndices : [0];
 	const [viewMode, setViewMode] = useState<'compact' | 'heatmap'>('compact');
+	const [activeTab, setActiveTab] = useState<'DAO' | 'GUARDIAN'>('DAO');
 	const [expandedRows, setExpandedRows] = useState<string[]>(votingMatrix.length > 0 ? [votingMatrix[0].address] : []); // Default first one expanded
 	const [sortBy, setSortBy] = useState<SortOption>('activity');
 
 	const minRef = referendums.length > 0 ? Math.min(...referendums) : 0;
 	const maxRef = referendums.length > 0 ? Math.max(...referendums) : 0;
-	const daoCount = cohort?.delegatesCount ?? 0;
 
-	const sortedVoicesData = [...votingMatrix].sort((a, b) => {
+	const daos = votingMatrix.filter((d) => d.type === EDVDelegateType.DAO);
+	const guardians = votingMatrix.filter((d) => d.type === EDVDelegateType.GUARDIAN);
+	const filteredVotingMatrix = activeTab === 'DAO' ? daos : guardians;
+
+	const sortedVoicesData = [...filteredVotingMatrix].sort((a, b) => {
 		switch (sortBy) {
 			case 'name':
 				return a.address.localeCompare(b.address);
@@ -87,17 +91,38 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 	return (
 		<div className='my-4 w-full max-w-full overflow-hidden rounded-3xl border border-border_grey bg-bg_modal p-6'>
 			<div className='mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
-				<div>
-					<h2 className='text-2xl font-semibold text-navbar_title'>Decentralized Voices Voting</h2>
-					<p className='text-text_secondary text-sm'>
-						{loading ? (
-							'...'
-						) : (
-							<>
-								{daoCount} DAOs across {referendums.length} referendums (#{minRef} - #{maxRef})
-							</>
-						)}
-					</p>
+				<div className='flex flex-col gap-4 md:flex-row md:items-center'>
+					<div>
+						<h2 className='text-2xl font-semibold text-navbar_title'>Decentralized Voices Voting</h2>
+						<p className='text-text_secondary text-sm'>
+							{loading ? (
+								'...'
+							) : (
+								<>
+									{activeTab === 'DAO' ? daos.length : guardians.length} {activeTab === 'DAO' ? 'DAOs' : 'Guardians'} across {referendums.length} referendums (#
+									{minRef} - #{maxRef})
+								</>
+							)}
+						</p>
+					</div>
+					{cohort && cohort.guardiansCount > 0 && (
+						<div className='flex rounded-lg bg-sidebar_footer p-1'>
+							<button
+								type='button'
+								onClick={() => setActiveTab('DAO')}
+								className={`rounded px-3 py-0.5 text-sm text-navbar_title transition-colors ${activeTab === 'DAO' && 'bg-section_dark_overlay font-semibold'}`}
+							>
+								DAO ({daos.length})
+							</button>
+							<button
+								type='button'
+								onClick={() => setActiveTab('GUARDIAN')}
+								className={`py-0.6 rounded px-3 text-sm font-medium text-navbar_title transition-colors ${activeTab === 'GUARDIAN' && 'bg-section_dark_overlay font-semibold'}`}
+							>
+								GUARDIAN ({guardians.length})
+							</button>
+						</div>
+					)}
 				</div>
 				<div className='flex items-center gap-4'>
 					<div className='flex items-center rounded-lg border border-border_grey bg-white p-1 dark:bg-black'>

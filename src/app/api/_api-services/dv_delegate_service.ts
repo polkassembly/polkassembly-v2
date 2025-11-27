@@ -25,8 +25,17 @@ import {
 } from '@/_shared/types';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
+import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { RedisService } from '@/app/api/_api-services/redis_service';
-import { fetchAllPages, filterReferendaForDelegate, getDelegatesByType, isReferendumActiveForDelegate, getVotePower, calculateVoteStats } from '@/_shared/_utils/dvDelegateUtils';
+import {
+	fetchAllPages,
+	filterReferendaForDelegate,
+	getDelegatesByType,
+	isReferendumActiveForDelegate,
+	getVotePower,
+	calculateVoteStats,
+	getAdjustedStartBlock
+} from '@/_shared/_utils/dvDelegateUtils';
 
 export class DVDelegateService {
 	static async GetCohortReferenda(
@@ -39,6 +48,7 @@ export class DVDelegateService {
 			status: EProposalStatus;
 			origin: string;
 			description: string;
+			title?: string;
 			voteMetrics: Partial<IVoteMetrics>;
 			createdAtBlock?: number;
 			updatedAtBlock?: number;
@@ -47,13 +57,14 @@ export class DVDelegateService {
 	> {
 		const { startBlock, endBlock } = cohort;
 		const latestBlock = await OnChainDbService.GetLatestBlockNumber(network);
+		const adjustedStartBlock = getAdjustedStartBlock(network, startBlock);
 
 		const delegateAddresses = cohort.delegates.map((d) => d.address);
 		const votedProposalsPromise = fetchAllPages<IOnChainPostListing>(async (page) => {
 			const votesListing = await OnChainDbService.GetVotesForAddressesAndReferenda({
 				network,
 				voters: delegateAddresses,
-				startBlock,
+				startBlock: adjustedStartBlock,
 				endBlock: endBlock || latestBlock,
 				limit: 1000,
 				page
@@ -77,9 +88,9 @@ export class DVDelegateService {
 
 		const recentProposalsMap = new Map<number, IOnChainPostListing>();
 		if (!allowedTracks) return [];
+		const { trackDetails } = NETWORKS_DETAILS[network] || {};
 		const trackIds = allowedTracks
 			.map((track) => {
-				const trackDetails = NETWORKS_DETAILS[network]?.trackDetails;
 				return trackDetails?.[track]?.trackId;
 			})
 			.filter((id) => id !== undefined) as number[];
@@ -130,16 +141,16 @@ export class DVDelegateService {
 
 		let allProposals = Array.from(allItemsMap.values());
 
-		const missingMetricsIndices = allProposals
+		const indicesNeedingMetrics = allProposals
 			.filter((p) => !p.voteMetrics || !p.voteMetrics.aye)
 			.map((p) => p.index)
 			.filter((index): index is number => index !== undefined);
 
-		if (missingMetricsIndices.length > 0) {
+		if (indicesNeedingMetrics.length > 0) {
 			try {
 				const metricsMap = await OnChainDbService.GetVoteMetricsForProposals({
 					network,
-					proposalIndices: missingMetricsIndices,
+					proposalIndices: indicesNeedingMetrics,
 					proposalType: EProposalType.REFERENDUM_V2
 				});
 
@@ -164,7 +175,7 @@ export class DVDelegateService {
 			}
 		}
 
-		return allProposals
+		const filteredProposals = allProposals
 			.filter((r) => {
 				if (allowedTracks && r.origin && !allowedTracks.includes(r.origin as EPostOrigin)) return false;
 
@@ -187,22 +198,30 @@ export class DVDelegateService {
 
 				return proposalStart <= end;
 			})
-			.map((r) => ({
-				index: r.index || 0,
-				status: r.status,
-				origin: r.origin,
-				description: r.description,
-				voteMetrics: (r.voteMetrics || {}) as Partial<IVoteMetrics>,
-				createdAtBlock: r.createdAtBlock,
-				updatedAtBlock: r.updatedAtBlock,
-				timeline: r.statusHistory
-			}))
 			.sort((a, b) => (b.index || 0) - (a.index || 0));
-	}
 
-	// =============================================================================
-	// Delegate Vote Statistics Methods
-	// =============================================================================
+		const offChainDataPromises = filteredProposals.map((r) => {
+			return OffChainDbService.GetOffChainPostData({
+				network,
+				indexOrHash: r.index?.toString() || '',
+				proposalType: EProposalType.REFERENDUM_V2
+			}).catch(() => null);
+		});
+
+		const offChainData = await Promise.all(offChainDataPromises);
+
+		return filteredProposals.map((r, index) => ({
+			index: r.index || 0,
+			status: r.status,
+			origin: r.origin,
+			description: r.description,
+			title: offChainData[Number(index)]?.title || `Referendum #${r.index}`,
+			voteMetrics: (r.voteMetrics || {}) as Partial<IVoteMetrics>,
+			createdAtBlock: r.createdAtBlock,
+			updatedAtBlock: r.updatedAtBlock,
+			timeline: r.statusHistory
+		}));
+	}
 
 	static async GetDelegateVoteStats(
 		network: ENetwork,
@@ -214,6 +233,7 @@ export class DVDelegateService {
 	): Promise<IDVDelegateVoteStats> {
 		try {
 			const latestBlock = await OnChainDbService.GetLatestBlockNumber(network);
+			const adjustedStartBlock = startBlock ? getAdjustedStartBlock(network, startBlock) : 0;
 			const votes = await fetchAllPages<IProfileVote>(async (page) => {
 				const response = await OnChainDbService.GetVotesForAddressesAndReferenda({
 					network,
@@ -221,7 +241,7 @@ export class DVDelegateService {
 					referendumIndices: eligibleReferendumIndices,
 					page,
 					limit: 1000,
-					startBlock: startBlock || 0,
+					startBlock: adjustedStartBlock,
 					endBlock: endBlock || latestBlock
 				});
 
@@ -265,7 +285,11 @@ export class DVDelegateService {
 		return stats;
 	}
 
-	private static ProcessDelegateVotes(delegates: IDVCohort['delegates'], referendum: { index: number; createdAtBlock?: number; updatedAtBlock?: number }, dvVotes: IProfileVote[]) {
+	private static ProcessDelegateVotes(
+		delegates: IDVCohort['delegates'],
+		referendum: { index?: number; status: EProposalStatus; createdAtBlock?: number; updatedAtBlock?: number },
+		dvVotes: IProfileVote[]
+	): { votes: IDVDelegateVote[]; ayeTotal: bigint; nayTotal: bigint; abstainTotal: bigint; ayeSupport: bigint; abstainSupport: bigint } {
 		let ayeTotal = BigInt(0);
 		let nayTotal = BigInt(0);
 		let abstainTotal = BigInt(0);
@@ -317,18 +341,7 @@ export class DVDelegateService {
 	): EInfluenceStatus {
 		const status = referendum.status as EProposalStatus;
 
-		const noNeedComparison = [
-			EProposalStatus.TimedOut,
-			EProposalStatus.Submitted,
-			EProposalStatus.Added,
-			EProposalStatus.Killed,
-			EProposalStatus.Cancelled,
-			EProposalStatus.Unknown,
-			EProposalStatus.Noted,
-			EProposalStatus.Proposed,
-			EProposalStatus.Tabled,
-			EProposalStatus.Started
-		].includes(status);
+		const noNeedComparison = [EProposalStatus.TimedOut, EProposalStatus.Killed, EProposalStatus.Cancelled, EProposalStatus.Unknown].includes(status);
 
 		if (noNeedComparison) {
 			return EInfluenceStatus.NO_IMPACT;
@@ -405,6 +418,8 @@ export class DVDelegateService {
 		const guardians = getDelegatesByType(cohort, EDVDelegateType.GUARDIAN);
 		const uniqueAddresses = [...new Set([...daos, ...guardians].map((d) => d.address))];
 
+		const voteQueryStartBlock = cohort.endBlock ? getAdjustedStartBlock(network, cohort.startBlock) : 0;
+
 		const allVotes = await fetchAllPages<IProfileVote>(async (page) => {
 			const res = await OnChainDbService.GetVotesForAddressesAndReferenda({
 				network,
@@ -412,7 +427,7 @@ export class DVDelegateService {
 				referendumIndices,
 				page,
 				limit: 1000,
-				startBlock: cohort.startBlock,
+				startBlock: voteQueryStartBlock,
 				endBlock: cohort.endBlock
 			});
 			return res.items || [];
@@ -451,7 +466,7 @@ export class DVDelegateService {
 
 				return {
 					index: referendum.index || 0,
-					title: referendum.description?.substring(0, 50) || `Referendum #${referendum.index}`,
+					title: referendum.title || `Referendum #${referendum.index}`,
 					track: referendum.origin || 'Unknown',
 					status: referendum.status || EProposalStatus.Unknown,
 					ayePercent,
@@ -470,7 +485,7 @@ export class DVDelegateService {
 				console.error(`Error processing influence data for referendum ${referendum.index}:`, error);
 				return {
 					index: referendum.index || 0,
-					title: `Referendum #${referendum.index}`,
+					title: referendum.title || `Referendum #${referendum.index}`,
 					track: referendum.origin || 'Unknown',
 					status: referendum.status || EProposalStatus.Unknown,
 					ayePercent: 0,
@@ -504,6 +519,7 @@ export class DVDelegateService {
 
 		const matrixPromises = cohort.delegates.map(async (delegate) => {
 			const delegateReferendumIndices = filterReferendaForDelegate(cohortReferenda, delegate.startBlock, delegate.endBlock);
+			const adjustedStartBlock = getAdjustedStartBlock(network, delegate.startBlock);
 
 			const votesResponse = await OnChainDbService.GetVotesForAddressesAndReferenda({
 				network,
@@ -511,7 +527,7 @@ export class DVDelegateService {
 				referendumIndices: delegateReferendumIndices,
 				page: 1,
 				limit: 1000,
-				startBlock: delegate.startBlock,
+				startBlock: adjustedStartBlock,
 				endBlock: delegate.endBlock || undefined
 			});
 
