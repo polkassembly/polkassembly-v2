@@ -11,6 +11,9 @@ import { useSearchParams } from 'next/navigation';
 import { useDVDelegates, useDVInfluence, useDVVotingMatrix } from '@/hooks/useDVDelegates';
 import { EDVTrackFilter } from '@/_shared/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { getCurrentDVCohort } from '@/_shared/_utils/dvDelegateUtils';
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import TabCard from './Components/TabCard';
 import CohortCard from './Components/CohortCard';
 import InfluenceCard from './Components/InfluenceCard';
@@ -22,7 +25,10 @@ function PeoplePage() {
 	const t = useTranslations('DecentralizedVoices');
 	const searchParams = useSearchParams();
 	const cohortIndexParam = searchParams.get('cohort');
-	const cohortId = cohortIndexParam ? parseInt(cohortIndexParam, 10) : 5;
+
+	const network = getCurrentNetwork();
+	const currentCohort = getCurrentDVCohort(network);
+	const cohortId = cohortIndexParam ? parseInt(cohortIndexParam, DEFAULT_LISTING_LIMIT) : (currentCohort?.index ?? 5);
 
 	const [trackFilter, setTrackFilter] = useState<EDVTrackFilter>(EDVTrackFilter.DV_TRACKS);
 

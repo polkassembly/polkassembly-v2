@@ -28,7 +28,14 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 
 	const { delegateVotes, guardianVotes } = data;
 
-	const activeVotes = activeTab === EDVDelegateType.DAO ? delegateVotes : guardianVotes;
+	const activeVotes = (activeTab === EDVDelegateType.DAO ? delegateVotes : guardianVotes).slice().sort((a, b) => {
+		const powerA = BigInt(a.votingPower || '0');
+		const powerB = BigInt(b.votingPower || '0');
+
+		if (powerA > powerB) return -1;
+		if (powerA < powerB) return 1;
+		return 0;
+	});
 
 	const getStats = (votes: IDVDelegateVote[]) => {
 		const ayeCount = votes.filter((v) => v.decision === EVoteDecision.AYE).length;

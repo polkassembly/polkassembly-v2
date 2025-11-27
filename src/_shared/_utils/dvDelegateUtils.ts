@@ -5,7 +5,13 @@
 import dayjs from 'dayjs';
 import { DV_COHORTS_KUSAMA, DV_COHORTS_POLKADOT } from '../_constants/dvCohorts';
 import { NETWORKS_DETAILS } from '../_constants/networks';
-import { ECohortStatus, ENetwork, IDVCohort, EDVDelegateType, EVoteDecision, IProfileVote, EProposalStatus, IStatusHistoryItem, IOnChainPostListing } from '../types';
+import { ECohortStatus, ENetwork, IDVCohort, EDVDelegateType, EVoteDecision, IProfileVote, EProposalStatus, IStatusHistoryItem } from '../types';
+
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+const DAYS_PER_MONTH = 30;
+const DEFAULT_MAX_PAGES = 10;
+const DEFAULT_START_PAGE = 1;
+const LOCK_PERIOD_DIVISOR = 10;
 
 export function formatNumber(num: number): string {
 	if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -33,7 +39,8 @@ export function formatDateRange(startDate: Date, endDate?: Date, isOngoing?: boo
 
 export function getCohortTenureDays(cohort: IDVCohort): number {
 	const endDate = cohort.endTime || new Date();
-	return Math.floor((endDate.getTime() - cohort.startTime.getTime()) / (1000 * 60 * 60 * 24));
+	const days = Math.floor((endDate.getTime() - cohort.startTime.getTime()) / MS_PER_DAY);
+	return Math.max(0, days);
 }
 
 export function getDVCohortsByNetwork(network: ENetwork): IDVCohort[] {
@@ -54,7 +61,7 @@ export function getDVCohortByIndex(network: ENetwork, index: number): IDVCohort 
 
 export function getOneMonthBufferInBlocks(network: ENetwork): number {
 	const { blockTime } = NETWORKS_DETAILS[network];
-	const oneMonthInMs = 30 * 24 * 60 * 60 * 1000;
+	const oneMonthInMs = DAYS_PER_MONTH * MS_PER_DAY;
 	return Math.floor(oneMonthInMs / blockTime);
 }
 
@@ -67,7 +74,7 @@ export function getDelegatesByType(cohort: IDVCohort, type: EDVDelegateType) {
 	return cohort.delegates.filter((d) => d.type === type);
 }
 
-export async function fetchAllPages<T>(fetcher: (page: number) => Promise<T[]>, maxPages = 10, page = 1, acc: T[] = []): Promise<T[]> {
+export async function fetchAllPages<T>(fetcher: (page: number) => Promise<T[]>, maxPages = DEFAULT_MAX_PAGES, page = DEFAULT_START_PAGE, acc: T[] = []): Promise<T[]> {
 	if (page > maxPages) return acc;
 	const items = await fetcher(page);
 	if (items.length === 0) return acc;
@@ -135,7 +142,7 @@ export function getVotePower(vote: IProfileVote): bigint {
 
 		const lockPeriod = vote.lockPeriod ?? 0;
 		if (lockPeriod === 0) {
-			power /= BigInt(10);
+			power /= BigInt(LOCK_PERIOD_DIVISOR);
 		} else {
 			power *= BigInt(lockPeriod);
 		}
@@ -160,12 +167,12 @@ export function calculateVoteStats(votes: IProfileVote[], cohortEndTime?: Date):
 		const { proposal, decision } = vote;
 		let status = proposal?.status;
 
-		const timeline = (proposal as IOnChainPostListing)?.statusHistory || [];
+		const timeline = (proposal && 'statusHistory' in proposal ? proposal.statusHistory : []) as IStatusHistoryItem[];
 
 		if (cohortEndTime && timeline.length > 0) {
 			const validHistory = timeline
-				.filter((h: IStatusHistoryItem) => new Date(h.timestamp).getTime() <= cohortEndTime.getTime())
-				.sort((a: IStatusHistoryItem, b: IStatusHistoryItem) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+				.filter((h) => new Date(h.timestamp).getTime() <= cohortEndTime.getTime())
+				.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
 			if (validHistory.length > 0) {
 				status = validHistory[0].status;
