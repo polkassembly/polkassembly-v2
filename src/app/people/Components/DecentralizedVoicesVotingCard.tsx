@@ -20,7 +20,7 @@ type SortOption = 'name' | 'participation' | 'supportRate' | 'activity';
 
 function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort, loading }: DecentralizedVoicesVotingCardProps) {
 	const t = useTranslations('DecentralizedVoices');
-	const referendums = referendumIndices.length > 0 ? referendumIndices : [0];
+	const referendums = referendumIndices;
 	const [viewMode, setViewMode] = useState<'compact' | 'heatmap'>('compact');
 	const [activeTab, setActiveTab] = useState<EDVDelegateType>(EDVDelegateType.DAO);
 	const [expandedRows, setExpandedRows] = useState<string[]>(votingMatrix.length > 0 ? [votingMatrix[0].address] : []);
@@ -102,8 +102,13 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 							) : (
 								<>
 									{activeTab === EDVDelegateType.DAO ? daos.length : guardians.length} {activeTab === EDVDelegateType.DAO ? t('DAOs') : t('Guardians')} {t('Across')}{' '}
-									{referendums.length} {t('Referendums')} (#
-									{minRef} - #{maxRef})
+									{referendums.length} {t('Referendums')}
+									{referendums.length > 0 && (
+										<>
+											{' '}
+											(#{minRef} - #{maxRef})
+										</>
+									)}
 								</>
 							)}
 						</p>

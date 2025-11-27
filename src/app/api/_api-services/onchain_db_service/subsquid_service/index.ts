@@ -1412,7 +1412,7 @@ export class SubsquidService extends SubsquidUtils {
 		} = {
 			limit,
 			offset: (page - 1) * limit,
-			voter_in: voters.map((address) => getEncodedAddress(address, network)).filter((addr): addr is string => addr !== null),
+			voter_in: voters.map((address) => getEncodedAddress(address, network)).filter((addr): addr is string => addr !== null && addr !== undefined),
 			createdAtBlock_gte: startBlock || 0,
 			createdAtBlock_lte: endBlock || 2147483647
 		};

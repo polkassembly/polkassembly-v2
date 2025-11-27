@@ -182,22 +182,17 @@ export class DVDelegateService {
 
 				const end = endBlock || latestBlock;
 				const proposalStart = r.createdAtBlock || 0;
-				const proposalEnd = r.updatedAtBlock || 0;
-				const isOngoingCohort = !endBlock;
+				const proposalEnd = r.updatedAtBlock;
 
-				if (!r.createdAtBlock && !r.updatedAtBlock) {
-					return isOngoingCohort;
+				if (!proposalStart && !proposalEnd) {
+					return !endBlock;
 				}
 
-				if (isOngoingCohort) {
-					return true;
+				if (!proposalEnd || proposalEnd === 0) {
+					return proposalStart >= startBlock && proposalStart <= end;
 				}
 
-				if (proposalEnd > 0) {
-					return proposalEnd >= startBlock && proposalEnd <= end;
-				}
-
-				return proposalStart <= end;
+				return proposalEnd >= startBlock && proposalEnd <= end;
 			})
 			.sort((a, b) => (b.index || 0) - (a.index || 0));
 
@@ -452,7 +447,7 @@ export class DVDelegateService {
 		const guardians = getDelegatesByType(cohort, EDVDelegateType.GUARDIAN);
 		const uniqueAddresses = [...new Set([...daos, ...guardians].map((d) => d.address))];
 
-		const voteQueryStartBlock = cohort.endBlock ? getAdjustedStartBlock(network, cohort.startBlock) : 0;
+		const voteQueryStartBlock = getAdjustedStartBlock(network, cohort.startBlock);
 
 		const allVotes = await fetchAllPages<IProfileVote>(async (page) => {
 			const res = await OnChainDbService.GetVotesForAddressesAndReferenda({
