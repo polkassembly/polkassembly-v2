@@ -24,9 +24,9 @@ function PeoplePage() {
 
 	const [trackFilter, setTrackFilter] = useState<EDVTrackFilter>(EDVTrackFilter.DV_TRACKS);
 
-	const { data: delegatesData, loading: delegatesLoading, error: delegatesError } = useDVDelegates(cohortId, trackFilter);
-	const { data: influenceData, loading: influenceLoading, error: influenceError } = useDVInfluence(cohortId, undefined, trackFilter);
-	const { data: votingMatrixData, loading: votingMatrixLoading, error: votingMatrixError } = useDVVotingMatrix(cohortId, trackFilter);
+	const { data: delegatesData, isLoading: delegatesLoading, error: delegatesError } = useDVDelegates({ cohortId, trackFilter });
+	const { data: influenceData, isLoading: influenceLoading, error: influenceError } = useDVInfluence({ cohortId, trackFilter });
+	const { data: votingMatrixData, isLoading: votingMatrixLoading, error: votingMatrixError } = useDVVotingMatrix({ cohortId, trackFilter });
 
 	const cohort = delegatesData?.cohort || null;
 	const delegatesWithStats = delegatesData?.delegatesWithStats || [];
@@ -41,7 +41,7 @@ function PeoplePage() {
 			<div className='min-h-screen bg-page_background'>
 				<TabCard />
 				<div className='flex h-96 items-center justify-center'>
-					<p className='text-text_secondary'>{error || 'No active DV cohort found for this network'}</p>
+					<p className='text-text_secondary'>{(typeof error === 'string' ? error : error?.message) || 'No active DV cohort found for this network'}</p>
 				</div>
 			</div>
 		);

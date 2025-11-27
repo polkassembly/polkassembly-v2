@@ -18,11 +18,9 @@ const querySchema = z.object({
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
 	const network = await getNetworkFromHeaders();
-
 	const { searchParams } = new URL(req.url);
 	const queryParams = Object.fromEntries(searchParams.entries());
 	const { cohortIndex: cohortIndexParam, cohortId, trackFilter } = querySchema.parse(queryParams);
-
 	const cohortParam = cohortId ?? cohortIndexParam;
 
 	let cohort;
