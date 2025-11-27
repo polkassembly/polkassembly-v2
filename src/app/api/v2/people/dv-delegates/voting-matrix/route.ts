@@ -36,6 +36,6 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'No DV cohort found for this network');
 	}
 
-	const { referendumIndices, delegates } = await DVDelegateService.getVotingMatrix(network, cohort, trackFilter);
+	const { referendumIndices, delegates } = await DVDelegateService.GetVotingMatrix(network, cohort, trackFilter);
 	return NextResponse.json({ referendumIndices, delegates });
 });

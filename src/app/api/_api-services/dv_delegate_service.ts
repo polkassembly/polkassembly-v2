@@ -1,6 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+
 import {
 	ENetwork,
 	EProposalStatus,
@@ -17,37 +18,18 @@ import {
 	EDVDelegateType,
 	EDVTrackFilter,
 	EInfluenceStatus,
-	IStatusHistoryItem,
 	IVoteMetrics,
-	EProposalType
+	IStatusHistoryItem,
+	EProposalType,
+	ProposalWithTally
 } from '@/_shared/types';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { RedisService } from '@/app/api/_api-services/redis_service';
+import { fetchAllPages, filterReferendaForDelegate, getDelegatesByType, isReferendumActiveForDelegate, getVotePower, calculateVoteStats } from '@/_shared/_utils/dvDelegateUtils';
 
-type ProposalWithTally = {
-	tally?: {
-		ayes: number;
-		nays: number;
-	};
-	voteMetrics?: {
-		aye: { value: number };
-		nay: { value: number };
-	};
-};
 export class DVDelegateService {
-	private static async fetchAllPages<T>(fetcher: (page: number) => Promise<T[]>, maxPages = 10, page = 1, acc: T[] = []): Promise<T[]> {
-		if (page > maxPages) return acc;
-		const items = await fetcher(page);
-		if (items.length === 0) return acc;
-		return this.fetchAllPages(fetcher, maxPages, page + 1, [...acc, ...items]);
-	}
-
-	private static getDelegatesByType(cohort: IDVCohort, type: EDVDelegateType) {
-		return cohort.delegates.filter((d) => d.type === type);
-	}
-
-	static async getCohortReferenda(
+	static async GetCohortReferenda(
 		network: ENetwork,
 		cohort: IDVCohort,
 		allowedTracks: EPostOrigin[] | null = null
@@ -67,7 +49,7 @@ export class DVDelegateService {
 		const latestBlock = await OnChainDbService.GetLatestBlockNumber(network);
 
 		const delegateAddresses = cohort.delegates.map((d) => d.address);
-		const votedProposalsPromise = this.fetchAllPages<IOnChainPostListing>(async (page) => {
+		const votedProposalsPromise = fetchAllPages<IOnChainPostListing>(async (page) => {
 			const votesListing = await OnChainDbService.GetVotesForAddressesAndReferenda({
 				network,
 				voters: delegateAddresses,
@@ -218,33 +200,11 @@ export class DVDelegateService {
 			.sort((a, b) => (b.index || 0) - (a.index || 0));
 	}
 
-	static filterReferendaForDelegate(
-		referenda: { index: number; status: EProposalStatus; createdAtBlock?: number; updatedAtBlock?: number }[],
-		delegateStartBlock: number,
-		delegateEndBlock: number | null
-	): number[] {
-		const endBlock = delegateEndBlock ?? Number.MAX_SAFE_INTEGER;
-		const isOngoingDelegate = delegateEndBlock === null;
+	// =============================================================================
+	// Delegate Vote Statistics Methods
+	// =============================================================================
 
-		return referenda
-			.filter((r) => {
-				const proposalStart = r.createdAtBlock || 0;
-				const proposalEnd = r.updatedAtBlock || 0;
-
-				if (isOngoingDelegate) {
-					return true;
-				}
-
-				if (proposalEnd > 0) {
-					return proposalEnd >= delegateStartBlock && proposalEnd <= endBlock;
-				}
-
-				return proposalStart <= endBlock;
-			})
-			.map((r) => r.index);
-	}
-
-	static async getDelegateVoteStats(
+	static async GetDelegateVoteStats(
 		network: ENetwork,
 		address: string,
 		eligibleReferendumIndices: number[],
@@ -254,58 +214,23 @@ export class DVDelegateService {
 	): Promise<IDVDelegateVoteStats> {
 		try {
 			const latestBlock = await OnChainDbService.GetLatestBlockNumber(network);
-			const votes = await this.fetchAllPages<IProfileVote>(async (page) => {
+			const votes = await fetchAllPages<IProfileVote>(async (page) => {
 				const response = await OnChainDbService.GetVotesForAddressesAndReferenda({
 					network,
 					voters: [address],
+					referendumIndices: eligibleReferendumIndices,
 					page,
 					limit: 1000,
 					startBlock: startBlock || 0,
 					endBlock: endBlock || latestBlock
 				});
+
 				return response.items || [];
 			}, 1000);
 
 			const validVotes = votes.filter((v) => v.proposalIndex !== undefined && eligibleReferendumIndices.includes(v.proposalIndex));
 
-			let ayeCount = 0;
-			let nayCount = 0;
-			let abstainCount = 0;
-			let winningVotes = 0;
-
-			validVotes.forEach((vote) => {
-				const proposal = vote.proposal as IOnChainPostListing | undefined;
-				let status = proposal?.status;
-				const timeline: IStatusHistoryItem[] = (proposal?.statusHistory || []) as IStatusHistoryItem[];
-
-				if (cohortEndTime && timeline.length > 0) {
-					const validHistory = timeline
-						.filter((h: IStatusHistoryItem) => new Date(h.timestamp).getTime() <= cohortEndTime.getTime())
-						.sort((a: IStatusHistoryItem, b: IStatusHistoryItem) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
-					if (validHistory.length > 0) {
-						status = validHistory[0].status;
-					}
-				}
-
-				const isClosed = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Rejected, EProposalStatus.TimedOut, EProposalStatus.Cancelled].includes(
-					status as EProposalStatus
-				);
-
-				if (vote.decision === EVoteDecision.AYE) {
-					ayeCount += 1;
-					if (isClosed && (status === EProposalStatus.Executed || status === EProposalStatus.Approved || status === EProposalStatus.Confirmed)) {
-						winningVotes += 1;
-					}
-				} else if (vote.decision === EVoteDecision.NAY) {
-					nayCount += 1;
-					if (isClosed && (status === EProposalStatus.Rejected || status === EProposalStatus.TimedOut || status === EProposalStatus.Cancelled)) {
-						winningVotes += 1;
-					}
-				} else {
-					abstainCount += 1;
-				}
-			});
+			const { ayeCount, nayCount, abstainCount, winningVotes } = calculateVoteStats(validVotes, cohortEndTime);
 
 			const totalVotes = ayeCount + nayCount + abstainCount;
 			const nonAbstainVotes = ayeCount + nayCount;
@@ -322,16 +247,16 @@ export class DVDelegateService {
 		}
 	}
 
-	static async getDelegatesWithStats(network: ENetwork, cohort: IDVCohort, trackFilter = EDVTrackFilter.DV_TRACKS): Promise<IDVDelegateWithStats[]> {
+	static async GetDelegatesWithStats(network: ENetwork, cohort: IDVCohort, trackFilter = EDVTrackFilter.DV_TRACKS): Promise<IDVDelegateWithStats[]> {
 		const cachedData = await RedisService.GetDVDelegates({ network, cohortId: cohort.index.toString(), trackFilter });
 		if (cachedData) return cachedData;
 
 		const allowedTracks = trackFilter === EDVTrackFilter.DV_TRACKS ? cohort.tracks : null;
-		const cohortReferenda = await this.getCohortReferenda(network, cohort, allowedTracks);
+		const cohortReferenda = await this.GetCohortReferenda(network, cohort, allowedTracks);
 
 		const statsPromises = cohort.delegates.map(async (delegate) => {
-			const delegateReferendumIndices = this.filterReferendaForDelegate(cohortReferenda, delegate.startBlock, delegate.endBlock);
-			const voteStats = await this.getDelegateVoteStats(network, delegate.address, delegateReferendumIndices, cohort.endTime, delegate.startBlock, delegate.endBlock);
+			const delegateReferendumIndices = filterReferendaForDelegate(cohortReferenda, delegate.startBlock, delegate.endBlock);
+			const voteStats = await this.GetDelegateVoteStats(network, delegate.address, delegateReferendumIndices, cohort.endTime, delegate.startBlock, delegate.endBlock);
 			return { ...delegate, voteStats } as IDVDelegateWithStats;
 		});
 		const stats = await Promise.all(statsPromises);
@@ -340,40 +265,7 @@ export class DVDelegateService {
 		return stats;
 	}
 
-	private static isReferendumActiveForDelegate(referendum: { createdAtBlock?: number; updatedAtBlock?: number }, delegate: IDVCohort['delegates'][0]): boolean {
-		const endBlock = delegate.endBlock ?? Number.MAX_SAFE_INTEGER;
-		if (!referendum.createdAtBlock && !referendum.updatedAtBlock) return true;
-
-		const effectiveEnd = referendum.updatedAtBlock || referendum.createdAtBlock || 0;
-		return effectiveEnd >= delegate.startBlock && effectiveEnd <= endBlock;
-	}
-
-	private static getVotePower(vote: IProfileVote): bigint {
-		let power = BigInt(vote.totalVotingPower || '0');
-
-		if (power === BigInt(0) && vote.balance) {
-			const { balance, decision } = vote;
-			const value = balance.value || '0';
-
-			if (decision === EVoteDecision.AYE) {
-				power = BigInt(balance.aye || value);
-			} else if (decision === EVoteDecision.NAY) {
-				power = BigInt(balance.nay || value);
-			} else if (decision === EVoteDecision.ABSTAIN || decision === EVoteDecision.SPLIT_ABSTAIN) {
-				power = BigInt(balance.abstain || value);
-			}
-
-			const lockPeriod = vote.lockPeriod ?? 0;
-			if (lockPeriod === 0) {
-				power /= BigInt(10);
-			} else {
-				power *= BigInt(lockPeriod);
-			}
-		}
-		return power;
-	}
-
-	private static processDelegateVotes(delegates: IDVCohort['delegates'], referendum: { index: number; createdAtBlock?: number; updatedAtBlock?: number }, dvVotes: IProfileVote[]) {
+	private static ProcessDelegateVotes(delegates: IDVCohort['delegates'], referendum: { index: number; createdAtBlock?: number; updatedAtBlock?: number }, dvVotes: IProfileVote[]) {
 		let ayeTotal = BigInt(0);
 		let nayTotal = BigInt(0);
 		let abstainTotal = BigInt(0);
@@ -381,7 +273,7 @@ export class DVDelegateService {
 		let abstainSupport = BigInt(0);
 
 		const votes = delegates.map((delegate) => {
-			const isReferendumActive = this.isReferendumActiveForDelegate(referendum, delegate);
+			const isReferendumActive = isReferendumActiveForDelegate(referendum, delegate);
 			const vote = dvVotes.find((v) => v.voterAddress === delegate.address && v.proposalIndex === referendum.index);
 
 			if (!vote || !isReferendumActive) {
@@ -393,7 +285,7 @@ export class DVDelegateService {
 				} as IDVDelegateVote;
 			}
 
-			const power = this.getVotePower(vote);
+			const power = getVotePower(vote);
 			const { balance } = vote;
 			const value = balance?.value || '0';
 
@@ -418,7 +310,7 @@ export class DVDelegateService {
 		return { votes, ayeTotal, nayTotal, abstainTotal, ayeSupport, abstainSupport };
 	}
 
-	private static calculateInfluenceStatus(
+	private static CalculateInfluenceStatus(
 		referendum: { status: string | EProposalStatus; voteMetrics?: Partial<IVoteMetrics>; index?: number },
 		dvAyeTotal: bigint,
 		dvNayTotal: bigint
@@ -500,20 +392,20 @@ export class DVDelegateService {
 		return EInfluenceStatus.NO_IMPACT;
 	}
 
-	static async getInfluence(network: ENetwork, cohort: IDVCohort, trackFilter = EDVTrackFilter.DV_TRACKS): Promise<IDVReferendumInfluence[]> {
+	static async GetInfluence(network: ENetwork, cohort: IDVCohort, trackFilter = EDVTrackFilter.DV_TRACKS): Promise<IDVReferendumInfluence[]> {
 		const cachedData = await RedisService.GetDVInfluence({ network, cohortId: cohort.index.toString(), trackFilter });
 		if (cachedData) return cachedData;
 
 		const allowedTracks = trackFilter === EDVTrackFilter.DV_TRACKS ? cohort.tracks : null;
-		const cohortReferenda = await this.getCohortReferenda(network, cohort, allowedTracks);
+		const cohortReferenda = await this.GetCohortReferenda(network, cohort, allowedTracks);
 		const referendaItems = cohortReferenda.slice(0, 1000);
 		const referendumIndices = referendaItems.map((r) => r.index);
 
-		const daos = this.getDelegatesByType(cohort, EDVDelegateType.DAO);
-		const guardians = this.getDelegatesByType(cohort, EDVDelegateType.GUARDIAN);
+		const daos = getDelegatesByType(cohort, EDVDelegateType.DAO);
+		const guardians = getDelegatesByType(cohort, EDVDelegateType.GUARDIAN);
 		const uniqueAddresses = [...new Set([...daos, ...guardians].map((d) => d.address))];
 
-		const allVotes = await this.fetchAllPages<IProfileVote>(async (page) => {
+		const allVotes = await fetchAllPages<IProfileVote>(async (page) => {
 			const res = await OnChainDbService.GetVotesForAddressesAndReferenda({
 				network,
 				voters: uniqueAddresses,
@@ -530,8 +422,8 @@ export class DVDelegateService {
 			try {
 				const dvVotes = allVotes.filter((v) => v.proposalIndex === referendum.index && !(cohort.endTime && new Date(v.createdAt).getTime() > cohort.endTime.getTime()));
 
-				const daoResult = this.processDelegateVotes(daos, referendum, dvVotes);
-				const guardianResult = this.processDelegateVotes(guardians, referendum, dvVotes);
+				const daoResult = this.ProcessDelegateVotes(daos, referendum, dvVotes);
+				const guardianResult = this.ProcessDelegateVotes(guardians, referendum, dvVotes);
 
 				const dvAyeTotal = daoResult.ayeTotal + guardianResult.ayeTotal;
 				const dvNayTotal = daoResult.nayTotal + guardianResult.nayTotal;
@@ -540,7 +432,7 @@ export class DVDelegateService {
 				const dvTotal = dvAyeTotal + dvNayTotal + dvAbstainTotal;
 				const dvDecidingTotal = dvAyeTotal + dvNayTotal;
 
-				const influence = this.calculateInfluenceStatus(referendum, dvAyeTotal, dvNayTotal);
+				const influence = this.CalculateInfluenceStatus(referendum, dvAyeTotal, dvNayTotal);
 
 				const totalValue = BigInt(referendum.voteMetrics?.aye?.value || '0') + BigInt(referendum.voteMetrics?.nay?.value || '0');
 				const ayeValue = BigInt(referendum.voteMetrics?.aye?.value || '0');
@@ -599,7 +491,7 @@ export class DVDelegateService {
 		return influenceData;
 	}
 
-	static async getVotingMatrix(
+	static async GetVotingMatrix(
 		network: ENetwork,
 		cohort: IDVCohort,
 		trackFilter = EDVTrackFilter.DV_TRACKS
@@ -608,16 +500,19 @@ export class DVDelegateService {
 		if (cachedData) return cachedData;
 
 		const allowedTracks = trackFilter === EDVTrackFilter.DV_TRACKS ? cohort.tracks : null;
-		const cohortReferenda = await this.getCohortReferenda(network, cohort, allowedTracks);
+		const cohortReferenda = await this.GetCohortReferenda(network, cohort, allowedTracks);
 
 		const matrixPromises = cohort.delegates.map(async (delegate) => {
-			const delegateReferendumIndices = this.filterReferendaForDelegate(cohortReferenda, delegate.startBlock, delegate.endBlock);
+			const delegateReferendumIndices = filterReferendaForDelegate(cohortReferenda, delegate.startBlock, delegate.endBlock);
 
-			const votesResponse = await OnChainDbService.GetVotesForAddresses({
+			const votesResponse = await OnChainDbService.GetVotesForAddressesAndReferenda({
 				network,
 				voters: [delegate.address],
+				referendumIndices: delegateReferendumIndices,
 				page: 1,
-				limit: 500
+				limit: 1000,
+				startBlock: delegate.startBlock,
+				endBlock: delegate.endBlock || undefined
 			});
 
 			const votes: Record<number, EVoteDecision | 'novote'> = {};

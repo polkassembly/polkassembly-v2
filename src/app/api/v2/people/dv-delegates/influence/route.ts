@@ -38,7 +38,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'No DV cohort found for this network');
 	}
 
-	const referenda = await DVDelegateService.getInfluence(network, cohort, trackFilter);
+	const referenda = await DVDelegateService.GetInfluence(network, cohort, trackFilter);
 
 	if (sortBy === 'status') {
 		referenda.sort((a, b) => a.status.localeCompare(b.status));

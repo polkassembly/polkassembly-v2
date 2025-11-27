@@ -845,6 +845,17 @@ export enum EActivityName {
 	UNFOLLOWED_USER = 'unfollowed_user'
 }
 
+export type ProposalWithTally = {
+	tally?: {
+		ayes: number;
+		nays: number;
+	};
+	voteMetrics?: {
+		aye: { value: number };
+		nay: { value: number };
+	};
+};
+
 export enum EActivityCategory {
 	ON_CHAIN = 'on_chain',
 	OFF_CHAIN = 'off_chain'

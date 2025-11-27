@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { DV_COHORTS_KUSAMA, DV_COHORTS_POLKADOT } from '../_constants/dvCohorts';
-import { ECohortStatus, ENetwork, IDVCohort } from '../types';
+import { ECohortStatus, ENetwork, IDVCohort, EDVDelegateType, EVoteDecision, IProfileVote, EProposalStatus, IStatusHistoryItem, IOnChainPostListing } from '../types';
 
 export function getDVCohortsByNetwork(network: ENetwork): IDVCohort[] {
 	if (network === ENetwork.KUSAMA) return DV_COHORTS_KUSAMA;
@@ -19,4 +19,125 @@ export function getCurrentDVCohort(network: ENetwork): IDVCohort | null {
 export function getDVCohortByIndex(network: ENetwork, index: number): IDVCohort | null {
 	const cohorts = getDVCohortsByNetwork(network);
 	return cohorts.find((c) => c.index === index) || null;
+}
+
+export function getDelegatesByType(cohort: IDVCohort, type: EDVDelegateType) {
+	return cohort.delegates.filter((d) => d.type === type);
+}
+
+export async function fetchAllPages<T>(fetcher: (page: number) => Promise<T[]>, maxPages = 10, page = 1, acc: T[] = []): Promise<T[]> {
+	if (page > maxPages) return acc;
+	const items = await fetcher(page);
+	if (items.length === 0) return acc;
+	return fetchAllPages(fetcher, maxPages, page + 1, [...acc, ...items]);
+}
+
+export function filterReferendaForDelegate(
+	referenda: { index: number; status: EProposalStatus; createdAtBlock?: number; updatedAtBlock?: number }[],
+	delegateStartBlock: number,
+	delegateEndBlock: number | null
+): number[] {
+	const endBlock = delegateEndBlock ?? Number.MAX_SAFE_INTEGER;
+	const isOngoingDelegate = delegateEndBlock === null;
+
+	return referenda
+		.filter((r) => {
+			const proposalStart = r.createdAtBlock || 0;
+			const proposalEnd = r.updatedAtBlock || 0;
+
+			if (isOngoingDelegate) {
+				return true;
+			}
+
+			if (proposalEnd > 0) {
+				return proposalEnd >= delegateStartBlock && proposalEnd <= endBlock;
+			}
+
+			return proposalStart <= endBlock;
+		})
+		.map((r) => r.index);
+}
+
+export function isReferendumActiveForDelegate(referendum: { createdAtBlock?: number; updatedAtBlock?: number }, delegate: IDVCohort['delegates'][0]): boolean {
+	const endBlock = delegate.endBlock ?? Number.MAX_SAFE_INTEGER;
+	if (!referendum.createdAtBlock && !referendum.updatedAtBlock) return true;
+
+	const effectiveEnd = referendum.updatedAtBlock || referendum.createdAtBlock || 0;
+	return effectiveEnd >= delegate.startBlock && effectiveEnd <= endBlock;
+}
+
+export function getVotePower(vote: IProfileVote): bigint {
+	let power = BigInt(vote.totalVotingPower || '0');
+
+	if (power === BigInt(0) && vote.balance) {
+		const { balance, decision } = vote;
+		const value = balance.value || '0';
+
+		if (decision === EVoteDecision.AYE) {
+			power = BigInt(balance.aye || value);
+		} else if (decision === EVoteDecision.NAY) {
+			power = BigInt(balance.nay || value);
+		} else if (decision === EVoteDecision.ABSTAIN || decision === EVoteDecision.SPLIT_ABSTAIN) {
+			power = BigInt(balance.abstain || value);
+		}
+
+		const lockPeriod = vote.lockPeriod ?? 0;
+		if (lockPeriod === 0) {
+			power /= BigInt(10);
+		} else {
+			power *= BigInt(lockPeriod);
+		}
+	}
+	return power;
+}
+
+export interface IVoteStatsResult {
+	ayeCount: number;
+	nayCount: number;
+	abstainCount: number;
+	winningVotes: number;
+}
+
+export function calculateVoteStats(votes: IProfileVote[], cohortEndTime?: Date): IVoteStatsResult {
+	let ayeCount = 0;
+	let nayCount = 0;
+	let abstainCount = 0;
+	let winningVotes = 0;
+
+	votes.forEach((vote) => {
+		const { proposal, decision } = vote;
+		let status = proposal?.status;
+
+		const timeline = (proposal as IOnChainPostListing)?.statusHistory || [];
+
+		if (cohortEndTime && timeline.length > 0) {
+			const validHistory = timeline
+				.filter((h: IStatusHistoryItem) => new Date(h.timestamp).getTime() <= cohortEndTime.getTime())
+				.sort((a: IStatusHistoryItem, b: IStatusHistoryItem) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+			if (validHistory.length > 0) {
+				status = validHistory[0].status;
+			}
+		}
+
+		const isClosed = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Rejected, EProposalStatus.TimedOut, EProposalStatus.Cancelled].includes(
+			status as EProposalStatus
+		);
+
+		if (decision === EVoteDecision.AYE) {
+			ayeCount += 1;
+			if (isClosed && (status === EProposalStatus.Executed || status === EProposalStatus.Approved || status === EProposalStatus.Confirmed)) {
+				winningVotes += 1;
+			}
+		} else if (decision === EVoteDecision.NAY) {
+			nayCount += 1;
+			if (isClosed && (status === EProposalStatus.Rejected || status === EProposalStatus.TimedOut || status === EProposalStatus.Cancelled)) {
+				winningVotes += 1;
+			}
+		} else {
+			abstainCount += 1;
+		}
+	});
+
+	return { ayeCount, nayCount, abstainCount, winningVotes };
 }

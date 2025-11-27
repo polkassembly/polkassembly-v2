@@ -35,6 +35,6 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'No DV cohort found for this network');
 	}
 
-	const delegatesWithStats = await DVDelegateService.getDelegatesWithStats(network, cohort, trackFilter);
+	const delegatesWithStats = await DVDelegateService.GetDelegatesWithStats(network, cohort, trackFilter);
 	return NextResponse.json({ cohort, delegatesWithStats });
 });
