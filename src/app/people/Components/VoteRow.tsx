@@ -67,7 +67,7 @@ function VoteRow({ vote, network }: { vote: IDVDelegateVote; network: ENetwork }
 				address={vote.address}
 				disableTooltip
 				iconSize={24}
-				textClassName='font-semibold max-w-20 text-text_primary'
+				textClassName='font-semibold md:max-w-full max-w-20 text-text_primary'
 			/>
 			<div className='flex items-center gap-8'>
 				<div className='flex items-center gap-2'>
