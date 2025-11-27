@@ -20,7 +20,7 @@ import CohortsTableCard from './Components/CohortsTableCard';
 function PeoplePage() {
 	const searchParams = useSearchParams();
 	const cohortIndexParam = searchParams.get('cohort');
-	const cohortId = cohortIndexParam ? parseInt(cohortIndexParam, 10) : undefined;
+	const cohortId = cohortIndexParam ? parseInt(cohortIndexParam, 10) : 5;
 
 	const [trackFilter, setTrackFilter] = useState<EDVTrackFilter>(EDVTrackFilter.DV_TRACKS);
 
