@@ -125,7 +125,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 							<button
 								type='button'
 								onClick={() => setActiveTab(EDVDelegateType.GUARDIAN)}
-								className={`py-0.6 rounded px-3 text-sm font-medium text-navbar_title transition-colors ${activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay font-semibold'}`}
+								className={`rounded px-3 py-0.5 text-sm font-medium text-navbar_title transition-colors ${activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay font-semibold'}`}
 							>
 								{t('Guardian').toUpperCase()} ({guardians.length})
 							</button>

@@ -1744,9 +1744,9 @@ export class SubsquidService extends SubsquidUtils {
 
 		if (error || !data || !data.proposals || data.proposals.length === 0) {
 			console.error('Error fetching latest block number:', error);
-			return 0;
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching latest block number from Subsquid');
 		}
 
-		return data.proposals[0].createdAtBlock || 0;
+		return data.proposals[0].createdAtBlock;
 	}
 }
