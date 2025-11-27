@@ -1,95 +1,106 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { IDVDelegatesResponse, IDVReferendaInfluenceResponse, IDVVotingMatrixResponse, EDVTrackFilter } from '@/_shared/types';
+import { ClientError } from '@/app/_client-utils/clientError';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 
-const UNEXPECTED_ERROR = 'An unexpected error occurred';
+interface UseDVDelegatesProps {
+	cohortId?: number;
+	trackFilter?: EDVTrackFilter;
+	initialData?: IDVDelegatesResponse;
+}
 
-export const useDVDelegates = (cohortId?: number, trackFilter = EDVTrackFilter.DV_TRACKS) => {
-	const [data, setData] = useState<IDVDelegatesResponse | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [error, setError] = useState<string | null>(null);
+export const useDVDelegates = ({ cohortId, trackFilter = EDVTrackFilter.DV_TRACKS, initialData }: UseDVDelegatesProps) => {
+	return useQuery<IDVDelegatesResponse, Error>({
+		queryKey: ['dv-delegates', cohortId, trackFilter],
+		enabled: Boolean(cohortId),
+		placeholderData: (previousData) => previousData || initialData,
+		retry: true,
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: false,
+		refetchOnMount: true,
+		staleTime: FIVE_MIN_IN_MILLI,
+		queryFn: async () => {
+			const { data, error } = await NextApiClientService.fetchDVDelegates({ cohortId, trackFilter });
 
-	useEffect(() => {
-		const fetchData = async () => {
-			setLoading(true);
-			setError(null);
-			try {
-				const { data: result, error: apiError } = await NextApiClientService.fetchDVDelegates({ cohortId, trackFilter });
-				if (apiError) {
-					setError(apiError.message || 'Failed to fetch DV delegates');
-				} else {
-					setData(result);
-				}
-			} catch {
-				setError(UNEXPECTED_ERROR);
-			} finally {
-				setLoading(false);
+			if (error) {
+				throw new ClientError(ERROR_CODES.API_FETCH_ERROR, error.message || 'Failed to fetch DV delegates');
 			}
-		};
 
-		fetchData();
-	}, [cohortId, trackFilter]);
+			if (!data) {
+				throw new ClientError(ERROR_CODES.NOT_FOUND, 'No DV delegates data found.');
+			}
 
-	return { data, loading, error };
+			return data;
+		}
+	});
 };
 
-export const useDVInfluence = (cohortId?: number, sortBy?: 'status' | 'votes', trackFilter = EDVTrackFilter.DV_TRACKS) => {
-	const [data, setData] = useState<IDVReferendaInfluenceResponse | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [error, setError] = useState<string | null>(null);
+interface UseDVInfluenceProps {
+	cohortId?: number;
+	sortBy?: 'status' | 'votes';
+	trackFilter?: EDVTrackFilter;
+	initialData?: IDVReferendaInfluenceResponse;
+}
 
-	useEffect(() => {
-		const fetchData = async () => {
-			setLoading(true);
-			setError(null);
-			try {
-				const { data: result, error: apiError } = await NextApiClientService.fetchDVInfluence({ cohortId, trackFilter, sortBy });
-				if (apiError) {
-					setError(apiError.message || 'Failed to fetch DV influence');
-				} else {
-					setData(result);
-				}
-			} catch {
-				setError(UNEXPECTED_ERROR);
-			} finally {
-				setLoading(false);
+export const useDVInfluence = ({ cohortId, sortBy, trackFilter = EDVTrackFilter.DV_TRACKS, initialData }: UseDVInfluenceProps) => {
+	return useQuery<IDVReferendaInfluenceResponse, Error>({
+		queryKey: ['dv-influence', cohortId, trackFilter, sortBy],
+		enabled: Boolean(cohortId),
+		placeholderData: (previousData) => previousData || initialData,
+		retry: true,
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: false,
+		refetchOnMount: true,
+		staleTime: FIVE_MIN_IN_MILLI,
+		queryFn: async () => {
+			const { data, error } = await NextApiClientService.fetchDVInfluence({ cohortId, trackFilter, sortBy });
+
+			if (error) {
+				throw new ClientError(ERROR_CODES.API_FETCH_ERROR, error.message || 'Failed to fetch DV influence');
 			}
-		};
 
-		fetchData();
-	}, [cohortId, trackFilter, sortBy]);
+			if (!data) {
+				throw new ClientError(ERROR_CODES.NOT_FOUND, 'No DV influence data found.');
+			}
 
-	return { data, loading, error };
+			return data;
+		}
+	});
 };
 
-export const useDVVotingMatrix = (cohortId?: number, trackFilter = EDVTrackFilter.DV_TRACKS) => {
-	const [data, setData] = useState<IDVVotingMatrixResponse | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [error, setError] = useState<string | null>(null);
+interface UseDVVotingMatrixProps {
+	cohortId?: number;
+	trackFilter?: EDVTrackFilter;
+	initialData?: IDVVotingMatrixResponse;
+}
 
-	useEffect(() => {
-		const fetchData = async () => {
-			setLoading(true);
-			setError(null);
-			try {
-				const { data: result, error: apiError } = await NextApiClientService.fetchDVVotingMatrix({ cohortId, trackFilter });
-				if (apiError) {
-					setError(apiError.message || 'Failed to fetch DV voting matrix');
-				} else {
-					setData(result);
-				}
-			} catch {
-				setError(UNEXPECTED_ERROR);
-			} finally {
-				setLoading(false);
+export const useDVVotingMatrix = ({ cohortId, trackFilter = EDVTrackFilter.DV_TRACKS, initialData }: UseDVVotingMatrixProps) => {
+	return useQuery<IDVVotingMatrixResponse, Error>({
+		queryKey: ['dv-voting-matrix', cohortId, trackFilter],
+		enabled: Boolean(cohortId),
+		placeholderData: (previousData) => previousData || initialData,
+		retry: true,
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: false,
+		refetchOnMount: true,
+		staleTime: FIVE_MIN_IN_MILLI,
+		queryFn: async () => {
+			const { data, error } = await NextApiClientService.fetchDVVotingMatrix({ cohortId, trackFilter });
+
+			if (error) {
+				throw new ClientError(ERROR_CODES.API_FETCH_ERROR, error.message || 'Failed to fetch DV voting matrix');
 			}
-		};
 
-		fetchData();
-	}, [cohortId, trackFilter]);
+			if (!data) {
+				throw new ClientError(ERROR_CODES.NOT_FOUND, 'No DV voting matrix data found.');
+			}
 
-	return { data, loading, error };
+			return data;
+		}
+	});
 };
