@@ -458,8 +458,8 @@
 		"analytics": "Analytics",
 		"treasuryAnalytics": "Treasury Analytics",
 		"proxies": "Proxies",
-		"judgementdashboard": "Judgement Dashboard",
 		"people": "People",
+		"identityAndJudgement": "Identity and Judgement",
 		"Tag": {
 			"new": "New"
 		}
@@ -1544,12 +1544,13 @@
 		"Amount": "Amount"
 	},
 	"Judgements": {
-		"judgement": "Judgement",
+		"identityAndJudgement": "Identity and Judgement",
 		"requestJudgement": "Request Judgement",
 		"becomeARegistrar": "Become a Registrar",
 		"dashboard": "Dashboard",
 		"registrar": "Registrar",
 		"registrars": "Registrars",
+		"judgementsGranted": "Judgements Granted",
 		"judgementsRequested": "Judgements Requested",
 		"judgementsCompleted": "Judgements Completed",
 		"thisMonth": "this month",

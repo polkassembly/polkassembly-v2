@@ -457,8 +457,8 @@
 		"analytics": "Analíticas",
 		"treasuryAnalytics": "Analíticas de Tesorería",
 		"proxies": "Proxies",
-		"judgementdashboard": "Panel de Juicios",
 		"people": "Personas",
+		"identityAndJudgement": "Identidad y Juicio",
 		"Tag": {
 			"new": "Nuevo"
 		}
@@ -1516,12 +1516,13 @@
 		"Amount": "Cantidad"
 	},
 	"Judgements": {
-		"judgement": "Juicio",
+		"identityAndJudgement": "Identidad y Juicio",
 		"requestJudgement": "Solicitar Juicio",
 		"becomeARegistrar": "Convertirse en Registrador",
 		"dashboard": "Panel de control",
 		"registrar": "Registrador",
 		"registrars": "Registradores",
+		"judgementsGranted": "Juicios concedidos",
 		"judgementsRequested": "Juicios solicitados",
 		"judgementsCompleted": "Juicios completados",
 		"thisMonth": "este mes",

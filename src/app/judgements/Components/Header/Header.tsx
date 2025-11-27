@@ -36,7 +36,7 @@ function Header() {
 		<div className={styles.header}>
 			<div className={styles.header_container}>
 				<div className={styles.header_title_container}>
-					<p className={styles.header_title}>{t('Judgements.judgement')}</p>
+					<p className={styles.header_title}>{t('Judgements.identityAndJudgement')}</p>
 					<div className={styles.header_button_container}>
 						<Link href={`/set-identity?open=${ESetIdentityStep.REQUEST_JUDGEMENT}`}>
 							<Button>{t('Judgements.requestJudgement')}</Button>
@@ -44,6 +44,7 @@ function Header() {
 						<BecomeRegistrarModal />
 					</div>
 				</div>
+				<p>{t('Judgements.registrarDescription')}</p>
 				<TabsList className={`w-fit max-w-full items-start overflow-auto pl-4 font-bold md:pl-0 ${styles.hideScrollbar}`}>
 					<TabsTrigger
 						className={styles.header_tab}

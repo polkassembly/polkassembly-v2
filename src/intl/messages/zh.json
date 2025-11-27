@@ -456,8 +456,8 @@
 		"analytics": "分析",
 		"treasuryAnalytics": "国库分析",
 		"proxies": "代理",
-		"judgementdashboard": "判定仪表板",
 		"people": "人员",
+		"identityAndJudgement": "身份和判断",
 		"Tag": {
 			"new": "新"
 		}
@@ -1515,12 +1515,13 @@
 		"Amount": "金额"
 	},
 	"Judgements": {
-		"judgement": "判断",
+		"identityAndJudgement": "身份和判断",
 		"requestJudgement": "判断请求",
 		"becomeARegistrar": "成为注册者",
 		"dashboard": "仪表板",
 		"registrar": "注册者",
 		"registrars": "注册者",
+		"judgementsGranted": "判断许可",
 		"judgementsRequested": "判断请求",
 		"judgementsCompleted": "判断完成",
 		"thisMonth": "本月",
