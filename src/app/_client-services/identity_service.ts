@@ -10,6 +10,7 @@
 import { APPNAME } from '@/_shared/_constants/appName';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
+import { mapJudgementStatus } from '@app/_client-utils/identityUtils';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
@@ -17,7 +18,7 @@ import { BN, BN_ZERO, hexToString, isHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { EAccountType, ENetwork, EWallet, IOnChainIdentity, ISelectedAccount, IVaultQrState } from '@shared/types';
+import { ENetwork, IOnChainIdentity, IJudgementRequest, EAccountType, EWallet, ISelectedAccount, IVaultQrState } from '@shared/types';
 import { Dispatch, SetStateAction } from 'react';
 import { isMimirDetected } from './isMimirDetected';
 import { VaultQrSigner } from './vault_qr_signer_service';
@@ -608,5 +609,61 @@ export class IdentityService {
 		const paymentInfo = await tx?.paymentInfo(encodedAddress);
 
 		return paymentInfo?.partialFee;
+	}
+
+	async getAllIdentityJudgements(): Promise<IJudgementRequest[]> {
+		try {
+			const registrars = await this.getRegistrars();
+			const judgements: IJudgementRequest[] = [];
+
+			const identityEntries = await this.peopleChainApi.query.identity.identityOf.entries();
+
+			identityEntries.forEach(([key, value]) => {
+				const address = key.args[0].toString();
+				const identityInfo = value.toHuman() as any;
+
+				if (!identityInfo?.judgements || !Array.isArray(identityInfo.judgements)) {
+					return;
+				}
+
+				const identity = identityInfo.info || {};
+
+				// Process judgements for each registrar
+				identityInfo.judgements.forEach((judgement: any) => {
+					const [registrarIndex, judgementData] = judgement;
+					const registrarIndexNum = Number(registrarIndex);
+
+					if (registrarIndexNum >= 0 && registrarIndexNum < registrars.length) {
+						const registrar = registrars[`${registrarIndexNum}`];
+						const status = mapJudgementStatus(judgementData);
+
+						const displayRaw = identity.display?.Raw ?? identity.display;
+						const displayName = isHex(displayRaw) ? hexToString(displayRaw) || displayRaw || '' : displayRaw || '';
+						const emailRaw = identity.email?.Raw ?? identity.email;
+						const email = isHex(emailRaw) ? hexToString(emailRaw) || emailRaw || '' : emailRaw || '';
+
+						const judgementRequest: IJudgementRequest = {
+							id: `${address}-${registrarIndexNum}-${key.hash.toString()}`,
+							address,
+							displayName,
+							email,
+							twitter: identity.twitter?.Raw || identity.twitter || '',
+							status,
+							dateInitiated: new Date(),
+							registrarIndex: registrarIndexNum,
+							registrarAddress: registrar.account,
+							judgementHash: key.hash.toString()
+						};
+
+						judgements.push(judgementRequest);
+					}
+				});
+			});
+
+			return judgements.sort((a, b) => b.dateInitiated.getTime() - a.dateInitiated.getTime());
+		} catch (error) {
+			console.error('Error fetching identity judgements:', error);
+			return [];
+		}
 	}
 }

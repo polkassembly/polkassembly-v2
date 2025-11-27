@@ -37,6 +37,8 @@ function ChatHeader({ chatState, setChatState, openMobileHistory }: Props) {
 		}
 	});
 
+	const formatter = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 });
+
 	return (
 		<div className={styles.chatUIHeader}>
 			<div className='flex items-center gap-2'>
@@ -47,10 +49,10 @@ function ChatHeader({ chatState, setChatState, openMobileHistory }: Props) {
 					height={24}
 					className='h-6 w-6'
 				/>
-				<p className='text-xl font-semibold text-text_primary'>Klara</p>
+				<p className='text-xl font-semibold text-text_primary'>Klara 1.5</p>
 				{stats && chatState === EChatState.EXPANDED && (
 					<>
-						<p className='rounded-full bg-klara_stats_bg px-2 py-1 text-xs font-normal text-klara_stats_text'>{stats?.totalConversations} total chats</p>
+						<p className='rounded-full bg-klara_stats_bg px-2 py-1 text-xs font-normal text-klara_stats_text'>{formatter.format(stats?.totalConversations || 0)} total messages</p>
 						<p className='rounded-full bg-klara_stats_bg px-2 py-1 text-xs font-normal text-klara_stats_text'>{stats?.totalUsers} users</p>
 					</>
 				)}

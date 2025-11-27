@@ -1,0 +1,19 @@
+.base {
+	@apply h-min whitespace-nowrap rounded-full border-2 border-blue-500 bg-blue-500 px-3 py-1 text-xs font-medium tracking-tight text-white dark:border-blue-700 dark:bg-blue-700 lg:px-4 lg:py-1.5;
+}
+
+.pending {
+	@apply border-orange-500 bg-orange-500 dark:border-orange-700 dark:bg-orange-700;
+}
+
+.approved {
+	@apply border-green-500 bg-green-500 dark:border-green-700 dark:bg-green-700;
+}
+
+.rejected {
+	@apply border-red-500 bg-red-500 dark:border-red-700 dark:bg-red-700;
+}
+
+.requested {
+	@apply border-yellow-500 bg-yellow-500 dark:border-yellow-700 dark:bg-yellow-700;
+}

@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { IPost, IPostListing } from '@/_shared/types';
 import { Link } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
@@ -19,7 +19,23 @@ function LinkPostButton({ postData, className }: { postData: IPostListing | IPos
 	const [isOpen, setIsOpen] = useState(false);
 
 	const proposerAddress = postData.onChainInfo?.proposer && getSubstrateAddress(postData.onChainInfo?.proposer);
-	const canLink = user && proposerAddress && user.addresses.includes(proposerAddress) && !OFF_CHAIN_PROPOSAL_TYPES.includes(postData.proposalType);
+	const canEditSignatories = useMemo(() => {
+		return (
+			proposerAddress &&
+			user?.addressRelations?.some((relation) =>
+				relation.multisigAddresses.some(
+					(multisig) => getSubstrateAddress(multisig.address) === proposerAddress || multisig.pureProxies.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress)
+				)
+			)
+		);
+	}, [proposerAddress, user?.addressRelations]);
+
+	const canEditProxy = useMemo(() => {
+		return proposerAddress && user?.addressRelations?.some((relation) => relation.proxyAddresses.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress));
+	}, [proposerAddress, user?.addressRelations]);
+
+	const canLink =
+		(user && proposerAddress && user.addresses.includes(proposerAddress) && !OFF_CHAIN_PROPOSAL_TYPES.includes(postData.proposalType)) || canEditSignatories || canEditProxy;
 
 	if (!canLink) return null;
 
