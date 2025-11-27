@@ -14,6 +14,7 @@ import DashboardSummary from './Components/TabSummary/DashboardSummary';
 import JudgementListingTable from './Components/ListingTable/JudgementListingTable';
 import RegistrarsListingTable from './Components/ListingTable/RegistrarsListingTable';
 import OverviewStats from './Components/Overview/OverviewStats';
+import IdentitiesListingTable from './Components/Overview/IdentitiesListingTable';
 import MyIdentitiesDashboard from './Components/MyDashboard/MyIdentitiesDashboard';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -41,6 +42,7 @@ async function Judgements() {
 					<TabsContent value={EJudgementDashboardTabs.OVERVIEW}>
 						<div className='flex flex-col gap-y-4'>
 							<OverviewStats />
+							<IdentitiesListingTable />
 						</div>
 					</TabsContent>
 					<TabsContent value={EJudgementDashboardTabs.DASHBOARD}>
