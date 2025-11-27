@@ -14,11 +14,10 @@ interface UseDVDelegatesProps {
 	initialData?: IDVDelegatesResponse;
 }
 
-export const useDVDelegates = ({ cohortId, trackFilter = EDVTrackFilter.DV_TRACKS, initialData }: UseDVDelegatesProps) => {
+export const useDVDelegates = ({ cohortId, trackFilter = EDVTrackFilter.DV_TRACKS }: UseDVDelegatesProps) => {
 	return useQuery<IDVDelegatesResponse, Error>({
 		queryKey: ['dv-delegates', cohortId, trackFilter],
 		enabled: Boolean(cohortId),
-		placeholderData: (previousData) => previousData || initialData,
 		retry: true,
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: false,
@@ -47,11 +46,10 @@ interface UseDVInfluenceProps {
 	initialData?: IDVReferendaInfluenceResponse;
 }
 
-export const useDVInfluence = ({ cohortId, sortBy, trackFilter = EDVTrackFilter.DV_TRACKS, initialData }: UseDVInfluenceProps) => {
+export const useDVInfluence = ({ cohortId, sortBy, trackFilter = EDVTrackFilter.DV_TRACKS }: UseDVInfluenceProps) => {
 	return useQuery<IDVReferendaInfluenceResponse, Error>({
 		queryKey: ['dv-influence', cohortId, trackFilter, sortBy],
 		enabled: Boolean(cohortId),
-		placeholderData: (previousData) => previousData || initialData,
 		retry: true,
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: false,
@@ -79,11 +77,10 @@ interface UseDVVotingMatrixProps {
 	initialData?: IDVVotingMatrixResponse;
 }
 
-export const useDVVotingMatrix = ({ cohortId, trackFilter = EDVTrackFilter.DV_TRACKS, initialData }: UseDVVotingMatrixProps) => {
+export const useDVVotingMatrix = ({ cohortId, trackFilter = EDVTrackFilter.DV_TRACKS }: UseDVVotingMatrixProps) => {
 	return useQuery<IDVVotingMatrixResponse, Error>({
 		queryKey: ['dv-voting-matrix', cohortId, trackFilter],
 		enabled: Boolean(cohortId),
-		placeholderData: (previousData) => previousData || initialData,
 		retry: true,
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: false,

@@ -101,11 +101,6 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 		setPage(1);
 	};
 
-	const handleInfluenceToggle = (influence: string) => {
-		setSelectedInfluence((prev) => (prev.includes(influence) ? prev.filter((i) => i !== influence) : [...prev, influence]));
-		setPage(1);
-	};
-
 	const clearFilters = () => {
 		setSelectedTracks([]);
 		setSelectedInfluence([]);
@@ -156,45 +151,6 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 											onCheckedChange={() => handleTrackToggle(track)}
 										/>
 										<span className='text-xs text-text_primary'>{convertCamelCaseToTitleCase(track)}</span>
-									</div>
-								))}
-							</div>
-						</PopoverContent>
-					</Popover>
-
-					<Popover>
-						<PopoverTrigger asChild>
-							<button
-								type='button'
-								className={`flex items-center gap-1 rounded-md border p-2 ${selectedInfluence.length > 0 ? 'border-text_pink bg-text_pink/10' : 'border-border_grey'}`}
-							>
-								<Filter className='h-4 w-4 text-wallet_btn_text' />
-								{selectedInfluence.length > 0 && <span className='ml-1 rounded-full bg-text_pink px-1.5 text-xs text-white'>{selectedInfluence.length}</span>}
-								<ChevronDown className='h-3 w-3 text-wallet_btn_text' />
-							</button>
-						</PopoverTrigger>
-						<PopoverContent className='w-48 border-border_grey p-3'>
-							<div className='mb-2 flex items-center justify-between'>
-								<span className='text-xs font-semibold text-text_primary'>Filter by Influence</span>
-								<button
-									type='button'
-									onClick={() => setSelectedInfluence([])}
-									className='text-xs text-text_pink'
-								>
-									Clear
-								</button>
-							</div>
-							<div className='space-y-2'>
-								{Object.values(EInfluenceStatus).map((influence) => (
-									<div
-										key={influence}
-										className='flex items-center gap-2'
-									>
-										<Checkbox
-											checked={selectedInfluence.includes(influence)}
-											onCheckedChange={() => handleInfluenceToggle(influence)}
-										/>
-										<span className='text-xs capitalize text-text_primary'>{influence.replace('_', ' ')}</span>
 									</div>
 								))}
 							</div>

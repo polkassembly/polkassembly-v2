@@ -87,13 +87,13 @@ export class DVDelegateService {
 		const votedProposals = await votedProposalsPromise;
 
 		const recentProposalsMap = new Map<number, IOnChainPostListing>();
-		if (!allowedTracks) return [];
 		const { trackDetails } = NETWORKS_DETAILS[network] || {};
+
 		const trackIds = allowedTracks
-			.map((track) => {
-				return trackDetails?.[track]?.trackId;
-			})
-			.filter((id) => id !== undefined) as number[];
+			? (allowedTracks.map((track) => trackDetails?.[track]?.trackId).filter((id) => id !== undefined) as number[])
+			: (Object.values(trackDetails || {})
+					.map((t) => t.trackId)
+					.filter((id) => id !== undefined) as number[]);
 
 		const recentProposalsPromises = trackIds.map(async (trackId) => {
 			try {
