@@ -7,7 +7,7 @@ import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { OffChainDbService } from '@api/_api-services/offchain_db_service';
 import { getNetworkFromHeaders } from '@api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
-import { EAllowedCommentor, EHttpHeaderKey, EProposalType, IPost } from '@shared/types';
+import { EAllowedCommentor, EDataSource, EHttpHeaderKey, EProposalType, IPost } from '@shared/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { RedisService } from '@/app/api/_api-services/redis_service';
@@ -19,6 +19,7 @@ import { APIError } from '@/app/api/_api-utils/apiError';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
 import { fetchCommentsVoteData } from '@/app/api/_api-utils/fetchCommentsVoteData.server';
+import { AlgoliaService } from '@/app/api/_api-services/algolia_service';
 
 const SET_COOKIE = 'Set-Cookie';
 
@@ -87,6 +88,18 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		post = { ...post, contentSummary };
 	}
 
+	// beneficiaries stats
+	if (post?.onChainInfo && post.onChainInfo.beneficiaries && post.onChainInfo.beneficiaries.length > 0) {
+		const updatedBeneficiaries = await OffChainDbService.GetBeneficiariesWithUsdAmount({
+			network,
+			beneficiaries: post.onChainInfo?.beneficiaries || [],
+			proposalCreatedAt: post.onChainInfo?.createdAt || post.createdAt || new Date()
+		});
+		if (updatedBeneficiaries) {
+			post = { ...post, onChainInfo: { ...post.onChainInfo, beneficiaries: updatedBeneficiaries } };
+		}
+	}
+
 	// Cache the post data without user specific data
 	await RedisService.SetPostData({ network, proposalType, indexOrHash: index, data: post });
 
@@ -105,6 +118,11 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	}
 	if (refreshToken) {
 		response.headers.append(COOKIE_HEADER_ACTION_NAME, await AuthService.GetRefreshTokenCookie(refreshToken));
+	}
+
+	if (post.dataSource !== EDataSource.POLKASSEMBLY) {
+		console.log(`Updating Algolia record for ${post.proposalType}/${post.index}`);
+		await AlgoliaService.updatePostRecord(post);
 	}
 
 	return response;
@@ -184,12 +202,15 @@ export const DELETE = withErrorHandling(async (req: NextRequest, { params }: { p
 
 	await OffChainDbService.DeleteOffChainPost({ network, proposalType, index: Number(index) });
 
-	// Invalidate caches
-	await RedisService.DeletePostData({ network, proposalType, indexOrHash: index });
-	await RedisService.DeletePostsListing({ network, proposalType });
-	await RedisService.DeleteActivityFeed({ network });
-	await RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType });
-	await RedisService.DeleteOverviewPageData({ network });
+	// Invalidate caches and delete from Algolia
+	await Promise.all([
+		RedisService.DeletePostData({ network, proposalType, indexOrHash: index }),
+		RedisService.DeletePostsListing({ network, proposalType }),
+		RedisService.DeleteActivityFeed({ network }),
+		RedisService.DeleteContentSummary({ network, indexOrHash: index, proposalType }),
+		RedisService.DeleteOverviewPageData({ network }),
+		AlgoliaService.deletePostRecord({ network, proposalType, indexOrHash: index })
+	]);
 
 	const response = NextResponse.json({ message: 'Post deleted successfully' });
 	response.headers.append(SET_COOKIE, await AuthService.GetAccessTokenCookie(newAccessToken));

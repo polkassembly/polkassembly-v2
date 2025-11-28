@@ -23,11 +23,10 @@ function SearchBar({ searchKey = 'dashboardSearch' }: { searchKey?: string }) {
 		const params = new URLSearchParams(Array.from(searchParams.entries()));
 		if (inputValue) {
 			params.set(searchKey, inputValue);
-			params.set('page', '1'); // Reset to first page on new search
+			params.set('page', '1');
 		} else {
 			params.delete(searchKey);
 		}
-		// Remove the other tab's search param to avoid cross-filtering
 		const otherKey = searchKey === 'dashboardSearch' ? 'registrarSearch' : 'dashboardSearch';
 		params.delete(otherKey);
 		router.push(`${pathname}?${params.toString()}`);

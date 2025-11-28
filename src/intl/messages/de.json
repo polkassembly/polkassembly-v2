@@ -27,7 +27,8 @@
 		"bounties": "Bounties",
 		"ambassador": "Ambassador",
 		"loans": "Loans",
-		"address": "Adresse"
+		"address": "Adresse",
+		"assets": "Assets"
 	},
 	"ActivityFeed": {
 		"title": "Aktivitätsfeed",
@@ -37,9 +38,6 @@
 		"About": "Über",
 		"AboutDescription": "Polkadot ist die All-in-One DeFi-Zentrale von Polkadot.",
 		"KnowMore": "Mehr erfahren",
-		"VotedProposals": "Abgestimmte Vorschläge",
-		"ActiveProposals": "Aktive Vorschläge",
-		"Last15Days": "Letzte 15 Tage",
 		"Rank": "Rang",
 		"BatchVoting": "Stapelabstimmung",
 		"BatchVotingDescription": "Stimmen Sie über Top-Vorschläge in einer einzigen Transaktion ab",
@@ -96,17 +94,20 @@
 		"NoRank": "um Ihren Rang zu sehen"
 	},
 	"AddressDropdown": {
-		"fallbackText": "Bitte wählen Sie eine Brieftasche",
-		"chooseLinkedAccount": "Verknüpftes Konto auswählen",
+		"fallbackText": "Bitte Wallet auswählen",
+		"chooseLinkedAccount": "Konto auswählen",
 		"noAccountsFound": "Keine Konten gefunden",
-		"selectWallet": "Bitte Brieftasche auswählen",
+		"selectWallet": "Bitte Wallet auswählen",
 		"fetchingAddresses": "Um Ihre Adressen abzurufen, benötigt Polkassembly Zugriff auf Ihre Wallet-Erweiterungen. Bitte autorisieren Sie diese Transaktion.",
 		"goBack": "Zurück",
 		"gotIt": "Verstanden",
-		"hidePassword": "Passwort verbergen",
+		"hidePassword": "Passwort ausblenden",
 		"showPassword": "Passwort anzeigen",
-		"pleaseConnectWallet": "Bitte verbinden Sie Ihre Brieftasche mit Polkassembly.",
+		"pleaseConnectWallet": "Bitte verbinden Sie Ihre Wallet mit Polkassembly.",
 		"pleaseCheckConnectedAccounts": "Bitte überprüfen Sie die verbundenen Konten in der Erweiterung.",
+		"scanYourAddressQr": "Scannen Sie Ihren Adress-QR-Code",
+		"scanYourAddressQrDescription1": "Melden Sie sich in Ihrer Polkadot Vault App an.",
+		"scanYourAddressQrDescription2": "Scannen Sie Ihren {network} Adress-QR-Code.",
 		"linkedAccount": "Verknüpftes Konto"
 	},
 	"AddressRelationsPicker": {
@@ -132,6 +133,8 @@
 		"contentWillBeAvailableSoon": "Inhalt wird in Kürze verfügbar sein..."
 	},
 	"Profile": {
+		"noAddresses": "Keine Adressen gefunden",
+		"blacklistWarning": "Dieses Benutzerkonto wurde wegen Verstoß gegen die Community-Richtlinien markiert.",
 		"settings": "Einstellungen",
 		"login": "Anmelden",
 		"loginFailed": "Anmeldung fehlgeschlagen",
@@ -163,6 +166,8 @@
 		"balance": "Guthaben",
 		"locked": "Gesperrt",
 		"on": "am",
+		"noJudgements": "Keine Beurteilungen",
+		"judgement": "Beurteilung",
 		"Delegations": {
 			"noDelegations": "Keine Delegationen gefunden",
 			"delegation": "Delegation",
@@ -178,6 +183,21 @@
 			"VP": "VP",
 			"CA": "CA",
 			"CO": "CO"
+		},
+		"Votes": {
+			"noData": "Keine Stimmen gefunden",
+			"votes": "Stimmen",
+			"proposal": "Vorschlag",
+			"voteFor": "Stimme für",
+			"action": "Aktion",
+			"voter": "Stimmberechtigter",
+			"status": "Status",
+			"showMore": "Mehr anzeigen",
+			"showLess": "Weniger anzeigen",
+			"votedProposals": "Abgestimmte Vorschläge",
+			"activeProposals": "aktive vorschläge",
+			"last15Days": "Letzte 15 Tage",
+			"selectAddresses": "Adressen auswählen"
 		},
 		"Activity": {
 			"voted_on_proposal": "Abgestimmt",
@@ -242,7 +262,7 @@
 			"noData": "Keine Beiträge gefunden"
 		},
 		"overview": "Übersicht",
-		"onchainIdentity": "Onchain-Identität",
+		"onchainIdentity": "On-Chain Identität",
 		"linkAddress": "Adresse verknüpfen",
 		"badges": "Abzeichen",
 		"badgesDescription": "Schalte Abzeichen frei, erhalte und verdiene sie, während du dich in Polkassembly engagierst",
@@ -428,12 +448,26 @@
 		"Treasury": "Finanzverwaltung",
 		"LeaseAdmin": "Leasing-Admin",
 		"GeneralAdmin": "Allgemeiner Admin",
+		"chatWithKlara": "Chat mit Klara",
+		"klaraDesc": "KI-Chatbot",
+		"more": "Mehr",
+		"gov1": "Gov 1 (Archives)",
+		"analytics": "Analysen",
+		"treasuryAnalytics": "Finanzverwaltungsanalysen",
+		"proxies": "Proxies",
+		"judgementdashboard": "Judgement Dashboard",
 		"Tag": {
 			"new": "Neu"
 		}
 	},
 	"PostDetails": {
+		"remove": "Entfernen",
+		"removeVote": "Abstimmung entfernen",
+		"selectYourVoterAddress": "Wählen Sie Ihre Abstimmungsadresse",
+		"removeVoteConfirmation": "Sind Sie sicher, dass Sie Ihre Abstimmung entfernen möchten?",
 		"castVote": "Abstimmen",
+		"changeVote": "Abstimmen ändern",
+		"myVote": "Meine Stimme",
 		"castYourVote": "Geben Sie Ihre Stimme ab",
 		"copyLink": "Link kopieren",
 		"loginToVote": "Zum Abstimmen anmelden",
@@ -452,13 +486,20 @@
 		"post": "Beitrag",
 		"cancel": "Abbrechen",
 		"reply": "Antworten",
+		"edited": "Bearbeitet",
+		"commentHistory": "Kommentarverlauf",
+		"removing": "Entfernen",
 		"proposalPassed": "Vorschlag angenommen",
 		"proposalFailed": "Vorschlag abgelehnt",
 		"confirmationPeriod": "Bestätigungszeitraum",
 		"votingStarted": "Abstimmung hat begonnen",
 		"preparePeriod": "Vorbereitungszeit",
 		"decisionPeriod": "Entscheidungszeit",
+		"votingPeriod": "Abstimmungszeitraum",
+		"enactmentPeriod": "Durchführungszeitraum",
+		"enactmentDescription": "Ref-Ausführung nach Abschluss dieser Periode",
 		"summary": "Zusammenfassung",
+		"summarise": "Zusammenfassung",
 		"aye": "Ja",
 		"nay": "Nein",
 		"split": "Geteilt",
@@ -467,12 +508,29 @@
 		"issuance": "Issuance",
 		"viewVoteHistory": "Abstimmungsverlauf anzeigen",
 		"voteHistory": "Abstimmungsverlauf",
+		"delegations": "Delegiert",
 		"delegated": "Delegiert",
 		"votingPower": "Stimmgewicht",
+		"voteRemoved": "Ihre Abstimmung wurde erfolgreich entfernt",
+		"voteRemoveFailed": "Abstimmung konnte nicht entfernt werden",
+		"voteRemoveFailedTitle": "Abstimmung entfernen fehlgeschlagen",
+		"voteRemovedTitle": "Abstimmung entfernt",
 		"capital": "Kapital",
 		"account": "Konto",
 		"abstain": "Enthaltung",
 		"onchainInfo": "Onchain-Informationen",
+		"BeneficiariesDetails": {
+			"requested": "Angefordert",
+			"details": "Details",
+			"immediately": "sofort",
+			"in": "in",
+			"to": "zu",
+			"totalEstimatedUSD": "Geschätzter USD-Äquivalent",
+			"more": "mehr",
+			"requestedAmountDetails": "Angeforderter Betrag Details",
+			"showMore": "Mehr anzeigen",
+			"showLess": "Weniger anzeigen"
+		},
 		"nestedVotes": "Verschachtelte Abstimmungen",
 		"flattenedVotes": "Ebene Abstimmungen",
 		"Poll": {
@@ -543,6 +601,7 @@
 			"table": "Tabelle",
 			"json": "JSON",
 			"origin": "Ursprung",
+			"details": "Details",
 			"method": "Methode",
 			"proposalHash": "Vorschlag-Hash",
 			"preimage": "Vorabbild",
@@ -556,7 +615,22 @@
 			"fee": "Gebühr",
 			"parentBountyIndex": "Elterntreffen-Index",
 			"payee": "Begünstigter",
-			"curator": "Curator"
+			"curator": "Curator",
+			"requested": "Angefordert",
+			"calls": "Aufrufe",
+			"showMore": "Mehr anzeigen",
+			"showLess": "Weniger anzeigen",
+			"call": "Aufruf",
+			"timeline": "Zeitlinie",
+			"submittedAtBlock": "Eingereicht am Block",
+			"createdAtBlock": "Erstellt am Block",
+			"createdAt": "Erstellt am",
+			"proposer": "Proposer",
+			"updatedAtBlock": "Aktualisiert am Block",
+			"enactmentAtBlock": "Ausgeführt am Block",
+			"enactmentAfterBlock": "Ausgeführt nach Block",
+			"trackNumber": "Track Nummer",
+			"hash": "Hash"
 		},
 		"deleteComment": "Kommentar löschen",
 		"deleteCommentConfirmation": "Möchten Sie diesen Kommentar wirklich löschen?",
@@ -567,8 +641,19 @@
 		"viewReplies": "Antworten anzeigen",
 		"commentSummary": "Kommentar Zusammenfassung",
 		"aiSummary": "KI Zusammenfassung",
+		"showingVotesFor": "Zeige Abstimmungen für",
+		"switchWallet": "Wallet wechseln",
+		"errorLoadingVote": "Fehler beim Laden der Abstimmungsdaten",
+		"noVoteForAddress": "Keine Abstimmung für diese Adresse gefunden",
 		"showLikelySpam": "Wahrscheinlichen Spam anzeigen",
 		"hideLikelySpam": "Wahrscheinlichen Spam ausblenden",
+		"HighlightMenu": {
+			"quote": "Zitieren",
+			"share": "Teilen",
+			"copy": "Kopieren",
+			"textCopiedToClipboard": "Text in die Zwischenablage kopiert",
+			"failedToCopyText": "Text konnte nicht kopiert werden"
+		},
 		"voted": "Abgestimmt",
 		"votes": "Abstimmungen",
 		"vote": "Abstimmung",
@@ -703,6 +788,8 @@
 		"ayeVoteValue": "Ja-Stimmwert",
 		"nayVoteValue": "Nein-Stimmwert",
 		"confirm": "Bestätigen",
+		"existingVote": "Bestehende Stimme",
+		"existingVoteDescription": "Sie haben bereits auf diesen Vorschlag abgestimmt. Das erneute Abstimmen überschreibt die aktuelle Abstimmung.",
 		"voteSuccess": "Ihre Stimme wurde erfolgreich abgegeben",
 		"voteFailed": "Ihre Stimme wurde nicht erfolgreich abgegeben",
 		"voteSuccessTitle": "Abstimmung erfolgreich",
@@ -717,13 +804,15 @@
 		"your": "Ihre",
 		"voteIsIn": "Stimme ist eingegangen! Möchten Sie in einem Kommentar erklären, warum Sie dafür sind?",
 		"reuseGovernanceLock": "Governance-Sperre wiederverwenden",
-		"reuseAllLocks": "Alle Sperren wiederverwenden"
+		"reuseAllLocks": "Alle Sperren wiederverwenden",
+		"changeVote": "Stimme ändern"
 	},
 	"Balance": {
 		"voteBalance": "Abstimmungsguthaben",
 		"Balance": "Guthaben",
 		"PeopleChainBalance": "People Chain Guthaben",
-		"VotingBalance": "Abstimmungsguthaben"
+		"VotingBalance": "Abstimmungsguthaben",
+		"migrationInfo": "Benutzerbilanzen wurden zu AssetHub migriert"
 	},
 	"EditPost": {
 		"edit": "Bearbeiten",
@@ -958,7 +1047,13 @@
 		"verify": "Verifizieren",
 		"verified": "Verifiziert",
 		"pending": "Ausstehend",
-		"CurrentJudgement": "Aktuelle Beurteilung"
+		"CurrentJudgement": "Aktuelle Beurteilung",
+		"clearIdentity": "Identität löschen",
+		"clearIdentitySuccess": "Identität gelöscht!",
+		"clearIdentitySuccessDescription": "Ihre Identität wurde erfolgreich gelöscht",
+		"clearIdentityFailed": "Identitätslöschung fehlgeschlagen",
+		"clearIdentityFailedDescription": "Beim Löschen Ihrer Identität ist ein Fehler aufgetreten",
+		"clearIdentityDescription": "Sind Sie sicher, dass Sie Ihre Identität löschen möchten?"
 	},
 	"Bounties": {
 		"onchainBounties": "Onchain-Prämien",
@@ -1101,7 +1196,8 @@
 		"redirectingToProposal": "Weiterleitung zum Vorschlag...",
 		"addContextToProposal": "Kontext zum Vorschlag hinzufügen",
 		"redirectingToPost": "Weiterleitung zum Beitrag...",
-		"discussion": "Diskussion"
+		"discussion": "Diskussion",
+		"postMigrationInfo": "Zeitlogik bezieht sich auf die Blockhöhe der Relay-Kette nach der Migration. AssetHub-Blocknummern sind nicht mehr für Planung gültig."
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Begünstigter",
@@ -1314,6 +1410,8 @@
 		"referenda": "Referenden",
 		"users": "Benutzer",
 		"discussions": "Diskussionen",
+		"bounties": "Kopfgelder",
+		"other": "Sonstiges",
 		"today": "Heute",
 		"last_7_days": "Letzte 7 Tage",
 		"last_30_days": "Letzte 30 Tage",
@@ -1339,7 +1437,8 @@
 		"useSuperSearchButton": "Super Suche verwenden",
 		"poweredByPolkassembly": "Bereitgestellt von Polkassembly.",
 		"enableSearchAndSuperSearch": "Wenn Sie die Suche und Super-Suche für Ihre Chain aktivieren möchten, kontaktieren Sie uns bitte unter",
-		"clearFilters": "Filter löschen"
+		"clearFilters": "Filter löschen",
+		"searchTriggerLabel": "Nach Vorschlägen, Diskussionen und Personen suchen"
 	},
 	"CreateBounty": {
 		"bountyProposedSuccessfully": "Kopfgeld erfolgreich vorgeschlagen",
@@ -1413,11 +1512,6 @@
 		"BeneficiaryAddress": "Begünstigten-Adresse",
 		"Amount": "Betrag"
 	},
-	"ConvictionSelector": {
-		"votes": "Stimmen",
-		"lockingPeriod": "Sperrfrist",
-		"lockingPeriodDescription": "Ihre {tokenSymbol} bleiben nach der Abstimmung für zusätzliche Zeit gesperrt, abhängig vom gewählten Multiplikator."
-	},
 	"Judgements": {
 		"judgement": "Urteil",
 		"requestJudgement": "Urteil anfordern",
@@ -1457,6 +1551,77 @@
 	"JudgementStatus": {
 		"pending": "Ausstehend",
 		"approved": "Genehmigt",
-		"rejected": "Abgelehnt"
+		"rejected": "Abgelehnt",
+		"requested": "Angefordert"
+	},
+	"ConvictionSelector": {
+		"votes": "Stimmen",
+		"lockingPeriod": "Sperrfrist",
+		"lockingPeriodDescription": "Ihr {tokenSymbol} bleibt je nach gewähltem Multiplikator nach der Abstimmung zusätzlich gesperrt."
+	},
+	"PolkadotVault": {
+		"signTransaction": "Transaktion signieren",
+		"addVaultAddress": "Polkadot Vault-Adresse hinzufügen",
+		"scan": "Scannen",
+		"openVaultAppInYourPhone": "Öffnen Sie die Vault-App auf Ihrem Telefon",
+		"scanTheQRHere": "Scannen Sie den QR-Code hier von der Vault-App",
+		"scanTheSignatureQRInYourApp": "Überprüfen Sie den Signatur-QR in Ihrer App und signieren Sie die Transaktion"
+	},
+	"GovAnalytics": {
+		"governanceAnalytics": "Governance Analytics",
+		"governanceAnalyticsDescription": "Referenda sind der Kernmechanismus der On-Chain-Governance von Polkadot, der Anlegern (DOT-Haltern) ermöglicht, über Netzwerkupgrades, Treasury-Ausgaben und andere wichtige Angelegenheiten zu entscheiden.",
+		"overview": "Übersicht",
+		"voting": "Abstimmung",
+		"votes": "Stimmen",
+		"capital": "Kapital",
+		"delegator": "Delegator",
+		"delegatee": "Delegatee",
+		"delegation": "Delegation",
+		"trackDelegation": "Track Delegation",
+		"delegationSplit": "Delegation Split",
+		"totalProposals": "Gesamte Vorschläge",
+		"approvedProposals": "Genehmigte Vorschläge",
+		"monitoredTracks": "Überwachte Tracks",
+		"referendumCount": "Referendum Anzahl",
+		"referendumCountByStatus": "Referendum Anzahl nach Status",
+		"referendumCountByCategory": "Referendum Anzahl nach Kategorie",
+		"monthlySpend": "Monatliche DOT Ausgaben",
+		"averageTurnoutPercentage": "Durchschnittliche Abstimmungsrate"
+	},
+	"DVBadge": {
+		"decentralizedVoice": "Dezentralisierte Stimme"
+	},
+	"Proxies": {
+		"proxyExplorer": "Proxy-Explorer",
+		"createProxy": "Proxy erstellen",
+		"all": "Alle",
+		"myProxies": "Meine Proxies",
+		"delegator": "Delegator",
+		"proxyType": "Proxy-Typ",
+		"delay": "Verzögerung",
+		"proxies": "Proxies",
+		"noProxiesFound": "Keine Proxies gefunden",
+		"searchByAddress": "Adresse eingeben, um zu suchen",
+		"delayTooltip": "Die Verzögerung dient als Sicherheitsmerkmal: Nachdem der Proxy seine beabsichtigte Aktion angekündigt hat, gibt es ein 24-Stunden-Fenster, in dem die Aktion überprüft und bei Bedarf von dem kontrollierenden Konto abgebrochen werden kann, bevor sie ausgeführt wird. Da Polkadot eine durchschnittliche Blockzeit von etwa 6 Sekunden hat, entspricht eine Verzögerung von 14.400 Blöcken ungefähr 24 Stunden.",
+		"please": "Bitte",
+		"logIn": "anmelden",
+		"toViewMyProxies": "um Ihre Proxies zu sehen"
+	},
+	"ProxyType": {
+		"any": "Beliebig",
+		"non_transfer": "Keine Übertragung",
+		"governance": "Governance",
+		"staking": "Staking",
+		"identity_judgement": "Identitätsurteil",
+		"auction": "Auktion",
+		"cancel_proxy": "Proxy abbrechen",
+		"pararegistration": "Para-Registrierung",
+		"nomination_pools": "Nominierungspools",
+		"sudo_balances": "Sudo-Balances"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "Hinweis: {network} wurde zu AssetHub migriert. Bilanzen, Daten, Referenden und andere On-Chain-Aktivitäten wurden zu AssetHub verschoben.",
+		"learnMore": "Mehr erfahren",
+		"polkadotMigration": "Hinweis: Polkadot erfolgt der AssetHub-Migration. Einige Funktionen können während der Migration nicht verfügbar sein."
 	}
 }

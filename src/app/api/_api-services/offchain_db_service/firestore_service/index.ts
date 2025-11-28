@@ -41,7 +41,8 @@ import {
 	IPollVote,
 	IPoll,
 	EPollVotesType,
-	IOffChainPollPayload
+	IOffChainPollPayload,
+	ICommentHistoryItem
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -471,6 +472,11 @@ export class FirestoreService extends FirestoreUtils {
 
 			const commentData = {
 				...dataRaw,
+				history:
+					dataRaw.history?.map((item: { createdAt: Timestamp; content: string }) => ({
+						...item,
+						createdAt: item.createdAt.toDate()
+					})) || [],
 				content: dataRaw.content || '',
 				createdAt: dataRaw.createdAt?.toDate(),
 				updatedAt: dataRaw.updatedAt?.toDate(),
@@ -493,6 +499,59 @@ export class FirestoreService extends FirestoreUtils {
 		return (await Promise.all(commentResponsePromises)).filter((comment): comment is ICommentResponse => comment !== null);
 	}
 
+	static async GetAllNetworkComments({ network, page, limit }: { network: ENetwork; page: number; limit: number }): Promise<IGenericListingResponse<ICommentResponse>> {
+		// Query comments by network, excluding deleted ones, with pagination
+		const commentsQuery = this.commentsCollectionRef()
+			.where('network', '==', network)
+			.where('isDeleted', '==', false)
+			.orderBy('createdAt', 'desc')
+			.limit(limit)
+			.offset((page - 1) * limit);
+
+		const commentsQuerySnapshot = await commentsQuery.get();
+
+		// Get total count for pagination
+		const totalCountQuery = this.commentsCollectionRef().where('network', '==', network).where('isDeleted', '==', false);
+		const totalCountSnapshot = await totalCountQuery.count().get();
+		const totalCount = totalCountSnapshot.data().count;
+
+		const commentResponsePromises = commentsQuerySnapshot.docs.map(async (doc) => {
+			const dataRaw = doc.data();
+
+			const commentData = {
+				...dataRaw,
+				history:
+					dataRaw.history?.map((item: { createdAt: Timestamp; content: string }) => ({
+						...item,
+						createdAt: item.createdAt.toDate()
+					})) || [],
+				content: dataRaw.content || '',
+				createdAt: dataRaw.createdAt?.toDate(),
+				updatedAt: dataRaw.updatedAt?.toDate(),
+				dataSource: dataRaw.dataSource || EDataSource.POLKASSEMBLY
+			} as IComment;
+
+			const user = await this.GetPublicUserById(commentData.userId);
+
+			if (!user) {
+				return null;
+			}
+
+			return {
+				...commentData,
+				publicUser: user,
+				children: []
+			} as ICommentResponse;
+		});
+
+		const comments = (await Promise.all(commentResponsePromises)).filter((comment): comment is ICommentResponse => comment !== null);
+
+		return {
+			items: comments,
+			totalCount
+		};
+	}
+
 	static async GetCommentById(id: string): Promise<IComment | null> {
 		const commentDocSnapshot = await this.commentsCollectionRef().doc(id).get();
 		if (!commentDocSnapshot.exists) {
@@ -507,6 +566,11 @@ export class FirestoreService extends FirestoreUtils {
 
 		return {
 			...data,
+			history:
+				data.history?.map((item: { createdAt: Timestamp; content: string }) => ({
+					...item,
+					createdAt: item.createdAt.toDate()
+				})) || [],
 			content: data.content || '',
 			createdAt: data.createdAt?.toDate(),
 			updatedAt: data.updatedAt?.toDate(),
@@ -521,6 +585,11 @@ export class FirestoreService extends FirestoreUtils {
 			const data = doc.data();
 			const publicUser = await this.GetPublicUserById(data.userId);
 
+			// Skip reactions that have a commentId (these are comment reactions)
+			if (data.commentId) {
+				return null;
+			}
+
 			return {
 				...data,
 				createdAt: data.createdAt?.toDate(),
@@ -529,7 +598,9 @@ export class FirestoreService extends FirestoreUtils {
 			} as IReaction;
 		});
 
-		return Promise.all(reactionPromises);
+		const results = await Promise.all(reactionPromises);
+		// Filter out null values (comment reactions that were skipped)
+		return results.filter((reaction): reaction is IReaction => reaction !== null);
 	}
 
 	static async GetCommentReactions({
@@ -556,6 +627,7 @@ export class FirestoreService extends FirestoreUtils {
 
 			return {
 				...data,
+				id: doc.id,
 				createdAt: data.createdAt?.toDate(),
 				updatedAt: data.updatedAt?.toDate(),
 				publicUser
@@ -581,6 +653,7 @@ export class FirestoreService extends FirestoreUtils {
 
 		return {
 			...data,
+			id: reactionDocSnapshot.id,
 			createdAt: data.createdAt?.toDate(),
 			updatedAt: data.updatedAt?.toDate(),
 			publicUser
@@ -1031,6 +1104,7 @@ export class FirestoreService extends FirestoreUtils {
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			isDeleted: false,
+			history: [],
 			indexOrHash,
 			parentCommentId: parentCommentId || null,
 			dataSource: EDataSource.POLKASSEMBLY,
@@ -1043,13 +1117,35 @@ export class FirestoreService extends FirestoreUtils {
 		return newComment;
 	}
 
-	static async UpdateComment({ commentId, content, isSpam, aiSentiment }: { commentId: string; content: string; isSpam?: boolean; aiSentiment?: ECommentSentiment }) {
+	static async UpdateComment({
+		commentId,
+		content,
+		isSpam,
+		updateHistory,
+		aiSentiment
+	}: {
+		commentId: string;
+		content: string;
+		isSpam?: boolean;
+		updateHistory?: boolean;
+		aiSentiment?: ECommentSentiment;
+	}) {
+		const comment = await this.GetCommentById(commentId);
+
+		if (!comment) {
+			throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND);
+		}
+
+		const history: ICommentHistoryItem[] = updateHistory
+			? [...(comment?.history || []), { content: comment?.content, createdAt: comment?.updatedAt || new Date() }]
+			: comment?.history || [];
 		const newCommentData: Partial<IComment> = {
 			content,
 			...(isSpam && { isSpam }),
 			...(aiSentiment && { aiSentiment }),
 			updatedAt: new Date(),
-			dataSource: EDataSource.POLKASSEMBLY
+			dataSource: EDataSource.POLKASSEMBLY,
+			history
 		};
 
 		await this.commentsCollectionRef().doc(commentId).set(newCommentData, { merge: true });
@@ -1139,6 +1235,7 @@ export class FirestoreService extends FirestoreUtils {
 			.doc(reactionId)
 			.set(
 				{
+					id: reactionId,
 					network,
 					indexOrHash,
 					proposalType,

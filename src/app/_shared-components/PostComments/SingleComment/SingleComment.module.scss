@@ -15,11 +15,11 @@
 }
 
 .tools {
-	@apply flex w-full items-center gap-x-2;
+	@apply flex w-full items-center gap-x-1;
 }
 
 .replyButton {
-	@apply gap-1 p-0 text-xs text-wallet_btn_text/[0.8];
+	@apply gap-1 p-0 text-xs text-wallet_btn_text;
 }
 
 .replies {

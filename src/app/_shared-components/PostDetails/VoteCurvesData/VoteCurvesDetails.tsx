@@ -12,8 +12,8 @@ function VoteCurvesDetails({
 	latestSupport,
 	thresholdValues
 }: {
-	latestApproval: number | null;
-	latestSupport: number | null;
+	latestApproval?: number;
+	latestSupport?: number;
 	thresholdValues: { approvalThreshold: number; supportThreshold: number } | null;
 }) {
 	const t = useTranslations('PostDetails.VoteCurves');

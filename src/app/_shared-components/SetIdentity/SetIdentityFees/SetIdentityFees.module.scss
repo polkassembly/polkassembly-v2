@@ -1,5 +1,5 @@
 .wrapper {
-	@apply flex flex-col gap-y-4;
+	@apply flex flex-1 flex-col gap-y-4 overflow-y-hidden;
 }
 
 .illustration {

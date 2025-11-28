@@ -13,7 +13,6 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import dynamic from 'next/dynamic';
 import { Separator } from '../Separator';
 import EditPostButton from './EditPost/EditPostButton';
-import AISummaryCollapsible from '../AISummary/AISummaryCollapsible';
 import { MarkdownViewer } from '../MarkdownViewer/MarkdownViewer';
 import LinkPostButton from './LinkDiscussionPost/LinkPostButton';
 
@@ -26,13 +25,6 @@ function PostContent({ postData, isModalOpen }: { postData: IPost; isModalOpen: 
 
 	return (
 		<div>
-			<AISummaryCollapsible
-				indexOrHash={String(postData?.index ?? postData?.hash)}
-				proposalType={postData.proposalType}
-				summaryType='content'
-				initialData={postData?.contentSummary}
-			/>
-
 			{user && user.addresses.includes(getSubstrateAddress(postData.onChainInfo?.proposer || '') || '') && postData.isDefaultContent ? (
 				<div className='flex flex-col items-center justify-center gap-y-4'>
 					<Image
@@ -56,6 +48,7 @@ function PostContent({ postData, isModalOpen }: { postData: IPost; isModalOpen: 
 					markdown={content}
 					className={cn(isModalOpen ? '' : 'max-h-full border-none')}
 					truncate
+					lineClampClassName='line-clamp-[12]'
 				/>
 			)}
 

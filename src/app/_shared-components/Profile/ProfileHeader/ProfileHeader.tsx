@@ -2,9 +2,9 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProfileTabs, ESocial, IFollowEntry, IOnChainIdentity, IPublicUser } from '@/_shared/types';
+import { EProfileTabs, ESocial, IFollowEntry, IPublicUser } from '@/_shared/types';
 import Identicon from '@polkadot/react-identicon';
-import { Pencil, ShieldPlus } from 'lucide-react';
+import { Pencil, ShieldPlus, ShieldAlert } from 'lucide-react';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { useTranslations } from 'next-intl';
 import { dayjs } from '@shared/_utils/dayjsInit';
@@ -12,15 +12,15 @@ import Image from 'next/image';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import UserIcon from '@assets/profile/user-icon.svg';
 import { useUser } from '@/hooks/useUser';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import EmailIcon from '@assets/icons/email-icon.svg';
 import TwitterIcon from '@assets/icons/twitter-icon.svg';
 import TelegramIcon from '@assets/icons/telegram-icon.svg';
 import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
-import { cn } from '@/lib/utils';
-import { useIdentityService } from '@/hooks/useIdentityService';
+import { shortenAddress } from '@/_shared/_utils/shortenAddress';
+import { isUserBlacklisted } from '@/_shared/_utils/isUserBlacklisted';
 import { TabsList, TabsTrigger } from '../../Tabs';
 import { Button } from '../../Button';
 import classes from './ProfileHeader.module.scss';
@@ -29,6 +29,9 @@ import EditProfile from '../EditProfile/EditProfile';
 import { Separator } from '../../Separator';
 import { Skeleton } from '../../Skeleton';
 import Address from '../Address/Address';
+import CopyToClipboard from '../../CopyToClipboard/CopyToClipboard';
+import UserAvatar from '../../UserAvatar/UserAvatar';
+import UserBlacklistWarning from '../../UserBlacklistWarning/UserBlacklistWarning';
 
 const SocialIcons = {
 	[ESocial.EMAIL]: EmailIcon,
@@ -52,18 +55,8 @@ function ProfileHeader({
 	const { user } = useUser();
 	const [openEditProfileDialog, setOpenEditProfileDialog] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
-	const { identityService, getOnChainIdentity } = useIdentityService();
 
-	useEffect(() => {
-		if (!address) return;
-
-		const fetchIdentity = async () => {
-			const identityLocal = await getOnChainIdentity(address);
-			setIdentity(identityLocal);
-		};
-		fetchIdentity();
-	}, [identityService, address, getOnChainIdentity]);
+	const [displayAddress, setDisplayAddress] = useState<string | undefined>();
 
 	const queryClient = useQueryClient();
 
@@ -169,10 +162,10 @@ function ProfileHeader({
 								height={90}
 							/>
 						</div>
-					) : userProfileData?.addresses?.[0] || address ? (
+					) : displayAddress ? (
 						<Identicon
 							size={!userProfileData ? 70 : 90}
-							value={userProfileData?.addresses?.[0] || address}
+							value={displayAddress}
 							theme='polkadot'
 							className='rounded-full border-[5px] border-border_blue'
 						/>
@@ -198,20 +191,47 @@ function ProfileHeader({
 				<div className='flex w-full flex-col gap-y-2'>
 					<div className='flex w-full flex-col justify-between gap-x-2 gap-y-3 sm:flex-row sm:items-start'>
 						<div className='mt-2 flex w-full flex-col gap-y-2'>
-							{userProfileData?.username && !identity?.displayParent && !identity?.display ? (
-								<p className={classes.profileHeaderTextTitle}>{userProfileData.username}</p>
-							) : (
-								address && (
-									<>
+							{address ? (
+								<>
+									<div className='flex items-center gap-2'>
 										<Address
 											disableTooltip
+											redirectToProfile={false}
 											address={address}
+											iconSize={26}
 											showIdenticon={false}
-											textClassName={cn('text-center text-lg font-semibold sm:text-left lg:text-2xl')}
+											textClassName='text-center text-lg font-semibold sm:text-left lg:text-2xl'
 										/>
-										{(identity?.display || identity?.displayParent) && <p className='text-base'>{address}</p>}
-									</>
-								)
+										{isUserBlacklisted(userProfileData?.id) && <ShieldAlert className='h-5 w-5 text-red-500' />}
+									</div>
+									<CopyToClipboard
+										label={shortenAddress(address, 5)}
+										text={address}
+										className='text-base'
+									/>
+								</>
+							) : (
+								<>
+									<div className='flex items-center gap-2'>
+										<UserAvatar
+											iconSize={26}
+											showIdenticon={false}
+											textClassName='text-center text-lg font-semibold sm:text-left lg:text-2xl'
+											disableTooltip
+											redirectToProfile={false}
+											publicUser={userProfileData}
+											onAddressSelection={setDisplayAddress}
+										/>
+										{isUserBlacklisted(userProfileData?.id) && <ShieldAlert className='h-5 w-5 text-red-500' />}
+									</div>
+									{displayAddress && (
+										<CopyToClipboard
+											label={shortenAddress(displayAddress, 5)}
+											text={displayAddress}
+											className='text-base'
+										/>
+									)}
+								</>
 							)}
 
 							{userProfileData && (
@@ -318,6 +338,11 @@ function ProfileHeader({
 					{userProfileData?.profileDetails.bio && <p className='text-center text-text_primary sm:text-left'>{userProfileData.profileDetails.bio}</p>}
 				</div>
 			</div>
+			{isUserBlacklisted(userProfileData?.id) && (
+				<div className='mt-6 px-4 sm:px-6'>
+					<UserBlacklistWarning />
+				</div>
+			)}
 			<TabsList className='flex w-full overflow-x-auto'>
 				<TabsTrigger
 					className='uppercase'
@@ -325,6 +350,13 @@ function ProfileHeader({
 				>
 					{t('Profile.overview')}
 				</TabsTrigger>
+				<TabsTrigger
+					className='uppercase'
+					value={EProfileTabs.ACTIVITY}
+				>
+					{t('Profile.activity')}
+				</TabsTrigger>
+
 				<TabsTrigger
 					className='uppercase'
 					value={EProfileTabs.POSTS}

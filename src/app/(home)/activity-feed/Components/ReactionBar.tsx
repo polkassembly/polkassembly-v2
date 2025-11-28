@@ -18,8 +18,6 @@ function ReactionBar({
 	postData,
 	isLiked,
 	isDisliked,
-	showLikeGif,
-	showDislikeGif,
 	handleReaction,
 	isSubscribed,
 	handleSubscribe
@@ -27,8 +25,6 @@ function ReactionBar({
 	postData: IPostListing;
 	isLiked: boolean;
 	isDisliked: boolean;
-	showLikeGif: boolean;
-	showDislikeGif: boolean;
 	handleReaction: (reaction: EReaction) => void;
 	isSubscribed?: boolean;
 	handleSubscribe?: () => void;
@@ -64,13 +60,11 @@ function ReactionBar({
 				<ReactionButton
 					type={EReaction.like}
 					isActive={isLiked}
-					showGif={showLikeGif}
 					onClick={handleLike}
 				/>
 				<ReactionButton
 					type={EReaction.dislike}
 					isActive={isDisliked}
-					showGif={showDislikeGif}
 					onClick={handleDislike}
 				/>
 
@@ -81,7 +75,7 @@ function ReactionBar({
 						onClick={() => handleAuthenticatedAction(handleSubscribe)}
 					>
 						{isCurrentlySubscribed ? <IoBookmark className='mr-2 h-4 w-4 text-bg_pink' /> : <IoBookmarkOutline className='mr-2 h-4 w-4 text-text_pink' />}
-						<span className='text-bg_pink'>{isCurrentlySubscribed ? t('ActivityFeed.unsubscribe') : t('ActivityFeed.subscribe')}</span>
+						<span className='text-bg_pink md:whitespace-nowrap'>{isCurrentlySubscribed ? t('ActivityFeed.unsubscribe') : t('ActivityFeed.subscribe')}</span>
 					</button>
 				)}
 

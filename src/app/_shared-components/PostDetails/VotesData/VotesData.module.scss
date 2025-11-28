@@ -1,5 +1,5 @@
 .card {
-	@apply flex flex-col rounded-xl bg-bg_modal shadow-lg;
+	@apply flex flex-col rounded-xl border border-primary_border bg-bg_modal;
 }
 .header {
 	@apply px-6 pt-6 text-xl font-semibold text-text_primary;

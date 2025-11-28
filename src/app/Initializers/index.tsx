@@ -4,7 +4,7 @@
 
 'use client';
 
-import { IAccessTokenPayload, IRefreshTokenPayload, IUserPreferences, EAccountType, IAddressRelations } from '@/_shared/types';
+import { IRefreshTokenPayload, IUserPreferences, EAccountType, IAddressRelations, IAccessTokenPayload } from '@/_shared/types';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -26,6 +26,8 @@ import { isMimirDetected } from '../_client-services/isMimirDetected';
 
 function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const network = getCurrentNetwork();
+
+	const userDataClient = CookieClientService.getAccessTokenPayload();
 
 	const { user, setUser, setUserAddressRelations } = useUser();
 	const { setUserPreferences } = useUserPreferences();
@@ -213,7 +215,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 			theme: theme || userPreferences.theme,
 			...(accessTokenPayload?.loginAddress
 				? {
-						address: {
+						selectedAccount: {
 							address: accessTokenPayload.loginAddress,
 							accountType: EAccountType.REGULAR,
 							name: '',
@@ -230,18 +232,19 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 	// set user
 	useEffect(() => {
-		if (!userData) {
+		if (!userData || !userDataClient) {
 			return;
 		}
 
 		setUser(userData);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [userData]);
+	}, []);
 
 	// set address relations
 	useEffect(() => {
+		if (!userDataClient || (user?.addressRelations && user.id === userDataClient.id)) return;
 		const fetchAddressRelations = async () => {
-			const userAddresses = userData?.addresses;
+			const userAddresses = userDataClient?.addresses;
 			if (!userAddresses?.length) return;
 
 			const addressRelations: IAddressRelations[] = [];
@@ -263,7 +266,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 		fetchAddressRelations();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [userData]);
+	}, [userDataClient]);
 
 	return null;
 }

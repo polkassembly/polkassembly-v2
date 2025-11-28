@@ -2,6 +2,12 @@
 	@apply bg-border_grey;
 }
 
+@property --angle {
+	syntax: '<angle>';
+	initial-value: 136.17deg;
+	inherits: false;
+}
+
 .hide_scrollbar {
 	@apply overflow-y-auto;
 	-ms-overflow-style: none;
@@ -13,11 +19,28 @@
 }
 
 .create_proposal_button {
-	@apply mx-3 mb-2 flex cursor-pointer items-center justify-center gap-[10px] rounded-xl border border-solid border-border_grey bg-page_background px-[5px] py-2;
+	@apply flex cursor-pointer items-center justify-center gap-[10px] rounded-xl border border-solid border-border_grey bg-page_background px-[5px] py-2;
 }
 
-.dark .create_proposal_button {
-	@apply border-[var(--separator-dark)] bg-[var(--section-dark-background)];
+.chat_button {
+	@apply z-10 mb-2 w-full rounded-xl bg-page_background p-[2px];
+	background-image: conic-gradient(from var(--angle) at 53.41% 52.82%, #51d36e 0deg, #e5007a 77.42deg, #3473ff 158.47deg, #ffd663 270deg, #51d36e 360deg);
+
+	animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+	from {
+		--angle: 0deg;
+	}
+
+	to {
+		--angle: 360deg;
+	}
+}
+
+.chat_button_content {
+	@apply flex cursor-pointer items-center gap-[10px] rounded-[10.5px] bg-page_background px-[5px] py-2;
 }
 
 .sidebar_logo {

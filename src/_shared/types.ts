@@ -7,15 +7,28 @@
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
-import { TypeDef } from '@polkadot/types/types';
+import { SignerResult, TypeDef } from '@polkadot/types/types';
+import { HexString } from '@polkadot/util/types';
 import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
 	KUSAMA = 'kusama',
+	ASSETHUB_KUSAMA = 'assethub-kusama',
 	POLKADOT = 'polkadot',
 	WESTEND = 'westend',
 	PASEO = 'paseo',
 	CERE = 'cere'
+}
+
+export enum ENetworkSocial {
+	HOME = 'home',
+	TWITTER = 'twitter',
+	DISCORD = 'discord',
+	GITHUB = 'github',
+	YOUTUBE = 'youtube',
+	REDDIT = 'reddit',
+	TELEGRAM = 'telegram',
+	SUBSCAN = 'subscan'
 }
 
 export enum EGovType {
@@ -156,6 +169,7 @@ export enum EWallet {
 	POLKAGATE = 'polkagate',
 	NOVAWALLET = 'nova',
 	MIMIR = 'mimir',
+	POLKADOT_VAULT = 'polkadot-vault',
 	OTHER = ''
 	// METAMASK = 'metamask',
 	// WALLETCONNECT = 'walletconnect',
@@ -216,6 +230,7 @@ export interface IMultisigAddress {
 export interface IProxyAddress {
 	address: string;
 	proxyType: EProxyType;
+	delay?: number;
 }
 
 export interface IAddressRelations {
@@ -330,7 +345,8 @@ export enum ENotificationTrigger {
 
 export enum EDataSource {
 	POLKASSEMBLY = 'polkassembly',
-	SUBSQUARE = 'subsquare'
+	SUBSQUARE = 'subsquare',
+	OTHER = 'other'
 }
 
 export enum EReaction {
@@ -404,6 +420,9 @@ export interface IOffChainContentHistoryItem {
 	title?: string;
 	createdAt: Date;
 }
+
+export type ICommentHistoryItem = Omit<IOffChainContentHistoryItem, 'title'>;
+
 export interface IPollVote {
 	id: string;
 	userId: number;
@@ -554,6 +573,7 @@ export interface IBeneficiary {
 	amount: string;
 	assetId?: string | null;
 	validFromBlock?: string;
+	usdAmount?: string;
 }
 
 export interface IBeneficiaryInput extends IBeneficiary {
@@ -649,6 +669,7 @@ export interface ISidebarMenuItem {
 	items?: ISidebarMenuItem[];
 	key?: string;
 	heading?: string;
+	renderAsParentItem?: boolean;
 }
 
 export interface IMessageResponse {
@@ -714,7 +735,7 @@ export interface IComment {
 	isSpam?: boolean;
 	sentiment?: ECommentSentiment;
 	aiSentiment?: ECommentSentiment;
-	history?: IOffChainContentHistoryItem[];
+	history?: ICommentHistoryItem[];
 	disabled?: boolean;
 	authorAddress?: string;
 }
@@ -756,8 +777,8 @@ export enum EAssets {
 
 export enum EPostDetailsTab {
 	DESCRIPTION = 'description',
-	TIMELINE = 'timeline',
 	ONCHAIN_INFO = 'onchain_info',
+	SUMMARISE = 'summarise',
 	POST_ANALYTICS = 'post_analytics'
 }
 
@@ -940,6 +961,7 @@ export interface IOnChainMetadata {
 	enactmentAfterBlock?: number;
 	createdAt?: Date;
 	createdAtBlock?: number;
+	submittedAtBlock?: number;
 	hash?: string;
 }
 
@@ -1010,7 +1032,12 @@ export interface IPostSubscription {
 export enum EReactQueryKeys {
 	BATCH_VOTE_CART = 'batch-vote-cart',
 	COMMENTS = 'comments',
-	POST_DETAILS = 'postDetails'
+	POST_DETAILS = 'postDetails',
+	ACCOUNTS = 'accounts',
+	IDENTITY_INFO = 'identityInfo',
+	TOKENS_USD_PRICE = 'tokensUsdPrice',
+	USER_VOTES = 'userVotes',
+	PROFILE_IDENTITIES = 'profileIdentities'
 }
 
 export interface IParamDef {
@@ -1130,6 +1157,8 @@ export interface ITreasuryStats {
 	};
 	nativeTokenUsdPrice?: string;
 	nativeTokenUsdPrice24hChange?: string;
+	dedTokenUsdPrice?: string;
+	dedTokenUsdPrice24hChange?: string;
 	[key: string]: unknown;
 }
 
@@ -1250,7 +1279,9 @@ export enum EPeriodType {
 export enum ESearchType {
 	POSTS = 'posts',
 	DISCUSSIONS = 'discussions',
-	USERS = 'users'
+	USERS = 'users',
+	BOUNTIES = 'bounties',
+	OTHER = 'other'
 }
 
 export enum ESearchDiscussionType {
@@ -1377,7 +1408,8 @@ export enum ESetIdentityStep {
 	SET_IDENTITY_FORM = 'SET_IDENTITY_FORM',
 	REQUEST_JUDGEMENT = 'REQUEST_JUDGEMENT',
 	IDENTITY_SUCCESS = 'IDENTITY_SUCCESS',
-	TELEPORT_TO_PEOPLE_CHAIN = 'TELEPORT_TO_PEOPLE_CHAIN'
+	TELEPORT_TO_PEOPLE_CHAIN = 'TELEPORT_TO_PEOPLE_CHAIN',
+	CLEAR_IDENTITY = 'CLEAR_IDENTITY'
 }
 
 export interface IAnalytics {
@@ -1471,6 +1503,191 @@ export type IPostBubbleVotes = {
 	};
 };
 
+export interface IVaultScannedAddress {
+	content: string;
+	isAddress: boolean;
+	genesisHash: HexString | null;
+	name?: string;
+}
+
+export interface IVaultQrState {
+	open: boolean;
+	isQrHashed: boolean;
+	qrAddress: string;
+	qrPayload: Uint8Array;
+	qrResolve?: (result: SignerResult) => void;
+	qrReject?: (error: Error) => void;
+}
+
+export enum EVoteBubbleTabs {
+	Bubble = 'bubble',
+	Graph = 'graph'
+}
+
+export interface IProfileVote extends Omit<IVoteData, 'createdAtBlock' | 'delegatedTo' | 'balanceValue'> {
+	balance: {
+		value: string;
+		abstain: string;
+		aye: string;
+		nay: string;
+	};
+	proposalIndex: number;
+	proposalType: EProposalType;
+	postDetails?: IPostListing;
+	isDelegated: boolean;
+	extrinsicIndex: string;
+	proposal?: {
+		status: EProposalStatus;
+	};
+}
+
+export interface IGovAnalyticsStats {
+	totalProposals: number;
+	approvedProposals: number;
+}
+
+export interface IGovAnalyticsReferendumOutcome {
+	approved: number;
+	rejected: number;
+	timeout: number;
+	ongoing: number;
+	cancelled: number;
+}
+
+export interface ITurnoutPercentageData {
+	averageSupportPercentages: Record<string, number>;
+}
+
+export interface IRawTurnoutData {
+	proposals: {
+		index: number;
+		trackNumber?: number;
+		convictionVoting: {
+			balance: {
+				value?: string;
+				aye?: string;
+				nay?: string;
+				abstain?: string;
+			};
+			decision: 'yes' | 'no' | 'abstain' | 'split' | 'splitAbstain';
+		}[];
+	}[];
+}
+
+export interface IGovAnalyticsDelegationStats {
+	totalCapital: string;
+	totalVotesBalance: string;
+	totalDelegates: number;
+	totalDelegators: number;
+}
+
+export interface IGovAnalyticsCategoryCounts {
+	governance: number | null;
+	main: number | null;
+	treasury: number | null;
+	whiteList: number | null;
+}
+
+// please make sure this is updated with the latest changes in the functions/src/types.ts file
+export interface IAlgoliaPost extends Record<string, unknown> {
+	objectID: string;
+	title: string;
+	createdAtTimestamp?: number;
+	updatedAtTimestamp?: number;
+	tags: string[];
+	dataSource: string;
+	proposalType: string;
+	network: string;
+	topic: string;
+	lastCommentAtTimestamp?: number;
+	userId: number;
+	hash?: string;
+	index?: number;
+	parsedContent: string;
+	titleAndContentHash: string;
+	proposer?: string;
+	origin?: EPostOrigin;
+}
+
+export enum EProxyDashboardTabs {
+	ALL = 'all',
+	MY_PROXIES = 'my-proxies'
+}
+
+export interface IProxyRequest {
+	id: string;
+	delegator: string;
+	proxyType?: EProxyType;
+	delay: number;
+	proxies: number;
+	proxyAddresses: string[];
+	individualProxies: IProxyAddress[];
+	dateCreated: Date;
+}
+
+export type IProxyListingResponse = IGenericListingResponse<IProxyRequest>;
+
+export enum EChatState {
+	EXPANDED = 'expanded',
+	COLLAPSED = 'collapsed',
+	EXPANDED_SMALL = 'expanded_small',
+	CLOSED = 'closed'
+}
+
+export interface IConversationHistory {
+	id: string;
+	title: string;
+	lastMessage: string;
+	lastActivity: number;
+	messageCount: number;
+}
+
+export interface IChatDataSource {
+	title: string;
+	url: string;
+	source_type: string;
+	similarity_score: number;
+}
+
+export interface IConversationMessage {
+	id: string;
+	text: string;
+	sender: 'user' | 'ai';
+	timestamp: number;
+	conversationId: string;
+	isStreaming?: boolean;
+	sources?: IChatDataSource[];
+	followUpQuestions?: string[];
+}
+
+export interface IConversationTurn {
+	query: string; // User's question
+	response: string; // AI's response
+	timestamp?: string; // Optional timestamp
+}
+
+export interface IChatApiResponse {
+	answer: string; // AI-generated response
+	sources: IChatDataSource[]; // Array of source documents
+	follow_up_questions: string[]; // Array of suggested questions
+	remaining_requests: number; // Rate limit remaining count
+	confidence: number; // 0.0-1.0 confidence score
+	context_used: boolean; // Whether document context was used
+	model_used: string; // AI model name (e.g., "gpt-3.5-turbo")
+	chunks_used: number; // Number of document chunks used
+	processing_time_ms: number; // Response time in milliseconds
+	timestamp: string; // ISO timestamp
+	search_method: string; // Method: "local_knowledge", "web_search", etc.
+}
+
+export interface IChatResponse {
+	text: string;
+	sources?: IChatDataSource[];
+	followUpQuestions?: string[];
+	isNewConversation?: boolean;
+	conversationId?: string;
+}
+
 export enum EJudgementDashboardTabs {
 	DASHBOARD = 'dashboard',
 	REGISTRARS = 'registrars'
@@ -1481,14 +1698,6 @@ export enum EJudgementStatus {
 	APPROVED = 'Approved',
 	REJECTED = 'Rejected',
 	PENDING = 'Pending'
-}
-
-export enum EJudgementStatusType {
-	REASONABLE = 'Reasonable',
-	KNOWN_GOOD = 'KnownGood',
-	OUT_OF_DATE = 'OutOfDate',
-	LOW_QUALITY = 'LowQuality',
-	ERRONEOUS = 'Erroneous'
 }
 
 export interface IJudgementRequest {
@@ -1509,21 +1718,3 @@ export interface IJudgementStats {
 	percentageIncreaseFromLastMonth: number;
 	percentageCompletedThisMonth: number;
 }
-
-export interface IRegistrarInfo {
-	address: string;
-	latestJudgementDate?: Date;
-	totalReceivedRequests: number;
-	totalJudgementsGiven: number;
-	registrarFee: string;
-	registrarIndex: number;
-}
-
-export enum EStatusTagType {
-	PROPOSAL = 'proposal',
-	JUDGEMENT = 'judgement'
-}
-
-export type IJudgementListingResponse = IGenericListingResponse<IJudgementRequest>;
-
-export type IRegistrarsListingResponse = IGenericListingResponse<IRegistrarInfo>;

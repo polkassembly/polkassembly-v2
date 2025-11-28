@@ -52,16 +52,3 @@
 .curatorunassigned {
 	@apply border-[#666666] bg-[#666666];
 }
-
-// Judgement status styles
-.pending {
-	@apply border-orange-500 bg-orange-500 dark:border-orange-700 dark:bg-orange-700;
-}
-
-.approved {
-	@apply border-green-500 bg-green-500 dark:border-green-700 dark:bg-green-700;
-}
-
-.rejected {
-	@apply border-red-500 bg-red-500 dark:border-red-700 dark:bg-red-700;
-}

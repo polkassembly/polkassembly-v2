@@ -17,6 +17,11 @@ import type { Components } from 'react-markdown';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import Image from 'next/image';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { failedImageUrlsAtom } from '@/app/_atoms/klara/klaraAtom';
+
+const HighlightMenu = dynamic(() => import('../HighlightMenu/HighlightMenu'), { ssr: false });
 
 const extractUrlsAndEmails = (text: string): string[] => {
 	const words = text.split(/\s+/);
@@ -79,9 +84,47 @@ const getEmbedUrl = (url: string): string | null => {
 	return null;
 };
 
+function SafeImage({ src, alt, height, width }: { src: string; alt?: string; height?: string | number; width?: string | number }) {
+	const failedUrls = useAtomValue(failedImageUrlsAtom);
+	const setFailedUrls = useSetAtom(failedImageUrlsAtom);
+
+	if (failedUrls.has(src)) {
+		return null;
+	}
+
+	const imageHeight = ValidatorService.isValidNumber(height) ? Number(height) : undefined;
+	const imageWidth = ValidatorService.isValidNumber(width) ? Number(width) : undefined;
+
+	return (
+		<span className='mr-2 inline-block align-top'>
+			<Link
+				href={src}
+				target='_blank'
+				rel='noopener noreferrer'
+			>
+				<Image
+					src={src}
+					alt={alt || 'Image'}
+					height={imageHeight || 800}
+					width={imageWidth || 800}
+					sizes='100vw'
+					unoptimized
+					onError={() => {
+						setFailedUrls((prev: Set<string>) => new Set(prev).add(src));
+					}}
+				/>
+			</Link>
+		</span>
+	);
+}
+
 const markdownComponents: Components = {
 	div: 'div',
-	table: 'table',
+	table: ({ children, ...props }) => (
+		<div className='w-full overflow-x-auto'>
+			<table {...props}>{children}</table>
+		</div>
+	),
 	thead: 'thead',
 	tbody: 'tbody',
 	tr: 'tr',
@@ -92,7 +135,7 @@ const markdownComponents: Components = {
 	li: 'li',
 	code: 'code',
 	pre: 'pre',
-	img: ({ src, alt }) => {
+	img: ({ src, alt, height, width }) => {
 		if (!src) {
 			return null;
 		}
@@ -145,24 +188,12 @@ const markdownComponents: Components = {
 		}
 
 		return (
-			<Link
-				href={src}
-				target='_blank'
-				rel='noopener noreferrer'
-				className='cursor-pointer'
-			>
-				<Image
-					src={src}
-					alt={alt || 'Image'}
-					height={256}
-					width={256}
-					sizes='100vw'
-					style={{
-						width: '90%',
-						height: 'auto'
-					}}
-				/>
-			</Link>
+			<SafeImage
+				src={src}
+				alt={alt}
+				height={height}
+				width={width}
+			/>
 		);
 	},
 	a: ({ href, children, ...props }) => {
@@ -267,12 +298,12 @@ interface ReactMarkdownProps {
 	markdown: string;
 	className?: string;
 	truncate?: boolean;
-	maxLines?: number;
+	lineClampClassName?: string;
 	onShowMore?: () => void;
 }
 
 export function MarkdownViewer(props: ReactMarkdownProps) {
-	const { markdown, className, truncate = false, maxLines = 4, onShowMore } = props;
+	const { markdown, className, truncate = false, lineClampClassName, onShowMore } = props;
 	const [showMore, setShowMore] = useState(false);
 	const [isTruncated, setIsTruncated] = useState(false);
 	const editorRef = useRef<HTMLDivElement>(null);
@@ -328,8 +359,9 @@ export function MarkdownViewer(props: ReactMarkdownProps) {
 		<div className='w-full'>
 			<div
 				ref={editorRef}
-				className={cn('markdown-body', truncate && !showMore ? `line-clamp-${maxLines}` : 'line-clamp-none', 'w-full', className)}
+				className={cn('markdown-body', truncate && !showMore ? lineClampClassName || 'line-clamp-4' : 'line-clamp-none', 'w-full', className)}
 			>
+				<HighlightMenu markdownRef={editorRef} />
 				<ReactMarkdownLib
 					components={markdownComponents}
 					remarkPlugins={[remarkGfm, remarkBreaks]}

@@ -6,7 +6,7 @@
 
 import { useState } from 'react';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
-import { IBeneficiary, IPayout } from '@/_shared/types';
+import { ENetwork, IBeneficiary, IPayout } from '@/_shared/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
@@ -16,6 +16,8 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useToast } from '@/hooks/useToast';
 import { useTranslations } from 'next-intl';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
+import { useAssethubApiService } from '@/hooks/useAssethubApiService';
 import Address from '../../Profile/Address/Address';
 import { Separator } from '../../Separator';
 import SwitchWalletOrAddress from '../../SwitchWalletOrAddress/SwitchWalletOrAddress';
@@ -30,6 +32,8 @@ function ClaimPayout({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
 
 	const { apiService } = usePolkadotApiService();
 
+	const { setVaultQrState } = usePolkadotVault();
+
 	const [loading, setLoading] = useState(false);
 
 	const [open, setOpen] = useState(false);
@@ -38,10 +42,16 @@ function ClaimPayout({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
 
 	const queryClient = useQueryClient();
 
+	const { assethubApiService } = useAssethubApiService();
+
 	const fetchPendingTreasurySpends = async () => {
 		if (!apiService) return null;
 
-		return apiService.getTreasurySpendsData();
+		const relayChainBlockHeight = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network)
+			? await assethubApiService?.getBlockHeight()
+			: await apiService?.getBlockHeight();
+
+		return apiService.getTreasurySpendsData({ relayChainBlockHeight });
 	};
 
 	const { data: pendingTreasurySpends } = useQuery({
@@ -68,13 +78,15 @@ function ClaimPayout({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
 	if (pendingTreasurySpendsByBeneficiary.length === 0) return null;
 
 	const claimPayout = async () => {
-		if (!apiService || !userPreferences?.selectedAccount?.address || pendingTreasurySpendsByBeneficiary.length === 0) return;
+		if (!apiService || !userPreferences?.selectedAccount?.address || pendingTreasurySpendsByBeneficiary.length === 0 || !userPreferences.wallet) return;
 
 		setLoading(true);
 
 		await apiService.claimTreasuryPayout({
 			payouts: pendingTreasurySpendsByBeneficiary,
-			address: userPreferences?.selectedAccount?.address,
+			address: userPreferences.selectedAccount.address,
+			wallet: userPreferences.wallet,
+			setVaultQrState,
 			onSuccess: () => {
 				setLoading(false);
 				toast({

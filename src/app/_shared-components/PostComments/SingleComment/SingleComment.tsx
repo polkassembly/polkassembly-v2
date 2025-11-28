@@ -4,10 +4,10 @@
 
 'use client';
 
-import { ICommentResponse, ENotificationStatus } from '@/_shared/types';
+import { ICommentResponse, ENotificationStatus, ICommentHistoryItem } from '@/_shared/types';
 import { Dispatch, SetStateAction, useCallback, memo, useState, useRef, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Identicon from '@polkadot/react-identicon';
-import ReplyIcon from '@assets/icons/Vote.svg';
 import Image from 'next/image';
 import { Button } from '@ui/Button';
 import Link from 'next/link';
@@ -16,7 +16,7 @@ import { Separator } from '@ui/Separator';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
 import { useTranslations } from 'next-intl';
-import { Ellipsis } from 'lucide-react';
+import { CornerUpLeft, Ellipsis } from 'lucide-react';
 import { CommentClientService } from '@/app/_client-services/comment_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
@@ -27,12 +27,17 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EVM_NETWORKS } from '@/_shared/_constants/evmNetworks';
 import { MDXEditorMethods } from '@mdxeditor/editor';
 import { useToast } from '@/hooks/useToast';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import AddComment from '../AddComment/AddComment';
 import classes from './SingleComment.module.scss';
 import Address from '../../Profile/Address/Address';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../DropdownMenu';
 import VoteComments from '../VoteComments/VoteComments';
 import { MarkdownEditor } from '../../MarkdownEditor/MarkdownEditor';
+import { Skeleton } from '../../Skeleton';
+import CommentReactions from '../CommentReactions/CommentReactions';
+
+const CommentHistory = dynamic(() => import('./CommentHistory/CommentHistory'), { ssr: false, loading: () => <Skeleton className='h-8 w-16' /> });
 
 interface SingleCommentProps {
 	commentData: ICommentResponse;
@@ -57,6 +62,7 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 	const [content, setContent] = useState<string>(commentData.content);
 
 	const user = useAtomValue(userAtom);
+	const [history, setHistory] = useState<ICommentHistoryItem[]>(commentData?.history || []);
 
 	const { toast } = useToast();
 
@@ -144,6 +150,9 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 		});
 		setIsEditing(false);
 
+		// create a new comment history item with the new content
+		setHistory((prev) => [...prev, { content: originalContent || '', createdAt: new Date() }]);
+
 		setLoading(true);
 
 		const { data, error } = await CommentClientService.editCommentFromPost({
@@ -171,6 +180,8 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 				description: error?.message || 'Failed to edit comment',
 				status: ENotificationStatus.ERROR
 			});
+			// remove the new history item from the comment history array
+			setHistory((prev) => (prev && prev.length ? prev.slice(0, -1) : []));
 			return;
 		}
 		toast({
@@ -219,6 +230,10 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 	const isHighlighted = typeof window !== 'undefined' && window?.location?.hash === `#comment-${comment.id}`;
 	const wrapperClassName = isHighlighted ? `${classes.wrapper} ${classes.highlighted}` : classes.wrapper;
 
+	const firstReply = comment.children?.[0];
+
+	const repliesToShow = !parentCommentId ? comment.children?.slice(1) : comment.children;
+
 	return (
 		<div
 			id={`comment-${comment.id}`}
@@ -256,7 +271,7 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 						value={addressToDisplay}
 						theme='polkadot'
 					/>
-				) : comment?.publicUser?.profileDetails?.image ? (
+				) : comment?.publicUser?.profileDetails?.image && ValidatorService.isValidImageSrc(comment.publicUser.profileDetails.image) ? (
 					<Image
 						src={comment.publicUser.profileDetails.image}
 						alt='profile'
@@ -291,6 +306,13 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 						className='h-3'
 					/>
 					<CreatedAtTime createdAt={comment.updatedAt || comment.createdAt} />
+					{history && history?.length > 0 && (
+						<CommentHistory
+							authorAddress={addressToDisplay}
+							authorUsername={comment?.publicUser?.username}
+							history={[...history, { content: comment.content, createdAt: comment.updatedAt || comment.createdAt }]}
+						/>
+					)}
 					{comment.voteData && comment.voteData.length > 0 && (
 						<>
 							<Separator
@@ -336,98 +358,98 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 				)}
 
 				<div className={classes.tools}>
-					<div className={classes.tools}>
-						{user ? (
+					<CommentReactions
+						commentData={comment}
+						disabled={comment.disabled}
+					/>
+					{user ? (
+						<Button
+							variant='ghost'
+							className={classes.replyButton}
+							onClick={handleToggleReply}
+							size='sm'
+							disabled={comment.disabled}
+							leftIcon={
+								<CornerUpLeft
+									size={14}
+									className={classes.replyButton}
+								/>
+							}
+						>
+							{t('PostDetails.reply')}
+						</Button>
+					) : (
+						<Link
+							href='/login'
+							className='p-0'
+						>
 							<Button
 								variant='ghost'
-								className={classes.replyButton}
-								onClick={handleToggleReply}
 								size='sm'
-								disabled={comment.disabled}
+								className={classes.replyButton}
 								leftIcon={
-									<Image
-										src={ReplyIcon}
-										alt='reply'
-										className='darkIcon'
+									<CornerUpLeft
+										size={14}
+										className={classes.replyButton}
 									/>
 								}
 							>
 								{t('PostDetails.reply')}
 							</Button>
-						) : (
-							<Link
-								href='/login'
-								className='p-0'
+						</Link>
+					)}
+					<div className='ml-auto'>
+						<DropdownMenu>
+							<DropdownMenuTrigger
+								noArrow
+								className='border-none'
 							>
-								<Button
-									variant='ghost'
-									size='sm'
-									className={classes.replyButton}
-									leftIcon={
-										<Image
-											src={ReplyIcon}
-											alt='reply'
-											className='darkIcon'
-										/>
-									}
-								>
-									{t('PostDetails.reply')}
-								</Button>
-							</Link>
-						)}
-						<div className='ml-auto'>
-							<DropdownMenu>
-								<DropdownMenuTrigger
-									noArrow
-									className='border-none'
-								>
-									<Ellipsis
-										className='text-text_primary/[0.8]'
-										size={14}
-									/>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent>
-									<DropdownMenuItem className='hover:bg-bg_pink/10'>
-										<Button
-											variant='ghost'
-											className='h-auto p-0 text-sm text-text_primary'
-											onClick={handleCopyCommentLink}
-											size='sm'
-										>
-											{t('PostDetails.copyLink')}
-										</Button>
-									</DropdownMenuItem>
-									{user && comment.userId === user.id && (
-										<>
-											<DropdownMenuItem className='hover:bg-bg_pink/10'>
-												<Button
-													variant='ghost'
-													className='h-auto p-0 text-sm text-text_primary'
-													disabled={comment.userId !== user.id || comment.disabled}
-													onClick={toggleEditComment}
-													size='sm'
-													isLoading={loading}
-												>
-													{t('PostDetails.edit')}
-												</Button>
-											</DropdownMenuItem>
-											<DropdownMenuItem className='hover:bg-bg_pink/10'>
-												<Button
-													variant='ghost'
-													className='h-auto p-0 text-sm text-text_primary'
-													disabled={comment.userId !== user.id || comment.disabled}
-													onClick={handleOpenDeleteModal}
-													size='sm'
-													isLoading={loading}
-												>
-													{t('PostDetails.delete')}
-												</Button>
-											</DropdownMenuItem>
-										</>
-									)}
-								</DropdownMenuContent>
-							</DropdownMenu>
-						</div>
+								<Ellipsis
+									className='text-text_primary/[0.8]'
+									size={14}
+								/>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent>
+								<DropdownMenuItem className='hover:bg-bg_pink/10'>
+									<Button
+										variant='ghost'
+										className='h-auto p-0 text-sm text-text_primary'
+										onClick={handleCopyCommentLink}
+										size='sm'
+									>
+										{t('PostDetails.copyLink')}
+									</Button>
+								</DropdownMenuItem>
+								{user && comment.userId === user.id && (
+									<>
+										<DropdownMenuItem className='hover:bg-bg_pink/10'>
+											<Button
+												variant='ghost'
+												className='h-auto p-0 text-sm text-text_primary'
+												disabled={comment.userId !== user.id || comment.disabled}
+												onClick={toggleEditComment}
+												size='sm'
+												isLoading={loading}
+											>
+												{t('PostDetails.edit')}
+											</Button>
+										</DropdownMenuItem>
+										<DropdownMenuItem className='hover:bg-bg_pink/10'>
+											<Button
+												variant='ghost'
+												className='h-auto p-0 text-sm text-text_primary'
+												disabled={comment.userId !== user.id || comment.disabled}
+												onClick={handleOpenDeleteModal}
+												size='sm'
+												isLoading={loading}
+											>
+												{t('PostDetails.delete')}
+											</Button>
+										</DropdownMenuItem>
+									</>
+								)}
+							</DropdownMenuContent>
+						</DropdownMenu>
 					</div>
 				</div>
 
@@ -446,7 +468,16 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 					/>
 				)}
 
-				{comment.children && comment.children.length > 0 && (
+				{!parentCommentId && firstReply && (
+					<SingleComment
+						commentData={firstReply}
+						setParentComment={setComment}
+						setComments={setComments}
+						parentCommentId={parentCommentId || comment.id}
+					/>
+				)}
+
+				{repliesToShow && repliesToShow.length > 0 && (
 					<div className={classes.replies}>
 						<div className={classes.viewReplies}>
 							<Separator className='w-[20px]' />
@@ -456,11 +487,11 @@ function SingleComment({ commentData, setParentComment, setComments, parentComme
 								variant='ghost'
 								size='sm'
 							>
-								{showReplies ? t('PostDetails.hideReplies') : `${t('PostDetails.viewReplies')} (${comment.children.length})`}
+								{showReplies ? t('PostDetails.hideReplies') : `${t('PostDetails.viewReplies')} (${repliesToShow.length})`}
 							</Button>
 						</div>
 						{showReplies &&
-							comment.children.map((item) => (
+							repliesToShow.map((item) => (
 								<SingleComment
 									key={item.id}
 									commentData={item}

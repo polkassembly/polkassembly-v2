@@ -15,6 +15,7 @@ import AstarLogo from '@assets/parachain-logos/astar-logo.png';
 import AcalaLogo from '@assets/parachain-logos/acala-logo.jpg';
 import ComposableLogo from '@assets/parachain-logos/composable-finance-logo.png';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
+import AssethubKusamaLogo from '@assets/parachain-logos/assethub-kusama.svg';
 import CentrifugeLogo from '@assets/parachain-logos/centrifuge-logo.png';
 import CollectivesLogo from '@assets/parachain-logos/collectives-logo.png';
 import AmplitudeLogo from '@assets/parachain-logos/amplitude-logo.png';
@@ -109,6 +110,7 @@ const NETWORKS_DISPLAY_DATA: INetworkDisplayData = {
 	},
 	kusama: {
 		Kusama: KusamaLogo,
+		'Assethub-Kusama': AssethubKusamaLogo,
 		Altair: AltairLogo,
 		Amplitude: AmplitudeLogo,
 		Basilisk: BasiliskLogo,

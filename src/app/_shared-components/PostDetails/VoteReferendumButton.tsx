@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { EPostOrigin, EProposalType } from '@/_shared/types';
 import { useState } from 'react';
 import { Button } from '../Button';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '../Dialog/Dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../Dialog/Dialog';
 import VoteReferendum from './VoteReferendum/VoteReferendum';
 
 interface VoteReferendumButtonProps {
@@ -21,14 +21,16 @@ interface VoteReferendumButtonProps {
 	btnClassName?: string;
 	iconClassName?: string;
 	size?: 'sm' | 'lg';
+	hasVoted?: boolean;
 	track?: EPostOrigin;
 	proposalType: EProposalType;
 }
 
-function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg', track, proposalType }: VoteReferendumButtonProps) {
+function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg', hasVoted = false, track, proposalType }: VoteReferendumButtonProps) {
 	const { user } = useUser();
 	const t = useTranslations();
 	const [openModal, setOpenModal] = useState(false);
+
 	return !user ? (
 		<Link href='/login'>
 			<Button
@@ -65,12 +67,14 @@ function VoteReferendumButton({ index, btnClassName, iconClassName, size = 'lg',
 							height={20}
 							className={iconClassName}
 						/>
-						{t('PostDetails.castVote')}
+						{hasVoted ? t('PostDetails.changeVote') : t('PostDetails.castVote')}
 					</div>
 				</Button>
 			</DialogTrigger>
 			<DialogContent className='max-w-xl p-3 sm:p-6'>
-				<DialogHeader className='text-xl font-semibold text-text_primary'>{t('PostDetails.castYourVote')}</DialogHeader>
+				<DialogHeader className='text-xl font-semibold text-text_primary'>
+					<DialogTitle>{t('PostDetails.castYourVote')}</DialogTitle>
+				</DialogHeader>
 				<VoteReferendum
 					index={index}
 					track={track}

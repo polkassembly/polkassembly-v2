@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { BN } from '@polkadot/util';
-import { ENetwork, EPostOrigin, EGovType, EAssets } from '@shared/types';
+import { ENetwork, EPostOrigin, EGovType, EAssets, ENetworkSocial } from '@shared/types';
 import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
 import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
 import { FaYoutube } from '@react-icons/all-files/fa/FaYoutube';
@@ -15,6 +15,7 @@ import { BiCube } from '@react-icons/all-files/bi/BiCube';
 import { IconType } from '@react-icons/all-files/lib';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
+import AssethubKusamaLogo from '@assets/parachain-logos/assethub-kusama.svg';
 import WestendLogo from '@assets/parachain-logos/westend-logo.jpg';
 import PaseoLogo from '@assets/parachain-logos/paseo-logo.png';
 import CereLogo from '@assets/parachain-logos/cere-logo.jpg';
@@ -38,7 +39,16 @@ const VIA_IBP_GEODNS1 = 'via IBP-GeoDNS1';
 const VIA_IBP_GEODNS2 = 'via IBP-GeoDNS2';
 const VIA_RADIUMBLOCK = 'via RadiumBlock';
 const VIA_LUCKYFRIDAY = 'via LuckyFriday';
-const VIA_PINKNODE = 'via Pinknode';
+const VIA_ALL_NODES = 'via All Nodes';
+const VIA_BLOCKOPS = 'via Blockops';
+const VIA_DWELLIR_TUNISIA = 'via Dwellir Tunisia';
+const VIA_HELIXSTREET = 'via HelixStreet';
+const VIA_IBP_1 = 'via IBP 1';
+const VIA_IBP_2 = 'via IBP 2';
+const VIA_PERMANENCE_DAO_EU = 'via Permanence DAO EU';
+const VIA_STAKETWORLD = 'via Stakeworld';
+const VIA_SIMPLY_STAKING = 'via Simply Staking';
+const VIA_SUBQUERY = 'via SubQuery';
 
 interface ITreasuryAsset {
 	name: string;
@@ -132,17 +142,7 @@ interface INetworkDetails {
 		large: string;
 		small: string;
 	};
-}
-
-enum ENetworkSocial {
-	HOME = 'home',
-	TWITTER = 'twitter',
-	DISCORD = 'discord',
-	GITHUB = 'github',
-	YOUTUBE = 'youtube',
-	REDDIT = 'reddit',
-	TELEGRAM = 'telegram',
-	SUBSCAN = 'subscan'
+	relayChainRpcEndpoints?: IRpcEndpoint[];
 }
 
 export const treasuryAssetsData: Record<string, ITreasuryAsset> = {
@@ -162,12 +162,16 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 				url: 'wss://polkadot-people-rpc.polkadot.io'
 			},
 			{
+				name: VIA_DWELLIR,
+				url: 'wss://people-polkadot-rpc.n.dwellir.com'
+			},
+			{
 				name: VIA_LUCKYFRIDAY,
 				url: 'wss://rpc-people-polkadot.luckyfriday.io'
 			},
 			{
-				name: VIA_RADIUMBLOCK,
-				url: 'wss://people-polkadot.public.curie.radiumblock.co/ws'
+				name: VIA_ONFINALITY,
+				url: 'wss://people-polkadot.api.onfinality.io/public-ws'
 			},
 			{
 				name: VIA_IBP_GEODNS1,
@@ -176,10 +180,33 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 			{
 				name: VIA_IBP_GEODNS2,
 				url: 'wss://people-polkadot.dotters.network'
+			},
+			{
+				name: VIA_STAKETWORLD,
+				url: 'wss://dot-rpc.stakeworld.io/people'
 			}
 		]
 	},
 	[ENetwork.KUSAMA]: {
+		polkassemblyRegistrarIndex: 5,
+		identityMinDeposit: new BN('6672333321'),
+		rpcEndpoints: [
+			{
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-people-kusama.luckyfriday.io'
+			},
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://people-kusama-rpc.dwellir.com'
+			},
+			{
+				name: VIA_PARITY,
+				url: 'wss://kusama-people-rpc.polkadot.io'
+			}
+		]
+	},
+	// TODO: Verify Assethub Kusama specific configuration
+	[ENetwork.ASSETHUB_KUSAMA]: {
 		polkassemblyRegistrarIndex: 5,
 		identityMinDeposit: new BN('6672333321'),
 		rpcEndpoints: [
@@ -247,55 +274,109 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 } as const;
 
 const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
+	// After AssetHub migration, this RPC is the relay chain endpoint (swapped with primary RPC)
 	[ENetwork.POLKADOT]: {
 		rpcEndpoints: [
 			{
-				name: VIA_PARITY,
-				url: 'wss://polkadot-asset-hub-rpc.polkadot.io'
+				name: `${VIA_ALL_NODES} (recommended)`,
+				url: 'wss://polkadot-rpc.publicnode.com'
+			},
+			{
+				name: VIA_BLOCKOPS,
+				url: 'wss://polkadot-public-rpc.blockops.network/ws'
 			},
 			{
 				name: VIA_DWELLIR,
-				url: 'wss://asset-hub-polkadot-rpc.dwellir.com'
+				url: 'wss://polkadot-rpc.n.dwellir.com'
+			},
+			{
+				name: VIA_DWELLIR_TUNISIA,
+				url: 'wss://polkadot-rpc-tn.dwellir.com'
+			},
+			{
+				name: VIA_HELIXSTREET,
+				url: 'wss://rpc-polkadot.helixstreet.io'
+			},
+			{
+				name: VIA_IBP_1,
+				url: 'wss://rpc.ibp.network/polkadot'
+			},
+			{
+				name: VIA_IBP_2,
+				url: 'wss://polkadot.dotters.network'
+			},
+			{
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-polkadot.luckyfriday.io'
+			},
+			{
+				name: VIA_PERMANENCE_DAO_EU,
+				url: 'wss://rpc.permanence.io'
 			},
 			{
 				name: VIA_ONFINALITY,
-				url: 'wss://statemint.api.onfinality.io/public-ws'
+				url: 'wss://polkadot.api.onfinality.io/public-ws'
 			},
 			{
-				name: VIA_IBP_GEODNS1,
-				url: 'wss://sys.ibp.network/asset-hub-polkadot'
+				name: VIA_PERMANENCE_DAO_EU,
+				url: 'wss://polkadot.rpc.permanence.io'
 			},
 			{
-				name: VIA_IBP_GEODNS2,
-				url: 'wss://asset-hub-polkadot.dotters.network'
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://polkadot.public.curie.radiumblock.co/ws'
 			},
 			{
-				name: VIA_LUCKYFRIDAY,
-				url: 'wss://rpc-asset-hub-polkadot.luckyfriday.io'
+				name: VIA_ONFINALITY,
+				url: 'wss://polkadot.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_PERMANENCE_DAO_EU,
+				url: 'wss://polkadot.rpc.permanence.io'
+			},
+			{
+				name: VIA_SIMPLY_STAKING,
+				url: 'wss://spectrum-03.simplystaking.xyz/cG9sa2Fkb3QtMDMtOTFkMmYwZGYtcG9sa2Fkb3Q/LjwBJpV3dIKyWQ/polkadot/mainnet/'
+			},
+			{
+				name: VIA_STAKETWORLD,
+				url: 'wss://dot-rpc.stakeworld.io'
+			},
+			{
+				name: VIA_SUBQUERY,
+				url: 'wss://polkadot.rpc.subquery.network/public/ws'
 			}
 		]
 	},
+	// After AssetHub migration, this RPC is the relay chain endpoint (swapped with primary RPC)
 	[ENetwork.KUSAMA]: {
 		rpcEndpoints: [
 			{
-				name: VIA_IBP_GEODNS1,
-				url: 'wss://sys.ibp.network/asset-hub-kusama'
-			},
-			{
-				name: VIA_PARITY,
-				url: 'wss://kusama-asset-hub-rpc.polkadot.io'
-			},
-			{
-				name: VIA_IBP_GEODNS2,
-				url: 'wss://asset-hub-kusama.dotters.network'
+				name: VIA_ONFINALITY,
+				url: 'wss://kusama.api.onfinality.io/public-ws'
 			},
 			{
 				name: VIA_DWELLIR,
-				url: 'wss://asset-hub-kusama-rpc.dwellir.com'
+				url: 'wss://kusama-rpc.dwellir.com'
+			},
+			{
+				name: VIA_PARITY,
+				url: 'wss://kusama-rpc.polkadot.io'
+			},
+			{
+				name: VIA_IBP_GEODNS1,
+				url: 'wss://rpc.ibp.network/kusama'
+			},
+			{
+				name: VIA_IBP_GEODNS2,
+				url: 'wss://rpc.dotters.network/kusama'
+			},
+			{
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://kusama.public.curie.radiumblock.co/ws'
 			},
 			{
 				name: VIA_LUCKYFRIDAY,
-				url: 'wss://rpc-asset-hub-kusama.luckyfriday.io'
+				url: 'wss://rpc-kusama.luckyfriday.io'
 			}
 		]
 	}
@@ -317,6 +398,7 @@ const TREASURER_DESCRIPTION = 'Origin for spending (any amount of) funds until t
 const NETWORK_TOKEN_DECIMALS: Record<ENetwork, number> = {
 	[ENetwork.POLKADOT]: 10,
 	[ENetwork.KUSAMA]: 12,
+	[ENetwork.ASSETHUB_KUSAMA]: 12,
 	[ENetwork.WESTEND]: 12,
 	[ENetwork.PASEO]: 10,
 	[ENetwork.CERE]: 10
@@ -749,6 +831,431 @@ const NETWORK_TRACK_DETAILS: Record<ENetwork, Partial<Record<EPostOrigin, ITrack
 		}
 	},
 	[ENetwork.KUSAMA]: {
+		[EPostOrigin.ROOT]: {
+			trackId: 0,
+			description: ROOT_ORIGIN_DESCRIPTION,
+			group: 'Origin',
+			name: 'root',
+			maxDeciding: 1,
+			decisionDeposit: new BN('3333333333300000'),
+			preparePeriod: 1200,
+			decisionPeriod: 201600,
+			confirmPeriod: 14400,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				reciprocal: {
+					factor: 222222224,
+					xOffset: 333333335,
+					yOffset: 333333332
+				}
+			},
+			minSupport: {
+				linearDecreasing: {
+					length: 1000000000,
+					floor: 0,
+					ceil: 500000000
+				}
+			}
+		},
+		[EPostOrigin.WISH_FOR_CHANGE]: {
+			trackId: 2,
+			description: WISH_FOR_CHANGE_DESCRIPTION,
+			group: 'Origin',
+			name: 'wish_for_change',
+			maxDeciding: 10,
+			decisionDeposit: new BN('666666666660000'),
+			preparePeriod: 1200,
+			decisionPeriod: 201600,
+			confirmPeriod: 14400,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 222222224,
+					xOffset: 333333335,
+					yOffset: 333333332
+				}
+			},
+			minSupport: {
+				linearDecreasing: {
+					length: 1000000000,
+					floor: 0,
+					ceil: 500000000
+				}
+			}
+		},
+		[EPostOrigin.WHITELISTED_CALLER]: {
+			trackId: 1,
+			description: WHITELISTED_CALLER_DESCRIPTION,
+			group: 'Origin',
+			name: 'whitelisted_caller',
+			maxDeciding: 100,
+			decisionDeposit: new BN('333333333330000'),
+			preparePeriod: 300,
+			decisionPeriod: 201600,
+			confirmPeriod: 100,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 270899180,
+					xOffset: 389830523,
+					yOffset: 305084738
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 8650766,
+					xOffset: 18867926,
+					yOffset: 41509433
+				}
+			}
+		},
+		[EPostOrigin.STAKING_ADMIN]: {
+			trackId: 10,
+			description: STAKING_ADMIN_DESCRIPTION,
+			group: 'Main',
+			name: 'staking_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('166666666665000'),
+			preparePeriod: 1200,
+			decisionPeriod: 201600,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7892829,
+					xOffset: 15544040,
+					yOffset: -7772020
+				}
+			}
+		},
+		[EPostOrigin.TREASURER]: {
+			trackId: 11,
+			description: TREASURER_DESCRIPTION,
+			group: 'Treasury',
+			name: 'treasurer',
+			maxSpend: new BN('333333').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.KUSAMA]))),
+			maxDeciding: 10,
+			decisionDeposit: new BN('33333333333000'),
+			preparePeriod: 1200,
+			decisionPeriod: 201600,
+			confirmPeriod: 28800,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				reciprocal: {
+					factor: 222222224,
+					xOffset: 333333335,
+					yOffset: 333333332
+				}
+			},
+			minSupport: {
+				linearDecreasing: {
+					length: 1000000000,
+					floor: 0,
+					ceil: 500000000
+				}
+			}
+		},
+		[EPostOrigin.LEASE_ADMIN]: {
+			trackId: 12,
+			description: LEASE_ADMIN_DESCRIPTION,
+			group: 'Main',
+			name: 'lease_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('166666666665000'),
+			preparePeriod: 1200,
+			decisionPeriod: 201600,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7892829,
+					xOffset: 15544040,
+					yOffset: -7772020
+				}
+			}
+		},
+		[EPostOrigin.FELLOWSHIP_ADMIN]: {
+			trackId: 13,
+			description: FELLOWSHIP_ADMIN_DESCRIPTION,
+			group: 'Origin',
+			name: 'fellowship_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('166666666665000'),
+			preparePeriod: 1200,
+			decisionPeriod: 201600,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7892829,
+					xOffset: 15544040,
+					yOffset: -7772020
+				}
+			}
+		},
+		[EPostOrigin.GENERAL_ADMIN]: {
+			trackId: 14,
+			description: GENERAL_ADMIN_DESCRIPTION,
+			group: 'Main',
+			name: 'general_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('166666666665000'),
+			preparePeriod: 1200,
+			decisionPeriod: 201600,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 222222224,
+					xOffset: 333333335,
+					yOffset: 333333332
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 49586777,
+					xOffset: 90909091,
+					yOffset: -45454546
+				}
+			}
+		},
+		[EPostOrigin.AUCTION_ADMIN]: {
+			trackId: 15,
+			description: AUCTION_ADMIN_DESCRIPTION,
+			group: 'Main',
+			name: 'auction_admin',
+			maxDeciding: 10,
+			decisionDeposit: new BN('166666666665000'),
+			preparePeriod: 1200,
+			decisionPeriod: 201600,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				reciprocal: {
+					factor: 222222224,
+					xOffset: 333333335,
+					yOffset: 333333332
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 49586777,
+					xOffset: 90909091,
+					yOffset: -45454546
+				}
+			}
+		},
+		[EPostOrigin.REFERENDUM_CANCELLER]: {
+			trackId: 20,
+			description: REFERENDUM_CANCELLER_DESCRIPTION,
+			group: 'Origin',
+			name: 'referendum_canceller',
+			maxDeciding: 1000,
+			decisionDeposit: new BN('333333333330000'),
+			preparePeriod: 1200,
+			decisionPeriod: 100800,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7892829,
+					xOffset: 15544040,
+					yOffset: -7772020
+				}
+			}
+		},
+		[EPostOrigin.REFERENDUM_KILLER]: {
+			trackId: 21,
+			description: REFERENDUM_KILLER_DESCRIPTION,
+			group: 'Origin',
+			name: 'referendum_killer',
+			maxDeciding: 1000,
+			decisionDeposit: new BN('1666666666650000'),
+			preparePeriod: 1200,
+			decisionPeriod: 201600,
+			confirmPeriod: 1800,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7892829,
+					xOffset: 15544040,
+					yOffset: -7772020
+				}
+			}
+		},
+		[EPostOrigin.SMALL_TIPPER]: {
+			trackId: 30,
+			description: 'Origin able to spend up to 1 KSM from the treasury at once.',
+			group: 'Treasury',
+			name: 'small_tipper',
+			maxSpend: new BN('1').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.KUSAMA]))),
+			maxDeciding: 200,
+			decisionDeposit: new BN('33333333333'),
+			preparePeriod: 10,
+			decisionPeriod: 100800,
+			confirmPeriod: 100,
+			minEnactmentPeriod: 10,
+			minApproval: {
+				linearDecreasing: {
+					length: 357142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 1620729,
+					xOffset: 3231018,
+					yOffset: -1615509
+				}
+			}
+		},
+		[EPostOrigin.BIG_TIPPER]: {
+			trackId: 31,
+			description: 'Origin able to spend up to 5 KSM from the treasury at once.',
+			group: 'Treasury',
+			name: 'big_tipper',
+			maxSpend: new BN('5').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.KUSAMA]))),
+			maxDeciding: 100,
+			decisionDeposit: new BN('333333333330'),
+			preparePeriod: 100,
+			decisionPeriod: 100800,
+			confirmPeriod: 600,
+			minEnactmentPeriod: 100,
+			minApproval: {
+				linearDecreasing: {
+					length: 357142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 4149097,
+					xOffset: 8230453,
+					yOffset: -4115227
+				}
+			}
+		},
+		[EPostOrigin.SMALL_SPENDER]: {
+			trackId: 32,
+			description: 'Origin able to spend up to 333 KSM from the treasury at once.',
+			group: 'Treasury',
+			name: 'small_spender',
+			maxSpend: new BN('333').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.KUSAMA]))),
+			maxDeciding: 50,
+			decisionDeposit: new BN('3333333333300'),
+			preparePeriod: 2400,
+			decisionPeriod: 201600,
+			confirmPeriod: 7200,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				linearDecreasing: {
+					length: 607142857,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 7892829,
+					xOffset: 15544040,
+					yOffset: -7772020
+				}
+			}
+		},
+		[EPostOrigin.MEDIUM_SPENDER]: {
+			trackId: 33,
+			description: 'Origin able to spend up to 3,333 KSM from the treasury at once.',
+			group: 'Treasury',
+			name: 'medium_spender',
+			maxSpend: new BN('3333').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.KUSAMA]))),
+			maxDeciding: 50,
+			decisionDeposit: new BN('6666666666600'),
+			preparePeriod: 2400,
+			decisionPeriod: 201600,
+			confirmPeriod: 14400,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				linearDecreasing: {
+					length: 821428571,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 14377233,
+					xOffset: 27972031,
+					yOffset: -13986016
+				}
+			}
+		},
+		[EPostOrigin.BIG_SPENDER]: {
+			trackId: 34,
+			description: 'Origin able to spend up to 33,333 KSM from the treasury at once.',
+			group: 'Treasury',
+			name: 'big_spender',
+			maxSpend: new BN('33333').mul(new BN(10).pow(new BN(NETWORK_TOKEN_DECIMALS[ENetwork.KUSAMA]))),
+			maxDeciding: 50,
+			decisionDeposit: new BN('13333333333200'),
+			preparePeriod: 2400,
+			decisionPeriod: 201600,
+			confirmPeriod: 28800,
+			minEnactmentPeriod: 14400,
+			minApproval: {
+				linearDecreasing: {
+					length: 1000000000,
+					floor: 500000000,
+					ceil: 1000000000
+				}
+			},
+			minSupport: {
+				reciprocal: {
+					factor: 28326977,
+					xOffset: 53763445,
+					yOffset: -26881723
+				}
+			}
+		}
+	},
+	// TODO: Verify Assethub Kusama track details configuration
+	[ENetwork.ASSETHUB_KUSAMA]: {
 		[EPostOrigin.ROOT]: {
 			trackId: 0,
 			description: ROOT_ORIGIN_DESCRIPTION,
@@ -2473,12 +2980,64 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 			label: 'Subscan'
 		}
 	],
+	// TODO: Verify Assethub Kusama social links configuration
+	[ENetwork.ASSETHUB_KUSAMA]: [
+		{
+			id: ENetworkSocial.HOME,
+			icon: SocialIcons.Home,
+			href: 'https://kusama.network/',
+			label: 'Kusama Homepage'
+		},
+		{
+			id: ENetworkSocial.TWITTER,
+			icon: SocialIcons.Twitter,
+			href: 'https://twitter.com/kusamanetwork',
+			label: 'Twitter'
+		},
+		{
+			id: ENetworkSocial.DISCORD,
+			icon: SocialIcons.Discord,
+			href: 'https://discord.com/invite/kusama',
+			label: 'Discord'
+		},
+		{
+			id: ENetworkSocial.GITHUB,
+			icon: SocialIcons.Github,
+			href: 'https://github.com/paritytech/polkadot',
+			label: 'GitHub'
+		},
+		{
+			id: ENetworkSocial.YOUTUBE,
+			icon: SocialIcons.Youtube,
+			href: 'https://www.youtube.com/channel/UCq4MRrQhdoIR0b44GxcCPxw',
+			label: 'YouTube'
+		},
+		{
+			id: ENetworkSocial.REDDIT,
+			icon: SocialIcons.Reddit,
+			href: 'https://www.reddit.com/r/Kusama/',
+			label: 'Reddit'
+		},
+		{
+			id: ENetworkSocial.TELEGRAM,
+			icon: SocialIcons.Telegram,
+			href: 'https://t.me/kusamanetworkofficial',
+			label: 'Telegram'
+		},
+		{
+			id: ENetworkSocial.SUBSCAN,
+			icon: SocialIcons.Subscan,
+			href: 'https://kusama.subscan.io/',
+			label: 'Subscan'
+		}
+	],
 	[ENetwork.WESTEND]: [],
 	[ENetwork.PASEO]: [],
 	[ENetwork.CERE]: []
 } as const;
 
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
+	// After AssetHub migration, the primary RPC is AssetHub (treasury operations moved to AssetHub)
 	[ENetwork.POLKADOT]: {
 		key: ENetwork.POLKADOT,
 		logo: PolkadotLogo,
@@ -2491,41 +3050,45 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		palletInstance: '50',
 		blockTime: 6000,
 		ss58Format: 0,
-		subsquidUrl: 'https://squid.subsquid.io/polkadot-polkassembly/graphql',
+		subsquidUrl: 'https://polkassembly.squids.live/polkadot-assethub-unified-pa@v2/api/graphql',
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.POLKADOT],
 		tokenSymbol: 'DOT',
 		rpcEndpoints: [
 			{
-				name: `${VIA_PARITY} (recommended)`,
-				url: 'wss://rpc.polkadot.io'
-			},
-			{
-				name: VIA_ONFINALITY,
-				url: 'wss://polkadot.api.onfinality.io/public-ws'
+				name: VIA_PARITY,
+				url: 'wss://polkadot-asset-hub-rpc.polkadot.io'
 			},
 			{
 				name: VIA_DWELLIR,
-				url: 'wss://polkadot-rpc.dwellir.com'
+				url: 'wss://asset-hub-polkadot-rpc.n.dwellir.com'
 			},
 			{
-				name: VIA_PINKNODE,
-				url: 'wss://public-rpc.pinknode.io/polkadot'
+				name: VIA_DWELLIR_TUNISIA,
+				url: 'wss://statemint-rpc-tn.dwellir.com'
+			},
+			{
+				name: VIA_ONFINALITY,
+				url: 'wss://statemint.api.onfinality.io/public-ws'
 			},
 			{
 				name: VIA_IBP_GEODNS1,
-				url: 'wss://rpc.ibp.network/polkadot'
+				url: 'wss://sys.ibp.network/asset-hub-polkadot'
 			},
 			{
 				name: VIA_IBP_GEODNS2,
-				url: 'wss://rpc.dotters.network/polkadot'
-			},
-			{
-				name: VIA_RADIUMBLOCK,
-				url: 'wss://polkadot.public.curie.radiumblock.co/ws'
+				url: 'wss://asset-hub-polkadot.dotters.network'
 			},
 			{
 				name: VIA_LUCKYFRIDAY,
-				url: 'wss://rpc-polkadot.luckyfriday.io'
+				url: 'wss://rpc-asset-hub-polkadot.luckyfriday.io'
+			},
+			{
+				name: VIA_RADIUMBLOCK,
+				url: 'wss://statemint.public.curie.radiumblock.co/ws'
+			},
+			{
+				name: VIA_STAKETWORLD,
+				url: 'wss://dot-rpc.stakeworld.io/assethub'
 			}
 		],
 		supportedAssets: {
@@ -2562,15 +3125,18 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fpolkassembly-small.jpg?alt=media&token=63accae8-ea14-4705-817b-92c7bf80ccce'
 		}
 	},
+	// After AssetHub migration, the primary RPC is AssetHub (treasury operations moved to AssetHub)
 	[ENetwork.KUSAMA]: {
 		key: ENetwork.KUSAMA,
 		logo: KusamaLogo,
 		submissionDeposit: new BN('33333333333'),
+		assetHubParaId: '1000',
+		peopleChainParaId: '1004',
 		govtype: EGovType.OPENGOV,
 		name: 'Kusama',
 		blockTime: 6000,
 		ss58Format: 2,
-		subsquidUrl: 'https://squid.subsquid.io/kusama-polkassembly/graphql',
+		subsquidUrl: 'https://polkassembly.squids.live/kusama-assethub-unified-pa@v1/api/graphql',
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.KUSAMA],
 		supportedAssets: {
 			'1984': {
@@ -2581,6 +3147,63 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		foreignAssets: {},
 		tokenSymbol: 'KSM',
 		rpcEndpoints: [
+			{
+				name: VIA_ONFINALITY,
+				url: 'wss://assethub-kusama.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_IBP_GEODNS1,
+				url: 'wss://sys.ibp.network/asset-hub-kusama'
+			},
+			{
+				name: VIA_PARITY,
+				url: 'wss://kusama-asset-hub-rpc.polkadot.io'
+			},
+			{
+				name: VIA_IBP_GEODNS2,
+				url: 'wss://asset-hub-kusama.dotters.network'
+			},
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://asset-hub-kusama-rpc.dwellir.com'
+			},
+			{
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-asset-hub-kusama.luckyfriday.io'
+			}
+		],
+		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.KUSAMA],
+		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.KUSAMA],
+		assethubDetails: ASSETHUB_DETAILS[ENetwork.KUSAMA],
+		socialLinks: networkSocialLinks[ENetwork.KUSAMA],
+		convictionVotingPeriodInBlocks: new BN('100800'),
+		openGraphImage: {
+			large: 'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fkusama.png?alt=media&token=82219f8f-c3bb-4c87-950c-7fcecfdca883',
+			small: 'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fkusama-small.png?alt=media&token=a268b1d7-ea0c-4b03-a423-db93ac1f0d4e'
+		}
+	},
+	// TODO: Verify Assethub Kusama specific configuration
+	[ENetwork.ASSETHUB_KUSAMA]: {
+		key: ENetwork.ASSETHUB_KUSAMA,
+		logo: AssethubKusamaLogo,
+		submissionDeposit: new BN('33333333333'),
+		assetHubParaId: '1000',
+		peopleChainParaId: '1004',
+		govtype: EGovType.OPENGOV,
+		name: 'Kusama Assethub',
+		blockTime: 6000,
+		ss58Format: 2,
+		subsquidUrl: 'https://polkassembly.squids.live/kusama-assethub-unified-pa@v1/api/graphql',
+		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.KUSAMA],
+		supportedAssets: {
+			'1984': {
+				...treasuryAssetsData[EAssets.USDT],
+				index: '1984'
+			}
+		},
+		foreignAssets: {},
+		tokenSymbol: 'KSM',
+		relayChainRpcEndpoints: [
 			{
 				name: VIA_ONFINALITY,
 				url: 'wss://kusama.api.onfinality.io/public-ws'
@@ -2610,10 +3233,36 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				url: 'wss://rpc-kusama.luckyfriday.io'
 			}
 		],
+		rpcEndpoints: [
+			{
+				name: VIA_ONFINALITY,
+				url: 'wss://assethub-kusama.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_IBP_GEODNS1,
+				url: 'wss://sys.ibp.network/asset-hub-kusama'
+			},
+			{
+				name: VIA_PARITY,
+				url: 'wss://kusama-asset-hub-rpc.polkadot.io'
+			},
+			{
+				name: VIA_IBP_GEODNS2,
+				url: 'wss://asset-hub-kusama.dotters.network'
+			},
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://asset-hub-kusama-rpc.dwellir.com'
+			},
+			{
+				name: VIA_LUCKYFRIDAY,
+				url: 'wss://rpc-asset-hub-kusama.luckyfriday.io'
+			}
+		],
 		peopleChainDetails: PEOPLE_CHAIN_NETWORK_DETAILS[ENetwork.KUSAMA],
-		assethubDetails: ASSETHUB_DETAILS[ENetwork.KUSAMA],
 		trackDetails: NETWORK_TRACK_DETAILS[ENetwork.KUSAMA],
-		socialLinks: networkSocialLinks[ENetwork.KUSAMA],
+		socialLinks: networkSocialLinks[ENetwork.ASSETHUB_KUSAMA],
+		assethubDetails: ASSETHUB_DETAILS[ENetwork.KUSAMA],
 		convictionVotingPeriodInBlocks: new BN('100800'),
 		openGraphImage: {
 			large: 'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fkusama.png?alt=media&token=82219f8f-c3bb-4c87-950c-7fcecfdca883',
@@ -2653,19 +3302,19 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				url: 'wss://rpc-westend.luckyfriday.io'
 			},
 			{
-				name: 'via OnFinality',
+				name: VIA_ONFINALITY,
 				url: 'wss://westend.api.onfinality.io/public-ws'
 			},
 			{
-				name: 'via Parity',
+				name: VIA_PARITY,
 				url: 'wss://westend-rpc.polkadot.io'
 			},
 			{
-				name: 'via RadiumBlock',
+				name: VIA_RADIUMBLOCK,
 				url: 'wss://westend.public.curie.radiumblock.co/ws'
 			},
 			{
-				name: 'via Stakeworld',
+				name: VIA_STAKETWORLD,
 				url: 'wss://wnd-rpc.stakeworld.io'
 			}
 		],
@@ -2689,6 +3338,10 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.PASEO],
 		tokenSymbol: 'PAS',
 		rpcEndpoints: [
+			{
+				name: 'via Dotters',
+				url: 'wss://paseo.dotters.network'
+			},
 			{
 				name: VIA_DWELLIR,
 				url: 'wss://paseo-rpc.dwellir.com'
@@ -2733,7 +3386,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		ss58Format: 54,
 		subsquidUrl: 'https://polkassembly.squids.live/cere-polkassembly/graphql',
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.CERE],
-		tokenSymbol: 'BCERE',
+		tokenSymbol: 'CERE',
 		rpcEndpoints: [
 			{
 				name: 'via Cere Network',
