@@ -9,28 +9,11 @@ import { TabsList, TabsTrigger } from '@ui/Tabs';
 import Link from 'next/link';
 import { EJudgementDashboardTabs, ESetIdentityStep } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
-import { useIdentityService } from '@/hooks/useIdentityService';
-import { useQuery } from '@tanstack/react-query';
-import { getRegistrarsWithStats } from '@/app/_client-utils/identityUtils';
 import BecomeRegistrarModal from '../BecomeRegistrarModal/BecomeRegistrarModal';
 import styles from './Header.module.scss';
 
 function Header() {
 	const t = useTranslations();
-	const { identityService } = useIdentityService();
-
-	const { data: registrars } = useQuery({
-		queryKey: ['registrars', identityService],
-		queryFn: async () => {
-			if (!identityService) return [];
-			const registrarsData = await identityService.getRegistrars();
-			const judgements = await identityService.getAllIdentityJudgements();
-			return getRegistrarsWithStats({ registrars: registrarsData, judgements });
-		},
-		enabled: !!identityService
-	});
-
-	const registrarsCount = registrars?.length || 0;
 
 	return (
 		<div className={styles.header}>
@@ -54,21 +37,21 @@ function Header() {
 					</TabsTrigger>
 					<TabsTrigger
 						className={styles.header_tab}
-						value={EJudgementDashboardTabs.DASHBOARD}
+						value={EJudgementDashboardTabs.JUDGEMENTS}
 					>
-						{t('Judgements.dashboard')}
+						{t('Judgements.judgements')}
 					</TabsTrigger>
 					<TabsTrigger
 						className={styles.header_tab}
 						value={EJudgementDashboardTabs.REGISTRARS}
 					>
-						{t('Judgements.registrars')} ({registrarsCount})
+						{t('Judgements.registrars')}
 					</TabsTrigger>
 					<TabsTrigger
 						className={styles.header_tab}
-						value={EJudgementDashboardTabs.MY_IDENTITIES}
+						value={EJudgementDashboardTabs.MY_DASHBOARD}
 					>
-						My Identities
+						{t('Judgements.myDashboard')}
 					</TabsTrigger>
 				</TabsList>
 			</div>

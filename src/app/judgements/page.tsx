@@ -45,7 +45,7 @@ async function Judgements() {
 							<IdentitiesListingTable />
 						</div>
 					</TabsContent>
-					<TabsContent value={EJudgementDashboardTabs.DASHBOARD}>
+					<TabsContent value={EJudgementDashboardTabs.JUDGEMENTS}>
 						<div className='flex flex-col gap-y-4'>
 							<DashboardSummary />
 							<JudgementListingTable />
@@ -57,7 +57,7 @@ async function Judgements() {
 							<RegistrarsListingTable />
 						</div>
 					</TabsContent>
-					<TabsContent value={EJudgementDashboardTabs.MY_IDENTITIES}>
+					<TabsContent value={EJudgementDashboardTabs.MY_DASHBOARD}>
 						<div className='flex flex-col gap-y-4'>
 							<MyIdentitiesDashboard />
 						</div>

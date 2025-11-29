@@ -7,15 +7,26 @@
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { mapJudgementStatus } from '@/app/_client-utils/identityUtils';
-import { EJudgementStatus, ENotificationStatus } from '@/_shared/types';
+import { EJudgementStatus, ENotificationStatus, ESocial } from '@/_shared/types';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '@/app/_shared-components/Table';
 import { useUser } from '@/hooks/useUser';
-import { Settings, Trash2 } from 'lucide-react';
+import { Settings, Trash2, Copy, PencilIcon } from 'lucide-react';
 import { useState } from 'react';
+import Address from '@/app/_shared-components/Profile/Address/Address';
+import Image from 'next/image';
+import CalendarWatchIcon from '@assets/icons/calendar-watch-icon.svg';
+import { IoMdMail } from '@react-icons/all-files/io/IoMdMail';
+import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
+import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
+import { FaGlobe } from '@react-icons/all-files/fa/FaGlobe';
+import RiotIcon from '@assets/icons/riot_icon.svg';
+import { FaGithub } from '@react-icons/all-files/fa/FaGithub';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { useToast } from '@/hooks/useToast';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import styles from '../Overview/IdentitiesListingTable.module.scss';
 
 const SUB_IDENTITY_TYPE = 'Sub-identity';
 
@@ -185,7 +196,7 @@ function MyIdentitiesDashboard() {
 
 	if (isLoading || !identityService) {
 		return (
-			<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
+			<div className='flex flex-col gap-4 rounded-3xl border border-primary_border bg-bg_modal p-4'>
 				<Skeleton className='h-12 w-full' />
 				<Skeleton className='h-12 w-full' />
 				<Skeleton className='h-12 w-full' />
@@ -195,7 +206,7 @@ function MyIdentitiesDashboard() {
 
 	if (!myIdentities || myIdentities.identities.length === 0) {
 		return (
-			<div className='flex items-center justify-center rounded-lg border border-primary_border bg-bg_modal p-12'>
+			<div className='flex items-center justify-center rounded-3xl border border-primary_border bg-bg_modal p-12'>
 				<div className='text-center'>
 					<h3 className='text-xl font-semibold text-text_primary'>No Identity Set</h3>
 					<p className='text-text_secondary mt-2'>Set up your on-chain identity to get started</p>
@@ -261,82 +272,158 @@ function MyIdentitiesDashboard() {
 			</div>
 
 			{/* Table */}
-			<div className='w-full rounded-lg border border-primary_border bg-bg_modal'>
+			<div className='w-full rounded-3xl border border-primary_border bg-bg_modal p-6'>
 				<Table>
 					<TableHeader>
-						<TableRow>
-							<TableHead>IDENTITY</TableHead>
-							<TableHead>SOCIALS</TableHead>
-							<TableHead>TYPE</TableHead>
-							<TableHead>LATEST UPDATE</TableHead>
-							<TableHead>JUDGEMENTS</TableHead>
-							<TableHead>ACTIONS</TableHead>
+						<TableRow className={styles.headerRow}>
+							<TableHead className={styles.headerCell}>IDENTITY</TableHead>
+							<TableHead className={styles.headerCell}>SOCIALS</TableHead>
+							<TableHead className={styles.headerCell}>TYPE</TableHead>
+							<TableHead className={styles.headerCell}>LATEST UPDATE</TableHead>
+							<TableHead className={styles.headerCell}>JUDGEMENTS</TableHead>
+							<TableHead className={styles.headerCell}>ACTIONS</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{myIdentities?.identities.map((identity) => (
 							<TableRow key={identity.address}>
-								<td className='px-6 py-4'>
-									<div className='flex items-center gap-2'>
-										<div className='flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-500'>
-											<span className='text-xs font-bold text-white'>{identity.displayName?.charAt(0) || 'N'}</span>
-										</div>
-										<div>
-											<div className='flex items-center gap-1'>
-												<span className='font-medium text-text_primary'>{identity.displayName || 'Unnamed'}</span>
-												<span className='text-text_secondary text-xs'>
-													({identity.address.slice(0, 6)}...{identity.address.slice(-5)})
-												</span>
-											</div>
-										</div>
+								<td className='py-4 pl-2 pr-6'>
+									<div className='flex items-center gap-1'>
+										<span className='text-xs text-basic_text'>
+											<Address
+												iconSize={24}
+												address={identity.address}
+											/>
+										</span>
+										<span className='text-xs text-basic_text'>
+											({identity.address.slice(0, 6)}...{identity.address.slice(-5)})
+										</span>
+										<button
+											type='button'
+											className='text-basic_text hover:text-text_primary'
+											title='Copy address'
+										>
+											<Copy size={14} />
+										</button>
 									</div>
 								</td>
 								<td className='px-6 py-4'>
 									<div className='flex gap-2'>
 										{identity.socials.email && (
-											<div className='flex h-7 w-7 items-center justify-center rounded-full bg-green-500/20'>
-												<span className='text-sm'>📧</span>
-											</div>
+											<a
+												key={ESocial.EMAIL}
+												href={`mailto:${identity.socials.email}`}
+												target='_blank'
+												className='flex h-7 w-7 items-center justify-center rounded-full bg-social_green'
+												rel='noreferrer'
+											>
+												<IoMdMail className='size-4 text-white' />
+											</a>
 										)}
 										{identity.socials.twitter && (
-											<div className='flex h-7 w-7 items-center justify-center rounded-full bg-blue-500/20'>
-												<span className='text-sm'>🐦</span>
-											</div>
+											<a
+												key={ESocial.TWITTER}
+												href={`https://x.com/${identity.socials.twitter}`}
+												target='_blank'
+												className='flex h-7 w-7 items-center justify-center rounded-full bg-social_green'
+												rel='noreferrer'
+											>
+												<FaTwitter className='size-4 text-white' />
+											</a>
 										)}
 										{identity.socials.discord && (
-											<div className='flex h-7 w-7 items-center justify-center rounded-full bg-purple-500/20'>
-												<span className='text-sm'>💬</span>
-											</div>
-										)}
-										{identity.socials.matrix && (
-											<div className='flex h-7 w-7 items-center justify-center rounded-full bg-gray-500/20'>
-												<span className='text-sm'>⚫</span>
-											</div>
+											<a
+												key={ESocial.DISCORD}
+												href={`https://discord.com/users/${identity.socials.discord}`}
+												target='_blank'
+												className='flex h-7 w-7 items-center justify-center rounded-full bg-social_green'
+												rel='noreferrer'
+											>
+												<FaDiscord className='size-4 text-white' />
+											</a>
 										)}
 										{identity.socials.github && (
-											<div className='flex h-7 w-7 items-center justify-center rounded-full bg-gray-700/20'>
-												<span className='text-sm'>🐙</span>
-											</div>
+											<a
+												key={ESocial.GITHUB}
+												href={`https://github.com/${identity.socials.github}`}
+												target='_blank'
+												className='flex h-7 w-7 items-center justify-center rounded-full bg-primary_border/40'
+												rel='noreferrer'
+											>
+												<FaGithub className='size-4 text-delegation_card_text' />
+											</a>
+										)}
+										{identity.socials.web && (
+											<a
+												key='web_url'
+												href={identity.socials.web}
+												target='_blank'
+												className='flex h-7 w-7 items-center justify-center rounded-full bg-primary_border/40'
+												rel='noreferrer'
+											>
+												<FaGlobe className='size-4 text-delegation_card_text' />
+											</a>
+										)}
+
+										{identity.socials.matrix && (
+											<a
+												key='matrix'
+												href={`https://matrix.to/#/${identity.socials.matrix}`}
+												target='_blank'
+												className='flex h-7 w-7 items-center justify-center rounded-full bg-primary_border/40'
+												rel='noreferrer'
+											>
+												<Image
+													src={RiotIcon}
+													alt='Riot'
+													width={20}
+													height={20}
+													className='size-5 text-delegation_card_text'
+												/>
+											</a>
 										)}
 									</div>
 								</td>
 								<td className='px-6 py-4'>
-									<span className='rounded-full bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-600'>{identity.type}</span>
+									<span className='rounded px-2 py-1 text-sm font-semibold text-text_primary'>{identity.type}</span>
 								</td>
 								<td className='px-6 py-4'>
-									<div className='text-text_secondary flex items-center gap-1 text-sm'>
+									<div className='flex items-center gap-2 text-sm font-semibold text-text_primary'>
 										<span>{formatDate(identity.lastUpdated)}</span>
-										<span className='text-xs'>⏰</span>
+										<Image
+											src={CalendarWatchIcon}
+											alt='calendar'
+											width={20}
+											height={20}
+											className='h-5 w-5'
+										/>
 									</div>
 								</td>
 								<td className='px-6 py-4'>
 									{identity.judgements.length > 0 ? (
 										<div className='flex items-center gap-1'>
-											<span className='rounded bg-green-500/20 px-2 py-1 text-xs font-medium text-green-600'>Reasonable</span>
-											<span className='text-xs font-bold text-text_primary'>+{identity.judgements.length}</span>
+											<span className='rounded px-2 py-1 text-sm font-semibold text-text_primary'>Reasonable</span>
+											{identity.judgements.length > 1 && (
+												<Tooltip>
+													<TooltipTrigger asChild>
+														<span className='flex !size-6 items-center justify-center rounded-full border border-primary_border bg-poll_option_bg p-2 text-xs font-medium text-text_primary'>
+															+{identity.judgements.length - 1}
+														</span>
+													</TooltipTrigger>
+													<TooltipContent
+														side='top'
+														align='center'
+														className='bg-tooltip_background'
+													>
+														<div className='flex flex-col gap-2 p-2'>
+															<span className='text-xs text-white'>{identity.judgements.join(', ')}</span>
+														</div>
+													</TooltipContent>
+												</Tooltip>
+											)}
 										</div>
 									) : (
-										<span className='text-text_secondary'>-</span>
+										<span className='px-4 text-center font-semibold text-text_primary'>-</span>
 									)}
 								</td>
 								<td className='px-6 py-4'>
@@ -348,7 +435,7 @@ function MyIdentitiesDashboard() {
 												type='button'
 												title='Edit'
 											>
-												<Trash2 size={16} />
+												<PencilIcon size={16} />
 											</button>
 										)}
 										{identity.canDelete && (
@@ -368,13 +455,6 @@ function MyIdentitiesDashboard() {
 											title='Settings'
 										>
 											<Settings size={16} />
-										</button>
-										<button
-											className='text-text_secondary hover:text-text_primary'
-											type='button'
-											title='More options'
-										>
-											▼
 										</button>
 									</div>
 								</td>
