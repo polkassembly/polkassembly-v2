@@ -64,14 +64,15 @@ function PeoplePage() {
 	}
 
 	return (
-		<div className='mx-auto grid min-h-screen max-w-7xl grid-cols-1 gap-5 bg-page_background px-4 py-5 lg:px-16'>
+		<div className='min-h-screen bg-page_background'>
 			<TabCard
 				cohortNumber={cohort?.index ?? cohortId}
 				delegates={delegates || 0}
 				guardians={guardians || 0}
 				tracks={tracks || 0}
 			/>
-			<div>
+
+			<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 				<div className='mb-4 w-full overflow-hidden rounded-2xl border border-border_grey bg-bg_modal p-4 shadow-md sm:p-5 md:mb-8 md:p-6 lg:p-8'>
 					<div className='flex items-center justify-between gap-3'>
 						<div className='flex items-center gap-2'>
