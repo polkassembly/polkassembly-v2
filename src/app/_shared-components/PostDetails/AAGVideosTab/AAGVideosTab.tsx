@@ -60,7 +60,7 @@ function AAGVideosTab({ referendaId }: AAGVideosTabProps) {
 
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='rounded-lg border border-border_grey bg-leaderboard_usercard_bg p-4'>
+			<div className='rounded-lg border border-border_grey bg-[linear-gradient(to_bottom,#f5f8ff,#fcfcfc)] p-4 dark:bg-[linear-gradient(to_bottom,#202331,#1a1c25)]'>
 				<Collapsible>
 					<CollapsibleTrigger className='group flex w-full items-center gap-2 rounded-lg'>
 						<Image

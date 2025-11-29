@@ -54,7 +54,7 @@ function AAGCard() {
 
 	return (
 		<div className='mb-4 w-full bg-bg_modal p-4 md:mb-8 md:p-8 md:px-20'>
-			<div className='flex w-full gap-4'>
+			<div className='mx-auto flex w-full max-w-7xl gap-4'>
 				<Image
 					src={AAGLogo}
 					alt='AAG Logo'

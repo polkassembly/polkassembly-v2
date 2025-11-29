@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import Image from 'next/image';
-import { Calendar, Clock, Share2 } from 'lucide-react';
+import { Calendar, Clock, Play, Share2 } from 'lucide-react';
 import { Button } from '@/app/_shared-components/Button';
 import { useToast } from '@/hooks/useToast';
 import { ENetwork, ENotificationStatus } from '@/_shared/types';
@@ -86,9 +86,17 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 		}
 	};
 
+	const formatVideoDate = (dateString: string): string => {
+		const pubdate = new Date(dateString);
+		const day = pubdate.getDate();
+		const month = pubdate.toLocaleDateString('en-US', { month: 'short' });
+		const year = pubdate.getFullYear().toString().slice(-2);
+		return `${day} ${month} '${year}`;
+	};
+
 	return (
 		<div
-			className='group relative cursor-pointer rounded-lg p-[1px] transition-all duration-300 [background:linear-gradient(180deg,#D2D8E0_0%,#000000_100%)] hover:[background:linear-gradient(180deg,#D2D8E0_0%,#E5007A_100%)]'
+			className={`group relative cursor-pointer rounded-lg p-[1px] transition-all duration-300 ${videoAssociatedNetwork === ENetwork.POLKADOT ? '[background:linear-gradient(180deg,#D2D8E0_0%,#E5007A_100%)]' : '[background:linear-gradient(180deg,#D2D8E0_0%,#000000_100%)]'}`}
 			onClick={handleCardClick}
 			onKeyDown={handleKeyDown}
 			role='button'
@@ -108,13 +116,7 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 					)}
 					<div className='absolute inset-0 flex items-center justify-center'>
 						<div className='flex h-12 w-12 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm md:h-16 md:w-16'>
-							<svg
-								className='h-6 w-6 text-btn_primary_text md:h-8 md:w-8'
-								fill='currentColor'
-								viewBox='0 0 24 24'
-							>
-								<path d='M8 5v14l11-7z' />
-							</svg>
+							<Play className='h-7 w-7 text-btn_primary_text' />
 						</div>
 					</div>
 				</div>
@@ -123,7 +125,7 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 					<h3 className='text-base font-bold md:text-lg'>{title}</h3>
 					<p className='mb-3 flex flex-col items-start gap-2 text-xs text-wallet_btn_text sm:flex-row sm:items-center sm:gap-3 md:mb-4'>
 						<span className='flex items-center gap-1'>
-							<Calendar className='h-3 w-3 md:h-3.5 md:w-3.5' /> {date}
+							<Calendar className='h-3 w-3 md:h-3.5 md:w-3.5' /> {formatVideoDate(date)}
 						</span>
 						<span className='flex items-center gap-1'>
 							<Clock className='h-3 w-3 md:h-3.5 md:w-3.5' />
@@ -133,6 +135,7 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 
 					<div className='mb-3 flex flex-col gap-2 md:mb-4'>
 						<div className='flex flex-wrap gap-2'>
+							<p className='text-sm text-text_primary'>{referenda ? t('referenda') : t('votingOutcomes')}</p>
 							{activeNetwork && referenda
 								? referenda.slice(0, MAX_VISIBLE_REFERENDA).map((referendaItem) => {
 										const networkBaseUrl = `https://${activeNetwork}.polkassembly.io`;

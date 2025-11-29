@@ -5,14 +5,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, Clock } from 'lucide-react';
-import { Button } from '@/app/_shared-components/Button';
 import { useTranslations } from 'next-intl';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
+import { MouseEvent } from 'react';
+import { Button } from '@/app/_shared-components/Button';
 import { ENetwork } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
-import { MouseEvent } from 'react';
 
 const MAX_VISIBLE_REFERENDA = 3;
 const DEFAULT_IMAGE_ALT = 'No Image';
@@ -58,7 +58,9 @@ function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoI
 			href={videoLinkHref}
 			className='block'
 		>
-			<div className='flex cursor-pointer items-start gap-4 rounded-lg p-[1px] transition-all duration-300 [background:linear-gradient(180deg,#D2D8E0_0%,#000000_100%)] hover:[background:linear-gradient(180deg,#D2D8E0_0%,#E5007A_100%)]'>
+			<div
+				className={`flex cursor-pointer items-start gap-4 rounded-lg p-[1px] transition-all duration-300 ${videoAssociatedNetwork === ENetwork.POLKADOT ? '[background:linear-gradient(180deg,#D2D8E0_0%,#E5007A_100%)]' : '[background:linear-gradient(180deg,#D2D8E0_0%,#000000_100%)]'}`}
+			>
 				<div className='flex w-full flex-col items-start gap-4 rounded-lg bg-bg_modal p-4 shadow-sm transition-shadow hover:shadow-md sm:flex-row'>
 					<div className='relative h-48 w-full flex-shrink-0 overflow-hidden rounded-md sm:h-24 sm:w-40'>
 						{thumbnail ? (
@@ -89,6 +91,7 @@ function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoI
 
 						{referenda && referenda.length > 0 && (
 							<div className='mt-2 flex flex-wrap items-center gap-2'>
+								<p className='text-sm text-text_primary'>{t('referenda')}</p>
 								{videoAssociatedNetwork &&
 									referenda.slice(0, 3).map((referendaItem) => {
 										const networkBaseUrl = `https://${videoAssociatedNetwork}.polkassembly.io`;
