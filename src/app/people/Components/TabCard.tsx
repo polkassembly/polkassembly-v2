@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useTranslations } from 'next-intl';
+import { TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
 
 interface TabCardProps {
 	cohortNumber: number;
@@ -15,8 +16,8 @@ function TabCard({ cohortNumber, delegates, guardians, tracks }: TabCardProps) {
 	const t = useTranslations('DecentralizedVoices');
 
 	return (
-		<div className='mb-4 w-full bg-bg_modal'>
-			<div className='mx-auto grid max-w-7xl grid-cols-1 px-4 py-5 lg:px-16'>
+		<div className='w-full bg-bg_modal'>
+			<div className='mx-auto grid max-w-7xl grid-cols-1 px-4 pt-5 lg:px-16'>
 				<p className='text-[28px] font-semibold text-text_primary'>{t('People')}</p>
 				<p className='pt-2 text-sm font-medium text-text_primary'>
 					{t('PeopleDescription', {
@@ -26,6 +27,9 @@ function TabCard({ cohortNumber, delegates, guardians, tracks }: TabCardProps) {
 						tracks
 					})}
 				</p>
+				<TabsList className='justify-start pt-5'>
+					<TabsTrigger value='dv'>{t('DecentralisedVoices')}</TabsTrigger>
+				</TabsList>
 			</div>
 		</div>
 	);

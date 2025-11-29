@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Activity, HelpCircle, Filter, Ban, Check } from 'lucide-react';
+import { HelpCircle, Filter, Ban, Check } from 'lucide-react';
 import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
 import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuSeparator } from '@/app/_shared-components/DropdownMenu';
@@ -12,6 +12,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { IDVDelegateWithStats, IDVCohort, EDVDelegateType } from '@/_shared/types';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import TimeLineIcon from '@assets/icons/timeline.svg';
+
+import Image from 'next/image';
 
 interface DecentralisedVoicesCardProps {
 	delegatesWithStats: IDVDelegateWithStats[];
@@ -58,8 +61,14 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 			<div className='mb-4 flex flex-col justify-between gap-3 sm:mb-5 sm:gap-4 md:mb-6 md:flex-row md:items-center'>
 				<div className='flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center'>
 					<div className='flex items-center gap-2'>
-						<Activity className='h-5 w-5 text-decision_bar_indicator sm:h-6 sm:w-6' />
-						<h2 className='text-xl font-semibold text-navbar_title sm:text-2xl lg:text-3xl'>{t('DecentralisedVoices')}</h2>
+						<Image
+							src={TimeLineIcon}
+							alt='Delegation Green Icon'
+							width={24}
+							height={24}
+							className='h-6 w-6'
+						/>{' '}
+						<h2 className='text-xl font-semibold text-navbar_title sm:text-2xl'>{t('DecentralisedVoices')}</h2>
 					</div>
 					{cohort && cohort.guardiansCount > 0 && (
 						<div className='flex w-full rounded-lg bg-sidebar_footer p-1 md:w-auto'>

@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { Activity, HelpCircle } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
@@ -14,6 +14,7 @@ import { ENetwork, ECohortStatus } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
+import TimeLineIcon from '@assets/icons/timeline.svg';
 
 function CohortsTableCard() {
 	const t = useTranslations('DecentralizedVoices');
@@ -34,10 +35,16 @@ function CohortsTableCard() {
 	};
 
 	return (
-		<div className='my-3 w-full rounded-2xl border border-border_grey bg-bg_modal p-4 shadow-md sm:my-4 sm:p-5 md:rounded-3xl md:p-6'>
+		<div className='w-full rounded-2xl border border-border_grey bg-bg_modal p-4 shadow-md sm:my-4 sm:p-5 md:rounded-3xl md:p-6'>
 			<div className='mb-4 flex items-center gap-2 sm:mb-5 md:mb-6'>
-				<Activity className='h-5 w-5 text-decision_bar_indicator sm:h-6 sm:w-6' />
-				<h2 className='text-xl font-semibold text-navbar_title sm:text-2xl lg:text-3xl'>{t('Cohorts')}</h2>
+				<Image
+					src={TimeLineIcon}
+					alt='Delegation Green Icon'
+					width={24}
+					height={24}
+					className='h-6 w-6'
+				/>{' '}
+				<h2 className='text-xl font-semibold text-navbar_title sm:text-2xl'>{t('Cohorts')}</h2>
 			</div>
 
 			<div className='-mx-4 sm:-mx-5 md:-mx-6'>

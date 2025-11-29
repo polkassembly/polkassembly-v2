@@ -92,7 +92,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 
 	return (
 		<div className='my-4 w-full max-w-full overflow-hidden rounded-3xl border border-border_grey bg-bg_modal p-6'>
-			<div className='mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
+			<div className='flex flex-col justify-between gap-4 md:flex-row md:items-center'>
 				<div className='flex flex-col gap-4 md:flex-row md:items-center'>
 					<div>
 						<h2 className='text-2xl font-semibold text-navbar_title'>{t('DecentralizedVoicesVoting')}</h2>
@@ -154,7 +154,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 				</div>
 			</div>
 
-			<div className='mb-4 flex flex-wrap items-center gap-4 rounded-lg border border-border_grey p-3'>
+			<div className='my-5 flex flex-wrap items-center gap-4 rounded-lg border border-border_grey p-3'>
 				<div className='flex items-center gap-2 text-sm text-text_primary'>
 					<Filter size={14} />
 					<span>{t('SortBy')}</span>

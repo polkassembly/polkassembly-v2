@@ -4,7 +4,7 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Activity, Filter, ArrowUpDown, Check, X, Minus, ChevronDown, Menu } from 'lucide-react';
+import { Filter, ArrowUpDown, Check, X, Minus, ChevronDown, Menu } from 'lucide-react';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import VotingBar from '@/app/_shared-components/ListingComponent/VotingBar/VotingBar';
 import { getSpanStyle } from '@/app/_shared-components/TopicTag/TopicTag';
@@ -19,6 +19,8 @@ import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import Link from 'next/link';
+import Image from 'next/image';
+import TimeLineIcon from '@assets/icons/timeline.svg';
 import DVVotesDialog from './DVVotesDialog';
 
 interface InfluenceCardProps {
@@ -113,7 +115,13 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
 			<div className='mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
 				<div className='flex items-center gap-2'>
-					<Activity className='text-decision_bar_indicator' />
+					<Image
+						src={TimeLineIcon}
+						alt='Delegation Green Icon'
+						width={24}
+						height={24}
+						className='h-6 w-6'
+					/>{' '}
 					<h2 className='text-2xl font-semibold text-navbar_title'>{t('InfluenceByReferenda')}</h2>
 					<span className='ml-2 rounded-lg bg-bounty_dash_bg p-2 text-xs font-medium text-wallet_btn_text'>
 						{t('OutcomeChanged')} {outcomeChangedCount} ({outcomePercent}%) | {t('Total')} {totalCount}
