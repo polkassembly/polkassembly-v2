@@ -1693,6 +1693,7 @@
 		"Days": "日",
 		"People": "人々",
 		"PeopleDescription": "分散型ボイスプログラムは、数百万のDOTを委任することで、OpenGovへのより広範なコミュニティ参加を促進します。最新のDVコホートは{cohortNumber}で、{delegates}人の代表者と{guardians}人のガーディアンがいます。最新のDVコホートは{tracks}つのトラックをサポートしています",
+		"PeopleDescriptionNoGuardians": "分散型ボイスプログラムは、数百万のDOTを委任することで、OpenGovへのより広範なコミュニティ参加を促進します。最新のDVコホートは{cohortNumber}で、{delegates}人の代表者がいます。最新のDVコホートは{tracks}つのトラックをサポートしています",
 		"PercentOfDV": "% の DV"
 	}
 }

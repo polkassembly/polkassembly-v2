@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { Filter, ChevronDown } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -79,7 +79,6 @@ function DecentralisedVoices() {
 									className='flex items-center justify-center gap-2 rounded-md border border-border_grey px-3 py-2 text-sm text-text_primary hover:bg-sidebar_footer sm:w-auto'
 								>
 									<Filter className='h-3.5 w-3.5 text-wallet_btn_text sm:h-4 sm:w-4' />
-									<ChevronDown className='h-3.5 w-3.5 text-wallet_btn_text sm:h-4 sm:w-4' />
 								</button>
 							</PopoverTrigger>
 							<PopoverContent className='w-56 border-border_grey p-2'>

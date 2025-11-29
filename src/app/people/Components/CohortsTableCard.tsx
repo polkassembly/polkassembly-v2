@@ -31,7 +31,7 @@ function CohortsTableCard() {
 	const handleCohortClick = (cohortIndex: number) => {
 		const params = new URLSearchParams(searchParams.toString());
 		params.set('cohort', cohortIndex.toString());
-		router.push(`/people?${params.toString()}`);
+		router.replace(`/people?${params.toString()}`, { scroll: false });
 	};
 
 	return (

@@ -1722,6 +1722,7 @@
 		"Days": "days",
 		"People": "People",
 		"PeopleDescription": "The Decentralized Voices program empowers broader community participation in OpenGov by delegating millions of DOT. The latest DV cohort is {cohortNumber} with {delegates} delegates and {guardians} guardians. The latest DV cohort supports {tracks} tracks",
+		"PeopleDescriptionNoGuardians": "The Decentralized Voices program empowers broader community participation in OpenGov by delegating millions of DOT. The latest DV cohort is {cohortNumber} with {delegates} delegates. The latest DV cohort supports {tracks} tracks",
 		"PercentOfDV": "% of DV"
 	}
 }

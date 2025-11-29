@@ -22,7 +22,6 @@ export const useDVDelegates = ({ cohortId, trackFilter = EDVTrackFilter.DV_TRACK
 		refetchOnWindowFocus: false,
 		refetchOnMount: true,
 		staleTime: 0,
-		placeholderData: (previousData) => previousData,
 		queryFn: async () => {
 			const { data, error } = await NextApiClientService.fetchDVDelegates({ cohortId, trackFilter });
 
@@ -55,7 +54,6 @@ export const useDVInfluence = ({ cohortId, sortBy, trackFilter = EDVTrackFilter.
 		refetchOnWindowFocus: false,
 		refetchOnMount: true,
 		staleTime: 0,
-		placeholderData: (previousData) => previousData,
 		queryFn: async () => {
 			const { data, error } = await NextApiClientService.fetchDVInfluence({ cohortId, trackFilter, sortBy });
 
@@ -87,7 +85,6 @@ export const useDVVotingMatrix = ({ cohortId, trackFilter = EDVTrackFilter.DV_TR
 		refetchOnWindowFocus: false,
 		refetchOnMount: true,
 		staleTime: 0,
-		placeholderData: (previousData) => previousData,
 		queryFn: async () => {
 			const { data, error } = await NextApiClientService.fetchDVVotingMatrix({ cohortId, trackFilter });
 

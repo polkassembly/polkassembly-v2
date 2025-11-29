@@ -15,18 +15,25 @@ interface TabCardProps {
 function TabCard({ cohortNumber, delegates, guardians, tracks }: TabCardProps) {
 	const t = useTranslations('DecentralizedVoices');
 
+	const description =
+		guardians > 0
+			? t('PeopleDescription', {
+					cohortNumber,
+					delegates,
+					guardians,
+					tracks
+				})
+			: t('PeopleDescriptionNoGuardians', {
+					cohortNumber,
+					delegates,
+					tracks
+				});
+
 	return (
 		<div className='w-full bg-bg_modal'>
 			<div className='mx-auto grid max-w-7xl grid-cols-1 px-4 pt-5 lg:px-16'>
 				<p className='text-[28px] font-semibold text-text_primary'>{t('People')}</p>
-				<p className='pt-2 text-sm font-medium text-text_primary'>
-					{t('PeopleDescription', {
-						cohortNumber,
-						delegates,
-						guardians,
-						tracks
-					})}
-				</p>
+				<p className='pt-2 text-sm font-medium text-text_primary'>{description}</p>
 				<TabsList className='justify-start pt-5'>
 					<TabsTrigger value='dv'>{t('DecentralisedVoices')}</TabsTrigger>
 				</TabsList>
