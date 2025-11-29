@@ -461,6 +461,15 @@
 		}
 	},
 	"PostDetails": {
+		"Tooltips": {
+			"requestedAmount": "Der Gesamtbetrag, der in diesem Vorschlag angefordert wird, in DOT angezeigt.",
+			"votingPeriod": "Der Zeitraum, in dem Token-Inhaber über diesen Vorschlag abstimmen können.",
+			"preparePeriod": "Ein Pufferzeitraum vor der Abstimmung, um Benutzer zu ermöglichen, sich vorzubereiten.",
+			"enactmentPeriod": "Der Zeitraum nach der Genehmigung eines Vorschlags, bevor er auf der Chain ausgeführt wird.",
+			"votingSummary": "Eine schnelle Zusammenfassung aller Abstimmungen: Wie viele unterstützt, widerstanden oder abgestimmt haben.",
+			"votesBubble": "Jede Blase stellt einen Wähler dar — Größe reflektiert seine Stimmgewichtung.",
+			"votesGraph": "Visualisierung der Abstimmungsverläufe über den Abstimmungszeitraum."
+		},
 		"remove": "Entfernen",
 		"removeVote": "Abstimmung entfernen",
 		"selectYourVoterAddress": "Wählen Sie Ihre Abstimmungsadresse",

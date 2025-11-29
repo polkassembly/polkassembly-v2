@@ -16,6 +16,8 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { THEME_COLORS } from '@/app/_style/theme';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import Image from 'next/image';
+import InfoQueryIcon from '@assets/icons/info-query-icon.svg';
 import classes from './VoteSummary.module.scss';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '../../Tooltip';
 import LoadingLayover from '../../LoadingLayover';
@@ -128,7 +130,21 @@ function VoteSummary({ voteMetrics, index, approvalThreshold }: { voteMetrics?: 
 
 	return (
 		<div className={classes.voteSummaryWrapper}>
-			<p className={classes.voteSummaryTitle}>{t('PostDetails.summary')}</p>
+			<p className={classes.voteSummaryTitle}>
+				{t('PostDetails.summary')}
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<Image
+							src={InfoQueryIcon}
+							alt='info query icon'
+							className='h-3.5 w-3.5'
+							width={14}
+							height={14}
+						/>
+					</TooltipTrigger>
+					<TooltipContent className='bg-tooltip_background text-sm text-white'>{t('PostDetails.Tooltips.votingSummary')}</TooltipContent>
+				</Tooltip>
+			</p>
 
 			<div className={classes.voteSummaryPieChart}>
 				{loading && <LoadingLayover />}
