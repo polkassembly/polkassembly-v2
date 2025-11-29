@@ -116,6 +116,26 @@ export class AIService {
 		- Your ENTIRE response must be EXACTLY ONE WORD from the following list: 'against', 'slightly_against', 'neutral', 'slightly_for', or 'for'.
 		- DO NOT include any explanations, reasoning, or additional text in your response.
 		- DO NOT use quotation marks or any other characters around your response.
+		`,
+		YOUTUBE_TRANSCRIPT_SUMMARY: `
+		You are a helpful assistant that creates concise summaries of All About Governance (AAG) video transcripts about Polkadot and Kusama governance.
+		
+		Create a brief, technical summary (150-200 words max) covering:
+		- Main governance topics discussed
+		- Key referendum numbers mentioned and their purpose
+		- Important decisions or proposals covered
+		- Notable community discussions or concerns
+		- Action items or upcoming votes
+
+		STRICT RULES:
+		- Keep the summary under 200 words
+		- Use clear, technical language appropriate for governance participants
+		- Focus on actionable information and key decisions
+		- Mention specific referendum numbers when discussed
+		- Use bullet points for better readability
+		- Be objective and factual
+		- DO NOT include any explanatory text before or after the summary
+		- Start directly with the summary content
 		`
 	} as const;
 
@@ -209,6 +229,8 @@ export class AIService {
 				cleanedResponse = this.cleanSingleWordResponse(cleanedResponse, validSpamResponses);
 			} else if (prompt.includes(this.BASE_PROMPTS.COMMENTS_SUMMARY)) {
 				cleanedResponse = this.cleanCommentsSummaryResponse(cleanedResponse);
+			} else if (prompt.includes(this.BASE_PROMPTS.YOUTUBE_TRANSCRIPT_SUMMARY)) {
+				cleanedResponse = cleanedResponse.trim();
 			}
 
 			return cleanedResponse;
@@ -545,5 +567,33 @@ export class AIService {
 			...comment,
 			aiSentiment: sentiment
 		};
+	}
+
+	static async GenerateYouTubeTranscriptSummary(transcript: Array<{ text: string; offset: number; duration: number }>): Promise<string | null> {
+		if (!IS_AI_ENABLED) {
+			return null;
+		}
+
+		if (!transcript || transcript.length === 0) {
+			console.log('No transcript provided for summary generation');
+			return null;
+		}
+
+		const fullTranscript = transcript.map((segment) => segment.text).join(' ');
+
+		const maxWords = 8000;
+		const words = fullTranscript.split(/\s+/);
+		const truncatedTranscript = words.slice(0, maxWords).join(' ');
+
+		if (words.length > maxWords) {
+			console.log(`Transcript truncated from ${words.length} to ${maxWords} words`);
+		}
+
+		const prompt = `${this.BASE_PROMPTS.YOUTUBE_TRANSCRIPT_SUMMARY}
+
+TRANSCRIPT:
+${truncatedTranscript}`;
+
+		return this.getAIResponse(prompt);
 	}
 }

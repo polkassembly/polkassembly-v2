@@ -14,12 +14,14 @@ import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { ACTIVE_BOUNTY_STATUSES } from '@/_shared/_constants/activeBountyStatuses';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { AAG_YOUTUBE_PLAYLIST_ID } from '@/_shared/_constants/aag_playlist_id';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { RedisService } from '../redis_service';
 import { OnChainDbService } from '../onchain_db_service';
 import { OffChainDbService } from '../offchain_db_service';
 import { AlgoliaService } from '../algolia_service';
+import { AAGVideoService } from '../external_api_service/aag/aag_video_service';
 
 if (!TOOLS_PASSPHRASE) {
 	throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'TOOLS_PASSPHRASE is not set');
@@ -41,7 +43,8 @@ enum EWebhookEvent {
 	CACHE_REFRESH = 'cache_refresh',
 	USER_CREATED = 'user_created',
 	ADDRESS_CREATED = 'address_created',
-	CLEAR_CACHE = 'clear_cache'
+	CLEAR_CACHE = 'clear_cache',
+	AAG_DAILY_CHECK = 'aag_daily_check'
 }
 
 enum ECacheRefreshType {
@@ -126,7 +129,10 @@ export class WebhookService {
 			userId: z.number().refine((userId) => ValidatorService.isValidUserId(userId), ERROR_MESSAGES.INVALID_USER_ID),
 			wallet: z.string()
 		}),
-		[EWebhookEvent.CLEAR_CACHE]: z.object({})
+		[EWebhookEvent.CLEAR_CACHE]: z.object({}),
+		[EWebhookEvent.AAG_DAILY_CHECK]: z.object({
+			lastCheckDate: z.string().optional()
+		})
 	} as const;
 
 	static async handleIncomingEvent({ event, body, network }: { event: string; body: unknown; network: ENetwork }) {
@@ -174,6 +180,8 @@ export class WebhookService {
 				return this.handleAddressCreated({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.ADDRESS_CREATED]> });
 			case EWebhookEvent.CLEAR_CACHE:
 				return this.handleClearCache();
+			case EWebhookEvent.AAG_DAILY_CHECK:
+				return this.handleAAGDailyCheck({ network, params: params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.AAG_DAILY_CHECK]> });
 			default:
 				throw new APIError(ERROR_CODES.BAD_REQUEST, StatusCodes.BAD_REQUEST, `Unsupported event: ${event}`);
 		}
@@ -650,5 +658,37 @@ export class WebhookService {
 
 	private static async handleOtherEvent({ network, params }: { network: ENetwork; params: unknown }) {
 		console.log('TODO: add handling for event ', { network, params });
+	}
+
+	private static async handleAAGDailyCheck({
+		network,
+		params
+	}: {
+		network: ENetwork;
+		params: z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.AAG_DAILY_CHECK]>;
+	}) {
+		try {
+			console.log('Starting daily AAG video check...', { network, lastCheckDate: params.lastCheckDate });
+
+			if (!AAG_YOUTUBE_PLAYLIST_ID?.trim()) {
+				console.warn('AAG playlist ID not configured, skipping daily check');
+				return;
+			}
+
+			const today = new Date().toISOString().split('T')[0];
+			const providedDate = params.lastCheckDate;
+
+			if (providedDate === today) {
+				console.log('AAG daily check already completed today, skipping...');
+				return;
+			}
+
+			const result = await AAGVideoService.CheckForNewVideos(AAG_YOUTUBE_PLAYLIST_ID);
+			console.log('Daily AAG video check completed:', result);
+
+			console.log('AAG daily check completed successfully for', today);
+		} catch (error) {
+			console.error('Error in AAG daily check:', error);
+		}
 	}
 }
