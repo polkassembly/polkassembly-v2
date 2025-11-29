@@ -703,6 +703,23 @@
 			"description": "Haga clic aquí para reembolsar el depósito de esta propuesta",
 			"decisionDeposit": "Depósito de Decisión",
 			"submissionDeposit": "Depósito de Presentación"
+		},
+		"CommentsFilter": {
+			"sortBy": "Ordenar por",
+			"filter": "Filtrar",
+			"newest": "Más recientes",
+			"oldest": "Más antiguos",
+			"top": "Top",
+			"all": "Todos",
+			"reset": "Restablecer",
+			"conditions": "Condiciones",
+			"fromAuthor": "De Autor",
+			"verifiedOnly": "Solo verificado",
+			"withVotes": "Con votos",
+			"hideZeroBalance": "Ocultar cuentas con 0 balance",
+			"showVotersComments": "Mostrar comentarios de votantes",
+			"showDVDelegates": "Mostrar delegados DV",
+			"hideDeletedComments": "Ocultar comentarios eliminados"
 		}
 	},
 	"ListingPage_Status": {

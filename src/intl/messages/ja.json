@@ -702,6 +702,23 @@
 			"description": "このプロポーザルのデポジットを返金するにはここをクリックしてください",
 			"decisionDeposit": "決定デポジット",
 			"submissionDeposit": "提出デポジット"
+		},
+		"CommentsFilter": {
+			"sortBy": "並び替え",
+			"filter": "フィルター",
+			"newest": "最新",
+			"oldest": "最古",
+			"top": "トップ",
+			"all": "すべて",
+			"reset": "リセット",
+			"conditions": "条件",
+			"fromAuthor": "投稿者",
+			"verifiedOnly": "本人確認のみ",
+			"withVotes": "投票のあるコメント",
+			"hideZeroBalance": "0残高のアカウントを非表示",
+			"showVotersComments": "投票者のコメントを表示",
+			"showDVDelegates": "DVデリゲートのコメントを表示",
+			"hideDeletedComments": "削除されたコメントを非表示"
 		}
 	},
 	"ListingPage_Status": {

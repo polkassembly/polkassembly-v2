@@ -702,6 +702,23 @@
 			"description": "点击此处退还此提案的押金",
 			"decisionDeposit": "决策押金",
 			"submissionDeposit": "提交押金"
+		},
+		"CommentsFilter": {
+			"sortBy": "排序",
+			"filter": "过滤",
+			"newest": "最新",
+			"oldest": "最旧",
+			"top": "顶部",
+			"all": "全部",
+			"reset": "重置",
+			"conditions": "条件",
+			"fromAuthor": "来自作者",
+			"verifiedOnly": "仅验证",
+			"withVotes": "有投票的评论",
+			"hideZeroBalance": "隐藏0余额账户",
+			"showVotersComments": "显示投票者评论",
+			"showDVDelegates": "显示DV委托者评论",
+			"hideDeletedComments": "隐藏已删除评论"
 		}
 	},
 	"ListingPage_Status": {

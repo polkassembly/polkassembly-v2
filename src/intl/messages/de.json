@@ -700,6 +700,23 @@
 			"description": "Klicken Sie hier, um die Einlage für diesen Vorschlag zurückzuerstatten",
 			"decisionDeposit": "Entscheidungskaution",
 			"submissionDeposit": "Einreichungskaution"
+		},
+		"CommentsFilter": {
+			"sortBy": "Sortieren nach",
+			"filter": "Filter",
+			"newest": "Neueste",
+			"oldest": "Älteste",
+			"top": "Top",
+			"all": "Alle",
+			"reset": "Zurücksetzen",
+			"conditions": "Bedingungen",
+			"fromAuthor": "Von Autor",
+			"verifiedOnly": "Nur verifiziert",
+			"withVotes": "Mit Abstimmungen",
+			"hideZeroBalance": "0 Guthaben ausblenden",
+			"showVotersComments": "Voter Kommentare anzeigen",
+			"showDVDelegates": "DV Delegaten anzeigen",
+			"hideDeletedComments": "Gelöschte Kommentare ausblenden"
 		}
 	},
 	"ListingPage_Status": {
