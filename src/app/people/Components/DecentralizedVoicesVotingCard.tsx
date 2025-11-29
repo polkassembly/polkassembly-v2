@@ -104,18 +104,12 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 						<div>
 							<h2 className='text-2xl font-semibold text-navbar_title'>{t('DecentralizedVoicesVoting')}</h2>
 							<p className='text-sm text-text_primary'>
-								{loading ? (
-									'...'
-								) : (
+								{activeTab === EDVDelegateType.DAO ? daos.length : guardians.length} {activeTab === EDVDelegateType.DAO ? t('DAOs') : t('Guardians')} {t('Across')}{' '}
+								{referendums.length} {t('Referendums')}
+								{referendums.length > 0 && (
 									<>
-										{activeTab === EDVDelegateType.DAO ? daos.length : guardians.length} {activeTab === EDVDelegateType.DAO ? t('DAOs') : t('Guardians')} {t('Across')}{' '}
-										{referendums.length} {t('Referendums')}
-										{referendums.length > 0 && (
-											<>
-												{' '}
-												(#{minRef} - #{maxRef})
-											</>
-										)}
+										{' '}
+										(#{minRef} - #{maxRef})
 									</>
 								)}
 							</p>

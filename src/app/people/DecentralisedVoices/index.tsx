@@ -64,7 +64,7 @@ function DecentralisedVoices() {
 								className='h-6 w-6'
 							/>{' '}
 							<h2 className='flex flex-wrap items-center gap-2 text-xl font-semibold text-navbar_title sm:text-2xl'>
-								{t('Cohort')} #{delegatesLoading ? '...' : (cohort?.index ?? '...')}{' '}
+								{t('Cohort')} #{cohort?.index ?? ''}
 								<span
 									className={`rounded-full px-2 py-0.5 text-[10px] text-btn_primary_text sm:text-xs ${cohort?.status === ECohortStatus.ONGOING ? 'bg-border_blue' : 'bg-progress_nay'}`}
 								>
