@@ -186,7 +186,7 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 														<BsFillQuestionCircleFill className='ml-1 text-base text-btn_secondary_border' />
 													</TooltipTrigger>
 													<TooltipContent className='bg-tooltip_background p-2 text-btn_primary_text'>
-														<p>{t('DurationOfCohort')}</p>
+														<p>{t('ParticipationTooltip')}</p>
 													</TooltipContent>
 												</Tooltip>
 											</TooltipProvider>
@@ -240,15 +240,15 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 														<div className='flex items-center gap-4'>
 															<div className='flex items-center gap-1 text-success'>
 																<AiFillLike className='fill-current text-sm' />
-																<span className='font-medium'>{delegate.voteStats.ayeCount}</span>
+																<span className='font-medium text-text_primary'>{delegate.voteStats.ayeCount}</span>
 															</div>
 															<div className='flex items-center gap-1 text-toast_error_text'>
 																<AiFillDislike className='fill-current text-sm' />
-																<span className='font-medium'>{delegate.voteStats.nayCount}</span>
+																<span className='font-medium text-text_primary'>{delegate.voteStats.nayCount}</span>
 															</div>
 															<div className='flex items-center gap-1 text-bg_blue'>
 																<Ban size={14} />
-																<span className='font-medium'>{delegate.voteStats.abstainCount}</span>
+																<span className='font-medium text-text_primary'>{delegate.voteStats.abstainCount}</span>
 															</div>
 														</div>
 													</td>

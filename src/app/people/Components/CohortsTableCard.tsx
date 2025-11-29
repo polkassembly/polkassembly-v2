@@ -2,7 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { HelpCircle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
@@ -15,6 +14,7 @@ import { useTranslations } from 'next-intl';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 import TimeLineIcon from '@assets/icons/timeline.svg';
+import { BsFillQuestionCircleFill } from '@react-icons/all-files/bs/BsFillQuestionCircleFill';
 
 function CohortsTableCard() {
 	const t = useTranslations('DecentralizedVoices');
@@ -47,7 +47,7 @@ function CohortsTableCard() {
 				<h2 className='text-xl font-semibold text-navbar_title sm:text-2xl'>{t('Cohorts')}</h2>
 			</div>
 
-			<div className='-mx-4 sm:-mx-5 md:-mx-6'>
+			<div className=''>
 				<Table className='table-auto'>
 					<TableHeader>
 						<TableRow className='border-b border-t border-border_grey bg-bounty_table_bg pt-3 text-left text-xs font-semibold uppercase text-text_primary'>
@@ -58,10 +58,7 @@ function CohortsTableCard() {
 									<TooltipProvider>
 										<Tooltip>
 											<TooltipTrigger>
-												<HelpCircle
-													size={14}
-													className='ml-1 text-text_primary'
-												/>
+												<BsFillQuestionCircleFill className='ml-1 text-base text-btn_secondary_border' />
 											</TooltipTrigger>
 											<TooltipContent className='bg-tooltip_background p-2 text-btn_primary_text'>
 												<p>{t('DurationOfCohort')}</p>

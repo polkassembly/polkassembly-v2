@@ -1694,6 +1694,7 @@
 		"People": "人员",
 		"PeopleDescription": "去中心化声音计划通过委托数百万 DOT 来增强社区在 OpenGov 中的广泛参与。最新的 DV 群组是第 {cohortNumber} 期，有 {delegates} 名代表和 {guardians} 名监护人。最新的 DV 群组支持 {tracks} 个轨道",
 		"PeopleDescriptionNoGuardians": "去中心化声音计划通过委托数百万 DOT 来增强社区在 OpenGov 中的广泛参与。最新的 DV 群组是第 {cohortNumber} 期，有 {delegates} 名代表。最新的 DV 群组支持 {tracks} 个轨道",
+		"ParticipationTooltip": "代表在任期内投票的公投百分比",
 		"PercentOfDV": "% 的 DV"
 	}
 }
