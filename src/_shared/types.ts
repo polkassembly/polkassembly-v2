@@ -1690,9 +1690,9 @@ export interface IChatResponse {
 
 export enum EJudgementDashboardTabs {
 	OVERVIEW = 'overview',
-	DASHBOARD = 'dashboard',
+	JUDGEMENTS = 'judgements',
 	REGISTRARS = 'registrars',
-	MY_IDENTITIES = 'my-identities'
+	MY_DASHBOARD = 'my-dashboard'
 }
 
 export enum EJudgementStatus {
