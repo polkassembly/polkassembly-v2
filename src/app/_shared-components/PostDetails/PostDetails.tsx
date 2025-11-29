@@ -210,6 +210,16 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									isModalOpen={isModalOpen ?? false}
 								/>
 							</div>
+							<div className={classes.commentsBox}>
+								<PostComments
+									proposalType={post.proposalType}
+									index={index}
+									contentSummary={post.contentSummary}
+									comments={post.comments}
+									allowedCommentor={post.allowedCommentor}
+									postUserId={post.userId}
+								/>
+							</div>
 						</TabsContent>
 						<TabsContent
 							value={EPostDetailsTab.ONCHAIN_INFO}
@@ -268,16 +278,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								)}
 							</div>
 						)}
-						<div className={classes.commentsBox}>
-							<PostComments
-								proposalType={post.proposalType}
-								index={index}
-								contentSummary={post.contentSummary}
-								comments={post.comments}
-								allowedCommentor={post.allowedCommentor}
-								postUserId={post.userId}
-							/>
-						</div>
 					</div>
 
 					{isModalOpen && !isOffchainPost && (
