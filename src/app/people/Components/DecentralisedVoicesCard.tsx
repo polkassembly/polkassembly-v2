@@ -4,10 +4,12 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { HelpCircle, Ban, Check } from 'lucide-react';
+import { Ban, Check } from 'lucide-react';
 import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
 import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
 import { MdArrowDropDown } from '@react-icons/all-files/md/MdArrowDropDown';
+import { BsFillQuestionCircleFill } from '@react-icons/all-files/bs/BsFillQuestionCircleFill';
+
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuSeparator } from '@/app/_shared-components/DropdownMenu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import Address from '@/app/_shared-components/Profile/Address/Address';
@@ -181,10 +183,7 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 											<TooltipProvider>
 												<Tooltip>
 													<TooltipTrigger>
-														<HelpCircle
-															size={14}
-															className='ml-1 text-text_primary'
-														/>
+														<BsFillQuestionCircleFill className='ml-1 text-base text-btn_secondary_border' />
 													</TooltipTrigger>
 													<TooltipContent className='bg-tooltip_background p-2 text-btn_primary_text'>
 														<p>{t('DurationOfCohort')}</p>
