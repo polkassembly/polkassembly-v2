@@ -40,7 +40,7 @@
 }
 
 .commentsBox {
-	@apply mt-4 flex flex-col gap-y-4 rounded-xl border border-primary_border bg-bg_modal;
+	@apply mt-5 flex flex-col gap-y-4 rounded-xl border border-primary_border bg-bg_modal;
 
 	@media (max-width: 1279px) {
 		order: 3;
