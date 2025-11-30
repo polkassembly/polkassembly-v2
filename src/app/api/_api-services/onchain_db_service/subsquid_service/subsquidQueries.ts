@@ -330,6 +330,20 @@ export class SubsquidQueries {
 		}
 	`;
 
+	protected static GET_VOTE_METRICS_FOR_PROPOSALS = `
+		query GetVoteMetricsForProposals($index_in: [Int!]!, $type_eq: ProposalType!) {
+			proposals(where: {index_in: $index_in, type_eq: $type_eq}) {
+				index
+				tally {
+					ayes
+					bareAyes
+					nays
+					support
+				}
+			}
+		}
+	`;
+
 	protected static GET_CONVICTION_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX = `
 		query GetConvictionVoteMetricsByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!) {
 			noCount: convictionVotesConnection(where: {decision_eq: no, proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
@@ -1070,6 +1084,11 @@ export class SubsquidQueries {
 							status
 							timestamp
 						}
+						tally {
+							ayes
+							nays
+							support
+						}
 						convictionVoting(where: {voter_eq: $voter_eq, removedAtBlock_isNull: true}) {
 							balance {
 								... on StandardVoteBalance {
@@ -1287,6 +1306,177 @@ export class SubsquidQueries {
 
 	`;
 
+	protected static GET_VOTES_BY_VOTER_AND_BLOCK_RANGE = `
+		query GetVotesByVoterAndBlockRange(
+			$limit: Int!,
+			$offset: Int!,
+			$voter_in: [String!]!,
+			$createdAtBlock_gte: Int!,
+			$createdAtBlock_lte: Int!
+		) {
+			votes: flattenedConvictionVotes(
+				where: {
+					voter_in: $voter_in,
+					removedAtBlock_isNull: true,
+					createdAtBlock_gte: $createdAtBlock_gte,
+					createdAtBlock_lte: $createdAtBlock_lte
+				},
+				limit: $limit,
+				offset: $offset,
+				orderBy: createdAtBlock_DESC
+			) {
+				proposalIndex
+				isDelegated
+				parentVote {
+					extrinsicIndex
+					selfVotingPower
+					delegatedVotingPower
+				}
+				type
+				voter
+				balance {
+					__typename
+					... on StandardVoteBalance {
+						value
+					}
+					... on SplitVoteBalance {
+						aye
+						nay
+						abstain
+					}
+				}
+				decision
+				createdAt
+				lockPeriod
+				proposal {
+					createdAt
+					description
+					index
+					origin
+					proposer
+					reward
+					status
+					curator
+					hash
+					preimage {
+						proposedCall {
+							args
+						}
+					}
+					statusHistory {
+						status
+						timestamp
+					}
+					createdAtBlock
+					updatedAtBlock
+					tally {
+						ayes
+						nays
+						support
+					}
+				}
+			}
+			totalCount: flattenedConvictionVotesConnection(
+				where: {
+					voter_in: $voter_in,
+					removedAtBlock_isNull: true,
+					createdAtBlock_gte: $createdAtBlock_gte,
+					createdAtBlock_lte: $createdAtBlock_lte
+				},
+				orderBy: createdAtBlock_DESC
+			) {
+				totalCount
+			}
+		}
+	`;
+
+	protected static GET_VOTES_FOR_ADDRESSES_AND_PROPOSAL_INDICES = `
+		query GetVotesForAddressesAndProposalIndices(
+			$limit: Int!,
+			$offset: Int!,
+			$voter_in: [String!]!,
+			$proposalIndex_in: [Int!],
+			$createdAtBlock_gte: Int!,
+			$createdAtBlock_lte: Int!
+		) {
+			votes: flattenedConvictionVotes(
+				where: {
+					voter_in: $voter_in,
+					proposalIndex_in: $proposalIndex_in,
+					removedAtBlock_isNull: true,
+					createdAtBlock_gte: $createdAtBlock_gte,
+					createdAtBlock_lte: $createdAtBlock_lte
+				},
+				limit: $limit,
+				offset: $offset,
+				orderBy: createdAt_DESC
+			) {
+				proposalIndex
+				isDelegated
+				parentVote {
+					extrinsicIndex
+					selfVotingPower
+					delegatedVotingPower
+				}
+				type
+				voter
+				balance {
+					__typename
+					... on StandardVoteBalance {
+						value
+					}
+					... on SplitVoteBalance {
+						aye
+						nay
+						abstain
+					}
+				}
+				decision
+				createdAt
+				lockPeriod
+				proposal {
+					createdAt
+					description
+					index
+					origin
+					proposer
+					reward
+					status
+					curator
+					hash
+					preimage {
+						proposedCall {
+							args
+						}
+					}
+					statusHistory {
+						status
+						timestamp
+					}
+					createdAtBlock
+					updatedAtBlock
+					tally {
+						ayes
+						nays
+						support
+					}
+				}
+			}
+			totalCount: flattenedConvictionVotesConnection(
+				where: {
+					voter_in: $voter_in,
+					proposalIndex_in: $proposalIndex_in,
+					removedAtBlock_isNull: true,
+					createdAtBlock_gte: $createdAtBlock_gte,
+					createdAtBlock_lte: $createdAtBlock_lte
+				},
+				orderBy: createdAt_DESC
+			) {
+				totalCount
+			}
+		}
+	`;
+
 	protected static GET_ALL_FLATTENED_VOTES_WITHOUT_FILTERS = `
 		query GetAllFlattenedVotesWithoutFilters(
 			$limit: Int!,
@@ -1471,6 +1661,15 @@ export class SubsquidQueries {
 				balance
 				lockPeriod
 				track
+			}
+		}
+	`;
+
+	protected static GET_LATEST_BLOCK_NUMBER = `
+		query GetLatestBlockNumber {
+			proposals(limit: 1, orderBy: createdAtBlock_DESC, where: {type_eq: ReferendumV2}) {
+				createdAtBlock
+				updatedAtBlock
 			}
 		}
 	`;
