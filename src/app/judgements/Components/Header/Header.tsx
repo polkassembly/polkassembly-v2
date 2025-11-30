@@ -9,11 +9,13 @@ import { TabsList, TabsTrigger } from '@ui/Tabs';
 import Link from 'next/link';
 import { EJudgementDashboardTabs, ESetIdentityStep } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
+import { useIsRegistrar } from '@/hooks/useIsRegistrar';
 import BecomeRegistrarModal from '../BecomeRegistrarModal/BecomeRegistrarModal';
 import styles from './Header.module.scss';
 
 function Header() {
 	const t = useTranslations();
+	const { data: isRegistrar } = useIsRegistrar();
 
 	return (
 		<div className={styles.header}>
@@ -29,6 +31,14 @@ function Header() {
 				</div>
 				<p>{t('Judgements.registrarDescription')}</p>
 				<TabsList className={`w-fit max-w-full items-start overflow-auto pl-4 font-bold md:pl-0 ${styles.hideScrollbar}`}>
+					{isRegistrar && (
+						<TabsTrigger
+							className={styles.header_tab}
+							value={EJudgementDashboardTabs.REQUESTS}
+						>
+							Requests
+						</TabsTrigger>
+					)}
 					<TabsTrigger
 						className={styles.header_tab}
 						value={EJudgementDashboardTabs.OVERVIEW}
