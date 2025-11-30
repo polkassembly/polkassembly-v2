@@ -99,11 +99,11 @@ function NewsBanner() {
 
 	return (
 		<div
-			className='fixed bottom-0 right-0 z-20 h-8 w-full bg-[#FEC021] shadow-lg transition-opacity duration-200'
+			className='fixed right-0 z-20 w-full bg-[#FEC021] shadow-lg transition-opacity duration-200'
 			style={{
 				left: isMobileDevice ? '0' : sidebarWidth,
-				WebkitTransform: 'translate3d(0,0,0)',
-				WebkitOverflowScrolling: 'touch'
+				bottom: isMobileDevice ? 'env(safe-area-inset-bottom, 0px)' : '0',
+				height: '32px'
 			}}
 		>
 			<div
