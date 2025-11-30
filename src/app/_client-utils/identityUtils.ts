@@ -267,6 +267,46 @@ export function getJudgementBadge(status: string): string {
 	}
 }
 
+export const JUDGEMENT_OPTIONS = [
+	{ value: 'Unknown', label: 'Unknown', description: 'No judgement' },
+	{ value: 'KnownGood', label: 'Known Good', description: 'The target is known directly by the registrar and the registrar can fully attest to the validity' },
+	{ value: 'Reasonable', label: 'Reasonable', description: 'The information appears reasonable, but no in-depth checks (e.g. formal KYC process) were performed' },
+	{ value: 'Erroneous', label: 'Erroneous', description: 'The information contains errors' },
+	{ value: 'OutOfDate', label: 'Out of Date', description: 'The information was correct in the past but is now outdated' },
+	{ value: 'LowQuality', label: 'Low Quality', description: 'The information is of low quality or imprecise' }
+] as const;
+
+export type JudgementValue = (typeof JUDGEMENT_OPTIONS)[number]['value'];
+
+export function getJudgementLabel(value: JudgementValue): string {
+	const option = JUDGEMENT_OPTIONS.find((opt) => opt.value === value);
+	return option?.label || value;
+}
+
+export function getJudgementDescription(value: JudgementValue): string {
+	const option = JUDGEMENT_OPTIONS.find((opt) => opt.value === value);
+	return option?.description || '';
+}
+
+export function filterJudgementsByStatus(judgements: IJudgementRequest[], status: EJudgementStatus): IJudgementRequest[] {
+	return judgements.filter((judgement) => judgement.status === status);
+}
+
+export function getJudgementStatusCounts(judgements: IJudgementRequest[]): Record<EJudgementStatus, number> {
+	return judgements.reduce(
+		(counts, judgement) => ({
+			...counts,
+			[judgement.status]: (counts[judgement.status] || 0) + 1
+		}),
+		{
+			[EJudgementStatus.REQUESTED]: 0,
+			[EJudgementStatus.PENDING]: 0,
+			[EJudgementStatus.APPROVED]: 0,
+			[EJudgementStatus.REJECTED]: 0
+		} as Record<EJudgementStatus, number>
+	);
+}
+
 function extractFieldValue(field: IIdentityFieldValue | undefined): string {
 	if (!field) return '';
 

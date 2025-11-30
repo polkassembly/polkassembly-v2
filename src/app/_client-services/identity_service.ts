@@ -693,4 +693,72 @@ export class IdentityService {
 			displayName: superData?.[1]?.Raw || ''
 		};
 	}
+
+	async getJudgementRequestsForRegistrar(registrarAddress: string): Promise<IJudgementRequest[]> {
+		try {
+			const encodedRegistrarAddress = getEncodedAddress(registrarAddress, this.network) || registrarAddress;
+			const allJudgements = await this.getAllIdentityJudgements();
+
+			return allJudgements.filter((judgement) => {
+				const encodedJudgementRegistrar = getEncodedAddress(judgement.registrarAddress, this.network) || judgement.registrarAddress;
+				return encodedJudgementRegistrar === encodedRegistrarAddress;
+			});
+		} catch (error) {
+			console.error('Error fetching judgement requests for registrar:', error);
+			return [];
+		}
+	}
+
+	async provideJudgement({
+		targetAddress,
+		judgement,
+		registrarAddress,
+		wallet,
+		setVaultQrState,
+		selectedAccount,
+		onSuccess,
+		onFailed
+	}: {
+		targetAddress: string;
+		judgement: 'Unknown' | 'KnownGood' | 'Reasonable' | 'Erroneous' | 'OutOfDate' | 'LowQuality';
+		registrarAddress: string;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+		selectedAccount?: ISelectedAccount;
+		onSuccess?: () => void;
+		onFailed?: (errorMessageFallback?: string) => void;
+	}) {
+		const encodedTargetAddress = getEncodedAddress(targetAddress, this.network) || targetAddress;
+		const encodedRegistrarAddress = getEncodedAddress(registrarAddress, this.network) || registrarAddress;
+
+		const registrars = await this.getRegistrars();
+		const registrarIndex = registrars.findIndex((reg) => {
+			const encodedRegAddress = getEncodedAddress(reg.account, this.network) || reg.account;
+			return encodedRegAddress === encodedRegistrarAddress;
+		});
+
+		if (registrarIndex === -1) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Registrar not found');
+		}
+
+		const judgementObj = { [judgement]: null };
+		const provideJudgementTx = this.peopleChainApi.tx.identity.provideJudgement(registrarIndex, encodedTargetAddress, judgementObj, null);
+
+		await this.executeTx({
+			tx: provideJudgementTx,
+			address: encodedRegistrarAddress,
+			wallet,
+			setVaultQrState,
+			selectedAccount,
+			errorMessageFallback: 'Failed to provide judgement',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: (errorMessageFallback: string) => {
+				console.log(errorMessageFallback, 'errorMessageFallback');
+				onFailed?.(errorMessageFallback);
+			}
+		});
+	}
 }
