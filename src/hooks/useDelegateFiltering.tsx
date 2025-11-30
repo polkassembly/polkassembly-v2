@@ -7,7 +7,7 @@ import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
 import { useCallback, useMemo, useState } from 'react';
 import { useDebounce } from './useDebounce';
 
-type SortOption = 'MAX_DELEGATED' | 'VOTED_PROPOSALS' | 'DELEGATORS';
+type SortOption = 'DECENTRALIZED_VOICE' | 'MAX_DELEGATED' | 'VOTED_PROPOSALS' | 'DELEGATORS';
 
 const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	const { debouncedValue: searchQuery, setValue: setSearchQuery, value: searchQueryValue } = useDebounce('');
@@ -35,6 +35,11 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 		(a: IDelegateDetails, b: IDelegateDetails) => {
 			if (!sortBy) return 0;
 			switch (sortBy) {
+				case 'DECENTRALIZED_VOICE':
+					if (a.hasDecentralizedVoice === b.hasDecentralizedVoice) {
+						return b.delegators.length - a.delegators.length;
+					}
+					return a.hasDecentralizedVoice ? -1 : 1;
 				case 'MAX_DELEGATED':
 					return Number(BigInt(b.maxDelegated || '0') - BigInt(a.maxDelegated || '0'));
 				case 'VOTED_PROPOSALS':

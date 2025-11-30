@@ -1355,7 +1355,8 @@
 		"errorCreatingDelegate": "Fehler beim Erstellen von Delegierten",
 		"delegateCreatedSuccessfully": "Delegierten erfolgreich erstellt",
 		"enterDelegateAddress": "Delegiertenadresse eingeben",
-		"youCannotDelegateToYourself": "Sie können sich nicht selbst delegieren"
+		"youCannotDelegateToYourself": "Sie können sich nicht selbst delegieren",
+		"decentralizedVoices": "Dezentralisierte Stimmen"
 	},
 	"TxFees": {
 		"preimageDeposit": "Preimage-Einzahlung",
