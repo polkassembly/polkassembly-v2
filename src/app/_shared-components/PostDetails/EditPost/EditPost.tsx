@@ -92,13 +92,27 @@ function EditPost({ postData, onClose }: { postData: IPostListing | IPost; onClo
 			return;
 		}
 
-		queryClient.setQueryData([EReactQueryKeys.POST_DETAILS, postData.index!.toString()], (prev: IPost) => ({
-			...prev,
-			title,
-			content,
-			allowedCommentor,
-			isDefaultContent: false
-		}));
+		queryClient.setQueryData(
+			[EReactQueryKeys.POST_DETAILS, postData.proposalType === EProposalType.TIP ? postData.hash?.toString() || '' : postData.index!.toString()],
+			(prev: IPost | undefined) => {
+				if (!prev) return prev;
+				const newHistoryItem = {
+					title: prev.title ?? '',
+					content: prev.content ?? '',
+					createdAt: prev.updatedAt ?? prev.createdAt ?? new Date()
+				};
+
+				return {
+					...prev,
+					title,
+					content,
+					allowedCommentor,
+					isDefaultContent: false,
+					updatedAt: new Date(),
+					history: prev.history ? [...prev.history, newHistoryItem] : [newHistoryItem]
+				};
+			}
+		);
 
 		LocalStorageClientService.deleteEditPostData({ postId: postData.index!.toString() });
 		onClose?.();
