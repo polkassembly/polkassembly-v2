@@ -179,3 +179,405 @@ export function getSocialsFromIdentity(identity: IdentityData) {
 		web: identity.web?.Raw || ''
 	};
 }
+
+export interface IIdentityUpdate {
+	type: 'IdentitySet' | 'JudgementRequested' | 'JudgementGiven' | 'IdentityCleared' | 'SubIdentityAdded' | 'SubIdentityRemoved';
+	timestamp: string;
+	blockNumber: number;
+	blockHash: string;
+	extrinsicHash: string;
+	extrinsicIndex: number;
+	signer: string;
+	success: boolean;
+	changes?: Array<{ field: string; oldValue?: string; newValue?: string }>;
+	registrarIndex?: number;
+	registrarAddress?: string;
+	judgement?: string;
+	maxFee?: string;
+	events: Array<{ section: string; method: string; data: unknown }>;
+}
+
+export interface IIdentityFieldValue {
+	Raw?: string;
+	BlakeTwo256?: string;
+	Sha256?: string;
+	Keccak256?: string;
+	ShaThree256?: string;
+	None?: null;
+}
+
+export interface IIdentityInfo {
+	display?: IIdentityFieldValue;
+	legal?: IIdentityFieldValue;
+	web?: IIdentityFieldValue;
+	matrix?: IIdentityFieldValue;
+	email?: IIdentityFieldValue;
+	twitter?: IIdentityFieldValue;
+	discord?: IIdentityFieldValue;
+	github?: IIdentityFieldValue;
+	image?: IIdentityFieldValue;
+	pgpFingerprint?: string | null;
+	additional?: Array<[IIdentityFieldValue, IIdentityFieldValue]>;
+}
+
+export function formatIdentityUpdateType(type: IIdentityUpdate['type']): string {
+	const typeMap: Record<string, string> = {
+		IdentitySet: 'Identity Set',
+		JudgementRequested: 'Judgement Requested',
+		JudgementGiven: 'Judgement Given',
+		IdentityCleared: 'Identity Cleared',
+		SubIdentityAdded: 'Sub-Identity Added',
+		SubIdentityRemoved: 'Sub-Identity Removed'
+	};
+	return typeMap[type] || type;
+}
+
+export function formatDate(date: Date): string {
+	const day = date.getDate();
+	const suffix = day === 1 || day === 21 || day === 31 ? 'st' : day === 2 || day === 22 ? 'nd' : day === 3 || day === 23 ? 'rd' : 'th';
+	const month = date.toLocaleDateString('en-US', { month: 'short' });
+	const year = date.getFullYear().toString().slice(-2);
+	const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+	return `${day}${suffix} ${month}'${year}, ${time}`;
+}
+
+export function formatJudgementLabel(judgement: string): string {
+	switch (judgement) {
+		case 'KnownGood':
+			return 'Known Good';
+		case 'OutOfDate':
+			return 'Out of Date';
+		case 'LowQuality':
+			return 'Low Quality';
+		default:
+			return judgement;
+	}
+}
+
+export function getJudgementBadge(status: string): string {
+	switch (status) {
+		case 'APPROVED':
+			return 'Reasonable';
+		case 'REJECTED':
+			return 'Erroneous';
+		case 'REQUESTED':
+			return 'Requested';
+		default:
+			return 'Pending';
+	}
+}
+
+function extractFieldValue(field: IIdentityFieldValue | undefined): string {
+	if (!field) return '';
+
+	const fieldAny = field as Record<string, unknown>;
+
+	if (fieldAny.none !== undefined) return '';
+
+	if (fieldAny.raw || fieldAny.Raw) {
+		const hexValue = (fieldAny.raw || fieldAny.Raw) as string;
+		if (hexValue.startsWith('0x')) {
+			try {
+				const hex = hexValue.slice(2);
+				const bytes = new Uint8Array(hex.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || []);
+				return new TextDecoder().decode(bytes);
+			} catch {
+				return hexValue;
+			}
+		}
+		return hexValue;
+	}
+
+	if (fieldAny.blakeTwo256 || fieldAny.BlakeTwo256) return `Blake2-256: ${fieldAny.blakeTwo256 || fieldAny.BlakeTwo256}`;
+	if (fieldAny.sha256 || fieldAny.Sha256) return `SHA-256: ${fieldAny.sha256 || fieldAny.Sha256}`;
+	if (fieldAny.keccak256 || fieldAny.Keccak256) return `Keccak-256: ${fieldAny.keccak256 || fieldAny.Keccak256}`;
+	if (fieldAny.shaThree256 || fieldAny.ShaThree256) return `SHA3-256: ${fieldAny.shaThree256 || fieldAny.ShaThree256}`;
+
+	return '';
+}
+
+function parseIdentityInfo(info: IIdentityInfo): Record<string, string> {
+	return {
+		display: extractFieldValue(info.display),
+		legal: extractFieldValue(info.legal),
+		web: extractFieldValue(info.web),
+		matrix: extractFieldValue(info.matrix),
+		email: extractFieldValue(info.email),
+		twitter: extractFieldValue(info.twitter),
+		discord: extractFieldValue(info.discord),
+		github: extractFieldValue(info.github),
+		image: extractFieldValue(info.image),
+		pgpFingerprint: info.pgpFingerprint || ''
+	};
+}
+
+export async function parseBlockExtrinsicsForIdentityUpdates(
+	blockData: {
+		height: number;
+		hash: string;
+		timestamp: string;
+		extrinsics: Array<{
+			id: string;
+			index: number;
+			hash: string;
+			section: string;
+			method: string;
+			args: unknown;
+			signer: string;
+			success: boolean;
+			events: Array<{ id: string; index: number; section: string; method: string; data: unknown }>;
+		}>;
+	},
+	targetAddress?: string
+): Promise<IIdentityUpdate[]> {
+	const identityExtrinsics = blockData.extrinsics.filter((extrinsic) => {
+		return extrinsic.section === 'identity' && (!targetAddress || extrinsic.signer === targetAddress);
+	});
+
+	return identityExtrinsics.flatMap((extrinsic): IIdentityUpdate[] => {
+		const baseUpdate = {
+			timestamp: blockData.timestamp,
+			blockNumber: blockData.height,
+			blockHash: blockData.hash,
+			extrinsicHash: extrinsic.hash,
+			extrinsicIndex: extrinsic.index,
+			signer: extrinsic.signer,
+			success: extrinsic.success,
+			events: extrinsic.events.map((e) => ({ section: e.section, method: e.method, data: e.data }))
+		};
+
+		try {
+			const args = extrinsic.args as Record<string, unknown>;
+
+			switch (extrinsic.method) {
+				case 'setIdentity': {
+					const info = args.info as IIdentityInfo;
+					const parsedInfo = parseIdentityInfo(info);
+
+					return [
+						{
+							...baseUpdate,
+							type: 'IdentitySet' as const,
+							changes: Object.entries(parsedInfo)
+								.filter(([, value]) => value)
+								.map(([field, value]) => ({
+									field,
+									newValue: value
+								}))
+						}
+					];
+				}
+
+				case 'requestJudgement': {
+					const regIndex = (args.regIndex || args.reg_index) as number;
+					const maxFee = args.maxFee || args.max_fee;
+
+					return [
+						{
+							...baseUpdate,
+							type: 'JudgementRequested' as const,
+							registrarIndex: regIndex,
+							maxFee: maxFee ? String(maxFee) : undefined
+						}
+					];
+				}
+
+				case 'provideJudgement': {
+					return [
+						{
+							...baseUpdate,
+							type: 'JudgementGiven' as const,
+							registrarIndex: args.reg_index as number,
+							judgement: args.judgement ? JSON.stringify(args.judgement) : undefined
+						}
+					];
+				}
+
+				case 'clearIdentity': {
+					return [
+						{
+							...baseUpdate,
+							type: 'IdentityCleared' as const
+						}
+					];
+				}
+
+				case 'setSubs': {
+					const subs = args.subs as Array<[string, unknown]>;
+					if (subs && subs.length > 0) {
+						return [
+							{
+								...baseUpdate,
+								type: 'SubIdentityAdded' as const,
+								changes: subs.map(([address]) => ({
+									field: 'sub-identity',
+									newValue: address
+								}))
+							}
+						];
+					}
+					return [];
+				}
+
+				default:
+					return [];
+			}
+		} catch {
+			return [];
+		}
+	});
+}
+
+export interface IIdentityHistoryBlock {
+	blockNumber: number;
+	blockHash: string;
+	timestamp: string;
+	updateType: IIdentityUpdate['type'];
+	extrinsicHash: string;
+	data?: Record<string, unknown>;
+}
+
+function mapStatescanEventToUpdateType(eventName: string): IIdentityHistoryBlock['updateType'] | null {
+	const eventMap: Record<string, IIdentityHistoryBlock['updateType']> = {
+		IdentitySet: 'IdentitySet',
+		JudgementRequested: 'JudgementRequested',
+		JudgementGiven: 'JudgementGiven',
+		IdentityCleared: 'IdentityCleared',
+		SubIdentityAdded: 'SubIdentityAdded',
+		SubIdentityRemoved: 'SubIdentityRemoved'
+	};
+	return eventMap[eventName] || null;
+}
+
+export function formatIdentityHistoryBlocks(blocks: IIdentityHistoryBlock[]): IIdentityUpdate[] {
+	return blocks.map((block) => {
+		const eventData = (block.data || {}) as Record<string, unknown>;
+
+		const registrarData = eventData.registrar as Record<string, unknown> | undefined;
+		const registrarIndex = registrarData?.index as number | undefined;
+		const registrarAddress = registrarData?.account as string | undefined;
+
+		const judgement = eventData.judgement || eventData.Judgement;
+		const maxFee = eventData.max_fee || eventData.maxFee || eventData.fee;
+
+		const changes: Array<{ field: string; newValue?: string }> = [];
+
+		if (block.updateType === 'IdentitySet') {
+			const identityFields = ['display', 'email', 'twitter', 'web', 'legal', 'matrix', 'discord', 'github', 'riot'];
+			identityFields.forEach((field) => {
+				const value = eventData[field];
+				if (value && typeof value === 'string') {
+					changes.push({
+						field: field.charAt(0).toUpperCase() + field.slice(1),
+						newValue: value
+					});
+				}
+			});
+		}
+
+		return {
+			type: block.updateType,
+			timestamp: block.timestamp,
+			blockNumber: block.blockNumber,
+			blockHash: block.blockHash,
+			extrinsicHash: block.extrinsicHash || '',
+			extrinsicIndex: 0,
+			signer: '',
+			success: true,
+			events: [],
+			registrarIndex: registrarIndex !== undefined ? Number(registrarIndex) : undefined,
+			registrarAddress: registrarAddress || undefined,
+			judgement: judgement ? String(judgement) : undefined,
+			maxFee: maxFee ? String(maxFee) : undefined,
+			changes: changes.length > 0 ? changes : undefined
+		};
+	});
+}
+
+export interface IStatescanTimelineItem {
+	name: string;
+	args: Record<string, unknown>;
+	indexer: {
+		chain: string | null;
+		blockHeight: number;
+		blockHash: string;
+		blockTime: number;
+		extrinsicIndex: number;
+		eventIndex: number;
+	};
+}
+
+export interface IStatescanResponse {
+	data: {
+		identityTimeline: IStatescanTimelineItem[];
+	};
+}
+
+export async function fetchIdentityTimelineFromStatescan(network: string, address: string): Promise<IIdentityHistoryBlock[]> {
+	const statescanEndpoints: Record<string, string> = {
+		polkadot: 'https://dot-gh-api.statescan.io/graphql',
+		kusama: 'https://ksm-gh-api.statescan.io/graphql'
+	};
+
+	const endpoint = statescanEndpoints[network];
+	if (!endpoint) {
+		throw new Error(`Statescan API not available for network: ${network}`);
+	}
+
+	const query = `
+		query GetIdentityTimeline($account: String!) {
+			identityTimeline(account: $account) {
+				name
+				args
+				indexer {
+					chain
+					blockHeight
+					blockHash
+					blockTime
+					extrinsicIndex
+					eventIndex
+				}
+			}
+		}
+	`;
+
+	const response = await fetch(endpoint, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			query,
+			variables: { account: address },
+			operationName: 'GetIdentityTimeline'
+		})
+	});
+
+	if (!response.ok) {
+		throw new Error(`Statescan API error: ${response.statusText}`);
+	}
+
+	const data: IStatescanResponse = await response.json();
+
+	if (!data.data?.identityTimeline) {
+		return [];
+	}
+
+	const history: IIdentityHistoryBlock[] = data.data.identityTimeline
+		.map((item): IIdentityHistoryBlock | null => {
+			const updateType = mapStatescanEventToUpdateType(item.name);
+			if (!updateType) return null;
+
+			return {
+				blockNumber: item.indexer.blockHeight,
+				blockHash: item.indexer.blockHash,
+				timestamp: new Date(item.indexer.blockTime).toISOString(),
+				updateType,
+				extrinsicHash: '',
+				data: item.args
+			};
+		})
+		.filter((item): item is IIdentityHistoryBlock => item !== null);
+
+	return history;
+}

@@ -6,26 +6,20 @@
 
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { mapJudgementStatus } from '@/app/_client-utils/identityUtils';
-import { EJudgementStatus, ENotificationStatus, ESocial } from '@/_shared/types';
+import { EJudgementStatus, ENotificationStatus } from '@/_shared/types';
+import { mapJudgementStatus, formatDate } from '@/app/_client-utils/identityUtils';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '@/app/_shared-components/Table';
 import { useUser } from '@/hooks/useUser';
 import { Settings, Trash2, Copy, PencilIcon } from 'lucide-react';
 import { useState } from 'react';
 import Address from '@/app/_shared-components/Profile/Address/Address';
-import Image from 'next/image';
-import CalendarWatchIcon from '@assets/icons/calendar-watch-icon.svg';
-import { IoMdMail } from '@react-icons/all-files/io/IoMdMail';
-import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
-import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
-import { FaGlobe } from '@react-icons/all-files/fa/FaGlobe';
-import RiotIcon from '@assets/icons/riot_icon.svg';
-import { FaGithub } from '@react-icons/all-files/fa/FaGithub';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { useToast } from '@/hooks/useToast';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { IdentityTimelineDialog } from '../IdentityUpdateTimeline/IdentityUpdateTimeline';
+import { SocialLinksDisplay, UpdateHistoryButton } from '../Shared/IdentityComponents';
 import styles from '../Overview/IdentitiesListingTable.module.scss';
 
 const SUB_IDENTITY_TYPE = 'Sub-identity';
@@ -36,6 +30,7 @@ function MyIdentitiesDashboard() {
 	const { userPreferences } = useUserPreferences();
 	const queryClient = useQueryClient();
 	const [isDeleting, setIsDeleting] = useState<string | null>(null);
+	const [selectedAddressForTimeline, setSelectedAddressForTimeline] = useState<{ address: string; displayName: string } | null>(null);
 	const { setVaultQrState } = usePolkadotVault();
 	const { toast } = useToast();
 	const { data: myIdentities, isLoading } = useQuery({
@@ -51,6 +46,16 @@ function MyIdentitiesDashboard() {
 
 			const getUserBalances = await api.derive.balances.all(user.defaultAddress);
 			const balance = getUserBalances.freeBalance.toString();
+
+			let lastUpdatedBlock: number | undefined;
+			try {
+				const identityData = await api.query.identity.identityOf(user.defaultAddress);
+				const blockHash = identityData?.createdAtHash || (await api.rpc.chain.getBlockHash());
+				const blockHeader = await api.rpc.chain.getHeader(blockHash);
+				lastUpdatedBlock = blockHeader.number.toNumber();
+			} catch {
+				lastUpdatedBlock = undefined;
+			}
 
 			if (mainIdentity.isIdentitySet) {
 				const judgements = mainIdentity.judgements.map((judgement) => {
@@ -79,6 +84,7 @@ function MyIdentitiesDashboard() {
 					judgements: approvedJudgements,
 					balance,
 					lastUpdated: new Date(),
+					lastUpdatedBlock,
 					canEdit: true,
 					canDelete: false
 				});
@@ -117,6 +123,7 @@ function MyIdentitiesDashboard() {
 						judgements: approvedSubJudgements,
 						balance: subBalance,
 						lastUpdated: new Date(),
+						lastUpdatedBlock,
 						canEdit: false,
 						canDelete: true
 					};
@@ -183,15 +190,6 @@ function MyIdentitiesDashboard() {
 			});
 			setIsDeleting(null);
 		}
-	};
-
-	const formatDate = (date: Date) => {
-		const day = date.getDate();
-		const suffix = day === 1 || day === 21 || day === 31 ? 'st' : day === 2 || day === 22 ? 'nd' : day === 3 || day === 23 ? 'rd' : 'th';
-		const month = date.toLocaleDateString('en-US', { month: 'short' });
-		const year = date.getFullYear().toString().slice(-2);
-		const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-		return `${day}${suffix} ${month}'${year}, ${time}`;
 	};
 
 	if (isLoading || !identityService) {
@@ -308,81 +306,7 @@ function MyIdentitiesDashboard() {
 									</div>
 								</td>
 								<td className='px-6 py-4'>
-									<div className='flex gap-2'>
-										{identity.socials.email && (
-											<a
-												key={ESocial.EMAIL}
-												href={`mailto:${identity.socials.email}`}
-												target='_blank'
-												className='flex h-7 w-7 items-center justify-center rounded-full bg-social_green'
-												rel='noreferrer'
-											>
-												<IoMdMail className='size-4 text-white' />
-											</a>
-										)}
-										{identity.socials.twitter && (
-											<a
-												key={ESocial.TWITTER}
-												href={`https://x.com/${identity.socials.twitter}`}
-												target='_blank'
-												className='flex h-7 w-7 items-center justify-center rounded-full bg-social_green'
-												rel='noreferrer'
-											>
-												<FaTwitter className='size-4 text-white' />
-											</a>
-										)}
-										{identity.socials.discord && (
-											<a
-												key={ESocial.DISCORD}
-												href={`https://discord.com/users/${identity.socials.discord}`}
-												target='_blank'
-												className='flex h-7 w-7 items-center justify-center rounded-full bg-social_green'
-												rel='noreferrer'
-											>
-												<FaDiscord className='size-4 text-white' />
-											</a>
-										)}
-										{identity.socials.github && (
-											<a
-												key={ESocial.GITHUB}
-												href={`https://github.com/${identity.socials.github}`}
-												target='_blank'
-												className='flex h-7 w-7 items-center justify-center rounded-full bg-primary_border/40'
-												rel='noreferrer'
-											>
-												<FaGithub className='size-4 text-delegation_card_text' />
-											</a>
-										)}
-										{identity.socials.web && (
-											<a
-												key='web_url'
-												href={identity.socials.web}
-												target='_blank'
-												className='flex h-7 w-7 items-center justify-center rounded-full bg-primary_border/40'
-												rel='noreferrer'
-											>
-												<FaGlobe className='size-4 text-delegation_card_text' />
-											</a>
-										)}
-
-										{identity.socials.matrix && (
-											<a
-												key='matrix'
-												href={`https://matrix.to/#/${identity.socials.matrix}`}
-												target='_blank'
-												className='flex h-7 w-7 items-center justify-center rounded-full bg-primary_border/40'
-												rel='noreferrer'
-											>
-												<Image
-													src={RiotIcon}
-													alt='Riot'
-													width={20}
-													height={20}
-													className='size-5 text-delegation_card_text'
-												/>
-											</a>
-										)}
-									</div>
+									<SocialLinksDisplay socials={identity.socials} />
 								</td>
 								<td className='px-6 py-4'>
 									<span className='rounded px-2 py-1 text-sm font-semibold text-text_primary'>{identity.type}</span>
@@ -390,13 +314,7 @@ function MyIdentitiesDashboard() {
 								<td className='px-6 py-4'>
 									<div className='flex items-center gap-2 text-sm font-semibold text-text_primary'>
 										<span>{formatDate(identity.lastUpdated)}</span>
-										<Image
-											src={CalendarWatchIcon}
-											alt='calendar'
-											width={20}
-											height={20}
-											className='h-5 w-5'
-										/>
+										<UpdateHistoryButton onClick={() => setSelectedAddressForTimeline({ address: identity.address, displayName: identity.displayName })} />
 									</div>
 								</td>
 								<td className='px-6 py-4'>
@@ -463,6 +381,11 @@ function MyIdentitiesDashboard() {
 					</TableBody>
 				</Table>
 			</div>
+
+			<IdentityTimelineDialog
+				selectedAddress={selectedAddressForTimeline}
+				onClose={() => setSelectedAddressForTimeline(null)}
+			/>
 		</div>
 	);
 }

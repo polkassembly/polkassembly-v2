@@ -6,28 +6,23 @@
 
 import { useMemo, useState } from 'react';
 import Identicon from '@polkadot/react-identicon';
-import { ChevronDown, ChevronRight, Copy } from 'lucide-react';
+import { ChevronDown, ChevronRight, Copy, History } from 'lucide-react';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useQuery } from '@tanstack/react-query';
-import { EJudgementStatus, ESocial } from '@/_shared/types';
+import { EJudgementStatus } from '@/_shared/types';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '@/app/_shared-components/Table';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { useSearchParams } from 'next/navigation';
-import CalendarWatchIcon from '@assets/icons/calendar-watch-icon.svg';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { mapJudgementStatus } from '@/app/_client-utils/identityUtils';
+import { mapJudgementStatus, formatDate, formatJudgementLabel, getJudgementBadge } from '@/app/_client-utils/identityUtils';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import Image from 'next/image';
-import { IoMdMail } from '@react-icons/all-files/io/IoMdMail';
-import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
-import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
-import { FaGlobe } from '@react-icons/all-files/fa/FaGlobe';
-import RiotIcon from '@assets/icons/riot_icon.svg';
-import { FaGithub } from '@react-icons/all-files/fa/FaGithub';
 import ChildListingIndicatorIcon from '@assets/icons/child-listing-indicator.svg';
 import ChildListingEndIndicatorIcon from '@assets/icons/child-listing-end-indicator.svg';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
+import { IdentityTimelineDialog } from '../IdentityUpdateTimeline/IdentityUpdateTimeline';
+import { SocialLinksDisplay, JudgementDisplay, UpdateHistoryButton } from '../Shared/IdentityComponents';
 import styles from './IdentitiesListingTable.module.scss';
 
 interface IdentityData {
@@ -55,25 +50,13 @@ interface IdentityData {
 	subIdentityCount: number;
 }
 
-function formatJudgementLabel(judgement: string) {
-	switch (judgement) {
-		case 'KnownGood':
-			return 'Known Good';
-		case 'OutOfDate':
-			return 'Out of Date';
-		case 'LowQuality':
-			return 'Low Quality';
-		default:
-			return judgement;
-	}
-}
-
 function IdentitiesListingTable() {
 	const searchParams = useSearchParams();
 	const page = Number(searchParams?.get('page')) || 1;
 	const search = searchParams?.get('search') || '';
 	const { identityService } = useIdentityService();
 	const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+	const [selectedAddressForTimeline, setSelectedAddressForTimeline] = useState<{ address: string; displayName: string } | null>(null);
 
 	const { data: allIdentities, isLoading } = useQuery({
 		queryKey: ['allIdentities', identityService],
@@ -243,28 +226,6 @@ function IdentitiesListingTable() {
 		setExpandedRows(newExpanded);
 	};
 
-	const formatDate = (date: Date) => {
-		const day = date.getDate();
-		const suffix = day === 1 || day === 21 || day === 31 ? 'st' : day === 2 || day === 22 ? 'nd' : day === 3 || day === 23 ? 'rd' : 'th';
-		const month = date.toLocaleDateString('en-US', { month: 'short' });
-		const year = date.getFullYear().toString().slice(-2);
-		const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-		return `${day}${suffix} ${month}'${year}, ${time}`;
-	};
-
-	const getJudgementBadge = (status: EJudgementStatus) => {
-		switch (status) {
-			case EJudgementStatus.APPROVED:
-				return 'Reasonable';
-			case EJudgementStatus.REJECTED:
-				return 'Erroneous';
-			case EJudgementStatus.REQUESTED:
-				return 'Requested';
-			default:
-				return 'Pending';
-		}
-	};
-
 	if (isLoading || !identityService) {
 		return (
 			<div className='flex flex-col gap-4 rounded-3xl border border-primary_border bg-bg_modal p-4'>
@@ -329,124 +290,19 @@ function IdentitiesListingTable() {
 										</div>
 									</td>
 									<td className='px-6 py-4'>
-										<div className='flex gap-2'>
-											{identity.socials.email && (
-												<a
-													key={ESocial.EMAIL}
-													href={`mailto:${identity.socials.email}`}
-													target='_blank'
-													className='flex h-7 w-7 items-center justify-center rounded-full bg-social_green'
-													rel='noreferrer'
-												>
-													<IoMdMail className='size-4 text-white' />
-												</a>
-											)}
-											{identity.socials.twitter && (
-												<a
-													key={ESocial.TWITTER}
-													href={`https://x.com/${identity.socials.twitter}`}
-													target='_blank'
-													className='flex h-7 w-7 items-center justify-center rounded-full bg-social_green'
-													rel='noreferrer'
-												>
-													<FaTwitter className='size-4 text-white' />
-												</a>
-											)}
-											{identity.socials.discord && (
-												<a
-													key={ESocial.DISCORD}
-													href={`https://discord.com/users/${identity.socials.discord}`}
-													target='_blank'
-													className='flex h-7 w-7 items-center justify-center rounded-full bg-social_green'
-													rel='noreferrer'
-												>
-													<FaDiscord className='size-4 text-white' />
-												</a>
-											)}
-											{identity.socials.github && (
-												<a
-													key={ESocial.GITHUB}
-													href={`https://github.com/${identity.socials.github}`}
-													target='_blank'
-													className='flex h-7 w-7 items-center justify-center rounded-full bg-primary_border/40'
-													rel='noreferrer'
-												>
-													<FaGithub className='size-4 text-delegation_card_text' />
-												</a>
-											)}
-											{identity.socials.web && (
-												<a
-													key='web_url'
-													href={identity.socials.web}
-													target='_blank'
-													className='flex h-7 w-7 items-center justify-center rounded-full bg-primary_border/40'
-													rel='noreferrer'
-												>
-													<FaGlobe className='size-4 text-delegation_card_text' />
-												</a>
-											)}
-
-											{identity.socials.matrix && (
-												<a
-													key='matrix'
-													href={`https://matrix.to/#/${identity.socials.matrix}`}
-													target='_blank'
-													className='flex h-7 w-7 items-center justify-center rounded-full bg-primary_border/40'
-													rel='noreferrer'
-												>
-													<Image
-														src={RiotIcon}
-														alt='Riot'
-														width={20}
-														height={20}
-														className='size-5 text-delegation_card_text'
-													/>
-												</a>
-											)}
-										</div>
+										<SocialLinksDisplay socials={identity.socials} />
 									</td>
 									<td className='px-6 py-4'>
-										{identity.judgements.count > 0 ? (
-											<div className='flex items-center gap-1'>
-												<span
-													className='rounded px-2 py-1 text-sm font-semibold text-text_primary'
-													title={identity.judgements.quality}
-												>
-													{getJudgementBadge(identity.judgements.status)}
-												</span>
-												{identity.judgements.count > 1 && (
-													<Tooltip>
-														<TooltipTrigger asChild>
-															<span className='flex !size-6 items-center justify-center rounded-full border border-primary_border bg-poll_option_bg p-2 text-xs font-medium text-text_primary'>
-																+{identity.judgements.count - 1}
-															</span>
-														</TooltipTrigger>
-														<TooltipContent
-															side='top'
-															align='center'
-															className='bg-tooltip_background'
-														>
-															<div className='flex flex-col gap-2 p-2'>
-																<span className='text-xs text-white'>{identity.judgements.labels.join(', ')}</span>
-															</div>
-														</TooltipContent>
-													</Tooltip>
-												)}
-											</div>
-										) : (
-											<span className='px-4 text-center font-semibold text-text_primary'>-</span>
-										)}
+										<JudgementDisplay
+											status={getJudgementBadge(identity.judgements.status)}
+											count={identity.judgements.count}
+											labels={identity.judgements.labels}
+										/>
 									</td>
 									<td className='px-6 py-4'>
 										<div className='flex items-center gap-2 text-sm font-semibold text-text_primary'>
 											<span>{formatDate(identity.lastUpdated)}</span>
-											<Image
-												src={CalendarWatchIcon}
-												alt='calendar'
-												width={20}
-												height={20}
-												className='h-5 w-5'
-											/>
+											<UpdateHistoryButton onClick={() => setSelectedAddressForTimeline({ address: identity.address, displayName: identity.displayName })} />
 										</div>
 									</td>
 									<td className='px-6 py-4'>
@@ -456,6 +312,25 @@ function IdentitiesListingTable() {
 									</td>
 									<td className='p-4'>
 										<div className='flex items-center gap-2'>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<button
+														type='button'
+														onClick={() => setSelectedAddressForTimeline({ address: identity.address, displayName: identity.displayName })}
+														className='text-basic_text hover:text-text_primary'
+														title='View History'
+													>
+														<History size={16} />
+													</button>
+												</TooltipTrigger>
+												<TooltipContent
+													side='top'
+													align='center'
+													className='bg-tooltip_background'
+												>
+													<span className='text-xs text-white'>View History</span>
+												</TooltipContent>
+											</Tooltip>
 											{identity.subIdentityCount > 0 && (
 												<button
 													type='button'
@@ -517,96 +392,25 @@ function IdentitiesListingTable() {
 												</div>
 											</td>
 											<td className='px-6 py-2'>
-												<div className='flex gap-2'>
-													{sub.socials.email && (
-														<a
-															key={ESocial.EMAIL}
-															href={`mailto:${sub.socials.email}`}
-															target='_blank'
-															className='flex h-7 w-7 items-center justify-center rounded-full bg-social_green'
-															rel='noreferrer'
-														>
-															<IoMdMail className='size-4 text-white' />
-														</a>
-													)}
-													{sub.socials.twitter && (
-														<a
-															key={ESocial.TWITTER}
-															href={`https://x.com/${sub.socials.twitter}`}
-															target='_blank'
-															className='flex h-7 w-7 items-center justify-center rounded-full bg-social_green'
-															rel='noreferrer'
-														>
-															<FaTwitter className='size-4 text-white' />
-														</a>
-													)}
-													{sub.socials.discord && (
-														<a
-															key={ESocial.DISCORD}
-															href={`https://discord.com/users/${sub.socials.discord}`}
-															target='_blank'
-															className='flex h-7 w-7 items-center justify-center rounded-full bg-social_green'
-															rel='noreferrer'
-														>
-															<FaDiscord className='size-4 text-white' />
-														</a>
-													)}
-												</div>
+												<SocialLinksDisplay
+													socials={sub.socials}
+													size='sm'
+												/>
 											</td>
 											<td className='px-6 py-2'>
-												{sub.judgements.count > 0 ? (
-													<div className='flex items-center gap-1'>
-														<span className='rounded px-2 py-0.5 text-xs font-medium text-basic_text'>{getJudgementBadge(sub.judgements.status)}</span>
-														{sub.judgements.count > 1 && (
-															<Tooltip>
-																<TooltipTrigger asChild>
-																	<span className='flex !size-6 items-center justify-center rounded-full border border-primary_border bg-poll_option_bg p-2 text-xs font-medium text-text_primary'>
-																		+{sub.judgements.count - 1}
-																	</span>
-																</TooltipTrigger>
-																<TooltipContent
-																	side='top'
-																	align='center'
-																	className='bg-tooltip_background'
-																>
-																	<div className='flex flex-col gap-2 p-2'>
-																		<span className='text-xs text-white'>{sub.judgements.labels.join(', ')}</span>
-																	</div>
-																</TooltipContent>
-															</Tooltip>
-														)}
-													</div>
-												) : (
-													<span className='text-sm text-basic_text'>-</span>
-												)}
-												{sub.judgements.count > 1 && (
-													<Tooltip>
-														<TooltipTrigger asChild>
-															<span className='flex !size-6 items-center justify-center rounded-full border border-primary_border bg-poll_option_bg p-2 text-xs font-medium text-text_primary'>
-																+{sub.judgements.count - 1}
-															</span>
-														</TooltipTrigger>
-														<TooltipContent
-															side='top'
-															align='center'
-															className='bg-tooltip_background'
-														>
-															<div className='flex flex-col gap-2 p-2'>
-																<span className='text-xs text-white'>{sub.judgements.labels.join(', ')}</span>
-															</div>
-														</TooltipContent>
-													</Tooltip>
-												)}
+												<JudgementDisplay
+													status={getJudgementBadge(sub.judgements.status)}
+													count={sub.judgements.count}
+													labels={sub.judgements.labels}
+													size='sm'
+												/>
 											</td>
 											<td className='px-6 py-2'>
 												<div className='flex items-center gap-1 text-xs text-basic_text'>
 													<span>{formatDate(sub.lastUpdated)}</span>
-													<Image
-														src={CalendarWatchIcon}
-														alt='calendar'
-														width={16}
-														height={16}
-														className='h-4 w-4'
+													<UpdateHistoryButton
+														onClick={() => setSelectedAddressForTimeline({ address: sub.address, displayName: sub.displayName })}
+														size='sm'
 													/>
 												</div>
 											</td>
@@ -632,6 +436,11 @@ function IdentitiesListingTable() {
 					/>
 				</div>
 			)}
+
+			<IdentityTimelineDialog
+				selectedAddress={selectedAddressForTimeline}
+				onClose={() => setSelectedAddressForTimeline(null)}
+			/>
 		</div>
 	);
 }
