@@ -405,4 +405,8 @@ export class OnChainDbService {
 	static async GetTrackLevelAnalyticsStats({ network, trackId }: { network: ENetwork; trackId?: number }): Promise<ITrackAnalyticsStats> {
 		return SubsquidService.GetTrackAnalyticsStats({ network, trackId });
 	}
+
+	static async GetBlockInfo({ network, blockNumber }: { network: ENetwork; blockNumber: number }) {
+		return SubsquidService.GetBlockInfo({ network, blockNumber });
+	}
 }
