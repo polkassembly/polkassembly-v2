@@ -1742,7 +1742,7 @@ export interface IAAGVideoSummary {
 	publishedAt: string;
 	duration: string;
 	agendaUrl: string;
-	network: string | null;
+	network: ENetwork | null;
 	url: string;
 }
 
@@ -1755,9 +1755,9 @@ export interface IAAGVideoMetadata {
 	thumbnail: string;
 	url: string;
 	network: ENetwork | null;
-	viewCount: number;
-	likeCount: number;
-	commentCount?: number;
+	viewCount: string;
+	likeCount: string;
+	commentCount?: string;
 	agendaUrl?: string;
 	aiSummary: string;
 	referenda?: { referendaNo: string }[];
