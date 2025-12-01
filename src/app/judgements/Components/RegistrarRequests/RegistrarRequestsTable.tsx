@@ -19,7 +19,9 @@ import Address from '@/app/_shared-components/Profile/Address/Address';
 import { Button } from '@/app/_shared-components/Button';
 import { Clock } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
+import { Separator } from '@/app/_shared-components/Separator';
 import { SocialLinksDisplay } from '../Overview/IdentityComponents';
+import styles from '../Overview/IdentitiesListingTable.module.scss';
 
 function RegistrarRequestsTable() {
 	const { identityService } = useIdentityService();
@@ -28,7 +30,6 @@ function RegistrarRequestsTable() {
 	const { setVaultQrState } = usePolkadotVault();
 	const { toast } = useToast();
 	const queryClient = useQueryClient();
-	const [filter, setFilter] = useState<'new' | 'past'>('new');
 	const [selectedJudgements, setSelectedJudgements] = useState<Record<string, JudgementValue>>({});
 	const [submittingId, setSubmittingId] = useState<string | null>(null);
 
@@ -41,13 +42,9 @@ function RegistrarRequestsTable() {
 		enabled: !!user?.defaultAddress && !!identityService
 	});
 
-	const filteredRequests =
-		requests?.filter((req) => {
-			if (filter === 'new') {
-				return req.status === EJudgementStatus.REQUESTED || req.status === EJudgementStatus.PENDING;
-			}
-			return req.status === EJudgementStatus.APPROVED || req.status === EJudgementStatus.REJECTED;
-		}) || [];
+	const newRequests = requests?.filter((req) => req.status === EJudgementStatus.REQUESTED || req.status === EJudgementStatus.PENDING) || [];
+
+	const pastRequests = requests?.filter((req) => req.status === EJudgementStatus.APPROVED || req.status === EJudgementStatus.REJECTED) || [];
 
 	const handleJudgementChange = (requestId: string, value: JudgementValue) => {
 		setSelectedJudgements((prev) => ({
@@ -121,49 +118,40 @@ function RegistrarRequestsTable() {
 	}
 
 	return (
-		<div className='flex flex-col gap-4 rounded-3xl border border-primary_border bg-bg_modal p-4'>
-			<div className='flex items-center justify-between'>
-				<div className='flex items-center gap-2'>
+		<div className='w-full'>
+			<div className='w-full rounded-3xl border border-primary_border bg-bg_modal p-6'>
+				<div className='my-4 flex items-center justify-center'>
+					<Separator className='flex-1' />
 					<Button
-						variant={filter === 'new' ? 'default' : 'ghost'}
+						variant='outline'
 						size='sm'
-						onClick={() => setFilter('new')}
-						className='gap-2'
+						className='pointer-events-none gap-1 rounded-full border-primary_border text-xs font-medium text-basic_text'
 					>
 						<Clock size={16} />
 						New requests
 					</Button>
-					<Button
-						variant={filter === 'past' ? 'default' : 'ghost'}
-						size='sm'
-						onClick={() => setFilter('past')}
-					>
-						Past
-					</Button>
+					<Separator className='flex-1' />
 				</div>
-			</div>
-
-			<div className='overflow-x-auto'>
 				<Table>
-					<TableHead>
-						<TableRow>
-							<TableHeader>NAME</TableHeader>
-							<TableHeader>SOCIALS</TableHeader>
-							<TableHeader>JUDGEMENTS</TableHeader>
+					<TableHeader>
+						<TableRow className={styles.headerRow}>
+							<TableHead className={styles.headerCell}>NAME</TableHead>
+							<TableHead className={styles.headerCell}>SOCIALS</TableHead>
+							<TableHead className={styles.headerCell}>JUDGEMENTS</TableHead>
 						</TableRow>
-					</TableHead>
+					</TableHeader>
 					<TableBody>
-						{filteredRequests.length === 0 ? (
+						{newRequests.length === 0 ? (
 							<TableRow>
 								<td
 									colSpan={3}
 									className='py-8 text-center text-basic_text'
 								>
-									No {filter} requests found
+									No new requests found
 								</td>
 							</TableRow>
 						) : (
-							filteredRequests.map((request) => {
+							newRequests.map((request) => {
 								const socials = {
 									email: request.email,
 									twitter: request.twitter
@@ -185,44 +173,101 @@ function RegistrarRequestsTable() {
 											<SocialLinksDisplay socials={socials} />
 										</td>
 										<td className='px-6 py-4'>
-											{filter === 'new' ? (
-												<div className='flex items-center gap-2'>
-													<Select
-														value={selectedJudgements[request.id] || ''}
-														onValueChange={(value) => handleJudgementChange(request.id, value as JudgementValue)}
+											<div className='flex items-center gap-2'>
+												<Select
+													value={selectedJudgements[request.id] || ''}
+													onValueChange={(value) => handleJudgementChange(request.id, value as JudgementValue)}
+												>
+													<SelectTrigger className='w-48 border-pink-500 text-pink-500'>
+														<SelectValue placeholder='Select Judgment' />
+													</SelectTrigger>
+													<SelectContent>
+														{JUDGEMENT_OPTIONS.map((option) => (
+															<SelectItem
+																key={option.value}
+																value={option.value}
+																className={option.value === 'Erroneous' ? 'text-pink-500' : ''}
+															>
+																{option.label}
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+												{selectedJudgements[request.id] && (
+													<Button
+														size='sm'
+														onClick={() => handleSubmitJudgement(request)}
+														disabled={submittingId === request.id}
 													>
-														<SelectTrigger className='w-48 border-pink-500 text-pink-500'>
-															<SelectValue placeholder='Select Judgment' />
-														</SelectTrigger>
-														<SelectContent>
-															{JUDGEMENT_OPTIONS.map((option) => (
-																<SelectItem
-																	key={option.value}
-																	value={option.value}
-																	className={option.value === 'Erroneous' ? 'text-pink-500' : ''}
-																>
-																	{option.label}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-													{selectedJudgements[request.id] && (
-														<Button
-															size='sm'
-															onClick={() => handleSubmitJudgement(request)}
-															disabled={submittingId === request.id}
-														>
-															{submittingId === request.id ? 'Submitting...' : 'Submit'}
-														</Button>
-													)}
-												</div>
-											) : (
-												<div className='flex items-center gap-2'>
-													<span className='text-sm font-medium text-text_primary'>
-														{request.status === EJudgementStatus.APPROVED ? 'Reasonable' : request.status === EJudgementStatus.REJECTED ? 'Erroneous' : request.status}
-													</span>
-												</div>
-											)}
+														{submittingId === request.id ? 'Submitting...' : 'Submit'}
+													</Button>
+												)}
+											</div>
+										</td>
+									</TableRow>
+								);
+							})
+						)}
+					</TableBody>
+				</Table>
+				<div className='my-4 flex items-center justify-center'>
+					<Separator className='flex-1' />
+					<Button
+						variant='outline'
+						size='sm'
+						className='pointer-events-none gap-1 rounded-full border-primary_border text-xs font-medium text-basic_text'
+					>
+						<Clock size={16} />
+						Past
+					</Button>
+					<Separator className='flex-1' />
+				</div>
+				<Table>
+					<TableHeader>
+						<TableRow className={styles.headerRow}>
+							<TableHead className={styles.headerCell}>NAME</TableHead>
+							<TableHead className={styles.headerCell}>SOCIALS</TableHead>
+							<TableHead className={styles.headerCell}>JUDGEMENTS</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{pastRequests.length === 0 ? (
+							<TableRow>
+								<td
+									colSpan={3}
+									className='py-8 text-center text-basic_text'
+								>
+									No past requests found
+								</td>
+							</TableRow>
+						) : (
+							pastRequests.map((request) => {
+								const socials = {
+									email: request.email,
+									twitter: request.twitter
+								};
+
+								return (
+									<TableRow key={request.id}>
+										<td className='px-6 py-4'>
+											<div className='flex flex-col gap-1'>
+												<span className='font-semibold text-text_primary'>{request.displayName || 'Unnamed'}</span>
+												<Address
+													address={request.address}
+													iconSize={16}
+													textClassName='text-xs text-basic_text'
+												/>
+											</div>
+										</td>
+										<td className='px-6 py-4'>
+											<SocialLinksDisplay socials={socials} />
+										</td>
+										<td className='px-6 py-4'>
+											<div className='flex items-center gap-2'>
+												<span className='text-sm font-medium text-text_primary'>
+													{request.status === EJudgementStatus.APPROVED ? 'Reasonable' : request.status === EJudgementStatus.REJECTED ? 'Erroneous' : request.status}
+												</span>
+											</div>
 										</td>
 									</TableRow>
 								);
