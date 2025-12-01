@@ -6,7 +6,7 @@
 
 import { useMemo, useState } from 'react';
 import Identicon from '@polkadot/react-identicon';
-import { ChevronDown, ChevronRight, Copy, History } from 'lucide-react';
+import { ChevronDown, ChevronRight, Copy } from 'lucide-react';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useQuery } from '@tanstack/react-query';
 import { EJudgementStatus } from '@/_shared/types';
@@ -15,14 +15,14 @@ import { Table, TableHead, TableBody, TableRow, TableHeader } from '@/app/_share
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { useSearchParams } from 'next/navigation';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { mapJudgementStatus, formatDate, formatJudgementLabel, getJudgementBadge } from '@/app/_client-utils/identityUtils';
+import { dayjs } from '@/_shared/_utils/dayjsInit';
+import { mapJudgementStatus, formatJudgementLabel } from '@/app/_client-utils/identityUtils';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import Image from 'next/image';
 import ChildListingIndicatorIcon from '@assets/icons/child-listing-indicator.svg';
 import ChildListingEndIndicatorIcon from '@assets/icons/child-listing-end-indicator.svg';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
-import { IdentityTimelineDialog } from '../IdentityUpdateTimeline/IdentityUpdateTimeline';
-import { SocialLinksDisplay, JudgementDisplay, UpdateHistoryButton } from '../Shared/IdentityComponents';
+import { IdentityTimelineDialog } from './IdentityUpdateTimeline/IdentityUpdateTimeline';
+import { SocialLinksDisplay, JudgementDisplay, UpdateHistoryButton } from './IdentityComponents';
 import styles from './IdentitiesListingTable.module.scss';
 
 interface IdentityData {
@@ -294,14 +294,13 @@ function IdentitiesListingTable() {
 									</td>
 									<td className='px-6 py-4'>
 										<JudgementDisplay
-											status={getJudgementBadge(identity.judgements.status)}
 											count={identity.judgements.count}
 											labels={identity.judgements.labels}
 										/>
 									</td>
 									<td className='px-6 py-4'>
 										<div className='flex items-center gap-2 text-sm font-semibold text-text_primary'>
-											<span>{formatDate(identity.lastUpdated)}</span>
+											<span>{dayjs(identity.lastUpdated).format("Do MMM 'YY, hh:mm:ss")}</span>
 											<UpdateHistoryButton onClick={() => setSelectedAddressForTimeline({ address: identity.address, displayName: identity.displayName })} />
 										</div>
 									</td>
@@ -312,25 +311,6 @@ function IdentitiesListingTable() {
 									</td>
 									<td className='p-4'>
 										<div className='flex items-center gap-2'>
-											<Tooltip>
-												<TooltipTrigger asChild>
-													<button
-														type='button'
-														onClick={() => setSelectedAddressForTimeline({ address: identity.address, displayName: identity.displayName })}
-														className='text-basic_text hover:text-text_primary'
-														title='View History'
-													>
-														<History size={16} />
-													</button>
-												</TooltipTrigger>
-												<TooltipContent
-													side='top'
-													align='center'
-													className='bg-tooltip_background'
-												>
-													<span className='text-xs text-white'>View History</span>
-												</TooltipContent>
-											</Tooltip>
 											{identity.subIdentityCount > 0 && (
 												<button
 													type='button'
@@ -399,7 +379,6 @@ function IdentitiesListingTable() {
 											</td>
 											<td className='px-6 py-2'>
 												<JudgementDisplay
-													status={getJudgementBadge(sub.judgements.status)}
 													count={sub.judgements.count}
 													labels={sub.judgements.labels}
 													size='sm'
@@ -407,7 +386,7 @@ function IdentitiesListingTable() {
 											</td>
 											<td className='px-6 py-2'>
 												<div className='flex items-center gap-1 text-xs text-basic_text'>
-													<span>{formatDate(sub.lastUpdated)}</span>
+													<span>{dayjs(sub.lastUpdated).format("Do MMM 'YY, hh:mm:ss")}</span>
 													<UpdateHistoryButton
 														onClick={() => setSelectedAddressForTimeline({ address: sub.address, displayName: sub.displayName })}
 														size='sm'

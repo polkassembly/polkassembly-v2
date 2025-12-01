@@ -19,7 +19,7 @@ import Address from '@/app/_shared-components/Profile/Address/Address';
 import { Button } from '@/app/_shared-components/Button';
 import { Clock } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
-import { SocialLinksDisplay } from '../Shared/IdentityComponents';
+import { SocialLinksDisplay } from '../Overview/IdentityComponents';
 
 function RegistrarRequestsTable() {
 	const { identityService } = useIdentityService();
