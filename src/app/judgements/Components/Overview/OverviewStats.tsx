@@ -165,7 +165,7 @@ function OverviewStats() {
 								}
 							}}
 							placeholder='Enter address or name to search'
-							className='bg-bg_card w-80 rounded-lg border border-primary_border px-4 py-2 pl-10 text-sm text-text_primary placeholder-basic_text focus:outline-none focus:ring-2 focus:ring-text_pink'
+							className='bg-bg_card w-60 rounded-lg border border-primary_border px-4 py-2 pl-10 text-xs text-text_primary placeholder-basic_text focus:outline-none focus:ring-2 focus:ring-text_pink'
 						/>
 						<span className='absolute left-3 top-1/2 -translate-y-1/2 text-basic_text'>
 							<SearchIcon className='h-4 w-4 text-wallet_btn_text' />
