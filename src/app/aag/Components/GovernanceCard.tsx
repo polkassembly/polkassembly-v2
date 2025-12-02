@@ -186,8 +186,8 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 							{agendaUrl && (
 								<Button
 									variant='ghost'
-									size='sm'
-									className='rounded-full border border-text_pink px-2 py-0.5 text-xs text-text_pink hover:bg-bg_light_pink'
+									size='icon'
+									className='rounded-full border border-text_pink px-2 py-1 text-xs text-text_pink hover:bg-bg_light_pink'
 									onClick={handleAgendaClick}
 								>
 									{t('viewAgenda')}

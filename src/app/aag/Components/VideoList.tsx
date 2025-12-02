@@ -71,7 +71,7 @@ function AAGVideoListingComponent({ videos = [], loading: isVideosLoading = fals
 	};
 
 	return (
-		<div className='my-8 rounded-xl border border-border_grey bg-bg_modal p-4 md:my-16 md:p-6'>
+		<div className='rounded-xl border border-border_grey bg-bg_modal p-4 md:p-6'>
 			<div className='mb-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between'>
 				<h2 className='text-xl font-bold text-text_primary'>{t('moreVideos')}</h2>
 

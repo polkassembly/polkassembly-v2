@@ -5,14 +5,13 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { useParams, usePathname } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import { useToast } from '@/hooks/useToast';
-import { ENetwork, ENotificationStatus, type IAAGVideoSummary } from '@/_shared/types';
+import { ENetwork, type IAAGVideoSummary } from '@/_shared/types';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
 import { Button } from '@/app/_shared-components/Button';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
-import { Calendar, Clock, Eye, Share2, Sparkles } from 'lucide-react';
+import { Calendar, Clock, Eye, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import PolkadotLogo from '@/_assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@/_assets/parachain-logos/kusama-logo.gif';
@@ -41,10 +40,6 @@ function VideoDetailPage() {
 	const t = useTranslations('AAG');
 	const routeParams = useParams();
 	const currentVideoId = routeParams?.id as string;
-	const currentPathname = usePathname();
-	const videoDetailPath = currentVideoId ? `/aag/${currentVideoId}` : currentPathname;
-	const videoShareUrl = typeof window !== 'undefined' ? `${window.location.origin}${videoDetailPath}` : '';
-	const { toast: showToast } = useToast();
 
 	const [selectedVideo, setSelectedVideo] = useState<IAAGVideoSummary | null>(null);
 	const [isPresentationModalOpen, setIsPresentationModalOpen] = useState(false);
@@ -159,23 +154,6 @@ function VideoDetailPage() {
 		}
 	}, [videoAgendaUrl]);
 
-	const handleVideoShare = useCallback(async () => {
-		try {
-			await navigator.clipboard.writeText(videoShareUrl);
-			showToast({
-				status: ENotificationStatus.SUCCESS,
-				title: t('linkCopied'),
-				description: t('linkCopiedDescription')
-			});
-		} catch {
-			showToast({
-				status: ENotificationStatus.ERROR,
-				title: t('failedToCopyLink'),
-				description: t('failedToCopyLinkDescription')
-			});
-		}
-	}, [videoShareUrl, showToast, t]);
-
 	const handleVideoChapterClick = useCallback(
 		(chapterStartTime?: number) => {
 			if (chapterStartTime !== undefined) {
@@ -277,26 +255,30 @@ function VideoDetailPage() {
 							</div>{' '}
 							<div className='p-3 sm:p-4 md:p-6'>
 								<div className='mb-4 flex w-full flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
-									<h1 className='break-words text-lg font-bold leading-tight text-text_primary sm:text-xl md:text-2xl'>{selectedVideo.title}</h1>
+									<h1 className='break-words text-lg font-bold leading-tight text-text_primary'>{selectedVideo.title}</h1>
 
 									<div className='flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap'>
+										{videoAssociatedNetwork && (
+											<div className='flex shrink-0 items-center gap-2'>
+												<Image
+													src={videoAssociatedNetwork === ENetwork.POLKADOT ? PolkadotLogo : KusamaLogo}
+													alt={videoAssociatedNetwork === ENetwork.POLKADOT ? ENetwork.POLKADOT : ENetwork.KUSAMA}
+													width={20}
+													height={20}
+													className='h-4 w-4 rounded-full sm:h-5 sm:w-5'
+												/>
+											</div>
+										)}
 										{videoAgendaUrl && (
 											<Button
-												className='flex-1 rounded-full text-sm sm:flex-none'
+												variant='ghost'
+												size='icon'
+												className='rounded-full border border-text_pink px-2 py-1 text-xs text-text_pink hover:bg-bg_light_pink'
 												onClick={handleVideoAgendaClick}
 											>
 												{t('viewAgenda')}
 											</Button>
 										)}
-										<Button
-											variant='ghost'
-											size='icon'
-											className='rounded-lg border border-border_grey bg-network_dropdown_bg p-2 sm:p-2.5'
-											onClick={handleVideoShare}
-											title={t('shareVideo')}
-										>
-											<Share2 className='h-4 w-4 text-wallet_btn_text' />
-										</Button>
 									</div>
 								</div>
 
@@ -316,18 +298,6 @@ function VideoDetailPage() {
 												{videoMetadata.viewCount.toLocaleString()} {t('views')}
 											</span>
 										)}{' '}
-										{videoAssociatedNetwork && (
-											<div className='flex shrink-0 items-center gap-2'>
-												<Image
-													src={videoAssociatedNetwork === ENetwork.POLKADOT ? PolkadotLogo : KusamaLogo}
-													alt={videoAssociatedNetwork === ENetwork.POLKADOT ? ENetwork.POLKADOT : ENetwork.KUSAMA}
-													width={20}
-													height={20}
-													className='h-4 w-4 rounded-full sm:h-5 sm:w-5'
-												/>
-												<span className='text-[11px] capitalize text-text_primary sm:text-xs'>{videoAssociatedNetwork}</span>
-											</div>
-										)}
 									</div>
 
 									{isLoadingTranscript ? (
@@ -415,14 +385,14 @@ function VideoDetailPage() {
 													<div className='min-w-0 flex-1'>
 														<div className='mb-1 flex items-center gap-2'>
 															<span
-																className={`rounded px-1.5 py-0.5 font-mono text-xs md:px-2 md:py-1 ${
+																className={`rounded px-1.5 py-0.5 text-sm font-medium md:px-2 md:py-1 ${
 																	isActive ? 'bg-text_pink/20 text-text_pink' : 'bg-border_blue/15 text-border_blue'
 																}`}
 															>
 																{chapterData.timestamp || formatTime(chapterData.start)}
 															</span>
 														</div>
-														<h3 className={`mb-1 text-xs font-medium md:text-sm ${isActive ? 'text-text_pink' : 'text-text_primary'}`}>{chapterData.title}</h3>
+														<h3 className={`mb-1 text-xs font-bold ${isActive ? 'text-text_pink' : 'text-text_primary'}`}>{chapterData.title}</h3>
 													</div>
 												</div>
 											</button>
@@ -436,9 +406,7 @@ function VideoDetailPage() {
 					</div>
 				</div>
 
-				<div className='mt-4 md:mt-6'>
-					<VideoList videos={relatedVideosList} />
-				</div>
+				<VideoList videos={relatedVideosList} />
 			</div>
 
 			<RequestToPresentModal
