@@ -12,7 +12,7 @@ import { getReqBody } from '@/app/api/_api-utils/getReqBody';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest, NextResponse } from 'next/server';
 
 export const maxDuration = 300; // 5 minutes
 
@@ -33,7 +33,15 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: { par
 
 	console.log('Webhook event received: ', { webhookEvent, network, body });
 
-	await WebhookService.handleIncomingEvent({ event: webhookEvent, body, network });
+	// Schedule processing to run AFTER the response is sent
+	// This prevents timeout issues and lets the indexer get immediate acknowledgment
+	after(async () => {
+		try {
+			await WebhookService.handleIncomingEvent({ event: webhookEvent, body, network });
+		} catch (error) {
+			console.error('Error processing webhook event in background:', error);
+		}
+	});
 
-	return NextResponse.json({ message: `Webhook event ${webhookEvent} processed successfully.`, params: { webhookEvent, network, body } });
+	return NextResponse.json({ message: `Webhook event ${webhookEvent} received and queued for processing.`, params: { webhookEvent, network, body } });
 });
