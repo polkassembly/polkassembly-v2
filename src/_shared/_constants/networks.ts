@@ -24,7 +24,7 @@ import USDCIcon from '@/_assets/icons/usdc.svg';
 import USDTIcon from '@/_assets/icons/usdt.svg';
 import MYTHIcon from '@/_assets/icons/myth.svg';
 import DEDIcon from '@/_assets/icons/ded.png';
-import { KUSAMA_ASSETHUB_UNIFIED_SQUID_URL } from '@/app/api/_api-constants/apiEnvVars';
+import { KUSAMA_ASSETHUB_UNIFIED_SQUID_URL, POLKADOT_ASSETHUB_UNIFIED_SQUID_URL } from '@/app/api/_api-constants/apiEnvVars';
 
 interface ISocialLink {
 	id: string;
@@ -3051,7 +3051,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		palletInstance: '50',
 		blockTime: 6000,
 		ss58Format: 0,
-		subsquidUrl: 'https://polkassembly.squids.live/polkadot-assethub-unified-pa@v2/api/graphql',
+		subsquidUrl: POLKADOT_ASSETHUB_UNIFIED_SQUID_URL,
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.POLKADOT],
 		tokenSymbol: 'DOT',
 		rpcEndpoints: [
