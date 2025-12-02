@@ -1333,7 +1333,8 @@
 		"errorCreatingDelegate": "委任者の作成に失敗",
 		"delegateCreatedSuccessfully": "委任者が正常に作成されました",
 		"enterDelegateAddress": "委任者のアドレスを入力",
-		"youCannotDelegateToYourself": "自分に委任することはできません"
+		"youCannotDelegateToYourself": "自分に委任することはできません",
+		"decentralizedVoices": "分散型の声"
 	},
 	"TxFees": {
 		"preimageDeposit": "プレイメージデポジット",

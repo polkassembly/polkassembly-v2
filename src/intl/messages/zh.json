@@ -1356,7 +1356,8 @@
 		"errorCreatingDelegate": "创建委托失败",
 		"delegateCreatedSuccessfully": "创建委托成功",
 		"enterDelegateAddress": "输入委托地址",
-		"youCannotDelegateToYourself": "您不能委托给自己"
+		"youCannotDelegateToYourself": "您不能委托给自己",
+		"decentralizedVoices": "分散的声音"
 	},
 	"TxFees": {
 		"preimageDeposit": "预映像押金",

@@ -22,11 +22,14 @@ import { useAtom } from 'jotai';
 import { delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { W3F_DELEGATES_2025 } from '@/_shared/_constants/delegates2025';
 import DelegateSearchInput from './DelegateSearchInput/DelegateSearchInput';
 import styles from './TrendingDelegates.module.scss';
 import DelegateCard from './DelegateCard/DelegateCard';
 
 const PA_ADDRESS = '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t';
+
+const delegates2025Addresses = new Set(W3F_DELEGATES_2025.map((delegate) => getSubstrateAddress(delegate.address)));
 
 const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedSources: EDelegateSource[]; setSelectedSources: (sources: EDelegateSource[]) => void }) => {
 	const t = useTranslations('Delegation');
@@ -100,8 +103,16 @@ function TrendingDelegates() {
 			return 0;
 		});
 
-		setDelegates(updatedDelegates);
-		return updatedDelegates;
+		const updatedDelegatesWithDV = updatedDelegates.map((delegate: IDelegateDetails) => {
+			const isDV2025 = delegates2025Addresses.has(getSubstrateAddress(delegate.address));
+			return {
+				...delegate,
+				hasDecentralizedVoice: isDV2025
+			};
+		});
+
+		setDelegates(updatedDelegatesWithDV);
+		return updatedDelegatesWithDV;
 	};
 
 	const { isLoading } = useQuery({
@@ -156,6 +167,7 @@ function TrendingDelegates() {
 							<MdSort className='text-xl text-text_pink' />
 						</SelectTrigger>
 						<SelectContent className={styles.selectContent}>
+							<SelectItem value='DECENTRALIZED_VOICE'>{t('decentralizedVoices')} (2025)</SelectItem>
 							<SelectItem value='MAX_DELEGATED'>{t('maxDelegated')}</SelectItem>
 							<SelectItem value='VOTED_PROPOSALS'>{t('votedProposals')}</SelectItem>
 							<SelectItem value='DELEGATORS'>{t('delegators')}</SelectItem>

@@ -1334,7 +1334,8 @@
 		"errorCreatingDelegate": "Error al crear delegado",
 		"delegateCreatedSuccessfully": "Delegado creado exitosamente",
 		"enterDelegateAddress": "Ingresar dirección del delegado",
-		"youCannotDelegateToYourself": "No puede delegar a sí mismo"
+		"youCannotDelegateToYourself": "No puede delegar a sí mismo",
+		"decentralizedVoices": "Voces Descentralizadas"
 	},
 	"TxFees": {
 		"preimageDeposit": "Depósito de Preimage",

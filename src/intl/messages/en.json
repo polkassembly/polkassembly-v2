@@ -1412,7 +1412,8 @@
 		"errorCreatingDelegate": "Error creating delegate",
 		"delegateCreatedSuccessfully": "Delegate created successfully",
 		"enterDelegateAddress": "Enter Delegate Address",
-		"youCannotDelegateToYourself": "You cannot delegate to yourself"
+		"youCannotDelegateToYourself": "You cannot delegate to yourself",
+		"decentralizedVoices": "Decentralized Voices"
 	},
 	"TxFees": {
 		"preimageDeposit": "Preimage Deposit",
