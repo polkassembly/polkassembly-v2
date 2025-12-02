@@ -15,14 +15,14 @@ import { Table, TableHead, TableBody, TableRow, TableHeader } from '@/app/_share
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { useSearchParams } from 'next/navigation';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { mapJudgementStatus, formatDate, formatJudgementLabel, getJudgementBadge } from '@/app/_client-utils/identityUtils';
-import Address from '@/app/_shared-components/Profile/Address/Address';
+import { mapJudgementStatus, formatJudgementLabel, getJudgementBadge } from '@/app/_client-utils/identityUtils';
 import Image from 'next/image';
 import ChildListingIndicatorIcon from '@assets/icons/child-listing-indicator.svg';
 import ChildListingEndIndicatorIcon from '@assets/icons/child-listing-end-indicator.svg';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
+import Address from '@/app/_shared-components/Profile/Address/Address';
 import { IdentityTimelineDialog } from '../IdentityUpdateTimeline/IdentityUpdateTimeline';
-import { SocialLinksDisplay, JudgementDisplay, UpdateHistoryButton } from '../Shared/IdentityComponents';
+import { SocialLinksDisplay, JudgementDisplay, UpdateHistoryButton, LastUpdateCell } from '../Shared/IdentityComponents';
 import styles from './IdentitiesListingTable.module.scss';
 
 interface IdentityData {
@@ -45,7 +45,6 @@ interface IdentityData {
 		quality: string;
 		labels: string[];
 	};
-	lastUpdated: Date;
 	subIdentities: IdentityData[];
 	subIdentityCount: number;
 }
@@ -78,9 +77,6 @@ function IdentitiesListingTable() {
 
 			const identitiesPromises = identityEntries.map(async ([key, value]) => {
 				const address = key.args[0].toString();
-				const blockHash = value.createdAtHash || (await api.rpc.chain.getBlockHash());
-				const timestamp = await api.query.timestamp.now.at(blockHash);
-				const lastUpdatedDate = new Date(Number(timestamp.toString()));
 				const identityInfo = value.toHuman() as {
 					info?: {
 						display?: { Raw?: string };
@@ -170,7 +166,6 @@ function IdentitiesListingTable() {
 								quality: 'Reasonable',
 								labels: approvedSubJudgementLabels
 							},
-							lastUpdated: lastUpdatedDate,
 							subIdentities: [],
 							subIdentityCount: 0
 						};
@@ -189,7 +184,6 @@ function IdentitiesListingTable() {
 						quality: judgementCount > 0 ? 'Good Quality, Known Good' : 'Reasonable',
 						labels: judgementLabels
 					},
-					lastUpdated: lastUpdatedDate,
 					subIdentities,
 					subIdentityCount: subIdentities.length
 				};
@@ -301,7 +295,7 @@ function IdentitiesListingTable() {
 									</td>
 									<td className='px-6 py-4'>
 										<div className='flex items-center gap-2 text-sm font-semibold text-text_primary'>
-											<span>{formatDate(identity.lastUpdated)}</span>
+											<LastUpdateCell address={identity.address} />
 											<UpdateHistoryButton onClick={() => setSelectedAddressForTimeline({ address: identity.address, displayName: identity.displayName })} />
 										</div>
 									</td>
@@ -407,7 +401,10 @@ function IdentitiesListingTable() {
 											</td>
 											<td className='px-6 py-2'>
 												<div className='flex items-center gap-1 text-xs text-basic_text'>
-													<span>{formatDate(sub.lastUpdated)}</span>
+													<LastUpdateCell
+														address={sub.address}
+														className='text-xs font-normal'
+													/>
 													<UpdateHistoryButton
 														onClick={() => setSelectedAddressForTimeline({ address: sub.address, displayName: sub.displayName })}
 														size='sm'

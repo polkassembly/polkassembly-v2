@@ -7,7 +7,7 @@
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { EJudgementStatus, ENotificationStatus } from '@/_shared/types';
-import { mapJudgementStatus, formatDate } from '@/app/_client-utils/identityUtils';
+import { mapJudgementStatus } from '@/app/_client-utils/identityUtils';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '@/app/_shared-components/Table';
 import { useUser } from '@/hooks/useUser';
@@ -19,7 +19,7 @@ import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { useToast } from '@/hooks/useToast';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { IdentityTimelineDialog } from '../IdentityUpdateTimeline/IdentityUpdateTimeline';
-import { SocialLinksDisplay, UpdateHistoryButton } from '../Shared/IdentityComponents';
+import { SocialLinksDisplay, UpdateHistoryButton, LastUpdateCell } from '../Shared/IdentityComponents';
 import styles from '../Overview/IdentitiesListingTable.module.scss';
 
 const SUB_IDENTITY_TYPE = 'Sub-identity';
@@ -313,7 +313,7 @@ function MyIdentitiesDashboard() {
 								</td>
 								<td className='px-6 py-4'>
 									<div className='flex items-center gap-2 text-sm font-semibold text-text_primary'>
-										<span>{formatDate(identity.lastUpdated)}</span>
+										<LastUpdateCell address={identity.address} />
 										<UpdateHistoryButton onClick={() => setSelectedAddressForTimeline({ address: identity.address, displayName: identity.displayName })} />
 									</div>
 								</td>
