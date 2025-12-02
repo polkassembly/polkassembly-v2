@@ -10,14 +10,19 @@ import { IIdentityUpdate, formatIdentityUpdateType, formatIdentityHistoryBlocks 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import Image from 'next/image';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import Address from '@/app/_shared-components/Profile/Address/Address';
 
 interface IdentityUpdateTimelineProps {
 	updates: IIdentityUpdate[];
 	isLoading?: boolean;
-	network?: string;
 }
 
-function IdentityUpdateTimeline({ updates, isLoading, network = 'polkadot' }: IdentityUpdateTimelineProps) {
+function IdentityUpdateTimeline({ updates, isLoading }: IdentityUpdateTimelineProps) {
+	const network = getCurrentNetwork();
 	const formatDate = (timestamp: string) => {
 		const date = new Date(timestamp);
 		const day = date.getDate();
@@ -87,7 +92,7 @@ function IdentityUpdateTimeline({ updates, isLoading, network = 'polkadot' }: Id
 	if (!updates || updates.length === 0) {
 		return (
 			<div className='rounded-lg border border-primary_border bg-bg_modal p-6 text-center'>
-				<p className='text-sm text-basic_text'>No update history available</p>
+				<p className='text-xs text-basic_text'>No update history available</p>
 			</div>
 		);
 	}
@@ -105,9 +110,9 @@ function IdentityUpdateTimeline({ updates, isLoading, network = 'polkadot' }: Id
 						className='relative flex gap-4 pb-6'
 					>
 						<div className='relative flex flex-col items-center'>
-							<div className={`z-10 flex h-10 w-10 items-center justify-center rounded-full ${colorClass}`}>
+							<div className={`z-10 flex h-8 w-8 items-center justify-center rounded-full ${colorClass}`}>
 								<UpdateIcon
-									size={20}
+									size={16}
 									className='text-white'
 								/>
 							</div>
@@ -117,14 +122,14 @@ function IdentityUpdateTimeline({ updates, isLoading, network = 'polkadot' }: Id
 						<div className='flex-1 pt-1'>
 							<div className='flex flex-col gap-3 md:flex-row md:items-start md:justify-between'>
 								<div className='flex-1 space-y-2'>
-									<h3 className='text-lg font-semibold text-text_primary'>{formatIdentityUpdateType(update.type)}</h3>
+									<h3 className='text-base font-semibold text-text_primary'>{formatIdentityUpdateType(update.type)}</h3>
 
-									<div className='flex items-center gap-2 text-sm text-basic_text'>
+									<div className='flex items-center gap-2 text-xs text-basic_text'>
 										<Clock size={14} />
 										<span>{formatDate(update.timestamp)}</span>
 									</div>
 
-									<div className='flex items-center gap-2 text-sm text-basic_text'>
+									<div className='flex items-center gap-2 text-xs text-basic_text'>
 										<Box size={14} />
 										<span>{update.blockNumber}</span>
 									</div>
@@ -159,7 +164,7 @@ function IdentityUpdateTimeline({ updates, isLoading, network = 'polkadot' }: Id
 											{update.changes.map((change) => (
 												<div
 													key={change.field}
-													className='flex items-center justify-between text-sm'
+													className='flex items-center justify-between rounded-sm bg-create_option_bg px-2 py-1 text-xs'
 												>
 													<span className='text-basic_text'>{change.field}</span>
 													<span className='font-medium text-text_primary'>{change.newValue || '-'}</span>
@@ -171,19 +176,26 @@ function IdentityUpdateTimeline({ updates, isLoading, network = 'polkadot' }: Id
 									{(update.type === 'JudgementRequested' || update.type === 'JudgementGiven') && (
 										<>
 											{update.registrarIndex !== undefined && (
-												<div className='flex items-center justify-between text-sm'>
+												<div className='flex items-center justify-between rounded-sm bg-create_option_bg px-2 py-1 text-xs'>
 													<span className='text-basic_text'>Registrar Index</span>
 													<span className='font-medium text-text_primary'>{update.registrarIndex}</span>
 												</div>
 											)}
 											{update.registrarAddress && (
-												<div className='flex items-center justify-between gap-2 text-sm'>
+												<div className='flex items-center justify-between gap-10 rounded-sm bg-create_option_bg px-2 py-1 text-xs'>
 													<span className='text-basic_text'>Registrar Address</span>
 													<div className='flex items-center gap-1'>
+														<Address
+															iconSize={16}
+															address={update.registrarAddress}
+															textClassName='text-xs'
+															disableTooltip
+														/>
 														<span className='font-medium text-text_primary'>
-															{update.registrarAddress.slice(0, 6)}...{update.registrarAddress.slice(-4)}
+															({update.registrarAddress.slice(0, 1)}...{update.registrarAddress.slice(-3)})
 														</span>
 														<button
+															title='Copy address'
 															onClick={() => copyToClipboard(update.registrarAddress || '')}
 															className='text-basic_text hover:text-text_primary'
 															type='button'
@@ -198,20 +210,39 @@ function IdentityUpdateTimeline({ updates, isLoading, network = 'polkadot' }: Id
 
 									{update.type === 'JudgementGiven' && update.judgement && (
 										<>
-											<div className='flex items-center justify-between text-sm'>
+											<div className='flex items-center justify-between rounded-sm bg-create_option_bg px-2 py-1 text-xs'>
 												<span className='text-basic_text'>Judgement</span>
-												<span className='rounded bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-500'>{update.judgement}</span>
+												<span className='text-xs font-medium text-text_primary'>{update.judgement}</span>
 											</div>
 											{update.maxFee && (
-												<div className='flex items-center justify-between text-sm'>
+												<div className='flex items-center justify-between rounded-sm bg-create_option_bg px-2 py-1 text-xs'>
 													<span className='text-basic_text'>Fees</span>
-													<span className='font-medium text-text_primary'>{update.maxFee}</span>
+													<div className='flex items-center gap-1'>
+														<Image
+															src={NETWORKS_DETAILS[`${network}`].logo}
+															alt={network}
+															width={16}
+															height={16}
+															className='rounded-full'
+														/>
+														<span className='font-medium text-text_primary'>
+															{formatBnBalance(
+																update.maxFee || '0',
+																{
+																	withUnit: true,
+																	numberAfterComma: 2,
+																	compactNotation: true
+																},
+																network
+															)}
+														</span>
+													</div>
 												</div>
 											)}
 										</>
 									)}
 
-									{!update.changes?.length && !update.registrarIndex && !update.judgement && <div className='text-center text-sm text-basic_text'>No additional details</div>}
+									{!update.changes?.length && !update.registrarIndex && !update.judgement && <div className='text-center text-xs text-basic_text'>No additional details</div>}
 								</div>
 							</div>
 						</div>
@@ -258,7 +289,7 @@ export function IdentityTimelineDialog({ selectedAddress, onClose }: { selectedA
 				<div className='mt-4 max-h-[350px] overflow-y-auto'>
 					{error ? (
 						<div className='rounded-lg border border-red-500/20 bg-red-500/5 p-6 text-center'>
-							<p className='text-sm font-medium text-red-500'>Failed to load update history</p>
+							<p className='text-xs font-medium text-red-500'>Failed to load update history</p>
 							<p className='mt-2 text-xs text-basic_text'>
 								{error instanceof Error ? error.message : 'This feature is currently only available for Polkadot and Kusama networks.'}
 							</p>
@@ -267,7 +298,6 @@ export function IdentityTimelineDialog({ selectedAddress, onClose }: { selectedA
 						<IdentityUpdateTimeline
 							updates={updates || []}
 							isLoading={isLoading}
-							network='polkadot'
 						/>
 					)}
 				</div>

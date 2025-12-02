@@ -4,34 +4,12 @@
 
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { useIdentityService } from '@/hooks/useIdentityService';
-import { useUser } from '@/hooks/useUser';
-import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { useIsRegistrar } from '@/hooks/useIsRegistrar';
 import RegistrarRequestsStats from './RegistrarRequestsStats';
 import RegistrarRequestsTable from './RegistrarRequestsTable';
 
 function RegistrarRequestsView() {
-	const { identityService } = useIdentityService();
-	const { user } = useUser();
-	const network = getCurrentNetwork();
-
-	const { data: isRegistrar, isLoading } = useQuery({
-		queryKey: ['is-registrar', user?.defaultAddress],
-		queryFn: async () => {
-			if (!user?.defaultAddress || !identityService) return false;
-
-			const registrars = await identityService.getRegistrars();
-			const encodedUserAddress = getEncodedAddress(user.defaultAddress, network);
-
-			return registrars.some((reg) => {
-				const encodedRegAddress = getEncodedAddress(reg.account, network);
-				return encodedRegAddress === encodedUserAddress;
-			});
-		},
-		enabled: !!user?.defaultAddress && !!identityService
-	});
+	const { data: isRegistrar, isLoading } = useIsRegistrar();
 
 	if (isLoading) {
 		return (

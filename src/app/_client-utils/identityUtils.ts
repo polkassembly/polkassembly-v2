@@ -232,38 +232,20 @@ export function formatIdentityUpdateType(type: IIdentityUpdate['type']): string 
 	return typeMap[type] || type;
 }
 
-export function formatDate(date: Date): string {
-	const day = date.getDate();
-	const suffix = day === 1 || day === 21 || day === 31 ? 'st' : day === 2 || day === 22 ? 'nd' : day === 3 || day === 23 ? 'rd' : 'th';
-	const month = date.toLocaleDateString('en-US', { month: 'short' });
-	const year = date.getFullYear().toString().slice(-2);
-	const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-	return `${day}${suffix} ${month}'${year}, ${time}`;
-}
-
 export function formatJudgementLabel(judgement: string): string {
 	switch (judgement) {
-		case 'KnownGood':
+		case EJudgementStatusType.REASONABLE:
+			return 'Reasonable';
+		case EJudgementStatusType.KNOWN_GOOD:
 			return 'Known Good';
-		case 'OutOfDate':
+		case EJudgementStatusType.OUT_OF_DATE:
 			return 'Out of Date';
-		case 'LowQuality':
+		case EJudgementStatusType.LOW_QUALITY:
 			return 'Low Quality';
+		case EJudgementStatusType.ERRONEOUS:
+			return 'Erroneous';
 		default:
 			return judgement;
-	}
-}
-
-export function getJudgementBadge(status: string): string {
-	switch (status) {
-		case 'APPROVED':
-			return 'Reasonable';
-		case 'REJECTED':
-			return 'Erroneous';
-		case 'REQUESTED':
-			return 'Requested';
-		default:
-			return 'Pending';
 	}
 }
 

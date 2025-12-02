@@ -17,8 +17,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-component
 import { ESocial } from '@/_shared/types';
 
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { formatIdentityHistoryBlocks, formatDate } from '@/app/_client-utils/identityUtils';
+import { formatIdentityHistoryBlocks } from '@/app/_client-utils/identityUtils';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { formatDate } from '@/app/_shared-components/PostDetails/BeneficiariesDetails/BeneficiaryPayoutsList';
 
 interface Socials {
 	email?: string;
@@ -108,7 +109,7 @@ export function SocialLinksDisplay({ socials, size = 'md' }: SocialLinksDisplayP
 						alt='Riot'
 						width={20}
 						height={20}
-						className={`${size === 'sm' ? 'size-4' : 'size-5'} text-delegation_card_text`}
+						className={`${size === 'sm' ? 'size-4' : 'size-5'} dark:grayscale dark:invert dark:filter`}
 					/>
 				</a>
 			)}
@@ -117,13 +118,12 @@ export function SocialLinksDisplay({ socials, size = 'md' }: SocialLinksDisplayP
 }
 
 interface JudgementDisplayProps {
-	status: string;
 	count: number;
-	labels?: string[];
+	labels: string[];
 	size?: 'sm' | 'md';
 }
 
-export function JudgementDisplay({ status, count, labels, size = 'md' }: JudgementDisplayProps) {
+export function JudgementDisplay({ count, labels, size = 'md' }: JudgementDisplayProps) {
 	if (count === 0) {
 		return <span className='px-4 text-center font-semibold text-text_primary'>-</span>;
 	}
@@ -132,7 +132,7 @@ export function JudgementDisplay({ status, count, labels, size = 'md' }: Judgeme
 
 	return (
 		<div className='flex items-center gap-1'>
-			<span className={`rounded px-2 py-1 ${badgeClass} font-semibold text-text_primary`}>{status}</span>
+			<span className={`rounded px-2 py-1 ${badgeClass} font-semibold text-text_primary`}>{labels[0]}</span>
 			{count > 1 && labels && (
 				<Tooltip>
 					<TooltipTrigger asChild>
@@ -167,6 +167,7 @@ export function UpdateHistoryButton({ onClick, size = 'md' }: UpdateHistoryButto
 		<Tooltip>
 			<TooltipTrigger asChild>
 				<button
+					title='View update history'
 					type='button'
 					onClick={onClick}
 					className='cursor-pointer hover:opacity-70'
@@ -176,7 +177,7 @@ export function UpdateHistoryButton({ onClick, size = 'md' }: UpdateHistoryButto
 						alt='View update history'
 						width={iconSize}
 						height={iconSize}
-						className={`${size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'}`}
+						className={`${size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'} dark:grayscale dark:invert dark:filter`}
 					/>
 				</button>
 			</TooltipTrigger>
@@ -184,7 +185,7 @@ export function UpdateHistoryButton({ onClick, size = 'md' }: UpdateHistoryButto
 				side='top'
 				className='bg-tooltip_background'
 			>
-				<span className='text-xs text-white'>View Update History</span>
+				<span className='text-xs text-white'>View History</span>
 			</TooltipContent>
 		</Tooltip>
 	);

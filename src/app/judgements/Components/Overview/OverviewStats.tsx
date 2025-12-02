@@ -14,6 +14,7 @@ import { Separator } from '@/app/_shared-components/Separator';
 import JudgementRequestedIcon from '@assets/icons/judgement-requests.svg';
 import JudgementCompletedIcon from '@assets/icons/judgements-completed.svg';
 import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
+import { Search as SearchIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { MdSort } from '@react-icons/all-files/md/MdSort';
 import Image from 'next/image';
@@ -164,23 +165,25 @@ function OverviewStats() {
 								}
 							}}
 							placeholder='Enter address or name to search'
-							className='bg-bg_card w-80 rounded-lg border border-primary_border px-4 py-2 pl-10 text-sm text-text_primary placeholder-basic_text focus:outline-none focus:ring-2 focus:ring-text_pink'
+							className='bg-bg_card w-60 rounded-lg border border-primary_border px-4 py-2 pl-10 text-xs text-text_primary placeholder-basic_text focus:outline-none focus:ring-2 focus:ring-text_pink'
 						/>
-						<span className='absolute left-3 top-1/2 -translate-y-1/2 text-basic_text'>🔍</span>
+						<span className='absolute left-3 top-1/2 -translate-y-1/2 text-basic_text'>
+							<SearchIcon className='h-4 w-4 text-wallet_btn_text' />
+						</span>
 					</div>
 					<button
 						type='button'
-						className='bg-bg_card rounded-lg border border-primary_border p-2 hover:text-text_primary'
+						className='bg-bg_card !size-9 rounded-lg border border-primary_border p-2 hover:text-text_primary'
 						title='Filter'
 					>
 						<FaFilter className='text-lg text-basic_text' />
 					</button>
 					<button
 						type='button'
-						className='bg-bg_card rounded-lg border border-primary_border p-2 hover:text-text_primary'
+						className='bg-bg_card !size-9 rounded-lg border border-primary_border p-1.5 hover:text-text_primary'
 						title='Menu'
 					>
-						<MdSort className='text-lg text-basic_text' />
+						<MdSort className='text-2xl text-basic_text' />
 					</button>
 				</div>
 			</div>
