@@ -53,7 +53,7 @@ function AAGCard() {
 	};
 
 	return (
-		<div className='mb-4 w-full bg-bg_modal p-4 md:mb-8 md:p-8 md:px-20'>
+		<div className='w-full bg-bg_modal p-4 md:p-8 md:px-20'>
 			<div className='mx-auto flex w-full max-w-7xl gap-4'>
 				<Image
 					src={AAGLogo}
@@ -65,7 +65,7 @@ function AAGCard() {
 				<div className='flex min-w-0 flex-1 flex-col'>
 					<div className='flex w-full flex-col gap-4 md:flex-row md:items-start md:justify-between'>
 						<div className='min-w-0 flex-1'>
-							<div className='mb-2 flex flex-col gap-2 sm:flex-row sm:items-center md:gap-4'>
+							<div className='mb-1 flex flex-col gap-2 sm:flex-row sm:items-center md:gap-4'>
 								<h1 className='text-xl font-semibold md:text-2xl'>{t('title')}</h1>
 								<Button
 									variant='secondary'
@@ -83,7 +83,7 @@ function AAGCard() {
 									height={24}
 									className='h-5 w-5 md:h-6 md:w-6'
 								/>
-								<p className='text-base font-medium md:text-lg'>{t('host')}</p>
+								<p className='text-lg font-medium md:text-lg'>{t('host')}</p>
 							</div>
 							<div className='mt-1 flex flex-wrap items-center gap-2 text-sm'>
 								<p>

@@ -260,7 +260,7 @@ function VideoDetailPage() {
 		<div className='min-h-screen bg-page_background text-text_primary'>
 			<AAGCard />
 
-			<div className='mx-auto max-w-7xl p-4 md:p-6'>
+			<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-10'>
 				<div className='flex flex-col gap-6 lg:flex-row'>
 					<div className='flex w-full flex-1 flex-col'>
 						<div className='flex flex-col overflow-hidden rounded-lg border border-border_grey bg-bg_modal shadow-sm'>

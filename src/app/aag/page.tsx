@@ -33,7 +33,7 @@ function AttemptsAtGovernancePage() {
 	return (
 		<div className='min-h-screen bg-page_background text-text_primary'>
 			<AAGCard />
-			<div className='mx-auto max-w-7xl px-4'>
+			<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-10'>
 				<div className='grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3'>
 					{isPlaylistLoading ? (
 						<>

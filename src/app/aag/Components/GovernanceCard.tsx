@@ -122,7 +122,7 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 				</div>
 
 				<div className='p-3 md:p-4'>
-					<h3 className='text-base font-bold md:text-lg'>{title}</h3>
+					<h3 className='text-base font-bold text-text_primary md:text-lg'>{title}</h3>
 					<p className='mb-3 flex flex-col items-start gap-2 text-xs text-wallet_btn_text sm:flex-row sm:items-center sm:gap-3 md:mb-4'>
 						<span className='flex items-center gap-1'>
 							<Calendar className='h-3 w-3 md:h-3.5 md:w-3.5' /> {formatVideoDate(date)}
@@ -187,7 +187,7 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 								<Button
 									variant='ghost'
 									size='sm'
-									className='rounded-full border border-text_pink px-3 py-1.5 text-xs text-text_pink hover:bg-bg_light_pink md:px-4 md:py-2 md:text-sm'
+									className='rounded-full border border-text_pink px-2 py-0.5 text-xs text-text_pink hover:bg-bg_light_pink'
 									onClick={handleAgendaClick}
 								>
 									{t('viewAgenda')}
@@ -197,7 +197,7 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 						<Button
 							variant='ghost'
 							size='icon'
-							className='w-fit rounded-lg border border-border_grey bg-network_dropdown_bg p-1.5 md:p-2'
+							className='w-fit rounded-lg border border-border_grey bg-network_dropdown_bg p-1.5'
 							onClick={handleVideoShare}
 							title={t('shareVideo')}
 						>

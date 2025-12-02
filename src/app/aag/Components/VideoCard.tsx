@@ -77,7 +77,7 @@ function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoI
 					</div>
 
 					<div className='flex-grow'>
-						<h3 className='text-lg font-bold'>{title}</h3>
+						<h3 className='text-base font-bold text-text_primary'>{title}</h3>
 
 						<p className='mb-4 flex flex-col items-start gap-2 pt-1 text-sm text-wallet_btn_text sm:flex-row sm:items-center sm:gap-4'>
 							<span className='flex items-center gap-1'>
@@ -125,8 +125,9 @@ function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoI
 						<div className='flex flex-shrink-0 items-center gap-2'>
 							{agendaUrl && (
 								<Button
-									className='rounded-full text-xs sm:text-sm'
+									className='rounded-full text-xs'
 									onClick={handleVideoAgendaClick}
+									size='sm'
 								>
 									{t('viewAgenda')}
 								</Button>
