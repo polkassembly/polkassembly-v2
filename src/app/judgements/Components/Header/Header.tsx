@@ -10,12 +10,14 @@ import Link from 'next/link';
 import { EJudgementDashboardTabs, ESetIdentityStep } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { useIsRegistrar } from '@/hooks/useIsRegistrar';
+import { useUser } from '@/hooks/useUser';
 import BecomeRegistrarModal from '../BecomeRegistrarModal/BecomeRegistrarModal';
 import styles from './Header.module.scss';
 
 function Header() {
 	const t = useTranslations();
 	const { data: isRegistrar } = useIsRegistrar();
+	const { user } = useUser();
 
 	return (
 		<div className={styles.header}>
@@ -57,12 +59,14 @@ function Header() {
 					>
 						{t('Judgements.registrars')}
 					</TabsTrigger>
-					<TabsTrigger
-						className={styles.header_tab}
-						value={EJudgementDashboardTabs.MY_DASHBOARD}
-					>
-						{t('Judgements.myDashboard')}
-					</TabsTrigger>
+					{user?.defaultAddress && (
+						<TabsTrigger
+							className={styles.header_tab}
+							value={EJudgementDashboardTabs.MY_DASHBOARD}
+						>
+							{t('Judgements.myDashboard')}
+						</TabsTrigger>
+					)}
 				</TabsList>
 			</div>
 		</div>
