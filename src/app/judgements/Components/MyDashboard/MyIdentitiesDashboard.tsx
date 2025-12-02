@@ -29,7 +29,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 import { BN } from '@polkadot/util';
 import { IdentityTimelineDialog } from '../Overview/IdentityUpdateTimeline/IdentityUpdateTimeline';
-import { SocialLinksDisplay, UpdateHistoryButton } from '../Overview/IdentityComponents';
+import { SocialLinksDisplay, UpdateHistoryButton, LastUpdateCell } from '../Overview/IdentityComponents';
 import styles from '../Overview/IdentitiesListingTable.module.scss';
 
 const SUB_IDENTITY_TYPE = 'Sub-identity';
@@ -378,7 +378,7 @@ function MyIdentitiesDashboard() {
 									</td>
 									<td className='px-6 py-4'>
 										<div className='flex items-center gap-2 text-sm font-semibold text-text_primary'>
-											<span>{dayjs(identity.lastUpdated).format("Do MMM 'YY, hh:mm:ss")}</span>
+											<LastUpdateCell address={identity.address} />
 											<UpdateHistoryButton onClick={() => setSelectedAddressForTimeline({ address: identity.address, displayName: identity.displayName })} />
 										</div>
 									</td>

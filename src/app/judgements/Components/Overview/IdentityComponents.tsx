@@ -15,7 +15,6 @@ import CalendarWatchIcon from '@assets/icons/calendar-watch-icon.svg';
 import { useQuery } from '@tanstack/react-query';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { ESocial } from '@/_shared/types';
-
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { formatIdentityHistoryBlocks } from '@/app/_client-utils/identityUtils';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
@@ -200,7 +199,7 @@ export function LastUpdateCell({ address, className }: { address: string; classN
 			return formatIdentityHistoryBlocks(data?.history || []);
 		},
 		enabled: !!address,
-		staleTime: 300000 // 5 minutes
+		staleTime: 300000
 	});
 
 	if (isLoading) {

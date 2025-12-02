@@ -15,14 +15,13 @@ import { Table, TableHead, TableBody, TableRow, TableHeader } from '@/app/_share
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { useSearchParams } from 'next/navigation';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { mapJudgementStatus, formatJudgementLabel } from '@/app/_client-utils/identityUtils';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import Image from 'next/image';
 import ChildListingIndicatorIcon from '@assets/icons/child-listing-indicator.svg';
 import ChildListingEndIndicatorIcon from '@assets/icons/child-listing-end-indicator.svg';
 import { IdentityTimelineDialog } from './IdentityUpdateTimeline/IdentityUpdateTimeline';
-import { SocialLinksDisplay, JudgementDisplay, UpdateHistoryButton } from './IdentityComponents';
+import { SocialLinksDisplay, JudgementDisplay, UpdateHistoryButton, LastUpdateCell } from './IdentityComponents';
 import styles from './IdentitiesListingTable.module.scss';
 
 interface IdentityData {
@@ -294,7 +293,7 @@ function IdentitiesListingTable() {
 									</td>
 									<td className='px-6 py-4'>
 										<div className='flex items-center gap-2 text-sm font-semibold text-text_primary'>
-											<span>{dayjs(identity.address).format("Do MMM 'YY, hh:mm:ss")}</span>
+											<LastUpdateCell address={identity.address} />{' '}
 											<UpdateHistoryButton onClick={() => setSelectedAddressForTimeline({ address: identity.address, displayName: identity.displayName })} />
 										</div>
 									</td>
@@ -380,7 +379,10 @@ function IdentitiesListingTable() {
 											</td>
 											<td className='px-6 py-2'>
 												<div className='flex items-center gap-1 text-xs text-basic_text'>
-													<span>{dayjs(sub.address).format("Do MMM 'YY, hh:mm:ss")}</span>
+													<LastUpdateCell
+														address={sub.address}
+														className='text-xs font-normal'
+													/>{' '}
 													<UpdateHistoryButton
 														onClick={() => setSelectedAddressForTimeline({ address: sub.address, displayName: sub.displayName })}
 														size='sm'
