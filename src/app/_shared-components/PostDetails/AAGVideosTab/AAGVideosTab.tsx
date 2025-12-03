@@ -70,7 +70,7 @@ function AAGVideosTab({ referendaId }: AAGVideosTabProps) {
 							height={24}
 							className='h-6 w-6'
 						/>
-						<span className='text-sm font-medium text-text_primary'>{t('aboutAAG')}</span>
+						<span className='text-[16px] font-semibold text-listing_page_btn'>{t('aboutAAG')}</span>
 						<ChevronDown className='ml-auto h-4 w-4 text-text_primary transition-transform group-data-[state=open]:rotate-180' />
 					</CollapsibleTrigger>
 					<CollapsibleContent className='mt-2 p-4'>
