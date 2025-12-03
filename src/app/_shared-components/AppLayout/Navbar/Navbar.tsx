@@ -55,8 +55,17 @@ function Navbar() {
 
 	const network = getCurrentNetwork();
 	const pathname = usePathname();
-	const allowedPaths = [/^\/post\/[^/]+$/, /^\/proposal\/[^/]+$/, /^\/referenda\/[^/]+$/, /^\/bounty\/[^/]+$/, /^\/child-bounty\/[^/]+$/];
-	const shouldShowBanner = pathname === '/overview' || allowedPaths.some((path) => path.test(pathname));
+	const allowedPaths = [
+		/^(?:\/[a-z]{2})?\/post\/[^/]+$/,
+		/^(?:\/[a-z]{2})?\/proposal\/[^/]+$/,
+		/^(?:\/[a-z]{2})?\/referenda\/[^/]+$/,
+		/^(?:\/[a-z]{2})?\/bounty\/[^/]+$/,
+		/^(?:\/[a-z]{2})?\/child-bounty\/[^/]+$/
+	];
+	const shouldShowBanner =
+		/^\/(?:[a-z]{2}\/)?overview$/.test(pathname) ||
+		pathname.endsWith('/overview') ||
+		allowedPaths.some((path) => path.test(pathname));
 
 	const handleLocaleChange = async (locale: ELocales) => {
 		setLocaleCookie(locale);
