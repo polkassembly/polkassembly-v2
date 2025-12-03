@@ -24,6 +24,15 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import styles from '../Overview/IdentitiesListingTable.module.scss';
 
+const getTrendProps = (value: number) => {
+	const isPositive = value >= 0;
+	return {
+		arrow: isPositive ? '↑' : '↓',
+		className: isPositive ? 'text-green-500' : 'text-red-500',
+		text: Math.abs(value).toFixed(1)
+	};
+};
+
 function RegistrarRequestsStats() {
 	const { identityService } = useIdentityService();
 	const { user } = useUser();
@@ -159,12 +168,17 @@ function RegistrarRequestsStats() {
 							{isLoading || !identityService ? (
 								<Skeleton className='h-6 w-20' />
 							) : (
-								<div className='flex items-baseline gap-2'>
-									<div className='text-2xl font-bold text-text_primary'>{stats.pendingRequests || 0}</div>
-									<span className='text-xs font-semibold text-green-500'>
-										↑ {stats.pendingRequestsIncrease.toFixed(1)}% <span className='font-normal text-basic_text'>this month</span>
-									</span>
-								</div>
+								(() => {
+									const trend = getTrendProps(stats.pendingRequestsIncrease);
+									return (
+										<div className='flex items-baseline gap-2'>
+											<div className='text-2xl font-bold text-text_primary'>{stats.pendingRequests || 0}</div>
+											<span className={`text-xs font-semibold ${trend.className}`}>
+												{trend.arrow} {trend.text}% <span className='font-normal text-basic_text'>this month</span>
+											</span>
+										</div>
+									);
+								})()
 							)}
 						</p>
 					</div>
@@ -186,12 +200,17 @@ function RegistrarRequestsStats() {
 							{isLoading || !identityService ? (
 								<Skeleton className='h-6 w-20' />
 							) : (
-								<div className='flex items-baseline gap-2'>
-									<div className='text-2xl font-bold text-text_primary'>{stats.judgementsGranted || 0}</div>
-									<span className='text-xs font-semibold text-green-500'>
-										↑ {stats.judgementsGrantedIncrease.toFixed(1)}% <span className='font-normal text-basic_text'>this month</span>
-									</span>
-								</div>
+								(() => {
+									const trend = getTrendProps(stats.judgementsGrantedIncrease);
+									return (
+										<div className='flex items-baseline gap-2'>
+											<div className='text-2xl font-bold text-text_primary'>{stats.judgementsGranted || 0}</div>
+											<span className={`text-xs font-semibold ${trend.className}`}>
+												{trend.arrow} {trend.text}% <span className='font-normal text-basic_text'>this month</span>
+											</span>
+										</div>
+									);
+								})()
 							)}
 						</p>
 					</div>
@@ -213,14 +232,19 @@ function RegistrarRequestsStats() {
 							{isLoading || !identityService ? (
 								<Skeleton className='h-6 w-20' />
 							) : (
-								<div className='flex items-baseline gap-2'>
-									<div className='text-2xl font-bold text-text_primary'>
-										{formatBnBalance(stats.feeEarned, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}
-									</div>
-									<span className='text-xs font-semibold text-green-500'>
-										↑ {stats.feeEarnedIncrease.toFixed(1)}% <span className='font-normal text-basic_text'>this month</span>
-									</span>
-								</div>
+								(() => {
+									const trend = getTrendProps(stats.feeEarnedIncrease);
+									return (
+										<div className='flex items-baseline gap-2'>
+											<div className='text-2xl font-bold text-text_primary'>
+												{formatBnBalance(stats.feeEarned, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}
+											</div>
+											<span className={`text-xs font-semibold ${trend.className}`}>
+												{trend.arrow} {trend.text}% <span className='font-normal text-basic_text'>this month</span>
+											</span>
+										</div>
+									);
+								})()
 							)}
 						</p>
 					</div>

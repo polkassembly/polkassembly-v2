@@ -737,8 +737,19 @@ export class IdentityService {
 			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Registrar not found');
 		}
 
+		const identityInfoRes: any = await this.peopleChainApi?.query.identity?.identityOf(encodedTargetAddress);
+		const identityHashInfo = await (identityInfoRes?.unwrapOr?.(null)?.[0] || identityInfoRes?.unwrapOr?.(null));
+		const identityHash = identityHashInfo?.info?.hash?.toHex();
+
+		if (!identityHash) {
+			const errorMsg = 'Identity hash not found for target address';
+			console.error(errorMsg);
+			onFailed?.(errorMsg);
+			return;
+		}
+
 		const judgementObj = { [judgement]: null };
-		const provideJudgementTx = this.peopleChainApi.tx.identity.provideJudgement(registrarIndex, encodedTargetAddress, judgementObj, null);
+		const provideJudgementTx = this.peopleChainApi.tx.identity.provideJudgement(registrarIndex, encodedTargetAddress, judgementObj, identityHash);
 
 		await this.executeTx({
 			tx: provideJudgementTx,

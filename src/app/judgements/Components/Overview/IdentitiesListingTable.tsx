@@ -121,8 +121,7 @@ function IdentitiesListingTable() {
 					</TableHeader>
 					<TableBody>
 						{paginatedData.map((identity) => (
-							<>
-								{/* Parent Identity Row */}
+							<div>
 								<TableRow
 									key={identity.id}
 									className={styles.tableRow}
@@ -142,6 +141,7 @@ function IdentitiesListingTable() {
 												type='button'
 												className='text-basic_text hover:text-text_primary'
 												title='Copy address'
+												onClick={() => navigator.clipboard.writeText(identity.address)}
 											>
 												<Copy size={14} />
 											</button>
@@ -177,7 +177,6 @@ function IdentitiesListingTable() {
 									</td>
 								</TableRow>
 
-								{/* Sub-Identity Rows */}
 								{expandedRows.has(identity.address) &&
 									identity.subIdentities.map((sub, index: number) => (
 										<TableRow
@@ -189,7 +188,7 @@ function IdentitiesListingTable() {
 													{identity.subIdentities.length === 1 || index === identity.subIdentities.length - 1 ? (
 														<Image
 															src={ChildListingEndIndicatorIcon}
-															alt='Child Bounty Icon'
+															alt='Sub-identity indicator'
 															width={20}
 															height={19}
 															priority
@@ -197,7 +196,7 @@ function IdentitiesListingTable() {
 													) : (
 														<Image
 															src={ChildListingIndicatorIcon}
-															alt='Child Bounty Icon'
+															alt='Sub-identity indicator'
 															width={20}
 															height={24}
 															priority
@@ -244,7 +243,7 @@ function IdentitiesListingTable() {
 											<td className='px-4 py-2' />
 										</TableRow>
 									))}
-							</>
+							</div>
 						))}
 					</TableBody>
 				</Table>

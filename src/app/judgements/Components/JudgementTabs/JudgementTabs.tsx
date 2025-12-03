@@ -7,6 +7,8 @@
 import { Tabs, TabsContent } from '@ui/Tabs';
 import { useIsRegistrar } from '@/hooks/useIsRegistrar';
 import { EJudgementDashboardTabs } from '@shared/types';
+import { useEffect, useState } from 'react';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 import Header from '../Header/Header';
 import RegistrarRequestsView from '../RegistrarRequests/RegistrarRequestsView';
 import OverviewStats from '../Overview/OverviewStats';
@@ -18,11 +20,23 @@ import RegistrarsListingTable from '../ListingTable/RegistrarsListingTable';
 import MyIdentitiesDashboard from '../MyDashboard/MyIdentitiesDashboard';
 
 function JudgementTabs() {
-	const { data: isRegistrar } = useIsRegistrar();
+	const { data: isRegistrar, isLoading } = useIsRegistrar();
+	const [activeTab, setActiveTab] = useState<EJudgementDashboardTabs>(EJudgementDashboardTabs.OVERVIEW);
+
+	useEffect(() => {
+		if (!isLoading && isRegistrar) {
+			setActiveTab(EJudgementDashboardTabs.REQUESTS);
+		}
+	}, [isLoading, isRegistrar]);
+
+	if (isLoading) {
+		return <Skeleton />;
+	}
 	return (
 		<Tabs
-			defaultValue={isRegistrar ? EJudgementDashboardTabs.REQUESTS : EJudgementDashboardTabs.OVERVIEW}
+			defaultValue={activeTab}
 			className='w-full'
+			onValueChange={(value) => setActiveTab(value as EJudgementDashboardTabs)}
 		>
 			<Header />
 			<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>

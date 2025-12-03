@@ -24,6 +24,7 @@ import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 import { BN } from '@polkadot/util';
+import { useRouter } from 'next/navigation';
 import { SocialLinksDisplay } from '../Overview/IdentityComponents';
 import styles from '../Overview/IdentitiesListingTable.module.scss';
 
@@ -33,6 +34,7 @@ function MyIdentitiesDashboard() {
 	const { identityService } = useIdentityService();
 	const { user } = useUser();
 	const network = getCurrentNetwork();
+	const router = useRouter();
 	const t = useTranslations();
 	const { userPreferences } = useUserPreferences();
 	const queryClient = useQueryClient();
@@ -60,7 +62,7 @@ function MyIdentitiesDashboard() {
 	});
 
 	const handleEdit = (address: string) => {
-		window.location.href = `/set-identity?address=${address}`;
+		router.push(`/set-identity?address=${address}`);
 	};
 
 	const handleDeleteIdentity = async (address: string, isSub: boolean) => {
@@ -119,7 +121,6 @@ function MyIdentitiesDashboard() {
 
 	return (
 		<div className='w-full'>
-			{/* Stats Cards */}
 			<div className={styles.container}>
 				<div className='flex w-full flex-col gap-x-4 gap-y-4 md:flex-row md:items-center md:justify-between lg:w-4/5'>
 					<div className={styles.statsContainer}>
@@ -240,6 +241,7 @@ function MyIdentitiesDashboard() {
 												type='button'
 												className='text-basic_text hover:text-text_primary'
 												title='Copy address'
+												onClick={() => navigator.clipboard.writeText(identity.address)}
 											>
 												<Copy size={14} />
 											</button>

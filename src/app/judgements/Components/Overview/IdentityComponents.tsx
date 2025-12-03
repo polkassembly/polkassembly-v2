@@ -79,7 +79,7 @@ export function SocialLinksDisplay({ socials, size = 'md' }: SocialLinksDisplayP
 			{socials.web && (
 				<a
 					key='web_url'
-					href={socials.web}
+					href={socials.web.startsWith('http://') || socials.web.startsWith('https://') ? socials.web : `https://${socials.web}`}
 					target='_blank'
 					className={`flex ${containerClass} items-center justify-center rounded-full bg-primary_border/40`}
 					rel='noreferrer'
@@ -115,7 +115,7 @@ interface JudgementDisplayProps {
 }
 
 export function JudgementDisplay({ count, labels, size = 'md' }: JudgementDisplayProps) {
-	if (count === 0) {
+	if (count === 0 || labels.length === 0) {
 		return <span className='px-4 text-center font-semibold text-text_primary'>-</span>;
 	}
 
@@ -123,8 +123,8 @@ export function JudgementDisplay({ count, labels, size = 'md' }: JudgementDispla
 
 	return (
 		<div className='flex items-center gap-1'>
-			<span className={`rounded px-2 py-1 ${badgeClass} font-semibold text-text_primary`}>{labels[0]}</span>
-			{count > 1 && labels && (
+			<span className={`rounded px-2 py-1 ${badgeClass} font-semibold text-text_primary`}>{labels[0]}</span>+{' '}
+			{count > 1 && labels.length > 1 && (
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<span className='flex !size-6 items-center justify-center rounded-full border border-primary_border bg-poll_option_bg p-2 text-xs font-medium text-text_primary'>
