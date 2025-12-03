@@ -55,6 +55,7 @@ function Navbar() {
 
 	const network = getCurrentNetwork();
 	const pathname = usePathname();
+
 	const allowedPaths = [
 		/^(?:\/[a-z]{2})?\/post\/[^/]+$/,
 		/^(?:\/[a-z]{2})?\/proposal\/[^/]+$/,
@@ -65,7 +66,7 @@ function Navbar() {
 	const isHomePage = /^\/(?:[a-z]{2})?$/.test(pathname);
 
 	const shouldShowBanner = isHomePage || allowedPaths.some((path) => path.test(pathname));
-	
+
 	const handleLocaleChange = async (locale: ELocales) => {
 		setLocaleCookie(locale);
 		setUserPreferences({ ...userPreferences, locale });
