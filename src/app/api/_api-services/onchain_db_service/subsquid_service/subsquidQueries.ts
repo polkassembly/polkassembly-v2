@@ -358,6 +358,32 @@ export class SubsquidQueries {
 		}
 	`;
 
+	// Batched conviction vote metrics query - fetches metrics for multiple indices in a single request
+	protected static GET_BATCHED_CONVICTION_VOTE_METRICS = (indices: number[], proposalType: string) => {
+		const fields = indices
+			.map(
+				(index) => `
+			noCount_${index}: convictionVotesConnection(where: {decision_eq: no, proposal: {index_eq: ${index}, type_eq: ${proposalType}}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
+				totalCount
+			}
+			yesCount_${index}: convictionVotesConnection(where: {decision_eq: yes, proposal: {index_eq: ${index}, type_eq: ${proposalType}}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
+				totalCount
+			}
+			tally_${index}: proposals(where: {index_eq: ${index}, type_eq: ${proposalType}}) {
+				tally {
+					ayes
+					bareAyes
+					nays
+					support
+				}
+			}
+		`
+			)
+			.join('\n');
+
+		return `query GetBatchedConvictionVoteMetrics { ${fields} }`;
+	};
+
 	// vote listing queries
 
 	protected static GET_VOTES_LISTING_BY_PROPOSAL_TYPE_AND_INDEX = () => `
