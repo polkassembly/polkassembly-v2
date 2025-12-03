@@ -98,7 +98,8 @@ export class RedisService {
 				return Math.min(times * 50, 2000);
 			},
 			reconnectOnError: (err) => err.message.includes('READONLY'),
-			keepAlive: 8000
+			keepAlive: 8000,
+			lazyConnect: true
 		});
 
 		client.on('error', (err) => {

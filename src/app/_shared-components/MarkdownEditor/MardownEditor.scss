@@ -93,7 +93,7 @@
 	}
 
 	/* Custom light theme colors using theme.ts variables */
-	:global(.mdxeditor) {
+	.mdxeditor {
 		/* Base colors using your theme variables */
 		--accentBase: #fff2f9; /* based on sidebar_menu_active */
 		--accentBgSubtle: #fde7f0; /* sidebar_menu_bg */
@@ -125,7 +125,7 @@
 	}
 
 	/* Custom dark theme colors using theme.ts variables */
-	:global(.dark-theme) {
+	.dark-theme {
 		/* Base colors using your theme variables for dark mode */
 		--accentBase: #540e33; /* sidebar_menu_active */
 		--accentBgSubtle: #540e33; /* sidebar_menu_active */
@@ -160,7 +160,7 @@
 	}
 
 	/* Dialog/popup z-index and colors */
-	:global(.mdxeditor-popup-container) {
+	.mdxeditor-popup-container {
 		.popupContainer {
 			z-index: 100;
 			--basePageBg: #1c1d1f;
