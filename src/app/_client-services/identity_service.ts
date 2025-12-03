@@ -10,7 +10,7 @@
 import { APPNAME } from '@/_shared/_constants/appName';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
-import { mapJudgementStatus, countSocialsFromIdentity, formatJudgementLabel } from '@app/_client-utils/identityUtils';
+import { mapJudgementStatus, countSocialsFromIdentity, formatJudgementLabel, getSocialsFromIdentity } from '@app/_client-utils/identityUtils';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
@@ -148,10 +148,6 @@ export class IdentityService {
 
 	getGenesisHash() {
 		return this.peopleChainApi.genesisHash.toHex();
-	}
-
-	getApi() {
-		return this.peopleChainApi;
 	}
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
@@ -847,14 +843,7 @@ export class IdentityService {
 
 			if (!identityInfo?.info) return null;
 
-			const socials = {
-				email: identityInfo.info.email?.Raw,
-				twitter: identityInfo.info.twitter?.Raw,
-				discord: identityInfo.info.discord?.Raw,
-				matrix: identityInfo.info.matrix?.Raw,
-				github: identityInfo.info.github?.Raw,
-				web: identityInfo.info.web?.Raw
-			};
+			const socials = getSocialsFromIdentity(identityInfo.info);
 
 			let judgementStatus = EJudgementStatus.PENDING;
 			let judgementCount = 0;
