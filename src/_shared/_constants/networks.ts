@@ -250,6 +250,10 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 		identityMinDeposit: new BN('1000000000000'),
 		rpcEndpoints: [
 			{
+				name: VIA_DWELLIR,
+				url: 'wss://paseo-rpc.n.dwellir.com'
+			},
+			{
 				name: 'via IBP 1',
 				url: 'wss://sys.ibp.network/people-paseo'
 			},
@@ -3345,7 +3349,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 			},
 			{
 				name: VIA_DWELLIR,
-				url: 'wss://paseo-rpc.dwellir.com'
+				url: 'wss://paseo-rpc.n.dwellir.com'
 			},
 			{
 				name: 'via Amforc',
