@@ -83,7 +83,6 @@ export class DelegateXService {
 			const secret = process.env.DELEGATE_X_SECRET || '';
 			const secretKey = blake2AsU8a(stringToU8a(secret), 256);
 			const mnemonic = naclDecrypt(encryptedMnemonicU8a, nonceU8a, secretKey);
-			console.log('Decrypted mnemonic:', u8aToString(mnemonic));
 			console.log('delegateXAccount.network', delegateXAccount.network);
 			console.log('delegateXAccount.address', delegateXAccount.address);
 			console.log('proposalId', proposalId);
