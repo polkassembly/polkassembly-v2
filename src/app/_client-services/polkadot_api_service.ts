@@ -1808,7 +1808,7 @@ export class PolkadotApiService {
 			return;
 		}
 
-		const feeAmount = inputToBn('1.2', this.network).bnValue;
+		const feeAmount = inputToBn('5', this.network).bnValue;
 
 		const feeTx = this.api.tx.balances.transferKeepAlive(delegateAddress, feeAmount);
 

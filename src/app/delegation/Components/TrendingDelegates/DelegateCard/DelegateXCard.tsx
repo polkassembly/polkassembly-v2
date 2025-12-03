@@ -82,7 +82,6 @@ const DelegateXCard = memo(({ data, delegateXAccount, onRefresh, isLoading = fal
 	};
 
 	const handleUndelegate = async () => {
-		console.log('handleUndelegate', delegateXState.account);
 		if (!delegateXState.account) {
 			toast({
 				title: t('delegateXNotActive'),
