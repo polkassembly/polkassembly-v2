@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/app/_shared-components/Skeleton';

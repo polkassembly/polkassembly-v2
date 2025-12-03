@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { IJudgementRequest } from '@/_shared/types';
 import { useMemo } from 'react';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
