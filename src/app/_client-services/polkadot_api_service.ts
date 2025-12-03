@@ -145,6 +145,7 @@ export class PolkadotApiService {
 			console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
 			console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
 			setIsTxFinalized?.(txHash.toString());
+			console.log('isFailed', isFailed);
 			if (!isFailed && waitTillFinalizedHash) {
 				await onSuccess(txHash);
 			}
@@ -1807,7 +1808,7 @@ export class PolkadotApiService {
 			return;
 		}
 
-		const feeAmount = inputToBn('5', this.network).bnValue;
+		const feeAmount = inputToBn('1.2', this.network).bnValue;
 
 		const feeTx = this.api.tx.balances.transferKeepAlive(delegateAddress, feeAmount);
 
@@ -1822,7 +1823,43 @@ export class PolkadotApiService {
 			errorMessageFallback: 'Failed to delegate',
 			onSuccess,
 			onFailed,
-			waitTillFinalizedHash: true,
+			waitTillFinalizedHash: false,
+			setVaultQrState
+		});
+	}
+
+	async undelegateForDelegateX({
+		address,
+		wallet,
+		tracks,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		address: string;
+		wallet: EWallet;
+		tracks: number[];
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api) {
+			onFailed('API not ready');
+			return;
+		}
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.undelegate(track));
+
+		const tx = this.api.tx.utility.batchAll(txs);
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			errorMessageFallback: 'Failed to undelegate',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: false,
 			setVaultQrState
 		});
 	}

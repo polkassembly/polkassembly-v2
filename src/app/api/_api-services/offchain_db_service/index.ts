@@ -1051,7 +1051,19 @@ export class OffChainDbService {
 		const existingAccount = await FirestoreService.GetDelegateXAccountByUserId({ userId, network });
 		if (existingAccount) {
 			console.log('delegateXAccount already exists');
-			return existingAccount;
+			// update the account if it exists
+			return FirestoreService.UpdateDelegateXAccount({
+				address,
+				userId,
+				network,
+				includeComment,
+				votingPower,
+				strategyId,
+				contactLink,
+				signatureLink,
+				prompt,
+				active: existingAccount.active ?? false
+			});
 		}
 
 		const delegateXAccount: IDelegateXAccount = {
@@ -1067,11 +1079,10 @@ export class OffChainDbService {
 			strategyId,
 			contactLink,
 			signatureLink,
-			prompt
+			prompt: prompt || '',
+			active: false
 		};
-		console.log('delegateXAccount', delegateXAccount);
 		await FirestoreService.CreateDelegateXAccount(delegateXAccount);
-		console.log('delegateXAccount created');
 		return delegateXAccount;
 	}
 
@@ -1084,7 +1095,8 @@ export class OffChainDbService {
 		strategyId,
 		contactLink,
 		signatureLink,
-		prompt
+		prompt,
+		active
 	}: {
 		address: string;
 		userId: number;
@@ -1095,6 +1107,7 @@ export class OffChainDbService {
 		contactLink?: string;
 		signatureLink?: string;
 		prompt?: string;
+		active?: boolean;
 	}): Promise<IDelegateXAccount> {
 		return FirestoreService.UpdateDelegateXAccount({
 			address,
@@ -1105,7 +1118,8 @@ export class OffChainDbService {
 			strategyId,
 			contactLink,
 			signatureLink,
-			prompt
+			prompt,
+			active
 		});
 	}
 

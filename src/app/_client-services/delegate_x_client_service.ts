@@ -38,7 +38,8 @@ export class DelegateXClientService extends NextApiClientService {
 		signatureLink,
 		includeComment,
 		votingPower,
-		prompt
+		prompt,
+		active
 	}: {
 		strategyId?: string;
 		contactLink?: string;
@@ -46,7 +47,8 @@ export class DelegateXClientService extends NextApiClientService {
 		includeComment?: boolean;
 		votingPower?: string;
 		prompt?: string;
+		active?: boolean;
 	}): Promise<{ data: { success: boolean; delegateXAccount: IDelegateXAccount } | null; error: IErrorResponse | null }> {
-		return NextApiClientService.updateDelegateXAccount({ strategyId, contactLink, signatureLink, includeComment, votingPower, prompt });
+		return NextApiClientService.updateDelegateXAccount({ strategyId, contactLink, signatureLink, includeComment, votingPower, prompt, active });
 	}
 }

@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { memo, RefObject, useRef, useEffect } from 'react';
+import { memo, RefObject, useRef, useEffect, useCallback } from 'react';
 import { IoMdTrendingUp } from '@react-icons/all-files/io/IoMdTrendingUp';
 import { EDelegateSource, IDelegateDetails, IDelegateXAccount } from '@/_shared/types';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
@@ -95,7 +95,7 @@ function TrendingDelegates() {
 	const { userPreferences } = useUserPreferences();
 	const [delegateXState, setDelegateXState] = useAtom(delegateXAtom);
 
-	const fetchDelegateXData = async () => {
+	const fetchDelegateXData = useCallback(async () => {
 		if (!userPreferences.selectedAccount?.address) return;
 
 		setDelegateXState((prev) => ({
@@ -142,7 +142,7 @@ function TrendingDelegates() {
 				isLoading: false
 			}));
 		}
-	};
+	}, [userPreferences.selectedAccount?.address, setDelegateXState]);
 
 	const handleDelegateXSuccess = (newAccount: IDelegateXAccount) => {
 		setDelegateXState((prev) => ({
@@ -160,8 +160,10 @@ function TrendingDelegates() {
 	};
 
 	useEffect(() => {
-		fetchDelegateXData();
-	}, [userPreferences.selectedAccount?.address]);
+		if (userPreferences.selectedAccount?.address) {
+			fetchDelegateXData();
+		}
+	}, [fetchDelegateXData, userPreferences.selectedAccount?.address]);
 
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const t = useTranslations('Delegation');
@@ -259,14 +261,12 @@ function TrendingDelegates() {
 					{filteredDelegates.length > 0 ? (
 						<>
 							<div className='my-5 grid w-full grid-cols-1 items-stretch gap-5 lg:grid-cols-2'>
-								{userPreferences.selectedAccount?.address && (
-									<DelegateXCard
-										data={delegateXState.data || defaultDelegateXData}
-										delegateXAccount={delegateXState.account}
-										onRefresh={handleDelegateXSuccess}
-										isLoading={delegateXState.isLoading}
-									/>
-								)}
+								<DelegateXCard
+									data={delegateXState.account?.active ? delegateXState.data || defaultDelegateXData : defaultDelegateXData}
+									delegateXAccount={delegateXState.account}
+									onRefresh={handleDelegateXSuccess}
+									isLoading={delegateXState.isLoading}
+								/>
 
 								{filteredDelegates.map((delegate: IDelegateDetails) => (
 									<DelegateCard

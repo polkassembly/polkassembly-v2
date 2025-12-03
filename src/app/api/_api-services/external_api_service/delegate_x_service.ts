@@ -139,4 +139,14 @@ export class DelegateXService {
 			throw error;
 		}
 	}
+
+	// update DelegateX Bot data as Active true
+	static async updateDelegateXBotDataAsActiveTrue(delegateXAccount: IDelegateXAccount): Promise<unknown> {
+		try {
+			return await OffChainDbService.UpdateDelegateXAccount({ ...delegateXAccount, active: true });
+		} catch (error) {
+			console.error('Error updating DelegateX Bot data as Active true:', error);
+			throw error;
+		}
+	}
 }

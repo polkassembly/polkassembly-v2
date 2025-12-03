@@ -14,12 +14,20 @@ import Address from '@/app/_shared-components/Profile/Address/Address';
 import { Button } from '@/app/_shared-components/Button';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
-import { IDelegateXAccount } from '@/_shared/types';
+import { IDelegateXAccount, EWallet, ENotificationStatus } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Pencil } from 'lucide-react';
 import DelegateXBotGif from '@assets/delegation/klara/klara.gif';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { useAtom } from 'jotai';
+import { delegateXAtom } from '@/app/_atoms/delegateX/delegateXAtom';
+import { usePolkadotVault } from '@/hooks/usePolkadotVault';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useToast } from '@/hooks/useToast';
+import { DelegateXClientService } from '@/app/_client-services/delegate_x_client_service';
+import { DELEGATE_X_TRACKS } from '@/_shared/_constants/delegateXTracks';
 import EditDelegateXDialog from '../../DelegateXSetupDialog/EditDelegateXDialog';
 import DelegateXSetupDialog from '../../DelegateXSetupDialog/DelegateXSetupDialog';
 import styles from './DelegateCard.module.scss';
@@ -54,7 +62,11 @@ const DelegateXCard = memo(({ data, delegateXAccount, onRefresh, isLoading = fal
 	const [openEditDialog, setOpenEditDialog] = useState(false);
 	const [editStep, setEditStep] = useState(1);
 	const [isEditMode, setIsEditMode] = useState(false);
-
+	const [delegateXState, setDelegateXState] = useAtom(delegateXAtom);
+	const { apiService } = usePolkadotApiService();
+	const { setVaultQrState } = usePolkadotVault();
+	const { userPreferences } = useUserPreferences();
+	const { toast } = useToast();
 	const handleEditStrategy = () => {
 		setOpenEditDialog(false);
 		setEditStep(3);
@@ -69,9 +81,46 @@ const DelegateXCard = memo(({ data, delegateXAccount, onRefresh, isLoading = fal
 		setOpenSetupDialog(true);
 	};
 
-	const handleUndelegate = () => {
-		// TODO: Implement undelegate
-		setOpenEditDialog(false);
+	const handleUndelegate = async () => {
+		console.log('handleUndelegate', delegateXState.account);
+		if (!delegateXState.account) {
+			toast({
+				title: t('delegateXNotActive'),
+				description: t('delegateXNotActiveDescription'),
+				status: ENotificationStatus.ERROR
+			});
+			return;
+		}
+		await apiService?.undelegateForDelegateX({
+			address: userPreferences.selectedAccount?.address || '',
+			wallet: userPreferences.wallet as EWallet,
+			tracks: DELEGATE_X_TRACKS.spender,
+			onSuccess: async () => {
+				await DelegateXClientService.updateDelegateXAccount({ ...delegateXState.account, votingPower: '0', active: false });
+				toast({
+					title: t('delegateXUndelegatedSuccessfully'),
+					description: t('delegateXUndelegatedSuccessfullyDescription'),
+					status: ENotificationStatus.SUCCESS
+				});
+				setOpenEditDialog(false);
+				setDelegateXState((prev) => ({
+					...prev,
+					account: {
+						...prev.account,
+						active: false,
+						votingPower: '0'
+					} as IDelegateXAccount
+				}));
+			},
+			onFailed: (error: string) => {
+				toast({
+					title: t('errorUndelegatingDelegateX'),
+					description: error,
+					status: ENotificationStatus.ERROR
+				});
+			},
+			setVaultQrState
+		});
 	};
 
 	return (
@@ -110,7 +159,7 @@ const DelegateXCard = memo(({ data, delegateXAccount, onRefresh, isLoading = fal
 									disabled={isLoading}
 									className='flex items-center gap-x-2 text-sm font-medium text-text_pink'
 									onClick={() => {
-										if (delegateXAccount) {
+										if (delegateXAccount && delegateXAccount.active) {
 											setOpenEditDialog(true);
 										} else {
 											setIsEditMode(false);
@@ -119,8 +168,8 @@ const DelegateXCard = memo(({ data, delegateXAccount, onRefresh, isLoading = fal
 										}
 									}}
 								>
-									{delegateXAccount ? <Pencil /> : <IoPersonAdd />}
-									<span>{delegateXAccount ? 'Edit' : t('delegate')}</span>
+									{delegateXAccount && delegateXAccount.active ? <Pencil /> : <IoPersonAdd />}
+									<span>{delegateXAccount && delegateXAccount.active ? 'Edit' : t('delegate')}</span>
 								</Button>
 								<DelegateXSetupDialog
 									key={`${delegateXAccount?.strategyId}-${delegateXAccount?.contactLink}-${delegateXAccount?.signatureLink}-${delegateXAccount?.votingPower}-${delegateXAccount?.prompt}`}

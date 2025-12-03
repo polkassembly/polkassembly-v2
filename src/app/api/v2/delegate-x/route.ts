@@ -30,7 +30,9 @@ const zodUpdateParamsSchema = z.object({
 	contactLink: z.string().optional(),
 	signatureLink: z.string().optional(),
 	includeComment: z.boolean().optional(),
-	votingPower: z.string().optional()
+	votingPower: z.string().optional(),
+	prompt: z.string().optional(),
+	active: z.boolean().optional()
 });
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
@@ -72,12 +74,9 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
 		votingPower,
 		strategyId,
 		contactLink,
-		signatureLink
+		signatureLink,
+		prompt: ''
 	});
-
-	// create DelegateX Bot (disabled for now)
-	console.log('setting up delegatex bot');
-	await DelegateXService.createDelegateXBot(Number(userId), strategyId, contactLink, signatureLink);
 
 	const response = NextResponse.json({ success: true, delegateXAccount });
 
@@ -133,6 +132,21 @@ export const PUT = withErrorHandling(async (req: NextRequest) => {
 		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'DelegateX account not found. Please create an account first.');
 	}
 
+	const updateDelegateXAccount =
+		(!existingAccount.active && updateData.active) ||
+		updateData.strategyId !== existingAccount.strategyId ||
+		updateData.contactLink !== existingAccount.contactLink ||
+		updateData.signatureLink !== existingAccount.signatureLink;
+
+	if (updateDelegateXAccount) {
+		await DelegateXService.createDelegateXBot(
+			Number(userId),
+			updateData.strategyId ?? existingAccount.strategyId ?? '',
+			updateData.contactLink ?? existingAccount.contactLink,
+			updateData.signatureLink ?? existingAccount.signatureLink
+		);
+	}
+
 	const updatedAccount = await OffChainDbService.UpdateDelegateXAccount({
 		address: existingAccount.address,
 		userId: Number(userId),
@@ -141,7 +155,9 @@ export const PUT = withErrorHandling(async (req: NextRequest) => {
 		votingPower: updateData.votingPower ?? existingAccount.votingPower,
 		strategyId: updateData.strategyId ?? existingAccount.strategyId,
 		contactLink: updateData.contactLink ?? existingAccount.contactLink,
-		signatureLink: updateData.signatureLink ?? existingAccount.signatureLink
+		signatureLink: updateData.signatureLink ?? existingAccount.signatureLink,
+		prompt: updateData.prompt ?? existingAccount.prompt ?? '',
+		active: updateData.active ?? existingAccount.active ?? false
 	});
 
 	// (disabled for now)

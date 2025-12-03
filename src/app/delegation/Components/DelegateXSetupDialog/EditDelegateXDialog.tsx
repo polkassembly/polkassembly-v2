@@ -2,20 +2,22 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { memo, ReactNode } from 'react';
+import { memo, ReactNode, useState } from 'react';
 import Image from 'next/image';
 import { Dialog, DialogContent } from '@/app/_shared-components/Dialog/Dialog';
 import UndelegateIcon from '@assets/delegation/undelegate.svg';
 import EditVoteStrategyIcon from '@assets/delegation/undelegated.svg';
 import EditPersonalityIcon from '@assets/delegation/editpersonality.svg';
 import Klara from '@assets/delegation/klara/klara.svg';
+import { cn } from '@/lib/utils';
+import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 
 interface EditDelegateXDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	onEditStrategy: () => void;
 	onEditPersonality: () => void;
-	onUndelegate: () => void;
+	onUndelegate: () => Promise<void>;
 }
 
 function Card({ children, onClick }: { children: ReactNode; onClick: () => void }) {
@@ -33,6 +35,12 @@ function Card({ children, onClick }: { children: ReactNode; onClick: () => void 
 }
 
 const EditDelegateXDialog = memo(({ open, onOpenChange, onEditStrategy, onEditPersonality, onUndelegate }: EditDelegateXDialogProps) => {
+	const [loading, setLoading] = useState(false);
+	const handleUndelegate = async () => {
+		setLoading(true);
+		await onUndelegate();
+		setLoading(false);
+	};
 	return (
 		<Dialog
 			open={open}
@@ -53,8 +61,8 @@ const EditDelegateXDialog = memo(({ open, onOpenChange, onEditStrategy, onEditPe
 					</div>
 				</div>
 				<div className='grid grid-cols-1 gap-4 p-4 sm:p-6 md:grid-cols-3'>
-					<Card onClick={onUndelegate}>
-						<div className='flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-delegation_bgcard md:h-24 md:w-24'>
+					<Card onClick={handleUndelegate}>
+						<div className={cn('flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-delegation_bgcard md:h-24 md:w-24', loading && 'opacity-50')}>
 							<Image
 								src={UndelegateIcon}
 								alt='Undelegate'
@@ -63,8 +71,8 @@ const EditDelegateXDialog = memo(({ open, onOpenChange, onEditStrategy, onEditPe
 								className='h-8 w-8 md:h-12 md:w-12'
 							/>
 						</div>
-						<div className='flex flex-col'>
-							<p className='text-base font-semibold'>Undelegate</p>
+						<div className={cn('flex flex-col', loading && 'opacity-50')}>
+							<p className='text-base font-semibold'>{loading ? <LoadingSpinner show={loading} /> : 'Undelegate'}</p>
 							<p className='text-text_secondary text-sm'>Take back control of your votes. Your delegation link will be removed, and you’ll be able to vote directly again.</p>
 						</div>
 					</Card>

@@ -1928,7 +1928,8 @@ export class FirestoreService extends FirestoreUtils {
 		strategyId,
 		contactLink,
 		signatureLink,
-		prompt
+		prompt,
+		active
 	}: {
 		address: string;
 		userId: number;
@@ -1939,10 +1940,11 @@ export class FirestoreService extends FirestoreUtils {
 		contactLink?: string;
 		signatureLink?: string;
 		prompt?: string;
+		active?: boolean;
 	}): Promise<IDelegateXAccount> {
 		const id = `${userId}-${network}-${address}`;
 		const delegateXAccountDoc = this.delegateXAccountsCollectionRef().doc(id);
-		await delegateXAccountDoc.set({ includeComment, votingPower, strategyId, contactLink, signatureLink, prompt }, { merge: true });
+		await delegateXAccountDoc.set({ includeComment, votingPower, strategyId, contactLink, signatureLink, prompt, active }, { merge: true });
 
 		const updatedDoc = await delegateXAccountDoc.get();
 		return updatedDoc.data() as IDelegateXAccount;

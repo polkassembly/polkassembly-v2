@@ -1546,7 +1546,8 @@ export class NextApiClientService {
 		signatureLink,
 		includeComment,
 		votingPower,
-		prompt
+		prompt,
+		active
 	}: {
 		strategyId?: string;
 		contactLink?: string;
@@ -1554,12 +1555,13 @@ export class NextApiClientService {
 		includeComment?: boolean;
 		votingPower?: string;
 		prompt?: string;
+		active?: boolean;
 	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.UPDATE_DELEGATE_X_BOT });
 		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount }>({
 			url,
 			method,
-			data: { strategyId, contactLink, signatureLink, includeComment, votingPower, prompt }
+			data: { strategyId, contactLink, signatureLink, includeComment, votingPower, prompt, active }
 		});
 	}
 

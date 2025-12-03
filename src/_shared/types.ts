@@ -1704,6 +1704,7 @@ export interface IDelegateXAccount {
 	contactLink?: string;
 	signatureLink?: string;
 	prompt?: string;
+	active?: boolean;
 }
 
 export interface IDelegateXVoteData {

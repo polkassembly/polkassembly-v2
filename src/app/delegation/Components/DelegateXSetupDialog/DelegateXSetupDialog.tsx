@@ -66,7 +66,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 	const { userPreferences } = useUserPreferences();
 	const { toast } = useToast();
 	const t = useTranslations();
-	const [, setDelegateXState] = useAtom(delegateXAtom);
+	const [delegateXState, setDelegateXState] = useAtom(delegateXAtom);
 	useEffect(() => {
 		if (open && isEditMode) {
 			setStep(initialStep);
@@ -181,7 +181,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 			balance: inputToBn(votingPower || '0', getCurrentNetwork()).bnValue,
 			conviction: EConvictionAmount.ZERO,
 			tracks: DELEGATE_X_TRACKS.spender,
-			onSuccess: () => {
+			onSuccess: async () => {
 				setIsLoading(false);
 				if (currentEditMode) {
 					setCurrentEditMode(false);
@@ -190,6 +190,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 					onOpenChange(false);
 					setOpenSuccess(true);
 				}
+				await DelegateXClientService.updateDelegateXAccount({ ...delegateXAccount, active: true });
 				toast({
 					title: t('delegateXCreatedSuccessfully'),
 					description: t('delegateXCreatedSuccessfullyDescription'),
@@ -216,6 +217,50 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 			setIsEditingFromDialog(false);
 		}
 		onOpenChange(isOpen);
+	};
+
+	const handleUndelegate = async () => {
+		console.log('handleUndelegate', delegateXState.account);
+		if (!delegateXState.account) {
+			toast({
+				title: t('delegateXNotActive'),
+				description: t('delegateXNotActiveDescription'),
+				status: ENotificationStatus.ERROR
+			});
+			return;
+		}
+		await apiService?.undelegateForDelegateX({
+			address: userPreferences.selectedAccount?.address || '',
+			wallet: userPreferences.wallet as EWallet,
+			tracks: DELEGATE_X_TRACKS.spender,
+			onSuccess: async () => {
+				setIsLoading(false);
+				await DelegateXClientService.updateDelegateXAccount({ ...delegateXState.account, votingPower: '0', active: false });
+				toast({
+					title: t('delegateXUndelegatedSuccessfully'),
+					description: t('delegateXUndelegatedSuccessfullyDescription'),
+					status: ENotificationStatus.SUCCESS
+				});
+				setOpenEdit(false);
+				setDelegateXState((prev) => ({
+					...prev,
+					account: {
+						...prev.account,
+						active: false,
+						votingPower: '0'
+					} as IDelegateXAccount
+				}));
+			},
+			onFailed: (error: string) => {
+				setIsLoading(false);
+				toast({
+					title: t('errorUndelegatingDelegateX'),
+					description: error,
+					status: ENotificationStatus.ERROR
+				});
+			},
+			setVaultQrState
+		});
 	};
 
 	const getStepCount = () => {
@@ -333,10 +378,7 @@ function DelegateXSetupDialog({ open, onOpenChange, isEditMode = false, initialS
 			<EditDelegateXDialog
 				open={openEdit}
 				onOpenChange={setOpenEdit}
-				onUndelegate={() => {
-					// TODO: trigger on-chain undelegate
-					setOpenEdit(false);
-				}}
+				onUndelegate={handleUndelegate}
 				onEditStrategy={() => {
 					setOpenEdit(false);
 					setIsEditingFromDialog(true);
