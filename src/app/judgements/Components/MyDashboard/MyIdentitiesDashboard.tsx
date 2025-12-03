@@ -28,8 +28,7 @@ import { useTranslations } from 'next-intl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 import { BN } from '@polkadot/util';
-import { IdentityTimelineDialog } from '../Overview/IdentityUpdateTimeline/IdentityUpdateTimeline';
-import { SocialLinksDisplay, UpdateHistoryButton, LastUpdateCell } from '../Overview/IdentityComponents';
+import { SocialLinksDisplay } from '../Overview/IdentityComponents';
 import styles from '../Overview/IdentitiesListingTable.module.scss';
 
 const SUB_IDENTITY_TYPE = 'Sub-identity';
@@ -42,7 +41,6 @@ function MyIdentitiesDashboard() {
 	const { userPreferences } = useUserPreferences();
 	const queryClient = useQueryClient();
 	const [isDeleting, setIsDeleting] = useState<string | null>(null);
-	const [selectedAddressForTimeline, setSelectedAddressForTimeline] = useState<{ address: string; displayName: string } | null>(null);
 	const { setVaultQrState } = usePolkadotVault();
 	const { toast } = useToast();
 	const { data: myIdentities, isLoading } = useQuery({
@@ -342,7 +340,6 @@ function MyIdentitiesDashboard() {
 								<TableHead className={styles.headerCell}>IDENTITY</TableHead>
 								<TableHead className={styles.headerCell}>SOCIALS</TableHead>
 								<TableHead className={styles.headerCell}>TYPE</TableHead>
-								<TableHead className={styles.headerCell}>LATEST UPDATE</TableHead>
 								<TableHead className={styles.headerCell}>JUDGEMENTS</TableHead>
 								<TableHead className={styles.headerCell}>ACTIONS</TableHead>
 							</TableRow>
@@ -375,12 +372,6 @@ function MyIdentitiesDashboard() {
 									</td>
 									<td className='px-6 py-4'>
 										<span className='rounded px-2 py-1 text-sm font-semibold text-text_primary'>{identity.type}</span>
-									</td>
-									<td className='px-6 py-4'>
-										<div className='flex items-center gap-2 text-sm font-semibold text-text_primary'>
-											<LastUpdateCell address={identity.address} />
-											<UpdateHistoryButton onClick={() => setSelectedAddressForTimeline({ address: identity.address, displayName: identity.displayName })} />
-										</div>
 									</td>
 									<td className='px-6 py-4'>
 										{identity.judgements.length > 0 ? (
@@ -447,11 +438,6 @@ function MyIdentitiesDashboard() {
 					</Table>
 				</div>
 			)}
-
-			<IdentityTimelineDialog
-				selectedAddress={selectedAddressForTimeline}
-				onClose={() => setSelectedAddressForTimeline(null)}
-			/>
 		</div>
 	);
 }

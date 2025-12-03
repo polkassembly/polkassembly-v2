@@ -11,14 +11,8 @@ import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
 import { FaGlobe } from '@react-icons/all-files/fa/FaGlobe';
 import { FaGithub } from '@react-icons/all-files/fa/FaGithub';
 import RiotIcon from '@assets/icons/riot_icon.svg';
-import CalendarWatchIcon from '@assets/icons/calendar-watch-icon.svg';
-import { useQuery } from '@tanstack/react-query';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { ESocial } from '@/_shared/types';
-import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { formatIdentityHistoryBlocks } from '@/app/_client-utils/identityUtils';
-import { Skeleton } from '@/app/_shared-components/Skeleton';
-import { formatDate } from '@/app/_shared-components/PostDetails/BeneficiariesDetails/BeneficiaryPayoutsList';
 
 interface Socials {
 	email?: string;
@@ -152,65 +146,4 @@ export function JudgementDisplay({ count, labels, size = 'md' }: JudgementDispla
 			)}
 		</div>
 	);
-}
-
-interface UpdateHistoryButtonProps {
-	onClick: () => void;
-	size?: 'sm' | 'md';
-}
-
-export function UpdateHistoryButton({ onClick, size = 'md' }: UpdateHistoryButtonProps) {
-	const iconSize = size === 'sm' ? 16 : 20;
-
-	return (
-		<Tooltip>
-			<TooltipTrigger asChild>
-				<button
-					title='View update history'
-					type='button'
-					onClick={onClick}
-					className='cursor-pointer hover:opacity-70'
-				>
-					<Image
-						src={CalendarWatchIcon}
-						alt='View update history'
-						width={iconSize}
-						height={iconSize}
-						className={`${size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'} dark:grayscale dark:invert dark:filter`}
-					/>
-				</button>
-			</TooltipTrigger>
-			<TooltipContent
-				side='top'
-				className='bg-tooltip_background'
-			>
-				<span className='text-xs text-white'>View History</span>
-			</TooltipContent>
-		</Tooltip>
-	);
-}
-
-export function LastUpdateCell({ address, className }: { address: string; className?: string }) {
-	const { data: updates, isLoading } = useQuery({
-		queryKey: ['identityHistory', address],
-		queryFn: async () => {
-			if (!address) return [];
-			const { data } = await NextApiClientService.fetchIdentityHistory({ address });
-			return formatIdentityHistoryBlocks(data?.history || []);
-		},
-		enabled: !!address,
-		staleTime: 300000
-	});
-
-	if (isLoading) {
-		return <Skeleton className='h-4 w-24' />;
-	}
-
-	const lastUpdate = updates?.[0];
-
-	if (!lastUpdate) {
-		return <span className={`text-sm text-basic_text ${className}`}>-</span>;
-	}
-
-	return <span className={`text-sm font-semibold text-text_primary ${className}`}>{formatDate(new Date(lastUpdate.timestamp))}</span>;
 }

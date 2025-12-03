@@ -165,8 +165,7 @@ enum EApiRoute {
 	GET_KLARA_STATS = 'GET_KLARA_STATS',
 	KLARA_SEND_FEEDBACK = 'KLARA_SEND_FEEDBACK',
 	KLARA_SEND_MESSAGE = 'KLARA_SEND_MESSAGE',
-	GET_GOOGLE_SHEET_NEWS = 'GET_GOOGLE_SHEET_NEWS',
-	GET_IDENTITY_HISTORY = 'GET_IDENTITY_HISTORY'
+	GET_GOOGLE_SHEET_NEWS = 'GET_GOOGLE_SHEET_NEWS'
 }
 
 export class NextApiClientService {
@@ -408,10 +407,6 @@ export class NextApiClientService {
 
 			case EApiRoute.GET_GOOGLE_SHEET_NEWS:
 				path = '/external/news/google-sheets';
-				break;
-
-			case EApiRoute.GET_IDENTITY_HISTORY:
-				path = '/identity/history';
 				break;
 
 			default:
@@ -1504,31 +1499,6 @@ export class NextApiClientService {
 		});
 
 		return this.nextApiClientFetch<{ data: T; success: boolean }>({
-			url,
-			method
-		});
-	}
-
-	static async fetchIdentityHistory({ address }: { address: string }) {
-		const queryParams = new URLSearchParams({ address });
-		const { url, method } = await this.getRouteConfig({
-			route: EApiRoute.GET_IDENTITY_HISTORY,
-			queryParams
-		});
-
-		return this.nextApiClientFetch<{
-			address: string;
-			history: Array<{
-				blockNumber: number;
-				blockHash: string;
-				timestamp: string;
-				updateType: 'IdentitySet' | 'JudgementRequested' | 'JudgementGiven' | 'IdentityCleared' | 'SubIdentityAdded' | 'SubIdentityRemoved';
-				extrinsicHash: string;
-				data?: Record<string, unknown>;
-			}>;
-			totalFound: number;
-			source: string;
-		}>({
 			url,
 			method
 		});

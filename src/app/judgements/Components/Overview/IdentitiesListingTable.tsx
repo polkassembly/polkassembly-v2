@@ -20,8 +20,7 @@ import Address from '@/app/_shared-components/Profile/Address/Address';
 import Image from 'next/image';
 import ChildListingIndicatorIcon from '@assets/icons/child-listing-indicator.svg';
 import ChildListingEndIndicatorIcon from '@assets/icons/child-listing-end-indicator.svg';
-import { IdentityTimelineDialog } from './IdentityUpdateTimeline/IdentityUpdateTimeline';
-import { SocialLinksDisplay, JudgementDisplay, UpdateHistoryButton, LastUpdateCell } from './IdentityComponents';
+import { SocialLinksDisplay, JudgementDisplay } from './IdentityComponents';
 import styles from './IdentitiesListingTable.module.scss';
 
 interface IdentityData {
@@ -54,7 +53,6 @@ function IdentitiesListingTable() {
 	const search = searchParams?.get('search') || '';
 	const { identityService } = useIdentityService();
 	const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-	const [selectedAddressForTimeline, setSelectedAddressForTimeline] = useState<{ address: string; displayName: string } | null>(null);
 
 	const { data: allIdentities, isLoading } = useQuery({
 		queryKey: ['allIdentities', identityService],
@@ -249,7 +247,6 @@ function IdentitiesListingTable() {
 							<TableHead className={styles.headerCell}>IDENTITY</TableHead>
 							<TableHead className={styles.headerCell}>SOCIALS</TableHead>
 							<TableHead className={styles.headerCell}>JUDGEMENTS</TableHead>
-							<TableHead className={styles.headerCell}>LATEST UPDATE</TableHead>
 							<TableHead className={styles.headerCell}>SUB-IDENTITY</TableHead>
 							<TableHead />
 						</TableRow>
@@ -291,12 +288,7 @@ function IdentitiesListingTable() {
 											labels={identity.judgements.labels}
 										/>
 									</td>
-									<td className='px-6 py-4'>
-										<div className='flex items-center gap-2 text-sm font-semibold text-text_primary'>
-											<LastUpdateCell address={identity.address} />{' '}
-											<UpdateHistoryButton onClick={() => setSelectedAddressForTimeline({ address: identity.address, displayName: identity.displayName })} />
-										</div>
-									</td>
+
 									<td className='px-6 py-4'>
 										<div className='flex items-center gap-2'>
 											<span className='text-sm font-semibold text-text_primary'>{identity.subIdentityCount || '-'}</span>
@@ -377,18 +369,7 @@ function IdentitiesListingTable() {
 													size='sm'
 												/>
 											</td>
-											<td className='px-6 py-2'>
-												<div className='flex items-center gap-1 text-xs text-basic_text'>
-													<LastUpdateCell
-														address={sub.address}
-														className='text-xs font-normal'
-													/>{' '}
-													<UpdateHistoryButton
-														onClick={() => setSelectedAddressForTimeline({ address: sub.address, displayName: sub.displayName })}
-														size='sm'
-													/>
-												</div>
-											</td>
+
 											<td className='px-6 py-2'>
 												<span className='text-sm text-basic_text'>-</span>
 											</td>
@@ -411,11 +392,6 @@ function IdentitiesListingTable() {
 					/>
 				</div>
 			)}
-
-			<IdentityTimelineDialog
-				selectedAddress={selectedAddressForTimeline}
-				onClose={() => setSelectedAddressForTimeline(null)}
-			/>
 		</div>
 	);
 }
