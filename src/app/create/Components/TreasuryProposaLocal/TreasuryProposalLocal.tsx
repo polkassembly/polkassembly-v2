@@ -86,6 +86,7 @@ function TreasuryProposalLocal({ onSuccess }: { onSuccess: (proposalId: number) 
 
 		await apiService.createProposal({
 			address: userPreferences.selectedAccount.address,
+			selectedAccount: userPreferences.selectedAccount,
 			wallet: userPreferences.wallet,
 			setVaultQrState,
 			extrinsicFn: tx,

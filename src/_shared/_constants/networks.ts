@@ -24,6 +24,7 @@ import USDCIcon from '@/_assets/icons/usdc.svg';
 import USDTIcon from '@/_assets/icons/usdt.svg';
 import MYTHIcon from '@/_assets/icons/myth.svg';
 import DEDIcon from '@/_assets/icons/ded.png';
+import { KUSAMA_ASSETHUB_UNIFIED_SQUID_URL } from '@/app/api/_api-constants/apiEnvVars';
 
 interface ISocialLink {
 	id: string;
@@ -3140,7 +3141,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		name: 'Kusama',
 		blockTime: 6000,
 		ss58Format: 2,
-		subsquidUrl: 'https://polkassembly.squids.live/kusama-assethub-unified-pa@v1/api/graphql',
+		subsquidUrl: KUSAMA_ASSETHUB_UNIFIED_SQUID_URL,
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.KUSAMA],
 		supportedAssets: {
 			'1984': {
@@ -3342,6 +3343,10 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.PASEO],
 		tokenSymbol: 'PAS',
 		rpcEndpoints: [
+			{
+				name: 'via Dotters',
+				url: 'wss://paseo.dotters.network'
+			},
 			{
 				name: VIA_DWELLIR,
 				url: 'wss://paseo-rpc.n.dwellir.com'

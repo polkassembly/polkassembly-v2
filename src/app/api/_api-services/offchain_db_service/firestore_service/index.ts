@@ -501,6 +501,59 @@ export class FirestoreService extends FirestoreUtils {
 		return (await Promise.all(commentResponsePromises)).filter((comment): comment is ICommentResponse => comment !== null);
 	}
 
+	static async GetAllNetworkComments({ network, page, limit }: { network: ENetwork; page: number; limit: number }): Promise<IGenericListingResponse<ICommentResponse>> {
+		// Query comments by network, excluding deleted ones, with pagination
+		const commentsQuery = this.commentsCollectionRef()
+			.where('network', '==', network)
+			.where('isDeleted', '==', false)
+			.orderBy('createdAt', 'desc')
+			.limit(limit)
+			.offset((page - 1) * limit);
+
+		const commentsQuerySnapshot = await commentsQuery.get();
+
+		// Get total count for pagination
+		const totalCountQuery = this.commentsCollectionRef().where('network', '==', network).where('isDeleted', '==', false);
+		const totalCountSnapshot = await totalCountQuery.count().get();
+		const totalCount = totalCountSnapshot.data().count;
+
+		const commentResponsePromises = commentsQuerySnapshot.docs.map(async (doc) => {
+			const dataRaw = doc.data();
+
+			const commentData = {
+				...dataRaw,
+				history:
+					dataRaw.history?.map((item: { createdAt: Timestamp; content: string }) => ({
+						...item,
+						createdAt: item.createdAt.toDate()
+					})) || [],
+				content: dataRaw.content || '',
+				createdAt: dataRaw.createdAt?.toDate(),
+				updatedAt: dataRaw.updatedAt?.toDate(),
+				dataSource: dataRaw.dataSource || EDataSource.POLKASSEMBLY
+			} as IComment;
+
+			const user = await this.GetPublicUserById(commentData.userId);
+
+			if (!user) {
+				return null;
+			}
+
+			return {
+				...commentData,
+				publicUser: user,
+				children: []
+			} as ICommentResponse;
+		});
+
+		const comments = (await Promise.all(commentResponsePromises)).filter((comment): comment is ICommentResponse => comment !== null);
+
+		return {
+			items: comments,
+			totalCount
+		};
+	}
+
 	static async GetCommentById(id: string): Promise<IComment | null> {
 		const commentDocSnapshot = await this.commentsCollectionRef().doc(id).get();
 		if (!commentDocSnapshot.exists) {

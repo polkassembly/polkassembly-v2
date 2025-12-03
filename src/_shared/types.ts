@@ -1735,3 +1735,34 @@ export interface VotingStrategy {
 	};
 	commentPreview: (signature: string, contact: string) => string;
 }
+
+export enum EJudgementDashboardTabs {
+	DASHBOARD = 'dashboard',
+	REGISTRARS = 'registrars'
+}
+
+export enum EJudgementStatus {
+	REQUESTED = 'Requested',
+	APPROVED = 'Approved',
+	REJECTED = 'Rejected',
+	PENDING = 'Pending'
+}
+
+export interface IJudgementRequest {
+	id: string;
+	address: string;
+	displayName: string;
+	email: string;
+	twitter: string;
+	status: EJudgementStatus;
+	dateInitiated: Date;
+	registrarIndex: number;
+	registrarAddress: string;
+	judgementHash?: string;
+}
+
+export interface IJudgementStats {
+	totalRequestedThisMonth: number;
+	percentageIncreaseFromLastMonth: number;
+	percentageCompletedThisMonth: number;
+}

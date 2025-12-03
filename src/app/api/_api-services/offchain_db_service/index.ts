@@ -55,10 +55,12 @@ import { OFF_CHAIN_PROPOSAL_TYPES } from '@/_shared/_constants/offChainProposalT
 import dayjs from 'dayjs';
 import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
 import { convertAssetToUSD } from '@/app/_client-utils/convertAssetToUSD';
+import { fetchHistoricalTreasuryStats } from '@/app/api/_api-utils/fetchHistoricalTreasuryStats';
 import { APIError } from '../../_api-utils/apiError';
 import { SubsquareOffChainService } from './subsquare_offchain_service';
 import { FirestoreService } from './firestore_service';
 import { OnChainDbService } from '../onchain_db_service';
+import { SubscanOnChainService } from '../onchain_db_service/subscan_onchain_service';
 
 export class OffChainDbService {
 	// Read methods
@@ -261,6 +263,28 @@ export class OffChainDbService {
 
 		// Get only top-level comments (those with no parent)
 		return buildCommentTree(null);
+	}
+
+	static async GetAllNetworkComments({ network, page, limit }: { network: ENetwork; page: number; limit: number }): Promise<IGenericListingResponse<ICommentResponse>> {
+		const commentsResponse = await FirestoreService.GetAllNetworkComments({ network, page, limit });
+
+		// Get reactions for each comment
+		const commentsWithReactions: ICommentResponse[] = await Promise.all(
+			commentsResponse.items.map(async (comment) => {
+				const reactions = await this.GetCommentReactions({
+					network,
+					indexOrHash: comment.indexOrHash,
+					proposalType: comment.proposalType,
+					id: comment.id
+				});
+				return { ...comment, reactions };
+			})
+		);
+
+		return {
+			...commentsResponse,
+			items: commentsWithReactions
+		};
 	}
 
 	static async GetCommentById(id: string): Promise<IComment | null> {
@@ -790,7 +814,30 @@ export class OffChainDbService {
 
 		// check if the user is the proposer
 		const userAddresses = await this.GetAddressesForUserId(userId);
-		if (!userAddresses.find((address) => address.address === proposerAddress)) throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+		const isDirectProposer = userAddresses.find((address) => address.address === proposerAddress);
+
+		if (!isDirectProposer) {
+			// Check if user has control over the proposer through multisig or proxy
+			// Get relations for all user addresses
+			const allAddressRelations = await Promise.all(userAddresses.map((userAddr) => SubscanOnChainService.GetAccountRelations({ address: userAddr.address, network })));
+
+			// Check if proposerAddress is in any user's multisig or proxy addresses
+			const hasProposerControl = allAddressRelations.some((addressRelations) => {
+				// Check if proposerAddress is in user's multisig addresses
+				const isMultisigMatch = addressRelations.multisigAddresses.some(
+					(multisig) => getSubstrateAddress(multisig.address) === proposerAddress || multisig.pureProxies.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress)
+				);
+
+				// Check if proposerAddress is in user's proxy addresses (addresses user has keys for)
+				const isProxyMatch = addressRelations.proxyAddresses.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress);
+
+				return isMultisigMatch || isProxyMatch;
+			});
+
+			if (!hasProposerControl) {
+				throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+			}
+		}
 
 		// check if offchain post context exists
 		const offChainPostData = await FirestoreService.GetOffChainPostData({ network, indexOrHash, proposalType });
@@ -992,14 +1039,24 @@ export class OffChainDbService {
 		return FirestoreService.GetPollVotes({ network, proposalType, index, pollId });
 	}
 
-	static async GetBeneficiariesWithUsdAmount({ network, beneficiaries }: { network: ENetwork; beneficiaries: IBeneficiary[] }) {
-		const treasuryStats = await FirestoreService.GetTreasuryStats({ network, from: dayjs().subtract(1, 'hour').toDate(), to: dayjs().toDate(), limit: 1, page: 1 });
+	static async GetBeneficiariesWithUsdAmount({ network, beneficiaries, proposalCreatedAt }: { network: ENetwork; beneficiaries: IBeneficiary[]; proposalCreatedAt: Date }) {
+		let treasuryStats = await FirestoreService.GetTreasuryStats({
+			network,
+			from: dayjs(proposalCreatedAt).startOf('day').toDate(),
+			to: dayjs(proposalCreatedAt).endOf('day').toDate(),
+			limit: 1,
+			page: 1
+		});
 
-		if (!treasuryStats) {
-			return beneficiaries;
+		if (!treasuryStats.length) {
+			const historicalStats = await fetchHistoricalTreasuryStats({ network, date: proposalCreatedAt });
+			if (historicalStats) {
+				await FirestoreService.SaveTreasuryStats({ treasuryStats: historicalStats });
+				treasuryStats = [historicalStats];
+			}
 		}
 
-		if (!treasuryStats[0]?.nativeTokenUsdPrice && !treasuryStats[0]?.dedTokenUsdPrice) {
+		if (!treasuryStats.length || (!treasuryStats[0]?.nativeTokenUsdPrice && !treasuryStats[0]?.dedTokenUsdPrice)) {
 			return beneficiaries;
 		}
 		return beneficiaries?.map((beneficiary) => {

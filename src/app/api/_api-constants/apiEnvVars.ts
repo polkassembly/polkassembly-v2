@@ -27,7 +27,8 @@ export const {
 	KLARA_AI_TOKEN = '',
 	GOOGLE_API_KEY = '',
 	NEWS_GOOGLE_SHEET_ID = '',
-	NEWS_GOOGLE_SHEET_NAME = ''
+	NEWS_GOOGLE_SHEET_NAME = '',
+	KUSAMA_ASSETHUB_UNIFIED_SQUID_URL = ''
 } = process.env;
 
 export const IS_CACHE_ENABLED = process.env.IS_CACHE_ENABLED === 'true';

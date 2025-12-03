@@ -40,6 +40,7 @@ import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateA
 import { APPNAME } from '@/_shared/_constants/appName';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
 import { Dispatch, SetStateAction } from 'react';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { BlockCalculationsService } from './block_calculations_service';
 import { VaultQrSigner } from './vault_qr_signer_service';
 import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
@@ -152,6 +153,7 @@ export class PolkadotApiService {
 		}
 	}
 
+	// eslint-disable-next-line sonarjs/cognitive-complexity
 	private async executeTx({
 		tx,
 		address,
@@ -273,9 +275,33 @@ export class PolkadotApiService {
 				extrinsic = this.api.tx.proxy.proxy(selectedAccount.address, null, extrinsic);
 			}
 
+			let signerAddress = address;
+
+			if (selectedAccount?.accountType === EAccountType.MULTISIG) {
+				signerAddress = selectedAccount.parent?.address || '';
+			} else if (selectedAccount?.accountType === EAccountType.PROXY) {
+				if (selectedAccount.parent?.accountType === EAccountType.MULTISIG) {
+					// For pure proxy of multisig, the multisig needs to call proxy.proxy
+					// So we wrap it in multisig first, THEN determine the signer
+					signerAddress = selectedAccount.parent?.parent?.address || '';
+				} else {
+					signerAddress = selectedAccount.parent?.address || '';
+				}
+			}
+
+			// For pure proxy of multisig: wrap in multisig AFTER proxy.proxy
 			if (multisigAccount) {
-				const signatories = multisigAccount?.signatories?.map((signatory) => getEncodedAddress(signatory, this.network)).filter((signatory) => signatory !== address);
-				const { weight } = await extrinsic.paymentInfo(address);
+				const signatories = multisigAccount?.signatories
+					?.map((signatory) => getEncodedAddress(signatory, this.network))
+					.filter((signatory) => signatory && getSubstrateAddress(signatory) !== getSubstrateAddress(signerAddress));
+
+				// Get the correct address for payment info
+				const paymentInfoAddress =
+					selectedAccount?.accountType === EAccountType.PROXY && selectedAccount.parent?.accountType === EAccountType.MULTISIG
+						? selectedAccount.parent.address // Use multisig address for payment info when it's a pure proxy
+						: signerAddress;
+
+				const { weight } = await extrinsic.paymentInfo(paymentInfoAddress);
 				extrinsic = this.api.tx.multisig.asMulti(multisigAccount?.threshold, signatories, null, extrinsic, weight);
 			}
 
@@ -284,9 +310,14 @@ export class PolkadotApiService {
 				withSignedTransaction: true
 			};
 
+			if (!signerAddress) {
+				onFailed('Invalid account type');
+				return;
+			}
+
 			extrinsic
 				// eslint-disable-next-line sonarjs/cognitive-complexity
-				.signAndSend(address, signerOptions, async ({ status, events, txHash }) =>
+				.signAndSend(signerAddress, signerOptions, async ({ status, events, txHash }) =>
 					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
 				)
 				.catch((error: unknown) => {
@@ -725,6 +756,7 @@ export class PolkadotApiService {
 	async notePreimage({
 		address,
 		wallet,
+		selectedAccount,
 		extrinsicFn,
 		onSuccess,
 		onFailed,
@@ -732,6 +764,7 @@ export class PolkadotApiService {
 	}: {
 		address: string;
 		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
 		extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>;
 		onSuccess?: () => void;
 		onFailed?: () => void;
@@ -750,6 +783,7 @@ export class PolkadotApiService {
 			tx: notePreimageTx,
 			address,
 			wallet,
+			selectedAccount,
 			setVaultQrState,
 			errorMessageFallback: 'Failed to note preimage',
 			waitTillFinalizedHash: true,
@@ -1099,6 +1133,7 @@ export class PolkadotApiService {
 	async createProposal({
 		address,
 		wallet,
+		selectedAccount,
 		extrinsicFn,
 		track,
 		enactment,
@@ -1111,6 +1146,7 @@ export class PolkadotApiService {
 	}: {
 		address: string;
 		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
 		track: EPostOrigin;
 		enactment: EEnactment;
 		enactmentValue: BN;
@@ -1149,6 +1185,7 @@ export class PolkadotApiService {
 			const postId = Number(await this.api.query.referenda.referendumCount());
 			await this.executeTx({
 				tx: submitProposalTx,
+				selectedAccount,
 				address,
 				wallet,
 				errorMessageFallback: 'Failed to create treasury proposal',
@@ -1198,6 +1235,7 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			selectedAccount,
 			wallet,
 			errorMessageFallback: 'Failed to create treasury proposal',
 			waitTillFinalizedHash: true,
@@ -1374,6 +1412,7 @@ export class PolkadotApiService {
 		postId,
 		address,
 		wallet,
+		selectedAccount,
 		onSuccess,
 		onFailed,
 		setVaultQrState
@@ -1381,6 +1420,7 @@ export class PolkadotApiService {
 		postId: number;
 		address: string;
 		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
 		onSuccess: () => void;
 		onFailed: (error: string) => void;
 		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
@@ -1396,7 +1436,8 @@ export class PolkadotApiService {
 			onSuccess,
 			onFailed,
 			waitTillFinalizedHash: true,
-			setVaultQrState
+			setVaultQrState,
+			selectedAccount
 		});
 	}
 

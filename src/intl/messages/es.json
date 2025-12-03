@@ -457,6 +457,7 @@
 		"analytics": "Analíticas",
 		"treasuryAnalytics": "Analíticas de Tesorería",
 		"proxies": "Proxies",
+		"identityAndJudgement": "Identidad y Juicio",
 		"Tag": {
 			"new": "Nuevo"
 		}
@@ -1512,6 +1513,49 @@
 		"teleportFundsToPeopleChainFailedDescription": "Hubo un error al teleportar los fondos a People Chain",
 		"BeneficiaryAddress": "Dirección del Beneficiario",
 		"Amount": "Cantidad"
+	},
+	"Judgements": {
+		"identityAndJudgement": "Identidad y Juicio",
+		"requestJudgement": "Solicitar Juicio",
+		"becomeARegistrar": "Convertirse en Registrador",
+		"dashboard": "Panel de control",
+		"registrar": "Registrador",
+		"registrars": "Registradores",
+		"judgementsGranted": "Juicios concedidos",
+		"judgementsRequested": "Juicios solicitados",
+		"judgementsCompleted": "Juicios completados",
+		"thisMonth": "este mes",
+		"registrarDescription": "Una entidad o individuo autorizado para verificar y validar la identidad de cuentas. Los registradores pueden establecer un cargo por sus servicios y limitar su atestación a ciertos campos.",
+		"becomeRegistrarTitle": "Cómo Convertirse en Registrador",
+		"becomeRegistrarDescription": "Para convertirse en registrador en Polkadot, necesita enviar una propuesta de referéndum y obtener la aprobación de la comunidad. Aquí está cómo:",
+		"becomeRegistrarSteps": {
+			"step1": "Enviar una propuesta de referéndum solicitando convertirse en registrador",
+			"step2": "La propuesta será votada por la comunidad",
+			"step3": "Si es aprobada, será agregado a la lista de registradores",
+			"step4": "Podrá establecer su tarifa y comenzar a proporcionar servicios de verificación de identidad"
+		},
+		"continueToCreate": "Continuar a Crear Propuesta",
+		"cancel": "Cancelar",
+		"index": "Índice",
+		"address": "Dirección",
+		"displayName": "Nombre de visualización",
+		"email": "Correo electrónico",
+		"twitter": "Twitter",
+		"status": "Estado",
+		"initiatedOn": "Iniciado el",
+		"latestJudgement": "Último juicio",
+		"receivedRequests": "Solicitudes recibidas",
+		"totalGiven": "Total dado",
+		"fee": "Tarifa",
+		"noJudgementsFound": "No se encontraron juicios",
+		"noRegistrarsFound": "No se encontraron registradores",
+		"searchByAddressOrName": "Ingrese dirección o nombre para buscar"
+	},
+	"JudgementStatus": {
+		"pending": "Pendiente",
+		"approved": "Aprobado",
+		"rejected": "Rechazado",
+		"requested": "Solicitado"
 	},
 	"ConvictionSelector": {
 		"votes": "Votos",

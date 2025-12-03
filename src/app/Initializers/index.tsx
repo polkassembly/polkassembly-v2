@@ -242,6 +242,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 	// set address relations
 	useEffect(() => {
+		if (!userDataClient || (user?.addressRelations && user.id === userDataClient.id)) return;
 		const fetchAddressRelations = async () => {
 			const userAddresses = userDataClient?.addresses;
 			if (!userAddresses?.length) return;
@@ -265,7 +266,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 		fetchAddressRelations();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [userData]);
+	}, [userDataClient]);
 
 	return null;
 }
