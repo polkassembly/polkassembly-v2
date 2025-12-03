@@ -11,7 +11,6 @@ import { useUser } from '@/hooks/useUser';
 import { Settings, Trash2, Copy, PencilIcon } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
-import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { Separator } from '@/app/_shared-components/Separator';
 import JudgementRequestedIcon from '@assets/icons/judgement-requests.svg';
 import JudgementCompletedIcon from '@assets/icons/judgements-completed.svg';
@@ -122,7 +121,7 @@ function MyIdentitiesDashboard() {
 		<div className='w-full'>
 			{/* Stats Cards */}
 			<div className={styles.container}>
-				<div className='flex w-full flex-col gap-x-4 gap-y-4 md:flex-row md:items-center md:justify-between'>
+				<div className='flex w-full flex-col gap-x-4 gap-y-4 md:flex-row md:items-center md:justify-between lg:w-4/5'>
 					<div className={styles.statsContainer}>
 						<Image
 							src={JudgementRequestedIcon}
@@ -196,30 +195,6 @@ function MyIdentitiesDashboard() {
 												network
 											)}
 										</div>
-									</div>
-								)}
-							</p>
-						</div>
-					</div>
-					<Separator
-						orientation='vertical'
-						className='hidden h-11 md:block'
-					/>
-					<div className={styles.statsContainer}>
-						<Image
-							src={JudgementCompletedIcon}
-							alt='Judgement Completed'
-							width={50}
-							height={50}
-						/>
-						<div className={styles.statsContent}>
-							<p className={styles.statsLabel}>{t('Judgements.lastUpdatedOn')}</p>
-							<p className={styles.statsValue}>
-								{isLoading || !identityService ? (
-									<Skeleton className='h-6 w-20' />
-								) : (
-									<div className='flex items-baseline gap-2'>
-										<div className='text-2xl font-bold text-text_primary'>{dayjs(myIdentities?.lastUpdatedOn).format("Do MMM 'YY")}</div>
 									</div>
 								)}
 							</p>
