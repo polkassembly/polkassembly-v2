@@ -62,11 +62,10 @@ function Navbar() {
 		/^(?:\/[a-z]{2})?\/bounty\/[^/]+$/,
 		/^(?:\/[a-z]{2})?\/child-bounty\/[^/]+$/
 	];
-	const shouldShowBanner =
-		/^\/(?:[a-z]{2}\/)?overview$/.test(pathname) ||
-		pathname.endsWith('/overview') ||
-		allowedPaths.some((path) => path.test(pathname));
+	const isHomePage = /^\/(?:[a-z]{2})?$/.test(pathname);
 
+	const shouldShowBanner = isHomePage || allowedPaths.some((path) => path.test(pathname));
+	
 	const handleLocaleChange = async (locale: ELocales) => {
 		setLocaleCookie(locale);
 		setUserPreferences({ ...userPreferences, locale });
