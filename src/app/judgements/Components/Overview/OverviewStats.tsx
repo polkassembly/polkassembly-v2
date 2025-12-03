@@ -6,8 +6,6 @@
 
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useQuery } from '@tanstack/react-query';
-import { countSocialsFromIdentity, mapJudgementStatus } from '@/app/_client-utils/identityUtils';
-import { EJudgementStatus } from '@/_shared/types';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { useState } from 'react';
 import { Separator } from '@/app/_shared-components/Separator';
@@ -32,61 +30,7 @@ function OverviewStats() {
 		queryKey: ['identityOverview', identityService],
 		queryFn: async () => {
 			if (!identityService) return null;
-
-			const api = identityService.getApi();
-			const identityEntries = await api.query.identity.identityOf.entries();
-			const subIdentityEntries = await api.query.identity.subsOf.entries();
-
-			let uniqueIdentities = 0;
-			let totalSubIdentities = 0;
-			let totalSocials = 0;
-			let totalJudgementsGiven = 0;
-
-			identityEntries.forEach(([, value]) => {
-				const identityInfo = value.toHuman() as {
-					info?: {
-						twitter?: { Raw?: string };
-						email?: { Raw?: string };
-						discord?: { Raw?: string };
-						matrix?: { Raw?: string };
-						riot?: { Raw?: string };
-						github?: { Raw?: string };
-						web?: { Raw?: string };
-						[key: string]: { Raw?: string } | undefined;
-					};
-					judgements?: Array<[string, string]>;
-				};
-
-				if (identityInfo?.info) {
-					uniqueIdentities += 1;
-					totalSocials += countSocialsFromIdentity(identityInfo.info);
-
-					if (identityInfo.judgements && Array.isArray(identityInfo.judgements)) {
-						identityInfo.judgements.forEach((judgement) => {
-							const [, judgementData] = judgement;
-							const status = mapJudgementStatus(judgementData);
-							if (status === EJudgementStatus.APPROVED || status === EJudgementStatus.REJECTED) {
-								totalJudgementsGiven += 1;
-							}
-						});
-					}
-				}
-			});
-
-			subIdentityEntries.forEach(([, value]) => {
-				const subsData = value.toJSON() as [string, string[]] | null;
-				if (subsData && Array.isArray(subsData[1])) {
-					totalSubIdentities += subsData[1].length;
-				}
-			});
-
-			return {
-				uniqueIdentities,
-				totalSubIdentities,
-				totalSocials,
-				totalJudgementsGiven,
-				percentageThisMonth: 12.5 // Placeholder percentage value
-			};
+			return identityService.getIdentityOverviewStats();
 		},
 		enabled: !!identityService,
 		staleTime: 60000
@@ -110,9 +54,6 @@ function OverviewStats() {
 							) : (
 								<div className='flex items-baseline gap-2'>
 									<div className='text-2xl font-bold text-text_primary'>{overviewData?.uniqueIdentities || 0}</div>
-									<span className='text-xs font-semibold text-green-500'>
-										↑ {overviewData?.percentageThisMonth.toFixed(1)}% <span className='font-normal text-basic_text'>this month</span>
-									</span>
 								</div>
 							)}
 						</p>
@@ -137,9 +78,6 @@ function OverviewStats() {
 							) : (
 								<div className='flex items-baseline gap-2'>
 									<div className='text-2xl font-bold text-text_primary'>{overviewData?.totalJudgementsGiven || 0}</div>
-									<span className='text-xs font-semibold text-green-500'>
-										↑ {overviewData?.percentageThisMonth.toFixed(1)}% <span className='font-normal text-basic_text'>this month</span>
-									</span>
 								</div>
 							)}
 						</p>

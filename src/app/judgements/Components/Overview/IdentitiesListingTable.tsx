@@ -15,7 +15,6 @@ import { Table, TableHead, TableBody, TableRow, TableHeader } from '@/app/_share
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { useSearchParams } from 'next/navigation';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import { mapJudgementStatus, formatJudgementLabel } from '@/app/_client-utils/identityUtils';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import Image from 'next/image';
 import ChildListingIndicatorIcon from '@assets/icons/child-listing-indicator.svg';
@@ -23,19 +22,19 @@ import ChildListingEndIndicatorIcon from '@assets/icons/child-listing-end-indica
 import { SocialLinksDisplay, JudgementDisplay } from './IdentityComponents';
 import styles from './IdentitiesListingTable.module.scss';
 
-interface IdentityData {
+interface IIdentity {
 	id: string;
 	address: string;
 	displayName: string;
 	isSubIdentity: boolean;
 	parentAddress?: string;
 	socials: {
-		email: string | undefined;
-		twitter: string | undefined;
-		discord: string | undefined;
-		matrix: string | undefined;
-		github: string | undefined;
-		web: string | undefined;
+		email?: string;
+		twitter?: string;
+		discord?: string;
+		matrix?: string;
+		github?: string;
+		web?: string;
 	};
 	judgements: {
 		status: EJudgementStatus;
@@ -43,7 +42,7 @@ interface IdentityData {
 		quality: string;
 		labels: string[];
 	};
-	subIdentities: IdentityData[];
+	subIdentities: IIdentity[];
 	subIdentityCount: number;
 }
 
@@ -54,140 +53,11 @@ function IdentitiesListingTable() {
 	const { identityService } = useIdentityService();
 	const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
-	const { data: allIdentities, isLoading } = useQuery({
+	const { data: allIdentities, isLoading } = useQuery<IIdentity[]>({
 		queryKey: ['allIdentities', identityService],
 		queryFn: async () => {
 			if (!identityService) return [];
-
-			const api = identityService.getApi();
-			const identityEntries = await api.query.identity.identityOf.entries();
-			const subIdentityEntries = await api.query.identity.subsOf.entries();
-
-			const subIdentityMap = new Map<string, string[]>();
-			subIdentityEntries.forEach(([key, value]) => {
-				const parentAddress = key.args[0].toString();
-				const subsData = value.toJSON() as [string, string[]] | null;
-				if (subsData && Array.isArray(subsData[1])) {
-					subIdentityMap.set(parentAddress, subsData[1]);
-				}
-			});
-
-			const identitiesPromises = identityEntries.map(async ([key, value]) => {
-				const address = key.args[0].toString();
-				const identityInfo = value.toHuman() as {
-					info?: {
-						display?: { Raw?: string };
-						twitter?: { Raw?: string };
-						email?: { Raw?: string };
-						discord?: { Raw?: string };
-						matrix?: { Raw?: string };
-						github?: { Raw?: string };
-						web?: { Raw?: string };
-					};
-					judgements?: Array<[string, string]>;
-				};
-
-				if (!identityInfo?.info) return null;
-
-				const socials = {
-					email: identityInfo.info.email?.Raw,
-					twitter: identityInfo.info.twitter?.Raw,
-					discord: identityInfo.info.discord?.Raw,
-					matrix: identityInfo.info.matrix?.Raw,
-					github: identityInfo.info.github?.Raw,
-					web: identityInfo.info.web?.Raw
-				};
-
-				let judgementStatus = EJudgementStatus.PENDING;
-				let judgementCount = 0;
-				let judgementLabels: string[] = [];
-
-				if (identityInfo.judgements && Array.isArray(identityInfo.judgements)) {
-					const approvedJudgements =
-						identityInfo.judgements
-							.map((judgement) => {
-								const [, judgementData] = judgement;
-								const judgementString = String(judgementData);
-								return {
-									status: mapJudgementStatus(judgementString),
-									label: formatJudgementLabel(judgementString)
-								};
-							})
-							.filter((judgement) => judgement.status === EJudgementStatus.APPROVED || judgement.status === EJudgementStatus.REJECTED) || [];
-					judgementLabels = approvedJudgements.map((judgement) => judgement.label);
-					judgementCount = judgementLabels.length;
-					if (approvedJudgements.length > 0) {
-						const lastJudgement = approvedJudgements[approvedJudgements.length - 1];
-						judgementStatus = lastJudgement.status;
-					}
-				}
-
-				const subAddresses = subIdentityMap.get(address) || [];
-				const subIdentities: IdentityData[] = await Promise.all(
-					subAddresses.map(async (subAddress) => {
-						const subIdentity = await identityService.getOnChainIdentity(subAddress);
-						const subInfo = await identityService.getSubIdentityInfo(subAddress);
-
-						const approvedSubJudgements =
-							(subIdentity.judgements || [])
-								.map((judgement) => {
-									const judgementArray = [...judgement];
-									const judgementData = judgementArray[1];
-									const judgementString = String(judgementData);
-									return {
-										status: mapJudgementStatus(judgementString),
-										label: formatJudgementLabel(judgementString)
-									};
-								})
-								.filter((j: { status: EJudgementStatus }) => j.status === EJudgementStatus.APPROVED || j.status === EJudgementStatus.REJECTED) || [];
-
-						const approvedSubJudgementLabels = approvedSubJudgements.map((j) => j.label);
-
-						return {
-							id: subAddress,
-							address: subAddress,
-							displayName: subInfo.displayName || subIdentity.display || 'Unnamed',
-							isSubIdentity: true,
-							parentAddress: address,
-							socials: {
-								email: subIdentity.email,
-								twitter: subIdentity.twitter,
-								discord: subIdentity.discord,
-								matrix: subIdentity.matrix,
-								github: subIdentity.github,
-								web: subIdentity.web
-							},
-							judgements: {
-								status: approvedSubJudgements[approvedSubJudgements.length - 1]?.status || EJudgementStatus.PENDING,
-								count: approvedSubJudgementLabels.length,
-								quality: 'Reasonable',
-								labels: approvedSubJudgementLabels
-							},
-							subIdentities: [],
-							subIdentityCount: 0
-						};
-					})
-				);
-
-				return {
-					id: address,
-					address,
-					displayName: identityInfo.info.display?.Raw || 'Noob',
-					isSubIdentity: false,
-					socials,
-					judgements: {
-						status: judgementStatus,
-						count: judgementCount,
-						quality: judgementCount > 0 ? 'Good Quality, Known Good' : 'Reasonable',
-						labels: judgementLabels
-					},
-					subIdentities,
-					subIdentityCount: subIdentities.length
-				};
-			});
-
-			const identitiesResults = await Promise.all(identitiesPromises);
-			return identitiesResults.filter((identity): identity is IdentityData => identity !== null);
+			return identityService.getAllIdentities();
 		},
 		enabled: !!identityService,
 		staleTime: 60000
@@ -311,7 +181,7 @@ function IdentitiesListingTable() {
 
 								{/* Sub-Identity Rows */}
 								{expandedRows.has(identity.address) &&
-									identity.subIdentities.map((sub, index) => (
+									identity.subIdentities.map((sub, index: number) => (
 										<TableRow
 											key={sub.id}
 											className={`${styles.subIdentityRow} ${index === identity.subIdentities.length - 1 ? 'border-solid' : 'border-dashed'}`}

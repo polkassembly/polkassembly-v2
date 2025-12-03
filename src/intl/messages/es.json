@@ -1533,6 +1533,8 @@
 		"pendingRequests": "Solicitudes pendientes",
 		"newRequests": "Nuevas solicitudes",
 		"thisMonth": "este mes",
+		"request": "Solicitud",
+		"overview": "Resumen",
 		"registrarDescription": "Una entidad o individuo autorizado para verificar y validar la identidad de cuentas. Los registradores pueden establecer un cargo por sus servicios y limitar su atestación a ciertos campos.",
 		"becomeRegistrarTitle": "Cómo Convertirse en Registrador",
 		"becomeRegistrarDescription": "Para convertirse en registrador en Polkadot, necesita enviar una propuesta de referéndum y obtener la aprobación de la comunidad. Aquí está cómo:",

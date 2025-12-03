@@ -1569,42 +1569,4 @@ export class SubsquidService extends SubsquidUtils {
 
 		return trackStats;
 	}
-
-	static async GetBlockInfo({ network, blockNumber }: { network: ENetwork; blockNumber: number }): Promise<{
-		height: number;
-		hash: string;
-		timestamp: string;
-		extrinsics: Array<{
-			id: string;
-			index: number;
-			hash: string;
-			section: string;
-			method: string;
-			args: unknown;
-			signer: string;
-			success: boolean;
-			events: Array<{
-				id: string;
-				index: number;
-				section: string;
-				method: string;
-				data: unknown;
-			}>;
-		}>;
-	} | null> {
-		const gqlClient = this.subsquidGqlClient(network);
-
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(SubsquidQueries.GET_BLOCK_INFO_BY_BLOCK_NUMBER, { blockNumber_eq: blockNumber }).toPromise();
-
-		if (subsquidErr || !subsquidData) {
-			console.error(`Error fetching block info from Subsquid: ${subsquidErr}`);
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching block info from Subsquid');
-		}
-
-		if (!subsquidData.blocks || subsquidData.blocks.length === 0) {
-			return null;
-		}
-
-		return subsquidData.blocks[0];
-	}
 }

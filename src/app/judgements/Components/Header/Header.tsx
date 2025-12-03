@@ -38,14 +38,14 @@ function Header() {
 							className={styles.header_tab}
 							value={EJudgementDashboardTabs.REQUESTS}
 						>
-							Requests
+							{t('Judgements.requests')}
 						</TabsTrigger>
 					)}
 					<TabsTrigger
 						className={styles.header_tab}
 						value={EJudgementDashboardTabs.OVERVIEW}
 					>
-						Overview
+						{t('Judgements.overview')}
 					</TabsTrigger>
 					<TabsTrigger
 						className={styles.header_tab}

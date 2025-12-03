@@ -1561,6 +1561,8 @@
 		"pendingRequests": "Pending Requests",
 		"newRequests": "New Requests",
 		"thisMonth": "this month",
+		"request": "Request",
+		"overview": "Overview",
 		"registrarDescription": "An entity or individual authorized to verify and validate the identity of accounts. Registrars can set a fee for their services and limit their attestation to certain fields.",
 		"becomeRegistrarTitle": "How to Become a Registrar",
 		"becomeRegistrarDescription": "To become a registrar on Polkadot, you need to submit a referendum proposal and get it approved by the community. Here's how:",

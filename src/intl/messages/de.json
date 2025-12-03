@@ -1531,6 +1531,8 @@
 		"pendingRequests": "Ausstehende Anfragen",
 		"newRequests": "Neue Anfragen",
 		"thisMonth": "dieser Monat",
+		"request": "Anfrage",
+		"overview": "Übersicht",
 		"registrarDescription": "Eine Entität oder ein Individuum, die/der autorisiert ist, die Identität von Konten zu verifizieren und zu validieren. Registrars können einen Gebührensatz für ihre Dienstleistungen festlegen und ihre Attestation auf bestimmte Felder beschränken.",
 		"becomeRegistrarTitle": "Wie man Registrar wird",
 		"becomeRegistrarDescription": "Um Registrar in Polkadot zu werden, müssen Sie einen Referendumsvorschlag einreichen und von der Community genehmigt werden. So geht's:",

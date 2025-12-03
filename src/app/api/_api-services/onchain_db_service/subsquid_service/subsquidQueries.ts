@@ -1474,31 +1474,4 @@ export class SubsquidQueries {
 			}
 		}
 	`;
-
-	protected static GET_BLOCK_INFO_BY_BLOCK_NUMBER = `
-		query GetBlockInfoByBlockNumber($blockNumber_eq: Int!) {
-			blocks(where: {height_eq: $blockNumber_eq}, limit: 1) {
-				height
-				hash
-				timestamp
-				extrinsics {
-					id
-					index
-					hash
-					section
-					method
-					args
-					signer
-					success
-					events {
-						id
-						index
-						section
-						method
-						data
-					}
-				}
-			}
-		}
-	`;
 }

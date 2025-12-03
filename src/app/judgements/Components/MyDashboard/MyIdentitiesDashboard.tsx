@@ -6,8 +6,7 @@
 
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { EJudgementStatus, ENotificationStatus } from '@/_shared/types';
-import { mapJudgementStatus } from '@/app/_client-utils/identityUtils';
+import { ENotificationStatus } from '@/_shared/types';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '@/app/_shared-components/Table';
 import { useUser } from '@/hooks/useUser';
@@ -48,109 +47,15 @@ function MyIdentitiesDashboard() {
 		queryFn: async () => {
 			if (!identityService || !user?.defaultAddress) return null;
 
-			const identities = [];
-			let totalJudgements = 0;
+			const data = await identityService.getUserIdentityDashboardData(user.defaultAddress);
 
-			const mainIdentity = await identityService.getOnChainIdentity(user.defaultAddress);
-			const api = identityService.getApi();
-
-			const getUserBalances = await api.derive.balances.all(user.defaultAddress);
-			const balance = getUserBalances.freeBalance.toString();
-
-			let lastUpdatedBlock: number | undefined;
-			try {
-				const identityData = await api.query.identity.identityOf(user.defaultAddress);
-				const blockHash = identityData?.createdAtHash || (await api.rpc.chain.getBlockHash());
-				const blockHeader = await api.rpc.chain.getHeader(blockHash);
-				lastUpdatedBlock = blockHeader.number.toNumber();
-			} catch {
-				lastUpdatedBlock = undefined;
-			}
-
-			if (mainIdentity.isIdentitySet) {
-				const judgements = mainIdentity.judgements.map((judgement) => {
-					const judgementArray = [...judgement];
-					const judgementStatus = judgementArray[1];
-					return mapJudgementStatus(String(judgementStatus));
-				});
-
-				const approvedJudgements = judgements.filter((j: EJudgementStatus) => j === EJudgementStatus.APPROVED || j === EJudgementStatus.REJECTED);
-				totalJudgements += approvedJudgements.length;
-
-				const socials = {
-					twitter: mainIdentity.twitter,
-					email: mainIdentity.email,
-					discord: mainIdentity.discord,
-					matrix: mainIdentity.matrix,
-					github: mainIdentity.github,
-					web: mainIdentity.web
-				};
-
-				identities.push({
-					address: user.defaultAddress,
-					displayName: mainIdentity.display,
-					type: 'Direct' as const,
-					socials,
-					judgements: approvedJudgements,
-					balance,
-					lastUpdated: new Date(),
-					lastUpdatedBlock,
-					canEdit: true,
-					canDelete: false
-				});
-			}
-
-			const subAddresses = await identityService.getSubIdentities(user.defaultAddress);
-
-			const subIdentitiesData = await Promise.all(
-				subAddresses.map(async (subAddress) => {
-					const subInfo = await identityService.getSubIdentityInfo(subAddress);
-					const subIdentity = await identityService.getOnChainIdentity(subAddress);
-					const subAccountInfo = await api.derive.balances.all(subAddress);
-					const subBalance = subAccountInfo.freeBalance.toString();
-
-					const subJudgements = subIdentity.judgements.map((judgement) => {
-						const judgementArray = [...judgement];
-						const judgementStatus = judgementArray[1];
-						return mapJudgementStatus(String(judgementStatus));
-					});
-
-					const approvedSubJudgements = subJudgements.filter((j: EJudgementStatus) => j === EJudgementStatus.APPROVED || j === EJudgementStatus.REJECTED);
-					totalJudgements += approvedSubJudgements.length;
-
-					return {
-						address: subAddress,
-						displayName: subInfo.displayName || subIdentity.display,
-						type: SUB_IDENTITY_TYPE,
-						socials: {
-							twitter: subIdentity.twitter,
-							email: subIdentity.email,
-							discord: subIdentity.discord,
-							matrix: subIdentity.matrix,
-							github: subIdentity.github,
-							web: subIdentity.web
-						},
-						judgements: approvedSubJudgements,
-						balance: subBalance,
-						lastUpdated: new Date(),
-						lastUpdatedBlock,
-						canEdit: false,
-						canDelete: true
-					};
-				})
-			);
-
-			identities.push(...subIdentitiesData);
 			return {
-				totalSubIdentities: subAddresses.length,
-				totalJudgements,
-				totalBalance: balance,
+				...data,
 				lastUpdatedOn: BlockCalculationsService.getDateFromBlockNumber({
-					currentBlockNumber: new BN(lastUpdatedBlock || 0),
-					targetBlockNumber: new BN(lastUpdatedBlock || 0),
+					currentBlockNumber: new BN(data.lastUpdatedBlock || 0),
+					targetBlockNumber: new BN(data.lastUpdatedBlock || 0),
 					network
-				}),
-				identities
+				})
 			};
 		},
 		enabled: !!identityService && !!user?.defaultAddress,

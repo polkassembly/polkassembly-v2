@@ -180,58 +180,6 @@ export function getSocialsFromIdentity(identity: IdentityData) {
 	};
 }
 
-export interface IIdentityUpdate {
-	type: 'IdentitySet' | 'JudgementRequested' | 'JudgementGiven' | 'IdentityCleared' | 'SubIdentityAdded' | 'SubIdentityRemoved';
-	timestamp: string;
-	blockNumber: number;
-	blockHash: string;
-	extrinsicHash: string;
-	extrinsicIndex: number;
-	signer: string;
-	success: boolean;
-	changes?: Array<{ field: string; oldValue?: string; newValue?: string }>;
-	registrarIndex?: number;
-	registrarAddress?: string;
-	judgement?: string;
-	maxFee?: string;
-	events: Array<{ section: string; method: string; data: unknown }>;
-}
-
-export interface IIdentityFieldValue {
-	Raw?: string;
-	BlakeTwo256?: string;
-	Sha256?: string;
-	Keccak256?: string;
-	ShaThree256?: string;
-	None?: null;
-}
-
-export interface IIdentityInfo {
-	display?: IIdentityFieldValue;
-	legal?: IIdentityFieldValue;
-	web?: IIdentityFieldValue;
-	matrix?: IIdentityFieldValue;
-	email?: IIdentityFieldValue;
-	twitter?: IIdentityFieldValue;
-	discord?: IIdentityFieldValue;
-	github?: IIdentityFieldValue;
-	image?: IIdentityFieldValue;
-	pgpFingerprint?: string | null;
-	additional?: Array<[IIdentityFieldValue, IIdentityFieldValue]>;
-}
-
-export function formatIdentityUpdateType(type: IIdentityUpdate['type']): string {
-	const typeMap: Record<string, string> = {
-		IdentitySet: 'Identity Set',
-		JudgementRequested: 'Judgement Requested',
-		JudgementGiven: 'Judgement Given',
-		IdentityCleared: 'Identity Cleared',
-		SubIdentityAdded: 'Sub-Identity Added',
-		SubIdentityRemoved: 'Sub-Identity Removed'
-	};
-	return typeMap[type] || type;
-}
-
 export function formatJudgementLabel(judgement: string): string {
 	switch (judgement) {
 		case EJudgementStatusType.REASONABLE:

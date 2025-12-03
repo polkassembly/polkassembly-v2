@@ -1532,6 +1532,8 @@
 		"pendingRequests": "保留中の要求",
 		"newRequests": "新しい要求",
 		"thisMonth": "今月",
+		"request": "要求",
+		"overview": "概览",
 		"registrarDescription": "アカウントの身元を検証および検証する権限を持つエンティティまたは個人。登録者はサービスの料金を設定し、特定のフィールドに対するアテステーションを制限できます。",
 		"becomeRegistrarTitle": "登録者になる方法",
 		"becomeRegistrarDescription": "Polkadotで登録者になるには、レファレンダム提案を提出し、コミュニティの承認を得る必要があります。方法は以下の通りです：",
