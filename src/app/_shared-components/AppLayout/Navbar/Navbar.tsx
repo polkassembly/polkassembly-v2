@@ -56,14 +56,8 @@ function Navbar() {
 	const network = getCurrentNetwork();
 	const pathname = usePathname();
 
-	const allowedPaths = [
-		/^(?:\/[a-z]{2})?\/post\/[^/]+$/,
-		/^(?:\/[a-z]{2})?\/proposal\/[^/]+$/,
-		/^(?:\/[a-z]{2})?\/referenda\/[^/]+$/,
-		/^(?:\/[a-z]{2})?\/bounty\/[^/]+$/,
-		/^(?:\/[a-z]{2})?\/child-bounty\/[^/]+$/
-	];
-	const isHomePage = /^\/(?:[a-z]{2})?$/.test(pathname);
+	const allowedPaths = [/^\/post\/[^/]+$/, /^\/proposal\/[^/]+$/, /^\/referenda\/[^/]+$/, /^\/bounty\/[^/]+$/, /^\/child-bounty\/[^/]+$/];
+	const isHomePage = pathname === '/';
 
 	const shouldShowBanner = isHomePage || allowedPaths.some((path) => path.test(pathname));
 
