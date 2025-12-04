@@ -273,12 +273,12 @@ function ListingCard({
 								)}
 							</div>
 						)}
-				</div>
 				{data.onChainInfo?.status && (
 						<div className='flex'>
 							<StatusTag status={data.onChainInfo?.status} />
 						</div>
 					)}
+				</div>
 			</div>
 		</Link>
 	);
