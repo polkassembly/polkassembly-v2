@@ -121,8 +121,11 @@ function IdentitiesListingTable() {
 					</TableHeader>
 					<TableBody>
 						{paginatedData.map((identity) => (
-							<div key={identity.id}>
-								<TableRow className={styles.tableRow}>
+							<>
+								<TableRow
+									key={identity.id}
+									className={styles.tableRow}
+								>
 									<td className='py-4 pl-2 pr-6'>
 										<div className='flex items-center gap-1'>
 											<span className='text-xs text-basic_text'>
@@ -240,7 +243,7 @@ function IdentitiesListingTable() {
 											<td className='px-4 py-2' />
 										</TableRow>
 									))}
-							</div>
+							</>
 						))}
 					</TableBody>
 				</Table>

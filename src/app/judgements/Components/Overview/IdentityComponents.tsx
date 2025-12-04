@@ -123,7 +123,7 @@ export function JudgementDisplay({ count, labels, size = 'md' }: JudgementDispla
 
 	return (
 		<div className='flex items-center gap-1'>
-			<span className={`rounded px-2 py-1 ${badgeClass} font-semibold text-text_primary`}>{labels[0]}</span>+{' '}
+			<span className={`rounded px-2 py-1 ${badgeClass} font-semibold text-text_primary`}>{labels[0]}</span>
 			{count > 1 && labels.length > 1 && (
 				<Tooltip>
 					<TooltipTrigger asChild>
