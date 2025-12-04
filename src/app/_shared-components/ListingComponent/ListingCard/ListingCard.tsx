@@ -195,12 +195,6 @@ function ListingCard({
 										</Tooltip>
 									</>
 								)}
-								{data.onChainInfo?.status && (
-									<>
-										<span>|</span>
-										<StatusTag status={data.onChainInfo?.status} />
-									</>
-								)}
 							</div>
 						</div>
 					</div>
