@@ -195,12 +195,6 @@ function ListingCard({
 										</Tooltip>
 									</>
 								)}
-								{data.onChainInfo?.status && (
-									<>
-										<span>|</span>
-										<StatusTag status={data.onChainInfo?.status} />
-									</>
-								)}
 							</div>
 						</div>
 					</div>
@@ -279,6 +273,11 @@ function ListingCard({
 								)}
 							</div>
 						)}
+				{data.onChainInfo?.status && (
+						<div className='flex'>
+							<StatusTag status={data.onChainInfo?.status} />
+						</div>
+					)}
 				</div>
 			</div>
 		</Link>
