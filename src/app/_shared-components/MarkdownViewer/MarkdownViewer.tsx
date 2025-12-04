@@ -136,7 +136,7 @@ const markdownComponents: Components = {
 	code: 'code',
 	pre: 'pre',
 	img: ({ src, alt, height, width }) => {
-		if (!src) {
+		if (!src || typeof src !== 'string') {
 			return null;
 		}
 
