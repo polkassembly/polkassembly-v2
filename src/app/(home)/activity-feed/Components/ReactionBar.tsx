@@ -75,7 +75,7 @@ function ReactionBar({
 						onClick={() => handleAuthenticatedAction(handleSubscribe)}
 					>
 						{isCurrentlySubscribed ? <IoBookmark className='mr-2 h-4 w-4 text-bg_pink' /> : <IoBookmarkOutline className='mr-2 h-4 w-4 text-text_pink' />}
-						<span className='text-bg_pink'>{isCurrentlySubscribed ? t('ActivityFeed.unsubscribe') : t('ActivityFeed.subscribe')}</span>
+						<span className='text-bg_pink md:whitespace-nowrap'>{isCurrentlySubscribed ? t('ActivityFeed.unsubscribe') : t('ActivityFeed.subscribe')}</span>
 					</button>
 				)}
 

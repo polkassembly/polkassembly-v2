@@ -15,6 +15,7 @@ import { useSuccessModal } from '@/hooks/useSuccessModal';
 import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import dynamic from 'next/dynamic';
 import { canVote } from '@/_shared/_utils/canVote';
+import { StatusCodes } from 'http-status-codes';
 import PostHeader from './PostHeader/PostHeader';
 import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
@@ -142,6 +143,9 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 		const { data, error } = await NextApiClientService.fetchProposalDetails({ proposalType: postData.proposalType, indexOrHash: index, skipCache: true });
 
 		if (error || !data || !data.id) {
+			if (error && error.status === StatusCodes.NOT_FOUND) {
+				return undefined;
+			}
 			console.log(error?.message || 'Failed to fetch post details');
 			return postData;
 		}

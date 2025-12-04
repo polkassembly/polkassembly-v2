@@ -18,6 +18,7 @@ import { BN } from '@polkadot/util';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
+import { useAssethubApiService } from '@/hooks/useAssethubApiService';
 import { Separator } from '../../Separator';
 import Address from '../../Profile/Address/Address';
 import { Skeleton } from '../../Skeleton';
@@ -204,6 +205,7 @@ function BeneficiaryPayoutsList({ beneficiaries, usedInOnchainInfo }: Beneficiar
 	const t = useTranslations('PostDetails.BeneficiariesDetails');
 	const network = getCurrentNetwork();
 	const { apiService } = usePolkadotApiService();
+	const { assethubApiService } = useAssethubApiService();
 	const [showAllBeneficiaries, setShowAllBeneficiaries] = useState(false);
 	const [beneficiariesWithDetails, setBeneficiariesWithDetails] = useState<IBeneficiaryPayoutDetails[]>(beneficiaries);
 
@@ -211,7 +213,11 @@ function BeneficiaryPayoutsList({ beneficiaries, usedInOnchainInfo }: Beneficiar
 		if (!apiService || !network) return beneficiariesWithDetails || [];
 
 		try {
-			const currentBlockHeight = await apiService.getBlockHeight();
+			const currentBlockHeight = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network)
+				? await assethubApiService?.getBlockHeight()
+				: await apiService?.getBlockHeight();
+
+			if (!currentBlockHeight) return beneficiariesWithDetails;
 
 			return beneficiaries.map((beneficiary) => ({
 				...beneficiary,

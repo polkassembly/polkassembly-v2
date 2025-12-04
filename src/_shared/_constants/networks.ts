@@ -24,6 +24,7 @@ import USDCIcon from '@/_assets/icons/usdc.svg';
 import USDTIcon from '@/_assets/icons/usdt.svg';
 import MYTHIcon from '@/_assets/icons/myth.svg';
 import DEDIcon from '@/_assets/icons/ded.png';
+import { KUSAMA_ASSETHUB_UNIFIED_SQUID_URL, POLKADOT_ASSETHUB_UNIFIED_SQUID_URL } from '@/app/api/_api-constants/apiEnvVars';
 
 interface ISocialLink {
 	id: string;
@@ -248,6 +249,10 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 	[ENetwork.PASEO]: {
 		identityMinDeposit: new BN('1000000000000'),
 		rpcEndpoints: [
+			{
+				name: VIA_DWELLIR,
+				url: 'wss://paseo-rpc.n.dwellir.com'
+			},
 			{
 				name: 'via IBP 1',
 				url: 'wss://sys.ibp.network/people-paseo'
@@ -3050,7 +3055,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		palletInstance: '50',
 		blockTime: 6000,
 		ss58Format: 0,
-		subsquidUrl: 'https://polkassembly.squids.live/polkadot-assethub-unified-pa@v2/api/graphql',
+		subsquidUrl: POLKADOT_ASSETHUB_UNIFIED_SQUID_URL,
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.POLKADOT],
 		tokenSymbol: 'DOT',
 		rpcEndpoints: [
@@ -3136,7 +3141,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		name: 'Kusama',
 		blockTime: 6000,
 		ss58Format: 2,
-		subsquidUrl: 'https://polkassembly.squids.live/kusama-assethub-unified-pa@v1/api/graphql',
+		subsquidUrl: KUSAMA_ASSETHUB_UNIFIED_SQUID_URL,
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.KUSAMA],
 		supportedAssets: {
 			'1984': {
@@ -3339,8 +3344,12 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		tokenSymbol: 'PAS',
 		rpcEndpoints: [
 			{
+				name: 'via Dotters',
+				url: 'wss://paseo.dotters.network'
+			},
+			{
 				name: VIA_DWELLIR,
-				url: 'wss://paseo-rpc.dwellir.com'
+				url: 'wss://paseo-rpc.n.dwellir.com'
 			},
 			{
 				name: 'via Amforc',

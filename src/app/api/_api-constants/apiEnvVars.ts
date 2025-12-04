@@ -29,7 +29,9 @@ export const {
 	NEWS_GOOGLE_SHEET_ID = '',
 	NEWS_GOOGLE_SHEET_NAME = '',
 	TELEGRAM_BOT_TOKEN = '',
-	TELEGRAM_CHAT_ID = ''
+	TELEGRAM_CHAT_ID = '',
+	KUSAMA_ASSETHUB_UNIFIED_SQUID_URL = '',
+	POLKADOT_ASSETHUB_UNIFIED_SQUID_URL = ''
 } = process.env;
 
 export const IS_CACHE_ENABLED = process.env.IS_CACHE_ENABLED === 'true';

@@ -105,6 +105,7 @@ function KillReferendum({ onSuccess }: { onSuccess: (proposalId: number) => void
 
 		apiService.createProposal({
 			address: userPreferences.selectedAccount.address,
+			selectedAccount: userPreferences.selectedAccount,
 			wallet: userPreferences.wallet,
 			setVaultQrState,
 			track: EPostOrigin.REFERENDUM_KILLER,

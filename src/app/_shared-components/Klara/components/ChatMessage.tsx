@@ -118,8 +118,8 @@ function ChatMessage({ message, onFollowUpClick, userId, conversationId, isStrea
 
 	return (
 		<div className={`flex w-full ${isUserMessage ? 'justify-end' : 'justify-start'}`}>
-			<div className='max-w-[80%]'>
-				<div className={`rounded-xl px-3 py-2 ${isUserMessage ? 'bg-klara_user_msg_bg text-white' : 'bg-klara_ai_msg_bg text-black dark:text-white'}`}>
+			<div className='max-w-[80%] break-words'>
+				<div className={`break-words rounded-xl px-3 py-2 ${isUserMessage ? 'bg-klara_user_msg_bg text-white' : 'bg-klara_ai_msg_bg text-black dark:text-white'}`}>
 					{isUserMessage ? (
 						<p className='whitespace-pre-wrap text-sm'>{message.text}</p>
 					) : (
