@@ -92,7 +92,7 @@ function ListingCard({
 									<>
 										<Address
 											address={data.onChainInfo?.proposer}
-											textClassName='max-w-[40px] truncate sm:max-w-full'
+											textClassName='max-w-[80px] truncate sm:max-w-full'
 										/>
 										<span>|</span>
 									</>
@@ -273,7 +273,6 @@ function ListingCard({
 								)}
 							</div>
 						)}
-
 					{data.onChainInfo?.status && (
 						<div className='flex'>
 							<StatusTag status={data.onChainInfo?.status} />
