@@ -34,7 +34,7 @@ function JudgementTabs() {
 	}
 	return (
 		<Tabs
-			defaultValue={activeTab}
+			value={activeTab}
 			className='w-full'
 			onValueChange={(value) => setActiveTab(value as EJudgementDashboardTabs)}
 		>
