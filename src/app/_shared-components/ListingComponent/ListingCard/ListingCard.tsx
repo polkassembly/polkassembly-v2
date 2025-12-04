@@ -273,7 +273,7 @@ function ListingCard({
 								)}
 							</div>
 						)}
-				{data.onChainInfo?.status && (
+					{data.onChainInfo?.status && (
 						<div className='flex'>
 							<StatusTag status={data.onChainInfo?.status} />
 						</div>
