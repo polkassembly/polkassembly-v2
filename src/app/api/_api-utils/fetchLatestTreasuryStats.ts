@@ -10,6 +10,7 @@ import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/netwo
 import { decimalToBN } from '@/_shared/_utils/decimalToBN';
 import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 import { APIError } from './apiError';
+import { fetchHydrationADotBalance } from './fetchHydrationADotBalance';
 
 interface CoinGeckoResponse {
 	[network: string]: { usd: number; usd_24h_change: number };
@@ -158,8 +159,10 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 
 		// Initialize all API connections
 		const apiProviders = {
-			relayChain: new WsProvider(config.relayChainRpc),
-			assetHub: new WsProvider(config.assetHubRpc),
+			// After AssetHub migration: relay chain and AssetHub RPCs are swapped for migrated networks
+			// The "relayChain" API actually connects to AssetHub for post-migration networks
+			relayChain: [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? new WsProvider(config.assetHubRpc) : new WsProvider(config.relayChainRpc),
+			assetHub: [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? new WsProvider(config.relayChainRpc) : new WsProvider(config.assetHubRpc),
 			hydration: config.hydrationRpc ? new WsProvider(config.hydrationRpc) : undefined
 		};
 
@@ -172,19 +175,21 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 		// Fetch relay chain data
 		const relayChainTasks = [
 			// Treasury balance and next burn
-			relayChainApi.query.system.account(config.treasuryAccount).then((accountInfo) => {
-				const treasuryBalance = (accountInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
-				const nextBurn = new BN(treasuryBalance).mul(config.burnPercentage.numerator).div(config.burnPercentage.denominator).toString();
+			([ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? assetHubApi : relayChainApi).query.system
+				.account(config.treasuryAccount)
+				.then((accountInfo) => {
+					const treasuryBalance = (accountInfo as unknown as { data: { free: { toString: () => string } } }).data.free.toString();
+					const nextBurn = new BN(treasuryBalance).mul(config.burnPercentage.numerator).div(config.burnPercentage.denominator).toString();
 
-				treasuryStats = {
-					...treasuryStats,
-					relayChain: {
-						...treasuryStats.relayChain,
-						nativeToken: treasuryBalance,
-						nextBurn
-					}
-				};
-			}),
+					treasuryStats = {
+						...treasuryStats,
+						relayChain: {
+							...treasuryStats.relayChain,
+							nativeToken: treasuryBalance,
+							nextBurn
+						}
+					};
+				}),
 
 			// next spend at - calculate when the current spend period ends
 			relayChainApi.rpc.chain.getHeader().then((header) => {
@@ -211,7 +216,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			// Bounties data
 			(async () => {
 				try {
-					const deriveBounties = await relayChainApi.derive.bounties?.bounties();
+					const deriveBounties = await ([ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? assetHubApi : relayChainApi).derive.bounties?.bounties();
 					const activeBounties = (deriveBounties as unknown as unknown[]).filter((item) => {
 						const { isFunded, isCuratorProposed, isActive } =
 							(item as { bounty?: { status: { isFunded?: boolean; isCuratorProposed?: boolean; isActive?: boolean } } })?.bounty?.status || {};
@@ -242,7 +247,9 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 							}
 
 							try {
-								const accountData = await relayChainApi.query.system.account(address);
+								const accountData = await ([ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) ? assetHubApi : relayChainApi).query.system.account(
+									address
+								);
 								const accountInfo = accountData as unknown as {
 									data: { free: { toString: () => string }; reserved: { toString: () => string } };
 								};
@@ -285,6 +292,36 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 			if (!assetHubApi) return [];
 			const assetHubTasks = [];
 
+			if ([ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network)) {
+				if (config.usdtIndex) {
+					assetHubTasks.push(
+						assetHubApi.query.assets.account(config.usdtIndex, config.treasuryAccount).then((balance) => {
+							treasuryStats = {
+								...treasuryStats,
+								assetHub: {
+									...treasuryStats.assetHub,
+									usdt: getBalanceIfExists(balance)
+								}
+							};
+						})
+					);
+				}
+
+				if (config.usdcIndex) {
+					assetHubTasks.push(
+						assetHubApi.query.assets.account(config.usdcIndex, config.treasuryAccount).then((balance) => {
+							treasuryStats = {
+								...treasuryStats,
+								assetHub: {
+									...treasuryStats.assetHub,
+									usdc: getBalanceIfExists(balance)
+								}
+							};
+						})
+					);
+				}
+			}
+
 			if (config.assetHubTreasuryAddress) {
 				assetHubTasks.push(
 					assetHubApi.query.system.account(config.assetHubTreasuryAddress).then((treasuryAddressInfo) => {
@@ -306,7 +343,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 								...treasuryStats,
 								assetHub: {
 									...treasuryStats.assetHub,
-									usdt: getBalanceIfExists(balance)
+									usdt: new BN(getBalanceIfExists(balance)).add(new BN(treasuryStats.assetHub?.usdt || '0')).toString()
 								}
 							};
 						})
@@ -321,7 +358,7 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 								...treasuryStats,
 								assetHub: {
 									...treasuryStats.assetHub,
-									usdc: getBalanceIfExists(balance)
+									usdc: new BN(getBalanceIfExists(balance)).add(new BN(treasuryStats.assetHub?.usdc || '0')).toString()
 								}
 							};
 						})
@@ -426,6 +463,10 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 						return { free: ZERO_BN, reserved: ZERO_BN };
 					};
 
+					const hydrationADotBalance = await fetchHydrationADotBalance(address, hydrationApi, network);
+
+					hydrationNativeTokenBalance = hydrationNativeTokenBalance.add(hydrationADotBalance);
+
 					// Get all token balances for each address
 					const [nativeTokenBalance, usdcBalance, usdtBalance] = await Promise.all([
 						config.hydrationNativeTokenAssetId ? getTokenBalance(config.hydrationNativeTokenAssetId) : null,
@@ -433,9 +474,11 @@ export async function fetchLatestTreasuryStats(network: ENetwork): Promise<ITrea
 						config.hydrationUsdtAssetId ? getTokenBalance(config.hydrationUsdtAssetId) : null
 					]);
 
-					hydrationNativeTokenBalance = !nativeTokenBalance ? ZERO_BN : hydrationNativeTokenBalance.add(nativeTokenBalance.free).add(nativeTokenBalance.reserved);
-					hydrationUsdcBalance = !usdcBalance ? ZERO_BN : hydrationUsdcBalance.add(usdcBalance.free).add(usdcBalance.reserved);
-					hydrationUsdtBalance = !usdtBalance ? ZERO_BN : hydrationUsdtBalance.add(usdtBalance.free).add(usdtBalance.reserved);
+					if (nativeTokenBalance) hydrationNativeTokenBalance = hydrationNativeTokenBalance.add(nativeTokenBalance.free).add(nativeTokenBalance.reserved);
+
+					if (usdcBalance) hydrationUsdcBalance = hydrationUsdcBalance.add(usdcBalance.free).add(usdcBalance.reserved);
+
+					if (usdtBalance) hydrationUsdtBalance = hydrationUsdtBalance.add(usdtBalance.free).add(usdtBalance.reserved);
 				})
 			);
 

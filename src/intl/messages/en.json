@@ -27,7 +27,8 @@
 		"bounties": "Bounties",
 		"ambassador": "Ambassador",
 		"loans": "Loans",
-		"address": "Address"
+		"address": "Address",
+		"assets": "Assets"
 	},
 	"ActivityFeed": {
 		"please": "Please",
@@ -451,11 +452,13 @@
 		"LeaseAdmin": "Lease Admin",
 		"GeneralAdmin": "General Admin",
 		"chatWithKlara": "Chat with Klara",
+		"klaraDesc": "AI Chat Bot",
 		"more": "More",
 		"gov1": "Gov 1 (Archives)",
 		"analytics": "Analytics",
 		"treasuryAnalytics": "Treasury Analytics",
 		"proxies": "Proxies",
+		"identityAndJudgement": "Identity and Judgement",
 		"Tag": {
 			"new": "New"
 		}
@@ -646,6 +649,7 @@
 			"proposer": "Proposer",
 			"createdAt": "Created At",
 			"createdAtBlock": "Created At Block",
+			"submittedAtBlock": "Submitted At Block",
 			"updatedAtBlock": "Updated At Block",
 			"enactmentAtBlock": "Enactment At Block",
 			"enactmentAfterBlock": "Enactment After Block",
@@ -838,7 +842,8 @@
 		"voteBalance": "Vote Balance",
 		"Balance": "Balance",
 		"PeopleChainBalance": "People Chain Balance",
-		"VotingBalance": "Voting Balance"
+		"VotingBalance": "Voting Balance",
+		"migrationInfo": "User balances have been migrated to AssetHub"
 	},
 	"EditPost": {
 		"edit": "Edit",
@@ -1235,7 +1240,8 @@
 		"redirectingToProposal": "Redirecting to proposal...",
 		"addContextToProposal": "Add Context to Proposal",
 		"redirectingToPost": "Redirecting to post...",
-		"discussion": "Discussion"
+		"discussion": "Discussion",
+		"postMigrationInfo": "Timing logic references relay chain block height after migration. AssetHub block numbers are no longer valid for scheduling."
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",
@@ -1461,6 +1467,8 @@
 		"referenda": "Referenda",
 		"users": "Users",
 		"discussions": "Discussions",
+		"bounties": "Bounties",
+		"other": "Other",
 		"today": "Today",
 		"last_7_days": "Last 7 days",
 		"last_30_days": "Last 30 days",
@@ -1534,6 +1542,49 @@
 		"BeneficiaryAddress": "Beneficiary Address",
 		"Amount": "Amount"
 	},
+	"Judgements": {
+		"identityAndJudgement": "Identity and Judgement",
+		"requestJudgement": "Request Judgement",
+		"becomeARegistrar": "Become a Registrar",
+		"dashboard": "Dashboard",
+		"registrar": "Registrar",
+		"registrars": "Registrars",
+		"judgementsGranted": "Judgements Granted",
+		"judgementsRequested": "Judgements Requested",
+		"judgementsCompleted": "Judgements Completed",
+		"thisMonth": "this month",
+		"registrarDescription": "An entity or individual authorized to verify and validate the identity of accounts. Registrars can set a fee for their services and limit their attestation to certain fields.",
+		"becomeRegistrarTitle": "How to Become a Registrar",
+		"becomeRegistrarDescription": "To become a registrar on Polkadot, you need to submit a referendum proposal and get it approved by the community. Here's how:",
+		"becomeRegistrarSteps": {
+			"step1": "Submit a referendum proposal requesting to become a registrar",
+			"step2": "The proposal will be voted on by the community",
+			"step3": "If approved, you'll be added to the registrar list",
+			"step4": "You can then set your fee and start providing identity verification services"
+		},
+		"continueToCreate": "Continue to Create Proposal",
+		"cancel": "Cancel",
+		"index": "Index",
+		"address": "Address",
+		"displayName": "Display Name",
+		"email": "Email",
+		"twitter": "Twitter",
+		"status": "Status",
+		"initiatedOn": "Initiated On",
+		"latestJudgement": "Latest Judgement",
+		"receivedRequests": "Received Requests",
+		"totalGiven": "Total Given",
+		"fee": "Fee",
+		"noJudgementsFound": "No judgements found",
+		"noRegistrarsFound": "No registrars found",
+		"searchByAddressOrName": "Enter address or name to search"
+	},
+	"JudgementStatus": {
+		"pending": "Pending",
+		"approved": "Approved",
+		"rejected": "Rejected",
+		"requested": "Requested"
+	},
 	"ConvictionSelector": {
 		"votes": "Votes",
 		"lockingPeriod": "Locking period",
@@ -1598,6 +1649,11 @@
 		"pararegistration": "Para Registration",
 		"nomination_pools": "Nomination Pools",
 		"sudo_balances": "Sudo Balances"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "Notice: {network} has migrated to AssetHub. Balances, data, referenda, and other on-chain activity has moved to AssetHub.",
+		"learnMore": "Learn more",
+		"polkadotMigration": "Notice: Polkadot is undergoing AssetHub migration. Some features may be unavailable during the migration."
 	},
 	"Community": {
 		"community": "Community",

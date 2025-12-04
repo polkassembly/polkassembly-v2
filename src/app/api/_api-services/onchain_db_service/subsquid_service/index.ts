@@ -53,6 +53,8 @@ import { SubsquidUtils } from './subsquidUtils';
 import { SubsquidQueries } from './subsquidQueries';
 
 const VOTING_POWER_DIVISOR = new BN('10');
+const SUBSQUID_MAX_RETRIES = 3;
+const SUBSQUID_RETRY_DELAY_MS = 1000;
 
 export class SubsquidService extends SubsquidUtils {
 	private static subsquidGqlClient = (network: ENetwork) => {
@@ -67,6 +69,36 @@ export class SubsquidService extends SubsquidUtils {
 			exchanges: [cacheExchange, fetchExchange]
 		});
 	};
+
+	// Helper method to execute GraphQL queries with retry logic for network failures
+	private static async executeWithRetry<T>(gqlClient: UrqlClient, query: string, variables: Record<string, unknown>, errorContext: string): Promise<T> {
+		const executeAttempt = async (attempt: number): Promise<T> => {
+			const { data, error } = await gqlClient.query(query, variables).toPromise();
+
+			if (!error && data) {
+				return data as T;
+			}
+
+			// Only retry on network errors, not on GraphQL errors
+			const isNetworkError = String(error).includes('fetch failed') || String(error).includes('Network');
+
+			if (!isNetworkError || attempt >= SUBSQUID_MAX_RETRIES) {
+				console.error(`${errorContext}: ${error} (attempt ${attempt}/${SUBSQUID_MAX_RETRIES})`);
+				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, errorContext);
+			}
+
+			// Wait before retrying with exponential backoff
+			const delay = SUBSQUID_RETRY_DELAY_MS * 2 ** (attempt - 1);
+			console.warn(`${errorContext}: Network error, retrying in ${delay}ms (attempt ${attempt}/${SUBSQUID_MAX_RETRIES})`);
+			await new Promise<void>((resolve) => {
+				setTimeout(resolve, delay);
+			});
+
+			return executeAttempt(attempt + 1);
+		};
+
+		return executeAttempt(1);
+	}
 
 	static async GetPostVoteMetrics({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IVoteMetrics | null> {
 		if ([EProposalType.BOUNTY, EProposalType.CHILD_BOUNTY].includes(proposalType)) {
@@ -83,14 +115,16 @@ export class SubsquidService extends SubsquidUtils {
 			query = this.GET_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_HASH;
 		}
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient
-			.query(query, { ...(proposalType === EProposalType.TIP ? { hash_eq: indexOrHash } : { index_eq: Number(indexOrHash) }), type_eq: proposalType })
-			.toPromise();
-
-		if (subsquidErr || !subsquidData) {
-			console.error(`Error fetching on-chain post vote counts from Subsquid: ${subsquidErr}`);
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post vote counts from Subsquid');
-		}
+		const subsquidData = await this.executeWithRetry<{
+			noCount: { totalCount: number };
+			yesCount: { totalCount: number };
+			tally?: Array<{ tally?: { ayes?: string; nays?: string; support?: string; bareAyes?: string } }>;
+		}>(
+			gqlClient,
+			query,
+			{ ...(proposalType === EProposalType.TIP ? { hash_eq: indexOrHash } : { index_eq: Number(indexOrHash) }), type_eq: proposalType },
+			'Error fetching on-chain post vote counts from Subsquid'
+		);
 
 		return {
 			[EVoteDecision.NAY]: {
@@ -108,6 +142,75 @@ export class SubsquidService extends SubsquidUtils {
 				value: subsquidData.tally?.[0]?.tally?.bareAyes || '0'
 			}
 		};
+	}
+
+	// Batched version that fetches vote metrics for multiple proposals in a single GraphQL request
+	static async GetBatchedPostVoteMetrics({
+		network,
+		proposalType,
+		indices
+	}: {
+		network: ENetwork;
+		proposalType: EProposalType;
+		indices: number[];
+	}): Promise<Map<number, IVoteMetrics | null>> {
+		const result = new Map<number, IVoteMetrics | null>();
+
+		if ([EProposalType.BOUNTY, EProposalType.CHILD_BOUNTY].includes(proposalType) || indices.length === 0) {
+			indices.forEach((index) => result.set(index, null));
+			return result;
+		}
+
+		// Only use batched query for conviction vote types (ReferendumV2, Fellowship)
+		if (![EProposalType.REFERENDUM_V2, EProposalType.FELLOWSHIP_REFERENDUM].includes(proposalType)) {
+			// Fall back to sequential processing for non-conviction vote types (processed one at a time to avoid connection issues)
+			const metricsResults = await indices.reduce(
+				async (accPromise, index) => {
+					const acc = await accPromise;
+					const metrics = await this.GetPostVoteMetrics({ network, proposalType, indexOrHash: String(index) });
+					acc.push({ index, metrics });
+					return acc;
+				},
+				Promise.resolve([] as { index: number; metrics: IVoteMetrics | null }[])
+			);
+			metricsResults.forEach(({ index, metrics }) => result.set(index, metrics));
+			return result;
+		}
+
+		const gqlClient = this.subsquidGqlClient(network);
+		const query = this.GET_BATCHED_CONVICTION_VOTE_METRICS(indices, proposalType);
+
+		const subsquidData = await this.executeWithRetry<Record<string, unknown>>(gqlClient, query, {}, 'Error fetching batched on-chain post vote counts from Subsquid');
+
+		// Parse the batched response
+		indices.forEach((index) => {
+			const noCountData = subsquidData[`noCount_${index}`] as { totalCount?: number } | undefined;
+			const yesCountData = subsquidData[`yesCount_${index}`] as { totalCount?: number } | undefined;
+			const tallyData = subsquidData[`tally_${index}`] as Array<{ tally?: { ayes?: string; nays?: string; support?: string; bareAyes?: string } }> | undefined;
+
+			const noCount = noCountData?.totalCount || 0;
+			const yesCount = yesCountData?.totalCount || 0;
+			const tally = tallyData?.[0]?.tally;
+
+			result.set(index, {
+				[EVoteDecision.NAY]: {
+					count: noCount,
+					value: tally?.nays || '0'
+				},
+				[EVoteDecision.AYE]: {
+					count: yesCount,
+					value: tally?.ayes || '0'
+				},
+				support: {
+					value: tally?.support || '0'
+				},
+				bareAyes: {
+					value: tally?.bareAyes || '0'
+				}
+			});
+		});
+
+		return result;
 	}
 
 	static async GetOnChainPostInfo({
@@ -202,21 +305,41 @@ export class SubsquidService extends SubsquidUtils {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_STATUSES_AND_ORIGINS_WHERE_NOT_VOTED;
 		}
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient
-			.query(gqlQuery, {
+		const subsquidData = await this.executeWithRetry<{
+			proposals: Array<{
+				createdAt: string;
+				description?: string | null;
+				index?: number;
+				origin: EPostOrigin;
+				proposer?: string;
+				curator?: string;
+				status?: EProposalStatus;
+				reward?: string;
+				hash?: string;
+				preimage?: {
+					proposedCall?: {
+						args?: Record<string, unknown>;
+					};
+				};
+				statusHistory?: Array<{
+					status: EProposalStatus;
+					timestamp: string;
+				}>;
+			}>;
+			proposalsConnection: { totalCount: number };
+		}>(
+			gqlClient,
+			gqlQuery,
+			{
 				limit,
 				offset: (page - 1) * limit,
 				status_in: statuses,
 				type_eq: proposalType,
 				origin_in: origins,
 				voters: notVotedByAddresses
-			})
-			.toPromise();
-
-		if (subsquidErr || !subsquidData) {
-			console.error(`Error fetching on-chain posts listing from Subsquid: ${subsquidErr}`);
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain posts listing from Subsquid');
-		}
+			},
+			'Error fetching on-chain posts listing from Subsquid'
+		);
 
 		if (subsquidData.proposals.length === 0) {
 			return {
@@ -225,80 +348,86 @@ export class SubsquidService extends SubsquidUtils {
 			};
 		}
 
-		// fetch vote counts for each post
-		const voteMetricsPromises: Promise<IVoteMetrics>[] = subsquidData.proposals.map((proposal: { index?: number; hash?: string }) => {
-			if (!ValidatorService.isValidNumber(proposal.index) && !proposal.hash?.startsWith?.('0x')) {
+		// Extract indices for batched vote metrics query
+		const proposalIndices: number[] = [];
+		const hashProposals: { hash: string; arrayIndex: number }[] = [];
+
+		subsquidData.proposals.forEach((proposal: { index?: number; hash?: string }, arrayIndex: number) => {
+			if (ValidatorService.isValidNumber(proposal.index)) {
+				proposalIndices.push(proposal.index as number);
+			} else if (proposal.hash?.startsWith?.('0x')) {
+				hashProposals.push({ hash: proposal.hash, arrayIndex });
+			} else {
 				throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Invalid index or hash for proposal');
 			}
-
-			return this.GetPostVoteMetrics({ network, proposalType, indexOrHash: (ValidatorService.isValidNumber(proposal.index) ? String(proposal.index) : proposal.hash) as string });
 		});
 
-		const voteMetrics = await Promise.all(voteMetricsPromises);
+		// Fetch vote metrics in a single batched request for index-based proposals
+		const batchedVoteMetrics = await this.GetBatchedPostVoteMetrics({ network, proposalType, indices: proposalIndices });
+
+		// For hash-based proposals (like TIPs), fetch sequentially (rare case, avoids connection issues)
+		const hashVoteMetricsMap = new Map<string, IVoteMetrics | null>();
+		if (hashProposals.length > 0) {
+			const hashMetricsResults = await hashProposals.reduce(
+				async (accPromise, { hash }) => {
+					const acc = await accPromise;
+					const metrics = await this.GetPostVoteMetrics({ network, proposalType, indexOrHash: hash });
+					acc.push({ hash, metrics });
+					return acc;
+				},
+				Promise.resolve([] as { hash: string; metrics: IVoteMetrics | null }[])
+			);
+			hashMetricsResults.forEach(({ hash, metrics }) => hashVoteMetricsMap.set(hash, metrics));
+		}
+
+		// Build a combined map for easy lookup
+		const voteMetricsMap = new Map<number | string, IVoteMetrics | null>();
+		batchedVoteMetrics.forEach((value, key) => voteMetricsMap.set(key, value));
+		hashVoteMetricsMap.forEach((value, key) => voteMetricsMap.set(key, value));
 
 		const posts: IOnChainPostListing[] = [];
 
-		const postsPromises = subsquidData.proposals.map(
-			async (
-				proposal: {
-					createdAt: string;
-					description?: string | null;
-					index: number;
-					origin: EPostOrigin;
-					proposer?: string;
-					curator?: string;
-					status?: EProposalStatus;
-					reward?: string;
-					hash?: string;
-					preimage?: {
-						proposedCall?: {
-							args?: Record<string, unknown>;
-						};
-					};
-					statusHistory?: Array<{
-						status: EProposalStatus;
-						timestamp: string;
-					}>;
-				},
-				index: number
-			) => {
-				const allPeriodEnds =
-					proposal.statusHistory && proposalType === EProposalType.REFERENDUM_V2 ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
-				let childBountiesCount = 0;
+		const postsPromises = subsquidData.proposals.map(async (proposal) => {
+			const allPeriodEnds =
+				proposal.statusHistory && proposalType === EProposalType.REFERENDUM_V2 ? this.getAllPeriodEndDates(proposal.statusHistory, network, proposal.origin) : null;
+			let childBountiesCount = 0;
 
-				// child bounties count
-				if (proposalType === EProposalType.BOUNTY) {
-					const childBountiesCountGQL = this.GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDICES;
+			// child bounties count
+			if (proposalType === EProposalType.BOUNTY && proposal.index !== undefined) {
+				const childBountiesCountGQL = this.GET_CHILD_BOUNTIES_COUNT_BY_PARENT_BOUNTY_INDICES;
 
-					const { data } = await gqlClient
-						.query(childBountiesCountGQL, {
-							parentBountyIndex_eq: proposal.index
-						})
-						.toPromise();
-					if (data) {
-						childBountiesCount = data?.totalChildBounties?.totalCount || 0;
-					}
+				const { data } = await gqlClient
+					.query(childBountiesCountGQL, {
+						parentBountyIndex_eq: proposal.index
+					})
+					.toPromise();
+				if (data) {
+					childBountiesCount = data?.totalChildBounties?.totalCount || 0;
 				}
-
-				return {
-					createdAt: new Date(proposal.createdAt),
-					...(proposalType === EProposalType.BOUNTY ? { childBountiesCount: childBountiesCount || 0 } : {}),
-					...(proposal.curator && { curator: proposal.curator }),
-					description: proposal.description || '',
-					index: proposal.index,
-					origin: proposal.origin,
-					proposer: proposal.proposer || '',
-					...(proposal.reward && { reward: proposal.reward }),
-					status: proposal.status || EProposalStatus.Unknown,
-					type: proposalType,
-					hash: proposal.hash || '',
-					voteMetrics: voteMetrics[Number(index)],
-					beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
-					decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
-					preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined
-				};
 			}
-		);
+
+			// Get vote metrics from the map using the proposal's index or hash
+			const voteMetricsKey = ValidatorService.isValidNumber(proposal.index) ? proposal.index : proposal.hash;
+			const proposalVoteMetrics = voteMetricsKey ? voteMetricsMap.get(voteMetricsKey) : undefined;
+
+			return {
+				createdAt: new Date(proposal.createdAt),
+				...(proposalType === EProposalType.BOUNTY ? { childBountiesCount: childBountiesCount || 0 } : {}),
+				...(proposal.curator && { curator: proposal.curator }),
+				description: proposal.description || '',
+				index: proposal.index ?? 0,
+				origin: proposal.origin,
+				proposer: proposal.proposer || '',
+				...(proposal.reward && { reward: proposal.reward }),
+				status: proposal.status || EProposalStatus.Unknown,
+				type: proposalType,
+				hash: proposal.hash || '',
+				voteMetrics: proposalVoteMetrics ?? undefined,
+				beneficiaries: proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(proposal.preimage?.proposedCall?.args) : undefined,
+				decisionPeriodEndsAt: allPeriodEnds?.decisionPeriodEnd ?? undefined,
+				preparePeriodEndsAt: allPeriodEnds?.preparePeriodEnd ?? undefined
+			};
+		});
 
 		const resolvedPosts = await Promise.allSettled(postsPromises);
 
@@ -513,6 +642,7 @@ export class SubsquidService extends SubsquidUtils {
 			proposedCall: data.proposalArguments,
 			proposer: getSubstrateAddress(proposer) || undefined,
 			trackNumber: data.trackNumber,
+			submittedAtBlock: data.submittedAtBlock,
 			updatedAtBlock: data.updatedAtBlock,
 			enactmentAtBlock: data.enactmentAtBlock,
 			enactmentAfterBlock: data.enactmentAfterBlock

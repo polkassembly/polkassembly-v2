@@ -6,7 +6,7 @@ import { LoadingSpinner } from './LoadingSpinner';
 
 function LoadingLayover() {
 	return (
-		<div className='absolute inset-0 z-50 flex h-full w-full items-center justify-center rounded-lg bg-opacity-50 backdrop-blur-sm'>
+		<div className='absolute inset-0 z-20 flex h-full w-full items-center justify-center rounded-lg bg-opacity-50 backdrop-blur-sm'>
 			<LoadingSpinner />
 		</div>
 	);

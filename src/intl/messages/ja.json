@@ -27,7 +27,8 @@
 		"bounties": "報奨金",
 		"ambassador": "アンバサダー",
 		"loans": "ローン",
-		"address": "アドレス"
+		"address": "アドレス",
+		"assets": "資産"
 	},
 	"ActivityFeed": {
 		"title": "アクティビティフィード",
@@ -449,11 +450,13 @@
 		"LeaseAdmin": "リース管理者",
 		"GeneralAdmin": "一般管理者",
 		"chatWithKlara": "Klaraとチャット",
+		"klaraDesc": "AIチャットボット",
 		"more": "もっと",
 		"gov1": "Gov 1 (Archives)",
 		"analytics": "分析",
 		"treasuryAnalytics": "財務分析",
 		"proxies": "プロキシ",
+		"identityAndJudgement": "身分と判断",
 		"Tag": {
 			"new": "新規"
 		}
@@ -620,7 +623,16 @@
 			"showMore": "もっと表示",
 			"showLess": "もっと少なく表示",
 			"call": "呼び出し",
-			"timeline": "タイムライン"
+			"timeline": "タイムライン",
+			"submittedAtBlock": "提出されたブロック",
+			"createdAtBlock": "作成されたブロック",
+			"createdAt": "作成された",
+			"proposer": "プロポーザー",
+			"updatedAtBlock": "更新されたブロック",
+			"enactmentAtBlock": "実行されたブロック",
+			"enactmentAfterBlock": "実行された後のブロック",
+			"trackNumber": "トラック番号",
+			"hash": "ハッシュ"
 		},
 		"deleteComment": "コメントを削除",
 		"deleteCommentConfirmation": "このコメントを削除してもよろしいですか？",
@@ -801,7 +813,8 @@
 		"voteBalance": "投票残高",
 		"Balance": "残高",
 		"PeopleChainBalance": "ピープルチェーン残高",
-		"VotingBalance": "投票残高"
+		"VotingBalance": "投票残高",
+		"migrationInfo": "ユーザー残高はAssetHubに移行されました"
 	},
 	"EditPost": {
 		"edit": "編集",
@@ -1162,7 +1175,8 @@
 		"redirectingToProposal": "提案にリダイレクト中...",
 		"addContextToProposal": "提案にコンテキストを追加",
 		"redirectingToPost": "投稿にリダイレクト中...",
-		"discussion": "ディスカッション"
+		"discussion": "ディスカッション",
+		"postMigrationInfo": "移行後の時間ロジックは、リレーチェーンのブロック高を参照します。AssetHubのブロック番号は、スケジューリングには無効です。"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益者",
@@ -1374,6 +1388,8 @@
 		"referenda": "レファレンダム",
 		"users": "ユーザー",
 		"discussions": "ディスカッション",
+		"bounties": "報奨金",
+		"other": "その他",
 		"today": "今日",
 		"last_7_days": "過去7日間",
 		"last_30_days": "過去30日間",
@@ -1497,6 +1513,49 @@
 		"BeneficiaryAddress": "受益者アドレス",
 		"Amount": "金額"
 	},
+	"Judgements": {
+		"identityAndJudgement": "身分と判断",
+		"requestJudgement": "判断を要求",
+		"becomeARegistrar": "登録者になる",
+		"dashboard": "ダッシュボード",
+		"registrar": "登録者",
+		"registrars": "登録者",
+		"judgementsGranted": "判断許可",
+		"judgementsRequested": "判断要求",
+		"judgementsCompleted": "判断完了",
+		"thisMonth": "今月",
+		"registrarDescription": "アカウントの身元を検証および検証する権限を持つエンティティまたは個人。登録者はサービスの料金を設定し、特定のフィールドに対するアテステーションを制限できます。",
+		"becomeRegistrarTitle": "登録者になる方法",
+		"becomeRegistrarDescription": "Polkadotで登録者になるには、レファレンダム提案を提出し、コミュニティの承認を得る必要があります。方法は以下の通りです：",
+		"becomeRegistrarSteps": {
+			"step1": "登録者になるためのレファレンダム提案を提出",
+			"step2": "提案はコミュニティによって投票されます",
+			"step3": "承認されると、登録者リストに追加されます",
+			"step4": "その後、料金を設定し、身元確認サービスの提供を開始できます"
+		},
+		"continueToCreate": "提案作成に進む",
+		"cancel": "キャンセル",
+		"index": "インデックス",
+		"address": "アドレス",
+		"displayName": "表示名",
+		"email": "メール",
+		"twitter": "Twitter",
+		"status": "ステータス",
+		"initiatedOn": "開始日",
+		"latestJudgement": "最新の判断",
+		"receivedRequests": "受信要求",
+		"totalGiven": "合計",
+		"fee": "料金",
+		"noJudgementsFound": "判断が見つかりません",
+		"noRegistrarsFound": "登録者が見つかりません",
+		"searchByAddressOrName": "アドレスまたは名前で検索"
+	},
+	"JudgementStatus": {
+		"pending": "保留中",
+		"approved": "承認済み",
+		"rejected": "拒否されました",
+		"requested": "リクエスト済み"
+	},
 	"ConvictionSelector": {
 		"votes": "投票",
 		"lockingPeriod": "ロック期間",
@@ -1561,6 +1620,11 @@
 		"pararegistration": "パラレジストレーション",
 		"nomination_pools": "ノミネーションプール",
 		"sudo_balances": "Sudoバランス"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "{network}はAssetHubに移行されました。残高、データ、国民投票、その他のオンチェーン活動はAssetHubに移行されました。",
+		"learnMore": "詳細を確認",
+		"polkadotMigration": "PolkadotはAssetHub移行中です。一部の機能は移行中に利用できない場合があります。"
 	},
 	"Community": {
 		"community": "コミュニティ",

@@ -27,7 +27,8 @@
 		"bounties": "Recompensas",
 		"ambassador": "Embajador",
 		"loans": "Préstamos",
-		"address": "Dirección"
+		"address": "Dirección",
+		"assets": "Activos"
 	},
 	"ActivityFeed": {
 		"title": "Feed de Actividad",
@@ -450,11 +451,13 @@
 		"LeaseAdmin": "Admin de Arrendamiento",
 		"GeneralAdmin": "Admin General",
 		"chatWithKlara": "Chat con Klara",
+		"klaraDesc": "Bot de chat de IA",
 		"more": "Más",
 		"gov1": "Gov 1 (Archives)",
 		"analytics": "Analíticas",
 		"treasuryAnalytics": "Analíticas de Tesorería",
 		"proxies": "Proxies",
+		"identityAndJudgement": "Identidad y Juicio",
 		"Tag": {
 			"new": "Nuevo"
 		}
@@ -621,7 +624,16 @@
 			"showMore": "Mostrar más",
 			"showLess": "Mostrar menos",
 			"call": "Llamada",
-			"timeline": "Línea de Tiempo"
+			"timeline": "Línea de Tiempo",
+			"submittedAtBlock": "Enviado en Block",
+			"createdAtBlock": "Creado en Block",
+			"createdAt": "Creado en",
+			"proposer": "Proposer",
+			"updatedAtBlock": "Actualizado en Block",
+			"enactmentAtBlock": "Ejecutado en Block",
+			"enactmentAfterBlock": "Ejecutado después de Block",
+			"trackNumber": "Número de Pista",
+			"hash": "Hash"
 		},
 		"deleteComment": "Eliminar comentario",
 		"deleteCommentConfirmation": "¿Está seguro de que desea eliminar este comentario?",
@@ -802,7 +814,8 @@
 		"voteBalance": "Saldo de votación",
 		"Balance": "Saldo",
 		"PeopleChainBalance": "Saldo de People Chain",
-		"VotingBalance": "Saldo de votación"
+		"VotingBalance": "Saldo de votación",
+		"migrationInfo": "Los saldos de los usuarios han sido migrados a AssetHub"
 	},
 	"EditPost": {
 		"edit": "Editar",
@@ -1163,7 +1176,8 @@
 		"redirectingToProposal": "Redirigiendo a la propuesta...",
 		"addContextToProposal": "Agregar contexto a la propuesta",
 		"redirectingToPost": "Redirigiendo a la publicación...",
-		"discussion": "Discusión"
+		"discussion": "Discusión",
+		"postMigrationInfo": "La lógica de tiempo se refiere a la altura de bloque de la cadena de relay después de la migración. Los números de bloque de AssetHub ya no son válidos para la programación."
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiario",
@@ -1375,6 +1389,8 @@
 		"referenda": "Referendos",
 		"users": "Usuarios",
 		"discussions": "Discusiones",
+		"bounties": "Recompensas",
+		"other": "Otro",
 		"today": "Hoy",
 		"last_7_days": "Últimos 7 días",
 		"last_30_days": "Últimos 30 días",
@@ -1498,6 +1514,49 @@
 		"BeneficiaryAddress": "Dirección del Beneficiario",
 		"Amount": "Cantidad"
 	},
+	"Judgements": {
+		"identityAndJudgement": "Identidad y Juicio",
+		"requestJudgement": "Solicitar Juicio",
+		"becomeARegistrar": "Convertirse en Registrador",
+		"dashboard": "Panel de control",
+		"registrar": "Registrador",
+		"registrars": "Registradores",
+		"judgementsGranted": "Juicios concedidos",
+		"judgementsRequested": "Juicios solicitados",
+		"judgementsCompleted": "Juicios completados",
+		"thisMonth": "este mes",
+		"registrarDescription": "Una entidad o individuo autorizado para verificar y validar la identidad de cuentas. Los registradores pueden establecer un cargo por sus servicios y limitar su atestación a ciertos campos.",
+		"becomeRegistrarTitle": "Cómo Convertirse en Registrador",
+		"becomeRegistrarDescription": "Para convertirse en registrador en Polkadot, necesita enviar una propuesta de referéndum y obtener la aprobación de la comunidad. Aquí está cómo:",
+		"becomeRegistrarSteps": {
+			"step1": "Enviar una propuesta de referéndum solicitando convertirse en registrador",
+			"step2": "La propuesta será votada por la comunidad",
+			"step3": "Si es aprobada, será agregado a la lista de registradores",
+			"step4": "Podrá establecer su tarifa y comenzar a proporcionar servicios de verificación de identidad"
+		},
+		"continueToCreate": "Continuar a Crear Propuesta",
+		"cancel": "Cancelar",
+		"index": "Índice",
+		"address": "Dirección",
+		"displayName": "Nombre de visualización",
+		"email": "Correo electrónico",
+		"twitter": "Twitter",
+		"status": "Estado",
+		"initiatedOn": "Iniciado el",
+		"latestJudgement": "Último juicio",
+		"receivedRequests": "Solicitudes recibidas",
+		"totalGiven": "Total dado",
+		"fee": "Tarifa",
+		"noJudgementsFound": "No se encontraron juicios",
+		"noRegistrarsFound": "No se encontraron registradores",
+		"searchByAddressOrName": "Ingrese dirección o nombre para buscar"
+	},
+	"JudgementStatus": {
+		"pending": "Pendiente",
+		"approved": "Aprobado",
+		"rejected": "Rechazado",
+		"requested": "Solicitado"
+	},
 	"ConvictionSelector": {
 		"votes": "Votos",
 		"lockingPeriod": "Período de bloqueo",
@@ -1562,6 +1621,11 @@
 		"pararegistration": "Registro de Para",
 		"nomination_pools": "Pools de Nominación",
 		"sudo_balances": "Sudo Balances"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "Nota: {network} se ha migrado a AssetHub; todas las acciones de gobernanza en cadena han sido movidas.",
+		"learnMore": "Más información",
+		"polkadotMigration": "Nota: Polkadot está en proceso de migración a AssetHub. Algunas características pueden estar no disponibles durante la migración."
 	},
 	"Community": {
 		"community": "Comunidad",

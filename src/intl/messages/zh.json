@@ -27,7 +27,8 @@
 		"bounties": "赏金",
 		"ambassador": "大使",
 		"loans": "贷款",
-		"address": "地址"
+		"address": "地址",
+		"assets": "资产"
 	},
 	"ActivityFeed": {
 		"title": "动态信息",
@@ -449,11 +450,13 @@
 		"LeaseAdmin": "租赁管理员",
 		"GeneralAdmin": "总管理员",
 		"chatWithKlara": "与Klara聊天",
+		"klaraDesc": "AI 聊天机器人",
 		"more": "更多",
 		"gov1": "Gov 1 (Archives)",
 		"analytics": "分析",
 		"treasuryAnalytics": "国库分析",
 		"proxies": "代理",
+		"identityAndJudgement": "身份和判断",
 		"Tag": {
 			"new": "新"
 		}
@@ -619,7 +622,16 @@
 			"showMore": "显示更多",
 			"showLess": "显示更少",
 			"call": "调用",
-			"timeline": "时间线"
+			"timeline": "时间线",
+			"submittedAtBlock": "提交于块",
+			"createdAtBlock": "创建于块",
+			"createdAt": "创建于",
+			"proposer": "提议者",
+			"updatedAtBlock": "更新于块",
+			"enactmentAtBlock": "执行于块",
+			"enactmentAfterBlock": "执行于块后",
+			"trackNumber": "轨道编号",
+			"hash": "哈希"
 		},
 		"onchainInfo": "链上信息",
 		"deleteComment": "删除评论",
@@ -801,7 +813,8 @@
 		"voteBalance": "投票余额",
 		"Balance": "余额",
 		"PeopleChainBalance": "人民链余额",
-		"VotingBalance": "投票余额"
+		"VotingBalance": "投票余额",
+		"migrationInfo": "用户余额已迁移至AssetHub"
 	},
 	"EditPost": {
 		"edit": "编辑",
@@ -1185,7 +1198,8 @@
 		"redirectingToProposal": "正在跳转到提案...",
 		"addContextToProposal": "为提案添加上下文",
 		"redirectingToPost": "正在跳转到帖子...",
-		"discussion": "讨论"
+		"discussion": "讨论",
+		"postMigrationInfo": "迁移后的时间逻辑参考了迁移后的链上区块高度。AssetHub区块号不再有效用于调度。"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "受益人",
@@ -1397,6 +1411,8 @@
 		"referenda": "公投",
 		"users": "用户",
 		"discussions": "讨论",
+		"bounties": "赏金",
+		"other": "其他",
 		"today": "今天",
 		"last_7_days": "最近7天",
 		"last_30_days": "最近30天",
@@ -1497,6 +1513,49 @@
 		"BeneficiaryAddress": "受益人地址",
 		"Amount": "金额"
 	},
+	"Judgements": {
+		"identityAndJudgement": "身份和判断",
+		"requestJudgement": "判断请求",
+		"becomeARegistrar": "成为注册者",
+		"dashboard": "仪表板",
+		"registrar": "注册者",
+		"registrars": "注册者",
+		"judgementsGranted": "判断许可",
+		"judgementsRequested": "判断请求",
+		"judgementsCompleted": "判断完成",
+		"thisMonth": "本月",
+		"registrarDescription": "一个被授权验证和验证账户身份的实体或个人。注册者可以设置服务费用并限制其认证到特定字段。",
+		"becomeRegistrarTitle": "如何成为注册者",
+		"becomeRegistrarDescription": "要在Polkadot上成为注册者，您需要提交公投提案并获得社区批准。方法如下：",
+		"becomeRegistrarSteps": {
+			"step1": "提交请求成为注册者的公投提案",
+			"step2": "提案将由社区投票",
+			"step3": "如果获得批准，您将被添加到注册者列表",
+			"step4": "然后您可以设置费用并开始提供身份验证服务"
+		},
+		"continueToCreate": "继续创建提案",
+		"cancel": "取消",
+		"index": "索引",
+		"address": "地址",
+		"displayName": "显示名称",
+		"email": "电子邮件",
+		"twitter": "Twitter",
+		"status": "状态",
+		"initiatedOn": "发起于",
+		"latestJudgement": "最新判断",
+		"receivedRequests": "接收请求",
+		"totalGiven": "总计",
+		"fee": "费用",
+		"noJudgementsFound": "未找到判断",
+		"noRegistrarsFound": "未找到注册者",
+		"searchByAddressOrName": "输入地址或名称进行搜索"
+	},
+	"JudgementStatus": {
+		"pending": "待定",
+		"approved": "已批准",
+		"rejected": "已拒绝",
+		"requested": "已请求"
+	},
 	"ConvictionSelector": {
 		"votes": "投票",
 		"lockingPeriod": "锁定期",
@@ -1561,6 +1620,11 @@
 		"pararegistration": "平行链注册",
 		"nomination_pools": "提名池",
 		"sudo_balances": "Sudo余额"
+	},
+	"AnnouncementBanner": {
+		"assethubMigration": "{network}已迁移至AssetHub。余额、数据、国民投票、以及其他链上活动已迁移至AssetHub。",
+		"learnMore": "了解更多",
+		"polkadotMigration": "Polkadot正在迁移至AssetHub。一些功能可能在迁移期间不可用。"
 	},
 	"Community": {
 		"community": "社区",

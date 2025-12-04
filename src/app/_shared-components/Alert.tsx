@@ -11,7 +11,8 @@ const alertVariants = cva('relative rounded-lg border px-4 py-3 text-sm', {
 		variant: {
 			default: 'bg-background text-foreground',
 			destructive: 'border-failure/50 text-failure dark:border-failure [&>svg]:text-failure',
-			info: 'border-info/50 text-info dark:border-info [&>svg]:text-info'
+			info: 'border-info/50 text-info dark:border-info [&>svg]:text-info',
+			warning: 'border-warning text-warning dark:border-warning [&>svg]:text-warning bg-warning_bg'
 		}
 	},
 	defaultVariants: {

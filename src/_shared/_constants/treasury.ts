@@ -21,6 +21,7 @@ interface NetworkTreasuryConfig {
 	hydrationRpc?: string;
 	hydrationAddresses?: string[];
 	hydrationNativeTokenAssetId?: number;
+	hydrationADotAssetId?: number;
 	fellowshipAddress?: {
 		treasury: string;
 		salary: string;
@@ -66,13 +67,15 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 		usdtIndex: '1984',
 		usdcIndex: '1337',
 		mythosParachainId: '3369',
-		hydrationRpc: 'wss://hydradx-rpc.dwellir.com',
+		hydrationRpc: 'wss://hydration-rpc.n.dwellir.com',
 		hydrationAddresses: [
 			'7KCp4eenFS4CowF9SpQE5BBCj5MtoBA3K811tNyRmhLfH1aV',
 			'7LcF8b5GSvajXkSChhoMFcGDxF9Yn9unRDceZj1Q6NYox8HY',
-			'7KATdGaecnKi4zDAMWQxpB2s59N2RE1JgLuugCjTsRZHgP24'
+			'7N4oFqXKgeTXo6CMSY9BVZdHP5J3RhQXY77Fe7qmQwjcxa1w'
+			// '7KATdGaecnKi4zDAMWQxpB2s59N2RE1JgLuugCjTsRZHgP24'
 		],
 		hydrationNativeTokenAssetId: 5,
+		hydrationADotAssetId: 1001,
 		fellowshipAddress: {
 			treasury: '16VcQSRcMFy6ZHVjBvosKmo7FKqTb8ZATChDYo8ibutzLnos',
 			salary: '13w7NdvSR1Af8xsQTArDtZmVvjE8XhWNdL4yed3iFHrUNCnS'
@@ -82,7 +85,7 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 		ambassadorAddress: '13wa8ddUNUhXnGeTrjYH8hYXF2jNdCJvgcADJakNvtNdGozX',
 		loanAmounts: {
 			bifrost: {
-				nativeToken: '5000000000000000',
+				nativeToken: '10000000000000000',
 				link: 'https://polkadot.polkassembly.io/referenda/432'
 			},
 			pendulum: {
@@ -92,11 +95,11 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 			hydration: {
 				nativeToken: '10000000000000000',
 				link: 'https://polkadot.polkassembly.io/referenda/560'
-			},
-			centrifuge: {
-				usdc: '1500000000000',
-				link: 'https://polkadot.polkassembly.io/referenda/1122'
 			}
+			// centrifuge: {
+			// usdc: '1500000000000',
+			// link: 'https://polkadot.polkassembly.io/referenda/1122'
+			// }
 		},
 		burnPercentage: {
 			numerator: new BN(1),
@@ -121,6 +124,8 @@ export const TREASURY_NETWORK_CONFIG: Record<ENetwork, NetworkTreasuryConfig | u
 		}, // 0% of the treasury balance
 		spendPeriodInBlocks: new BN(86400)
 	}, // Add Kusama specific configuration when needed
+	// TODO: Add Assethub Kusama specific configuration when needed
+	[ENetwork.ASSETHUB_KUSAMA]: undefined,
 	[ENetwork.WESTEND]: undefined, // Add Westend specific configuration when needed
 	[ENetwork.PASEO]: undefined, // Add Paseo specific configuration when needed
 	[ENetwork.CERE]: {

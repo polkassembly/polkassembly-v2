@@ -61,7 +61,12 @@ import {
 	IGovAnalyticsReferendumOutcome,
 	IRawTurnoutData,
 	IGovAnalyticsDelegationStats,
-	IGovAnalyticsCategoryCounts
+	IGovAnalyticsCategoryCounts,
+	IConversationHistory,
+	IConversationMessage,
+	IDelegateXAccount,
+	IDelegateXVoteData,
+	IConversationTurn
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -157,6 +162,16 @@ enum EApiRoute {
 	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES',
 	GET_GOV_ANALYTICS = 'GET_GOV_ANALYTICS',
 	GET_TRACK_COUNTS = 'GET_TRACK_COUNTS',
+	GET_CONVERSATION_HISTORY = 'GET_CONVERSATION_HISTORY',
+	GET_CONVERSATION_MESSAGES = 'GET_CONVERSATION_MESSAGES',
+	GET_KLARA_STATS = 'GET_KLARA_STATS',
+	KLARA_SEND_FEEDBACK = 'KLARA_SEND_FEEDBACK',
+	KLARA_SEND_MESSAGE = 'KLARA_SEND_MESSAGE',
+	GET_GOOGLE_SHEET_NEWS = 'GET_GOOGLE_SHEET_NEWS',
+	CREATE_DELEGATE_X_BOT = 'CREATE_DELEGATE_X_BOT',
+	UPDATE_DELEGATE_X_BOT = 'UPDATE_DELEGATE_X_BOT',
+	GET_DELEGATE_X_DETAILS = 'GET_DELEGATE_X_DETAILS',
+	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY',
 	FETCH_COMMUNITY_MEMBERS = 'FETCH_COMMUNITY_MEMBERS'
 }
 
@@ -387,6 +402,41 @@ export class NextApiClientService {
 				method = 'DELETE';
 				break;
 
+			case EApiRoute.GET_CONVERSATION_HISTORY:
+			case EApiRoute.GET_CONVERSATION_MESSAGES:
+			case EApiRoute.GET_KLARA_STATS:
+				path = '/klara';
+				break;
+			case EApiRoute.KLARA_SEND_FEEDBACK:
+			case EApiRoute.KLARA_SEND_MESSAGE:
+				path = '/klara';
+				method = 'POST';
+				break;
+
+			case EApiRoute.GET_GOOGLE_SHEET_NEWS:
+				path = '/external/news/google-sheets';
+				break;
+
+			case EApiRoute.CREATE_DELEGATE_X_BOT:
+				path = '/delegate-x';
+				method = 'POST';
+				break;
+
+			case EApiRoute.UPDATE_DELEGATE_X_BOT:
+				path = '/delegate-x';
+				method = 'PUT';
+				break;
+
+			case EApiRoute.GET_DELEGATE_X_DETAILS:
+				path = '/delegate-x';
+				method = 'GET';
+				break;
+
+			case EApiRoute.GET_DELEGATE_X_VOTE_HISTORY:
+				path = '/delegate-x/vote-history';
+				method = 'GET';
+				break;
+
 			default:
 				throw new ClientError(`Invalid route: ${route}`);
 		}
@@ -456,6 +506,40 @@ export class NextApiClientService {
 			return { data: resJSON as T, error: null };
 		}
 		return { data: null, error: resJSON as IErrorResponse };
+	}
+
+	private static async nextApiClientFetchStream({
+		url,
+		method,
+		data,
+		skipCache = false,
+		signal
+	}: {
+		url: URL;
+		method: Method;
+		data?: Record<string, unknown>;
+		skipCache?: boolean;
+		signal?: AbortSignal;
+	}): Promise<Response> {
+		const currentNetwork = await this.getCurrentNetwork();
+
+		// Detect if we're in an iframe and specifically from Mimir
+		const isMimir = await isMimirDetected();
+
+		return fetch(url, {
+			body: JSON.stringify(data),
+			credentials: 'include',
+			headers: {
+				...(!global.window ? await getCookieHeadersServer() : {}),
+				...(isMimir ? { 'x-iframe-context': 'mimir' } : {}),
+				[EHttpHeaderKey.CONTENT_TYPE]: 'application/json',
+				[EHttpHeaderKey.API_KEY]: getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
+				[EHttpHeaderKey.NETWORK]: currentNetwork,
+				[EHttpHeaderKey.SKIP_CACHE]: skipCache.toString()
+			},
+			method,
+			signal
+		});
 	}
 
 	// auth
@@ -1350,6 +1434,179 @@ export class NextApiClientService {
 			method,
 			url
 		});
+	}
+
+	static async getConversationHistory({ userId, limit }: { userId: string; limit: number }) {
+		const queryParams = new URLSearchParams({
+			userId,
+			limit: limit?.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CONVERSATION_HISTORY, routeSegments: ['conversations'], queryParams });
+		return this.nextApiClientFetch<IConversationHistory[]>({ url, method });
+	}
+
+	static async getConversationMessages({ conversationId }: { conversationId: string }) {
+		const queryParams = new URLSearchParams({
+			conversationId
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_CONVERSATION_MESSAGES, routeSegments: ['messages'], queryParams });
+		return this.nextApiClientFetch<IConversationMessage[]>({ url, method });
+	}
+
+	static async getKlaraStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_KLARA_STATS, routeSegments: ['stats'] });
+		return this.nextApiClientFetch<{ totalUsers: number; totalConversations: number }>({ url, method });
+	}
+
+	static async klaraSendMessage({
+		message,
+		userId,
+		conversationId,
+		conversationHistory,
+		signal
+	}: {
+		message: string;
+		userId: string;
+		conversationId: string;
+		conversationHistory?: IConversationTurn[];
+		signal: AbortSignal;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.KLARA_SEND_MESSAGE, routeSegments: ['send-message'] });
+
+		return this.nextApiClientFetchStream({ url, method, signal, data: { message, userId, conversationId, conversationHistory } });
+	}
+
+	static async submitKlaraFeedback({
+		firstName,
+		lastName,
+		email,
+		feedbackText,
+		userId,
+		conversationId,
+		messageId,
+		rating,
+		feedbackType,
+		queryText,
+		responseText
+	}: {
+		firstName: string;
+		lastName: string;
+		email: string;
+		feedbackText: string;
+		userId: string;
+		conversationId: string;
+		messageId: string;
+		rating: number;
+		feedbackType: string;
+		queryText: string;
+		responseText: string;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.KLARA_SEND_FEEDBACK, routeSegments: ['feedback'] });
+		return this.nextApiClientFetch<{ message: string }>({
+			url,
+			method,
+			data: {
+				firstName,
+				lastName,
+				email,
+				feedbackText,
+				userId,
+				conversationId,
+				messageId,
+				rating,
+				feedbackType,
+				queryText,
+				responseText
+			}
+		});
+	}
+
+	static async getGoogleSheetData<T = Record<string, string>[]>() {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_GOOGLE_SHEET_NEWS
+		});
+
+		return this.nextApiClientFetch<{ data: T; success: boolean }>({
+			url,
+			method
+		});
+	}
+
+	static async createDelegateXAccount({
+		strategyId,
+		contactLink,
+		signatureLink,
+		includeComment,
+		votingPower,
+		prompt
+	}: {
+		strategyId: string;
+		contactLink: string;
+		signatureLink: string;
+		includeComment: boolean;
+		votingPower: string;
+		prompt?: string;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_DELEGATE_X_BOT });
+		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount }>({
+			url,
+			method,
+			data: { strategyId, contactLink, signatureLink, includeComment, votingPower, prompt }
+		});
+	}
+
+	static async updateDelegateXAccount({
+		strategyId,
+		contactLink,
+		signatureLink,
+		includeComment,
+		votingPower,
+		prompt,
+		active
+	}: {
+		strategyId?: string;
+		contactLink?: string;
+		signatureLink?: string;
+		includeComment?: boolean;
+		votingPower?: string;
+		prompt?: string;
+		active?: boolean;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.UPDATE_DELEGATE_X_BOT });
+		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount }>({
+			url,
+			method,
+			data: { strategyId, contactLink, signatureLink, includeComment, votingPower, prompt, active }
+		});
+	}
+
+	static async getDelegateXDetails() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_DETAILS });
+		return this.nextApiClientFetch<{
+			success: boolean;
+			delegateXAccount: IDelegateXAccount;
+			totalVotingPower: string;
+			totalVotes: number;
+			totalDelegators: number;
+			yesCount: number;
+			noCount: number;
+			abstainCount: number;
+			votesPast30Days: number;
+			votingPower: string;
+			totalVotesPast30Days: number;
+		}>({
+			url,
+			method
+		});
+	}
+
+	static async getDelegateXVoteHistory({ page = 1, limit = DEFAULT_LISTING_LIMIT }: { page?: number; limit?: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_VOTE_HISTORY, queryParams });
+		return this.nextApiClientFetch<{ success: boolean; voteData: IDelegateXVoteData[]; totalCount: number }>({ url, method });
 	}
 
 	static async fetchCommunityMembers({ page, limit }: { page: number; limit?: number }) {

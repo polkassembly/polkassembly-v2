@@ -5,7 +5,7 @@
 import { useMemo } from 'react';
 import { ESearchType } from '@/_shared/types';
 
-export const useSearchConfig = ({ network, activeIndex }: { network: string; activeIndex: ESearchType | null }) => {
+export const useSearchConfig = ({ network, activeIndex, proposalTypeFilter }: { network: string; activeIndex: ESearchType | null; proposalTypeFilter?: ESearchType }) => {
 	const networkFilterQuery = useMemo(() => {
 		if (!activeIndex || activeIndex === ESearchType.USERS) return '';
 
@@ -15,17 +15,35 @@ export const useSearchConfig = ({ network, activeIndex }: { network: string; act
 	const postFilterQuery = useMemo(() => {
 		if (!activeIndex || activeIndex === ESearchType.USERS) return '';
 
-		const baseFilter = networkFilterQuery ? ' AND ' : '';
+		const filters: string[] = [];
 
-		switch (activeIndex) {
-			case ESearchType.POSTS:
-				return `${baseFilter}(NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS)`;
-			case ESearchType.DISCUSSIONS:
-				return `${baseFilter}(proposalType:DISCUSSION OR proposalType:GRANTS)`;
-			default:
-				return '';
+		if (networkFilterQuery) {
+			filters.push(networkFilterQuery);
 		}
-	}, [activeIndex, networkFilterQuery]);
+
+		const searchType = proposalTypeFilter || activeIndex;
+
+		switch (searchType) {
+			case ESearchType.POSTS:
+				filters.push('(proposalType:Referendum OR proposalType:ReferendumV2)');
+				break;
+			case ESearchType.BOUNTIES:
+				filters.push('(proposalType:Bounty OR proposalType:ChildBounty)');
+				break;
+			case ESearchType.OTHER:
+				filters.push(
+					'(NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS AND NOT proposalType:Referendum AND NOT proposalType:ReferendumV2 AND NOT proposalType:Bounty AND NOT proposalType:ChildBounty)'
+				);
+				break;
+			case ESearchType.DISCUSSIONS:
+				filters.push('(proposalType:DISCUSSION OR proposalType:GRANTS)');
+				break;
+			default:
+				break;
+		}
+
+		return filters.join(' AND ');
+	}, [activeIndex, networkFilterQuery, proposalTypeFilter]);
 
 	const indexName = useMemo(() => {
 		if (activeIndex === ESearchType.USERS) return 'polkassembly_v2_users';

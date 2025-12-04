@@ -20,7 +20,7 @@ function Account({ address }: { address: string }) {
 
 	const [balance, setBalance] = useState<string>('0');
 	const [balanceLocked, setBalanceLocked] = useState<string>('0');
-	const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		if (!apiService || !address) return;
@@ -35,9 +35,8 @@ function Account({ address }: { address: string }) {
 			setBalanceLocked?.(lockedBalance.toString());
 			setLoading(false);
 		})();
+	}, [address, apiService]);
 
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [address]);
 	return (
 		<div className={classes.accountWrapper}>
 			<Identicon

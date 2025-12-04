@@ -25,6 +25,9 @@ function CustomSearchBox({ onSearch, ...props }: CustomSearchBoxProps) {
 		if (debouncedSearchTerm.length >= 3) {
 			refine(debouncedSearchTerm);
 			onSearch(debouncedSearchTerm);
+		} else if (debouncedSearchTerm.length === 0) {
+			refine('');
+			onSearch('');
 		}
 	}, [debouncedSearchTerm, refine, onSearch]);
 

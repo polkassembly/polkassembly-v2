@@ -10,7 +10,7 @@ import { EConvictionAmount } from '@/_shared/types';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { Separator } from '@/app/_shared-components/Separator';
 import { Slider } from '@/app/_shared-components/Slider';
-import { BN } from '@polkadot/util';
+import { BN, BN_TEN } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -65,7 +65,11 @@ function ConvictionSelector({
 					{t('ConvictionSelector.votes')}
 				</div>
 				<span className='font-semibold text-text_primary'>
-					{formatBnBalance(new BN(voteBalance.toNumber() * getConvictionMultiplier(conviction)), { withUnit: true, numberAfterComma: 2 }, network)}
+					{formatBnBalance(
+						conviction === EConvictionAmount.ZERO ? voteBalance.div(BN_TEN) : voteBalance.mul(new BN(getConvictionMultiplier(conviction))),
+						{ withUnit: true, numberAfterComma: 2 },
+						network
+					)}
 				</span>
 			</div>
 			<div className='flex items-center justify-between text-sm'>

@@ -1,0 +1,35 @@
+.header {
+	@apply flex w-full flex-col bg-bg_modal;
+}
+
+.header_container {
+	@apply mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 px-4 pt-7 lg:px-16;
+}
+
+.header_title {
+	@apply text-2xl font-bold text-navbar_title;
+}
+
+.header_title_container {
+	@apply flex flex-col justify-between gap-y-4 md:flex-row md:items-center;
+}
+
+.header_button_container {
+	@apply flex items-center gap-x-4;
+}
+
+.header_tab {
+	@apply uppercase;
+}
+
+.hideScrollbar {
+	-ms-overflow-style: none;
+	/* IE and Edge */
+	scrollbar-width: none;
+
+	/* Firefox */
+	&::-webkit-scrollbar {
+		/* Chrome, Safari and Opera */
+		display: none;
+	}
+}

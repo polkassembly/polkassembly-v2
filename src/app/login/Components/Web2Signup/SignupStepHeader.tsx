@@ -13,7 +13,7 @@ function SignupStepHeader({ step, setStep }: { step: ESignupSteps; setStep: Reac
 			<Button
 				variant='ghost'
 				onClick={() => setStep(ESignupSteps.USERNAME)}
-				className={classes.btn}
+				className={cn(classes.btn, 'm-0 p-0')}
 			>
 				<div className={cn(classes.tagWrapper, 'border-navbar_border', step === ESignupSteps.PASSWORD && 'border-success')}>
 					<span className={cn(classes.tag, 'bg-bg_pink text-btn_primary_text', step === ESignupSteps.PASSWORD && 'bg-success')}>01</span>
@@ -22,7 +22,7 @@ function SignupStepHeader({ step, setStep }: { step: ESignupSteps; setStep: Reac
 			</Button>
 			<Button
 				variant='ghost'
-				className={classes.btn}
+				className={cn(classes.btn, 'm-0 p-0')}
 			>
 				<div className={cn(classes.tagWrapper, 'border-border_grey', step === ESignupSteps.PASSWORD && 'border-navbar_border')}>
 					<span className={cn(classes.tag, 'bg-border_grey text-text_grey', step === ESignupSteps.PASSWORD && 'bg-bg_pink text-btn_primary_text')}>02</span>

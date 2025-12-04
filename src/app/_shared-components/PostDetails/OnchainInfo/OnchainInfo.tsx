@@ -65,6 +65,7 @@ function OnchainInfo({
 	const createdAtDate: Date | string | undefined = onchainInfo?.createdAt || onchainMetadata?.preimage?.createdAt || onchainMetadata?.createdAt;
 	const hash: string | undefined = onchainInfo?.hash || onchainMetadata?.preimage?.hash || onchainMetadata?.hash;
 	const createdAtBlock: number | undefined = onchainMetadata?.preimage?.createdAtBlock || onchainMetadata?.createdAtBlock;
+	const submittedAtBlock: number | undefined = onchainMetadata?.submittedAtBlock;
 	const method: string | undefined = onchainMetadata?.preimage?.method || onchainMetadata?.preimage?.proposedCall?.method || onchainMetadata?.proposedCall?.method;
 	const section: string | undefined = onchainMetadata?.preimage?.section || onchainMetadata?.preimage?.proposedCall?.section || onchainMetadata?.proposedCall?.section;
 	const description: string | undefined = onchainMetadata?.preimage?.proposedCall?.description || onchainMetadata?.proposedCall?.description;
@@ -99,7 +100,7 @@ function OnchainInfo({
 							</div>
 						)}
 
-						{!proposer && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='h-4' />
 						) : (
 							proposer && (
@@ -110,7 +111,7 @@ function OnchainInfo({
 							)
 						)}
 
-						{!createdAtDate && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-7' />
 						) : (
 							createdAtDate && (
@@ -121,8 +122,13 @@ function OnchainInfo({
 							)
 						)}
 
-						{!createdAtBlock && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-7' />
+						) : proposalType === EProposalType.REFERENDUM_V2 && submittedAtBlock ? (
+							<div className={classes.infoRow}>
+								<p className={classes.infoRowLabel}>{t('PostDetails.OnchainInfo.submittedAtBlock')}</p>
+								<p className={classes.infoRowValue}>{submittedAtBlock}</p>
+							</div>
 						) : (
 							createdAtBlock && (
 								<div className={classes.infoRow}>
@@ -143,7 +149,7 @@ function OnchainInfo({
 							)
 						)}
 
-						{!enactmentAtBlock && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-7' />
 						) : (
 							enactmentAtBlock && (
@@ -154,7 +160,7 @@ function OnchainInfo({
 							)
 						)}
 
-						{!enactmentAfterBlock && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-7' />
 						) : (
 							enactmentAfterBlock && (
@@ -164,7 +170,7 @@ function OnchainInfo({
 								</div>
 							)
 						)}
-						{!method && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-7' />
 						) : (
 							method && (
@@ -175,7 +181,7 @@ function OnchainInfo({
 							)
 						)}
 
-						{!section && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-7' />
 						) : (
 							section && (
@@ -186,7 +192,7 @@ function OnchainInfo({
 							)
 						)}
 
-						{!description && isFetching ? (
+						{isFetching ? (
 							<Skeleton className='my-2 h-20' />
 						) : (
 							description && (

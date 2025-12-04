@@ -42,7 +42,9 @@ import {
 	IPoll,
 	EPollVotesType,
 	IOffChainPollPayload,
-	ICommentHistoryItem
+	ICommentHistoryItem,
+	IDelegateXAccount,
+	IDelegateXVoteData
 } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { APIError } from '@/app/api/_api-utils/apiError';
@@ -502,6 +504,59 @@ export class FirestoreService extends FirestoreUtils {
 		});
 
 		return (await Promise.all(commentResponsePromises)).filter((comment): comment is ICommentResponse => comment !== null);
+	}
+
+	static async GetAllNetworkComments({ network, page, limit }: { network: ENetwork; page: number; limit: number }): Promise<IGenericListingResponse<ICommentResponse>> {
+		// Query comments by network, excluding deleted ones, with pagination
+		const commentsQuery = this.commentsCollectionRef()
+			.where('network', '==', network)
+			.where('isDeleted', '==', false)
+			.orderBy('createdAt', 'desc')
+			.limit(limit)
+			.offset((page - 1) * limit);
+
+		const commentsQuerySnapshot = await commentsQuery.get();
+
+		// Get total count for pagination
+		const totalCountQuery = this.commentsCollectionRef().where('network', '==', network).where('isDeleted', '==', false);
+		const totalCountSnapshot = await totalCountQuery.count().get();
+		const totalCount = totalCountSnapshot.data().count;
+
+		const commentResponsePromises = commentsQuerySnapshot.docs.map(async (doc) => {
+			const dataRaw = doc.data();
+
+			const commentData = {
+				...dataRaw,
+				history:
+					dataRaw.history?.map((item: { createdAt: Timestamp; content: string }) => ({
+						...item,
+						createdAt: item.createdAt.toDate()
+					})) || [],
+				content: dataRaw.content || '',
+				createdAt: dataRaw.createdAt?.toDate(),
+				updatedAt: dataRaw.updatedAt?.toDate(),
+				dataSource: dataRaw.dataSource || EDataSource.POLKASSEMBLY
+			} as IComment;
+
+			const user = await this.GetPublicUserById(commentData.userId);
+
+			if (!user) {
+				return null;
+			}
+
+			return {
+				...commentData,
+				publicUser: user,
+				children: []
+			} as ICommentResponse;
+		});
+
+		const comments = (await Promise.all(commentResponsePromises)).filter((comment): comment is ICommentResponse => comment !== null);
+
+		return {
+			items: comments,
+			totalCount
+		};
 	}
 
 	static async GetCommentById(id: string): Promise<IComment | null> {
@@ -1033,7 +1088,8 @@ export class FirestoreService extends FirestoreUtils {
 		content,
 		parentCommentId,
 		sentiment,
-		authorAddress
+		authorAddress,
+		isDelegateXVote = false
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -1044,6 +1100,7 @@ export class FirestoreService extends FirestoreUtils {
 		address?: string;
 		sentiment?: ECommentSentiment;
 		authorAddress?: string;
+		isDelegateXVote?: boolean;
 	}) {
 		const newCommentId = this.commentsCollectionRef().doc().id;
 
@@ -1061,7 +1118,8 @@ export class FirestoreService extends FirestoreUtils {
 			parentCommentId: parentCommentId || null,
 			dataSource: EDataSource.POLKASSEMBLY,
 			...(sentiment && { sentiment }),
-			...(authorAddress && { authorAddress })
+			...(authorAddress && { authorAddress }),
+			...(isDelegateXVote && { isDelegateXVote })
 		};
 
 		await this.commentsCollectionRef().doc(newCommentId).set(newComment);
@@ -1875,5 +1933,186 @@ export class FirestoreService extends FirestoreUtils {
 				})
 				.filter((vote): vote is IPollVote => vote !== null);
 		});
+	}
+
+	static async GetDelegateXAccountByUserId({ userId, network }: { userId: number; network: ENetwork }): Promise<IDelegateXAccount | null> {
+		const delegateXAccountSnapshot = await this.delegateXAccountsCollectionRef().where('userId', '==', userId).where('network', '==', network).limit(1).get();
+
+		if (delegateXAccountSnapshot.docs.length) {
+			return delegateXAccountSnapshot.docs?.[0]?.data() as IDelegateXAccount;
+		}
+
+		return null;
+	}
+
+	static async GetTotalDelegateXAccountsCount(): Promise<number> {
+		const countSnapshot = await this.delegateXAccountsCollectionRef().count().get();
+		return countSnapshot.data().count || 0;
+	}
+
+	static async GetTotalDelegateXVotesPast30Days(): Promise<number> {
+		const thirtyDaysAgo = new Date();
+		thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+		const countSnapshot = await this.delegateXVotesCollectionRef().where('createdAt', '>=', thirtyDaysAgo).count().get();
+		return countSnapshot.data().count || 0;
+	}
+
+	static async GetTotalDelegateXVotingPower(): Promise<string> {
+		const snapshot = await this.delegateXAccountsCollectionRef().get();
+		let total = BigInt(0);
+		snapshot.forEach((doc) => {
+			const data = doc.data() as IDelegateXAccount;
+			if (data.votingPower) {
+				total += BigInt(data.votingPower);
+			}
+		});
+		return total.toString();
+	}
+
+	static async CreateDelegateXAccount(delegateXAccount: IDelegateXAccount) {
+		console.log('delegateXAccount', delegateXAccount);
+		const id = `${delegateXAccount.userId}-${delegateXAccount.network}-${delegateXAccount.address}`;
+		console.log('id', id);
+		const delegateXAccountDoc = this.delegateXAccountsCollectionRef().doc(id);
+		await delegateXAccountDoc.set({ ...delegateXAccount }, { merge: true });
+	}
+
+	static async UpdateDelegateXAccount({
+		address,
+		userId,
+		network,
+		includeComment,
+		votingPower,
+		strategyId,
+		contactLink,
+		signatureLink,
+		prompt,
+		active
+	}: {
+		address: string;
+		userId: number;
+		network: ENetwork;
+		includeComment?: boolean;
+		votingPower?: string;
+		strategyId?: string;
+		contactLink?: string;
+		signatureLink?: string;
+		prompt?: string;
+		active?: boolean;
+	}): Promise<IDelegateXAccount> {
+		const id = `${userId}-${network}-${address}`;
+		const delegateXAccountDoc = this.delegateXAccountsCollectionRef().doc(id);
+		await delegateXAccountDoc.set({ includeComment, votingPower, strategyId, contactLink, signatureLink, prompt, active }, { merge: true });
+
+		const updatedDoc = await delegateXAccountDoc.get();
+		return updatedDoc.data() as IDelegateXAccount;
+	}
+
+	static async CreateVote({
+		delegateXAccountId,
+		proposalId,
+		hash,
+		decision,
+		reason,
+		proposalType,
+		comment,
+		votingPower
+	}: {
+		delegateXAccountId: string;
+		proposalId: string;
+		hash: string;
+		decision: number;
+		reason: string[];
+		comment: string;
+		proposalType: EProposalType;
+		votingPower: string;
+	}) {
+		const voteDoc = this.delegateXVotesCollectionRef().doc();
+		const delegateXVote: IDelegateXVoteData = {
+			delegateXAccountId,
+			proposalId,
+			hash,
+			proposalType,
+			decision,
+			votingPower,
+			reason,
+			comment,
+			conviction: EConvictionAmount.ZERO,
+			createdAt: new Date(),
+			updatedAt: new Date()
+		};
+		await voteDoc.set(delegateXVote, { merge: true });
+		return delegateXVote;
+	}
+
+	static async GetVoteDataByDelegateXAccountId({
+		delegateXAccountId,
+		page,
+		limit
+	}: {
+		delegateXAccountId: string;
+		page: number;
+		limit: number;
+	}): Promise<{ votes: IDelegateXVoteData[]; totalCount: number } | null> {
+		const voteDoc = await this.delegateXVotesCollectionRef()
+			.where('delegateXAccountId', '==', delegateXAccountId)
+			.orderBy('createdAt', 'desc')
+			.limit(limit)
+			.offset((page - 1) * limit)
+			.get();
+
+		if (voteDoc.empty) {
+			return { votes: [], totalCount: 0 };
+		}
+
+		// get the total count of votes
+		const totalCount = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).count().get();
+		const totalCountData = totalCount.data();
+		const totalCountValue = totalCountData.count;
+
+		return {
+			votes: voteDoc.docs.map((doc) => doc.data() as IDelegateXVoteData).filter((vote): vote is IDelegateXVoteData => vote !== null) as IDelegateXVoteData[],
+			totalCount: totalCountValue
+		} as unknown as { votes: IDelegateXVoteData[]; totalCount: number };
+	}
+
+	static async GetDelegateXVotesMatrixByDelegateXAccountId({
+		delegateXAccountId
+	}: {
+		delegateXAccountId: string;
+	}): Promise<{ votesPast30Days: number; yesCount: number; noCount: number; abstainCount: number; votingPower: string }> {
+		// get All the votes with decision of 1 and count the total count of votes
+		const yesCount = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).where('decision', '==', 1).count().get();
+		const yesCountData = yesCount.data();
+		const yesCountValue = yesCountData.count;
+
+		// get All the votes with decision of 0 and count the total count of votes
+		const noCount = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).where('decision', '==', 0).count().get();
+		const noCountData = noCount.data();
+		const noCountValue = noCountData.count;
+
+		// get All the votes with decision of abstain and count the total count of votes
+		const abstainCount = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).where('decision', '==', 2).count().get();
+		const abstainCountData = abstainCount.data();
+		const abstainCountValue = abstainCountData.count;
+
+		// get a single vote with decision of 1 and return the voting power
+		const yesVote = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).where('decision', '==', 1).limit(1).get();
+		const yesVoteData = yesVote.docs[0]?.data() as IDelegateXVoteData;
+		const yesVoteValue = yesVoteData?.votingPower;
+
+		const thirtyDaysAgo = new Date();
+		thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+		const votesPast30Days = await this.delegateXVotesCollectionRef().where('delegateXAccountId', '==', delegateXAccountId).where('createdAt', '>=', thirtyDaysAgo).count().get();
+		const votesPast30DaysValue = votesPast30Days.data().count;
+
+		return {
+			yesCount: yesCountValue,
+			noCount: noCountValue,
+			abstainCount: abstainCountValue,
+			votingPower: yesVoteValue || '0',
+			votesPast30Days: votesPast30DaysValue
+		};
 	}
 }

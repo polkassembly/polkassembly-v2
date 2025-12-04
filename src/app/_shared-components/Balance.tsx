@@ -10,8 +10,10 @@ import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { useIdentityService } from '@/hooks/useIdentityService';
+import { ENetwork } from '@/_shared/types';
 import { formatBnBalance } from '../_client-utils/formatBnBalance';
 import { Skeleton } from './Skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from './Tooltip';
 
 interface Props {
 	address: string;
@@ -87,6 +89,20 @@ function Balance({
 			<span className={cn('text-text_pink', classname)}>
 				{loading ? <Skeleton className='h-4 w-[20px]' /> : formatBnBalance(balance, { numberAfterComma: 2, withUnit: true }, network)}
 			</span>
+			{[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) && (
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<div className='flex h-4 w-4 items-center justify-center rounded-full bg-tooltip_trigger_yellow text-xs font-medium text-white'>?</div>
+					</TooltipTrigger>
+					<TooltipContent
+						side='top'
+						align='center'
+						className='bg-tooltip_background'
+					>
+						<p className='text-xs text-white'>{t('Balance.migrationInfo')}</p>
+					</TooltipContent>
+				</Tooltip>
+			)}
 		</div>
 	);
 }

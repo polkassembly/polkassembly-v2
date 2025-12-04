@@ -51,7 +51,16 @@ export class SubsquidUtils extends SubsquidQueries {
 			return substrateAddress || beneficiary.value;
 		}
 
-		// Handle V3/V4 nested interior case
+		// Handle V4 nested interior case
+		if (beneficiary.__kind === 'V4' && beneficiary.accountId) {
+			const id = beneficiary?.accountId?.interior?.value?.id || beneficiary?.accountId?.interior?.value?.[0]?.id;
+			if (id) {
+				const substrateAddress = encodeAddress(id, 42);
+				return substrateAddress || id;
+			}
+		}
+
+		// Handle V3 nested interior case
 		const id = beneficiary?.value?.interior?.value?.id || beneficiary?.value?.interior?.value?.[0]?.id;
 		if (id) {
 			const substrateAddress = encodeAddress(id, 42);

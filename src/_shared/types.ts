@@ -13,6 +13,7 @@ import { StatusCodes } from 'http-status-codes';
 
 export enum ENetwork {
 	KUSAMA = 'kusama',
+	ASSETHUB_KUSAMA = 'assethub-kusama',
 	POLKADOT = 'polkadot',
 	WESTEND = 'westend',
 	PASEO = 'paseo',
@@ -739,6 +740,7 @@ export interface IComment {
 	history?: ICommentHistoryItem[];
 	disabled?: boolean;
 	authorAddress?: string;
+	isDelegateXVote?: boolean;
 }
 
 export interface ICommentResponse extends IComment {
@@ -962,6 +964,7 @@ export interface IOnChainMetadata {
 	enactmentAfterBlock?: number;
 	createdAt?: Date;
 	createdAtBlock?: number;
+	submittedAtBlock?: number;
 	hash?: string;
 }
 
@@ -1184,7 +1187,8 @@ export enum EDelegateSource {
 	NOVA = 'nova',
 	PARITY = 'parity',
 	POLKASSEMBLY = 'polkassembly',
-	INDIVIDUAL = 'individual'
+	INDIVIDUAL = 'individual',
+	DELEGATEX = 'delegateX'
 }
 
 export interface IDelegate {
@@ -1279,7 +1283,9 @@ export enum EPeriodType {
 export enum ESearchType {
 	POSTS = 'posts',
 	DISCUSSIONS = 'discussions',
-	USERS = 'users'
+	USERS = 'users',
+	BOUNTIES = 'bounties',
+	OTHER = 'other'
 }
 
 export enum ESearchDiscussionType {
@@ -1624,6 +1630,144 @@ export interface IProxyRequest {
 }
 
 export type IProxyListingResponse = IGenericListingResponse<IProxyRequest>;
+
+export enum EChatState {
+	EXPANDED = 'expanded',
+	COLLAPSED = 'collapsed',
+	EXPANDED_SMALL = 'expanded_small',
+	CLOSED = 'closed'
+}
+
+export interface IConversationHistory {
+	id: string;
+	title: string;
+	lastMessage: string;
+	lastActivity: number;
+	messageCount: number;
+}
+
+export interface IChatDataSource {
+	title: string;
+	url: string;
+	source_type: string;
+	similarity_score: number;
+}
+
+export interface IConversationMessage {
+	id: string;
+	text: string;
+	sender: 'user' | 'ai';
+	timestamp: number;
+	conversationId: string;
+	isStreaming?: boolean;
+	sources?: IChatDataSource[];
+	followUpQuestions?: string[];
+}
+
+export interface IConversationTurn {
+	query: string; // User's question
+	response: string; // AI's response
+	timestamp?: string; // Optional timestamp
+}
+
+export interface IChatApiResponse {
+	answer: string; // AI-generated response
+	sources: IChatDataSource[]; // Array of source documents
+	follow_up_questions: string[]; // Array of suggested questions
+	remaining_requests: number; // Rate limit remaining count
+	confidence: number; // 0.0-1.0 confidence score
+	context_used: boolean; // Whether document context was used
+	model_used: string; // AI model name (e.g., "gpt-3.5-turbo")
+	chunks_used: number; // Number of document chunks used
+	processing_time_ms: number; // Response time in milliseconds
+	timestamp: string; // ISO timestamp
+	search_method: string; // Method: "local_knowledge", "web_search", etc.
+}
+
+export interface IChatResponse {
+	text: string;
+	sources?: IChatDataSource[];
+	followUpQuestions?: string[];
+	isNewConversation?: boolean;
+	conversationId?: string;
+}
+
+export interface IDelegateXAccount {
+	address: string;
+	encryptedMnemonic: string;
+	nonce: string;
+	userId: number;
+	createdAt: Date;
+	updatedAt: Date;
+	includeComment: boolean;
+	network: ENetwork;
+	votingPower: string;
+	strategyId?: string;
+	contactLink?: string;
+	signatureLink?: string;
+	prompt?: string;
+	active?: boolean;
+}
+
+export interface IDelegateXVoteData {
+	delegateXAccountId: string;
+	proposalId: string;
+	hash: string;
+	decision: number;
+	reason: string[];
+	comment?: string;
+	proposalType: EProposalType;
+	createdAt: Date;
+	updatedAt: Date;
+	votingPower: string;
+	conviction: EConvictionAmount;
+}
+
+export interface VotingStrategy {
+	id: string;
+	name: string;
+	description: string;
+	icon: string;
+	tags: string[];
+	logic: string;
+	weights: {
+		balthazar: number;
+		caspar: number;
+		melchior: number;
+	};
+	commentPreview: (signature: string, contact: string) => string;
+}
+
+export enum EJudgementDashboardTabs {
+	DASHBOARD = 'dashboard',
+	REGISTRARS = 'registrars'
+}
+
+export enum EJudgementStatus {
+	REQUESTED = 'Requested',
+	APPROVED = 'Approved',
+	REJECTED = 'Rejected',
+	PENDING = 'Pending'
+}
+
+export interface IJudgementRequest {
+	id: string;
+	address: string;
+	displayName: string;
+	email: string;
+	twitter: string;
+	status: EJudgementStatus;
+	dateInitiated: Date;
+	registrarIndex: number;
+	registrarAddress: string;
+	judgementHash?: string;
+}
+
+export interface IJudgementStats {
+	totalRequestedThisMonth: number;
+	percentageIncreaseFromLastMonth: number;
+	percentageCompletedThisMonth: number;
+}
 
 export enum ECommunityRole {
 	MEMBERS = 'members',
