@@ -8,7 +8,7 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { IEcosystemContext } from '@/_shared/types';
 
 /**
- * GET /api/v2/analytics/ecosystem-context
+ * GET /api/v2/treasury-analytics/ecosystem-context
  *
  * Returns ecosystem context data including:
  * - Network activity backdrop (transactions, accounts)

@@ -8,7 +8,7 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { IMethodologyAppendix } from '@/_shared/types';
 
 /**
- * GET /api/v2/analytics/methodology
+ * GET /api/v2/treasury-analytics/methodology
  *
  * Returns the methodology appendix explaining how metrics are calculated including:
  * - Category definitions

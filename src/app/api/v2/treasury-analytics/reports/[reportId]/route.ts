@@ -14,7 +14,7 @@ interface IRouteParams {
 }
 
 /**
- * GET /api/v2/analytics/reports/[reportId]
+ * GET /api/v2/treasury-analytics/reports/[reportId]
  *
  * Returns a specific treasury report by ID.
  * The report includes all sections as defined in the PRD:

@@ -17,7 +17,7 @@ const zodQuerySchema = z.object({
 });
 
 /**
- * GET /api/v2/analytics/reports
+ * GET /api/v2/treasury-analytics/reports
  *
  * Returns the report archive with list of available treasury reports.
  * Supports filtering by type (monthly/annual) and year.
@@ -49,7 +49,7 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 });
 
 /**
- * POST /api/v2/analytics/reports
+ * POST /api/v2/treasury-analytics/reports
  *
  * Triggers generation of a new treasury report.
  * This is typically called by a scheduled job or admin action.

@@ -8,7 +8,7 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { IProjects } from '@/_shared/types';
 
 /**
- * GET /api/v2/analytics/projects
+ * GET /api/v2/treasury-analytics/projects
  *
  * Returns a summary of projects and historical funds awarded from treasury including:
  * - Project details (name, description, category, links)

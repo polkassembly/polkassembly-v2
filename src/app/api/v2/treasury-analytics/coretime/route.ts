@@ -8,7 +8,7 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { ICoretimeAnalytics } from '@/_shared/types';
 
 /**
- * GET /api/v2/analytics/coretime
+ * GET /api/v2/treasury-analytics/coretime
  *
  * Returns coretime analytics data including:
  * - Coretime revenue burned

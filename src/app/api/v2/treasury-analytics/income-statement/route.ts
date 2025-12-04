@@ -8,7 +8,7 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { IIncomeStatement } from '@/_shared/types';
 
 /**
- * GET /api/v2/analytics/income-statement
+ * GET /api/v2/treasury-analytics/income-statement
  *
  * Returns income statement data including:
  * - Monthly operating results (inflows, outflows, net result)

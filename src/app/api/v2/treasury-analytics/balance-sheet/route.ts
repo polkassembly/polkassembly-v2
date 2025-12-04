@@ -8,7 +8,7 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { IBalanceSheet } from '@/_shared/types';
 
 /**
- * GET /api/v2/analytics/balance-sheet
+ * GET /api/v2/treasury-analytics/balance-sheet
  *
  * Returns balance sheet data including:
  * - Assets breakdown

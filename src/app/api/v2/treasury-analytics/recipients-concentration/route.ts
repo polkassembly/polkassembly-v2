@@ -8,7 +8,7 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { IRecipientsConcentration } from '@/_shared/types';
 
 /**
- * GET /api/v2/analytics/recipients-concentration
+ * GET /api/v2/treasury-analytics/recipients-concentration
  *
  * Returns recipients and concentration data including:
  * - Top Recipients Share (Lorenz curve showing spend concentration)

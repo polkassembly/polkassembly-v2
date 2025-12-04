@@ -8,7 +8,7 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { IAdvancedAnalyticsResponse, ETreasuryHealthStatus } from '@/_shared/types';
 
 /**
- * GET /api/v2/analytics/advanced
+ * GET /api/v2/treasury-analytics/advanced
  *
  * Returns all Advanced Analytics data in a single response including:
  * - Forecasts (treasury runway predictions with confidence bands, spend by tracks, AI insights)

@@ -25,7 +25,7 @@ interface ITreasuryOverviewResponse {
 }
 
 /**
- * GET /api/v2/analytics/treasury-overview
+ * GET /api/v2/treasury-analytics/treasury-overview
  *
  * Returns treasury overview data including:
  * - Total treasury balance with composition (relay chain, AssetHub, parachains)

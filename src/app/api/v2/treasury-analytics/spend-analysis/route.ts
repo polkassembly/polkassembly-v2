@@ -8,7 +8,7 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { ISpendAnalysis } from '@/_shared/types';
 
 /**
- * GET /api/v2/analytics/spend-analysis
+ * GET /api/v2/treasury-analytics/spend-analysis
  *
  * Returns spend analysis data including:
  * - Refunds and cancellations

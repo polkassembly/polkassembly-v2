@@ -8,7 +8,7 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { IGeneralAnalyticsResponse, ETreasuryHealthStatus } from '@/_shared/types';
 
 /**
- * GET /api/v2/analytics/general
+ * GET /api/v2/treasury-analytics/general
  *
  * Returns all General Analytics data in a single response including:
  * - Treasury Overview (stats, asset distribution by token/chain/liquidity, stablecoin coverage, health indicators)

@@ -8,7 +8,7 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { IForecasts } from '@/_shared/types';
 
 /**
- * GET /api/v2/analytics/forecasts
+ * GET /api/v2/treasury-analytics/forecasts
  *
  * Returns AI/ML-generated forecast data including:
  * - Forecasted treasury runway with confidence intervals

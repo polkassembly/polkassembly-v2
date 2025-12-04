@@ -8,7 +8,7 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { IRiskDetection, ETreasuryHealthStatus } from '@/_shared/types';
 
 /**
- * GET /api/v2/analytics/risk-detection
+ * GET /api/v2/treasury-analytics/risk-detection
  *
  * Returns risk and anomaly detection data including:
  * - Anomaly detection panel (outlier spend, unusual timing, etc.)
