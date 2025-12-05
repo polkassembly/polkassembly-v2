@@ -64,13 +64,11 @@ import {
 	IGovAnalyticsCategoryCounts,
 	IConversationHistory,
 	IConversationMessage,
-	IConversationTurn,
-	IDVDelegatesResponse,
-	IDVReferendaInfluenceResponse,
-	IDVVotingMatrixResponse,
-	EDVTrackFilter,
 	IDelegateXAccount,
-	IDelegateXVoteData
+	IDelegateXVoteData,
+	IConversationTurn,
+	IDVCohort,
+	IDVDReferendumResponse
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -166,9 +164,6 @@ enum EApiRoute {
 	GET_VOTES_BY_ADDRESSES = 'GET_VOTES_BY_ADDRESSES',
 	GET_GOV_ANALYTICS = 'GET_GOV_ANALYTICS',
 	GET_TRACK_COUNTS = 'GET_TRACK_COUNTS',
-	GET_DV_DELEGATES = 'GET_DV_DELEGATES',
-	GET_DV_INFLUENCE = 'GET_DV_INFLUENCE',
-	GET_DV_VOTING_MATRIX = 'GET_DV_VOTING_MATRIX',
 	GET_CONVERSATION_HISTORY = 'GET_CONVERSATION_HISTORY',
 	GET_CONVERSATION_MESSAGES = 'GET_CONVERSATION_MESSAGES',
 	GET_KLARA_STATS = 'GET_KLARA_STATS',
@@ -178,7 +173,10 @@ enum EApiRoute {
 	CREATE_DELEGATE_X_BOT = 'CREATE_DELEGATE_X_BOT',
 	UPDATE_DELEGATE_X_BOT = 'UPDATE_DELEGATE_X_BOT',
 	GET_DELEGATE_X_DETAILS = 'GET_DELEGATE_X_DETAILS',
-	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY'
+	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY',
+	GET_DV_COHORTS = 'GET_DV_COHORTS',
+	GET_DV_COHORT_DETAILS = 'GET_DV_COHORT_DETAILS',
+	GET_DV_COHORT_REFERENDA = 'GET_DV_COHORT_REFERENDA'
 }
 
 export class NextApiClientService {
@@ -422,18 +420,6 @@ export class NextApiClientService {
 				path = '/external/news/google-sheets';
 				break;
 
-			case EApiRoute.GET_DV_DELEGATES:
-				path = '/people/dv-delegates/delegates';
-				break;
-
-			case EApiRoute.GET_DV_INFLUENCE:
-				path = '/people/dv-delegates/influence';
-				break;
-
-			case EApiRoute.GET_DV_VOTING_MATRIX:
-				path = '/people/dv-delegates/voting-matrix';
-				break;
-
 			case EApiRoute.CREATE_DELEGATE_X_BOT:
 				path = '/delegate-x';
 				method = 'POST';
@@ -452,6 +438,18 @@ export class NextApiClientService {
 			case EApiRoute.GET_DELEGATE_X_VOTE_HISTORY:
 				path = '/delegate-x/vote-history';
 				method = 'GET';
+				break;
+
+			case EApiRoute.GET_DV_COHORTS:
+				path = '/dv/cohorts';
+				break;
+
+			case EApiRoute.GET_DV_COHORT_DETAILS:
+				path = '/dv/cohorts/id';
+				break;
+
+			case EApiRoute.GET_DV_COHORT_REFERENDA:
+				path = '/dv/cohorts/id/referenda';
 				break;
 
 			default:
@@ -1112,29 +1110,19 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ id: string }>({ url, method, data: { address, manifesto } });
 	}
 
-	static async fetchDVDelegates({ cohortId, trackFilter = EDVTrackFilter.DV_TRACKS }: { cohortId?: number; trackFilter?: EDVTrackFilter }) {
-		const queryParams = new URLSearchParams({ trackFilter });
-		if (cohortId !== undefined) queryParams.set('cohortId', cohortId.toString());
-
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_DELEGATES, queryParams });
-		return this.nextApiClientFetch<IDVDelegatesResponse>({ url, method });
+	static async fetchDVCohorts() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS });
+		return this.nextApiClientFetch<IDVCohort[]>({ url, method });
 	}
 
-	static async fetchDVInfluence({ cohortId, trackFilter = EDVTrackFilter.DV_TRACKS, sortBy }: { cohortId?: number; trackFilter?: EDVTrackFilter; sortBy?: 'status' | 'votes' }) {
-		const queryParams = new URLSearchParams({ trackFilter });
-		if (cohortId !== undefined) queryParams.set('cohortId', cohortId.toString());
-		if (sortBy) queryParams.set('sortBy', sortBy);
-
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_INFLUENCE, queryParams });
-		return this.nextApiClientFetch<IDVReferendaInfluenceResponse>({ url, method });
+	static async fetchDVCohortDetails(id: number) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORT_DETAILS, routeSegments: [id.toString()] });
+		return this.nextApiClientFetch<IDVCohort>({ url, method });
 	}
 
-	static async fetchDVVotingMatrix({ cohortId, trackFilter = EDVTrackFilter.DV_TRACKS }: { cohortId?: number; trackFilter?: EDVTrackFilter }) {
-		const queryParams = new URLSearchParams({ trackFilter });
-		if (cohortId !== undefined) queryParams.set('cohortId', cohortId.toString());
-
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_VOTING_MATRIX, queryParams });
-		return this.nextApiClientFetch<IDVVotingMatrixResponse>({ url, method });
+	static async fetchDVCohortReferenda(id: number) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORT_REFERENDA, routeSegments: [id.toString()] });
+		return this.nextApiClientFetch<IDVDReferendumResponse[]>({ url, method });
 	}
 
 	static async updatePADelegate({ address, manifesto }: { address: string; manifesto: string }) {
