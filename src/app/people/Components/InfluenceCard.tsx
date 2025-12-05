@@ -75,9 +75,12 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 				case 'influence':
 					comparison = a.influence.localeCompare(b.influence);
 					break;
-				case 'votes':
-					comparison = Number(a.dvTotalVotingPower) - Number(b.dvTotalVotingPower);
+				case 'votes': {
+					const aPower = BigInt(a.dvTotalVotingPower || '0');
+					const bPower = BigInt(b.dvTotalVotingPower || '0');
+					comparison = aPower > bPower ? 1 : aPower < bPower ? -1 : 0;
 					break;
+				}
 				default:
 					comparison = 0;
 			}

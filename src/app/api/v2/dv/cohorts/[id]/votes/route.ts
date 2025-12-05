@@ -11,7 +11,7 @@ import { ENetwork, IDVVotes, IDVCohortVote } from '@/_shared/types';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
-import { formatDVCohortVote } from '@/app/api/_api-utils/voteUtils';
+import { formatDVCohortVote } from '@/_shared/_utils/dvDelegateUtils';
 
 const schema = z.object({
 	id: z

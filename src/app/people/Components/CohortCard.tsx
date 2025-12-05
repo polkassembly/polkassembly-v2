@@ -8,8 +8,10 @@ import timer from '@assets/icons/timer.svg';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { IDVCohort, ECohortStatus, ENetwork } from '@/_shared/types';
-import { formatDate, formatDelegationAmount } from '@/_shared/_utils/dvDelegateUtils';
+import { formatDate } from '@/_shared/_utils/dvDelegateUtils';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 
 interface CohortCardProps {
 	cohort: IDVCohort | null;
@@ -58,7 +60,11 @@ function CohortCard({ cohort, loading, network }: CohortCardProps) {
 						<p className='text-xs font-medium uppercase text-community_text'>{t('TotalDAOs').toUpperCase()}</p>
 						<p className='text-2xl font-semibold text-text_primary'>{cohort.delegatesCount}</p>
 						<p className='text-xs text-wallet_btn_text'>
-							{formatDelegationAmount(cohort.delegationPerDelegate || 0, network)} {t('DelegationsEach')}
+							{cohort.guardiansCount > 0
+								? `${formatUSDWithUnits(
+										formatBnBalance(String(cohort.delegationPerDelegate || 0), { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
+									)}${t('DelegationsEach')}`
+								: 'N/A'}{' '}
 						</p>
 					</div>
 				</div>
@@ -74,7 +80,11 @@ function CohortCard({ cohort, loading, network }: CohortCardProps) {
 							<p className='text-xs font-medium uppercase text-community_text'>{t('Guardians').toUpperCase()}</p>
 							<p className='text-2xl font-semibold text-text_primary'>{cohort.guardiansCount}</p>
 							<p className='text-xs text-wallet_btn_text'>
-								{cohort.guardiansCount > 0 ? `${formatDelegationAmount(cohort.delegationPerGuardian || 0, network)} ${t('DelegationsEach')}` : 'N/A'}
+								{cohort.guardiansCount > 0
+									? `${formatUSDWithUnits(
+											formatBnBalance(String(cohort.delegationPerGuardian || 0), { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
+										)}${t('DelegationsEach')}`
+									: 'N/A'}
 							</p>
 						</div>
 					</div>

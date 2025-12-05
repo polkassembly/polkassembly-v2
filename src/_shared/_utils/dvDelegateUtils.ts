@@ -20,7 +20,9 @@ import {
 	IDVReferendumInfluence,
 	IDVDelegateVotingMatrix,
 	EInfluenceStatus,
-	IDVDelegateVote
+	IDVDelegateVote,
+	IDelegatedVote,
+	IDVVotes
 } from '../types';
 
 export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: IDVDReferendumResponse[], cohort: IDVCohort): { delegatesWithStats: IDVDelegateWithStats[] } {
@@ -396,15 +398,17 @@ export function calculateDVInfluence(
 		const turnout = totalAye + totalNay;
 
 		const setPercentage = (votesList: IDVDelegateVote[]) => {
-			votesList.forEach((v) => {
-				const power = BigInt(v.votingPower);
-				// eslint-disable-next-line no-param-reassign
-				v.percentage = turnout > BigInt(0) ? Number((power * BigInt(10000)) / turnout) / 100 : 0;
+			return votesList.map((vote) => {
+				const power = BigInt(vote.votingPower);
+				return {
+					...vote,
+					percentage: turnout > BigInt(0) ? Number((power * BigInt(10000)) / turnout) / 100 : 0
+				};
 			});
 		};
 
-		setPercentage(delegateVotes);
-		setPercentage(guardianVotes);
+		const delegateVotesWithPercentage = setPercentage(delegateVotes);
+		const guardianVotesWithPercentage = setPercentage(guardianVotes);
 		const ayePercent = turnout > BigInt(0) ? Number((totalAye * BigInt(10000)) / turnout) / 100 : 0;
 		const nayPercent = turnout > BigInt(0) ? Number((totalNay * BigInt(10000)) / turnout) / 100 : 0;
 		const { trackNumber } = referendum;
@@ -422,8 +426,8 @@ export function calculateDVInfluence(
 			nayPercent,
 			influence,
 			dvTotalVotingPower: totalPower.toString(),
-			delegateVotes,
-			guardianVotes,
+			delegateVotes: delegateVotesWithPercentage,
+			guardianVotes: guardianVotesWithPercentage,
 			totalAyeVotingPower: totalAye.toString(),
 			totalNayVotingPower: totalNay.toString()
 		};
@@ -483,4 +487,56 @@ export function calculateDVVotingMatrix(
 	});
 
 	return { votingMatrix, referendumIndices };
+}
+
+export function formatDVCohortVote(vote: IDVVotes): IDVCohortVote {
+	const refIndex = vote.proposal.index;
+
+	let delegatedVotes = BigInt(0);
+	let delegatedCapital = BigInt(0);
+
+	if (vote.delegatedVotes && Array.isArray(vote.delegatedVotes)) {
+		vote.delegatedVotes.forEach((dv: IDelegatedVote) => {
+			delegatedVotes += BigInt(dv.votingPower || 0);
+			const balance = dv.balance?.value || dv.balance?.aye || dv.balance?.nay || dv.balance?.abstain || 0;
+			delegatedCapital += BigInt(balance);
+		});
+	}
+
+	const isSplit = !!(vote.balance?.aye && vote.balance?.nay);
+	const isSplitAbstain = !!vote.balance?.abstain;
+	const isStandard = !!vote.balance?.value;
+
+	const voteData: IDVCohortVote = {
+		referendumIndex: refIndex,
+		account: vote.voter,
+		isDelegating: !!vote.delegatedTo,
+		isStandard,
+		isSplit,
+		isSplitAbstain,
+		balance: vote.balance?.value || (BigInt(vote.balance?.aye || 0) + BigInt(vote.balance?.nay || 0) + BigInt(vote.balance?.abstain || 0)).toString(),
+		aye: vote.decision === 'yes',
+		conviction: vote.lockPeriod,
+		votes: vote.selfVotingPower || '0',
+		delegations: {
+			votes: delegatedVotes.toString(),
+			capital: delegatedCapital.toString()
+		}
+	};
+
+	if (isSplit || isSplitAbstain) {
+		const ayeBalance = BigInt(vote.balance?.aye || 0);
+		const nayBalance = BigInt(vote.balance?.nay || 0);
+		const abstainBalance = BigInt(vote.balance?.abstain || 0);
+
+		voteData.ayeBalance = ayeBalance.toString();
+		voteData.nayBalance = nayBalance.toString();
+		voteData.abstainBalance = abstainBalance.toString();
+
+		voteData.ayeVotes = (ayeBalance / BigInt(10)).toString();
+		voteData.nayVotes = (nayBalance / BigInt(10)).toString();
+		voteData.abstainVotes = (abstainBalance / BigInt(10)).toString();
+	}
+
+	return voteData;
 }
