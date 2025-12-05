@@ -11,7 +11,8 @@ import { Tabs, TabsContent } from '@ui/Tabs';
 import { TreasurySpendsHeader } from './components/Header/Header';
 import InfoNudge from './components/InfoNudge/InfoNudge';
 import SpendsList from './components/SpendsList/SpendsList';
-import SpendsStats from './components/SpendsStats/SpendsStats';
+import SpendsStats from './components/Stats/SpendsStats';
+import CoretimeStats from './components/Stats/CoretimeStats';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
@@ -32,18 +33,18 @@ async function TreasuryAnalyticsPage() {
 			<Tabs defaultValue={ETreasurySpendsTabs.SPENDS}>
 				<TreasurySpendsHeader />
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-10'>
-					<TabsContent
-						value={ETreasurySpendsTabs.SPENDS}
-						className='flex flex-col gap-6'
-					>
-						<SpendsStats />
-						<SpendsList />
+					<TabsContent value={ETreasurySpendsTabs.SPENDS}>
+						<div className='flex flex-col gap-6'>
+							<SpendsStats />
+							<SpendsList />
+						</div>
 					</TabsContent>
-					<TabsContent
-						value={ETreasurySpendsTabs.CORETIME}
-						className='flex flex-col gap-6'
-					>
-						<InfoNudge />
+					<TabsContent value={ETreasurySpendsTabs.CORETIME}>
+						<div className='flex flex-col gap-6'>
+							<CoretimeStats />
+
+							<InfoNudge />
+						</div>
 					</TabsContent>
 				</div>
 			</Tabs>
