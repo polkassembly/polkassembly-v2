@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { IJudgementRequest } from '@/_shared/types';
 import { useMemo } from 'react';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
@@ -46,7 +44,7 @@ function JudgementListingTable() {
 
 	if (isLoading || !identityService) {
 		return (
-			<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
+			<div className='flex flex-col gap-4 rounded-3xl border border-primary_border bg-bg_modal p-4'>
 				<Skeleton className='h-12 w-full' />
 				<Skeleton className='h-12 w-full' />
 				<Skeleton className='h-12 w-full' />
@@ -58,7 +56,7 @@ function JudgementListingTable() {
 		<div className='w-full'>
 			{judgementData && judgementData.length > 0 ? (
 				<>
-					<div className='w-full rounded-lg border border-primary_border bg-bg_modal p-6'>
+					<div className='w-full rounded-3xl border border-primary_border bg-bg_modal p-6'>
 						<Table>
 							<TableHeader>
 								<TableRow className={styles.tableRow}>

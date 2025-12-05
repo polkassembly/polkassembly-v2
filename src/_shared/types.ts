@@ -1737,8 +1737,11 @@ export interface VotingStrategy {
 }
 
 export enum EJudgementDashboardTabs {
-	DASHBOARD = 'dashboard',
-	REGISTRARS = 'registrars'
+	REQUESTS = 'requests',
+	OVERVIEW = 'overview',
+	JUDGEMENTS = 'judgements',
+	REGISTRARS = 'registrars',
+	MY_DASHBOARD = 'my-dashboard'
 }
 
 export enum EJudgementStatus {
