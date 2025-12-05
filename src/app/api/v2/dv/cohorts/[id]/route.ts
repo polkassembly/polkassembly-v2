@@ -33,13 +33,14 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	}
 
 	const response = {
-		id: cohort.id || cohort.index,
+		index: Number(cohort.id || cohort.index),
 		announcementLink: cohort.announcementLink,
-		delegateCnt: cohort.delegatesCount,
-		delegation: cohort.delegation,
+		delegatesCount: cohort.delegatesCount,
+		delegationPerDelegate: cohort.delegation,
+		status: cohort.status,
 		endIndexer: cohort.endIndexer,
-		guardianCnt: cohort.guardiansCount,
-		guardianDelegation: cohort.guardianDelegation,
+		guardiansCount: cohort.guardiansCount,
+		delegationPerGuardian: cohort.guardianDelegation,
 		startIndexer: cohort.startIndexer,
 		tracks: cohort.tracks,
 		allReferendaCnt: cohort.allReferendaCnt,

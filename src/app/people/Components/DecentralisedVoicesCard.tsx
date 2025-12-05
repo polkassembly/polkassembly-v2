@@ -37,8 +37,8 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 		votesCastedHighToLow: true
 	});
 
-	const daos = delegatesWithStats.filter((d) => d.type === EDVDelegateType.DAO);
-	const guardians = delegatesWithStats.filter((d) => d.type === EDVDelegateType.GUARDIAN);
+	const daos = delegatesWithStats.filter((d) => d.role === EDVDelegateType.DAO);
+	const guardians = delegatesWithStats.filter((d) => d.role === EDVDelegateType.GUARDIAN);
 	const filteredDelegates = activeTab === EDVDelegateType.DAO ? daos : guardians;
 
 	const sortedDelegates = [...filteredDelegates].sort((a, b) => {

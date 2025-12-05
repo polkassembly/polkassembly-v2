@@ -68,7 +68,8 @@ import {
 	IDelegateXVoteData,
 	IConversationTurn,
 	IDVCohort,
-	IDVDReferendumResponse
+	IDVDReferendumResponse,
+	IDVCohortVote
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -174,9 +175,7 @@ enum EApiRoute {
 	UPDATE_DELEGATE_X_BOT = 'UPDATE_DELEGATE_X_BOT',
 	GET_DELEGATE_X_DETAILS = 'GET_DELEGATE_X_DETAILS',
 	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY',
-	GET_DV_COHORTS = 'GET_DV_COHORTS',
-	GET_DV_COHORT_DETAILS = 'GET_DV_COHORT_DETAILS',
-	GET_DV_COHORT_REFERENDA = 'GET_DV_COHORT_REFERENDA'
+	GET_DV_COHORTS = 'GET_DV_COHORTS'
 }
 
 export class NextApiClientService {
@@ -442,14 +441,6 @@ export class NextApiClientService {
 
 			case EApiRoute.GET_DV_COHORTS:
 				path = '/dv/cohorts';
-				break;
-
-			case EApiRoute.GET_DV_COHORT_DETAILS:
-				path = '/dv/cohorts/id';
-				break;
-
-			case EApiRoute.GET_DV_COHORT_REFERENDA:
-				path = '/dv/cohorts/id/referenda';
 				break;
 
 			default:
@@ -1110,21 +1101,6 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ id: string }>({ url, method, data: { address, manifesto } });
 	}
 
-	static async fetchDVCohorts() {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS });
-		return this.nextApiClientFetch<IDVCohort[]>({ url, method });
-	}
-
-	static async fetchDVCohortDetails(id: number) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORT_DETAILS, routeSegments: [id.toString()] });
-		return this.nextApiClientFetch<IDVCohort>({ url, method });
-	}
-
-	static async fetchDVCohortReferenda(id: number) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORT_REFERENDA, routeSegments: [id.toString()] });
-		return this.nextApiClientFetch<IDVDReferendumResponse[]>({ url, method });
-	}
-
 	static async updatePADelegate({ address, manifesto }: { address: string; manifesto: string }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.UPDATE_PA_DELEGATE, routeSegments: [address] });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { manifesto } });
@@ -1637,5 +1613,25 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_VOTE_HISTORY, queryParams });
 		return this.nextApiClientFetch<{ success: boolean; voteData: IDelegateXVoteData[]; totalCount: number }>({ url, method });
+	}
+
+	static async fetchDVCohorts() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS });
+		return this.nextApiClientFetch<IDVCohort[]>({ url, method });
+	}
+
+	static async fetchDVCohortDetails(id: number) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS, routeSegments: [id.toString()] });
+		return this.nextApiClientFetch<IDVCohort>({ url, method });
+	}
+
+	static async fetchDVCohortReferenda(cohortId: number) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS, routeSegments: [cohortId.toString(), 'referenda'] });
+		return this.nextApiClientFetch<IDVDReferendumResponse[]>({ url, method });
+	}
+
+	static async fetchDVCohortVotes(cohortId: number) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS, routeSegments: [cohortId.toString(), 'votes'] });
+		return this.nextApiClientFetch<IDVCohortVote[]>({ url, method });
 	}
 }

@@ -1,18 +1,19 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-
 import { Filter } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { getCurrentDVCohort } from '@/_shared/_utils/dvDelegateUtils';
-import { useState } from 'react';
+import { getCurrentDVCohort, calculateDVCohortStats, calculateDVInfluence, calculateDVVotingMatrix } from '@/_shared/_utils/dvDelegateUtils';
+import { DV_TRACKS } from '@/_shared/_constants/dvCohorts';
+import { useState, useMemo } from 'react';
 import { ECohortStatus, EDVTrackFilter } from '@/_shared/types';
-import { useDVDelegates, useDVInfluence, useDVVotingMatrix } from '@/hooks/useDVDelegates';
+import { useDVCohortDetails, useDVCohortReferenda, useDVCohortVotes } from '@/hooks/useDVDelegates';
 import TimeLineIcon from '@assets/icons/timeline.svg';
 import Image from 'next/image';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import CohortsTableCard from '../Components/CohortsTableCard';
 import DecentralizedVoicesVotingCard from '../Components/DecentralizedVoicesVotingCard';
 import DecentralisedVoicesCard from '../Components/DecentralisedVoicesCard';
@@ -30,18 +31,43 @@ function DecentralisedVoices() {
 
 	const [trackFilter, setTrackFilter] = useState<EDVTrackFilter>(EDVTrackFilter.DV_TRACKS);
 
-	const { data: delegatesData, isLoading: delegatesLoading, error: delegatesError } = useDVDelegates({ cohortId, trackFilter });
-	const { data: influenceData, isLoading: influenceLoading, error: influenceError } = useDVInfluence({ cohortId, trackFilter });
-	const { data: votingMatrixData, isLoading: votingMatrixLoading, error: votingMatrixError } = useDVVotingMatrix({ cohortId, trackFilter });
+	const { data: cohort, isLoading: cohortLoading, error: cohortError } = useDVCohortDetails(cohortId);
+	const { data: referenda, isLoading: referendaLoading, error: referendaError } = useDVCohortReferenda(cohortId);
+	const { data: votes, isLoading: votesLoading, error: votesError } = useDVCohortVotes(cohortId);
 
-	const cohort = delegatesData?.cohort || null;
-	const delegatesWithStats = delegatesData?.delegatesWithStats || [];
-	const referendaInfluence = influenceData?.referenda || [];
-	const votingMatrix = votingMatrixData?.delegates || [];
-	const referendumIndices = votingMatrixData?.referendumIndices || [];
+	const isLoading = cohortLoading || referendaLoading || votesLoading;
+	const error = cohortError || referendaError || votesError;
 
-	const error = delegatesError || influenceError || votingMatrixError;
-	if (error || (!delegatesLoading && !cohort)) {
+	const { delegatesWithStats, referendaInfluence, votingMatrix, referendumIndices } = useMemo(() => {
+		if (!cohort || !referenda || !votes) {
+			return { delegatesWithStats: [], referendaInfluence: [], votingMatrix: [], referendumIndices: [] };
+		}
+
+		let filteredReferenda = referenda;
+		if (trackFilter === EDVTrackFilter.DV_TRACKS) {
+			const dvTracks = DV_TRACKS;
+			const networkDetails = NETWORKS_DETAILS[network];
+			if (networkDetails) {
+				const allowedTrackIds = dvTracks.map((origin) => networkDetails.trackDetails[origin]?.trackId).filter((id) => id !== undefined);
+				filteredReferenda = referenda.filter((r) => allowedTrackIds.includes(r.trackNumber));
+			} else {
+				filteredReferenda = [];
+			}
+		}
+
+		const stats = calculateDVCohortStats(votes, filteredReferenda, cohort);
+		const influence = calculateDVInfluence(votes, cohort, filteredReferenda, network);
+		const matrix = calculateDVVotingMatrix(votes, cohort, filteredReferenda);
+
+		return {
+			delegatesWithStats: stats.delegatesWithStats,
+			referendaInfluence: influence.referendaInfluence,
+			votingMatrix: matrix.votingMatrix,
+			referendumIndices: matrix.referendumIndices
+		};
+	}, [cohort, referenda, votes, trackFilter, network]);
+
+	if (error || (!isLoading && !cohort)) {
 		return (
 			<div className='min-h-screen bg-page_background'>
 				<div className='flex h-96 items-center justify-center'>
@@ -64,12 +90,14 @@ function DecentralisedVoices() {
 								className='h-6 w-6'
 							/>{' '}
 							<h2 className='flex flex-wrap items-center gap-2 text-xl font-semibold text-navbar_title sm:text-2xl'>
-								{t('Cohort')} #{cohort?.index ?? ''}
-								<span
-									className={`rounded-full px-2 py-0.5 text-[10px] text-btn_primary_text sm:text-xs ${cohort?.status === ECohortStatus.ONGOING ? 'bg-border_blue' : 'bg-progress_nay'}`}
-								>
-									{cohort?.status ?? 'Loading'}
-								</span>
+								{t('Cohort')} {cohort ? `#${cohort.index}` : ''}
+								{cohort && (
+									<span
+										className={`rounded-full px-2 py-0.5 text-[10px] text-btn_primary_text sm:text-xs ${cohort.status === ECohortStatus.ONGOING ? 'bg-border_blue' : 'bg-progress_nay'}`}
+									>
+										{cohort.status}
+									</span>
+								)}
 							</h2>
 						</div>
 						<Popover>
@@ -102,23 +130,24 @@ function DecentralisedVoices() {
 						</Popover>
 					</div>
 					<CohortCard
-						cohort={cohort}
-						loading={delegatesLoading}
+						cohort={cohort || null}
+						loading={isLoading}
+						network={network}
 					/>
 					<DecentralisedVoicesCard
 						delegatesWithStats={delegatesWithStats}
-						cohort={cohort}
-						loading={delegatesLoading}
+						cohort={cohort || null}
+						loading={isLoading}
 					/>
 					<InfluenceCard
 						referendaInfluence={referendaInfluence}
-						loading={influenceLoading}
+						loading={isLoading}
 					/>
 					<DecentralizedVoicesVotingCard
 						votingMatrix={votingMatrix}
 						referendumIndices={referendumIndices}
-						cohort={cohort}
-						loading={votingMatrixLoading}
+						cohort={cohort || null}
+						loading={isLoading}
 					/>
 				</div>
 

@@ -5,7 +5,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useDVDelegates } from '@/hooks/useDVDelegates';
+import { useDVCohortDetails } from '@/hooks/useDVDelegates';
 import { EDVDelegateType } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getCurrentDVCohort } from '@/_shared/_utils/dvDelegateUtils';
@@ -21,12 +21,10 @@ function PeoplePage() {
 	const currentCohort = getCurrentDVCohort(network);
 	const cohortId = cohortIndexParam ? parseInt(cohortIndexParam, 10) : (currentCohort?.index ?? 5);
 
-	const { data: delegatesData } = useDVDelegates({ cohortId });
+	const { data: cohort } = useDVCohortDetails(cohortId);
 
-	const cohort = delegatesData?.cohort || null;
-
-	const delegates = cohort?.delegates?.filter((d) => d.type === EDVDelegateType.DAO).length;
-	const guardians = cohort?.delegates?.filter((d) => d.type === EDVDelegateType.GUARDIAN).length;
+	const delegates = cohort?.delegates?.filter((d) => d.role === EDVDelegateType.DAO).length;
+	const guardians = cohort?.delegates?.filter((d) => d.role === EDVDelegateType.GUARDIAN).length;
 	const tracks = cohort?.tracks?.length;
 
 	return (

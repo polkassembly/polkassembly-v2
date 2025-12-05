@@ -409,4 +409,8 @@ export class OnChainDbService {
 	static async GetCohortReferenda({ network, indexStart, indexEnd }: { network: ENetwork; indexStart: number; indexEnd: number }) {
 		return SubsquidService.GetCohortReferenda({ network, indexStart, indexEnd });
 	}
+
+	static async GetVotesForDelegateCohort({ network, indexStart, indexEnd, voterAddresses }: { network: ENetwork; indexStart: number; indexEnd: number; voterAddresses: string[] }) {
+		return SubsquidService.GetVotesForDelegateCohort({ network, indexStart, indexEnd, voterAddresses });
+	}
 }

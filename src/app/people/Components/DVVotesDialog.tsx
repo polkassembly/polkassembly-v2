@@ -26,9 +26,9 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 
 	if (!data) return null;
 
-	const { delegateVotes, guardianVotes } = data;
+	const { delegateVotes = [], guardianVotes = [] } = data;
 
-	const activeVotes = (activeTab === EDVDelegateType.DAO ? delegateVotes : guardianVotes).slice().sort((a, b) => {
+	const activeVotes = (activeTab === EDVDelegateType.DAO ? delegateVotes || [] : guardianVotes || []).slice().sort((a, b) => {
 		const powerA = BigInt(a.votingPower || '0');
 		const powerB = BigInt(b.votingPower || '0');
 
@@ -56,7 +56,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 		return { ayeCount, nayCount, abstainCount, ayePower, nayPower, abstainPower };
 	};
 
-	const allVotes = [...delegateVotes, ...guardianVotes];
+	const allVotes = [...(delegateVotes || []), ...(guardianVotes || [])];
 	const totalStats = getStats(allVotes);
 
 	const dvAyePower = totalStats.ayePower;
@@ -66,13 +66,14 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 
 	const dvDecidingPower = dvAyePower + dvNayPower;
 
-	const ayePercentBar = dvTotalPower > 0 ? Number((dvAyePower * BigInt(10000)) / dvTotalPower) / 100 : 0;
-	const nayPercentBar = dvTotalPower > 0 ? Number((dvNayPower * BigInt(10000)) / dvTotalPower) / 100 : 0;
-	const abstainPercentBar = dvTotalPower > 0 ? Number((dvAbstainPower * BigInt(10000)) / dvTotalPower) / 100 : 0;
-
-	const totalChainAyePower = BigInt(data.ayeVotingPower || '0');
-	const totalChainNayPower = BigInt(data.nayVotingPower || '0');
+	const totalChainAyePower = BigInt(data.totalAyeVotingPower || '0');
+	const totalChainNayPower = BigInt(data.totalNayVotingPower || '0');
 	const totalChainPower = totalChainAyePower + totalChainNayPower;
+
+	const ayePercentBar = totalChainPower > 0 ? Number((dvAyePower * BigInt(10000)) / totalChainPower) / 100 : 0;
+	const nayPercentBar = totalChainPower > 0 ? Number((dvNayPower * BigInt(10000)) / totalChainPower) / 100 : 0;
+	const abstainPercentBar = totalChainPower > 0 ? Number((dvAbstainPower * BigInt(10000)) / totalChainPower) / 100 : 0;
+
 	const dvPercentOfTotal = totalChainPower > 0 ? Number((dvDecidingPower * BigInt(10000)) / totalChainPower) / 100 : 0;
 
 	return (
@@ -105,7 +106,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 							</span>
 						</div>
 
-						<div className='flex h-8 w-full overflow-hidden rounded-full'>
+						<div className='flex h-8 w-full overflow-hidden rounded-full bg-sidebar_footer'>
 							{ayePercentBar > 0 && (
 								<div
 									className='flex items-center justify-center bg-aye_color text-xs font-semibold text-btn_primary_text'

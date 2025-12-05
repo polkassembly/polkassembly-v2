@@ -6,12 +6,12 @@ import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
-import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { DV_COHORTS_KUSAMA, DV_COHORTS_POLKADOT } from '@/_shared/_constants/dvCohorts';
-import { ENetwork, EProposalType, IDVDReferendumResponse } from '@/_shared/types';
+import { ENetwork, IDVVotes, IDVCohortVote } from '@/_shared/types';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
+import { formatDVCohortVote } from '@/app/api/_api-utils/voteUtils';
 
 const schema = z.object({
 	id: z
@@ -42,59 +42,28 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_PARAMS_ERROR);
 	}
 
-	const referenda = await OnChainDbService.GetCohortReferenda({
+	const voterAddresses = cohort.delegates.map((d) => d.address);
+
+	const votes = await OnChainDbService.GetVotesForDelegateCohort({
 		network,
 		indexStart: cohort.referendumIndexStart,
-		indexEnd: cohort.referendumIndexEnd || 1000000000
+		indexEnd: cohort.referendumIndexEnd || 1000000000,
+		voterAddresses
 	});
 
-	const postsDataPromises = referenda.map(async (ref: IDVDReferendumResponse) => {
-		const offChainData = await OffChainDbService.GetOffChainPostData({
-			network,
-			indexOrHash: String(ref.index),
-			proposalType: EProposalType.REFERENDUM_V2,
-			proposer: ''
-		});
-		return { ref, offChainData };
+	const votesByReferendum: Record<number, IDVCohortVote[]> = {};
+
+	votes.forEach((vote: IDVVotes) => {
+		const refIndex = vote.proposal.index;
+		if (!votesByReferendum[refIndex]) {
+			votesByReferendum[refIndex] = [];
+		}
+
+		const voteData = formatDVCohortVote(vote);
+		votesByReferendum[refIndex].push(voteData);
 	});
 
-	const postsData = await Promise.all(postsDataPromises);
+	const result = Object.values(votesByReferendum).flat();
 
-	const formattedReferenda = postsData.map(({ ref, offChainData }) => {
-		return {
-			index: ref.index,
-			createdAtBlock: ref.createdAtBlock,
-			trackNumber: ref.trackNumber,
-			status: ref.status,
-			tally: ref.tally
-				? {
-						ayes: ref.tally.ayes,
-						nays: ref.tally.nays,
-						support: ref.tally.support
-					}
-				: undefined,
-			decisionDeposit: ref.decisionDeposit
-				? {
-						amount: ref.decisionDeposit.amount,
-						who: ref.decisionDeposit.who
-					}
-				: undefined,
-			submissionDeposit: ref.submissionDeposit
-				? {
-						amount: ref.submissionDeposit.amount,
-						who: ref.submissionDeposit.who
-					}
-				: undefined,
-			preimage: {
-				proposedCall: {
-					description: offChainData?.title || ref.preimage?.proposedCall?.description
-				}
-			},
-			proposalArguments: {
-				description: offChainData?.title || ref.proposalArguments?.description
-			}
-		};
-	});
-
-	return NextResponse.json(formattedReferenda);
+	return NextResponse.json(result);
 });

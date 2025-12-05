@@ -302,13 +302,17 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 															<div className='flex flex-col gap-1'>
 																<p>
 																	{t('Aye')} ={' '}
-																	{formatUSDWithUnits(formatBnBalance(item.ayeVotingPower, { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
-																	{item.ayePercent.toFixed(2)}%)
+																	{formatUSDWithUnits(
+																		formatBnBalance(item.totalAyeVotingPower || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
+																	)}{' '}
+																	({item.ayePercent.toFixed(2)}%)
 																</p>
 																<p>
 																	{t('Nay')} ={' '}
-																	{formatUSDWithUnits(formatBnBalance(item.nayVotingPower, { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
-																	{item.nayPercent.toFixed(2)}%)
+																	{formatUSDWithUnits(
+																		formatBnBalance(item.totalNayVotingPower || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
+																	)}{' '}
+																	({item.nayPercent.toFixed(2)}%)
 																</p>
 															</div>
 														</TooltipContent>

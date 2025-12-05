@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Check, X, Minus, LayoutList, LayoutGrid, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { MdArrowDropDown } from '@react-icons/all-files/md/MdArrowDropDown';
-import { IDVDelegateVotingMatrix, IDVCohort, EDVDelegateType } from '@/_shared/types';
+import { IDVDelegateVotingMatrix, IDVCohort, EDVDelegateType, EVoteDecision } from '@/_shared/types';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
@@ -265,7 +265,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 										<div className='mt-4'>
 											<div className='grid grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-8'>
 												{referendums.map((ref) => {
-													const vote = item.votes[ref] || 'novote';
+													const vote = item.votes[ref] || '';
 													return (
 														<div
 															key={ref}
@@ -273,7 +273,9 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 														>
 															<div className='mb-1'>{getVoteIcon(vote)}</div>
 															<span className='text-xs font-medium'>#{ref}</span>
-															<span className='text-[10px] capitalize opacity-70'>{vote === 'novote' ? t('NoVote') : vote}</span>
+															<span className='text-[10px] capitalize opacity-70'>
+																{vote !== EVoteDecision.AYE && vote !== EVoteDecision.NAY && vote !== EVoteDecision.ABSTAIN ? t('NoVote') : vote}
+															</span>
 														</div>
 													);
 												})}
@@ -282,7 +284,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 												{referendums.map((ref) => (
 													<div
 														key={ref}
-														className={`flex-1 ${getVoteBarColor(item.votes[ref] || 'novote')} border-r border-border_grey last:border-0`}
+														className={`flex-1 ${getVoteBarColor(item.votes[ref] || '')} border-r border-border_grey last:border-0`}
 													/>
 												))}
 											</div>
@@ -292,7 +294,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 											{referendums.map((ref) => (
 												<div
 													key={ref}
-													className={`flex-1 ${getVoteBarColor(item.votes[ref] || 'novote')} border-r border-border_grey last:border-0`}
+													className={`flex-1 ${getVoteBarColor(item.votes[ref] || '')} border-r border-border_grey last:border-0`}
 												/>
 											))}
 										</div>
@@ -329,7 +331,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 														</div>
 													</td>
 													{referendums.map((ref) => {
-														const vote = item.votes[ref] || 'novote';
+														const vote = item.votes[ref] || '';
 														return (
 															<td
 																key={ref}

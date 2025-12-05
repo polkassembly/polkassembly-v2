@@ -20,17 +20,23 @@ export const GET = withErrorHandling(async () => {
 	const cohorts = network === ENetwork.POLKADOT ? DV_COHORTS_POLKADOT : network === ENetwork.KUSAMA ? DV_COHORTS_KUSAMA : [];
 
 	const response = cohorts.map((cohort) => ({
-		id: cohort.id || cohort.index,
+		index: Number(cohort.id || cohort.index),
 		announcementLink: cohort.announcementLink,
-		delegateCnt: cohort.delegatesCount,
-		delegation: cohort.delegation,
+		delegatesCount: cohort.delegatesCount,
+		delegationPerDelegate: cohort.delegation,
 		endIndexer: cohort.endIndexer,
-		guardianCnt: cohort.guardiansCount,
-		guardianDelegation: cohort.guardianDelegation,
+		guardiansCount: cohort.guardiansCount,
+		delegationPerGuardian: cohort.guardianDelegation,
 		startIndexer: cohort.startIndexer,
 		tracks: cohort.tracks,
 		allReferendaCnt: cohort.allReferendaCnt,
-		dvTrackReferendaCnt: cohort.dvTrackReferendaCnt
+		dvTrackReferendaCnt: cohort.dvTrackReferendaCnt,
+		startTime: cohort.startIndexer?.blockTime ? new Date(cohort.startIndexer.blockTime) : undefined,
+		endTime: cohort.endIndexer?.blockTime ? new Date(cohort.endIndexer.blockTime) : undefined,
+		startBlock: cohort.startIndexer?.blockHeight,
+		endBlock: cohort.endIndexer?.blockHeight,
+		status: cohort.endIndexer ? 'Closed' : 'Ongoing',
+		delegates: cohort.delegates
 	}));
 
 	return NextResponse.json(response);

@@ -2,19 +2,22 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { getDVCohortsByNetwork, formatNumber, formatDateRange, getCohortTenureDays } from '@/_shared/_utils/dvDelegateUtils';
+import { formatDateRange, getCohortTenureDays } from '@/_shared/_utils/dvDelegateUtils';
 import { ENetwork, ECohortStatus } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 import TimeLineIcon from '@assets/icons/timeline.svg';
 import { BsFillQuestionCircleFill } from '@react-icons/all-files/bs/BsFillQuestionCircleFill';
+import { useDVCohorts } from '@/hooks/useDVDelegates';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 
 function CohortsTableCard() {
 	const t = useTranslations('DecentralizedVoices');
@@ -23,10 +26,12 @@ function CohortsTableCard() {
 	const selectedCohortIndex = searchParams.get('cohort');
 
 	const network = getCurrentNetwork();
-	const cohorts = getDVCohortsByNetwork(network).slice().reverse();
+	const { data: cohortsData, isLoading } = useDVCohorts();
+
+	const cohorts = cohortsData ? [...cohortsData].reverse() : [];
+
 	const isPolkadot = network === ENetwork.POLKADOT;
 	const networkLogo = isPolkadot ? PolkadotLogo : KusamaLogo;
-	const { tokenSymbol } = NETWORKS_DETAILS[network];
 
 	const handleCohortClick = (cohortIndex: number) => {
 		const params = new URLSearchParams(searchParams.toString());
@@ -73,47 +78,67 @@ function CohortsTableCard() {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{cohorts.map((cohort) => {
-							const isSelected = selectedCohortIndex === cohort.index.toString();
-							const delegationAmount = cohort.delegationPerDelegate;
-							return (
-								<TableRow
-									key={cohort.index}
-									onClick={() => handleCohortClick(cohort.index)}
-									className={`cursor-pointer border-b border-border_grey text-sm font-semibold hover:bg-sidebar_footer ${isSelected ? 'bg-sidebar_footer' : ''}`}
-								>
-									<TableCell className='whitespace-nowrap py-4 pl-4 text-text_primary sm:pl-5 md:pl-6'>{cohort.index}</TableCell>
-									<TableCell className='whitespace-nowrap py-4'>
-										<span className='text-text_primary'>{formatDateRange(cohort.startTime, cohort.endTime, cohort.status === ECohortStatus.ONGOING)}</span>
-										<span className='ml-2 text-wallet_btn_text'>
-											{getCohortTenureDays(cohort)} {t('Days')}
-										</span>
-									</TableCell>
-									<TableCell className='whitespace-nowrap py-4 text-text_primary'>{cohort.delegatesCount + cohort.guardiansCount}</TableCell>
-									<TableCell className='whitespace-nowrap py-4'>
-										<div className='flex items-center gap-2'>
-											<Image
-												src={networkLogo}
-												alt='network logo'
-												className='h-8 w-8 rounded-full'
-												width={32}
-												height={32}
-											/>
-											<span className='font-medium text-text_primary'>
-												{formatNumber(delegationAmount)} {tokenSymbol}
-											</span>
-										</div>
-									</TableCell>
-									<TableCell className='whitespace-nowrap py-4'>
-										<span
-											className={`rounded-full px-4 py-1 text-xs font-medium text-btn_primary_text ${cohort.status === ECohortStatus.ONGOING ? 'bg-decision_bar_indicator' : 'bg-progress_nay'}`}
+						{isLoading
+							? [1, 2, 3].map((i) => (
+									<TableRow
+										key={i}
+										className='border-b border-border_grey'
+									>
+										<TableCell className='py-4 pl-4'>
+											<Skeleton className='h-4 w-8' />
+										</TableCell>
+										<TableCell className='py-4'>
+											<Skeleton className='h-4 w-32' />
+										</TableCell>
+										<TableCell className='py-4'>
+											<Skeleton className='h-4 w-12' />
+										</TableCell>
+										<TableCell className='py-4'>
+											<Skeleton className='h-8 w-8 rounded-full' />
+										</TableCell>
+									</TableRow>
+								))
+							: cohorts.map((cohort) => {
+									const isSelected = selectedCohortIndex === cohort?.index?.toString();
+									const delegationAmount = cohort?.delegationPerDelegate || 0;
+									return (
+										<TableRow
+											key={cohort.index}
+											onClick={() => handleCohortClick(cohort.index)}
+											className={`cursor-pointer border-b border-border_grey text-sm font-semibold hover:bg-sidebar_footer ${isSelected ? 'bg-sidebar_footer' : ''}`}
 										>
-											{cohort.status}
-										</span>
-									</TableCell>
-								</TableRow>
-							);
-						})}
+											<TableCell className='whitespace-nowrap py-4 pl-4 text-text_primary sm:pl-5 md:pl-6'>{cohort.index}</TableCell>
+											<TableCell className='whitespace-nowrap py-4'>
+												<span className='text-text_primary'>{formatDateRange(cohort.startTime, cohort.endTime, cohort.status === ECohortStatus.ONGOING)}</span>
+												<span className='ml-2 text-wallet_btn_text'>
+													{getCohortTenureDays(cohort)} {t('Days')}
+												</span>
+											</TableCell>
+											<TableCell className='whitespace-nowrap py-4 text-text_primary'>{cohort.delegatesCount + cohort.guardiansCount}</TableCell>
+											<TableCell className='whitespace-nowrap py-4'>
+												<div className='flex items-center gap-2'>
+													<Image
+														src={networkLogo}
+														alt='network logo'
+														className='h-8 w-8 rounded-full'
+														width={32}
+														height={32}
+													/>
+													<span className='font-medium text-text_primary'>
+														{formatUSDWithUnits(formatBnBalance(delegationAmount.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
+													</span>
+												</div>
+											</TableCell>
+											<TableCell className='whitespace-nowrap py-4'>
+												<span
+													className={`rounded-full px-4 py-1 text-xs font-medium text-btn_primary_text ${cohort.status === ECohortStatus.ONGOING ? 'bg-decision_bar_indicator' : 'bg-progress_nay'}`}
+												>
+													{cohort.status}
+												</span>
+											</TableCell>
+										</TableRow>
+									);
+								})}
 					</TableBody>
 				</Table>
 			</div>

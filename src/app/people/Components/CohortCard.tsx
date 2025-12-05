@@ -7,19 +7,20 @@ import delegatees from '@assets/delegation/delegatees.svg';
 import timer from '@assets/icons/timer.svg';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { IDVCohort, ECohortStatus } from '@/_shared/types';
-import { formatNumber, formatDate } from '@/_shared/_utils/dvDelegateUtils';
+import { IDVCohort, ECohortStatus, ENetwork } from '@/_shared/types';
+import { formatDate, formatDelegationAmount } from '@/_shared/_utils/dvDelegateUtils';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 
 interface CohortCardProps {
 	cohort: IDVCohort | null;
 	loading?: boolean;
+	network: ENetwork;
 }
 
-function CohortCard({ cohort, loading }: CohortCardProps) {
+function CohortCard({ cohort, loading, network }: CohortCardProps) {
 	const t = useTranslations('DecentralizedVoices');
-	const startDateTime = cohort ? formatDate(cohort.startTime) : null;
-	const endDateTime = cohort?.endTime ? formatDate(cohort.endTime) : null;
+	const startDateTime = cohort?.startIndexer?.blockTime ? formatDate(new Date(cohort.startIndexer.blockTime)) : cohort?.startTime ? formatDate(cohort.startTime) : null;
+	const endDateTime = cohort?.endIndexer?.blockTime ? formatDate(new Date(cohort.endIndexer.blockTime)) : cohort?.endTime ? formatDate(cohort.endTime) : null;
 	const isOngoing = cohort?.status === ECohortStatus.ONGOING;
 
 	if (loading || !cohort) {
@@ -57,7 +58,7 @@ function CohortCard({ cohort, loading }: CohortCardProps) {
 						<p className='text-xs font-medium uppercase text-community_text'>{t('TotalDAOs').toUpperCase()}</p>
 						<p className='text-2xl font-semibold text-text_primary'>{cohort.delegatesCount}</p>
 						<p className='text-xs text-wallet_btn_text'>
-							{formatNumber(cohort.delegationPerDelegate)} {t('DelegationsEach')}
+							{formatDelegationAmount(cohort.delegationPerDelegate || 0, network)} {t('DelegationsEach')}
 						</p>
 					</div>
 				</div>
@@ -72,7 +73,9 @@ function CohortCard({ cohort, loading }: CohortCardProps) {
 						<div>
 							<p className='text-xs font-medium uppercase text-community_text'>{t('Guardians').toUpperCase()}</p>
 							<p className='text-2xl font-semibold text-text_primary'>{cohort.guardiansCount}</p>
-							<p className='text-xs text-wallet_btn_text'>{cohort.guardiansCount > 0 ? `${formatNumber(cohort.delegationPerGuardian)} ${t('DelegationsEach')}` : 'N/A'}</p>
+							<p className='text-xs text-wallet_btn_text'>
+								{cohort.guardiansCount > 0 ? `${formatDelegationAmount(cohort.delegationPerGuardian || 0, network)} ${t('DelegationsEach')}` : 'N/A'}
+							</p>
 						</div>
 					</div>
 				)}
@@ -88,11 +91,11 @@ function CohortCard({ cohort, loading }: CohortCardProps) {
 						<p className='text-lg font-semibold text-text_primary'>
 							{startDateTime?.date} <span className='text-wallet_btn_text'>{startDateTime?.time}</span>
 						</p>
-						<p className='text-xs text-wallet_btn_text'>#{cohort.startBlock.toLocaleString()}</p>
+						<p className='text-xs text-wallet_btn_text'>#{cohort.startIndexer?.blockHeight.toLocaleString() || cohort.startBlock?.toLocaleString() || 'N/A'}</p>
 					</div>
 				</div>
 
-				{!isOngoing && endDateTime && cohort.endBlock && (
+				{!isOngoing && (endDateTime || cohort.endIndexer) && (
 					<div className='flex items-start gap-4'>
 						<Image
 							src={timer}
@@ -102,9 +105,9 @@ function CohortCard({ cohort, loading }: CohortCardProps) {
 						<div>
 							<p className='text-xs font-medium uppercase text-community_text'>{t('EndTime').toUpperCase()}</p>
 							<p className='whitespace-nowrap text-lg font-semibold text-text_primary'>
-								{endDateTime.date} <span className='text-wallet_btn_text'>{endDateTime.time}</span>
+								{endDateTime?.date} <span className='text-wallet_btn_text'>{endDateTime?.time}</span>
 							</p>
-							<p className='text-xs text-wallet_btn_text'>#{cohort.endBlock.toLocaleString()}</p>
+							<p className='text-xs text-wallet_btn_text'>#{cohort.endIndexer?.blockHeight.toLocaleString() || cohort.endBlock?.toLocaleString() || 'N/A'}</p>
 						</div>
 					</div>
 				)}

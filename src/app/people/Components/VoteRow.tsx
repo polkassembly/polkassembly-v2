@@ -10,16 +10,8 @@ import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { useTranslations } from 'next-intl';
 
-const getVoteStyles = (decision: EVoteDecision | 'novote' | string, t: (key: string) => string) => {
+const getVoteStyles = (decision: EVoteDecision | string, t: (key: string) => string) => {
 	switch (decision) {
-		case 'novote':
-			return {
-				containerBg: 'bg-text_secondary/20',
-				icon: <Minus size={12} />,
-				iconBg: 'bg-text_secondary/20 text-text_secondary',
-				statusColor: 'text-text_secondary',
-				statusText: t('NoVote')
-			};
 		case EVoteDecision.AYE:
 			return {
 				containerBg: 'bg-aye_color/10',
@@ -48,9 +40,9 @@ const getVoteStyles = (decision: EVoteDecision | 'novote' | string, t: (key: str
 			return {
 				containerBg: 'bg-text_secondary/20',
 				icon: <Minus size={12} />,
-				iconBg: 'bg-abstain_color text-white',
-				statusColor: 'text-blue-500',
-				statusText: t('Abstain')
+				iconBg: 'bg-text_secondary/20 text-text_secondary',
+				statusColor: 'text-text_secondary',
+				statusText: t('NoVote')
 			};
 	}
 };
@@ -58,7 +50,7 @@ const getVoteStyles = (decision: EVoteDecision | 'novote' | string, t: (key: str
 function VoteRow({ vote, network }: { vote: IDVDelegateVote; network: ENetwork }) {
 	const t = useTranslations('DecentralizedVoices');
 	const { decision } = vote;
-	const isNoVote = decision === 'novote';
+	const isNoVote = decision !== EVoteDecision.AYE && decision !== EVoteDecision.NAY && decision !== EVoteDecision.ABSTAIN;
 	const { statusColor, statusText, iconBg, containerBg, icon } = getVoteStyles(decision, t);
 
 	return (

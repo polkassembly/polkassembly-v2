@@ -1868,3 +1868,100 @@ export interface IDVDReferendumResponse {
 		block: number;
 	}>;
 }
+
+export interface IDelegatedVote {
+	votingPower?: string;
+	balance?: {
+		value?: string;
+		aye?: string;
+		nay?: string;
+		abstain?: string;
+	};
+}
+
+export interface IDVVotes {
+	balance?: {
+		value?: string;
+		aye?: string;
+		nay?: string;
+		abstain?: string;
+	};
+	decision?: string;
+	lockPeriod?: number;
+	delegatedVotes?: IDelegatedVote[];
+	delegatedTo?: string;
+	proposal: {
+		index: number;
+	};
+	voter: string;
+	selfVotingPower?: string;
+}
+
+export interface IDVCohortVote {
+	referendumIndex: number;
+	account: string;
+	isDelegating: boolean;
+	isStandard: boolean;
+	isSplit: boolean;
+	isSplitAbstain: boolean;
+	balance: string;
+	aye: boolean;
+	conviction?: number;
+	votes: string;
+	delegations: {
+		votes: string;
+		capital: string;
+	};
+	ayeBalance?: string;
+	nayBalance?: string;
+	abstainBalance?: string;
+	ayeVotes?: string;
+	nayVotes?: string;
+	abstainVotes?: string;
+}
+
+export interface IDVDelegateWithStats extends IDVCohortDelegate {
+	voteStats: {
+		ayeCount: number;
+		nayCount: number;
+		abstainCount: number;
+		participation: number;
+		winRate: number;
+	};
+}
+
+export interface IDVDelegateVote {
+	address: string;
+	decision: EVoteDecision;
+	votingPower: string;
+	balance: string;
+	conviction: number;
+	percentage?: number;
+}
+
+export interface IDVReferendumInfluence {
+	index: number;
+	title: string;
+	track: string;
+	status: EProposalStatus;
+	ayeVotingPower: string;
+	nayVotingPower: string;
+	ayePercent: number;
+	nayPercent: number;
+	influence: EInfluenceStatus;
+	dvTotalVotingPower: string;
+	delegateVotes: IDVDelegateVote[];
+	guardianVotes: IDVDelegateVote[];
+	totalAyeVotingPower?: string;
+	totalNayVotingPower?: string;
+}
+
+export interface IDVDelegateVotingMatrix {
+	address: string;
+	type: EDVDelegateType;
+	votes: Record<number, EVoteDecision>;
+	participation: number;
+	ayeRate: number;
+	activeCount: number;
+	totalRefs: number;
+}

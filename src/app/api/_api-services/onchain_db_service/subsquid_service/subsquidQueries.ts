@@ -1543,4 +1543,50 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_BATCHED_VOTES_FOR_DELEGATE_COHORT = (indices: number[], voters: string[]) => {
+		const votersString = JSON.stringify(voters);
+		const fields = indices
+			.map(
+				(index) => `
+			votes_${index}: convictionVotes(where: {proposal: {index_eq: ${index}}, voter_in: ${votersString}, removedAtBlock_isNull: true}) {
+				decision
+				balance {
+					... on StandardVoteBalance {
+						value
+					}
+					... on SplitVoteBalance {
+						aye
+						nay
+						abstain
+					}
+				}
+				lockPeriod
+				voter
+				proposal {
+					index
+				}
+				totalVotingPower
+				selfVotingPower
+				delegatedVotingPower
+				delegatedVotes(where: {removedAtBlock_isNull: true}) {
+					votingPower
+					balance {
+						... on StandardVoteBalance {
+							value
+						}
+						... on SplitVoteBalance {
+							aye
+							nay
+							abstain
+						}
+					}
+				}
+			}
+		`
+			)
+			.join('\n');
+
+		return `query GetBatchedVotesForDelegateCohort { ${fields} }`;
+	};
 }
