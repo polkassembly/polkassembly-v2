@@ -6,13 +6,13 @@ import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
-import { SubsquidService } from '@/app/api/_api-services/onchain_db_service/subsquid_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { DV_COHORTS_KUSAMA, DV_COHORTS_POLKADOT } from '@/_shared/_constants/dvCohorts';
 import { ENetwork, EProposalStatus, EProposalType, IDVDReferendumResponse } from '@/_shared/types';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
+import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 
 const schema = z.object({
 	id: z
@@ -43,7 +43,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_PARAMS_ERROR);
 	}
 
-	const referenda = await SubsquidService.GetCohortReferenda({
+	const referenda = await OnChainDbService.GetCohortReferenda({
 		network,
 		indexStart: cohort.referendumIndexStart,
 		indexEnd: cohort.referendumIndexEnd || 1000000000

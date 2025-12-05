@@ -377,34 +377,6 @@ export class OnChainDbService {
 		return SubsquidService.GetVotesForAddresses({ network, voters, page, limit, proposalStatuses });
 	}
 
-	static async GetVotesForAddressesAndReferenda({
-		network,
-		voters,
-		referendumIndices,
-		page,
-		limit,
-		startBlock,
-		endBlock
-	}: {
-		network: ENetwork;
-		voters: string[];
-		referendumIndices?: number[];
-		page: number;
-		limit: number;
-		startBlock?: number;
-		endBlock?: number;
-	}) {
-		return SubsquidService.GetVotesForAddressesAndReferenda({
-			network,
-			voters,
-			referendumIndices,
-			page,
-			limit,
-			startBlock,
-			endBlock
-		});
-	}
-
 	static async GetAllFlattenedVotesWithoutFilters({ network, page, limit }: { network: ENetwork; page: number; limit: number }) {
 		return SubsquidService.GetAllFlattenedVotesWithoutFilters({ network, page, limit });
 	}
@@ -434,7 +406,7 @@ export class OnChainDbService {
 		return SubsquidService.GetTrackAnalyticsStats({ network, trackId });
 	}
 
-	static async GetLatestBlockNumber(network: ENetwork): Promise<number> {
-		return SubsquidService.GetLatestBlockNumber(network);
+	static async GetCohortReferenda({ network, indexStart, indexEnd }: { network: ENetwork; indexStart: number; indexEnd: number }) {
+		return SubsquidService.GetCohortReferenda({ network, indexStart, indexEnd });
 	}
 }
