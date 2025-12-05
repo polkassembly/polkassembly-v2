@@ -24,8 +24,10 @@ import {
 	ITrackAnalyticsStats,
 	IGovAnalyticsStats,
 	IGovAnalyticsReferendumOutcome,
-	IGovAnalyticsDelegationStats
+	IGovAnalyticsDelegationStats,
+	IDVVotes
 } from '@shared/types';
+
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
 import { BN, BN_ZERO } from '@polkadot/util';
@@ -410,7 +412,17 @@ export class OnChainDbService {
 		return SubsquidService.GetCohortReferenda({ network, indexStart, indexEnd });
 	}
 
-	static async GetVotesForDelegateCohort({ network, indexStart, indexEnd, voterAddresses }: { network: ENetwork; indexStart: number; indexEnd: number; voterAddresses: string[] }) {
+	static async GetVotesForDelegateCohort({
+		network,
+		indexStart,
+		indexEnd,
+		voterAddresses
+	}: {
+		network: ENetwork;
+		indexStart: number;
+		indexEnd: number;
+		voterAddresses: string[];
+	}): Promise<IDVVotes[]> {
 		return SubsquidService.GetVotesForDelegateCohort({ network, indexStart, indexEnd, voterAddresses });
 	}
 }

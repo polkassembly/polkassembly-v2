@@ -438,37 +438,34 @@ export function calculateDVVotingMatrix(
 	referenda: IDVDReferendumResponse[]
 ): { votingMatrix: IDVDelegateVotingMatrix[]; referendumIndices: number[] } {
 	const referendumIndices = referenda.map((r) => r.index).sort((a, b) => a - b);
+	const validReferendumIndices = new Set(referendumIndices);
 
 	const votingMatrix: IDVDelegateVotingMatrix[] = cohort.delegates.map((delegate) => {
 		const delegateVotes = votes.filter((v) => v.account === delegate.address);
 		const votesMap: Record<number, EVoteDecision> = {};
 
-		let activeCount = 0;
-		let ayeCount = 0;
-
 		delegateVotes.forEach((vote) => {
+			if (!validReferendumIndices.has(vote.referendumIndex)) return;
+
 			if (vote.isSplit || vote.isSplitAbstain) {
 				if (BigInt(vote.ayeBalance || 0) >= BigInt(vote.nayBalance || 0) && BigInt(vote.ayeBalance || 0) >= BigInt(vote.abstainBalance || 0)) {
 					votesMap[vote.referendumIndex] = EVoteDecision.AYE;
-					ayeCount += 1;
 				} else if (BigInt(vote.nayBalance || 0) >= BigInt(vote.ayeBalance || 0) && BigInt(vote.nayBalance || 0) >= BigInt(vote.abstainBalance || 0)) {
 					votesMap[vote.referendumIndex] = EVoteDecision.NAY;
 				} else {
 					votesMap[vote.referendumIndex] = EVoteDecision.ABSTAIN;
 				}
-				activeCount += 1;
+			} else if (vote.aye) {
+				votesMap[vote.referendumIndex] = EVoteDecision.AYE;
+			} else if (vote.balance && !vote.aye) {
+				votesMap[vote.referendumIndex] = EVoteDecision.NAY;
 			} else {
-				if (vote.aye) {
-					votesMap[vote.referendumIndex] = EVoteDecision.AYE;
-					ayeCount += 1;
-				} else if (vote.balance && !vote.aye) {
-					votesMap[vote.referendumIndex] = EVoteDecision.NAY;
-				} else {
-					votesMap[vote.referendumIndex] = EVoteDecision.ABSTAIN;
-				}
-				activeCount += 1;
+				votesMap[vote.referendumIndex] = EVoteDecision.ABSTAIN;
 			}
 		});
+
+		const activeCount = Object.keys(votesMap).length;
+		const ayeCount = Object.values(votesMap).filter((v) => v === EVoteDecision.AYE).length;
 
 		const totalRefs = referenda.length;
 		const participation = totalRefs > 0 ? (activeCount / totalRefs) * 100 : 0;

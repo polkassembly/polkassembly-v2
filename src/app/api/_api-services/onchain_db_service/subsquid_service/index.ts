@@ -33,7 +33,8 @@ import {
 	IGovAnalyticsReferendumOutcome,
 	IRawTurnoutData,
 	IGovAnalyticsDelegationStats,
-	IGovAnalyticsCategoryCounts
+	IGovAnalyticsCategoryCounts,
+	IDVVotes
 } from '@shared/types';
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
@@ -1716,7 +1717,17 @@ export class SubsquidService extends SubsquidUtils {
 		return data.proposals;
 	}
 
-	static async GetVotesForDelegateCohort({ network, indexStart, indexEnd, voterAddresses }: { network: ENetwork; indexStart: number; indexEnd: number; voterAddresses: string[] }) {
+	static async GetVotesForDelegateCohort({
+		network,
+		indexStart,
+		indexEnd,
+		voterAddresses
+	}: {
+		network: ENetwork;
+		indexStart: number;
+		indexEnd: number;
+		voterAddresses: string[];
+	}): Promise<IDVVotes[]> {
 		const gqlClient = this.subsquidGqlClient(network);
 
 		const referenda = await this.GetCohortReferenda({ network, indexStart, indexEnd });
@@ -1748,6 +1759,6 @@ export class SubsquidService extends SubsquidUtils {
 			})
 		);
 
-		return results.flat();
+		return results.flat() as IDVVotes[];
 	}
 }
