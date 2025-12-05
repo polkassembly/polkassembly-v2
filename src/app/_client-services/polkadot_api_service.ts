@@ -2049,7 +2049,7 @@ export class PolkadotApiService {
 					delay: delayValue
 				};
 			})
-			.filter((proxy) => proxy !== undefined);
+			.filter((proxy) => proxy !== undefined) as IProxyAddress[];
 	}
 
 	private static processProxyInfo(delegator: string, proxyHuman: any): IProxyRequest | null {
