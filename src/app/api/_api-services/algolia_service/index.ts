@@ -14,6 +14,7 @@ import { markdownToPlainText } from '@/_shared/_utils/markdownToText';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ALGOLIA_WRITE_API_KEY } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
+import { delay } from '../../_api-utils/delay';
 import { fetchPostData } from '../../_api-utils/fetchPostData';
 
 const { NEXT_PUBLIC_ALGOLIA_APP_ID } = getSharedEnvVars();
@@ -166,30 +167,42 @@ export class AlgoliaService {
 	}
 
 	static async createPreliminaryAlgoliaPostRecord({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }) {
-		try {
-			// Fetch post data from the API
-			let postData: IPost;
+		const maxRetries = 5;
+		const initialDelay = 5000; // 5 seconds between retries
+
+		for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
 			try {
-				postData = await fetchPostData({ network, proposalType, indexOrHash });
+				// Fetch post data from the API
+				// eslint-disable-next-line no-await-in-loop
+				const postData = await fetchPostData({ network, proposalType, indexOrHash });
+
+				// Build the Algolia post object
+				const algoliaPost = this.buildAlgoliaPost(postData);
+				if (!algoliaPost) {
+					console.error(`Failed to build Algolia post for ${proposalType}/${indexOrHash} on ${network}`);
+					return;
+				}
+
+				// Save to Algolia
+				// eslint-disable-next-line no-await-in-loop
+				await this.saveToAlgolia(algoliaPost);
+
+				console.log(`Successfully created preliminary Algolia record for ${proposalType}/${indexOrHash} on ${network}`);
+				return;
 			} catch (error) {
-				console.error(`Failed to fetch post data for ${proposalType}/${indexOrHash} on ${network}:`, error);
-				return;
+				const isLastAttempt = attempt === maxRetries;
+
+				if (isLastAttempt) {
+					console.error(`Failed to create Algolia record for ${proposalType}/${indexOrHash} on ${network} after ${maxRetries + 1} attempts:`, error);
+					return; // Don't throw to prevent disrupting other operations
+				}
+
+				// Exponential backoff: 5s, 10s, 20s, 40s, 80s
+				const backoffDelay = initialDelay * 2 ** attempt;
+				console.log(`Attempt ${attempt + 1}/${maxRetries + 1} failed for Algolia record ${proposalType}/${indexOrHash}. Retrying in ${backoffDelay / 1000}s...`);
+				// eslint-disable-next-line no-await-in-loop
+				await delay(backoffDelay);
 			}
-
-			// Build the Algolia post object
-			const algoliaPost = this.buildAlgoliaPost(postData);
-			if (!algoliaPost) {
-				console.error(`Failed to build Algolia post for ${proposalType}/${indexOrHash} on ${network}`);
-				return;
-			}
-
-			// Save to Algolia
-			await this.saveToAlgolia(algoliaPost);
-
-			console.log(`Successfully created preliminary Algolia record for ${proposalType}/${indexOrHash} on ${network}`);
-		} catch (error) {
-			console.error(`Error creating preliminary Algolia record for ${proposalType}/${indexOrHash} on ${network}:`, error);
-			throw error;
 		}
 	}
 
