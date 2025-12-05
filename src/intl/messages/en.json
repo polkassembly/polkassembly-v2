@@ -725,6 +725,23 @@
 			"description": "Click here to refund the deposit for this proposal",
 			"decisionDeposit": "Decision Deposit",
 			"submissionDeposit": "Submission Deposit"
+		},
+		"CommentsFilter": {
+			"sortBy": "Sort By",
+			"filter": "Filter",
+			"newest": "Newest",
+			"oldest": "Oldest",
+			"top": "Top",
+			"all": "All",
+			"reset": "Reset",
+			"conditions": "Conditions",
+			"fromAuthor": "From Author",
+			"verifiedOnly": "Verified only",
+			"withVotes": "With votes",
+			"hideZeroBalance": "Hide 0 Balance Accounts",
+			"showVotersComments": "Show Voter's Comments",
+			"showDVDelegates": "Show DV delegates",
+			"hideDeletedComments": "Hide (deleted) Comments"
 		}
 	},
 	"ListingPage_Status": {

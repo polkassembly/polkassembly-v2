@@ -4,7 +4,7 @@
 
 'use client';
 
-import { EAllowedCommentor, EProposalType, ICommentResponse } from '@/_shared/types';
+import { EAllowedCommentor, ECommentFilterCondition, ECommentSortBy, EProposalType, ICommentResponse } from '@/_shared/types';
 import { useMemo, useState, useCallback, useLayoutEffect, useEffect } from 'react';
 import { useAtomValue } from 'jotai';
 import { userAtom } from '@/app/_atoms/user/userAtom';
@@ -20,6 +20,7 @@ import { useIdentityService } from '@/hooks/useIdentityService';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import dynamic from 'next/dynamic';
 import { Button } from '@ui/Button';
+import { useCommentFilters } from '@/hooks/useCommentFilters';
 import SingleComment from '../SingleComment/SingleComment';
 import classes from './Comments.module.scss';
 
@@ -30,14 +31,20 @@ function Comments({
 	proposalType,
 	index,
 	allowedCommentor,
-	postUserId
-}: {
+	postUserId,
+	sortBy = ECommentSortBy.newest,
+	activeFilters = [],
+	onFilteredCommentsChange
+}: Readonly<{
 	comments: ICommentResponse[];
 	proposalType: EProposalType;
 	index: string;
 	allowedCommentor: EAllowedCommentor;
 	postUserId?: number;
-}) {
+	sortBy?: ECommentSortBy;
+	activeFilters?: ECommentFilterCondition[];
+	onFilteredCommentsChange?: (count: number) => void;
+}>) {
 	const t = useTranslations();
 	const user = useAtomValue(userAtom);
 	const [showMore, setShowMore] = useState(false);
@@ -46,7 +53,15 @@ function Comments({
 
 	const regularComments = useMemo(() => comments.filter((comment) => !comment.isSpam), [comments]);
 	const spamComments = useMemo(() => comments.filter((comment) => comment.isSpam), [comments]);
-	const commentsToShow = showMore ? regularComments : regularComments.slice(0, 2);
+
+	// Use the custom hook for filtering and sorting
+	const { processedComments: processedRegularComments } = useCommentFilters({
+		comments: regularComments,
+		activeFilters: activeFilters || [],
+		sortBy: sortBy || ECommentSortBy.newest
+	});
+
+	const commentsToShow = showMore ? processedRegularComments : processedRegularComments.slice(0, 2);
 
 	const handleShowMore = () => {
 		setShowMore(true);
@@ -80,29 +95,26 @@ function Comments({
 		if (allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED) {
 			return { canComment: onchainIdentities?.some((identity) => identity?.isVerified), commentDisabledMessage: t('PostDetails.commentsDisabledForNonVerifiedUsers') };
 		}
-		return { canComment: !(allowedCommentor === EAllowedCommentor.NONE), commentDisabledMessage: t('PostDetails.commentsDisabled') };
+		return { canComment: allowedCommentor !== EAllowedCommentor.NONE, commentDisabledMessage: t('PostDetails.commentsDisabled') };
 	}, [allowedCommentor, onchainIdentities, user, postUserId, t]);
 
 	// Handle comment link navigation
 	const handleCommentLink = useCallback(() => {
 		const { hash } = window?.location || { hash: '' };
+
 		if (!hash) return;
-
 		const commentId = hash.replace('#comment-', '');
-		const comment = regularComments.find((c) => c.id === commentId);
-
-		if (comment && !showMore && regularComments.indexOf(comment) >= 2) {
+		const comment = processedRegularComments.find((c) => c.id === commentId);
+		if (comment && showMore === false && processedRegularComments.indexOf(comment) >= 2) {
 			handleShowMore();
 		}
-
-		// Use requestAnimationFrame to ensure the DOM is ready
 		requestAnimationFrame(() => {
 			const element = document.getElementById(hash.substring(1));
 			if (element) {
 				element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 			}
 		});
-	}, [regularComments, showMore]);
+	}, [processedRegularComments, showMore]);
 
 	// Call handleCommentLink when the component mounts
 	useLayoutEffect(() => {
@@ -112,6 +124,13 @@ function Comments({
 	useEffect(() => {
 		setComments(commentsFromProps);
 	}, [commentsFromProps]);
+
+	// Notify parent component about filtered comments count
+	useEffect(() => {
+		if (onFilteredCommentsChange) {
+			onFilteredCommentsChange(processedRegularComments.length);
+		}
+	}, [processedRegularComments.length, onFilteredCommentsChange]);
 
 	return (
 		<div className={classes.wrapper}>

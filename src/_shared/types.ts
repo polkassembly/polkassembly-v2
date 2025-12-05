@@ -748,6 +748,19 @@ export interface ICommentResponse extends IComment {
 	voteData?: IVoteData[];
 }
 
+export enum ECommentFilterCondition {
+	HIDE_ZERO_BALANCE = 'hide_zero_balance',
+	VOTERS_ONLY = 'voters_only',
+	DV_DELEGATES_ONLY = 'dv_delegates_only',
+	HIDE_DELETED = 'hide_deleted'
+}
+
+export enum ECommentSortBy {
+	newest = 'newest',
+	oldest = 'oldest',
+	top = 'top'
+}
+
 export interface IOnChainIdentity {
 	display: string;
 	legal: string;
