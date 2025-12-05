@@ -8,16 +8,16 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { ArrowUpRightFromSquareIcon } from 'lucide-react';
 import { TabsList, TabsTrigger } from '@ui/Tabs';
-import { ETreasuryAnalyticsTabs } from '@/_shared/types';
+import { ETreasurySpendsTabs } from '@/_shared/types';
 import styles from './Header.module.scss';
 
-export function TreasuryAnalyticsHeader() {
+export function TreasurySpendsHeader() {
 	const t = useTranslations();
 	return (
 		<div className={styles.header}>
 			<div className={styles.header_container}>
 				<div className={styles.header_content}>
-					<h1 className={styles.header_title}>{t('Sidebar.treasuryAnalytics')}</h1>
+					<h1 className={styles.header_title}>{t('Sidebar.treasurySpendsAndCoretime')}</h1>
 					<p className={styles.header_description}>{t('TreasuryAnalytics.description')}</p>
 					<Link
 						href='https://wiki.polkadot.com/general/glossary/#referendum'
@@ -31,19 +31,13 @@ export function TreasuryAnalyticsHeader() {
 				<TabsList className={`w-fit max-w-full items-start overflow-auto pl-4 font-bold md:pl-0 ${styles.hideScrollbar}`}>
 					<TabsTrigger
 						className={styles.header_tab}
-						value={ETreasuryAnalyticsTabs.OVERVIEW}
-					>
-						{t('TreasuryAnalytics.overview')}
-					</TabsTrigger>
-					<TabsTrigger
-						className={styles.header_tab}
-						value={ETreasuryAnalyticsTabs.SPENDS}
+						value={ETreasurySpendsTabs.SPENDS}
 					>
 						{t('TreasuryAnalytics.spends')}
 					</TabsTrigger>
 					<TabsTrigger
 						className={styles.header_tab}
-						value={ETreasuryAnalyticsTabs.CORETIME}
+						value={ETreasurySpendsTabs.CORETIME}
 					>
 						{t('TreasuryAnalytics.coretime')}
 					</TabsTrigger>

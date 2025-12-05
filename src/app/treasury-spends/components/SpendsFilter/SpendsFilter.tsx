@@ -6,7 +6,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { CheckSquare, Filter } from 'lucide-react';
+import { CheckSquare } from 'lucide-react';
+import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
+import { MdSort } from '@react-icons/all-files/md/MdSort';
 import { useCallback, useMemo, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_shared-components/Select/Select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/_shared-components/DropdownMenu';
@@ -54,9 +56,9 @@ function SpendsFilter() {
 			<DropdownMenu>
 				<DropdownMenuTrigger
 					noArrow
-					className='flex items-center justify-center rounded-md border border-border_grey px-3 py-1.5 text-sm text-text_pink hover:bg-grey_bg'
+					className='flex !size-9 items-center justify-center rounded-md border border-border_grey p-2 text-sm text-text_pink hover:bg-grey_bg'
 				>
-					<Filter className='h-5 w-4' />
+					<FaFilter className='text-base text-basic_text' />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
 					align='end'
@@ -106,6 +108,13 @@ function SpendsFilter() {
 					))}
 				</DropdownMenuContent>
 			</DropdownMenu>
+			<button
+				type='button'
+				className='bg-bg_card !size-9 rounded-md border border-primary_border p-1.5 hover:text-text_primary'
+				title='Menu'
+			>
+				<MdSort className='text-2xl text-basic_text' />
+			</button>
 		</div>
 	);
 }

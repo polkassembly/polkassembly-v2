@@ -1767,8 +1767,7 @@ export interface IJudgementStats {
 	percentageCompletedThisMonth: number;
 }
 
-export enum ETreasuryAnalyticsTabs {
-	OVERVIEW = 'overview',
+export enum ETreasurySpendsTabs {
 	SPENDS = 'spends',
 	CORETIME = 'coretime'
 }

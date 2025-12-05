@@ -458,6 +458,7 @@
 		"proxies": "プロキシ",
 		"identityAndJudgement": "身分と判断",
 		"spendsAndCoretime": "支出とコアタイム",
+		"treasurySpendsAndCoretime": "財務支出とコアタイム",
 		"Tag": {
 			"new": "新規"
 		}

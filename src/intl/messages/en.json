@@ -460,6 +460,7 @@
 		"proxies": "Proxies",
 		"identityAndJudgement": "Identity and Judgement",
 		"spendsAndCoretime": "Spends & Coretime",
+		"treasurySpendsAndCoretime": "Treasury Spends and Coretime",
 		"Tag": {
 			"new": "New"
 		}

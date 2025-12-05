@@ -459,6 +459,7 @@
 		"proxies": "Proxies",
 		"identityAndJudgement": "Identidad y Juicio",
 		"spendsAndCoretime": "Gastos y Coretime",
+		"treasurySpendsAndCoretime": "Gastos y Coretime de Tesorería",
 		"Tag": {
 			"new": "Nuevo"
 		}

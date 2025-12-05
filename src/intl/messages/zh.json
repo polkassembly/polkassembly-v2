@@ -458,6 +458,7 @@
 		"proxies": "代理",
 		"identityAndJudgement": "身份和判断",
 		"spendsAndCoretime": "支出和核心时间",
+		"treasurySpendsAndCoretime": "国库支出和核心时间",
 		"Tag": {
 			"new": "新"
 		}

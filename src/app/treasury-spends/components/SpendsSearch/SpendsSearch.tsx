@@ -18,7 +18,7 @@ function SpendsSearch() {
 	const router = useRouter();
 	const pathname = usePathname();
 	const [inputValue, setInputValue] = useState(searchParams.get('hash') || '');
-	const spendsSearchPath = '/treasury-analytics/spends';
+	const spendsSearchPath = '/treasury-spends';
 
 	return (
 		<>
