@@ -268,36 +268,6 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async GetVoteMetricsForProposals({
-		network,
-		proposalIndices,
-		proposalType
-	}: {
-		network: ENetwork;
-		proposalIndices: number[];
-		proposalType: EProposalType;
-	}): Promise<Map<number, { ayes: string; nays: string; support: string; bareAyes: string }>> {
-		const gqlClient = this.subsquidGqlClient(network);
-		const query = this.GET_VOTE_METRICS_FOR_PROPOSALS;
-		const variables = { index_in: proposalIndices, type_eq: proposalType };
-
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
-
-		if (subsquidErr || !subsquidData) {
-			console.error(`Error fetching vote metrics for proposals from Subsquid: ${subsquidErr}`);
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching vote metrics for proposals from Subsquid');
-		}
-
-		const metricsMap = new Map<number, { ayes: string; nays: string; support: string; bareAyes: string }>();
-		subsquidData.proposals.forEach((p: { index: number; tally: { ayes: string; nays: string; support: string; bareAyes: string } }) => {
-			if (p.index !== undefined && p.tally) {
-				metricsMap.set(p.index, p.tally);
-			}
-		});
-
-		return metricsMap;
-	}
-
 	static async GetOnChainPostsListing({
 		network,
 		proposalType,
@@ -1511,144 +1481,6 @@ export class SubsquidService extends SubsquidUtils {
 		};
 	}
 
-	static async GetVotesForAddressesAndReferenda({
-		network,
-		voters,
-		referendumIndices,
-		page,
-		limit,
-		startBlock,
-		endBlock
-	}: {
-		network: ENetwork;
-		voters: string[];
-		referendumIndices?: number[];
-		page: number;
-		limit: number;
-		startBlock?: number;
-		endBlock?: number;
-	}): Promise<IGenericListingResponse<IProfileVote>> {
-		const gqlClient = this.subsquidGqlClient(network);
-
-		let query = this.GET_VOTES_FOR_ADDRESSES_AND_PROPOSAL_INDICES;
-		const variables: {
-			limit: number;
-			offset: number;
-			voter_in: string[];
-			createdAtBlock_gte: number;
-			createdAtBlock_lte: number;
-			proposalIndex_in?: number[];
-		} = {
-			limit,
-			offset: (page - 1) * limit,
-			voter_in: voters.map((address) => getEncodedAddress(address, network)).filter((addr): addr is string => addr !== null && addr !== undefined),
-			createdAtBlock_gte: startBlock || 0,
-			createdAtBlock_lte: endBlock || 2147483647
-		};
-
-		if (referendumIndices && referendumIndices.length > 0) {
-			variables.proposalIndex_in = referendumIndices;
-		} else {
-			query = this.GET_VOTES_BY_VOTER_AND_BLOCK_RANGE;
-		}
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
-
-		if (subsquidErr || !subsquidData) {
-			console.error(`Error fetching on-chain votes for multiple voters and referenda from Subsquid: ${subsquidErr}`);
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain votes for multiple voters and referenda from Subsquid');
-		}
-
-		const { votes, totalCount } = subsquidData;
-
-		if (totalCount.totalCount === 0) {
-			return {
-				items: [],
-				totalCount: totalCount.totalCount
-			};
-		}
-
-		interface ISubsquidVoteResponse {
-			decision: string;
-			voter: string;
-			type: string;
-			proposalIndex: number;
-			isDelegated: boolean;
-			lockPeriod: number;
-			createdAt: string;
-			balance: {
-				__typename: string;
-				value?: string;
-				aye?: string;
-				nay?: string;
-				abstain?: string;
-			};
-			parentVote?: {
-				extrinsicIndex: string;
-				selfVotingPower?: string;
-				delegatedVotingPower?: string;
-			};
-			proposal?: {
-				createdAt: string;
-				description?: string;
-				index: number;
-				origin: EPostOrigin;
-				proposer?: string;
-				status?: EProposalStatus;
-				hash?: string;
-				preimage?: {
-					proposedCall?: {
-						args?: Record<string, unknown>;
-					};
-				};
-				statusHistory?: Array<{
-					status: EProposalStatus;
-					timestamp: string;
-					block?: number;
-				}>;
-				createdAtBlock?: number;
-				updatedAtBlock?: number;
-			};
-		}
-
-		const votesData: IProfileVote[] = votes.map((vote: ISubsquidVoteResponse) => {
-			const selfVotingPower = new BN(vote.parentVote?.selfVotingPower || '0');
-			const delegatedVotingPower = new BN(vote.parentVote?.delegatedVotingPower || '0');
-			const totalVotingPower = selfVotingPower.add(delegatedVotingPower).toString();
-
-			return {
-				...vote,
-				decision: this.convertSubsquidVoteDecisionToVoteDecision({ decision: vote.decision }),
-				voterAddress: vote.voter,
-				proposalType: vote.type as EProposalType,
-				extrinsicIndex: vote.parentVote?.extrinsicIndex || '',
-				totalVotingPower,
-				proposal: vote.proposal
-					? {
-							createdAt: new Date(vote.proposal.createdAt),
-							description: vote.proposal.description || '',
-							index: vote.proposal.index,
-							origin: vote.proposal.origin,
-							proposer: vote.proposal.proposer || '',
-							status: vote.proposal.status || EProposalStatus.Unknown,
-							type: EProposalType.REFERENDUM_V2,
-							hash: vote.proposal.hash || '',
-							voteMetrics: {},
-							beneficiaries: vote.proposal.preimage?.proposedCall?.args ? this.extractAmountAndAssetId(vote.proposal.preimage?.proposedCall?.args) : undefined,
-							timeline: (vote.proposal.statusHistory || []).map((h) => ({ ...h, block: h.block || 0, timestamp: new Date(h.timestamp) })) as IStatusHistoryItem[],
-							statusHistory: (vote.proposal.statusHistory || []).map((h) => ({ ...h, block: h.block || 0, timestamp: new Date(h.timestamp) })) as IStatusHistoryItem[],
-							createdAtBlock: vote.proposal.createdAtBlock,
-							updatedAtBlock: vote.proposal.updatedAtBlock
-						}
-					: undefined
-			};
-		});
-
-		return {
-			items: votesData,
-			totalCount: totalCount.totalCount
-		};
-	}
-
 	static async GetAllFlattenedVotesWithoutFilters({ network, page, limit }: { network: ENetwork; page: number; limit: number }): Promise<IGenericListingResponse<IProfileVote>> {
 		const gqlClient = this.subsquidGqlClient(network);
 
@@ -1865,18 +1697,6 @@ export class SubsquidService extends SubsquidUtils {
 		}
 
 		return trackStats;
-	}
-
-	static async GetLatestBlockNumber(network: ENetwork): Promise<number> {
-		const gqlClient = this.subsquidGqlClient(network);
-		const { data, error } = await gqlClient.query(SubsquidService.GET_LATEST_BLOCK_NUMBER, {}).toPromise();
-
-		if (error || !data || !data.proposals || data.proposals.length === 0) {
-			console.error('Error fetching latest block number:', error);
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching latest block number from Subsquid');
-		}
-
-		return data.proposals[0].createdAtBlock;
 	}
 
 	static async GetCohortReferenda({ network, indexStart, indexEnd }: { network: ENetwork; indexStart: number; indexEnd: number }) {

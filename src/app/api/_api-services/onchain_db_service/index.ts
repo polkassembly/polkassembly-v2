@@ -56,18 +56,6 @@ export class OnChainDbService {
 		return null;
 	}
 
-	static async GetVoteMetricsForProposals({
-		network,
-		proposalIndices,
-		proposalType
-	}: {
-		network: ENetwork;
-		proposalIndices: number[];
-		proposalType: EProposalType;
-	}): Promise<Map<number, { ayes: string; nays: string; support: string; bareAyes: string }>> {
-		return SubsquidService.GetVoteMetricsForProposals({ network, proposalIndices, proposalType });
-	}
-
 	static async GetOnChainPostsListing({
 		network,
 		proposalType,

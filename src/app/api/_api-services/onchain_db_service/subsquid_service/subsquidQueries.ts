@@ -373,20 +373,6 @@ export class SubsquidQueries {
 		}
 	`;
 
-	protected static GET_VOTE_METRICS_FOR_PROPOSALS = `
-		query GetVoteMetricsForProposals($index_in: [Int!]!, $type_eq: ProposalType!) {
-			proposals(where: {index_in: $index_in, type_eq: $type_eq}) {
-				index
-				tally {
-					ayes
-					bareAyes
-					nays
-					support
-				}
-			}
-		}
-	`;
-
 	protected static GET_CONVICTION_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_INDEX = `
 		query GetConvictionVoteMetricsByProposalTypeAndIndex($type_eq: ProposalType!, $index_eq: Int!) {
 			noCount: convictionVotesConnection(where: {decision_eq: no, proposal: {index_eq: $index_eq, type_eq: $type_eq}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
@@ -414,6 +400,32 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	// Batched conviction vote metrics query - fetches metrics for multiple indices in a single request
+	protected static GET_BATCHED_CONVICTION_VOTE_METRICS = (indices: number[], proposalType: string) => {
+		const fields = indices
+			.map(
+				(index) => `
+			noCount_${index}: convictionVotesConnection(where: {decision_eq: no, proposal: {index_eq: ${index}, type_eq: ${proposalType}}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
+				totalCount
+			}
+			yesCount_${index}: convictionVotesConnection(where: {decision_eq: yes, proposal: {index_eq: ${index}, type_eq: ${proposalType}}, removedAtBlock_isNull: true}, orderBy: id_ASC) {
+				totalCount
+			}
+			tally_${index}: proposals(where: {index_eq: ${index}, type_eq: ${proposalType}}) {
+				tally {
+					ayes
+					bareAyes
+					nays
+					support
+				}
+			}
+		`
+			)
+			.join('\n');
+
+		return `query GetBatchedConvictionVoteMetrics { ${fields} }`;
+	};
 
 	// vote listing queries
 
