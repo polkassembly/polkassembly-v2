@@ -272,6 +272,44 @@ export class SubsquidQueries {
 		}
 	`;
 
+	protected static GET_COHORT_REFERENDA = `
+		query GetCohortReferenda($index_gte: Int!, $index_lte: Int!) {
+			proposals(where: {index_gte: $index_gte, index_lte: $index_lte, type_eq: ReferendumV2}, orderBy: index_ASC) {
+				index
+				createdAtBlock
+				trackNumber
+				status
+				tally {
+					ayes
+					nays
+					support
+				}
+				decisionDeposit {
+					amount
+					who
+				}
+				preimage {
+					proposedCall {
+						args
+						description
+						method
+						section
+					}
+				}
+				proposalArguments {
+					description
+				}
+				description
+				hash
+				statusHistory {
+					status
+					timestamp
+					block
+				}
+			}
+		}
+	`;
+
 	// vote metrics queries
 
 	protected static GET_VOTE_METRICS_BY_PROPOSAL_TYPE_AND_HASH = `

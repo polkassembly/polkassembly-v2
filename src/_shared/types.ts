@@ -1753,26 +1753,49 @@ export enum ECohortStatus {
 
 interface IDVCohortDelegate {
 	address: string;
-	type: EDVDelegateType;
 	startBlock: number;
 	endBlock: number | null;
 	subsquareUrl?: string;
+	cohortId?: number;
+	name?: string;
+	w3f?: string;
+	role: EDVDelegateType;
+	startHeight?: number;
+	endHeight?: number | null;
 }
 
 export interface IDVCohort {
 	index: number;
+	id?: number;
 	network: ENetwork;
 	status: ECohortStatus;
 	startTime: Date;
 	startBlock: number;
 	endTime?: Date;
-	endBlock?: number;
+	endBlock?: number | null;
 	delegatesCount: number;
 	guardiansCount: number;
 	delegationPerDelegate: number;
 	delegationPerGuardian: number;
 	delegates: IDVCohortDelegate[];
 	tracks: EPostOrigin[];
+	announcementLink?: string;
+	delegation?: number;
+	guardianDelegation?: number;
+	startIndexer?: {
+		blockHeight: number;
+		blockHash: string;
+		blockTime: number;
+	};
+	endIndexer?: {
+		blockHeight: number;
+		blockHash: string;
+		blockTime: number;
+	} | null;
+	allReferendaCnt?: number;
+	dvTrackReferendaCnt?: number;
+	referendumIndexStart?: number;
+	referendumIndexEnd?: number;
 }
 
 export interface IDVDelegateWithStats extends IDVCohortDelegate {

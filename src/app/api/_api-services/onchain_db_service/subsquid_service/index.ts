@@ -1749,4 +1749,21 @@ export class SubsquidService extends SubsquidUtils {
 
 		return data.proposals[0].createdAtBlock;
 	}
+
+	static async GetCohortReferenda({ network, indexStart, indexEnd }: { network: ENetwork; indexStart: number; indexEnd: number }) {
+		const gqlClient = this.subsquidGqlClient(network);
+		const { data, error } = await gqlClient
+			.query(this.GET_COHORT_REFERENDA, {
+				index_gte: indexStart,
+				index_lte: indexEnd
+			})
+			.toPromise();
+
+		if (error || !data) {
+			console.error('Error fetching cohort referenda:', error);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching cohort referenda from Subsquid');
+		}
+
+		return data.proposals;
+	}
 }
