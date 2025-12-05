@@ -1910,3 +1910,36 @@ export interface IDVVotingMatrixResponse {
 	referendumIndices: number[];
 	delegates: IDVDelegateVotingMatrix[];
 }
+
+export interface IDVDReferendumResponse {
+	index: number;
+	createdAtBlock: number;
+	trackNumber: number;
+	status: EProposalStatus;
+	tally?: {
+		ayes: string;
+		nays: string;
+		support: string;
+	};
+	decisionDeposit?: {
+		amount: string;
+		who: string;
+	};
+	submissionDeposit?: {
+		amount: string;
+		who: string;
+	};
+	preimage?: {
+		proposedCall?: {
+			description?: string;
+		};
+	};
+	proposalArguments?: {
+		description?: string;
+	};
+	description?: string;
+	statusHistory?: Array<{
+		status: string;
+		block: number;
+	}>;
+}

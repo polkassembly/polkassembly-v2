@@ -413,7 +413,6 @@ const KUSAMA_COHORT_5: IDVCohort = {
 	allReferendaCnt: 44,
 	dvTrackReferendaCnt: 27,
 	referendumIndexStart: 578,
-	referendumIndexEnd: 621,
 	tracks: DV_TRACKS,
 	delegates: [
 		{
