@@ -93,7 +93,7 @@ function BTreeMapComp({
 			}
 
 			while (prevValue.length < count) {
-				const value = getInitValue(registry, keyValueParam[0].type);
+				const value = getInitValue({ def: keyValueParam[0].type, registry });
 
 				prevValue.push(value);
 			}

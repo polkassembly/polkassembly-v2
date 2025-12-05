@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { EEnactment, EPostOrigin, ENotificationStatus } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -170,7 +172,7 @@ function ExistingPreimage({ createdPreimageHash, onSuccess }: { createdPreimageH
 				/>
 
 				<TxFeesDetailsView
-					extrinsicFn={[submitProposalTx]}
+					extrinsicFn={[submitProposalTx as any]}
 					extraFees={[{ name: t('TxFees.submissionDeposit'), value: NETWORKS_DETAILS[`${network}`].submissionDeposit || BN_ZERO }]}
 				/>
 			</div>

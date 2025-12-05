@@ -5,6 +5,8 @@ import { IParamDef } from '@/_shared/types';
 import { Enum, getTypeDef } from '@polkadot/types';
 import { Registry, TypeDef } from '@polkadot/types/types';
 import { useCallback, useMemo, useState } from 'react';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { PolkadotApiService } from '@/app/_client-services/polkadot_api_service';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../DropdownMenu';
 // eslint-disable-next-line import/no-cycle
 import Params from '.';
@@ -24,12 +26,21 @@ interface Initial {
 	initialParams: unknown[] | undefined | null;
 }
 
-function getSubTypes(registry: Registry, type: TypeDef): TypeDef[] {
-	return getTypeDef(registry.createType(type.type as '(u32, u32)').toRawType()).sub as TypeDef[];
+function getSubTypes({ registry, type }: { registry?: Registry; type: TypeDef }): TypeDef[] {
+	// PAPI: The type definition is already fully resolved in papiTypeToTypeDef,
+	// so type.sub contains the array of variants directly.
+	if (Array.isArray(type.sub)) {
+		return type.sub;
+	}
+	// PolkadotJS: We need to use the registry to resolve the type definition.
+	if (registry) {
+		return getTypeDef(registry.createType(type.type as '(u32, u32)').toRawType()).sub as TypeDef[];
+	}
+	return [];
 }
 
-function getOptions(registry: Registry, type: TypeDef): Options {
-	const subTypes = getSubTypes(registry, type).filter(({ name }) => !!name && !name.startsWith('__Unused'));
+function getOptions({ registry, type }: { registry?: Registry; type: TypeDef }): Options {
+	const subTypes = getSubTypes({ registry, type }).filter(({ name }) => !!name && !name.startsWith('__Unused'));
 
 	return {
 		options: subTypes.map(
@@ -49,16 +60,19 @@ function getInitial(options: Option[]): Initial {
 	};
 }
 
-function getCurrent(registry: Registry, type: TypeDef, defaultValue: unknown, subTypes: TypeDef[]): IParamDef[] | null {
-	const subs = getSubTypes(registry, type);
+function getCurrent({ registry, type, defaultValue, subTypes }: { registry?: Registry; type: TypeDef; defaultValue: unknown; subTypes: TypeDef[] }): IParamDef[] | null {
+	const subs = getSubTypes({ registry, type });
 
 	return defaultValue instanceof Enum ? [{ name: defaultValue.type, type: subs[defaultValue.index] }] : [{ name: subTypes[0].name || '', type: subTypes[0] }];
 }
 
-function EnumComp({ param, onChange, defaultValue, registry }: { param: IParamDef; onChange: (value: unknown) => void; defaultValue: unknown; registry: Registry }) {
-	const { options, subTypes } = useMemo(() => getOptions(registry, param.type), [registry, param.type]);
+function EnumComp({ param, onChange, defaultValue, registry }: { param: IParamDef; onChange: (value: unknown) => void; defaultValue: unknown; registry?: Registry }) {
+	const { apiService } = usePolkadotApiService();
+	const isPapi = apiService instanceof PolkadotApiService;
 
-	const [current, setCurrent] = useState<IParamDef[] | null>(() => getCurrent(registry, param.type, defaultValue, subTypes));
+	const { options, subTypes } = useMemo(() => getOptions({ registry, type: param.type }), [registry, param.type]);
+
+	const [current, setCurrent] = useState<IParamDef[] | null>(() => getCurrent({ registry, type: param.type, defaultValue, subTypes }));
 	const [{ initialParams }, setInitial] = useState<Initial>(() => getInitial(options));
 
 	const onEnumChange = useCallback(
@@ -79,10 +93,20 @@ function EnumComp({ param, onChange, defaultValue, registry }: { param: IParamDe
 	const onParamValueChange = useCallback(
 		(values: unknown[]): void => {
 			if (current) {
-				onChange({ [current[0].name || 'unknown']: values[0] });
+				const variantName = current[0].name || 'unknown';
+				console.log('enum values', values);
+				const innerValue = values[0];
+
+				if (isPapi) {
+					// PAPI expects: { type: 'VariantName', value: innerValue }
+					onChange({ type: variantName, value: innerValue || '' });
+				} else {
+					// PolkadotJS expects: { VariantName: innerValue }
+					onChange({ [variantName]: innerValue });
+				}
 			}
 		},
-		[current, onChange]
+		[current, onChange, isPapi]
 	);
 
 	return (

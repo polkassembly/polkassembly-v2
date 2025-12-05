@@ -8,7 +8,7 @@ import { Registry } from '@polkadot/types/types';
 import Enum from './Enum';
 import AddressInput from '../../../AddressInput/AddressInput';
 
-function Account({ param, onChange, defaultValue, registry }: { param: IParamDef; onChange: (value: unknown) => void; defaultValue: unknown; registry: Registry }) {
+function Account({ param, onChange, defaultValue, registry }: { param: IParamDef; onChange: (value: unknown) => void; defaultValue: unknown; registry?: Registry }) {
 	const onAddressChange = useCallback((value: unknown) => onChange(value), [onChange]);
 
 	if (param.type.type === 'MultiAddress') {

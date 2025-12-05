@@ -2,18 +2,20 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+/* eslint-disable camelcase */
 /* eslint-disable no-use-before-define */
 
+import { Kusama_assethub, Kusama_people, Kusama_relay, Paseo_relay, Polkadot_assethub, Polkadot_people, Polkadot_relay } from '@polkadot-api/descriptors';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { SignerResult, TypeDef } from '@polkadot/types/types';
 import { HexString } from '@polkadot/util/types';
 import { StatusCodes } from 'http-status-codes';
+import { Transaction } from 'polkadot-api';
 
 export enum ENetwork {
 	KUSAMA = 'kusama',
-	ASSETHUB_KUSAMA = 'assethub-kusama',
 	POLKADOT = 'polkadot',
 	WESTEND = 'westend',
 	PASEO = 'paseo',
@@ -1049,7 +1051,8 @@ export interface IParamDef {
 
 export interface ICallState {
 	extrinsic: {
-		extrinsicFn: SubmittableExtrinsicFunction<'promise'> | null;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		extrinsicFn: (SubmittableExtrinsicFunction<'promise'> & Transaction<any, any, any, any>) | null;
 		params: IParamDef[];
 	};
 	paramValues: unknown[];
@@ -1766,3 +1769,7 @@ export interface IJudgementStats {
 	percentageIncreaseFromLastMonth: number;
 	percentageCompletedThisMonth: number;
 }
+
+export type IPapiRelayDescriptor = Polkadot_relay | Kusama_relay | Paseo_relay;
+export type IPapiAssetHubDescriptor = Polkadot_assethub | Kusama_assethub;
+export type IPapiPeopleDescriptor = Polkadot_people | Kusama_people;

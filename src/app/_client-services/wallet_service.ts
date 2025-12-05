@@ -9,15 +9,15 @@ import { APPNAME } from '@/_shared/_constants/appName';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { stringToHex } from '@polkadot/util';
 import { inject } from '@mimirdev/apps-inject';
-import { PolkadotApiService } from './polkadot_api_service';
 import { IdentityService } from './identity_service';
 import { isMimirDetected } from './isMimirDetected';
 import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
+import { PolkadotJSApiService } from './polkadotJS_api_service';
 
 export class WalletClientService {
 	private injectedWindow: Window & InjectedWindow;
 
-	private apiService?: PolkadotApiService;
+	private polkadotJsApiService?: PolkadotJSApiService;
 
 	private identityService?: IdentityService;
 
@@ -25,22 +25,22 @@ export class WalletClientService {
 
 	private constructor({
 		injectedWindow,
-		apiService,
+		polkadotJsApiService,
 		network,
 		identityService
 	}: {
 		injectedWindow: Window & InjectedWindow;
-		apiService?: PolkadotApiService;
+		polkadotJsApiService?: PolkadotJSApiService;
 		network: ENetwork;
 		identityService?: IdentityService;
 	}) {
 		this.network = network;
 		this.injectedWindow = injectedWindow;
-		this.apiService = apiService;
+		this.polkadotJsApiService = polkadotJsApiService;
 		this.identityService = identityService;
 	}
 
-	static async Init(network: ENetwork, apiService?: PolkadotApiService, identityService?: IdentityService) {
+	static async Init(network: ENetwork, polkadotJsApiService?: PolkadotJSApiService, identityService?: IdentityService) {
 		// Todo: wait for doc ready. (async)
 		const returnWalletService = async () => {
 			const injectedWindow = window as Window & InjectedWindow;
@@ -50,7 +50,7 @@ export class WalletClientService {
 				inject();
 			}
 
-			return new WalletClientService({ injectedWindow, apiService, network, identityService });
+			return new WalletClientService({ injectedWindow, polkadotJsApiService, network, identityService });
 		};
 
 		if (document.readyState !== 'loading') {
@@ -78,8 +78,8 @@ export class WalletClientService {
 				return [];
 			}
 
-			if (this.apiService) {
-				this.apiService.setSigner(injected.signer as Signer);
+			if (this.polkadotJsApiService) {
+				this.polkadotJsApiService.setSigner(injected.signer as Signer);
 			}
 
 			if (this.identityService) {

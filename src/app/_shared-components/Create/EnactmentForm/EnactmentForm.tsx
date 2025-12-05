@@ -40,9 +40,7 @@ function EnactmentForm({
 
 	useEffect(() => {
 		const getCurrentBlockNumber = async () => {
-			const blockHeight = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network)
-				? await assethubApiService?.getBlockHeight()
-				: await apiService?.getBlockHeight();
+			const blockHeight = [ENetwork.KUSAMA, ENetwork.POLKADOT].includes(network) ? await assethubApiService?.getBlockHeight() : await apiService?.getBlockHeight();
 			if (blockHeight) {
 				onEnactmentValueChange({ ...advancedDetails, [EEnactment.At_Block_No]: new BN(blockHeight).add(BN_THOUSAND) });
 			}
@@ -66,7 +64,7 @@ function EnactmentForm({
 			<CollapsibleContent>
 				<Separator className='my-4' />
 				<div className='flex flex-col gap-y-2'>
-					{[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) && (
+					{[ENetwork.KUSAMA, ENetwork.POLKADOT].includes(network) && (
 						<Alert
 							variant='warning'
 							className='flex items-start justify-start gap-x-2'

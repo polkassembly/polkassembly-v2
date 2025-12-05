@@ -17,7 +17,6 @@ interface CoinGeckoHistoryResponse {
 const networkToCoinGeckoId: Record<string, string> = {
 	[ENetwork.POLKADOT]: 'polkadot',
 	[ENetwork.KUSAMA]: 'kusama',
-	[ENetwork.ASSETHUB_KUSAMA]: 'kusama',
 	[ENetwork.WESTEND]: 'westend',
 	[ENetwork.PASEO]: 'paseo',
 	[ENetwork.CERE]: 'cere-network'
@@ -26,7 +25,6 @@ const networkToCoinGeckoId: Record<string, string> = {
 const networkToCryptoCompareSymbol: Record<string, string> = {
 	[ENetwork.POLKADOT]: 'DOT',
 	[ENetwork.KUSAMA]: 'KSM',
-	[ENetwork.ASSETHUB_KUSAMA]: 'KSM',
 	[ENetwork.WESTEND]: 'WND',
 	[ENetwork.PASEO]: 'PAS',
 	[ENetwork.CERE]: 'CERE'
@@ -123,14 +121,14 @@ export async function fetchHistoricalTreasuryStats({ network, date }: { network:
 			return null;
 		}
 
-		let dedTokenUsdPrice: string | undefined;
+		let dedTokenUsdPrice = '0';
 		if (network === ENetwork.POLKADOT && treasuryAssetsData[EAssets.DED]) {
 			const dedId = treasuryAssetsData[EAssets.DED].name;
 			try {
 				const dedResponse = await fetch(`https://api.coingecko.com/api/v3/coins/${dedId}/history?date=${formattedDate}`);
 				if (dedResponse.ok) {
 					const dedData = (await dedResponse.json()) as CoinGeckoHistoryResponse;
-					dedTokenUsdPrice = dedData?.market_data?.current_price?.usd?.toString();
+					dedTokenUsdPrice = dedData?.market_data?.current_price?.usd?.toString() || '0';
 				}
 			} catch (e) {
 				console.error('Error fetching DED price:', e);

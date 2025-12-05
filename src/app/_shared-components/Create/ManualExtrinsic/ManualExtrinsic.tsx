@@ -1,6 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 'use client';
 
@@ -20,6 +21,7 @@ import { SquareArrowOutUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { usePolkadotVault } from '@/hooks/usePolkadotVault';
+import { Transaction } from 'polkadot-api';
 import { Extrinsic } from './Extrinsic/Extrinsic';
 import { Button } from '../../Button';
 import PreimageDetailsView from '../PreimageDetailsView/PreimageDetailsView';
@@ -30,7 +32,7 @@ import AddressRelationsPicker from '../../AddressRelationsPicker/AddressRelation
 
 function ManualExtrinsic({ onSuccess }: { onSuccess: (preimageHash: string) => void }) {
 	const t = useTranslations();
-	const [extrinsicFn, setExtrinsicFn] = useState<SubmittableExtrinsic<'promise'> | null>();
+	const [extrinsicFn, setExtrinsicFn] = useState<(SubmittableExtrinsic<'promise'> & Transaction<any, any, any, any>) | null>();
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences } = useUserPreferences();
 	const network = getCurrentNetwork();
@@ -150,7 +152,7 @@ function ManualExtrinsic({ onSuccess }: { onSuccess: (preimageHash: string) => v
 			)}
 			{notePreimageTx && extrinsicDetails && (
 				<TxFeesDetailsView
-					extrinsicFn={[notePreimageTx]}
+					extrinsicFn={[notePreimageTx as any]}
 					extraFees={[{ name: 'Preimage Deposit', value: NETWORKS_DETAILS[`${network}`].preimageBaseDeposit || BN_ZERO }]}
 				/>
 			)}

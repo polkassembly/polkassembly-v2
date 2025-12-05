@@ -213,9 +213,7 @@ function BeneficiaryPayoutsList({ beneficiaries, usedInOnchainInfo }: Beneficiar
 		if (!apiService || !network) return beneficiariesWithDetails || [];
 
 		try {
-			const currentBlockHeight = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network)
-				? await assethubApiService?.getBlockHeight()
-				: await apiService?.getBlockHeight();
+			const currentBlockHeight = [ENetwork.KUSAMA, ENetwork.POLKADOT].includes(network) ? await assethubApiService?.getBlockHeight() : await apiService?.getBlockHeight();
 
 			if (!currentBlockHeight) return beneficiariesWithDetails;
 

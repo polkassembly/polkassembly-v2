@@ -370,12 +370,12 @@ function Navbar() {
 					</div>
 				)}
 			</nav>
-			{[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) && (
+			{[ENetwork.KUSAMA, ENetwork.POLKADOT].includes(network) && (
 				<AnnouncementBanner
 					message={
 						<p className='flex flex-wrap items-center gap-x-1 text-sm'>
 							{t('AnnouncementBanner.assethubMigration', {
-								network: network === ENetwork.ASSETHUB_KUSAMA ? NETWORKS_DETAILS[ENetwork.KUSAMA].name : NETWORKS_DETAILS[`${network}`].name
+								network: NETWORKS_DETAILS[`${network}`].name
 							})}
 							<Link
 								href='https://docs.google.com/document/d/1XR3vL2p4QV0wC7FrlC8eN-q62BqNFTFElbj21wEmMGg/edit?tab=t.0#heading=h.vxykbd6ai7n7'

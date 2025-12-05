@@ -51,7 +51,9 @@ function InputNumber({ onChange, ...props }: InputNumberProps) {
 	);
 
 	useEffect(() => {
-		onChange(Number(props.defaultValue));
+		// Safely convert defaultValue to number, fallback to 0 if NaN or undefined
+		const numValue = Number(props.defaultValue);
+		onChange(Number.isNaN(numValue) ? 0 : numValue);
 		setValueString(props.defaultValue?.toString() || '');
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [props.defaultValue]);
@@ -62,12 +64,29 @@ function InputNumber({ onChange, ...props }: InputNumberProps) {
 				type='text'
 				onChange={(e) => {
 					const { value } = e.target;
-					if (new BN(value).lt(getGlobalMaxValue(props.bitLength))) {
-						setValueString(value);
-						onChange(Number(value));
+
+					// Handle empty or invalid input
+					if (!value || value.trim() === '') {
+						setValueString('');
+						onChange(0);
 						setError('');
-					} else {
-						setError(t('errorMessages.valueTooLarge'));
+						return;
+					}
+
+					try {
+						const bnValue = new BN(value);
+						if (bnValue.lt(getGlobalMaxValue(props.bitLength))) {
+							setValueString(value);
+							const numValue = Number(value);
+							// Ensure we never pass NaN
+							onChange(Number.isNaN(numValue) ? 0 : numValue);
+							setError('');
+						} else {
+							setError(t('errorMessages.valueTooLarge'));
+						}
+					} catch {
+						// Invalid BN input
+						setError(t('errorMessages.invalidNumber'));
 					}
 				}}
 				maxLength={maxValueLength}

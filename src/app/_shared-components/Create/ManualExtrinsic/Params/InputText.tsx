@@ -16,6 +16,7 @@ function InputText({ onChange, ...props }: InputTextProps) {
 		<Input
 			type='text'
 			onChange={(e) => {
+				console.log('input text value', e.target.value);
 				onChange?.(e.target.value);
 			}}
 			{...props}

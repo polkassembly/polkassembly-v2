@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { BN, BN_HUNDRED, BN_ONE, BN_ZERO } from '@polkadot/util';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -73,9 +75,9 @@ function KillReferendum({ onSuccess }: { onSuccess: (proposalId: number) => void
 		return apiService.getKillReferendumExtrinsic({ referendumId: data.index });
 	}, [apiService, data]);
 
-	const preimageDetails = useMemo(() => apiService && tx && apiService.getPreimageTxDetails({ extrinsicFn: tx }), [apiService, tx]);
+	const preimageDetails = useMemo(() => apiService && tx && apiService.getPreimageTxDetails({ extrinsicFn: tx as any }), [apiService, tx]);
 
-	const notePreimageTx = useMemo(() => apiService && tx && apiService.getNotePreimageTx({ extrinsicFn: tx }), [apiService, tx]);
+	const notePreimageTx = useMemo(() => apiService && tx && apiService.getNotePreimageTx({ extrinsicFn: tx as any }), [apiService, tx]);
 
 	const submitProposalTx = useMemo(
 		() =>
@@ -92,7 +94,7 @@ function KillReferendum({ onSuccess }: { onSuccess: (proposalId: number) => void
 	);
 
 	const batchCallTx = useMemo(
-		() => apiService && notePreimageTx && submitProposalTx && apiService.getBatchAllTx([notePreimageTx, submitProposalTx]),
+		() => apiService && notePreimageTx && submitProposalTx && apiService.getBatchAllTx([notePreimageTx, submitProposalTx] as any),
 		[apiService, notePreimageTx, submitProposalTx]
 	);
 
@@ -109,7 +111,7 @@ function KillReferendum({ onSuccess }: { onSuccess: (proposalId: number) => void
 			wallet: userPreferences.wallet,
 			setVaultQrState,
 			track: EPostOrigin.REFERENDUM_KILLER,
-			extrinsicFn: tx,
+			extrinsicFn: tx as any,
 			enactment: selectedEnactment,
 			enactmentValue: advancedDetails[`${selectedEnactment}`],
 			onSuccess: (postId) => {
@@ -195,7 +197,7 @@ function KillReferendum({ onSuccess }: { onSuccess: (proposalId: number) => void
 
 			{batchCallTx && (
 				<TxFeesDetailsView
-					extrinsicFn={[batchCallTx]}
+					extrinsicFn={[batchCallTx as any]}
 					extraFees={[
 						{ name: t('TxFees.preimageDeposit'), value: NETWORKS_DETAILS[`${network}`].preimageBaseDeposit || BN_ZERO },
 						{ name: t('TxFees.submissionDeposit'), value: NETWORKS_DETAILS[`${network}`].submissionDeposit || BN_ZERO }

@@ -69,7 +69,7 @@ function VectorComp({ param, onChange, defaultValue, registry }: { param: IParam
 			}
 
 			while (prevValue.length < count) {
-				const value = getInitValue(registry, inputParams[0].type);
+				const value = getInitValue({ def: inputParams[0].type, registry });
 
 				prevValue.push(value);
 			}

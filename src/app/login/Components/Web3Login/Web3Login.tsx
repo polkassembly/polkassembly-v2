@@ -22,6 +22,7 @@ import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddres
 import { useRouter } from 'nextjs-toploader/app';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { usePolkadotVault } from '@/hooks/usePolkadotVault';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import classes from './Web3Login.module.scss';
 
 function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; onTfaEnabled: (token: string) => void }) {
@@ -43,7 +44,7 @@ function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; o
 	const searchParams = useSearchParams();
 	const nextUrl = searchParams.get('nextUrl');
 
-	const { apiService } = usePolkadotApiService();
+	const { apiService } = usePolkadotApiService(getCurrentNetwork());
 
 	const { setVaultQrState } = usePolkadotVault();
 

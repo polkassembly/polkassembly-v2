@@ -2,6 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+/* eslint-disable camelcase */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -11,12 +12,11 @@ import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
-import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
-import { SubmittableExtrinsic } from '@polkadot/api/types';
-import { Signer, ISubmittableResult, TypeDef } from '@polkadot/types/types';
-import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
-import { getTypeDef } from '@polkadot/types';
-import { decodeAddress, mnemonicGenerate, cryptoWaitReady } from '@polkadot/util-crypto';
+import { Keyring } from '@polkadot/api';
+import { decodeAddress, blake2AsHex, blake2AsU8a, mnemonicGenerate, cryptoWaitReady } from '@polkadot/util-crypto';
+import { TypeDef, TypeDefInfo } from '@polkadot/types/types';
+import { TypeRegistry, Metadata } from '@polkadot/types';
+import { BN, BN_ZERO, u8aToHex, u8aToU8a } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import {
@@ -34,17 +34,30 @@ import {
 	IVoteCartItem,
 	EProxyType,
 	IProxyRequest,
-	IProxyAddress
+	IProxyAddress,
+	IPapiAssetHubDescriptor
 } from '@shared/types';
 import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateAddressFromAccountId';
 import { APPNAME } from '@/_shared/_constants/appName';
-import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
 import { Dispatch, SetStateAction } from 'react';
-import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
-import { BlockCalculationsService } from './block_calculations_service';
-import { VaultQrSigner } from './vault_qr_signer_service';
+
+// papi imports
+import { createClient, TypedApi, PolkadotClient, Transaction, TxCallData, CompatibilityToken, Binary } from 'polkadot-api';
+import { getSmProvider } from 'polkadot-api/sm-provider';
+import { startFromWorker } from 'polkadot-api/smoldot/from-worker';
+import { getPolkadotSignerFromPjs } from 'polkadot-api/pjs-signer';
+import { unifyMetadata, decAnyMetadata, UnifiedMetadata } from '@polkadot-api/substrate-bindings';
+import { getLookupFn, MetadataLookup } from '@polkadot-api/metadata-builders';
+
+import { MultiAddress } from '@polkadot-api/descriptors';
 import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
 import { inputToBn } from '../_client-utils/inputToBn';
+// import { VaultQrSigner } from './vault_qr_signer_service';
+import { BlockCalculationsService } from './block_calculations_service';
+import { isAHMNetwork } from '../_client-utils/isAHMNetwork';
+import { convictionMap } from '../_client-utils/convictionMap';
+import { VaultQrSigner } from './vault_qr_signer_service';
+
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
 // const blockHeight = await apiService.getBlockHeight();
@@ -52,105 +65,109 @@ import { inputToBn } from '../_client-utils/inputToBn';
 export class PolkadotApiService {
 	private readonly network: ENetwork;
 
-	private api: ApiPromise;
+	private api: TypedApi<IPapiAssetHubDescriptor>;
+
+	private client: PolkadotClient;
+
+	private relayClient: PolkadotClient;
+
+	private compatibilityToken: CompatibilityToken<IPapiAssetHubDescriptor>;
+
+	private unifiedMetadata: UnifiedMetadata | null;
+
+	private lookup: MetadataLookup | null;
 
 	private currentRpcEndpointIndex: number;
 
-	private constructor(network: ENetwork, api: ApiPromise) {
+	private constructor(
+		network: ENetwork,
+		api: TypedApi<IPapiAssetHubDescriptor>,
+		client: PolkadotClient,
+		relayClient: PolkadotClient,
+		compatibilityToken: CompatibilityToken<IPapiAssetHubDescriptor>,
+		unifiedMetadata: UnifiedMetadata,
+		lookup: MetadataLookup
+	) {
 		this.network = network;
 		this.api = api;
+		this.client = client;
+		this.relayClient = relayClient;
+		this.compatibilityToken = compatibilityToken;
+		this.unifiedMetadata = unifiedMetadata;
+		this.lookup = lookup;
 		this.currentRpcEndpointIndex = 0;
 	}
 
 	static async Init(network: ENetwork): Promise<PolkadotApiService> {
-		const api = await ApiPromise.create({
-			provider: new WsProvider(NETWORKS_DETAILS[network as ENetwork].rpcEndpoints[0].url)
-		});
+		const relayChainSpec = NETWORKS_DETAILS[`${network}`]?.papiChainSpec;
+		const assetHubChainSpec = NETWORKS_DETAILS[`${network}`]?.assethubDetails?.papiChainSpec;
+		const papiRelayDescriptor = NETWORKS_DETAILS[`${network}`]?.papiDescriptor;
+		const papiAssetHubDescriptor = NETWORKS_DETAILS[`${network}`]?.assethubDetails?.papiDescriptor;
 
-		await api.isReady;
-
-		return new PolkadotApiService(network, api);
-	}
-
-	// eslint-disable-next-line sonarjs/cognitive-complexity
-	private async executeTxCallback({
-		status,
-		events,
-		txHash,
-		setStatus,
-		onBroadcast,
-		onSuccess,
-		onFailed,
-		waitTillFinalizedHash,
-		errorMessageFallback,
-		setIsTxFinalized
-	}: {
-		status: ExtrinsicStatus;
-		events: EventRecord[];
-		txHash: Hash;
-		setStatus?: (pre: string) => void;
-		onBroadcast?: () => void;
-		onSuccess: (pre?: unknown) => Promise<void> | void;
-		onFailed: (errorMessageFallback: string) => Promise<void> | void;
-		waitTillFinalizedHash: boolean;
-		errorMessageFallback: string;
-		setIsTxFinalized?: (pre: string) => void;
-	}) {
-		let isFailed = false;
-		if (status.isInvalid) {
-			console.log('Transaction invalid');
-			setStatus?.('Transaction invalid');
-		} else if (status.isReady) {
-			console.log('Transaction is ready');
-			setStatus?.('Transaction is ready');
-		} else if (status.isBroadcast) {
-			console.log('Transaction has been broadcasted');
-			setStatus?.('Transaction has been broadcasted');
-			onBroadcast?.();
-		} else if (status.isInBlock) {
-			console.log('Transaction is in block');
-			setStatus?.('Transaction is in block');
-
-			// eslint-disable-next-line no-restricted-syntax
-			for (const { event } of events) {
-				if (event.method === 'ExtrinsicSuccess') {
-					setStatus?.('Transaction Success');
-					isFailed = false;
-					if (!waitTillFinalizedHash) {
-						// eslint-disable-next-line no-await-in-loop
-						await onSuccess(txHash);
-					}
-				} else if (event.method === 'ExtrinsicFailed') {
-					// eslint-disable-next-line sonarjs/no-duplicate-string
-					console.log('Transaction failed');
-					setStatus?.('Transaction failed');
-					const dispatchError = (event.data as any)?.dispatchError;
-					isFailed = true;
-
-					if (dispatchError?.isModule) {
-						const errorModule = (event.data as any)?.dispatchError?.asModule;
-						const { method, section, docs } = this.api.registry.findMetaError(errorModule);
-						// eslint-disable-next-line no-param-reassign
-						errorMessageFallback = `${section}.${method} : ${docs.join(' ')}`;
-						console.log(errorMessageFallback, 'error module');
-						await onFailed(errorMessageFallback);
-					} else if (dispatchError?.isToken) {
-						console.log(`${dispatchError.type}.${dispatchError.asToken.type}`);
-						await onFailed(`${dispatchError.type}.${dispatchError.asToken.type}`);
-					} else {
-						await onFailed(`${dispatchError.type}` || errorMessageFallback);
-					}
-				}
-			}
-		} else if (status.isFinalized) {
-			console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
-			console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
-			setIsTxFinalized?.(txHash.toString());
-			console.log('isFailed', isFailed);
-			if (!isFailed && waitTillFinalizedHash) {
-				await onSuccess(txHash);
-			}
+		if (!relayChainSpec || !papiRelayDescriptor) {
+			throw new Error('PAPI chain spec or descriptor not found');
 		}
+
+		const worker = new Worker(new URL('polkadot-api/smoldot/worker', import.meta.url));
+		const smoldot = startFromWorker(worker);
+		const relayChain = await smoldot.addChain({ chainSpec: relayChainSpec });
+
+		if (isAHMNetwork(network) && assetHubChainSpec && papiAssetHubDescriptor) {
+			const assetHubChain = await smoldot.addChain({ chainSpec: assetHubChainSpec, potentialRelayChains: [relayChain] });
+
+			const client = createClient(getSmProvider(assetHubChain));
+			const relayClient = createClient(getSmProvider(relayChain));
+			client.finalizedBlock$.subscribe((finalizedBlock) => console.log('api init', finalizedBlock.number, finalizedBlock.hash));
+
+			const papi = client.getTypedApi(papiAssetHubDescriptor);
+			console.log('papi', network, (await client.getBlockHeader()).number);
+
+			const compatibilityToken = await papi.compatibilityToken;
+
+			const finalizedBlock = await client.getFinalizedBlock();
+			console.log('finalizedBlock', finalizedBlock.number, finalizedBlock.hash);
+			const metadata = await client.getMetadata(finalizedBlock.hash);
+			console.log('metadata', metadata);
+
+			// const registry = new TypeRegistry();
+			// registry.setMetadata(new Metadata(registry, metadata));
+			// if (properties) {
+			// registry.setChainProperties(registry.createType('ChainProperties', properties) as any);
+			// }
+
+			const unifiedMetadata = unifyMetadata(decAnyMetadata(metadata));
+			console.log('unifiedMetadata', unifiedMetadata);
+			const lookup = getLookupFn(unifiedMetadata);
+			console.log('lookup', lookup);
+
+			return new PolkadotApiService(network, papi, client, relayClient, compatibilityToken, unifiedMetadata, lookup);
+		}
+
+		const client = createClient(getSmProvider(relayChain));
+		client.finalizedBlock$.subscribe((finalizedBlock) => console.log('api init', finalizedBlock.number, finalizedBlock.hash));
+
+		// To interact with the chain, you need to get the `TypedApi`, which includes
+		// all the types for every call in that chain:
+
+		const papi = client.getTypedApi(papiRelayDescriptor) as unknown as TypedApi<IPapiAssetHubDescriptor>;
+		console.log('papi', network, (await client.getBlockHeader()).number);
+
+		const compatibilityToken = (await papi.compatibilityToken) as unknown as CompatibilityToken<IPapiAssetHubDescriptor>;
+
+		const blockHeader = await client.getBlockHeader();
+		const metadata = await client.getMetadata(blockHeader.parentHash);
+		const { properties } = await client.getChainSpecData();
+
+		const registry = new TypeRegistry();
+		registry.setMetadata(new Metadata(registry, metadata));
+		if (properties) {
+			registry.setChainProperties(registry.createType('ChainProperties', properties) as any);
+		}
+
+		const unifiedMetadata = unifyMetadata(decAnyMetadata(metadata));
+		const lookup = getLookupFn(unifiedMetadata);
+
+		return new PolkadotApiService(network, papi, client, client, compatibilityToken, unifiedMetadata, lookup);
 	}
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
@@ -158,7 +175,7 @@ export class PolkadotApiService {
 		tx,
 		address,
 		wallet,
-		params = {},
+		// params = {},
 		errorMessageFallback,
 		setVaultQrState,
 		onSuccess,
@@ -169,7 +186,8 @@ export class PolkadotApiService {
 		waitTillFinalizedHash = false,
 		selectedAccount
 	}: {
-		tx: SubmittableExtrinsic<'promise'>;
+		// tx: SubmittableExtrinsic<'promise'>;
+		tx: Transaction<any, any, any, any>;
 		address: string;
 		wallet: EWallet;
 		params?: Record<string, unknown>;
@@ -199,49 +217,116 @@ export class PolkadotApiService {
 				return;
 			}
 
-			const result: any = await injected.signer.signPayload({
-				address,
-				method: tx.method.toHex(),
-				genesisHash: this.getGenesisHash()
-			} as any);
+			try {
+				// const callHex = tx.decodedCall.value.value;
+				// const txEntry = this.api.txFromCallData(Binary.fromHex(callHex));
+				const signer = getPolkadotSignerFromPjs(address, injected.signer.signPayload as any, injected.signer.signRaw as any);
 
-			const call = this.api.registry.createType('Call', result.payload.method);
-
-			const newTx = this.api.tx[call.section][call.method](...call.args);
-
-			newTx.addSignature(result.signer, result.signature, result.payload);
-
-			newTx
-				// eslint-disable-next-line sonarjs/cognitive-complexity
-				.send(async ({ status, events, txHash }) =>
-					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
-				)
-				.catch((error: unknown) => {
-					console.log(':( transaction failed');
-					setStatus?.(':( transaction failed');
-					console.error('ERROR:', error);
-					onFailed(error?.toString?.() || errorMessageFallback);
+				tx.signSubmitAndWatch(signer).subscribe({
+					next: async (event) => {
+						// evt: { type, txHash, ... }
+						if (event.type === 'signed') {
+							setStatus?.('Transaction is ready');
+							return;
+						}
+						if (event.type === 'broadcasted') {
+							setStatus?.('Transaction has been broadcasted');
+							onBroadcast?.();
+							return;
+						}
+						if (event.type === 'txBestBlocksState') {
+							if (event.found && event.ok && !waitTillFinalizedHash) {
+								setStatus?.('Transaction is in block');
+								await onSuccess(event.txHash);
+							}
+							if (event.found && !event.ok) {
+								setStatus?.('Transaction failed');
+								onFailed(errorMessageFallback);
+							}
+							return;
+						}
+						if (event.type === 'finalized') {
+							setStatus?.('Transaction finalized');
+							setIsTxFinalized?.(event.txHash);
+							if (event.ok) {
+								await onSuccess(event.txHash);
+							} else {
+								onFailed(errorMessageFallback);
+							}
+						}
+					},
+					error: (error: unknown) => {
+						console.log(':( transaction failed');
+						setStatus?.(':( transaction failed');
+						console.error('ERROR:', error);
+						onFailed((error as any)?.toString?.() || errorMessageFallback);
+					}
 				});
+			} catch (error) {
+				console.log(':( transaction failed');
+				setStatus?.(':( transaction failed');
+				console.error('ERROR:', error);
+				onFailed((error as any)?.toString?.() || errorMessageFallback);
+			}
 		} else if (wallet === EWallet.POLKADOT_VAULT) {
-			const signer = new VaultQrSigner(this.api.registry, setVaultQrState);
-			await tx.signAsync(address, { nonce: -1, signer });
+			const vaultSigner = new VaultQrSigner(setVaultQrState);
 
-			setVaultQrState((prev) => ({
-				...prev,
-				open: false
-			}));
+			const signer = getPolkadotSignerFromPjs(address, vaultSigner.signPayload as any, async (payload) => {
+				return new Promise((resolve, reject) => {
+					const data = u8aToU8a(payload.data);
+					const isQrHashed = data.length > 5000;
+					const qrPayload = isQrHashed ? blake2AsU8a(data) : data;
+					setVaultQrState({
+						open: true,
+						isQrHashed,
+						qrAddress: payload.address,
+						qrPayload,
+						qrResolve: resolve,
+						qrReject: reject
+					});
+				});
+			});
 
-			tx
-				// eslint-disable-next-line sonarjs/cognitive-complexity
-				.send(async ({ status, events, txHash }) =>
-					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
-				)
-				.catch((error: unknown) => {
+			tx.signSubmitAndWatch(signer).subscribe({
+				next: async (event) => {
+					// evt: { type, txHash, ... }
+					if (event.type === 'signed') {
+						setStatus?.('Transaction is ready');
+						return;
+					}
+					if (event.type === 'broadcasted') {
+						setStatus?.('Transaction has been broadcasted');
+						onBroadcast?.();
+						return;
+					}
+					if (event.type === 'txBestBlocksState') {
+						if (event.found && event.ok && !waitTillFinalizedHash) {
+							setStatus?.('Transaction is in block');
+							await onSuccess(event.txHash);
+						}
+						if (event.found && !event.ok) {
+							setStatus?.('Transaction failed');
+							onFailed(errorMessageFallback);
+						}
+						return;
+					}
+					if (event.type === 'finalized') {
+						setStatus?.('Transaction finalized');
+						setIsTxFinalized?.(event.txHash);
+						if (event.ok) {
+							await onSuccess(event.txHash);
+						} else {
+							onFailed(errorMessageFallback);
+						}
+					}
+				},
+				error: (error: unknown) => {
 					console.log(':( transaction failed');
 					setStatus?.(':( transaction failed');
 					console.error('ERROR:', error);
-					onFailed(error?.toString?.() || errorMessageFallback);
-				});
+					onFailed((error as any)?.toString?.() || errorMessageFallback);
+				}
+			});
 		} else {
 			const injected = await getInjectedWallet(wallet);
 
@@ -251,7 +336,9 @@ export class PolkadotApiService {
 				return;
 			}
 
-			this.setSigner(injected.signer as Signer);
+			// this.setSigner(injected.signer as Signer);
+
+			const signer = getPolkadotSignerFromPjs(address, injected.signer.signPayload as any, injected.signer.signRaw as any);
 
 			let extrinsic = tx;
 
@@ -272,126 +359,108 @@ export class PolkadotApiService {
 			const multisigAccount = getMultisigAccount(selectedAccount);
 
 			if (selectedAccount?.accountType === EAccountType.PROXY) {
-				extrinsic = this.api.tx.proxy.proxy(selectedAccount.address, null, extrinsic);
+				extrinsic = this.api.tx.Proxy.proxy({
+					real: MultiAddress.Id(selectedAccount.address),
+					force_proxy_type: undefined,
+					call: tx.decodedCall
+				});
 			}
 
-			let signerAddress = address;
-
-			if (selectedAccount?.accountType === EAccountType.MULTISIG) {
-				signerAddress = selectedAccount.parent?.address || '';
-			} else if (selectedAccount?.accountType === EAccountType.PROXY) {
-				if (selectedAccount.parent?.accountType === EAccountType.MULTISIG) {
-					// For pure proxy of multisig, the multisig needs to call proxy.proxy
-					// So we wrap it in multisig first, THEN determine the signer
-					signerAddress = selectedAccount.parent?.parent?.address || '';
-				} else {
-					signerAddress = selectedAccount.parent?.address || '';
-				}
-			}
-
-			// For pure proxy of multisig: wrap in multisig AFTER proxy.proxy
 			if (multisigAccount) {
 				const signatories = multisigAccount?.signatories
 					?.map((signatory) => getEncodedAddress(signatory, this.network))
-					.filter((signatory) => signatory && getSubstrateAddress(signatory) !== getSubstrateAddress(signerAddress));
+					.filter((signatory) => signatory !== address)
+					.filter((signatory) => signatory !== null);
+				const { weight } = await extrinsic.getPaymentInfo(address);
 
-				// Get the correct address for payment info
-				const paymentInfoAddress =
-					selectedAccount?.accountType === EAccountType.PROXY && selectedAccount.parent?.accountType === EAccountType.MULTISIG
-						? selectedAccount.parent.address // Use multisig address for payment info when it's a pure proxy
-						: signerAddress;
-
-				const { weight } = await extrinsic.paymentInfo(paymentInfoAddress);
-				extrinsic = this.api.tx.multisig.asMulti(multisigAccount?.threshold, signatories, null, extrinsic, weight);
+				if (signatories && signatories?.length > 0 && multisigAccount?.threshold) {
+					extrinsic = this.api.tx.Multisig.as_multi({
+						threshold: multisigAccount?.threshold,
+						other_signatories: signatories,
+						call: tx.decodedCall,
+						maybe_timepoint: undefined,
+						max_weight: weight
+					});
+				}
 			}
 
-			const signerOptions = {
-				...params,
-				withSignedTransaction: true
-			};
-
-			if (!signerAddress) {
-				onFailed('Invalid account type');
-				return;
-			}
+			// const signerOptions = {
+			// ...params,
+			// withSignedTransaction: true
+			// };
 
 			extrinsic
 				// eslint-disable-next-line sonarjs/cognitive-complexity
-				.signAndSend(signerAddress, signerOptions, async ({ status, events, txHash }) =>
-					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
-				)
-				.catch((error: unknown) => {
-					console.log(':( transaction failed');
-					setStatus?.(':( transaction failed');
-					console.error('ERROR:', error);
-					onFailed(error?.toString?.() || errorMessageFallback);
+				.signSubmitAndWatch(signer)
+				.subscribe({
+					next: async (event) => {
+						// evt: { type, txHash, ... }
+						if (event.type === 'signed') {
+							setStatus?.('Transaction is ready');
+							return;
+						}
+						if (event.type === 'broadcasted') {
+							setStatus?.('Transaction has been broadcasted');
+							onBroadcast?.();
+							return;
+						}
+						if (event.type === 'txBestBlocksState') {
+							if (event.found && event.ok && !waitTillFinalizedHash) {
+								setStatus?.('Transaction is in block');
+								await onSuccess(event.txHash);
+							}
+							if (event.found && !event.ok) {
+								setStatus?.('Transaction failed');
+								onFailed(errorMessageFallback);
+							}
+							return;
+						}
+						if (event.type === 'finalized') {
+							setStatus?.('Transaction finalized');
+							setIsTxFinalized?.(event.txHash);
+							if (event.ok) {
+								await onSuccess(event.txHash);
+							} else {
+								onFailed(errorMessageFallback);
+							}
+						}
+					},
+					error: (error: unknown) => {
+						console.log(':( transaction failed');
+						setStatus?.(':( transaction failed');
+						console.error('ERROR:', error);
+						onFailed((error as any)?.toString?.() || errorMessageFallback);
+					}
 				});
 		}
 	}
 
-	getGenesisHash() {
-		return this.api.genesisHash.toHex();
-	}
-
-	async disconnect(): Promise<void> {
-		await this.api.disconnect();
+	async getGenesisHash() {
+		const { genesisHash } = await this.client.getChainSpecData();
+		return genesisHash;
 	}
 
 	getCurrentRpcIndex(): number {
 		return this.currentRpcEndpointIndex;
 	}
 
-	async switchToNewRpcEndpoint(index?: number): Promise<void> {
-		if (index) {
-			// check if valid index
-			if (index < 0 || index >= NETWORKS_DETAILS[this.network].rpcEndpoints.length) {
-				throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Invalid RPC index');
-			}
-			this.currentRpcEndpointIndex = index;
-		} else {
-			this.currentRpcEndpointIndex = (this.currentRpcEndpointIndex + 1) % NETWORKS_DETAILS[this.network].rpcEndpoints.length;
-		}
-
-		this.api.disconnect();
-		this.api = await ApiPromise.create({
-			provider: new WsProvider(NETWORKS_DETAILS[this.network].rpcEndpoints[this.currentRpcEndpointIndex].url)
-		});
-		await this.api.isReady;
-	}
-
 	async getBlockHeight(): Promise<number> {
-		const header = await this.api.rpc.chain.getHeader();
-		return header.number.toNumber();
+		const header = await this.relayClient.getBlockHeader();
+		return header.number;
 	}
 
 	async keepAlive(): Promise<void> {
 		await this.getBlockHeight();
 	}
 
-	async reconnect(): Promise<void> {
-		if (this.api.isConnected && (await this.api.isReady)) return;
-
-		try {
-			this.api = await ApiPromise.create({
-				provider: new WsProvider(NETWORKS_DETAILS[this.network].rpcEndpoints[this.currentRpcEndpointIndex].url)
-			});
-
-			await this.api.isReady;
-		} catch {
-			await this.switchToNewRpcEndpoint();
-		}
-	}
-
-	setSigner(signer: Signer) {
-		this.api.setSigner(signer);
-	}
-
-	async apiReady() {
-		await this.api.isReady;
+	async disconnect(): Promise<void> {
+		this.client.destroy();
+		this.relayClient.destroy();
 	}
 
 	async getExistentialDeposit() {
-		return this.api.consts.balances.existentialDeposit;
+		if (!this.api) return new BN(0);
+		return this.api.constants.Balances.ExistentialDeposit;
 	}
 
 	async getUserBalances({ address }: { address: string }) {
@@ -407,31 +476,33 @@ export class PolkadotApiService {
 			transferableBalance
 		};
 
-		if (!address || !this.api?.derive?.balances?.all) {
+		if (!address) {
 			return responseObj;
 		}
 
-		const existentialDeposit = this.api.consts?.balances?.existentialDeposit ? new BN(this.api.consts.balances.existentialDeposit.toString()) : BN_ZERO;
+		const existentialDeposit = this.api.constants?.Balances?.ExistentialDeposit ? new BN(this.api.constants.Balances.ExistentialDeposit.toString()) : BN_ZERO;
 
 		const encodedAddress = getEncodedAddress(address, this.network) || address;
-		await this.api.derive.balances
-			.all(encodedAddress)
-			.then((result) => {
-				lockedBalance = new BN(result.lockedBalance || lockedBalance);
-			})
-			.catch(() => {
-				// TODO: show notification
-			});
+		// await this.api.derive.balances
+		// .all(encodedAddress)
+		// .then((result) => {
+		// lockedBalance = new BN(result.lockedBalance || lockedBalance);
+		// })
+		// .catch(() => {
+		// // TODO: show notification
+		// });
 
-		await this.api.query.system
-			.account(encodedAddress)
-			.then((result: any) => {
-				const free = new BN(result?.data?.free) || BN_ZERO;
-				const reserved = new BN(result?.data?.reserved) || BN_ZERO;
-				const frozen = new BN(result?.data?.frozen || result?.data?.feeFrozen || result?.data?.miscFrozen) || BN_ZERO;
+		await this.api.query.System.Account.getValue(encodedAddress)
+			.then((result) => {
+				const free = new BN(result?.data?.free.toString()) || BN_ZERO;
+				const reserved = new BN(result?.data?.reserved.toString()) || BN_ZERO;
+				// const frozen = new BN(result?.data?.frozen || result?.data?.feeFrozen || result?.data?.miscFrozen) || BN_ZERO;
+				const frozen = new BN(result?.data?.frozen.toString()) || BN_ZERO;
 
 				totalBalance = free.add(reserved);
 				freeBalance = free;
+
+				lockedBalance = reserved;
 
 				const frozenMinusReserved = frozen.sub(reserved);
 				transferableBalance = BN.max(free.sub(BN.max(frozenMinusReserved, existentialDeposit)), BN_ZERO);
@@ -471,21 +542,38 @@ export class PolkadotApiService {
 		referendumId: number;
 		vote: EVoteDecision;
 		lockedBalance?: BN;
-		conviction?: number;
+		conviction: number;
 		ayeVoteValue?: BN;
 		nayVoteValue?: BN;
 		abstainVoteValue?: BN;
 		selectedAccount?: ISelectedAccount;
 	}) {
-		let voteTx: SubmittableExtrinsic<'promise'> | null = null;
+		let voteTx: Transaction<any, any, any, any> | null = null;
 
 		if ([EVoteDecision.AYE, EVoteDecision.NAY].includes(vote) && lockedBalance) {
-			voteTx = this.api.tx.convictionVoting.vote(referendumId, { Standard: { balance: lockedBalance, vote: { aye: vote === EVoteDecision.AYE, conviction } } });
+			voteTx = this.api.tx.ConvictionVoting.vote({
+				poll_index: referendumId,
+				vote: {
+					type: 'Standard',
+					value: {
+						// AYE: conviction + 128, NAY: conviction + 0
+						vote: vote === EVoteDecision.AYE ? conviction + 128 : conviction,
+						balance: BigInt(lockedBalance.toString())
+					}
+				}
+			});
 		} else if (vote === EVoteDecision.SPLIT) {
-			voteTx = this.api.tx.convictionVoting.vote(referendumId, { Split: { aye: `${ayeVoteValue?.toString()}`, nay: `${nayVoteValue?.toString()}` } });
+			voteTx = this.api.tx.ConvictionVoting.vote({
+				poll_index: referendumId,
+				vote: { type: 'Split', value: { aye: BigInt(ayeVoteValue?.toString() || '0'), nay: BigInt(nayVoteValue?.toString() || '0') } }
+			});
 		} else if (vote === EVoteDecision.SPLIT_ABSTAIN && ayeVoteValue && nayVoteValue) {
-			voteTx = this.api.tx.convictionVoting.vote(referendumId, {
-				SplitAbstain: { abstain: `${abstainVoteValue?.toString()}`, aye: `${ayeVoteValue?.toString()}`, nay: `${nayVoteValue?.toString()}` }
+			voteTx = this.api.tx.ConvictionVoting.vote({
+				poll_index: referendumId,
+				vote: {
+					type: 'SplitAbstain',
+					value: { abstain: BigInt(abstainVoteValue?.toString() || '0'), aye: BigInt(ayeVoteValue?.toString() || '0'), nay: BigInt(nayVoteValue?.toString() || '0') }
+				}
 			});
 		}
 
@@ -499,6 +587,35 @@ export class PolkadotApiService {
 				onSuccess,
 				onFailed,
 				selectedAccount,
+				setVaultQrState
+			});
+		}
+	}
+
+	async remark({
+		address,
+		wallet,
+		setVaultQrState,
+		onSuccess,
+		onFailed
+	}: {
+		address: string;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+		onSuccess: (pre?: unknown) => Promise<void> | void;
+		onFailed: (errorMessageFallback: string) => Promise<void> | void;
+	}) {
+		const remarkTx: Transaction<any, any, any, any> | null = this.api.tx.System.remark({ remark: Binary.fromText('test-papi-assethub-polkadot') });
+
+		if (remarkTx) {
+			await this.executeTx({
+				tx: remarkTx,
+				address,
+				wallet,
+				errorMessageFallback: 'Failed to vote',
+				waitTillFinalizedHash: true,
+				onSuccess,
+				onFailed,
 				setVaultQrState
 			});
 		}
@@ -527,7 +644,11 @@ export class PolkadotApiService {
 		}
 
 		try {
-			const tx: SubmittableExtrinsic<'promise'> = this.api.tx.convictionVoting.removeVote(null, referendumId);
+			const tx = this.api.tx.ConvictionVoting.remove_vote({
+				index: referendumId,
+				class: undefined
+			});
+
 			await this.executeTx({
 				tx,
 				address,
@@ -562,22 +683,40 @@ export class PolkadotApiService {
 		if (!this.api) return;
 
 		const voteTxList = voteCartItems.map((voteCartItem) => {
-			let voteTx: SubmittableExtrinsic<'promise'> | null = null;
+			let voteTx = null;
 			const vote = voteCartItem.decision;
 			const ayeVoteValue = voteCartItem.amount.aye;
 			const nayVoteValue = voteCartItem.amount.nay;
 			const abstainVoteValue = voteCartItem.amount.abstain;
-			const referendumId = voteCartItem.postIndexOrHash;
+			const referendumId = Number(voteCartItem.postIndexOrHash);
 			const { conviction } = voteCartItem;
 			if ([EVoteDecision.AYE, EVoteDecision.NAY].includes(vote) && (ayeVoteValue || nayVoteValue)) {
-				voteTx = this.api.tx.convictionVoting.vote(referendumId, {
-					Standard: { balance: vote === EVoteDecision.AYE ? ayeVoteValue : nayVoteValue, vote: { aye: vote === EVoteDecision.AYE, conviction } }
+				voteTx = this.api.tx.ConvictionVoting.vote({
+					poll_index: referendumId,
+					vote: {
+						type: 'Standard',
+						value: {
+							// AYE: conviction + 128, NAY: conviction + 0
+							vote: vote === EVoteDecision.AYE ? conviction + 128 : conviction,
+							balance: BigInt(ayeVoteValue?.toString() || '0')
+						}
+					}
 				});
 			} else if (vote === EVoteDecision.SPLIT) {
-				voteTx = this.api.tx.convictionVoting.vote(referendumId, { Split: { aye: `${ayeVoteValue?.toString()}`, nay: `${nayVoteValue?.toString()}` } });
+				voteTx = this.api.tx.ConvictionVoting.vote({
+					poll_index: referendumId,
+					vote: {
+						type: 'Split',
+						value: { aye: BigInt(ayeVoteValue?.toString() || '0'), nay: BigInt(nayVoteValue?.toString() || '0') }
+					}
+				});
 			} else if (vote === EVoteDecision.SPLIT_ABSTAIN && ayeVoteValue && nayVoteValue) {
-				voteTx = this.api.tx.convictionVoting.vote(referendumId, {
-					SplitAbstain: { abstain: `${abstainVoteValue?.toString()}`, aye: `${ayeVoteValue?.toString()}`, nay: `${nayVoteValue?.toString()}` }
+				voteTx = this.api.tx.ConvictionVoting.vote({
+					poll_index: referendumId,
+					vote: {
+						type: 'SplitAbstain',
+						value: { abstain: BigInt(abstainVoteValue?.toString() || '0'), aye: BigInt(ayeVoteValue?.toString() || '0'), nay: BigInt(nayVoteValue?.toString() || '0') }
+					}
 				});
 			}
 			if (voteTx) {
@@ -586,7 +725,7 @@ export class PolkadotApiService {
 			return null;
 		});
 
-		const tx = this.api.tx.utility.batchAll(voteTxList);
+		const tx = this.api.tx.Utility.batch_all({ calls: voteTxList.filter((t) => t !== null) as unknown as TxCallData[] });
 		await this.executeTx({
 			tx,
 			address,
@@ -599,14 +738,163 @@ export class PolkadotApiService {
 		});
 	}
 
+	private papiTypeToTypeDef(entry: any): TypeDef {
+		switch (entry.type) {
+			case 'primitive':
+				return {
+					info: TypeDefInfo.Plain,
+					type: entry.value
+				};
+			case 'compact':
+				return {
+					info: TypeDefInfo.Compact,
+					type: 'Compact',
+					sub: {
+						info: TypeDefInfo.Plain,
+						type: entry.size || 'u128'
+					}
+				};
+			case 'sequence': {
+				const sub = this.papiTypeToTypeDef(entry.value);
+				return {
+					info: TypeDefInfo.Vec,
+					// Explicitly check for u8 to map to Vec<u8>, which Param.tsx recognizes as Bytes
+					type: sub.type === 'u8' ? 'Vec<u8>' : 'Vec',
+					sub
+				};
+			}
+			case 'array':
+				return {
+					info: TypeDefInfo.VecFixed,
+					type: 'VecFixed',
+					length: entry.len,
+					sub: this.papiTypeToTypeDef(entry.value)
+				};
+			case 'tuple':
+				return {
+					info: TypeDefInfo.Tuple,
+					type: 'Tuple',
+					sub: entry.value.map((e: any) => this.papiTypeToTypeDef(e))
+				};
+			case 'struct':
+				return {
+					info: TypeDefInfo.Struct,
+					type: 'Struct',
+					sub: Object.entries(entry.value).map(([name, e]) => ({
+						name,
+						...this.papiTypeToTypeDef(e)
+					}))
+				};
+			case 'enum':
+				return {
+					info: TypeDefInfo.Enum,
+					type: 'Enum',
+					sub: Object.entries(entry.value)
+						.sort(([, a]: [string, any], [, b]: [string, any]) => a.idx - b.idx)
+						.map(([name, variant]: [string, any]) => {
+							const common = { name, index: variant.idx };
+							// eslint-disable-next-line sonarjs/no-nested-switch
+							switch (variant.type) {
+								case 'void':
+									return { ...common, info: TypeDefInfo.Plain, type: 'Null' };
+								case 'lookupEntry':
+									return {
+										...common,
+										info: TypeDefInfo.Tuple,
+										sub: [this.papiTypeToTypeDef(variant.value)]
+									};
+								case 'tuple':
+									return {
+										...common,
+										info: TypeDefInfo.Tuple,
+										sub: variant.value.map((e: any) => this.papiTypeToTypeDef(e))
+									};
+								case 'struct':
+									return {
+										...common,
+										info: TypeDefInfo.Struct,
+										sub: Object.entries(variant.value).map(([n, e]: [string, any]) => ({
+											name: n,
+											...this.papiTypeToTypeDef(e)
+										}))
+									};
+								default:
+									return { ...common, info: TypeDefInfo.Plain, type: 'Unknown' };
+							}
+						}) as TypeDef[]
+				};
+			case 'option':
+				return {
+					info: TypeDefInfo.Option,
+					type: 'Option',
+					sub: this.papiTypeToTypeDef(entry.value)
+				};
+			case 'result':
+				return {
+					info: TypeDefInfo.Result,
+					type: 'Result',
+					sub: [
+						{ name: 'Ok', ...this.papiTypeToTypeDef(entry.value.ok) },
+						{ name: 'Err', ...this.papiTypeToTypeDef(entry.value.ko) }
+					]
+				};
+			case 'bitSequence':
+				return {
+					info: TypeDefInfo.Plain,
+					type: 'BitVec'
+				};
+			case 'AccountId32':
+				return {
+					info: TypeDefInfo.Plain,
+					type: 'AccountId32'
+				};
+			case 'AccountId20':
+				return {
+					info: TypeDefInfo.Plain,
+					type: 'AccountId20'
+				};
+			case 'void':
+				return { info: TypeDefInfo.Null, type: 'Null' };
+			default:
+				return {
+					info: TypeDefInfo.Plain,
+					type: (entry as any).type || 'Unknown'
+				};
+		}
+	}
+
 	getApiSectionOptions() {
-		if (!this.api) {
+		if (!this.unifiedMetadata) {
 			return [];
 		}
 
-		return Object.keys(this.api.tx)
+		return this.unifiedMetadata.pallets
+			.filter((p) => p.calls)
+			.map((p) => ({
+				label: p.name,
+				text: p.name,
+				value: p.name
+			}))
+			.sort((a, b) => a.label.localeCompare(b.label));
+	}
+
+	getApiMethodOptions({ sectionName }: { sectionName: string }) {
+		if (!this.unifiedMetadata || !this.lookup) {
+			return [];
+		}
+
+		const pallet = this.unifiedMetadata.pallets.find((p) => p.name === sectionName);
+		if (!pallet || !pallet.calls) {
+			return [];
+		}
+
+		const callsLookup = this.lookup(pallet.calls.type);
+		if (callsLookup.type !== 'enum') {
+			return [];
+		}
+
+		return Object.keys(callsLookup.value)
 			.sort()
-			.filter((name) => Object.keys(this.api.tx[`${name}`]).length)
 			.map((name) => ({
 				label: name,
 				text: name,
@@ -614,62 +902,73 @@ export class PolkadotApiService {
 			}));
 	}
 
-	getApiMethodOptions({ sectionName }: { sectionName: string }) {
-		if (!this.api) {
+	getPreimageParams({ extrinsicFn }: { extrinsicFn: Transaction<any, any, any, any> }) {
+		console.log('extrinsicFn', extrinsicFn);
+		console.log('unifiedMetadata', this.unifiedMetadata);
+		console.log('lookup', this.lookup);
+		if (!this.unifiedMetadata || !this.lookup || !extrinsicFn || !extrinsicFn.decodedCall) {
 			return [];
 		}
 
-		const section = this.api.tx[`${sectionName}`];
+		const sectionName = extrinsicFn.decodedCall.type;
+		const methodName = extrinsicFn.decodedCall.value.type;
 
-		if (!section || Object.keys(section)?.length === 0) {
+		console.log('sectionName', sectionName);
+		console.log('methodName', methodName);
+
+		const pallet = this.unifiedMetadata.pallets.find((p) => p.name === sectionName);
+		console.log('pallet', pallet);
+		if (!pallet || !pallet.calls) {
 			return [];
 		}
 
-		return Object.keys(section)
-			.sort()
-			.map((value) => {
-				const method = section[`${value}`];
-				const inputs = method.meta.args.map((arg: any) => arg.name.toString()).join(', ');
-				return {
-					label: `${value} (${inputs})`,
-					text: value,
-					value
-				};
-			});
-	}
-
-	getPreimageParams({ sectionName, methodName }: { sectionName: string; methodName: string }) {
-		if (!this.api) {
+		const callsLookup = this.lookup(pallet.calls.type);
+		console.log('callsLookup', callsLookup);
+		if (callsLookup.type !== 'enum') {
 			return [];
 		}
 
-		const submittable = this.api.tx[`${sectionName}`][`${methodName}`];
-
-		if (!submittable) {
+		const variant = callsLookup.value[`${methodName}`];
+		console.log('variant', variant);
+		if (!variant) {
 			return [];
 		}
 
-		return submittable.meta.args.map(
-			({ name, type, typeName }): IParamDef => ({
-				name: name.toString(),
-				type: {
-					...getTypeDef(type.toString()),
-					...(typeName.isSome ? { typeName: typeName.unwrap().toString() } : {})
+		if (variant.type === 'struct') {
+			return Object.entries(variant.value).map(([name, entry]) => ({
+				name,
+				type: this.papiTypeToTypeDef(entry)
+			}));
+		}
+		if (variant.type === 'tuple') {
+			return variant.value.map((entry: any, idx: number) => ({
+				name: idx.toString(),
+				type: this.papiTypeToTypeDef(entry)
+			}));
+		}
+		if (variant.type === 'lookupEntry') {
+			return [
+				{
+					name: 'arg',
+					type: this.papiTypeToTypeDef(variant.value)
 				}
-			})
-		);
+			];
+		}
+
+		return [];
 	}
 
 	getPreimageParamsFromTypeDef({ type }: { type: TypeDef }) {
-		const registry = this.getApiRegistry();
-		const typeDef = getTypeDef(registry.createType(type.type as 'u32').toRawType()) || type;
-
-		return typeDef.sub
-			? (Array.isArray(typeDef.sub) ? typeDef.sub : [typeDef.sub]).map(
+		if (!this.api) {
+			return [];
+		}
+		// PAPI types are already fully resolved in papiTypeToTypeDef, so no registry lookup is needed.
+		return type.sub
+			? (Array.isArray(type.sub) ? type.sub : [type.sub]).map(
 					(td): IParamDef => ({
 						name: td.name || '',
 						type: td as TypeDef,
-						length: typeDef.length
+						length: type.length
 					})
 				)
 			: [];
@@ -679,78 +978,116 @@ export class PolkadotApiService {
 		if (!this.api) {
 			return null;
 		}
-		return this.api.tx[`${sectionName}`][`${methodName}`];
+		return (this.api.tx as any)[`${sectionName}`][`${methodName}`];
 	}
 
 	getPreimageCallableTx({ sectionName, methodName, paramsValues }: { sectionName: string; methodName: string; paramsValues: unknown[] }) {
 		if (!this.api) {
 			return null;
 		}
-		return this.api.tx[`${sectionName}`][`${methodName}`](...paramsValues);
+		return (this.api.tx as any)[`${sectionName}`][`${methodName}`](...paramsValues);
 	}
 
-	getPreimageTxDetails({ extrinsicFn }: { extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult> }) {
-		if (!this.api) {
+	getPreimageTxDetails({ extrinsicFn }: { extrinsicFn: Transaction<any, any, any, any> }) {
+		if (!this.api || !extrinsicFn || !extrinsicFn.decodedCall || !extrinsicFn.decodedCall.value?.value) {
 			return null;
 		}
 
-		const u8a = extrinsicFn.method.toU8a();
-		const inspect = extrinsicFn.method.inspect();
+		console.log('extrinsicFn', extrinsicFn);
 
-		const encodedTx = extrinsicFn.method.toHex();
+		const tx = this.api.tx.Balances.transfer_keep_alive({ dest: MultiAddress.Id(''), value: BigInt('1000000000000000000') });
+		console.log('tx', tx);
 
-		const preimageLength = Math.ceil((encodedTx.length - 2) / 2);
+		try {
+			const encoded = extrinsicFn.getEncodedData(this.compatibilityToken);
+			console.log('encoded', encoded);
+			const u8a = encoded.asBytes();
+			console.log('u8a', u8a);
+			const preimageHash = blake2AsHex(u8a);
+			const preimageLength = u8a.length;
 
-		return {
-			preimageHash: extrinsicFn.registry.hash(u8a).toHex(),
-			inspect,
-			preimage: u8aToHex(u8a),
-			preimageLength
-		};
+			console.log('preimageHash', preimageHash);
+			console.log('preimageLength', preimageLength);
+
+			const decoded = extrinsicFn.decodedCall;
+			const inspect = {
+				section: decoded.type,
+				method: decoded.value.type,
+				args: decoded.value.value
+			};
+
+			console.log('preimageHash', preimageHash);
+			console.log('inspect', inspect);
+
+			return {
+				preimageHash,
+				inspect,
+				preimage: u8aToHex(u8a),
+				preimageLength
+			};
+		} catch (error) {
+			console.error('ERROR:', error);
+			return {
+				preimageHash: '',
+				inspect: null,
+				preimage: '',
+				preimageLength: 0
+			};
+		}
 	}
 
 	async getPreimageLengthFromPreimageHash({ preimageHash }: { preimageHash: string }) {
 		if (!this.api || !preimageHash || !ValidatorService.isValidPreimageHash(preimageHash)) {
 			return null;
 		}
-		const statusFor = (await this.api.query.preimage.statusFor?.(preimageHash)) as any;
-		const requestStatusFor = (await this.api.query.preimage.requestStatusFor?.(preimageHash)) as any;
+		const statusFor = await this.api.query.Preimage.StatusFor.getValue(Binary.fromHex(preimageHash));
+		const requestStatusFor = await this.api.query.Preimage.RequestStatusFor.getValue(Binary.fromHex(preimageHash));
 
-		const status = statusFor?.isSome ? statusFor.unwrapOr(null) : requestStatusFor.unwrapOr(null);
+		const status = statusFor || requestStatusFor;
 
 		if (!status) return null;
-		return Number(status.value?.len);
+		return Number((status.value as any)?.len);
 	}
 
 	// create proposal calls
 
-	getBatchAllTx(extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>[] | null) {
-		if (!this.api || !extrinsicFn?.length) {
+	getBatchAllTx(calls: Transaction<any, any, any, any>[] | null) {
+		if (!this.api || !calls?.length) {
 			return null;
 		}
-		return this.api.tx.utility.batchAll(extrinsicFn);
+		return this.api.tx.Utility.batch_all({ calls: calls.map((t) => t.decodedCall) });
 	}
 
-	getNotePreimageTx({ extrinsicFn }: { extrinsicFn?: SubmittableExtrinsic<'promise', ISubmittableResult> | null }) {
-		if (!this.api || !extrinsicFn) {
+	getNotePreimageTx({ extrinsicFn }: { extrinsicFn?: Transaction<any, any, any, any> | null }) {
+		if (
+			!this.api ||
+			!extrinsicFn ||
+			!extrinsicFn.decodedCall ||
+			!extrinsicFn.decodedCall.value?.value ||
+			(Array.isArray(extrinsicFn.decodedCall.value.value) && extrinsicFn.decodedCall.value.value.length === 0)
+		) {
 			return null;
 		}
-		const encodedTx = extrinsicFn.method.toHex();
-		return this.api.tx.preimage.notePreimage(encodedTx);
+		try {
+			return this.api.tx.Preimage.note_preimage({ bytes: extrinsicFn.getEncodedData(this.compatibilityToken) });
+		} catch (error) {
+			console.error('ERROR:', error);
+			return null;
+		}
 	}
 
 	getUnnotePreimageTx({ preimageHash }: { preimageHash: string }) {
 		if (!this.api || !preimageHash) {
 			return null;
 		}
-		return this.api.tx.preimage.unnotePreimage(preimageHash);
+		return this.api.tx.Preimage.unnote_preimage({ hash: Binary.fromHex(preimageHash) });
 	}
 
 	getUnRequestPreimageTx({ preimageHash }: { preimageHash: string }) {
 		if (!this.api || !preimageHash) {
 			return null;
 		}
-		return this.api.tx.preimage.unrequestPreimage(preimageHash);
+		return this.api.tx.Preimage.unrequest_preimage({ hash: Binary.fromHex(preimageHash) });
 	}
 
 	async notePreimage({
@@ -765,7 +1102,7 @@ export class PolkadotApiService {
 		address: string;
 		wallet: EWallet;
 		selectedAccount?: ISelectedAccount;
-		extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>;
+		extrinsicFn: Transaction<any, any, any, any>;
 		onSuccess?: () => void;
 		onFailed?: () => void;
 		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
@@ -894,22 +1231,37 @@ export class PolkadotApiService {
 		}
 
 		const isRoot = track === EPostOrigin.ROOT;
-		return this.api.tx.referenda.submit(
-			isRoot ? { system: track } : { Origins: track },
-			{ Lookup: { hash: preimageHash, len: String(preimageLength) } },
-			enactmentValue ? (enactment === EEnactment.At_Block_No ? { At: enactmentValue } : { After: enactmentValue }) : { After: BN_HUNDRED }
-		);
+		return this.api.tx.Referenda.submit({
+			proposal_origin: isRoot ? { type: 'system', value: { type: 'Root', value: undefined } } : { type: 'Origins', value: { type: track as any, value: undefined } },
+			proposal: {
+				type: 'Lookup',
+				value: {
+					hash: Binary.fromHex(preimageHash),
+					len: preimageLength
+				}
+			},
+			enactment_moment: enactmentValue
+				? enactment === EEnactment.At_Block_No
+					? { type: 'At', value: Number(enactmentValue) }
+					: { type: 'After', value: Number(enactmentValue) }
+				: { type: 'After', value: 100 }
+		});
 	}
 
 	getTreasurySpendLocalExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiaryInput[] }) {
 		if (!this.api) {
 			return null;
 		}
-		const tx: SubmittableExtrinsic<'promise', ISubmittableResult>[] = [];
+		const tx: Transaction<any, any, any, any>[] = [];
 
 		beneficiaries.forEach((beneficiary) => {
 			if (ValidatorService.isValidAmount(beneficiary.amount) && ValidatorService.isValidSubstrateAddress(beneficiary.address)) {
-				tx.push(this.api.tx?.treasury?.spendLocal(beneficiary.amount.toString(), beneficiary.address));
+				tx.push(
+					this.api.tx.Treasury?.spend_local({
+						amount: BigInt(beneficiary.amount),
+						beneficiary: MultiAddress.Id(beneficiary.address)
+					})
+				);
 			}
 		});
 
@@ -917,35 +1269,43 @@ export class PolkadotApiService {
 
 		if (tx.length === 1) return tx[0];
 
-		return this.api.tx.utility.batchAll(tx);
+		return this.api.tx.Utility.batch_all({ calls: tx.map((t) => t.decodedCall) }) as Transaction<any, any, any, any>;
 	}
 
 	getTreasurySpendExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiaryInput[] }) {
 		if (!this.api) {
 			return null;
 		}
-		const tx: SubmittableExtrinsic<'promise', ISubmittableResult>[] = [];
+		const tx: Transaction<any, any, any, any>[] = [];
 
 		// After AssetHub migration, these networks execute treasury calls FROM AssetHub
-		const isPostMigration = [ENetwork.KUSAMA, ENetwork.POLKADOT].includes(this.network);
+		const isPostMigration = isAHMNetwork(this.network);
 
 		beneficiaries.forEach((beneficiary) => {
 			if (ValidatorService.isValidAmount(beneficiary.amount) && ValidatorService.isValidSubstrateAddress(beneficiary.address)) {
+				const validFrom = beneficiary.validFromBlock ? Number(beneficiary.validFromBlock) : undefined;
+				const beneficiaryId = Binary.fromBytes(decodeAddress(beneficiary.address));
+
 				if (beneficiary.assetId && ValidatorService.isValidAssetId(beneficiary.assetId, this.network)) {
 					tx.push(
-						this.api.tx?.treasury?.spend(
-							{
-								V3: {
-									assetId: {
-										Concrete: {
+						this.api.tx.Treasury.spend({
+							asset_kind: {
+								type: 'V3',
+								value: {
+									asset_id: {
+										type: 'Concrete',
+										value: {
 											parents: 0,
 											interior: {
-												X2: [
+												type: 'X2',
+												value: [
 													{
-														PalletInstance: NETWORKS_DETAILS[this.network]?.palletInstance
+														type: 'PalletInstance',
+														value: Number(NETWORKS_DETAILS[this.network]?.palletInstance)
 													},
 													{
-														GeneralIndex: beneficiary.assetId
+														type: 'GeneralIndex',
+														value: BigInt(beneficiary.assetId)
 													}
 												]
 											}
@@ -954,107 +1314,55 @@ export class PolkadotApiService {
 									location: isPostMigration
 										? {
 												parents: 0,
-												interior: 'Here'
+												interior: { type: 'Here', value: undefined }
 											}
 										: {
 												parents: 0,
 												interior: {
-													X1: { Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId }
+													type: 'X1',
+													value: { type: 'Parachain', value: Number(NETWORKS_DETAILS[this.network]?.assetHubParaId) }
 												}
 											}
 								}
 							},
-							beneficiary.amount.toString(),
-							isPostMigration
-								? {
-										V4: {
-											location: {
-												parents: 0,
-												interior: 'Here'
-											},
-											accountId: {
-												parents: 0,
-												interior: {
-													X1: [
-														{
-															AccountId32: {
-																id: decodeAddress(beneficiary.address),
-																network: null
-															}
-														}
-													]
-												}
-											}
-										}
-									}
-								: { V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
-							beneficiary.validFromBlock || null
-						)
-					);
-				} else {
-					tx.push(
-						this.api.tx?.treasury?.spend(
-							{
-								V4: {
-									location: isPostMigration
-										? {
-												parents: 0,
-												interior: 'Here'
-											}
-										: {
-												parents: 0,
-												interior: {
-													X1: [
-														{
-															Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId
-														}
-													]
-												}
-											},
-									assetId: {
-										parents: 1,
-										interior: 'here'
-									}
-								}
-							},
-							beneficiary.amount.toString(),
-							isPostMigration
-								? {
-										V4: {
-											location: {
-												parents: 0,
-												interior: 'Here'
-											},
-											accountId: {
-												parents: 0,
-												interior: {
-													X1: [
-														{
-															AccountId32: {
-																id: decodeAddress(beneficiary.address),
-																network: null
-															}
-														}
-													]
-												}
-											}
-										}
-									}
-								: {
-										V3: {
-											parents: 0,
-											interior: {
-												X1: {
-													AccountId32: {
-														id: decodeAddress(beneficiary.address),
-														network: null
-													}
+							amount: BigInt(beneficiary.amount),
+							beneficiary: {
+								type: 'V4',
+								value: {
+									account_id: {
+										parents: 0,
+										interior: {
+											type: 'X1',
+											value: {
+												type: 'AccountId32',
+												value: {
+													id: beneficiaryId,
+													network: undefined
 												}
 											}
 										}
 									},
-							beneficiary.validFromBlock || null
-						)
+									location: {
+										parents: 0,
+										interior: { type: 'Here', value: undefined }
+									}
+								}
+							},
+							// : {
+							// type: 'V3',
+							// value: {
+							// parents: 0,
+							// interior: {
+							// type: 'X1',
+							// value: {
+							// type: 'AccountId32',
+							// value: { id: beneficiaryId, network: undefined }
+							// }
+							// }
+							// }
+							// },
+							valid_from: validFrom
+						})
 					);
 				}
 			}
@@ -1064,23 +1372,23 @@ export class PolkadotApiService {
 
 		if (tx.length === 1) return tx[0];
 
-		return this.api.tx.utility.batchAll(tx);
+		return this.api.tx.Utility.batch_all({ calls: tx.map((t) => t.decodedCall) });
 	}
 
 	getCancelReferendumExtrinsic({ referendumId }: { referendumId: number }) {
 		if (!this.api) return null;
-		return this.api.tx.referenda.cancel(referendumId);
+		return this.api.tx.Referenda.cancel({ index: referendumId });
 	}
 
 	getKillReferendumExtrinsic({ referendumId }: { referendumId: number }) {
 		if (!this.api) return null;
-		return this.api.tx.referenda.kill(referendumId);
+		return this.api.tx.Referenda.kill({ index: referendumId });
 	}
 
 	getProposeBountyTx({ bountyAmount }: { bountyAmount: BN }) {
 		if (!this.api) return null;
 		const title = 'Bounty';
-		return this.api.tx.bounties.proposeBounty(bountyAmount, title);
+		return this.api.tx.Bounties.propose_bounty({ value: BigInt(bountyAmount.toString()), description: Binary.fromText(title) });
 	}
 
 	async proposeBounty({
@@ -1100,7 +1408,7 @@ export class PolkadotApiService {
 	}) {
 		if (!this.api || !address || !bountyAmount) return;
 
-		const bountyId = Number(await this.api.query.bounties.bountyCount());
+		const bountyId = Number(await this.api.query.Bounties.BountyCount.getValue());
 
 		const tx = this.getProposeBountyTx({ bountyAmount });
 
@@ -1127,7 +1435,7 @@ export class PolkadotApiService {
 
 	getApproveBountyTx({ bountyId }: { bountyId: number }) {
 		if (!this.api) return null;
-		return this.api.tx.bounties.approveBounty(bountyId);
+		return this.api.tx.Bounties.approve_bounty({ bounty_id: bountyId });
 	}
 
 	async createProposal({
@@ -1150,7 +1458,7 @@ export class PolkadotApiService {
 		track: EPostOrigin;
 		enactment: EEnactment;
 		enactmentValue: BN;
-		extrinsicFn?: SubmittableExtrinsic<'promise', ISubmittableResult>;
+		extrinsicFn?: Transaction<any, any, any, any>;
 		preimageHash?: string;
 		preimageLength?: number;
 		onSuccess?: (postId: number) => void;
@@ -1182,7 +1490,7 @@ export class PolkadotApiService {
 				return;
 			}
 
-			const postId = Number(await this.api.query.referenda.referendumCount());
+			const postId = Number(await this.api.query.Referenda.ReferendumCount.getValue());
 			await this.executeTx({
 				tx: submitProposalTx,
 				selectedAccount,
@@ -1231,7 +1539,7 @@ export class PolkadotApiService {
 			return;
 		}
 
-		const postId = Number(await this.api.query.referenda.referendumCount());
+		const postId = Number(await this.api.query.Referenda.ReferendumCount.getValue());
 		await this.executeTx({
 			tx,
 			address,
@@ -1249,15 +1557,11 @@ export class PolkadotApiService {
 		});
 	}
 
-	getApiRegistry() {
-		return this.api?.registry;
-	}
-
 	async getTotalActiveIssuance() {
 		if (!this.api) return null;
 		try {
-			const totalIssuance = await this.api.query.balances.totalIssuance();
-			const inactiveIssuance = await this.api.query.balances.inactiveIssuance();
+			const totalIssuance = await this.api.query.Balances.TotalIssuance.getValue();
+			const inactiveIssuance = await this.api.query.Balances.InactiveIssuance.getValue();
 
 			if (!totalIssuance || !inactiveIssuance) {
 				console.error('Failed to fetch issuance values');
@@ -1271,18 +1575,21 @@ export class PolkadotApiService {
 		}
 	}
 
-	async getTxFee({ extrinsicFn, address }: { extrinsicFn: (SubmittableExtrinsic<'promise', ISubmittableResult> | null)[]; address: string }) {
+	async getTxFee({ extrinsicFn, address }: { extrinsicFn: (Transaction<any, any, any, any> | null)[]; address: string }) {
 		if (!this.api) {
 			return null;
 		}
-		const fees = await Promise.all(extrinsicFn.filter((tx) => tx !== null).map((tx) => tx && tx.paymentInfo(address)));
-		return fees.reduce((acc, fee) => acc.add(new BN(fee?.partialFee || BN_ZERO)), BN_ZERO);
+		const fees = await Promise.all(extrinsicFn.filter((tx) => tx !== null).map((tx) => tx && tx.getPaymentInfo(address)));
+		return fees.reduce((acc, fee) => acc.add(new BN(fee?.partial_fee || BN_ZERO)), BN_ZERO);
 	}
 
 	async getNativeTreasuryBalance(): Promise<BN> {
 		const treasuryAddress = TREASURY_NETWORK_CONFIG[this.network]?.treasuryAccount;
-		const nativeTokenData: any = await this.api?.query?.system?.account(treasuryAddress);
-		return new BN(nativeTokenData?.data?.free.toBigInt() || 0);
+		if (!treasuryAddress) {
+			return BN_ZERO;
+		}
+		const nativeTokenData = await this.api?.query?.System?.Account?.getValue(treasuryAddress);
+		return new BN(nativeTokenData?.data?.free || 0);
 	}
 
 	async delegate({
@@ -1308,9 +1615,16 @@ export class PolkadotApiService {
 	}) {
 		if (!this.api) return;
 
-		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, delegateAddress, conviction, balance));
+		const txs = tracks.map((track) =>
+			this.api.tx.ConvictionVoting.delegate({
+				class: track,
+				to: MultiAddress.Id(delegateAddress),
+				conviction: convictionMap[`${conviction as unknown as keyof typeof convictionMap}`],
+				balance: BigInt(balance.toString())
+			})
+		);
 
-		const tx = txs.length === 1 ? txs[0] : this.api.tx.utility.batchAll(txs);
+		const tx = txs.length === 1 ? txs[0] : this.api.tx.Utility.batch_all({ calls: txs.map((t) => t.decodedCall) });
 
 		await this.executeTx({
 			tx,
@@ -1341,7 +1655,7 @@ export class PolkadotApiService {
 	}) {
 		if (!this.api) return;
 
-		const tx = this.api.tx.convictionVoting.undelegate(trackId);
+		const tx = this.api.tx.ConvictionVoting.undelegate({ class: trackId });
 
 		await this.executeTx({
 			tx,
@@ -1358,36 +1672,35 @@ export class PolkadotApiService {
 	async getDelegateTxFee({ address, tracks, conviction, balance }: { address: string; tracks: number[]; conviction: number; balance: BN }) {
 		if (!this.api) return null;
 
-		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, address, conviction, balance));
+		const txs = tracks.map((track) =>
+			this.api.tx.ConvictionVoting.delegate({
+				class: track,
+				to: MultiAddress.Id(address),
+				conviction: convictionMap[`${conviction as unknown as keyof typeof convictionMap}`],
+				balance: BigInt(balance.toString())
+			})
+		);
 		return this.getTxFee({ extrinsicFn: txs, address });
 	}
 
 	async getUndelegateTxFee({ address, trackId }: { address: string; trackId: number }) {
 		if (!this.api) return null;
 
-		const tx = this.api.tx.convictionVoting.undelegate(trackId);
+		const tx = this.api.tx.ConvictionVoting.undelegate({ class: trackId });
 		return this.getTxFee({ extrinsicFn: [tx], address });
 	}
 
 	async getOngoingReferendaTally({ postIndex }: { postIndex: number }) {
-		const referendumInfoOf = await this.api?.query?.referenda?.referendumInfoFor(postIndex);
-		const parsedReferendumInfo: any = referendumInfoOf?.toJSON();
+		const referendumInfoOf = await this.api?.query?.Referenda?.ReferendumInfoFor?.getValue(postIndex);
 
-		if (!parsedReferendumInfo?.ongoing?.tally) return null;
+		if (referendumInfoOf?.type !== 'Ongoing') return null;
+
+		const { tally } = referendumInfoOf.value;
 
 		return {
-			aye:
-				typeof parsedReferendumInfo.ongoing.tally.ayes === 'string'
-					? new BN(parsedReferendumInfo.ongoing.tally.ayes.slice(2), 'hex')?.toString()
-					: new BN(parsedReferendumInfo.ongoing.tally.ayes)?.toString(),
-			nay:
-				typeof parsedReferendumInfo.ongoing.tally.nays === 'string'
-					? new BN(parsedReferendumInfo.ongoing.tally.nays.slice(2), 'hex')?.toString()
-					: new BN(parsedReferendumInfo.ongoing.tally.nays)?.toString(),
-			support:
-				typeof parsedReferendumInfo.ongoing.tally.support === 'string'
-					? new BN(parsedReferendumInfo.ongoing.tally.support.slice(2), 'hex')?.toString()
-					: new BN(parsedReferendumInfo.ongoing.tally.support)?.toString()
+			aye: tally.ayes.toString(),
+			nay: tally.nays.toString(),
+			support: tally.support.toString()
 		};
 	}
 
@@ -1397,7 +1710,7 @@ export class PolkadotApiService {
 			return null;
 		}
 
-		return this.api.query.balances.inactiveIssuance();
+		return this.api.query.Balances.InactiveIssuance.getValue();
 	}
 
 	async getTotalIssuance() {
@@ -1405,7 +1718,7 @@ export class PolkadotApiService {
 		if (!this.api) {
 			return null;
 		}
-		return this.api.query.balances.totalIssuance();
+		return this.api.query.Balances.TotalIssuance.getValue();
 	}
 
 	async submitDecisionDeposit({
@@ -1427,7 +1740,7 @@ export class PolkadotApiService {
 	}) {
 		if (!this.api) return;
 
-		const tx = this.api.tx.referenda.placeDecisionDeposit(postId);
+		const tx = this.api.tx.Referenda.place_decision_deposit({ index: postId });
 		await this.executeTx({
 			tx,
 			address,
@@ -1441,26 +1754,23 @@ export class PolkadotApiService {
 		});
 	}
 
-	async getTreasurySpendsData({ relayChainBlockHeight }: { relayChainBlockHeight?: number }) {
+	async getTreasurySpendsData() {
 		if (!this.api) return null;
 
-		const currentBlockHeight = relayChainBlockHeight || (await this.getBlockHeight());
+		const currentBlockHeight = await this.getBlockHeight();
 
-		const proposals = await this.api?.query?.treasury?.spends?.entries();
+		const proposals = await this.api?.query?.Treasury?.Spends.getEntries();
 
 		const treasuryPendingSpends: IPayout[] = [];
 
-		proposals?.forEach((proposal) => {
-			const indexData = proposal?.[0]?.toHuman();
-			const spendData = proposal?.[1]?.toHuman();
+		proposals?.forEach(({ keyArgs: [spendIndex], value: spendData }) => {
+			if (spendIndex && spendData) {
+				const expiresAt = Number(spendData.expire_at);
+				const startsAt = Number(spendData.valid_from);
 
-			if (indexData && spendData) {
-				const expiresAt = Number(((spendData as any)?.expireAt as string)?.split(',')?.join(''));
-				const startsAt = Number(((spendData as any)?.validFrom as string)?.split(',')?.join(''));
-
-				if (new BN(currentBlockHeight).gt(new BN(startsAt)) && new BN(currentBlockHeight).lt(new BN(expiresAt)) && (spendData as any).status === 'Pending') {
+				if (new BN(currentBlockHeight).gt(new BN(startsAt)) && new BN(currentBlockHeight).lt(new BN(expiresAt)) && spendData.status.type === 'Pending') {
 					const payout: IPayout = {
-						treasurySpendIndex: Number(((indexData as any)?.[0] as string)?.split(',')?.join('')),
+						treasurySpendIndex: Number(spendIndex),
 						treasurySpendData: {
 							beneficiary:
 								getSubstrateAddressFromAccountId(
@@ -1507,9 +1817,9 @@ export class PolkadotApiService {
 	}) {
 		if (!this.api || !payouts || payouts.length === 0) return;
 
-		const tx = payouts.map((p) => this.api.tx.treasury.payout(p.treasurySpendIndex));
+		const tx = payouts.map((p) => this.api.tx.Treasury.payout({ index: p.treasurySpendIndex }));
 
-		const batchTx = tx.length > 1 ? this.api.tx.utility.batch(tx) : tx[0];
+		const batchTx = tx.length > 1 ? this.api.tx.Utility.batch({ calls: tx.map((t) => t.decodedCall) }) : tx[0];
 
 		await this.executeTx({
 			tx: batchTx,
@@ -1526,34 +1836,63 @@ export class PolkadotApiService {
 	getTeleportToPeopleChainTx({ beneficiaryAddress, amount }: { beneficiaryAddress: string; amount: BN }) {
 		if (!this.api) return null;
 
-		return this.api.tx.polkadotXcm.limitedTeleportAssets(
-			{
-				V3: {
+		return this.api.tx.PolkadotXcm.limited_teleport_assets({
+			dest: {
+				type: 'V3',
+				value: {
+					parents: 1,
 					interior: {
-						X1: { Parachain: NETWORKS_DETAILS[this.network]?.peopleChainParaId }
-					},
-					parents: '1'
+						type: 'X1',
+						value: {
+							type: 'Parachain',
+							value: Number(NETWORKS_DETAILS[this.network]?.peopleChainParaId)
+						}
+					}
 				}
 			},
-			{ V3: { interior: { X1: { AccountId32: { id: decodeAddress(beneficiaryAddress), network: null } } } } },
-			{
-				V3: [
+			beneficiary: {
+				type: 'V3',
+				value: {
+					parents: 0,
+					interior: {
+						type: 'X1',
+						value: {
+							type: 'AccountId32',
+							value: {
+								id: Binary.fromBytes(decodeAddress(beneficiaryAddress)),
+								network: undefined
+							}
+						}
+					}
+				}
+			},
+			assets: {
+				type: 'V3',
+				value: [
 					{
 						fun: {
-							Fungible: amount.toString()
+							type: 'Fungible',
+							value: BigInt(amount.toString())
 						},
 						id: {
-							Concrete: {
-								interior: 'Here',
-								parents: '1'
+							type: 'Concrete',
+							value: {
+								interior: {
+									type: 'Here',
+									value: undefined
+								},
+								parents: 1
 							}
 						}
 					}
 				]
 			},
-			'0',
-			'Unlimited'
-		);
+			fee_asset_item: 0,
+			weight_limit: {
+				type: 'Unlimited',
+				value: undefined
+			}
+		});
 	}
 
 	async teleportToPeopleChain({
@@ -1608,7 +1947,7 @@ export class PolkadotApiService {
 	}) {
 		if (!this.api) return;
 
-		const tx = this.api.tx.system.remark(remarkLoginMessage);
+		const tx = this.api.tx.System.remark({ remark: Binary.fromText(remarkLoginMessage) });
 
 		await this.executeTx({
 			tx,
@@ -1624,7 +1963,7 @@ export class PolkadotApiService {
 
 	async getAddressGovernanceLock({ address }: { address: string }): Promise<BN | null> {
 		if (!this.api) return null;
-		const locks: any = await this.api.query?.convictionVoting?.classLocksFor(address);
+		const locks: any = await this.api.query?.ConvictionVoting?.ClassLocksFor?.getValue(address);
 
 		return locks.reduce((max: BN, rawLock: any) => {
 			const locked = rawLock[1].toString();
@@ -1634,8 +1973,21 @@ export class PolkadotApiService {
 
 	async getReferendaInfo({ postId }: { postId: number }) {
 		if (!this.api) return null;
-		const referendaInfo = await this.api.query.referenda.referendumInfoFor(postId);
-		return referendaInfo.toHuman() as { [key: string]: any[] };
+		const referendaInfo = await this.api.query.Referenda.ReferendumInfoFor.getValue(postId);
+
+		const canRefundDecisionDeposit = !!(
+			(referendaInfo?.type === 'Approved' && referendaInfo.value) ||
+			(referendaInfo?.type === 'Cancelled' && referendaInfo.value) ||
+			(referendaInfo?.type === 'Rejected' && referendaInfo.value) ||
+			(referendaInfo?.type === 'TimedOut' && referendaInfo.value)
+		);
+
+		const canRefundSubmissionDeposit = !!(referendaInfo?.type === 'Approved' && referendaInfo.value) || (referendaInfo?.type === 'Cancelled' && referendaInfo.value);
+
+		return {
+			canRefundDecisionDeposit,
+			canRefundSubmissionDeposit
+		};
 	}
 
 	async refundDeposits({
@@ -1659,13 +2011,13 @@ export class PolkadotApiService {
 	}) {
 		if (!this.api) return;
 
-		const refundDecisionDepositTx = this.api.tx.referenda.refundDecisionDeposit(postId);
-		const refundSubmissionDepositTx = this.api.tx.referenda.refundSubmissionDeposit(postId);
+		const refundDecisionDepositTx = this.api.tx.Referenda.refund_decision_deposit({ index: postId });
+		const refundSubmissionDepositTx = this.api.tx.Referenda.refund_submission_deposit({ index: postId });
 
-		let tx: SubmittableExtrinsic<'promise', ISubmittableResult>;
+		let tx: Transaction<any, any, any, any>;
 
 		if (canRefundDecisionDeposit && canRefundSubmissionDeposit) {
-			tx = this.api.tx.utility.batchAll([refundDecisionDepositTx, refundSubmissionDepositTx]);
+			tx = this.api.tx.Utility.batch_all({ calls: [refundDecisionDepositTx, refundSubmissionDepositTx].map((t) => t.decodedCall) });
 		} else if (canRefundSubmissionDeposit) {
 			tx = refundSubmissionDepositTx;
 		} else {
@@ -1686,18 +2038,18 @@ export class PolkadotApiService {
 
 	private static mapIndividualProxies(proxyArray: any[]): IProxyAddress[] {
 		return proxyArray
-			.map((proxyEntry: any) => {
-				const delayValue = proxyEntry?.delay ? parseInt(proxyEntry.delay.replace(/,/g, ''), 10) : 0;
+			.map((proxyEntry) => {
+				const delayValue = proxyEntry?.delay || 0;
 				if (!proxyEntry.delegate) {
 					return undefined;
 				}
 				return {
 					address: proxyEntry.delegate,
-					proxyType: (proxyEntry?.proxyType as EProxyType) || EProxyType.GOVERNANCE,
+					proxyType: (proxyEntry?.proxy_type.type as EProxyType) || EProxyType.GOVERNANCE,
 					delay: delayValue
 				};
 			})
-			.filter((proxy) => proxy !== undefined) as IProxyAddress[];
+			.filter((proxy) => proxy !== undefined);
 	}
 
 	private static processProxyInfo(delegator: string, proxyHuman: any): IProxyRequest | null {
@@ -1724,13 +2076,10 @@ export class PolkadotApiService {
 
 		try {
 			// Get all proxy entries from the chain
-			const proxyEntries = await this.api.query.proxy.proxies.entries();
+			const proxyEntries = await this.api.query.Proxy.Proxies.getEntries();
 			const proxies: IProxyRequest[] = [];
 
-			proxyEntries.forEach(([key, value]) => {
-				const delegator = key.args[0].toString();
-				const proxyData = value.toHuman() as any;
-
+			proxyEntries.forEach(({ keyArgs: [delegator], value: proxyData }) => {
 				// Filter by search if provided
 				if (search && !delegator.toLowerCase().includes(search.toLowerCase())) {
 					return;
@@ -1762,12 +2111,10 @@ export class PolkadotApiService {
 
 		try {
 			// Get proxies for the specific user
-			const proxyData = await this.api.query.proxy.proxies(userAddress);
+			const proxyData = await this.api.query.Proxy.Proxies.getValue(userAddress);
 			const proxies: IProxyRequest[] = [];
 
-			const proxyInfo = proxyData.toHuman() as any;
-
-			const proxyRequest = PolkadotApiService.processProxyInfo(userAddress, proxyInfo);
+			const proxyRequest = PolkadotApiService.processProxyInfo(userAddress, proxyData);
 			if (proxyRequest) proxies.push(proxyRequest);
 
 			// Sort by date created (newest first)
@@ -1792,17 +2139,18 @@ export class PolkadotApiService {
 		const treasuryAddress = TREASURY_NETWORK_CONFIG[this.network]?.assetHubTreasuryAddress;
 		const balances: { [key: string]: BN } = {};
 
+		if (!treasuryAddress) return balances;
+
 		await Promise.all(
 			assetIds.map(async (assetId) => {
-				const data: any = await this.api.query.assets.account(assetId, treasuryAddress);
-				const assetInfo = data.unwrap();
-				balances[`${assetId}`] = new BN(assetInfo.balance.toBigInt());
+				const data = await (this.api as unknown as TypedApi<IPapiAssetHubDescriptor>).query.Assets.Account.getValue(Number(assetId), treasuryAddress);
+				balances[`${assetId}`] = new BN(data?.balance || '0');
 			})
 		);
 
-		const nativeTokenData: any = await this.api?.query?.system?.account(treasuryAddress);
+		const nativeTokenData = await this.api.query.System.Account.getValue(treasuryAddress);
 		if (nativeTokenData?.data?.free) {
-			const freeTokenBalance = nativeTokenData.data.free.toBigInt();
+			const freeTokenBalance = nativeTokenData.data.free;
 			balances[`${NETWORKS_DETAILS[this.network].tokenSymbol}`] = new BN(freeTokenBalance);
 		}
 
@@ -1851,11 +2199,18 @@ export class PolkadotApiService {
 
 		const feeAmount = inputToBn('5', this.network).bnValue;
 
-		const feeTx = this.api.tx.balances.transferKeepAlive(delegateAddress, feeAmount);
+		const feeTx = this.api.tx.Balances.transfer_keep_alive({ dest: MultiAddress.Id(delegateAddress), value: BigInt(feeAmount.toString()) });
 
-		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, delegateAddress, conviction, balance));
+		const txs = tracks.map((track) =>
+			this.api.tx.ConvictionVoting.delegate({
+				class: track,
+				to: MultiAddress.Id(delegateAddress),
+				conviction: convictionMap[`${conviction as unknown as keyof typeof convictionMap}`],
+				balance: BigInt(balance.toString())
+			})
+		);
 
-		const tx = this.api.tx.utility.batchAll([feeTx, ...txs]);
+		const tx = this.api.tx.Utility.batch_all({ calls: [feeTx.decodedCall, ...txs.map((t) => t.decodedCall)] });
 
 		await this.executeTx({
 			tx,
@@ -1889,9 +2244,9 @@ export class PolkadotApiService {
 			return;
 		}
 
-		const txs = tracks.map((track) => this.api.tx.convictionVoting.undelegate(track));
+		const txs = tracks.map((track) => this.api.tx.ConvictionVoting.undelegate({ class: track }));
 
-		const tx = this.api.tx.utility.batchAll(txs);
+		const tx = this.api.tx.Utility.batch_all({ calls: txs.map((t) => t.decodedCall) });
 
 		await this.executeTx({
 			tx,

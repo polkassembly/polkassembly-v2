@@ -7,6 +7,9 @@ import { IParamDef } from '@/_shared/types';
 import { compactAddLength } from '@polkadot/util';
 import { Switch } from '@/app/_shared-components/Switch';
 import { useTranslations } from 'next-intl';
+import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { PolkadotApiService } from '@/app/_client-services/polkadot_api_service';
+import { Binary } from 'polkadot-api';
 import InputText from './InputText';
 import InputFile from './InputFile';
 
@@ -18,12 +21,19 @@ type BytesInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> &
 function BytesInput({ onChange, ...props }: BytesInputProps) {
 	const t = useTranslations();
 	const [isFileDrop, setIsFileDrop] = useState(false);
+	const { apiService } = usePolkadotApiService();
+
+	const isPapi = apiService instanceof PolkadotApiService;
 
 	const onFileChange = useCallback(
 		(value: Uint8Array): void => {
-			onChange(compactAddLength(value));
+			if (isPapi) {
+				onChange(Binary.fromBytes(value));
+			} else {
+				onChange(compactAddLength(value));
+			}
 		},
-		[onChange]
+		[onChange, isPapi]
 	);
 
 	return (
@@ -42,7 +52,20 @@ function BytesInput({ onChange, ...props }: BytesInputProps) {
 			) : (
 				<InputText
 					onChange={(value) => {
-						onChange(value);
+						if (isPapi) {
+							const strValue = String(value);
+							if (strValue.startsWith('0x')) {
+								try {
+									onChange(Binary.fromHex(strValue));
+								} catch {
+									onChange(Binary.fromText(strValue));
+								}
+							} else {
+								onChange(Binary.fromText(strValue));
+							}
+						} else {
+							onChange(value);
+						}
 					}}
 					{...props}
 				/>

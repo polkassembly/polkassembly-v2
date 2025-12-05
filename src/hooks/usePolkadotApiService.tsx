@@ -4,12 +4,17 @@
 
 import { useAtom } from 'jotai';
 import { useMemo } from 'react';
-import { polkadotApiAtom } from '@/app/_atoms/polkadotJsApi/polkadotJsApiAtom';
+import { polkadotApiAtom, polkadotJSApiAtom } from '@/app/_atoms/polkadotJsApi/polkadotJsApiAtom';
+import { ENetwork } from '@/_shared/types';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 
 export const usePolkadotApiService = () => {
-	const [apiService] = useAtom(polkadotApiAtom);
+	const [papiService] = useAtom(polkadotApiAtom);
+	const [jsApiService] = useAtom(polkadotJSApiAtom);
+
+	const network = getCurrentNetwork();
 
 	return useMemo(() => {
-		return { apiService };
-	}, [apiService]);
+		return { apiService: network === ENetwork.POLKADOT ? papiService : jsApiService };
+	}, [jsApiService, papiService, network]);
 };
