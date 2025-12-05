@@ -376,7 +376,7 @@ export class PolkadotApiService {
 				if (signatories && signatories?.length > 0 && multisigAccount?.threshold) {
 					extrinsic = this.api.tx.Multisig.as_multi({
 						threshold: multisigAccount?.threshold,
-						other_signatories: signatories,
+						other_signatories: signatories as string[],
 						call: tx.decodedCall,
 						maybe_timepoint: undefined,
 						max_weight: weight
