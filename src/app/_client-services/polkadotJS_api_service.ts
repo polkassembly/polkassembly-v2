@@ -11,12 +11,12 @@ import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
-import { ApiPromise, WsProvider } from '@polkadot/api';
+import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
 import { SubmittableExtrinsic, SubmittableExtrinsicFunction } from '@polkadot/api/types';
 import { Signer, ISubmittableResult, TypeDef } from '@polkadot/types/types';
 import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
 import { getTypeDef } from '@polkadot/types';
-import { decodeAddress } from '@polkadot/util-crypto';
+import { cryptoWaitReady, decodeAddress, mnemonicGenerate } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import {
@@ -44,6 +44,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
 import { VaultQrSigner } from './vault_qr_signer_service';
 import { BlockCalculationsService } from './block_calculations_service';
+import { inputToBn } from '../_client-utils/inputToBn';
 
 // Usage:
 // const apiService = await PolkadotJSApiService.Init(ENetwork.POLKADOT);
@@ -1721,5 +1722,101 @@ export class PolkadotJSApiService {
 		}
 
 		return balances;
+	}
+
+	static async createNewAddress(): Promise<{ mnemonic: string; address: string }> {
+		await cryptoWaitReady();
+		const mnemonic = mnemonicGenerate();
+		const keyring = new Keyring({ type: 'sr25519' });
+		const pair = keyring.addFromUri(mnemonic);
+		return { mnemonic, address: pair.address };
+	}
+
+	async delegateForDelegateX({
+		address,
+		wallet,
+		delegateAddress,
+		balance,
+		conviction,
+		tracks,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		address: string;
+		wallet: EWallet;
+		delegateAddress: string;
+		balance: BN;
+		conviction: number;
+		tracks: number[];
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api) {
+			onFailed('API not ready');
+			return;
+		}
+
+		// Validate balance - cannot delegate zero balance
+		if (!balance || balance.isZero()) {
+			onFailed('Balance cannot be zero. Please specify a voting power amount.');
+			return;
+		}
+
+		const feeAmount = inputToBn('5', this.network).bnValue;
+
+		const feeTx = this.api.tx.balances.transferKeepAlive(delegateAddress, feeAmount);
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, delegateAddress, conviction, balance));
+
+		const tx = this.api.tx.utility.batchAll([feeTx, ...txs]);
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			errorMessageFallback: 'Failed to delegate',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: false,
+			setVaultQrState
+		});
+	}
+
+	async undelegateForDelegateX({
+		address,
+		wallet,
+		tracks,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		address: string;
+		wallet: EWallet;
+		tracks: number[];
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api) {
+			onFailed('API not ready');
+			return;
+		}
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.undelegate(track));
+
+		const tx = this.api.tx.utility.batchAll(txs);
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			errorMessageFallback: 'Failed to undelegate',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: false,
+			setVaultQrState
+		});
 	}
 }
