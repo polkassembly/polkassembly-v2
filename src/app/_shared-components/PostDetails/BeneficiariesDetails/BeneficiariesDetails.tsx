@@ -6,6 +6,8 @@ import { ENetwork, IBeneficiary, IBeneficiaryInput } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { ChevronRightIcon } from 'lucide-react';
+import Image from 'next/image';
+import InfoQueryIcon from '@assets/icons/info-query-icon.svg';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { cn } from '@/lib/utils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
@@ -15,6 +17,7 @@ import classes from './BeneficiariesDetails.module.scss';
 import { Button } from '../../Button';
 import BeneficiariesDetailsDialog from './BeneficiariesDetailsDialog';
 import BeneficiaryItem from './BeneficiaryItem';
+import { Tooltip, TooltipTrigger, TooltipContent } from '../../Tooltip';
 
 export const aggregateBeneficiariesByAsset = (beneficiaries: IBeneficiaryInput[] | undefined | null, network: ENetwork): Record<string, { amount: BN; addresses: string[] }> => {
 	if (!beneficiaries || !Array.isArray(beneficiaries) || !ValidatorService.isValidNetwork(network)) {
@@ -48,7 +51,7 @@ export const aggregateBeneficiariesByAsset = (beneficiaries: IBeneficiaryInput[]
 
 // Main component
 function BeneficiariesDetails({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
-	const t = useTranslations('PostDetails.BeneficiariesDetails');
+	const t = useTranslations('PostDetails');
 	const [openDialog, setOpenDialog] = useState(false);
 	const network = getCurrentNetwork();
 
@@ -62,14 +65,28 @@ function BeneficiariesDetails({ beneficiaries }: { beneficiaries: IBeneficiary[]
 	return (
 		<div className={classes.beneficiariesWrapper}>
 			<div className={classes.beneficiariesHeader}>
-				<p className={classes.beneficiariesTitle}>{t('requested')}</p>
+				<p className={classes.beneficiariesTitle}>
+					{t('BeneficiariesDetails.requested')}
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Image
+								src={InfoQueryIcon}
+								alt='info query icon'
+								className='h-3.5 w-3.5'
+								width={14}
+								height={14}
+							/>
+						</TooltipTrigger>
+						<TooltipContent className='bg-tooltip_background text-sm text-white'>{t('Tooltips.requestedAmount')}</TooltipContent>
+					</Tooltip>
+				</p>
 				<Button
 					variant='ghost'
 					size='sm'
 					className={cn(classes.beneficiariesButton, 'p-0 px-0')}
 					onClick={() => setOpenDialog(true)}
 				>
-					{t('details')}
+					{t('BeneficiariesDetails.details')}
 					<ChevronRightIcon className='h-4 w-4' />
 				</Button>
 			</div>
