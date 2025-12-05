@@ -55,6 +55,7 @@ function ManualExtrinsic({ onSuccess }: { onSuccess: (preimageHash: string) => v
 
 		await apiService?.notePreimage({
 			address: userPreferences.selectedAccount.address,
+			selectedAccount: userPreferences.selectedAccount,
 			wallet: userPreferences.wallet,
 			setVaultQrState,
 			extrinsicFn,

@@ -11,12 +11,12 @@ import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
-import { ApiPromise, WsProvider } from '@polkadot/api';
+import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { Signer, ISubmittableResult, TypeDef } from '@polkadot/types/types';
 import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
 import { getTypeDef } from '@polkadot/types';
-import { decodeAddress } from '@polkadot/util-crypto';
+import { decodeAddress, mnemonicGenerate, cryptoWaitReady } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import {
@@ -40,10 +40,11 @@ import { getSubstrateAddressFromAccountId } from '@/_shared/_utils/getSubstrateA
 import { APPNAME } from '@/_shared/_constants/appName';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
 import { Dispatch, SetStateAction } from 'react';
+import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { BlockCalculationsService } from './block_calculations_service';
 import { VaultQrSigner } from './vault_qr_signer_service';
 import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
-
+import { inputToBn } from '../_client-utils/inputToBn';
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
 // const blockHeight = await apiService.getBlockHeight();
@@ -145,12 +146,14 @@ export class PolkadotApiService {
 			console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
 			console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
 			setIsTxFinalized?.(txHash.toString());
+			console.log('isFailed', isFailed);
 			if (!isFailed && waitTillFinalizedHash) {
 				await onSuccess(txHash);
 			}
 		}
 	}
 
+	// eslint-disable-next-line sonarjs/cognitive-complexity
 	private async executeTx({
 		tx,
 		address,
@@ -272,9 +275,33 @@ export class PolkadotApiService {
 				extrinsic = this.api.tx.proxy.proxy(selectedAccount.address, null, extrinsic);
 			}
 
+			let signerAddress = address;
+
+			if (selectedAccount?.accountType === EAccountType.MULTISIG) {
+				signerAddress = selectedAccount.parent?.address || '';
+			} else if (selectedAccount?.accountType === EAccountType.PROXY) {
+				if (selectedAccount.parent?.accountType === EAccountType.MULTISIG) {
+					// For pure proxy of multisig, the multisig needs to call proxy.proxy
+					// So we wrap it in multisig first, THEN determine the signer
+					signerAddress = selectedAccount.parent?.parent?.address || '';
+				} else {
+					signerAddress = selectedAccount.parent?.address || '';
+				}
+			}
+
+			// For pure proxy of multisig: wrap in multisig AFTER proxy.proxy
 			if (multisigAccount) {
-				const signatories = multisigAccount?.signatories?.map((signatory) => getEncodedAddress(signatory, this.network)).filter((signatory) => signatory !== address);
-				const { weight } = await extrinsic.paymentInfo(address);
+				const signatories = multisigAccount?.signatories
+					?.map((signatory) => getEncodedAddress(signatory, this.network))
+					.filter((signatory) => signatory && getSubstrateAddress(signatory) !== getSubstrateAddress(signerAddress));
+
+				// Get the correct address for payment info
+				const paymentInfoAddress =
+					selectedAccount?.accountType === EAccountType.PROXY && selectedAccount.parent?.accountType === EAccountType.MULTISIG
+						? selectedAccount.parent.address // Use multisig address for payment info when it's a pure proxy
+						: signerAddress;
+
+				const { weight } = await extrinsic.paymentInfo(paymentInfoAddress);
 				extrinsic = this.api.tx.multisig.asMulti(multisigAccount?.threshold, signatories, null, extrinsic, weight);
 			}
 
@@ -283,9 +310,14 @@ export class PolkadotApiService {
 				withSignedTransaction: true
 			};
 
+			if (!signerAddress) {
+				onFailed('Invalid account type');
+				return;
+			}
+
 			extrinsic
 				// eslint-disable-next-line sonarjs/cognitive-complexity
-				.signAndSend(address, signerOptions, async ({ status, events, txHash }) =>
+				.signAndSend(signerAddress, signerOptions, async ({ status, events, txHash }) =>
 					this.executeTxCallback({ status, events, txHash, setStatus, onBroadcast, onSuccess, onFailed, waitTillFinalizedHash, errorMessageFallback, setIsTxFinalized })
 				)
 				.catch((error: unknown) => {
@@ -724,6 +756,7 @@ export class PolkadotApiService {
 	async notePreimage({
 		address,
 		wallet,
+		selectedAccount,
 		extrinsicFn,
 		onSuccess,
 		onFailed,
@@ -731,6 +764,7 @@ export class PolkadotApiService {
 	}: {
 		address: string;
 		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
 		extrinsicFn: SubmittableExtrinsic<'promise', ISubmittableResult>;
 		onSuccess?: () => void;
 		onFailed?: () => void;
@@ -749,6 +783,7 @@ export class PolkadotApiService {
 			tx: notePreimageTx,
 			address,
 			wallet,
+			selectedAccount,
 			setVaultQrState,
 			errorMessageFallback: 'Failed to note preimage',
 			waitTillFinalizedHash: true,
@@ -891,6 +926,9 @@ export class PolkadotApiService {
 		}
 		const tx: SubmittableExtrinsic<'promise', ISubmittableResult>[] = [];
 
+		// After AssetHub migration, these networks execute treasury calls FROM AssetHub
+		const isPostMigration = [ENetwork.KUSAMA, ENetwork.POLKADOT].includes(this.network);
+
 		beneficiaries.forEach((beneficiary) => {
 			if (ValidatorService.isValidAmount(beneficiary.amount) && ValidatorService.isValidSubstrateAddress(beneficiary.address)) {
 				if (beneficiary.assetId && ValidatorService.isValidAssetId(beneficiary.assetId, this.network)) {
@@ -913,17 +951,42 @@ export class PolkadotApiService {
 											}
 										}
 									},
-									location: {
-										parents: 0,
-										interior: {
-											X1: { Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId }
-										}
-									}
+									location: isPostMigration
+										? {
+												parents: 0,
+												interior: 'Here'
+											}
+										: {
+												parents: 0,
+												interior: {
+													X1: { Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId }
+												}
+											}
 								}
 							},
 							beneficiary.amount.toString(),
-							[ENetwork.ASSETHUB_KUSAMA, ENetwork.KUSAMA].includes(this.network)
-								? { V4: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } }
+							isPostMigration
+								? {
+										V4: {
+											location: {
+												parents: 0,
+												interior: 'Here'
+											},
+											accountId: {
+												parents: 0,
+												interior: {
+													X1: [
+														{
+															AccountId32: {
+																id: decodeAddress(beneficiary.address),
+																network: null
+															}
+														}
+													]
+												}
+											}
+										}
+									}
 								: { V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
 							beneficiary.validFromBlock || null
 						)
@@ -933,16 +996,21 @@ export class PolkadotApiService {
 						this.api.tx?.treasury?.spend(
 							{
 								V4: {
-									location: {
-										parents: 0,
-										interior: {
-											X1: [
-												{
-													Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId
+									location: isPostMigration
+										? {
+												parents: 0,
+												interior: 'Here'
+											}
+										: {
+												parents: 0,
+												interior: {
+													X1: [
+														{
+															Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId
+														}
+													]
 												}
-											]
-										}
-									},
+											},
 									assetId: {
 										parents: 1,
 										interior: 'here'
@@ -950,21 +1018,41 @@ export class PolkadotApiService {
 								}
 							},
 							beneficiary.amount.toString(),
-							{
-								V4: {
-									parents: 0,
-									interior: {
-										X1: [
-											{
-												AccountId32: {
-													id: decodeAddress(beneficiary.address),
-													network: null
+							isPostMigration
+								? {
+										V4: {
+											location: {
+												parents: 0,
+												interior: 'Here'
+											},
+											accountId: {
+												parents: 0,
+												interior: {
+													X1: [
+														{
+															AccountId32: {
+																id: decodeAddress(beneficiary.address),
+																network: null
+															}
+														}
+													]
 												}
 											}
-										]
+										}
 									}
-								}
-							},
+								: {
+										V3: {
+											parents: 0,
+											interior: {
+												X1: {
+													AccountId32: {
+														id: decodeAddress(beneficiary.address),
+														network: null
+													}
+												}
+											}
+										}
+									},
 							beneficiary.validFromBlock || null
 						)
 					);
@@ -1045,6 +1133,7 @@ export class PolkadotApiService {
 	async createProposal({
 		address,
 		wallet,
+		selectedAccount,
 		extrinsicFn,
 		track,
 		enactment,
@@ -1057,6 +1146,7 @@ export class PolkadotApiService {
 	}: {
 		address: string;
 		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
 		track: EPostOrigin;
 		enactment: EEnactment;
 		enactmentValue: BN;
@@ -1095,6 +1185,7 @@ export class PolkadotApiService {
 			const postId = Number(await this.api.query.referenda.referendumCount());
 			await this.executeTx({
 				tx: submitProposalTx,
+				selectedAccount,
 				address,
 				wallet,
 				errorMessageFallback: 'Failed to create treasury proposal',
@@ -1144,6 +1235,7 @@ export class PolkadotApiService {
 		await this.executeTx({
 			tx,
 			address,
+			selectedAccount,
 			wallet,
 			errorMessageFallback: 'Failed to create treasury proposal',
 			waitTillFinalizedHash: true,
@@ -1320,6 +1412,7 @@ export class PolkadotApiService {
 		postId,
 		address,
 		wallet,
+		selectedAccount,
 		onSuccess,
 		onFailed,
 		setVaultQrState
@@ -1327,6 +1420,7 @@ export class PolkadotApiService {
 		postId: number;
 		address: string;
 		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
 		onSuccess: () => void;
 		onFailed: (error: string) => void;
 		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
@@ -1342,7 +1436,8 @@ export class PolkadotApiService {
 			onSuccess,
 			onFailed,
 			waitTillFinalizedHash: true,
-			setVaultQrState
+			setVaultQrState,
+			selectedAccount
 		});
 	}
 
@@ -1431,13 +1526,13 @@ export class PolkadotApiService {
 	getTeleportToPeopleChainTx({ beneficiaryAddress, amount }: { beneficiaryAddress: string; amount: BN }) {
 		if (!this.api) return null;
 
-		return this.api.tx.xcmPallet.limitedTeleportAssets(
+		return this.api.tx.polkadotXcm.limitedTeleportAssets(
 			{
 				V3: {
 					interior: {
 						X1: { Parachain: NETWORKS_DETAILS[this.network]?.peopleChainParaId }
 					},
-					parents: 0
+					parents: '1'
 				}
 			},
 			{ V3: { interior: { X1: { AccountId32: { id: decodeAddress(beneficiaryAddress), network: null } } } } },
@@ -1450,7 +1545,7 @@ export class PolkadotApiService {
 						id: {
 							Concrete: {
 								interior: 'Here',
-								parents: '0'
+								parents: '1'
 							}
 						}
 					}
@@ -1712,5 +1807,101 @@ export class PolkadotApiService {
 		}
 
 		return balances;
+	}
+
+	static async createNewAddress(): Promise<{ mnemonic: string; address: string }> {
+		await cryptoWaitReady();
+		const mnemonic = mnemonicGenerate();
+		const keyring = new Keyring({ type: 'sr25519' });
+		const pair = keyring.addFromUri(mnemonic);
+		return { mnemonic, address: pair.address };
+	}
+
+	async delegateForDelegateX({
+		address,
+		wallet,
+		delegateAddress,
+		balance,
+		conviction,
+		tracks,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		address: string;
+		wallet: EWallet;
+		delegateAddress: string;
+		balance: BN;
+		conviction: number;
+		tracks: number[];
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api) {
+			onFailed('API not ready');
+			return;
+		}
+
+		// Validate balance - cannot delegate zero balance
+		if (!balance || balance.isZero()) {
+			onFailed('Balance cannot be zero. Please specify a voting power amount.');
+			return;
+		}
+
+		const feeAmount = inputToBn('5', this.network).bnValue;
+
+		const feeTx = this.api.tx.balances.transferKeepAlive(delegateAddress, feeAmount);
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, delegateAddress, conviction, balance));
+
+		const tx = this.api.tx.utility.batchAll([feeTx, ...txs]);
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			errorMessageFallback: 'Failed to delegate',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: false,
+			setVaultQrState
+		});
+	}
+
+	async undelegateForDelegateX({
+		address,
+		wallet,
+		tracks,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		address: string;
+		wallet: EWallet;
+		tracks: number[];
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api) {
+			onFailed('API not ready');
+			return;
+		}
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.undelegate(track));
+
+		const tx = this.api.tx.utility.batchAll(txs);
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			errorMessageFallback: 'Failed to undelegate',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: false,
+			setVaultQrState
+		});
 	}
 }

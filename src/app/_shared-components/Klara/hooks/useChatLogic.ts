@@ -4,11 +4,12 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { createId } from '@paralleldrive/cuid2';
-import { IConversationMessage, IChatDataSource } from '@/_shared/types';
+import { IConversationMessage, IChatDataSource, IConversationTurn } from '@/_shared/types';
 import { useUser } from '@/hooks/useUser';
 import { useKlara } from '@/hooks/useKlara';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQueryClient } from '@tanstack/react-query';
+import { KLARA_CONVERSATION_HISTORY_LIMIT } from '@/_shared/_constants/klaraConstants';
 
 type MascotType = 'welcome' | 'loading' | 'error' | null;
 
@@ -44,6 +45,22 @@ export const useChatLogic = () => {
 
 	const addMessage = useCallback((message: IConversationMessage) => {
 		setMessages((prev) => [...prev, message]);
+	}, []);
+
+	// Build conversation history from local messages (client-side)
+	const buildConversationHistory = useCallback((messagesToUse: IConversationMessage[], limit: number): IConversationTurn[] => {
+		return messagesToUse
+			.reduce<IConversationTurn[]>((history, message, index, array) => {
+				if (message.sender === 'user' && index + 1 < array.length && array[index + 1].sender === 'ai') {
+					history.push({
+						query: message.text,
+						response: array[index + 1].text,
+						timestamp: new Date(message.timestamp).toISOString()
+					});
+				}
+				return history;
+			}, [])
+			.slice(-limit);
 	}, []);
 
 	const handleStopGeneration = useCallback(() => {
@@ -177,6 +194,11 @@ export const useChatLogic = () => {
 				timestamp: Date.now()
 			};
 
+			// Build conversation history from existing messages BEFORE adding new user message
+			const historyLimit = KLARA_CONVERSATION_HISTORY_LIMIT || 5;
+			const conversationHistory = buildConversationHistory(messages, historyLimit);
+
+			// Add to local state immediately (optimistic UI)
 			addMessage(userMessage);
 			setInputText('');
 			setHasUserStartedTyping(false);
@@ -196,6 +218,7 @@ export const useChatLogic = () => {
 					message: userMessage.text,
 					userId: user?.id?.toString(),
 					conversationId: conversationId || '',
+					conversationHistory,
 					signal: controller.signal
 				});
 
@@ -224,7 +247,7 @@ export const useChatLogic = () => {
 				}
 			}
 		},
-		[isLoading, generateMessageId, addMessage, user, conversationId, mascotType, processStreamingResponse, abortController]
+		[isLoading, generateMessageId, addMessage, user, conversationId, mascotType, processStreamingResponse, abortController, messages, buildConversationHistory]
 	);
 
 	const fetchMessages = useCallback(async (chatId: string) => {

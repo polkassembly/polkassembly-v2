@@ -89,7 +89,7 @@ function Balance({
 			<span className={cn('text-text_pink', classname)}>
 				{loading ? <Skeleton className='h-4 w-[20px]' /> : formatBnBalance(balance, { numberAfterComma: 2, withUnit: true }, network)}
 			</span>
-			{[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network) && (
+			{[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) && (
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<div className='flex h-4 w-4 items-center justify-center rounded-full bg-tooltip_trigger_yellow text-xs font-medium text-white'>?</div>

@@ -29,7 +29,7 @@ export class SubsquareOffChainService {
 		[EProposalType.REFERENDUM_V2]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/gov2/referendums/${id}`,
 		[EProposalType.TECH_COMMITTEE_PROPOSAL]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/tech-comm/motions/${id}`,
 		[EProposalType.TIP]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/treasury/tips/${id}`,
-		[EProposalType.TREASURY_PROPOSAL]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/treasury/proposals/${id}`,
+		// [EProposalType.TREASURY_PROPOSAL]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/treasury/proposals/${id}`,
 		[EProposalType.DISCUSSION]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/posts/${id}`
 	};
 

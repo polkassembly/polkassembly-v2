@@ -27,7 +27,8 @@
 		"bounties": "Bounties",
 		"ambassador": "Ambassador",
 		"loans": "Loans",
-		"address": "Adresse"
+		"address": "Adresse",
+		"assets": "Assets"
 	},
 	"ActivityFeed": {
 		"title": "Aktivitätsfeed",
@@ -454,6 +455,7 @@
 		"analytics": "Analysen",
 		"treasuryAnalytics": "Finanzverwaltungsanalysen",
 		"proxies": "Proxies",
+		"identityAndJudgement": "Identität und Urteil",
 		"Tag": {
 			"new": "Neu"
 		}
@@ -1408,6 +1410,8 @@
 		"referenda": "Referenden",
 		"users": "Benutzer",
 		"discussions": "Diskussionen",
+		"bounties": "Kopfgelder",
+		"other": "Sonstiges",
 		"today": "Heute",
 		"last_7_days": "Letzte 7 Tage",
 		"last_30_days": "Letzte 30 Tage",
@@ -1508,6 +1512,49 @@
 		"BeneficiaryAddress": "Begünstigten-Adresse",
 		"Amount": "Betrag"
 	},
+	"Judgements": {
+		"identityAndJudgement": "Identität und Urteil",
+		"requestJudgement": "Urteil anfordern",
+		"becomeARegistrar": "Registrar werden",
+		"dashboard": "Dashboard",
+		"registrar": "Registrar",
+		"registrars": "Registrars",
+		"judgementsGranted": "Urteile vergeben",
+		"judgementsRequested": "Urteile angefordert",
+		"judgementsCompleted": "Urteile abgeschlossen",
+		"thisMonth": "dieser Monat",
+		"registrarDescription": "Eine Entität oder ein Individuum, die/der autorisiert ist, die Identität von Konten zu verifizieren und zu validieren. Registrars können einen Gebührensatz für ihre Dienstleistungen festlegen und ihre Attestation auf bestimmte Felder beschränken.",
+		"becomeRegistrarTitle": "Wie man Registrar wird",
+		"becomeRegistrarDescription": "Um Registrar in Polkadot zu werden, müssen Sie einen Referendumsvorschlag einreichen und von der Community genehmigt werden. So geht's:",
+		"becomeRegistrarSteps": {
+			"step1": "Einen Referendumsvorschlag einreichen, um Registrar zu werden",
+			"step2": "Der Vorschlag wird von der Community abgestimmt",
+			"step3": "Bei Genehmigung werden Sie zur Registrar-Liste hinzugefügt",
+			"step4": "Sie können dann Ihre Gebühr festlegen und mit der Bereitstellung von Identitätsverifizierungsdiensten beginnen"
+		},
+		"continueToCreate": "Weiter zum Vorschlag erstellen",
+		"cancel": "Abbrechen",
+		"index": "Index",
+		"address": "Adresse",
+		"displayName": "Anzeigename",
+		"email": "E-Mail",
+		"twitter": "Twitter",
+		"status": "Status",
+		"initiatedOn": "Initiiert am",
+		"latestJudgement": "Letztes Urteil",
+		"receivedRequests": "Empfangene Anfragen",
+		"totalGiven": "Gesamt gegeben",
+		"fee": "Gebühr",
+		"noJudgementsFound": "Keine Urteile gefunden",
+		"noRegistrarsFound": "Keine Registrars gefunden",
+		"searchByAddressOrName": "Adresse oder Name eingeben, um zu suchen"
+	},
+	"JudgementStatus": {
+		"pending": "Ausstehend",
+		"approved": "Genehmigt",
+		"rejected": "Abgelehnt",
+		"requested": "Angefordert"
+	},
 	"ConvictionSelector": {
 		"votes": "Stimmen",
 		"lockingPeriod": "Sperrfrist",
@@ -1574,7 +1621,8 @@
 		"sudo_balances": "Sudo-Balances"
 	},
 	"AnnouncementBanner": {
-		"assethubMigration": "Hinweis: Kusama wurde zu AssetHub migriert. Bilanzen, Daten, Referenden und andere On-Chain-Aktivitäten wurden zu AssetHub verschoben.",
-		"learnMore": "Mehr erfahren"
+		"assethubMigration": "Hinweis: {network} wurde zu AssetHub migriert. Bilanzen, Daten, Referenden und andere On-Chain-Aktivitäten wurden zu AssetHub verschoben.",
+		"learnMore": "Mehr erfahren",
+		"polkadotMigration": "Hinweis: Polkadot erfolgt der AssetHub-Migration. Einige Funktionen können während der Migration nicht verfügbar sein."
 	}
 }

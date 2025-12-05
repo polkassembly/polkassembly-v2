@@ -40,7 +40,9 @@ import {
 	IPostLink,
 	IOffChainPollPayload,
 	IBeneficiary,
-	EAssets
+	EAssets,
+	IDelegateXAccount,
+	IDelegateXVoteData
 } from '@shared/types';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
@@ -53,10 +55,12 @@ import { OFF_CHAIN_PROPOSAL_TYPES } from '@/_shared/_constants/offChainProposalT
 import dayjs from 'dayjs';
 import { getAssetDataByIndexForNetwork } from '@/_shared/_utils/getAssetDataByIndexForNetwork';
 import { convertAssetToUSD } from '@/app/_client-utils/convertAssetToUSD';
+import { fetchHistoricalTreasuryStats } from '@/app/api/_api-utils/fetchHistoricalTreasuryStats';
 import { APIError } from '../../_api-utils/apiError';
 import { SubsquareOffChainService } from './subsquare_offchain_service';
 import { FirestoreService } from './firestore_service';
 import { OnChainDbService } from '../onchain_db_service';
+import { SubscanOnChainService } from '../onchain_db_service/subscan_onchain_service';
 
 export class OffChainDbService {
 	// Read methods
@@ -259,6 +263,28 @@ export class OffChainDbService {
 
 		// Get only top-level comments (those with no parent)
 		return buildCommentTree(null);
+	}
+
+	static async GetAllNetworkComments({ network, page, limit }: { network: ENetwork; page: number; limit: number }): Promise<IGenericListingResponse<ICommentResponse>> {
+		const commentsResponse = await FirestoreService.GetAllNetworkComments({ network, page, limit });
+
+		// Get reactions for each comment
+		const commentsWithReactions: ICommentResponse[] = await Promise.all(
+			commentsResponse.items.map(async (comment) => {
+				const reactions = await this.GetCommentReactions({
+					network,
+					indexOrHash: comment.indexOrHash,
+					proposalType: comment.proposalType,
+					id: comment.id
+				});
+				return { ...comment, reactions };
+			})
+		);
+
+		return {
+			...commentsResponse,
+			items: commentsWithReactions
+		};
 	}
 
 	static async GetCommentById(id: string): Promise<IComment | null> {
@@ -531,7 +557,8 @@ export class OffChainDbService {
 		content,
 		parentCommentId,
 		sentiment,
-		authorAddress
+		authorAddress,
+		isDelegateXVote = false
 	}: {
 		network: ENetwork;
 		indexOrHash: string;
@@ -541,6 +568,7 @@ export class OffChainDbService {
 		parentCommentId?: string;
 		sentiment?: ECommentSentiment;
 		authorAddress?: string;
+		isDelegateXVote?: boolean;
 	}) {
 		// check if the post is allowed to be commented on
 		const post = await this.GetOffChainPostData({ network, indexOrHash, proposalType });
@@ -549,7 +577,7 @@ export class OffChainDbService {
 		}
 		// TODO: implement on-chain check
 
-		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, sentiment, authorAddress });
+		const comment = await FirestoreService.AddNewComment({ network, indexOrHash, proposalType, userId, content, parentCommentId, sentiment, authorAddress, isDelegateXVote });
 
 		await this.saveUserActivity({
 			userId,
@@ -786,7 +814,30 @@ export class OffChainDbService {
 
 		// check if the user is the proposer
 		const userAddresses = await this.GetAddressesForUserId(userId);
-		if (!userAddresses.find((address) => address.address === proposerAddress)) throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+		const isDirectProposer = userAddresses.find((address) => address.address === proposerAddress);
+
+		if (!isDirectProposer) {
+			// Check if user has control over the proposer through multisig or proxy
+			// Get relations for all user addresses
+			const allAddressRelations = await Promise.all(userAddresses.map((userAddr) => SubscanOnChainService.GetAccountRelations({ address: userAddr.address, network })));
+
+			// Check if proposerAddress is in any user's multisig or proxy addresses
+			const hasProposerControl = allAddressRelations.some((addressRelations) => {
+				// Check if proposerAddress is in user's multisig addresses
+				const isMultisigMatch = addressRelations.multisigAddresses.some(
+					(multisig) => getSubstrateAddress(multisig.address) === proposerAddress || multisig.pureProxies.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress)
+				);
+
+				// Check if proposerAddress is in user's proxy addresses (addresses user has keys for)
+				const isProxyMatch = addressRelations.proxyAddresses.some((proxy) => getSubstrateAddress(proxy.address) === proposerAddress);
+
+				return isMultisigMatch || isProxyMatch;
+			});
+
+			if (!hasProposerControl) {
+				throw new APIError(ERROR_CODES.UNAUTHORIZED, StatusCodes.UNAUTHORIZED);
+			}
+		}
 
 		// check if offchain post context exists
 		const offChainPostData = await FirestoreService.GetOffChainPostData({ network, indexOrHash, proposalType });
@@ -988,14 +1039,24 @@ export class OffChainDbService {
 		return FirestoreService.GetPollVotes({ network, proposalType, index, pollId });
 	}
 
-	static async GetBeneficiariesWithUsdAmount({ network, beneficiaries }: { network: ENetwork; beneficiaries: IBeneficiary[] }) {
-		const treasuryStats = await FirestoreService.GetTreasuryStats({ network, from: dayjs().subtract(1, 'hour').toDate(), to: dayjs().toDate(), limit: 1, page: 1 });
+	static async GetBeneficiariesWithUsdAmount({ network, beneficiaries, proposalCreatedAt }: { network: ENetwork; beneficiaries: IBeneficiary[]; proposalCreatedAt: Date }) {
+		let treasuryStats = await FirestoreService.GetTreasuryStats({
+			network,
+			from: dayjs(proposalCreatedAt).startOf('day').toDate(),
+			to: dayjs(proposalCreatedAt).endOf('day').toDate(),
+			limit: 1,
+			page: 1
+		});
 
-		if (!treasuryStats) {
-			return beneficiaries;
+		if (!treasuryStats.length) {
+			const historicalStats = await fetchHistoricalTreasuryStats({ network, date: proposalCreatedAt });
+			if (historicalStats) {
+				await FirestoreService.SaveTreasuryStats({ treasuryStats: historicalStats });
+				treasuryStats = [historicalStats];
+			}
 		}
 
-		if (!treasuryStats[0]?.nativeTokenUsdPrice && !treasuryStats[0]?.dedTokenUsdPrice) {
+		if (!treasuryStats.length || (!treasuryStats[0]?.nativeTokenUsdPrice && !treasuryStats[0]?.dedTokenUsdPrice)) {
 			return beneficiaries;
 		}
 		return beneficiaries?.map((beneficiary) => {
@@ -1016,5 +1077,164 @@ export class OffChainDbService {
 
 			return { ...beneficiary, usdAmount };
 		});
+	}
+
+	static async CreateDelegateXAccount({
+		address,
+		encryptedMnemonic,
+		nonce,
+		userId,
+		network,
+		includeComment,
+		votingPower,
+		strategyId,
+		contactLink,
+		signatureLink,
+		prompt
+	}: {
+		address: string;
+		encryptedMnemonic: string;
+		nonce: string;
+		userId: number;
+		network: ENetwork;
+		includeComment: boolean;
+		votingPower: string;
+		strategyId?: string;
+		contactLink?: string;
+		signatureLink?: string;
+		prompt?: string;
+	}) {
+		// check if account already exists
+		const existingAccount = await FirestoreService.GetDelegateXAccountByUserId({ userId, network });
+		if (existingAccount) {
+			console.log('delegateXAccount already exists');
+			// update the account if it exists
+			return FirestoreService.UpdateDelegateXAccount({
+				address,
+				userId,
+				network,
+				includeComment,
+				votingPower,
+				strategyId,
+				contactLink,
+				signatureLink,
+				prompt,
+				active: existingAccount.active ?? false
+			});
+		}
+
+		const delegateXAccount: IDelegateXAccount = {
+			address,
+			encryptedMnemonic,
+			nonce,
+			userId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			network,
+			includeComment,
+			votingPower,
+			strategyId,
+			contactLink,
+			signatureLink,
+			prompt: prompt || '',
+			active: false
+		};
+		await FirestoreService.CreateDelegateXAccount(delegateXAccount);
+		return delegateXAccount;
+	}
+
+	static async UpdateDelegateXAccount({
+		address,
+		userId,
+		network,
+		includeComment,
+		votingPower,
+		strategyId,
+		contactLink,
+		signatureLink,
+		prompt,
+		active
+	}: {
+		address: string;
+		userId: number;
+		network: ENetwork;
+		includeComment: boolean;
+		votingPower: string;
+		strategyId?: string;
+		contactLink?: string;
+		signatureLink?: string;
+		prompt?: string;
+		active?: boolean;
+	}): Promise<IDelegateXAccount> {
+		return FirestoreService.UpdateDelegateXAccount({
+			address,
+			userId,
+			network,
+			includeComment,
+			votingPower,
+			strategyId,
+			contactLink,
+			signatureLink,
+			prompt,
+			active
+		});
+	}
+
+	static async GetDelegateXAccountByUserId({ userId, network }: { userId: number; network: ENetwork }) {
+		return FirestoreService.GetDelegateXAccountByUserId({ userId, network });
+	}
+
+	static async CreateVote({
+		delegateXAccountId,
+		proposalId,
+		hash,
+		decision,
+		reason,
+		comment,
+		proposalType,
+		votingPower
+	}: {
+		delegateXAccountId: string;
+		proposalId: string;
+		hash: string;
+		decision: number;
+		reason: string[];
+		comment: string;
+		proposalType: EProposalType;
+		votingPower: string;
+	}) {
+		return FirestoreService.CreateVote({ delegateXAccountId, proposalId, hash, decision, reason, comment, proposalType, votingPower });
+	}
+
+	static async GetVoteDataByDelegateXAccountId({
+		delegateXAccountId,
+		page,
+		limit
+	}: {
+		delegateXAccountId: string;
+		page: number;
+		limit: number;
+	}): Promise<{ votes: IDelegateXVoteData[]; totalCount: number } | null> {
+		return FirestoreService.GetVoteDataByDelegateXAccountId({ delegateXAccountId, page, limit });
+	}
+
+	static async GetTotalDelegateXAccountsCount(): Promise<number> {
+		return FirestoreService.GetTotalDelegateXAccountsCount();
+	}
+
+	static async GetTotalDelegateXVotesPast30Days(): Promise<number> {
+		return FirestoreService.GetTotalDelegateXVotesPast30Days();
+	}
+
+	static async GetTotalDelegateXVotingPower(): Promise<string> {
+		return FirestoreService.GetTotalDelegateXVotingPower();
+	}
+
+	static async GetDelegateXVotesMatrixByDelegateXAccountId({
+		delegateXAccountId
+	}: {
+		delegateXAccountId: string;
+	}): Promise<{ votesPast30Days: number; yesCount: number; noCount: number; abstainCount: number; votingPower: string }> {
+		return FirestoreService.GetDelegateXVotesMatrixByDelegateXAccountId({ delegateXAccountId });
 	}
 }

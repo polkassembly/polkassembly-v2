@@ -10,7 +10,7 @@ import userIcon from '@assets/profile/user-icon.svg';
 import { Hits, Index, useInstantSearch, useSearchBox, Configure, usePagination } from 'react-instantsearch';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import Link from 'next/link';
-import { EProposalType, ESearchType, ENetwork } from '@/_shared/types';
+import { EProposalType, ESearchType, ENetwork, IPublicUser } from '@/_shared/types';
 import CommentIcon from '@assets/icons/Comment.svg';
 import { POST_TOPIC_MAP } from '@/_shared/_constants/searchConstants';
 import { cn } from '@/lib/utils';
@@ -19,6 +19,10 @@ import { AiOutlineDislike } from '@react-icons/all-files/ai/AiOutlineDislike';
 import { AiOutlineLike } from '@react-icons/all-files/ai/AiOutlineLike';
 import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { useSearchConfig } from '@/hooks/useSearchConfig';
+import { useState, useEffect } from 'react';
+import { ValidatorService } from '@/_shared/_services/validator_service';
+import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import PaLogo from '../PaLogo';
 import { Separator } from '../../Separator';
 import Address from '../../Profile/Address/Address';
@@ -79,7 +83,7 @@ function PostHit({ hit }: { hit: Post }) {
 			target='_blank'
 		>
 			<div className={`${styles.search_results_wrapper} ${backgroundColor} hover:bg-bg_pink/10`}>
-				<div className='flex'>
+				<div className='flex flex-col gap-2 sm:flex-row sm:items-start'>
 					{hit.proposer_address && (
 						<Address
 							address={hit.proposer_address}
@@ -190,19 +194,63 @@ function UserHit({ hit }: { hit: User }) {
 	);
 }
 
+function useAddressSearch(query: string, activeIndex: ESearchType | null) {
+	const [user, setUser] = useState<IPublicUser | null>(null);
+	const [loading, setLoading] = useState(false);
+
+	useEffect(() => {
+		if (activeIndex !== ESearchType.USERS || query.length < 3) {
+			setUser(null);
+			setLoading(false);
+			return;
+		}
+
+		const isAddress = ValidatorService.isValidWeb3Address(query);
+		if (!isAddress) {
+			setUser(null);
+			setLoading(false);
+			return;
+		}
+
+		const fetchUserByAddress = async () => {
+			setLoading(true);
+			try {
+				const { data } = await UserProfileClientService.fetchPublicUserByAddress({ address: query });
+				setUser(data ?? null);
+			} catch (error) {
+				console.error('Error fetching user by address:', error);
+				setUser(null);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchUserByAddress();
+	}, [query, activeIndex]);
+
+	return { user, loading };
+}
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
-function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
+function SearchResults({ activeIndex, proposalTypeFilter = ESearchType.POSTS }: { activeIndex: ESearchType | null; proposalTypeFilter?: ESearchType }) {
 	const { status, results } = useInstantSearch();
 	const { query } = useSearchBox();
 	const { currentRefinement, refine } = usePagination();
 	const t = useTranslations();
-	const isLoading = results?.nbHits === 0 && (status === 'loading' || status === 'stalled');
-	const hasNoResults = results?.nbHits === 0 && query.length > 2;
+	const addressSearchResult = useAddressSearch(query, activeIndex);
+	const isLoading = (results?.nbHits === 0 && (status === 'loading' || status === 'stalled')) || addressSearchResult.loading;
+	const hasNoResults = results?.nbHits === 0 && query.length > 2 && !addressSearchResult.user;
 	const network = getCurrentNetwork();
+
+	const { postFilterQuery } = useSearchConfig({
+		network,
+		activeIndex,
+		proposalTypeFilter
+	});
 
 	return (
 		<div>
-			<div className='h-[50vh] overflow-hidden md:h-[58vh]'>
+			<div className={`${!isLoading && query.length > 2 && !hasNoResults ? 'h-[40vh] md:h-[50vh]' : 'h-[50vh]'} overflow-hidden`}>
 				{isLoading ? (
 					<div className='flex h-full items-center justify-center'>
 						<Image
@@ -272,27 +320,40 @@ function SearchResults({ activeIndex }: { activeIndex: ESearchType | null }) {
 							</div>
 						) : (
 							<div className='h-full overflow-y-auto pr-2'>
-								{activeIndex === ESearchType.POSTS ? (
+								{activeIndex === ESearchType.POSTS || activeIndex === ESearchType.BOUNTIES || activeIndex === ESearchType.OTHER ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters={`NOT proposalType:DISCUSSION AND NOT proposalType:GRANTS AND network:${network}`} />
+										<Configure filters={postFilterQuery} />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>
 									</Index>
 								) : activeIndex === ESearchType.DISCUSSIONS ? (
 									<Index indexName='polkassembly_v2_posts'>
-										<Configure filters={`proposalType:DISCUSSION OR proposalType:GRANTS AND network:${network}`} />
+										<Configure filters={postFilterQuery} />
 										<div className='space-y-4'>
 											<Hits hitComponent={PostHit} />
 										</div>
 									</Index>
 								) : (
-									<Index indexName='polkassembly_v2_users'>
-										<Configure />
-										<div className='space-y-4'>
-											<Hits hitComponent={UserHit} />
-										</div>
-									</Index>
+									<>
+										{addressSearchResult.user && (
+											<div className='mb-4'>
+												<UserHit
+													hit={{
+														objectID: addressSearchResult.user.id.toString(),
+														username: addressSearchResult.user.username,
+														profile: addressSearchResult.user.profileDetails
+													}}
+												/>
+											</div>
+										)}
+										<Index indexName='polkassembly_v2_users'>
+											<Configure />
+											<div className='space-y-4'>
+												<Hits hitComponent={UserHit} />
+											</div>
+										</Index>
+									</>
 								)}
 							</div>
 						)}

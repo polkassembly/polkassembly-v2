@@ -57,3 +57,72 @@
 .readMoreBtn {
 	@apply cursor-pointer text-xs font-medium text-read_more_txt;
 }
+
+.delegateXCardWrapper {
+	position: relative;
+	padding: 1px;
+	border-radius: 6px;
+	@apply flex h-full flex-col;
+}
+
+.delegateXCardWrapper::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	padding: 1px;
+	background: linear-gradient(110.4deg, #e5007a 0.58%, #51d36e 23.87%, #ffd669 51.9%, #cf2dab 71.14%, #1b61ff 99.42%);
+	mask:
+		linear-gradient(#fff 0 0) content-box,
+		linear-gradient(#fff 0 0);
+	mask-composite: exclude;
+	-webkit-mask-composite: xor;
+	pointer-events: none;
+}
+
+.delegateXCard {
+	@apply flex h-full flex-1 flex-col rounded-md bg-bg_modal;
+	position: relative;
+	z-index: 1;
+	border-radius: 6px;
+}
+
+.delegateXGif {
+	position: absolute;
+	top: -30px;
+	left: -20px;
+	z-index: 3;
+	pointer-events: none;
+	animation: delegateXWave 2.4s ease-in-out infinite;
+	transform-origin: 20% 80%;
+}
+
+@keyframes delegateXWave {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	10% {
+		transform: rotate(12deg);
+	}
+
+	20% {
+		transform: rotate(-8deg);
+	}
+
+	30% {
+		transform: rotate(10deg);
+	}
+
+	40% {
+		transform: rotate(-6deg);
+	}
+
+	50% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(0deg);
+	}
+}

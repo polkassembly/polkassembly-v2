@@ -738,6 +738,7 @@ export interface IComment {
 	history?: ICommentHistoryItem[];
 	disabled?: boolean;
 	authorAddress?: string;
+	isDelegateXVote?: boolean;
 }
 
 export interface ICommentResponse extends IComment {
@@ -1184,7 +1185,8 @@ export enum EDelegateSource {
 	NOVA = 'nova',
 	PARITY = 'parity',
 	POLKASSEMBLY = 'polkassembly',
-	INDIVIDUAL = 'individual'
+	INDIVIDUAL = 'individual',
+	DELEGATEX = 'delegateX'
 }
 
 export interface IDelegate {
@@ -1279,7 +1281,9 @@ export enum EPeriodType {
 export enum ESearchType {
 	POSTS = 'posts',
 	DISCUSSIONS = 'discussions',
-	USERS = 'users'
+	USERS = 'users',
+	BOUNTIES = 'bounties',
+	OTHER = 'other'
 }
 
 export enum ESearchDiscussionType {
@@ -1684,6 +1688,83 @@ export interface IChatResponse {
 	followUpQuestions?: string[];
 	isNewConversation?: boolean;
 	conversationId?: string;
+}
+
+export interface IDelegateXAccount {
+	address: string;
+	encryptedMnemonic: string;
+	nonce: string;
+	userId: number;
+	createdAt: Date;
+	updatedAt: Date;
+	includeComment: boolean;
+	network: ENetwork;
+	votingPower: string;
+	strategyId?: string;
+	contactLink?: string;
+	signatureLink?: string;
+	prompt?: string;
+	active?: boolean;
+}
+
+export interface IDelegateXVoteData {
+	delegateXAccountId: string;
+	proposalId: string;
+	hash: string;
+	decision: number;
+	reason: string[];
+	comment?: string;
+	proposalType: EProposalType;
+	createdAt: Date;
+	updatedAt: Date;
+	votingPower: string;
+	conviction: EConvictionAmount;
+}
+
+export interface VotingStrategy {
+	id: string;
+	name: string;
+	description: string;
+	icon: string;
+	tags: string[];
+	logic: string;
+	weights: {
+		balthazar: number;
+		caspar: number;
+		melchior: number;
+	};
+	commentPreview: (signature: string, contact: string) => string;
+}
+
+export enum EJudgementDashboardTabs {
+	DASHBOARD = 'dashboard',
+	REGISTRARS = 'registrars'
+}
+
+export enum EJudgementStatus {
+	REQUESTED = 'Requested',
+	APPROVED = 'Approved',
+	REJECTED = 'Rejected',
+	PENDING = 'Pending'
+}
+
+export interface IJudgementRequest {
+	id: string;
+	address: string;
+	displayName: string;
+	email: string;
+	twitter: string;
+	status: EJudgementStatus;
+	dateInitiated: Date;
+	registrarIndex: number;
+	registrarAddress: string;
+	judgementHash?: string;
+}
+
+export interface IJudgementStats {
+	totalRequestedThisMonth: number;
+	percentageIncreaseFromLastMonth: number;
+	percentageCompletedThisMonth: number;
 }
 
 export enum ETreasuryAnalyticsTabs {

@@ -24,6 +24,7 @@ import USDCIcon from '@/_assets/icons/usdc.svg';
 import USDTIcon from '@/_assets/icons/usdt.svg';
 import MYTHIcon from '@/_assets/icons/myth.svg';
 import DEDIcon from '@/_assets/icons/ded.png';
+import { KUSAMA_ASSETHUB_UNIFIED_SQUID_URL, POLKADOT_ASSETHUB_UNIFIED_SQUID_URL } from '@/app/api/_api-constants/apiEnvVars';
 
 interface ISocialLink {
 	id: string;
@@ -249,6 +250,10 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 		identityMinDeposit: new BN('1000000000000'),
 		rpcEndpoints: [
 			{
+				name: VIA_DWELLIR,
+				url: 'wss://paseo-rpc.n.dwellir.com'
+			},
+			{
 				name: 'via IBP 1',
 				url: 'wss://sys.ibp.network/people-paseo'
 			},
@@ -274,47 +279,80 @@ const PEOPLE_CHAIN_NETWORK_DETAILS: Record<ENetwork, IPeopleChainDetails> = {
 } as const;
 
 const ASSETHUB_DETAILS: Partial<Record<ENetwork, IAssethubDetails>> = {
+	// After AssetHub migration, this RPC is the relay chain endpoint (swapped with primary RPC)
 	[ENetwork.POLKADOT]: {
 		rpcEndpoints: [
 			{
-				name: VIA_PARITY,
-				url: 'wss://polkadot-asset-hub-rpc.polkadot.io'
+				name: `${VIA_ALL_NODES} (recommended)`,
+				url: 'wss://polkadot-rpc.publicnode.com'
+			},
+			{
+				name: VIA_BLOCKOPS,
+				url: 'wss://polkadot-public-rpc.blockops.network/ws'
 			},
 			{
 				name: VIA_DWELLIR,
-				url: 'wss://asset-hub-polkadot-rpc.n.dwellir.com'
+				url: 'wss://polkadot-rpc.n.dwellir.com'
 			},
 			{
 				name: VIA_DWELLIR_TUNISIA,
-				url: 'wss://statemint-rpc-tn.dwellir.com'
+				url: 'wss://polkadot-rpc-tn.dwellir.com'
 			},
 			{
-				name: VIA_ONFINALITY,
-				url: 'wss://statemint.api.onfinality.io/public-ws'
+				name: VIA_HELIXSTREET,
+				url: 'wss://rpc-polkadot.helixstreet.io'
 			},
 			{
-				name: VIA_IBP_GEODNS1,
-				url: 'wss://sys.ibp.network/asset-hub-polkadot'
+				name: VIA_IBP_1,
+				url: 'wss://rpc.ibp.network/polkadot'
 			},
 			{
-				name: VIA_IBP_GEODNS2,
-				url: 'wss://asset-hub-polkadot.dotters.network'
+				name: VIA_IBP_2,
+				url: 'wss://polkadot.dotters.network'
 			},
 			{
 				name: VIA_LUCKYFRIDAY,
-				url: 'wss://rpc-asset-hub-polkadot.luckyfriday.io'
+				url: 'wss://rpc-polkadot.luckyfriday.io'
+			},
+			{
+				name: VIA_PERMANENCE_DAO_EU,
+				url: 'wss://rpc.permanence.io'
+			},
+			{
+				name: VIA_ONFINALITY,
+				url: 'wss://polkadot.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_PERMANENCE_DAO_EU,
+				url: 'wss://polkadot.rpc.permanence.io'
 			},
 			{
 				name: VIA_RADIUMBLOCK,
-				url: 'wss://statemint.public.curie.radiumblock.co/ws'
+				url: 'wss://polkadot.public.curie.radiumblock.co/ws'
+			},
+			{
+				name: VIA_ONFINALITY,
+				url: 'wss://polkadot.api.onfinality.io/public-ws'
+			},
+			{
+				name: VIA_PERMANENCE_DAO_EU,
+				url: 'wss://polkadot.rpc.permanence.io'
+			},
+			{
+				name: VIA_SIMPLY_STAKING,
+				url: 'wss://spectrum-03.simplystaking.xyz/cG9sa2Fkb3QtMDMtOTFkMmYwZGYtcG9sa2Fkb3Q/LjwBJpV3dIKyWQ/polkadot/mainnet/'
 			},
 			{
 				name: VIA_STAKETWORLD,
-				url: 'wss://dot-rpc.stakeworld.io/assethub'
+				url: 'wss://dot-rpc.stakeworld.io'
+			},
+			{
+				name: VIA_SUBQUERY,
+				url: 'wss://polkadot.rpc.subquery.network/public/ws'
 			}
 		]
 	},
-	// TODO: here the rpc is of relay chain, update this.
+	// After AssetHub migration, this RPC is the relay chain endpoint (swapped with primary RPC)
 	[ENetwork.KUSAMA]: {
 		rpcEndpoints: [
 			{
@@ -3004,6 +3042,7 @@ const networkSocialLinks: Record<ENetwork, ISocialLink[]> = {
 } as const;
 
 export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
+	// After AssetHub migration, the primary RPC is AssetHub (treasury operations moved to AssetHub)
 	[ENetwork.POLKADOT]: {
 		key: ENetwork.POLKADOT,
 		logo: PolkadotLogo,
@@ -3016,77 +3055,45 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		palletInstance: '50',
 		blockTime: 6000,
 		ss58Format: 0,
-		subsquidUrl: 'https://squid.subsquid.io/polkadot-polkassembly/graphql',
+		subsquidUrl: POLKADOT_ASSETHUB_UNIFIED_SQUID_URL,
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.POLKADOT],
 		tokenSymbol: 'DOT',
 		rpcEndpoints: [
 			{
-				name: `${VIA_ALL_NODES} (recommended)`,
-				url: 'wss://polkadot-rpc.publicnode.com'
-			},
-			{
-				name: VIA_BLOCKOPS,
-				url: 'wss://polkadot-public-rpc.blockops.network/ws'
+				name: VIA_PARITY,
+				url: 'wss://polkadot-asset-hub-rpc.polkadot.io'
 			},
 			{
 				name: VIA_DWELLIR,
-				url: 'wss://polkadot-rpc.n.dwellir.com'
+				url: 'wss://asset-hub-polkadot-rpc.n.dwellir.com'
 			},
 			{
 				name: VIA_DWELLIR_TUNISIA,
-				url: 'wss://polkadot-rpc-tn.dwellir.com'
+				url: 'wss://statemint-rpc-tn.dwellir.com'
 			},
 			{
-				name: VIA_HELIXSTREET,
-				url: 'wss://rpc-polkadot.helixstreet.io'
+				name: VIA_ONFINALITY,
+				url: 'wss://statemint.api.onfinality.io/public-ws'
 			},
 			{
-				name: VIA_IBP_1,
-				url: 'wss://rpc.ibp.network/polkadot'
+				name: VIA_IBP_GEODNS1,
+				url: 'wss://sys.ibp.network/asset-hub-polkadot'
 			},
 			{
-				name: VIA_IBP_2,
-				url: 'wss://polkadot.dotters.network'
+				name: VIA_IBP_GEODNS2,
+				url: 'wss://asset-hub-polkadot.dotters.network'
 			},
 			{
 				name: VIA_LUCKYFRIDAY,
-				url: 'wss://rpc-polkadot.luckyfriday.io'
-			},
-			{
-				name: VIA_PERMANENCE_DAO_EU,
-				url: 'wss://rpc.permanence.io'
-			},
-			{
-				name: VIA_ONFINALITY,
-				url: 'wss://polkadot.api.onfinality.io/public-ws'
-			},
-			{
-				name: VIA_PERMANENCE_DAO_EU,
-				url: 'wss://polkadot.rpc.permanence.io'
+				url: 'wss://rpc-asset-hub-polkadot.luckyfriday.io'
 			},
 			{
 				name: VIA_RADIUMBLOCK,
-				url: 'wss://polkadot.public.curie.radiumblock.co/ws'
-			},
-			{
-				name: VIA_ONFINALITY,
-				url: 'wss://polkadot.api.onfinality.io/public-ws'
-			},
-			{
-				name: VIA_PERMANENCE_DAO_EU,
-				url: 'wss://polkadot.rpc.permanence.io'
-			},
-			{
-				name: VIA_SIMPLY_STAKING,
-				url: 'wss://spectrum-03.simplystaking.xyz/cG9sa2Fkb3QtMDMtOTFkMmYwZGYtcG9sa2Fkb3Q/LjwBJpV3dIKyWQ/polkadot/mainnet/'
+				url: 'wss://statemint.public.curie.radiumblock.co/ws'
 			},
 			{
 				name: VIA_STAKETWORLD,
-				url: 'wss://dot-rpc.stakeworld.io'
-			},
-			{
-				name: VIA_SUBQUERY,
-				url: 'wss://polkadot.rpc.subquery.network/public/ws'
+				url: 'wss://dot-rpc.stakeworld.io/assethub'
 			}
 		],
 		supportedAssets: {
@@ -3123,7 +3130,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 				'https://firebasestorage.googleapis.com/v0/b/polkassembly-v2.firebasestorage.app/o/public%2Fpolkassembly-small.jpg?alt=media&token=63accae8-ea14-4705-817b-92c7bf80ccce'
 		}
 	},
-	// TODO: here the primary rpc is of assethub, update this.
+	// After AssetHub migration, the primary RPC is AssetHub (treasury operations moved to AssetHub)
 	[ENetwork.KUSAMA]: {
 		key: ENetwork.KUSAMA,
 		logo: KusamaLogo,
@@ -3134,7 +3141,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		name: 'Kusama',
 		blockTime: 6000,
 		ss58Format: 2,
-		subsquidUrl: 'https://polkassembly.squids.live/kusama-assethub-unified-pa@v1/api/graphql',
+		subsquidUrl: KUSAMA_ASSETHUB_UNIFIED_SQUID_URL,
 		tokenDecimals: NETWORK_TOKEN_DECIMALS[ENetwork.KUSAMA],
 		supportedAssets: {
 			'1984': {
@@ -3337,8 +3344,12 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		tokenSymbol: 'PAS',
 		rpcEndpoints: [
 			{
+				name: 'via Dotters',
+				url: 'wss://paseo.dotters.network'
+			},
+			{
 				name: VIA_DWELLIR,
-				url: 'wss://paseo-rpc.dwellir.com'
+				url: 'wss://paseo-rpc.n.dwellir.com'
 			},
 			{
 				name: 'via Amforc',

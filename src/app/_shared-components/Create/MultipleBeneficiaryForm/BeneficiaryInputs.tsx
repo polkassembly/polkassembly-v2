@@ -57,13 +57,15 @@ function BeneficiaryInputs({
 
 	useEffect(() => {
 		const getCurrentBlockNumber = async () => {
-			const height = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network) ? await assethubApiService?.getBlockHeight() : await apiService?.getBlockHeight();
+			const height = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network)
+				? await assethubApiService?.getBlockHeight()
+				: await apiService?.getBlockHeight();
 			if (height) {
 				setBlockHeight(new BN(height));
 			}
 		};
 		getCurrentBlockNumber();
-	}, [apiService]);
+	}, [apiService, assethubApiService, network]);
 
 	useEffect(() => {
 		if (!payoutDate || !blockHeight) return;
