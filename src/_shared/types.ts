@@ -637,9 +637,6 @@ export interface IOnChainPostListing {
 	reward?: string;
 	decisionPeriodEndsAt?: Date;
 	preparePeriodEndsAt?: Date;
-	statusHistory?: IStatusHistoryItem[];
-	createdAtBlock?: number;
-	updatedAtBlock?: number;
 }
 
 export interface IPostListing extends IOffChainPost {
@@ -845,17 +842,6 @@ export enum EActivityName {
 	FOLLOWED_USER = 'followed_user',
 	UNFOLLOWED_USER = 'unfollowed_user'
 }
-
-export type ProposalWithTally = {
-	tally?: {
-		ayes: number;
-		nays: number;
-	};
-	voteMetrics?: {
-		aye: { value: number };
-		nay: { value: number };
-	};
-};
 
 export enum EActivityCategory {
 	ON_CHAIN = 'on_chain',
@@ -1781,14 +1767,6 @@ export interface IJudgementStats {
 	percentageCompletedThisMonth: number;
 }
 
-export interface IDVDelegateVoteStats {
-	ayeCount: number;
-	nayCount: number;
-	abstainCount: number;
-	participation: number;
-	winRate: number;
-}
-
 export enum EDVDelegateType {
 	DAO = 'DAO',
 	GUARDIAN = 'GUARDIAN'
@@ -1846,17 +1824,6 @@ export interface IDVCohort {
 	referendumIndexEnd?: number;
 }
 
-export interface IDVDelegateWithStats extends IDVCohortDelegate {
-	voteStats: IDVDelegateVoteStats;
-}
-
-export interface IDVDelegateVote {
-	address: string;
-	decision: EVoteDecision | 'novote';
-	votingPower?: string;
-	percentage?: number;
-}
-
 export enum EInfluenceStatus {
 	APPROVED = 'approved',
 	REJECTED = 'rejected',
@@ -1867,48 +1834,6 @@ export enum EInfluenceStatus {
 export enum EDVTrackFilter {
 	DV_TRACKS = 'dv_tracks',
 	ALL = 'all'
-}
-
-export interface IDVReferendumInfluence {
-	index: number;
-	title: string;
-	track: string;
-	status: EProposalStatus;
-	ayePercent: number;
-	nayPercent: number;
-	ayeVotingPower: string;
-	nayVotingPower: string;
-	dvTotalVotingPower: string;
-	dvAyeVotingPower: string;
-	dvNayVotingPower: string;
-	dvPercentage: number;
-	influence: EInfluenceStatus;
-	delegateVotes: IDVDelegateVote[];
-	guardianVotes: IDVDelegateVote[];
-}
-
-export interface IDVDelegateVotingMatrix {
-	address: string;
-	type: EDVDelegateType;
-	votes: Record<number, EVoteDecision | 'novote'>;
-	participation: number;
-	ayeRate: number;
-	activeCount: number;
-	totalRefs: number;
-}
-
-export interface IDVDelegatesResponse {
-	cohort: IDVCohort;
-	delegatesWithStats: IDVDelegateWithStats[];
-}
-
-export interface IDVReferendaInfluenceResponse {
-	referenda: IDVReferendumInfluence[];
-}
-
-export interface IDVVotingMatrixResponse {
-	referendumIndices: number[];
-	delegates: IDVDelegateVotingMatrix[];
 }
 
 export interface IDVDReferendumResponse {
