@@ -1584,6 +1584,8 @@
 		"polkadotMigration": "PolkadotはAssetHub移行中です。一部の機能は移行中に利用できない場合があります。"
 	},
 	"AAG": {
+		"calendarEventTitle": "ガバナンスへの試み (AAG) コール",
+		"calendarEventDetails": "PolkadotとKusamaのガバナンスについて議論する毎週のAAGコールに参加してください。リンク: https://x.com/KusDAO",
 		"title": "ガバナンスへの試み (AAG)",
 		"host": "ホスト: The KUS DAO",
 		"description": "Polkadotの#1ニュースリソース。日々のニュース、洞察、Polkadotエコシステムのトップマインドとのインタビュー。",

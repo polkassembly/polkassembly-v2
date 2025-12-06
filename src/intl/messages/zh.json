@@ -1585,6 +1585,8 @@
 	},
 	"AAG": {
 		"title": "治理尝试 (AAG)",
+		"calendarEventTitle": "治理尝试 (AAG) 电话会议",
+		"calendarEventDetails": "参加每周的 AAG 电话会议，讨论 Polkadot 和 Kusama 的治理。链接: https://x.com/KusDAO",
 		"host": "主持人: The KUS DAO",
 		"description": "Polkadot的#1新闻资源。每日新闻、见解和与Polkadot生态系统顶尖人才的访谈。",
 		"requestToPresent": "申请演示",

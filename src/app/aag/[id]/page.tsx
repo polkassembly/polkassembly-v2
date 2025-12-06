@@ -246,7 +246,7 @@ function VideoDetailPage() {
 								<iframe
 									ref={playerRef}
 									id='youtube-player'
-									src={`https://www.youtube.com/embed/${currentVideoId}?enablejsapi=1&autoplay=1&rel=0&origin=${window.location.origin}`}
+									src={`https://www.youtube.com/embed/${currentVideoId}?enablejsapi=1&autoplay=1&rel=0&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
 									title={selectedVideo.title}
 									className='absolute inset-0 h-full w-full'
 									allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'

@@ -1693,6 +1693,8 @@
 			"requestSubmittedDescription": "Your presentation request has been submitted successfully.",
 			"submissionFailed": "Submission Failed",
 			"submissionFailedDescription": "Failed to submit request. Please try again."
-		}
+		},
+		"calendarEventTitle": "Attempts At Governance (AAG) Call",
+		"calendarEventDetails": "Join the weekly AAG call to discuss Polkadot and Kusama governance. Link: https://x.com/KusDAO"
 	}
 }

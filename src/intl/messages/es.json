@@ -1585,6 +1585,8 @@
 		"polkadotMigration": "Nota: Polkadot está en proceso de migración a AssetHub. Algunas características pueden estar no disponibles durante la migración."
 	},
 	"AAG": {
+		"calendarEventTitle": "Llamada de Intentos de Gobernanza (AAG)",
+		"calendarEventDetails": "Únase a la llamada semanal de AAG para discutir la gobernanza de Polkadot y Kusama. Enlace: https://x.com/KusDAO",
 		"title": "Intentos de Gobernanza (AAG)",
 		"host": "Anfitrión: The KUS DAO",
 		"description": "El recurso de noticias #1 sobre Polkadot. Noticias diarias, perspectivas y entrevistas con las mentes más brillantes del ecosistema Polkadot.",

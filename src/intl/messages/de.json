@@ -1583,6 +1583,8 @@
 		"polkadotMigration": "Hinweis: Polkadot erfolgt der AssetHub-Migration. Einige Funktionen können während der Migration nicht verfügbar sein."
 	},
 	"AAG": {
+		"calendarEventTitle": "Attempts At Governance (AAG) Anruf",
+		"calendarEventDetails": "Nehmen Sie am wöchentlichen AAG-Call teil, um über die Governance von Polkadot und Kusama zu diskutieren. Link: https://x.com/KusDAO",
 		"title": "Versuche der Governance (AAG)",
 		"host": "Gastgeber: The KUS DAO",
 		"description": "Die #1 Nachrichtenquelle zu Polkadot. Tägliche Nachrichten, Einblicke & Interviews mit den führenden Köpfen im Polkadot-Ökosystem.",

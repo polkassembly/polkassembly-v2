@@ -5,7 +5,6 @@
 'use client';
 
 import { Skeleton } from '@/app/_shared-components/Skeleton';
-import { useTranslations } from 'next-intl';
 import { useAAGVideos } from '@/hooks/useAAGVideos';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import GovernanceVideoCard from './Components/GovernanceCard';
@@ -15,8 +14,6 @@ import AAGCard from './Components/AAGCard';
 const FEATURED_VIDEOS_COUNT = 3;
 
 function AttemptsAtGovernancePage() {
-	const t = useTranslations('AAG');
-
 	const {
 		data: aagVideosData,
 		isLoading: isPlaylistLoading,
@@ -53,12 +50,6 @@ function AttemptsAtGovernancePage() {
 								</div>
 							))}
 						</>
-					) : playlistError ? (
-						<div className='col-span-full flex justify-center py-8'>
-							<div className='text-toast_warning_text'>
-								{t('errorLoadingVideos')}: {playlistError.message}
-							</div>
-						</div>
 					) : (
 						featuredVideosList.map((featuredVideo) => (
 							<GovernanceVideoCard

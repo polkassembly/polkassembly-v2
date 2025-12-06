@@ -275,9 +275,6 @@ export class AAGVideoService extends FirestoreUtils {
 				throw new Error('Failed to fetch playlist data or no videos found');
 			}
 
-			let newVideos = 0;
-			let updatedVideos = 0;
-
 			const videoPromises = playlistData.videos.map(async (video) => {
 				try {
 					const existingMetadata = await this.GetAAGVideoMetadata(video.id);
@@ -285,24 +282,26 @@ export class AAGVideoService extends FirestoreUtils {
 					if (!existingMetadata) {
 						const aagVideoData = await this.ConvertYouTubeVideoToAAGFormat(video);
 						await this.IndexVideoMetadata(aagVideoData);
-						newVideos += 1;
-						console.log(`Indexed new video: ${video.title}`);
-					} else {
-						const aagVideoData = await this.ConvertYouTubeVideoToAAGFormat(video);
-						const hasChanges = this.hasMetadataChanges(existingMetadata, aagVideoData);
-
-						if (hasChanges) {
-							await this.IndexVideoMetadata(aagVideoData);
-							updatedVideos += 1;
-							console.log(`Updated video: ${video.title}`);
-						}
+						return { type: 'new' as const };
 					}
+					const aagVideoData = await this.ConvertYouTubeVideoToAAGFormat(video);
+					const hasChanges = this.hasMetadataChanges(existingMetadata, aagVideoData);
+
+					if (hasChanges) {
+						await this.IndexVideoMetadata(aagVideoData);
+						return { type: 'updated' as const };
+					}
+
+					return { type: 'unchanged' as const };
 				} catch (error) {
 					console.error(`Error processing video ${video.id}:`, error);
+					return { type: 'error' as const };
 				}
 			});
 
-			await Promise.all(videoPromises);
+			const outcomes = await Promise.all(videoPromises);
+			const newVideos = outcomes.filter((o) => o?.type === 'new').length;
+			const updatedVideos = outcomes.filter((o) => o?.type === 'updated').length;
 
 			console.log(`Check completed: ${newVideos} new videos, ${updatedVideos} updated videos`);
 			return { newVideos, updatedVideos };
@@ -371,7 +370,7 @@ export class AAGVideoService extends FirestoreUtils {
 	}
 
 	private static generateId(): string {
-		return `aag_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+		return `aag_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 	}
 
 	static async GetLatestAAGVideos(limit: number = 10): Promise<IAAGVideoMetadata[]> {
@@ -479,11 +478,5 @@ export class AAGVideoService extends FirestoreUtils {
 			network: video.network,
 			url: video.url
 		};
-	}
-
-	private static delay(ms: number): Promise<void> {
-		return new Promise((resolve) => {
-			setTimeout(() => resolve(), ms);
-		});
 	}
 }

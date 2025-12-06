@@ -11,7 +11,6 @@ import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import { MouseEvent } from 'react';
 import { Button } from '@/app/_shared-components/Button';
 import { ENetwork } from '@/_shared/types';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
 
 const MAX_VISIBLE_REFERENDA = 3;
@@ -33,7 +32,6 @@ interface AAGVideoCardProps {
 function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoId, publishedAt, agendaUrl }: Omit<AAGVideoCardProps, 'variant'>) {
 	const t = useTranslations('AAG');
 	const videoLinkHref = videoId ? `/aag/${videoId}` : url || '#';
-	const activeNetwork = getCurrentNetwork();
 	const videoAssociatedNetwork = publishedAt ? getNetworkFromDate(publishedAt) : null;
 
 	const handleVideoAgendaClick = (e: MouseEvent) => {
@@ -99,7 +97,7 @@ function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoI
 
 										return (
 											<a
-												key={`${activeNetwork}-${referendaItem.referendaNo}`}
+												key={`${videoAssociatedNetwork}-${referendaItem.referendaNo}`}
 												href={referendumUrl}
 												target='_blank'
 												rel='noopener noreferrer'

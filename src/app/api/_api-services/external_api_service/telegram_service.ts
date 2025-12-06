@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { StatusCodes } from 'http-status-codes';
-import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { APIError } from '../../_api-utils/apiError';
 import { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } from '../../_api-constants/apiEnvVars';
@@ -209,8 +209,7 @@ ${data.supportingFile ? `📎 Supporting file: ${this.escapeMarkdown(data.suppor
 			const data: ITelegramApiResponse = await response.json();
 
 			if (!response.ok || !data.ok) {
-				console.error('Telegrams API Error:', data);
-				throw new APIError(ERROR_CODES.API_FETCH_ERROR, response.status, `Telegram API error: ${data.description || 'Unknown errors'}`);
+				throw new APIError(ERROR_CODES.API_FETCH_ERROR, response.status, `Telegram API error: ${data.description || ERROR_MESSAGES.API_FETCH_ERROR}`);
 			}
 
 			return data;
@@ -218,7 +217,6 @@ ${data.supportingFile ? `📎 Supporting file: ${this.escapeMarkdown(data.suppor
 			if (error instanceof APIError) {
 				throw error;
 			}
-			console.error('Error sending Telegram document:', error);
 			throw new APIError(ERROR_CODES.API_FETCH_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to send document to Telegram');
 		}
 	}
@@ -245,8 +243,7 @@ ${data.supportingFile ? `📎 Supporting file: ${this.escapeMarkdown(data.suppor
 			const data: ITelegramApiResponse = await response.json();
 
 			if (!response.ok || !data.ok) {
-				console.error('Telegram API Error:', data);
-				throw new APIError(ERROR_CODES.API_FETCH_ERROR, response.status, `Telegram API error: ${data.description || 'Unknown error'}`);
+				throw new APIError(ERROR_CODES.API_FETCH_ERROR, response.status, `Telegram API error: ${data.description || ERROR_MESSAGES.API_FETCH_ERROR}`);
 			}
 
 			return data;
@@ -281,8 +278,7 @@ ${data.supportingFile ? `📎 Supporting file: ${this.escapeMarkdown(data.suppor
 			const data: ITelegramApiResponse = await response.json();
 
 			if (!response.ok || !data.ok) {
-				console.error('Telegram API Error:', data);
-				throw new APIError(ERROR_CODES.API_FETCH_ERROR, response.status, `Telegram API error: ${data.description || 'Unknown error'}`);
+				throw new APIError(ERROR_CODES.API_FETCH_ERROR, response.status, `Telegram API error: ${data.description || ERROR_MESSAGES.API_FETCH_ERROR}`);
 			}
 
 			return data;

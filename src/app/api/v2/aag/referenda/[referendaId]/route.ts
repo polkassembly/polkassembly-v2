@@ -16,7 +16,7 @@ export const GET = withErrorHandling(
 		});
 
 		const zodQuerySchema = z.object({
-			limit: z.coerce.number().max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)
+			limit: z.coerce.number().int().min(1).max(MAX_LISTING_LIMIT).optional().default(DEFAULT_LISTING_LIMIT)
 		});
 
 		const { referendaId } = zodParamsSchema.parse(await params);

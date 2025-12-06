@@ -31,10 +31,9 @@ function AAGCard() {
 	];
 
 	const handleAddToCalendar = () => {
-		const title = 'Attempts At Governance (AAG) Call';
-		const details = 'Join the weekly AAG call to discuss Polkadot and Kusama governance. Link: https://x.com/KusDAO';
+		const title = t('calendarEventTitle');
+		const details = t('calendarEventDetails');
 		const location = 'https://x.com/KusDAO';
-
 		const now = new Date();
 		const nextThursday = new Date(now);
 		nextThursday.setDate(now.getDate() + ((4 + 7 - now.getDay()) % 7));
