@@ -12,6 +12,7 @@ import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeader
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { formatDVCohortVote } from '@/_shared/_utils/dvDelegateUtils';
+import { RedisService } from '@/app/api/_api-services/redis_service';
 
 const schema = z.object({
 	id: z
@@ -29,6 +30,11 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	if (network !== ENetwork.POLKADOT && network !== ENetwork.KUSAMA) {
 		throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_NETWORK);
+	}
+
+	const cachedData = await RedisService.GetDVCohortVotes(network, String(cohortId));
+	if (cachedData) {
+		return NextResponse.json(JSON.parse(cachedData));
 	}
 
 	const cohorts = network === ENetwork.POLKADOT ? DV_COHORTS_POLKADOT : DV_COHORTS_KUSAMA;
@@ -64,6 +70,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	});
 
 	const result = Object.values(votesByReferendum).flat();
+
+	await RedisService.SetDVCohortVotes(network, String(cohortId), JSON.stringify(result));
 
 	return NextResponse.json(result);
 });

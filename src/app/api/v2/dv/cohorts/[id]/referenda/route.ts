@@ -12,6 +12,7 @@ import { ENetwork, EProposalType, IDVDReferendumResponse } from '@/_shared/types
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
+import { RedisService } from '@/app/api/_api-services/redis_service';
 
 const schema = z.object({
 	id: z
@@ -29,6 +30,11 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	if (network !== ENetwork.POLKADOT && network !== ENetwork.KUSAMA) {
 		throw new APIError(ERROR_CODES.INVALID_NETWORK, StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_NETWORK);
+	}
+
+	const cachedData = await RedisService.GetDVCohortReferenda(network, String(cohortId));
+	if (cachedData) {
+		return NextResponse.json(JSON.parse(cachedData));
 	}
 
 	const cohorts = network === ENetwork.POLKADOT ? DV_COHORTS_POLKADOT : DV_COHORTS_KUSAMA;
@@ -95,6 +101,8 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 			}
 		};
 	});
+
+	await RedisService.SetDVCohortReferenda(network, String(cohortId), JSON.stringify(formattedReferenda));
 
 	return NextResponse.json(formattedReferenda);
 });
