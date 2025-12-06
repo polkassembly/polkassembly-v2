@@ -144,7 +144,7 @@ export async function fetchHistoricalTreasuryStats({ network, date }: { network:
 			relayChain: {},
 			total: {},
 			nativeTokenUsdPrice,
-			dedTokenUsdPrice
+			...(dedTokenUsdPrice && { dedTokenUsdPrice })
 		} as ITreasuryStats;
 	} catch (error) {
 		console.error('Error fetching historical treasury stats:', error);
