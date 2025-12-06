@@ -30,8 +30,6 @@ function DelegationSupplyData({ delegationStats }: { delegationStats: IDelegatio
 			if (!apiService) return;
 
 			try {
-				await apiService.apiReady();
-
 				const supply = await apiService.getTotalActiveIssuance();
 				if (supply) {
 					setTotalSupply(supply);

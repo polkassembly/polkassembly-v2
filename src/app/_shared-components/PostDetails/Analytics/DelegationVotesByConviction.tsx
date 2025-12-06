@@ -138,7 +138,7 @@ function DelegationVotesByConvictions({ delegationVotesByConviction, isAccountsA
 						const value = context.parsed.y;
 						const { label } = context.dataset;
 						const conviction = context.label;
-						return `${label}: ${isAccountsAnalytics ? value : formatUSDWithUnits(value?.toString(), 1)} ${isAccountsAnalytics ? t('users') : NETWORKS_DETAILS[network].tokenSymbol} in conviction: ${conviction}`;
+						return `${label}: ${isAccountsAnalytics ? value : formatUSDWithUnits(value?.toString() || '0', 1)} ${isAccountsAnalytics ? t('users') : NETWORKS_DETAILS[network].tokenSymbol} in conviction: ${conviction}`;
 					}
 				}
 			}

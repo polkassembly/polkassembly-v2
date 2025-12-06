@@ -5,7 +5,7 @@ import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { usePolkadotVault } from '@/hooks/usePolkadotVault';
 import { QrDisplayPayload, QrScanSignature } from '@polkadot/react-qr';
 import { isHex } from '@polkadot/util';
-import { useMemo, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { AlertCircle } from 'lucide-react';
 import Image from 'next/image';
@@ -21,8 +21,16 @@ function SignVaultTransaction() {
 
 	const [cameraAccessError, setCameraAccessError] = useState<string>();
 
-	const genesisHash = useMemo(() => {
-		return apiService?.getGenesisHash();
+	const [genesisHash, setGenesisHash] = useState<string>('');
+
+	useEffect(() => {
+		const fetchGenesisHash = async () => {
+			const hash = await apiService?.getGenesisHash();
+			if (hash) {
+				setGenesisHash(hash);
+			}
+		};
+		fetchGenesisHash();
 	}, [apiService]);
 
 	let qrId = 0;

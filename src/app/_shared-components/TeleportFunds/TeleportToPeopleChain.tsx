@@ -99,7 +99,8 @@ function TeleportToPeopleChain({ onSuccess }: { onSuccess?: () => void }) {
 				/>
 			</div>
 
-			{tx && <TxFeesDetailsView extrinsicFn={[tx]} />}
+			{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+			{tx && <TxFeesDetailsView extrinsicFn={[tx] as any} />}
 
 			<Separator />
 

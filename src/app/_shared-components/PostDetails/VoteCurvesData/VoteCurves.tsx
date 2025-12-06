@@ -104,15 +104,23 @@ function VoteCurves({ chartLabels, approvalData, supportData, approvalThresholdD
 							const threshold = Number(parsed.y).toFixed(2);
 							const data = chartData.datasets.find((d) => d.label === 'Support');
 
-							const currSupport = data?.data.find((d) => (d as Point).x > dataIndex) as Point;
-							return `Support: ${convertGraphPoint(currSupport?.y)} / ${threshold}%`;
+							const currSupport = data?.data.find((d) => {
+								if (!d || typeof d !== 'object') return false;
+								// eslint-disable-next-line @typescript-eslint/no-explicit-any
+								return (d as any).x > dataIndex;
+							}) as Point;
+							return `Support: ${convertGraphPoint(currSupport?.y ?? undefined)} / ${threshold}%`;
 						}
 						if (dataset.label === 'Approval Threshold') {
 							const threshold = Number(parsed.y).toFixed(2);
 							const data = chartData.datasets.find((d) => d.label === 'Approval');
 
-							const currApproval = data?.data.find((d) => (d as Point).x > dataIndex) as Point;
-							return `Approval: ${convertGraphPoint(currApproval?.y)} / ${threshold}%`;
+							const currApproval = data?.data.find((d) => {
+								if (!d || typeof d !== 'object') return false;
+								// eslint-disable-next-line @typescript-eslint/no-explicit-any
+								return (d as any).x > dataIndex;
+							}) as Point;
+							return `Approval: ${convertGraphPoint(currApproval?.y ?? undefined)} / ${threshold}%`;
 						}
 
 						return '';
