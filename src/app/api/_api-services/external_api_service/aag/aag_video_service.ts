@@ -217,13 +217,30 @@ export class AAGVideoService extends FirestoreUtils {
 			return [];
 		}
 
-		return videoData.chapters.map((chapter, index) => ({
-			id: this.generateId(),
-			title: chapter.title || 'Untitled Chapter',
-			startTime: chapter.start || 0,
-			endTime: videoData.chapters?.[index + 1]?.start || 0,
-			description: chapter.description
-		}));
+		return videoData.chapters.map((chapter, index) => {
+			const startTime = chapter.start || 0;
+
+			let endTime = videoData.chapters?.[index + 1]?.start ?? 0;
+
+			if ((!endTime || endTime <= 0) && chapter.duration) {
+				const [minStr = '0', secStr = '0'] = chapter.duration.split(':');
+				const minutes = parseInt(minStr, 10) || 0;
+				const seconds = parseInt(secStr, 10) || 0;
+				endTime = startTime + minutes * 60 + seconds;
+			}
+
+			if (!endTime || endTime < startTime) {
+				endTime = startTime;
+			}
+
+			return {
+				id: this.generateId(),
+				title: chapter.title || 'Untitled Chapter',
+				startTime,
+				endTime,
+				description: chapter.description
+			};
+		});
 	}
 
 	public static async ConvertYouTubeVideoToAAGFormat(video: IYouTubeVideoMetadata): Promise<IAAGVideoData> {
@@ -287,14 +304,22 @@ export class AAGVideoService extends FirestoreUtils {
 
 					if (!existingMetadata) {
 						const aagVideoData = await this.ConvertYouTubeVideoToAAGFormat(video);
-						await this.IndexVideoMetadata(aagVideoData);
+						const result = await this.IndexVideoMetadata(aagVideoData);
+						if (!result.success) {
+							console.error(`Failed to index new video ${video.id}:`, result.error);
+							return { type: 'error' as const };
+						}
 						return { type: 'new' as const };
 					}
 					const aagVideoData = await this.ConvertYouTubeVideoToAAGFormat(video);
 					const hasChanges = this.hasMetadataChanges(existingMetadata, aagVideoData);
 
 					if (hasChanges) {
-						await this.IndexVideoMetadata(aagVideoData);
+						const result = await this.IndexVideoMetadata(aagVideoData);
+						if (!result.success) {
+							console.error(`Failed to update video ${video.id}:`, result.error);
+							return { type: 'error' as const };
+						}
 						return { type: 'updated' as const };
 					}
 
