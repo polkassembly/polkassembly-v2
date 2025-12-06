@@ -99,9 +99,6 @@ export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: IDVDRe
 }
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
-const DAYS_PER_MONTH = 30;
-const DEFAULT_MAX_PAGES = 10;
-const DEFAULT_START_PAGE = 1;
 
 export function formatDate(date: Date): { date: string; time: string } {
 	const d = dayjs(date);
@@ -142,53 +139,6 @@ export function getCurrentDVCohort(network: ENetwork): IDVCohort | null {
 export function getDVCohortByIndex(network: ENetwork, index: number): IDVCohort | null {
 	const cohorts = getDVCohortsByNetwork(network);
 	return cohorts.find((c) => c.index === index) || null;
-}
-
-export function getOneMonthBufferInBlocks(network: ENetwork): number {
-	const { blockTime } = NETWORKS_DETAILS[network];
-	const oneMonthInMs = DAYS_PER_MONTH * MS_PER_DAY;
-	return Math.floor(oneMonthInMs / blockTime);
-}
-
-export function getAdjustedStartBlock(network: ENetwork, startBlock: number): number {
-	const buffer = getOneMonthBufferInBlocks(network);
-	return Math.max(0, startBlock - buffer);
-}
-
-export function getDelegatesByType(cohort: IDVCohort, type: EDVDelegateType) {
-	return cohort.delegates.filter((d) => d.role === type);
-}
-
-export async function fetchAllPages<T>(fetcher: (page: number) => Promise<T[]>, maxPages = DEFAULT_MAX_PAGES, page = DEFAULT_START_PAGE, acc: T[] = []): Promise<T[]> {
-	if (page > maxPages) return acc;
-	const items = await fetcher(page);
-	if (items.length === 0) return acc;
-	return fetchAllPages(fetcher, maxPages, page + 1, [...acc, ...items]);
-}
-
-export function filterReferendaForDelegate(
-	referenda: { index: number; status: EProposalStatus; createdAtBlock?: number; updatedAtBlock?: number }[],
-	delegateStartBlock: number,
-	delegateEndBlock: number | null
-): number[] {
-	const endBlock = delegateEndBlock ?? Number.MAX_SAFE_INTEGER;
-
-	return referenda
-		.filter((r) => {
-			const createdAt = r.createdAtBlock || 0;
-			const updatedAt = r.updatedAtBlock;
-
-			if (!createdAt && !updatedAt) {
-				return delegateEndBlock === null;
-			}
-
-			if (!updatedAt || updatedAt === 0) {
-				return createdAt >= delegateStartBlock && createdAt <= endBlock;
-			}
-
-			return updatedAt >= delegateStartBlock && updatedAt <= endBlock;
-		})
-		.map((r) => r.index);
 }
 
 export function calculateDVInfluence(
@@ -395,7 +345,7 @@ export function formatDVCohortVote(vote: IDVVotes): IDVCohortVote {
 	}
 
 	const isSplit = !!(vote.balance?.aye && vote.balance?.nay);
-	const isSplitAbstain = !!vote.balance?.abstain;
+	const isSplitAbstain = !!vote.balance?.abstain && (!!vote.balance?.aye || !!vote.balance?.nay);
 	const isStandard = !!vote.balance?.value;
 
 	const voteData: IDVCohortVote = {

@@ -91,14 +91,22 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 						who: ref.submissionDeposit.who
 					}
 				: undefined,
-			preimage: {
-				proposedCall: {
-					description: offChainData?.title || ref.preimage?.proposedCall?.description
-				}
-			},
-			proposalArguments: {
-				description: offChainData?.title || ref.proposalArguments?.description
-			}
+			preimage:
+				ref.preimage?.proposedCall?.description || offChainData?.title
+					? {
+							proposedCall: {
+								description: offChainData?.title || ref.preimage?.proposedCall?.description
+							}
+						}
+					: undefined,
+			proposalArguments:
+				ref.proposalArguments?.description || offChainData?.title
+					? {
+							description: offChainData?.title || ref.proposalArguments?.description
+						}
+					: undefined,
+			hash: ref.hash,
+			statusHistory: ref.statusHistory
 		};
 	});
 

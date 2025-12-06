@@ -60,7 +60,7 @@ function CohortCard({ cohort, loading, network }: CohortCardProps) {
 						<p className='text-xs font-medium uppercase text-dv_header_text'>{t('TotalDAOs').toUpperCase()}</p>
 						<p className='text-xl font-semibold text-text_primary'>{cohort.delegatesCount}</p>
 						<p className='text-xs text-wallet_btn_text'>
-							{cohort.guardiansCount > 0
+							{cohort.delegatesCount > 0
 								? `${formatUSDWithUnits(
 										formatBnBalance(String(cohort.delegationPerDelegate || 0), { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
 									)}${t('DelegationsEach')}`
