@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { Filter } from 'lucide-react';
+import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
 import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -104,9 +104,9 @@ function DecentralisedVoices() {
 							<PopoverTrigger asChild>
 								<button
 									type='button'
-									className='flex items-center justify-center gap-2 rounded-md border border-border_grey px-3 py-2 text-sm text-text_primary hover:bg-sidebar_footer sm:w-auto'
+									className='flex items-center justify-center gap-2 rounded-md border border-border_grey p-2 text-sm text-text_primary hover:bg-sidebar_footer sm:w-auto'
 								>
-									<Filter className='h-3.5 w-3.5 text-wallet_btn_text sm:h-4 sm:w-4' />
+									<FaFilter className='h-3.5 w-3.5 text-wallet_btn_text sm:h-4 sm:w-4' />
 								</button>
 							</PopoverTrigger>
 							<PopoverContent className='w-56 border-border_grey p-2'>

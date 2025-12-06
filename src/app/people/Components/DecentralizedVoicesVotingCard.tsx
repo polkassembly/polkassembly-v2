@@ -4,13 +4,22 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Check, X, Minus, Activity, ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { Check, X, Minus, Activity, ChevronDown, ChevronUp } from 'lucide-react';
 import { MdArrowDropDown } from '@react-icons/all-files/md/MdArrowDropDown';
 import { BiBarChart } from '@react-icons/all-files/bi/BiBarChart';
 import { IDVDelegateVotingMatrix, IDVCohort, EDVDelegateType, EVoteDecision } from '@/_shared/types';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { BN } from '@polkadot/util';
+import delegates from '@assets/delegation/delegates.svg';
+import delegatees from '@assets/delegation/delegatees.svg';
+import votes from '@assets/delegation/votes.svg';
+import Image from 'next/image';
+import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
+import { MdSort } from '@react-icons/all-files/md/MdSort';
 
 interface DecentralizedVoicesVotingCardProps {
 	votingMatrix: IDVDelegateVotingMatrix[];
@@ -29,7 +38,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 	const [activeTab, setActiveTab] = useState<EDVDelegateType>(EDVDelegateType.DAO);
 	const [expandedRows, setExpandedRows] = useState<string[]>(votingMatrix.length > 0 ? [votingMatrix[0].address] : []);
 	const [sortBy, setSortBy] = useState<SortOption>('activity');
-
+	const network = getCurrentNetwork();
 	const minRef = referendums.length > 0 ? Math.min(...referendums) : 0;
 	const maxRef = referendums.length > 0 ? Math.max(...referendums) : 0;
 
@@ -103,17 +112,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 				<div className='flex flex-col justify-between gap-4 md:flex-row md:items-center'>
 					<div className='flex flex-col gap-4 md:flex-row md:items-center'>
 						<div>
-							<h2 className='text-2xl font-semibold text-navbar_title'>{t('DecentralizedVoicesVoting')}</h2>
-							<p className='text-sm text-text_primary'>
-								{activeTab === EDVDelegateType.DAO ? daos.length : guardians.length} {activeTab === EDVDelegateType.DAO ? t('DAOs') : t('Guardians')} {t('Across')}{' '}
-								{referendums.length} {t('Referendums')}
-								{referendums.length > 0 && (
-									<>
-										{' '}
-										(#{minRef} - #{maxRef})
-									</>
-								)}
-							</p>
+							<h2 className='text-2xl font-semibold text-navbar_title'>Votes</h2>
 						</div>
 						{cohort && cohort.guardiansCount > 0 && (
 							<div className='flex rounded-lg bg-sidebar_footer p-1'>
@@ -134,23 +133,40 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 							</div>
 						)}
 					</div>
-					<div className='flex items-center gap-4'>
-						<div className='flex items-center rounded-lg border border-border_grey bg-bg_modal p-1'>
-							<button
-								type='button'
-								onClick={() => setViewMode('compact')}
-								className={`flex items-center gap-2 rounded px-3 py-1.5 text-sm font-medium transition-colors ${viewMode === 'compact' ? 'bg-info text-btn_primary_text' : 'text-text_primary'}`}
-							>
-								<BiBarChart size={16} />
-							</button>
-							<button
-								type='button'
-								onClick={() => setViewMode('heatmap')}
-								className={`flex items-center gap-2 rounded px-3 py-1.5 text-sm font-medium transition-colors ${viewMode === 'heatmap' ? 'bg-info text-btn_primary_text' : 'text-text_primary'}`}
-							>
-								<Activity size={16} />
-							</button>
-						</div>
+					<div className='flex items-center gap-2'>
+						<Popover>
+							<PopoverTrigger asChild>
+								<button
+									type='button'
+									className='flex items-center gap-1 rounded-md border border-border_grey p-1.5'
+								>
+									<MdSort className='text-xl text-wallet_btn_text' />
+								</button>
+							</PopoverTrigger>
+							<PopoverContent className='w-48 border-border_grey p-3'>
+								<div className='mb-2 text-xs font-semibold text-text_primary'>{t('SortBy')}</div>
+								<div className='space-y-1'>
+									{(['name', 'participation', 'supportRate', 'activity'] as SortOption[]).map((option) => {
+										const labels: Record<SortOption, string> = {
+											name: t('Name'),
+											participation: t('Participation'),
+											supportRate: t('SupportRate'),
+											activity: t('Activity')
+										};
+										return (
+											<button
+												type='button'
+												key={option}
+												onClick={() => setSortBy(option)}
+												className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-xs ${sortBy === option ? 'bg-text_pink/10 text-text_pink' : 'text-text_primary hover:bg-sidebar_footer'}`}
+											>
+												{labels[option]}
+											</button>
+										);
+									})}
+								</div>
+							</PopoverContent>
+						</Popover>
 						<CollapsibleTrigger asChild>
 							<button
 								type='button'
@@ -163,33 +179,126 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 					</div>
 				</div>
 
-				<CollapsibleContent>
-					<div className='my-5 flex flex-wrap items-center gap-4 rounded-lg border border-border_grey p-3'>
-						<div className='flex items-center gap-2 text-sm text-text_primary'>
-							<Filter size={14} />
-							<span>{t('SortBy')}</span>
+				<div className='my-2 w-full rounded-xl border border-border_grey bg-bg_modal p-3'>
+					{loading ? (
+						<div className='flex flex-wrap items-center justify-between gap-6'>
+							<div className='flex items-start gap-4'>
+								<Skeleton className='h-10 w-10 rounded-full' />
+								<div className='space-y-2'>
+									<Skeleton className='h-3 w-24' />
+									<Skeleton className='h-5 w-32' />
+								</div>
+							</div>
+							<div className='flex items-start gap-4'>
+								<Skeleton className='h-10 w-10 rounded-full' />
+								<div className='space-y-2'>
+									<Skeleton className='h-3 w-24' />
+									<Skeleton className='h-5 w-32' />
+								</div>
+							</div>
+							<div className='flex items-start gap-4'>
+								<Skeleton className='h-10 w-10 rounded-full' />
+								<div className='space-y-2'>
+									<Skeleton className='h-3 w-24' />
+									<Skeleton className='h-5 w-32' />
+								</div>
+							</div>
 						</div>
-						{(['name', 'participation', 'supportRate', 'activity'] as SortOption[]).map((option) => {
-							const labels: Record<SortOption, string> = {
-								name: t('Name'),
-								participation: t('Participation'),
-								supportRate: t('SupportRate'),
-								activity: t('Activity')
-							};
-							return (
+					) : (
+						<div className='flex flex-wrap items-center justify-between gap-6'>
+							<div className='flex items-start gap-4'>
+								<Image
+									src={delegatees}
+									alt='Delegatees'
+									className='h-10 w-10'
+								/>
+								<div>
+									<p className='text-xs font-medium uppercase text-dv_header_text'>{t('TotalDAOVotes')}</p>
+									<p className='text-lg font-semibold text-text_primary'>
+										{formatBnBalance(
+											votingMatrix
+												.filter((d) => d.type === EDVDelegateType.DAO)
+												.reduce((acc, curr) => acc.add(new BN(curr.totalVotingPower || '0')), new BN(0))
+												.toString(),
+											{ withUnit: true, numberAfterComma: 0, compactNotation: true },
+											network
+										)}
+									</p>
+								</div>
+							</div>
+
+							{votingMatrix.filter((d) => d.type === EDVDelegateType.GUARDIAN).length > 0 && (
+								<div className='flex items-start gap-4'>
+									<Image
+										src={delegates}
+										alt='Delegates'
+										className='h-10 w-10'
+									/>
+									<div>
+										<p className='text-xs font-medium uppercase text-dv_header_text'>{t('TotalGuardianVotes')}</p>
+										<p className='text-lg font-semibold text-text_primary'>
+											{formatBnBalance(
+												votingMatrix
+													.filter((d) => d.type === EDVDelegateType.GUARDIAN)
+													.reduce((acc, curr) => acc.add(new BN(curr.totalVotingPower || '0')), new BN(0))
+													.toString(),
+												{ withUnit: true, numberAfterComma: 0, compactNotation: true },
+												network
+											)}
+										</p>
+									</div>
+								</div>
+							)}
+
+							<div className='flex items-start gap-4'>
+								<Image
+									src={votes}
+									alt='Votes'
+									className='h-10 w-10'
+								/>
+								<div>
+									<p className='text-xs font-medium uppercase text-dv_header_text'>{t('ActiveParticipationRate')}</p>
+									<p className='text-lg font-semibold text-text_primary'>
+										{((votingMatrix.reduce((acc, curr) => acc + curr.activeCount, 0) / (votingMatrix.length * referendums.length || 1)) * 100).toFixed(1)}%
+									</p>
+								</div>
+							</div>
+						</div>
+					)}
+				</div>
+
+				<CollapsibleContent>
+					<div className='flex items-center justify-between'>
+						<p className='text-sm text-text_primary'>
+							{activeTab === EDVDelegateType.DAO ? daos.length : guardians.length} {activeTab === EDVDelegateType.DAO ? t('DAOs') : t('Guardians')} {t('Across')}{' '}
+							{referendums.length} {t('Referendums')}
+							{referendums.length > 0 && (
+								<>
+									{' '}
+									(#{minRef} - #{maxRef})
+								</>
+							)}
+						</p>
+						<div className='flex items-center gap-4'>
+							<div className='flex items-center rounded-lg bg-sidebar_footer p-1'>
 								<button
 									type='button'
-									key={option}
-									onClick={() => setSortBy(option)}
-									className={`rounded px-3 py-1 text-sm font-medium transition-colors ${sortBy === option ? 'bg-grey_bg text-info' : 'bg-grey_bg/10 text-text_primary'}`}
+									onClick={() => setViewMode('compact')}
+									className={`flex items-center gap-2 rounded px-3 py-1.5 text-sm font-medium transition-colors ${viewMode === 'compact' ? 'bg-section_dark_overlay text-wallet_btn_text' : 'text-text_primary'}`}
 								>
-									{labels[option]}
+									<BiBarChart size={16} />
 								</button>
-							);
-						})}
+								<button
+									type='button'
+									onClick={() => setViewMode('heatmap')}
+									className={`flex items-center gap-2 rounded px-3 py-1.5 text-sm font-medium transition-colors ${viewMode === 'heatmap' ? 'bg-section_dark_overlay text-wallet_btn_text' : 'text-text_primary'}`}
+								>
+									<Activity size={16} />
+								</button>
+							</div>
+						</div>
 					</div>
-
-					<div className='grid grid-cols-1 gap-4'>
+					<div className='grid grid-cols-1 gap-4 pt-2'>
 						{loading ? (
 							[1, 2, 3, 4].map((i) => (
 								<div

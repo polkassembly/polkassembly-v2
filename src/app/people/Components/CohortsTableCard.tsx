@@ -57,8 +57,8 @@ function CohortsTableCard() {
 				<Table className='table-auto'>
 					<TableHeader>
 						<TableRow className='border-b border-t border-border_grey bg-bounty_table_bg pt-3 text-left text-xs font-semibold uppercase text-text_primary'>
-							<TableHead className='whitespace-nowrap py-3 pl-4 sm:pl-5 md:pl-6'>{t('Index')}</TableHead>
-							<TableHead className='whitespace-nowrap py-3'>
+							<TableHead className='whitespace-nowrap py-3 pl-4 font-semibold sm:pl-5 md:pl-6'>{t('Index')}</TableHead>
+							<TableHead className='whitespace-nowrap py-3 font-semibold'>
 								<div className='flex items-center gap-1'>
 									{t('Tenure')}
 									<TooltipProvider>
@@ -73,9 +73,9 @@ function CohortsTableCard() {
 									</TooltipProvider>
 								</div>
 							</TableHead>
-							<TableHead className='whitespace-nowrap py-4'>{t('Delegates')}</TableHead>
-							<TableHead className='whitespace-nowrap py-4'>{t('W3FDelegation')}</TableHead>
-							<TableHead className='whitespace-nowrap py-4'>{t('Status').toUpperCase()}</TableHead>
+							<TableHead className='whitespace-nowrap py-4 font-semibold'>{t('Delegates')}</TableHead>
+							<TableHead className='whitespace-nowrap py-4 font-semibold'>{t('W3FDelegation')}</TableHead>
+							<TableHead className='whitespace-nowrap py-4 font-semibold'>{t('Status').toUpperCase()}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>

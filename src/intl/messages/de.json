@@ -1694,6 +1694,9 @@
 		"PeopleDescription": "Das Programm Dezentralisierte Stimmen ermöglicht eine breitere Beteiligung der Gemeinschaft an OpenGov durch die Delegierung von Millionen von DOT. Die neueste DV-Kohorte ist {cohortNumber} mit {delegates} Delegierten und {guardians} Wächtern. Die neueste DV-Kohorte unterstützt {tracks} Tracks",
 		"PeopleDescriptionNoGuardians": "Das Programm Dezentralisierte Stimmen ermöglicht eine breitere Beteiligung der Gemeinschaft an OpenGov durch die Delegierung von Millionen von DOT. Die neueste DV-Kohorte ist {cohortNumber} mit {delegates} Delegierten. Die neueste DV-Kohorte unterstützt {tracks} Tracks",
 		"ParticipationTooltip": "Prozentsatz der Referenden, bei denen der Delegierte während seiner Amtszeit abgestimmt hat",
-		"PercentOfDV": "% von DV"
+		"PercentOfDV": "% von DV",
+		"TotalDAOVotes": "Gesamt DAO-Stimmen",
+		"TotalGuardianVotes": "Gesamt Wächter-Stimmen",
+		"ActiveParticipationRate": "Aktive Beteiligungsrate"
 	}
 }

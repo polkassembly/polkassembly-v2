@@ -147,7 +147,7 @@ function InfluenceCard({ referendaInfluence, loading, cohortId }: InfluenceCardP
 									className={`flex items-center gap-1 rounded-md border p-2 ${selectedTracks.length > 0 ? 'border-text_pink bg-text_pink/10' : 'border-border_grey'}`}
 								>
 									<Filter className='h-4 w-4 text-wallet_btn_text' />
-									{selectedTracks.length > 0 && <span className='ml-1 rounded-full bg-text_pink px-1.5 text-xs text-white'>{selectedTracks.length}</span>}
+									{selectedTracks.length > 0 && <span className='ml-1 rounded-full bg-text_pink px-1.5 text-xs text-btn_primary_text'>{selectedTracks.length}</span>}
 								</button>
 							</PopoverTrigger>
 							<PopoverContent className='max-h-64 w-56 overflow-y-auto border-border_grey p-3'>
@@ -234,13 +234,13 @@ function InfluenceCard({ referendaInfluence, loading, cohortId }: InfluenceCardP
 					<div className='overflow-x-auto'>
 						<table className='w-full border-collapse'>
 							<thead>
-								<tr className='border-b border-border_grey'>
-									<th className='py-3 pl-4 text-left text-xs font-semibold text-wallet_btn_text'>{t('Referendum')}</th>
-									<th className='py-3 text-left text-xs font-semibold text-wallet_btn_text'>{t('Track')}</th>
-									<th className='py-3 text-left text-xs font-semibold text-wallet_btn_text'>{t('Status')}</th>
-									<th className='py-3 text-left text-xs font-semibold text-wallet_btn_text'>{t('VotingPower')}</th>
-									<th className='py-3 text-left text-xs font-semibold text-wallet_btn_text'>{t('Influence')}</th>
-									<th className='py-3 pr-4 text-right text-xs font-semibold text-wallet_btn_text' />
+								<tr className='border-b border-t border-border_grey bg-bounty_table_bg pt-3 text-left text-xs font-semibold uppercase text-text_primary'>
+									<th className='py-4 pl-4'>{t('Referendum')}</th>
+									<th className='py-4 pl-4'>{t('Track')}</th>
+									<th className='py-4'>{t('Status')}</th>
+									<th className='py-4'>{t('VotingPower')}</th>
+									<th className='py-4'>{t('Influence')}</th>
+									<th className='py-4' />
 								</tr>
 							</thead>
 							<tbody>

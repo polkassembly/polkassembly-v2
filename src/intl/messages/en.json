@@ -1724,6 +1724,9 @@
 		"PeopleDescription": "The Decentralized Voices program empowers broader community participation in OpenGov by delegating millions of DOT. The latest DV cohort is {cohortNumber} with {delegates} delegates and {guardians} guardians. The latest DV cohort supports {tracks} tracks",
 		"PeopleDescriptionNoGuardians": "The Decentralized Voices program empowers broader community participation in OpenGov by delegating millions of DOT. The latest DV cohort is {cohortNumber} with {delegates} delegates. The latest DV cohort supports {tracks} tracks",
 		"ParticipationTooltip": "Percentage of referenda the delegate has voted on during their tenure",
-		"PercentOfDV": "% of DV"
+		"PercentOfDV": "% of DV",
+		"TotalDAOVotes": "Total DAO Votes",
+		"TotalGuardianVotes": "Total Guardian Votes",
+		"ActiveParticipationRate": "Active Participation Rate"
 	}
 }

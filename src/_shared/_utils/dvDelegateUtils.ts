@@ -307,6 +307,36 @@ export function calculateDVInfluence(
 	return { referendaInfluence };
 }
 
+function processDelegateVote(vote: IDVCohortVote): { decision: EVoteDecision; votingPower: bigint } {
+	let votingPower = BigInt(0);
+	let decision = EVoteDecision.ABSTAIN;
+
+	if (vote.isSplit || vote.isSplitAbstain) {
+		const ayeBalance = BigInt(vote.ayeBalance || 0);
+		const nayBalance = BigInt(vote.nayBalance || 0);
+		const abstainBalance = BigInt(vote.abstainBalance || 0);
+
+		if (ayeBalance >= nayBalance && ayeBalance >= abstainBalance) {
+			decision = EVoteDecision.AYE;
+		} else if (nayBalance >= ayeBalance && nayBalance >= abstainBalance) {
+			decision = EVoteDecision.NAY;
+		} else {
+			decision = EVoteDecision.ABSTAIN;
+		}
+		votingPower = BigInt(vote.ayeVotes || 0) + BigInt(vote.nayVotes || 0) + BigInt(vote.abstainVotes || 0);
+	} else if (vote.aye) {
+		decision = EVoteDecision.AYE;
+		votingPower = BigInt(vote.votes || 0) + BigInt(vote.delegations?.votes || 0);
+	} else if (vote.balance && !vote.aye) {
+		decision = EVoteDecision.NAY;
+		votingPower = BigInt(vote.votes || 0) + BigInt(vote.delegations?.votes || 0);
+	} else {
+		decision = EVoteDecision.ABSTAIN;
+	}
+
+	return { decision, votingPower };
+}
+
 export function calculateDVVotingMatrix(
 	votes: IDVCohortVote[],
 	cohort: IDVCohort,
@@ -318,25 +348,14 @@ export function calculateDVVotingMatrix(
 	const votingMatrix: IDVDelegateVotingMatrix[] = cohort.delegates.map((delegate) => {
 		const delegateVotes = votes.filter((v) => v.account === delegate.address);
 		const votesMap: Record<number, EVoteDecision> = {};
+		let delegateTotalVotingPower = BigInt(0);
 
 		delegateVotes.forEach((vote) => {
 			if (!validReferendumIndices.has(vote.referendumIndex)) return;
 
-			if (vote.isSplit || vote.isSplitAbstain) {
-				if (BigInt(vote.ayeBalance || 0) >= BigInt(vote.nayBalance || 0) && BigInt(vote.ayeBalance || 0) >= BigInt(vote.abstainBalance || 0)) {
-					votesMap[vote.referendumIndex] = EVoteDecision.AYE;
-				} else if (BigInt(vote.nayBalance || 0) >= BigInt(vote.ayeBalance || 0) && BigInt(vote.nayBalance || 0) >= BigInt(vote.abstainBalance || 0)) {
-					votesMap[vote.referendumIndex] = EVoteDecision.NAY;
-				} else {
-					votesMap[vote.referendumIndex] = EVoteDecision.ABSTAIN;
-				}
-			} else if (vote.aye) {
-				votesMap[vote.referendumIndex] = EVoteDecision.AYE;
-			} else if (vote.balance && !vote.aye) {
-				votesMap[vote.referendumIndex] = EVoteDecision.NAY;
-			} else {
-				votesMap[vote.referendumIndex] = EVoteDecision.ABSTAIN;
-			}
+			const { decision, votingPower } = processDelegateVote(vote);
+			votesMap[vote.referendumIndex] = decision;
+			delegateTotalVotingPower += votingPower;
 		});
 
 		const activeCount = Object.keys(votesMap).length;
@@ -353,7 +372,8 @@ export function calculateDVVotingMatrix(
 			participation,
 			ayeRate,
 			activeCount,
-			totalRefs
+			totalRefs,
+			totalVotingPower: delegateTotalVotingPower.toString()
 		};
 	});
 

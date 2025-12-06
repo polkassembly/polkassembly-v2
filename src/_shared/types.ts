@@ -1964,4 +1964,5 @@ export interface IDVDelegateVotingMatrix {
 	ayeRate: number;
 	activeCount: number;
 	totalRefs: number;
+	totalVotingPower: string;
 }

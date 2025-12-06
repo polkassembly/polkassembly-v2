@@ -57,8 +57,8 @@ function CohortCard({ cohort, loading, network }: CohortCardProps) {
 						className='h-10 w-10'
 					/>
 					<div>
-						<p className='text-xs font-medium uppercase text-community_text'>{t('TotalDAOs').toUpperCase()}</p>
-						<p className='text-2xl font-semibold text-text_primary'>{cohort.delegatesCount}</p>
+						<p className='text-xs font-medium uppercase text-dv_header_text'>{t('TotalDAOs').toUpperCase()}</p>
+						<p className='text-xl font-semibold text-text_primary'>{cohort.delegatesCount}</p>
 						<p className='text-xs text-wallet_btn_text'>
 							{cohort.guardiansCount > 0
 								? `${formatUSDWithUnits(
@@ -77,8 +77,8 @@ function CohortCard({ cohort, loading, network }: CohortCardProps) {
 							className='h-10 w-10'
 						/>
 						<div>
-							<p className='text-xs font-medium uppercase text-community_text'>{t('Guardians').toUpperCase()}</p>
-							<p className='text-2xl font-semibold text-text_primary'>{cohort.guardiansCount}</p>
+							<p className='text-xs font-medium uppercase text-dv_header_text'>{t('Guardians').toUpperCase()}</p>
+							<p className='text-xl font-semibold text-text_primary'>{cohort.guardiansCount}</p>
 							<p className='text-xs text-wallet_btn_text'>
 								{cohort.guardiansCount > 0
 									? `${formatUSDWithUnits(
@@ -97,7 +97,7 @@ function CohortCard({ cohort, loading, network }: CohortCardProps) {
 						className='h-10 w-10'
 					/>
 					<div>
-						<p className='text-xs font-medium uppercase text-community_text'>{t('StartTime').toUpperCase()}</p>
+						<p className='text-xs font-medium uppercase text-dv_header_text'>{t('StartTime').toUpperCase()}</p>
 						<p className='text-lg font-semibold text-text_primary'>
 							{startDateTime?.date} <span className='text-wallet_btn_text'>{startDateTime?.time}</span>
 						</p>
@@ -113,7 +113,7 @@ function CohortCard({ cohort, loading, network }: CohortCardProps) {
 							className='h-10 w-10'
 						/>
 						<div>
-							<p className='text-xs font-medium uppercase text-community_text'>{t('EndTime').toUpperCase()}</p>
+							<p className='text-xs font-medium uppercase text-dv_header_text'>{t('EndTime').toUpperCase()}</p>
 							<p className='whitespace-nowrap text-lg font-semibold text-text_primary'>
 								{endDateTime?.date} <span className='text-wallet_btn_text'>{endDateTime?.time}</span>
 							</p>
