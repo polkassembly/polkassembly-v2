@@ -13,6 +13,8 @@ import InfoNudge from './components/InfoNudge/InfoNudge';
 import SpendsList from './components/SpendsList/SpendsList';
 import SpendsStats from './components/Stats/SpendsStats';
 import CoretimeStats from './components/Stats/CoretimeStats';
+import CoretimeMigration from './components/Stats/CoretimeMigration';
+import CoretimeProcurementMethods from './components/Stats/CoretimeProcurementMethods';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
@@ -42,6 +44,11 @@ async function TreasuryAnalyticsPage() {
 					<TabsContent value={ETreasurySpendsTabs.CORETIME}>
 						<div className='flex flex-col gap-6'>
 							<CoretimeStats />
+
+							<div className='flex gap-6'>
+								<CoretimeMigration />
+								<CoretimeProcurementMethods />
+							</div>
 
 							<InfoNudge />
 						</div>

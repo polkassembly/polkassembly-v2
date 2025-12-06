@@ -12,7 +12,7 @@ import ApprovedProposals from '@assets/analytics/approved-proposals.svg';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useTranslations } from 'next-intl';
-import SpendsFilter from '../SpendsFilter/SpendsFilter';
+import SpendsFilter from '../SpendsSearch/SpendsFilter';
 import SpendsSearch from '../SpendsSearch/SpendsSearch';
 
 function SpendsStats() {
