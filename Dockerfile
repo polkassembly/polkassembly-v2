@@ -62,6 +62,10 @@ ENV NODE_OPTIONS=--max_old_space_size=4096
 
 # 4. Install dependencies
 COPY package.json yarn.lock ./
+
+# Copy .papi directory so 'yarn install' can find the local dependency
+COPY .papi ./.papi 
+
 RUN yarn install --frozen-lockfile --production=false
 
 # 5. Copy source code
