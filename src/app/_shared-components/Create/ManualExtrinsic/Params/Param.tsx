@@ -8,6 +8,7 @@ import { IParamDef } from '@/_shared/types';
 import { Registry, TypeDef, TypeDefInfo } from '@polkadot/types/types';
 import { getTypeDef } from '@polkadot/types';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
+import { PolkadotJSApiService } from '@/app/_client-services/polkadotJS_api_service';
 import BalanceInput from '../../../BalanceInput/BalanceInput';
 import { Extrinsic } from '../Extrinsic/Extrinsic';
 import InputText from './InputText';
@@ -52,7 +53,7 @@ export interface ComponentProps {
 	title?: ReactNode;
 	withLabel?: boolean;
 	withLength?: boolean;
-	registry: Registry;
+	registry?: Registry;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -117,18 +118,27 @@ const components: ComponentMap = componentDef.reduce(
 const warnList: string[] = [];
 
 function getTypeFromDef({ displayName, info, lookupName, sub, type }: TypeDef) {
+	console.log('displayName', displayName);
+	console.log('info', info);
+	console.log('sub', sub);
+	console.log('type', type);
 	if (displayName && SPECIAL_TYPES.includes(displayName)) {
 		return displayName;
 	}
-	if (type.endsWith('RuntimeSessionKeys')) {
+	if (type?.endsWith('RuntimeSessionKeys')) {
 		return 'RuntimeSessionKeys';
 	}
 
-	const typeValue = lookupName || type;
+	const typeValue = lookupName || type || 'Unknown';
+
+	// Handle undefined or invalid info (can happen with PAPI edge cases)
+	if (info === undefined || info === null) {
+		return typeValue;
+	}
 
 	switch (info) {
 		case TypeDefInfo.Compact:
-			return (sub as TypeDef)?.type;
+			return (sub as TypeDef)?.type || typeValue;
 
 		case TypeDefInfo.Option:
 			return 'Option';
@@ -143,21 +153,21 @@ function getTypeFromDef({ displayName, info, lookupName, sub, type }: TypeDef) {
 			return 'BTreeSet';
 
 		case TypeDefInfo.Tuple:
-			return components[`${type}`] === AddressInput ? type : 'Tuple';
+			return components[`${type || ''}`] === AddressInput ? type || 'Tuple' : 'Tuple';
 
 		case TypeDefInfo.Vec:
-			return type === 'Vec<u8>' ? 'Bytes' : ['Vec<KeyValue>'].includes(type) ? 'Vec<KeyValue>' : 'Vec';
+			return type === 'Vec<u8>' ? 'Bytes' : ['Vec<KeyValue>'].includes(type || '') ? 'Vec<KeyValue>' : 'Vec';
 
 		case TypeDefInfo.VecFixed:
-			return (sub as TypeDef)?.type === 'u8' ? type : 'VecFixed';
+			return (sub as TypeDef)?.type === 'u8' ? type || 'VecFixed' : 'VecFixed';
 
 		default:
 			return typeValue;
 	}
 }
 
-function getComponent({ def, registry }: { def: TypeDef; registry: Registry }): ComponentType<ComponentProps> | null {
-	if (['AccountId20', 'AccountId32'].includes(def.type)) {
+function getComponent({ def, registry }: { def: TypeDef; registry?: Registry }): ComponentType<ComponentProps> | null {
+	if (['AccountId20', 'AccountId32'].includes(def.type) && registry) {
 		const defType = `AccountId${(registry.createType('AccountId') as unknown as { length: number }).length}`;
 
 		if (def.type !== defType) {
@@ -171,6 +181,7 @@ function getComponent({ def, registry }: { def: TypeDef; registry: Registry }): 
 	const findOne = (type?: string): ComponentType<ComponentProps> | null => (type ? components[`${type}`] : null);
 
 	const type = getTypeFromDef(def);
+	console.log('type', type);
 	let Component = findOne(def.lookupName) || findOne(def.type) || findOne(type);
 
 	if (!Component && registry) {
@@ -210,15 +221,16 @@ function Param({ param, paramValue, onChange }: { param: IParamDef; paramValue?:
 		</p>
 	);
 
-	const registry = useMemo(() => apiService?.getApiRegistry(), [apiService]);
-
-	if (!registry) return null;
+	const registry = useMemo(() => (apiService instanceof PolkadotJSApiService ? apiService?.getApiRegistry() : undefined), [apiService]);
 
 	const Component = getComponent({ registry, def: param.type });
 	if (!Component) return null;
 
 	const paramComponent = createElement(Component, {
-		onChange: (value: unknown) => onChange(value),
+		onChange: (value: unknown) => {
+			console.log('param value', value);
+			onChange(value);
+		},
 		defaultValue: paramValue,
 		registry,
 		param

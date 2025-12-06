@@ -49,11 +49,11 @@ function RefundDeposits({ postId, track }: { postId: number; track: EPostOrigin 
 	});
 
 	const canRefundDecisionDeposit = useMemo(() => {
-		return !!(referendaInfo?.Approved?.[2] || referendaInfo?.Cancelled?.[2] || referendaInfo?.Rejected?.[2] || referendaInfo?.TimedOut?.[2]);
+		return !!referendaInfo?.canRefundDecisionDeposit;
 	}, [referendaInfo]);
 
 	const canRefundSubmissionDeposit = useMemo(() => {
-		return !!(referendaInfo?.Approved?.[1] || referendaInfo?.Cancelled?.[1]);
+		return !!referendaInfo?.canRefundSubmissionDeposit;
 	}, [referendaInfo]);
 
 	const handleSubmit = () => {

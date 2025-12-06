@@ -37,7 +37,8 @@ function TxFeesDetailsView({ extrinsicFn, extraFees }: { extrinsicFn: (Submittab
 	useEffect(() => {
 		const fetchFee = async () => {
 			if (extrinsicFnDebouncedValue && userPreferences.selectedAccount?.address && apiService) {
-				const fee = await apiService.getTxFee({ extrinsicFn: extrinsicFnDebouncedValue, address: userPreferences.selectedAccount.address });
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				const fee = await apiService.getTxFee({ extrinsicFn: extrinsicFnDebouncedValue as any, address: userPreferences.selectedAccount.address });
 				setGasFee(fee);
 			}
 		};

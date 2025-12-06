@@ -10,21 +10,39 @@ import InputNumber from './InputNumber';
 type AmountProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
 	onChange: (value: number) => void;
 	param: IParamDef;
-	registry: Registry;
+	registry?: Registry;
 };
 
 export type BitLength = 8 | 16 | 32 | 64 | 128 | 256;
 
-function getBitLength(registry: Registry, { type }: IParamDef): BitLength {
-	try {
-		return registry.createType(type as unknown as 'u32').bitLength() as BitLength;
-	} catch {
-		return 32;
+function getBitLength({ registry, type }: { registry?: Registry; type: IParamDef }): BitLength {
+	// PAPI: Try to infer bit length from the type string directly
+	// PAPI types usually come as 'u8', 'u16', 'u32', 'u64', 'u128', 'u256', etc.
+	const typeName = type.type.type as string;
+	if (typeName) {
+		const match = typeName.match(/^[ui](\d+)$/);
+		if (match) {
+			const bits = parseInt(match[1], 10);
+			if ([8, 16, 32, 64, 128, 256].includes(bits)) {
+				return bits as BitLength;
+			}
+		}
 	}
+
+	// Fallback to registry for PolkadotJS
+	if (registry) {
+		try {
+			return registry.createType(type.type.type as unknown as 'u32').bitLength() as BitLength;
+		} catch {
+			return 32;
+		}
+	}
+
+	return 32;
 }
 
 function Amount({ onChange, ...props }: AmountProps) {
-	const bitLength = useMemo(() => getBitLength(props.registry, props.param), [props.registry, props.param]);
+	const bitLength = useMemo(() => getBitLength({ registry: props.registry, type: props.param }), [props.registry, props.param]);
 
 	return (
 		<InputNumber

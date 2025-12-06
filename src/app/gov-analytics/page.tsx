@@ -12,6 +12,8 @@ import GovOverview from './components/GovOverview';
 import GovVoting from './components/GovVoting';
 import { AnalyticsHeader } from './components/Header/Header';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
 	const { title } = OPENGRAPH_METADATA;

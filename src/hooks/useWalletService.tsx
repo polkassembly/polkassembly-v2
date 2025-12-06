@@ -7,6 +7,8 @@ import { WalletClientService } from '@/app/_client-services/wallet_service';
 import { useAtom } from 'jotai';
 import { useEffect, useMemo } from 'react';
 import { walletAtom } from '@/app/_atoms/wallet/walletAtom';
+import { ENetwork } from '@/_shared/types';
+import { PolkadotJSApiService } from '@/app/_client-services/polkadotJS_api_service';
 import { usePolkadotApiService } from './usePolkadotApiService';
 import { useIdentityService } from './useIdentityService';
 
@@ -19,8 +21,14 @@ export const useWalletService = () => {
 	useEffect(() => {
 		// Todo: reload(notification) if service is null;
 
+		const isPolkadot = network === ENetwork.POLKADOT;
 		const initWalletService = async () => {
-			const service = await WalletClientService.Init(network, apiService || undefined, identityService || undefined);
+			const service = await WalletClientService.Init(
+				network,
+				!isPolkadot && apiService instanceof PolkadotJSApiService ? apiService : undefined,
+				// isPolkadot && apiService instanceof PolkadotApiService ? apiService : undefined,
+				identityService || undefined
+			);
 			setWalletService(service);
 		};
 

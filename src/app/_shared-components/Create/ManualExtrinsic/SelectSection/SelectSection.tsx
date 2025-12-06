@@ -12,7 +12,7 @@ function SelectSection({ selectedSection, onChange }: { selectedSection?: string
 
 	useEffect(() => {
 		if (sections?.length) {
-			const systemSection = sections.find((item) => item.value === 'system')?.value;
+			const systemSection = sections.find((item) => item.value.toLowerCase() === 'system')?.value;
 			if (systemSection) {
 				setDefaultSection(systemSection);
 				onChange(systemSection);

@@ -86,7 +86,7 @@ function TimeSplitCard({
 					label(context: TooltipItem<'line'>) {
 						return isAccountsAnalytics
 							? `${Number(context.parsed.y).toFixed(0)} ${t('voters')}`
-							: `${t('votingPower')} ${formatUSDWithUnits(context.parsed.y.toString(), 1)} ${NETWORKS_DETAILS[network].tokenSymbol}`;
+							: `${t('votingPower')} ${formatUSDWithUnits(context.parsed.y?.toString() || '0', 1)} ${NETWORKS_DETAILS[network].tokenSymbol}`;
 					}
 				}
 			}

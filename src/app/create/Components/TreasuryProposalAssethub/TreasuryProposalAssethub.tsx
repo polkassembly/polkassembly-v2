@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { EEnactment, EPostOrigin, IBeneficiaryInput, ENotificationStatus, IBeneficiary, ENetwork, EAssets, EReactQueryKeys } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -116,9 +118,9 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 		return calculateNativeTokenEquivalent({ beneficiaries, network, currentTokenPrice: tokensUsdPrice?.nativeTokenUsdPrice, dedTokenUsdPrice: tokensUsdPrice?.dedTokenUsdPrice });
 	}, [beneficiaries, network, tokensUsdPrice]);
 
-	const preimageDetails = useMemo(() => apiService && tx && apiService.getPreimageTxDetails({ extrinsicFn: tx }), [apiService, tx]);
+	const preimageDetails = useMemo(() => apiService && tx && apiService.getPreimageTxDetails({ extrinsicFn: tx as any }), [apiService, tx]);
 
-	const notePreimageTx = useMemo(() => apiService && tx && apiService.getNotePreimageTx({ extrinsicFn: tx }), [apiService, tx]);
+	const notePreimageTx = useMemo(() => apiService && tx && apiService.getNotePreimageTx({ extrinsicFn: tx as any }), [apiService, tx]);
 
 	const submitProposalTx = useMemo(
 		() =>
@@ -136,7 +138,7 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 	);
 
 	const batchCallTx = useMemo(
-		() => apiService && notePreimageTx && submitProposalTx && apiService.getBatchAllTx([notePreimageTx, submitProposalTx]),
+		() => apiService && notePreimageTx && submitProposalTx && apiService.getBatchAllTx([notePreimageTx, submitProposalTx] as any),
 		[apiService, notePreimageTx, submitProposalTx]
 	);
 
@@ -152,7 +154,7 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 			selectedAccount: userPreferences.selectedAccount,
 			wallet: userPreferences.wallet,
 			setVaultQrState,
-			extrinsicFn: tx,
+			extrinsicFn: tx as any,
 			track: selectedTrack.name,
 			enactment: selectedEnactment,
 			enactmentValue: advancedDetails[`${selectedEnactment}`],
@@ -218,7 +220,7 @@ function TreasuryProposalAssethub({ onSuccess }: { onSuccess: (proposalId: numbe
 
 			{batchCallTx && (
 				<TxFeesDetailsView
-					extrinsicFn={[batchCallTx]}
+					extrinsicFn={[batchCallTx as any]}
 					extraFees={[
 						{ name: t('TxFees.preimageDeposit'), value: NETWORKS_DETAILS[`${network}`].preimageBaseDeposit || BN_ZERO },
 						{ name: t('TxFees.submissionDeposit'), value: NETWORKS_DETAILS[`${network}`].submissionDeposit || BN_ZERO }

@@ -24,7 +24,8 @@
 			"@shared/*": ["./src/_shared/*"],
 			"@api/*": ["./src/app/api/*"],
 			"@app/*": ["./src/app/*"],
-			"@ui/*": ["./src/app/_shared-components/*"]
+			"@ui/*": ["./src/app/_shared-components/*"],
+			"@polkadot-api/descriptors": ["./.papi/descriptors"]
 		},
 		"target": "ES2017"
 	},

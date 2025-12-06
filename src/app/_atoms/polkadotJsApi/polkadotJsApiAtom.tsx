@@ -4,5 +4,7 @@
 
 import { atom } from 'jotai';
 import { PolkadotApiService } from '@app/_client-services/polkadot_api_service';
+import { PolkadotJSApiService } from '@app/_client-services/polkadotJS_api_service';
 
+export const polkadotJSApiAtom = atom<PolkadotJSApiService | null>(null);
 export const polkadotApiAtom = atom<PolkadotApiService | null>(null);

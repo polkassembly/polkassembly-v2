@@ -22,6 +22,7 @@ import SwitchWalletOrAddress from '@/app/_shared-components/SwitchWalletOrAddres
 import { useRouter } from 'nextjs-toploader/app';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { usePolkadotVault } from '@/hooks/usePolkadotVault';
+
 import classes from './Web3Login.module.scss';
 
 function Web3Login({ switchToWeb2, onTfaEnabled }: { switchToWeb2: () => void; onTfaEnabled: (token: string) => void }) {

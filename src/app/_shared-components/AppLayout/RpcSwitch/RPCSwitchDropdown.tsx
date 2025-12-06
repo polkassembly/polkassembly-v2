@@ -12,6 +12,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PolkadotApiService } from '@/app/_client-services/polkadot_api_service';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '../../DropdownMenu';
 
 export default function RPCSwitchDropdown({ className }: { className?: string }) {
@@ -28,7 +29,7 @@ export default function RPCSwitchDropdown({ className }: { className?: string })
 	const currentEndpoint = rpcEndpoints[userPreferences?.rpcIndex || 0];
 
 	const handleRpcSwitch = async (index: number) => {
-		if (!apiService || isLoading) return;
+		if (!apiService || apiService instanceof PolkadotApiService || isLoading) return;
 		setIsLoading(true);
 		try {
 			await apiService.switchToNewRpcEndpoint(index);

@@ -47,9 +47,7 @@ function ClaimPayout({ beneficiaries }: { beneficiaries: IBeneficiary[] }) {
 	const fetchPendingTreasurySpends = async () => {
 		if (!apiService) return null;
 
-		const relayChainBlockHeight = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network)
-			? await assethubApiService?.getBlockHeight()
-			: await apiService?.getBlockHeight();
+		const relayChainBlockHeight = [ENetwork.KUSAMA, ENetwork.POLKADOT].includes(network) ? await assethubApiService?.getBlockHeight() : await apiService?.getBlockHeight();
 
 		return apiService.getTreasurySpendsData({ relayChainBlockHeight });
 	};

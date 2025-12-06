@@ -20,7 +20,7 @@ export async function getInjectedWallet(selectedWallet: EWallet): Promise<Inject
 				.enable(APPNAME)
 				.then((value) => {
 					clearTimeout(timeoutId);
-					resolve(value);
+					resolve(value as Injected);
 				})
 				.catch((error) => {
 					reject(error);

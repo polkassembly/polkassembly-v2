@@ -1,9 +1,12 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
 import { useEffect, useState } from 'react';
 import { SubmittableExtrinsicFunction } from '@polkadot/api/types';
+import { Transaction } from 'polkadot-api';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../DropdownMenu';
 
 function SelectMethod({
@@ -13,7 +16,7 @@ function SelectMethod({
 }: {
 	selectedSection?: string;
 	selectedMethod?: string;
-	onChange: (extFn: SubmittableExtrinsicFunction<'promise'>) => void;
+	onChange: (extFn: SubmittableExtrinsicFunction<'promise'> & Transaction<any, any, any, any>, method: string) => void;
 }) {
 	const { apiService } = usePolkadotApiService();
 	const [methods, setMethods] = useState<{ label: string; value: string }[]>([]);
@@ -27,9 +30,10 @@ function SelectMethod({
 			return;
 		}
 		const initialExtFn = apiService?.getPreimageTx({ sectionName: selectedSection, methodName: methodOptions[0].value });
+		console.log('initialExtFn', initialExtFn);
 		setMethods(methodOptions || []);
 		if (initialExtFn) {
-			onChange(initialExtFn);
+			onChange(initialExtFn, methodOptions[0].value);
 		}
 	}, [apiService, onChange, selectedSection]);
 
@@ -50,7 +54,7 @@ function SelectMethod({
 								}
 								const extFn = apiService?.getPreimageTx({ sectionName: selectedSection, methodName: method.value });
 								if (extFn) {
-									onChange(extFn);
+									onChange(extFn, method.value);
 								}
 							}}
 						>

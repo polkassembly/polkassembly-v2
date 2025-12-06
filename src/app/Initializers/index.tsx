@@ -10,7 +10,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { useUser } from '@/hooks/useUser';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { polkadotApiAtom } from '../_atoms/polkadotJsApi/polkadotJsApiAtom';
+import { polkadotApiAtom, polkadotJSApiAtom } from '../_atoms/polkadotJsApi/polkadotJsApiAtom';
 import { AuthClientService } from '../_client-services/auth_client_service';
 import { ClientError } from '../_client-utils/clientError';
 import { CookieClientService } from '../_client-services/cookie_client_service';
@@ -23,6 +23,7 @@ import { assethubApiAtom } from '../_atoms/polkadotJsApi/assethubApiAtom';
 import { AssethubApiService } from '../_client-services/assethub_api_service';
 import { NextApiClientService } from '../_client-services/next_api_client_service';
 import { isMimirDetected } from '../_client-services/isMimirDetected';
+import { PolkadotJSApiService } from '../_client-services/polkadotJS_api_service';
 
 function Initializers({ userData, userPreferences }: { userData: IAccessTokenPayload | null; userPreferences: IUserPreferences }) {
 	const network = getCurrentNetwork();
@@ -33,10 +34,13 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 	const { setUserPreferences } = useUserPreferences();
 
 	const polkadotApi = useAtomValue(polkadotApiAtom);
+	const polkadotJSApi = useAtomValue(polkadotJSApiAtom);
 	const identityApi = useAtomValue(identityApiAtom);
 	const assethubApi = useAtomValue(assethubApiAtom);
 
 	const setPolkadotApiAtom = useSetAtom(polkadotApiAtom);
+	const setPolkadotJSApiAtom = useSetAtom(polkadotJSApiAtom);
+
 	const setIdentityApiAtom = useSetAtom(identityApiAtom);
 	const setAssethubApiAtom = useSetAtom(assethubApiAtom);
 
@@ -68,7 +72,8 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 	const restablishConnections = useCallback(async () => {
 		if (document.visibilityState === 'hidden') return;
 
-		polkadotApi?.reconnect();
+		// polkadotApi?.reconnect();
+		polkadotJSApi?.reconnect();
 		identityApi?.reconnect();
 		assethubApi?.reconnect();
 
@@ -82,7 +87,7 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 			AuthClientService.logout({ isIframe: !!isMimir, onLogout: () => setUser(null) });
 		}
-	}, [assethubApi, identityApi, polkadotApi, refreshAccessToken, refreshTokenData, user, setUser]);
+	}, [assethubApi, identityApi, polkadotJSApi, refreshAccessToken, refreshTokenData, user, setUser]);
 
 	// Throttled with a 1 second delay
 	const throttledRestablishConnections = useCallback(() => {
@@ -167,15 +172,15 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [assethubApi, network]);
 
-	// init polkadot api and wallet service
+	// init polkadot js api and wallet service
 	useEffect(() => {
 		let polkadotApiIntervalId: ReturnType<typeof setInterval>;
 
 		(async () => {
-			if (polkadotApi) return;
+			if (polkadotJSApi) return;
 
-			const newApi = await PolkadotApiService.Init(network);
-			setPolkadotApiAtom(newApi);
+			const newApi = await PolkadotJSApiService.Init(network);
+			setPolkadotJSApiAtom(newApi);
 
 			polkadotApiIntervalId = setInterval(async () => {
 				try {
@@ -188,9 +193,9 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 		// init wallet service
 		(async () => {
-			if (!polkadotApi) return;
+			if (!polkadotJSApi) return;
 
-			const service = await WalletClientService.Init(network, polkadotApi, identityApi || undefined);
+			const service = await WalletClientService.Init(network, polkadotJSApi, identityApi || undefined);
 			setWalletServiceAtom(service);
 		})();
 
@@ -198,10 +203,38 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 			if (polkadotApiIntervalId) {
 				clearInterval(polkadotApiIntervalId);
 			}
-			polkadotApi?.disconnect().then(() => setPolkadotApiAtom(null));
+			polkadotJSApi?.disconnect().then(() => setPolkadotJSApiAtom(null));
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [network, polkadotApi, identityApi]);
+	}, [network, polkadotJSApi, identityApi]);
+
+	useEffect(() => {
+		let polkadotPAPIIntervalId: ReturnType<typeof setInterval>;
+
+		(async () => {
+			if (polkadotApi) return;
+
+			const newApi = await PolkadotApiService.Init(network);
+			setPolkadotApiAtom(newApi);
+
+			polkadotPAPIIntervalId = setInterval(async () => {
+				try {
+					await newApi.keepAlive();
+				} catch {
+					console.error('Error keeping PAPI alive');
+				}
+			}, 6000);
+		})();
+
+		return () => {
+			if (polkadotPAPIIntervalId) {
+				clearInterval(polkadotPAPIIntervalId);
+			}
+			polkadotApi?.disconnect();
+			setPolkadotApiAtom(null);
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [network]);
 
 	// set user preferences
 	useEffect(() => {

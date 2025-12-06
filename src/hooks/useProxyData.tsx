@@ -29,9 +29,6 @@ export const useProxyData = (page: number = 1, search: string = '') => {
 			setError(null);
 
 			try {
-				// Wait for API to be fully ready
-				await apiService.apiReady();
-
 				const data = await apiService.getProxyRequests({
 					page,
 					limit: 10,

@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { EEnactment, EPostOrigin, ENotificationStatus, EProposalType } from '@/_shared/types';
 import { Button } from '@/app/_shared-components/Button';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -66,9 +68,9 @@ function CreateBounty({ onSuccess }: { onSuccess: (proposalId: number) => void }
 
 	const proposeBountyTx = useMemo(() => apiService && bountyAmount && !bountyAmount.isZero() && apiService.getProposeBountyTx({ bountyAmount }), [apiService, bountyAmount]);
 
-	const preimageDetails = useMemo(() => apiService && tx && apiService.getPreimageTxDetails({ extrinsicFn: tx }), [apiService, tx]);
+	const preimageDetails = useMemo(() => apiService && tx && apiService.getPreimageTxDetails({ extrinsicFn: tx as any }), [apiService, tx]);
 
-	const notePreimageTx = useMemo(() => apiService && tx && apiService.getNotePreimageTx({ extrinsicFn: tx }), [apiService, tx]);
+	const notePreimageTx = useMemo(() => apiService && tx && apiService.getNotePreimageTx({ extrinsicFn: tx as any }), [apiService, tx]);
 
 	const submitProposalTx = useMemo(
 		() =>
@@ -86,7 +88,7 @@ function CreateBounty({ onSuccess }: { onSuccess: (proposalId: number) => void }
 	);
 
 	const batchCallTx = useMemo(
-		() => apiService && notePreimageTx && submitProposalTx && apiService.getBatchAllTx([notePreimageTx, submitProposalTx]),
+		() => apiService && notePreimageTx && submitProposalTx && apiService.getBatchAllTx([notePreimageTx, submitProposalTx] as any),
 		[apiService, notePreimageTx, submitProposalTx]
 	);
 
@@ -152,7 +154,7 @@ function CreateBounty({ onSuccess }: { onSuccess: (proposalId: number) => void }
 			wallet: userPreferences.wallet,
 			setVaultQrState,
 			track: selectedTrack.name,
-			extrinsicFn: proposalTx,
+			extrinsicFn: proposalTx as any,
 			enactment: selectedEnactment,
 			enactmentValue: advancedDetails[`${selectedEnactment}`],
 			onSuccess: (postId) => {
@@ -308,7 +310,7 @@ function CreateBounty({ onSuccess }: { onSuccess: (proposalId: number) => void }
 
 			{proposeBountyTx && (
 				<TxFeesDetailsView
-					extrinsicFn={bountyId ? (batchCallTx ? [batchCallTx] : []) : [proposeBountyTx]}
+					extrinsicFn={bountyId ? (batchCallTx ? [batchCallTx] : []) : ([proposeBountyTx] as any)}
 					extraFees={[
 						{ name: t('TxFees.preimageDeposit'), value: NETWORKS_DETAILS[`${network}`].preimageBaseDeposit || BN_ZERO },
 						{ name: t('TxFees.submissionDeposit'), value: NETWORKS_DETAILS[`${network}`].submissionDeposit || BN_ZERO }

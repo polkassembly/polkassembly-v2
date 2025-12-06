@@ -79,7 +79,7 @@ function BalanceInput({
 	});
 
 	// disable native token in multi asset for assethub kusama
-	if (![ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA].includes(network)) {
+	if (![ENetwork.KUSAMA].includes(network)) {
 		reorderedAssetOptions.push({ label: networkDetails.tokenSymbol, value: null });
 	}
 
@@ -129,7 +129,7 @@ function BalanceInput({
 	useEffect(() => {
 		const fetchTreasuryBalance = async () => {
 			if (!showTreasuryBalance || !assethubApiService || !multiAsset) return;
-			const balances = [ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network)
+			const balances = [ENetwork.KUSAMA, ENetwork.POLKADOT].includes(network)
 				? await apiService?.getAssethubTreasuryAssetsBalance()
 				: await assethubApiService?.getAssethubTreasuryAssetsBalance();
 			setTreasuryBalance(balances || null);

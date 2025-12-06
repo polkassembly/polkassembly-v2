@@ -301,7 +301,7 @@ export class IdentityService {
 					onFailed(error?.toString?.() || errorMessageFallback);
 				});
 		} else if (wallet === EWallet.POLKADOT_VAULT) {
-			const signer = new VaultQrSigner(this.peopleChainApi.registry, setVaultQrState);
+			const signer = new VaultQrSigner(setVaultQrState, this.peopleChainApi.registry);
 			await tx.signAsync(address, { nonce: -1, signer });
 
 			setVaultQrState((prev) => ({

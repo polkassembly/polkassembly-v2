@@ -9,25 +9,26 @@ import { BN_ZERO, isBn } from '@polkadot/util';
 
 const warnList: string[] = [];
 
-export function getInitValue(registry: Registry, def: TypeDef): unknown {
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export function getInitValue({ def, registry }: { def: TypeDef; registry?: Registry }): unknown {
 	if (def.info === TypeDefInfo.Vec) {
-		return [getInitValue(registry, def.sub as TypeDef)];
+		return [getInitValue({ def: def.sub as TypeDef, registry })];
 	}
 	if (def.info === TypeDefInfo.Tuple) {
-		return Array.isArray(def.sub) ? def.sub.map((d) => getInitValue(registry, d)) : [];
+		return Array.isArray(def.sub) ? def.sub.map((d) => getInitValue({ def: d, registry })) : [];
 	}
 	if (def.info === TypeDefInfo.Struct) {
 		return Array.isArray(def.sub)
 			? def.sub.reduce((result: Record<string, unknown>, d): Record<string, unknown> => {
 					// eslint-disable-next-line no-param-reassign
-					result[d.name || 'unknown'] = getInitValue(registry, d);
+					result[d.name || 'unknown'] = getInitValue({ def: d, registry });
 
 					return result;
 				}, {})
 			: {};
 	}
 	if (def.info === TypeDefInfo.Enum) {
-		return Array.isArray(def.sub) ? { [def.sub[0].name || 'unknown']: getInitValue(registry, def.sub[0]) } : {};
+		return Array.isArray(def.sub) ? { [def.sub[0].name || 'unknown']: getInitValue({ def: def.sub[0], registry }) } : {};
 	}
 
 	const type = [TypeDefInfo.Compact, TypeDefInfo.Option].includes(def.info) ? (def.sub as TypeDef).type : def.type;
@@ -81,13 +82,13 @@ export function getInitValue(registry: Registry, def: TypeDef): unknown {
 		case 'CodeHash':
 		case 'Hash':
 		case 'H256':
-			return registry.createType('H256');
+			return registry ? registry.createType('H256') : '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 		case 'H512':
-			return registry.createType('H512');
+			return registry ? registry.createType('H512') : `0x${'00'.repeat(64)}`;
 
 		case 'H160':
-			return registry.createType('H160');
+			return registry ? registry.createType('H160') : `0x${'00'.repeat(20)}`;
 
 		case 'Raw':
 		case 'Keys':
@@ -114,7 +115,7 @@ export function getInitValue(registry: Registry, def: TypeDef): unknown {
 			return undefined;
 
 		case 'Extrinsic':
-			return registry.createType('Raw');
+			return registry ? registry.createType('Raw') : '0x';
 
 		case 'Null':
 			return null;
@@ -122,27 +123,31 @@ export function getInitValue(registry: Registry, def: TypeDef): unknown {
 		default: {
 			let error: string | null = null;
 
-			try {
-				const instance = registry.createType(type as 'u32');
-				const raw = getTypeDef(instance.toRawType());
+			if (registry) {
+				try {
+					const instance = registry.createType(type as 'u32');
+					const raw = getTypeDef(instance.toRawType());
 
-				if (isBn(instance)) {
-					return BN_ZERO;
+					if (isBn(instance)) {
+						return BN_ZERO;
+					}
+					if ([TypeDefInfo.Struct].includes(raw.info)) {
+						return undefined;
+					}
+					if ([TypeDefInfo.Enum, TypeDefInfo.Tuple].includes(raw.info)) {
+						return getInitValue({ def: raw, registry });
+					}
+				} catch (e) {
+					error = (e as Error).message;
 				}
-				if ([TypeDefInfo.Struct].includes(raw.info)) {
-					return undefined;
-				}
-				if ([TypeDefInfo.Enum, TypeDefInfo.Tuple].includes(raw.info)) {
-					return getInitValue(registry, raw);
-				}
-			} catch (e) {
-				error = (e as Error).message;
 			}
 
 			// we only want to want once, not spam
 			if (!warnList.includes(type)) {
 				warnList.push(type);
-				console.error(`params: initValue: ${error}`);
+				if (registry) {
+					console.error(`params: initValue: ${error}`);
+				}
 				console.info(`params: initValue: No default value for type ${type} from ${JSON.stringify(def)}, using defaults`);
 			}
 

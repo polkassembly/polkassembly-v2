@@ -16,7 +16,11 @@ function Tuple({ param, onChange }: { param: IParamDef; onChange: (value: unknow
 
 	const onParamsChange = useCallback(
 		(values: unknown[]): void => {
-			onChange(values.map((value) => value));
+			onChange(
+				values.map((value) => {
+					return value;
+				})
+			);
 		},
 		[onChange]
 	);
