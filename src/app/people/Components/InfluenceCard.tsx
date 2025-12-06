@@ -29,12 +29,13 @@ import DVVotesDialog from './DVVotesDialog';
 interface InfluenceCardProps {
 	referendaInfluence: IDVReferendumInfluence[];
 	loading?: boolean;
+	cohortId?: number;
 }
 
 type SortOption = 'index' | 'status' | 'influence' | 'votes';
 type SortDirection = 'asc' | 'desc';
 
-function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
+function InfluenceCard({ referendaInfluence, loading, cohortId }: InfluenceCardProps) {
 	const t = useTranslations('DecentralizedVoices');
 	const [isOpen, setIsOpen] = useState(true);
 	const [page, setPage] = useState(1);
@@ -379,6 +380,7 @@ function InfluenceCard({ referendaInfluence, loading }: InfluenceCardProps) {
 				open={isDialogOpen}
 				onOpenChange={setIsDialogOpen}
 				data={selectedReferendum}
+				cohortId={cohortId}
 			/>
 		</Collapsible>
 	);

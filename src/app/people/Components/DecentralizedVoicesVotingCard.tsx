@@ -4,8 +4,9 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Check, X, Minus, LayoutList, LayoutGrid, ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { Check, X, Minus, Activity, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { MdArrowDropDown } from '@react-icons/all-files/md/MdArrowDropDown';
+import { BiBarChart } from '@react-icons/all-files/bi/BiBarChart';
 import { IDVDelegateVotingMatrix, IDVCohort, EDVDelegateType, EVoteDecision } from '@/_shared/types';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
@@ -140,16 +141,14 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 								onClick={() => setViewMode('compact')}
 								className={`flex items-center gap-2 rounded px-3 py-1.5 text-sm font-medium transition-colors ${viewMode === 'compact' ? 'bg-info text-btn_primary_text' : 'text-text_primary'}`}
 							>
-								<LayoutList size={16} />
-								{t('Compact')}
+								<BiBarChart size={16} />
 							</button>
 							<button
 								type='button'
 								onClick={() => setViewMode('heatmap')}
 								className={`flex items-center gap-2 rounded px-3 py-1.5 text-sm font-medium transition-colors ${viewMode === 'heatmap' ? 'bg-info text-btn_primary_text' : 'text-text_primary'}`}
 							>
-								<LayoutGrid size={16} />
-								{t('Heatmap')}
+								<Activity size={16} />
 							</button>
 						</div>
 						<CollapsibleTrigger asChild>

@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { IDVReferendumInfluence, EDVDelegateType, IDVDelegateVote, EVoteDecision } from '@/_shared/types';
@@ -11,31 +11,64 @@ import TwoUser from '@assets/icons/2User.svg';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
+import { getDVCohortByIndex } from '@/_shared/_utils/dvDelegateUtils';
 import VoteRow from './VoteRow';
 
 interface DVVotesDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	data: IDVReferendumInfluence | null;
+	cohortId?: number;
 }
 
-export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialogProps) {
+export default function DVVotesDialog({ open, onOpenChange, data, cohortId }: DVVotesDialogProps) {
 	const t = useTranslations('DecentralizedVoices');
 	const [activeTab, setActiveTab] = useState<EDVDelegateType>(EDVDelegateType.DAO);
 	const network = getCurrentNetwork();
 
+	const activeVotes = useMemo(() => {
+		if (!data || !cohortId) return [];
+
+		const cohort = getDVCohortByIndex(network, cohortId);
+		if (!cohort) return [];
+
+		const { delegateVotes = [], guardianVotes = [] } = data;
+		const votedList = activeTab === EDVDelegateType.DAO ? delegateVotes : guardianVotes;
+
+		const allDelegates = cohort.delegates.filter((d) => d.role === activeTab);
+
+		return allDelegates
+			.map((delegate) => {
+				const existingVote = votedList.find((v) => v.address === delegate.address);
+
+				if (existingVote) {
+					return existingVote;
+				}
+
+				return {
+					address: delegate.address,
+					decision: null,
+					votingPower: '0',
+					balance: '0',
+					conviction: 0
+				} as IDVDelegateVote;
+			})
+			.sort((a, b) => {
+				if (a.decision !== null && b.decision === null) return -1;
+				if (a.decision === null && b.decision !== null) return 1;
+
+				const powerA = BigInt(a.votingPower || '0');
+				const powerB = BigInt(b.votingPower || '0');
+
+				if (powerA > powerB) return -1;
+				if (powerA < powerB) return 1;
+				return 0;
+			});
+	}, [data, cohortId, network, activeTab]);
+
 	if (!data) return null;
 
 	const { delegateVotes = [], guardianVotes = [] } = data;
-
-	const activeVotes = (activeTab === EDVDelegateType.DAO ? delegateVotes || [] : guardianVotes || []).slice().sort((a, b) => {
-		const powerA = BigInt(a.votingPower || '0');
-		const powerB = BigInt(b.votingPower || '0');
-
-		if (powerA > powerB) return -1;
-		if (powerA < powerB) return 1;
-		return 0;
-	});
 
 	const getStats = (votes: IDVDelegateVote[]) => {
 		const ayeCount = votes.filter((v) => v.decision === EVoteDecision.AYE).length;
@@ -75,6 +108,22 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 	const abstainPercentBar = totalChainPower > 0 ? Number((dvAbstainPower * BigInt(10000)) / totalChainPower) / 100 : 0;
 
 	const dvPercentOfTotal = totalChainPower > 0 ? Number((dvDecidingPower * BigInt(10000)) / totalChainPower) / 100 : 0;
+
+	const tabCounts = {
+		[EDVDelegateType.DAO]: 0,
+		[EDVDelegateType.GUARDIAN]: 0
+	};
+
+	if (cohortId) {
+		const cohort = getDVCohortByIndex(network, cohortId);
+		if (cohort) {
+			tabCounts[EDVDelegateType.DAO] = cohort.delegates.filter((d) => d.role === EDVDelegateType.DAO).length;
+			tabCounts[EDVDelegateType.GUARDIAN] = cohort.delegates.filter((d) => d.role === EDVDelegateType.GUARDIAN).length;
+		}
+	} else {
+		tabCounts[EDVDelegateType.DAO] = delegateVotes.length;
+		tabCounts[EDVDelegateType.GUARDIAN] = guardianVotes.length;
+	}
 
 	return (
 		<Dialog
@@ -137,7 +186,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 						</p>
 					</div>
 
-					<div className='grid max-h-[150px] grid-cols-1 gap-4 overflow-y-auto md:max-h-full md:grid-cols-3'>
+					<div className='grid max-h-[150px] grid-cols-1 gap-4 overflow-y-auto md:max-h-[400px] md:grid-cols-3'>
 						<div className='rounded-xl border border-border_grey bg-aye_color/10 p-4'>
 							<div className='flex items-center justify-between'>
 								<span className='font-semibold text-success'>{t('Aye').toUpperCase()}</span>
@@ -172,7 +221,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 							</div>
 						</div>
 					</div>
-					{guardianVotes.length > 0 && (
+					{(tabCounts[EDVDelegateType.GUARDIAN] > 0 || guardianVotes.length > 0) && (
 						<div className='flex gap-4 rounded-lg bg-sidebar_footer p-1'>
 							<button
 								type='button'
@@ -182,7 +231,7 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 									activeTab === EDVDelegateType.DAO && 'bg-section_dark_overlay text-text_primary shadow-sm'
 								)}
 							>
-								{t('DAO')} ({delegateVotes.length})
+								{t('DAO')} ({tabCounts[EDVDelegateType.DAO]})
 							</button>
 
 							<button
@@ -193,12 +242,12 @@ export default function DVVotesDialog({ open, onOpenChange, data }: DVVotesDialo
 									activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay text-text_primary shadow-sm'
 								)}
 							>
-								{t('Guardian').toUpperCase()} ({guardianVotes.length})
+								{t('Guardian').toUpperCase()} ({tabCounts[EDVDelegateType.GUARDIAN]})
 							</button>
 						</div>
 					)}
 
-					<div className='flex max-h-[150px] flex-col gap-3 overflow-y-auto md:max-h-full'>
+					<div className='flex max-h-[150px] flex-col gap-3 overflow-y-auto md:max-h-[400px]'>
 						{activeVotes.length > 0 ? (
 							activeVotes.map((vote) => (
 								<VoteRow

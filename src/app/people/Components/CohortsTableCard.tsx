@@ -23,7 +23,7 @@ function CohortsTableCard() {
 	const t = useTranslations('DecentralizedVoices');
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const selectedCohortIndex = searchParams.get('cohort');
+	const selectedCohortIndex = searchParams.get('cohort') || 5;
 
 	const network = getCurrentNetwork();
 	const { data: cohortsData, isLoading } = useDVCohorts();
@@ -37,6 +37,7 @@ function CohortsTableCard() {
 		const params = new URLSearchParams(searchParams.toString());
 		params.set('cohort', cohortIndex.toString());
 		router.replace(`/people?${params.toString()}`, { scroll: false });
+		window.scrollTo({ top: 0, behavior: 'smooth' });
 	};
 
 	return (

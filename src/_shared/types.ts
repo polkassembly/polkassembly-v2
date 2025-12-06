@@ -1932,7 +1932,7 @@ export interface IDVDelegateWithStats extends IDVCohortDelegate {
 
 export interface IDVDelegateVote {
 	address: string;
-	decision: EVoteDecision;
+	decision: EVoteDecision | null;
 	votingPower: string;
 	balance: string;
 	conviction: number;

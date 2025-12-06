@@ -11,9 +11,7 @@ import {
 	IDVCohort,
 	EDVDelegateType,
 	EVoteDecision,
-	IProfileVote,
 	EProposalStatus,
-	IStatusHistoryItem,
 	IDVCohortVote,
 	IDVDReferendumResponse,
 	IDVDelegateWithStats,
@@ -28,20 +26,14 @@ import {
 export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: IDVDReferendumResponse[], cohort: IDVCohort): { delegatesWithStats: IDVDelegateWithStats[] } {
 	const getWinningVoteIncrement = (vote: IDVCohortVote, referendum: IDVDReferendumResponse): number => {
 		if (vote.isSplit || vote.isSplitAbstain) return 0;
-
-		const isClosed = [
-			EProposalStatus.Executed,
-			EProposalStatus.Approved,
-			EProposalStatus.Rejected,
-			EProposalStatus.TimedOut,
-			EProposalStatus.Cancelled,
-			EProposalStatus.Confirmed
-		].includes(referendum.status);
+		if (!referendum.status) return 0;
+		const approvedStatuses = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed];
+		const isApproved = approvedStatuses.includes(referendum.status);
+		const isClosed = isApproved || [EProposalStatus.Rejected, EProposalStatus.TimedOut, EProposalStatus.Cancelled].includes(referendum.status);
 
 		if (!isClosed) return 0;
 
-		const passed = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed].includes(referendum.status);
-		if ((passed && vote.aye) || (!passed && !vote.aye)) {
+		if ((isApproved && vote.aye) || (!isApproved && !vote.aye)) {
 			return 1;
 		}
 		return 0;
@@ -61,7 +53,7 @@ export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: IDVDRe
 			if (BigInt(vote.abstainBalance || 0) > 0) result.abstainCount = 1;
 		} else if (vote.aye) {
 			result.ayeCount = 1;
-		} else if (vote.balance) {
+		} else {
 			result.nayCount = 1;
 		}
 
@@ -110,24 +102,6 @@ const MS_PER_DAY = 1000 * 60 * 60 * 24;
 const DAYS_PER_MONTH = 30;
 const DEFAULT_MAX_PAGES = 10;
 const DEFAULT_START_PAGE = 1;
-const LOCK_PERIOD_DIVISOR = 10;
-
-export function formatNumber(num: number): string {
-	if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-	if (num >= 1000) return `${(num / 1000).toFixed(0)}K`;
-	return num.toString();
-}
-
-export function formatDelegationAmount(amount: string | number, network: ENetwork): string {
-	if (!amount) return '0';
-	const { tokenDecimals, tokenSymbol } = NETWORKS_DETAILS[network];
-	// Handle potential scientific notation or precision issues if it's a number
-	const safeAmount = typeof amount === 'number' ? BigInt(amount.toLocaleString('fullwide', { useGrouping: false }).split('.')[0]) : BigInt(amount);
-	const divisor = BigInt(10) ** BigInt(tokenDecimals);
-	const wholeUnits = safeAmount / divisor;
-	const num = Number(wholeUnits);
-	return `${formatNumber(num)} ${tokenSymbol}`;
-}
 
 export function formatDate(date: Date): { date: string; time: string } {
 	const d = dayjs(date);
@@ -217,105 +191,6 @@ export function filterReferendaForDelegate(
 		.map((r) => r.index);
 }
 
-export function isReferendumActiveForDelegate(referendum: { createdAtBlock?: number; updatedAtBlock?: number }, delegate: IDVCohort['delegates'][0]): boolean {
-	const isOngoingDelegate = delegate.endBlock === null;
-
-	if (!referendum.createdAtBlock && !referendum.updatedAtBlock) {
-		return isOngoingDelegate;
-	}
-
-	const endBlock = delegate.endBlock ?? Number.MAX_SAFE_INTEGER;
-	const createdAt = referendum.createdAtBlock || 0;
-	const updatedAt = referendum.updatedAtBlock;
-
-	if (!updatedAt || updatedAt === 0) {
-		return createdAt >= delegate.startBlock && createdAt <= endBlock;
-	}
-
-	return updatedAt >= delegate.startBlock && updatedAt <= endBlock;
-}
-
-export function getVotePower(vote: IProfileVote): bigint {
-	let power = BigInt(vote.totalVotingPower || '0');
-
-	if (power === BigInt(0) && vote.balance) {
-		const { balance, decision } = vote;
-		const value = balance.value || '0';
-
-		if (decision === EVoteDecision.AYE) {
-			power = BigInt(balance.aye || value);
-		} else if (decision === EVoteDecision.NAY) {
-			power = BigInt(balance.nay || value);
-		} else if (decision === EVoteDecision.ABSTAIN || decision === EVoteDecision.SPLIT_ABSTAIN) {
-			power = BigInt(balance.abstain || value);
-		}
-
-		const lockPeriod = vote.lockPeriod ?? 0;
-		if (lockPeriod === 0) {
-			power /= BigInt(LOCK_PERIOD_DIVISOR);
-		} else {
-			power *= BigInt(lockPeriod);
-		}
-	}
-	return power;
-}
-
-export interface IVoteStatsResult {
-	ayeCount: number;
-	nayCount: number;
-	abstainCount: number;
-	winningVotes: number;
-}
-
-export function calculateVoteStats(votes: IProfileVote[], cohortEndTime?: Date): IVoteStatsResult {
-	let ayeCount = 0;
-	let nayCount = 0;
-	let abstainCount = 0;
-	let winningVotes = 0;
-
-	votes.forEach((vote) => {
-		const { proposal, decision } = vote;
-		let status = proposal?.status;
-
-		const timeline = (proposal && 'statusHistory' in proposal ? proposal.statusHistory : []) as IStatusHistoryItem[];
-
-		if (cohortEndTime && timeline.length > 0) {
-			const validHistory = timeline
-				.filter((h) => new Date(h.timestamp).getTime() <= cohortEndTime.getTime())
-				.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
-			if (validHistory.length > 0) {
-				status = validHistory[0].status;
-			}
-		}
-
-		const isClosed = [
-			EProposalStatus.Executed,
-			EProposalStatus.Approved,
-			EProposalStatus.Rejected,
-			EProposalStatus.TimedOut,
-			EProposalStatus.Cancelled,
-			EProposalStatus.Confirmed
-		].includes(status as EProposalStatus);
-
-		if (decision === EVoteDecision.AYE) {
-			ayeCount += 1;
-			if (isClosed && (status === EProposalStatus.Executed || status === EProposalStatus.Approved || status === EProposalStatus.Confirmed)) {
-				winningVotes += 1;
-			}
-		} else if (decision === EVoteDecision.NAY) {
-			nayCount += 1;
-			if (isClosed && (status === EProposalStatus.Rejected || status === EProposalStatus.TimedOut || status === EProposalStatus.Cancelled)) {
-				winningVotes += 1;
-			}
-		} else {
-			abstainCount += 1;
-		}
-	});
-
-	return { ayeCount, nayCount, abstainCount, winningVotes };
-}
-
 export function calculateDVInfluence(
 	votes: IDVCohortVote[],
 	cohort: IDVCohort,
@@ -340,11 +215,7 @@ export function calculateDVInfluence(
 				dvNayPower += BigInt(vote.nayVotes || 0);
 				dvAbstainPower += BigInt(vote.abstainVotes || 0);
 				votingPower = BigInt(vote.ayeVotes || 0) + BigInt(vote.nayVotes || 0) + BigInt(vote.abstainVotes || 0);
-				// Determine major decision for display? Or just split?
-				// For now, let's say split is abstain or we need a split type.
-				// EVoteDecision has SPLIT and SPLIT_ABSTAIN?
-				// Let's check EVoteDecision definition.
-				// Assuming it has. If not, use ABSTAIN.
+
 				decision = vote.isSplitAbstain ? EVoteDecision.SPLIT_ABSTAIN : EVoteDecision.SPLIT;
 			} else if (vote.aye) {
 				const totalVotes = BigInt(vote.votes || 0) + BigInt(vote.delegations?.votes || 0);

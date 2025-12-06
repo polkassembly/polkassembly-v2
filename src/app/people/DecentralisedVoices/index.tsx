@@ -142,6 +142,7 @@ function DecentralisedVoices() {
 					<InfluenceCard
 						referendaInfluence={referendaInfluence}
 						loading={isLoading}
+						cohortId={cohortId}
 					/>
 					<DecentralizedVoicesVotingCard
 						votingMatrix={votingMatrix}
