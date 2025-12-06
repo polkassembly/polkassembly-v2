@@ -42,10 +42,10 @@ export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: IDVDRe
 	const getVoteStatsIncrement = (
 		vote: IDVCohortVote,
 		referendum: IDVDReferendumResponse | undefined
-	): { ayeCount: number; nayCount: number; abstainCount: number; winningVotes: number } => {
-		const result = { ayeCount: 0, nayCount: 0, abstainCount: 0, winningVotes: 0 };
-
+	): { ayeCount: number; nayCount: number; abstainCount: number; winningVotes: number; votedCount: number } => {
+		const result = { ayeCount: 0, nayCount: 0, abstainCount: 0, winningVotes: 0, votedCount: 0 };
 		if (!referendum) return result;
+		result.votedCount = 1;
 
 		if (vote.isSplit || vote.isSplitAbstain) {
 			if (BigInt(vote.ayeBalance || 0) > 0) result.ayeCount = 1;
@@ -67,7 +67,8 @@ export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: IDVDRe
 			ayeCount: 0,
 			nayCount: 0,
 			abstainCount: 0,
-			winningVotes: 0
+			winningVotes: 0,
+			votedCount: 0
 		};
 
 		delegateVotes.forEach((vote) => {
@@ -77,10 +78,10 @@ export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: IDVDRe
 			stats.nayCount += increment.nayCount;
 			stats.abstainCount += increment.abstainCount;
 			stats.winningVotes += increment.winningVotes;
+			stats.votedCount += increment.votedCount;
 		});
 
-		const totalVotes = stats.ayeCount + stats.nayCount + stats.abstainCount;
-		const participation = referenda.length > 0 ? (totalVotes / referenda.length) * 100 : 0;
+		const participation = referenda.length > 0 ? (stats.votedCount / referenda.length) * 100 : 0;
 		const winRate = delegateVotes.length > 0 ? (stats.winningVotes / delegateVotes.length) * 100 : 0;
 
 		return {
