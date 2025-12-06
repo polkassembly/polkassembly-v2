@@ -202,12 +202,17 @@ export class FirestoreService extends FirestoreUtils {
 								.get()
 						).data().count + 1;
 
+					const followers = await this.GetFollowers(data.id);
+					const following = await this.GetFollowing(data.id);
+
 					return {
 						id: data.id,
 						username: data.username,
 						profileScore: data.profileScore,
 						addresses: addresses.map((addr: IUserAddress) => addr.address),
 						rank,
+						followers,
+						following,
 						createdAt: data.createdAt?.toDate?.(),
 						profileDetails: data.profileDetails || DEFAULT_PROFILE_DETAILS
 					} as IPublicUser;

@@ -1654,5 +1654,21 @@
 		"assethubMigration": "Notice: {network} has migrated to AssetHub. Balances, data, referenda, and other on-chain activity has moved to AssetHub.",
 		"learnMore": "Learn more",
 		"polkadotMigration": "Notice: Polkadot is undergoing AssetHub migration. Some features may be unavailable during the migration."
+	},
+	"Community": {
+		"community": "Community",
+		"communityDescription": "Explore all members contributing to the Polkadot ecosystem.",
+		"members": "Members",
+		"delegates": "Delegates",
+		"curators": "Curators",
+		"experts": "Experts",
+		"Members": {
+			"totalMembers": "Total Members",
+			"verifiedMembers": "Verified Members",
+			"tip": "Tip",
+			"independent": "Independent",
+			"readMore": "Read more",
+			"readLess": "Read less"
+		}
 	}
 }

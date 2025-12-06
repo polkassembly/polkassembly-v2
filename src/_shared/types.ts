@@ -152,6 +152,8 @@ export interface IPublicUser {
 	profileScore: number;
 	addresses: string[];
 	rank?: number;
+	followers?: IFollowEntry[];
+	following?: IFollowEntry[];
 	profileDetails: IProfileDetails;
 }
 
@@ -1765,4 +1767,11 @@ export interface IJudgementStats {
 	totalRequestedThisMonth: number;
 	percentageIncreaseFromLastMonth: number;
 	percentageCompletedThisMonth: number;
+}
+
+export enum ECommunityRole {
+	MEMBERS = 'members',
+	DELEGATES = 'delegates',
+	CURATORS = 'curators',
+	EXPERTS = 'experts'
 }
