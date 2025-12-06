@@ -15,7 +15,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
 import { KeyboardEvent, MouseEvent } from 'react';
 
-const MAX_VISIBLE_REFERENDA = 7;
+const MAX_VISIBLE_REFERENDA = 6;
 
 interface GovernanceCardProps {
 	title: string;

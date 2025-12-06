@@ -503,7 +503,7 @@ export class AAGVideoService extends FirestoreUtils {
 			title: video.title,
 			thumbnail: video.thumbnail,
 			referenda: video.referenda || [],
-			publishedAt: video.publishedAt.toISOString(),
+			publishedAt: video.publishedAt instanceof Date && !isNaN(video.publishedAt.getTime()) ? video.publishedAt.toISOString() : new Date().toISOString(),
 			duration: video.duration,
 			agendaUrl: video.agendaUrl || '',
 			network: video.network,

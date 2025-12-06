@@ -428,9 +428,9 @@ export class YouTubeService {
 
 	static async getPlaylistMetadata(
 		playlistIdOrUrl: string,
-		options: { includeCaptions?: boolean; language?: string; maxVideos?: number } = {}
+		options: { includeCaptions?: boolean; language?: string; maxVideos?: number; offset?: number } = {}
 	): Promise<IYouTubePlaylistMetadata | null> {
-		const { includeCaptions = true, language = this.DEFAULT_LANGUAGE, maxVideos } = options;
+		const { includeCaptions = true, language = this.DEFAULT_LANGUAGE, maxVideos, offset = 0 } = options;
 
 		const playlistId = this.extractPlaylistId(playlistIdOrUrl);
 		if (!playlistId) {
@@ -448,7 +448,13 @@ export class YouTubeService {
 
 			const allVideoIds = await this.fetchPlaylistVideos(playlistId);
 
-			const videoIds = maxVideos ? allVideoIds.slice(0, maxVideos) : allVideoIds;
+			let videoIds = allVideoIds;
+			if (offset > 0) {
+				videoIds = videoIds.slice(offset);
+			}
+			if (maxVideos) {
+				videoIds = videoIds.slice(0, maxVideos);
+			}
 
 			const videos = await this.getMultipleVideosMetadata(videoIds, { includeCaptions, language });
 
