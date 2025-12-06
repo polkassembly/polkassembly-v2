@@ -181,7 +181,13 @@ export class AAGVideoService extends FirestoreUtils {
 				if (!data || typeof data.id !== 'string' || typeof data.title !== 'string') {
 					return null;
 				}
-				return data as IAAGVideoMetadata;
+				const processedData = {
+					...data,
+					publishedAt: data.publishedAt?.toDate ? data.publishedAt.toDate() : new Date(data.publishedAt || Date.now()),
+					createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
+					updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now())
+				};
+				return processedData as IAAGVideoMetadata;
 			})
 			.filter((item): item is IAAGVideoMetadata => item !== null);
 	}

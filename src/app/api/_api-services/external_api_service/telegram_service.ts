@@ -96,7 +96,7 @@ export class TelegramService {
 
 	private static escapeMarkdown(text: string): string {
 		if (!text) return '';
-		return text.replace(/([_*[\]()~`>#+=|{}.!-])/g, '\\$1');
+		return text.replace(/([_*`[])/g, '\\$1');
 	}
 
 	public static escapeHtml(text: string): string {
@@ -162,9 +162,9 @@ ${escapedDescription}
 📅 *Preferred Date:* ${escapedDate}
 
 📧 *Contact Information:*
-${escapedEmail ? `Email: ${escapedEmail}` : ''}
-${escapedTelegram ? `Telegram: ${escapedTelegram}` : ''}
-${escapedTwitter ? `Twitter: ${escapedTwitter}` : ''}
+${escapedEmail ? `📧 Email: ${escapedEmail}` : ''}
+${escapedTelegram ? `💬 Telegram: @${escapedTelegram}` : ''}
+${escapedTwitter ? `🐦 Twitter: @${escapedTwitter}` : ''}
 
 ${data.supportingFile ? `📎 Supporting file: ${this.escapeMarkdown(data.supportingFile.name)} (${(data.supportingFile.size / 1024 / 1024).toFixed(2)}MB)` : ''}
 		`
@@ -236,7 +236,7 @@ ${data.supportingFile ? `📎 Supporting file: ${this.escapeMarkdown(data.suppor
 				body: JSON.stringify({
 					chat_id: targetChatId,
 					text: message,
-					parse_mode: 'Markdown'
+					parse_mode: 'MarkdownV2'
 				})
 			});
 

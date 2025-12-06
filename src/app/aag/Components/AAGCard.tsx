@@ -48,7 +48,7 @@ function AAGCard() {
 
 		const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}&dates=${startDate}/${endDate}&recur=RRULE:FREQ=WEEKLY`;
 
-		window.open(googleCalendarUrl, '_blank');
+		window.open(googleCalendarUrl, '_blank', 'noopener,noreferrer');
 	};
 
 	return (
