@@ -18,6 +18,8 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { failedImageUrlsAtom } from '@/app/_atoms/klara/klaraAtom';
 
 const HighlightMenu = dynamic(() => import('../HighlightMenu/HighlightMenu'), { ssr: false });
 
@@ -82,6 +84,40 @@ const getEmbedUrl = (url: string): string | null => {
 	return null;
 };
 
+function SafeImage({ src, alt, height, width }: { src: string; alt?: string; height?: string | number; width?: string | number }) {
+	const failedUrls = useAtomValue(failedImageUrlsAtom);
+	const setFailedUrls = useSetAtom(failedImageUrlsAtom);
+
+	if (failedUrls.has(src)) {
+		return null;
+	}
+
+	const imageHeight = ValidatorService.isValidNumber(height) ? Number(height) : undefined;
+	const imageWidth = ValidatorService.isValidNumber(width) ? Number(width) : undefined;
+
+	return (
+		<span className='mr-2 inline-block align-top'>
+			<Link
+				href={src}
+				target='_blank'
+				rel='noopener noreferrer'
+			>
+				<Image
+					src={src}
+					alt={alt || 'Image'}
+					height={imageHeight || 800}
+					width={imageWidth || 800}
+					sizes='100vw'
+					unoptimized
+					onError={() => {
+						setFailedUrls((prev: Set<string>) => new Set(prev).add(src));
+					}}
+				/>
+			</Link>
+		</span>
+	);
+}
+
 const markdownComponents: Components = {
 	div: 'div',
 	table: ({ children, ...props }) => (
@@ -100,7 +136,7 @@ const markdownComponents: Components = {
 	code: 'code',
 	pre: 'pre',
 	img: ({ src, alt, height, width }) => {
-		if (!src) {
+		if (!src || typeof src !== 'string') {
 			return null;
 		}
 
@@ -152,21 +188,12 @@ const markdownComponents: Components = {
 		}
 
 		return (
-			<span className='mr-2 inline-block max-w-max align-top'>
-				<Link
-					href={src}
-					target='_blank'
-					rel='noopener noreferrer'
-				>
-					<Image
-						src={src}
-						alt={alt || 'Image'}
-						height={ValidatorService.isValidNumber(height) ? Number(height) : 256}
-						width={ValidatorService.isValidNumber(width) ? Number(width) : 256}
-						sizes='100vw'
-					/>
-				</Link>
-			</span>
+			<SafeImage
+				src={src}
+				alt={alt}
+				height={height}
+				width={width}
+			/>
 		);
 	},
 	a: ({ href, children, ...props }) => {

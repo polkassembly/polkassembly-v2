@@ -17,6 +17,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { AAG_YOUTUBE_PLAYLIST_ID } from '@/_shared/_constants/aag_playlist_id';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
+import { delay } from '../../_api-utils/delay';
 import { RedisService } from '../redis_service';
 import { OnChainDbService } from '../onchain_db_service';
 import { OffChainDbService } from '../offchain_db_service';
@@ -142,6 +143,10 @@ export class WebhookService {
 		switch (webhookEvent) {
 			case EWebhookEvent.PROPOSAL_CREATED: {
 				const parsedParams = params as z.infer<(typeof WebhookService.zodEventBodySchemas)[EWebhookEvent.PROPOSAL_CREATED]>;
+
+				// Wait for indexer to commit transaction before processing
+				// Subsquid batch transactions can take 5-15 seconds to commit
+				await delay(10000); // 10 second initial delay
 
 				return Promise.allSettled([
 					AlgoliaService.createPreliminaryAlgoliaPostRecord({
@@ -525,18 +530,11 @@ export class WebhookService {
 			// Add a small delay between batches to reduce server load
 			if (batchIndex < batches.length - 1) {
 				// eslint-disable-next-line no-await-in-loop
-				await this.delay(500);
+				await delay(500);
 			}
 		}
 
 		return { successCount, failCount };
-	}
-
-	// Helper method to wait for a specific time
-	private static delay(ms: number): Promise<void> {
-		return new Promise((resolve) => {
-			setTimeout(resolve, ms);
-		});
 	}
 
 	// Helper method to fetch with retries
@@ -584,7 +582,7 @@ export class WebhookService {
 				console.log(`Retry ${currentRetry}/${maxRetries} for ${url}`);
 
 				// eslint-disable-next-line no-await-in-loop
-				await this.delay(1000 * currentRetry); // Exponential backoff
+				await delay(1000 * currentRetry); // Exponential backoff
 			}
 		}
 

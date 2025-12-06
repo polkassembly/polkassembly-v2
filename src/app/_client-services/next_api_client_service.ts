@@ -66,7 +66,10 @@ import {
 	IConversationMessage,
 	IAAGVideoSummary,
 	IAAGVideoMetadata,
-	ENetwork
+	ENetwork,
+	IDelegateXAccount,
+	IDelegateXVoteData,
+	IConversationTurn
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -171,7 +174,11 @@ enum EApiRoute {
 	GET_AAG_VIDEO_BY_ID = 'GET_AAG_VIDEO_BY_ID',
 	GET_AAG_VIDEOS = 'GET_AAG_VIDEOS',
 	GET_AAG_VIDEO_BY_REFERENDUM = 'GET_AAG_VIDEO_BY_REFERENDUM',
-	POST_AAG_REQUEST = 'POST_AAG_REQUEST'
+	POST_AAG_REQUEST = 'POST_AAG_REQUEST',
+	CREATE_DELEGATE_X_BOT = 'CREATE_DELEGATE_X_BOT',
+	UPDATE_DELEGATE_X_BOT = 'UPDATE_DELEGATE_X_BOT',
+	GET_DELEGATE_X_DETAILS = 'GET_DELEGATE_X_DETAILS',
+	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY'
 }
 
 export class NextApiClientService {
@@ -427,6 +434,26 @@ export class NextApiClientService {
 			case EApiRoute.POST_AAG_REQUEST:
 				path = '/aag/request';
 				method = 'POST';
+				break;
+
+			case EApiRoute.CREATE_DELEGATE_X_BOT:
+				path = '/delegate-x';
+				method = 'POST';
+				break;
+
+			case EApiRoute.UPDATE_DELEGATE_X_BOT:
+				path = '/delegate-x';
+				method = 'PUT';
+				break;
+
+			case EApiRoute.GET_DELEGATE_X_DETAILS:
+				path = '/delegate-x';
+				method = 'GET';
+				break;
+
+			case EApiRoute.GET_DELEGATE_X_VOTE_HISTORY:
+				path = '/delegate-x/vote-history';
+				method = 'GET';
 				break;
 
 			default:
@@ -1482,10 +1509,22 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ totalUsers: number; totalConversations: number }>({ url, method });
 	}
 
-	static async klaraSendMessage({ message, userId, conversationId, signal }: { message: string; userId: string; conversationId: string; signal: AbortSignal }) {
+	static async klaraSendMessage({
+		message,
+		userId,
+		conversationId,
+		conversationHistory,
+		signal
+	}: {
+		message: string;
+		userId: string;
+		conversationId: string;
+		conversationHistory?: IConversationTurn[];
+		signal: AbortSignal;
+	}) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.KLARA_SEND_MESSAGE, routeSegments: ['send-message'] });
 
-		return this.nextApiClientFetchStream({ url, method, signal, data: { message, userId, conversationId } });
+		return this.nextApiClientFetchStream({ url, method, signal, data: { message, userId, conversationId, conversationHistory } });
 	}
 
 	static async submitKlaraFeedback({
@@ -1542,6 +1581,83 @@ export class NextApiClientService {
 			url,
 			method
 		});
+	}
+
+	static async createDelegateXAccount({
+		strategyId,
+		contactLink,
+		signatureLink,
+		includeComment,
+		votingPower,
+		prompt
+	}: {
+		strategyId: string;
+		contactLink: string;
+		signatureLink: string;
+		includeComment: boolean;
+		votingPower: string;
+		prompt?: string;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.CREATE_DELEGATE_X_BOT });
+		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount }>({
+			url,
+			method,
+			data: { strategyId, contactLink, signatureLink, includeComment, votingPower, prompt }
+		});
+	}
+
+	static async updateDelegateXAccount({
+		strategyId,
+		contactLink,
+		signatureLink,
+		includeComment,
+		votingPower,
+		prompt,
+		active
+	}: {
+		strategyId?: string;
+		contactLink?: string;
+		signatureLink?: string;
+		includeComment?: boolean;
+		votingPower?: string;
+		prompt?: string;
+		active?: boolean;
+	}) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.UPDATE_DELEGATE_X_BOT });
+		return this.nextApiClientFetch<{ success: boolean; delegateXAccount: IDelegateXAccount }>({
+			url,
+			method,
+			data: { strategyId, contactLink, signatureLink, includeComment, votingPower, prompt, active }
+		});
+	}
+
+	static async getDelegateXDetails() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_DETAILS });
+		return this.nextApiClientFetch<{
+			success: boolean;
+			delegateXAccount: IDelegateXAccount;
+			totalVotingPower: string;
+			totalVotes: number;
+			totalDelegators: number;
+			yesCount: number;
+			noCount: number;
+			abstainCount: number;
+			votesPast30Days: number;
+			votingPower: string;
+			totalVotesPast30Days: number;
+		}>({
+			url,
+			method
+		});
+	}
+
+	static async getDelegateXVoteHistory({ page = 1, limit = DEFAULT_LISTING_LIMIT }: { page?: number; limit?: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_VOTE_HISTORY, queryParams });
+		return this.nextApiClientFetch<{ success: boolean; voteData: IDelegateXVoteData[]; totalCount: number }>({ url, method });
 	}
 
 	static async getAAGVideos({ q, limit, sort, network }: { q?: string; limit?: number; sort?: 'latest' | 'oldest'; network?: ENetwork | null }) {

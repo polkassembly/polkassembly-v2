@@ -456,6 +456,7 @@
 		"analytics": "分析",
 		"treasuryAnalytics": "財務分析",
 		"proxies": "プロキシ",
+		"identityAndJudgement": "身分と判断",
 		"Tag": {
 			"new": "新規"
 		}
@@ -1512,6 +1513,49 @@
 		"teleportFundsToPeopleChainFailedDescription": "People Chainへの資金テレポート中にエラーが発生しました",
 		"BeneficiaryAddress": "受益者アドレス",
 		"Amount": "金額"
+	},
+	"Judgements": {
+		"identityAndJudgement": "身分と判断",
+		"requestJudgement": "判断を要求",
+		"becomeARegistrar": "登録者になる",
+		"dashboard": "ダッシュボード",
+		"registrar": "登録者",
+		"registrars": "登録者",
+		"judgementsGranted": "判断許可",
+		"judgementsRequested": "判断要求",
+		"judgementsCompleted": "判断完了",
+		"thisMonth": "今月",
+		"registrarDescription": "アカウントの身元を検証および検証する権限を持つエンティティまたは個人。登録者はサービスの料金を設定し、特定のフィールドに対するアテステーションを制限できます。",
+		"becomeRegistrarTitle": "登録者になる方法",
+		"becomeRegistrarDescription": "Polkadotで登録者になるには、レファレンダム提案を提出し、コミュニティの承認を得る必要があります。方法は以下の通りです：",
+		"becomeRegistrarSteps": {
+			"step1": "登録者になるためのレファレンダム提案を提出",
+			"step2": "提案はコミュニティによって投票されます",
+			"step3": "承認されると、登録者リストに追加されます",
+			"step4": "その後、料金を設定し、身元確認サービスの提供を開始できます"
+		},
+		"continueToCreate": "提案作成に進む",
+		"cancel": "キャンセル",
+		"index": "インデックス",
+		"address": "アドレス",
+		"displayName": "表示名",
+		"email": "メール",
+		"twitter": "Twitter",
+		"status": "ステータス",
+		"initiatedOn": "開始日",
+		"latestJudgement": "最新の判断",
+		"receivedRequests": "受信要求",
+		"totalGiven": "合計",
+		"fee": "料金",
+		"noJudgementsFound": "判断が見つかりません",
+		"noRegistrarsFound": "登録者が見つかりません",
+		"searchByAddressOrName": "アドレスまたは名前で検索"
+	},
+	"JudgementStatus": {
+		"pending": "保留中",
+		"approved": "承認済み",
+		"rejected": "拒否されました",
+		"requested": "リクエスト済み"
 	},
 	"ConvictionSelector": {
 		"votes": "投票",
