@@ -993,7 +993,6 @@ export class PolkadotApiService {
 							isPostMigration
 								? {
 										// V4 beneficiary: VersionedLocatableAccount with location (where) and accountId (which account)
-										// Format matches Subsquare's implementation for Asset Hub treasury spends
 										V4: {
 											location: {
 												parents: 0,
