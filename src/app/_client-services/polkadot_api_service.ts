@@ -989,33 +989,40 @@ export class PolkadotApiService {
 										}
 									},
 							beneficiary.amount.toString(),
-							// beneficiary: VersionedLocation (just a Location in V4, not nested location+accountId)
+							// beneficiary: VersionedLocatableAccount (has location + accountId)
 							isPostMigration
 								? {
-										// V4 beneficiary is just a Location pointing to the account
+										// V4 beneficiary: VersionedLocatableAccount with location (where) and accountId (which account)
+										// Format matches Subsquare's implementation for Asset Hub treasury spends
 										V4: {
-											parents: 0,
-											interior: {
-												X1: [
-													{
-														AccountId32: {
-															id: decodeAddress(beneficiary.address),
-															network: null
+											location: {
+												parents: 0,
+												interior: 'Here'
+											},
+											accountId: {
+												parents: 0,
+												interior: {
+													X1: [
+														{
+															AccountId32: {
+																network: null,
+																id: u8aToHex(decodeAddress(beneficiary.address))
+															}
 														}
-													}
-												]
+													]
+												}
 											}
 										}
 									}
 								: {
-										// V3 beneficiary format
+										// V3 beneficiary format - simple Location
 										V3: {
 											parents: 0,
 											interior: {
 												X1: {
 													AccountId32: {
-														id: decodeAddress(beneficiary.address),
-														network: null
+														network: null,
+														id: u8aToHex(decodeAddress(beneficiary.address))
 													}
 												}
 											}
@@ -1060,32 +1067,39 @@ export class PolkadotApiService {
 										}
 									},
 							beneficiary.amount.toString(),
-							// beneficiary: VersionedLocation
+							// beneficiary: VersionedLocatableAccount (has location + accountId)
 							isPostMigration
 								? {
-										// V4 beneficiary - simple Location format
+										// V4 beneficiary has location (where) and accountId (which account)
 										V4: {
-											parents: 0,
-											interior: {
-												X1: [
-													{
-														AccountId32: {
-															id: decodeAddress(beneficiary.address),
-															network: null
+											location: {
+												parents: 0,
+												interior: 'Here'
+											},
+											accountId: {
+												parents: 0,
+												interior: {
+													X1: [
+														{
+															AccountId32: {
+																network: null,
+																id: u8aToHex(decodeAddress(beneficiary.address))
+															}
 														}
-													}
-												]
+													]
+												}
 											}
 										}
 									}
 								: {
+										// V3 beneficiary format - simple Location
 										V3: {
 											parents: 0,
 											interior: {
 												X1: {
 													AccountId32: {
-														id: decodeAddress(beneficiary.address),
-														network: null
+														network: null,
+														id: u8aToHex(decodeAddress(beneficiary.address))
 													}
 												}
 											}
