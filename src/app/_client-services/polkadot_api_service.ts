@@ -1464,7 +1464,7 @@ export class PolkadotApiService {
 						treasurySpendData: {
 							beneficiary:
 								getSubstrateAddressFromAccountId(
-									(spendData as any)?.beneficiary?.V4?.interior?.X1?.[0]?.AccountId32?.id || (spendData as any)?.beneficiary?.V3?.interior?.X1?.AccountId32?.id || ''
+									(spendData as any)?.beneficiary?.V4?.accountId?.interior?.X1?.[0]?.AccountId32?.id || (spendData as any)?.beneficiary?.V3?.interior?.X1?.AccountId32?.id || ''
 								) || '',
 							generalIndex:
 								(
