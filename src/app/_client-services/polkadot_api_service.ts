@@ -932,92 +932,103 @@ export class PolkadotApiService {
 		beneficiaries.forEach((beneficiary) => {
 			if (ValidatorService.isValidAmount(beneficiary.amount) && ValidatorService.isValidSubstrateAddress(beneficiary.address)) {
 				if (beneficiary.assetId && ValidatorService.isValidAssetId(beneficiary.assetId, this.network)) {
+					// For non-native assets (USDC, USDT, etc.)
+					// Use consistent XCM V4 format for both assetKind and beneficiary on post-migration networks
 					tx.push(
 						this.api.tx?.treasury?.spend(
-							{
-								V3: {
-									assetId: {
-										Concrete: {
-											parents: 0,
-											interior: {
-												X2: [
-													{
-														PalletInstance: NETWORKS_DETAILS[this.network]?.palletInstance
-													},
-													{
-														GeneralIndex: beneficiary.assetId
-													}
-												]
-											}
-										}
-									},
-									location: isPostMigration
-										? {
+							// assetKind: VersionedLocatableAsset
+							// In XCM V4, AssetId is just a Location (no Concrete wrapper like V3)
+							isPostMigration
+								? {
+										V4: {
+											// location: Where the asset exists (Asset Hub = Here for post-migration)
+											location: {
 												parents: 0,
 												interior: 'Here'
+											},
+											// assetId: The asset identifier - in V4 this is a Location, not Concrete
+											assetId: {
+												parents: 0,
+												interior: {
+													X2: [
+														{
+															PalletInstance: NETWORKS_DETAILS[this.network]?.palletInstance
+														},
+														{
+															GeneralIndex: beneficiary.assetId
+														}
+													]
+												}
 											}
-										: {
+										}
+									}
+								: {
+										// Pre-migration: Use V3 with Concrete wrapper
+										V3: {
+											location: {
 												parents: 0,
 												interior: {
 													X1: { Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId }
 												}
-											}
-								}
-							},
-							beneficiary.amount.toString(),
-							isPostMigration
-								? {
-										V4: {
-											location: {
-												parents: 0,
-												interior: 'Here'
 											},
-											accountId: {
-												parents: 0,
-												interior: {
-													X1: [
-														{
-															AccountId32: {
-																id: decodeAddress(beneficiary.address),
-																network: null
+											assetId: {
+												Concrete: {
+													parents: 0,
+													interior: {
+														X2: [
+															{
+																PalletInstance: NETWORKS_DETAILS[this.network]?.palletInstance
+															},
+															{
+																GeneralIndex: beneficiary.assetId
 															}
-														}
-													]
+														]
+													}
 												}
 											}
 										}
+									},
+							beneficiary.amount.toString(),
+							// beneficiary: VersionedLocation (just a Location in V4, not nested location+accountId)
+							isPostMigration
+								? {
+										// V4 beneficiary is just a Location pointing to the account
+										V4: {
+											parents: 0,
+											interior: {
+												X1: [
+													{
+														AccountId32: {
+															id: decodeAddress(beneficiary.address),
+															network: null
+														}
+													}
+												]
+											}
+										}
 									}
-								: { V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
+								: {
+										// V3 beneficiary format
+										V3: {
+											parents: 0,
+											interior: {
+												X1: {
+													AccountId32: {
+														id: decodeAddress(beneficiary.address),
+														network: null
+													}
+												}
+											}
+										}
+									},
 							beneficiary.validFromBlock || null
 						)
 					);
 				} else {
+					// For native token spends
 					tx.push(
 						this.api.tx?.treasury?.spend(
-							{
-								V4: {
-									location: isPostMigration
-										? {
-												parents: 0,
-												interior: 'Here'
-											}
-										: {
-												parents: 0,
-												interior: {
-													X1: [
-														{
-															Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId
-														}
-													]
-												}
-											},
-									assetId: {
-										parents: 1,
-										interior: 'here'
-									}
-								}
-							},
-							beneficiary.amount.toString(),
+							// assetKind for native token
 							isPostMigration
 								? {
 										V4: {
@@ -1025,18 +1036,45 @@ export class PolkadotApiService {
 												parents: 0,
 												interior: 'Here'
 											},
-											accountId: {
+											// Native token assetId: points to relay chain (parents: 1, interior: Here)
+											assetId: {
+												parents: 1,
+												interior: 'Here'
+											}
+										}
+									}
+								: {
+										V3: {
+											location: {
 												parents: 0,
 												interior: {
-													X1: [
-														{
-															AccountId32: {
-																id: decodeAddress(beneficiary.address),
-																network: null
-															}
-														}
-													]
+													X1: { Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId }
 												}
+											},
+											assetId: {
+												Concrete: {
+													parents: 1,
+													interior: 'Here'
+												}
+											}
+										}
+									},
+							beneficiary.amount.toString(),
+							// beneficiary: VersionedLocation
+							isPostMigration
+								? {
+										// V4 beneficiary - simple Location format
+										V4: {
+											parents: 0,
+											interior: {
+												X1: [
+													{
+														AccountId32: {
+															id: decodeAddress(beneficiary.address),
+															network: null
+														}
+													}
+												]
 											}
 										}
 									}
