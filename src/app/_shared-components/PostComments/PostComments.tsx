@@ -41,25 +41,23 @@ function PostComments({
 
 	const [identityLoading, setIdentityLoading] = useState(false);
 
-	const fetchCommentIdentities = useCallback(
-		async (newComments: ICommentResponse[]) => {
-			if (!newComments || !newComments.length) return;
-			setIdentityLoading(true);
-			const identityComments = await Promise.all(
-				newComments.map(async (comment) => {
-					const identity = await getOnChainIdentity(comment?.publicUser?.addresses?.[0]);
-					return { ...comment, isVerified: identity?.isVerified };
-				})
-			);
-			setCommentsData(allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED ? identityComments.filter((comment) => comment.isVerified) : identityComments);
-			setIdentityLoading(false);
-		},
-		[allowedCommentor, getOnChainIdentity]
-	);
+	const fetchCommentIdentities = useCallback(async () => {
+		if (allowedCommentor !== EAllowedCommentor.ONCHAIN_VERIFIED || !comments?.length || (commentsData[0] && 'isVerified' in commentsData[0])) return;
+		setIdentityLoading(true);
+		const identityComments = await Promise.all(
+			comments.map(async (comment) => {
+				const identity = await getOnChainIdentity(comment?.publicUser?.addresses?.[0]);
+				return { ...comment, isVerified: identity?.isVerified };
+			})
+		);
+		setCommentsData(allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED ? identityComments.filter((comment) => comment.isVerified) : identityComments);
+		setIdentityLoading(false);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [allowedCommentor, comments, getOnChainIdentity]);
 
 	useEffect(() => {
-		fetchCommentIdentities(comments || []);
-	}, [comments, fetchCommentIdentities]);
+		fetchCommentIdentities();
+	}, [fetchCommentIdentities]);
 
 	const fetchComments = async () => {
 		const { data, error } = await CommentClientService.getCommentsOfPost({ proposalType, index });
@@ -70,6 +68,8 @@ function PostComments({
 
 		const allComments = data && data.length ? data : commentsData || [];
 
+		if (allowedCommentor !== EAllowedCommentor.ONCHAIN_VERIFIED) setCommentsData(allComments);
+
 		const identityComments: ICommentResponse[] = await Promise.all(
 			allComments.map(async (comment) => {
 				const identity = await getOnChainIdentity(comment?.publicUser?.addresses?.[0]);
@@ -77,13 +77,13 @@ function PostComments({
 			})
 		);
 
-		return allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED ? identityComments.filter((comment) => comment.isVerified) : identityComments;
+		setCommentsData(allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED ? identityComments.filter((comment) => comment.isVerified) : identityComments);
 	};
 
-	const { data } = useQuery({
+	useQuery({
 		queryKey: [EReactQueryKeys.COMMENTS, proposalType, index],
 		queryFn: () => fetchComments(),
-		placeholderData: (previousData) => previousData || (commentsData as ICommentResponse[]),
+		enabled: !!identityService,
 		retry: true,
 		refetchOnMount: true,
 		refetchOnWindowFocus: false
@@ -93,7 +93,7 @@ function PostComments({
 		<div>
 			<div className='mb-4 flex flex-wrap items-center gap-4 px-6 pt-6'>
 				<p className={classes.title}>
-					{t('PostDetails.comments')} <span className='text-base font-normal'>{data ? `(${data?.length})` : ''}</span>
+					{t('PostDetails.comments')} <span className='text-base font-normal'>{commentsData ? `(${commentsData?.length})` : ''}</span>
 				</p>
 				{allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED && (
 					<Alert
@@ -108,7 +108,7 @@ function PostComments({
 				)}
 			</div>
 
-			{data && data?.length >= MIN_COMMENTS_FOR_SUMMARY && (
+			{commentsData && commentsData?.length >= MIN_COMMENTS_FOR_SUMMARY && (
 				<div className={classes.summaryComponent}>
 					<AISummaryCollapsible
 						indexOrHash={index}
@@ -130,7 +130,7 @@ function PostComments({
 				<Comments
 					proposalType={proposalType}
 					index={index}
-					comments={data || []}
+					comments={commentsData || []}
 					allowedCommentor={allowedCommentor}
 					postUserId={postUserId}
 				/>
