@@ -79,7 +79,7 @@ export default function JobsAndBounties() {
 			</div>
 
 			<div className='flex max-h-[400px] flex-col gap-4 overflow-y-auto'>
-				{JOBS.map((job) => (
+				{JOBS.filter((job) => job.type === activeTab).map((job) => (
 					<div
 						key={job.title}
 						className='rounded-xl border border-border_grey p-4'

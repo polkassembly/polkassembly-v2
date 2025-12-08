@@ -91,14 +91,11 @@ function ActivityItem({ rowData }: { rowData: IPostListing }) {
 									/>
 								)}
 							</div>
-
 							<span className='text-text_secondary hidden md:inline'>|</span>
-
 							<div className='flex items-center gap-1'>
 								<FaRegClock className='text-text_secondary' />
 								<span>{formattedCreatedAt}</span>
 							</div>
-
 							<div className='hidden items-center gap-1 md:flex'>
 								<span className='text-text_secondary mx-1'>|</span>
 								<Image
@@ -110,7 +107,8 @@ function ActivityItem({ rowData }: { rowData: IPostListing }) {
 								/>
 								<span>{metrics?.comments || 0}</span>
 							</div>
-							{timeRemaining && timeRemaining.days > 0 && timeRemaining.hours > 0 && timeRemaining.minutes > 0 && (
+
+							{timeRemaining && (timeRemaining.days > 0 || timeRemaining.hours > 0 || timeRemaining.minutes > 0) && (
 								<div className='hidden items-center gap-1 md:flex'>
 									<span className='text-text_secondary mx-1'>|</span>
 									<Tooltip>
@@ -128,7 +126,6 @@ function ActivityItem({ rowData }: { rowData: IPostListing }) {
 									</Tooltip>
 								</div>
 							)}
-
 							{ayePercent > 0 && nayPercent > 0 && (
 								<div className='hidden items-center gap-1 md:flex'>
 									<span className='text-text_secondary mx-1'>|</span>
@@ -154,7 +151,6 @@ function ActivityItem({ rowData }: { rowData: IPostListing }) {
 									</Tooltip>
 								</div>
 							)}
-
 							<div className='mt-2 flex w-full justify-between gap-1 md:hidden'>
 								{onChainInfo?.beneficiaries && onChainInfo.beneficiaries.length > 0 && groupedByAsset && (
 									<div className='flex items-center'>

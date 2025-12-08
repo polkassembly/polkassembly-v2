@@ -77,6 +77,7 @@ function SpendPeriodStats({ nextSpendAt, nextBurn }: { nextSpendAt?: Date; nextB
 								<span className='font-semibold'>
 									{spendPeriodRemaining?.days ? <>{spendPeriodRemaining?.days} days </> : ''}
 									{spendPeriodRemaining?.hours ? <>{spendPeriodRemaining?.hours} hrs</> : ''}
+									{!spendPeriodRemaining?.days && !spendPeriodRemaining?.hours && spendPeriodRemaining?.minutes ? <>{spendPeriodRemaining?.minutes} mins</> : null}
 									<span className='mx-1 font-normal text-wallet_btn_text'>/</span>
 									<span className='font-normal text-wallet_btn_text'>{spendPeriodInDays} days</span>
 								</span>

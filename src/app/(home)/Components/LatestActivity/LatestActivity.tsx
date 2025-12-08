@@ -103,12 +103,14 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 				<div className='flex gap-2'>
 					<button
 						type='button'
+						aria-label='Filter activities'
 						className='flex h-9 w-9 items-center justify-center rounded border border-border_grey text-text_primary hover:bg-gray-50 dark:hover:bg-gray-800'
 					>
 						<FaFilter className='text-sm' />
 					</button>
 					<button
 						type='button'
+						aria-label='Sort activities'
 						className='flex h-9 w-9 items-center justify-center rounded border border-border_grey text-text_primary hover:bg-gray-50 dark:hover:bg-gray-800'
 					>
 						<MdSort className='text-lg' />
@@ -153,7 +155,6 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 								data-value={key}
 							>
 								{parseCamelCase(key)}
-								<span className='ml-1 text-xs text-wallet_btn_text'>(04)</span>
 							</TabsTrigger>
 						))}
 						<div className='invisible w-12 flex-shrink-0' />
@@ -166,6 +167,7 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 								<button
 									type='button'
 									onClick={handleScrollLeft}
+									aria-label='Scroll tabs left'
 									className='flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-bg_modal hover:bg-bg_modal/80'
 								>
 									<ChevronLeft className='h-5 w-5 text-wallet_btn_text' />
@@ -181,6 +183,7 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 								<button
 									type='button'
 									onClick={handleScrollRight}
+									aria-label='Scroll tabs right'
 									className='flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-bg_modal hover:bg-gray-100 dark:hover:bg-gray-800'
 								>
 									<ChevronRight className='h-5 w-5 text-wallet_btn_text' />

@@ -103,9 +103,9 @@ function OverviewTreasuryStats({ data }: { data: ITreasuryStats[] }) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const priceChange = data?.[0]?.nativeTokenUsdPrice24hChange;
-	const isPriceUp = priceChange && parseFloat(priceChange) >= 0;
-	const priceChangeText = `${Number(priceChange).toFixed(2)}%`;
-
+	const parsedPriceChange = priceChange ? parseFloat(priceChange) : 0;
+	const isPriceUp = parsedPriceChange >= 0;
+	const priceChangeText = `${parsedPriceChange.toFixed(2)}%`;
 	const treasuryData = useTreasuryData(data || []);
 
 	if (!data || !data?.length) {
