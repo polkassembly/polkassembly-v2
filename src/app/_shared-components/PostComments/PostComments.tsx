@@ -62,7 +62,7 @@ function PostComments({
 				<p className={classes.title}>
 					{t('PostDetails.comments')}{' '}
 					<span className='text-base font-normal'>
-						{allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED ? isVerifiedComments?.length : commentsData ? `(${commentsData?.length})` : ''}
+						{allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED ? `(${isVerifiedComments?.length})` : commentsData ? `(${commentsData?.length})` : ''}
 					</span>
 				</p>
 				{allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED && (
