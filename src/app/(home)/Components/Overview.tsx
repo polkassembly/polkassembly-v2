@@ -48,7 +48,7 @@ function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGeneri
 					</button>
 				</div>
 				<div className='mt-2 flex flex-col gap-6 lg:flex-row lg:items-start'>
-					<div className='w-full rounded-xl border border-border_grey bg-bg_modal p-6 shadow-sm lg:max-w-2xl'>
+					<div className='w-full lg:max-w-2xl'>
 						<Suspense
 							fallback={
 								<div className='relative flex min-h-40 w-full items-center justify-center'>

@@ -9,6 +9,7 @@ import { Button } from '@/app/_shared-components/Button';
 import { useTranslations } from 'next-intl';
 import { MdSort } from '@react-icons/all-files/md/MdSort';
 import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
+import { Separator } from '@/app/_shared-components/Separator';
 
 enum JobType {
 	JOB = 'job',
@@ -97,8 +98,8 @@ export default function JobsAndBounties() {
 						<p className='mt-1 text-xs text-wallet_btn_text'>
 							Salary: {job.salary} | Applicants: {job.applicants}
 						</p>
-
-						<div className='mt-4 flex items-center justify-between'>
+						<Separator className='my-2' />
+						<div className='mt-4 flex flex-col items-center justify-between md:flex-row'>
 							<div className='flex gap-2'>
 								{job.tags.map((tag) => (
 									<span
@@ -111,7 +112,7 @@ export default function JobsAndBounties() {
 							</div>
 							<Button
 								variant='link'
-								className='h-auto p-0 text-text_pink'
+								className='mt-3 h-auto p-0 text-text_pink md:mt-0'
 							>
 								Apply Now
 							</Button>
