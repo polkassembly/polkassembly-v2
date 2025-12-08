@@ -2,6 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
 import { Suspense } from 'react';
 import { useTranslations } from 'next-intl';
 import { IGenericListingResponse, IPostListing, ITreasuryStats } from '@/_shared/types';

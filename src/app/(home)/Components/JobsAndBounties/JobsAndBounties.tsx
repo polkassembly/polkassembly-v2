@@ -106,15 +106,15 @@ export default function JobsAndBounties() {
 						<Separator className='my-2' />
 						<div className='mt-4 flex flex-col items-center justify-between md:flex-row'>
 							<div className='flex gap-2'>
-								{job.tags.slice(0, 2).map((tag) => (
+								{job.tags.slice(0, 1).map((tag) => (
 									<span
 										key={tag}
-										className='rounded-full border border-border_grey px-3 py-1 text-xs text-wallet_btn_text'
+										className='rounded-full border border-border_grey px-2 py-1 text-xs text-wallet_btn_text'
 									>
 										{tag}
 									</span>
 								))}
-								{job.tags.length > 2 && <span className='rounded-full border border-border_grey px-3 py-1 text-xs text-wallet_btn_text'>+{job.tags.length - 2}</span>}
+								{job.tags.length > 1 && <span className='rounded-full border border-border_grey px-2 py-1 text-xs text-wallet_btn_text'>+{job.tags.length - 1}</span>}
 							</div>
 							<Button
 								variant='link'
