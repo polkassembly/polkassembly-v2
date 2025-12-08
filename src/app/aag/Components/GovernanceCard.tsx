@@ -96,14 +96,14 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 
 	return (
 		<div
-			className={`group relative cursor-pointer rounded-lg p-[1px] transition-all duration-300 ${videoAssociatedNetwork === ENetwork.POLKADOT ? '[background:linear-gradient(180deg,#D2D8E0_0%,#E5007A_100%)]' : '[background:linear-gradient(180deg,#D2D8E0_0%,#000000_100%)]'}`}
+			className={`group relative flex h-full cursor-pointer flex-col rounded-lg p-[1px] transition-all duration-300 ${videoAssociatedNetwork === ENetwork.POLKADOT ? '[background:linear-gradient(180deg,#D2D8E0_0%,#E5007A_100%)]' : '[background:linear-gradient(180deg,#D2D8E0_0%,#000000_100%)]'}`}
 			onClick={handleCardClick}
 			onKeyDown={handleKeyDown}
 			role='button'
 			tabIndex={0}
 			aria-label={`View video: ${title}`}
 		>
-			<div className='overflow-hidden rounded-lg bg-bg_modal px-4 pb-3 pt-4 shadow-md transition-shadow hover:shadow-lg md:px-6 md:pt-6'>
+			<div className='flex h-full flex-col overflow-hidden rounded-lg bg-bg_modal px-4 pb-3 pt-4 shadow-md transition-shadow hover:shadow-lg md:px-6 md:pt-6'>
 				<div className='relative'>
 					{thumbnail && (
 						<Image
@@ -121,7 +121,7 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 					</div>
 				</div>
 
-				<div className='p-3 md:p-4'>
+				<div className='flex flex-1 flex-col p-3 md:p-4'>
 					<h3 className='text-base font-bold text-text_primary md:text-lg'>{title}</h3>
 					<p className='mb-3 flex flex-col items-start gap-2 text-xs text-wallet_btn_text sm:flex-row sm:items-center sm:gap-3 md:mb-4'>
 						<span className='flex items-center gap-1'>
@@ -133,7 +133,7 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 						</span>
 					</p>
 
-					<div className='mb-3 flex flex-col gap-2 md:mb-4'>
+					<div className='mb-3 flex flex-1 flex-col gap-2 md:mb-4'>
 						<div className='flex flex-wrap gap-2'>
 							<p className='text-sm text-text_primary'>{referenda ? t('referenda') : t('votingOutcomes')}</p>
 							{activeNetwork && referenda
@@ -172,7 +172,7 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 						</div>
 					</div>
 
-					<div className='flex flex-row items-center justify-between gap-3 border-t border-border_grey pt-3 md:pt-4'>
+					<div className='mt-auto flex flex-row items-center justify-between gap-3 border-t border-border_grey pt-3 md:pt-4'>
 						<div className='flex items-center gap-2 md:gap-3'>
 							{videoAssociatedNetwork && (
 								<Image
