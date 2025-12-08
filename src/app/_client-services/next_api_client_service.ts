@@ -66,6 +66,7 @@ import {
 	IConversationMessage,
 	IDelegateXAccount,
 	IDelegateXVoteData,
+	IOGTrackerData,
 	IConversationTurn
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
@@ -171,7 +172,8 @@ enum EApiRoute {
 	CREATE_DELEGATE_X_BOT = 'CREATE_DELEGATE_X_BOT',
 	UPDATE_DELEGATE_X_BOT = 'UPDATE_DELEGATE_X_BOT',
 	GET_DELEGATE_X_DETAILS = 'GET_DELEGATE_X_DETAILS',
-	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY'
+	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY',
+	GET_OGTRACKER_DATA = 'GET_OGTRACKER_DATA'
 }
 
 export class NextApiClientService {
@@ -433,6 +435,10 @@ export class NextApiClientService {
 			case EApiRoute.GET_DELEGATE_X_VOTE_HISTORY:
 				path = '/delegate-x/vote-history';
 				method = 'GET';
+				break;
+
+			case EApiRoute.GET_OGTRACKER_DATA:
+				path = '/external/ogtracker';
 				break;
 
 			default:
@@ -1605,5 +1611,13 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_VOTE_HISTORY, queryParams });
 		return this.nextApiClientFetch<{ success: boolean; voteData: IDelegateXVoteData[]; totalCount: number }>({ url, method });
+	}
+
+	static async getOGTrackerData({ refNum }: { refNum: string }) {
+		const queryParams = new URLSearchParams({
+			refNum
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_OGTRACKER_DATA, queryParams });
+		return this.nextApiClientFetch<IOGTrackerData>({ url, method });
 	}
 }

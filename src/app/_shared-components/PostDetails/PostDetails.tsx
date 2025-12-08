@@ -95,6 +95,18 @@ const VotesData = dynamic(() => import('./VotesData/VotesData'), {
 	)
 });
 
+const OGTrackerInfo = dynamic(() => import('./OGTrackerInfo/OGTrackerInfo'), {
+	ssr: false,
+	loading: () => (
+		<div className='flex flex-col gap-4 rounded-lg border border-border_grey bg-bg_modal p-4'>
+			<Skeleton className='h-6 w-40' />
+			<Skeleton className='h-4 w-full' />
+			<Skeleton className='h-4 w-3/4' />
+			<Skeleton className='h-20 w-full' />
+		</div>
+	)
+});
+
 const PlaceDecisionDeposit = dynamic(() => import('./PlaceDecisionDeposit/PlaceDecisionDeposit'), {
 	ssr: false,
 	loading: () => (
@@ -290,6 +302,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
+							{post.index && <OGTrackerInfo refNum={String(post.index)} />}
+
 							{/* Place Decision Deposit */}
 							{post.proposalType === EProposalType.REFERENDUM_V2 &&
 								post.onChainInfo?.status &&
