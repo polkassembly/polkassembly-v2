@@ -34,7 +34,7 @@ function Header({ activeTab, tabCounts }: { activeTab: ECommunityRole; tabCounts
 		<div className={styles.header}>
 			<div className={styles.header_container}>
 				<div className={styles.header_title_container}>
-					<p className={styles.header_title}>{t('Community.community')}</p>
+					<p className={styles.header_title}>{t('Sidebar.people')}</p>
 					<p className={styles.header_description}>{t('Community.communityDescription')}</p>
 				</div>
 				<TabsList className={`w-fit max-w-full items-start overflow-auto pl-4 font-bold md:pl-0 ${styles.hideScrollbar}`}>

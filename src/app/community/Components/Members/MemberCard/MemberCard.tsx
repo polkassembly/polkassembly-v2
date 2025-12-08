@@ -9,9 +9,6 @@ import { useTranslations } from 'next-intl';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import Image from 'next/image';
 import { ESocial, EUserBadge, IPublicUser, IUserBadgeDetails, EReactQueryKeys } from '@/_shared/types';
-import EmailIcon from '@assets/icons/email-icon.svg';
-import TwitterIcon from '@assets/icons/twitter-icon.svg';
-import TelegramIcon from '@assets/icons/telegram-icon.svg';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import JudgementIcon from '@assets/icons/judgement-icon.svg';
 import RankStar from '@assets/profile/rank-star.svg';
@@ -29,15 +26,21 @@ import { isUserBlacklisted } from '@/_shared/_utils/isUserBlacklisted';
 import Address from '@ui/Profile/Address/Address';
 import { ShieldPlus, CircleDollarSign, UserIcon, ShieldAlert } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
+import { IoMdMail } from '@react-icons/all-files/io/IoMdMail';
+import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
+import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
+import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
+import RiotIcon from '@assets/icons/riot_icon.svg';
+import { FaGithub } from '@react-icons/all-files/fa/FaGithub';
 import styles from './MemberCard.module.scss';
 
 const SocialIcons = {
-	[ESocial.EMAIL]: EmailIcon,
-	[ESocial.TWITTER]: TwitterIcon,
-	[ESocial.TELEGRAM]: TelegramIcon,
-	[ESocial.DISCORD]: TelegramIcon,
-	[ESocial.RIOT]: TelegramIcon,
-	[ESocial.GITHUB]: TelegramIcon
+	[ESocial.EMAIL]: IoMdMail,
+	[ESocial.TWITTER]: FaTwitter,
+	[ESocial.TELEGRAM]: FaTelegramPlane,
+	[ESocial.DISCORD]: FaDiscord,
+	[ESocial.RIOT]: RiotIcon,
+	[ESocial.GITHUB]: FaGithub
 };
 
 function MemberCard({ member }: { member: IPublicUser }) {
@@ -205,7 +208,7 @@ function MemberCard({ member }: { member: IPublicUser }) {
 						href={social.platform === ESocial.EMAIL ? `mailto:${social.url}` : social.url}
 						target='_blank'
 						className='flex h-8 w-8 items-center justify-center rounded-full bg-social_green'
-						rel='noreferrer'
+						rel='noreferrer noopener'
 					>
 						<Image
 							src={SocialIcons[social.platform]}
