@@ -1176,7 +1176,86 @@
 		"switchToActivityFeed": "Switch to Activity Feed",
 		"topic": "Topic",
 		"creator": "Creator",
-		"viewAll": "View All"
+		"viewAll": "View All",
+		"headingTitle": "Polkassembly App Hub",
+		"headingSubtitle": "Track decisions, treasury health, and essential apps",
+		"readAnnouncement": "Read Announcement",
+		"treasuryReportTitle": "Q4 Treasury Report",
+		"treasuryReportDescription": "Review spending performance and ecosystem growth"
+	},
+	"JobsAndBounties": {
+		"title": "Jobs and Bounties",
+		"jobsTab": "JOBS",
+		"bountiesTab": "BOUNTIES",
+		"salary": "Salary",
+		"applicants": "Applicants",
+		"applyNow": "Apply Now"
+	},
+	"Apps": {
+		"OpenGov": {
+			"title": "OpenGov",
+			"description": "Explore and participate in Polkadot's on-chain governance."
+		},
+		"Delegation": {
+			"title": "Delegation",
+			"description": "Empower trusted voices to vote on your behalf and track how they represent you."
+		},
+		"Bounties": {
+			"title": "Bounties",
+			"description": "Fund community-driven work and follow progress on tasks."
+		},
+		"Identity": {
+			"title": "Identity & Judgement",
+			"description": "Verify and manage your on-chain identity to build reputation and transparency."
+		},
+		"People": {
+			"title": "People",
+			"description": "Discover members, delegates, curators, and contributors driving Polkadot's decisions."
+		},
+		"PoP": {
+			"title": "Proof of Personhood",
+			"description": "Authenticate your unique presence in the network — ensuring one person, one voice."
+		},
+		"DelegateX": {
+			"title": "DelegateX",
+			"description": "Compare delegates, review performance, and find the one who aligns with your gov values."
+		},
+		"Klara": {
+			"title": "Klara",
+			"description": "Your AI governance assistant — ask anything about proposals, votes, or on-chain activity."
+		},
+		"TreasuryAnalytics": {
+			"title": "Treasury Analytics",
+			"description": "Track treasury spending, assets, and trends to see how network funds are being used."
+		},
+		"Offchain": {
+			"title": "Offchain",
+			"description": "Engage with off-chain discussions and proposals for decision-making."
+		},
+		"Create": {
+			"title": "Create",
+			"description": "Submit proposals, preimages, and discussions to shape the future of Polkadot."
+		},
+		"GovAnalytics": {
+			"title": "Governance Analytics",
+			"description": "Analyze referenda trends, voter behavior, and network participation over time."
+		},
+		"AAG": {
+			"title": "AAG",
+			"description": "Watch and revisit key governance discussions and debates from the ecosystem."
+		},
+		"Polkasafe": {
+			"title": "Polkasafe",
+			"description": "Securely manage multisig wallets and track transactions across your wallets."
+		},
+		"Fellowship": {
+			"title": "Fellowship",
+			"description": "Explore the Polkadot Fellowship — a collective of experts advancing core protocol evolution."
+		},
+		"Proxy": {
+			"title": "Proxy",
+			"description": "Manage and assign proxy accounts to perform actions on your behalf safely."
+		}
 	},
 	"BatchVote": {
 		"batchVoting": "Batch Voting",
