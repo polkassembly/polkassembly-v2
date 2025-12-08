@@ -90,28 +90,27 @@ function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoI
 						{referenda && referenda.length > 0 && (
 							<div className='mt-2 flex flex-wrap items-center gap-2'>
 								<p className='text-sm text-text_primary'>{t('referenda')}</p>
-								{videoAssociatedNetwork &&
-									referenda.slice(0, 3).map((referendaItem) => {
-										const networkBaseUrl = `https://${videoAssociatedNetwork}.polkassembly.io`;
-										const referendumUrl = `${networkBaseUrl}/referenda/${referendaItem.referendaNo}`;
+								{referenda.slice(0, 3).map((referendaItem) => {
+									const networkBaseUrl = `https://${videoAssociatedNetwork}.polkassembly.io`;
+									const referendumUrl = `${networkBaseUrl}/referenda/${referendaItem.referendaNo}`;
 
-										return (
-											<a
-												key={`${videoAssociatedNetwork}-${referendaItem.referendaNo}`}
-												href={referendumUrl}
-												target='_blank'
-												rel='noopener noreferrer'
-												className='inline-flex items-center gap-1.5 rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink transition-colors hover:bg-bg_light_pink/80'
-												onClick={(e) => {
-													e.preventDefault();
-													e.stopPropagation();
-													window.open(referendumUrl, '_blank', 'noopener,noreferrer');
-												}}
-											>
-												# {referendaItem.referendaNo}
-											</a>
-										);
-									})}
+									return (
+										<a
+											key={`${videoAssociatedNetwork}-${referendaItem.referendaNo}`}
+											href={referendumUrl}
+											target='_blank'
+											rel='noopener noreferrer'
+											className='inline-flex items-center gap-1.5 rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink transition-colors hover:bg-bg_light_pink/80'
+											onClick={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
+												window.open(referendumUrl, '_blank', 'noopener,noreferrer');
+											}}
+										>
+											# {referendaItem.referendaNo}
+										</a>
+									);
+								})}
 								{referenda.length > MAX_VISIBLE_REFERENDA && (
 									<span className='rounded-full bg-bg_light_pink px-2 py-0.5 text-xs font-medium text-text_pink'>+{referenda.length - MAX_VISIBLE_REFERENDA} </span>
 								)}

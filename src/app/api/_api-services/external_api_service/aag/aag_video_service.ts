@@ -471,12 +471,7 @@ export class AAGVideoService extends FirestoreUtils {
 	}
 
 	static async GetAAGVideosByReferenda(referendaId: string, limit: number = 20): Promise<IAAGVideoMetadata[]> {
-		const snapshot = await this.aagVideoMetadataCollectionRef()
-			.where('isIndexed', '==', true)
-			.where('referenda', 'array-contains', { referendaNo: referendaId })
-			.orderBy('publishedAt', 'desc')
-			.limit(limit)
-			.get();
+		const snapshot = await this.aagVideoMetadataCollectionRef().where('isIndexed', '==', true).orderBy('publishedAt', 'desc').limit(100).get();
 
 		return snapshot.docs
 			.map((doc) => {
@@ -494,7 +489,9 @@ export class AAGVideoService extends FirestoreUtils {
 
 				return processedData as IAAGVideoMetadata;
 			})
-			.filter((item): item is IAAGVideoMetadata => item !== null);
+			.filter((item): item is IAAGVideoMetadata => item !== null)
+			.filter((video) => (video.referenda || []).some((ref) => ref.referendaNo === referendaId))
+			.slice(0, limit);
 	}
 
 	static formatAAGVideoSummary(video: IAAGVideoMetadata): IAAGVideoSummary {

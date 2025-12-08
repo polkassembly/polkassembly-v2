@@ -80,6 +80,9 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 	};
 
 	const handleKeyDown = (e: KeyboardEvent) => {
+		if (e.target !== e.currentTarget) {
+			return;
+		}
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
 			handleCardClick();
