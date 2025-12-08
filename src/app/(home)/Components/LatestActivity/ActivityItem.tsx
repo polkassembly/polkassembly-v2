@@ -126,7 +126,7 @@ function ActivityItem({ rowData }: { rowData: IPostListing }) {
 									</Tooltip>
 								</div>
 							)}
-							{ayePercent > 0 && nayPercent > 0 && (
+							{(ayePercent > 0 || nayPercent > 0) && (
 								<div className='hidden items-center gap-1 md:flex'>
 									<span className='text-text_secondary mx-1'>|</span>
 									<Tooltip>
