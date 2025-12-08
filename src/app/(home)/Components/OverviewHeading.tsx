@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 import { ExternalLink } from 'lucide-react';
 
 export default function OverviewHeading() {
-	const t = useTranslations('Overview');
+	const t = useTranslations('Profile');
 	return (
 		<div className='flex flex-col gap-y-2 bg-bg_modal'>
 			<div className='mx-auto w-full max-w-7xl px-4 py-8 lg:px-16'>
@@ -21,7 +21,7 @@ export default function OverviewHeading() {
 					<a
 						href='https://polkassembly.io'
 						target='_blank'
-						rel='noreferrer'
+						rel='noopener noreferrer'
 						className='flex items-center gap-2 text-sm font-medium text-text_pink'
 					>
 						{t('readAnnouncement')} <ExternalLink className='h-4 w-4' />

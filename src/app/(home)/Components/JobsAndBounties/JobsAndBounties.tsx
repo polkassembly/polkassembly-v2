@@ -16,6 +16,7 @@ enum JobType {
 	BOUNTY = 'bounty'
 }
 
+// TODO: Fetch real data from API
 const JOBS = [
 	{
 		company: 'Parity Technologies',
@@ -48,12 +49,16 @@ export default function JobsAndBounties() {
 				<div className='flex gap-2'>
 					<button
 						type='button'
+						aria-label='Filter jobs and bounties'
+						onClick={() => {}}
 						className='rounded border border-border_grey p-1'
 					>
 						<FaFilter className='text-sm text-text_primary' />
 					</button>
 					<button
 						type='button'
+						aria-label='Sort jobs and bounties'
+						onClick={() => {}}
 						className='rounded border border-border_grey p-1'
 					>
 						<MdSort className='text-xl text-text_primary' />
@@ -114,6 +119,7 @@ export default function JobsAndBounties() {
 							<Button
 								variant='link'
 								className='mt-3 h-auto p-0 text-text_pink md:mt-0'
+								onClick={() => {}}
 							>
 								{t('JobsAndBounties.applyNow')}
 							</Button>

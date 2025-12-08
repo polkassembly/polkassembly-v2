@@ -75,11 +75,29 @@ function SpendPeriodStats({ nextSpendAt, nextBurn }: { nextSpendAt?: Date; nextB
 								'N/A'
 							) : (
 								<span className='font-semibold'>
-									{spendPeriodRemaining?.days ? <>{spendPeriodRemaining?.days} days </> : ''}
-									{spendPeriodRemaining?.hours ? <>{spendPeriodRemaining?.hours} hrs</> : ''}
-									{!spendPeriodRemaining?.days && !spendPeriodRemaining?.hours && spendPeriodRemaining?.minutes ? <>{spendPeriodRemaining?.minutes} mins</> : null}
+									{spendPeriodRemaining?.days ? (
+										<>
+											{spendPeriodRemaining?.days} {t('TreasuryStats.days')}{' '}
+										</>
+									) : (
+										''
+									)}
+									{spendPeriodRemaining?.hours ? (
+										<>
+											{spendPeriodRemaining?.hours} {t('TreasuryStats.hours')}{' '}
+										</>
+									) : (
+										''
+									)}
+									{!spendPeriodRemaining?.days && !spendPeriodRemaining?.hours && spendPeriodRemaining?.minutes ? (
+										<>
+											{spendPeriodRemaining?.minutes} {t('TreasuryStats.minutes')}
+										</>
+									) : null}
 									<span className='mx-1 font-normal text-wallet_btn_text'>/</span>
-									<span className='font-normal text-wallet_btn_text'>{spendPeriodInDays} days</span>
+									<span className='font-normal text-wallet_btn_text'>
+										{spendPeriodInDays} {t('TreasuryStats.days')}
+									</span>
 								</span>
 							)}
 						</span>
@@ -109,7 +127,6 @@ function SpendPeriodStats({ nextSpendAt, nextBurn }: { nextSpendAt?: Date; nextB
 					</div>
 				</div>
 			</div>
-			<p className='text-[10px] text-wallet_btn_text'>{t('TreasuryStats.nextBurnTooltip')}</p>
 		</div>
 	);
 }

@@ -42,6 +42,8 @@ function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGeneri
 					</div>
 					<button
 						type='button'
+						aria-label={t('Overview.treasuryReportButtonLabel')}
+						onClick={() => {}}
 						className='flex h-10 w-10 items-center justify-center rounded-full bg-arrow_bg_color text-bg_modal'
 					>
 						<ArrowRight className='h-5 w-5' />
