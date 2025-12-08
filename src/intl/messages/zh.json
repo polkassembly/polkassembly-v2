@@ -270,12 +270,7 @@
 		"userSince": "用户自",
 		"rank": "等级",
 		"judgements": "判定",
-		"since": "于",
-		"headingTitle": "Polkassembly 应用中心",
-		"headingSubtitle": "追踪决策、国库状况和重要应用",
-		"readAnnouncement": "阅读公告",
-		"treasuryReportTitle": "Q4 国库报告",
-		"treasuryReportDescription": "回顾支出表现和生态系统增长"
+		"since": "于"
 	},
 	"JobsAndBounties": {
 		"title": "工作与赏金",
@@ -1222,7 +1217,12 @@
 		"switchToActivityFeed": "切换到活动动态",
 		"topic": "主题",
 		"creator": "创建者",
-		"viewAll": "查看全部"
+		"viewAll": "查看全部",
+		"headingTitle": "Polkassembly 应用中心",
+		"headingSubtitle": "追踪决策、国库状况和重要应用",
+		"readAnnouncement": "阅读公告",
+		"treasuryReportTitle": "Q4 国库报告",
+		"treasuryReportDescription": "回顾支出表现和生态系统增长"
 	},
 	"BatchVote": {
 		"batchVoting": "批量投票",

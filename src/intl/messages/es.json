@@ -271,12 +271,7 @@
 		"userSince": "Usuario desde",
 		"rank": "Rango",
 		"judgements": "Juicios",
-		"since": "Desde",
-		"headingTitle": "Centro de Aplicaciones Polkassembly",
-		"headingSubtitle": "Seguimiento de decisiones, salud del tesoro y aplicaciones esenciales",
-		"readAnnouncement": "Leer Anuncio",
-		"treasuryReportTitle": "Informe del Tesoro Q4",
-		"treasuryReportDescription": "Revise el rendimiento del gasto y el crecimiento del ecosistema"
+		"since": "Desde"
 	},
 	"JobsAndBounties": {
 		"title": "Empleos y Recompensas",
@@ -1183,7 +1178,12 @@
 		"switchToActivityFeed": "Cambiar a feed de actividad",
 		"topic": "Tema",
 		"creator": "Creador",
-		"viewAll": "Ver todo"
+		"viewAll": "Ver todo",
+		"headingTitle": "Centro de Aplicaciones Polkassembly",
+		"headingSubtitle": "Seguimiento de decisiones, salud del tesoro y aplicaciones esenciales",
+		"readAnnouncement": "Leer Anuncio",
+		"treasuryReportTitle": "Informe del Tesoro Q4",
+		"treasuryReportDescription": "Revise el rendimiento del gasto y el crecimiento del ecosistema"
 	},
 	"Bounty": {
 		"availableBountyPool": "Piscina de Prémios Disponibles",

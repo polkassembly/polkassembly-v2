@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 import { ExternalLink } from 'lucide-react';
 
 export default function OverviewHeading() {
-	const t = useTranslations('Profile');
+	const t = useTranslations('Overview');
 	return (
 		<div className='flex flex-col gap-y-2 bg-bg_modal'>
 			<div className='mx-auto w-full max-w-7xl px-4 py-8 lg:px-16'>

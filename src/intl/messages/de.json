@@ -269,20 +269,7 @@
 		"userSince": "Benutzer seit",
 		"rank": "Rang",
 		"judgements": "Beurteilungen",
-		"since": "Seit",
-		"headingTitle": "Polkassembly App-Hub",
-		"headingSubtitle": "Verfolgen Sie Entscheidungen, Treasury-Status und wichtige Apps",
-		"readAnnouncement": "Ankündigung lesen",
-		"treasuryReportTitle": "Q4 Treasury-Bericht",
-		"treasuryReportDescription": "Überprüfung der Ausgabenleistung und des Ökosystemwachstums"
-	},
-	"JobsAndBounties": {
-		"title": "Jobs und Bounties",
-		"jobsTab": "JOBS",
-		"bountiesTab": "BOUNTIES",
-		"salary": "Gehalt",
-		"applicants": "Bewerber",
-		"applyNow": "Jetzt bewerben"
+		"since": "Seit"
 	},
 	"Apps": {
 		"header": "Apps",
@@ -1220,7 +1207,20 @@
 		"switchToActivityFeed": "Zum Aktivitätsfeed wechseln",
 		"topic": "Thema",
 		"creator": "Ersteller",
-		"viewAll": "Alle anzeigen"
+		"viewAll": "Alle anzeigen",
+		"headingTitle": "Polkassembly App-Hub",
+		"headingSubtitle": "Verfolgen Sie Entscheidungen, Treasury-Status und wichtige Apps",
+		"readAnnouncement": "Ankündigung lesen",
+		"treasuryReportTitle": "Q4 Treasury-Bericht",
+		"treasuryReportDescription": "Überprüfung der Ausgabenleistung und des Ökosystemwachstums"
+	},
+	"JobsAndBounties": {
+		"title": "Jobs und Bounties",
+		"jobsTab": "JOBS",
+		"bountiesTab": "BOUNTIES",
+		"salary": "Gehalt",
+		"applicants": "Bewerber",
+		"applyNow": "Jetzt bewerben"
 	},
 	"BatchVote": {
 		"batchVoting": "Stapelabstimmung",

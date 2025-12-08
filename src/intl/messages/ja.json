@@ -171,11 +171,6 @@
 		"on": "日時",
 		"judgements": "判定",
 		"since": "開始日",
-		"headingTitle": "Polkassembly アプリハブ",
-		"headingSubtitle": "意思決定、国庫の健全性、および重要なアプリを追跡",
-		"readAnnouncement": "お知らせを読む",
-		"treasuryReportTitle": "Q4 国庫レポート",
-		"treasuryReportDescription": "支出実績とエコシステムの成長を確認",
 		"noJudgements": "判定がありません",
 		"judgement": "判定",
 		"Delegations": {
@@ -1110,7 +1105,12 @@
 		"switchToActivityFeed": "アクティビティフィードに切り替え",
 		"topic": "トピック",
 		"creator": "作成者",
-		"viewAll": "すべて表示"
+		"viewAll": "すべて表示",
+		"headingTitle": "Polkassembly アプリハブ",
+		"headingSubtitle": "意思決定、国庫の健全性、および重要なアプリを追跡",
+		"readAnnouncement": "お知らせを読む",
+		"treasuryReportTitle": "Q4 国庫レポート",
+		"treasuryReportDescription": "支出実績とエコシステムの成長を確認"
 	},
 	"Bounty": {
 		"availableBountyPool": "利用可能な報奨金プール",

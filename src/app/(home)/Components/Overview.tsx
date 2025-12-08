@@ -42,7 +42,7 @@ function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGeneri
 					</div>
 					<button
 						type='button'
-						aria-label={t('Overview.treasuryReportButtonLabel')}
+						aria-label='View Report'
 						onClick={() => {}}
 						className='flex h-10 w-10 items-center justify-center rounded-full bg-arrow_bg_color text-bg_modal'
 					>
