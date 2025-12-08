@@ -47,8 +47,8 @@ function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGeneri
 						<ArrowRight className='h-5 w-5' />
 					</button>
 				</div>
-				<div className='mt-2 flex flex-col gap-6 lg:flex-row lg:items-start'>
-					<div className='w-full lg:max-w-2xl'>
+				<div className='mt-2 grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-start'>
+					<div className='w-full lg:col-span-2'>
 						<Suspense
 							fallback={
 								<div className='relative flex min-h-40 w-full items-center justify-center'>
@@ -60,7 +60,9 @@ function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGeneri
 						</Suspense>
 					</div>
 
-					<JobsAndBounties />
+					<div className='w-full lg:col-span-1'>
+						<JobsAndBounties />
+					</div>
 				</div>
 			</div>
 		</div>

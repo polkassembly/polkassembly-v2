@@ -110,13 +110,12 @@ function ActivityItem({ rowData }: { rowData: IPostListing }) {
 								/>
 								<span>{metrics?.comments || 0}</span>
 							</div>
-
-							{timeRemaining && (
+							{timeRemaining && timeRemaining.days > 0 && timeRemaining.hours > 0 && timeRemaining.minutes > 0 && (
 								<div className='hidden items-center gap-1 md:flex'>
 									<span className='text-text_secondary mx-1'>|</span>
 									<Tooltip>
 										<TooltipTrigger asChild>
-											<div>
+											<div className='w-7'>
 												<Progress
 													value={decisionPeriodPercentage}
 													className='h-1.5 max-w-7 bg-decision_bar_bg'

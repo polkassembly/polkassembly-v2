@@ -42,7 +42,7 @@ export default function JobsAndBounties() {
 	const t = useTranslations();
 
 	return (
-		<div className='flex w-full flex-col rounded-xl border border-border_grey bg-bg_modal p-6 shadow-sm lg:w-1/2'>
+		<div className='flex w-full flex-col rounded-xl border border-border_grey bg-bg_modal p-6 shadow-sm'>
 			<div className='mb-6 flex items-center justify-between'>
 				<h2 className='text-xl font-semibold text-text_primary'>{t('JobsAndBounties.title')}</h2>
 				<div className='flex gap-2'>
@@ -96,12 +96,12 @@ export default function JobsAndBounties() {
 
 						<p className='mt-2 truncate text-sm text-wallet_btn_text'>{job.description}</p>
 						<p className='mt-1 text-xs text-wallet_btn_text'>
-							Salary: {job.salary} | Applicants: {job.applicants}
+							{t('JobsAndBounties.salary')}: {job.salary} | {t('JobsAndBounties.applicants')}: {job.applicants}
 						</p>
 						<Separator className='my-2' />
 						<div className='mt-4 flex flex-col items-center justify-between md:flex-row'>
 							<div className='flex gap-2'>
-								{job.tags.map((tag) => (
+								{job.tags.slice(0, 2).map((tag) => (
 									<span
 										key={tag}
 										className='rounded-full border border-border_grey px-3 py-1 text-xs text-wallet_btn_text'
@@ -109,12 +109,13 @@ export default function JobsAndBounties() {
 										{tag}
 									</span>
 								))}
+								{job.tags.length > 2 && <span className='rounded-full border border-border_grey px-3 py-1 text-xs text-wallet_btn_text'>+{job.tags.length - 2}</span>}
 							</div>
 							<Button
 								variant='link'
 								className='mt-3 h-auto p-0 text-text_pink md:mt-0'
 							>
-								Apply Now
+								{t('JobsAndBounties.applyNow')}
 							</Button>
 						</div>
 					</div>
