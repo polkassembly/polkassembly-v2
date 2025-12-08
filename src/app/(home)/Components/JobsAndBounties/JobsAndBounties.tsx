@@ -77,7 +77,7 @@ export default function JobsAndBounties() {
 				</button>
 			</div>
 
-			<div className='flex flex-col gap-4'>
+			<div className='flex max-h-[400px] flex-col gap-4 overflow-y-auto'>
 				{JOBS.map((job) => (
 					<div
 						key={job.title}

@@ -11,7 +11,7 @@ export default function OverviewHeading() {
 	const t = useTranslations('Overview');
 	return (
 		<div className='flex flex-col gap-y-2 bg-bg_modal'>
-			<div className='max-w-7xl px-4 py-8 lg:px-16'>
+			<div className='mx-auto w-full max-w-7xl px-4 py-8 lg:px-16'>
 				<div className='flex flex-col gap-y-6 md:flex-row md:items-center md:justify-between'>
 					<div className='flex flex-col gap-1'>
 						<h1 className='text-3xl font-bold text-text_primary'>{t('headingTitle')}</h1>
