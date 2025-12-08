@@ -139,7 +139,7 @@ function VideoDetailPage() {
 				title: videoMetadata.title,
 				thumbnail: videoMetadata.thumbnail,
 				duration: videoMetadata.duration,
-				publishedAt: typeof videoMetadata.publishedAt === 'string' ? videoMetadata.publishedAt : videoMetadata.publishedAt.toISOString(),
+				publishedAt: typeof videoMetadata.publishedAt === 'string' ? videoMetadata.publishedAt : videoMetadata.publishedAt?.toISOString() || new Date().toISOString(),
 				url: videoMetadata.url,
 				agendaUrl: videoMetadata.agendaUrl || '',
 				network: videoMetadata.network,

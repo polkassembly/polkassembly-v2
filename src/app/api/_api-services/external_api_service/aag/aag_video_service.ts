@@ -164,7 +164,7 @@ export class AAGVideoService extends FirestoreUtils {
 
 		const processedData = {
 			...data,
-			publishedAt: data.publishedAt?.toDate ? data.publishedAt.toDate() : new Date(data.publishedAt || Date.now()),
+			publishedAt: data.publishedAt?.toDate ? data.publishedAt.toDate() : new Date(data?.publishedAt || Date.now()),
 			createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
 			updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now())
 		};
