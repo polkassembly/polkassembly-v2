@@ -80,15 +80,30 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const commentsWithVoteData = await fetchCommentsVoteData({ comments, network, proposalType, index });
 	post = { ...post, comments: commentsWithVoteData };
 
-	const identityService = await IdentityService.Init(network);
-	if (post.allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED && identityService) {
-		const commentsWithIdentities = await Promise.all(
-			commentsWithVoteData.map(async (comment) => {
-				const identity = await identityService.getOnChainIdentity(comment.publicUser?.addresses?.[0]);
-				return { ...comment, isVerified: identity?.isVerified };
-			})
-		);
-		post = { ...post, comments: commentsWithIdentities };
+	if (post.allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED) {
+		try {
+			const identityService = await IdentityService.Init(network);
+			const commentsWithIdentities = await Promise.all(
+				commentsWithVoteData.map(async (comment) => {
+					const address = comment.publicUser?.addresses?.[0];
+
+					if (!address) {
+						return { ...comment, isVerified: false };
+					}
+
+					try {
+						const identity = await identityService.getOnChainIdentity(address);
+						return { ...comment, isVerified: identity?.isVerified ?? false };
+					} catch (error) {
+						console.error('Failed to fetch identity for comment', { commentId: comment.id, error });
+						return { ...comment, isVerified: false };
+					}
+				})
+			);
+			post = { ...post, comments: commentsWithIdentities };
+		} catch (error) {
+			console.error('Failed to fetch identity for comments:', error);
+		}
 	}
 
 	// fetch and add reactions to post
