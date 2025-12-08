@@ -32,6 +32,14 @@ export class AAGVideoService extends FirestoreUtils {
 
 	public static async IndexVideoMetadata(videoData: IAAGVideoData): Promise<{ success: boolean; videoId: string; message: string; error?: string }> {
 		try {
+			if (!videoData?.id) {
+				return {
+					success: false,
+					videoId: '',
+					message: 'Video ID is required',
+					error: 'Missing video ID in input data'
+				};
+			}
 			console.log(`Starting indexing for video: ${videoData.id} - ${videoData.title}`);
 
 			const existingVideo = await this.GetAAGVideoMetadata(videoData.id);

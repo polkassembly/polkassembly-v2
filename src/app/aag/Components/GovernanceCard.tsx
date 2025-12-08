@@ -4,16 +4,16 @@
 
 import Image from 'next/image';
 import { Calendar, Clock, Play, Share2 } from 'lucide-react';
-import { Button } from '@/app/_shared-components/Button';
-import { useToast } from '@/hooks/useToast';
-import { ENetwork, ENotificationStatus } from '@/_shared/types';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { KeyboardEvent, MouseEvent } from 'react';
+import { Button } from '@/app/_shared-components/Button';
+import { useToast } from '@/hooks/useToast';
+import { ENetwork, ENotificationStatus } from '@/_shared/types';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getNetworkFromDate } from '@/_shared/_utils/getNetworkFromDate';
-import { KeyboardEvent, MouseEvent } from 'react';
 
 const MAX_VISIBLE_REFERENDA = 6;
 
@@ -36,17 +36,17 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 	const currentPathname = usePathname();
 	const activeNetwork = getCurrentNetwork();
 	const videoDetailPath = videoId ? `/aag/${videoId}` : currentPathname;
-	const videoShareUrl = typeof window !== 'undefined' ? `${window.location.origin}${videoDetailPath}` : '';
+	const videoShareUrl = typeof window !== 'undefined' ? (videoId ? `${window.location.origin}${videoDetailPath}` : (url ?? '')) : '';
 
 	const videoLinkHref = videoId ? `/aag/${videoId}` : url || '#';
-
 	const videoAssociatedNetwork = publishedAt ? getNetworkFromDate(publishedAt) : null;
+	const referendaNetwork = videoAssociatedNetwork ?? activeNetwork;
 
 	const handleVideoShare = async (e: MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
 
-		if (!videoId) return;
+		if (!videoShareUrl) return;
 
 		try {
 			await navigator.clipboard.writeText(videoShareUrl);
@@ -139,14 +139,14 @@ function GovernanceVideoCard({ title, date, duration, thumbnail, referenda, voti
 					<div className='mb-3 flex flex-1 flex-col gap-2 md:mb-4'>
 						<div className='flex flex-wrap gap-2'>
 							<p className='text-sm text-text_primary'>{referenda ? t('referenda') : t('votingOutcomes')}</p>
-							{activeNetwork && referenda
+							{referendaNetwork && referenda
 								? referenda.slice(0, MAX_VISIBLE_REFERENDA).map((referendaItem) => {
-										const networkBaseUrl = `https://${activeNetwork}.polkassembly.io`;
+										const networkBaseUrl = `https://${referendaNetwork}.polkassembly.io`;
 										const referendumUrl = `${networkBaseUrl}/referenda/${referendaItem.referendaNo}`;
 
 										return (
 											<a
-												key={`${activeNetwork}-${referendaItem.referendaNo}`}
+												key={`${referendaNetwork}-${referendaItem.referendaNo}`}
 												href={referendumUrl}
 												target='_blank'
 												rel='noopener noreferrer'

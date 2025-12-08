@@ -76,7 +76,6 @@ function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoI
 
 					<div className='flex-grow'>
 						<h3 className='text-base font-bold text-text_primary'>{title}</h3>
-
 						<p className='mb-4 flex flex-col items-start gap-2 pt-1 text-sm text-wallet_btn_text sm:flex-row sm:items-center sm:gap-4'>
 							<span className='flex items-center gap-1'>
 								<Calendar className='h-3.5 w-3.5' /> {formatVideoDate(date)}
@@ -86,11 +85,10 @@ function AAGVideoCard({ title, date, duration, referenda, thumbnail, url, videoI
 								{duration}
 							</span>
 						</p>
-
-						{referenda && referenda.length > 0 && (
+						{videoAssociatedNetwork && referenda && referenda.length > 0 && (
 							<div className='mt-2 flex flex-wrap items-center gap-2'>
 								<p className='text-sm text-text_primary'>{t('referenda')}</p>
-								{referenda.slice(0, 3).map((referendaItem) => {
+								{referenda.slice(0, MAX_VISIBLE_REFERENDA).map((referendaItem) => {
 									const networkBaseUrl = `https://${videoAssociatedNetwork}.polkassembly.io`;
 									const referendumUrl = `${networkBaseUrl}/referenda/${referendaItem.referendaNo}`;
 
