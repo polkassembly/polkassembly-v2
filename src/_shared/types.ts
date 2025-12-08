@@ -1766,3 +1766,9 @@ export interface IJudgementStats {
 	percentageIncreaseFromLastMonth: number;
 	percentageCompletedThisMonth: number;
 }
+
+export interface IActivityStats {
+	activeProposalsCount: number;
+	weeklyVotesCount: number;
+	weeklySpends: { amount: string }[];
+}

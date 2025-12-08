@@ -25,7 +25,7 @@ const apps: AppItem[] = [
 	},
 	{
 		key: 'Identity',
-		href: '/identity'
+		href: '/judgements'
 	},
 	{
 		key: 'People',
@@ -33,15 +33,15 @@ const apps: AppItem[] = [
 	},
 	{
 		key: 'PoP',
-		href: '/pop'
+		href: 'https://www.proofofpersonhood.how/'
 	},
 	{
 		key: 'DelegateX',
-		href: '/delegatex'
+		href: '/delegation'
 	},
 	{
 		key: 'Klara',
-		href: '/klara'
+		href: '/'
 	},
 	{
 		key: 'TreasuryAnalytics',
@@ -65,15 +65,15 @@ const apps: AppItem[] = [
 	},
 	{
 		key: 'Polkasafe',
-		href: '/polkasafe'
+		href: 'https://polkasafe.xyz'
 	},
 	{
 		key: 'Fellowship',
-		href: '/fellowship'
+		href: 'https://collectives.polkassembly.io'
 	},
 	{
 		key: 'Proxy',
-		href: '/proxy'
+		href: '/proxies'
 	}
 ];
 
@@ -81,7 +81,7 @@ export default function AppGrid() {
 	const t = useTranslations('Apps');
 	return (
 		<div>
-			<h2 className='mb-4 text-lg font-semibold text-text_primary'>Apps</h2>
+			<h2 className='mb-4 text-lg font-semibold text-text_primary'>{t('header')}</h2>
 			<div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
 				{apps.map((app) => (
 					<Link

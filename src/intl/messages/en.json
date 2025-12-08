@@ -1140,6 +1140,14 @@
 		"viewAllChildBounties": "View All"
 	},
 	"Overview": {
+		"activeProposals": "Active Proposals",
+		"totalVotes": "Total Votes this week",
+		"totalSpends": "Total Spends this week",
+		"decidingEnds": "Deciding ends in",
+		"decisionPeriodEnded": "Decision period has ended",
+		"aye": "Aye",
+		"nay": "Nay",
+		"viewAllActivity": "View All Activity",
 		"month": "Month",
 		"year": "Year",
 		"events": "Events",
@@ -1192,6 +1200,7 @@
 		"applyNow": "Apply Now"
 	},
 	"Apps": {
+		"header": "Apps",
 		"OpenGov": {
 			"title": "OpenGov",
 			"description": "Explore and participate in Polkadot's on-chain governance."

@@ -2,6 +2,9 @@
 	"HomePage": {
 		"title": "ホームへようこそ"
 	},
+	"Apps": {
+		"header": "アプリ"
+	},
 	"TreasuryStats": {
 		"tooltip": "ブロック生成報酬、取引手数料、罰金、ステーキング効率などの一部から収集された資金。",
 		"treasury": "財務",
@@ -1063,6 +1066,14 @@
 		"clearIdentityDescription": "アイデンティティをクリアしてもよろしいですか？"
 	},
 	"Overview": {
+		"activeProposals": "アクティブな提案",
+		"totalVotes": "今週の総投票数",
+		"totalSpends": "今週の総支出",
+		"decidingEnds": "決定終了まで",
+		"decisionPeriodEnded": "決定期間が終了しました",
+		"aye": "賛成",
+		"nay": "反対",
+		"viewAllActivity": "すべてのアクティビティを表示",
 		"month": "月",
 		"year": "年",
 		"events": "イベント",

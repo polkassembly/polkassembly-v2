@@ -285,6 +285,7 @@
 		"applyNow": "Jetzt bewerben"
 	},
 	"Apps": {
+		"header": "Apps",
 		"OpenGov": {
 			"title": "OpenGov",
 			"description": "Erkunden Sie und nehmen Sie an der On-Chain-Governance von Polkadot teil."
@@ -1175,6 +1176,14 @@
 		"viewAllChildBounties": "Alle anzeigen"
 	},
 	"Overview": {
+		"activeProposals": "Aktive Vorschläge",
+		"totalVotes": "Gesamtstimmen diese Woche",
+		"totalSpends": "Gesamtausgaben diese Woche",
+		"decidingEnds": "Entscheidung endet in",
+		"decisionPeriodEnded": "Entscheidungszeitraum ist beendet",
+		"aye": "Ja",
+		"nay": "Nein",
+		"viewAllActivity": "Alle Aktivitäten anzeigen",
 		"month": "Monat",
 		"year": "Jahr",
 		"events": "Ereignisse",

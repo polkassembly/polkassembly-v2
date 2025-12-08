@@ -66,7 +66,8 @@ import {
 	IConversationMessage,
 	IDelegateXAccount,
 	IDelegateXVoteData,
-	IConversationTurn
+	IConversationTurn,
+	IActivityStats
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -171,7 +172,8 @@ enum EApiRoute {
 	CREATE_DELEGATE_X_BOT = 'CREATE_DELEGATE_X_BOT',
 	UPDATE_DELEGATE_X_BOT = 'UPDATE_DELEGATE_X_BOT',
 	GET_DELEGATE_X_DETAILS = 'GET_DELEGATE_X_DETAILS',
-	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY'
+	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY',
+	GET_OVERVIEW_STATS = 'GET_OVERVIEW_STATS'
 }
 
 export class NextApiClientService {
@@ -433,6 +435,10 @@ export class NextApiClientService {
 			case EApiRoute.GET_DELEGATE_X_VOTE_HISTORY:
 				path = '/delegate-x/vote-history';
 				method = 'GET';
+				break;
+
+			case EApiRoute.GET_OVERVIEW_STATS:
+				path = '/overview-stats';
 				break;
 
 			default:
@@ -1279,6 +1285,11 @@ export class NextApiClientService {
 				error: treasuryStatsResponse.error
 			}
 		};
+	}
+
+	static async getOverviewStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_OVERVIEW_STATS });
+		return this.nextApiClientFetch<IActivityStats | null>({ url, method });
 	}
 
 	static async getUserPostsByAddress({ address, page, limit }: { address: string; page: number; limit: number }) {

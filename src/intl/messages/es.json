@@ -287,6 +287,7 @@
 		"applyNow": "Aplicar Ahora"
 	},
 	"Apps": {
+		"header": "Aplicaciones",
 		"OpenGov": {
 			"title": "OpenGov",
 			"description": "Explore y participe en la gobernanza on-chain de Polkadot."
@@ -1138,6 +1139,14 @@
 		"clearIdentityDescription": "¿Está seguro de que desea borrar su identidad?"
 	},
 	"Overview": {
+		"activeProposals": "Propuestas Activas",
+		"totalVotes": "Votos totales esta semana",
+		"totalSpends": "Gastos totales esta semana",
+		"decidingEnds": "La decisión termina en",
+		"decisionPeriodEnded": "El periodo de decisión ha terminado",
+		"aye": "A favor",
+		"nay": "En contra",
+		"viewAllActivity": "Ver toda la actividad",
 		"month": "Mes",
 		"year": "Año",
 		"events": "Eventos",

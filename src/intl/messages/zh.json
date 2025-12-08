@@ -286,6 +286,7 @@
 		"applyNow": "立即申请"
 	},
 	"Apps": {
+		"header": "应用",
 		"OpenGov": {
 			"title": "OpenGov",
 			"description": "探索并参与 Polkadot 的链上治理。"
@@ -1177,6 +1178,14 @@
 		"viewAllChildBounties": "查看全部"
 	},
 	"Overview": {
+		"activeProposals": "活跃提案",
+		"totalVotes": "本周总投票数",
+		"totalSpends": "本周总支出",
+		"decidingEnds": "决议结束于",
+		"decisionPeriodEnded": "决议期已结束",
+		"aye": "赞成",
+		"nay": "反对",
+		"viewAllActivity": "查看所有活动",
 		"month": "月",
 		"year": "年",
 		"events": "活动",
