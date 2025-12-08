@@ -4,7 +4,7 @@
 
 import { memo, RefObject, useRef, useEffect, useCallback } from 'react';
 import { IoMdTrendingUp } from '@react-icons/all-files/io/IoMdTrendingUp';
-import { EDelegateSource, IDelegateDetails, IDelegateXAccount } from '@/_shared/types';
+import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { Label } from '@/app/_shared-components/Label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
@@ -28,22 +28,22 @@ import { delegateXAtom } from '@/app/_atoms/delegateX/delegateXAtom';
 import DelegateSearchInput from './DelegateSearchInput/DelegateSearchInput';
 import styles from './TrendingDelegates.module.scss';
 import DelegateCard from './DelegateCard/DelegateCard';
-import DelegateXCard from './DelegateCard/DelegateXCard';
+// import DelegateXCard from './DelegateCard/DelegateXCard';
 
 const PA_ADDRESS = '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t';
 
-const defaultDelegateXData = {
-	address: '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t',
-	bio: 'An AI powered custom agent that votes just like you would. Setup bot suited to your evaluation criterias and simplify voting with reason',
-	votingPower: '0',
-	ayeCount: 0,
-	nayCount: 0,
-	abstainCount: 0,
-	votesPast30Days: 0,
-	totalVotingPower: '0',
-	totalVotesPast30Days: 0,
-	totalDelegators: 0
-};
+// const defaultDelegateXData = {
+// address: '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t',
+// bio: 'An AI powered custom agent that votes just like you would. Setup bot suited to your evaluation criterias and simplify voting with reason',
+// votingPower: '0',
+// ayeCount: 0,
+// nayCount: 0,
+// abstainCount: 0,
+// votesPast30Days: 0,
+// totalVotingPower: '0',
+// totalVotesPast30Days: 0,
+// totalDelegators: 0
+// };
 
 const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedSources: EDelegateSource[]; setSelectedSources: (sources: EDelegateSource[]) => void }) => {
 	const t = useTranslations('Delegation');
@@ -93,7 +93,7 @@ const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedS
 function TrendingDelegates() {
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
 	const { userPreferences } = useUserPreferences();
-	const [delegateXState, setDelegateXState] = useAtom(delegateXAtom);
+	const [, setDelegateXState] = useAtom(delegateXAtom);
 
 	const fetchDelegateXData = useCallback(async () => {
 		if (!userPreferences.selectedAccount?.address) return;
@@ -143,21 +143,6 @@ function TrendingDelegates() {
 			}));
 		}
 	}, [userPreferences.selectedAccount?.address, setDelegateXState]);
-
-	const handleDelegateXSuccess = (newAccount: IDelegateXAccount) => {
-		setDelegateXState((prev) => ({
-			...prev,
-			account: newAccount,
-			data: prev.data
-				? {
-						...prev.data,
-						address: newAccount.address,
-						votingPower: newAccount.votingPower || '0'
-					}
-				: null
-		}));
-		fetchDelegateXData();
-	};
 
 	useEffect(() => {
 		if (userPreferences.selectedAccount?.address) {
@@ -261,12 +246,12 @@ function TrendingDelegates() {
 					{filteredDelegates.length > 0 ? (
 						<>
 							<div className='my-5 grid w-full grid-cols-1 items-stretch gap-5 lg:grid-cols-2'>
-								<DelegateXCard
+								{/* <DelegateXCard
 									data={delegateXState.account?.active ? delegateXState.data || defaultDelegateXData : defaultDelegateXData}
 									delegateXAccount={delegateXState.account}
 									onRefresh={handleDelegateXSuccess}
 									isLoading={delegateXState.isLoading}
-								/>
+								/> */}
 
 								{filteredDelegates.map((delegate: IDelegateDetails) => (
 									<DelegateCard
