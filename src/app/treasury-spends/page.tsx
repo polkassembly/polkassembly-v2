@@ -9,12 +9,13 @@ import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMet
 import { ETreasurySpendsTabs } from '@/_shared/types';
 import { Tabs, TabsContent } from '@ui/Tabs';
 import { TreasurySpendsHeader } from './components/Header/Header';
-import InfoNudge from './components/InfoNudge/InfoNudge';
 import SpendsList from './components/SpendsList/SpendsList';
 import SpendsStats from './components/Stats/SpendsStats';
 import CoretimeStats from './components/Stats/CoretimeStats';
 import CoretimeMigration from './components/Stats/CoretimeMigration';
 import CoretimeProcurementMethods from './components/Stats/CoretimeProcurementMethods';
+import CoretimeAllocations from './components/Coretime/Allocations';
+import CoretimeCycles from './components/Coretime/CoretimeCycles';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
@@ -44,13 +45,12 @@ async function TreasuryAnalyticsPage() {
 					<TabsContent value={ETreasurySpendsTabs.CORETIME}>
 						<div className='flex flex-col gap-6'>
 							<CoretimeStats />
-
 							<div className='flex gap-6'>
 								<CoretimeMigration />
 								<CoretimeProcurementMethods />
 							</div>
-
-							<InfoNudge />
+							<CoretimeCycles />
+							<CoretimeAllocations />
 						</div>
 					</TabsContent>
 				</div>
