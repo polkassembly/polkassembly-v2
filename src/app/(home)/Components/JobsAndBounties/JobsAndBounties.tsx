@@ -67,19 +67,17 @@ export default function JobsAndBounties() {
 				<div className='flex gap-2'>
 					<button
 						type='button'
-						aria-label='Filter jobs and bounties'
-						onClick={() => {}}
-						className='rounded border border-border_grey p-1'
+						aria-label='Filter activities'
+						className='flex h-9 w-9 items-center justify-center rounded border border-border_grey text-text_primary hover:bg-gray-50 dark:hover:bg-gray-800'
 					>
-						<FaFilter className='text-sm text-text_primary' />
+						<FaFilter className='text-sm' />
 					</button>
 					<button
 						type='button'
-						aria-label='Sort jobs and bounties'
-						onClick={() => {}}
-						className='rounded border border-border_grey p-1'
+						aria-label='Sort activities'
+						className='flex h-9 w-9 items-center justify-center rounded border border-border_grey text-text_primary hover:bg-gray-50 dark:hover:bg-gray-800'
 					>
-						<MdSort className='text-xl text-text_primary' />
+						<MdSort className='text-lg' />
 					</button>
 				</div>
 			</div>
