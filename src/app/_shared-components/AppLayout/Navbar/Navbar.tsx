@@ -5,6 +5,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button } from '@ui/Button';
 import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
@@ -53,6 +54,12 @@ function Navbar() {
 	const [isModalOpen, setModalOpen] = useState(false);
 
 	const network = getCurrentNetwork();
+	const pathname = usePathname();
+
+	const allowedPaths = [/^\/post\/[^/]+$/, /^\/proposal\/[^/]+$/, /^\/referenda\/[^/]+$/, /^\/bounty\/[^/]+$/, /^\/child-bounty\/[^/]+$/];
+	const isHomePage = pathname === '/';
+
+	const shouldShowBanner = isHomePage || allowedPaths.some((path) => path.test(pathname));
 
 	const handleLocaleChange = async (locale: ELocales) => {
 		setLocaleCookie(locale);
@@ -370,7 +377,7 @@ function Navbar() {
 					</div>
 				)}
 			</nav>
-			{[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) && (
+			{[ENetwork.KUSAMA, ENetwork.ASSETHUB_KUSAMA, ENetwork.POLKADOT].includes(network) && shouldShowBanner && (
 				<AnnouncementBanner
 					message={
 						<p className='flex flex-wrap items-center gap-x-1 text-sm'>
