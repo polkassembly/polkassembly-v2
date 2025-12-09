@@ -5,10 +5,10 @@
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import MemberCard from '../PeopleCards/MemberCard';
+import DelegateCard from '../PeopleCards/DelegateCard';
 import MembersStats from '../Stats/MembersStats';
 
-async function CommunityMembers({ page }: { page: number }) {
+async function CommunityDelegates({ page }: { page: number }) {
 	const { data, error } = await NextApiClientService.fetchCommunityMembers({ page });
 
 	if (error || !data) {
@@ -16,6 +16,7 @@ async function CommunityMembers({ page }: { page: number }) {
 	}
 
 	const members = data.items;
+	console.log('members', members);
 
 	if (members.length === 0) {
 		return <div className='text-text_secondary text-center text-sm'>No members found</div>;
@@ -28,7 +29,7 @@ async function CommunityMembers({ page }: { page: number }) {
 			/>
 			<div className='mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6'>
 				{members.map((member) => (
-					<MemberCard key={member.id} />
+					<DelegateCard key={member.id} />
 				))}
 			</div>
 			{data.totalCount > DEFAULT_LISTING_LIMIT && (
@@ -45,4 +46,4 @@ async function CommunityMembers({ page }: { page: number }) {
 	);
 }
 
-export default CommunityMembers;
+export default CommunityDelegates;

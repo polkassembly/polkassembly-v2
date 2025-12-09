@@ -21,3 +21,19 @@
 .readMoreButton {
 	@apply cursor-pointer !p-0 text-xs text-link;
 }
+
+.delegationCardStats {
+	@apply mt-auto grid grid-cols-3 items-center border-t border-border_grey;
+}
+
+.delegationCardStatsItem {
+	@apply border-r border-border_grey p-5 text-center;
+}
+
+.delegationCardStatsItemText {
+	@apply text-xs text-delegation_card_text xl:whitespace-nowrap;
+}
+
+.delegationCardStatsItemTextPast30Days {
+	@apply block text-[10px] text-delegation_card_text;
+}

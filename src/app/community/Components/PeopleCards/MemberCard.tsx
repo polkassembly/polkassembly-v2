@@ -4,11 +4,11 @@
 
 'use client';
 
-import { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import Image from 'next/image';
-import { ESocial, EUserBadge, IPublicUser, IUserBadgeDetails, EReactQueryKeys } from '@/_shared/types';
+import { ESocial, EUserBadge, IUserBadgeDetails } from '@/_shared/types';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import JudgementIcon from '@assets/icons/judgement-icon.svg';
 import RankStar from '@assets/profile/rank-star.svg';
@@ -18,9 +18,6 @@ import CopyToClipboard from '@ui/CopyToClipboard/CopyToClipboard';
 import { Separator } from '@ui/Separator';
 import { Button } from '@ui/Button';
 import { useIdentityService } from '@/hooks/useIdentityService';
-import { useQuery } from '@tanstack/react-query';
-import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
-import { RegistrationJudgement } from '@polkadot/types/interfaces';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { isUserBlacklisted } from '@/_shared/_utils/isUserBlacklisted';
 import Address from '@ui/Profile/Address/Address';
@@ -30,56 +27,80 @@ import { IoMdMail } from '@react-icons/all-files/io/IoMdMail';
 import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
 import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
 import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
-import RiotIcon from '@assets/icons/riot_icon.svg';
 import { FaGithub } from '@react-icons/all-files/fa/FaGithub';
-import styles from './MemberCard.module.scss';
+import styles from './PeopleCard.module.scss';
 
-const SocialIcons = {
+const SocialIcons: Partial<Record<ESocial, React.ComponentType<React.SVGProps<SVGSVGElement>>>> = {
 	[ESocial.EMAIL]: IoMdMail,
 	[ESocial.TWITTER]: FaTwitter,
 	[ESocial.TELEGRAM]: FaTelegramPlane,
 	[ESocial.DISCORD]: FaDiscord,
-	[ESocial.RIOT]: RiotIcon,
 	[ESocial.GITHUB]: FaGithub
 };
 
-function MemberCard({ member }: { member: IPublicUser }) {
+const member = {
+	addresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
+	balance: '1000000000000000000',
+	createdAt: '2024-05-20T12:00:00Z',
+	id: 1,
+	last30DaysVotedProposalsCount: 15,
+	maxDelegated: '500000000000000000000',
+	delegators: [
+		{
+			address: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
+			balance: '1000000000000000000',
+			createdAt: '2024-05-20T12:00:00Z',
+			updatedAt: '2024-06-20T12:00:00Z'
+		}
+	],
+	updatedAt: '2024-06-20T12:00:00Z',
+	username: 'blockchain_dev',
+	profileScore: 85.5,
+	followers: [{ followerUserId: 2 }],
+	following: [{ followerUserId: 3 }],
+	profileDetails: {
+		bio: 'Experienced blockchain developer and community advocate dedicated to fostering decentralized ecosystems.',
+		achievementBadges: [
+			{
+				name: EUserBadge.ACTIVE_VOTER,
+				unlockedAt: new Date('2025-08-20T12:00:00Z')
+			}
+		],
+		socials: [
+			{
+				platform: ESocial.EMAIL,
+				url: 'blockchain_dev@email.com'
+			},
+			{
+				platform: ESocial.TWITTER,
+				url: 'https://twitter.com/blockchain_dev'
+			},
+			{
+				platform: ESocial.TELEGRAM,
+				url: 'https://t.me/blockchain_dev'
+			}
+		]
+	},
+	judgements: ['Reasonable']
+};
+
+function MemberCard() {
 	const t = useTranslations();
 	const { user } = useUser();
 
 	const { identityService } = useIdentityService();
 	const [isReadMoreVisible, setIsReadMoreVisible] = useState(false);
+	const isFetching = false;
 
-	const userBadges = {} as Record<EUserBadge, IUserBadgeDetails>;
-
-	member?.profileDetails.achievementBadges?.forEach((badge) => {
-		userBadges[badge.name] = badge;
-	});
+	const userBadges = member.profileDetails.achievementBadges.reduce(
+		(acc, badge) => {
+			acc[badge.name] = badge;
+			return acc;
+		},
+		{} as Record<EUserBadge, IUserBadgeDetails>
+	);
 
 	const isFollowing = member?.following?.some((item) => item.followerUserId === user?.id);
-
-	const getIdentityOfAddresses = useCallback(async () => {
-		if (!identityService || !member?.addresses.length) return undefined;
-		const identities = await Promise.all(
-			member.addresses.map(async (a) => {
-				const identity = await identityService.getOnChainIdentity(a);
-				if (identity) {
-					return { ...identity, address: a };
-				}
-				return null;
-			})
-		);
-		return identities.filter((i) => i !== null);
-	}, [identityService, member?.addresses]);
-
-	const { data: identities, isFetching } = useQuery({
-		queryKey: [EReactQueryKeys.PROFILE_IDENTITIES, member?.addresses.join(',')],
-		queryFn: getIdentityOfAddresses,
-		enabled: !!member?.addresses.length && !!identityService,
-		staleTime: FIVE_MIN_IN_MILLI
-	});
-
-	const judgements = identities?.[0]?.judgements.filter(([, judgement]: RegistrationJudgement): boolean => !judgement.isFeePaid) || [];
 
 	return (
 		<div className={styles.memberCard}>
@@ -150,7 +171,7 @@ function MemberCard({ member }: { member: IPublicUser }) {
 						<Skeleton className='ml-2 h-4 w-16' />
 					) : (
 						<span className='text-xs text-basic_text'>
-							{t('Profile.judgement')}: <span className='font-medium'>{judgements?.[0]?.[1]?.toString() || t('Profile.noJudgements')}</span>
+							{t('Profile.judgement')}: <span className='font-medium'>{member?.judgements?.[0] || t('Profile.noJudgements')}</span>
 						</span>
 					)}
 				</div>
@@ -202,22 +223,20 @@ function MemberCard({ member }: { member: IPublicUser }) {
 				)}
 			</div>
 			<div className='flex items-center gap-x-4'>
-				{member?.profileDetails.publicSocialLinks?.map((social) => (
-					<a
-						key={social.platform}
-						href={social.platform === ESocial.EMAIL ? `mailto:${social.url}` : social.url}
-						target='_blank'
-						className='flex h-8 w-8 items-center justify-center rounded-full bg-social_green'
-						rel='noreferrer noopener'
-					>
-						<Image
-							src={SocialIcons[social.platform]}
-							alt='social green'
-							width={16}
-							height={16}
-						/>
-					</a>
-				))}
+				{member?.profileDetails.socials?.map((social) => {
+					const IconComponent = SocialIcons[social.platform];
+					return IconComponent ? (
+						<a
+							key={social.platform}
+							href={social.platform === ESocial.EMAIL ? `mailto:${social.url}` : social.url}
+							target='_blank'
+							className='flex h-8 w-8 items-center justify-center rounded-full bg-social_green'
+							rel='noreferrer noopener'
+						>
+							<IconComponent className='text-white' />
+						</a>
+					) : null;
+				})}
 			</div>
 			<div className='flex flex-wrap items-center gap-x-3'>
 				{Object.keys(userBadges || []).map((badge) => {
