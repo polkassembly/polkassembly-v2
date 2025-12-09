@@ -418,7 +418,7 @@ export class NextApiClientService {
 				break;
 
 			case EApiRoute.GET_GOOGLE_SHEET_NEWS:
-				path = '/external/news/google-sheets';
+				path = '/external/news';
 				break;
 
 			case EApiRoute.CREATE_DELEGATE_X_BOT:

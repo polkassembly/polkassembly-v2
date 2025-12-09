@@ -18,6 +18,7 @@ import { Skeleton } from '@/app/_shared-components/Skeleton';
 import dayjs from 'dayjs';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 
@@ -211,14 +212,16 @@ export default function JobsAndBounties() {
 											))}
 											{tags.length > 2 && <span className='rounded-full border border-border_grey px-1 py-0.5 text-xs text-wallet_btn_text'>+{tags.length - 2}</span>}
 										</div>
-										<a
-											href={job.company_website}
-											target='_blank'
-											rel='noopener noreferrer'
-											className='mt-3 h-auto p-0 text-sm font-medium text-text_pink hover:underline md:mt-0'
-										>
-											{t('JobsAndBounties.applyNow')}
-										</a>
+										{job.company_website && ValidatorService.isUrl(job.company_website) && (
+											<a
+												href={job.company_website}
+												target='_blank'
+												rel='noopener noreferrer'
+												className='mt-3 h-auto p-0 text-sm font-medium text-text_pink hover:underline md:mt-0'
+											>
+												{t('JobsAndBounties.applyNow')}
+											</a>
+										)}
 									</div>
 								</div>
 							);
