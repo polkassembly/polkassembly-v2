@@ -280,8 +280,8 @@
 		"applicants": "申请人",
 		"applyNow": "立即申请",
 		"noJobsFound": "未找到工作",
-		"posted": "Posted",
-		"noBountiesFound": "No bounties found"
+		"posted": "已发布",
+		"noBountiesFound": "未找到赏金"
 	},
 	"Apps": {
 		"header": "应用",

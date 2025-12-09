@@ -151,7 +151,7 @@ export default function JobsAndBounties() {
 							const tags = [job.employment_type, job.work_arrangement, job.salary_type].filter(Boolean);
 							return (
 								<div
-									key={job.title}
+									key={`${job.company_name}-${job.title}`}
 									className='rounded-xl border border-border_grey p-4'
 								>
 									<div className='flex items-start gap-2'>

@@ -1224,8 +1224,8 @@
 		"applicants": "Bewerber",
 		"applyNow": "Jetzt bewerben",
 		"noJobsFound": "Keine Jobs gefunden",
-		"posted": "Posted",
-		"noBountiesFound": "No bounties found"
+		"posted": "Veröffentlicht",
+		"noBountiesFound": "Keine Bounties gefunden"
 	},
 	"BatchVote": {
 		"batchVoting": "Stapelabstimmung",

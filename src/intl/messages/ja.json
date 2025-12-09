@@ -3,7 +3,71 @@
 		"title": "ホームへようこそ"
 	},
 	"Apps": {
-		"header": "アプリ"
+		"header": "アプリ",
+		"OpenGov": {
+			"title": "OpenGov",
+			"description": "Polkadotのオンチェーンガバナンスを探索し、参加しましょう。"
+		},
+		"Delegation": {
+			"title": "委任",
+			"description": "信頼できる声に投票を委任し、彼らがあなたをどのように代表しているかを追跡します。"
+		},
+		"Bounties": {
+			"title": "報奨金",
+			"description": "コミュニティ主導の作業に資金を提供し、タスクの進捗状況を追跡します。"
+		},
+		"Identity": {
+			"title": "アイデンティティと判定",
+			"description": "オンチェーンのアイデンティティを確認および管理して、評判と透明性を構築します。"
+		},
+		"People": {
+			"title": "人々",
+			"description": "Polkadotの決定を推進するメンバー、委任者、キュレーター、貢献者を発見します。"
+		},
+		"PoP": {
+			"title": "人間性の証明",
+			"description": "ネットワーク内での独自の存在を認証します — 一人一票を確保します。"
+		},
+		"DelegateX": {
+			"title": "DelegateX",
+			"description": "委任者を比較し、パフォーマンスを確認し、ガバナンスの価値観に合った委任者を見つけます。"
+		},
+		"Klara": {
+			"title": "Klara",
+			"description": "あなたのAIガバナンスアシスタント — 提案、投票、オンチェーンアクティビティについて何でも質問してください。"
+		},
+		"TreasuryAnalytics": {
+			"title": "財務分析",
+			"description": "財務支出、資産、トレンドを追跡して、ネットワーク資金がどのように使用されているかを確認します。"
+		},
+		"Offchain": {
+			"title": "オフチェーン",
+			"description": "意思決定のためのオフチェーンディスカッションや提案に参加します。"
+		},
+		"Create": {
+			"title": "作成",
+			"description": "Polkadotの未来を形作るために、提案、事前イメージ、ディスカッションを提出します。"
+		},
+		"GovAnalytics": {
+			"title": "ガバナンス分析",
+			"description": "リファレンダムの傾向、有権者の行動、ネットワークへの参加を長期的に分析します。"
+		},
+		"AAG": {
+			"title": "AAG",
+			"description": "エコシステムからの主要なガバナンスディスカッションや討論を視聴して再確認します。"
+		},
+		"Polkasafe": {
+			"title": "Polkasafe",
+			"description": "マルチシグウォレットを安全に管理し、ウォレット間の取引を追跡します。"
+		},
+		"Fellowship": {
+			"title": "フェローシップ",
+			"description": "Polkadotフェローシップを探索します — コアプロトコルの進化を推進する専門家の集団。"
+		},
+		"Proxy": {
+			"title": "プロキシ",
+			"description": "プロキシアカウントを管理および割り当てて、あなたに代わって安全にアクションを実行します。"
+		}
 	},
 	"TreasuryStats": {
 		"tooltip": "ブロック生成報酬、取引手数料、罰金、ステーキング効率などの一部から収集された資金。",
@@ -1122,8 +1186,8 @@
 		"applicants": "応募者",
 		"applyNow": "今すぐ応募",
 		"noJobsFound": "仕事が見つかりませんでした",
-		"posted": "Posted",
-		"noBountiesFound": "No bounties found"
+		"posted": "投稿日",
+		"noBountiesFound": "報奨金が見つかりませんでした"
 	},
 	"Bounty": {
 		"availableBountyPool": "利用可能な報奨金プール",
