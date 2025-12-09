@@ -10,8 +10,6 @@ import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { MdSort } from '@react-icons/all-files/md/MdSort';
-import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
 import { Separator } from '@/app/_shared-components/Separator';
 import { IJob, EProposalType, EProposalStatus, IPostListing } from '@/_shared/types';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
@@ -64,22 +62,6 @@ export default function JobsAndBounties() {
 		<div className='flex w-full flex-col rounded-xl border border-border_grey bg-bg_modal p-6 shadow-sm'>
 			<div className='mb-6 flex items-center justify-between'>
 				<h2 className='text-xl font-semibold text-text_primary'>{t('JobsAndBounties.title')}</h2>
-				<div className='flex gap-2'>
-					<button
-						type='button'
-						aria-label='Filter activities'
-						className='flex h-9 w-9 items-center justify-center rounded border border-border_grey text-text_primary hover:bg-gray-50 dark:hover:bg-gray-800'
-					>
-						<FaFilter className='text-sm' />
-					</button>
-					<button
-						type='button'
-						aria-label='Sort activities'
-						className='flex h-9 w-9 items-center justify-center rounded border border-border_grey text-text_primary hover:bg-gray-50 dark:hover:bg-gray-800'
-					>
-						<MdSort className='text-lg' />
-					</button>
-				</div>
 			</div>
 
 			<div className='mb-6 flex w-full rounded-md bg-sidebar_footer p-1'>
