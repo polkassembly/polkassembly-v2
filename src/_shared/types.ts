@@ -49,6 +49,12 @@ export interface ITrackCounts {
 	[trackName: string]: number;
 }
 
+export interface IOverviewTreasuryReport {
+	title: string;
+	description: string;
+	redirectLink: string;
+}
+
 export interface IUserSocialDetails {
 	platform: ESocial;
 	url: string;

@@ -6,73 +6,90 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
 interface AppItem {
+	icon: string;
 	key: string;
 	href: string;
 }
 
 const apps: AppItem[] = [
 	{
-		key: '🏛 OpenGov',
+		icon: '🏛',
+		key: 'OpenGov',
 		href: '/opengov'
 	},
 	{
-		key: '👥 Delegation',
+		icon: '👥',
+		key: 'Delegation',
 		href: '/delegation'
 	},
 	{
-		key: '💰 Bounties',
+		icon: '💰',
+		key: 'Bounties',
 		href: '/bounties'
 	},
 	{
-		key: '🪪 Identity & Judgement',
+		icon: '🪪',
+		key: 'Identity',
 		href: '/judgements'
 	},
 	{
-		key: '🧑‍🤝‍🧑 People',
+		icon: '🧑‍🤝‍🧑',
+		key: 'People',
 		href: '/people'
 	},
 	{
-		key: '🧬 Proof of Personhood',
+		icon: '🧬',
+		key: 'PoP',
 		href: 'https://www.proofofpersonhood.how/'
 	},
 	{
-		key: '⚖️ DelegateX',
+		icon: '⚖️',
+		key: 'DelegateX',
 		href: '/delegation'
 	},
 	{
-		key: '🦜 Klara',
+		icon: '🦜',
+		key: 'Klara',
 		href: '/'
 	},
 	{
-		key: '📊 Treasury Analytics',
+		icon: '📊',
+		key: 'TreasuryAnalytics',
 		href: '/treasury-analytics'
 	},
 	{
-		key: '🌐 Offchain',
+		icon: '🌐',
+		key: 'Offchain',
 		href: '/offchain'
 	},
 	{
-		key: '🏗 Create',
+		icon: '🏗',
+		key: 'Create',
 		href: '/create'
 	},
 	{
-		key: '📈 Governance Analytics',
+		icon: '📈',
+		key: 'GovAnalytics',
 		href: '/gov-analytics'
 	},
 	{
-		key: '🎥 AAG',
+		icon: '🎥',
+		key: 'AAG',
 		href: '/aag'
 	},
 	{
-		key: '🛡 Polkasafe',
+		icon: '🛡',
+		key: 'Polkasafe',
 		href: 'https://polkasafe.xyz'
 	},
 	{
-		key: '🎓 Fellowship',
+		icon: '🎓',
+		key: 'Fellowship',
 		href: 'https://collectives.polkassembly.io'
 	},
 	{
-		key: '🧩 Proxy',
+		icon: '🧩',
+		key: 'Proxy',
 		href: '/proxies'
 	}
 ];
@@ -90,7 +107,7 @@ export default function AppGrid() {
 						className='flex flex-col gap-y-2 rounded-2xl border border-border_grey bg-bg_modal p-3 shadow-sm transition-all hover:shadow-md'
 					>
 						<div className='mb-1 flex items-center gap-x-2'>
-							<span className='text-base font-semibold text-text_primary'>{t(`${app.key}.title`)}</span>
+							{app.icon} <span className='text-base font-semibold text-text_primary'>{t(`${app.key}.title`)}</span>
 						</div>
 						<p className='text-xs leading-5 text-wallet_btn_text'>{t(`${app.key}.description`)}</p>
 					</Link>

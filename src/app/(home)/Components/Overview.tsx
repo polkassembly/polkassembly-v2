@@ -5,13 +5,12 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useTranslations } from 'next-intl';
 import { IGenericListingResponse, IPostListing, ITreasuryStats } from '@/_shared/types';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
 import SpendPeriodStats from '@/app/_shared-components/TreasuryStats/SpendPeriodStats';
-import { ArrowRight } from 'lucide-react';
 import OverviewTreasuryStats from './OverviewTreasuryStats';
 import styles from './Overview.module.scss';
+import TreasuryReportBanner from './TreasuryReportBanner';
 import LatestActivity from './LatestActivity/LatestActivity';
 
 import OverviewHeading from './OverviewHeading';
@@ -19,7 +18,6 @@ import AppGrid from './AppGrid/AppGrid';
 import JobsAndBounties from './JobsAndBounties/JobsAndBounties';
 
 function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGenericListingResponse<IPostListing>; treasuryStatsData: ITreasuryStats[] }) {
-	const t = useTranslations();
 	return (
 		<div className={styles.overview_container}>
 			<OverviewHeading />
@@ -37,20 +35,7 @@ function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGeneri
 				</div>
 				<AppGrid />
 
-				<div className='flex items-center justify-between rounded-xl border border-treasury_stats_border bg-klara_stats_bg p-6'>
-					<div className='flex flex-col gap-1'>
-						<h3 className='text-xl font-bold text-text_primary'>{t('Overview.treasuryReportTitle')}</h3>
-						<p className='text-sm font-medium text-wallet_btn_text'>{t('Overview.treasuryReportDescription')}</p>
-					</div>
-					<button
-						type='button'
-						aria-label='View Report'
-						onClick={() => {}}
-						className='flex h-10 w-10 items-center justify-center rounded-full bg-arrow_bg_color text-bg_modal'
-					>
-						<ArrowRight className='h-5 w-5' />
-					</button>
-				</div>
+				<TreasuryReportBanner />
 				<div className='mt-2 grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-start'>
 					<div className='w-full lg:col-span-2'>
 						<Suspense

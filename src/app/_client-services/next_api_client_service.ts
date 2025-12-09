@@ -68,6 +68,7 @@ import {
 	IDelegateXVoteData,
 	IConversationTurn,
 	IActivityStats,
+	IOverviewTreasuryReport,
 	IJob
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
@@ -175,7 +176,8 @@ enum EApiRoute {
 	GET_DELEGATE_X_DETAILS = 'GET_DELEGATE_X_DETAILS',
 	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY',
 	GET_OVERVIEW_STATS = 'GET_OVERVIEW_STATS',
-	GET_EXTERNAL_JOBS = 'GET_EXTERNAL_JOBS'
+	GET_EXTERNAL_JOBS = 'GET_EXTERNAL_JOBS',
+	GET_TREASURY_REPORT = 'GET_TREASURY_REPORT'
 }
 
 export class NextApiClientService {
@@ -445,6 +447,10 @@ export class NextApiClientService {
 
 			case EApiRoute.GET_EXTERNAL_JOBS:
 				path = '/external/jobs';
+				break;
+
+			case EApiRoute.GET_TREASURY_REPORT:
+				path = '/external/treasury-report';
 				break;
 
 			default:
@@ -1644,5 +1650,10 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_VOTE_HISTORY, queryParams });
 		return this.nextApiClientFetch<{ success: boolean; voteData: IDelegateXVoteData[]; totalCount: number }>({ url, method });
+	}
+
+	static async getTreasuryReport() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_REPORT });
+		return this.nextApiClientFetch<IOverviewTreasuryReport[]>({ url, method });
 	}
 }

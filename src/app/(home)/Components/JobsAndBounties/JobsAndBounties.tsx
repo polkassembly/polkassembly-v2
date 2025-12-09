@@ -8,14 +8,17 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
-
+import Link from 'next/link';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { MdSort } from '@react-icons/all-files/md/MdSort';
 import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
 import { Separator } from '@/app/_shared-components/Separator';
-import { IJob } from '@/_shared/types';
+import { IJob, EProposalType, EProposalStatus, IPostListing } from '@/_shared/types';
 import { STALE_TIME } from '@/_shared/_constants/listingLimit';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import dayjs from 'dayjs';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 
 enum JobType {
 	JOB = 'job',
@@ -25,22 +28,35 @@ enum JobType {
 export default function JobsAndBounties() {
 	const [activeTab, setActiveTab] = useState<JobType>(JobType.JOB);
 	const t = useTranslations();
+	const network = getCurrentNetwork();
 
-	const { data: jobsData, isLoading } = useQuery({
-		queryKey: ['external-jobs', activeTab],
+	const { data: listingData, isLoading } = useQuery({
+		queryKey: ['jobs-and-bounties', activeTab],
 		queryFn: async () => {
+			if (activeTab === JobType.BOUNTY) {
+				const { data, error } = await NextApiClientService.fetchListingData({
+					proposalType: EProposalType.BOUNTY,
+					page: 1,
+					limit: 10,
+					statuses: [EProposalStatus.Active, EProposalStatus.Extended]
+				});
+				if (error || !data) throw new Error(error?.message || 'Failed to fetch bounties');
+				return { items: data.items, type: JobType.BOUNTY };
+			}
+
 			const { data, error } = await NextApiClientService.getExternalJobs({
 				page: 1,
 				limit: 10,
 				sortBy: 'createdAt'
 			});
 			if (error || !data) throw new Error(error?.message || 'Failed to fetch jobs');
-			return data;
+			return { items: data?.data?.job?.data || [], type: JobType.JOB };
 		},
 		staleTime: STALE_TIME
 	});
 
-	const jobs = jobsData?.data?.job?.data || [];
+	const items = listingData?.items || [];
+	const isBountyTab = activeTab === JobType.BOUNTY;
 
 	return (
 		<div className='flex w-full flex-col rounded-xl border border-border_grey bg-bg_modal p-6 shadow-sm'>
@@ -110,7 +126,48 @@ export default function JobsAndBounties() {
 								</div>
 							</div>
 						))
-					: jobs.map((job: IJob) => {
+					: items.map((item: IJob | IPostListing) => {
+							if (isBountyTab) {
+								const bounty = item as IPostListing;
+								const formattedReward = bounty.onChainInfo?.reward
+									? formatBnBalance(bounty.onChainInfo.reward, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)
+									: '';
+
+								return (
+									<Link
+										key={bounty.index}
+										href={`/bounty/${bounty.index}`}
+										target='_blank'
+										className='hover:bg-section_light rounded-xl border border-border_grey p-4'
+									>
+										<div className='flex items-start gap-3'>
+											<div className='bg-section_light flex h-10 w-10 shrink-0 items-center justify-center rounded'>
+												<span className='text-lg font-bold text-btn_primary_text'>#</span>
+											</div>
+											<div>
+												<p className='text-xs font-medium text-wallet_btn_text'>
+													{t('PostDetails.ProposalType.bounty')} #{bounty.index}
+												</p>
+												<h3 className='line-clamp-1 text-base font-semibold text-text_primary'>{bounty.title}</h3>
+											</div>
+										</div>
+										<p className='mt-2 line-clamp-2 text-sm text-wallet_btn_text'>{bounty.content}</p>
+										<Separator className='my-2' />
+										<div className='mt-2 flex items-center justify-between'>
+											<span className='text-xs text-wallet_btn_text'>
+												{t('JobsAndBounties.posted')}: {dayjs(bounty.createdAt).format('DD MMM YYYY')}
+											</span>
+											{formattedReward && (
+												<span className='text-xs font-medium text-text_pink'>
+													{t('PostDetails.OnchainInfo.reward')}: {formattedReward}
+												</span>
+											)}
+										</div>
+									</Link>
+								);
+							}
+
+							const job = item as IJob;
 							const tags = [job.employment_type, job.work_arrangement, job.salary_type].filter(Boolean);
 							return (
 								<div
@@ -167,7 +224,9 @@ export default function JobsAndBounties() {
 								</div>
 							);
 						})}
-				{!isLoading && jobs.length === 0 && <div className='text-center text-sm text-sidebar_text'>{t('JobsAndBounties.noJobsFound')}</div>}
+				{!isLoading && items.length === 0 && (
+					<div className='text-center text-sm text-sidebar_text'>{isBountyTab ? t('JobsAndBounties.noBountiesFound') : t('JobsAndBounties.noJobsFound')}</div>
+				)}
 			</div>
 		</div>
 	);
