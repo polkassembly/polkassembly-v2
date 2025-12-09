@@ -4,13 +4,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { OGTrackerService } from '@/app/api/_api-services/external_api_service/ogtracker_service';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
+import { APIError } from '@/app/api/_api-utils/apiError';
+import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
+import { StatusCodes } from 'http-status-codes';
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
 	const { searchParams } = req.nextUrl;
 	const refNum = searchParams.get('refNum');
 
 	if (!refNum) {
-		return NextResponse.json({ message: 'Missing refNum parameter' }, { status: 400 });
+		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Missing refNum parameter');
 	}
 
 	const data = await OGTrackerService.getOGTrackerData({ refNum });

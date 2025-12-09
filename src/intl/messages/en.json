@@ -489,7 +489,16 @@
 		"OGTracker": {
 			"heading": "OGT Report",
 			"viewOnApp": "View on app",
-			"tasksDelivered": "{delivered}/{total} tasks delivered"
+			"tasksDelivered": "{delivered}/{total} tasks delivered",
+			"tasks": "Tasks",
+			"proofOfWork": "Proof of Work",
+			"linkedToTask": "Linked to task",
+			"status": {
+				"Delivered": "Delivered",
+				"InProgress": "In Progress",
+				"Flagged": "Flagged",
+				"Remodel": "Remodel"
+			}
 		},
 		"post": "Post",
 		"cancel": "Cancel",

@@ -523,7 +523,16 @@
 		"OGTracker": {
 			"heading": "OGT 报告",
 			"viewOnApp": "在应用中查看",
-			"tasksDelivered": "已交付 {delivered}/{total} 项任务"
+			"tasksDelivered": "已交付 {delivered}/{total} 项任务",
+			"tasks": "任务",
+			"proofOfWork": "工作量证明",
+			"linkedToTask": "链接到任务",
+			"status": {
+				"Delivered": "已交付",
+				"InProgress": "进行中",
+				"Flagged": "已标记",
+				"Remodel": "重塑"
+			}
 		},
 		"BeneficiariesDetails": {
 			"requested": "已请求",

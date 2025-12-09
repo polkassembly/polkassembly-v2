@@ -326,7 +326,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 										}}
 									/>
 								)}
-
 							{/* Refund Deposits */}
 							{post.onChainInfo?.status && post.index !== undefined && ValidatorService.isValidNumber(post.index) && post.onChainInfo?.origin && (
 								<RefundDeposits
@@ -355,7 +354,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								voteMetrics={post.onChainInfo?.voteMetrics}
 								approvalThreshold={thresholdValues.approvalThreshold}
 							/>
-
 							<VotesData
 								proposalType={post.proposalType}
 								index={index}
@@ -365,8 +363,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								setThresholdValues={setThresholdValues}
 								thresholdValues={thresholdValues}
 							/>
-
-							{post.index && (
+							{post.index !== undefined && (
 								<OGTrackerInfo
 									refNum={String(post.index)}
 									trackName={post.onChainInfo?.origin}

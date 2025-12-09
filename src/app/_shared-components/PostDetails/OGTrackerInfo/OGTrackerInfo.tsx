@@ -13,6 +13,7 @@ import { ExternalLink } from 'lucide-react';
 import OGLogo from '@assets/icons/og.png';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { ValidatorService } from '@/_shared/_services/validator_service';
 import { Skeleton } from '../../Skeleton';
 
 interface OGTrackerInfoProps {
@@ -100,12 +101,12 @@ function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 	const formattedTrackName = getOGTrackerTrackName(trackName);
 	const ogTrackerUrl = formattedTrackName ? `https://app.ogtracker.io/${formattedTrackName}/${refNum}` : `https://ogtracker.io/proposal/${refNum}`;
 
-	const deliveredTasksCount = tasks?.filter((task) => task.status === 'A' || task.status === 'Delivered').length || 0;
+	const deliveredTasksCount = tasks?.filter((task) => task.status === 'A').length || 0;
 	const totalTasksCount = tasks?.length || 0;
 
 	return (
 		<div className='flex max-h-[300px] flex-col overflow-hidden rounded-xl border border-border_grey bg-bg_modal shadow-sm'>
-			<div className='check-0 sticky top-0 z-10 flex items-center justify-between border-b border-border_grey bg-bg_modal/95 px-4 py-3 backdrop-blur-sm'>
+			<div className='sticky top-0 z-10 flex items-center justify-between border-b border-border_grey bg-bg_modal/95 px-4 py-3 backdrop-blur-sm'>
 				<div className='flex items-center gap-2'>
 					<Image
 						src={OGLogo}
@@ -126,12 +127,11 @@ function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 					<ExternalLink className='h-3 w-3' />
 				</a>
 			</div>
-
 			<div className='custom-scroll flex flex-col gap-4 overflow-y-auto p-4'>
 				{tasks && tasks.length > 0 && (
 					<div className='flex flex-col gap-2.5'>
 						<div className='flex items-center justify-between'>
-							<div className='text-text_secondary text-xs font-medium uppercase tracking-wide'>tasks</div>
+							<div className='text-text_secondary text-xs font-medium uppercase tracking-wide'>{t('PostDetails.OGTracker.tasks')}</div>
 							<span className='bg-bg_secondary text-text_secondary rounded-full px-2 py-0.5 text-xs font-medium'>
 								{t('PostDetails.OGTracker.tasksDelivered', {
 									delivered: deliveredTasksCount,
@@ -142,16 +142,16 @@ function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 						<div className='flex flex-col gap-2'>
 							{tasks.map((task, index) => {
 								const statusMap: Record<string, string> = {
-									A: 'Delivered',
-									B: 'In Progress',
-									C: 'Flagged',
-									D: 'Remodel'
+									A: t('PostDetails.OGTracker.status.Delivered'),
+									B: t('PostDetails.OGTracker.status.InProgress'),
+									C: t('PostDetails.OGTracker.status.Flagged'),
+									D: t('PostDetails.OGTracker.status.Remodel')
 								};
 								const statusLabel = statusMap[task.status] || task.status;
 								const getStatusColor = (status: string) => {
-									if (status === 'Delivered') return 'text-green-500 bg-green-500/10 border-green-500/20';
-									if (status === 'In Progress') return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
-									if (status === 'Flagged') return 'text-red-500 bg-red-500/10 border-red-500/20';
+									if (status === t('PostDetails.OGTracker.status.Delivered')) return 'text-green-500 bg-green-500/10 border-green-500/20';
+									if (status === t('PostDetails.OGTracker.status.InProgress')) return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+									if (status === t('PostDetails.OGTracker.status.Flagged')) return 'text-red-500 bg-red-500/10 border-red-500/20';
 									return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
 								};
 
@@ -176,25 +176,37 @@ function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 				{proofOfWork && proofOfWork.length > 0 && (
 					<div className='flex flex-col gap-2.5'>
 						<div className='flex items-center justify-between'>
-							<div className='text-xs font-medium uppercase tracking-wide text-text_primary'>Proof of Work</div>
+							<div className='text-xs font-medium uppercase tracking-wide text-text_primary'>{t('PostDetails.OGTracker.proofOfWork')}</div>
 							<span className='bg-bg_secondary rounded-full px-2 py-0.5 text-xs font-medium text-text_primary'>{proofOfWork.length}</span>
 						</div>
 						<div className='flex flex-col gap-2'>
-							{proofOfWork.map((pow, index) => (
-								<a
-									key={pow.id || index}
-									href={pow.content}
-									target='_blank'
-									rel='noopener noreferrer'
-									className='bg-bg_secondary hover:border-pink_primary/50 hover:bg-bg_tertiary group flex items-center justify-between gap-3 rounded-lg border border-border_grey p-3 transition-all'
-								>
-									<div className='flex min-w-0 flex-1 flex-col gap-0.5'>
-										<div className='text-pink_primary truncate text-sm font-medium group-hover:underline'>{pow.content}</div>
-										{pow.task_id && <div className='text-[10px] text-text_primary'>Linked to task</div>}
+							{proofOfWork.map((pow) =>
+								ValidatorService.isUrl(pow.content) ? (
+									<a
+										key={pow.id}
+										href={pow.content}
+										target='_blank'
+										rel='noopener noreferrer'
+										className='bg-bg_secondary hover:border-pink_primary/50 hover:bg-bg_tertiary group flex items-center justify-between gap-3 rounded-lg border border-border_grey p-3 transition-all'
+									>
+										<div className='flex min-w-0 flex-1 flex-col gap-0.5'>
+											<div className='text-pink_primary truncate text-sm font-medium group-hover:underline'>{pow.content}</div>
+											{pow.task_id && <div className='text-[10px] text-text_primary'>{t('PostDetails.OGTracker.linkedToTask')}</div>}
+										</div>
+										<ExternalLink className='group-hover:text-pink_primary h-3.5 w-3.5 flex-shrink-0 text-wallet_btn_text transition-colors' />
+									</a>
+								) : (
+									<div
+										key={pow.id}
+										className='bg-bg_secondary flex items-center justify-between gap-3 rounded-lg border border-border_grey p-3'
+									>
+										<div className='flex min-w-0 flex-1 flex-col gap-0.5'>
+											<div className='truncate text-sm font-medium text-text_primary'>{pow.content}</div>
+											{pow.task_id && <div className='text-[10px] text-text_primary'>{t('PostDetails.OGTracker.linkedToTask')}</div>}
+										</div>
 									</div>
-									<ExternalLink className='group-hover:text-pink_primary h-3.5 w-3.5 flex-shrink-0 text-wallet_btn_text transition-colors' />
-								</a>
-							))}
+								)
+							)}
 						</div>
 					</div>
 				)}

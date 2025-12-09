@@ -480,7 +480,16 @@
 		"OGTracker": {
 			"heading": "Informe OGT",
 			"viewOnApp": "Ver en la aplicación",
-			"tasksDelivered": "{delivered}/{total} tareas entregadas"
+			"tasksDelivered": "{delivered}/{total} tareas entregadas",
+			"tasks": "Tareas",
+			"proofOfWork": "Prueba de Trabajo",
+			"linkedToTask": "Vinculado a tarea",
+			"status": {
+				"Delivered": "Entregado",
+				"InProgress": "En Progreso",
+				"Flagged": "Marcado",
+				"Remodel": "Remodelar"
+			}
 		},
 		"timeline": "Línea de Tiempo",
 		"more": "más",

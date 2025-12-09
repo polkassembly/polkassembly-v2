@@ -49,8 +49,6 @@ export class OGTrackerService {
 					fetch(`${API_BASE_URL}/proposals_report?proposal_id=eq.${proposalId}&select=*`, { headers: getHeaders(), signal: controller.signal })
 				]);
 
-				clearTimeout(timeoutId);
-
 				const tasks: IOGTrackerTask[] = tasksRes.ok ? await tasksRes.json() : [];
 				const proofOfWork: IOGTrackerPoW[] = powRes.ok ? await powRes.json() : [];
 
@@ -60,12 +58,12 @@ export class OGTrackerService {
 					proofOfWork
 				};
 			} catch (err) {
-				clearTimeout(timeoutId);
-
 				if (err instanceof Error && err.name === 'AbortError') {
 					throw new APIError(ERROR_CODES.API_FETCH_ERROR, StatusCodes.REQUEST_TIMEOUT, 'Request to OGTracker timed out');
 				}
 				throw err;
+			} finally {
+				clearTimeout(timeoutId);
 			}
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
