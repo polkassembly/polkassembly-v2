@@ -11,8 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-componen
 import { useTranslations } from 'next-intl';
 import { useState, useRef, useEffect } from 'react';
 import { parseCamelCase } from '@/app/_client-utils/parseCamelCase';
-import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
-import { MdSort } from '@react-icons/all-files/md/MdSort';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import DiscussionsTab from './DiscussionsTab';
 import TrackTabs from './TrackTabs';
@@ -95,27 +93,10 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 
 	return (
 		<div className='flex flex-col gap-6 rounded-xl border border-border_grey bg-bg_modal p-6 shadow-sm'>
-			{/* Header */}
 			<div className='flex items-center justify-between'>
 				<h2 className='text-xl font-bold text-text_primary'>
 					{t('latestActivity')} <span className='text-wallet_btn_text'>({allTracksData?.totalCount || 0})</span>
 				</h2>
-				<div className='flex gap-2'>
-					<button
-						type='button'
-						aria-label='Filter activities'
-						className='flex h-9 w-9 items-center justify-center rounded border border-border_grey text-text_primary hover:bg-gray-50 dark:hover:bg-gray-800'
-					>
-						<FaFilter className='text-sm' />
-					</button>
-					<button
-						type='button'
-						aria-label='Sort activities'
-						className='flex h-9 w-9 items-center justify-center rounded border border-border_grey text-text_primary hover:bg-gray-50 dark:hover:bg-gray-800'
-					>
-						<MdSort className='text-lg' />
-					</button>
-				</div>
 			</div>
 
 			<ActivityStats />
@@ -202,12 +183,10 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 					/>
 				</TabsContent>
 
-				{/* "Discussion" Tab */}
 				<TabsContent value={EOverviewTabs.Discussion}>
 					<DiscussionsTab />
 				</TabsContent>
 
-				{/* Individual Track Tabs */}
 				{Object.keys(tracks).map((track) => (
 					<TabsContent
 						key={track}
