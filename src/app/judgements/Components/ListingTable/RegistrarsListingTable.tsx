@@ -36,7 +36,9 @@ function RegistrarsListingTable() {
 
 	const registrars = useMemo(() => {
 		if (!allRegistrarsData?.registrars) return [];
-		return getRegistrarsWithStats({ registrars: allRegistrarsData.registrars, judgements: allRegistrarsData.judgements, search });
+		return getRegistrarsWithStats({ registrars: allRegistrarsData.registrars, judgements: allRegistrarsData.judgements, search }).sort(
+			(a, b) => b.totalReceivedRequests - a.totalReceivedRequests
+		);
 	}, [allRegistrarsData, search]);
 
 	if (isLoading || !identityService) {
@@ -55,16 +57,18 @@ function RegistrarsListingTable() {
 				<div className='w-full rounded-3xl border border-primary_border bg-bg_modal p-6'>
 					<Table>
 						<TableHeader>
-							<TableRow className={styles.tableRow}>
-								<TableHead className={styles.tableCell_1}>{t('address')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('receivedRequests')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('totalGiven')}</TableHead>
-								<TableHead className={styles.tableCell_last}>{t('fee')}</TableHead>
+							<TableRow className={styles.headerRow}>
+								<TableHead className={styles.headerCell}>{t('rank')}</TableHead>
+								<TableHead className={styles.headerCell}>{t('registrar')}</TableHead>
+								<TableHead className={styles.headerCell}>{t('receivedRequests')}</TableHead>
+								<TableHead className={styles.headerCell}>{t('judgementsGranted')}</TableHead>
+								<TableHead className={styles.headerCell}>{t('fee')}</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{registrars.map((registrar) => (
+							{registrars.map((registrar, index) => (
 								<TableRow key={registrar.address}>
+									<td className='px-6 py-5'>{index + 1}</td>
 									<td className='px-6 py-5'>
 										<Address
 											truncateCharLen={5}
