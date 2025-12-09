@@ -217,6 +217,7 @@ function IdentitiesListingTable() {
 															type='button'
 															className='text-basic_text hover:text-text_primary'
 															title='Copy address'
+															onClick={() => navigator.clipboard.writeText(sub.address)}
 														>
 															<Copy size={12} />
 														</button>
