@@ -278,7 +278,8 @@
 		"bountiesTab": "赏金",
 		"salary": "薪资",
 		"applicants": "申请人",
-		"applyNow": "立即申请"
+		"applyNow": "立即申请",
+		"noJobsFound": "未找到工作"
 	},
 	"Apps": {
 		"header": "应用",

@@ -1197,7 +1197,8 @@
 		"bountiesTab": "BOUNTIES",
 		"salary": "Salary",
 		"applicants": "Applicants",
-		"applyNow": "Apply Now"
+		"applyNow": "Apply Now",
+		"noJobsFound": "No jobs found"
 	},
 	"Apps": {
 		"header": "Apps",

@@ -67,7 +67,8 @@ import {
 	IDelegateXAccount,
 	IDelegateXVoteData,
 	IConversationTurn,
-	IActivityStats
+	IActivityStats,
+	IJob
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -173,7 +174,8 @@ enum EApiRoute {
 	UPDATE_DELEGATE_X_BOT = 'UPDATE_DELEGATE_X_BOT',
 	GET_DELEGATE_X_DETAILS = 'GET_DELEGATE_X_DETAILS',
 	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY',
-	GET_OVERVIEW_STATS = 'GET_OVERVIEW_STATS'
+	GET_OVERVIEW_STATS = 'GET_OVERVIEW_STATS',
+	GET_EXTERNAL_JOBS = 'GET_EXTERNAL_JOBS'
 }
 
 export class NextApiClientService {
@@ -439,6 +441,10 @@ export class NextApiClientService {
 
 			case EApiRoute.GET_OVERVIEW_STATS:
 				path = '/overview-stats';
+				break;
+
+			case EApiRoute.GET_EXTERNAL_JOBS:
+				path = '/external/jobs';
 				break;
 
 			default:
@@ -1299,6 +1305,28 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS_BY_ADDRESS, routeSegments: [address, 'posts'], queryParams });
 		return this.nextApiClientFetch<IUserPosts>({ url, method });
+	}
+
+	static async getExternalJobs({ page = 1, limit = 10, sortBy = 'createdAt' }: { page?: number; limit?: number; sortBy?: string }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString(),
+			sortBy
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_EXTERNAL_JOBS, queryParams });
+		return this.nextApiClientFetch<{
+			data: {
+				job: {
+					data: IJob[];
+					pagination: {
+						totalJobs: number;
+						totalPages: number;
+						currentPage: number;
+						pageSize: number;
+					};
+				};
+			};
+		}>({ url, method });
 	}
 
 	static async addPollVote({ proposalType, index, pollId, decision }: { proposalType: EProposalType; index: number; pollId: string; decision: string }) {

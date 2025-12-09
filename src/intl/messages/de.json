@@ -1220,7 +1220,8 @@
 		"bountiesTab": "BOUNTIES",
 		"salary": "Gehalt",
 		"applicants": "Bewerber",
-		"applyNow": "Jetzt bewerben"
+		"applyNow": "Jetzt bewerben",
+		"noJobsFound": "Keine Jobs gefunden"
 	},
 	"BatchVote": {
 		"batchVoting": "Stapelabstimmung",

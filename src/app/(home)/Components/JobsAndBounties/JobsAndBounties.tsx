@@ -5,42 +5,42 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/app/_shared-components/Button';
 import { useTranslations } from 'next-intl';
+import { useQuery } from '@tanstack/react-query';
+import Image from 'next/image';
+
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { MdSort } from '@react-icons/all-files/md/MdSort';
 import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
 import { Separator } from '@/app/_shared-components/Separator';
+import { IJob } from '@/_shared/types';
+import { STALE_TIME } from '@/_shared/_constants/listingLimit';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
 
 enum JobType {
 	JOB = 'job',
 	BOUNTY = 'bounty'
 }
 
-// TODO: Fetch real data from API
-const JOBS = [
-	{
-		company: 'Parity Technologies',
-		title: 'Infrastructure Security Engineer',
-		description: 'This is a crucial role where your understanding of...',
-		salary: '0 - 15,000 DOT',
-		applicants: 1,
-		tags: ['full-time', 'monthly', 'remote'],
-		type: 'job'
-	},
-	{
-		company: 'Parity Technologies',
-		title: 'Core Developer',
-		description: 'As a Core Developer within the Runtime function yo...',
-		salary: '0 - 15,000 DOT',
-		applicants: 2,
-		tags: ['contract', 'monthly', 'remote'],
-		type: 'job'
-	}
-];
-
 export default function JobsAndBounties() {
 	const [activeTab, setActiveTab] = useState<JobType>(JobType.JOB);
 	const t = useTranslations();
+
+	const { data: jobsData, isLoading } = useQuery({
+		queryKey: ['external-jobs', activeTab],
+		queryFn: async () => {
+			const { data, error } = await NextApiClientService.getExternalJobs({
+				page: 1,
+				limit: 10,
+				sortBy: 'createdAt'
+			});
+			if (error || !data) throw new Error(error?.message || 'Failed to fetch jobs');
+			return data;
+		},
+		staleTime: STALE_TIME
+	});
+
+	const jobs = jobsData?.data?.job?.data || [];
 
 	return (
 		<div className='flex w-full flex-col rounded-xl border border-border_grey bg-bg_modal p-6 shadow-sm'>
@@ -84,48 +84,90 @@ export default function JobsAndBounties() {
 			</div>
 
 			<div className='flex max-h-[400px] flex-col gap-4 overflow-y-auto'>
-				{JOBS.filter((job) => job.type === activeTab).map((job) => (
-					<div
-						key={job.title}
-						className='rounded-xl border border-border_grey p-4'
-					>
-						<div className='flex items-start gap-3'>
-							<div className='flex h-10 w-10 shrink-0 items-center justify-center rounded bg-black'>
-								<span className='font-bold text-btn_primary_text'>P</span>
-							</div>
-							<div>
-								<p className='text-xs font-medium text-wallet_btn_text'>{job.company}</p>
-								<h3 className='text-base font-semibold text-text_primary'>{job.title}</h3>
-							</div>
-						</div>
-
-						<p className='mt-2 truncate text-sm text-wallet_btn_text'>{job.description}</p>
-						<p className='mt-1 text-xs text-wallet_btn_text'>
-							{t('JobsAndBounties.salary')}: {job.salary} | {t('JobsAndBounties.applicants')}: {job.applicants}
-						</p>
-						<Separator className='my-2' />
-						<div className='mt-4 flex flex-col items-center justify-between md:flex-row'>
-							<div className='flex gap-2'>
-								{job.tags.slice(0, 1).map((tag) => (
-									<span
-										key={tag}
-										className='rounded-full border border-border_grey px-2 py-1 text-xs text-wallet_btn_text'
-									>
-										{tag}
-									</span>
-								))}
-								{job.tags.length > 1 && <span className='rounded-full border border-border_grey px-2 py-1 text-xs text-wallet_btn_text'>+{job.tags.length - 1}</span>}
-							</div>
-							<Button
-								variant='link'
-								className='mt-3 h-auto p-0 text-text_pink md:mt-0'
-								onClick={() => {}}
+				{isLoading
+					? Array.from({ length: 3 }).map((_, i) => (
+							<div
+								/* eslint-disable-next-line react/no-array-index-key */
+								key={i}
+								className='rounded-xl border border-border_grey p-4'
 							>
-								{t('JobsAndBounties.applyNow')}
-							</Button>
-						</div>
-					</div>
-				))}
+								<div className='flex items-start gap-3'>
+									<Skeleton className='h-10 w-10 shrink-0 rounded' />
+									<div className='flex flex-col gap-1'>
+										<Skeleton className='h-3 w-24' />
+										<Skeleton className='h-4 w-40' />
+									</div>
+								</div>
+								<Skeleton className='mt-4 h-4 w-full' />
+								<Skeleton className='mt-2 h-3 w-1/2' />
+								<Separator className='my-2' />
+								<div className='mt-3 flex items-center justify-between'>
+									<div className='flex gap-2'>
+										<Skeleton className='h-5 w-16 rounded-full' />
+										<Skeleton className='h-5 w-16 rounded-full' />
+									</div>
+									<Skeleton className='h-4 w-20' />
+								</div>
+							</div>
+						))
+					: jobs.map((job: IJob) => {
+							const tags = [job.employment_type, job.work_arrangement, job.salary_type].filter(Boolean);
+							return (
+								<div
+									key={job.title}
+									className='rounded-xl border border-border_grey p-4'
+								>
+									<div className='flex items-start gap-3'>
+										{job.logo ? (
+											<Image
+												src={job.logo}
+												alt={`${job.company_name} logo`}
+												className='h-10 w-10 shrink-0 rounded bg-black object-contain'
+												width={40}
+												height={40}
+												unoptimized
+											/>
+										) : (
+											<div className='flex h-10 w-10 shrink-0 items-center justify-center rounded bg-black'>
+												<span className='font-bold text-btn_primary_text'>{job.company_name?.[0] || 'C'}</span>
+											</div>
+										)}
+										<div>
+											<p className='text-xs font-medium text-wallet_btn_text'>{job.company_name}</p>
+											<h3 className='text-base font-semibold text-text_primary'>{job.title}</h3>
+										</div>
+									</div>
+
+									<p className='mt-2 truncate text-sm text-wallet_btn_text'>{job.description}</p>
+									<p className='mt-1 text-xs text-wallet_btn_text'>
+										{t('JobsAndBounties.salary')}: {job.salary_range?.min} - {job.salary_range?.max} {job.salary_token} | {t('JobsAndBounties.applicants')}: {job.applicantCount}
+									</p>
+									<Separator className='my-2' />
+									<div className='mt-4 flex flex-col items-center justify-between md:flex-row'>
+										<div className='flex gap-2'>
+											{tags.slice(0, 2).map((tag: string) => (
+												<span
+													key={tag}
+													className='rounded-full border border-border_grey px-1 py-0.5 text-xs text-wallet_btn_text'
+												>
+													{tag}
+												</span>
+											))}
+											{tags.length > 2 && <span className='rounded-full border border-border_grey px-1 py-0.5 text-xs text-wallet_btn_text'>+{tags.length - 2}</span>}
+										</div>
+										<a
+											href={job.company_website}
+											target='_blank'
+											rel='noopener noreferrer'
+											className='mt-3 h-auto p-0 text-sm font-medium text-text_pink hover:underline md:mt-0'
+										>
+											{t('JobsAndBounties.applyNow')}
+										</a>
+									</div>
+								</div>
+							);
+						})}
+				{!isLoading && jobs.length === 0 && <div className='text-center text-sm text-sidebar_text'>{t('JobsAndBounties.noJobsFound')}</div>}
 			</div>
 		</div>
 	);

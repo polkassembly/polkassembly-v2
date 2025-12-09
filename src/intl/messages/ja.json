@@ -1112,6 +1112,15 @@
 		"treasuryReportTitle": "Q4 国庫レポート",
 		"treasuryReportDescription": "支出実績とエコシステムの成長を確認"
 	},
+	"JobsAndBounties": {
+		"title": "仕事と報奨金",
+		"jobsTab": "仕事",
+		"bountiesTab": "報奨金",
+		"salary": "給与",
+		"applicants": "応募者",
+		"applyNow": "今すぐ応募",
+		"noJobsFound": "仕事が見つかりませんでした"
+	},
 	"Bounty": {
 		"availableBountyPool": "利用可能な報奨金プール",
 		"viewAll": "すべて表示",

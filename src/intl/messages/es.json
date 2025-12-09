@@ -279,7 +279,8 @@
 		"bountiesTab": "RECOMPENSAS",
 		"salary": "Salario",
 		"applicants": "Solicitantes",
-		"applyNow": "Aplicar Ahora"
+		"applyNow": "Aplicar Ahora",
+		"noJobsFound": "No se encontraron empleos"
 	},
 	"Apps": {
 		"header": "Aplicaciones",
