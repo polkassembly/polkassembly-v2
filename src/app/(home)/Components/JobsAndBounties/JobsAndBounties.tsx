@@ -19,6 +19,7 @@ import { Skeleton } from '@/app/_shared-components/Skeleton';
 import dayjs from 'dayjs';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
 
 enum JobType {
 	JOB = 'job',
@@ -140,22 +141,20 @@ export default function JobsAndBounties() {
 										target='_blank'
 										className='hover:bg-section_light rounded-xl border border-border_grey p-4'
 									>
-										<div className='flex items-start gap-3'>
-											<div className='bg-section_light flex h-10 w-10 shrink-0 items-center justify-center rounded'>
-												<span className='text-lg font-bold text-btn_primary_text'>#</span>
-											</div>
-											<div>
-												<p className='text-xs font-medium text-wallet_btn_text'>
-													{t('PostDetails.ProposalType.bounty')} #{bounty.index}
-												</p>
-												<h3 className='line-clamp-1 text-base font-semibold text-text_primary'>{bounty.title}</h3>
-											</div>
+										<div className='flex flex-col gap-0.5'>
+											<p className='text-xs font-medium leading-none text-wallet_btn_text'>
+												{t('PostDetails.ProposalType.bounty')} #{bounty.index}
+											</p>
+											<h3 className='line-clamp-1 text-base font-semibold text-text_primary'>{bounty.title}</h3>
 										</div>
-										<p className='mt-2 line-clamp-2 text-sm text-wallet_btn_text'>{bounty.content}</p>
+										<MarkdownViewer
+											className='mt-1.5 line-clamp-2'
+											markdown={bounty.content}
+										/>
 										<Separator className='my-2' />
 										<div className='mt-2 flex items-center justify-between'>
 											<span className='text-xs text-wallet_btn_text'>
-												{t('JobsAndBounties.posted')}: {dayjs(bounty.createdAt).format('DD MMM YYYY')}
+												{t('PostDetails.OnchainInfo.createdAt')}: {dayjs(bounty.createdAt).format('DD MMM YYYY')}
 											</span>
 											{formattedReward && (
 												<span className='text-xs font-medium text-text_pink'>
@@ -174,7 +173,7 @@ export default function JobsAndBounties() {
 									key={job.title}
 									className='rounded-xl border border-border_grey p-4'
 								>
-									<div className='flex items-start gap-3'>
+									<div className='flex items-start gap-2'>
 										{job.logo ? (
 											<Image
 												src={job.logo}
@@ -190,12 +189,12 @@ export default function JobsAndBounties() {
 											</div>
 										)}
 										<div>
-											<p className='text-xs font-medium text-wallet_btn_text'>{job.company_name}</p>
+											<p className='text-xs font-medium leading-none text-wallet_btn_text'>{job.company_name}</p>
 											<h3 className='text-base font-semibold text-text_primary'>{job.title}</h3>
 										</div>
 									</div>
 
-									<p className='mt-2 truncate text-sm text-wallet_btn_text'>{job.description}</p>
+									<p className='mt-1.5 truncate text-sm text-wallet_btn_text'>{job.description}</p>
 									<p className='mt-1 text-xs text-wallet_btn_text'>
 										{t('JobsAndBounties.salary')}: {job.salary_range?.min} - {job.salary_range?.max} {job.salary_token} | {t('JobsAndBounties.applicants')}: {job.applicantCount}
 									</p>
