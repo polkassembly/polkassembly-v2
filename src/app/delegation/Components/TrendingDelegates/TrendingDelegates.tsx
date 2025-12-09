@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { memo, RefObject, useRef } from 'react';
+import { memo, RefObject, useRef, useEffect, useCallback } from 'react';
 import { IoMdTrendingUp } from '@react-icons/all-files/io/IoMdTrendingUp';
 import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
@@ -22,11 +22,28 @@ import { useAtom } from 'jotai';
 import { delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { DelegateXClientService } from '@/app/_client-services/delegate_x_client_service';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { delegateXAtom } from '@/app/_atoms/delegateX/delegateXAtom';
 import DelegateSearchInput from './DelegateSearchInput/DelegateSearchInput';
 import styles from './TrendingDelegates.module.scss';
 import DelegateCard from './DelegateCard/DelegateCard';
+// import DelegateXCard from './DelegateCard/DelegateXCard';
 
 const PA_ADDRESS = '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t';
+
+// const defaultDelegateXData = {
+// address: '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t',
+// bio: 'An AI powered custom agent that votes just like you would. Setup bot suited to your evaluation criterias and simplify voting with reason',
+// votingPower: '0',
+// ayeCount: 0,
+// nayCount: 0,
+// abstainCount: 0,
+// votesPast30Days: 0,
+// totalVotingPower: '0',
+// totalVotesPast30Days: 0,
+// totalDelegators: 0
+// };
 
 const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedSources: EDelegateSource[]; setSelectedSources: (sources: EDelegateSource[]) => void }) => {
 	const t = useTranslations('Delegation');
@@ -75,6 +92,63 @@ const FilterPopover = memo(({ selectedSources, setSelectedSources }: { selectedS
 
 function TrendingDelegates() {
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
+	const { userPreferences } = useUserPreferences();
+	const [, setDelegateXState] = useAtom(delegateXAtom);
+
+	const fetchDelegateXData = useCallback(async () => {
+		if (!userPreferences.selectedAccount?.address) return;
+
+		setDelegateXState((prev) => ({
+			...prev,
+			isLoading: true,
+			error: null
+		}));
+
+		const { data, error } = await DelegateXClientService.getDelegateXDetails();
+
+		if (error || !data) {
+			console.error('Error fetching delegate x details', error);
+			setDelegateXState((prev) => ({
+				...prev,
+				isLoading: false,
+				error: typeof error === 'string' ? error : 'Failed to fetch DelegateX details'
+			}));
+			return;
+		}
+
+		if (data.success) {
+			const delegateXData = {
+				address: data.delegateXAccount?.address || PA_ADDRESS,
+				bio: 'An AI powered custom agent that votes just like you would. Setup bot suited to your evaluation criterias and simplify voting with reason',
+				totalVotesPast30Days: data.totalVotesPast30Days || 0,
+				totalVotingPower: data.totalVotingPower || '0',
+				totalDelegators: data.totalDelegators || 0,
+				votingPower: data.votingPower || '0',
+				ayeCount: data.yesCount || 0,
+				nayCount: data.noCount || 0,
+				abstainCount: data.abstainCount || 0,
+				votesPast30Days: data.votesPast30Days || 0
+			};
+
+			setDelegateXState({
+				data: delegateXData,
+				account: data.delegateXAccount || null,
+				isLoading: false,
+				error: null
+			});
+		} else {
+			setDelegateXState((prev) => ({
+				...prev,
+				isLoading: false
+			}));
+		}
+	}, [userPreferences.selectedAccount?.address, setDelegateXState]);
+
+	useEffect(() => {
+		if (userPreferences.selectedAccount?.address) {
+			fetchDelegateXData();
+		}
+	}, [fetchDelegateXData, userPreferences.selectedAccount?.address]);
 
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const t = useTranslations('Delegation');
@@ -172,6 +246,13 @@ function TrendingDelegates() {
 					{filteredDelegates.length > 0 ? (
 						<>
 							<div className='my-5 grid w-full grid-cols-1 items-stretch gap-5 lg:grid-cols-2'>
+								{/* <DelegateXCard
+									data={delegateXState.account?.active ? delegateXState.data || defaultDelegateXData : defaultDelegateXData}
+									delegateXAccount={delegateXState.account}
+									onRefresh={handleDelegateXSuccess}
+									isLoading={delegateXState.isLoading}
+								/> */}
+
 								{filteredDelegates.map((delegate: IDelegateDetails) => (
 									<DelegateCard
 										key={delegate.address}

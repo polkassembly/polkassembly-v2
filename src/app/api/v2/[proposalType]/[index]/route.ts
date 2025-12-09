@@ -20,6 +20,7 @@ import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
 import { fetchCommentsVoteData } from '@/app/api/_api-utils/fetchCommentsVoteData.server';
 import { AlgoliaService } from '@/app/api/_api-services/algolia_service';
+import { IdentityService } from '@/app/_client-services/identity_service';
 
 const SET_COOKIE = 'Set-Cookie';
 
@@ -28,6 +29,7 @@ const zodParamsSchema = z.object({
 	index: z.string()
 });
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export const GET = withErrorHandling(async (req: NextRequest, { params }: { params: Promise<{ proposalType: string; index: string }> }): Promise<NextResponse<IPost>> => {
 	const { proposalType, index } = zodParamsSchema.parse(await params);
 
@@ -77,6 +79,32 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const comments = await OffChainDbService.GetPostComments({ network, proposalType, indexOrHash: index });
 	const commentsWithVoteData = await fetchCommentsVoteData({ comments, network, proposalType, index });
 	post = { ...post, comments: commentsWithVoteData };
+
+	if (post.allowedCommentor === EAllowedCommentor.ONCHAIN_VERIFIED) {
+		try {
+			const identityService = await IdentityService.Init(network);
+			const commentsWithIdentities = await Promise.all(
+				commentsWithVoteData.map(async (comment) => {
+					const address = comment.publicUser?.addresses?.[0];
+
+					if (!address) {
+						return { ...comment, isVerified: false };
+					}
+
+					try {
+						const identity = await identityService.getOnChainIdentity(address);
+						return { ...comment, isVerified: identity?.isVerified ?? false };
+					} catch (error) {
+						console.error('Failed to fetch identity for comment', { commentId: comment.id, error });
+						return { ...comment, isVerified: false };
+					}
+				})
+			);
+			post = { ...post, comments: commentsWithIdentities };
+		} catch (error) {
+			console.error('Failed to fetch identity for comments:', error);
+		}
+	}
 
 	// fetch and add reactions to post
 	const reactions = await OffChainDbService.GetPostReactions({ network, proposalType, indexOrHash: index });

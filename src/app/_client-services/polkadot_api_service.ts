@@ -11,12 +11,12 @@ import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
-import { ApiPromise, WsProvider } from '@polkadot/api';
+import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { Signer, ISubmittableResult, TypeDef } from '@polkadot/types/types';
 import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
 import { getTypeDef } from '@polkadot/types';
-import { decodeAddress } from '@polkadot/util-crypto';
+import { decodeAddress, mnemonicGenerate, cryptoWaitReady } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import {
@@ -44,7 +44,7 @@ import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { BlockCalculationsService } from './block_calculations_service';
 import { VaultQrSigner } from './vault_qr_signer_service';
 import { getInjectedWallet } from '../_client-utils/getInjectedWallet';
-
+import { inputToBn } from '../_client-utils/inputToBn';
 // Usage:
 // const apiService = await PolkadotApiService.Init(ENetwork.POLKADOT);
 // const blockHeight = await apiService.getBlockHeight();
@@ -146,6 +146,7 @@ export class PolkadotApiService {
 			console.log(`Transaction has been included in blockHash ${status.asFinalized.toHex()}`);
 			console.log(`tx: https://${this.network}.subscan.io/extrinsic/${txHash}`);
 			setIsTxFinalized?.(txHash.toString());
+			console.log('isFailed', isFailed);
 			if (!isFailed && waitTillFinalizedHash) {
 				await onSuccess(txHash);
 			}
@@ -931,94 +932,67 @@ export class PolkadotApiService {
 		beneficiaries.forEach((beneficiary) => {
 			if (ValidatorService.isValidAmount(beneficiary.amount) && ValidatorService.isValidSubstrateAddress(beneficiary.address)) {
 				if (beneficiary.assetId && ValidatorService.isValidAssetId(beneficiary.assetId, this.network)) {
+					// For non-native assets (USDC, USDT, etc.)
+					// Use consistent XCM V4 format for both assetKind and beneficiary on post-migration networks
 					tx.push(
 						this.api.tx?.treasury?.spend(
-							{
-								V3: {
-									assetId: {
-										Concrete: {
-											parents: 0,
-											interior: {
-												X2: [
-													{
-														PalletInstance: NETWORKS_DETAILS[this.network]?.palletInstance
-													},
-													{
-														GeneralIndex: beneficiary.assetId
-													}
-												]
-											}
-										}
-									},
-									location: isPostMigration
-										? {
+							// assetKind: VersionedLocatableAsset
+							// In XCM V4, AssetId is just a Location (no Concrete wrapper like V3)
+							isPostMigration
+								? {
+										V4: {
+											// location: Where the asset exists (Asset Hub = Here for post-migration)
+											location: {
 												parents: 0,
 												interior: 'Here'
+											},
+											// assetId: The asset identifier - in V4 this is a Location, not Concrete
+											assetId: {
+												parents: 0,
+												interior: {
+													X2: [
+														{
+															PalletInstance: NETWORKS_DETAILS[this.network]?.palletInstance
+														},
+														{
+															GeneralIndex: beneficiary.assetId
+														}
+													]
+												}
 											}
-										: {
+										}
+									}
+								: {
+										// Pre-migration: Use V3 with Concrete wrapper
+										V3: {
+											location: {
 												parents: 0,
 												interior: {
 													X1: { Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId }
 												}
-											}
-								}
-							},
-							beneficiary.amount.toString(),
-							isPostMigration
-								? {
-										V4: {
-											location: {
-												parents: 0,
-												interior: 'Here'
 											},
-											accountId: {
-												parents: 0,
-												interior: {
-													X1: [
-														{
-															AccountId32: {
-																id: decodeAddress(beneficiary.address),
-																network: null
+											assetId: {
+												Concrete: {
+													parents: 0,
+													interior: {
+														X2: [
+															{
+																PalletInstance: NETWORKS_DETAILS[this.network]?.palletInstance
+															},
+															{
+																GeneralIndex: beneficiary.assetId
 															}
-														}
-													]
+														]
+													}
 												}
 											}
 										}
-									}
-								: { V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
-							beneficiary.validFromBlock || null
-						)
-					);
-				} else {
-					tx.push(
-						this.api.tx?.treasury?.spend(
-							{
-								V4: {
-									location: isPostMigration
-										? {
-												parents: 0,
-												interior: 'Here'
-											}
-										: {
-												parents: 0,
-												interior: {
-													X1: [
-														{
-															Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId
-														}
-													]
-												}
-											},
-									assetId: {
-										parents: 1,
-										interior: 'here'
-									}
-								}
-							},
+									},
 							beneficiary.amount.toString(),
+							// beneficiary: VersionedLocatableAccount (has location + accountId)
 							isPostMigration
 								? {
+										// V4 beneficiary: VersionedLocatableAccount with location (where) and accountId (which account)
 										V4: {
 											location: {
 												parents: 0,
@@ -1030,8 +1004,8 @@ export class PolkadotApiService {
 													X1: [
 														{
 															AccountId32: {
-																id: decodeAddress(beneficiary.address),
-																network: null
+																network: null,
+																id: u8aToHex(decodeAddress(beneficiary.address))
 															}
 														}
 													]
@@ -1040,13 +1014,91 @@ export class PolkadotApiService {
 										}
 									}
 								: {
+										// V3 beneficiary format - simple Location
 										V3: {
 											parents: 0,
 											interior: {
 												X1: {
 													AccountId32: {
-														id: decodeAddress(beneficiary.address),
-														network: null
+														network: null,
+														id: u8aToHex(decodeAddress(beneficiary.address))
+													}
+												}
+											}
+										}
+									},
+							beneficiary.validFromBlock || null
+						)
+					);
+				} else {
+					// For native token spends
+					tx.push(
+						this.api.tx?.treasury?.spend(
+							// assetKind for native token
+							isPostMigration
+								? {
+										V4: {
+											location: {
+												parents: 0,
+												interior: 'Here'
+											},
+											// Native token assetId: points to relay chain (parents: 1, interior: Here)
+											assetId: {
+												parents: 1,
+												interior: 'Here'
+											}
+										}
+									}
+								: {
+										V3: {
+											location: {
+												parents: 0,
+												interior: {
+													X1: { Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId }
+												}
+											},
+											assetId: {
+												Concrete: {
+													parents: 1,
+													interior: 'Here'
+												}
+											}
+										}
+									},
+							beneficiary.amount.toString(),
+							// beneficiary: VersionedLocatableAccount (has location + accountId)
+							isPostMigration
+								? {
+										// V4 beneficiary has location (where) and accountId (which account)
+										V4: {
+											location: {
+												parents: 0,
+												interior: 'Here'
+											},
+											accountId: {
+												parents: 0,
+												interior: {
+													X1: [
+														{
+															AccountId32: {
+																network: null,
+																id: u8aToHex(decodeAddress(beneficiary.address))
+															}
+														}
+													]
+												}
+											}
+										}
+									}
+								: {
+										// V3 beneficiary format - simple Location
+										V3: {
+											parents: 0,
+											interior: {
+												X1: {
+													AccountId32: {
+														network: null,
+														id: u8aToHex(decodeAddress(beneficiary.address))
 													}
 												}
 											}
@@ -1463,7 +1515,7 @@ export class PolkadotApiService {
 						treasurySpendData: {
 							beneficiary:
 								getSubstrateAddressFromAccountId(
-									(spendData as any)?.beneficiary?.V4?.interior?.X1?.[0]?.AccountId32?.id || (spendData as any)?.beneficiary?.V3?.interior?.X1?.AccountId32?.id || ''
+									(spendData as any)?.beneficiary?.V4?.accountId?.interior?.X1?.[0]?.AccountId32?.id || (spendData as any)?.beneficiary?.V3?.interior?.X1?.AccountId32?.id || ''
 								) || '',
 							generalIndex:
 								(
@@ -1806,5 +1858,101 @@ export class PolkadotApiService {
 		}
 
 		return balances;
+	}
+
+	static async createNewAddress(): Promise<{ mnemonic: string; address: string }> {
+		await cryptoWaitReady();
+		const mnemonic = mnemonicGenerate();
+		const keyring = new Keyring({ type: 'sr25519' });
+		const pair = keyring.addFromUri(mnemonic);
+		return { mnemonic, address: pair.address };
+	}
+
+	async delegateForDelegateX({
+		address,
+		wallet,
+		delegateAddress,
+		balance,
+		conviction,
+		tracks,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		address: string;
+		wallet: EWallet;
+		delegateAddress: string;
+		balance: BN;
+		conviction: number;
+		tracks: number[];
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api) {
+			onFailed('API not ready');
+			return;
+		}
+
+		// Validate balance - cannot delegate zero balance
+		if (!balance || balance.isZero()) {
+			onFailed('Balance cannot be zero. Please specify a voting power amount.');
+			return;
+		}
+
+		const feeAmount = inputToBn('5', this.network).bnValue;
+
+		const feeTx = this.api.tx.balances.transferKeepAlive(delegateAddress, feeAmount);
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.delegate(track, delegateAddress, conviction, balance));
+
+		const tx = this.api.tx.utility.batchAll([feeTx, ...txs]);
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			errorMessageFallback: 'Failed to delegate',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: false,
+			setVaultQrState
+		});
+	}
+
+	async undelegateForDelegateX({
+		address,
+		wallet,
+		tracks,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		address: string;
+		wallet: EWallet;
+		tracks: number[];
+		onSuccess: () => void;
+		onFailed: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api) {
+			onFailed('API not ready');
+			return;
+		}
+
+		const txs = tracks.map((track) => this.api.tx.convictionVoting.undelegate(track));
+
+		const tx = this.api.tx.utility.batchAll(txs);
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			errorMessageFallback: 'Failed to undelegate',
+			onSuccess,
+			onFailed,
+			waitTillFinalizedHash: false,
+			setVaultQrState
+		});
 	}
 }

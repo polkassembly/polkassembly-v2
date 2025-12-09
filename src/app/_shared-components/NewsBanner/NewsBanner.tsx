@@ -99,17 +99,23 @@ function NewsBanner() {
 
 	return (
 		<div
-			className='fixed bottom-0 right-0 z-20 h-8 w-full bg-[#FEC021] shadow-lg transition-opacity duration-200'
+			className='fixed bottom-0 right-0 z-20 max-h-8 min-h-8 w-full flex-none bg-[#FEC021] pb-[env(safe-area-inset-bottom)] shadow-lg'
 			style={{
 				left: isMobileDevice ? '0' : sidebarWidth,
+				height: '32px',
+				transform: 'translate3d(0,0,0)',
+				backfaceVisibility: 'hidden',
+				WebkitBackfaceVisibility: 'hidden',
 				WebkitTransform: 'translate3d(0,0,0)',
-				WebkitOverflowScrolling: 'touch'
+				WebkitOverflowScrolling: 'touch',
+				willChange: 'transform'
 			}}
 		>
 			<div
-				className='relative h-8 overflow-hidden'
+				className='relative overflow-hidden'
 				style={{
 					height: '32px',
+					minHeight: '32px',
 					maxHeight: '32px'
 				}}
 			>
@@ -120,7 +126,7 @@ function NewsBanner() {
 				>
 					{duplicatedNewsItems.map((item: INewsItem) => (
 						<div
-							key={`news-item-${(item.URL ?? item.Title).replace(/[^a-zA-Z0-9-_]/g, '-')}`}
+							key={item.Title}
 							className='mr-6 inline-block'
 						>
 							<div className='flex items-center'>
