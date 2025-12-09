@@ -19,6 +19,19 @@ import { APIError } from '../../../_api-utils/apiError';
 import { EV1ProposalType, IOnChainPost } from '../../_v1_api-utils/types';
 import { getUpdatedComments, handleReactions, v1ToV2ProposalType } from '../../_v1_api-utils/utils';
 
+const SUBSQUID_FETCH_TIMEOUT_MS = 30000; // 30 second timeout for Subsquid requests
+
+// Custom fetch with timeout for Subsquid requests
+const fetchWithTimeout: typeof fetch = (url, options) => {
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), SUBSQUID_FETCH_TIMEOUT_MS);
+
+	return fetch(url, {
+		...options,
+		signal: controller.signal
+	}).finally(() => clearTimeout(timeoutId));
+};
+
 const SUBSQUID_QUERY = `query ProposalByIndexAndType($index_eq: Int, $hash_eq: String, $type_eq: ProposalType) {
   proposals(limit: 1, where: {type_eq: $type_eq, index_eq: $index_eq, hash_eq: $hash_eq}) {
     index
@@ -129,7 +142,8 @@ const subsquidGqlClient = (network: ENetwork) => {
 
 	return new UrqlClient({
 		url: subsquidUrl,
-		exchanges: [cacheExchange, fetchExchange]
+		exchanges: [cacheExchange, fetchExchange],
+		fetch: fetchWithTimeout
 	});
 };
 
