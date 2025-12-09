@@ -12,67 +12,67 @@ interface AppItem {
 
 const apps: AppItem[] = [
 	{
-		key: 'OpenGov',
+		key: '🏛 OpenGov',
 		href: '/opengov'
 	},
 	{
-		key: 'Delegation',
+		key: '👥 Delegation',
 		href: '/delegation'
 	},
 	{
-		key: 'Bounties',
+		key: '💰 Bounties',
 		href: '/bounties'
 	},
 	{
-		key: 'Identity',
+		key: '🪪 Identity & Judgement',
 		href: '/judgements'
 	},
 	{
-		key: 'People',
+		key: '🧑‍🤝‍🧑 People',
 		href: '/people'
 	},
 	{
-		key: 'PoP',
+		key: '🧬 Proof of Personhood',
 		href: 'https://www.proofofpersonhood.how/'
 	},
 	{
-		key: 'DelegateX',
+		key: '⚖️ DelegateX',
 		href: '/delegation'
 	},
 	{
-		key: 'Klara',
+		key: '🦜 Klara',
 		href: '/'
 	},
 	{
-		key: 'TreasuryAnalytics',
+		key: '📊 Treasury Analytics',
 		href: '/treasury-analytics'
 	},
 	{
-		key: 'Offchain',
+		key: '🌐 Offchain',
 		href: '/offchain'
 	},
 	{
-		key: 'Create',
+		key: '🏗 Create',
 		href: '/create'
 	},
 	{
-		key: 'GovAnalytics',
+		key: '📈 Governance Analytics',
 		href: '/gov-analytics'
 	},
 	{
-		key: 'AAG',
+		key: '🎥 AAG',
 		href: '/aag'
 	},
 	{
-		key: 'Polkasafe',
+		key: '🛡 Polkasafe',
 		href: 'https://polkasafe.xyz'
 	},
 	{
-		key: 'Fellowship',
+		key: '🎓 Fellowship',
 		href: 'https://collectives.polkassembly.io'
 	},
 	{
-		key: 'Proxy',
+		key: '🧩 Proxy',
 		href: '/proxies'
 	}
 ];
