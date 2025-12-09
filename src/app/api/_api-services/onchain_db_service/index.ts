@@ -265,6 +265,10 @@ export class OnChainDbService {
 		return SubsquidService.GetChildBountiesByParentBountyIndex({ network, index, page, limit });
 	}
 
+	static async GetAllActiveBountyCurators(network: ENetwork): Promise<string[]> {
+		return SubsquidService.GetAllActiveBountyCurators(network);
+	}
+
 	static async GetConvictionVotingDelegationStats(network: ENetwork): Promise<IDelegationStats> {
 		return SubsquidService.GetConvictionVotingDelegationStats(network);
 	}

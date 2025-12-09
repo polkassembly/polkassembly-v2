@@ -1025,7 +1025,7 @@ export class SubsquidQueries {
 				from
 				track
 			}
-			convictionVotesConnection(where: {voter_eq: $address_eq, proposal: {type_eq: ReferendumV2, createdAt_gte: $createdAt_gte}}) {
+			convictionVotesConnection(orderBy: id_ASC, where: {voter_eq: $address_eq, proposal: {type_eq: ReferendumV2, createdAt_gte: $createdAt_gte}}) {
 				totalCount
 			}
 		}
@@ -1497,6 +1497,14 @@ export class SubsquidQueries {
 				balance
 				lockPeriod
 				track
+			}
+		}
+	`;
+
+	protected static GET_ACTIVE_BOUNTY_CURATORS = `
+		query ActiveBountyCurators($status_in: [ProposalStatus!]!) {
+			proposals(where: {type_eq: Bounty, status_in: $status_in, curator_isNull: false}) {
+				curator
 			}
 		}
 	`;

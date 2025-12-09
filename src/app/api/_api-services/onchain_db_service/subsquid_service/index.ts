@@ -837,6 +837,37 @@ export class SubsquidService extends SubsquidUtils {
 		}
 	}
 
+	static async GetAllActiveBountyCurators(network: ENetwork): Promise<string[]> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const query = this.GET_ACTIVE_BOUNTY_CURATORS;
+			const variables = {
+				status_in: [EProposalStatus.CuratorProposed, EProposalStatus.Active, EProposalStatus.Extended]
+			};
+
+			const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
+
+			if (subsquidErr || !subsquidData) {
+				console.error(`SubsquidService: Error fetching on-chain active bounty curators: ${subsquidErr?.message || subsquidErr}`);
+				return [];
+			}
+
+			if (!subsquidData.proposals) return [];
+
+			const curators = new Set<string>();
+			subsquidData.proposals.forEach((proposal: { curator: string }) => {
+				if (proposal.curator) {
+					curators.add(proposal.curator);
+				}
+			});
+
+			return Array.from(curators);
+		} catch (error) {
+			console.error(`SubsquidService: Exception fetching active bounty curators: ${error}`);
+			return [];
+		}
+	}
+
 	static async GetChildBountiesByParentBountyIndex({
 		network,
 		index,
@@ -926,73 +957,79 @@ export class SubsquidService extends SubsquidUtils {
 	}
 
 	static async GetLast30DaysConvictionVoteCountByAddress({ network, address }: { network: ENetwork; address: string }): Promise<number> {
-		const gqlClient = this.subsquidGqlClient(network);
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
 
-		const query = this.GET_LAST_30_DAYS_CONVICTION_VOTE_COUNT_BY_ADDRESS;
+			const query = this.GET_LAST_30_DAYS_CONVICTION_VOTE_COUNT_BY_ADDRESS;
 
-		const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+			const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { address_eq: address, createdAt_gte: thirtyDaysAgo.toISOString() }).toPromise();
+			const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, { address_eq: address, createdAt_gte: thirtyDaysAgo.toISOString() }).toPromise();
 
-		if (subsquidErr || !subsquidData) {
-			console.error(`Error fetching on-chain vote count details from Subsquid: ${subsquidErr}`);
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain vote count details from Subsquid');
+			if (subsquidErr || !subsquidData) {
+				console.error(`Error fetching on-chain vote count details from Subsquid: ${subsquidErr}`);
+				return 0;
+			}
+
+			return subsquidData.convictionVotesConnection.totalCount;
+		} catch (error) {
+			console.error('Error fetching on-chain vote count details from Subsquid:', error);
+			return 0;
 		}
-
-		return subsquidData.convictionVotesConnection.totalCount;
 	}
 
 	static async GetAllDelegatesWithConvictionVotingPowerAndDelegationsCount(
 		network: ENetwork
 	): Promise<Record<string, { maxDelegated: string; delegators: string[]; receivedDelegationsCount: number }>> {
-		const gqlClient = this.subsquidGqlClient(network);
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
 
-		const query = this.GET_ALL_DELEGATES_CONVICTION_VOTING_POWER_AND_DELEGATIONS_COUNT;
+			const query = this.GET_ALL_DELEGATES_CONVICTION_VOTING_POWER_AND_DELEGATIONS_COUNT;
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, {}).toPromise();
+			const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, {}).toPromise();
 
-		if (subsquidErr || !subsquidData) {
-			console.error(`Error fetching on-chain all delegates conviction voting power and delegations count from Subsquid: ${subsquidErr}`);
-			throw new APIError(
-				ERROR_CODES.INTERNAL_SERVER_ERROR,
-				StatusCodes.INTERNAL_SERVER_ERROR,
-				'Error fetching on-chain all delegates conviction voting power and delegations count from Subsquid'
-			);
-		}
-
-		const result: Record<string, { maxDelegated: string; delegators: string[]; receivedDelegationsCount: number }> = {};
-
-		// Use Map for optimized grouping by delegate
-		const delegateMap = new Map<string, Array<{ balance: string; lockPeriod: number; from: string; track?: number; trackNumber?: number }>>();
-
-		// Single pass grouping - O(n) complexity
-		subsquidData.votingDelegations.forEach((delegation: { to: string; balance: string; lockPeriod: number; from: string; track?: number; trackNumber?: number }) => {
-			const delegate = delegation.to;
-			const existing = delegateMap.get(delegate);
-
-			if (existing) {
-				existing.push(delegation);
-			} else {
-				delegateMap.set(delegate, [delegation]);
+			if (subsquidErr || !subsquidData) {
+				console.error(`Error fetching on-chain all delegates conviction voting power and delegations count from Subsquid: ${subsquidErr}`);
+				return {};
 			}
-		});
 
-		// Calculate results for each delegate - optimized iteration
-		delegateMap.forEach((delegations, delegate) => {
-			const maxDelegated = this.calculateMaxTrackVotingPower(delegations);
+			const result: Record<string, { maxDelegated: string; delegators: string[]; receivedDelegationsCount: number }> = {};
 
-			// Use Set for efficient deduplication
-			const uniqueDelegators = new Set<string>();
-			delegations.forEach((d) => uniqueDelegators.add(d.from));
+			// Use Map for optimized grouping by delegate
+			const delegateMap = new Map<string, Array<{ balance: string; lockPeriod: number; from: string; track?: number; trackNumber?: number }>>();
 
-			result[`${delegate}`] = {
-				maxDelegated,
-				delegators: Array.from(uniqueDelegators),
-				receivedDelegationsCount: delegations.length
-			};
-		});
+			// Single pass grouping - O(n) complexity
+			subsquidData.votingDelegations.forEach((delegation: { to: string; balance: string; lockPeriod: number; from: string; track?: number; trackNumber?: number }) => {
+				const delegate = delegation.to;
+				const existing = delegateMap.get(delegate);
 
-		return result;
+				if (existing) {
+					existing.push(delegation);
+				} else {
+					delegateMap.set(delegate, [delegation]);
+				}
+			});
+
+			// Calculate results for each delegate - optimized iteration
+			delegateMap.forEach((delegations, delegate) => {
+				const maxDelegated = this.calculateMaxTrackVotingPower(delegations);
+
+				// Use Set for efficient deduplication
+				const uniqueDelegators = new Set<string>();
+				delegations.forEach((d) => uniqueDelegators.add(d.from));
+
+				result[`${delegate}`] = {
+					maxDelegated,
+					delegators: Array.from(uniqueDelegators),
+					receivedDelegationsCount: delegations.length
+				};
+			});
+
+			return result;
+		} catch (error) {
+			console.error('Error fetching on-chain all delegates conviction voting power and delegations count from Subsquid:', error);
+			return {};
+		}
 	}
 
 	static async GetDelegateDetails({ network, address }: { network: ENetwork; address: string }): Promise<{
@@ -1065,24 +1102,29 @@ export class SubsquidService extends SubsquidUtils {
 	}
 
 	static async GetActiveProposalsCountByTrackIds({ network, trackIds }: { network: ENetwork; trackIds: number[] }) {
-		const gqlClient = this.subsquidGqlClient(network);
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
 
-		const query = this.GET_ACTIVE_PROPOSALS_COUNT_BY_TRACK_IDS(trackIds);
+			const query = this.GET_ACTIVE_PROPOSALS_COUNT_BY_TRACK_IDS(trackIds);
 
-		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, {}).toPromise();
+			const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, {}).toPromise();
 
-		if (subsquidErr || !subsquidData) {
-			console.error(`Error fetching on-chain active proposals by track id from Subsquid: ${subsquidErr}`);
-			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain active proposals by track id from Subsquid');
+			if (subsquidErr || !subsquidData) {
+				console.error(`Error fetching on-chain active proposals by track id from Subsquid: ${subsquidErr}`);
+				return {};
+			}
+
+			const result: Record<number, number> = {};
+
+			trackIds.forEach((trackId) => {
+				result[Number(trackId)] = subsquidData[`track_${trackId}`]?.totalCount || 0;
+			});
+
+			return result;
+		} catch (error) {
+			console.error('Error fetching on-chain active proposals by track id from Subsquid:', error);
+			return {};
 		}
-
-		const result: Record<number, number> = {};
-
-		trackIds.forEach((trackId) => {
-			result[Number(trackId)] = subsquidData[`track_${trackId}`].totalCount;
-		});
-
-		return result;
 	}
 
 	static async GetActiveProposalListingsWithVoteForAddressByTrackId({
