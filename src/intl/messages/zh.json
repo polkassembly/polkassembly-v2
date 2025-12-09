@@ -286,7 +286,7 @@
 	"Apps": {
 		"header": "应用",
 		"OpenGov": {
-			"title": "OpenGov",
+			"title": "链下帖子",
 			"description": "探索并参与 Polkadot 的链上治理。"
 		},
 		"Delegation": {
@@ -478,6 +478,7 @@
 		"delegation": "委托",
 		"profile": "个人资料",
 		"home": "主页",
+		"openGov": "链下帖子",
 		"overview": "概览",
 		"discussions": "讨论",
 		"preimages": "预映像",
@@ -1181,6 +1182,7 @@
 		"totalSpends": "本周总支出",
 		"decidingEnds": "决议结束于",
 		"decisionPeriodEnded": "决议期已结束",
+		"totalSpendsTooltip": "本周总支出 = 最近7天内，Approved或Executed状态的ReferendumV2提案的总和。",
 		"aye": "赞成",
 		"nay": "反对",
 		"viewAllActivity": "查看所有活动",
