@@ -109,7 +109,7 @@ function SpendPeriodStats({ nextSpendAt, nextBurn }: { nextSpendAt?: Date; nextB
 					className='hidden h-16 w-[1px] lg:block'
 				/>
 				<div className='flex flex-col justify-between gap-y-1'>
-					<div className='flex items-center gap-1'>
+					<div className='flex items-center'>
 						<h2 className='whitespace-nowrap text-sm font-semibold text-text_primary'>{t('TreasuryStats.nextBurn')}</h2>
 						<Tooltip>
 							<TooltipTrigger asChild>
