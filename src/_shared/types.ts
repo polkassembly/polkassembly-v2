@@ -1709,7 +1709,13 @@ export interface IJudgementRequest {
 	displayName: string;
 	email: string;
 	twitter: string;
+	discord?: string;
+	matrix?: string;
+	github?: string;
+	web?: string;
 	status: EJudgementStatus;
+	judgementType?: string;
+	judgementLabel?: string;
 	dateInitiated: Date;
 	registrarIndex: number;
 	registrarAddress: string;

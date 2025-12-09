@@ -1578,6 +1578,7 @@
 		"address": "Address",
 		"displayName": "Display Name",
 		"email": "Email",
+		"socials": "Socials",
 		"twitter": "Twitter",
 		"status": "Status",
 		"initiatedOn": "Initiated On",

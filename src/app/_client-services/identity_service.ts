@@ -627,28 +627,43 @@ export class IdentityService {
 				}
 
 				const identity = identityInfo.info || {};
+				const socials = getSocialsFromIdentity(identity);
 
 				// Process judgements for each registrar
 				identityInfo.judgements.forEach((judgement: any) => {
 					const [registrarIndex, judgementData] = judgement;
+					const judgementValue =
+						typeof judgementData === 'string'
+							? judgementData
+							: judgementData && typeof judgementData === 'object'
+								? Object.keys(judgementData)[0] || String(judgementData)
+								: String(judgementData);
 					const registrarIndexNum = Number(registrarIndex);
 
 					if (registrarIndexNum >= 0 && registrarIndexNum < registrars.length) {
 						const registrar = registrars[`${registrarIndexNum}`];
-						const status = mapJudgementStatus(judgementData);
+						const status = mapJudgementStatus(judgementValue);
+						const judgementLabel = formatJudgementLabel(judgementValue);
 
 						const displayRaw = identity.display?.Raw ?? identity.display;
 						const displayName = isHex(displayRaw) ? hexToString(displayRaw) || displayRaw || '' : displayRaw || '';
-						const emailRaw = identity.email?.Raw ?? identity.email;
+						const emailRaw = identity.email?.Raw ?? identity.email ?? socials.email;
 						const email = isHex(emailRaw) ? hexToString(emailRaw) || emailRaw || '' : emailRaw || '';
+						const twitterHandle = socials.twitter || identity.twitter?.Raw || identity.twitter || '';
 
 						const judgementRequest: IJudgementRequest = {
 							id: `${address}-${registrarIndexNum}-${key.hash.toString()}`,
 							address,
 							displayName,
 							email,
-							twitter: identity.twitter?.Raw || identity.twitter || '',
+							twitter: twitterHandle,
+							discord: socials.discord || '',
+							matrix: socials.matrix || '',
+							github: socials.github || '',
+							web: socials.web || '',
 							status,
+							judgementType: judgementValue,
+							judgementLabel,
 							dateInitiated: new Date(),
 							registrarIndex: registrarIndexNum,
 							registrarAddress: registrar.account,
