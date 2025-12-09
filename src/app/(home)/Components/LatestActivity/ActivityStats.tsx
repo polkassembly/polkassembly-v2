@@ -89,7 +89,7 @@ function ActivityStats() {
 							{stat.tooltip && (
 								<Tooltip>
 									<TooltipTrigger asChild>
-										<AiFillQuestionCircle className='h-3 w-3 text-question_icon_color' />
+										<AiFillQuestionCircle className='h-4 w-4 text-question_icon_color' />
 									</TooltipTrigger>
 									<TooltipContent className='w-40 break-words bg-tooltip_background p-2 text-center text-xs text-white'>
 										<p>{stat.tooltip}</p>
