@@ -9,13 +9,55 @@ import { EReactQueryKeys } from '@/_shared/types';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { STALE_TIME } from '@/_shared/_constants/listingLimit';
+import { ExternalLink } from 'lucide-react';
+import OGLogo from '@assets/icons/og.png';
+import Image from 'next/image';
 import { Skeleton } from '../../Skeleton';
 
 interface OGTrackerInfoProps {
 	refNum: string;
+	trackName?: string;
 }
 
-function OGTrackerInfo({ refNum }: OGTrackerInfoProps) {
+const getOGTrackerTrackName = (trackName?: string): string => {
+	if (!trackName) return '';
+	switch (trackName) {
+		case 'Root':
+			return 'root';
+		case 'Whitelisted Caller':
+			return 'whitelistedCaller';
+		case 'Staking Admin':
+			return 'stakingAdmin';
+		case 'Treasurer':
+			return 'treasurer';
+		case 'Lease Admin':
+			return 'leaseAdmin';
+		case 'Fellowship Admin':
+			return 'fellowshipAdmin';
+		case 'General Admin':
+			return 'generalAdmin';
+		case 'Auction Admin':
+			return 'auctionAdmin';
+		case 'Referendum Killer':
+			return 'referendumKiller';
+		case 'Referendum Canceller':
+			return 'referendumCanceller';
+		case 'Big Tipper':
+			return 'bigTipper';
+		case 'Big Spender':
+			return 'bigSpender';
+		case 'Medium Spender':
+			return 'mediumSpender';
+		case 'Small Spender':
+			return 'smallSpender';
+		case 'Small Tipper':
+			return 'smallTipper';
+		default:
+			return trackName.replace(/ ([a-zA-Z])/g, (g) => g[1].toUpperCase()).replace(/^./, (g) => g.toLowerCase());
+	}
+};
+
+function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 	const { data, isLoading, error } = useQuery({
 		queryKey: [EReactQueryKeys.OGTRACKER_DATA, refNum],
 		queryFn: async () => {
@@ -47,101 +89,107 @@ function OGTrackerInfo({ refNum }: OGTrackerInfoProps) {
 		return null;
 	}
 
-	const { proposal, tasks, proofOfWork } = data;
+	const { tasks, proofOfWork } = data;
+
+	if ((!tasks || tasks.length === 0) && (!proofOfWork || proofOfWork.length === 0)) {
+		return null;
+	}
+
+	const formattedTrackName = getOGTrackerTrackName(trackName);
+	const ogTrackerUrl = formattedTrackName ? `https://app.ogtracker.io/${formattedTrackName}/${refNum}` : `https://ogtracker.io/proposal/${refNum}`;
 
 	return (
-		<div className='flex flex-col gap-4 rounded-lg border border-border_grey bg-bg_modal p-4'>
-			<div className='flex items-center justify-between border-b border-border_grey pb-3'>
-				<h3 className='text-lg font-semibold text-text_primary'>OGTracker Information</h3>
+		<div className='flex max-h-[300px] flex-col overflow-hidden rounded-xl border border-border_grey bg-bg_modal shadow-sm'>
+			<div className='check-0 sticky top-0 z-10 flex items-center justify-between border-b border-border_grey bg-bg_modal/95 px-4 py-3 backdrop-blur-sm'>
+				<div className='flex items-center gap-2'>
+					<Image
+						src={OGLogo}
+						alt='OGTracker'
+						width={20}
+						height={20}
+						className='rounded-full'
+					/>
+					<h3 className='text-sm font-semibold text-text_primary'>OGTracker Info</h3>
+				</div>
 				<a
-					href={`https://ogtracker.io/proposal/${refNum}`}
+					href={ogTrackerUrl}
 					target='_blank'
 					rel='noopener noreferrer'
-					className='text-pink_primary text-sm hover:underline'
+					className='text-pink_primary hover:text-pink_secondary flex items-center gap-1 text-xs font-medium transition-colors hover:underline'
 				>
-					View on OGTracker →
+					View on app
+					<ExternalLink className='h-3 w-3' />
 				</a>
 			</div>
 
-			{proposal && (
-				<div className='flex flex-col gap-2'>
-					<div className='text-text_secondary text-sm font-medium'>Proposal Status</div>
-					<div className='text-base text-text_primary'>{proposal.status || 'Active'}</div>
-				</div>
-			)}
+			<div className='custom-scroll flex flex-col gap-4 overflow-y-auto p-4'>
+				{tasks && tasks.length > 0 && (
+					<div className='flex flex-col gap-2.5'>
+						<div className='flex items-center justify-between'>
+							<div className='text-text_secondary text-xs font-medium uppercase tracking-wide'>Tasks</div>
+							<span className='bg-bg_secondary text-text_secondary rounded-full px-2 py-0.5 text-xs font-medium'>{tasks.length}</span>
+						</div>
+						<div className='flex flex-col gap-2'>
+							{tasks.map((task, index) => {
+								const statusMap: Record<string, string> = {
+									A: 'Delivered',
+									B: 'In Progress',
+									C: 'Flagged',
+									D: 'Remodel'
+								};
+								const statusLabel = statusMap[task.status] || task.status;
+								const getStatusColor = (status: string) => {
+									if (status === 'Delivered') return 'text-green-500 bg-green-500/10 border-green-500/20';
+									if (status === 'In Progress') return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+									if (status === 'Flagged') return 'text-red-500 bg-red-500/10 border-red-500/20';
+									return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
+								};
 
-			{tasks && tasks.length > 0 && (
-				<div className='flex flex-col gap-3'>
-					<div className='text-text_secondary text-sm font-medium'>Tasks ({tasks.length})</div>
-					<div className='flex flex-col gap-2'>
-						{tasks.map((task, index) => {
-							const statusMap: Record<string, string> = {
-								A: 'Delivered',
-								B: 'In Progress',
-								C: 'Flagged',
-								D: 'Remodel'
-							};
-							const statusLabel = statusMap[task.status] || task.status;
-							return (
-								<div
-									key={task.id || index}
-									className='bg-bg_secondary flex items-start gap-2 rounded-md border border-border_grey p-3'
-								>
-									<div className='flex-1'>
-										<div className='text-sm font-medium text-text_primary'>{task.title}</div>
+								return (
+									<div
+										key={task.id || index}
+										className='bg-bg_secondary hover:bg-bg_tertiary group flex flex-col gap-2 rounded-lg border border-border_grey p-3 transition-all'
+									>
+										<div className='text-sm font-medium leading-snug text-text_primary'>{task.title}</div>
 										{statusLabel && (
-											<div className='text-text_secondary mt-1 text-xs'>
-												Status: <span className={cn('font-medium', statusLabel === 'Delivered' ? 'text-green-500' : 'text-orange-500')}>{statusLabel}</span>
+											<div className='flex items-center gap-2'>
+												<span className={cn('rounded-md border px-2 py-0.5 text-xs font-medium', getStatusColor(statusLabel))}>{statusLabel}</span>
 											</div>
 										)}
 									</div>
-								</div>
-							);
-						})}
+								);
+							})}
+						</div>
 					</div>
-				</div>
-			)}
+				)}
 
-			{proofOfWork && proofOfWork.length > 0 && (
-				<div className='flex flex-col gap-3'>
-					<div className='text-text_secondary text-sm font-medium'>Proof of Work ({proofOfWork.length})</div>
-					<div className='flex flex-col gap-2'>
-						{proofOfWork.map((pow, index) => (
-							<a
-								key={pow.id || index}
-								href={pow.content}
-								target='_blank'
-								rel='noopener noreferrer'
-								className='bg-bg_secondary hover:bg-bg_tertiary flex items-center gap-2 rounded-md border border-border_grey p-3 transition-colors'
-							>
-								<div className='flex-1'>
-									<div className='text-pink_primary text-sm hover:underline'>{pow.content}</div>
-									{pow.task_id && <div className='text-text_secondary mt-1 text-xs'>Linked to task</div>}
-								</div>
-								<svg
-									className='text-text_secondary h-4 w-4'
-									fill='none'
-									stroke='currentColor'
-									viewBox='0 0 24 24'
+				{proofOfWork && proofOfWork.length > 0 && (
+					<div className='flex flex-col gap-2.5'>
+						<div className='flex items-center justify-between'>
+							<div className='text-xs font-medium uppercase tracking-wide text-text_primary'>Proof of Work</div>
+							<span className='bg-bg_secondary rounded-full px-2 py-0.5 text-xs font-medium text-text_primary'>{proofOfWork.length}</span>
+						</div>
+						<div className='flex flex-col gap-2'>
+							{proofOfWork.map((pow, index) => (
+								<a
+									key={pow.id || index}
+									href={pow.content}
+									target='_blank'
+									rel='noopener noreferrer'
+									className='bg-bg_secondary hover:border-pink_primary/50 hover:bg-bg_tertiary group flex items-center justify-between gap-3 rounded-lg border border-border_grey p-3 transition-all'
 								>
-									<path
-										strokeLinecap='round'
-										strokeLinejoin='round'
-										strokeWidth={2}
-										d='M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'
-									/>
-								</svg>
-							</a>
-						))}
+									<div className='flex min-w-0 flex-1 flex-col gap-0.5'>
+										<div className='text-pink_primary truncate text-sm font-medium group-hover:underline'>{pow.content}</div>
+										{pow.task_id && <div className='text-[10px] text-text_primary'>Linked to task</div>}
+									</div>
+									<ExternalLink className='group-hover:text-pink_primary h-3.5 w-3.5 flex-shrink-0 text-wallet_btn_text transition-colors' />
+								</a>
+							))}
+						</div>
 					</div>
-				</div>
-			)}
-
-			{(!tasks || tasks.length === 0) && (!proofOfWork || proofOfWork.length === 0) && (
-				<div className='text-text_secondary py-6 text-center text-sm'>No tasks or proof of work found for this proposal on OGTracker</div>
-			)}
+				)}
+			</div>
 		</div>
 	);
 }
-
 export default OGTrackerInfo;

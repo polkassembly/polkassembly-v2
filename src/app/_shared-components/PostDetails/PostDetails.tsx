@@ -302,7 +302,12 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
-							{post.index && <OGTrackerInfo refNum={String(post.index)} />}
+							{post.index && (
+								<OGTrackerInfo
+									refNum={String(post.index)}
+									trackName={post.onChainInfo?.origin}
+								/>
+							)}
 
 							{/* Place Decision Deposit */}
 							{post.proposalType === EProposalType.REFERENDUM_V2 &&
