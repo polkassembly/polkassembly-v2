@@ -1198,7 +1198,9 @@
 		"salary": "Salary",
 		"applicants": "Applicants",
 		"applyNow": "Apply Now",
-		"noJobsFound": "No jobs found"
+		"noJobsFound": "No jobs found",
+		"posted": "Posted",
+		"noBountiesFound": "No bounties found"
 	},
 	"Apps": {
 		"header": "Apps",

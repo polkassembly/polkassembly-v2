@@ -1119,7 +1119,9 @@
 		"salary": "給与",
 		"applicants": "応募者",
 		"applyNow": "今すぐ応募",
-		"noJobsFound": "仕事が見つかりませんでした"
+		"noJobsFound": "仕事が見つかりませんでした",
+		"posted": "Posted",
+		"noBountiesFound": "No bounties found"
 	},
 	"Bounty": {
 		"availableBountyPool": "利用可能な報奨金プール",

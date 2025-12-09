@@ -11,7 +11,7 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { STALE_TIME } from '@/_shared/_constants/listingLimit';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 
 function TreasuryReportBanner() {
 	const [currentIndex, setCurrentIndex] = useState(0);
@@ -22,7 +22,7 @@ function TreasuryReportBanner() {
 			const { data } = await NextApiClientService.getTreasuryReport();
 			return data || [];
 		},
-		staleTime: STALE_TIME
+		staleTime: FIVE_MIN_IN_MILLI
 	});
 
 	useEffect(() => {
@@ -45,9 +45,8 @@ function TreasuryReportBanner() {
 		);
 	}
 
-	if (!reports?.length) return null;
+	if (!reports || !reports?.length) return null;
 
-	// eslint-disable-next-line security/detect-object-injection
 	const currentReport = reports[currentIndex];
 
 	return (
@@ -65,14 +64,20 @@ function TreasuryReportBanner() {
 						<h3 className='line-clamp-1 text-xl font-bold text-text_primary'>{currentReport.title}</h3>
 						<p className='line-clamp-1 text-sm font-medium text-wallet_btn_text'>{currentReport.description}</p>
 					</div>
-					<Link
-						href={currentReport.redirectLink || '#'}
-						target='_blank'
-						aria-label='View Report'
-						className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-arrow_bg_color text-bg_modal transition-transform hover:scale-105'
-					>
-						<ArrowRight className='h-5 w-5' />
-					</Link>
+					{currentReport.redirectLink ? (
+						<Link
+							href={currentReport.redirectLink}
+							target='_blank'
+							aria-label={`View ${currentReport.title} report`}
+							className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-arrow_bg_color text-bg_modal transition-transform hover:scale-105'
+						>
+							<ArrowRight className='h-5 w-5' />
+						</Link>
+					) : (
+						<div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-arrow_bg_color/50 text-bg_modal/50'>
+							<ArrowRight className='h-5 w-5' />
+						</div>
+					)}
 				</motion.div>
 			</AnimatePresence>
 		</div>

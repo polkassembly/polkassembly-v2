@@ -14,12 +14,12 @@ import { MdSort } from '@react-icons/all-files/md/MdSort';
 import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
 import { Separator } from '@/app/_shared-components/Separator';
 import { IJob, EProposalType, EProposalStatus, IPostListing } from '@/_shared/types';
-import { STALE_TIME } from '@/_shared/_constants/listingLimit';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import dayjs from 'dayjs';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 
 enum JobType {
 	JOB = 'job',
@@ -53,7 +53,7 @@ export default function JobsAndBounties() {
 			if (error || !data) throw new Error(error?.message || 'Failed to fetch jobs');
 			return { items: data?.data?.job?.data || [], type: JobType.JOB };
 		},
-		staleTime: STALE_TIME
+		staleTime: FIVE_MIN_IN_MILLI
 	});
 
 	const items = listingData?.items || [];

@@ -1221,7 +1221,9 @@
 		"salary": "Gehalt",
 		"applicants": "Bewerber",
 		"applyNow": "Jetzt bewerben",
-		"noJobsFound": "Keine Jobs gefunden"
+		"noJobsFound": "Keine Jobs gefunden",
+		"posted": "Posted",
+		"noBountiesFound": "No bounties found"
 	},
 	"BatchVote": {
 		"batchVoting": "Stapelabstimmung",

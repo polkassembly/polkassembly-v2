@@ -28,7 +28,13 @@ export class ExternalJobsService {
 			return await response.json();
 		} catch (error) {
 			console.error('Error fetching external jobs:', error);
-			throw error;
+
+			if (error instanceof APIError) {
+				throw error;
+			}
+
+			const message = error instanceof Error ? error.message : String(error);
+			throw new APIError('ExternalJobsError', StatusCodes.INTERNAL_SERVER_ERROR, `Failed to fetch external jobs: ${message}`);
 		}
 	}
 }

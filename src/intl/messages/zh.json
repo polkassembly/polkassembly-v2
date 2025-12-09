@@ -279,7 +279,9 @@
 		"salary": "薪资",
 		"applicants": "申请人",
 		"applyNow": "立即申请",
-		"noJobsFound": "未找到工作"
+		"noJobsFound": "未找到工作",
+		"posted": "Posted",
+		"noBountiesFound": "No bounties found"
 	},
 	"Apps": {
 		"header": "应用",

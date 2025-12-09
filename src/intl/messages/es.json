@@ -280,7 +280,9 @@
 		"salary": "Salario",
 		"applicants": "Solicitantes",
 		"applyNow": "Aplicar Ahora",
-		"noJobsFound": "No se encontraron empleos"
+		"noJobsFound": "No se encontraron empleos",
+		"posted": "Publicado",
+		"noBountiesFound": "No se encontraron recompensas"
 	},
 	"Apps": {
 		"header": "Aplicaciones",

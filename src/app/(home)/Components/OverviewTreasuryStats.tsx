@@ -69,7 +69,7 @@ const useTreasuryData = (data: ITreasuryStats[]) => {
 
 	const formatAssetBalance = (value: string | BN, assetSymbol?: EAssets) => {
 		const assetIndex = assetSymbol
-			? Object.values(NETWORKS_DETAILS[`${network}`]?.supportedAssets)?.find((supportedAsset) => supportedAsset.symbol === assetSymbol)?.index
+			? Object.values(NETWORKS_DETAILS?.[network]?.supportedAssets ?? {})?.find((supportedAsset) => supportedAsset.symbol === assetSymbol)?.index
 			: undefined;
 
 		return formatBnBalance(value || BN_ZERO?.toString(), { withUnit: true, numberAfterComma: 2, compactNotation: true }, network, assetIndex);
