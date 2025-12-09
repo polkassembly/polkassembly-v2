@@ -1557,7 +1557,7 @@
 		"latestJudgement": "最新判断",
 		"receivedRequests": "接收请求",
 		"totalGiven": "总计",
-		"fee": "费用",
+		"fees": "费用",
 		"noJudgementsFound": "未找到判断",
 		"noRegistrarsFound": "未找到注册者",
 		"searchByAddressOrName": "输入地址或名称进行搜索"

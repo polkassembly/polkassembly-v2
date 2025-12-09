@@ -1556,7 +1556,7 @@
 		"latestJudgement": "Letztes Urteil",
 		"receivedRequests": "Empfangene Anfragen",
 		"totalGiven": "Gesamt gegeben",
-		"fee": "Gebühr",
+		"fees": "Gebühren",
 		"noJudgementsFound": "Keine Urteile gefunden",
 		"noRegistrarsFound": "Keine Registrars gefunden",
 		"searchByAddressOrName": "Adresse oder Name eingeben, um zu suchen"

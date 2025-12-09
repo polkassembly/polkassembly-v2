@@ -1586,7 +1586,7 @@
 		"latestJudgement": "Latest Judgement",
 		"receivedRequests": "Received Requests",
 		"totalGiven": "Total Given",
-		"fee": "Fee",
+		"fees": "Fees",
 		"noJudgementsFound": "No judgements found",
 		"noRegistrarsFound": "No registrars found",
 		"searchByAddressOrName": "Enter address or name to search"

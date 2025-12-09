@@ -62,7 +62,7 @@ function RegistrarsListingTable() {
 								<TableHead className={styles.headerCell}>{t('registrar')}</TableHead>
 								<TableHead className={styles.headerCell}>{t('receivedRequests')}</TableHead>
 								<TableHead className={styles.headerCell}>{t('judgementsGranted')}</TableHead>
-								<TableHead className={styles.headerCell}>{t('fee')}</TableHead>
+								<TableHead className={styles.headerCell}>{t('fees')}</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>

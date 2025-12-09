@@ -1557,7 +1557,7 @@
 		"latestJudgement": "最新の判断",
 		"receivedRequests": "受信要求",
 		"totalGiven": "合計",
-		"fee": "料金",
+		"fees": "料金",
 		"noJudgementsFound": "判断が見つかりません",
 		"noRegistrarsFound": "登録者が見つかりません",
 		"searchByAddressOrName": "アドレスまたは名前で検索"
