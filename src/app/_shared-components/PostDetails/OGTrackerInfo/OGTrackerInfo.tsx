@@ -12,6 +12,7 @@ import { STALE_TIME } from '@/_shared/_constants/listingLimit';
 import { ExternalLink } from 'lucide-react';
 import OGLogo from '@assets/icons/og.png';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { Skeleton } from '../../Skeleton';
 
 interface OGTrackerInfoProps {
@@ -58,6 +59,7 @@ const getOGTrackerTrackName = (trackName?: string): string => {
 };
 
 function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
+	const t = useTranslations();
 	const { data, isLoading, error } = useQuery({
 		queryKey: [EReactQueryKeys.OGTRACKER_DATA, refNum],
 		queryFn: async () => {
@@ -98,6 +100,9 @@ function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 	const formattedTrackName = getOGTrackerTrackName(trackName);
 	const ogTrackerUrl = formattedTrackName ? `https://app.ogtracker.io/${formattedTrackName}/${refNum}` : `https://ogtracker.io/proposal/${refNum}`;
 
+	const deliveredTasksCount = tasks?.filter((task) => task.status === 'A' || task.status === 'Delivered').length || 0;
+	const totalTasksCount = tasks?.length || 0;
+
 	return (
 		<div className='flex max-h-[300px] flex-col overflow-hidden rounded-xl border border-border_grey bg-bg_modal shadow-sm'>
 			<div className='check-0 sticky top-0 z-10 flex items-center justify-between border-b border-border_grey bg-bg_modal/95 px-4 py-3 backdrop-blur-sm'>
@@ -109,7 +114,7 @@ function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 						height={20}
 						className='rounded-full'
 					/>
-					<h3 className='text-sm font-semibold text-text_primary'>OGTracker Info</h3>
+					<h3 className='text-sm font-semibold text-text_primary'>{t('PostDetails.OGTracker.heading')}</h3>
 				</div>
 				<a
 					href={ogTrackerUrl}
@@ -117,7 +122,7 @@ function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 					rel='noopener noreferrer'
 					className='text-pink_primary hover:text-pink_secondary flex items-center gap-1 text-xs font-medium transition-colors hover:underline'
 				>
-					View on app
+					{t('PostDetails.OGTracker.viewOnApp')}
 					<ExternalLink className='h-3 w-3' />
 				</a>
 			</div>
@@ -126,8 +131,13 @@ function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 				{tasks && tasks.length > 0 && (
 					<div className='flex flex-col gap-2.5'>
 						<div className='flex items-center justify-between'>
-							<div className='text-text_secondary text-xs font-medium uppercase tracking-wide'>Tasks</div>
-							<span className='bg-bg_secondary text-text_secondary rounded-full px-2 py-0.5 text-xs font-medium'>{tasks.length}</span>
+							<div className='text-text_secondary text-xs font-medium uppercase tracking-wide'>tasks</div>
+							<span className='bg-bg_secondary text-text_secondary rounded-full px-2 py-0.5 text-xs font-medium'>
+								{t('PostDetails.OGTracker.tasksDelivered', {
+									delivered: deliveredTasksCount,
+									total: totalTasksCount
+								})}
+							</span>
 						</div>
 						<div className='flex flex-col gap-2'>
 							{tasks.map((task, index) => {

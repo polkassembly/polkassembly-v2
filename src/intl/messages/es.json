@@ -477,6 +477,11 @@
 		"commentHistory": "Historial de Comentarios",
 		"edited": "Editado",
 		"noVotes": "No se encontraron votos",
+		"OGTracker": {
+			"heading": "Informe OGT",
+			"viewOnApp": "Ver en la aplicación",
+			"tasksDelivered": "{delivered}/{total} tareas entregadas"
+		},
 		"timeline": "Línea de Tiempo",
 		"more": "más",
 		"referendum": "Referendo",

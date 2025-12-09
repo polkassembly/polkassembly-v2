@@ -302,13 +302,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 
 					{!isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 						<div className={classes.rightWrapper}>
-							{post.index && (
-								<OGTrackerInfo
-									refNum={String(post.index)}
-									trackName={post.onChainInfo?.origin}
-								/>
-							)}
-
 							{/* Place Decision Deposit */}
 							{post.proposalType === EProposalType.REFERENDUM_V2 &&
 								post.onChainInfo?.status &&
@@ -372,6 +365,13 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								setThresholdValues={setThresholdValues}
 								thresholdValues={thresholdValues}
 							/>
+
+							{post.index && (
+								<OGTrackerInfo
+									refNum={String(post.index)}
+									trackName={post.onChainInfo?.origin}
+								/>
+							)}
 						</div>
 					)}
 

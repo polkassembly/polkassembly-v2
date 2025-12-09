@@ -486,6 +486,11 @@
 		"login": "Login",
 		"toComment": "to comment",
 		"noVotes": "No Votes Found",
+		"OGTracker": {
+			"heading": "OGT Report",
+			"viewOnApp": "View on app",
+			"tasksDelivered": "{delivered}/{total} tasks delivered"
+		},
 		"post": "Post",
 		"cancel": "Cancel",
 		"reply": "Reply",

@@ -543,6 +543,11 @@
 			"seeMore": "もっと見る",
 			"seeLess": "もっと見る"
 		},
+		"OGTracker": {
+			"heading": "OGTレポート",
+			"viewOnApp": "アプリで見る",
+			"tasksDelivered": "{delivered}/{total} タスク完了"
+		},
 		"nestedVotes": "ネストされた投票",
 		"flattenedVotes": "フラット化された投票",
 		"VotesBubble": {
