@@ -475,6 +475,20 @@
 		"beneficiary": "Begünstigter",
 		"description": "Beschreibung",
 		"noVotes": "Keine Abstimmungen gefunden",
+		"OGTracker": {
+			"heading": "OGT-Bericht",
+			"viewOnApp": "In der App ansehen",
+			"tasksDelivered": "{delivered}/{total} Aufgaben erledigt",
+			"tasks": "Aufgaben",
+			"proofOfWork": "Proof of Work",
+			"linkedToTask": "Verknüpft mit Aufgabe",
+			"status": {
+				"Delivered": "Geliefert",
+				"InProgress": "In Bearbeitung",
+				"Flagged": "Markiert",
+				"Remodel": "Umbau"
+			}
+		},
 		"timeline": "Zeitlinie",
 		"more": "mehr",
 		"referendum": "Referendum",

@@ -543,6 +543,20 @@
 			"seeMore": "もっと見る",
 			"seeLess": "もっと見る"
 		},
+		"OGTracker": {
+			"heading": "OGTレポート",
+			"viewOnApp": "アプリで見る",
+			"tasksDelivered": "{delivered}/{total} タスク完了",
+			"tasks": "タスク",
+			"proofOfWork": "Proof of Work",
+			"linkedToTask": "タスクにリンク済み",
+			"status": {
+				"Delivered": "配信済み",
+				"InProgress": "進行中",
+				"Flagged": "フラグ付き",
+				"Remodel": "改造"
+			}
+		},
 		"nestedVotes": "ネストされた投票",
 		"flattenedVotes": "フラット化された投票",
 		"VotesBubble": {
