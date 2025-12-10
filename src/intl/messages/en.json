@@ -1241,7 +1241,9 @@
 		"addContextToProposal": "Add Context to Proposal",
 		"redirectingToPost": "Redirecting to post...",
 		"discussion": "Discussion",
-		"postMigrationInfo": "Timing logic references relay chain block height after migration. AssetHub block numbers are no longer valid for scheduling."
+		"postMigrationInfo": "Timing logic references relay chain block height after migration. AssetHub block numbers are no longer valid for scheduling.",
+		"createProxy": "Create Proxy",
+		"createProxyDescription": "Add a proxy account to perform actions on your behalf"
 	},
 	"CreateTreasuryProposal": {
 		"beneficiary": "Beneficiary",
@@ -1648,7 +1650,16 @@
 		"delayTooltip": "Delay acts as a security feature: after the proxy announces its intended action, there is a 24-hour window during which the action can be reviewed and, if necessary, canceled by the controlling account before it is executed. Since Polkadot has an average block time of about 6 seconds, a delay of 14,400 blocks translates to approximately 24 hours.",
 		"please": "Please",
 		"logIn": "log in",
-		"toViewMyProxies": "to view your proxies"
+		"toViewMyProxies": "to view your proxies",
+		"delegateAddress": "Delegate Address",
+		"delegateAddressPlaceholder": "Enter the address of the delegate",
+		"delayBlocks": "Delay (Blocks)",
+		"delayBlocksDescription": "Number of blocks to wait after announcement before execution (0 for immediate)",
+		"proxyCreatedSuccessfully": "Proxy created successfully!",
+		"proxyCreationFailed": "Failed to create proxy",
+		"invalidDelegateAddress": "Please enter a valid delegate address",
+		"selectProxyType": "Select Proxy Type",
+		"blocks": "blocks"
 	},
 	"ProxyType": {
 		"any": "Any",
