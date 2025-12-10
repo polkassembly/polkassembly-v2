@@ -9,7 +9,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./src/intl/intlRequest.ts');
 
 // Change src/_shared/_constants/allowedOutboundIFrameDomains.ts if you change this
-export const ALLOWED_OUTBOUND_IFRAME_DOMAINS = ['https://app.mimir.global'];
+export const ALLOWED_OUTBOUND_IFRAME_DOMAINS = ['https://app.mimir.global', 'https://www.youtube.com'];
 
 const NETWORKS = ['polkadot', 'kusama'];
 
