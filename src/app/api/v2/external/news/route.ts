@@ -5,7 +5,7 @@
 import { NextResponse } from 'next/server';
 import { NEWS_GOOGLE_SHEET_ID, NEWS_GOOGLE_SHEET_NAME } from '@/app/api/_api-constants/apiEnvVars';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
-import { GoogleSheetService } from '../../../../_api-services/external_api_service/googlesheets_service';
+import { GoogleSheetService } from '../../../_api-services/external_api_service/googlesheets_service';
 
 export const GET = withErrorHandling(async () => {
 	const sheetId = NEWS_GOOGLE_SHEET_ID;

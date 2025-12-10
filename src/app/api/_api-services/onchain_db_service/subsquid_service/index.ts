@@ -114,6 +114,40 @@ export class SubsquidService extends SubsquidUtils {
 		return executeAttempt(1);
 	}
 
+	static async GetActivityStatsRaw({ network, oneWeekAgo }: { network: ENetwork; oneWeekAgo: string }) {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const subsquidData = await this.executeWithRetry<{
+			activeProposals: { totalCount: number };
+			weeklyVotes: { totalCount: number };
+			weeklySpends: Array<{
+				reward?: string | null;
+				preimage?: {
+					proposedCall?: {
+						args?: Record<string, unknown>;
+					} | null;
+				} | null;
+			}>;
+		}>(gqlClient, this.GET_ACTIVITY_STATS, { oneWeekAgo }, 'Error fetching activity stats from Subsquid');
+
+		const weeklySpends = subsquidData.weeklySpends.map((curr) => {
+			let amount = new BN(curr.reward || '0');
+			if (amount.isZero() && curr.preimage?.proposedCall?.args) {
+				const beneficiaries = this.extractAmountAndAssetId(curr.preimage.proposedCall.args);
+				beneficiaries.forEach((b) => {
+					amount = amount.add(new BN(b.amount));
+				});
+			}
+			return { amount: amount.toString() };
+		});
+
+		return {
+			activeProposalsCount: subsquidData.activeProposals.totalCount || 0,
+			weeklyVotesCount: subsquidData.weeklyVotes.totalCount || 0,
+			weeklySpends
+		};
+	}
+
 	static async GetPostVoteMetrics({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }): Promise<IVoteMetrics | null> {
 		if ([EProposalType.BOUNTY, EProposalType.CHILD_BOUNTY].includes(proposalType)) {
 			return null;

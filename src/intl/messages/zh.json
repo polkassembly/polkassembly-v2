@@ -270,7 +270,85 @@
 		"userSince": "用户自",
 		"rank": "等级",
 		"judgements": "判定",
-		"since": "于",
+		"since": "于"
+	},
+	"JobsAndBounties": {
+		"title": "工作与赏金",
+		"jobsTab": "工作",
+		"bountiesTab": "赏金",
+		"salary": "薪资",
+		"applicants": "申请人",
+		"applyNow": "立即申请",
+		"noJobsFound": "未找到工作",
+		"posted": "已发布",
+		"noBountiesFound": "未找到赏金"
+	},
+	"Apps": {
+		"header": "应用",
+		"OpenGov": {
+			"title": "链下帖子",
+			"description": "探索并参与 Polkadot 的链上治理。"
+		},
+		"Delegation": {
+			"title": "委托",
+			"description": "授权受信任的声音代表您投票，并追踪他们如何代表您。"
+		},
+		"Bounties": {
+			"title": "赏金",
+			"description": "资助社区驱动的工作并关注任务进度。"
+		},
+		"Identity": {
+			"title": "身份与判定",
+			"description": "验证和管理您的链上身份，建立声誉和透明度。"
+		},
+		"People": {
+			"title": "成员",
+			"description": "发现推动 Polkadot 决策的成员、代表、策展人和贡献者。"
+		},
+		"PoP": {
+			"title": "人格证明",
+			"description": "验证您在网络中的唯一存在 —— 确保一人一票。"
+		},
+		"DelegateX": {
+			"title": "DelegateX",
+			"description": "比较代表，审查表现，并找到符合您治理价值观的人。"
+		},
+		"Klara": {
+			"title": "Klara",
+			"description": "您的 AI 治理助手 —— 询问有关提案、投票或链上活动的任何问题。"
+		},
+		"TreasuryAnalytics": {
+			"title": "国库分析",
+			"description": "追踪国库支出、资产和趋势，了解网络资金的使用情况。"
+		},
+		"Offchain": {
+			"title": "链下",
+			"description": "参与链下讨论和决策提案。"
+		},
+		"Create": {
+			"title": "创建",
+			"description": "提交提案、预映像和讨论，以塑造 Polkadot 的未来。"
+		},
+		"GovAnalytics": {
+			"title": "治理分析",
+			"description": "分析公投趋势、投票者行为和随时间推移的网络参与度。"
+		},
+		"AAG": {
+			"title": "AAG",
+			"description": "观看并重温生态系统中的关键治理讨论和辩论。"
+		},
+		"Polkasafe": {
+			"title": "Polkasafe",
+			"description": "安全地管理多重签名钱包并追踪跨钱包的交易。"
+		},
+		"Fellowship": {
+			"title": "Fellowship",
+			"description": "探索 Polkadot Fellowship —— 推动核心协议演进的专家集体。"
+		},
+		"Proxy": {
+			"title": "代理",
+			"description": "安全地管理和分配代理账户以代表您执行操作。"
+		},
 		"Settings": {
 			"settings": "设置",
 			"deleteAccount": "删除账户",
@@ -400,6 +478,7 @@
 		"delegation": "委托",
 		"profile": "个人资料",
 		"home": "主页",
+		"openGov": "链下帖子",
 		"overview": "概览",
 		"discussions": "讨论",
 		"preimages": "预映像",
@@ -1098,6 +1177,15 @@
 		"viewAllChildBounties": "查看全部"
 	},
 	"Overview": {
+		"activeProposals": "活跃提案",
+		"totalVotes": "本周总投票数",
+		"totalSpends": "本周总支出",
+		"decidingEnds": "决议结束于",
+		"decisionPeriodEnded": "决议期已结束",
+		"totalSpendsTooltip": "本周总支出 = 最近7天内，Approved或Executed状态的ReferendumV2提案的总和。",
+		"aye": "赞成",
+		"nay": "反对",
+		"viewAllActivity": "查看所有活动",
 		"month": "月",
 		"year": "年",
 		"events": "活动",
@@ -1134,7 +1222,12 @@
 		"switchToActivityFeed": "切换到活动动态",
 		"topic": "主题",
 		"creator": "创建者",
-		"viewAll": "查看全部"
+		"viewAll": "查看全部",
+		"headingTitle": "Polkassembly 应用中心",
+		"headingSubtitle": "追踪决策、国库状况和重要应用",
+		"readAnnouncement": "阅读公告",
+		"treasuryReportTitle": "Q4 国库报告",
+		"treasuryReportDescription": "回顾支出表现和生态系统增长"
 	},
 	"BatchVote": {
 		"batchVoting": "批量投票",
