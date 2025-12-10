@@ -15,7 +15,7 @@ const apps: AppItem[] = [
 	{
 		icon: '🏛',
 		key: 'OpenGov',
-		href: '/opengov'
+		href: '/activity-feed'
 	},
 	{
 		icon: '👥',
@@ -60,7 +60,7 @@ const apps: AppItem[] = [
 	{
 		icon: '🌐',
 		key: 'Offchain',
-		href: '/offchain'
+		href: '/discussions'
 	},
 	{
 		icon: '🏗',
