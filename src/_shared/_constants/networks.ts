@@ -79,12 +79,12 @@ interface ILinearDecreasing {
 	ceil: number;
 }
 
-interface IMinApproval {
+export interface IMinApproval {
 	reciprocal?: IReciprocal;
 	linearDecreasing?: ILinearDecreasing;
 }
 
-interface IMinSupport {
+export interface IMinSupport {
 	reciprocal?: IReciprocal;
 	linearDecreasing?: ILinearDecreasing;
 }
