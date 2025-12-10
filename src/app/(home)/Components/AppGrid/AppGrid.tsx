@@ -109,7 +109,7 @@ export default function AppGrid() {
 						<div className='mb-1 flex items-center gap-x-2'>
 							{app.icon} <span className='text-base font-semibold text-text_primary'>{t(`${app.key}.title`)}</span>
 						</div>
-						<p className='text-xs leading-5 text-wallet_btn_text'>{t(`${app.key}.description`)}</p>
+						<p className='text-sm leading-5 text-wallet_btn_text'>{t(`${app.key}.description`)}</p>
 					</Link>
 				))}
 			</div>

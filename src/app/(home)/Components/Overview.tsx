@@ -36,7 +36,7 @@ function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGeneri
 				<AppGrid />
 
 				<TreasuryReportBanner />
-				<div className='mt-2 grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-start'>
+				<div className='mt-2 grid grid-cols-1 gap-6 lg:grid-cols-3'>
 					<div className='w-full lg:col-span-2'>
 						<Suspense
 							fallback={
@@ -49,8 +49,10 @@ function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGeneri
 						</Suspense>
 					</div>
 
-					<div className='w-full lg:col-span-1'>
-						<JobsAndBounties />
+					<div className='w-full lg:relative lg:col-span-1'>
+						<div className='w-full lg:absolute lg:inset-0 lg:h-full'>
+							<JobsAndBounties />
+						</div>
 					</div>
 				</div>
 			</div>

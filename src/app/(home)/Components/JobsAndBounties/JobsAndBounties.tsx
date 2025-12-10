@@ -59,7 +59,7 @@ export default function JobsAndBounties() {
 	const isBountyTab = activeTab === JobType.BOUNTY;
 
 	return (
-		<div className='flex w-full flex-col rounded-xl border border-border_grey bg-bg_modal p-6 shadow-sm'>
+		<div className='flex h-full w-full flex-col rounded-xl border border-border_grey bg-bg_modal p-6 shadow-sm'>
 			<div className='mb-6 flex items-center justify-between'>
 				<h2 className='text-xl font-semibold text-text_primary'>{t('JobsAndBounties.title')}</h2>
 			</div>
@@ -81,7 +81,7 @@ export default function JobsAndBounties() {
 				</button>
 			</div>
 
-			<div className='flex max-h-[400px] flex-col gap-4 overflow-y-auto'>
+			<div className='flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto'>
 				{isLoading
 					? Array.from({ length: 3 }).map((_, i) => (
 							<div
