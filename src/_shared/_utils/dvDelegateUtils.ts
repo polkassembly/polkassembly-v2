@@ -340,8 +340,12 @@ export function formatDVCohortVote(vote: IDVVotes): IDVCohortVote {
 	if (vote.delegatedVotes && Array.isArray(vote.delegatedVotes)) {
 		vote.delegatedVotes.forEach((dv: IDelegatedVote) => {
 			delegatedVotes += BigInt(dv.votingPower || 0);
-			const balance = dv.balance?.value || BigInt(dv.balance?.aye || 0) + BigInt(dv.balance?.nay || 0) + BigInt(dv.balance?.abstain || 0);
-			delegatedCapital += BigInt(balance);
+
+			const valuePart = dv.balance?.value ? BigInt(dv.balance.value) : BigInt(0);
+			const splitPart = BigInt(dv.balance?.aye || 0) + BigInt(dv.balance?.nay || 0) + BigInt(dv.balance?.abstain || 0);
+
+			const balance = valuePart > BigInt(0) ? valuePart : splitPart;
+			delegatedCapital += balance;
 		});
 	}
 
