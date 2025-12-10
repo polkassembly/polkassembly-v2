@@ -1314,19 +1314,21 @@ export class NextApiClientService {
 		proposalType,
 		index,
 		analyticsType,
-		votesType
+		votesType,
+		skipCache = false
 	}: {
 		proposalType: EProposalType;
 		index: string;
 		analyticsType: EAnalyticsType;
 		votesType: EVotesDisplayType;
+		skipCache?: boolean;
 	}) {
 		const queryParams = new URLSearchParams({
 			analyticsType: analyticsType ? analyticsType.toString() : '',
 			votesType: votesType.toString()
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_BUBBLE_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-bubble'], queryParams });
-		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method });
+		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method, skipCache });
 	}
 
 	static async addCommentReaction(proposalType: EProposalType, index: string, commentId: string, reactionType: EReaction) {
