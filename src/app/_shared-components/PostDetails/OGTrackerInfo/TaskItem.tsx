@@ -15,11 +15,12 @@ function TaskItem({ task }: { task: IOGTrackerTask }) {
 		D: t('PostDetails.OGTracker.status.Remodel')
 	};
 	const statusLabel = statusMap[task.status] || task.status;
-	const getStatusColor = (status: string) => {
-		if (status === t('PostDetails.OGTracker.status.Delivered')) return 'text-green-500 bg-green-500/10 border-green-500/20';
-		if (status === t('PostDetails.OGTracker.status.InProgress')) return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
-		if (status === t('PostDetails.OGTracker.status.Flagged')) return 'text-red-500 bg-red-500/10 border-red-500/20';
-		return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
+	const getStatusColor = (code: string) => {
+		if (code === 'A') return 'text-green-500 bg-green-500/10 border-green-500/20';
+		if (code === 'B') return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+		if (code === 'C') return 'text-red-500 bg-red-500/10 border-red-500/20';
+		if (code === 'D') return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
+		return 'text-gray-500 bg-gray-500/10 border-gray-500/20';
 	};
 
 	return (
@@ -27,7 +28,7 @@ function TaskItem({ task }: { task: IOGTrackerTask }) {
 			<div className='text-sm font-medium leading-snug text-text_primary'>{task.title}</div>
 			{statusLabel && (
 				<div className='flex items-center gap-2'>
-					<span className={cn('rounded-md border px-2 py-0.5 text-xs font-medium', getStatusColor(statusLabel))}>{statusLabel}</span>
+					<span className={cn('rounded-md border px-2 py-0.5 text-xs font-medium', getStatusColor(task.status))}>{statusLabel}</span>
 				</div>
 			)}
 		</div>
