@@ -739,6 +739,7 @@ export interface IComment {
 	disabled?: boolean;
 	authorAddress?: string;
 	isDelegateXVote?: boolean;
+	isVerified?: boolean;
 }
 
 export interface ICommentResponse extends IComment {
@@ -1737,8 +1738,11 @@ export interface VotingStrategy {
 }
 
 export enum EJudgementDashboardTabs {
-	DASHBOARD = 'dashboard',
-	REGISTRARS = 'registrars'
+	REQUESTS = 'requests',
+	OVERVIEW = 'overview',
+	JUDGEMENTS = 'judgements',
+	REGISTRARS = 'registrars',
+	MY_DASHBOARD = 'my-dashboard'
 }
 
 export enum EJudgementStatus {
@@ -1754,7 +1758,13 @@ export interface IJudgementRequest {
 	displayName: string;
 	email: string;
 	twitter: string;
+	discord?: string;
+	matrix?: string;
+	github?: string;
+	web?: string;
 	status: EJudgementStatus;
+	judgementType?: string;
+	judgementLabel?: string;
 	dateInitiated: Date;
 	registrarIndex: number;
 	registrarAddress: string;
