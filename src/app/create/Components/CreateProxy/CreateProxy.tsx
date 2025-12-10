@@ -38,18 +38,32 @@ const PROXY_TYPES: EProxyType[] = [
 	EProxyType.NOMINATION_POOLS
 ];
 
-// Map EProxyType to translation keys
-const PROXY_TYPE_TRANSLATION_KEYS: Record<EProxyType, string> = {
-	[EProxyType.ANY]: 'any',
-	[EProxyType.NON_TRANSFER]: 'non_transfer',
-	[EProxyType.GOVERNANCE]: 'governance',
-	[EProxyType.STAKING]: 'staking',
-	[EProxyType.IDENTITY_JUDGEMENT]: 'identity_judgement',
-	[EProxyType.AUCTION]: 'auction',
-	[EProxyType.CANCEL_PROXY]: 'cancel_proxy',
-	[EProxyType.PARAREGISTRATION]: 'pararegistration',
-	[EProxyType.NOMINATION_POOLS]: 'nomination_pools',
-	[EProxyType.SUDO_BALANCES]: 'sudo_balances'
+// Get translation key for proxy type
+const getProxyTypeTranslationKey = (proxyTypeValue: EProxyType): string => {
+	switch (proxyTypeValue) {
+		case EProxyType.ANY:
+			return 'any';
+		case EProxyType.NON_TRANSFER:
+			return 'non_transfer';
+		case EProxyType.GOVERNANCE:
+			return 'governance';
+		case EProxyType.STAKING:
+			return 'staking';
+		case EProxyType.IDENTITY_JUDGEMENT:
+			return 'identity_judgement';
+		case EProxyType.AUCTION:
+			return 'auction';
+		case EProxyType.CANCEL_PROXY:
+			return 'cancel_proxy';
+		case EProxyType.PARAREGISTRATION:
+			return 'pararegistration';
+		case EProxyType.NOMINATION_POOLS:
+			return 'nomination_pools';
+		case EProxyType.SUDO_BALANCES:
+			return 'sudo_balances';
+		default:
+			return 'any';
+	}
 };
 
 function CreateProxy({ onSuccess }: { onSuccess?: () => void }) {
@@ -101,8 +115,8 @@ function CreateProxy({ onSuccess }: { onSuccess?: () => void }) {
 				setDepositBase(base);
 				setDepositFactor(factor);
 				setTxFee(fee);
-			} catch (error) {
-				console.error('Error fetching proxy fees:', error);
+			} catch {
+				// Silently fail - fee estimation is not critical
 			}
 		};
 
@@ -194,7 +208,7 @@ function CreateProxy({ onSuccess }: { onSuccess?: () => void }) {
 									key={type}
 									value={type}
 								>
-									{t(`ProxyType.${PROXY_TYPE_TRANSLATION_KEYS[type]}`)}
+									{t(`ProxyType.${getProxyTypeTranslationKey(type)}`)}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -225,13 +239,13 @@ function CreateProxy({ onSuccess }: { onSuccess?: () => void }) {
 						<div className='flex items-center justify-between'>
 							<span className='text-sm text-wallet_btn_text'>Deposit Required</span>
 							<span className='text-sm font-medium text-text_primary'>
-								{formatBnBalance(totalDeposit, { withUnit: true, numberAfterComma: 4 }, network)} {NETWORKS_DETAILS[network]?.tokenSymbol}
+								{formatBnBalance(totalDeposit, { withUnit: true, numberAfterComma: 4 }, network)} {NETWORKS_DETAILS[`${network}`]?.tokenSymbol}
 							</span>
 						</div>
 						<div className='flex items-center justify-between'>
 							<span className='text-sm text-wallet_btn_text'>{t('TxFees.gasFees')}</span>
 							<span className='text-sm font-medium text-text_primary'>
-								{formatBnBalance(txFee, { withUnit: true, numberAfterComma: 4 }, network)} {NETWORKS_DETAILS[network]?.tokenSymbol}
+								{formatBnBalance(txFee, { withUnit: true, numberAfterComma: 4 }, network)} {NETWORKS_DETAILS[`${network}`]?.tokenSymbol}
 							</span>
 						</div>
 					</div>
