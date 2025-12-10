@@ -5,24 +5,29 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'nextjs-toploader/app';
-import { Button } from '@/app/_shared-components/Button';
-import { RefreshCw } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 
 export default function OverviewHeading() {
 	const t = useTranslations('Overview');
-	const router = useRouter();
 	return (
-		<div className='flex items-center justify-between gap-x-2'>
-			<h1 className='text-2xl font-semibold text-btn_secondary_text'>{t('overview')}</h1>
-			<Button
-				variant='secondary'
-				onClick={() => router.push('/activity-feed')}
-				rightIcon={<RefreshCw className='hidden h-4 w-4 md:block' />}
-				size='sm'
-			>
-				{t('switchToActivityFeed')}
-			</Button>
+		<div className='flex flex-col gap-y-2 bg-bg_modal'>
+			<div className='mx-auto w-full max-w-7xl px-4 py-8 lg:px-16'>
+				<div className='flex flex-col gap-y-6 md:flex-row md:items-center md:justify-between'>
+					<div className='flex flex-col gap-1'>
+						<h1 className='text-3xl font-bold text-text_primary'>{t('headingTitle')}</h1>
+						<p className='text-sm font-medium text-wallet_btn_text'>{t('headingSubtitle')}</p>
+					</div>
+
+					<a
+						href='https://polkassembly.io'
+						target='_blank'
+						rel='noopener noreferrer'
+						className='flex items-center gap-2 text-sm font-medium text-text_pink'
+					>
+						{t('readAnnouncement')} <ExternalLink className='h-4 w-4' />
+					</a>
+				</div>
+			</div>
 		</div>
 	);
 }
