@@ -6,11 +6,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { AAGVideoService } from '@/app/api/_api-services/external_api_service/aag/aag_video_service';
-import { IGenericListingResponse, IAAGVideoSummary, ENetwork } from '@/_shared/types';
+import { IGenericListingResponse, IAAGVideoSummary, ENetwork, IAAGVideoMetadata } from '@/_shared/types';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 
 export const GET = withErrorHandling(async (req: NextRequest): Promise<NextResponse<IGenericListingResponse<IAAGVideoSummary>>> => {
 	const zodQuerySchema = z.object({
+		page: z.coerce.number().int().min(1).default(1),
 		q: z.string().trim().min(3, 'Search query must be at least 3 characters long').optional(),
 		limit: z.coerce.number().int().min(1).max(MAX_LISTING_LIMIT).default(DEFAULT_LISTING_LIMIT),
 		sort: z.enum(['latest', 'oldest']).optional().default('latest'),
@@ -18,20 +19,25 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 	});
 
 	const searchParamsObject = Object.fromEntries(req.nextUrl.searchParams);
-	const { q: query, limit, sort: sortBy, network } = zodQuerySchema.parse(searchParamsObject);
+	const { q: query, limit, sort: sortBy, network, page } = zodQuerySchema.parse(searchParamsObject);
 
-	let videos;
+	let videos: IAAGVideoMetadata[] = [];
+	let totalCount = 0;
 
 	if (query) {
-		videos = await AAGVideoService.SearchAAGVideosByTitle(query, limit, sortBy, network);
+		const { data, totalCount: count } = await AAGVideoService.SearchAAGVideosByTitle(query, limit, page, sortBy, network);
+		videos = data;
+		totalCount = count;
 	} else {
-		videos = await AAGVideoService.GetLatestAAGVideos(limit);
+		const { data, totalCount: count } = await AAGVideoService.GetLatestAAGVideos(limit, page);
+		videos = data;
+		totalCount = count;
 	}
 
 	const formattedVideos = videos.map((video) => AAGVideoService.formatAAGVideoSummary(video));
 
 	return NextResponse.json({
 		items: formattedVideos,
-		totalCount: formattedVideos.length
+		totalCount
 	});
 });

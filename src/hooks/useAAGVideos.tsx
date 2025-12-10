@@ -46,6 +46,7 @@ declare global {
 interface UseAAGVideosParams {
 	q?: string;
 	limit?: number;
+	page?: number;
 	sort?: 'latest' | 'oldest';
 	network?: ENetwork | null;
 	enabled?: boolean;
@@ -62,16 +63,16 @@ interface UseAAGVideosByReferendumParams {
 	enabled?: boolean;
 }
 
-export const useAAGVideos = ({ q, limit, sort, network, enabled = true }: UseAAGVideosParams) => {
+export const useAAGVideos = ({ q, limit, page = 1, sort, network, enabled = true }: UseAAGVideosParams) => {
 	return useQuery<IGenericListingResponse<IAAGVideoSummary>, Error>({
-		queryKey: ['aag-videos', q, limit, sort, network],
+		queryKey: ['aag-videos', q, limit, page, sort, network],
 		enabled,
 		retry: true,
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: false,
 		refetchOnMount: true,
 		queryFn: async () => {
-			const { data, error } = await NextApiClientService.getAAGVideos({ q, limit, sort, network });
+			const { data, error } = await NextApiClientService.getAAGVideos({ q, limit, page, sort, network });
 
 			if (error) {
 				throw new ClientError(ERROR_CODES.API_FETCH_ERROR, error.message);

@@ -1660,7 +1660,7 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<{ success: boolean; voteData: IDelegateXVoteData[]; totalCount: number }>({ url, method });
 	}
 
-	static async getAAGVideos({ q, limit, sort, network }: { q?: string; limit?: number; sort?: 'latest' | 'oldest'; network?: ENetwork | null }) {
+	static async getAAGVideos({ q, limit, page, sort, network }: { q?: string; limit?: number; page?: number; sort?: 'latest' | 'oldest'; network?: ENetwork | null }) {
 		const queryParams = new URLSearchParams();
 
 		if (q) {
@@ -1669,6 +1669,10 @@ export class NextApiClientService {
 
 		if (limit) {
 			queryParams.set('limit', limit.toString());
+		}
+
+		if (page) {
+			queryParams.set('page', page.toString());
 		}
 
 		if (sort) {

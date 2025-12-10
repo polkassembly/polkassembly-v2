@@ -412,10 +412,12 @@ export class AAGVideoService extends FirestoreUtils {
 		return `aag_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 	}
 
-	static async GetLatestAAGVideos(limit: number = 10): Promise<IAAGVideoMetadata[]> {
-		const snapshot = await this.aagVideoMetadataCollectionRef().where('isIndexed', '==', true).orderBy('publishedAt', 'desc').limit(limit).get();
+	static async GetLatestAAGVideos(limit: number = 10, page: number = 1): Promise<{ data: IAAGVideoMetadata[]; totalCount: number }> {
+		const offset = (page - 1) * limit;
+		const snapshot = await this.aagVideoMetadataCollectionRef().where('isIndexed', '==', true).orderBy('publishedAt', 'desc').offset(offset).limit(limit).get();
+		const totalCount = await this.GetAAGVideoCount();
 
-		return snapshot.docs
+		const data = snapshot.docs
 			.map((doc) => {
 				const data = doc.data();
 				if (!data || typeof data.id !== 'string' || typeof data.title !== 'string') {
@@ -432,14 +434,17 @@ export class AAGVideoService extends FirestoreUtils {
 				return processedData as IAAGVideoMetadata;
 			})
 			.filter((item): item is IAAGVideoMetadata => item !== null);
+
+		return { data, totalCount };
 	}
 
 	static async SearchAAGVideosByTitle(
 		searchQuery: string,
 		limit: number = 20,
+		page: number = 1,
 		sortBy: 'latest' | 'oldest' = 'latest',
 		network: ENetwork | null = null
-	): Promise<IAAGVideoMetadata[]> {
+	): Promise<{ data: IAAGVideoMetadata[]; totalCount: number }> {
 		const sortOrder = sortBy === 'latest' ? 'desc' : 'asc';
 		const snapshot = await this.aagVideoMetadataCollectionRef().where('isIndexed', '==', true).orderBy('publishedAt', sortOrder).limit(200).get();
 
@@ -448,7 +453,7 @@ export class AAGVideoService extends FirestoreUtils {
 			.split(' ')
 			.filter((term) => term.length > 2);
 
-		return snapshot.docs
+		const filteredVideos = snapshot.docs
 			.map((doc) => {
 				const data = doc.data();
 				if (!data || typeof data.id !== 'string' || typeof data.title !== 'string') {
@@ -474,8 +479,14 @@ export class AAGVideoService extends FirestoreUtils {
 			.filter((video) => {
 				if (network === null) return true;
 				return video.network === network;
-			})
-			.slice(0, limit);
+			});
+
+		const totalCount = filteredVideos.length;
+		const startIndex = (page - 1) * limit;
+		const endIndex = startIndex + limit;
+		const data = filteredVideos.slice(startIndex, endIndex);
+
+		return { data, totalCount };
 	}
 
 	static async GetAAGVideosByReferenda(referendaId: string, limit: number = 20): Promise<IAAGVideoMetadata[]> {
