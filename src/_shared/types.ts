@@ -741,6 +741,7 @@ export interface IComment {
 	disabled?: boolean;
 	authorAddress?: string;
 	isDelegateXVote?: boolean;
+	isVerified?: boolean;
 }
 
 export interface ICommentResponse extends IComment {

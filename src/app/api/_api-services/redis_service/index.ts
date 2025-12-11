@@ -86,7 +86,9 @@ enum ERedisKeys {
 	USER_POSTS = 'UPS',
 	TRACK_COUNTS = 'TC',
 	KLARA_CONVERSATION_HISTORY = 'KCH',
-	KLARA_REQUEST_DEDUP = 'KRD'
+	KLARA_REQUEST_DEDUP = 'KRD',
+	COMMUNITY_CURATORS = 'CC',
+	COMMUNITY_MEMBERS = 'CM'
 }
 
 export class RedisService {
@@ -175,6 +177,8 @@ export class RedisService {
 			const proposalTypePart = proposalType ? `-pt:${proposalType}` : '';
 			return baseKey + proposalTypePart;
 		},
+		[ERedisKeys.COMMUNITY_CURATORS]: (network: string, page: number, limit: number): string => `${ERedisKeys.COMMUNITY_CURATORS}-${network}-${page}-${limit}`,
+		[ERedisKeys.COMMUNITY_MEMBERS]: (network: string, page: number, limit: number): string => `${ERedisKeys.COMMUNITY_MEMBERS}-${network}-${page}-${limit}`,
 		[ERedisKeys.KLARA_CONVERSATION_HISTORY]: (conversationId: string): string => `${ERedisKeys.KLARA_CONVERSATION_HISTORY}-${conversationId}`,
 		[ERedisKeys.KLARA_REQUEST_DEDUP]: (userId: string, messageHash: string): string => `${ERedisKeys.KLARA_REQUEST_DEDUP}-${userId}-${messageHash}`
 	} as const;
@@ -321,7 +325,9 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TURNOUT_DATA}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_DELEGATION_ANALYTICS}-${network}-*` }),
-			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK}-${network}-*` })
+			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.COMMUNITY_CURATORS}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.COMMUNITY_MEMBERS}-${network}-*` })
 		]);
 	}
 
@@ -1101,5 +1107,25 @@ export class RedisService {
 
 	static async DeleteKlaraRequestDedup(userId: string, messageHash: string): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.KLARA_REQUEST_DEDUP](userId, messageHash), forceCache: true });
+	}
+
+	static async GetCommunityCurators(network: string, page: number, limit: number): Promise<string | null> {
+		if (!network || !IS_CACHE_ENABLED) return null;
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.COMMUNITY_CURATORS](network, page, limit) });
+	}
+
+	static async SetCommunityCurators(network: string, details: IDelegateDetails[], page: number, limit: number) {
+		if (!network || !IS_CACHE_ENABLED) return;
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.COMMUNITY_CURATORS](network, page, limit), value: JSON.stringify(details) });
+	}
+
+	static async GetCommunityMembers(network: string, page: number, limit: number): Promise<string | null> {
+		if (!network || !IS_CACHE_ENABLED) return null;
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.COMMUNITY_MEMBERS](network, page, limit) });
+	}
+
+	static async SetCommunityMembers(network: string, details: IGenericListingResponse<IDelegateDetails>, page: number, limit: number) {
+		if (!network || !IS_CACHE_ENABLED) return;
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.COMMUNITY_MEMBERS](network, page, limit), value: JSON.stringify(details) });
 	}
 }

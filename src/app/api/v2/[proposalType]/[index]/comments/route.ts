@@ -16,6 +16,7 @@ import { fetchCommentsVoteData } from '@/app/api/_api-utils/fetchCommentsVoteDat
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
+import { IdentityService } from '@/app/_client-services/identity_service';
 
 const zodParamsSchema = z.object({
 	proposalType: z.nativeEnum(EProposalType),
@@ -31,7 +32,21 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const commentsWithVoteData = await fetchCommentsVoteData({ comments, network, proposalType, index });
 
-	return NextResponse.json(commentsWithVoteData);
+	try {
+		const identityService = await IdentityService.Init(network);
+
+		const commentsWithIdentities = await Promise.all(
+			commentsWithVoteData.map(async (comment) => {
+				const identity = await identityService.getOnChainIdentity(comment.publicUser?.addresses?.[0]);
+				return { ...comment, isVerified: identity?.isVerified };
+			})
+		);
+
+		return NextResponse.json(commentsWithIdentities);
+	} catch (error) {
+		console.error('Failed to fetch identity for comments:', error);
+		return NextResponse.json(commentsWithVoteData);
+	}
 });
 
 // add comment
