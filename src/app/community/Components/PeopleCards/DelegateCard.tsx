@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import Image from 'next/image';
-import { ESocial } from '@/_shared/types';
+import { ESocial, IDelegateDetails } from '@/_shared/types';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import JudgementIcon from '@assets/icons/judgement-icon.svg';
 import RankStar from '@assets/profile/rank-star.svg';
@@ -40,48 +40,7 @@ const SocialIcons: Partial<Record<ESocial, React.ComponentType<React.SVGProps<SV
 	[ESocial.GITHUB]: FaGithub
 };
 
-const delegate = {
-	addresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
-	balance: '1000000000000000000',
-	createdAt: '2024-05-20T12:00:00Z',
-	id: 1,
-	last30DaysVotedProposalsCount: 15,
-	maxDelegated: '500000000000000000000',
-	delegators: [
-		{
-			address: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
-			balance: '1000000000000000000',
-			createdAt: '2024-05-20T12:00:00Z',
-			updatedAt: '2024-06-20T12:00:00Z'
-		}
-	],
-	updatedAt: '2024-06-20T12:00:00Z',
-	username: 'blockchain_dev',
-	profileScore: 85.5,
-	followers: [{ followerUserId: 2 }],
-	following: [{ followerUserId: 3 }],
-	profileDetails: {
-		bio: 'Experienced blockchain developer and community advocate dedicated to fostering decentralized ecosystems.',
-		achievementBadges: [],
-		socials: [
-			{
-				platform: ESocial.EMAIL,
-				url: 'blockchain_dev@email.com'
-			},
-			{
-				platform: ESocial.TWITTER,
-				url: 'https://twitter.com/blockchain_dev'
-			},
-			{
-				platform: ESocial.TELEGRAM,
-				url: 'https://t.me/blockchain_dev'
-			}
-		]
-	},
-	judgements: ['Reasonable']
-};
-
-function DelegateCard() {
+function DelegateCard({ delegate }: { delegate: IDelegateDetails }) {
 	const t = useTranslations();
 	const { user } = useUser();
 	const network = getCurrentNetwork();
@@ -91,22 +50,22 @@ function DelegateCard() {
 
 	const isFetching = false;
 
-	const isFollowing = delegate?.following?.some((item) => item.followerUserId === user?.id);
+	const isFollowing = delegate?.publicUser?.following?.some((item) => item.followerUserId === user?.id);
 
 	return (
 		<div className={styles.memberCard}>
 			<div className='flex items-center justify-between gap-3'>
 				<div className='flex items-center gap-2'>
-					{delegate.addresses.length > 0 ? (
+					{(delegate?.publicUser?.addresses?.length ?? 0) > 0 ? (
 						<Address
 							disableTooltip
-							address={delegate?.addresses[0] || ''}
+							address={delegate?.publicUser?.addresses[0] || ''}
 							iconSize={30}
 							showIdenticon
 							textClassName='text-left text-lg font-semibold'
 						/>
 					) : (
-						<span className='text-xl font-semibold text-text_primary'>{delegate?.username || ''}</span>
+						<span className='text-xl font-semibold text-text_primary'>{delegate?.publicUser?.username || ''}</span>
 					)}
 				</div>
 				<div className='flex items-center gap-x-2'>
@@ -131,10 +90,10 @@ function DelegateCard() {
 			</div>
 			<div className='flex items-center justify-between gap-x-4'>
 				<div className='flex items-center gap-x-2'>
-					{delegate?.addresses.length > 0 ? (
+					{(delegate?.publicUser?.addresses?.length ?? 0) > 0 ? (
 						<CopyToClipboard
-							label={shortenAddress(delegate?.addresses[0] || '', 5)}
-							text={delegate?.addresses[0] || ''}
+							label={shortenAddress(delegate?.publicUser?.addresses[0] || '', 5)}
+							text={delegate?.publicUser?.addresses[0] || ''}
 							className='text-base'
 						/>
 					) : null}
@@ -149,7 +108,7 @@ function DelegateCard() {
 							width={16}
 							height={16}
 						/>
-						<span className='text-sm font-medium text-leaderboard_score'>{Math.floor(delegate?.profileScore)}</span>
+						<span className='text-sm font-medium text-leaderboard_score'>{Math.floor(delegate?.publicUser?.profileScore || 0)}</span>
 					</span>
 				</div>
 				<div className='flex items-center gap-x-1'>
@@ -187,21 +146,21 @@ function DelegateCard() {
 					orientation='vertical'
 				/>
 				<div className={styles.memberFollowing}>
-					{t('Profile.following')}: <span className='font-medium text-text_pink'>{delegate?.following?.length || 0}</span>
+					{t('Profile.following')}: <span className='font-medium text-text_pink'>{delegate?.publicUser?.following?.length || 0}</span>
 				</div>
 				<Separator
 					className='h-4'
 					orientation='vertical'
 				/>
 				<div className={styles.memberFollowing}>
-					{t('Profile.followers')}: <span className='font-medium text-text_pink'>{delegate?.followers?.length || 0}</span>
+					{t('Profile.followers')}: <span className='font-medium text-text_pink'>{delegate?.publicUser?.followers?.length || 0}</span>
 				</div>
 			</div>
 			<div>
-				{delegate?.profileDetails?.bio && (
+				{delegate?.publicUser?.profileDetails?.bio && (
 					<>
-						<div className={`${styles.bio} ${isReadMoreVisible ? '' : styles.bioCollapsed} mt-3`}>{delegate?.profileDetails?.bio}</div>
-						{delegate?.profileDetails?.bio.length > 100 && (
+						<div className={`${styles.bio} ${isReadMoreVisible ? '' : styles.bioCollapsed} mt-3`}>{delegate?.publicUser?.profileDetails?.bio}</div>
+						{(delegate?.publicUser?.profileDetails?.bio?.length ?? 0) > 100 && (
 							<Button
 								variant='ghost'
 								className={styles.readMoreButton}
@@ -215,7 +174,7 @@ function DelegateCard() {
 				)}
 			</div>
 			<div className='flex items-center gap-x-4'>
-				{delegate?.profileDetails.socials?.map((social) => {
+				{delegate?.publicUser?.profileDetails.publicSocialLinks?.map((social) => {
 					const IconComponent = SocialIcons[social.platform];
 					return IconComponent ? (
 						<a
