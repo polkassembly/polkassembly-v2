@@ -66,6 +66,7 @@ import {
 	IConversationMessage,
 	IDelegateXAccount,
 	IDelegateXVoteData,
+	IOGTrackerData,
 	IConversationTurn
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
@@ -172,6 +173,7 @@ enum EApiRoute {
 	UPDATE_DELEGATE_X_BOT = 'UPDATE_DELEGATE_X_BOT',
 	GET_DELEGATE_X_DETAILS = 'GET_DELEGATE_X_DETAILS',
 	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY',
+	GET_OGTRACKER_DATA = 'GET_OGTRACKER_DATA',
 	FETCH_COMMUNITY_MEMBERS = 'FETCH_COMMUNITY_MEMBERS'
 }
 
@@ -435,6 +437,10 @@ export class NextApiClientService {
 			case EApiRoute.GET_DELEGATE_X_VOTE_HISTORY:
 				path = '/delegate-x/vote-history';
 				method = 'GET';
+				break;
+
+			case EApiRoute.GET_OGTRACKER_DATA:
+				path = '/external/ogtracker';
 				break;
 
 			default:
@@ -1316,19 +1322,21 @@ export class NextApiClientService {
 		proposalType,
 		index,
 		analyticsType,
-		votesType
+		votesType,
+		skipCache = false
 	}: {
 		proposalType: EProposalType;
 		index: string;
 		analyticsType: EAnalyticsType;
 		votesType: EVotesDisplayType;
+		skipCache?: boolean;
 	}) {
 		const queryParams = new URLSearchParams({
 			analyticsType: analyticsType ? analyticsType.toString() : '',
 			votesType: votesType.toString()
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_BUBBLE_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-bubble'], queryParams });
-		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method });
+		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method, skipCache });
 	}
 
 	static async addCommentReaction(proposalType: EProposalType, index: string, commentId: string, reactionType: EReaction) {
@@ -1607,6 +1615,14 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_VOTE_HISTORY, queryParams });
 		return this.nextApiClientFetch<{ success: boolean; voteData: IDelegateXVoteData[]; totalCount: number }>({ url, method });
+	}
+
+	static async getOGTrackerData({ refNum }: { refNum: string }) {
+		const queryParams = new URLSearchParams({
+			refNum
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_OGTRACKER_DATA, queryParams });
+		return this.nextApiClientFetch<IOGTrackerData>({ url, method });
 	}
 
 	static async fetchCommunityMembers({ page, limit }: { page: number; limit?: number }) {
