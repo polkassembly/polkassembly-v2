@@ -225,7 +225,6 @@ export class NextApiClientService {
 				path = '/activity-feed/subscriptions';
 				break;
 			case EApiRoute.FETCH_LEADERBOARD:
-			case EApiRoute.FETCH_COMMUNITY_MEMBERS:
 				path = '/users';
 				break;
 			case EApiRoute.GET_VOTES_BY_ADDRESSES:
@@ -441,6 +440,9 @@ export class NextApiClientService {
 
 			case EApiRoute.GET_OGTRACKER_DATA:
 				path = '/external/ogtracker';
+				break;
+			case EApiRoute.FETCH_COMMUNITY_MEMBERS:
+				path = '/community/members';
 				break;
 
 			default:
@@ -1632,6 +1634,6 @@ export class NextApiClientService {
 		});
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_COMMUNITY_MEMBERS, queryParams });
-		return this.nextApiClientFetch<IGenericListingResponse<IPublicUser>>({ url, method });
+		return this.nextApiClientFetch<IGenericListingResponse<IDelegateDetails>>({ url, method });
 	}
 }

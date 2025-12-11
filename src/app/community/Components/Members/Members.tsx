@@ -28,7 +28,10 @@ async function CommunityMembers({ page }: { page: number }) {
 			/>
 			<div className='mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6'>
 				{members.map((member) => (
-					<MemberCard key={member.id} />
+					<MemberCard
+						key={member.id}
+						member={member}
+					/>
 				))}
 			</div>
 			{data.totalCount > DEFAULT_LISTING_LIMIT && (

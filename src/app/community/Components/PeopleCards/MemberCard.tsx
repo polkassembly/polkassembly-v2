@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import Image from 'next/image';
-import { ESocial, EUserBadge, IUserBadgeDetails } from '@/_shared/types';
+import { ESocial, EUserBadge, IDelegateDetails, IUserBadgeDetails } from '@/_shared/types';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import JudgementIcon from '@assets/icons/judgement-icon.svg';
 import RankStar from '@assets/profile/rank-star.svg';
@@ -38,53 +38,7 @@ const SocialIcons: Partial<Record<ESocial, React.ComponentType<React.SVGProps<SV
 	[ESocial.GITHUB]: FaGithub
 };
 
-const member = {
-	addresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
-	balance: '1000000000000000000',
-	createdAt: '2024-05-20T12:00:00Z',
-	id: 1,
-	last30DaysVotedProposalsCount: 15,
-	maxDelegated: '500000000000000000000',
-	delegators: [
-		{
-			address: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
-			balance: '1000000000000000000',
-			createdAt: '2024-05-20T12:00:00Z',
-			updatedAt: '2024-06-20T12:00:00Z'
-		}
-	],
-	updatedAt: '2024-06-20T12:00:00Z',
-	username: 'blockchain_dev',
-	profileScore: 85.5,
-	followers: [{ followerUserId: 2 }],
-	following: [{ followerUserId: 3 }],
-	profileDetails: {
-		bio: 'Experienced blockchain developer and community advocate dedicated to fostering decentralized ecosystems.',
-		achievementBadges: [
-			{
-				name: EUserBadge.ACTIVE_VOTER,
-				unlockedAt: new Date('2025-08-20T12:00:00Z')
-			}
-		],
-		socials: [
-			{
-				platform: ESocial.EMAIL,
-				url: 'blockchain_dev@email.com'
-			},
-			{
-				platform: ESocial.TWITTER,
-				url: 'https://twitter.com/blockchain_dev'
-			},
-			{
-				platform: ESocial.TELEGRAM,
-				url: 'https://t.me/blockchain_dev'
-			}
-		]
-	},
-	judgements: ['Reasonable']
-};
-
-function MemberCard() {
+function MemberCard({ member }: { member: IDelegateDetails }) {
 	const t = useTranslations();
 	const { user } = useUser();
 
@@ -92,33 +46,34 @@ function MemberCard() {
 	const [isReadMoreVisible, setIsReadMoreVisible] = useState(false);
 	const isFetching = false;
 
-	const userBadges = member.profileDetails.achievementBadges.reduce(
-		(acc, badge) => {
-			acc[badge.name] = badge;
-			return acc;
-		},
-		{} as Record<EUserBadge, IUserBadgeDetails>
-	);
+	const userBadges =
+		member?.publicUser?.profileDetails?.achievementBadges?.reduce(
+			(acc, badge) => {
+				acc[badge.name] = badge;
+				return acc;
+			},
+			{} as Record<EUserBadge, IUserBadgeDetails>
+		) || {};
 
-	const isFollowing = member?.following?.some((item) => item.followerUserId === user?.id);
+	const isFollowing = member?.publicUser?.following?.some((item) => item.followerUserId === user?.id);
 
 	return (
 		<div className={styles.memberCard}>
 			<div className='flex items-center justify-between gap-3'>
 				<div className='flex items-center gap-2'>
-					{member.addresses.length > 0 ? (
+					{member.address && member.address !== '' ? (
 						<>
 							<Address
 								disableTooltip
-								address={member?.addresses[0] || ''}
+								address={member?.address || ''}
 								iconSize={30}
 								showIdenticon
 								textClassName='text-left text-lg font-semibold'
 							/>
-							{isUserBlacklisted(member.id) && <ShieldAlert className='h-5 w-5 text-red-500' />}
+							{isUserBlacklisted(member?.publicUser?.id) && <ShieldAlert className='h-5 w-5 text-red-500' />}
 						</>
 					) : (
-						<span className='text-xl font-semibold text-text_primary'>{member?.username || ''}</span>
+						<span className='text-xl font-semibold text-text_primary'>{member?.name || ''}</span>
 					)}
 				</div>
 				<div className='flex items-center gap-x-2'>
@@ -139,16 +94,16 @@ function MemberCard() {
 			</div>
 			<div className='flex items-center justify-between gap-x-4'>
 				<div className='flex items-center gap-x-2'>
-					{member.addresses.length > 0 ? (
+					{member.address && member.address !== '' ? (
 						<CopyToClipboard
-							label={shortenAddress(member?.addresses[0] || '', 5)}
-							text={member?.addresses[0] || ''}
+							label={shortenAddress(member?.address || '', 5)}
+							text={member?.address || ''}
 							className='text-base'
 						/>
 					) : null}
 					<div className='flex items-center gap-1 rounded-md bg-topic_tag_bg px-1.5 py-1'>
 						<UserIcon className='h-4 w-4 text-basic_text' />
-						<span className='text-xs text-basic_text'>{t('Community.Members.independent')}</span>
+						<span className='text-xs text-basic_text'>{member?.sources[0] || ''}</span>
 					</div>
 					<span className='flex items-center gap-1 rounded-md bg-rank_card_bg px-1.5 py-0.5 font-medium'>
 						<Image
@@ -157,7 +112,7 @@ function MemberCard() {
 							width={16}
 							height={16}
 						/>
-						<span className='text-sm font-medium text-leaderboard_score'>{Math.floor(member?.profileScore)}</span>
+						<span className='text-sm font-medium text-leaderboard_score'>{Math.floor(member?.publicUser?.profileScore || 0)}</span>
 					</span>
 				</div>
 				<div className='flex items-center gap-x-1'>
@@ -195,21 +150,21 @@ function MemberCard() {
 					orientation='vertical'
 				/>
 				<div className={styles.memberFollowing}>
-					{t('Profile.following')}: <span className='font-medium text-text_pink'>{member?.following?.length || 0}</span>
+					{t('Profile.following')}: <span className='font-medium text-text_pink'>{member?.publicUser?.following?.length || 0}</span>
 				</div>
 				<Separator
 					className='h-4'
 					orientation='vertical'
 				/>
 				<div className={styles.memberFollowing}>
-					{t('Profile.followers')}: <span className='font-medium text-text_pink'>{member?.followers?.length || 0}</span>
+					{t('Profile.followers')}: <span className='font-medium text-text_pink'>{member?.publicUser?.followers?.length || 0}</span>
 				</div>
 			</div>
 			<div>
-				{member?.profileDetails?.bio && (
+				{member?.publicUser?.profileDetails?.bio && (
 					<>
-						<div className={`${styles.bio} ${isReadMoreVisible ? '' : styles.bioCollapsed} mt-3`}>{member?.profileDetails?.bio}</div>
-						{member?.profileDetails?.bio.length > 100 && (
+						<div className={`${styles.bio} ${isReadMoreVisible ? '' : styles.bioCollapsed} mt-3`}>{member?.publicUser?.profileDetails?.bio}</div>
+						{member?.publicUser?.profileDetails?.bio.length > 100 && (
 							<Button
 								variant='ghost'
 								className={styles.readMoreButton}
@@ -223,7 +178,7 @@ function MemberCard() {
 				)}
 			</div>
 			<div className='flex items-center gap-x-4'>
-				{member?.profileDetails.socials?.map((social) => {
+				{member?.publicUser?.profileDetails.publicSocialLinks?.map((social) => {
 					const IconComponent = SocialIcons[social.platform];
 					return IconComponent ? (
 						<a
@@ -241,6 +196,7 @@ function MemberCard() {
 			<div className='flex flex-wrap items-center gap-x-3'>
 				{Object.keys(userBadges || []).map((badge) => {
 					const badgeDetails = userBadges[`${badge}` as EUserBadge];
+					if (!badgeDetails) return null;
 					return (
 						<div
 							key={badgeDetails.name}
