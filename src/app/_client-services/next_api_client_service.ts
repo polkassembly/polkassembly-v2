@@ -174,6 +174,7 @@ enum EApiRoute {
 	GET_DELEGATE_X_DETAILS = 'GET_DELEGATE_X_DETAILS',
 	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY',
 	GET_OGTRACKER_DATA = 'GET_OGTRACKER_DATA',
+	FETCH_COMMUNITY_CURATORS = 'FETCH_COMMUNITY_CURATORS',
 	FETCH_COMMUNITY_MEMBERS = 'FETCH_COMMUNITY_MEMBERS'
 }
 
@@ -441,8 +442,9 @@ export class NextApiClientService {
 			case EApiRoute.GET_OGTRACKER_DATA:
 				path = '/external/ogtracker';
 				break;
+			case EApiRoute.FETCH_COMMUNITY_CURATORS:
 			case EApiRoute.FETCH_COMMUNITY_MEMBERS:
-				path = '/community/members';
+				path = '/community';
 				break;
 
 			default:
@@ -1627,13 +1629,23 @@ export class NextApiClientService {
 		return this.nextApiClientFetch<IOGTrackerData>({ url, method });
 	}
 
+	static async fetchCommunityCurators({ page, limit }: { page: number; limit?: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString() || '1',
+			limit: limit?.toString() || DEFAULT_LISTING_LIMIT.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_COMMUNITY_CURATORS, routeSegments: ['curators'], queryParams });
+		return this.nextApiClientFetch<IDelegateDetails[]>({ url, method });
+	}
+
 	static async fetchCommunityMembers({ page, limit }: { page: number; limit?: number }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString() || '1',
 			limit: limit?.toString() || DEFAULT_LISTING_LIMIT.toString()
 		});
 
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_COMMUNITY_MEMBERS, queryParams });
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_COMMUNITY_MEMBERS, routeSegments: ['members'], queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IDelegateDetails>>({ url, method });
 	}
 }

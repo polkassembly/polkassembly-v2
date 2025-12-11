@@ -9,35 +9,37 @@ import MembersStats from '../Stats/MembersStats';
 import CuratorCard from '../PeopleCards/CuratorCard';
 
 async function CommunityCurators({ page }: { page: number }) {
-	const { data, error } = await NextApiClientService.fetchCommunityMembers({ page });
+	const { data, error } = await NextApiClientService.fetchCommunityCurators({ page });
 
 	if (error || !data) {
-		return <div className='text-center text-sm text-red-500'>Error fetching members</div>;
+		return <div className='text-center text-sm text-red-500'>Error fetching curators</div>;
 	}
 
-	const members = data.items;
-	console.log('members', members);
+	const curators = data;
 
-	if (members.length === 0) {
-		return <div className='text-text_secondary text-center text-sm'>No members found</div>;
+	if (curators.length === 0) {
+		return <div className='text-text_secondary text-center text-sm'>No curators found</div>;
 	}
 	return (
 		<div>
 			<MembersStats
-				totalMembers={data.totalCount}
+				totalMembers={data.length}
 				verifiedMembers={80}
 			/>
 			<div className='mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6'>
-				{members.map((member) => (
-					<CuratorCard key={member.id} />
+				{curators.map((curator) => (
+					<CuratorCard
+						key={curator.id}
+						curator={curator}
+					/>
 				))}
 			</div>
-			{data.totalCount > DEFAULT_LISTING_LIMIT && (
+			{curators.length > DEFAULT_LISTING_LIMIT && (
 				<div className='mt-5 w-full'>
 					<PaginationWithLinks
 						page={page}
 						pageSize={DEFAULT_LISTING_LIMIT}
-						totalCount={data.totalCount}
+						totalCount={curators.length}
 						pageSearchParam='page'
 					/>
 				</div>

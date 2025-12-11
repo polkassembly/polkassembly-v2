@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { ESocial } from '@/_shared/types';
+import { ESocial, IDelegateDetails } from '@/_shared/types';
 import RankStar from '@assets/profile/rank-star.svg';
 import Identicon from '@polkadot/react-identicon';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
@@ -34,74 +34,27 @@ const SocialIcons: Partial<Record<ESocial, React.ComponentType<React.SVGProps<SV
 	[ESocial.GITHUB]: FaGithub
 };
 
-const delegate = {
-	addresses: ['5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty'],
-	balance: '1000000000000000000',
-	createdAt: '2024-05-20T12:00:00Z',
-	id: 1,
-	last30DaysVotedProposalsCount: 15,
-	maxDelegated: '500000000000000000000',
-	delegators: [
-		{
-			address: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
-			balance: '1000000000000000000',
-			createdAt: '2024-05-20T12:00:00Z',
-			updatedAt: '2024-06-20T12:00:00Z'
-		},
-		{
-			address: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
-			balance: '1000000000000000000',
-			createdAt: '2023-06-20T12:00:00Z',
-			updatedAt: '2025-06-20T12:00:00Z'
-		}
-	],
-	updatedAt: '2024-06-20T12:00:00Z',
-	username: 'blockchain_dev',
-	profileScore: 85.5,
-	followers: [{ followerUserId: 2 }],
-	following: [{ followerUserId: 3 }],
-	profileDetails: {
-		bio: 'Experienced blockchain developer and community advocate dedicated to fostering decentralized ecosystems.',
-		achievementBadges: [],
-		socials: [
-			{
-				platform: ESocial.EMAIL,
-				url: 'blockchain_dev@email.com'
-			},
-			{
-				platform: ESocial.TWITTER,
-				url: 'https://twitter.com/blockchain_dev'
-			},
-			{
-				platform: ESocial.TELEGRAM,
-				url: 'https://t.me/blockchain_dev'
-			}
-		]
-	},
-	judgements: ['Reasonable']
-};
-
-function CuratorCard() {
+function CuratorCard({ curator }: { curator: IDelegateDetails }) {
 	const t = useTranslations();
 	const network = getCurrentNetwork();
 
 	const [isReadMoreVisible, setIsReadMoreVisible] = useState(false);
-	const signatories = delegate?.delegators?.map((delegator) => delegator.address).filter(Boolean) ?? [];
+	const signatories = curator?.delegators ?? [];
 
 	return (
 		<div className={styles.memberCard}>
 			<div className='flex items-center justify-between gap-3'>
 				<div className='flex items-center gap-2'>
-					{delegate.addresses.length > 0 ? (
+					{(curator?.publicUser?.addresses?.length ?? 0) > 0 ? (
 						<Address
 							disableTooltip
-							address={delegate?.addresses[0] || ''}
+							address={curator?.publicUser?.addresses[0] || ''}
 							iconSize={30}
 							showIdenticon
 							textClassName='text-left text-lg font-semibold'
 						/>
 					) : (
-						<span className='text-xl font-semibold text-text_primary'>{delegate?.username || ''}</span>
+						<span className='text-xl font-semibold text-text_primary'>{curator?.publicUser?.username || ''}</span>
 					)}
 				</div>
 				<div className='flex items-center gap-x-2'>
@@ -126,10 +79,10 @@ function CuratorCard() {
 			</div>
 			<div className='flex items-center justify-between gap-x-4'>
 				<div className='flex items-center gap-x-2'>
-					{delegate?.addresses.length > 0 ? (
+					{(curator?.publicUser?.addresses?.length ?? 0) > 0 ? (
 						<CopyToClipboard
-							label={shortenAddress(delegate?.addresses[0] || '', 5)}
-							text={delegate?.addresses[0] || ''}
+							label={shortenAddress(curator?.publicUser?.addresses[0] || '', 5)}
+							text={curator?.publicUser?.addresses[0] || ''}
 							className='text-base'
 						/>
 					) : null}
@@ -140,7 +93,7 @@ function CuratorCard() {
 							width={16}
 							height={16}
 						/>
-						<span className='text-sm font-medium text-leaderboard_score'>{Math.floor(delegate?.profileScore)}</span>
+						<span className='text-sm font-medium text-leaderboard_score'>{Math.floor(curator?.publicUser?.profileScore || 0)}</span>
 					</span>
 					<span className='flex items-center gap-1 rounded-full bg-bounties_label_bg px-2 py-0.5 font-medium'>
 						<CircleDollarSign className='h-4 w-4 text-2xl text-bounties_label_text' />
@@ -158,10 +111,10 @@ function CuratorCard() {
 				</div>
 			</div>
 			<div>
-				{delegate?.profileDetails?.bio && (
+				{curator?.publicUser?.profileDetails?.bio && (
 					<>
-						<div className={`${styles.bio} ${isReadMoreVisible ? '' : styles.bioCollapsed} mt-3`}>{delegate?.profileDetails?.bio}</div>
-						{delegate?.profileDetails?.bio.length > 100 && (
+						<div className={`${styles.bio} ${isReadMoreVisible ? '' : styles.bioCollapsed} mt-3`}>{curator?.publicUser?.profileDetails?.bio}</div>
+						{curator?.publicUser?.profileDetails?.bio.length > 100 && (
 							<Button
 								variant='ghost'
 								className={styles.readMoreButton}
@@ -175,7 +128,7 @@ function CuratorCard() {
 				)}
 			</div>
 			<div className='flex items-center gap-x-4'>
-				{delegate?.profileDetails.socials?.map((social) => {
+				{curator?.publicUser?.profileDetails?.publicSocialLinks?.map((social) => {
 					const IconComponent = SocialIcons[social.platform];
 					return IconComponent ? (
 						<a
@@ -195,7 +148,7 @@ function CuratorCard() {
 					<div>
 						<div className='text-sm text-btn_secondary_text xl:whitespace-nowrap'>
 							<span className='font-semibold md:text-2xl'>
-								{formatUSDWithUnits(formatBnBalance(delegate?.maxDelegated, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
+								{formatUSDWithUnits(formatBnBalance(curator?.maxDelegated, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
 							</span>
 						</div>
 						<span className={styles.delegationCardStatsItemText}>Total Rewarded</span>
@@ -203,15 +156,14 @@ function CuratorCard() {
 				</div>
 				<div className={styles.delegationCardStatsItem}>
 					<div>
-						<div className='font-semibold text-btn_secondary_text md:text-2xl'>{delegate?.last30DaysVotedProposalsCount}</div>
+						<div className='font-semibold text-btn_secondary_text md:text-2xl'>{curator?.last30DaysVotedProposalsCount}</div>
 						<span className={styles.delegationCardStatsItemText}>Active Bounties</span>
 					</div>
 				</div>
 				<div className='p-5 text-center'>
 					<div>
 						<div className='flex items-center gap-3 font-semibold text-btn_secondary_text md:text-2xl'>
-							{delegate?.delegators?.length || 0}{' '}
-							<span className='flex items-center gap-1 rounded-md bg-failure px-1.5 py-0.5 text-xs font-medium text-white'>Unclaimed: $700</span>
+							{curator?.delegators?.length || 0} <span className='flex items-center gap-1 rounded-md bg-failure px-1.5 py-0.5 text-xs font-medium text-white'>Unclaimed: $700</span>
 						</div>
 						<span className={styles.delegationCardStatsItemText}>Child Bounty Disbursed</span>
 					</div>
