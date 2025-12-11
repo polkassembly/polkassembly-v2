@@ -27,7 +27,7 @@ function Header({ activeTab, tabCounts }: { activeTab: ECommunityRole; tabCounts
 		{ label: t('Community.members'), value: ECommunityRole.MEMBERS, count: tabCounts.members },
 		{ label: t('Community.delegates'), value: ECommunityRole.DELEGATES, count: tabCounts.delegates },
 		{ label: t('Community.curators'), value: ECommunityRole.CURATORS, count: tabCounts.curators },
-		{ label: t('Community.experts'), value: ECommunityRole.EXPERTS, count: tabCounts.experts }
+		{ label: t('Community.decentralizedVoices'), value: ECommunityRole.DVS, count: tabCounts.decentralized_voices }
 	];
 
 	return (

@@ -35,7 +35,7 @@ async function Community({ searchParams }: { searchParams: Promise<{ tab?: EComm
 	const page = parseInt(searchParamsValue?.page || '1', DEFAULT_LISTING_LIMIT);
 
 	// Todo: fetch allTab counts in single server call and pass to header
-	const allTabCounts: Record<ECommunityRole, number> = { members: 0, delegates: 0, curators: 0, experts: 0 };
+	const allTabCounts: Record<ECommunityRole, number> = { members: 0, delegates: 0, curators: 0, decentralized_voices: 0 };
 
 	return (
 		<div className='w-full'>
@@ -54,7 +54,7 @@ async function Community({ searchParams }: { searchParams: Promise<{ tab?: EComm
 					<TabsContent value={ECommunityRole.CURATORS}>
 						<CommunityCurators page={page} />
 					</TabsContent>
-					<TabsContent value={ECommunityRole.EXPERTS}>Experts Page</TabsContent>
+					<TabsContent value={ECommunityRole.DVS}>DVs Page</TabsContent>
 				</div>
 			</Tabs>
 		</div>

@@ -1831,5 +1831,5 @@ export enum ECommunityRole {
 	MEMBERS = 'members',
 	DELEGATES = 'delegates',
 	CURATORS = 'curators',
-	EXPERTS = 'experts'
+	DVS = 'decentralized_voices'
 }
