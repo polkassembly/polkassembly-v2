@@ -125,7 +125,7 @@ function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 											{t('PostDetails.BeneficiariesDetails.showMore')}
 										</Button>
 									</DialogTrigger>
-									<DialogContent className='max-w-max px-4 pb-4 pt-3'>
+									<DialogContent className='max-w-max px-4 pb-4 pt-3 md:min-w-[400px]'>
 										<DialogHeader className='flex flex-row items-center justify-between gap-4'>
 											<DialogTitle className='text-text_primary'>{t('PostDetails.OGTracker.tasks')}</DialogTitle>
 											<a
@@ -176,7 +176,7 @@ function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 											{t('PostDetails.BeneficiariesDetails.showMore')}
 										</Button>
 									</DialogTrigger>
-									<DialogContent className='max-w-max px-4 pb-4 pt-3'>
+									<DialogContent className='max-w-max px-4 pb-4 pt-3 md:min-w-[400px]'>
 										<DialogHeader className='flex flex-row items-center justify-between gap-4'>
 											<DialogTitle className='text-text_primary'>{t('PostDetails.OGTracker.proofOfWork')}</DialogTitle>
 											<a
