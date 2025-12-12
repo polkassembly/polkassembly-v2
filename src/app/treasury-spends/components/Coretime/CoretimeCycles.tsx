@@ -12,11 +12,11 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
 import TimeLineIcon from '@assets/icons/timeline.svg';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
-import { ETheme, EAssets } from '@/_shared/types';
+import { ETheme, EAssets, ETreasurySpendsTabs } from '@/_shared/types';
 import React, { useState } from 'react';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS, treasuryAssetsData } from '@/_shared/_constants/networks';
@@ -26,16 +26,18 @@ import { Table, TableHead, TableBody, TableRow, TableHeader, TableCell } from '.
 import { PaginationWithLinks } from '../../../_shared-components/PaginationWithLinks';
 import styles from './Coretime.module.scss';
 import CycleSummary from './CycleSummary';
+import { coretimeCyclesMock, CoretimeCycle } from './mockCycles';
 
 function CoretimeCycles() {
 	const { userPreferences } = useUserPreferences();
 	const searchParams = useSearchParams();
+	const router = useRouter();
+	const pathname = usePathname();
 	const network = getCurrentNetwork();
 	const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
 	const page = searchParams?.get('page') || 1;
 	const t = useTranslations('TreasuryAnalytics');
-	const totalCount = 2;
 	const DATE_FORMAT = "Do MMM 'YY";
 
 	const toggleExpand = (address: string) => {
@@ -48,34 +50,18 @@ function CoretimeCycles() {
 		setExpandedRows(newExpanded);
 	};
 
+	const goToCoretimeDetail = (cycleId: string) => {
+		const queryParams = new URLSearchParams(searchParams?.toString());
+		queryParams.set('tab', ETreasurySpendsTabs.CYCLE_DETAIL);
+		queryParams.set('cycleId', cycleId);
+		router.push(`${pathname}?${queryParams.toString()}`);
+	};
+
 	const loading = false; // Replace with actual loading state
 
 	// Mock data - replace with actual data fetching logic
-
-	const data = [
-		{
-			id: '1',
-			core: 23,
-			startPeriod: '2025-01-01',
-			endPeriod: '2025-06-30',
-			regionBegin: '353,000',
-			regionEnd: '357,000',
-			cycleDuration: '5,000',
-			assetId: null,
-			totalRevenue: '1165260000000000'
-		},
-		{
-			id: '2',
-			core: 24,
-			startPeriod: '2025-01-01',
-			endPeriod: '2025-06-30',
-			regionBegin: '353,000',
-			regionEnd: '357,000',
-			cycleDuration: '5,000',
-			assetId: null,
-			totalRevenue: '1165260000000000'
-		}
-	];
+	const data: CoretimeCycle[] = coretimeCyclesMock;
+	const totalCount = data.length;
 
 	return (
 		<Collapsible
@@ -130,10 +116,10 @@ function CoretimeCycles() {
 										return (
 											<React.Fragment key={cycle?.id}>
 												<TableRow>
-													<td className='py-5'>
+													<td className='py-5 pl-4 pr-6'>
 														<div className='flex items-center'>{cycle.id}</div>
 													</td>
-													<td className='py-5'>{cycle.regionBegin}</td>
+													<td className='px-6 py-5'>{cycle.regionBegin}</td>
 													<td className='px-6 py-5'>{cycle.regionEnd}</td>
 													<td className='px-6 py-5'>{`${dayjs(cycle.startPeriod).format(DATE_FORMAT)} - ${dayjs(cycle.endPeriod).format(DATE_FORMAT)}`}</td>
 													<td className='px-6 py-5'>
@@ -171,10 +157,11 @@ function CoretimeCycles() {
 															className='p-0 py-3'
 															colSpan={6}
 														>
-															<CycleSummary />
+															<CycleSummary cycle={cycle} />
 															<Separator className='mx-auto my-3 max-w-[98%]' />
 															<button
 																type='button'
+																onClick={() => goToCoretimeDetail(cycle.id)}
 																className='mx-auto flex items-center justify-center font-medium text-text_pink'
 															>
 																View Detail

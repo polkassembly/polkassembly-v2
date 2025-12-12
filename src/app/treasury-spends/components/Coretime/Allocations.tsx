@@ -121,10 +121,10 @@ function CoretimeAllocations() {
 										return (
 											<React.Fragment key={allocation?.id}>
 												<TableRow>
-													<TableCell className='truncate py-3'>
+													<TableCell className='py-3 pl-4 pr-6'>
 														<div className='flex items-center'>{allocation.id}</div>
 													</TableCell>
-													<TableCell className='truncate py-3'>{allocation.parachain}</TableCell>
+													<TableCell className='px-6 py-3'>{allocation.parachain}</TableCell>
 													<TableCell className='px-6 py-3'>Core #{allocation.core}</TableCell>
 													<TableCell className='px-6 py-3'>
 														<div className='flex flex-col gap-1'>

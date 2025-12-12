@@ -16,6 +16,7 @@ import CoretimeMigration from './components/Stats/CoretimeMigration';
 import CoretimeProcurementMethods from './components/Stats/CoretimeProcurementMethods';
 import CoretimeAllocations from './components/Coretime/Allocations';
 import CoretimeCycles from './components/Coretime/CoretimeCycles';
+import CoretimeCycleDetail from './components/Coretime/CoretimeCycleDetail';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
@@ -30,11 +31,17 @@ export async function generateMetadata(): Promise<Metadata> {
 	});
 }
 
-async function TreasuryAnalyticsPage() {
+async function TreasuryAnalyticsPage({ searchParams }: { searchParams: Promise<{ tab?: string; page?: string }> }) {
+	const searchParamsValue = await searchParams;
+	const tabParam = searchParamsValue?.tab;
+	const validTab = Object.values(ETreasurySpendsTabs).includes(tabParam as ETreasurySpendsTabs) ? (tabParam as ETreasurySpendsTabs) : ETreasurySpendsTabs.SPENDS;
+	const isCoretimeDetail = validTab === ETreasurySpendsTabs.CYCLE_DETAIL;
+	const activeTab = isCoretimeDetail ? ETreasurySpendsTabs.CORETIME : validTab;
+
 	return (
 		<div className='w-full'>
-			<Tabs defaultValue={ETreasurySpendsTabs.SPENDS}>
-				<TreasurySpendsHeader />
+			<Tabs defaultValue={activeTab}>
+				<TreasurySpendsHeader activeTab={activeTab} />
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-10'>
 					<TabsContent value={ETreasurySpendsTabs.SPENDS}>
 						<div className='flex flex-col gap-6'>
@@ -43,15 +50,19 @@ async function TreasuryAnalyticsPage() {
 						</div>
 					</TabsContent>
 					<TabsContent value={ETreasurySpendsTabs.CORETIME}>
-						<div className='flex flex-col gap-6'>
-							<CoretimeStats />
-							<div className='flex gap-6'>
-								<CoretimeMigration />
-								<CoretimeProcurementMethods />
+						{isCoretimeDetail ? (
+							<CoretimeCycleDetail />
+						) : (
+							<div className='flex flex-col gap-6'>
+								<CoretimeStats />
+								<div className='flex gap-6'>
+									<CoretimeMigration />
+									<CoretimeProcurementMethods />
+								</div>
+								<CoretimeCycles />
+								<CoretimeAllocations />
 							</div>
-							<CoretimeCycles />
-							<CoretimeAllocations />
-						</div>
+						)}
 					</TabsContent>
 				</div>
 			</Tabs>

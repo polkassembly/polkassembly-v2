@@ -1827,7 +1827,8 @@ export interface IOGTrackerData {
 
 export enum ETreasurySpendsTabs {
 	SPENDS = 'spends',
-	CORETIME = 'coretime'
+	CORETIME = 'coretime',
+	CYCLE_DETAIL = 'cycle_detail'
 }
 
 export interface ITreasurySpend {
