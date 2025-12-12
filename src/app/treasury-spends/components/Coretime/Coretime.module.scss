@@ -1,0 +1,27 @@
+.headerRow {
+	@apply overflow-hidden rounded-lg border-t bg-page_background px-6 py-3 text-center;
+}
+
+.headerCell {
+	@apply px-6 py-5 text-sm font-semibold uppercase text-text_primary;
+}
+
+.progressSection {
+	@apply flex flex-col gap-y-2;
+}
+
+.progressBars {
+	@apply flex w-full items-center justify-between;
+}
+
+.progressBar {
+	@apply h-2 w-0.5 rounded-sm;
+}
+
+.filled {
+	@apply bg-bg_pink;
+}
+
+.empty {
+	@apply bg-empty_bar_bg_dark;
+}
