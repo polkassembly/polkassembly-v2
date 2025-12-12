@@ -1502,8 +1502,8 @@ export class SubsquidQueries {
 	`;
 
 	protected static GET_COHORT_REFERENDA = `
-		query GetCohortReferenda($index_gte: Int!, $index_lte: Int!) {
-			proposals(where: {index_gte: $index_gte, index_lte: $index_lte, type_eq: ReferendumV2}, orderBy: index_ASC) {
+		query GetCohortReferenda($limit: Int = 5000) {
+			proposals(limit: $limit, where: {type_eq: ReferendumV2}, orderBy: index_ASC) {
 				index
 				createdAtBlock
 				trackNumber

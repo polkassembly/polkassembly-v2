@@ -42,8 +42,8 @@ export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: IDVDRe
 	const getVoteStatsIncrement = (
 		vote: IDVCohortVote,
 		referendum: IDVDReferendumResponse | undefined
-	): { ayeCount: number; nayCount: number; abstainCount: number; winningVotes: number; votedCount: number } => {
-		const result = { ayeCount: 0, nayCount: 0, abstainCount: 0, winningVotes: 0, votedCount: 0 };
+	): { ayeCount: number; nayCount: number; abstainCount: number; winningVotes: number; votedCount: number; isClosed: boolean } => {
+		const result = { ayeCount: 0, nayCount: 0, abstainCount: 0, winningVotes: 0, votedCount: 0, isClosed: false };
 		if (!referendum) return result;
 		result.votedCount = 1;
 
@@ -51,6 +51,8 @@ export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: IDVDRe
 			if (BigInt(vote.ayeBalance || 0) > 0) result.ayeCount = 1;
 			if (BigInt(vote.nayBalance || 0) > 0) result.nayCount = 1;
 			if (BigInt(vote.abstainBalance || 0) > 0) result.abstainCount = 1;
+		} else if (vote.isAbstain) {
+			result.abstainCount = 1;
 		} else if (vote.aye) {
 			result.ayeCount = 1;
 		} else {
@@ -58,6 +60,13 @@ export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: IDVDRe
 		}
 
 		result.winningVotes = getWinningVoteIncrement(vote, referendum);
+
+		const approvedStatuses = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed];
+		const isApproved = approvedStatuses.includes(referendum.status);
+		result.isClosed =
+			isApproved ||
+			[EProposalStatus.Rejected, EProposalStatus.TimedOut, EProposalStatus.Cancelled, EProposalStatus.Killed, EProposalStatus.ExecutionFailed].includes(referendum.status);
+
 		return result;
 	};
 
@@ -77,12 +86,16 @@ export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: IDVDRe
 			stats.ayeCount += increment.ayeCount;
 			stats.nayCount += increment.nayCount;
 			stats.abstainCount += increment.abstainCount;
-			stats.winningVotes += increment.winningVotes;
+
+			if (increment.isClosed) {
+				stats.winningVotes += increment.winningVotes;
+			}
+
 			stats.votedCount += increment.votedCount;
 		});
 
 		const participation = referenda.length > 0 ? (stats.votedCount / referenda.length) * 100 : 0;
-		const winRate = delegateVotes.length > 0 ? (stats.winningVotes / delegateVotes.length) * 100 : 0;
+		const winRate = stats.votedCount > 0 ? (stats.winningVotes / stats.votedCount) * 100 : 0;
 
 		return {
 			...delegate,
@@ -349,8 +362,8 @@ export function formatDVCohortVote(vote: IDVVotes): IDVCohortVote {
 		});
 	}
 
-	const isSplit = !!(vote.balance?.aye && vote.balance?.nay);
-	const isSplitAbstain = !!vote.balance?.abstain && (!!vote.balance?.aye || !!vote.balance?.nay);
+	const isSplit = BigInt(vote.balance?.aye || 0) > BigInt(0) && BigInt(vote.balance?.nay || 0) > BigInt(0);
+	const isSplitAbstain = BigInt(vote.balance?.abstain || 0) > BigInt(0) && (BigInt(vote.balance?.aye || 0) > BigInt(0) || BigInt(vote.balance?.nay || 0) > BigInt(0));
 	const isStandard = !!vote.balance?.value;
 
 	const voteData: IDVCohortVote = {
@@ -360,8 +373,9 @@ export function formatDVCohortVote(vote: IDVVotes): IDVCohortVote {
 		isStandard,
 		isSplit,
 		isSplitAbstain,
+		isAbstain: vote.decision?.toLowerCase() === 'abstain',
 		balance: vote.balance?.value || (BigInt(vote.balance?.aye || 0) + BigInt(vote.balance?.nay || 0) + BigInt(vote.balance?.abstain || 0)).toString(),
-		aye: vote.decision === 'yes',
+		aye: vote.decision?.toLowerCase() === 'yes' || vote.decision?.toLowerCase() === 'aye',
 		conviction: vote.lockPeriod,
 		votes: vote.selfVotingPower || '0',
 		delegations: {

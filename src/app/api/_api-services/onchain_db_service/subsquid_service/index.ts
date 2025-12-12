@@ -1714,38 +1714,20 @@ export class SubsquidService extends SubsquidUtils {
 		return trackStats;
 	}
 
-	static async GetCohortReferenda({ network, indexStart, indexEnd }: { network: ENetwork; indexStart: number; indexEnd: number }) {
+	static async GetCohortReferenda({ network }: { network: ENetwork }) {
 		const gqlClient = this.subsquidGqlClient(network);
-		const { data, error } = await gqlClient
-			.query(this.GET_COHORT_REFERENDA, {
-				index_gte: indexStart,
-				index_lte: indexEnd
-			})
-			.toPromise();
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(SubsquidService.GET_COHORT_REFERENDA, {}).toPromise();
 
-		if (error || !data) {
-			console.error('Error fetching cohort referenda:', error);
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching cohort referenda from Subsquid: ${subsquidErr}`);
 			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching cohort referenda from Subsquid');
 		}
 
-		return data.proposals;
+		return subsquidData?.proposals || [];
 	}
 
-	static async GetVotesForDelegateCohort({
-		network,
-		indexStart,
-		indexEnd,
-		voterAddresses
-	}: {
-		network: ENetwork;
-		indexStart: number;
-		indexEnd: number;
-		voterAddresses: string[];
-	}): Promise<IDVVotes[]> {
+	static async GetVotesForReferendaIndices({ network, indices, voterAddresses }: { network: ENetwork; indices: number[]; voterAddresses: string[] }): Promise<IDVVotes[]> {
 		const gqlClient = this.subsquidGqlClient(network);
-
-		const referenda = await this.GetCohortReferenda({ network, indexStart, indexEnd });
-		const indices = referenda.map((r: { index: number }) => r.index);
 
 		if (indices.length === 0) {
 			return [];

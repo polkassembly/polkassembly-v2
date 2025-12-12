@@ -44,8 +44,6 @@ const KUSAMA_COHORT_1: IDVCohort = {
 	},
 	allReferendaCnt: 60,
 	dvTrackReferendaCnt: 25,
-	referendumIndexStart: 338,
-	referendumIndexEnd: 404,
 	tracks: DV_TRACKS.filter((track) => track !== EPostOrigin.TREASURER && track !== EPostOrigin.WISH_FOR_CHANGE),
 	delegates: [
 		{
@@ -124,8 +122,6 @@ const KUSAMA_COHORT_2: IDVCohort = {
 	},
 	allReferendaCnt: 54,
 	dvTrackReferendaCnt: 41,
-	referendumIndexStart: 407,
-	referendumIndexEnd: 461,
 	tracks: DV_TRACKS,
 	delegates: [
 		{
@@ -240,8 +236,6 @@ const KUSAMA_COHORT_3: IDVCohort = {
 	},
 	allReferendaCnt: 46,
 	dvTrackReferendaCnt: 34,
-	referendumIndexStart: 467,
-	referendumIndexEnd: 515,
 	tracks: DV_TRACKS,
 	delegates: [
 		{
@@ -329,8 +323,6 @@ const KUSAMA_COHORT_4: IDVCohort = {
 	},
 	allReferendaCnt: 65,
 	dvTrackReferendaCnt: 43,
-	referendumIndexStart: 512,
-	referendumIndexEnd: 577,
 	tracks: DV_TRACKS,
 	delegates: [
 		{
@@ -412,7 +404,6 @@ const KUSAMA_COHORT_5: IDVCohort = {
 	endIndexer: null,
 	allReferendaCnt: 44,
 	dvTrackReferendaCnt: 27,
-	referendumIndexStart: 578,
 	tracks: DV_TRACKS,
 	delegates: [
 		{
@@ -557,8 +548,6 @@ const POLKADOT_COHORT_1: IDVCohort = {
 	},
 	allReferendaCnt: 380,
 	dvTrackReferendaCnt: 380,
-	referendumIndexStart: 448,
-	referendumIndexEnd: 827,
 	tracks: DV_TRACKS.filter((track) => track !== EPostOrigin.TREASURER && track !== EPostOrigin.WISH_FOR_CHANGE),
 	delegates: [
 		{
@@ -655,8 +644,6 @@ const POLKADOT_COHORT_2: IDVCohort = {
 	},
 	allReferendaCnt: 312,
 	dvTrackReferendaCnt: 312,
-	referendumIndexStart: 755,
-	referendumIndexEnd: 1206,
 	tracks: DV_TRACKS,
 	delegates: [
 		{
@@ -780,8 +767,6 @@ const POLKADOT_COHORT_3: IDVCohort = {
 	},
 	allReferendaCnt: 260,
 	dvTrackReferendaCnt: 228,
-	referendumIndexStart: 1213,
-	referendumIndexEnd: 1524,
 	tracks: DV_TRACKS,
 	delegates: [
 		{
@@ -869,8 +854,6 @@ const POLKADOT_COHORT_4: IDVCohort = {
 	},
 	allReferendaCnt: 194,
 	dvTrackReferendaCnt: 174,
-	referendumIndexStart: 1497,
-	referendumIndexEnd: 1713,
 	tracks: DV_TRACKS,
 	delegates: [
 		{
@@ -952,7 +935,6 @@ const POLKADOT_COHORT_5: IDVCohort = {
 	endIndexer: null,
 	allReferendaCnt: 103,
 	dvTrackReferendaCnt: 80,
-	referendumIndexStart: 1695,
 	tracks: DV_TRACKS,
 	delegates: [
 		{

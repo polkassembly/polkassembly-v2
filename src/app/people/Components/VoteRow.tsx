@@ -63,15 +63,13 @@ function VoteRow({ vote, network }: { vote: IDVDelegateVote; network: ENetwork }
 			<div className='flex items-center gap-8'>
 				<div className='flex items-center gap-2'>
 					<span className={cn('text-sm font-medium', statusColor)}>{statusText}</span>
-					{!decision && (
-						<span className='text-text_secondary text-sm'>
-							{vote.percentage?.toFixed(2)} {t('PercentOfDV')}
-						</span>
-					)}
+					<span className='text-text_secondary text-sm'>
+						{vote.percentage?.toFixed(2) ?? 0} {t('PercentOfDV')}
+					</span>
 					<div className={cn('flex h-5 w-5 items-center justify-center rounded-full', iconBg)}>{icon}</div>
 				</div>
 				<span className={cn('min-w-[80px] text-right text-sm font-medium', decision ? 'text-text_secondary' : 'text-success')}>
-					{decision ? '-' : `(~${formatUSDWithUnits(formatBnBalance(vote.votingPower || '0', { withUnit: true, numberAfterComma: 2 }, network))})`}
+					{`(~${formatUSDWithUnits(formatBnBalance(vote.votingPower || '0', { withUnit: true, numberAfterComma: 2 }, network))})`}
 				</span>
 			</div>
 		</div>

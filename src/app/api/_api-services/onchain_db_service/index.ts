@@ -408,21 +408,13 @@ export class OnChainDbService {
 		return SubsquidService.GetTrackAnalyticsStats({ network, trackId });
 	}
 
-	static async GetCohortReferenda({ network, indexStart, indexEnd }: { network: ENetwork; indexStart: number; indexEnd: number }) {
-		return SubsquidService.GetCohortReferenda({ network, indexStart, indexEnd });
+	static async GetCohortReferenda({ network }: { network: ENetwork }) {
+		return SubsquidService.GetCohortReferenda({
+			network
+		});
 	}
 
-	static async GetVotesForDelegateCohort({
-		network,
-		indexStart,
-		indexEnd,
-		voterAddresses
-	}: {
-		network: ENetwork;
-		indexStart: number;
-		indexEnd: number;
-		voterAddresses: string[];
-	}): Promise<IDVVotes[]> {
-		return SubsquidService.GetVotesForDelegateCohort({ network, indexStart, indexEnd, voterAddresses });
+	static async GetVotesForReferendaIndices({ network, indices, voterAddresses }: { network: ENetwork; indices: number[]; voterAddresses: string[] }): Promise<IDVVotes[]> {
+		return SubsquidService.GetVotesForReferendaIndices({ network, indices, voterAddresses });
 	}
 }

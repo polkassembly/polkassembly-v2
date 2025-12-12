@@ -8,7 +8,7 @@ import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES, ERROR_MESSAGES } from '@/_shared/_constants/errorLiterals';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { DV_COHORTS_KUSAMA, DV_COHORTS_POLKADOT } from '@/_shared/_constants/dvCohorts';
-import { ENetwork, EProposalType, IDVDReferendumResponse } from '@/_shared/types';
+import { ENetwork, EProposalStatus, EProposalType, IDVDReferendumResponse } from '@/_shared/types';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
@@ -44,17 +44,58 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 		throw new APIError(ERROR_CODES.NOT_FOUND, StatusCodes.NOT_FOUND, 'Cohort not found');
 	}
 
-	if (cohort.referendumIndexStart === undefined || cohort.referendumIndexStart === null) {
+	if (cohort.startIndexer?.blockHeight === undefined || cohort.startIndexer?.blockHeight === null) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, ERROR_MESSAGES.INVALID_PARAMS_ERROR);
 	}
 
 	const referenda = await OnChainDbService.GetCohortReferenda({
-		network,
-		indexStart: cohort.referendumIndexStart,
-		indexEnd: cohort.referendumIndexEnd || 1000000000
+		network
 	});
 
-	const postsDataPromises = referenda.map(async (ref: IDVDReferendumResponse) => {
+	const cohortStartBlock = cohort.startIndexer.blockHeight;
+	const cohortEndBlock = cohort.endIndexer?.blockHeight;
+	const isOngoingCohort = !cohortEndBlock;
+
+	const sortedReferenda = [...referenda].sort((a, b) => a.index - b.index);
+
+	const firstActiveRef = sortedReferenda.find((ref: IDVDReferendumResponse) => {
+		const sortedHistory = (ref.statusHistory || []).sort((a, b) => a.block - b.block);
+		return sortedHistory.some((s) => s.block >= cohortStartBlock);
+	});
+
+	const startingIndex = firstActiveRef?.index ?? Infinity;
+
+	const filteredReferenda = referenda
+		.filter((ref: IDVDReferendumResponse) => {
+			if (ref.index < startingIndex) return false;
+
+			const sortedHistory = (ref.statusHistory || []).sort((a, b) => a.block - b.block);
+
+			const finalStatusEvent = sortedHistory.find((h) =>
+				[
+					EProposalStatus.Executed,
+					EProposalStatus.Rejected,
+					EProposalStatus.Confirmed,
+					EProposalStatus.TimedOut,
+					EProposalStatus.Killed,
+					EProposalStatus.Cancelled,
+					EProposalStatus.Approved
+				].includes(h.status as EProposalStatus)
+			);
+
+			if (isOngoingCohort) {
+				if (!finalStatusEvent) return true;
+				const isRelayChainBlock = finalStatusEvent.block > 20000000;
+				return !(isRelayChainBlock && finalStatusEvent.block < cohortStartBlock);
+			}
+
+			if (!finalStatusEvent) return false;
+
+			return finalStatusEvent.block >= cohortStartBlock && finalStatusEvent.block <= cohortEndBlock;
+		})
+		.sort((a: IDVDReferendumResponse, b: IDVDReferendumResponse) => b.index - a.index);
+
+	const postsDataPromises = filteredReferenda.map(async (ref: IDVDReferendumResponse) => {
 		const offChainData = await OffChainDbService.GetOffChainPostData({
 			network,
 			indexOrHash: String(ref.index),
@@ -67,11 +108,19 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	const postsData = await Promise.all(postsDataPromises);
 
 	const formattedReferenda = postsData.map(({ ref, offChainData }) => {
+		const statusHistory = (ref.statusHistory || []).sort((a: { block: number; status: EProposalStatus }, b: { block: number; status: EProposalStatus }) => a.block - b.block);
+		const lastStatusItem = statusHistory.length > 0 ? statusHistory[statusHistory.length - 1] : null;
+		let computedStatus = ref.status;
+
+		if (lastStatusItem) {
+			computedStatus = lastStatusItem.status;
+		}
+
 		return {
 			index: ref.index,
 			createdAtBlock: ref.createdAtBlock,
 			trackNumber: ref.trackNumber,
-			status: ref.status,
+			status: computedStatus,
 			tally: ref.tally
 				? {
 						ayes: ref.tally.ayes,

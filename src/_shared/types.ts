@@ -1830,8 +1830,6 @@ export interface IDVCohort {
 	} | null;
 	allReferendaCnt?: number;
 	dvTrackReferendaCnt?: number;
-	referendumIndexStart?: number;
-	referendumIndexEnd?: number;
 }
 
 export enum EInfluenceStatus {
@@ -1914,6 +1912,7 @@ export interface IDVCohortVote {
 	isStandard: boolean;
 	isSplit: boolean;
 	isSplitAbstain: boolean;
+	isAbstain: boolean;
 	balance: string;
 	aye: boolean;
 	conviction?: number;
