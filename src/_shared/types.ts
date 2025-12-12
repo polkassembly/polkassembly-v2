@@ -739,6 +739,7 @@ export interface IComment {
 	disabled?: boolean;
 	authorAddress?: string;
 	isDelegateXVote?: boolean;
+	isVerified?: boolean;
 }
 
 export interface ICommentResponse extends IComment {
@@ -1038,7 +1039,8 @@ export enum EReactQueryKeys {
 	IDENTITY_INFO = 'identityInfo',
 	TOKENS_USD_PRICE = 'tokensUsdPrice',
 	USER_VOTES = 'userVotes',
-	PROFILE_IDENTITIES = 'profileIdentities'
+	PROFILE_IDENTITIES = 'profileIdentities',
+	OGTRACKER_DATA = 'ogtracker-data'
 }
 
 export interface IParamDef {
@@ -1737,8 +1739,11 @@ export interface VotingStrategy {
 }
 
 export enum EJudgementDashboardTabs {
-	DASHBOARD = 'dashboard',
-	REGISTRARS = 'registrars'
+	REQUESTS = 'requests',
+	OVERVIEW = 'overview',
+	JUDGEMENTS = 'judgements',
+	REGISTRARS = 'registrars',
+	MY_DASHBOARD = 'my-dashboard'
 }
 
 export enum EJudgementStatus {
@@ -1754,7 +1759,13 @@ export interface IJudgementRequest {
 	displayName: string;
 	email: string;
 	twitter: string;
+	discord?: string;
+	matrix?: string;
+	github?: string;
+	web?: string;
 	status: EJudgementStatus;
+	judgementType?: string;
+	judgementLabel?: string;
 	dateInitiated: Date;
 	registrarIndex: number;
 	registrarAddress: string;
@@ -1765,6 +1776,53 @@ export interface IJudgementStats {
 	totalRequestedThisMonth: number;
 	percentageIncreaseFromLastMonth: number;
 	percentageCompletedThisMonth: number;
+}
+
+export interface IOGTrackerProposal {
+	id: number;
+	refnum: string;
+	status: string;
+	proposer: string;
+	proposeradd: string;
+	palink: string;
+	sublink: string;
+	reqdot: string;
+	benadd: string;
+	scanlink: string;
+	ptitle: string;
+	track: string;
+	category: string;
+	fdate: string;
+	ldate: string;
+	proplink: string;
+	summary: string;
+	twitter: string;
+	github: string;
+	youtube: string;
+	website: string;
+	articles: string;
+}
+
+export interface IOGTrackerTask {
+	id: number;
+	proposal_id: number;
+	title: string;
+	status: string;
+	code: string | null;
+}
+
+export interface IOGTrackerPoW {
+	id: number;
+	proposal_id: number;
+	task_id: number | null;
+	content: string;
+	created_at: string;
+}
+
+export interface IOGTrackerData {
+	proposal: IOGTrackerProposal | null;
+	tasks: IOGTrackerTask[];
+	proofOfWork: IOGTrackerPoW[];
 }
 
 export enum ETreasurySpendsTabs {

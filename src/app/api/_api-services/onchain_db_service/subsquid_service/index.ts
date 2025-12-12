@@ -55,6 +55,18 @@ import { SubsquidQueries } from './subsquidQueries';
 const VOTING_POWER_DIVISOR = new BN('10');
 const SUBSQUID_MAX_RETRIES = 3;
 const SUBSQUID_RETRY_DELAY_MS = 1000;
+const SUBSQUID_FETCH_TIMEOUT_MS = 30000; // 30 second timeout for Subsquid requests
+
+// Custom fetch with timeout for Subsquid requests
+const fetchWithTimeout: typeof fetch = (url, options) => {
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), SUBSQUID_FETCH_TIMEOUT_MS);
+
+	return fetch(url, {
+		...options,
+		signal: controller.signal
+	}).finally(() => clearTimeout(timeoutId));
+};
 
 export class SubsquidService extends SubsquidUtils {
 	private static subsquidGqlClient = (network: ENetwork) => {
@@ -66,7 +78,8 @@ export class SubsquidService extends SubsquidUtils {
 
 		return new UrqlClient({
 			url: subsquidUrl,
-			exchanges: [cacheExchange, fetchExchange]
+			exchanges: [cacheExchange, fetchExchange],
+			fetch: fetchWithTimeout
 		});
 	};
 
@@ -80,7 +93,8 @@ export class SubsquidService extends SubsquidUtils {
 			}
 
 			// Only retry on network errors, not on GraphQL errors
-			const isNetworkError = String(error).includes('fetch failed') || String(error).includes('Network');
+			const isNetworkError =
+				String(error).includes('fetch failed') || String(error).includes('Network') || String(error).includes('aborted') || String(error).includes('ECONNRESET');
 
 			if (!isNetworkError || attempt >= SUBSQUID_MAX_RETRIES) {
 				console.error(`${errorContext}: ${error} (attempt ${attempt}/${SUBSQUID_MAX_RETRIES})`);
