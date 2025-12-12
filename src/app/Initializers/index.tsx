@@ -183,8 +183,9 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 				try {
 					await newApi.keepAlive();
 				} catch {
-					await newApi.switchToNewRpcEndpoint();
-					setUserPreferences({ ...userPreferences, rpcIndex: newApi.getCurrentRpcIndex() });
+					// switchToNewRpcEndpoint returns the actual connected index (may differ due to fallback)
+					const connectedIndex = await newApi.switchToNewRpcEndpoint();
+					setUserPreferences({ ...userPreferences, rpcIndex: connectedIndex });
 				}
 			}, 6000);
 		})();

@@ -32,8 +32,9 @@ export default function RPCSwitchDropdown({ className }: { className?: string })
 		if (!apiService || isLoading) return;
 		setIsLoading(true);
 		try {
-			await apiService.switchToNewRpcEndpoint(index);
-			setUserPreferences({ ...userPreferences, rpcIndex: index });
+			// switchToNewRpcEndpoint returns the actual connected index (may differ if fallback occurred)
+			const connectedIndex = await apiService.switchToNewRpcEndpoint(index);
+			setUserPreferences({ ...userPreferences, rpcIndex: connectedIndex });
 		} catch {
 			// TODO: show notification
 		} finally {

@@ -62,75 +62,114 @@ export class PolkadotApiService {
 		this.currentRpcEndpointIndex = currentRpcEndpointIndex;
 	}
 
+	/**
+	 * Initialize the Polkadot API service with automatic RPC fallback
+	 */
 	static async Init(network: ENetwork): Promise<PolkadotApiService> {
-		return this.initWithRpcSwitching(network, 0);
+		const { api, connectedRpcIndex } = await this.connectWithFallback(network, 0);
+		return new PolkadotApiService({ network, api, currentRpcEndpointIndex: connectedRpcIndex });
 	}
 
-	private static async initWithRpcSwitching(network: ENetwork, rpcIndex: number = 0, attempts: number = 0): Promise<PolkadotApiService> {
-		const networkDetails = NETWORKS_DETAILS[network as ENetwork];
-		const maxAttempts = networkDetails.rpcEndpoints.length;
+	/**
+	 * Core method to connect to a single RPC endpoint with timeout
+	 * Returns the connected API or throws an error
+	 */
+	private static async connectToRpc(network: ENetwork, rpcIndex: number): Promise<ApiPromise> {
+		const networkDetails = NETWORKS_DETAILS[`${network}`];
+		const rpcEndpoint = networkDetails.rpcEndpoints[`${rpcIndex}`];
 
-		if (attempts >= maxAttempts) {
-			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'All RPC endpoints failed to initialize');
-		}
-
-		const currentRpcIndex = rpcIndex % networkDetails.rpcEndpoints.length;
-
-		if (typeof currentRpcIndex !== 'number' || currentRpcIndex < 0 || currentRpcIndex >= networkDetails.rpcEndpoints.length) {
-			throw new ClientError(ERROR_CODES.CLIENT_ERROR, `Invalid RPC index ${currentRpcIndex}`);
-		}
-
-		// eslint-disable-next-line security/detect-object-injection
-		const rpcEndpoint = networkDetails.rpcEndpoints[currentRpcIndex];
-
-		if (!rpcEndpoint) {
-			throw new ClientError(ERROR_CODES.CLIENT_ERROR, `No RPC endpoint found at index ${currentRpcIndex}`);
+		if (!rpcEndpoint?.url) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, `Invalid RPC endpoint at index ${rpcIndex}`);
 		}
 
 		const rpcUrl = rpcEndpoint.url;
-
-		if (!rpcUrl) {
-			throw new ClientError(ERROR_CODES.CLIENT_ERROR, `No RPC URL found at index ${currentRpcIndex}`);
-		}
-
-		// Create provider outside try block so we can disconnect it on failure
 		const provider = new WsProvider(rpcUrl);
 
 		try {
-			console.log(`Attempting to connect to RPC ${currentRpcIndex}: ${rpcUrl}`);
+			console.log(`Attempting to connect to RPC ${rpcIndex}: ${rpcUrl}`);
 
-			// Create a promise that rejects after 20 seconds
 			const timeoutPromise = new Promise<never>((_, reject) => {
-				setTimeout(() => reject(new Error('RPC initialization timeout')), 20000);
+				setTimeout(() => reject(new Error('RPC connection timeout')), 20000);
 			});
 
-			// Create the API promise
 			const apiPromise = ApiPromise.create({ provider });
-
-			// Race between API creation and timeout
 			const api = await Promise.race([apiPromise, timeoutPromise]);
-
-			// Wait for API to be ready with timeout
 			await Promise.race([api.isReady, timeoutPromise]);
 
-			console.log(`Successfully connected to RPC ${currentRpcIndex}`);
-			return new PolkadotApiService({ network, api, currentRpcEndpointIndex: currentRpcIndex });
+			console.log(`Successfully connected to RPC ${rpcIndex}: ${rpcUrl}`);
+			return api;
 		} catch (error) {
-			console.error(`Failed to connect to RPC ${currentRpcIndex}: ${error}`);
-
-			// IMPORTANT: Disconnect the provider to stop any retry attempts
+			// Disconnect provider to stop auto-reconnect attempts
 			try {
 				await provider.disconnect();
 			} catch {
 				// Ignore disconnect errors
 			}
+			throw error;
+		}
+	}
 
-			// Try next RPC endpoint after a brief delay
+	/**
+	 * Connect to an RPC endpoint with automatic fallback to next endpoints on failure
+	 * Tries all available endpoints before giving up
+	 */
+	private static async connectWithFallback(network: ENetwork, startIndex: number, attempts: number = 0): Promise<{ api: ApiPromise; connectedRpcIndex: number }> {
+		const networkDetails = NETWORKS_DETAILS[`${network}`];
+		const maxAttempts = networkDetails.rpcEndpoints.length;
+
+		if (attempts >= maxAttempts) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'All RPC endpoints failed to connect');
+		}
+
+		const currentIndex = startIndex % networkDetails.rpcEndpoints.length;
+
+		try {
+			const api = await PolkadotApiService.connectToRpc(network, currentIndex);
+			return { api, connectedRpcIndex: currentIndex };
+		} catch (error) {
+			console.error(`RPC ${currentIndex} failed:`, error);
+
+			// Brief delay before trying next endpoint
 			await new Promise<void>((resolve) => {
 				setTimeout(resolve, 1000);
 			});
-			return this.initWithRpcSwitching(network, currentRpcIndex + 1, attempts + 1);
+
+			return PolkadotApiService.connectWithFallback(network, currentIndex + 1, attempts + 1);
 		}
+	}
+
+	/**
+	 * Switch to a new RPC endpoint with automatic fallback on failure
+	 * @param index - Optional specific index to switch to. If not provided, switches to next endpoint.
+	 * @returns The index of the RPC endpoint that was successfully connected
+	 */
+	async switchToNewRpcEndpoint(index?: number): Promise<number> {
+		const networkDetails = NETWORKS_DETAILS[this.network];
+		let targetIndex: number;
+
+		if (typeof index === 'number') {
+			if (index < 0 || index >= networkDetails.rpcEndpoints.length) {
+				throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Invalid RPC index');
+			}
+			targetIndex = index;
+		} else {
+			targetIndex = (this.currentRpcEndpointIndex + 1) % networkDetails.rpcEndpoints.length;
+		}
+
+		// Disconnect current API
+		try {
+			await this.api.disconnect();
+		} catch {
+			// Ignore disconnect errors
+		}
+
+		// Connect with fallback - will try other endpoints if target fails
+		const { api, connectedRpcIndex } = await PolkadotApiService.connectWithFallback(this.network, targetIndex);
+
+		this.api = api;
+		this.currentRpcEndpointIndex = connectedRpcIndex;
+
+		return connectedRpcIndex;
 	}
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
@@ -402,24 +441,6 @@ export class PolkadotApiService {
 		return this.currentRpcEndpointIndex;
 	}
 
-	async switchToNewRpcEndpoint(index?: number): Promise<void> {
-		if (typeof index === 'number') {
-			// check if valid index
-			if (index < 0 || index >= NETWORKS_DETAILS[this.network].rpcEndpoints.length) {
-				throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Invalid RPC index');
-			}
-			this.currentRpcEndpointIndex = index;
-		} else {
-			this.currentRpcEndpointIndex = (this.currentRpcEndpointIndex + 1) % NETWORKS_DETAILS[this.network].rpcEndpoints.length;
-		}
-
-		this.api.disconnect();
-		this.api = await ApiPromise.create({
-			provider: new WsProvider(NETWORKS_DETAILS[this.network].rpcEndpoints[this.currentRpcEndpointIndex].url)
-		});
-		await this.api.isReady;
-	}
-
 	async getBlockHeight(): Promise<number> {
 		const header = await this.api.rpc.chain.getHeader();
 		return header.number.toNumber();
@@ -429,18 +450,22 @@ export class PolkadotApiService {
 		await this.getBlockHeight();
 	}
 
-	async reconnect(): Promise<void> {
-		if (this.api.isConnected && (await this.api.isReady)) return;
-
-		try {
-			this.api = await ApiPromise.create({
-				provider: new WsProvider(NETWORKS_DETAILS[this.network].rpcEndpoints[this.currentRpcEndpointIndex].url)
-			});
-
-			await this.api.isReady;
-		} catch {
-			await this.switchToNewRpcEndpoint();
+	/**
+	 * Reconnect to the current RPC endpoint, or switch to next one if it fails
+	 * @returns The index of the RPC endpoint that was successfully connected
+	 */
+	async reconnect(): Promise<number> {
+		if (this.api.isConnected && (await this.api.isReady)) {
+			return this.currentRpcEndpointIndex;
 		}
+
+		// Try to reconnect to current endpoint, with fallback to others
+		const { api, connectedRpcIndex } = await PolkadotApiService.connectWithFallback(this.network, this.currentRpcEndpointIndex);
+
+		this.api = api;
+		this.currentRpcEndpointIndex = connectedRpcIndex;
+
+		return connectedRpcIndex;
 	}
 
 	setSigner(signer: Signer) {

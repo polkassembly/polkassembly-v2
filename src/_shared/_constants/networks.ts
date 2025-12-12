@@ -3060,8 +3060,12 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		tokenSymbol: 'DOT',
 		rpcEndpoints: [
 			{
+				name: VIA_ONFINALITY,
+				url: 'wss://statemint.api.onfinality.io/public-ws'
+			},
+			{
 				name: VIA_PARITY,
-				url: 'wss://invalid-rpc.example.com'
+				url: 'wss://polkadot-asset-hub-rpc.polkadot.io'
 			},
 			{
 				name: VIA_DWELLIR,
@@ -3070,10 +3074,6 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 			{
 				name: VIA_DWELLIR_TUNISIA,
 				url: 'wss://statemint-rpc-tn.dwellir.com'
-			},
-			{
-				name: VIA_ONFINALITY,
-				url: 'wss://statemint.api.onfinality.io/public-ws'
 			},
 			{
 				name: VIA_IBP_GEODNS1,
