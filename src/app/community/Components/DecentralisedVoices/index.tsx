@@ -14,11 +14,11 @@ import { useDVCohortDetails, useDVCohortReferenda, useDVCohortVotes } from '@/ho
 import TimeLineIcon from '@assets/icons/timeline.svg';
 import Image from 'next/image';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
-import CohortsTableCard from '../Components/CohortsTableCard';
-import DecentralizedVoicesVotingCard from '../Components/DecentralizedVoicesVotingCard';
-import DecentralisedVoicesCard from '../Components/DecentralisedVoicesCard';
-import InfluenceCard from '../Components/InfluenceCard';
-import CohortCard from '../Components/CohortCard';
+import CohortsTableCard from './Components/CohortsTableCard';
+import DecentralizedVoicesVotingCard from './Components/DecentralizedVoicesVotingCard';
+import DecentralisedVoicesCard from './Components/DecentralisedVoicesCard';
+import InfluenceCard from './Components/InfluenceCard';
+import CohortCard from './Components/CohortCard';
 
 function DecentralisedVoices() {
 	const t = useTranslations('DecentralizedVoices');

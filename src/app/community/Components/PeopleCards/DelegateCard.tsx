@@ -4,11 +4,11 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import Image from 'next/image';
-import { ESocial, IDelegateDetails } from '@/_shared/types';
+import { ESocial, IDelegateDetails, IOnChainIdentity } from '@/_shared/types';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import JudgementIcon from '@assets/icons/judgement-icon.svg';
 import RankStar from '@assets/profile/rank-star.svg';
@@ -45,12 +45,35 @@ function DelegateCard({ delegate }: { delegate: IDelegateDetails }) {
 	const { user } = useUser();
 	const network = getCurrentNetwork();
 
-	const { identityService } = useIdentityService();
+	const { getOnChainIdentity, identityService } = useIdentityService();
 	const [isReadMoreVisible, setIsReadMoreVisible] = useState(false);
-
-	const isFetching = false;
+	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
+	const [isFetching, setIsFetching] = useState(true);
 
 	const isFollowing = delegate?.publicUser?.following?.some((item) => item.followerUserId === user?.id);
+
+	useEffect(() => {
+		const fetchIdentity = async () => {
+			if (!delegate?.publicUser?.addresses?.[0]) {
+				setIsFetching(false);
+				return;
+			}
+
+			try {
+				setIsFetching(true);
+				const identityInfo = await getOnChainIdentity(delegate.publicUser.addresses[0]);
+				if (identityInfo) {
+					setIdentity(identityInfo);
+				}
+			} catch (error) {
+				console.error('Error fetching identity:', error);
+			} finally {
+				setIsFetching(false);
+			}
+		};
+
+		fetchIdentity();
+	}, [delegate?.publicUser?.addresses, getOnChainIdentity]);
 
 	return (
 		<div className={styles.memberCard}>
@@ -122,7 +145,7 @@ function DelegateCard({ delegate }: { delegate: IDelegateDetails }) {
 						<Skeleton className='ml-2 h-4 w-16' />
 					) : (
 						<span className='text-xs text-basic_text'>
-							{t('Profile.judgement')}: <span className='font-medium'>{delegate?.judgements?.[0] || t('Profile.noJudgements')}</span>
+							{t('Profile.judgement')}: <span className='font-medium'>{identity?.judgements?.[0]?.[1]?.toString() || t('Profile.noJudgements')}</span>
 						</span>
 					)}
 				</div>
