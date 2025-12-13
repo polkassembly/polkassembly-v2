@@ -7,6 +7,8 @@
 import { useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ETreasurySpendsTabs } from '@/_shared/types';
+import TimeLineIcon from '@assets/icons/timeline.svg';
+import Image from 'next/image';
 import CycleSummary from './CycleSummary';
 import { coretimeCyclesMock } from './mockCycles';
 
@@ -48,9 +50,15 @@ function CoretimeCycleDetail() {
 	return (
 		<div className='flex flex-col gap-4 rounded-lg border border-border_grey bg-bg_modal p-4 lg:p-6'>
 			<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-				<div>
-					<p className='text-sm font-medium uppercase text-text_primary'>Coretime Detail View</p>
-					<p className='text-sm text-basic_text'>Deep dive into cycle #{cycle.id}.</p>
+				<div className='flex items-center gap-2'>
+					<Image
+						src={TimeLineIcon}
+						alt='Timeline Icon'
+						width={24}
+						height={24}
+						className='h-6 w-6'
+					/>
+					<p className='text-2xl font-bold text-text_primary'>Coretime Cycle #{cycle.id}</p>
 				</div>
 				<button
 					type='button'
@@ -61,7 +69,7 @@ function CoretimeCycleDetail() {
 				</button>
 			</div>
 
-			<div className='rounded-lg border border-border_grey bg-page_background p-4'>
+			<div className='rounded-lg border border-border_grey p-4'>
 				<CycleSummary cycle={cycle} />
 			</div>
 		</div>
