@@ -81,7 +81,7 @@ function DecentralisedVoices() {
 	}
 	return (
 		<div>
-			<div className='mx-auto max-w-7xl px-4 py-5 lg:px-16'>
+			<div>
 				<div className='w-full overflow-hidden rounded-2xl border border-border_grey bg-bg_modal p-4 shadow-md sm:p-5 md:mb-8 md:p-6 lg:p-8'>
 					<div className='flex items-center justify-between gap-3'>
 						<div className='flex items-center gap-2'>

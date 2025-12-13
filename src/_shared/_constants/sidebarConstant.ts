@@ -135,7 +135,6 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 							items: [
 								{ title: t('Sidebar.people'), url: '/community' },
 								{ title: t('Sidebar.proxies'), url: '/proxies' },
-								{ title: t('Sidebar.people'), url: '/people' },
 								{ title: t('Sidebar.identityAndJudgement'), url: '/judgements' }
 							]
 						},
