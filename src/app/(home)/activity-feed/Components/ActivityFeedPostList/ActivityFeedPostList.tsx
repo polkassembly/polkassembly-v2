@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { EPostOrigin, IPostListing, IGenericListingResponse } from '@/_shared/types';
+import { EPostOrigin, IPostListing, IGenericListingResponse, ESortOption } from '@/_shared/types';
 import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -16,12 +16,13 @@ import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
 import styles from './ActivityFeedPostList.module.scss';
-import ActivityFeedNavbar from '../ActivityFeedNavbar/ActivityFeedNavbar';
+import ActivityFeedStats from '../ActivityFeedStats/ActivityFeedStats';
 
 function ActivityFeedPostList({ initialData }: { initialData: IGenericListingResponse<IPostListing> }) {
 	const network = getCurrentNetwork();
 	const t = useTranslations();
 	const [origin, setOrigin] = useState<EPostOrigin | 'All'>('All');
+	const [sortOrder, setSortOrder] = useState<ESortOption>(ESortOption.NEWEST);
 	const observerTarget = useRef<HTMLDivElement>(null);
 	const [reachedEnd, setReachedEnd] = useState(false);
 
@@ -107,6 +108,27 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 		});
 	}, [allPosts, origin, network]);
 
+	const sortedPosts = useMemo(() => {
+		const posts = [...filteredPosts];
+		return posts.sort((a, b) => {
+			const dateA = a.onChainInfo?.createdAt ? new Date(a.onChainInfo.createdAt).getTime() : 0;
+			const dateB = b.onChainInfo?.createdAt ? new Date(b.onChainInfo.createdAt).getTime() : 0;
+
+			return sortOrder === ESortOption.NEWEST ? dateB - dateA : dateA - dateB;
+		});
+	}, [filteredPosts, sortOrder]);
+
+	const activeVotesCount = useMemo(() => {
+		return filteredPosts.reduce((total, post) => {
+			if (post.onChainInfo?.voteMetrics) {
+				const ayeCount = post.onChainInfo.voteMetrics.aye?.count || 0;
+				const nayCount = post.onChainInfo.voteMetrics.nay?.count || 0;
+				return total + ayeCount + nayCount;
+			}
+			return total;
+		}, 0);
+	}, [filteredPosts]);
+
 	useEffect(() => {
 		if (reachedEnd || isFetching || !hasNextPage) return () => {};
 
@@ -129,10 +151,6 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 	if (isLoading && !data?.pages?.length) {
 		return (
 			<div className='pb-10'>
-				<ActivityFeedNavbar
-					currentTab={origin}
-					setCurrentTab={setOrigin}
-				/>
 				<div className='flex h-full items-center justify-center bg-bg_modal'>
 					<div className='flex flex-col items-center gap-4'>
 						<LoadingSpinner className='mt-10 h-10 w-auto md:mt-32' />
@@ -145,11 +163,15 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 
 	return (
 		<div className='pb-10'>
-			<ActivityFeedNavbar
+			<ActivityFeedStats
+				activeProposalsCount={data?.pages?.[0]?.totalCount || initialData.totalCount || 0}
+				activeVotesCount={activeVotesCount}
 				currentTab={origin}
 				setCurrentTab={setOrigin}
+				currentSort={sortOrder}
+				onSortChange={setSortOrder}
 			/>
-			{filteredPosts?.length === 0 ? (
+			{sortedPosts?.length === 0 ? (
 				<div className={styles.allCaughtUp}>
 					<Image
 						src={NoActivity}
@@ -168,7 +190,7 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 				</div>
 			) : (
 				<div className='hide_scrollbar flex flex-col gap-5 pb-16'>
-					{filteredPosts?.map((post: IPostListing) => (
+					{sortedPosts?.map((post: IPostListing) => (
 						<ActivityFeedPostItem
 							key={`${post?.proposalType}-${post?.index}-${post?.onChainInfo?.createdAt}`}
 							postData={post}

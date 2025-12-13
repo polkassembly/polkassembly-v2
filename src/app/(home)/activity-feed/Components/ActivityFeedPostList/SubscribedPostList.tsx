@@ -2,8 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { useEffect, useRef, useState } from 'react';
-import { IPostListing, IGenericListingResponse } from '@/_shared/types';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { IPostListing, IGenericListingResponse, EPostOrigin, ESortOption } from '@/_shared/types';
 import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
@@ -15,6 +15,7 @@ import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
 import styles from './ActivityFeedPostList.module.scss';
+import ActivityFeedStats from '../ActivityFeedStats/ActivityFeedStats';
 
 interface QueryData {
 	pages: {
@@ -30,6 +31,8 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 	const observerTarget = useRef<HTMLDivElement>(null);
 	const [reachedEnd, setReachedEnd] = useState(false);
 	const [localPosts, setLocalPosts] = useState<IPostListing[]>([]);
+	const [origin, setOrigin] = useState<EPostOrigin | 'All'>('All');
+	const [sortOrder, setSortOrder] = useState<ESortOption>(ESortOption.NEWEST);
 	const queryClient = useQueryClient();
 
 	const { user } = useUser();
@@ -107,6 +110,27 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 		setLocalPosts(posts);
 	}, [data]);
 
+	const sortedPosts = useMemo(() => {
+		const posts = [...localPosts];
+		return posts.sort((a, b) => {
+			const dateA = a.onChainInfo?.createdAt ? new Date(a.onChainInfo.createdAt).getTime() : 0;
+			const dateB = b.onChainInfo?.createdAt ? new Date(b.onChainInfo.createdAt).getTime() : 0;
+
+			return sortOrder === ESortOption.NEWEST ? dateB - dateA : dateA - dateB;
+		});
+	}, [localPosts, sortOrder]);
+
+	const activeVotesCount = useMemo(() => {
+		return localPosts.reduce((total, post) => {
+			if (post.onChainInfo?.voteMetrics) {
+				const ayeCount = post.onChainInfo.voteMetrics.aye?.count || 0;
+				const nayCount = post.onChainInfo.voteMetrics.nay?.count || 0;
+				return total + ayeCount + nayCount;
+			}
+			return total;
+		}, 0);
+	}, [localPosts]);
+
 	useEffect(() => {
 		if (reachedEnd || isFetching || !hasNextPage) return () => {};
 
@@ -153,7 +177,15 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 
 	return (
 		<div className='pb-10'>
-			{localPosts?.length === 0 ? (
+			<ActivityFeedStats
+				activeProposalsCount={data?.pages?.[0]?.totalCount || initialData.totalCount || 0}
+				activeVotesCount={activeVotesCount}
+				currentTab={origin}
+				setCurrentTab={setOrigin}
+				currentSort={sortOrder}
+				onSortChange={setSortOrder}
+			/>
+			{sortedPosts?.length === 0 ? (
 				<div className={styles.allCaughtUp}>
 					<Image
 						src={NoActivity}
@@ -172,7 +204,7 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 				</div>
 			) : (
 				<div className='hide_scrollbar flex flex-col gap-5 pb-16 lg:max-h-[1078px] lg:overflow-y-auto'>
-					{localPosts?.map((post: IPostListing) => (
+					{sortedPosts?.map((post: IPostListing) => (
 						<ActivityFeedPostItem
 							key={`${post?.proposalType}-${post?.index}-${post?.onChainInfo?.createdAt}`}
 							postData={post}
