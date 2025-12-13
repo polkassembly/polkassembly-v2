@@ -13,7 +13,7 @@ import { useRouter } from 'nextjs-toploader/app';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import Link from 'next/link';
-import ActivityFeedSidebar from '../ActivityFeedSidebar';
+import TabContentLayout from '../TabContentLayout/TabContentLayout';
 import styles from './ActivityFeedComp.module.scss';
 import ActivityFeedPostList from '../ActivityFeedPostList/ActivityFeedPostList';
 import SubscribedPostList from '../ActivityFeedPostList/SubscribedPostList';
@@ -66,6 +66,7 @@ function ActivityFeedComp({
 									rel='noopener noreferrer'
 									className={styles.socialLink}
 									title={link.label}
+									aria-label={link.label}
 								>
 									<link.icon />
 								</Link>
@@ -102,24 +103,14 @@ function ActivityFeedComp({
 
 			<div className={styles.contentContainer}>
 				<TabsContent value={EActivityFeedTab.SUBSCRIBED}>
-					<div className={styles.gridContainer}>
-						<div className={styles.mainContent}>
-							<SubscribedPostList initialData={initialData} />
-						</div>
-						<div className={styles.sidebar}>
-							<ActivityFeedSidebar treasuryStatsData={treasuryStatsData} />
-						</div>
-					</div>
+					<TabContentLayout treasuryStatsData={treasuryStatsData}>
+						<SubscribedPostList initialData={initialData} />
+					</TabContentLayout>
 				</TabsContent>
 				<TabsContent value={EActivityFeedTab.EXPLORE}>
-					<div className={styles.gridContainer}>
-						<div className={styles.mainContent}>
-							<ActivityFeedPostList initialData={initialData} />
-						</div>
-						<div className={styles.sidebar}>
-							<ActivityFeedSidebar treasuryStatsData={treasuryStatsData} />
-						</div>
-					</div>
+					<TabContentLayout treasuryStatsData={treasuryStatsData}>
+						<ActivityFeedPostList initialData={initialData} />
+					</TabContentLayout>
 				</TabsContent>
 			</div>
 		</Tabs>

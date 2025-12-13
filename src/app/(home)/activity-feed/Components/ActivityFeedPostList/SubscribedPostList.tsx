@@ -13,6 +13,8 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
 import styles from './ActivityFeedPostList.module.scss';
 import ActivityFeedStats from '../ActivityFeedStats/ActivityFeedStats';
@@ -34,6 +36,7 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 	const [origin, setOrigin] = useState<EPostOrigin | 'All'>('All');
 	const [sortOrder, setSortOrder] = useState<ESortOption>(ESortOption.NEWEST);
 	const queryClient = useQueryClient();
+	const network = getCurrentNetwork();
 
 	const { user } = useUser();
 
@@ -110,18 +113,32 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 		setLocalPosts(posts);
 	}, [data]);
 
+	const filteredPosts = useMemo(() => {
+		if (origin === 'All') return localPosts;
+
+		return localPosts.filter((post: IPostListing) => {
+			if (!(network in NETWORKS_DETAILS)) return false;
+			const networkInfo = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS];
+			if (!networkInfo) return false;
+
+			const postOrigin = post?.onChainInfo?.origin;
+			return postOrigin?.replace(/\s+/g, '') === origin.replace(/\s+/g, '');
+		});
+	}, [localPosts, origin, network]);
+
 	const sortedPosts = useMemo(() => {
-		const posts = [...localPosts];
+		if (!filteredPosts || filteredPosts.length === 0) return [];
+		const posts = [...filteredPosts];
 		return posts.sort((a, b) => {
 			const dateA = a.onChainInfo?.createdAt ? new Date(a.onChainInfo.createdAt).getTime() : 0;
 			const dateB = b.onChainInfo?.createdAt ? new Date(b.onChainInfo.createdAt).getTime() : 0;
 
 			return sortOrder === ESortOption.NEWEST ? dateB - dateA : dateA - dateB;
 		});
-	}, [localPosts, sortOrder]);
+	}, [filteredPosts, sortOrder]);
 
 	const activeVotesCount = useMemo(() => {
-		return localPosts.reduce((total, post) => {
+		return filteredPosts.reduce((total, post) => {
 			if (post.onChainInfo?.voteMetrics) {
 				const ayeCount = post.onChainInfo.voteMetrics.aye?.count || 0;
 				const nayCount = post.onChainInfo.voteMetrics.nay?.count || 0;
@@ -129,7 +146,7 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 			}
 			return total;
 		}, 0);
-	}, [localPosts]);
+	}, [filteredPosts]);
 
 	useEffect(() => {
 		if (reachedEnd || isFetching || !hasNextPage) return () => {};

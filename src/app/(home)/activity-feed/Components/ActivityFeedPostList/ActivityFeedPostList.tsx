@@ -109,6 +109,7 @@ function ActivityFeedPostList({ initialData }: { initialData: IGenericListingRes
 	}, [allPosts, origin, network]);
 
 	const sortedPosts = useMemo(() => {
+		if (!filteredPosts || filteredPosts.length === 0) return [];
 		const posts = [...filteredPosts];
 		return posts.sort((a, b) => {
 			const dateA = a.onChainInfo?.createdAt ? new Date(a.onChainInfo.createdAt).getTime() : 0;

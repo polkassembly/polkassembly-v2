@@ -94,13 +94,19 @@ function ActivityFeedStats({ activeProposalsCount = 0, activeVotesCount = 0, onS
 	const handleCategoryClick = (category: string) => {
 		if (category === CATEGORIES.ALL) {
 			setCurrentTab('All');
-		} else if ([CATEGORIES.ROOT, CATEGORIES.WISH_FOR_CHANGE].includes(category)) {
-			setCurrentTab(CATEGORIES.ROOT === category ? EPostOrigin.ROOT : EPostOrigin.WISH_FOR_CHANGE);
+		} else if (category === CATEGORIES.ROOT) {
+			setCurrentTab(EPostOrigin.ROOT);
+		} else if (category === CATEGORIES.WISH_FOR_CHANGE) {
+			setCurrentTab(EPostOrigin.WISH_FOR_CHANGE);
 		}
 	};
 
 	const isActiveCategory = (category: string, tracks: EPostOrigin[]) => {
-		if (currentTab === category) return true;
+		if (currentTab === 'All' && category === CATEGORIES.ALL) return true;
+
+		if (category === CATEGORIES.ROOT && currentTab === EPostOrigin.ROOT) return true;
+		if (category === CATEGORIES.WISH_FOR_CHANGE && currentTab === EPostOrigin.WISH_FOR_CHANGE) return true;
+
 		return tracks.some((track) => currentTab === track);
 	};
 
