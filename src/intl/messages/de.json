@@ -32,11 +32,11 @@
 	},
 	"ActivityFeed": {
 		"title": "Aktivitätsfeed",
-		"switchTo": "Zur",
-		"Overview": "Übersicht wechseln",
+		"switchTo": "Wechseln zu",
+		"Overview": "Übersicht",
 		"ExploreTab": "Erkunden",
 		"Following": "Folgen",
-		"description": "Alle Mitglieder im Polkadot Ecosystem.",
+		"description": "Erkunden Sie alle Mitglieder, die zum Polkadot-Ökosystem beitragen.",
 		"About": "Über",
 		"Stats": {
 			"activeProposals": "Aktive Vorschläge",

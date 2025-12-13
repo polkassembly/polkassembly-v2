@@ -32,11 +32,11 @@
 	},
 	"ActivityFeed": {
 		"title": "アクティビティフィード",
-		"switchTo": "概要に切り替え",
+		"switchTo": "切り替え",
 		"Overview": "概要",
 		"ExploreTab": "探索",
 		"Following": "フォロー",
-		"description": "すべてのメンバーを探索して、Polkadotのエコシステムに貢献する。",
+		"description": "Polkadotエコシステムに貢献しているすべてのメンバーを探索します。",
 		"About": "概要",
 		"Stats": {
 			"activeProposals": "アクティブな提案",
