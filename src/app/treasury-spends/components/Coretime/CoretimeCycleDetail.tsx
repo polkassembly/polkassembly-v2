@@ -9,8 +9,19 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ETreasurySpendsTabs } from '@/_shared/types';
 import TimeLineIcon from '@assets/icons/timeline.svg';
 import Image from 'next/image';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/app/_shared-components/Tabs';
+import { cn } from '@/lib/utils';
 import CycleSummary from './CycleSummary';
 import { coretimeCyclesMock } from './mockCycles';
+import CyclePurchases from './CyclePurchases';
+
+import classes from './Coretime.module.scss';
+import CycleRenewals from './CycleRenewals';
+
+enum ESalesHistoryTabs {
+	PURCHASES = 'purchases',
+	RENEWALS = 'renewals'
+}
 
 function CoretimeCycleDetail() {
 	const router = useRouter();
@@ -48,31 +59,76 @@ function CoretimeCycleDetail() {
 	}
 
 	return (
-		<div className='flex flex-col gap-4 rounded-lg border border-border_grey bg-bg_modal p-4 lg:p-6'>
-			<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-				<div className='flex items-center gap-2'>
-					<Image
-						src={TimeLineIcon}
-						alt='Timeline Icon'
-						width={24}
-						height={24}
-						className='h-6 w-6'
-					/>
-					<p className='text-2xl font-bold text-text_primary'>Coretime Cycle #{cycle.id}</p>
-				</div>
-				<button
-					type='button'
-					onClick={goBackToOverview}
-					className='w-full rounded-md border border-text_pink px-4 py-2 text-sm font-semibold text-text_pink transition hover:bg-text_pink hover:text-white sm:w-auto'
-				>
-					Back to overview
-				</button>
-			</div>
+		<Tabs defaultValue={ESalesHistoryTabs.RENEWALS}>
+			<div className='flex flex-col gap-6 p-4 lg:p-6'>
+				<div className='flex flex-col gap-4 rounded-lg border border-border_grey bg-bg_modal p-4 lg:p-6'>
+					<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
+						<div className='flex items-center gap-2'>
+							<Image
+								src={TimeLineIcon}
+								alt='Timeline Icon'
+								width={24}
+								height={24}
+								className='h-6 w-6'
+							/>
+							<p className='text-2xl font-bold text-text_primary'>Coretime Cycle #{cycle.id}</p>
+						</div>
+						<button
+							type='button'
+							onClick={goBackToOverview}
+							className='w-full rounded-md border border-text_pink px-4 py-1.5 text-sm font-semibold text-text_pink transition hover:bg-text_pink hover:text-white sm:w-auto'
+						>
+							Back to overview
+						</button>
+					</div>
 
-			<div className='rounded-lg border border-border_grey p-4'>
-				<CycleSummary cycle={cycle} />
+					<div className='rounded-lg border border-border_grey p-4'>
+						<CycleSummary cycle={cycle} />
+					</div>
+				</div>
+				<div className='flex flex-col gap-4 rounded-lg border border-border_grey bg-bg_modal p-4 lg:p-6'>
+					<div className='flex flex-col gap-4 sm:flex-row sm:items-center'>
+						<div className='flex items-center gap-2'>
+							<Image
+								src={TimeLineIcon}
+								alt='Timeline Icon'
+								width={24}
+								height={24}
+								className='h-6 w-6'
+							/>
+							<p className='text-2xl font-bold text-text_primary'>Sales History</p>
+						</div>
+						<TabsList className='grid grid-cols-2 gap-2 rounded-lg bg-bounty_dash_bg p-1'>
+							<TabsTrigger
+								className={cn(
+									classes.tabs,
+									'px-4 py-1 data-[state=active]:rounded-lg data-[state=active]:border-none data-[state=active]:bg-bg_modal data-[state=active]:text-text_primary'
+								)}
+								value={ESalesHistoryTabs.RENEWALS}
+							>
+								Renewals
+							</TabsTrigger>
+							<TabsTrigger
+								className={cn(
+									classes.tabs,
+									'px-4 py-1 data-[state=active]:rounded-lg data-[state=active]:border-none data-[state=active]:bg-bg_modal data-[state=active]:text-text_primary'
+								)}
+								value={ESalesHistoryTabs.PURCHASES}
+							>
+								Purchases
+							</TabsTrigger>
+						</TabsList>
+					</div>
+
+					<TabsContent value={ESalesHistoryTabs.RENEWALS}>
+						<CycleRenewals cycleId={cycle.id} />
+					</TabsContent>
+					<TabsContent value={ESalesHistoryTabs.PURCHASES}>
+						<CyclePurchases cycleId={cycle.id} />
+					</TabsContent>
+				</div>
 			</div>
-		</div>
+		</Tabs>
 	);
 }
 

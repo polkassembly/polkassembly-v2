@@ -25,3 +25,7 @@
 .empty {
 	@apply bg-empty_bar_bg_dark;
 }
+
+.tabs {
+	@apply flex items-center justify-center gap-x-2 rounded-lg text-sm text-basic_text;
+}
