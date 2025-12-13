@@ -64,25 +64,13 @@ function ActivityFeedStats({ activeProposalsCount = 0, activeVotesCount = 0, onS
 				structure[ECategory.ROOT].push(origin);
 			} else if (origin === EPostOrigin.WISH_FOR_CHANGE) {
 				structure[ECategory.WISH_FOR_CHANGE].push(origin);
-			} else if (origin.includes('ADMIN') || origin.includes(EPostOrigin.STAKING_ADMIN) || origin.includes(EPostOrigin.AUCTION_ADMIN)) {
+			} else if (origin.includes('Admin')) {
 				structure[ECategory.ADMIN].push(origin);
-			} else if (
-				origin.includes(EPostOrigin.LEASE_ADMIN) ||
-				origin.includes(EPostOrigin.GENERAL_ADMIN) ||
-				origin.includes(EPostOrigin.REFERENDUM_CANCELLER) ||
-				origin.includes(EPostOrigin.REFERENDUM_KILLER)
-			) {
+			} else if (origin.includes('Canceller') || origin.includes('Killer')) {
 				structure[ECategory.GOVERNANCE].push(origin);
-			} else if (
-				origin.includes(EPostOrigin.BIG_SPENDER) ||
-				origin.includes(EPostOrigin.MEDIUM_SPENDER) ||
-				origin.includes(EPostOrigin.SMALL_SPENDER) ||
-				origin.includes(EPostOrigin.BIG_TIPPER) ||
-				origin.includes(EPostOrigin.SMALL_TIPPER) ||
-				origin.includes(EPostOrigin.TREASURER)
-			) {
+			} else if (origin.includes('Spender') || origin.includes('Tipper') || origin.includes('Treasurer')) {
 				structure[ECategory.TREASURY].push(origin);
-			} else if (origin.includes(EPostOrigin.WHITELISTED_CALLER) || origin.includes(EPostOrigin.FELLOWSHIP_ADMIN)) {
+			} else if (origin.includes('Whitelisted') || origin.includes('Fellowship')) {
 				structure[ECategory.WHITELIST].push(origin);
 			}
 		});

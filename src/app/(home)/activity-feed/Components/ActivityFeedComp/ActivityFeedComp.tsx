@@ -30,7 +30,7 @@ function ActivityFeedComp({
 	const t = useTranslations();
 	const router = useRouter();
 	const network = getCurrentNetwork();
-	const { socialLinks } = NETWORKS_DETAILS[`${network}`];
+	const socialLinks = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS]?.socialLinks ?? [];
 
 	return (
 		<Tabs
@@ -75,6 +75,7 @@ function ActivityFeedComp({
 						<TabsTrigger
 							className={styles.tabsTrigger}
 							value={EActivityFeedTab.SUBSCRIBED}
+							asChild
 						>
 							<Link
 								className='uppercase'
@@ -86,6 +87,7 @@ function ActivityFeedComp({
 						<TabsTrigger
 							className={styles.tabsTrigger}
 							value={EActivityFeedTab.EXPLORE}
+							asChild
 						>
 							<Link
 								href={`/activity-feed?tab=${EActivityFeedTab.EXPLORE}`}
