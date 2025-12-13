@@ -32,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const zodParamsSchema = z.object({
-	tab: z.nativeEnum(EActivityFeedTab).optional().default(EActivityFeedTab.EXPLORE)
+	tab: z.nativeEnum(EActivityFeedTab).optional().default(EActivityFeedTab.SUBSCRIBED)
 });
 
 export default async function ActivityFeedPage({ searchParams }: { searchParams: Promise<{ activeTab?: string }> }) {
