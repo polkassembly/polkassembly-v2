@@ -36,9 +36,6 @@ function ActivityFeedComp({
 		<Tabs
 			value={activeTab}
 			defaultValue={activeTab}
-			onValueChange={(value) => {
-				router.push(`/activity-feed?tab=${value}`);
-			}}
 			className={styles.tabsContainer}
 		>
 			<div className={styles.headerContainer}>
