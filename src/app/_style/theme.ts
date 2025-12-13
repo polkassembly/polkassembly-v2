@@ -197,7 +197,8 @@ export const THEME_COLORS = {
 		child_bounties_label_bg: '#FFEEE0',
 		child_bounties_label_text: '#DB511F',
 		bounties_label_bg: '#EEF2FF',
-		bounties_label_text: '#4F46E5'
+		bounties_label_text: '#4F46E5',
+		dv_header_text: '#96A4B6'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -393,6 +394,7 @@ export const THEME_COLORS = {
 		child_bounties_label_bg: '#FFEEE0',
 		child_bounties_label_text: '#DB511F',
 		bounties_label_bg: '#EEF2FF',
-		bounties_label_text: '#4F46E5'
+		bounties_label_text: '#4F46E5',
+		dv_header_text: '#96A4B6'
 	}
 };

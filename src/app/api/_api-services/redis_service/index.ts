@@ -9,6 +9,8 @@ import { APIError } from '@api/_api-utils/apiError';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import Redis from 'ioredis';
+import { deepParseJson } from 'deep-parse-json';
+import { createId as createCuid } from '@paralleldrive/cuid2';
 import {
 	ENetwork,
 	EProposalStatus,
@@ -34,9 +36,7 @@ import {
 	IGovAnalyticsCategoryCounts,
 	IUserPosts
 } from '@/_shared/types';
-import { deepParseJson } from 'deep-parse-json';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
-import { createId as createCuid } from '@paralleldrive/cuid2';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
 import {
@@ -88,7 +88,9 @@ enum ERedisKeys {
 	KLARA_CONVERSATION_HISTORY = 'KCH',
 	KLARA_REQUEST_DEDUP = 'KRD',
 	COMMUNITY_CURATORS = 'CC',
-	COMMUNITY_MEMBERS = 'CM'
+	COMMUNITY_MEMBERS = 'CM',
+	DV_COHORTS_REFERENDA = 'DVCR',
+	DV_COHORTS_VOTES = 'DVCV'
 }
 
 export class RedisService {
@@ -184,7 +186,9 @@ export class RedisService {
 		[ERedisKeys.COMMUNITY_CURATORS]: (network: string, page: number, limit: number): string => `${ERedisKeys.COMMUNITY_CURATORS}-${network}-${page}-${limit}`,
 		[ERedisKeys.COMMUNITY_MEMBERS]: (network: string, page: number, limit: number): string => `${ERedisKeys.COMMUNITY_MEMBERS}-${network}-${page}-${limit}`,
 		[ERedisKeys.KLARA_CONVERSATION_HISTORY]: (conversationId: string): string => `${ERedisKeys.KLARA_CONVERSATION_HISTORY}-${conversationId}`,
-		[ERedisKeys.KLARA_REQUEST_DEDUP]: (userId: string, messageHash: string): string => `${ERedisKeys.KLARA_REQUEST_DEDUP}-${userId}-${messageHash}`
+		[ERedisKeys.KLARA_REQUEST_DEDUP]: (userId: string, messageHash: string): string => `${ERedisKeys.KLARA_REQUEST_DEDUP}-${userId}-${messageHash}`,
+		[ERedisKeys.DV_COHORTS_REFERENDA]: (network: string, cohortId: string): string => `${ERedisKeys.DV_COHORTS_REFERENDA}-${network}-${cohortId}`,
+		[ERedisKeys.DV_COHORTS_VOTES]: (network: string, cohortId: string): string => `${ERedisKeys.DV_COHORTS_VOTES}-${network}-${cohortId}`
 	} as const;
 
 	// helper methods
@@ -434,6 +438,30 @@ export class RedisService {
 
 	static async DeleteResetPasswordToken(token: string): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.PASSWORD_RESET_TOKEN](token), forceCache: true });
+	}
+
+	static async GetDVCohortReferenda(network: string, cohortId: string): Promise<string | null> {
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.DV_COHORTS_REFERENDA](network, cohortId) });
+	}
+
+	static async SetDVCohortReferenda(network: string, cohortId: string, data: string): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.DV_COHORTS_REFERENDA](network, cohortId),
+			value: data,
+			ttlSeconds: HALF_HOUR_IN_SECONDS
+		});
+	}
+
+	static async GetDVCohortVotes(network: string, cohortId: string): Promise<string | null> {
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.DV_COHORTS_VOTES](network, cohortId) });
+	}
+
+	static async SetDVCohortVotes(network: string, cohortId: string, data: string): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.DV_COHORTS_VOTES](network, cohortId),
+			value: data,
+			ttlSeconds: HALF_HOUR_IN_SECONDS
+		});
 	}
 
 	// Posts caching methods
