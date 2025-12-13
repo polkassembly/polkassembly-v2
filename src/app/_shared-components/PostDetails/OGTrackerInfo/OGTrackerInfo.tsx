@@ -71,6 +71,8 @@ function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 	const deliveredTasksCount = tasks?.filter((task) => task.status === 'A').length || 0;
 	const totalTasksCount = tasks?.length || 0;
 
+	const viewOnAppKey = 'PostDetails.OGTracker.viewOnApp';
+
 	return (
 		<div className='flex max-h-[325px] flex-col overflow-hidden rounded-xl border border-border_grey bg-bg_modal shadow-sm'>
 			<div className='sticky top-0 z-10 flex items-center justify-between border-b border-border_grey bg-bg_modal/95 px-4 py-3 backdrop-blur-sm'>
@@ -90,7 +92,7 @@ function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 					rel='noopener noreferrer'
 					className='flex items-center gap-1 text-xs font-medium text-text_pink transition-colors hover:underline'
 				>
-					{t('PostDetails.OGTracker.viewOnApp')}
+					{t(viewOnAppKey)}
 					<ExternalLink className='h-3 w-3' />
 				</a>
 			</div>
@@ -123,9 +125,18 @@ function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 											{t('PostDetails.BeneficiariesDetails.showMore')}
 										</Button>
 									</DialogTrigger>
-									<DialogContent className='max-w-max px-4 pb-4 pt-3'>
-										<DialogHeader>
+									<DialogContent className='max-w-max px-4 pb-4 pt-3 md:min-w-[400px]'>
+										<DialogHeader className='flex flex-row items-center justify-between gap-4'>
 											<DialogTitle className='text-text_primary'>{t('PostDetails.OGTracker.tasks')}</DialogTitle>
+											<a
+												href={ogTrackerUrl}
+												target='_blank'
+												rel='noopener noreferrer'
+												className='flex items-center gap-1 pr-7 text-xs font-medium text-text_pink transition-colors hover:underline'
+											>
+												{t(viewOnAppKey)}
+												<ExternalLink className='h-3 w-3' />
+											</a>
 										</DialogHeader>
 										<div className='flex max-h-[400px] flex-col gap-4 overflow-y-auto pr-2'>
 											{tasks.map((task) => (
@@ -165,9 +176,18 @@ function OGTrackerInfo({ refNum, trackName }: OGTrackerInfoProps) {
 											{t('PostDetails.BeneficiariesDetails.showMore')}
 										</Button>
 									</DialogTrigger>
-									<DialogContent className='max-w-max px-4 pb-4 pt-3'>
-										<DialogHeader>
+									<DialogContent className='max-w-max px-4 pb-4 pt-3 md:min-w-[400px]'>
+										<DialogHeader className='flex flex-row items-center justify-between gap-4'>
 											<DialogTitle className='text-text_primary'>{t('PostDetails.OGTracker.proofOfWork')}</DialogTitle>
+											<a
+												href={ogTrackerUrl}
+												target='_blank'
+												rel='noopener noreferrer'
+												className='flex items-center gap-1 pr-7 text-xs font-medium text-text_pink transition-colors hover:underline'
+											>
+												{t(viewOnAppKey)}
+												<ExternalLink className='h-3 w-3' />
+											</a>
 										</DialogHeader>
 										<div className='flex max-h-[400px] flex-col gap-4 overflow-y-auto pr-2'>
 											{proofOfWork.map((pow) => (
