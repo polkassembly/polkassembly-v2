@@ -22,6 +22,16 @@ import { MdSort } from '@react-icons/all-files/md/MdSort';
 const CURSOR_POINTER_CLASS = 'cursor-pointer';
 const ACTIVE_BG_CLASS = 'bg-page_background';
 
+enum ECategory {
+	ALL = 'ALL',
+	ROOT = 'ROOT',
+	WISH_FOR_CHANGE = 'WISH_FOR_CHANGE',
+	ADMIN = 'ADMIN',
+	GOVERNANCE = 'GOVERNANCE',
+	TREASURY = 'TREASURY',
+	WHITELIST = 'WHITELIST'
+}
+
 interface ActivityFeedStatsProps {
 	activeProposalsCount?: number;
 	activeVotesCount?: number;
@@ -36,44 +46,33 @@ function ActivityFeedStats({ activeProposalsCount = 0, activeVotesCount = 0, onS
 	const network = getCurrentNetwork();
 	const trackInfo = NETWORKS_DETAILS[network].trackDetails;
 
-	const CATEGORIES = useMemo(
-		() => ({
-			ALL: t('ActivityFeed.Navbar.All'),
-			ROOT: t('ActivityFeed.Navbar.Root'),
-			WISH_FOR_CHANGE: t('ActivityFeed.Navbar.Wish For Change'),
-			ADMIN: t('ActivityFeed.Navbar.Admin'),
-			GOVERNANCE: t('ActivityFeed.Navbar.Governance'),
-			TREASURY: t('ActivityFeed.Navbar.Treasury'),
-			WHITELIST: t('ActivityFeed.Navbar.Whitelist')
-		}),
-		[t]
-	);
-
 	const categoryStructure = useMemo(() => {
-		const structure: Record<string, EPostOrigin[]> = Object.values(CATEGORIES).reduce(
-			(acc, category) => ({
-				...acc,
-				[category]: []
-			}),
-			{}
-		);
+		const structure: Record<ECategory, EPostOrigin[]> = {
+			[ECategory.ALL]: [],
+			[ECategory.ROOT]: [],
+			[ECategory.WISH_FOR_CHANGE]: [],
+			[ECategory.ADMIN]: [],
+			[ECategory.GOVERNANCE]: [],
+			[ECategory.TREASURY]: [],
+			[ECategory.WHITELIST]: []
+		};
 
 		Object.entries(trackInfo).forEach(([key]) => {
 			const origin = key as EPostOrigin;
 
 			if (origin === EPostOrigin.ROOT) {
-				structure[CATEGORIES.ROOT].push(origin);
+				structure[ECategory.ROOT].push(origin);
 			} else if (origin === EPostOrigin.WISH_FOR_CHANGE) {
-				structure[CATEGORIES.WISH_FOR_CHANGE].push(origin);
+				structure[ECategory.WISH_FOR_CHANGE].push(origin);
 			} else if (origin.includes('ADMIN') || origin.includes(EPostOrigin.STAKING_ADMIN) || origin.includes(EPostOrigin.AUCTION_ADMIN)) {
-				structure[CATEGORIES.ADMIN].push(origin);
+				structure[ECategory.ADMIN].push(origin);
 			} else if (
 				origin.includes(EPostOrigin.LEASE_ADMIN) ||
 				origin.includes(EPostOrigin.GENERAL_ADMIN) ||
 				origin.includes(EPostOrigin.REFERENDUM_CANCELLER) ||
 				origin.includes(EPostOrigin.REFERENDUM_KILLER)
 			) {
-				structure[CATEGORIES.GOVERNANCE].push(origin);
+				structure[ECategory.GOVERNANCE].push(origin);
 			} else if (
 				origin.includes(EPostOrigin.BIG_SPENDER) ||
 				origin.includes(EPostOrigin.MEDIUM_SPENDER) ||
@@ -82,30 +81,43 @@ function ActivityFeedStats({ activeProposalsCount = 0, activeVotesCount = 0, onS
 				origin.includes(EPostOrigin.SMALL_TIPPER) ||
 				origin.includes(EPostOrigin.TREASURER)
 			) {
-				structure[CATEGORIES.TREASURY].push(origin);
+				structure[ECategory.TREASURY].push(origin);
 			} else if (origin.includes(EPostOrigin.WHITELISTED_CALLER) || origin.includes(EPostOrigin.FELLOWSHIP_ADMIN)) {
-				structure[CATEGORIES.WHITELIST].push(origin);
+				structure[ECategory.WHITELIST].push(origin);
 			}
 		});
 
-		return Object.fromEntries(Object.entries(structure).filter(([category, tracks]) => tracks.length > 0 || category === CATEGORIES.ALL));
-	}, [trackInfo, CATEGORIES]);
+		return Object.fromEntries(Object.entries(structure).filter(([categoryKey, tracks]) => tracks.length > 0 || categoryKey === ECategory.ALL));
+	}, [trackInfo]);
 
-	const handleCategoryClick = (category: string) => {
-		if (category === CATEGORIES.ALL) {
+	const getCategoryLabel = (categoryKey: ECategory): string => {
+		const labelMap: Record<ECategory, string> = {
+			[ECategory.ALL]: t('ActivityFeed.Navbar.All'),
+			[ECategory.ROOT]: t('ActivityFeed.Navbar.Root'),
+			[ECategory.WISH_FOR_CHANGE]: t('ActivityFeed.Navbar.Wish For Change'),
+			[ECategory.ADMIN]: t('ActivityFeed.Navbar.Admin'),
+			[ECategory.GOVERNANCE]: t('ActivityFeed.Navbar.Governance'),
+			[ECategory.TREASURY]: t('ActivityFeed.Navbar.Treasury'),
+			[ECategory.WHITELIST]: t('ActivityFeed.Navbar.Whitelist')
+		};
+		return labelMap[categoryKey];
+	};
+
+	const handleCategoryClick = (categoryKey: ECategory) => {
+		if (categoryKey === ECategory.ALL) {
 			setCurrentTab('All');
-		} else if (category === CATEGORIES.ROOT) {
+		} else if (categoryKey === ECategory.ROOT) {
 			setCurrentTab(EPostOrigin.ROOT);
-		} else if (category === CATEGORIES.WISH_FOR_CHANGE) {
+		} else if (categoryKey === ECategory.WISH_FOR_CHANGE) {
 			setCurrentTab(EPostOrigin.WISH_FOR_CHANGE);
 		}
 	};
 
-	const isActiveCategory = (category: string, tracks: EPostOrigin[]) => {
-		if (currentTab === 'All' && category === CATEGORIES.ALL) return true;
+	const isActiveCategory = (categoryKey: ECategory, tracks: EPostOrigin[]) => {
+		if (currentTab === 'All' && categoryKey === ECategory.ALL) return true;
 
-		if (category === CATEGORIES.ROOT && currentTab === EPostOrigin.ROOT) return true;
-		if (category === CATEGORIES.WISH_FOR_CHANGE && currentTab === EPostOrigin.WISH_FOR_CHANGE) return true;
+		if (categoryKey === ECategory.ROOT && currentTab === EPostOrigin.ROOT) return true;
+		if (categoryKey === ECategory.WISH_FOR_CHANGE && currentTab === EPostOrigin.WISH_FOR_CHANGE) return true;
 
 		return tracks.some((track) => currentTab === track);
 	};
@@ -162,8 +174,10 @@ function ActivityFeedStats({ activeProposalsCount = 0, activeVotesCount = 0, onS
 						align='end'
 						className='max-h-[400px] min-w-[200px] overflow-y-auto'
 					>
-						{Object.entries(categoryStructure).map(([category, tracks]) => {
-							const isSimpleCategory = tracks.length === 0 || category === CATEGORIES.ROOT || category === CATEGORIES.WISH_FOR_CHANGE;
+						{Object.entries(categoryStructure).map(([categoryKey, tracks]) => {
+							const category = categoryKey as ECategory;
+							const categoryLabel = getCategoryLabel(category);
+							const isSimpleCategory = tracks.length === 0 || category === ECategory.ROOT || category === ECategory.WISH_FOR_CHANGE;
 							const isActive = isActiveCategory(category, tracks);
 
 							if (isSimpleCategory) {
@@ -173,14 +187,14 @@ function ActivityFeedStats({ activeProposalsCount = 0, activeVotesCount = 0, onS
 										className={cn(CURSOR_POINTER_CLASS, isActive && ACTIVE_BG_CLASS)}
 										onSelect={() => handleCategoryClick(category)}
 									>
-										{category}
+										{categoryLabel}
 									</DropdownMenuItem>
 								);
 							}
 
 							return (
 								<DropdownMenuSub key={category}>
-									<DropdownMenuSubTrigger className={cn(CURSOR_POINTER_CLASS, isActive && ACTIVE_BG_CLASS)}>{category}</DropdownMenuSubTrigger>
+									<DropdownMenuSubTrigger className={cn(CURSOR_POINTER_CLASS, isActive && ACTIVE_BG_CLASS)}>{categoryLabel}</DropdownMenuSubTrigger>
 									<DropdownMenuSubContent className='max-h-[300px] overflow-y-auto border-border_grey bg-bg_modal'>
 										{tracks.map((track) => (
 											<DropdownMenuItem
