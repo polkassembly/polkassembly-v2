@@ -38,37 +38,43 @@ export const GET = withErrorHandling(async (req: Request) => {
 		return NextResponse.json({ items: [], totalCount: 0 });
 	}
 
-	const membersPromises = users.map(async (user: IPublicUser) => {
-		const address = user.addresses?.[0] || '';
-		if (!address) {
-			return {
-				address: '',
-				sources: [EDelegateSource.INDIVIDUAL],
-				name: user.username,
-				image: user.profileDetails?.image,
-				network,
-				delegators: [],
-				receivedDelegationsCount: 0,
-				maxDelegated: '0',
-				last30DaysVotedProposalsCount: 0,
-				publicUser: user
-			} as IDelegateDetails;
-		}
-
-		const delegateDetails = await OnChainDbService.GetDelegateDetails({ network, address });
-
-		return {
+	const buildBaseMember = (user: IPublicUser, address: string) =>
+		({
 			address,
 			sources: [EDelegateSource.INDIVIDUAL],
 			name: user.username,
 			image: user.profileDetails?.image,
 			network,
-			delegators: delegateDetails?.delegators || [],
-			receivedDelegationsCount: delegateDetails?.receivedDelegationsCount || 0,
-			maxDelegated: delegateDetails?.maxDelegated || '0',
-			last30DaysVotedProposalsCount: delegateDetails?.last30DaysVotedProposalsCount || 0,
+			delegators: [],
+			receivedDelegationsCount: 0,
+			maxDelegated: '0',
+			last30DaysVotedProposalsCount: 0,
 			publicUser: user
-		} as IDelegateDetails;
+		}) as IDelegateDetails;
+
+	const membersPromises = users.map(async (user: IPublicUser) => {
+		const address = user.addresses?.[0] || '';
+		const baseMember = buildBaseMember(user, address);
+
+		if (!address) {
+			return baseMember;
+		}
+
+		try {
+			const delegateDetails = await OnChainDbService.GetDelegateDetails({ network, address });
+
+			return {
+				...baseMember,
+				delegators: delegateDetails?.delegators || [],
+				receivedDelegationsCount: delegateDetails?.receivedDelegationsCount || 0,
+				maxDelegated: delegateDetails?.maxDelegated || '0',
+				last30DaysVotedProposalsCount: delegateDetails?.last30DaysVotedProposalsCount || 0
+			};
+		} catch (error) {
+			// If on-chain data fetch fails for a user, fall back to base details instead of failing the entire response
+			console.error(`Failed to fetch delegate details for address ${address}:`, error);
+			return baseMember;
+		}
 	});
 
 	const items = await Promise.all(membersPromises);

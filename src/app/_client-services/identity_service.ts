@@ -10,7 +10,7 @@
 import { APPNAME } from '@/_shared/_constants/appName';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ClientError } from '@app/_client-utils/clientError';
-import { mapJudgementStatus } from '@app/_client-utils/identityUtils';
+import { mapJudgementStatus, countSocialsFromIdentity, formatJudgementLabel, getSocialsFromIdentity } from '@app/_client-utils/identityUtils';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Signer, SubmittableExtrinsic } from '@polkadot/api/types';
 import { EventRecord, ExtrinsicStatus, Hash } from '@polkadot/types/interfaces';
@@ -18,7 +18,7 @@ import { BN, BN_ZERO, hexToString, isHex } from '@polkadot/util';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 
-import { ENetwork, IOnChainIdentity, IJudgementRequest, EAccountType, EWallet, ISelectedAccount, IVaultQrState } from '@shared/types';
+import { ENetwork, IOnChainIdentity, IJudgementRequest, EAccountType, EWallet, ISelectedAccount, IVaultQrState, EJudgementStatus } from '@shared/types';
 import { Dispatch, SetStateAction } from 'react';
 import { isMimirDetected } from './isMimirDetected';
 import { VaultQrSigner } from './vault_qr_signer_service';
@@ -627,28 +627,43 @@ export class IdentityService {
 				}
 
 				const identity = identityInfo.info || {};
+				const socials = getSocialsFromIdentity(identity);
 
 				// Process judgements for each registrar
 				identityInfo.judgements.forEach((judgement: any) => {
 					const [registrarIndex, judgementData] = judgement;
+					const judgementValue =
+						typeof judgementData === 'string'
+							? judgementData
+							: judgementData && typeof judgementData === 'object'
+								? Object.keys(judgementData)[0] || String(judgementData)
+								: String(judgementData);
 					const registrarIndexNum = Number(registrarIndex);
 
 					if (registrarIndexNum >= 0 && registrarIndexNum < registrars.length) {
 						const registrar = registrars[`${registrarIndexNum}`];
-						const status = mapJudgementStatus(judgementData);
+						const status = mapJudgementStatus(judgementValue);
+						const judgementLabel = formatJudgementLabel(judgementValue);
 
 						const displayRaw = identity.display?.Raw ?? identity.display;
 						const displayName = isHex(displayRaw) ? hexToString(displayRaw) || displayRaw || '' : displayRaw || '';
-						const emailRaw = identity.email?.Raw ?? identity.email;
+						const emailRaw = identity.email?.Raw ?? identity.email ?? socials.email;
 						const email = isHex(emailRaw) ? hexToString(emailRaw) || emailRaw || '' : emailRaw || '';
+						const twitterHandle = socials.twitter || identity.twitter?.Raw || identity.twitter || '';
 
 						const judgementRequest: IJudgementRequest = {
 							id: `${address}-${registrarIndexNum}-${key.hash.toString()}`,
 							address,
 							displayName,
 							email,
-							twitter: identity.twitter?.Raw || identity.twitter || '',
+							twitter: twitterHandle,
+							discord: socials.discord || '',
+							matrix: socials.matrix || '',
+							github: socials.github || '',
+							web: socials.web || '',
 							status,
+							judgementType: judgementValue,
+							judgementLabel,
 							dateInitiated: new Date(),
 							registrarIndex: registrarIndexNum,
 							registrarAddress: registrar.account,
@@ -665,5 +680,388 @@ export class IdentityService {
 			console.error('Error fetching identity judgements:', error);
 			return [];
 		}
+	}
+
+	async getSubIdentities(address: string) {
+		const encodedAddress = getEncodedAddress(address, this.network) || address;
+		const subsOf = await this.peopleChainApi.query.identity.subsOf(encodedAddress);
+		const subsData = subsOf.toJSON() as any;
+
+		if (!subsData || !Array.isArray(subsData[1])) {
+			return [];
+		}
+
+		return subsData[1] as string[];
+	}
+
+	async getSubIdentityInfo(subAddress: string) {
+		const encodedAddress = getEncodedAddress(subAddress, this.network) || subAddress;
+		const superOf = await this.peopleChainApi.query.identity.superOf(encodedAddress);
+		const superData = superOf.toHuman() as any;
+
+		return {
+			parentAddress: superData?.[0] || '',
+			displayName: superData?.[1]?.Raw || ''
+		};
+	}
+
+	async getJudgementRequestsForRegistrar(registrarAddress: string): Promise<IJudgementRequest[]> {
+		try {
+			const encodedRegistrarAddress = getEncodedAddress(registrarAddress, this.network) || registrarAddress;
+			const allJudgements = await this.getAllIdentityJudgements();
+
+			return allJudgements.filter((judgement) => {
+				const encodedJudgementRegistrar = getEncodedAddress(judgement.registrarAddress, this.network) || judgement.registrarAddress;
+				return encodedJudgementRegistrar === encodedRegistrarAddress;
+			});
+		} catch (error) {
+			console.error('Error fetching judgement requests for registrar:', error);
+			return [];
+		}
+	}
+
+	async provideJudgement({
+		targetAddress,
+		judgement,
+		registrarAddress,
+		wallet,
+		setVaultQrState,
+		selectedAccount,
+		onSuccess,
+		onFailed
+	}: {
+		targetAddress: string;
+		judgement: 'Unknown' | 'KnownGood' | 'Reasonable' | 'Erroneous' | 'OutOfDate' | 'LowQuality';
+		registrarAddress: string;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+		selectedAccount?: ISelectedAccount;
+		onSuccess?: () => void;
+		onFailed?: (errorMessageFallback?: string) => void;
+	}) {
+		const encodedTargetAddress = getEncodedAddress(targetAddress, this.network) || targetAddress;
+		const encodedRegistrarAddress = getEncodedAddress(registrarAddress, this.network) || registrarAddress;
+
+		const registrars = await this.getRegistrars();
+		const registrarIndex = registrars.findIndex((reg) => {
+			const encodedRegAddress = getEncodedAddress(reg.account, this.network) || reg.account;
+			return encodedRegAddress === encodedRegistrarAddress;
+		});
+
+		if (registrarIndex === -1) {
+			throw new ClientError(ERROR_CODES.CLIENT_ERROR, 'Registrar not found');
+		}
+
+		const identityInfoRes: any = await this.peopleChainApi?.query.identity?.identityOf(encodedTargetAddress);
+		const identityHashInfo = await (identityInfoRes?.unwrapOr?.(null)?.[0] || identityInfoRes?.unwrapOr?.(null));
+		const identityHash = identityHashInfo?.info?.hash?.toHex();
+
+		if (!identityHash) {
+			const errorMsg = 'Identity hash not found for target address';
+			console.error(errorMsg);
+			onFailed?.(errorMsg);
+			return;
+		}
+
+		const judgementObj = { [judgement]: null };
+		const provideJudgementTx = this.peopleChainApi.tx.identity.provideJudgement(registrarIndex, encodedTargetAddress, judgementObj, identityHash);
+
+		await this.executeTx({
+			tx: provideJudgementTx,
+			address: encodedRegistrarAddress,
+			wallet,
+			setVaultQrState,
+			selectedAccount,
+			errorMessageFallback: 'Failed to provide judgement',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: (errorMessageFallback: string) => {
+				console.log(errorMessageFallback, 'errorMessageFallback');
+				onFailed?.(errorMessageFallback);
+			}
+		});
+	}
+
+	async getIdentityOverviewStats() {
+		const identityEntries = await this.peopleChainApi.query.identity.identityOf.entries();
+		const subIdentityEntries = await this.peopleChainApi.query.identity.subsOf.entries();
+
+		let uniqueIdentities = 0;
+		let totalSubIdentities = 0;
+		let totalSocials = 0;
+		let totalJudgementsGiven = 0;
+
+		identityEntries.forEach(([, value]) => {
+			const identityInfo = value.toHuman() as {
+				info?: {
+					twitter?: { Raw?: string };
+					email?: { Raw?: string };
+					discord?: { Raw?: string };
+					matrix?: { Raw?: string };
+					riot?: { Raw?: string };
+					github?: { Raw?: string };
+					web?: { Raw?: string };
+					[key: string]: { Raw?: string } | undefined;
+				};
+				judgements?: Array<[string, string]>;
+			};
+
+			if (identityInfo?.info) {
+				uniqueIdentities += 1;
+				totalSocials += countSocialsFromIdentity(identityInfo.info);
+
+				if (identityInfo.judgements && Array.isArray(identityInfo.judgements)) {
+					identityInfo.judgements.forEach((judgement) => {
+						const [, judgementData] = judgement;
+						const status = mapJudgementStatus(judgementData);
+						if (status === EJudgementStatus.APPROVED || status === EJudgementStatus.REJECTED) {
+							totalJudgementsGiven += 1;
+						}
+					});
+				}
+			}
+		});
+
+		subIdentityEntries.forEach(([, value]) => {
+			const subsData = value.toJSON() as [string, string[]] | null;
+			if (subsData && Array.isArray(subsData[1])) {
+				totalSubIdentities += subsData[1].length;
+			}
+		});
+
+		return {
+			uniqueIdentities,
+			totalSubIdentities,
+			totalSocials,
+			totalJudgementsGiven
+		};
+	}
+
+	async getAllIdentities() {
+		const identityEntries = await this.peopleChainApi.query.identity.identityOf.entries();
+		const subIdentityEntries = await this.peopleChainApi.query.identity.subsOf.entries();
+
+		const subIdentityMap = new Map<string, string[]>();
+		subIdentityEntries.forEach(([key, value]) => {
+			const parentAddress = key.args[0].toString();
+			const subsData = value.toJSON() as [string, string[]] | null;
+			if (subsData && Array.isArray(subsData[1])) {
+				subIdentityMap.set(parentAddress, subsData[1]);
+			}
+		});
+
+		const identitiesPromises = identityEntries.map(async ([key, value]) => {
+			const address = key.args[0].toString();
+			const identityInfo = value.toHuman() as {
+				info?: {
+					display?: { Raw?: string };
+					twitter?: { Raw?: string };
+					email?: { Raw?: string };
+					discord?: { Raw?: string };
+					matrix?: { Raw?: string };
+					github?: { Raw?: string };
+					web?: { Raw?: string };
+				};
+				judgements?: Array<[string, string]>;
+			};
+
+			if (!identityInfo?.info) return null;
+
+			const socials = getSocialsFromIdentity(identityInfo.info);
+
+			let judgementStatus = EJudgementStatus.PENDING;
+			let judgementCount = 0;
+			let judgementLabels: string[] = [];
+
+			if (identityInfo.judgements && Array.isArray(identityInfo.judgements)) {
+				const approvedJudgements =
+					identityInfo.judgements
+						.map((judgement) => {
+							const [, judgementData] = judgement;
+							const judgementString = String(judgementData);
+							return {
+								status: mapJudgementStatus(judgementString),
+								label: formatJudgementLabel(judgementString)
+							};
+						})
+						.filter((judgement) => judgement.status === EJudgementStatus.APPROVED || judgement.status === EJudgementStatus.REJECTED) || [];
+				judgementLabels = approvedJudgements.map((judgement) => judgement.label);
+				judgementCount = judgementLabels.length;
+				if (approvedJudgements.length > 0) {
+					const lastJudgement = approvedJudgements[approvedJudgements.length - 1];
+					judgementStatus = lastJudgement.status;
+				}
+			}
+
+			const subAddresses = subIdentityMap.get(address) || [];
+			const subIdentities: any[] = await Promise.all(
+				subAddresses.map(async (subAddress) => {
+					const subIdentity = await this.getOnChainIdentity(subAddress);
+					const subInfo = await this.getSubIdentityInfo(subAddress);
+
+					const approvedSubJudgements =
+						(subIdentity.judgements || [])
+							.map((judgement) => {
+								const judgementArray = [...judgement];
+								const judgementData = judgementArray[1];
+								const judgementString = String(judgementData);
+								return {
+									status: mapJudgementStatus(judgementString),
+									label: formatJudgementLabel(judgementString)
+								};
+							})
+							.filter((j: { status: EJudgementStatus }) => j.status === EJudgementStatus.APPROVED || j.status === EJudgementStatus.REJECTED) || [];
+
+					const approvedSubJudgementLabels = approvedSubJudgements.map((j) => j.label);
+
+					return {
+						id: subAddress,
+						address: subAddress,
+						displayName: subInfo.displayName || subIdentity.display || 'Unnamed',
+						isSubIdentity: true,
+						parentAddress: address,
+						socials: {
+							email: subIdentity.email,
+							twitter: subIdentity.twitter,
+							discord: subIdentity.discord,
+							matrix: subIdentity.matrix,
+							github: subIdentity.github,
+							web: subIdentity.web
+						},
+						judgements: {
+							status: approvedSubJudgements[approvedSubJudgements.length - 1]?.status || EJudgementStatus.PENDING,
+							count: approvedSubJudgementLabels.length,
+							quality: 'Reasonable',
+							labels: approvedSubJudgementLabels
+						},
+						subIdentities: [],
+						subIdentityCount: 0
+					};
+				})
+			);
+
+			return {
+				id: address,
+				address,
+				displayName: identityInfo.info.display?.Raw || 'Noob',
+				isSubIdentity: false,
+				socials,
+				judgements: {
+					status: judgementStatus,
+					count: judgementCount,
+					quality: judgementCount > 0 ? 'Good Quality, Known Good' : 'Reasonable',
+					labels: judgementLabels
+				},
+				subIdentities,
+				subIdentityCount: subIdentities.length
+			};
+		});
+
+		const identitiesResults = await Promise.all(identitiesPromises);
+		return identitiesResults.filter((identity): identity is any => identity !== null);
+	}
+
+	async getUserIdentityDashboardData(address: string) {
+		const identities = [];
+		let totalJudgements = 0;
+
+		const mainIdentity = await this.getOnChainIdentity(address);
+
+		const getUserBalances = await this.peopleChainApi.derive.balances.all(address);
+		const balance = getUserBalances.freeBalance.toString();
+
+		let lastUpdatedBlock: number | undefined;
+		try {
+			const identityData: any = await this.peopleChainApi.query.identity.identityOf(address);
+			const blockHash = identityData?.createdAtHash || (await this.peopleChainApi.rpc.chain.getBlockHash());
+			const blockHeader = await this.peopleChainApi.rpc.chain.getHeader(blockHash);
+			lastUpdatedBlock = blockHeader.number.toNumber();
+		} catch {
+			lastUpdatedBlock = undefined;
+		}
+
+		if (mainIdentity.isIdentitySet) {
+			const judgements = mainIdentity.judgements.map((judgement) => {
+				const judgementArray = [...judgement];
+				const judgementStatus = judgementArray[1];
+				return mapJudgementStatus(String(judgementStatus));
+			});
+
+			const approvedJudgements = judgements.filter((j: EJudgementStatus) => j === EJudgementStatus.APPROVED || j === EJudgementStatus.REJECTED);
+			totalJudgements += approvedJudgements.length;
+
+			const socials = {
+				twitter: mainIdentity.twitter,
+				email: mainIdentity.email,
+				discord: mainIdentity.discord,
+				matrix: mainIdentity.matrix,
+				github: mainIdentity.github,
+				web: mainIdentity.web
+			};
+
+			identities.push({
+				address,
+				displayName: mainIdentity.display,
+				type: 'Direct' as const,
+				socials,
+				judgements: approvedJudgements,
+				balance,
+				lastUpdated: new Date(),
+				lastUpdatedBlock,
+				canEdit: true,
+				canDelete: false
+			});
+		}
+
+		const subAddresses = await this.getSubIdentities(address);
+
+		const subIdentitiesData = await Promise.all(
+			subAddresses.map(async (subAddress) => {
+				const subInfo = await this.getSubIdentityInfo(subAddress);
+				const subIdentity = await this.getOnChainIdentity(subAddress);
+				const subAccountInfo = await this.peopleChainApi.derive.balances.all(subAddress);
+				const subBalance = subAccountInfo.freeBalance.toString();
+
+				const subJudgements = subIdentity.judgements.map((judgement) => {
+					const judgementArray = [...judgement];
+					const judgementStatus = judgementArray[1];
+					return mapJudgementStatus(String(judgementStatus));
+				});
+
+				const approvedSubJudgements = subJudgements.filter((j: EJudgementStatus) => j === EJudgementStatus.APPROVED || j === EJudgementStatus.REJECTED);
+				totalJudgements += approvedSubJudgements.length;
+
+				return {
+					address: subAddress,
+					displayName: subInfo.displayName || subIdentity.display,
+					type: 'Sub-identity',
+					socials: {
+						twitter: subIdentity.twitter,
+						email: subIdentity.email,
+						discord: subIdentity.discord,
+						matrix: subIdentity.matrix,
+						github: subIdentity.github,
+						web: subIdentity.web
+					},
+					judgements: approvedSubJudgements,
+					balance: subBalance,
+					lastUpdated: new Date(),
+					lastUpdatedBlock,
+					canEdit: false,
+					canDelete: true
+				};
+			})
+		);
+
+		identities.push(...subIdentitiesData);
+		return {
+			totalSubIdentities: subAddresses.length,
+			totalJudgements,
+			totalBalance: balance,
+			lastUpdatedBlock: lastUpdatedBlock || 0,
+			identities
+		};
 	}
 }

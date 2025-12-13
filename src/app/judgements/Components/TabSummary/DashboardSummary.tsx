@@ -2,8 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { Separator } from '@/app/_shared-components/Separator';
 import JudgementRequestedIcon from '@assets/icons/judgement-requests.svg';
 import JudgementCompletedIcon from '@assets/icons/judgements-completed.svg';

@@ -1,3 +1,11 @@
+.headerRow {
+	@apply overflow-hidden rounded-lg border-t bg-page_background px-6 py-3 text-center;
+}
+
+.headerCell {
+	@apply px-6 py-5 text-sm font-semibold uppercase text-text_primary;
+}
+
 .tableRow {
 	@apply overflow-hidden rounded-lg bg-page_background px-6 text-center;
 }

@@ -126,7 +126,7 @@ function NewsBanner() {
 				>
 					{duplicatedNewsItems.map((item: INewsItem) => (
 						<div
-							key={`news-item-${(item.URL ?? item.Title).replace(/[^a-zA-Z0-9-_]/g, '-')}`}
+							key={item.Title}
 							className='mr-6 inline-block'
 						>
 							<div className='flex items-center'>
