@@ -98,7 +98,11 @@ export class RedisService {
 				return Math.min(times * 50, 2000);
 			},
 			reconnectOnError: (err) => err.message.includes('READONLY'),
-			keepAlive: 8000
+			keepAlive: 8000,
+			tls: {
+				rejectUnauthorized: false,
+				checkServerIdentity: () => undefined
+			}
 		});
 
 		client.on('error', (err) => {
