@@ -26,6 +26,7 @@ import {
 export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: IDVDReferendumResponse[], cohort: IDVCohort): { delegatesWithStats: IDVDelegateWithStats[] } {
 	const getWinningVoteIncrement = (vote: IDVCohortVote, referendum: IDVDReferendumResponse): number => {
 		if (vote.isSplit || vote.isSplitAbstain) return 0;
+		if (vote.isAbstain) return 0;
 		if (!referendum.status) return 0;
 		const approvedStatuses = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed];
 		const isApproved = approvedStatuses.includes(referendum.status);
@@ -155,6 +156,91 @@ export function getDVCohortByIndex(network: ENetwork, index: number): IDVCohort 
 	return cohorts.find((c) => c.index === index) || null;
 }
 
+function calculateVotePowers(vote: IDVCohortVote): {
+	decision: EVoteDecision;
+	votingPower: bigint;
+	dvAyePower: bigint;
+	dvNayPower: bigint;
+	dvAbstainPower: bigint;
+} {
+	let decision = EVoteDecision.ABSTAIN;
+	let votingPower = BigInt(0);
+	let dvAyePower = BigInt(0);
+	let dvNayPower = BigInt(0);
+	let dvAbstainPower = BigInt(0);
+
+	if (vote.isSplit || vote.isSplitAbstain) {
+		dvAyePower = BigInt(vote.ayeVotes || 0);
+		dvNayPower = BigInt(vote.nayVotes || 0);
+		dvAbstainPower = BigInt(vote.abstainVotes || 0);
+		votingPower = dvAyePower + dvNayPower + dvAbstainPower;
+		decision = vote.isSplitAbstain ? EVoteDecision.SPLIT_ABSTAIN : EVoteDecision.SPLIT;
+	} else if (vote.aye) {
+		const totalVotes = BigInt(vote.votes || 0) + BigInt(vote.delegations?.votes || 0);
+		dvAyePower = totalVotes;
+		votingPower = totalVotes;
+		decision = EVoteDecision.AYE;
+	} else if (vote.isAbstain) {
+		const totalVotes = BigInt(vote.votes || 0) + BigInt(vote.delegations?.votes || 0);
+		dvAbstainPower = totalVotes;
+		votingPower = totalVotes;
+		decision = EVoteDecision.ABSTAIN;
+	} else if (!vote.aye) {
+		const totalVotes = BigInt(vote.votes || 0) + BigInt(vote.delegations?.votes || 0);
+		dvNayPower = totalVotes;
+		votingPower = totalVotes;
+		decision = EVoteDecision.NAY;
+	}
+
+	return { decision, votingPower, dvAyePower, dvNayPower, dvAbstainPower };
+}
+
+function processVoteForInfluence(
+	vote: IDVCohortVote,
+	cohort: IDVCohort,
+	delegateVotes: IDVDelegateVote[],
+	guardianVotes: IDVDelegateVote[]
+): { dvAyePower: bigint; dvNayPower: bigint; dvAbstainPower: bigint } {
+	const { decision, votingPower, dvAyePower, dvNayPower, dvAbstainPower } = calculateVotePowers(vote);
+
+	const delegate = cohort.delegates.find((d) => d.address === vote.account);
+	if (delegate) {
+		const voteData: IDVDelegateVote = {
+			address: vote.account,
+			decision,
+			votingPower: votingPower.toString(),
+			balance: vote.balance,
+			conviction: vote.conviction || 0
+		};
+
+		if (delegate.role === EDVDelegateType.DAO) {
+			delegateVotes.push(voteData);
+		} else {
+			guardianVotes.push(voteData);
+		}
+	}
+
+	return { dvAyePower, dvNayPower, dvAbstainPower };
+}
+
+function calculateInfluenceStatus(dvAyePower: bigint, dvNayPower: bigint, referendum: IDVDReferendumResponse): EInfluenceStatus {
+	if (dvAyePower === BigInt(0) && dvNayPower === BigInt(0)) {
+		return EInfluenceStatus.NO_IMPACT;
+	}
+
+	const isPassed = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed].includes(referendum.status);
+	const isFailed = [EProposalStatus.Rejected].includes(referendum.status);
+
+	if (isPassed) {
+		return dvAyePower >= dvNayPower ? EInfluenceStatus.APPROVED : EInfluenceStatus.FAILED;
+	}
+	if (isFailed) {
+		return dvNayPower >= dvAyePower ? EInfluenceStatus.REJECTED : EInfluenceStatus.FAILED;
+	}
+
+	return EInfluenceStatus.NO_IMPACT;
+}
+
 export function calculateDVInfluence(
 	votes: IDVCohortVote[],
 	cohort: IDVCohort,
@@ -172,63 +258,15 @@ export function calculateDVInfluence(
 		let dvAbstainPower = BigInt(0);
 
 		refVotes.forEach((vote) => {
-			let decision = EVoteDecision.ABSTAIN;
-			let votingPower = BigInt(0);
-			if (vote.isSplit || vote.isSplitAbstain) {
-				dvAyePower += BigInt(vote.ayeVotes || 0);
-				dvNayPower += BigInt(vote.nayVotes || 0);
-				dvAbstainPower += BigInt(vote.abstainVotes || 0);
-				votingPower = BigInt(vote.ayeVotes || 0) + BigInt(vote.nayVotes || 0) + BigInt(vote.abstainVotes || 0);
-
-				decision = vote.isSplitAbstain ? EVoteDecision.SPLIT_ABSTAIN : EVoteDecision.SPLIT;
-			} else if (vote.aye) {
-				const totalVotes = BigInt(vote.votes || 0) + BigInt(vote.delegations?.votes || 0);
-				dvAyePower += totalVotes;
-				votingPower = totalVotes;
-				decision = EVoteDecision.AYE;
-			} else if (!vote.aye) {
-				const totalVotes = BigInt(vote.votes || 0) + BigInt(vote.delegations?.votes || 0);
-				dvNayPower += totalVotes;
-				votingPower = totalVotes;
-				decision = EVoteDecision.NAY;
-			}
-
-			const delegate = cohort.delegates.find((d) => d.address === vote.account);
-			if (delegate) {
-				const voteData: IDVDelegateVote = {
-					address: vote.account,
-					decision,
-					votingPower: votingPower.toString(),
-					balance: vote.balance,
-					conviction: vote.conviction || 0
-				};
-
-				if (delegate.role === EDVDelegateType.DAO) {
-					delegateVotes.push(voteData);
-				} else {
-					guardianVotes.push(voteData);
-				}
-			}
+			const powers = processVoteForInfluence(vote, cohort, delegateVotes, guardianVotes);
+			dvAyePower += powers.dvAyePower;
+			dvNayPower += powers.dvNayPower;
+			dvAbstainPower += powers.dvAbstainPower;
 		});
 
 		const totalAye = BigInt(referendum.tally?.ayes || 0);
 		const totalNay = BigInt(referendum.tally?.nays || 0);
-
-		const isPassed = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed].includes(referendum.status);
-		const isFailed = [EProposalStatus.Rejected].includes(referendum.status);
-
-		let influence = EInfluenceStatus.NO_IMPACT;
-
-		if (dvAyePower === BigInt(0) && dvNayPower === BigInt(0)) {
-			influence = EInfluenceStatus.NO_IMPACT;
-		} else if (isPassed) {
-			if (dvAyePower >= dvNayPower) influence = EInfluenceStatus.APPROVED;
-			else influence = EInfluenceStatus.FAILED;
-		} else if (isFailed) {
-			if (dvNayPower >= dvAyePower) influence = EInfluenceStatus.REJECTED;
-			else influence = EInfluenceStatus.FAILED;
-		}
-
+		const influence = calculateInfluenceStatus(dvAyePower, dvNayPower, referendum);
 		const totalPower = dvAyePower + dvNayPower + dvAbstainPower;
 		const turnout = totalAye + totalNay;
 
@@ -246,10 +284,10 @@ export function calculateDVInfluence(
 		const guardianVotesWithPercentage = setPercentage(guardianVotes);
 		const ayePercent = turnout > BigInt(0) ? Number((totalAye * BigInt(10000)) / turnout) / 100 : 0;
 		const nayPercent = turnout > BigInt(0) ? Number((totalNay * BigInt(10000)) / turnout) / 100 : 0;
-		const { trackNumber } = referendum;
 		const networkDetails = NETWORKS_DETAILS[network];
 		const trackDetails = networkDetails?.trackDetails || {};
-		const track = Object.values(trackDetails).find((t) => t && t.trackId === trackNumber);
+		const refTrackNumber = referendum.trackNumber;
+		const track = Object.values(trackDetails).find((t) => t && t.trackId === refTrackNumber);
 		return {
 			index: referendum.index,
 			title: referendum.proposalArguments?.description || referendum.preimage?.proposedCall?.description || 'Untitled',
@@ -271,6 +309,16 @@ export function calculateDVInfluence(
 	return { referendaInfluence };
 }
 
+function getSplitVoteDecision(ayeBalance: bigint, nayBalance: bigint, abstainBalance: bigint): EVoteDecision {
+	if (ayeBalance >= nayBalance && ayeBalance >= abstainBalance) {
+		return EVoteDecision.AYE;
+	}
+	if (nayBalance >= ayeBalance && nayBalance >= abstainBalance) {
+		return EVoteDecision.NAY;
+	}
+	return EVoteDecision.ABSTAIN;
+}
+
 function processDelegateVote(vote: IDVCohortVote): { decision: EVoteDecision; votingPower: bigint } {
 	let votingPower = BigInt(0);
 	let decision = EVoteDecision.ABSTAIN;
@@ -279,23 +327,17 @@ function processDelegateVote(vote: IDVCohortVote): { decision: EVoteDecision; vo
 		const ayeBalance = BigInt(vote.ayeBalance || 0);
 		const nayBalance = BigInt(vote.nayBalance || 0);
 		const abstainBalance = BigInt(vote.abstainBalance || 0);
-
-		if (ayeBalance >= nayBalance && ayeBalance >= abstainBalance) {
-			decision = EVoteDecision.AYE;
-		} else if (nayBalance >= ayeBalance && nayBalance >= abstainBalance) {
-			decision = EVoteDecision.NAY;
-		} else {
-			decision = EVoteDecision.ABSTAIN;
-		}
+		decision = getSplitVoteDecision(ayeBalance, nayBalance, abstainBalance);
 		votingPower = BigInt(vote.ayeVotes || 0) + BigInt(vote.nayVotes || 0) + BigInt(vote.abstainVotes || 0);
 	} else if (vote.aye) {
 		decision = EVoteDecision.AYE;
 		votingPower = BigInt(vote.votes || 0) + BigInt(vote.delegations?.votes || 0);
+	} else if (vote.isAbstain) {
+		decision = EVoteDecision.ABSTAIN;
+		votingPower = BigInt(vote.votes || 0) + BigInt(vote.delegations?.votes || 0);
 	} else if (vote.balance && !vote.aye) {
 		decision = EVoteDecision.NAY;
 		votingPower = BigInt(vote.votes || 0) + BigInt(vote.delegations?.votes || 0);
-	} else {
-		decision = EVoteDecision.ABSTAIN;
 	}
 
 	return { decision, votingPower };
