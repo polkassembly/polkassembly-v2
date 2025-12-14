@@ -412,12 +412,13 @@ export class AAGVideoService extends FirestoreUtils {
 		return `aag_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 	}
 
-	static async GetLatestAAGVideos(limit: number = 10, page: number = 1): Promise<{ data: IAAGVideoMetadata[]; totalCount: number }> {
-		const offset = (page - 1) * limit;
-		const snapshot = await this.aagVideoMetadataCollectionRef().where('isIndexed', '==', true).orderBy('publishedAt', 'desc').offset(offset).limit(limit).get();
-		const totalCount = await this.GetAAGVideoCount();
+	static async GetLatestAAGVideos(limit: number = 10, page: number = 1, network: ENetwork | null = null): Promise<{ data: IAAGVideoMetadata[]; totalCount: number }> {
+		const fetchLimit = network ? 200 : limit;
+		const offset = network ? 0 : (page - 1) * limit;
 
-		const data = snapshot.docs
+		const snapshot = await this.aagVideoMetadataCollectionRef().where('isIndexed', '==', true).orderBy('publishedAt', 'desc').offset(offset).limit(fetchLimit).get();
+
+		let videos = snapshot.docs
 			.map((doc) => {
 				const data = doc.data();
 				if (!data || typeof data.id !== 'string' || typeof data.title !== 'string') {
@@ -435,7 +436,21 @@ export class AAGVideoService extends FirestoreUtils {
 			})
 			.filter((item): item is IAAGVideoMetadata => item !== null);
 
-		return { data, totalCount };
+		// Apply network filter if specified
+		if (network !== null) {
+			videos = videos.filter((video) => video.network === network);
+		}
+
+		const totalCount = network !== null ? videos.length : await this.GetAAGVideoCount();
+
+		// Apply pagination for network-filtered results
+		if (network !== null) {
+			const startIndex = (page - 1) * limit;
+			const endIndex = startIndex + limit;
+			videos = videos.slice(startIndex, endIndex);
+		}
+
+		return { data: videos, totalCount };
 	}
 
 	static async SearchAAGVideosByTitle(

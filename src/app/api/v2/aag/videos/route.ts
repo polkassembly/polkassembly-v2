@@ -29,7 +29,7 @@ export const GET = withErrorHandling(async (req: NextRequest): Promise<NextRespo
 		videos = data;
 		totalCount = count;
 	} else {
-		const { data, totalCount: count } = await AAGVideoService.GetLatestAAGVideos(limit, page);
+		const { data, totalCount: count } = await AAGVideoService.GetLatestAAGVideos(limit, page, network);
 		videos = data;
 		totalCount = count;
 	}
