@@ -34,16 +34,10 @@ async function Community({ searchParams }: { searchParams: Promise<{ tab?: EComm
 	const activeTab = searchParamsValue?.tab || ECommunityRole.MEMBERS;
 	const page = parseInt(searchParamsValue?.page || '1', DEFAULT_LISTING_LIMIT);
 
-	// Todo: fetch allTab counts in single server call and pass to header
-	const allTabCounts: Record<ECommunityRole, number> = { members: 0, delegates: 0, curators: 0, decentralized_voices: 0 };
-
 	return (
 		<div className='w-full'>
 			<Tabs defaultValue={activeTab}>
-				<Header
-					activeTab={activeTab}
-					tabCounts={allTabCounts}
-				/>
+				<Header activeTab={activeTab} />
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 					<TabsContent value={ECommunityRole.MEMBERS}>
 						<CommunityMembers page={page} />

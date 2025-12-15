@@ -10,7 +10,7 @@ import { ECommunityRole } from '@/_shared/types';
 import { useRouter, usePathname } from 'next/navigation';
 import styles from './Header.module.scss';
 
-function Header({ activeTab, tabCounts }: { activeTab: ECommunityRole; tabCounts: Record<ECommunityRole, number> }) {
+function Header({ activeTab }: { activeTab: ECommunityRole }) {
 	const t = useTranslations();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -24,10 +24,10 @@ function Header({ activeTab, tabCounts }: { activeTab: ECommunityRole; tabCounts
 	};
 
 	const communityTabs = [
-		{ label: t('Community.members'), value: ECommunityRole.MEMBERS, count: tabCounts.members },
-		{ label: t('Community.delegates'), value: ECommunityRole.DELEGATES, count: tabCounts.delegates },
-		{ label: t('Community.curators'), value: ECommunityRole.CURATORS, count: tabCounts.curators },
-		{ label: t('Community.decentralizedVoices'), value: ECommunityRole.DVS, count: tabCounts.decentralized_voices }
+		{ label: t('Community.members'), value: ECommunityRole.MEMBERS },
+		{ label: t('Community.delegates'), value: ECommunityRole.DELEGATES },
+		{ label: t('Community.curators'), value: ECommunityRole.CURATORS },
+		{ label: t('Community.decentralizedVoices'), value: ECommunityRole.DVS }
 	];
 
 	return (
@@ -45,7 +45,7 @@ function Header({ activeTab, tabCounts }: { activeTab: ECommunityRole; tabCounts
 							value={tab.value}
 							onClick={() => onTabChange(tab.value)}
 						>
-							{tab.label} ({tab.count})
+							{tab.label}
 						</TabsTrigger>
 					))}
 				</TabsList>
