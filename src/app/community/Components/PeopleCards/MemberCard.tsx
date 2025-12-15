@@ -4,30 +4,30 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import Image from 'next/image';
-import { ESocial, EUserBadge, IDelegateDetails, IUserBadgeDetails } from '@/_shared/types';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import JudgementIcon from '@assets/icons/judgement-icon.svg';
 import RankStar from '@assets/profile/rank-star.svg';
-import { shortenAddress } from '@/_shared/_utils/shortenAddress';
-import { achievementBadges } from '@/_shared/_constants/achievementBadges';
 import CopyToClipboard from '@ui/CopyToClipboard/CopyToClipboard';
 import { Separator } from '@ui/Separator';
 import { Button } from '@ui/Button';
-import { useIdentityService } from '@/hooks/useIdentityService';
-import { Skeleton } from '@/app/_shared-components/Skeleton';
-import { isUserBlacklisted } from '@/_shared/_utils/isUserBlacklisted';
 import Address from '@ui/Profile/Address/Address';
 import { ShieldPlus, CircleDollarSign, UserIcon, ShieldAlert } from 'lucide-react';
-import { useUser } from '@/hooks/useUser';
 import { IoMdMail } from '@react-icons/all-files/io/IoMdMail';
 import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
 import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
 import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
 import { FaGithub } from '@react-icons/all-files/fa/FaGithub';
+import { useUser } from '@/hooks/useUser';
+import { isUserBlacklisted } from '@/_shared/_utils/isUserBlacklisted';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { useIdentityService } from '@/hooks/useIdentityService';
+import { achievementBadges } from '@/_shared/_constants/achievementBadges';
+import { shortenAddress } from '@/_shared/_utils/shortenAddress';
+import { ESocial, IDelegateDetails, IOnChainIdentity, EUserBadge, IUserBadgeDetails } from '@/_shared/types';
 import styles from './PeopleCard.module.scss';
 
 const SocialIcons: Partial<Record<ESocial, React.ComponentType<React.SVGProps<SVGSVGElement>>>> = {
@@ -42,9 +42,10 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 	const t = useTranslations();
 	const { user } = useUser();
 
-	const { identityService } = useIdentityService();
+	const { getOnChainIdentity, identityService } = useIdentityService();
 	const [isReadMoreVisible, setIsReadMoreVisible] = useState(false);
-	const isFetching = false;
+	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
+	const [isFetching, setIsFetching] = useState(true);
 
 	const userBadges =
 		member?.publicUser?.profileDetails?.achievementBadges?.reduce(
@@ -52,10 +53,33 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 				acc[badge.name] = badge;
 				return acc;
 			},
-			{} as Record<EUserBadge, IUserBadgeDetails>
+			{} as Partial<Record<EUserBadge, IUserBadgeDetails>>
 		) || {};
 
 	const isFollowing = member?.publicUser?.following?.some((item) => item.followerUserId === user?.id);
+
+	useEffect(() => {
+		const fetchIdentity = async () => {
+			if (!member?.address) {
+				setIsFetching(false);
+				return;
+			}
+
+			try {
+				setIsFetching(true);
+				const identityInfo = await getOnChainIdentity(member.address);
+				if (identityInfo) {
+					setIdentity(identityInfo);
+				}
+			} catch (error) {
+				console.error('Error fetching identity:', error);
+			} finally {
+				setIsFetching(false);
+			}
+		};
+
+		fetchIdentity();
+	}, [member?.address, getOnChainIdentity]);
 
 	return (
 		<div className={styles.memberCard}>
@@ -126,7 +150,7 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 						<Skeleton className='ml-2 h-4 w-16' />
 					) : (
 						<span className='text-xs text-basic_text'>
-							{t('Profile.judgement')}: <span className='font-medium'>{member?.judgements?.[0] || t('Profile.noJudgements')}</span>
+							{t('Profile.judgement')}: <span className='font-medium'>{identity?.judgements?.[0]?.[1]?.toString() || t('Profile.noJudgements')}</span>
 						</span>
 					)}
 				</div>

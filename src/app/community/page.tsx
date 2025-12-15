@@ -2,7 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import React from 'react';
 import Header from '@/app/community/Components/Header/Header';
 import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
@@ -14,6 +13,7 @@ import { ECommunityRole } from '@/_shared/types';
 import CommunityMembers from './Components/Members/Members';
 import CommunityDelegates from './Components/Delegates/Delegates';
 import CommunityCurators from './Components/Curators/Curators';
+import DecentralisedVoices from './Components/DecentralisedVoices';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
@@ -48,7 +48,9 @@ async function Community({ searchParams }: { searchParams: Promise<{ tab?: EComm
 					<TabsContent value={ECommunityRole.CURATORS}>
 						<CommunityCurators page={page} />
 					</TabsContent>
-					<TabsContent value={ECommunityRole.DVS}>DVs Page</TabsContent>
+					<TabsContent value={ECommunityRole.DVS}>
+						<DecentralisedVoices />
+					</TabsContent>
 				</div>
 			</Tabs>
 		</div>
