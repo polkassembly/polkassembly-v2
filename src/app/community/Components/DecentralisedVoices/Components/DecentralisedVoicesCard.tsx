@@ -192,7 +192,21 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 											</TooltipProvider>
 										</div>
 									</th>
-									<th className='py-4'>{t('WinRate').toUpperCase()}</th>
+									<th className='py-4'>
+										<div className='flex items-center gap-1'>
+											{t('WinRate').toUpperCase()}
+											<TooltipProvider>
+												<Tooltip>
+													<TooltipTrigger>
+														<BsFillQuestionCircleFill className='ml-1 text-base text-btn_secondary_border' />
+													</TooltipTrigger>
+													<TooltipContent className='bg-tooltip_background p-2 text-btn_primary_text'>
+														<p>A win = referendum finished && ((aye vote && referendum approval) || (nay vote && no referendum approval))</p>
+													</TooltipContent>
+												</Tooltip>
+											</TooltipProvider>
+										</div>
+									</th>
 								</tr>
 							</thead>
 							<tbody>
