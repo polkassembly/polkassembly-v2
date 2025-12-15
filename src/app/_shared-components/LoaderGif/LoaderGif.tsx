@@ -16,9 +16,10 @@ const loaders = [loader1, loader2, loader3];
 interface ILoaderGifProps {
 	message?: string;
 	className?: string;
+	minHeight?: string;
 }
 
-function LoaderGif({ message, className = '' }: ILoaderGifProps) {
+function LoaderGif({ message, className = '', minHeight = '400px' }: ILoaderGifProps) {
 	const t = useTranslations('Common');
 	const [currentLoaderIndex, setCurrentLoaderIndex] = useState(0);
 
@@ -33,7 +34,10 @@ function LoaderGif({ message, className = '' }: ILoaderGifProps) {
 	const displayMessage = message || t('loadingMessage');
 
 	return (
-		<div className={`flex min-h-[400px] flex-col items-center justify-center gap-6 ${className}`}>
+		<div
+			className={`flex flex-col items-center justify-center gap-6 ${className}`}
+			style={{ minHeight }}
+		>
 			<div className='relative h-[200px] w-[200px]'>
 				<Image
 					src={loaders[currentLoaderIndex]}

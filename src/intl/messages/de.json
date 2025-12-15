@@ -1576,7 +1576,9 @@
 		"fees": "Gebühren",
 		"noJudgementsFound": "Keine Urteile gefunden",
 		"noRegistrarsFound": "Keine Registrars gefunden",
-		"searchByAddressOrName": "Adresse oder Name eingeben, um zu suchen"
+		"searchByAddressOrName": "Adresse oder Name eingeben, um zu suchen",
+		"reasonable": "Angemessen",
+		"failedToLoadData": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut."
 	},
 	"JudgementStatus": {
 		"pending": "Ausstehend",

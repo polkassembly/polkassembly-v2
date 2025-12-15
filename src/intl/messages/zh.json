@@ -1577,7 +1577,9 @@
 		"fees": "费用",
 		"noJudgementsFound": "未找到判断",
 		"noRegistrarsFound": "未找到注册者",
-		"searchByAddressOrName": "输入地址或名称进行搜索"
+		"searchByAddressOrName": "输入地址或名称进行搜索",
+		"reasonable": "合理",
+		"failedToLoadData": "加载数据失败。请再试一次。"
 	},
 	"JudgementStatus": {
 		"pending": "待定",

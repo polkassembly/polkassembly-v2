@@ -1578,7 +1578,9 @@
 		"fees": "Tarifas",
 		"noJudgementsFound": "No se encontraron juicios",
 		"noRegistrarsFound": "No se encontraron registradores",
-		"searchByAddressOrName": "Ingrese dirección o nombre para buscar"
+		"searchByAddressOrName": "Ingrese dirección o nombre para buscar",
+		"reasonable": "Razonable",
+		"failedToLoadData": "No se pudieron cargar los datos. Por favor, inténtelo de nuevo."
 	},
 	"JudgementStatus": {
 		"pending": "Pendiente",

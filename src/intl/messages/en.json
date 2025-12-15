@@ -1606,7 +1606,9 @@
 		"fees": "Fees",
 		"noJudgementsFound": "No judgements found",
 		"noRegistrarsFound": "No registrars found",
-		"searchByAddressOrName": "Enter address or name to search"
+		"searchByAddressOrName": "Enter address or name to search",
+		"reasonable": "Reasonable",
+		"failedToLoadData": "Failed to load data. Please try again."
 	},
 	"JudgementStatus": {
 		"pending": "Pending",

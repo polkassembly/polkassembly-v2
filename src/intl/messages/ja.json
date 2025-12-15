@@ -1577,7 +1577,9 @@
 		"fees": "料金",
 		"noJudgementsFound": "判断が見つかりません",
 		"noRegistrarsFound": "登録者が見つかりません",
-		"searchByAddressOrName": "アドレスまたは名前で検索"
+		"searchByAddressOrName": "アドレスまたは名前で検索",
+		"reasonable": "合理的",
+		"failedToLoadData": "データの読み込みに失敗しました。もう一度お試しください。"
 	},
 	"JudgementStatus": {
 		"pending": "保留中",

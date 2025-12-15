@@ -232,7 +232,7 @@ function MyIdentitiesDashboard() {
 									<SocialLinksDisplay socials={identity.socials} />
 								</td>
 								<td className='px-6 py-4'>
-									<span className='rounded px-2 py-1 text-sm font-semibold text-text_primary'>{identity.type}</span>
+									<span className='rounded px-2 py-1 text-sm font-semibold text-text_primary'>{t('Judgements.reasonable')}</span>
 								</td>
 								<td className='px-6 py-4'>
 									{identity.judgements.length > 0 ? (

@@ -8,13 +8,19 @@ import { useIdentityService } from '@/hooks/useIdentityService';
 import { useQuery } from '@tanstack/react-query';
 import LoaderGif from '@/app/_shared-components/LoaderGif/LoaderGif';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { useTranslations } from 'next-intl';
 import OverviewStats from './OverviewStats';
 import IdentitiesListingTable from './IdentitiesListingTable';
 
 function OverviewTab() {
 	const { identityService } = useIdentityService();
+	const t = useTranslations();
 
-	const { data: overviewData, isLoading: isStatsLoading } = useQuery({
+	const {
+		data: overviewData,
+		isLoading: isStatsLoading,
+		error: statsError
+	} = useQuery({
 		queryKey: ['identityOverview'],
 		queryFn: async () => {
 			if (!identityService) return null;
@@ -26,7 +32,11 @@ function OverviewTab() {
 		refetchOnWindowFocus: false
 	});
 
-	const { data: allIdentities, isLoading: isIdentitiesLoading } = useQuery({
+	const {
+		data: allIdentities,
+		isLoading: isIdentitiesLoading,
+		error: identitiesError
+	} = useQuery({
 		queryKey: ['allIdentities'],
 		queryFn: async () => {
 			if (!identityService) return [];
@@ -42,6 +52,14 @@ function OverviewTab() {
 
 	if (isLoading) {
 		return <LoaderGif />;
+	}
+
+	if (statsError || identitiesError) {
+		return (
+			<div className='flex items-center justify-center rounded-3xl border border-primary_border bg-bg_modal p-8'>
+				<p className='text-error text-center'>{t('Judgements.failedToLoadData')}</p>
+			</div>
+		);
 	}
 
 	return (
