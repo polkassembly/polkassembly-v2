@@ -5,10 +5,7 @@
 import { useMemo, useState } from 'react';
 import Identicon from '@polkadot/react-identicon';
 import { ChevronDown, ChevronRight, Copy } from 'lucide-react';
-import { useIdentityService } from '@/hooks/useIdentityService';
-import { useQuery } from '@tanstack/react-query';
 import { EJudgementStatus } from '@/_shared/types';
-import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '@/app/_shared-components/Table';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { useSearchParams } from 'next/navigation';
@@ -44,22 +41,15 @@ interface IIdentity {
 	subIdentityCount: number;
 }
 
-function IdentitiesListingTable() {
+interface IIdentitiesListingTableProps {
+	allIdentities: IIdentity[] | undefined;
+}
+
+function IdentitiesListingTable({ allIdentities }: IIdentitiesListingTableProps) {
 	const searchParams = useSearchParams();
 	const page = Number(searchParams?.get('page')) || 1;
 	const search = searchParams?.get('search') || '';
-	const { identityService } = useIdentityService();
 	const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-
-	const { data: allIdentities, isLoading } = useQuery<IIdentity[]>({
-		queryKey: ['allIdentities', identityService],
-		queryFn: async () => {
-			if (!identityService) return [];
-			return identityService.getAllIdentities();
-		},
-		enabled: !!identityService,
-		staleTime: 60000
-	});
 
 	const filteredIdentities = useMemo(() => {
 		if (!allIdentities) return [];
@@ -84,16 +74,6 @@ function IdentitiesListingTable() {
 		}
 		setExpandedRows(newExpanded);
 	};
-
-	if (isLoading || !identityService) {
-		return (
-			<div className='flex flex-col gap-4 rounded-3xl border border-primary_border bg-bg_modal p-4'>
-				<Skeleton className='h-12 w-full' />
-				<Skeleton className='h-12 w-full' />
-				<Skeleton className='h-12 w-full' />
-			</div>
-		);
-	}
 
 	if (!paginatedData || paginatedData.length === 0) {
 		return (

@@ -5,7 +5,6 @@
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ENotificationStatus } from '@/_shared/types';
-import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '@/app/_shared-components/Table';
 import { useUser } from '@/hooks/useUser';
 import { Settings, Trash2, Copy, PencilIcon } from 'lucide-react';
@@ -25,6 +24,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 import { BN } from '@polkadot/util';
 import { useRouter } from 'next/navigation';
+import LoaderGif from '@/app/_shared-components/LoaderGif/LoaderGif';
 import { SocialLinksDisplay } from '../Overview/IdentityComponents';
 import styles from '../Overview/IdentitiesListingTable.module.scss';
 
@@ -108,7 +108,11 @@ function MyIdentitiesDashboard() {
 		}
 	};
 
-	if (!isLoading && identityService && (!myIdentities || myIdentities.identities.length === 0)) {
+	if (isLoading || !identityService) {
+		return <LoaderGif />;
+	}
+
+	if (!myIdentities || myIdentities.identities.length === 0) {
 		return (
 			<div className='flex items-center justify-center rounded-3xl border border-primary_border bg-bg_modal p-12'>
 				<div className='text-center'>
@@ -132,15 +136,9 @@ function MyIdentitiesDashboard() {
 						/>
 						<div className={styles.statsContent}>
 							<p className={styles.statsLabel}>{t('Judgements.mySubIdentities')}</p>
-							<p className={styles.statsValue}>
-								{isLoading || !identityService ? (
-									<Skeleton className='h-6 w-20' />
-								) : (
-									<div className='flex items-baseline gap-2'>
-										<div className='text-2xl font-bold text-text_primary'>{myIdentities?.totalSubIdentities || 0}</div>
-									</div>
-								)}
-							</p>
+							<div className={styles.statsValue}>
+								<p className='text-2xl font-bold text-text_primary'>{myIdentities?.totalSubIdentities || 0}</p>
+							</div>
 						</div>
 					</div>
 					<Separator
@@ -156,15 +154,9 @@ function MyIdentitiesDashboard() {
 						/>
 						<div className={styles.statsContent}>
 							<p className={styles.statsLabel}>{t('Judgements.judgements')}</p>
-							<p className={styles.statsValue}>
-								{isLoading || !identityService ? (
-									<Skeleton className='h-6 w-20' />
-								) : (
-									<div className='flex items-baseline gap-2'>
-										<div className='text-2xl font-bold text-text_primary'>{myIdentities?.totalJudgements || 0}</div>
-									</div>
-								)}
-							</p>
+							<div className={styles.statsValue}>
+								<p className='text-2xl font-bold text-text_primary'>{myIdentities?.totalJudgements || 0}</p>
+							</div>
 						</div>
 					</div>
 					<Separator
@@ -180,144 +172,132 @@ function MyIdentitiesDashboard() {
 						/>
 						<div className={styles.statsContent}>
 							<p className={styles.statsLabel}>{t('Profile.balance')}</p>
-							<p className={styles.statsValue}>
-								{isLoading || !identityService ? (
-									<Skeleton className='h-6 w-20' />
-								) : (
-									<div className='flex items-baseline gap-2'>
-										<div className='text-2xl font-bold text-text_primary'>
-											{formatBnBalance(
-												myIdentities?.totalBalance || '0',
-												{
-													withUnit: true,
-													numberAfterComma: 2,
-													compactNotation: true
-												},
-												network
-											)}
-										</div>
-									</div>
-								)}
-							</p>
+							<div className={styles.statsValue}>
+								<div className='flex items-baseline gap-2'>
+									<p className='text-2xl font-bold text-text_primary'>
+										{formatBnBalance(
+											myIdentities?.totalBalance || '0',
+											{
+												withUnit: true,
+												numberAfterComma: 2,
+												compactNotation: true
+											},
+											network
+										)}
+									</p>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			{/* Table */}
-			{isLoading || !identityService ? (
-				<div className='mt-4 flex flex-col gap-4 rounded-3xl border border-primary_border bg-bg_modal p-4'>
-					<Skeleton className='h-12 w-full' />
-					<Skeleton className='h-12 w-full' />
-					<Skeleton className='h-12 w-full' />
-				</div>
-			) : (
-				<div className='mt-4 w-full rounded-3xl border border-primary_border bg-bg_modal p-6'>
-					<Table>
-						<TableHeader>
-							<TableRow className={styles.headerRow}>
-								<TableHead className={styles.headerCell}>IDENTITY</TableHead>
-								<TableHead className={styles.headerCell}>SOCIALS</TableHead>
-								<TableHead className={styles.headerCell}>TYPE</TableHead>
-								<TableHead className={styles.headerCell}>JUDGEMENTS</TableHead>
-								<TableHead className={styles.headerCell}>ACTIONS</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{myIdentities?.identities.map((identity) => (
-								<TableRow key={identity.address}>
-									<td className='py-4 pl-2 pr-6'>
+			<div className='mt-4 w-full rounded-3xl border border-primary_border bg-bg_modal p-6'>
+				<Table>
+					<TableHeader>
+						<TableRow className={styles.headerRow}>
+							<TableHead className={styles.headerCell}>{t('Judgements.identityColumn')}</TableHead>
+							<TableHead className={styles.headerCell}>{t('Judgements.socialsColumn')}</TableHead>
+							<TableHead className={styles.headerCell}>{t('Judgements.typeColumn')}</TableHead>
+							<TableHead className={styles.headerCell}>{t('Judgements.judgementsColumn')}</TableHead>
+							<TableHead className={styles.headerCell}>{t('Judgements.actionsColumn')}</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{myIdentities?.identities.map((identity) => (
+							<TableRow key={identity.address}>
+								<td className='py-4 pl-2 pr-6'>
+									<div className='flex items-center gap-1'>
+										<span className='text-xs text-basic_text'>
+											<Address
+												iconSize={24}
+												address={identity.address}
+											/>
+										</span>
+										<span className='text-xs text-basic_text'>
+											({identity.address.slice(0, 6)}...{identity.address.slice(-5)})
+										</span>
+										<button
+											type='button'
+											className='text-basic_text hover:text-text_primary'
+											title='Copy address'
+											onClick={() => navigator.clipboard.writeText(identity.address)}
+										>
+											<Copy size={14} />
+										</button>
+									</div>
+								</td>
+								<td className='px-6 py-4'>
+									<SocialLinksDisplay socials={identity.socials} />
+								</td>
+								<td className='px-6 py-4'>
+									<span className='rounded px-2 py-1 text-sm font-semibold text-text_primary'>{identity.type}</span>
+								</td>
+								<td className='px-6 py-4'>
+									{identity.judgements.length > 0 ? (
 										<div className='flex items-center gap-1'>
-											<span className='text-xs text-basic_text'>
-												<Address
-													iconSize={24}
-													address={identity.address}
-												/>
-											</span>
-											<span className='text-xs text-basic_text'>
-												({identity.address.slice(0, 6)}...{identity.address.slice(-5)})
-											</span>
-											<button
-												type='button'
-												className='text-basic_text hover:text-text_primary'
-												title='Copy address'
-												onClick={() => navigator.clipboard.writeText(identity.address)}
-											>
-												<Copy size={14} />
-											</button>
+											<span className='rounded px-2 py-1 text-sm font-semibold text-text_primary'>{t('Judgements.reasonable')}</span>
+											{identity.judgements.length > 1 && (
+												<Tooltip>
+													<TooltipTrigger asChild>
+														<span className='flex !size-6 items-center justify-center rounded-full border border-primary_border bg-poll_option_bg p-2 text-xs font-medium text-text_primary'>
+															+{identity.judgements.length - 1}
+														</span>
+													</TooltipTrigger>
+													<TooltipContent
+														side='top'
+														align='center'
+														className='bg-tooltip_background'
+													>
+														<div className='flex flex-col gap-2 p-2'>
+															<span className='text-xs text-white'>{identity.judgements.join(', ')}</span>
+														</div>
+													</TooltipContent>
+												</Tooltip>
+											)}
 										</div>
-									</td>
-									<td className='px-6 py-4'>
-										<SocialLinksDisplay socials={identity.socials} />
-									</td>
-									<td className='px-6 py-4'>
-										<span className='rounded px-2 py-1 text-sm font-semibold text-text_primary'>{identity.type}</span>
-									</td>
-									<td className='px-6 py-4'>
-										{identity.judgements.length > 0 ? (
-											<div className='flex items-center gap-1'>
-												<span className='rounded px-2 py-1 text-sm font-semibold text-text_primary'>Reasonable</span>
-												{identity.judgements.length > 1 && (
-													<Tooltip>
-														<TooltipTrigger asChild>
-															<span className='flex !size-6 items-center justify-center rounded-full border border-primary_border bg-poll_option_bg p-2 text-xs font-medium text-text_primary'>
-																+{identity.judgements.length - 1}
-															</span>
-														</TooltipTrigger>
-														<TooltipContent
-															side='top'
-															align='center'
-															className='bg-tooltip_background'
-														>
-															<div className='flex flex-col gap-2 p-2'>
-																<span className='text-xs text-white'>{identity.judgements.join(', ')}</span>
-															</div>
-														</TooltipContent>
-													</Tooltip>
-												)}
-											</div>
-										) : (
-											<span className='px-4 text-center font-semibold text-text_primary'>-</span>
-										)}
-									</td>
-									<td className='px-6 py-4'>
-										<div className='flex items-center gap-2'>
-											{identity.canEdit && (
-												<button
-													onClick={() => handleEdit(identity.address)}
-													className='text-text_pink hover:text-text_pink/80'
-													type='button'
-													title='Edit'
-												>
-													<PencilIcon size={16} />
-												</button>
-											)}
-											{identity.canDelete && (
-												<button
-													onClick={() => handleDeleteIdentity(identity.address, identity.type === SUB_IDENTITY_TYPE)}
-													className='text-red-500 hover:text-red-600 disabled:opacity-50'
-													type='button'
-													title={identity.type === SUB_IDENTITY_TYPE ? 'Remove Sub-identity' : 'Clear Identity'}
-													disabled={isDeleting === identity.address}
-												>
-													{isDeleting === identity.address ? <span>⏳</span> : <Trash2 size={16} />}
-												</button>
-											)}
+									) : (
+										<span className='px-4 text-center font-semibold text-text_primary'>-</span>
+									)}
+								</td>
+								<td className='px-6 py-4'>
+									<div className='flex items-center gap-2'>
+										{identity.canEdit && (
 											<button
+												onClick={() => handleEdit(identity.address)}
 												className='text-text_pink hover:text-text_pink/80'
 												type='button'
-												title='Settings'
+												title='Edit'
 											>
-												<Settings size={16} />
+												<PencilIcon size={16} />
 											</button>
-										</div>
-									</td>
-								</TableRow>
-							))}
-						</TableBody>
-					</Table>
-				</div>
-			)}
+										)}
+										{identity.canDelete && (
+											<button
+												onClick={() => handleDeleteIdentity(identity.address, identity.type === SUB_IDENTITY_TYPE)}
+												className='text-red-500 hover:text-red-600 disabled:opacity-50'
+												type='button'
+												title={identity.type === SUB_IDENTITY_TYPE ? 'Remove Sub-identity' : 'Clear Identity'}
+												disabled={isDeleting === identity.address}
+											>
+												{isDeleting === identity.address ? <span>⏳</span> : <Trash2 size={16} />}
+											</button>
+										)}
+										<button
+											className='text-text_pink hover:text-text_pink/80'
+											type='button'
+											title='Settings'
+										>
+											<Settings size={16} />
+										</button>
+									</div>
+								</td>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			</div>
 		</div>
 	);
 }

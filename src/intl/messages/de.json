@@ -1,4 +1,7 @@
 {
+	"Common": {
+		"loadingMessage": "Governance-Weisheit kommt an 🚀"
+	},
 	"HomePage": {
 		"title": "Willkommen zu Hause"
 	},
@@ -1573,7 +1576,19 @@
 		"fees": "Gebühren",
 		"noJudgementsFound": "Keine Urteile gefunden",
 		"noRegistrarsFound": "Keine Registrars gefunden",
-		"searchByAddressOrName": "Adresse oder Name eingeben, um zu suchen"
+		"searchByAddressOrName": "Adresse oder Name eingeben, um zu suchen",
+		"reasonable": "Angemessen",
+		"knownGood": "Bekannt Gut",
+		"outOfDate": "Veraltet",
+		"lowQuality": "Minderwertig",
+		"erroneous": "Fehlerhaft",
+		"feePaid": "Gebühr bezahlt",
+		"failedToLoadData": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+		"identityColumn": "Identität",
+		"socialsColumn": "Soziale Medien",
+		"typeColumn": "Typ",
+		"judgementsColumn": "Beurteilungen",
+		"actionsColumn": "Aktionen"
 	},
 	"JudgementStatus": {
 		"pending": "Ausstehend",

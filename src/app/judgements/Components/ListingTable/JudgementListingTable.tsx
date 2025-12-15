@@ -8,10 +8,7 @@ import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import Address from '@/app/_shared-components/Profile/Address/Address';
-import { useIdentityService } from '@/hooks/useIdentityService';
-import { useQuery } from '@tanstack/react-query';
 import { formatJudgementLabel, getJudgementRequests } from '@/app/_client-utils/identityUtils';
-import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { Copy } from 'lucide-react';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '../../../_shared-components/Table';
 import { PaginationWithLinks } from '../../../_shared-components/PaginationWithLinks';
@@ -19,22 +16,15 @@ import { JudgementDisplay, SocialLinksDisplay } from '../Overview/IdentityCompon
 import JudgementStatusTag from '../../../_shared-components/JudgementStatusTag/JudgementStatusTag';
 import styles from './ListingTable.module.scss';
 
-function JudgementListingTable() {
+interface IJudgementListingTableProps {
+	allJudgements: IJudgementRequest[] | undefined;
+}
+
+function JudgementListingTable({ allJudgements }: IJudgementListingTableProps) {
 	const searchParams = useSearchParams();
 	const page = Number(searchParams?.get('page')) || 1;
 	const search = searchParams?.get('dashboardSearch') || '';
 	const t = useTranslations('Judgements');
-	const { identityService } = useIdentityService();
-
-	const { data: allJudgements, isLoading } = useQuery({
-		queryKey: ['allJudgementRequests', identityService],
-		queryFn: async () => {
-			if (!identityService) return [];
-			return identityService.getAllIdentityJudgements();
-		},
-		enabled: !!identityService,
-		staleTime: 60000
-	});
 
 	const data = useMemo(() => {
 		if (!allJudgements) return { items: [], totalCount: 0 };
@@ -62,16 +52,6 @@ function JudgementListingTable() {
 
 	const judgementData = data?.items || [];
 	const totalCount = data?.totalCount || 0;
-
-	if (isLoading || !identityService) {
-		return (
-			<div className='flex flex-col gap-4 rounded-3xl border border-primary_border bg-bg_modal p-4'>
-				<Skeleton className='h-12 w-full' />
-				<Skeleton className='h-12 w-full' />
-				<Skeleton className='h-12 w-full' />
-			</div>
-		);
-	}
 
 	return (
 		<div className='w-full'>
