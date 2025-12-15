@@ -136,11 +136,9 @@ function MyIdentitiesDashboard() {
 						/>
 						<div className={styles.statsContent}>
 							<p className={styles.statsLabel}>{t('Judgements.mySubIdentities')}</p>
-							<p className={styles.statsValue}>
-								<div className='flex items-baseline gap-2'>
-									<div className='text-2xl font-bold text-text_primary'>{myIdentities?.totalSubIdentities || 0}</div>
-								</div>
-							</p>
+							<div className={styles.statsValue}>
+								<p className='text-2xl font-bold text-text_primary'>{myIdentities?.totalSubIdentities || 0}</p>
+							</div>
 						</div>
 					</div>
 					<Separator
@@ -156,11 +154,9 @@ function MyIdentitiesDashboard() {
 						/>
 						<div className={styles.statsContent}>
 							<p className={styles.statsLabel}>{t('Judgements.judgements')}</p>
-							<p className={styles.statsValue}>
-								<div className='flex items-baseline gap-2'>
-									<div className='text-2xl font-bold text-text_primary'>{myIdentities?.totalJudgements || 0}</div>
-								</div>
-							</p>
+							<div className={styles.statsValue}>
+								<p className='text-2xl font-bold text-text_primary'>{myIdentities?.totalJudgements || 0}</p>
+							</div>
 						</div>
 					</div>
 					<Separator
@@ -176,9 +172,9 @@ function MyIdentitiesDashboard() {
 						/>
 						<div className={styles.statsContent}>
 							<p className={styles.statsLabel}>{t('Profile.balance')}</p>
-							<p className={styles.statsValue}>
+							<div className={styles.statsValue}>
 								<div className='flex items-baseline gap-2'>
-									<div className='text-2xl font-bold text-text_primary'>
+									<p className='text-2xl font-bold text-text_primary'>
 										{formatBnBalance(
 											myIdentities?.totalBalance || '0',
 											{
@@ -188,9 +184,9 @@ function MyIdentitiesDashboard() {
 											},
 											network
 										)}
-									</div>
+									</p>
 								</div>
-							</p>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -241,7 +237,7 @@ function MyIdentitiesDashboard() {
 								<td className='px-6 py-4'>
 									{identity.judgements.length > 0 ? (
 										<div className='flex items-center gap-1'>
-											<span className='rounded px-2 py-1 text-sm font-semibold text-text_primary'>Reasonable</span>
+											<span className='rounded px-2 py-1 text-sm font-semibold text-text_primary'>{t('Judgements.reasonable')}</span>
 											{identity.judgements.length > 1 && (
 												<Tooltip>
 													<TooltipTrigger asChild>

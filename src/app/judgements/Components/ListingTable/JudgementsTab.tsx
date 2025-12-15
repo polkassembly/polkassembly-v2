@@ -6,7 +6,7 @@
 
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { useQuery } from '@tanstack/react-query';
-import { IJudgementStats } from '@/_shared/types';
+import { IJudgementStats, IJudgementRequest } from '@/_shared/types';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { getJudgementStats } from '@/app/_client-utils/identityUtils';
 import LoaderGif from '@/app/_shared-components/LoaderGif/LoaderGif';
@@ -17,14 +17,15 @@ function JudgementsTab() {
 	const { identityService } = useIdentityService();
 
 	const {
-		data: stats,
-		isLoading: isStatsLoading,
+		data: judgementsData,
+		isLoading,
 		isError
-	} = useQuery<IJudgementStats>({
-		queryKey: ['judgementStats'],
+	} = useQuery<{ stats: IJudgementStats; allJudgements: IJudgementRequest[] }>({
+		queryKey: ['judgementsTabData'],
 		queryFn: async () => {
 			const allJudgements = await identityService!.getAllIdentityJudgements();
-			return getJudgementStats(allJudgements);
+			const stats = getJudgementStats(allJudgements);
+			return { stats, allJudgements };
 		},
 		staleTime: FIVE_MIN_IN_MILLI,
 		retry: 3,
@@ -32,29 +33,17 @@ function JudgementsTab() {
 		enabled: !!identityService
 	});
 
-	const { data: allJudgements, isLoading: isJudgementsLoading } = useQuery({
-		queryKey: ['allJudgementRequests', identityService],
-		queryFn: async () => {
-			if (!identityService) return [];
-			return identityService.getAllIdentityJudgements();
-		},
-		enabled: !!identityService,
-		staleTime: 60000
-	});
-
-	const isLoading = isStatsLoading || isJudgementsLoading || !identityService;
-
-	if (isLoading) {
+	if (isLoading || !identityService) {
 		return <LoaderGif />;
 	}
 
 	return (
 		<div className='flex flex-col gap-y-4'>
 			<DashboardSummary
-				stats={stats}
+				stats={judgementsData?.stats}
 				isError={isError}
 			/>
-			<JudgementListingTable allJudgements={allJudgements} />
+			<JudgementListingTable allJudgements={judgementsData?.allJudgements} />
 		</div>
 	);
 }

@@ -16,20 +16,20 @@ function RegistrarsTab() {
 	const { identityService } = useIdentityService();
 
 	const {
-		data: stats,
-		isLoading: isStatsLoading,
+		data: registrarsData,
+		isLoading,
 		isError
 	} = useQuery({
-		queryKey: ['judgementStats', identityService],
+		queryKey: ['registrarsTabData'],
 		queryFn: async () => {
-			if (!identityService) return { totalJudgementsGranted: 0, totalRegistrars: 0 };
-			const allJudgements = await identityService.getAllIdentityJudgements();
-			const registrars = await identityService.getRegistrars();
+			const [registrars, judgements] = await Promise.all([identityService!.getRegistrars(), identityService!.getAllIdentityJudgements()]);
 
-			const totalJudgementsGranted = allJudgements.filter((j) => j.status === EJudgementStatus.APPROVED).length;
-			const totalRegistrars = registrars.length;
+			const totalJudgementsGranted = judgements.filter((j) => j.status === EJudgementStatus.APPROVED).length;
 
-			return { totalJudgementsGranted, totalRegistrars };
+			return {
+				stats: { totalJudgementsGranted, totalRegistrars: registrars.length },
+				allRegistrarsData: { registrars, judgements }
+			};
 		},
 		staleTime: FIVE_MIN_IN_MILLI,
 		retry: 3,
@@ -37,31 +37,17 @@ function RegistrarsTab() {
 		enabled: !!identityService
 	});
 
-	const { data: allRegistrarsData, isLoading: isRegistrarsLoading } = useQuery({
-		queryKey: ['allRegistrarsData', identityService],
-		queryFn: async () => {
-			if (!identityService) return { registrars: [], judgements: [] };
-			const registrarsData = await identityService.getRegistrars();
-			const judgements = await identityService.getAllIdentityJudgements();
-			return { registrars: registrarsData, judgements };
-		},
-		enabled: !!identityService,
-		staleTime: 60000
-	});
-
-	const isLoading = isStatsLoading || isRegistrarsLoading || !identityService;
-
-	if (isLoading) {
+	if (isLoading || !identityService) {
 		return <LoaderGif />;
 	}
 
 	return (
 		<div className='flex flex-col gap-y-4'>
 			<RegistrarsSummary
-				stats={stats}
+				stats={registrarsData?.stats}
 				isError={isError}
 			/>
-			<RegistrarsListingTable allRegistrarsData={allRegistrarsData} />
+			<RegistrarsListingTable allRegistrarsData={registrarsData?.allRegistrarsData} />
 		</div>
 	);
 }
