@@ -1579,7 +1579,12 @@
 		"noRegistrarsFound": "未找到注册者",
 		"searchByAddressOrName": "输入地址或名称进行搜索",
 		"reasonable": "合理",
-		"failedToLoadData": "加载数据失败。请再试一次。"
+		"failedToLoadData": "加载数据失败。请再试一次。",
+		"identityColumn": "身份",
+		"socialsColumn": "社交媒体",
+		"typeColumn": "类型",
+		"judgementsColumn": "判断",
+		"actionsColumn": "操作"
 	},
 	"JudgementStatus": {
 		"pending": "待定",

@@ -1608,7 +1608,12 @@
 		"noRegistrarsFound": "No registrars found",
 		"searchByAddressOrName": "Enter address or name to search",
 		"reasonable": "Reasonable",
-		"failedToLoadData": "Failed to load data. Please try again."
+		"failedToLoadData": "Failed to load data. Please try again.",
+		"identityColumn": "Identity",
+		"socialsColumn": "Socials",
+		"typeColumn": "Type",
+		"judgementsColumn": "Judgements",
+		"actionsColumn": "Actions"
 	},
 	"JudgementStatus": {
 		"pending": "Pending",

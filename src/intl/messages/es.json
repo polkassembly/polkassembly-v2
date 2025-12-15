@@ -1580,7 +1580,12 @@
 		"noRegistrarsFound": "No se encontraron registradores",
 		"searchByAddressOrName": "Ingrese dirección o nombre para buscar",
 		"reasonable": "Razonable",
-		"failedToLoadData": "No se pudieron cargar los datos. Por favor, inténtelo de nuevo."
+		"failedToLoadData": "No se pudieron cargar los datos. Por favor, inténtelo de nuevo.",
+		"identityColumn": "Identidad",
+		"socialsColumn": "Redes sociales",
+		"typeColumn": "Tipo",
+		"judgementsColumn": "Juicios",
+		"actionsColumn": "Acciones"
 	},
 	"JudgementStatus": {
 		"pending": "Pendiente",

@@ -197,11 +197,11 @@ function MyIdentitiesDashboard() {
 				<Table>
 					<TableHeader>
 						<TableRow className={styles.headerRow}>
-							<TableHead className={styles.headerCell}>IDENTITY</TableHead>
-							<TableHead className={styles.headerCell}>SOCIALS</TableHead>
-							<TableHead className={styles.headerCell}>TYPE</TableHead>
-							<TableHead className={styles.headerCell}>JUDGEMENTS</TableHead>
-							<TableHead className={styles.headerCell}>ACTIONS</TableHead>
+							<TableHead className={styles.headerCell}>{t('Judgements.identityColumn')}</TableHead>
+							<TableHead className={styles.headerCell}>{t('Judgements.socialsColumn')}</TableHead>
+							<TableHead className={styles.headerCell}>{t('Judgements.typeColumn')}</TableHead>
+							<TableHead className={styles.headerCell}>{t('Judgements.judgementsColumn')}</TableHead>
+							<TableHead className={styles.headerCell}>{t('Judgements.actionsColumn')}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -232,7 +232,7 @@ function MyIdentitiesDashboard() {
 									<SocialLinksDisplay socials={identity.socials} />
 								</td>
 								<td className='px-6 py-4'>
-									<span className='rounded px-2 py-1 text-sm font-semibold text-text_primary'>{t('Judgements.reasonable')}</span>
+									<span className='rounded px-2 py-1 text-sm font-semibold text-text_primary'>{identity.type}</span>
 								</td>
 								<td className='px-6 py-4'>
 									{identity.judgements.length > 0 ? (

@@ -1579,7 +1579,12 @@
 		"noRegistrarsFound": "登録者が見つかりません",
 		"searchByAddressOrName": "アドレスまたは名前で検索",
 		"reasonable": "合理的",
-		"failedToLoadData": "データの読み込みに失敗しました。もう一度お試しください。"
+		"failedToLoadData": "データの読み込みに失敗しました。もう一度お試しください。",
+		"identityColumn": "アイデンティティ",
+		"socialsColumn": "ソーシャル",
+		"typeColumn": "タイプ",
+		"judgementsColumn": "判断",
+		"actionsColumn": "アクション"
 	},
 	"JudgementStatus": {
 		"pending": "保留中",
