@@ -1,4 +1,7 @@
 {
+	"Common": {
+		"loadingMessage": "Sabiduría de gobernanza en camino 🚀"
+	},
 	"HomePage": {
 		"title": "Bienvenido a Inicio"
 	},

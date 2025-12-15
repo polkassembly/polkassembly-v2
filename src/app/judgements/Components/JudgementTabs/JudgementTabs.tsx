@@ -8,15 +8,12 @@ import { Tabs, TabsContent } from '@ui/Tabs';
 import { useIsRegistrar } from '@/hooks/useIsRegistrar';
 import { EJudgementDashboardTabs } from '@shared/types';
 import { useEffect, useState } from 'react';
-import { Skeleton } from '@/app/_shared-components/Skeleton';
+import LoaderGif from '@/app/_shared-components/LoaderGif/LoaderGif';
 import Header from '../Header/Header';
 import RegistrarRequestsView from '../RegistrarRequests/RegistrarRequestsView';
-import OverviewStats from '../Overview/OverviewStats';
-import IdentitiesListingTable from '../Overview/IdentitiesListingTable';
-import DashboardSummary from '../TabSummary/DashboardSummary';
-import JudgementListingTable from '../ListingTable/JudgementListingTable';
-import RegistrarsSummary from '../TabSummary/RegistrarsSummary';
-import RegistrarsListingTable from '../ListingTable/RegistrarsListingTable';
+import OverviewTab from '../Overview/OverviewTab';
+import JudgementsTab from '../ListingTable/JudgementsTab';
+import RegistrarsTab from '../ListingTable/RegistrarsTab';
 import MyIdentitiesDashboard from '../MyDashboard/MyIdentitiesDashboard';
 
 function JudgementTabs() {
@@ -30,7 +27,7 @@ function JudgementTabs() {
 	}, [isLoading, isRegistrar]);
 
 	if (isLoading) {
-		return <Skeleton />;
+		return <LoaderGif />;
 	}
 	return (
 		<Tabs
@@ -44,27 +41,16 @@ function JudgementTabs() {
 					<RegistrarRequestsView />
 				</TabsContent>
 				<TabsContent value={EJudgementDashboardTabs.OVERVIEW}>
-					<div className='flex flex-col gap-y-4'>
-						<OverviewStats />
-						<IdentitiesListingTable />
-					</div>
+					<OverviewTab />
 				</TabsContent>
 				<TabsContent value={EJudgementDashboardTabs.JUDGEMENTS}>
-					<div className='flex flex-col gap-y-4'>
-						<DashboardSummary />
-						<JudgementListingTable />
-					</div>
+					<JudgementsTab />
 				</TabsContent>
 				<TabsContent value={EJudgementDashboardTabs.REGISTRARS}>
-					<div className='flex flex-col gap-y-4'>
-						<RegistrarsSummary />
-						<RegistrarsListingTable />
-					</div>
+					<RegistrarsTab />
 				</TabsContent>
 				<TabsContent value={EJudgementDashboardTabs.MY_DASHBOARD}>
-					<div className='flex flex-col gap-y-4'>
-						<MyIdentitiesDashboard />
-					</div>
+					<MyIdentitiesDashboard />
 				</TabsContent>
 			</div>
 		</Tabs>

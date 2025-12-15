@@ -1,4 +1,7 @@
 {
+	"Common": {
+		"loadingMessage": "Governance wisdom incoming 🚀"
+	},
 	"HomePage": {
 		"title": "Welcome to Home"
 	},
