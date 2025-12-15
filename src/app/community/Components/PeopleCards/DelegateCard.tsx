@@ -8,7 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import Image from 'next/image';
-import { ESocial, IDelegateDetails, IOnChainIdentity } from '@/_shared/types';
+import { ESocial, IDelegateDetails, IOnChainIdentity, IFollowEntry, IPublicUser } from '@/_shared/types';
 import CalendarIcon from '@assets/icons/calendar-icon.svg';
 import JudgementIcon from '@assets/icons/judgement-icon.svg';
 import RankStar from '@assets/profile/rank-star.svg';
@@ -30,6 +30,14 @@ import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
 import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
 import { FaGithub } from '@react-icons/all-files/fa/FaGithub';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { MarkdownViewer } from '@/app/_shared-components/MarkdownViewer/MarkdownViewer';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/app/_shared-components/Dialog/Dialog';
+import DelegateVotingPower from '@/app/_shared-components/DelegateVotingPower/DelegateVotingPower';
+import Link from 'next/link';
+import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { usePathname } from 'next/navigation';
 import styles from './PeopleCard.module.scss';
 
 const SocialIcons: Partial<Record<ESocial, React.ComponentType<React.SVGProps<SVGSVGElement>>>> = {
@@ -42,97 +50,224 @@ const SocialIcons: Partial<Record<ESocial, React.ComponentType<React.SVGProps<SV
 
 function DelegateCard({ delegate }: { delegate: IDelegateDetails }) {
 	const t = useTranslations();
+	const delegateCtaTitle = t('Delegation.delegate');
 	const { user } = useUser();
 	const network = getCurrentNetwork();
+	const pathname = usePathname();
 
 	const { getOnChainIdentity, identityService } = useIdentityService();
-	const [isReadMoreVisible, setIsReadMoreVisible] = useState(false);
+	const [openModal, setOpenModal] = useState(false);
+	const [openDelegateDialog, setOpenDelegateDialog] = useState(false);
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
-	const [isFetching, setIsFetching] = useState(true);
+	const [isIdentityFetching, setIsIdentityFetching] = useState(true);
 
-	const isFollowing = delegate?.publicUser?.following?.some((item) => item.followerUserId === user?.id);
+	const [publicUser, setPublicUser] = useState<IPublicUser | undefined>(delegate.publicUser);
+
+	const queryClient = useQueryClient();
+
+	const mainJudgement = identity?.judgements?.[0]?.[1];
+	const displayJudgement = mainJudgement ? (typeof mainJudgement === 'object' ? Object.keys(mainJudgement)[0] : String(mainJudgement)) : t('Profile.noJudgements');
+
+	useEffect(() => {
+		const fetchPublicUser = async () => {
+			if (!delegate.publicUser && delegate.address) {
+				const { data, error } = await UserProfileClientService.fetchPublicUserByAddress({ address: delegate.address });
+				if (data && !error) {
+					setPublicUser(data);
+				}
+			}
+		};
+		fetchPublicUser();
+	}, [delegate.publicUser, delegate.address]);
 
 	useEffect(() => {
 		const fetchIdentity = async () => {
-			if (!delegate?.publicUser?.addresses?.[0]) {
-				setIsFetching(false);
+			if (!delegate?.address) {
+				setIsIdentityFetching(false);
 				return;
 			}
 
 			try {
-				setIsFetching(true);
-				const identityInfo = await getOnChainIdentity(delegate.publicUser.addresses[0]);
+				setIsIdentityFetching(true);
+				const identityInfo = await getOnChainIdentity(delegate.address);
 				if (identityInfo) {
 					setIdentity(identityInfo);
 				}
 			} catch (error) {
 				console.error('Error fetching identity:', error);
 			} finally {
-				setIsFetching(false);
+				setIsIdentityFetching(false);
 			}
 		};
 
 		fetchIdentity();
-	}, [delegate?.publicUser?.addresses, getOnChainIdentity]);
+	}, [delegate?.address, getOnChainIdentity]);
+
+	const fetchFollowers = async () => {
+		if (!publicUser?.id) return { followers: [] };
+		const { data, error } = await UserProfileClientService.getFollowers({ userId: publicUser.id });
+		if (error) {
+			return { followers: [] };
+		}
+		return data;
+	};
+
+	const { data: followers, isFetching: isFetchingFollowers } = useQuery({
+		queryKey: ['followers', publicUser?.id, user?.id],
+		queryFn: () => fetchFollowers(),
+		placeholderData: (previousData) => previousData,
+		staleTime: FIVE_MIN_IN_MILLI,
+		enabled: !!publicUser?.id
+	});
+
+	const fetchFollowing = async () => {
+		if (!publicUser?.id) return { following: [] };
+		const { data, error } = await UserProfileClientService.getFollowing({ userId: publicUser.id });
+		if (error) {
+			return { following: [] };
+		}
+		return data;
+	};
+
+	const { data: following, isFetching: isFetchingFollowing } = useQuery({
+		queryKey: ['following', publicUser?.id, user?.id],
+		queryFn: () => fetchFollowing(),
+		placeholderData: (previousData) => previousData,
+		staleTime: FIVE_MIN_IN_MILLI,
+		enabled: !!publicUser?.id
+	});
+
+	const isFollowing = followers?.followers.some((item) => item.followerUserId === user?.id);
+
+	const followUser = async () => {
+		if (!publicUser?.id || !user?.id || user.id === publicUser.id) return;
+
+		queryClient.setQueryData(['followers', publicUser.id, user?.id], (oldData: { followers: IFollowEntry[] } | undefined) => ({
+			followers: [
+				...(oldData?.followers || []),
+				{
+					id: publicUser?.id || 0,
+					createdAt: new Date(),
+					followerUserId: user.id,
+					followedUserId: publicUser?.id || 0,
+					updatedAt: new Date()
+				}
+			]
+		}));
+
+		const { data, error } = await UserProfileClientService.followUser({ userId: publicUser.id });
+
+		if (!data || error) {
+			queryClient.invalidateQueries({ queryKey: ['followers', publicUser.id, user?.id] });
+		}
+	};
+
+	const unfollowUser = async () => {
+		if (!publicUser?.id || !user?.id || user.id === publicUser.id) return;
+
+		queryClient.setQueryData(['followers', publicUser.id, user?.id], (oldData: { followers: IFollowEntry[] } | undefined) => ({
+			...oldData,
+			followers: (oldData?.followers || []).filter((item) => item.followerUserId !== user.id)
+		}));
+
+		const { data, error } = await UserProfileClientService.unfollowUser({ userId: publicUser.id });
+
+		if (!data || error) {
+			queryClient.invalidateQueries({ queryKey: ['followers', publicUser.id, user?.id] });
+		}
+	};
+
+	const creationDate = delegate.createdAt || publicUser?.createdAt;
 
 	return (
 		<div className={styles.memberCard}>
 			<div className='flex items-center justify-between gap-3'>
 				<div className='flex items-center gap-2'>
-					{(delegate?.publicUser?.addresses?.length ?? 0) > 0 ? (
-						<Address
-							disableTooltip
-							address={delegate?.publicUser?.addresses[0] || ''}
-							iconSize={30}
-							showIdenticon
-							textClassName='text-left text-lg font-semibold'
-						/>
+					<Address
+						disableTooltip
+						address={delegate.address}
+						iconSize={30}
+						showIdenticon
+						textClassName='text-left text-lg font-semibold'
+					/>
+				</div>
+				<div className='flex items-center gap-x-2'>
+					{publicUser?.id && user?.id && user.id !== publicUser.id && (
+						<Button
+							size='sm'
+							variant='link'
+							className='w-full rounded-3xl px-0 text-text_pink sm:w-auto'
+							leftIcon={<ShieldPlus />}
+							onClick={isFollowing ? unfollowUser : followUser}
+							disabled={!user?.id}
+						>
+							{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
+						</Button>
+					)}
+
+					{user?.id ? (
+						<Dialog
+							open={openDelegateDialog}
+							onOpenChange={setOpenDelegateDialog}
+						>
+							<DialogTrigger asChild>
+								<Button
+									size='sm'
+									className='w-full rounded-3xl sm:w-auto'
+									leftIcon={<IoPersonAdd />}
+								>
+									{delegateCtaTitle}
+								</Button>
+							</DialogTrigger>
+							<DialogContent className='max-w-screen-md p-6'>
+								<DialogHeader>
+									<DialogTitle className='flex items-center gap-x-2'>
+										<IoPersonAdd />
+										<span>{delegateCtaTitle}</span>
+									</DialogTitle>
+								</DialogHeader>
+								<DelegateVotingPower
+									delegate={delegate}
+									onClose={() => setOpenDelegateDialog(false)}
+								/>
+							</DialogContent>
+						</Dialog>
 					) : (
-						<span className='text-xl font-semibold text-text_primary'>{delegate?.publicUser?.username || ''}</span>
+						<Link href={`/login?redirect=${pathname}`}>
+							<Button
+								size='sm'
+								className='w-full rounded-3xl sm:w-auto'
+								leftIcon={<IoPersonAdd />}
+							>
+								{delegateCtaTitle}
+							</Button>
+						</Link>
 					)}
 				</div>
-				<div className='flex items-center gap-x-2'>
-					<Button
-						size='sm'
-						variant='link'
-						className='w-full rounded-3xl text-text_pink sm:w-auto'
-						leftIcon={<ShieldPlus />}
-						disabled={!user?.id}
-					>
-						{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
-					</Button>
-					<Button
-						size='sm'
-						className='w-full rounded-3xl sm:w-auto'
-						leftIcon={<IoPersonAdd />}
-						disabled={!user?.id}
-					>
-						{t('Delegation.delegate')}
-					</Button>
-				</div>
 			</div>
+
 			<div className='flex items-center justify-between gap-x-4'>
 				<div className='flex items-center gap-x-2'>
-					{(delegate?.publicUser?.addresses?.length ?? 0) > 0 ? (
-						<CopyToClipboard
-							label={shortenAddress(delegate?.publicUser?.addresses[0] || '', 5)}
-							text={delegate?.publicUser?.addresses[0] || ''}
-							className='text-base'
-						/>
-					) : null}
+					<CopyToClipboard
+						label={shortenAddress(delegate.address, 5)}
+						text={delegate.address}
+						className='text-base'
+					/>
 					<div className='flex items-center gap-1 rounded-md bg-topic_tag_bg px-1.5 py-1'>
 						<UserIcon className='h-4 w-4 text-basic_text' />
 						<span className='text-xs text-basic_text'>{t('Community.Members.independent')}</span>
 					</div>
-					<span className='flex items-center gap-1 rounded-md bg-rank_card_bg px-1.5 py-0.5 font-medium'>
-						<Image
-							src={RankStar}
-							alt='Rank Star'
-							width={16}
-							height={16}
-						/>
-						<span className='text-sm font-medium text-leaderboard_score'>{Math.floor(delegate?.publicUser?.profileScore || 0)}</span>
-					</span>
+					{publicUser?.profileScore !== undefined && (
+						<span className='flex items-center gap-1 rounded-md bg-rank_card_bg px-1.5 py-0.5 font-medium'>
+							<Image
+								src={RankStar}
+								alt='Rank Star'
+								width={16}
+								height={16}
+							/>
+							<span className='text-sm font-medium text-leaderboard_score'>{Math.floor(publicUser.profileScore)}</span>
+						</span>
+					)}
 				</div>
 				<div className='flex items-center gap-x-1'>
 					<Image
@@ -141,63 +276,67 @@ function DelegateCard({ delegate }: { delegate: IDelegateDetails }) {
 						width={14}
 						height={14}
 					/>
-					{isFetching || !identityService ? (
+					{isIdentityFetching || !identityService ? (
 						<Skeleton className='ml-2 h-4 w-16' />
 					) : (
 						<span className='text-xs text-basic_text'>
-							{t('Profile.judgement')}: <span className='font-medium'>{identity?.judgements?.[0]?.[1]?.toString() || t('Profile.noJudgements')}</span>
+							{t('Profile.judgement')}: <span className='font-medium'>{displayJudgement}</span>
 						</span>
 					)}
 				</div>
 			</div>
-			<div className='flex flex-wrap items-center gap-x-2 gap-y-2'>
-				<p className={styles.memberSince}>
-					<span>{t('Profile.userSince')}: </span>{' '}
-					<span className='flex items-center gap-x-1 text-xs'>
-						<Image
-							src={CalendarIcon}
-							alt='calendar'
-							width={20}
-							height={20}
-						/>
-						{dayjs(delegate?.createdAt).format("Do MMM 'YY")}
-					</span>
-				</p>
 
-				<Separator
-					className='h-4'
-					orientation='vertical'
-				/>
-				<div className={styles.memberFollowing}>
-					{t('Profile.following')}: <span className='font-medium text-text_pink'>{delegate?.publicUser?.following?.length || 0}</span>
-				</div>
-				<Separator
-					className='h-4'
-					orientation='vertical'
-				/>
-				<div className={styles.memberFollowing}>
-					{t('Profile.followers')}: <span className='font-medium text-text_pink'>{delegate?.publicUser?.followers?.length || 0}</span>
-				</div>
-			</div>
-			<div>
-				{delegate?.publicUser?.profileDetails?.bio && (
+			<div className='flex flex-wrap items-center gap-x-2 gap-y-2'>
+				{creationDate && (
 					<>
-						<div className={`${styles.bio} ${isReadMoreVisible ? '' : styles.bioCollapsed} mt-3`}>{delegate?.publicUser?.profileDetails?.bio}</div>
-						{(delegate?.publicUser?.profileDetails?.bio?.length ?? 0) > 100 && (
-							<Button
-								variant='ghost'
-								className={styles.readMoreButton}
-								onClick={() => setIsReadMoreVisible(!isReadMoreVisible)}
-								aria-expanded={isReadMoreVisible ? 'true' : 'false'}
-							>
-								{isReadMoreVisible ? t('Community.Members.readLess') : t('Community.Members.readMore')}
-							</Button>
-						)}
+						<p className={styles.memberSince}>
+							<span>{t('Profile.userSince')}: </span>{' '}
+							<span className='flex items-center gap-x-1 text-xs'>
+								<Image
+									src={CalendarIcon}
+									alt='calendar'
+									width={20}
+									height={20}
+								/>
+								{dayjs(creationDate).format("Do MMM 'YY")}
+							</span>
+						</p>
+						<Separator
+							className='h-4'
+							orientation='vertical'
+						/>
 					</>
 				)}
+
+				<div className={styles.memberFollowing}>
+					{t('Profile.following')}:{' '}
+					{isFetchingFollowing ? <Skeleton className='h-4 w-6' /> : <span className='font-medium text-text_pink'>{following?.following?.length || 0}</span>}
+				</div>
+				<Separator
+					className='h-4'
+					orientation='vertical'
+				/>
+				<div className={styles.memberFollowing}>
+					{t('Profile.followers')}:{' '}
+					{isFetchingFollowers ? <Skeleton className='h-4 w-6' /> : <span className='font-medium text-text_pink'>{followers?.followers?.length || 0}</span>}
+				</div>
 			</div>
+
+			<div className='px-1 pb-2 pt-2'>
+				{delegate.manifesto ? (
+					<MarkdownViewer
+						markdown={delegate.manifesto}
+						truncate
+						onShowMore={() => setOpenModal(true)}
+						className='line-clamp-2 text-sm text-text_primary'
+					/>
+				) : (
+					<span className='text-text_secondary text-sm'>{t('Delegation.noBio')}</span>
+				)}
+			</div>
+
 			<div className='flex items-center gap-x-4'>
-				{delegate?.publicUser?.profileDetails.publicSocialLinks?.map((social) => {
+				{publicUser?.profileDetails?.publicSocialLinks?.map((social) => {
 					const IconComponent = SocialIcons[social.platform];
 					return IconComponent ? (
 						<a
@@ -212,12 +351,13 @@ function DelegateCard({ delegate }: { delegate: IDelegateDetails }) {
 					) : null;
 				})}
 			</div>
+
 			<div className={styles.delegationCardStats}>
 				<div className={styles.delegationCardStatsItem}>
 					<div>
 						<div className='text-sm text-btn_secondary_text xl:whitespace-nowrap'>
 							<span className='font-semibold md:text-2xl'>
-								{formatUSDWithUnits(formatBnBalance(delegate?.maxDelegated, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
+								{formatUSDWithUnits(formatBnBalance(delegate.maxDelegated, { withUnit: true, numberAfterComma: 2, withThousandDelimitor: false }, network), 1)}
 							</span>
 						</div>
 						<span className={styles.delegationCardStatsItemText}>{t('Delegation.maxDelegated')}</span>
@@ -225,18 +365,37 @@ function DelegateCard({ delegate }: { delegate: IDelegateDetails }) {
 				</div>
 				<div className={styles.delegationCardStatsItem}>
 					<div>
-						<div className='font-semibold text-btn_secondary_text md:text-2xl'>{delegate?.last30DaysVotedProposalsCount}</div>
+						<div className='font-semibold text-btn_secondary_text md:text-2xl'>{delegate.last30DaysVotedProposalsCount}</div>
 						<span className={styles.delegationCardStatsItemText}>{t('Delegation.votedProposals')}</span>
 						<span className={styles.delegationCardStatsItemTextPast30Days}>({t('Delegation.past30Days')})</span>
 					</div>
 				</div>
 				<div className='p-5 text-center'>
 					<div>
-						<div className='font-semibold text-btn_secondary_text md:text-2xl'>{delegate?.delegators?.length || 0}</div>
+						<div className='font-semibold text-btn_secondary_text md:text-2xl'>{delegate.delegators?.length || 0}</div>
 						<span className={styles.delegationCardStatsItemText}>{t('Delegation.delegators')}</span>
 					</div>
 				</div>
 			</div>
+
+			<Dialog
+				open={openModal}
+				onOpenChange={setOpenModal}
+			>
+				<DialogContent className='max-w-xl p-6'>
+					<DialogHeader>
+						<DialogTitle>
+							<Address address={delegate.address} />
+						</DialogTitle>
+					</DialogHeader>
+					{delegate.manifesto && (
+						<MarkdownViewer
+							className='max-h-[70vh] overflow-y-auto'
+							markdown={delegate.manifesto}
+						/>
+					)}
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

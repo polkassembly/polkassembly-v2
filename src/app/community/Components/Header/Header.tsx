@@ -17,9 +17,7 @@ function Header({ activeTab }: { activeTab: ECommunityRole }) {
 
 	const onTabChange = (value: ECommunityRole) => {
 		if (value !== activeTab) {
-			const queryParams = new URLSearchParams(window.location.search);
-			queryParams.set('tab', value);
-			router.push(`${pathname}?${queryParams.toString()}`);
+			router.push(`${pathname}?tab=${value}`);
 		}
 	};
 

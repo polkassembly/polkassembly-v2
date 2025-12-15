@@ -9,7 +9,7 @@ import MembersStats from '../Stats/MembersStats';
 import CuratorCard from '../PeopleCards/CuratorCard';
 
 async function CommunityCurators({ page }: { page: number }) {
-	const { data, error } = await NextApiClientService.fetchCommunityCurators({ page });
+	const { data, error } = await NextApiClientService.fetchCommunityCurators({ page: 1, limit: 3000 });
 
 	if (error || !data) {
 		return <div className='text-center text-sm text-red-500'>Error fetching curators</div>;
@@ -20,6 +20,11 @@ async function CommunityCurators({ page }: { page: number }) {
 	if (curators.length === 0) {
 		return <div className='text-text_secondary text-center text-sm'>No curators found</div>;
 	}
+
+	const startIndex = (page - 1) * DEFAULT_LISTING_LIMIT;
+	const endIndex = startIndex + DEFAULT_LISTING_LIMIT;
+	const paginatedCurators = curators.slice(startIndex, endIndex);
+
 	return (
 		<div>
 			<MembersStats
@@ -27,7 +32,7 @@ async function CommunityCurators({ page }: { page: number }) {
 				verifiedMembers={80}
 			/>
 			<div className='mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6'>
-				{curators.map((curator) => (
+				{paginatedCurators.map((curator) => (
 					<CuratorCard
 						key={curator.id}
 						curator={curator}

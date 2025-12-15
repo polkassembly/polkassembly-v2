@@ -22,8 +22,6 @@ import { delegateXAtom } from '@/app/_atoms/delegateX/delegateXAtom';
 import MembersStats from '../Stats/MembersStats';
 import DelegateCard from '../PeopleCards/DelegateCard';
 
-// import DelegateXCard from './DelegateCard/DelegateXCard';
-
 const PA_ADDRESS = '13mZThJSNdKUyVUjQE9ZCypwJrwdvY8G5cUCpS9Uw4bodh4t';
 
 function CommunityDelegates({ page }: { page: number }) {
@@ -43,7 +41,6 @@ function CommunityDelegates({ page }: { page: number }) {
 		const { data, error } = await DelegateXClientService.getDelegateXDetails();
 
 		if (error || !data) {
-			console.error('Error fetching delegate x details', error);
 			setDelegateXState((prev) => ({
 				...prev,
 				isLoading: false,
@@ -89,7 +86,6 @@ function CommunityDelegates({ page }: { page: number }) {
 	const fetchDelegates = async () => {
 		const { data, error } = await NextApiClientService.fetchDelegates();
 		if (error || !data) {
-			console.error('Error fetching delegates:', error);
 			return [];
 		}
 
@@ -115,11 +111,9 @@ function CommunityDelegates({ page }: { page: number }) {
 		queryKey: ['delegates'],
 		queryFn: fetchDelegates,
 		staleTime: FIVE_MIN_IN_MILLI
-		// refetchOnWindowFocus: false,
-		// refetchOnMount: false
 	});
 
-	const { filteredDelegates } = useDelegateFiltering(delegates);
+	const { filteredDelegates, totalDelegates } = useDelegateFiltering(delegates, page);
 
 	return (
 		<div>
@@ -141,12 +135,12 @@ function CommunityDelegates({ page }: { page: number }) {
 					))}
 				</div>
 			)}
-			{filteredDelegates.length > DEFAULT_LISTING_LIMIT && (
+			{totalDelegates > DEFAULT_LISTING_LIMIT && (
 				<div className='mt-5 w-full'>
 					<PaginationWithLinks
 						page={page}
 						pageSize={DEFAULT_LISTING_LIMIT}
-						totalCount={filteredDelegates.length}
+						totalCount={totalDelegates}
 						pageSearchParam='page'
 					/>
 				</div>
