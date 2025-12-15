@@ -464,6 +464,15 @@
 		}
 	},
 	"PostDetails": {
+		"Tooltips": {
+			"requestedAmount": "The total funds being requested in this proposal, shown in DOT.",
+			"votingPeriod": "The timeframe during which token holders can vote on this proposal.",
+			"preparePeriod": "A buffer period before voting starts, allowing users to review and get ready.",
+			"enactmentPeriod": "The waiting period after a proposal is approved before it gets executed on-chain.",
+			"votingSummary": "A quick breakdown of all votes: how many supported, opposed, or abstained.",
+			"votesBubble": "Each bubble represents a voter — size reflects their voting power.",
+			"votesGraph": "Visual timeline of how votes came in over the voting period."
+		},
 		"selectYourVoterAddress": "Select Your Voter Address",
 		"address": "Address",
 		"save": "Save",

@@ -463,6 +463,15 @@
 		}
 	},
 	"PostDetails": {
+		"Tooltips": {
+			"requestedAmount": "El monto total solicitado en esta propuesta, mostrado en DOT.",
+			"votingPeriod": "El período de tiempo durante el cual los titulares de tokens pueden votar sobre esta propuesta.",
+			"preparePeriod": "Un período de buffer antes de que comience la votación, permitiendo a los usuarios prepararse.",
+			"enactmentPeriod": "El período de espera después de que una propuesta es aprobada antes de que se ejecute en la cadena.",
+			"votingSummary": "Un resumen rápido de todas las votaciones: cuántos apoyaron, se opusieron o abstuvieron.",
+			"votesBubble": "Cada burbuja representa a un votante — el tamaño refleja su poder de voto.",
+			"votesGraph": "Visualización de la línea de tiempo de cómo llegaron las votaciones durante el período de votación."
+		},
 		"selectYourVoterAddress": "Seleccione su dirección de votación",
 		"address": "Dirección",
 		"castVote": "Emitir Voto",

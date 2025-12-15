@@ -462,6 +462,15 @@
 		}
 	},
 	"PostDetails": {
+		"Tooltips": {
+			"requestedAmount": "この提案で要求された総額、DOTで表示されます。",
+			"votingPeriod": "トークン保有者がこの提案に投票できる期間。",
+			"preparePeriod": "投票開始前のバッファー期間、ユーザーが準備できるようにします。",
+			"enactmentPeriod": "提案が承認された後、チェーン上で実行されるまでの待機期間。",
+			"votingSummary": "すべての投票の概要：支持、反対、棄権の数。",
+			"votesBubble": "各バブルは投票者を表します — サイズは投票力を反映します。",
+			"votesGraph": "投票期間中の投票の時系列表示。"
+		},
 		"selectYourVoterAddress": "投票者アドレスを選択",
 		"address": "アドレス",
 		"castVote": "投票する",

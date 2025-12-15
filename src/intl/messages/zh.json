@@ -462,6 +462,15 @@
 		}
 	},
 	"PostDetails": {
+		"Tooltips": {
+			"requestedAmount": "此提案中要求的总金额，以DOT显示。",
+			"votingPeriod": "Token持有者可以在此提案上投票的时间段。",
+			"preparePeriod": "投票开始前的缓冲期，允许用户准备。",
+			"enactmentPeriod": "提案被批准后，链上执行前的等待期。",
+			"votingSummary": "所有投票的概要：支持、反对、弃权的数量。",
+			"votesBubble": "每个气泡代表一个投票者 — 大小反映其投票权重。",
+			"votesGraph": "投票期间投票的时序图。"
+		},
 		"selectYourVoterAddress": "选择您的投票地址",
 		"address": "地址",
 		"castVote": "投票",
