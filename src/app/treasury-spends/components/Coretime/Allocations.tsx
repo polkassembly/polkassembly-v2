@@ -46,7 +46,7 @@ function CoretimeAllocations() {
 			core: 23,
 			startPeriod: '2025-01-01',
 			endPeriod: '2025-06-30',
-			renewal: 'Yes',
+			autoRenewal: 'Yes',
 			utilization: '85%',
 			cost: '1165260000000000',
 			assetId: null,
@@ -58,7 +58,7 @@ function CoretimeAllocations() {
 			core: 45,
 			startPeriod: '2025-01-01',
 			endPeriod: '2025-06-30',
-			renewal: 'No',
+			autoRenewal: 'No',
 			utilization: '70%',
 			cost: '271786000000',
 			assetId: null,
@@ -132,7 +132,7 @@ function CoretimeAllocations() {
 															<span className='text-xs'>{dayjs(allocation.endPeriod).diff(dayjs(allocation.startPeriod), 'days')} days</span>
 														</div>
 													</TableCell>
-													<TableCell className='px-6 py-3'>{allocation.renewal}</TableCell>
+													<TableCell className='px-6 py-3'>{allocation.autoRenewal}</TableCell>
 													<TableCell className='px-6 py-3'>{allocation.utilization}</TableCell>
 													<TableCell className='px-6 py-3'>
 														<div className='flex items-center gap-1'>
