@@ -175,7 +175,7 @@ export default function JobsAndBounties() {
 											<h3 className='text-base font-semibold text-text_primary'>{job.title}</h3>
 										</div>
 									</div>
-									<p className='mt-1.5 truncate text-sm text-wallet_btn_text'>{job.description}</p>+
+									<p className='mt-1.5 truncate text-sm text-wallet_btn_text'>{job.description}</p>
 									<p className='mt-1 text-xs text-wallet_btn_text'>
 										{job.salary_range?.min && job.salary_range?.max ? (
 											<>
