@@ -32,8 +32,6 @@
 	},
 	"ActivityFeed": {
 		"title": "动态信息",
-		"switchTo": "切换到",
-		"Overview": "概览",
 		"ExploreTab": "探索",
 		"Following": "关注",
 		"description": "探索所有为Polkadot生态系统做出贡献的成员。",

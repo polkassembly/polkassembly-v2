@@ -32,8 +32,6 @@
 	},
 	"ActivityFeed": {
 		"title": "Feed de Actividad",
-		"switchTo": "Cambiar a",
-		"Overview": "Resumen",
 		"ExploreTab": "Explorar",
 		"Following": "Siguiendo",
 		"description": "Explore todos los miembros contribuyendo al ecosistema de Polkadot.",

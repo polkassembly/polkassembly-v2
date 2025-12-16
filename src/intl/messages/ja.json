@@ -32,8 +32,6 @@
 	},
 	"ActivityFeed": {
 		"title": "アクティビティフィード",
-		"switchTo": "切り替え",
-		"Overview": "概要",
 		"ExploreTab": "探索",
 		"Following": "フォロー",
 		"description": "Polkadotエコシステムに貢献しているすべてのメンバーを探索します。",

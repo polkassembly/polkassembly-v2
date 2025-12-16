@@ -7,9 +7,6 @@
 import { EActivityFeedTab, IGenericListingResponse, IPostListing, ITreasuryStats } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/Tabs';
-import { Button } from '@/app/_shared-components/Button';
-import { RefreshCw } from 'lucide-react';
-import { useRouter } from 'nextjs-toploader/app';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import Link from 'next/link';
@@ -28,7 +25,6 @@ function ActivityFeedComp({
 	treasuryStatsData: ITreasuryStats[];
 }) {
 	const t = useTranslations();
-	const router = useRouter();
 	const network = getCurrentNetwork();
 	const socialLinks = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS]?.socialLinks ?? [];
 
@@ -43,16 +39,6 @@ function ActivityFeedComp({
 					<div className={styles.headerTop}>
 						<div className={styles.activityFeedToggleButton}>
 							<h1 className={styles.activityFeedTitle}>{t('ActivityFeed.title')}</h1>
-							<Button
-								variant='outline'
-								onClick={() => router.push('/')}
-								rightIcon={<RefreshCw className='h-4 w-4' />}
-								size='sm'
-							>
-								<span className={styles.switchButtonText}>
-									{t('ActivityFeed.switchTo')} <span className={styles.switchButtonBold}>{t('ActivityFeed.Overview')}</span>
-								</span>
-							</Button>
 						</div>
 						<div className={styles.socialLinks}>
 							{socialLinks?.map((link) => (
