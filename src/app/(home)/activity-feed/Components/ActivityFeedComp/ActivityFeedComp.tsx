@@ -89,12 +89,12 @@ function ActivityFeedComp({
 			<div className={styles.contentContainer}>
 				<TabsContent value={EActivityFeedTab.SUBSCRIBED}>
 					<TabContentLayout treasuryStatsData={treasuryStatsData}>
-						<SubscribedPostList initialData={activeTab === EActivityFeedTab.SUBSCRIBED ? initialData : { items: [], totalCount: 0 }} />
+						<SubscribedPostList initialData={initialData} />
 					</TabContentLayout>
 				</TabsContent>
 				<TabsContent value={EActivityFeedTab.EXPLORE}>
 					<TabContentLayout treasuryStatsData={treasuryStatsData}>
-						<ActivityFeedPostList initialData={activeTab === EActivityFeedTab.EXPLORE ? initialData : { items: [], totalCount: 0 }} />
+						<ActivityFeedPostList initialData={initialData} />
 					</TabContentLayout>
 				</TabsContent>
 			</div>
