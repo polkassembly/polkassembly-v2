@@ -149,7 +149,7 @@ function OverviewTreasuryStats({ data }: { data: ITreasuryStats[] }) {
 				</Button>
 			</div>
 
-			<div className='mt-4 flex flex-wrap gap-2'>
+			<div className='mt-4 flex gap-1'>
 				<AssetDisplay
 					icon={NETWORKS_DETAILS[`${network}`]?.logo}
 					value={treasuryData.nativeTokenBalance}

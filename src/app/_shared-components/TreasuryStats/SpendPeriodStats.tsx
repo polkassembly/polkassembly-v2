@@ -44,7 +44,7 @@ function SpendPeriodStats({ nextSpendAt, nextBurn }: { nextSpendAt?: Date; nextB
 
 	return (
 		<div>
-			<div className='flex h-full w-full flex-col justify-between gap-3 lg:flex-row lg:items-center'>
+			<div className='flex h-full w-full flex-col justify-between gap-2 lg:flex-row lg:items-center'>
 				<div className='flex flex-1 flex-col justify-between gap-y-2'>
 					<div className='flex items-center gap-1'>
 						<h2 className='text-sm font-semibold text-text_primary'>{t('TreasuryStats.spendPeriodRemaining')}</h2>
