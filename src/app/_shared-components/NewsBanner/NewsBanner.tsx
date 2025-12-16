@@ -91,7 +91,9 @@ function NewsBanner() {
 	}, [newsItems]);
 
 	const duplicatedNewsItems = useMemo(() => {
-		return [...newsItems.map((item) => ({ ...item, id: `${item.Title}-1` })), ...newsItems.map((item) => ({ ...item, id: `${item.Title}-2` }))];
+		const first = newsItems.map((item, idx) => ({ ...item, id: `${idx}` }));
+		const second = newsItems.map((item, idx) => ({ ...item, id: `${newsItems.length + idx}` }));
+		return [...first, ...second];
 	}, [newsItems]);
 
 	if (!newsItems || newsItems.length === 0) {
