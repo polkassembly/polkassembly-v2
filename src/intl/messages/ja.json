@@ -460,6 +460,7 @@
 		"treasuryAnalytics": "財務分析",
 		"proxies": "プロキシ",
 		"identityAndJudgement": "身分と判断",
+		"people": "人々",
 		"Tag": {
 			"new": "新規"
 		}
@@ -1666,5 +1667,22 @@
 		"assethubMigration": "{network}はAssetHubに移行されました。残高、データ、国民投票、その他のオンチェーン活動はAssetHubに移行されました。",
 		"learnMore": "詳細を確認",
 		"polkadotMigration": "PolkadotはAssetHub移行中です。一部の機能は移行中に利用できない場合があります。"
+	},
+	"Community": {
+		"community": "コミュニティ",
+		"communityDescription": "Polkadot エコシステムに貢献しているすべてのメンバーをご覧ください。",
+		"members": "メンバー",
+		"delegates": "代表者",
+		"curators": "キュレーター",
+		"experts": "専門家",
+		"decentralizedVoices": "分散化された声",
+		"Members": {
+			"totalMembers": "総メンバー数",
+			"verifiedMembers": "確認済みメンバー",
+			"tip": "チップ",
+			"independent": "独立",
+			"readMore": "続きを読む",
+			"readLess": "表示を減らす"
+		}
 	}
 }

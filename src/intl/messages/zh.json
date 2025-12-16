@@ -460,6 +460,7 @@
 		"treasuryAnalytics": "国库分析",
 		"proxies": "代理",
 		"identityAndJudgement": "身份和判断",
+		"people": "人员",
 		"Tag": {
 			"new": "新"
 		}
@@ -1666,5 +1667,22 @@
 		"assethubMigration": "{network}已迁移至AssetHub。余额、数据、国民投票、以及其他链上活动已迁移至AssetHub。",
 		"learnMore": "了解更多",
 		"polkadotMigration": "Polkadot正在迁移至AssetHub。一些功能可能在迁移期间不可用。"
+	},
+	"Community": {
+		"community": "社区",
+		"communityDescription": "探索所有為 Polkadot 生態系統做出貢獻的成員。",
+		"members": "成员",
+		"delegates": "代表",
+		"curators": "策展人",
+		"experts": "专家",
+		"decentralizedVoices": "分散化声音",
+		"Members": {
+			"totalMembers": "总成员数",
+			"verifiedMembers": "已验证成员",
+			"tip": "提示",
+			"independent": "独立",
+			"readMore": "阅读更多",
+			"readLess": "阅读更少"
+		}
 	}
 }

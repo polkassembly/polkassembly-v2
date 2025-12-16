@@ -1826,3 +1826,10 @@ export interface IOGTrackerData {
 	tasks: IOGTrackerTask[];
 	proofOfWork: IOGTrackerPoW[];
 }
+
+export enum ECommunityRole {
+	MEMBERS = 'members',
+	DELEGATES = 'delegates',
+	CURATORS = 'curators',
+	DVS = 'decentralized_voices'
+}

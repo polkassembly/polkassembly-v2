@@ -459,6 +459,7 @@
 		"treasuryAnalytics": "Finanzverwaltungsanalysen",
 		"proxies": "Proxies",
 		"identityAndJudgement": "Identität und Urteil",
+		"people": "Menschen",
 		"Tag": {
 			"new": "Neu"
 		}
@@ -1665,5 +1666,22 @@
 		"assethubMigration": "Hinweis: {network} wurde zu AssetHub migriert. Bilanzen, Daten, Referenden und andere On-Chain-Aktivitäten wurden zu AssetHub verschoben.",
 		"learnMore": "Mehr erfahren",
 		"polkadotMigration": "Hinweis: Polkadot erfolgt der AssetHub-Migration. Einige Funktionen können während der Migration nicht verfügbar sein."
+	},
+	"Community": {
+		"community": "Community",
+		"communityDescription": "Erforschen Sie alle Mitglieder, die zum Polkadot-Ökosystem beitragen.",
+		"members": "Mitglieder",
+		"delegates": "Delegierte",
+		"curators": "Kuratoren",
+		"experts": "Experten",
+		"decentralizedVoices": "Dezentralisierte Stimmen",
+		"Members": {
+			"totalMembers": "Gesamtmitglieder",
+			"verifiedMembers": "Verifizierte Mitglieder",
+			"tip": "Tipp",
+			"independent": "Unabhängig",
+			"readMore": "Mehr lesen",
+			"readLess": "Weniger lesen"
+		}
 	}
 }
