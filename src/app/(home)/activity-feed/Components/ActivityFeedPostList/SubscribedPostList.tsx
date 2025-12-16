@@ -116,7 +116,7 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 
 			return dateB - dateA;
 		});
-	}, []);
+	}, [localPosts]);
 
 	useEffect(() => {
 		if (reachedEnd || isFetching || !hasNextPage) return () => {};
