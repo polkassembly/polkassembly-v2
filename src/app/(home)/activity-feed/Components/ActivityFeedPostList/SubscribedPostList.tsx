@@ -83,7 +83,7 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 		queryFn: getSubscribedActivityFeed,
 		initialPageParam: 1,
 		initialData:
-			initialData.items.length > 0
+			userId && initialData.items.length > 0
 				? {
 						pages: [{ ...initialData, page: 1 }],
 						pageParams: [1]
