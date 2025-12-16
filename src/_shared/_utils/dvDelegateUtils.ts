@@ -21,6 +21,9 @@ import {
 	IDVDelegateVote,
 	IDVVotes
 } from '../types';
+import { DECIDING_PROPOSAL_STATUSES } from '../_constants/decidingProposalStatuses';
+import { FAILED_PROPOSAL_STATUSES, PASSED_PROPOSAL_STATUSES } from '../_constants/proposalResultStatuses';
+import { CLOSED_PROPOSAL_STATUSES } from '../_constants/closedProposalStatuses';
 
 const NO_LOCK_CONVICTION_DIVISOR = BigInt(10);
 
@@ -67,17 +70,7 @@ export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: ICohor
 				return;
 			}
 
-			const finalStatuses = [
-				EProposalStatus.Executed,
-				EProposalStatus.Approved,
-				EProposalStatus.Confirmed,
-				EProposalStatus.Rejected,
-				EProposalStatus.Cancelled,
-				EProposalStatus.Killed,
-				EProposalStatus.TimedOut,
-				EProposalStatus.ExecutionFailed
-			];
-			const isFinal = finalStatuses.includes(referendum.status);
+			const isFinal = CLOSED_PROPOSAL_STATUSES.includes(referendum.status);
 
 			if (!isFinal) {
 				return;
@@ -155,42 +148,42 @@ export const getDVCohortByIndex = (network: ENetwork, index: number): IDVCohort 
 	return cohorts.find((c) => c.index === index) || null;
 };
 
-function calculateInfluenceStatus(dvAyePower: bigint, dvNayPower: bigint, referendum: ICohortReferenda): EInfluenceStatus {
-	if (dvAyePower === BigInt(0) && dvNayPower === BigInt(0)) {
-		return EInfluenceStatus.NO_IMPACT;
+function calculateInfluenceStatus(referendum: ICohortReferenda, dvAyePower: bigint, dvNayPower: bigint): EInfluenceStatus {
+	const noComparisonStatuses = [EProposalStatus.TimedOut, EProposalStatus.Killed, EProposalStatus.Cancelled];
+
+	if (noComparisonStatuses.includes(referendum.status)) {
+		return EInfluenceStatus.NOT_APPLICABLE;
 	}
 
-	const finalStatuses = [
-		EProposalStatus.Executed,
-		EProposalStatus.Approved,
-		EProposalStatus.Confirmed,
-		EProposalStatus.Rejected,
-		EProposalStatus.Cancelled,
-		EProposalStatus.Killed,
-		EProposalStatus.TimedOut,
-		EProposalStatus.ExecutionFailed
-	];
+	if (!referendum.tally) {
+		return EInfluenceStatus.NOT_APPLICABLE;
+	}
 
-	if (!finalStatuses.includes(referendum.status) || !referendum.tally) {
-		return EInfluenceStatus.NO_IMPACT;
+	if (DECIDING_PROPOSAL_STATUSES.includes(referendum.status)) {
+		return EInfluenceStatus.NO_INFLUENCE;
 	}
 
 	const totalAye = BigInt(referendum.tally.ayes || 0);
 	const totalNay = BigInt(referendum.tally.nays || 0);
-	const denominator = totalAye + totalNay;
 
-	if (denominator === BigInt(0)) {
-		return EInfluenceStatus.NO_IMPACT;
+	let isPass = totalAye > totalNay;
+
+	if (PASSED_PROPOSAL_STATUSES.includes(referendum.status)) {
+		isPass = true;
+	} else if (FAILED_PROPOSAL_STATUSES.includes(referendum.status)) {
+		isPass = false;
 	}
-
-	const isPass = totalAye > totalNay;
 
 	const noDvAye = totalAye - dvAyePower;
 	const noDvNay = totalNay - dvNayPower;
+
 	const noDvDenominator = noDvAye + noDvNay;
 
-	if (noDvDenominator === BigInt(0)) {
-		return EInfluenceStatus.NO_IMPACT;
+	if (noDvDenominator <= BigInt(0)) {
+		const noDvIsPass = false;
+		const hasInfluence = isPass !== noDvIsPass;
+		if (!hasInfluence) return EInfluenceStatus.NO_INFLUENCE;
+		return isPass ? EInfluenceStatus.CHANGED_TO_PASS : EInfluenceStatus.CHANGED_TO_FAIL;
 	}
 
 	const noDvIsPass = noDvAye > noDvNay;
@@ -198,16 +191,13 @@ function calculateInfluenceStatus(dvAyePower: bigint, dvNayPower: bigint, refere
 	const hasInfluence = isPass !== noDvIsPass;
 
 	if (!hasInfluence) {
-		return EInfluenceStatus.NO_IMPACT;
+		return EInfluenceStatus.NO_INFLUENCE;
 	}
 
-	const approvedStatuses = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed];
-	const isApproved = approvedStatuses.includes(referendum.status);
-
-	if (isApproved) {
-		return EInfluenceStatus.APPROVED;
+	if (isPass) {
+		return EInfluenceStatus.CHANGED_TO_PASS;
 	}
-	return EInfluenceStatus.REJECTED;
+	return EInfluenceStatus.CHANGED_TO_FAIL;
 }
 
 export function calculateDVInfluence(
@@ -286,7 +276,7 @@ export function calculateDVInfluence(
 		const totalNay = BigInt(referendum.tally?.nays || 0);
 		const turnout = totalAye + totalNay;
 
-		const influence = calculateInfluenceStatus(dvAyePower, dvNayPower, referendum);
+		const influence = calculateInfluenceStatus(referendum, dvAyePower, dvNayPower);
 		const totalPower = dvAyePower + dvNayPower + dvAbstainPower;
 
 		const calcPercent = (v: IDVDelegateVote) => {
@@ -407,6 +397,14 @@ export function calculateDVVotingMatrix(
 	return { votingMatrix, referendumIndices };
 }
 
+function calculateVotingPower(balanceStr: string, lockPeriod: number = 0): string {
+	const balance = BigInt(balanceStr || '0');
+	if (lockPeriod === 0) {
+		return (balance / NO_LOCK_CONVICTION_DIVISOR).toString();
+	}
+	return (balance * BigInt(lockPeriod)).toString();
+}
+
 export function formatDVCohortVote(vote: IDVVotes): IDVCohortVote {
 	const refIndex = vote.proposal.index;
 	let delegatedVotes = BigInt(0);
@@ -445,8 +443,8 @@ export function formatDVCohortVote(vote: IDVVotes): IDVCohortVote {
 		isAbstain,
 		balance: balVal,
 		aye: isAye,
-		conviction: vote.lockPeriod,
-		votes: vote.selfVotingPower || '0',
+		conviction: vote.lockPeriod || 0,
+		votes: vote.selfVotingPower && vote.selfVotingPower !== '0' ? vote.selfVotingPower : calculateVotingPower(balVal, vote.lockPeriod || 0),
 		delegations: {
 			votes: delegatedVotes.toString(),
 			capital: delegatedCapital.toString()

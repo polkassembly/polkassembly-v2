@@ -1778,6 +1778,10 @@
 		"TotalDAOVotes": "Total DAO Votes",
 		"TotalGuardianVotes": "Total Guardian Votes",
 		"ActiveParticipationRate": "Active Participation Rate",
-		"WinRateTooltip": "Win = referendum finished && ((aye vote && referendum approval) || (nay vote && no referendum approval))"
+		"WinRateTooltip": "Win = referendum finished && ((aye vote && referendum approval) || (nay vote && no referendum approval))",
+		"InfluenceNotApplicable": "Influence comparison not applicable for this status",
+		"InfluenceNoChange": "DV delegations didn't change the result of this referendum",
+		"InfluenceChangedToPass": "This referendum won't pass if no DV delegations",
+		"InfluenceChangedToFail": "This referendum won't fail if no DV delegations"
 	}
 }

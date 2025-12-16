@@ -114,33 +114,47 @@ function InfluenceTable({ data, network, loading, onReferendumClick }: Influence
 										</Tooltip>
 									</td>
 									<td className='py-4'>
-										<div className='flex items-center gap-2'>
-											<div
-												className={`flex h-5 w-5 items-center justify-center rounded-sm ${
-													item.influence === EInfluenceStatus.APPROVED
-														? 'bg-success_vote_bg text-success'
-														: item.influence === EInfluenceStatus.REJECTED
-															? 'bg-toast_error_bg text-toast_error_text'
-															: item.influence === EInfluenceStatus.FAILED
-																? 'bg-toast_error_bg text-toast_error_text'
-																: 'bg-toast_info_bg text-toast_info_text'
-												}`}
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<div className='flex items-center gap-2'>
+													<div
+														className={`flex h-5 w-5 items-center justify-center rounded-sm ${
+															item.influence === EInfluenceStatus.NOT_APPLICABLE
+																? 'bg-toast_info_bg text-toast_info_text'
+																: item.influence === EInfluenceStatus.NO_INFLUENCE
+																	? 'bg-toast_error_bg text-toast_error_text'
+																	: 'bg-success_vote_bg text-success'
+														}`}
+													>
+														{item.influence === EInfluenceStatus.NOT_APPLICABLE ? (
+															<Minus size={12} />
+														) : item.influence === EInfluenceStatus.NO_INFLUENCE ? (
+															<X size={12} />
+														) : (
+															<Check size={12} />
+														)}
+													</div>
+												</div>
+											</TooltipTrigger>
+											<TooltipContent
+												side='top'
+												align='center'
+												className='bg-tooltip_background text-btn_primary_text'
 											>
-												{item.influence === EInfluenceStatus.APPROVED ? (
-													<Check size={12} />
-												) : item.influence === EInfluenceStatus.REJECTED || item.influence === EInfluenceStatus.FAILED ? (
-													<X size={12} />
-												) : (
-													<Minus size={12} />
-												)}
-											</div>
-										</div>
+												{item.influence === EInfluenceStatus.NOT_APPLICABLE
+													? t('InfluenceNotApplicable')
+													: item.influence === EInfluenceStatus.NO_INFLUENCE
+														? t('InfluenceNoChange')
+														: item.influence === EInfluenceStatus.CHANGED_TO_PASS
+															? t('InfluenceChangedToPass')
+															: t('InfluenceChangedToFail')}
+											</TooltipContent>
+										</Tooltip>
 									</td>
 									<td className='py-4 pr-4 text-right'>
 										<button
 											type='button'
 											onClick={() => onReferendumClick(item)}
-											className='rounded-full p-1'
 										>
 											<Menu className='h-4 w-4 text-wallet_btn_text' />
 										</button>

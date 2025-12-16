@@ -1890,10 +1890,10 @@ export interface IDVCohort {
 }
 
 export enum EInfluenceStatus {
-	APPROVED = 'approved',
-	REJECTED = 'rejected',
-	FAILED = 'failed',
-	NO_IMPACT = 'no_impact'
+	NOT_APPLICABLE = 'not_applicable',
+	NO_INFLUENCE = 'no_influence',
+	CHANGED_TO_PASS = 'changed_to_pass',
+	CHANGED_TO_FAIL = 'changed_to_fail'
 }
 
 export interface IDelegatedVote {

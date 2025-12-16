@@ -1748,6 +1748,10 @@
 		"TotalDAOVotes": "Gesamt DAO-Stimmen",
 		"TotalGuardianVotes": "Gesamt Wächter-Stimmen",
 		"ActiveParticipationRate": "Aktive Beteiligungsrate",
-		"WinRateTooltip": "Gewinn = Referendum abgeschlossen && ((Ja-Stimme && Referendum genehmigt) || (Nein-Stimme && Referendum nicht genehmigt))"
+		"WinRateTooltip": "Gewinn = Referendum abgeschlossen && ((Ja-Stimme && Referendum genehmigt) || (Nein-Stimme && Referendum nicht genehmigt))",
+		"InfluenceNotApplicable": "Einflussvergleich für diesen Status nicht anwendbar",
+		"InfluenceNoChange": "DV-Delegationen haben das Ergebnis dieses Referendums nicht verändert",
+		"InfluenceChangedToPass": "Dieses Referendum würde ohne DV-Delegationen nicht angenommen werden",
+		"InfluenceChangedToFail": "Dieses Referendum würde ohne DV-Delegationen nicht scheitern"
 	}
 }

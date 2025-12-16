@@ -48,7 +48,7 @@ function DecentralisedVoices() {
 	const error = cohortError || referendaError || votesError;
 
 	const { delegatesWithStats, referendaInfluence, votingMatrix, referendumIndices } = useMemo(() => {
-		if (!cohort || !referenda || !votes) {
+		if (!cohort || !referenda || !votes || !Array.isArray(votes) || !Array.isArray(referenda)) {
 			return { delegatesWithStats: [], referendaInfluence: [], votingMatrix: [], referendumIndices: [] };
 		}
 

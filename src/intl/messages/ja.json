@@ -1749,6 +1749,10 @@
 		"TotalDAOVotes": "DAO総投票数",
 		"TotalGuardianVotes": "ガーディアン総投票数",
 		"ActiveParticipationRate": "アクティブな参加率",
-		"WinRateTooltip": "勝利 = 国民投票完了 && ((賛成票 && 国民投票承認) || (反対票 && 国民投票不承認))"
+		"WinRateTooltip": "勝利 = 国民投票完了 && ((賛成票 && 国民投票承認) || (反対票 && 国民投票不承認))",
+		"InfluenceNotApplicable": "このステータスでは影響力の比較は適用されません",
+		"InfluenceNoChange": "DVの委任はこのレファレンダムの結果を変えませんでした",
+		"InfluenceChangedToPass": "DVの委任がなければ、このレファレンダムは可決されません",
+		"InfluenceChangedToFail": "DVの委任がなければ、このレファレンダムは否決されません"
 	}
 }

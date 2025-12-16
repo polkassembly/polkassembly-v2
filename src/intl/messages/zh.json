@@ -1749,6 +1749,10 @@
 		"TotalDAOVotes": "DAO 投票",
 		"TotalGuardianVotes": "监护人投票",
 		"ActiveParticipationRate": "活跃参与率",
-		"WinRateTooltip": "获胜 = 公投完成 && ((赞成票 && 公投批准) || (反对票 && 公投未批准))"
+		"WinRateTooltip": "获胜 = 公投完成 && ((赞成票 && 公投批准) || (反对票 && 公投未批准))",
+		"InfluenceNotApplicable": "影响力比较不适用于此状态",
+		"InfluenceNoChange": "DV 委托并未改变此公投的结果",
+		"InfluenceChangedToPass": "如果没有 DV 委托，此公投将不会通过",
+		"InfluenceChangedToFail": "如果没有 DV 委托，此公投将不会失败"
 	}
 }

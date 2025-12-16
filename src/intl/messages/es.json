@@ -1750,6 +1750,10 @@
 		"TotalDAOVotes": "Votos totales de DAO",
 		"TotalGuardianVotes": "Votos totales de Guardianes",
 		"ActiveParticipationRate": "Tasa de participación activa",
-		"WinRateTooltip": "Ganancia = referéndum finalizado && ((voto aye && aprobación del referéndum) || (voto nay && no aprobación del referéndum))"
+		"WinRateTooltip": "Ganancia = referéndum finalizado && ((voto aye && aprobación del referéndum) || (voto nay && no aprobación del referéndum))",
+		"InfluenceNotApplicable": "Comparación de influencia no aplicable para este estado",
+		"InfluenceNoChange": "Las delegaciones de DV no cambiaron el resultado de este referéndum",
+		"InfluenceChangedToPass": "Este referéndum no se aprobaría sin las delegaciones de DV",
+		"InfluenceChangedToFail": "Este referéndum no fracasaría sin las delegaciones de DV"
 	}
 }
