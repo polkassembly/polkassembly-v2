@@ -179,7 +179,7 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 						items={allTracksData?.items || []}
 						isFetching={false}
 						noActivityText={t('noactivity')}
-						viewAllUrl='/latest-activity'
+						viewAllUrl='/all'
 					/>
 				</TabsContent>
 
