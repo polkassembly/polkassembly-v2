@@ -26,9 +26,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 async function Community({ searchParams }: { searchParams: Promise<{ tab?: ECommunityRole; page?: string }> }) {
-	// Default to members tab
 	const searchParamsValue = await searchParams;
-	const activeTab = searchParamsValue?.tab || ECommunityRole.MEMBERS;
+	const activeTab = searchParamsValue?.tab || ECommunityRole.DELEGATES;
 	const page = parseInt(searchParamsValue?.page || '1', DEFAULT_LISTING_LIMIT);
 
 	return (
@@ -36,7 +35,7 @@ async function Community({ searchParams }: { searchParams: Promise<{ tab?: EComm
 			<Tabs defaultValue={activeTab}>
 				<Header activeTab={activeTab} />
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
-					<TabsContent value={ECommunityRole.DELEGATES}>
+					<TabsContent value={activeTab}>
 						<CommunityDelegates page={page} />
 					</TabsContent>
 				</div>

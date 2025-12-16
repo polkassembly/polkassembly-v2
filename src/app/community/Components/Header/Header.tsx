@@ -21,12 +21,7 @@ function Header({ activeTab }: { activeTab: ECommunityRole }) {
 		}
 	};
 
-	const communityTabs = [
-		{ label: t('Community.members'), value: ECommunityRole.MEMBERS },
-		{ label: t('Community.delegates'), value: ECommunityRole.DELEGATES },
-		{ label: t('Community.curators'), value: ECommunityRole.CURATORS },
-		{ label: t('Community.decentralizedVoices'), value: ECommunityRole.DVS }
-	];
+	const communityTabs = [{ label: t('Community.delegates'), value: ECommunityRole.DELEGATES }];
 
 	return (
 		<div className={styles.header}>
