@@ -43,7 +43,7 @@ function InfluenceTable({ data, network, loading, onReferendumClick }: Influence
 										<BsFillQuestionCircleFill className='text-base text-btn_secondary_border' />
 									</TooltipTrigger>
 									<TooltipContent className='bg-tooltip_background p-2 text-btn_primary_text'>
-										<p>Whether DV delegations changed the outcome of a referendum</p>
+										<p>{t('InfluenceTooltip')}</p>
 									</TooltipContent>
 								</Tooltip>
 							</span>

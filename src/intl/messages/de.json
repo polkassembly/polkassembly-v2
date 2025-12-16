@@ -1752,6 +1752,9 @@
 		"InfluenceNotApplicable": "Einflussvergleich für diesen Status nicht anwendbar",
 		"InfluenceNoChange": "DV-Delegationen haben das Ergebnis dieses Referendums nicht verändert",
 		"InfluenceChangedToPass": "Dieses Referendum würde ohne DV-Delegationen nicht angenommen werden",
-		"InfluenceChangedToFail": "Dieses Referendum würde ohne DV-Delegationen nicht scheitern"
+		"InfluenceChangedToFail": "Dieses Referendum würde ohne DV-Delegationen nicht scheitern",
+		"Untitled": "Ohne Titel",
+		"InfluenceTooltip": "Ob DV-Delegationen das Ergebnis eines Referendums geändert haben",
+		"Votes": "Stimmen"
 	}
 }

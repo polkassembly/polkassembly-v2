@@ -1753,6 +1753,9 @@
 		"InfluenceNotApplicable": "このステータスでは影響力の比較は適用されません",
 		"InfluenceNoChange": "DVの委任はこのレファレンダムの結果を変えませんでした",
 		"InfluenceChangedToPass": "DVの委任がなければ、このレファレンダムは可決されません",
-		"InfluenceChangedToFail": "DVの委任がなければ、このレファレンダムは否決されません"
+		"InfluenceChangedToFail": "DVの委任がなければ、このレファレンダムは否決されません",
+		"Untitled": "無題",
+		"InfluenceTooltip": "DV委任が国民投票の結果を変更したかどうか",
+		"Votes": "投票"
 	}
 }

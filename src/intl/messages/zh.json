@@ -1753,6 +1753,9 @@
 		"InfluenceNotApplicable": "影响力比较不适用于此状态",
 		"InfluenceNoChange": "DV 委托并未改变此公投的结果",
 		"InfluenceChangedToPass": "如果没有 DV 委托，此公投将不会通过",
-		"InfluenceChangedToFail": "如果没有 DV 委托，此公投将不会失败"
+		"InfluenceChangedToFail": "如果没有 DV 委托，此公投将不会失败",
+		"Untitled": "无标题",
+		"InfluenceTooltip": "DV委托是否改变了公投结果",
+		"Votes": "投票"
 	}
 }

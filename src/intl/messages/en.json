@@ -1782,6 +1782,9 @@
 		"InfluenceNotApplicable": "Influence comparison not applicable for this status",
 		"InfluenceNoChange": "DV delegations didn't change the result of this referendum",
 		"InfluenceChangedToPass": "This referendum won't pass if no DV delegations",
-		"InfluenceChangedToFail": "This referendum won't fail if no DV delegations"
+		"InfluenceChangedToFail": "This referendum won't fail if no DV delegations",
+		"Untitled": "Untitled",
+		"InfluenceTooltip": "Whether DV delegations changed the outcome of a referendum",
+		"Votes": "Votes"
 	}
 }

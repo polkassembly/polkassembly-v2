@@ -1754,6 +1754,9 @@
 		"InfluenceNotApplicable": "Comparación de influencia no aplicable para este estado",
 		"InfluenceNoChange": "Las delegaciones de DV no cambiaron el resultado de este referéndum",
 		"InfluenceChangedToPass": "Este referéndum no se aprobaría sin las delegaciones de DV",
-		"InfluenceChangedToFail": "Este referéndum no fracasaría sin las delegaciones de DV"
+		"InfluenceChangedToFail": "Este referéndum no fracasaría sin las delegaciones de DV",
+		"Untitled": "Sin título",
+		"InfluenceTooltip": "Si las delegaciones DV cambiaron el resultado de un referéndum",
+		"Votes": "Votos"
 	}
 }

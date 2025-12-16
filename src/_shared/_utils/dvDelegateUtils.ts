@@ -24,8 +24,10 @@ import {
 import { DECIDING_PROPOSAL_STATUSES } from '../_constants/decidingProposalStatuses';
 import { FAILED_PROPOSAL_STATUSES, PASSED_PROPOSAL_STATUSES } from '../_constants/proposalResultStatuses';
 import { CLOSED_PROPOSAL_STATUSES } from '../_constants/closedProposalStatuses';
+import { convertSnakeCaseToTitleCase } from './convertSnakeCaseToTitleCase';
 
 const NO_LOCK_CONVICTION_DIVISOR = BigInt(10);
+const PERCENTAGE_PRECISION = BigInt(10000);
 
 export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: ICohortReferenda[], cohort: IDVCohort): { delegatesWithStats: IDVDelegateWithStats[] } {
 	const referendaMap = new Map(referenda.map((r) => [r.index, r]));
@@ -281,7 +283,7 @@ export function calculateDVInfluence(
 
 		const calcPercent = (v: IDVDelegateVote) => {
 			const power = BigInt(v.votingPower);
-			return turnout > BigInt(0) ? Number((power * BigInt(10000)) / turnout) / 100 : 0;
+			return turnout > BigInt(0) ? Number((power * PERCENTAGE_PRECISION) / turnout) / 100 : 0;
 		};
 
 		const delegateVotesWithPercentage = delegateVotes.map((v) => ({
@@ -300,12 +302,12 @@ export function calculateDVInfluence(
 		return {
 			index: referendum.index,
 			title: referendum.preimage?.proposedCall?.description || 'Untitled',
-			track: track?.name?.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) || '',
+			track: convertSnakeCaseToTitleCase(track?.name || ''),
 			status: referendum.status,
 			ayeVotingPower: dvAyePower.toString(),
 			nayVotingPower: dvNayPower.toString(),
-			ayePercent: turnout > BigInt(0) ? Number((totalAye * BigInt(10000)) / turnout) / 100 : 0,
-			nayPercent: turnout > BigInt(0) ? Number((totalNay * BigInt(10000)) / turnout) / 100 : 0,
+			ayePercent: turnout > BigInt(0) ? Number((totalAye * PERCENTAGE_PRECISION) / turnout) / 100 : 0,
+			nayPercent: turnout > BigInt(0) ? Number((totalNay * PERCENTAGE_PRECISION) / turnout) / 100 : 0,
 			influence,
 			dvTotalVotingPower: totalPower.toString(),
 			delegateVotes: delegateVotesWithPercentage,
