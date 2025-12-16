@@ -455,6 +455,7 @@ export interface IOffChainPost {
 	id?: string;
 	index?: number;
 	hash?: string;
+	compositeIndex?: string; // For child bounties: "parentBountyIndex_childBountyIndex"
 	userId?: number;
 	title?: string;
 	content: string;
