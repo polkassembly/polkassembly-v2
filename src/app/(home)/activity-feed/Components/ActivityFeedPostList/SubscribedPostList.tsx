@@ -82,10 +82,13 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 		queryKey: ['subscribedActivityFeed', userId],
 		queryFn: getSubscribedActivityFeed,
 		initialPageParam: 1,
-		initialData: {
-			pages: [{ ...initialData, page: 1 }],
-			pageParams: [1]
-		},
+		initialData:
+			initialData.items.length > 0
+				? {
+						pages: [{ ...initialData, page: 1 }],
+						pageParams: [1]
+					}
+				: undefined,
 		getNextPageParam: (lastPage, allPages) => {
 			if (reachedEnd || (lastPage?.items && lastPage.items.length < DEFAULT_LISTING_LIMIT)) {
 				return undefined;
