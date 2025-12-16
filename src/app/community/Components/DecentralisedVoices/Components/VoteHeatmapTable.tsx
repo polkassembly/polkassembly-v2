@@ -2,15 +2,18 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { useTranslations } from 'next-intl';
-import { Check, X, Minus } from 'lucide-react';
-import { IDVDelegateVotingMatrix, EDVDelegateType } from '@/_shared/types';
+import { useRef, useState, useEffect } from 'react';
+import { Ban, ChevronLeft, ChevronRight } from 'lucide-react';
+import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
+import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
+
+import { IDVDelegateVotingMatrix } from '@/_shared/types';
 import Address from '@/app/_shared-components/Profile/Address/Address';
+import { Button } from '@/app/_shared-components/Button';
 
 interface VoteHeatmapTableProps {
 	votingMatrix: IDVDelegateVotingMatrix[];
 	referendumIndices: number[];
-	activeTab: EDVDelegateType;
 }
 
 const getVoteColor = (vote: string) => {
@@ -20,7 +23,7 @@ const getVoteColor = (vote: string) => {
 		case 'nay':
 			return 'bg-failure_vote_bg text-nay_color';
 		case 'abstain':
-			return 'bg-activity_selected_tab text-abstain_color';
+			return 'bg-abstain_bubble_bg text-abstain_color';
 		default:
 			return 'bg-activity_selected_tab text-text_primary';
 	}
@@ -29,62 +32,133 @@ const getVoteColor = (vote: string) => {
 const getVoteIcon = (vote: string) => {
 	switch (vote) {
 		case 'aye':
-			return <Check size={12} />;
+			return <AiFillLike size={16} />;
 		case 'nay':
-			return <X size={12} />;
+			return <AiFillDislike size={16} />;
 		case 'abstain':
-			return <Minus size={12} />;
+			return <Ban size={16} />;
 		default:
-			return <div className='h-1 w-1 rounded-full bg-voting_bar_bg' />;
+			return <p>-</p>;
 	}
 };
 
-function VoteHeatmapTable({ votingMatrix, referendumIndices, activeTab }: VoteHeatmapTableProps) {
-	const t = useTranslations('DecentralizedVoices');
+const getVoteBarColor = (vote: string) => {
+	switch (vote) {
+		case 'aye':
+			return 'bg-success';
+		case 'nay':
+			return 'bg-failure';
+		case 'abstain':
+			return 'bg-abstain_bubble_bg';
+		default:
+			return 'bg-activity_selected_tab';
+	}
+};
+
+function VoteHeatmapRow({ item, referendumIndices }: { item: IDVDelegateVotingMatrix; referendumIndices: number[] }) {
+	const scrollRef = useRef<HTMLDivElement>(null);
+	const [showLeftArrow, setShowLeftArrow] = useState(false);
+	const [showRightArrow, setShowRightArrow] = useState(false);
+
+	const checkScroll = () => {
+		if (scrollRef.current) {
+			const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+			setShowLeftArrow(scrollLeft > 0);
+			setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
+		}
+	};
+
+	useEffect(() => {
+		checkScroll();
+		window.addEventListener('resize', checkScroll);
+		return () => window.removeEventListener('resize', checkScroll);
+	}, []);
+
+	const scroll = (direction: 'left' | 'right') => {
+		if (scrollRef.current) {
+			const scrollAmount = 200;
+			scrollRef.current.scrollBy({
+				left: direction === 'left' ? -scrollAmount : scrollAmount,
+				behavior: 'smooth'
+			});
+		}
+	};
 
 	return (
-		<div className='hide_scrollbar block w-full overflow-x-auto'>
-			<table className='w-full table-auto border-collapse'>
-				<thead>
-					<tr className='border-b border-border_grey text-left text-xs font-semibold text-text_primary'>
-						<th className='sticky left-0 z-10 w-64 bg-bg_modal py-4 pl-4 uppercase'>{activeTab === EDVDelegateType.DAO ? t('DAO') : t('Guardian').toUpperCase()}</th>{' '}
-						{referendumIndices.map((ref) => (
-							<th
-								key={ref}
-								className='px-2 py-4 text-center text-text_primary'
-							>
-								#{ref}
-							</th>
-						))}
-					</tr>
-				</thead>
-				<tbody>
-					{votingMatrix.map((item) => (
-						<tr
-							key={item.address}
-							className='border-b border-border_grey hover:bg-bg_modal/70'
-						>
-							<td className='sticky left-0 z-10 bg-bg_modal px-4 py-4'>
-								<div className='flex max-w-28 flex-col md:max-w-full'>
-									<Address address={item.address} />
-									<span className='text-xs text-text_primary'>{item.participation.toFixed(1)}% active</span>
+		<div className='w-full rounded-2xl border border-border_grey bg-bg_modal'>
+			<div className='flex flex-col items-start gap-2 border-b border-border_grey p-4 md:flex-row md:items-center'>
+				<div className='flex items-center gap-2'>
+					<Address address={item.address} />
+					<span className='rounded bg-sidebar_footer px-2 py-1 text-xs text-text_primary'>{item.participation.toFixed(1)}% active</span>
+				</div>
+			</div>
+
+			<div className='relative flex w-full items-center p-4'>
+				{showLeftArrow && (
+					<Button
+						variant='outline'
+						size='icon'
+						onClick={() => scroll('left')}
+						className='absolute left-0 z-10 flex items-center justify-center rounded-full bg-gradient-to-r from-bg_modal to-transparent px-1 hover:text-text_pink'
+					>
+						<ChevronLeft size={18} />
+					</Button>
+				)}
+
+				<div
+					ref={scrollRef}
+					onScroll={checkScroll}
+					className='hide_scrollbar flex w-full overflow-x-auto'
+				>
+					<div className='flex gap-2.5 px-4'>
+						{referendumIndices.map((ref) => {
+							const vote = item.votes[ref] || '';
+							return (
+								<div
+									key={ref}
+									className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg ${getVoteColor(vote)}`}
+									title={`Referendum #${ref}: ${vote}`}
+								>
+									{getVoteIcon(vote)}
 								</div>
-							</td>
-							{referendumIndices.map((ref) => {
-								const vote = item.votes[ref] || '';
-								return (
-									<td
-										key={ref}
-										className='p-2 text-center'
-									>
-										<div className={`mx-auto flex h-8 w-8 items-center justify-center rounded ${getVoteColor(vote)}`}>{getVoteIcon(vote)}</div>
-									</td>
-								);
-							})}
-						</tr>
-					))}
-				</tbody>
-			</table>
+							);
+						})}
+					</div>
+				</div>
+
+				{showRightArrow && (
+					<Button
+						size='icon'
+						variant='outline'
+						onClick={() => scroll('right')}
+						className='absolute right-0 z-10 flex items-center justify-center rounded-full bg-gradient-to-l from-bg_modal to-transparent px-1 hover:text-text_pink'
+					>
+						<ChevronRight size={18} />
+					</Button>
+				)}
+			</div>
+			<div className='flex h-1.5 w-full overflow-hidden rounded-b-2xl'>
+				{referendumIndices.map((ref) => (
+					<div
+						key={ref}
+						className={`flex-1 flex-shrink-0 ${getVoteBarColor(item.votes[ref] || '')}`}
+					/>
+				))}
+			</div>
+		</div>
+	);
+}
+
+function VoteHeatmapTable({ votingMatrix, referendumIndices }: VoteHeatmapTableProps) {
+	return (
+		<div className='flex flex-col gap-4 pt-3'>
+			{votingMatrix.map((item) => (
+				<VoteHeatmapRow
+					key={item.address}
+					item={item}
+					referendumIndices={referendumIndices}
+				/>
+			))}
 		</div>
 	);
 }

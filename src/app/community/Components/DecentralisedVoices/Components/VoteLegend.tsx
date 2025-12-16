@@ -2,7 +2,10 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { Check, X, Minus } from 'lucide-react';
+import { Ban } from 'lucide-react';
+import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
+import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
+
 import { useTranslations } from 'next-intl';
 
 function VoteLegend() {
@@ -13,19 +16,19 @@ function VoteLegend() {
 			<span className='font-semibold text-text_primary'>{t('Legend')}</span>
 			<div className='flex items-center gap-2'>
 				<div className='flex h-6 w-6 items-center justify-center rounded bg-success_vote_bg text-aye_color'>
-					<Check size={14} />
+					<AiFillLike size={14} />
 				</div>
 				<span className='text-sm text-text_primary'>{t('Aye')}</span>
 			</div>
 			<div className='flex items-center gap-2'>
 				<div className='flex h-6 w-6 items-center justify-center rounded bg-failure_vote_bg text-nay_color'>
-					<X size={14} />
+					<AiFillDislike size={14} />
 				</div>
 				<span className='text-sm text-text_primary'>{t('Nay')}</span>
 			</div>
 			<div className='flex items-center gap-2'>
 				<div className='flex h-6 w-6 items-center justify-center rounded bg-activity_selected_tab text-abstain_color'>
-					<Minus size={14} />
+					<Ban size={14} />
 				</div>
 				<span className='text-sm text-text_primary'>{t('Abstain')}</span>
 			</div>

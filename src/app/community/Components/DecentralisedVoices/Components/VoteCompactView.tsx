@@ -4,7 +4,10 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Check, X, Minus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Ban, ChevronDown, ChevronUp } from 'lucide-react';
+import { AiFillLike } from '@react-icons/all-files/ai/AiFillLike';
+import { AiFillDislike } from '@react-icons/all-files/ai/AiFillDislike';
+
 import { IDVDelegateVotingMatrix, EVoteDecision } from '@/_shared/types';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
@@ -22,7 +25,7 @@ const getVoteColor = (vote: string) => {
 		case 'nay':
 			return 'bg-failure_vote_bg text-nay_color';
 		case 'abstain':
-			return 'bg-activity_selected_tab text-abstain_color';
+			return 'bg-abstain_bubble_bg text-abstain_color';
 		default:
 			return 'bg-activity_selected_tab text-text_primary';
 	}
@@ -31,13 +34,13 @@ const getVoteColor = (vote: string) => {
 const getVoteIcon = (vote: string) => {
 	switch (vote) {
 		case 'aye':
-			return <Check size={12} />;
+			return <AiFillLike size={16} />;
 		case 'nay':
-			return <X size={12} />;
+			return <AiFillDislike size={16} />;
 		case 'abstain':
-			return <Minus size={12} />;
+			return <Ban size={16} />;
 		default:
-			return <div className='h-1 w-1 rounded-full bg-voting_bar_bg' />;
+			return <p>-</p>;
 	}
 };
 
@@ -48,7 +51,7 @@ const getVoteBarColor = (vote: string) => {
 		case 'nay':
 			return 'bg-failure';
 		case 'abstain':
-			return 'bg-activity_selected_tab';
+			return 'bg-abstain_bubble_bg';
 		default:
 			return 'bg-activity_selected_tab';
 	}
@@ -106,7 +109,7 @@ function VoteCompactView({ votingMatrix, referendumIndices, loading }: VoteCompa
 			{votingMatrix.map((item) => (
 				<div
 					key={item.address}
-					className='rounded-xl border border-border_grey bg-bg_modal p-4'
+					className='rounded-xl border border-border_grey bg-bg_modal px-4 py-2'
 				>
 					<div
 						className='flex cursor-pointer items-center justify-between'
@@ -120,18 +123,34 @@ function VoteCompactView({ votingMatrix, referendumIndices, loading }: VoteCompa
 						role='button'
 						tabIndex={0}
 					>
-						<div className='flex flex-col items-center gap-3 md:flex-row'>
-							<Address address={item.address} />
-							<div>
-								<p className='text-xs text-text_primary'>
-									{item.activeCount} {t('Of')} {item.totalRefs} {t('Referendums')}
-								</p>
+						<div className='flex w-full items-center justify-between gap-3'>
+							<div className='flex flex-col items-center gap-3 lg:flex-row'>
+								<Address address={item.address} />
+								<div>
+									<p className='text-xs text-text_primary'>
+										{item.activeCount} {t('Of')} {item.totalRefs} {t('Referendums')}
+									</p>
+								</div>
+							</div>
+							<div className='hidden grid-cols-2 gap-4 rounded-lg bg-bg_modal/70 p-4 lg:grid lg:grid-cols-3'>
+								<div>
+									<p className='text-xs text-text_primary'>{t('Participation')}</p>
+									<p className='text-lg font-bold text-text_primary'>{item.participation.toFixed(1)}%</p>
+								</div>
+								<div>
+									<p className='text-xs text-text_primary'>{t('AyeRate')}</p>
+									<p className='text-lg font-bold text-aye_color'>{item.ayeRate.toFixed(1)}%</p>
+								</div>
+								<div>
+									<p className='text-xs text-text_primary'>{t('Total')}</p>
+									<p className='text-lg font-bold text-abstain_color'>{item.activeCount}</p>
+								</div>
 							</div>
 						</div>
 						<div className='text-text_primary'>{expandedRows.includes(item.address) ? <ChevronUp size={20} /> : <ChevronDown size={20} />}</div>
 					</div>
 
-					<div className='mt-4 grid grid-cols-2 gap-4 rounded-lg bg-bg_modal/70 p-4 md:grid-cols-3'>
+					<div className='mt-4 grid grid-cols-2 gap-4 rounded-lg bg-bg_modal/70 p-4 lg:hidden lg:grid-cols-3'>
 						<div>
 							<p className='text-xs text-text_primary'>{t('Participation')}</p>
 							<p className='text-lg font-bold text-text_primary'>{item.participation.toFixed(1)}%</p>
@@ -147,7 +166,7 @@ function VoteCompactView({ votingMatrix, referendumIndices, loading }: VoteCompa
 					</div>
 
 					{expandedRows.includes(item.address) ? (
-						<div className='mt-4'>
+						<div className='mb-3'>
 							<div className='grid grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-8'>
 								{referendumIndices.map((ref) => {
 									const vote = item.votes[ref] || '';
@@ -165,7 +184,7 @@ function VoteCompactView({ votingMatrix, referendumIndices, loading }: VoteCompa
 									);
 								})}
 							</div>
-							<div className='mt-2 flex h-2 w-full overflow-hidden rounded-full'>
+							<div className='mt-3 flex h-2 w-full overflow-hidden rounded-full'>
 								{referendumIndices.map((ref) => (
 									<div
 										key={ref}
@@ -175,7 +194,7 @@ function VoteCompactView({ votingMatrix, referendumIndices, loading }: VoteCompa
 							</div>
 						</div>
 					) : (
-						<div className='mt-4 flex h-2 w-full overflow-hidden rounded-full'>
+						<div className='mt-3 flex h-2 w-full overflow-hidden rounded-full'>
 							{referendumIndices.map((ref) => (
 								<div
 									key={ref}

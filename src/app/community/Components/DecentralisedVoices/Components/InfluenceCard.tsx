@@ -75,7 +75,7 @@ function InfluenceCard({ referendaInfluence, loading, cohortId }: InfluenceCardP
 		return data;
 	}, [referendaInfluence, selectedTracks, sortBy, sortDirection]);
 
-	const outcomeChangedCount = filteredAndSortedData.filter((r) => r.influence === EInfluenceStatus.APPROVED || r.influence === EInfluenceStatus.REJECTED).length;
+	const outcomeChangedCount = filteredAndSortedData.filter((r) => r.influence === EInfluenceStatus.CHANGED_TO_PASS || r.influence === EInfluenceStatus.CHANGED_TO_FAIL).length;
 
 	const totalCount = filteredAndSortedData.length;
 	const outcomePercent = totalCount > 0 ? ((outcomeChangedCount / totalCount) * 100).toFixed(2) : '0';
@@ -113,8 +113,8 @@ function InfluenceCard({ referendaInfluence, loading, cohortId }: InfluenceCardP
 			onOpenChange={setIsOpen}
 		>
 			<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
-				<div className='mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
-					<div className='flex items-center gap-2'>
+				<div className='mb-2 grid grid-cols-[1fr_auto] gap-y-4 lg:mb-6 lg:flex lg:flex-nowrap lg:items-center lg:justify-between lg:gap-4'>
+					<div className='order-1 flex min-w-0 items-center gap-2 lg:order-1'>
 						<Image
 							src={TimeLineIcon}
 							alt='Delegation Green Icon'
@@ -122,12 +122,14 @@ function InfluenceCard({ referendaInfluence, loading, cohortId }: InfluenceCardP
 							height={24}
 							className='h-6 w-6'
 						/>{' '}
-						<h2 className='text-2xl font-semibold text-navbar_title'>{t('InfluenceByReferenda')}</h2>
-						<span className='ml-2 rounded-lg bg-bounty_dash_bg p-2 text-xs font-medium text-wallet_btn_text'>
-							{t('OutcomeChanged')} {outcomeChangedCount} ({outcomePercent}%) | {t('Total')} {totalCount}
-						</span>
+						<h2 className='truncate text-lg font-semibold text-navbar_title lg:text-2xl'>{t('InfluenceByReferenda')}</h2>
 					</div>
-					<div className='flex items-center gap-2'>
+
+					<span className='order-3 col-span-2 w-full rounded-lg bg-bounty_dash_bg p-2 text-xs font-medium text-wallet_btn_text lg:order-2 lg:ml-2 lg:w-auto'>
+						{t('OutcomeChanged')} {outcomeChangedCount} ({outcomePercent}%) | {t('Total')} {totalCount}
+					</span>
+
+					<div className='order-2 ml-auto flex w-auto items-center justify-end gap-2 lg:order-3'>
 						<InfluenceFilters
 							selectedTracks={selectedTracks}
 							availableTracks={availableTracks}

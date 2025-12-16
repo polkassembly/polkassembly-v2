@@ -61,31 +61,33 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 			onOpenChange={setIsOpen}
 		>
 			<div className='my-4 w-full max-w-full overflow-hidden rounded-3xl border border-border_grey bg-bg_modal p-6'>
-				<div className='flex flex-row items-center justify-between gap-2'>
-					<div className='flex flex-row items-center gap-2 md:gap-4'>
+				<div className='mb-2 flex w-full flex-wrap gap-y-4 lg:mb-6 lg:flex-nowrap lg:items-center lg:justify-between lg:gap-4'>
+					<div className='order-1 flex items-center gap-2 lg:order-1'>
 						<div>
 							<h2 className='text-lg font-semibold text-navbar_title md:text-2xl'>Votes</h2>
 						</div>
-						{cohort && cohort.guardiansCount > 0 && (
-							<div className='flex rounded-lg bg-sidebar_footer p-1'>
-								<button
-									type='button'
-									onClick={() => setActiveTab(EDVDelegateType.DAO)}
-									className={`rounded px-2 py-0.5 text-xs font-medium text-navbar_title transition-colors md:px-3 md:text-sm ${activeTab === EDVDelegateType.DAO && 'bg-section_dark_overlay font-semibold'}`}
-								>
-									{t('DAO')} ({daos.length})
-								</button>
-								<button
-									type='button'
-									onClick={() => setActiveTab(EDVDelegateType.GUARDIAN)}
-									className={`rounded px-2 py-0.5 text-xs font-medium text-navbar_title transition-colors md:px-3 md:text-sm ${activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay font-semibold'}`}
-								>
-									{t('Guardian').toUpperCase()} ({guardians.length})
-								</button>
-							</div>
-						)}
 					</div>
-					<div className='flex items-center gap-2'>
+
+					{cohort && cohort.guardiansCount > 0 && (
+						<div className='order-3 flex w-full rounded-lg bg-sidebar_footer p-1 lg:order-2 lg:w-auto'>
+							<button
+								type='button'
+								onClick={() => setActiveTab(EDVDelegateType.DAO)}
+								className={`flex-1 rounded px-2 py-0.5 text-xs font-medium text-navbar_title transition-colors md:flex-none md:px-3 md:text-sm ${activeTab === EDVDelegateType.DAO && 'bg-section_dark_overlay font-semibold'}`}
+							>
+								{t('DAO')} ({daos.length})
+							</button>
+							<button
+								type='button'
+								onClick={() => setActiveTab(EDVDelegateType.GUARDIAN)}
+								className={`flex-1 rounded px-2 py-0.5 text-xs font-medium text-navbar_title transition-colors md:flex-none md:px-3 md:text-sm ${activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay font-semibold'}`}
+							>
+								{t('Guardian').toUpperCase()} ({guardians.length})
+							</button>
+						</div>
+					)}
+
+					<div className='order-2 ml-auto flex items-center gap-2 lg:order-3'>
 						<Popover>
 							<PopoverTrigger asChild>
 								<button
