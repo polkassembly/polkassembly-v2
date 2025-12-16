@@ -34,7 +34,7 @@ export const useDVCohorts = () => {
 export const useDVCohortDetails = (id: number) => {
 	return useQuery<IDVCohort, Error>({
 		queryKey: ['dv-cohort-details', id],
-		enabled: Boolean(id),
+		enabled: id != null && id > 0,
 		staleTime: FIVE_MIN_IN_MILLI,
 		retry: true,
 		refetchOnMount: true,
@@ -58,7 +58,7 @@ export const useDVCohortDetails = (id: number) => {
 export const useDVCohortReferenda = (id: number) => {
 	return useQuery<ICohortReferenda[], Error>({
 		queryKey: ['dv-cohort-referenda', id],
-		enabled: Boolean(id),
+		enabled: id != null && id > 0,
 		staleTime: FIVE_MIN_IN_MILLI,
 		retry: true,
 		refetchOnMount: true,
@@ -82,7 +82,7 @@ export const useDVCohortReferenda = (id: number) => {
 export const useDVCohortVotes = (id: number) => {
 	return useQuery<IDVCohortVote[], Error>({
 		queryKey: ['dv-cohort-votes', id],
-		enabled: Boolean(id),
+		enabled: id != null && id > 0,
 		staleTime: FIVE_MIN_IN_MILLI,
 		retry: true,
 		refetchOnMount: true,

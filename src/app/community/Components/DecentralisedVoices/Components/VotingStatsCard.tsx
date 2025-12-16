@@ -62,8 +62,8 @@ function VotingStatsCard({ votingMatrix, referendumCount, network, loading }: Vo
 		.reduce((acc, curr) => acc.add(new BN(curr.totalVotingPower || '0')), new BN(0))
 		.toString();
 
-	const activeParticipationRate = ((votingMatrix.reduce((acc, curr) => acc + curr.activeCount, 0) / (votingMatrix.length * referendumCount || 1)) * 100).toFixed(1);
-
+	const totalPossibleVotes = votingMatrix.length * referendumCount;
+	const activeParticipationRate = totalPossibleVotes > 0 ? ((votingMatrix.reduce((acc, curr) => acc + curr.activeCount, 0) / totalPossibleVotes) * 100).toFixed(1) : '0.0';
 	const hasGuardians = votingMatrix.filter((d) => d.type === EDVDelegateType.GUARDIAN).length > 0;
 
 	return (

@@ -1844,7 +1844,7 @@ export enum ECohortStatus {
 	CLOSED = 'Closed'
 }
 
-interface IDVCohortDelegate {
+export interface IDVCohortDelegate {
 	address: string;
 	startBlock: number;
 	endBlock: number | null;

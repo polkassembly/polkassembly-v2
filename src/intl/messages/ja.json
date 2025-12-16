@@ -1748,6 +1748,7 @@
 		"PercentOfDV": "% の DV",
 		"TotalDAOVotes": "DAO総投票数",
 		"TotalGuardianVotes": "ガーディアン総投票数",
-		"ActiveParticipationRate": "アクティブな参加率"
+		"ActiveParticipationRate": "アクティブな参加率",
+		"WinRateTooltip": "勝利 = 国民投票完了 && ((賛成票 && 国民投票承認) || (反対票 && 国民投票不承認))"
 	}
 }

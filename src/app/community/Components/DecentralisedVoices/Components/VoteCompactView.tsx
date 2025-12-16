@@ -109,9 +109,16 @@ function VoteCompactView({ votingMatrix, referendumIndices, loading }: VoteCompa
 					className='rounded-xl border border-border_grey bg-bg_modal p-4'
 				>
 					<div
-						aria-hidden
 						className='flex cursor-pointer items-center justify-between'
 						onClick={() => toggleRow(item.address)}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								toggleRow(item.address);
+							}
+						}}
+						role='button'
+						tabIndex={0}
 					>
 						<div className='flex flex-col items-center gap-3 md:flex-row'>
 							<Address address={item.address} />

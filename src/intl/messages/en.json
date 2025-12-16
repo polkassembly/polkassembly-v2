@@ -1777,6 +1777,7 @@
 		"PercentOfDV": "% of DV",
 		"TotalDAOVotes": "Total DAO Votes",
 		"TotalGuardianVotes": "Total Guardian Votes",
-		"ActiveParticipationRate": "Active Participation Rate"
+		"ActiveParticipationRate": "Active Participation Rate",
+		"WinRateTooltip": "Win = referendum finished && ((aye vote && referendum approval) || (nay vote && no referendum approval))"
 	}
 }

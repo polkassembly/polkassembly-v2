@@ -1749,6 +1749,7 @@
 		"PercentOfDV": "% de DV",
 		"TotalDAOVotes": "Votos totales de DAO",
 		"TotalGuardianVotes": "Votos totales de Guardianes",
-		"ActiveParticipationRate": "Tasa de participación activa"
+		"ActiveParticipationRate": "Tasa de participación activa",
+		"WinRateTooltip": "Ganancia = referéndum finalizado && ((voto aye && aprobación del referéndum) || (voto nay && no aprobación del referéndum))"
 	}
 }

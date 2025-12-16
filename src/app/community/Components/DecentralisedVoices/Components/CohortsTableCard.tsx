@@ -98,6 +98,9 @@ function CohortsTableCard() {
 										<TableCell className='py-4'>
 											<Skeleton className='h-8 w-8 rounded-full' />
 										</TableCell>
+										<TableCell className='py-4'>
+											<Skeleton className='h-4 w-16 rounded-full' />
+										</TableCell>
 									</TableRow>
 								))
 							: cohorts.map((cohort) => {

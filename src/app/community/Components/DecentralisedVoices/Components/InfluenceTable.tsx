@@ -140,7 +140,7 @@ function InfluenceTable({ data, network, loading, onReferendumClick }: Influence
 										<button
 											type='button'
 											onClick={() => onReferendumClick(item)}
-											className='hover:bg-bg_secondary rounded-full p-1'
+											className='rounded-full p-1'
 										>
 											<Menu className='h-4 w-4 text-wallet_btn_text' />
 										</button>

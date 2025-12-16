@@ -1670,12 +1670,12 @@
 	},
 	"Community": {
 		"community": "社区",
-		"communityDescription": "探索所有為 Polkadot 生態系統做出貢獻的成員。",
+		"communityDescription": "探索所有为 Polkadot 生态系统做出贡献的成员。",
 		"members": "成员",
 		"delegates": "代表",
 		"curators": "策展人",
 		"experts": "专家",
-		"decentralizedVoices": "分散化声音"
+		"decentralizedVoices": "去中心化声音"
 	},
 	"DecentralizedVoices": {
 		"Cohort": "群组",
@@ -1748,6 +1748,7 @@
 		"PercentOfDV": "% 的 DV",
 		"TotalDAOVotes": "DAO 投票",
 		"TotalGuardianVotes": "监护人投票",
-		"ActiveParticipationRate": "活跃参与率"
+		"ActiveParticipationRate": "活跃参与率",
+		"WinRateTooltip": "获胜 = 公投完成 && ((赞成票 && 公投批准) || (反对票 && 公投未批准))"
 	}
 }

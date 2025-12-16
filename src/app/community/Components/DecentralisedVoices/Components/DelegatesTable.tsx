@@ -52,7 +52,7 @@ function DelegatesTable({ delegates, loading }: DelegatesTableProps) {
 											<BsFillQuestionCircleFill className='ml-1 text-base text-btn_secondary_border' />
 										</TooltipTrigger>
 										<TooltipContent className='bg-tooltip_background p-2 text-btn_primary_text'>
-											<p>A win = referendum finished && ((aye vote && referendum approval) || (nay vote && no referendum approval))</p>
+											<p>{t('WinRateTooltip')}</p>
 										</TooltipContent>
 									</Tooltip>
 								</TooltipProvider>

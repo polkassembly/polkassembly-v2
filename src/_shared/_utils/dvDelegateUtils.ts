@@ -22,6 +22,10 @@ import {
 	IDVVotes
 } from '../types';
 
+// Polkadot split votes cannot use conviction multipliers and default to 0.1x conviction
+// This represents the minimum conviction multiplier for voluntary locking
+const NO_LOCK_CONVICTION_DIVISOR = BigInt(10);
+
 export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: ICohortReferenda[], cohort: IDVCohort): { delegatesWithStats: IDVDelegateWithStats[] } {
 	const referendaMap = new Map(referenda.map((r) => [r.index, r]));
 
@@ -159,9 +163,9 @@ export function calculateDVInfluence(
 	const referendaInfluence = referenda.map((referendum) => {
 		const refVotes = votesByReferendum.get(referendum.index) || [];
 
-		let dvAyePower = BigInt(0);
-		let dvNayPower = BigInt(0);
-		const dvAbstainPower = BigInt(0);
+		let dvAyePower: bigint;
+		let dvNayPower: bigint;
+		let dvAbstainPower: bigint;
 		const delegateVotes: IDVDelegateVote[] = [];
 		const guardianVotes: IDVDelegateVote[] = [];
 
@@ -171,7 +175,7 @@ export function calculateDVInfluence(
 				return;
 			}
 
-			let votingPower = BigInt(0);
+			let votingPower: bigint;
 			let decision = EVoteDecision.ABSTAIN;
 
 			if (vote.isSplit || vote.isSplitAbstain) {
@@ -180,6 +184,7 @@ export function calculateDVInfluence(
 				const absP = BigInt(vote.abstainVotes || 0);
 				dvAyePower += ayeP;
 				dvNayPower += nayP;
+				dvAbstainPower += absP;
 				votingPower = ayeP + nayP + absP;
 				decision = vote.isSplitAbstain ? EVoteDecision.SPLIT_ABSTAIN : EVoteDecision.SPLIT;
 			} else if (vote.aye) {
@@ -194,6 +199,7 @@ export function calculateDVInfluence(
 				decision = EVoteDecision.NAY;
 			} else {
 				const total = BigInt(vote.votes || 0) + BigInt(vote.delegations?.votes || 0);
+				dvAbstainPower += total;
 				votingPower = total;
 				decision = EVoteDecision.ABSTAIN;
 			}
@@ -261,7 +267,7 @@ export function calculateDVInfluence(
 
 function processVoteDecisionAndPower(vote: IDVCohortVote): { decision: EVoteDecision; power: bigint } {
 	let decision = EVoteDecision.ABSTAIN;
-	let power = BigInt(0);
+	let power: bigint;
 
 	if (vote.isSplit || vote.isSplitAbstain) {
 		const aye = BigInt(vote.ayeBalance || 0);
@@ -388,9 +394,9 @@ export function formatDVCohortVote(vote: IDVVotes): IDVCohortVote {
 		voteData.ayeBalance = ayeBal.toString();
 		voteData.nayBalance = nayBal.toString();
 		voteData.abstainBalance = absBal.toString();
-		voteData.ayeVotes = (ayeBal / BigInt(10)).toString();
-		voteData.nayVotes = (nayBal / BigInt(10)).toString();
-		voteData.abstainVotes = (absBal / BigInt(10)).toString();
+		voteData.ayeVotes = (ayeBal / NO_LOCK_CONVICTION_DIVISOR).toString();
+		voteData.nayVotes = (nayBal / NO_LOCK_CONVICTION_DIVISOR).toString();
+		voteData.abstainVotes = (absBal / NO_LOCK_CONVICTION_DIVISOR).toString();
 	}
 
 	return voteData;
