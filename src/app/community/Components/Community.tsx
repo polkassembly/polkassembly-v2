@@ -4,10 +4,8 @@
 
 'use client';
 
-import React from 'react';
 import { Tabs, TabsContent } from '@ui/Tabs';
 import { ECommunityRole } from '@/_shared/types';
-import Header from './Header/Header';
 import DecentralisedVoices from './DecentralisedVoices/DecentralisedVoices';
 
 interface ICommunityProps {
@@ -21,16 +19,12 @@ function Community({ activeTab }: ICommunityProps) {
 				className='m-0 p-0'
 				value={activeTab}
 			>
-				{activeTab !== ECommunityRole.DVS && <Header activeTab={activeTab} />}
-
 				<TabsContent
 					className='m-0 p-0'
 					value={ECommunityRole.DVS}
 				>
 					<DecentralisedVoices />
 				</TabsContent>
-
-				{activeTab !== ECommunityRole.DVS && <div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16' />}
 			</Tabs>
 		</div>
 	);

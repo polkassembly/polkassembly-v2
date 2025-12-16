@@ -24,12 +24,7 @@ function TabCard({ cohortNumber, delegates, guardians, tracks }: TabCardProps) {
 		router.push(`${pathname}?tab=${value}`);
 	};
 
-	const communityTabs = [
-		{ label: t('Community.members'), value: ECommunityRole.MEMBERS },
-		{ label: t('Community.delegates'), value: ECommunityRole.DELEGATES },
-		{ label: t('Community.curators'), value: ECommunityRole.CURATORS },
-		{ label: t('Community.decentralizedVoices'), value: ECommunityRole.DVS }
-	];
+	const communityTabs = [{ label: t('Community.decentralizedVoices'), value: ECommunityRole.DVS }];
 
 	const description =
 		guardians > 0
