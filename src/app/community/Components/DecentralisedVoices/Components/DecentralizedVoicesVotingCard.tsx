@@ -109,24 +109,24 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 			onOpenChange={setIsOpen}
 		>
 			<div className='my-4 w-full max-w-full overflow-hidden rounded-3xl border border-border_grey bg-bg_modal p-6'>
-				<div className='flex flex-col justify-between gap-4 md:flex-row md:items-center'>
-					<div className='flex flex-col gap-4 md:flex-row md:items-center'>
+				<div className='flex flex-row items-center justify-between gap-2'>
+					<div className='flex flex-row items-center gap-2 md:gap-4'>
 						<div>
-							<h2 className='text-2xl font-semibold text-navbar_title'>Votes</h2>
+							<h2 className='text-lg font-semibold text-navbar_title md:text-2xl'>Votes</h2>
 						</div>
 						{cohort && cohort.guardiansCount > 0 && (
 							<div className='flex rounded-lg bg-sidebar_footer p-1'>
 								<button
 									type='button'
 									onClick={() => setActiveTab(EDVDelegateType.DAO)}
-									className={`rounded px-3 py-0.5 text-sm text-navbar_title transition-colors ${activeTab === EDVDelegateType.DAO && 'bg-section_dark_overlay font-semibold'}`}
+									className={`rounded px-2 py-0.5 text-xs font-medium text-navbar_title transition-colors md:px-3 md:text-sm ${activeTab === EDVDelegateType.DAO && 'bg-section_dark_overlay font-semibold'}`}
 								>
 									{t('DAO')} ({daos.length})
 								</button>
 								<button
 									type='button'
 									onClick={() => setActiveTab(EDVDelegateType.GUARDIAN)}
-									className={`rounded px-3 py-0.5 text-sm font-medium text-navbar_title transition-colors ${activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay font-semibold'}`}
+									className={`rounded px-2 py-0.5 text-xs font-medium text-navbar_title transition-colors md:px-3 md:text-sm ${activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay font-semibold'}`}
 								>
 									{t('Guardian').toUpperCase()} ({guardians.length})
 								</button>
