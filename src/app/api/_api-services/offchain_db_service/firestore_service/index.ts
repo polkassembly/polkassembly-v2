@@ -1755,8 +1755,16 @@ export class FirestoreService extends FirestoreUtils {
 		}
 	}
 
-	static async DeleteOffChainPost({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }) {
-		const post = await this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('index', '==', index).limit(1).get();
+	static async DeleteOffChainPost({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+		let post;
+
+		// For child bounties with composite index, query by compositeIndex field
+		if (proposalType === EProposalType.CHILD_BOUNTY && isCompositeIndex(indexOrHash)) {
+			post = await this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('compositeIndex', '==', indexOrHash).limit(1).get();
+		} else {
+			// For other proposals, query by numeric index
+			post = await this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('index', '==', Number(indexOrHash)).limit(1).get();
+		}
 
 		if (post.docs.length) {
 			await post.docs[0].ref.set({ isDeleted: true, updatedAt: new Date() }, { merge: true });

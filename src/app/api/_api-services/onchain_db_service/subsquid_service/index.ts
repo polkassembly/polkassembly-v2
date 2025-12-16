@@ -452,7 +452,7 @@ export class SubsquidService extends SubsquidUtils {
 				...(proposal.curator && { curator: proposal.curator }),
 				description: proposal.description || '',
 				index: proposal.index ?? 0,
-				...(proposal.parentBountyIndex !== undefined && proposal.parentBountyIndex !== null && { parentBountyIndex: proposal.parentBountyIndex }),
+				...((proposal as { parentBountyIndex?: number }).parentBountyIndex !== undefined && { parentBountyIndex: (proposal as { parentBountyIndex?: number }).parentBountyIndex }),
 				origin: proposal.origin,
 				proposer: proposal.proposer || '',
 				...(proposal.reward && { reward: proposal.reward }),
