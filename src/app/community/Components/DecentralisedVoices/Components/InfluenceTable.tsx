@@ -81,7 +81,7 @@ function InfluenceTable({ data, network, loading, onReferendumClick }: Influence
 						: data.map((item) => (
 								<tr
 									key={item.index}
-									className='cursor-pointer border-b border-border_grey text-sm font-semibold hover:border-border_grey/90'
+									className='border-b border-border_grey text-sm font-semibold hover:border-border_grey/90'
 								>
 									<td className='max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap py-4 pr-10 font-medium text-text_primary'>
 										<Link href={`/referenda/${item.index}`}>

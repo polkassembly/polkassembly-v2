@@ -99,7 +99,7 @@ function DelegatesTable({ delegates, loading }: DelegatesTableProps) {
 								return (
 									<tr
 										key={delegate.address}
-										className='cursor-pointer border-b border-border_grey text-sm font-semibold text-text_primary hover:border-border_grey/90'
+										className='border-b border-border_grey text-sm font-semibold text-text_primary hover:border-border_grey/90'
 									>
 										<td className='py-4 pl-4'>
 											<div className='flex items-center gap-2'>
