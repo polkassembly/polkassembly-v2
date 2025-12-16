@@ -14,6 +14,7 @@ import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import Link from 'next/link';
+import { BsFillQuestionCircleFill } from '@react-icons/all-files/bs/BsFillQuestionCircleFill';
 
 interface InfluenceTableProps {
 	data: IDVReferendumInfluence[];
@@ -34,7 +35,19 @@ function InfluenceTable({ data, network, loading, onReferendumClick }: Influence
 						<th className='py-4 pl-4'>{t('Track')}</th>
 						<th className='py-4'>{t('Status')}</th>
 						<th className='py-4'>{t('VotingPower')}</th>
-						<th className='py-4'>{t('Influence')}</th>
+						<th className='py-4'>
+							<span className='inline-flex items-center gap-1 whitespace-nowrap'>
+								{t('Influence')}
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<BsFillQuestionCircleFill className='text-base text-btn_secondary_border' />
+									</TooltipTrigger>
+									<TooltipContent className='bg-tooltip_background p-2 text-btn_primary_text'>
+										<p>Whether DV delegations changed the outcome of a referendum</p>
+									</TooltipContent>
+								</Tooltip>
+							</span>
+						</th>
 						<th className='py-4' />
 					</tr>
 				</thead>
