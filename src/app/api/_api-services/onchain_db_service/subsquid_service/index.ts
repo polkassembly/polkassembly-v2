@@ -33,7 +33,9 @@ import {
 	IGovAnalyticsReferendumOutcome,
 	IRawTurnoutData,
 	IGovAnalyticsDelegationStats,
-	IGovAnalyticsCategoryCounts
+	IGovAnalyticsCategoryCounts,
+	IDVVotes,
+	ICohortReferenda
 } from '@shared/types';
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
@@ -1736,5 +1738,49 @@ export class SubsquidService extends SubsquidUtils {
 		}
 
 		return trackStats;
+	}
+
+	static async GetCohortReferenda({ network }: { network: ENetwork }): Promise<ICohortReferenda[]> {
+		const gqlClient = this.subsquidGqlClient(network);
+		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(SubsquidService.GET_COHORT_REFERENDA, {}).toPromise();
+
+		if (subsquidErr || !subsquidData) {
+			console.error(`Error fetching cohort referenda from Subsquid: ${subsquidErr}`);
+			throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching cohort referenda from Subsquid');
+		}
+
+		return subsquidData?.proposals || [];
+	}
+
+	static async GetVotesForReferendaIndices({ network, indices, voterAddresses }: { network: ENetwork; indices: number[]; voterAddresses: string[] }): Promise<IDVVotes[]> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		if (indices.length === 0) {
+			return [];
+		}
+
+		const encodedAddresses = voterAddresses.map((address) => getEncodedAddress(address, network)).filter((addr): addr is string => addr !== null);
+
+		const chunkSize = 10;
+		const chunkIndices: number[][] = [];
+		for (let i = 0; i < indices.length; i += chunkSize) {
+			chunkIndices.push(indices.slice(i, i + chunkSize));
+		}
+
+		const results = await Promise.all(
+			chunkIndices.map(async (indicesChunk) => {
+				const query = this.GET_BATCHED_VOTES_FOR_DELEGATE_COHORT(indicesChunk, encodedAddresses);
+				const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, {}).toPromise();
+
+				if (subsquidErr || !subsquidData) {
+					console.error(`Error fetching on-chain post vote data from Subsquid: ${subsquidErr}`);
+					throw new APIError(ERROR_CODES.INTERNAL_SERVER_ERROR, StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching on-chain post vote data from Subsquid');
+				}
+
+				return Object.values(subsquidData).flat();
+			})
+		);
+
+		return results.flat() as IDVVotes[];
 	}
 }
