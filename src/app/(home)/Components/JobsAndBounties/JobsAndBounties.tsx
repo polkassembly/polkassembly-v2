@@ -25,6 +25,8 @@ enum JobType {
 	BOUNTY = 'bounty'
 }
 
+const SKELETON_IDS = ['skeleton-1', 'skeleton-2', 'skeleton-3'];
+
 export default function JobsAndBounties() {
 	const [activeTab, setActiveTab] = useState<JobType>(JobType.JOB);
 	const t = useTranslations();
@@ -83,10 +85,9 @@ export default function JobsAndBounties() {
 
 			<div className='flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto'>
 				{isLoading
-					? Array.from({ length: 3 }).map((_, i) => (
+					? SKELETON_IDS.map((id) => (
 							<div
-								/* eslint-disable-next-line react/no-array-index-key */
-								key={i}
+								key={id}
 								className='rounded-xl border border-border_grey p-4'
 							>
 								<div className='flex items-start gap-3'>
