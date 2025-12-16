@@ -16,6 +16,7 @@ export const DV_TRACKS = [
 
 const performanceDAO = 'Permanence DAO';
 const luckyFridayLabs = 'Lucky Friday Labs';
+
 const KUSAMA_COHORT_1: IDVCohort = {
 	index: 1,
 	id: 1,
