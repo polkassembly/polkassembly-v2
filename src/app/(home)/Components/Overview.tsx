@@ -22,17 +22,19 @@ function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGeneri
 		<div className={styles.overview_container}>
 			<OverviewHeading />
 			<div className='mx-auto grid max-w-7xl grid-cols-1 gap-5 px-4 py-8 lg:px-16'>
-				<div className='flex flex-col gap-6 lg:flex-row'>
-					<div className='w-full rounded-xl border border-border_grey bg-bg_modal p-4 shadow-sm lg:w-1/2'>
-						<OverviewTreasuryStats data={treasuryStatsData} />
+				{treasuryStatsData?.length > 0 && (
+					<div className='flex flex-col gap-6 lg:flex-row'>
+						<div className='w-full rounded-xl border border-border_grey bg-bg_modal p-4 shadow-sm lg:w-1/2'>
+							<OverviewTreasuryStats data={treasuryStatsData} />
+						</div>
+						<div className='w-full rounded-xl border border-border_grey bg-bg_modal p-4 shadow-sm lg:w-1/2'>
+							<SpendPeriodStats
+								nextSpendAt={treasuryStatsData?.[0]?.relayChain?.nextSpendAt}
+								nextBurn={treasuryStatsData?.[0]?.relayChain?.nextBurn}
+							/>
+						</div>
 					</div>
-					<div className='w-full rounded-xl border border-border_grey bg-bg_modal p-4 shadow-sm lg:w-1/2'>
-						<SpendPeriodStats
-							nextSpendAt={treasuryStatsData?.[0]?.relayChain?.nextSpendAt}
-							nextBurn={treasuryStatsData?.[0]?.relayChain?.nextBurn}
-						/>
-					</div>
-				</div>
+				)}
 				<AppGrid />
 
 				<TreasuryReportBanner />
