@@ -455,6 +455,7 @@ export interface IOffChainPost {
 	id?: string;
 	index?: number;
 	hash?: string;
+	compositeIndex?: string; // For child bounties: "parentBountyIndex_childBountyIndex"
 	userId?: number;
 	title?: string;
 	content: string;
@@ -626,6 +627,7 @@ export interface IOnChainPostListing {
 	description: string;
 	childBountiesCount?: number;
 	index?: number;
+	parentBountyIndex?: number;
 	origin: EPostOrigin;
 	proposer: string;
 	status: EProposalStatus;

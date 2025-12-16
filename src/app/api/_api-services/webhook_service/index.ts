@@ -14,6 +14,7 @@ import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
 import { ACTIVE_BOUNTY_STATUSES } from '@/_shared/_constants/activeBountyStatuses';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
+import { buildCompositeIndex } from '@/_shared/_utils/childBountyUtils';
 import { TOOLS_PASSPHRASE } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { delay } from '../../_api-utils/delay';
@@ -425,13 +426,18 @@ export class WebhookService {
 		});
 
 		activeChildBounties.items.forEach((bounty) => {
-			const indexOrHash = bounty.index;
-			const proposalUrl = `${baseUrl}/${EProposalType.CHILD_BOUNTY}/${indexOrHash}`;
+			// Child bounties need composite index format: parentBountyIndex_childIndex
+			const { parentBountyIndex, index: childIndex } = bounty;
+
+			// Use composite format for child bounties to match frontend cache keys
+			const compositeIndex = parentBountyIndex !== undefined ? buildCompositeIndex(parentBountyIndex, childIndex ?? 0) : String(childIndex);
+
+			const proposalUrl = `${baseUrl}/${EProposalType.CHILD_BOUNTY}/${compositeIndex}`;
 
 			fetchUrls.push(proposalUrl);
 
-			// content-summary cache for bounty
-			contentSummaryPromises.push(RedisService.DeleteContentSummary({ network, indexOrHash: String(indexOrHash), proposalType: EProposalType.CHILD_BOUNTY }));
+			// content-summary cache for bounty - use composite index
+			contentSummaryPromises.push(RedisService.DeleteContentSummary({ network, indexOrHash: compositeIndex, proposalType: EProposalType.CHILD_BOUNTY }));
 		});
 
 		await Promise.allSettled(contentSummaryPromises);

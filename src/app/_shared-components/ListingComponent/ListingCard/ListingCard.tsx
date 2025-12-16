@@ -28,6 +28,7 @@ import { getPostTypeUrl } from '@/app/_client-utils/getPostDetailsUrl';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { ARCHIVE_PROPOSAL_TYPES } from '@/_shared/_constants/archiveProposalTypes';
+import { buildCompositeIndex, buildDisplayIndex } from '@/_shared/_utils/childBountyUtils';
 import VotingBar from '../VotingBar/VotingBar';
 import styles from './ListingCard.module.scss';
 import UserAvatar from '../../UserAvatar/UserAvatar';
@@ -63,9 +64,19 @@ function ListingCard({
 
 	const groupedByAsset = groupBeneficiariesByAssetIndex({ beneficiaries: data.onChainInfo?.beneficiaries || [], network });
 
+	// For child bounties, use the onChainInfo index (per-parent index from indexer)
+	// and build composite format: parentBountyIndex_childBountyIndex
+	// Note: Use !== undefined check to handle index 0 correctly (0 is a valid index but falsy)
+	const childBountyIndex = proposalType === EProposalType.CHILD_BOUNTY && data.onChainInfo?.index !== undefined ? data.onChainInfo.index : index;
+	const parentBountyIndex = data.onChainInfo?.parentBountyIndex;
+
+	// Build URL index (e.g., "43_199") and display index (e.g., "43-199") for child bounties
+	const urlIndex = proposalType === EProposalType.CHILD_BOUNTY && parentBountyIndex !== undefined ? buildCompositeIndex(parentBountyIndex, childBountyIndex) : index;
+	const displayIndex = proposalType === EProposalType.CHILD_BOUNTY && parentBountyIndex !== undefined ? buildDisplayIndex(parentBountyIndex, childBountyIndex) : index;
+
 	const redirectUrl = ARCHIVE_PROPOSAL_TYPES.includes(proposalType)
-		? getPostTypeUrl({ proposalType, indexOrHash: index, network, govType: EGovType.GOV_1 })
-		: getPostTypeUrl({ proposalType, indexOrHash: index, network });
+		? getPostTypeUrl({ proposalType, indexOrHash: urlIndex, network, govType: EGovType.GOV_1 })
+		: getPostTypeUrl({ proposalType, indexOrHash: urlIndex, network });
 
 	return (
 		<Link
@@ -83,7 +94,7 @@ function ListingCard({
 		>
 			<div className={`${styles.listingCard} ${backgroundColor}`}>
 				<div className='flex items-start lg:gap-4'>
-					<p className={styles.indexText}>#{index}</p>
+					<p className={styles.indexText}>#{displayIndex}</p>
 					<div className='flex flex-col items-start gap-1'>
 						<h3 className={styles.titleText}>{title}</h3>
 						<div className={styles.infoContainer}>
