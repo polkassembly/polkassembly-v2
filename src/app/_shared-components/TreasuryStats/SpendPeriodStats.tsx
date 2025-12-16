@@ -44,7 +44,7 @@ function SpendPeriodStats({ nextSpendAt, nextBurn }: { nextSpendAt?: Date; nextB
 
 	return (
 		<div>
-			<div className='flex h-full w-full flex-col justify-between gap-2 lg:flex-row lg:items-center'>
+			<div className='flex w-full flex-col gap-2 lg:flex-row lg:items-center lg:justify-between'>
 				<div className='flex flex-1 flex-col justify-between gap-y-2'>
 					<div className='flex items-center gap-1'>
 						<h2 className='text-sm font-semibold text-text_primary'>{t('TreasuryStats.spendPeriodRemaining')}</h2>
@@ -58,7 +58,7 @@ function SpendPeriodStats({ nextSpendAt, nextBurn }: { nextSpendAt?: Date; nextB
 						</Tooltip>
 					</div>
 
-					<div className='flex flex-col gap-2 md:flex-row md:items-center'>
+					<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3'>
 						<div className='flex h-5 items-center gap-[2px]'>
 							{Array.from({ length: 40 }, (_, i) => i).map((i) => {
 								const isActive = i < (spendPeriodProgress / 100) * 40;
@@ -70,7 +70,7 @@ function SpendPeriodStats({ nextSpendAt, nextBurn }: { nextSpendAt?: Date; nextB
 								);
 							})}
 						</div>
-						<span className='whitespace-nowrap text-xs text-text_primary'>
+						<span className='break-words text-xs text-text_primary'>
 							{spendPeriodRemaining === 'N/A' ? (
 								'N/A'
 							) : (
@@ -108,7 +108,7 @@ function SpendPeriodStats({ nextSpendAt, nextBurn }: { nextSpendAt?: Date; nextB
 					orientation='vertical'
 					className='hidden h-16 w-[1px] lg:block'
 				/>
-				<div className='flex flex-col justify-between gap-y-1'>
+				<div className='flex flex-col gap-y-1 lg:items-end'>
 					<div className='flex items-center'>
 						<h2 className='whitespace-nowrap text-sm font-semibold text-text_primary'>{t('TreasuryStats.nextBurn')}</h2>
 						<Tooltip>
