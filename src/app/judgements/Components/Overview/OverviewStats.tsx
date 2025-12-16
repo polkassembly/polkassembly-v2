@@ -2,9 +2,6 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { useIdentityService } from '@/hooks/useIdentityService';
-import { useQuery } from '@tanstack/react-query';
-import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { useState } from 'react';
 import { Separator } from '@/app/_shared-components/Separator';
 import JudgementRequestedIcon from '@assets/icons/judgement-requests.svg';
@@ -17,22 +14,23 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './IdentitiesListingTable.module.scss';
 
-function OverviewStats() {
-	const { identityService } = useIdentityService();
+interface IOverviewStatsProps {
+	overviewData:
+		| {
+				uniqueIdentities: number;
+				totalSubIdentities: number;
+				totalSocials: number;
+				totalJudgementsGiven: number;
+		  }
+		| null
+		| undefined;
+}
+
+function OverviewStats({ overviewData }: IOverviewStatsProps) {
 	const router = useRouter();
 	const t = useTranslations();
 	const searchParams = useSearchParams();
 	const [searchValue, setSearchValue] = useState(searchParams?.get('search') || '');
-
-	const { data: overviewData, isLoading } = useQuery({
-		queryKey: ['identityOverview', identityService],
-		queryFn: async () => {
-			if (!identityService) return null;
-			return identityService.getIdentityOverviewStats();
-		},
-		enabled: !!identityService,
-		staleTime: 60000
-	});
 
 	return (
 		<div className={styles.container}>
@@ -47,13 +45,9 @@ function OverviewStats() {
 					<div className={styles.statsContent}>
 						<p className={styles.statsLabel}>{t('Judgements.uniqueIdentitiesSet')}</p>
 						<p className={styles.statsValue}>
-							{isLoading || !identityService ? (
-								<Skeleton className='h-6 w-20' />
-							) : (
-								<div className='flex items-baseline gap-2'>
-									<div className='text-2xl font-bold text-text_primary'>{overviewData?.uniqueIdentities || 0}</div>
-								</div>
-							)}
+							<div className='flex items-baseline gap-2'>
+								<div className='text-2xl font-bold text-text_primary'>{overviewData?.uniqueIdentities || 0}</div>
+							</div>
 						</p>
 					</div>
 				</div>
@@ -71,13 +65,9 @@ function OverviewStats() {
 					<div className={styles.statsContent}>
 						<p className={styles.statsLabel}>{t('Judgements.judgements')}</p>
 						<p className={styles.statsValue}>
-							{isLoading || !identityService ? (
-								<Skeleton className='h-6 w-20' />
-							) : (
-								<div className='flex items-baseline gap-2'>
-									<div className='text-2xl font-bold text-text_primary'>{overviewData?.totalJudgementsGiven || 0}</div>
-								</div>
-							)}
+							<div className='flex items-baseline gap-2'>
+								<div className='text-2xl font-bold text-text_primary'>{overviewData?.totalJudgementsGiven || 0}</div>
+							</div>
 						</p>
 					</div>
 				</div>

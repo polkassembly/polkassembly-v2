@@ -1,4 +1,7 @@
 {
+	"Common": {
+		"loadingMessage": "Governance wisdom incoming 🚀"
+	},
 	"HomePage": {
 		"title": "Welcome to Home"
 	},
@@ -1604,7 +1607,19 @@
 		"fees": "Fees",
 		"noJudgementsFound": "No judgements found",
 		"noRegistrarsFound": "No registrars found",
-		"searchByAddressOrName": "Enter address or name to search"
+		"searchByAddressOrName": "Enter address or name to search",
+		"reasonable": "Reasonable",
+		"knownGood": "Known Good",
+		"outOfDate": "Out of Date",
+		"lowQuality": "Low Quality",
+		"erroneous": "Erroneous",
+		"feePaid": "Fee Paid",
+		"failedToLoadData": "Failed to load data. Please try again.",
+		"identityColumn": "Identity",
+		"socialsColumn": "Socials",
+		"typeColumn": "Type",
+		"judgementsColumn": "Judgements",
+		"actionsColumn": "Actions"
 	},
 	"JudgementStatus": {
 		"pending": "Pending",

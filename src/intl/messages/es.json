@@ -1,4 +1,7 @@
 {
+	"Common": {
+		"loadingMessage": "Sabiduría de gobernanza en camino 🚀"
+	},
 	"HomePage": {
 		"title": "Bienvenido a Inicio"
 	},
@@ -1576,7 +1579,19 @@
 		"fees": "Tarifas",
 		"noJudgementsFound": "No se encontraron juicios",
 		"noRegistrarsFound": "No se encontraron registradores",
-		"searchByAddressOrName": "Ingrese dirección o nombre para buscar"
+		"searchByAddressOrName": "Ingrese dirección o nombre para buscar",
+		"reasonable": "Razonable",
+		"knownGood": "Conocido Bueno",
+		"outOfDate": "Desactualizado",
+		"lowQuality": "Baja Calidad",
+		"erroneous": "Erróneo",
+		"feePaid": "Tarifa Pagada",
+		"failedToLoadData": "No se pudieron cargar los datos. Por favor, inténtelo de nuevo.",
+		"identityColumn": "Identidad",
+		"socialsColumn": "Redes sociales",
+		"typeColumn": "Tipo",
+		"judgementsColumn": "Juicios",
+		"actionsColumn": "Acciones"
 	},
 	"JudgementStatus": {
 		"pending": "Pendiente",

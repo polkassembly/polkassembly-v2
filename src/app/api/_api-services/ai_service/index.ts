@@ -432,7 +432,7 @@ export class AIService {
 
 			console.log(`SPAM DETECTED and DELETING for ${proposalType} post ${offChainPostData.index}`);
 
-			await OffChainDbService.DeleteOffChainPost({ network, proposalType, index: offChainPostData.index! });
+			await OffChainDbService.DeleteOffChainPost({ network, proposalType, indexOrHash: String(offChainPostData.index!) });
 
 			const contentSummary: IContentSummary = {
 				id: existingContentSummary?.id || '', // if new will be set by firestore

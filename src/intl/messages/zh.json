@@ -1,4 +1,7 @@
 {
+	"Common": {
+		"loadingMessage": "治理智慧即将到来 🚀"
+	},
 	"HomePage": {
 		"title": "欢迎来到主页"
 	},
@@ -1575,7 +1578,19 @@
 		"fees": "费用",
 		"noJudgementsFound": "未找到判断",
 		"noRegistrarsFound": "未找到注册者",
-		"searchByAddressOrName": "输入地址或名称进行搜索"
+		"searchByAddressOrName": "输入地址或名称进行搜索",
+		"reasonable": "合理",
+		"knownGood": "已知良好",
+		"outOfDate": "过期",
+		"lowQuality": "低质量",
+		"erroneous": "错误",
+		"feePaid": "已付费",
+		"failedToLoadData": "加载数据失败。请再试一次。",
+		"identityColumn": "身份",
+		"socialsColumn": "社交媒体",
+		"typeColumn": "类型",
+		"judgementsColumn": "判断",
+		"actionsColumn": "操作"
 	},
 	"JudgementStatus": {
 		"pending": "待定",
