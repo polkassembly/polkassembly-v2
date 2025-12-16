@@ -20,6 +20,12 @@ interface DelegatesTableProps {
 function DelegatesTable({ delegates, loading }: DelegatesTableProps) {
 	const t = useTranslations('DecentralizedVoices');
 
+	const getWinRateColor = (percent: number): string => {
+		if (percent < 50) return 'text-toast_error_text';
+		if (percent < 80) return 'text-toast_warning_text';
+		return 'text-success';
+	};
+
 	return (
 		<div className='overflow-x-auto'>
 			<table className='w-full min-w-[800px] table-auto'>
@@ -122,7 +128,9 @@ function DelegatesTable({ delegates, loading }: DelegatesTableProps) {
 												<Tooltip>
 													<TooltipTrigger className='cursor-pointer font-medium text-text_primary'>{delegate.voteStats.participation.toFixed(2)} %</TooltipTrigger>
 													<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
-														<p>{t('VotesCastTotalEligibleReferenda')}</p>
+														<p>
+															Voted/Total: {totalVotes}/{delegate.voteStats.totalReferenda}
+														</p>
 													</TooltipContent>
 												</Tooltip>
 											</TooltipProvider>
@@ -130,9 +138,13 @@ function DelegatesTable({ delegates, loading }: DelegatesTableProps) {
 										<td className='py-4'>
 											<TooltipProvider>
 												<Tooltip>
-													<TooltipTrigger className='cursor-pointer font-medium text-success'>{delegate.voteStats.winRate.toFixed(2)} %</TooltipTrigger>
+													<TooltipTrigger className={`cursor-pointer font-medium ${getWinRateColor(delegate.voteStats.winRate)}`}>
+														{delegate.voteStats.winRate.toFixed(2)} %
+													</TooltipTrigger>
 													<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
-														<p>{t('WinningVotesTotalNonAbstainVotes')}</p>
+														<p>
+															Won/Participated: {delegate.voteStats.winCount}/{delegate.voteStats.finalVotesCount}
+														</p>
 													</TooltipContent>
 												</Tooltip>
 											</TooltipProvider>

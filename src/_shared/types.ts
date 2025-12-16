@@ -1955,6 +1955,9 @@ export interface IDVDelegateWithStats extends IDVCohortDelegate {
 		abstainCount: number;
 		participation: number;
 		winRate: number;
+		winCount: number;
+		totalReferenda: number;
+		finalVotesCount: number;
 	};
 }
 

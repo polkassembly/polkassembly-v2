@@ -22,8 +22,6 @@ import {
 	IDVVotes
 } from '../types';
 
-// Polkadot split votes cannot use conviction multipliers and default to 0.1x conviction
-// This represents the minimum conviction multiplier for voluntary locking
 const NO_LOCK_CONVICTION_DIVISOR = BigInt(10);
 
 export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: ICohortReferenda[], cohort: IDVCohort): { delegatesWithStats: IDVDelegateWithStats[] } {
@@ -37,6 +35,7 @@ export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: ICohor
 		let abstainCount = 0;
 		let winningVotes = 0;
 		let votedCount = 0;
+		let finalVotesCount = 0;
 
 		delegateVotes.forEach((vote) => {
 			const referendum = referendaMap.get(vote.referendumIndex);
@@ -68,20 +67,38 @@ export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: ICohor
 				return;
 			}
 
-			const approvedStatuses = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed];
-			const isApproved = approvedStatuses.includes(referendum.status);
-			const isClosed =
-				isApproved ||
-				[EProposalStatus.Rejected, EProposalStatus.TimedOut, EProposalStatus.Cancelled, EProposalStatus.Killed, EProposalStatus.ExecutionFailed].includes(referendum.status);
+			const finalStatuses = [
+				EProposalStatus.Executed,
+				EProposalStatus.Approved,
+				EProposalStatus.Confirmed,
+				EProposalStatus.Rejected,
+				EProposalStatus.Cancelled,
+				EProposalStatus.Killed,
+				EProposalStatus.TimedOut,
+				EProposalStatus.ExecutionFailed
+			];
+			const isFinal = finalStatuses.includes(referendum.status);
 
-			if (isClosed && ((isApproved && vote.aye) || (!isApproved && !vote.aye))) {
+			if (!isFinal) {
+				return;
+			}
+			finalVotesCount += 1;
+
+			if (vote.isSplit || vote.isSplitAbstain || vote.isAbstain) {
+				return;
+			}
+
+			const approvedStatuses = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed, EProposalStatus.ExecutionFailed];
+			const isApproved = approvedStatuses.includes(referendum.status);
+
+			if ((isApproved && vote.aye) || (!isApproved && !vote.aye)) {
 				winningVotes += 1;
 			}
 		});
 
 		const totalRefs = referenda.length;
 		const participation = totalRefs > 0 ? (votedCount / totalRefs) * 100 : 0;
-		const winRate = votedCount > 0 ? (winningVotes / votedCount) * 100 : 0;
+		const winRate = finalVotesCount > 0 ? (winningVotes / finalVotesCount) * 100 : 0;
 
 		return {
 			...delegate,
@@ -90,7 +107,10 @@ export function calculateDVCohortStats(votes: IDVCohortVote[], referenda: ICohor
 				nayCount,
 				abstainCount,
 				participation,
-				winRate
+				winRate,
+				winCount: winningVotes,
+				totalReferenda: totalRefs,
+				finalVotesCount
 			}
 		};
 	});
@@ -136,15 +156,58 @@ export const getDVCohortByIndex = (network: ENetwork, index: number): IDVCohort 
 };
 
 function calculateInfluenceStatus(dvAyePower: bigint, dvNayPower: bigint, referendum: ICohortReferenda): EInfluenceStatus {
-	if (dvAyePower === BigInt(0) && dvNayPower === BigInt(0)) return EInfluenceStatus.NO_IMPACT;
+	if (dvAyePower === BigInt(0) && dvNayPower === BigInt(0)) {
+		return EInfluenceStatus.NO_IMPACT;
+	}
 
-	const isPassed = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed].includes(referendum.status);
-	const isFailed = [EProposalStatus.Rejected].includes(referendum.status);
+	const finalStatuses = [
+		EProposalStatus.Executed,
+		EProposalStatus.Approved,
+		EProposalStatus.Confirmed,
+		EProposalStatus.Rejected,
+		EProposalStatus.Cancelled,
+		EProposalStatus.Killed,
+		EProposalStatus.TimedOut,
+		EProposalStatus.ExecutionFailed
+	];
 
-	if (isPassed) return dvAyePower >= dvNayPower ? EInfluenceStatus.APPROVED : EInfluenceStatus.FAILED;
-	if (isFailed) return dvNayPower >= dvAyePower ? EInfluenceStatus.REJECTED : EInfluenceStatus.FAILED;
+	if (!finalStatuses.includes(referendum.status) || !referendum.tally) {
+		return EInfluenceStatus.NO_IMPACT;
+	}
 
-	return EInfluenceStatus.NO_IMPACT;
+	const totalAye = BigInt(referendum.tally.ayes || 0);
+	const totalNay = BigInt(referendum.tally.nays || 0);
+	const denominator = totalAye + totalNay;
+
+	if (denominator === BigInt(0)) {
+		return EInfluenceStatus.NO_IMPACT;
+	}
+
+	const isPass = totalAye > totalNay;
+
+	const noDvAye = totalAye - dvAyePower;
+	const noDvNay = totalNay - dvNayPower;
+	const noDvDenominator = noDvAye + noDvNay;
+
+	if (noDvDenominator === BigInt(0)) {
+		return EInfluenceStatus.NO_IMPACT;
+	}
+
+	const noDvIsPass = noDvAye > noDvNay;
+
+	const hasInfluence = isPass !== noDvIsPass;
+
+	if (!hasInfluence) {
+		return EInfluenceStatus.NO_IMPACT;
+	}
+
+	const approvedStatuses = [EProposalStatus.Executed, EProposalStatus.Approved, EProposalStatus.Confirmed];
+	const isApproved = approvedStatuses.includes(referendum.status);
+
+	if (isApproved) {
+		return EInfluenceStatus.APPROVED;
+	}
+	return EInfluenceStatus.REJECTED;
 }
 
 export function calculateDVInfluence(
