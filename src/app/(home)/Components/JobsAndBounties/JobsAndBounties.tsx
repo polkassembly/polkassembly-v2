@@ -175,11 +175,15 @@ export default function JobsAndBounties() {
 											<h3 className='text-base font-semibold text-text_primary'>{job.title}</h3>
 										</div>
 									</div>
-
-									<p className='mt-1.5 truncate text-sm text-wallet_btn_text'>{job.description}</p>
+									<p className='mt-1.5 truncate text-sm text-wallet_btn_text'>{job.description}</p>+
 									<p className='mt-1 text-xs text-wallet_btn_text'>
-										{t('JobsAndBounties.salary')}: {job.salary_range?.min} - {job.salary_range?.max} {job.salary_token} | {t('JobsAndBounties.applicants')}: {job.applicantCount}
-									</p>
+										{job.salary_range?.min && job.salary_range?.max ? (
+											<>
+												{t('JobsAndBounties.salary')}: {job.salary_range.min} - {job.salary_range.max} {job.salary_token} |{' '}
+											</>
+										) : null}
+										{t('JobsAndBounties.applicants')}: {job.applicantCount}
+									</p>{' '}
 									<Separator className='my-2' />
 									<div className='mt-4 flex flex-col items-center justify-between md:flex-row'>
 										<div className='flex gap-2'>

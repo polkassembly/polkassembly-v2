@@ -8,7 +8,7 @@ import { useMemo } from 'react';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import { BN, BN_ZERO } from '@polkadot/util';
+import { BN } from '@polkadot/util';
 import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
 import { cn } from '@/lib/utils';
 import { AiFillQuestionCircle } from '@react-icons/all-files/ai/AiFillQuestionCircle';
@@ -122,7 +122,7 @@ function SpendPeriodStats({ nextSpendAt, nextBurn }: { nextSpendAt?: Date; nextB
 					</div>
 					<div>
 						<span className='text-lg font-medium text-text_primary'>
-							{formatBnBalance(nextBurn || BN_ZERO, { withUnit: true, numberAfterComma: 0, compactNotation: true }, network)}
+							{nextBurn ? formatBnBalance(nextBurn, { withUnit: true, numberAfterComma: 0, compactNotation: true }, network) : 'N/A'}
 						</span>
 					</div>
 				</div>
