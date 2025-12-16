@@ -10,6 +10,7 @@ import { Metadata } from 'next';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { markdownToPlainText } from '@/_shared/_utils/markdownToText';
 import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
+import { formatChildBountyDisplayIndex } from '@/_shared/_utils/childBountyUtils';
 import { notFound } from 'next/navigation';
 import { StatusCodes } from 'http-status-codes';
 import ServerComponentError from '@/app/_shared-components/ServerComponentError';
@@ -20,14 +21,17 @@ export async function generateMetadata({ params }: { params: Promise<{ index: st
 	const { data } = await NextApiClientService.fetchProposalDetails({ proposalType: EProposalType.CHILD_BOUNTY, indexOrHash: index });
 	const { title } = OPENGRAPH_METADATA;
 
+	// Format display index: convert 43_199 to 43-199
+	const displayIndex = formatChildBountyDisplayIndex(index);
+
 	return getGeneratedContentMetadata({
 		network,
-		title: `${title} - Child Bounty #${index}`,
+		title: `${title} - Child Bounty #${displayIndex}`,
 		description: data
-			? `Bounty #${index}: ${data.contentSummary?.postSummary ? markdownToPlainText(data.contentSummary.postSummary) : data.title}`
+			? `Child Bounty #${displayIndex}: ${data.contentSummary?.postSummary ? markdownToPlainText(data.contentSummary.postSummary) : data.title}`
 			: 'Explore all Child Bounty Proposals on Polkassembly',
 		url: `https://${network}.polkassembly.io/child-bounty/${index}`,
-		imageAlt: `Polkassembly Child Bounty #${index}`
+		imageAlt: `Polkassembly Child Bounty #${displayIndex}`
 	});
 }
 
