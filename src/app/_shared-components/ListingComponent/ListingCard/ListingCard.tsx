@@ -51,7 +51,7 @@ function ListingCard({
 	const network = getCurrentNetwork();
 	const { userPreferences } = useUserPreferences();
 
-	const formattedCreatedAt = dayjs(data.createdAt || data.onChainInfo?.createdAt || new Date()).fromNow();
+	const formattedCreatedAt = dayjs(data.onChainInfo?.createdAt || data.createdAt || new Date()).fromNow();
 	const ayeValue = new BN(data.onChainInfo?.voteMetrics?.aye.value || '0');
 	const nayValue = new BN(data.onChainInfo?.voteMetrics?.nay.value || '0');
 	const totalValue = ayeValue.add(nayValue);
