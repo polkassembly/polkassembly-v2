@@ -63,7 +63,7 @@ function CohortCard({ cohort, loading, network }: CohortCardProps) {
 							{cohort.delegatesCount > 0
 								? `${formatUSDWithUnits(
 										formatBnBalance(String(cohort.delegationPerDelegate || 0), { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
-									)}${t('DelegationsEach')}`
+									)} ${t('DelegationsEach')}`
 								: 'N/A'}{' '}
 						</p>
 					</div>
@@ -83,7 +83,7 @@ function CohortCard({ cohort, loading, network }: CohortCardProps) {
 								{cohort.guardiansCount > 0
 									? `${formatUSDWithUnits(
 											formatBnBalance(String(cohort.delegationPerGuardian || 0), { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
-										)}${t('DelegationsEach')}`
+										)} ${t('DelegationsEach')}`
 									: 'N/A'}
 							</p>
 						</div>

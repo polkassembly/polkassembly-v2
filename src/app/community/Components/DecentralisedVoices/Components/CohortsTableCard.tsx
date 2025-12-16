@@ -28,7 +28,7 @@ function CohortsTableCard() {
 	const { data: cohortsData, isLoading } = useDVCohorts();
 
 	const cohorts = cohortsData ? [...cohortsData].reverse() : [];
-	const selectedCohortIndex = searchParams.get('cohort') || cohortsData?.[0]?.index?.toString() || '';
+	const selectedCohortIndex = searchParams.get('cohort') || cohortsData?.[cohortsData.length - 1]?.index?.toString() || '';
 
 	const isPolkadot = network === ENetwork.POLKADOT;
 	const networkLogo = isPolkadot ? PolkadotLogo : KusamaLogo;
