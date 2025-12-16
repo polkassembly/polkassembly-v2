@@ -1826,3 +1826,198 @@ export interface IOGTrackerData {
 	tasks: IOGTrackerTask[];
 	proofOfWork: IOGTrackerPoW[];
 }
+
+export enum ECommunityRole {
+	MEMBERS = 'members',
+	DELEGATES = 'delegates',
+	CURATORS = 'curators',
+	DVS = 'decentralized_voices'
+}
+
+export enum EDVDelegateType {
+	DAO = 'DAO',
+	GUARDIAN = 'GUARDIAN'
+}
+
+export enum ECohortStatus {
+	ONGOING = 'Ongoing',
+	CLOSED = 'Closed'
+}
+
+interface IDVCohortDelegate {
+	address: string;
+	startBlock: number;
+	endBlock: number | null;
+	subsquareUrl?: string;
+	cohortId?: number;
+	name?: string;
+	w3f?: string;
+	role: EDVDelegateType;
+	startHeight?: number;
+	endHeight?: number | null;
+}
+
+export interface IDVCohort {
+	index: number;
+	id?: number;
+	network: ENetwork;
+	status: ECohortStatus;
+	startTime: Date;
+	startBlock: number;
+	endTime?: Date;
+	endBlock?: number | null;
+	delegatesCount: number;
+	guardiansCount: number;
+	delegationPerDelegate: number;
+	delegationPerGuardian: number;
+	delegates: IDVCohortDelegate[];
+	tracks: EPostOrigin[];
+	announcementLink?: string;
+	delegation?: number;
+	guardianDelegation?: number;
+	startIndexer?: {
+		blockHeight: number;
+		blockHash: string;
+		blockTime: number;
+	};
+	endIndexer?: {
+		blockHeight: number;
+		blockHash: string;
+		blockTime: number;
+	} | null;
+	allReferendaCnt?: number;
+	dvTrackReferendaCnt?: number;
+}
+
+export enum EInfluenceStatus {
+	APPROVED = 'approved',
+	REJECTED = 'rejected',
+	FAILED = 'failed',
+	NO_IMPACT = 'no_impact'
+}
+
+export interface IDelegatedVote {
+	votingPower?: string;
+	balance?: {
+		value?: string;
+		aye?: string;
+		nay?: string;
+		abstain?: string;
+	};
+}
+
+export interface IDVVotes {
+	balance?: {
+		value?: string;
+		aye?: string;
+		nay?: string;
+		abstain?: string;
+	};
+	decision?: string;
+	lockPeriod?: number;
+	delegatedVotes?: IDelegatedVote[];
+	delegatedTo?: string;
+	proposal: {
+		index: number;
+	};
+	voter: string;
+	selfVotingPower?: string;
+}
+
+export interface IDVCohortVote {
+	referendumIndex: number;
+	account: string;
+	isDelegating: boolean;
+	isStandard: boolean;
+	isSplit: boolean;
+	isSplitAbstain: boolean;
+	isAbstain: boolean;
+	balance: string;
+	aye: boolean;
+	conviction?: number;
+	votes: string;
+	delegations: {
+		votes: string;
+		capital: string;
+	};
+	ayeBalance?: string;
+	nayBalance?: string;
+	abstainBalance?: string;
+	ayeVotes?: string;
+	nayVotes?: string;
+	abstainVotes?: string;
+}
+
+export interface IDVDelegateWithStats extends IDVCohortDelegate {
+	voteStats: {
+		ayeCount: number;
+		nayCount: number;
+		abstainCount: number;
+		participation: number;
+		winRate: number;
+	};
+}
+
+export interface IDVDelegateVote {
+	address: string;
+	decision: EVoteDecision | null;
+	votingPower: string;
+	balance: string;
+	conviction: number;
+	percentage?: number;
+}
+
+export interface IDVReferendumInfluence {
+	index: number;
+	title: string;
+	track: string;
+	status: EProposalStatus;
+	ayeVotingPower: string;
+	nayVotingPower: string;
+	ayePercent: number;
+	nayPercent: number;
+	influence: EInfluenceStatus;
+	dvTotalVotingPower: string;
+	delegateVotes: IDVDelegateVote[];
+	guardianVotes: IDVDelegateVote[];
+	totalAyeVotingPower?: string;
+	totalNayVotingPower?: string;
+}
+
+export interface IDVDelegateVotingMatrix {
+	address: string;
+	type: EDVDelegateType;
+	votes: Record<number, EVoteDecision>;
+	participation: number;
+	ayeRate: number;
+	activeCount: number;
+	totalRefs: number;
+	totalVotingPower: string;
+}
+export interface ICohortReferenda {
+	index: number;
+	createdAtBlock: number;
+	trackNumber: number;
+	status: EProposalStatus;
+	tally?: {
+		ayes: string;
+		bareAyes: string;
+		nays: string;
+		support: string;
+	};
+	decisionDeposit?: {
+		amount: string;
+		who: string;
+	};
+	submissionDeposit?: {
+		amount: string;
+		who: string;
+	};
+	preimage?: {
+		proposedCall?: IProposalArguments;
+	};
+	proposalArguments?: IProposalArguments;
+	description?: string;
+	hash: string;
+	statusHistory?: IStatusHistoryItem[];
+}
