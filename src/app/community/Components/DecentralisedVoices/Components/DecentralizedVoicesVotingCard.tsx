@@ -64,7 +64,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 				<div className='mb-2 flex w-full flex-wrap gap-y-4 lg:mb-6 lg:flex-nowrap lg:items-center lg:justify-between lg:gap-4'>
 					<div className='order-1 flex items-center gap-2 lg:order-1'>
 						<div>
-							<h2 className='text-lg font-semibold text-navbar_title md:text-2xl'>Votes</h2>
+							<h2 className='text-lg font-semibold text-navbar_title md:text-2xl'>{t('Votes')}</h2>
 						</div>
 					</div>
 

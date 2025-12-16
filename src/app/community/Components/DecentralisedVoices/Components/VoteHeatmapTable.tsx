@@ -72,7 +72,7 @@ function VoteHeatmapRow({ item, referendumIndices }: { item: IDVDelegateVotingMa
 		checkScroll();
 		window.addEventListener('resize', checkScroll);
 		return () => window.removeEventListener('resize', checkScroll);
-	}, []);
+	}, [referendumIndices.length]);
 
 	const scroll = (direction: 'left' | 'right') => {
 		if (scrollRef.current) {
