@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 import { useQuery } from '@tanstack/react-query';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { IDVCohort, IDVDReferendumResponse, IDVCohortVote } from '@/_shared/types';
+import { IDVCohort, ICohortReferenda, IDVCohortVote } from '@/_shared/types';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
@@ -56,7 +56,7 @@ export const useDVCohortDetails = (id: number) => {
 };
 
 export const useDVCohortReferenda = (id: number) => {
-	return useQuery<IDVDReferendumResponse[], Error>({
+	return useQuery<ICohortReferenda[], Error>({
 		queryKey: ['dv-cohort-referenda', id],
 		enabled: Boolean(id),
 		staleTime: FIVE_MIN_IN_MILLI,

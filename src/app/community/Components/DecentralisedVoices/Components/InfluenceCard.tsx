@@ -4,27 +4,16 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Filter, Check, X, Minus, Menu } from 'lucide-react';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
-import VotingBar from '@/app/_shared-components/ListingComponent/VotingBar/VotingBar';
-import { getSpanStyle } from '@/app/_shared-components/TopicTag/TopicTag';
-import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
-import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
-import { Popover, PopoverContent, PopoverTrigger } from '@/app/_shared-components/Popover/Popover';
-import { Checkbox } from '@/app/_shared-components/Checkbox';
 import { IDVReferendumInfluence, EInfluenceStatus } from '@/_shared/types';
-import { Skeleton } from '@/app/_shared-components/Skeleton';
-import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import { MdArrowDropDown } from '@react-icons/all-files/md/MdArrowDropDown';
-import { MdSort } from '@react-icons/all-files/md/MdSort';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/app/_shared-components/Collapsible';
-import Link from 'next/link';
 import Image from 'next/image';
 import TimeLineIcon from '@assets/icons/timeline.svg';
 import DVVotesDialog from './DVVotesDialog';
+import InfluenceFilters from './InfluenceFilters';
+import InfluenceTable from './InfluenceTable';
 
 interface InfluenceCardProps {
 	referendaInfluence: IDVReferendumInfluence[];
@@ -42,7 +31,6 @@ function InfluenceCard({ referendaInfluence, loading, cohortId }: InfluenceCardP
 	const [sortBy, setSortBy] = useState<SortOption>('index');
 	const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 	const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
-	const [selectedInfluence, setSelectedInfluence] = useState<string[]>([]);
 	const [selectedReferendum, setSelectedReferendum] = useState<IDVReferendumInfluence | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const pageSize = 10;
@@ -58,10 +46,6 @@ function InfluenceCard({ referendaInfluence, loading, cohortId }: InfluenceCardP
 
 		if (selectedTracks.length > 0) {
 			data = data.filter((r) => selectedTracks.includes(r.track));
-		}
-
-		if (selectedInfluence.length > 0) {
-			data = data.filter((r) => selectedInfluence.includes(r.influence));
 		}
 
 		data.sort((a, b) => {
@@ -89,7 +73,7 @@ function InfluenceCard({ referendaInfluence, loading, cohortId }: InfluenceCardP
 		});
 
 		return data;
-	}, [referendaInfluence, selectedTracks, selectedInfluence, sortBy, sortDirection]);
+	}, [referendaInfluence, selectedTracks, sortBy, sortDirection]);
 
 	const outcomeChangedCount = filteredAndSortedData.filter((r) => r.influence === EInfluenceStatus.APPROVED || r.influence === EInfluenceStatus.REJECTED).length;
 
@@ -115,8 +99,12 @@ function InfluenceCard({ referendaInfluence, loading, cohortId }: InfluenceCardP
 
 	const clearFilters = () => {
 		setSelectedTracks([]);
-		setSelectedInfluence([]);
 		setPage(1);
+	};
+
+	const handleReferendumClick = (item: IDVReferendumInfluence) => {
+		setSelectedReferendum(item);
+		setIsDialogOpen(true);
 	};
 
 	return (
@@ -140,85 +128,16 @@ function InfluenceCard({ referendaInfluence, loading, cohortId }: InfluenceCardP
 						</span>
 					</div>
 					<div className='flex items-center gap-2'>
-						<Popover>
-							<PopoverTrigger asChild>
-								<button
-									type='button'
-									className={`flex items-center gap-1 rounded-md border p-2 ${selectedTracks.length > 0 ? 'border-text_pink bg-text_pink/10' : 'border-border_grey'}`}
-								>
-									<Filter className='h-4 w-4 text-wallet_btn_text' />
-									{selectedTracks.length > 0 && <span className='ml-1 rounded-full bg-text_pink px-1.5 text-xs text-btn_primary_text'>{selectedTracks.length}</span>}
-								</button>
-							</PopoverTrigger>
-							<PopoverContent className='max-h-64 w-56 overflow-y-auto border-border_grey p-3'>
-								<div className='mb-2 flex items-center justify-between'>
-									<span className='text-xs font-semibold text-text_primary'>{t('FilterByTrack')}</span>
-									<button
-										type='button'
-										onClick={() => setSelectedTracks([])}
-										className='text-xs text-text_pink'
-									>
-										{t('Clear')}
-									</button>
-								</div>
-								<div className='space-y-2'>
-									{availableTracks.map((track) => (
-										<div
-											key={track}
-											className='flex items-center gap-2'
-										>
-											<Checkbox
-												checked={selectedTracks.includes(track)}
-												onCheckedChange={() => handleTrackToggle(track)}
-											/>
-											<span className='text-xs text-text_primary'>{convertCamelCaseToTitleCase(track)}</span>
-										</div>
-									))}
-								</div>
-							</PopoverContent>
-						</Popover>
-
-						<Popover>
-							<PopoverTrigger asChild>
-								<button
-									type='button'
-									className='flex items-center gap-1 rounded-md border border-border_grey p-1.5'
-								>
-									<MdSort className='text-xl text-wallet_btn_text' />
-								</button>
-							</PopoverTrigger>
-							<PopoverContent className='w-48 border-border_grey p-3'>
-								<div className='mb-2 text-xs font-semibold text-text_primary'>{t('SortBy')}</div>
-								<div className='space-y-1'>
-									{[
-										{ value: 'index', label: `${t('Referendum')} #` },
-										{ value: 'status', label: t('Status') },
-										{ value: 'influence', label: t('Influence') },
-										{ value: 'votes', label: t('VotingPower') }
-									].map((option) => (
-										<button
-											key={option.value}
-											type='button'
-											onClick={() => handleSort(option.value as SortOption)}
-											className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-xs ${sortBy === option.value ? 'bg-text_pink/10 text-text_pink' : 'text-text_primary hover:bg-sidebar_footer'}`}
-										>
-											{option.label}
-											{sortBy === option.value && <span className='text-[10px]'>{sortDirection === 'asc' ? '↑' : '↓'}</span>}
-										</button>
-									))}
-								</div>
-							</PopoverContent>
-						</Popover>
-
-						{(selectedTracks.length > 0 || selectedInfluence.length > 0) && (
-							<button
-								type='button'
-								onClick={clearFilters}
-								className='rounded-md border border-toast_error_text px-3 py-2 text-xs text-toast_error_text'
-							>
-								{t('ClearAll')}
-							</button>
-						)}
+						<InfluenceFilters
+							selectedTracks={selectedTracks}
+							availableTracks={availableTracks}
+							sortBy={sortBy}
+							sortDirection={sortDirection}
+							onTrackToggle={handleTrackToggle}
+							onClearTracks={() => setSelectedTracks([])}
+							onSort={handleSort}
+							onClearAll={clearFilters}
+						/>
 						<CollapsibleTrigger asChild>
 							<button
 								type='button'
@@ -231,137 +150,12 @@ function InfluenceCard({ referendaInfluence, loading, cohortId }: InfluenceCardP
 					</div>
 				</div>
 				<CollapsibleContent>
-					<div className='overflow-x-auto'>
-						<table className='w-full border-collapse'>
-							<thead>
-								<tr className='border-b border-t border-border_grey bg-bounty_table_bg pt-3 text-left text-xs font-semibold uppercase text-text_primary'>
-									<th className='py-4 pl-4'>{t('Referendum')}</th>
-									<th className='py-4 pl-4'>{t('Track')}</th>
-									<th className='py-4'>{t('Status')}</th>
-									<th className='py-4'>{t('VotingPower')}</th>
-									<th className='py-4'>{t('Influence')}</th>
-									<th className='py-4' />
-								</tr>
-							</thead>
-							<tbody>
-								{loading
-									? [1, 2, 3, 4, 5].map((i) => (
-											<tr
-												key={i}
-												className='border-b border-border_grey'
-											>
-												<td className='py-4 pl-4'>
-													<Skeleton className='h-5 w-48' />
-												</td>
-												<td className='py-4'>
-													<Skeleton className='h-5 w-24' />
-												</td>
-												<td className='py-4'>
-													<Skeleton className='h-5 w-20' />
-												</td>
-												<td className='py-4'>
-													<Skeleton className='h-5 w-32' />
-												</td>
-												<td className='py-4'>
-													<Skeleton className='h-5 w-20' />
-												</td>
-												<td className='py-4'>
-													<Skeleton className='h-5 w-6' />
-												</td>
-											</tr>
-										))
-									: paginatedData.map((item) => (
-											<tr
-												key={item.index}
-												className='cursor-pointer border-b border-border_grey text-sm font-semibold hover:border-border_grey/90'
-											>
-												<td className='max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap py-4 pr-10 font-medium text-text_primary'>
-													<Link href={`/referenda/${item.index}`}>
-														#{item?.index} {item?.title}
-													</Link>
-												</td>
-
-												<td className='py-4'>
-													<span className={`${getSpanStyle(item.track || '', 1)} rounded-md px-1.5 py-1 text-xs`}>{convertCamelCaseToTitleCase(item.track || '')}</span>
-												</td>
-												<td className='py-4'>
-													<div className='flex'>
-														<StatusTag status={item.status} />
-													</div>
-												</td>
-												<td className='py-4'>
-													<Tooltip>
-														<TooltipTrigger asChild>
-															<div>
-																<VotingBar
-																	ayePercent={item.ayePercent}
-																	nayPercent={item.nayPercent}
-																/>
-															</div>
-														</TooltipTrigger>
-														<TooltipContent
-															side='top'
-															align='center'
-														>
-															<div className='flex flex-col gap-1'>
-																<p>
-																	{t('Aye')} ={' '}
-																	{formatUSDWithUnits(
-																		formatBnBalance(item.totalAyeVotingPower || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
-																	)}{' '}
-																	({item.ayePercent.toFixed(2)}%)
-																</p>
-																<p>
-																	{t('Nay')} ={' '}
-																	{formatUSDWithUnits(
-																		formatBnBalance(item.totalNayVotingPower || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network)
-																	)}{' '}
-																	({item.nayPercent.toFixed(2)}%)
-																</p>
-															</div>
-														</TooltipContent>
-													</Tooltip>
-												</td>
-												<td className='py-4'>
-													<div className='flex items-center gap-2'>
-														<div
-															className={`flex h-5 w-5 items-center justify-center rounded-sm ${
-																item.influence === EInfluenceStatus.APPROVED
-																	? 'bg-success_vote_bg text-success'
-																	: item.influence === EInfluenceStatus.REJECTED
-																		? 'bg-toast_error_bg text-toast_error_text'
-																		: item.influence === EInfluenceStatus.FAILED
-																			? 'bg-toast_error_bg text-toast_error_text'
-																			: 'bg-toast_info_bg text-toast_info_text'
-															}`}
-														>
-															{item.influence === EInfluenceStatus.APPROVED ? (
-																<Check size={12} />
-															) : item.influence === EInfluenceStatus.REJECTED || item.influence === EInfluenceStatus.FAILED ? (
-																<X size={12} />
-															) : (
-																<Minus size={12} />
-															)}
-														</div>
-													</div>
-												</td>
-												<td className='py-4 pr-4 text-right'>
-													<button
-														type='button'
-														onClick={() => {
-															setSelectedReferendum(item);
-															setIsDialogOpen(true);
-														}}
-														className='hover:bg-bg_secondary rounded-full p-1'
-													>
-														<Menu className='h-4 w-4 text-wallet_btn_text' />
-													</button>
-												</td>
-											</tr>
-										))}
-							</tbody>
-						</table>
-					</div>
+					<InfluenceTable
+						data={paginatedData}
+						network={network}
+						loading={loading}
+						onReferendumClick={handleReferendumClick}
+					/>
 
 					{totalCount > pageSize && (
 						<div className='mt-6 flex justify-center gap-2'>

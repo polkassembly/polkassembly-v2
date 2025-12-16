@@ -1,0 +1,156 @@
+// Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
+// This software may be modified and distributed under the terms
+// of the Apache-2.0 license. See the LICENSE file for details.
+
+import { useTranslations } from 'next-intl';
+import { Check, X, Minus, Menu } from 'lucide-react';
+import VotingBar from '@/app/_shared-components/ListingComponent/VotingBar/VotingBar';
+import { getSpanStyle } from '@/app/_shared-components/TopicTag/TopicTag';
+import { convertCamelCaseToTitleCase } from '@/_shared/_utils/convertCamelCaseToTitleCase';
+import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/app/_shared-components/Tooltip';
+import { IDVReferendumInfluence, EInfluenceStatus, ENetwork } from '@/_shared/types';
+import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
+import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
+import Link from 'next/link';
+
+interface InfluenceTableProps {
+	data: IDVReferendumInfluence[];
+	network: ENetwork;
+	loading?: boolean;
+	onReferendumClick: (item: IDVReferendumInfluence) => void;
+}
+
+function InfluenceTable({ data, network, loading, onReferendumClick }: InfluenceTableProps) {
+	const t = useTranslations('DecentralizedVoices');
+
+	return (
+		<div className='overflow-x-auto'>
+			<table className='w-full border-collapse'>
+				<thead>
+					<tr className='border-b border-t border-border_grey bg-bounty_table_bg pt-3 text-left text-xs font-semibold uppercase text-text_primary'>
+						<th className='py-4 pl-4'>{t('Referendum')}</th>
+						<th className='py-4 pl-4'>{t('Track')}</th>
+						<th className='py-4'>{t('Status')}</th>
+						<th className='py-4'>{t('VotingPower')}</th>
+						<th className='py-4'>{t('Influence')}</th>
+						<th className='py-4' />
+					</tr>
+				</thead>
+				<tbody>
+					{loading
+						? [1, 2, 3, 4, 5].map((i) => (
+								<tr
+									key={i}
+									className='border-b border-border_grey'
+								>
+									<td className='py-4 pl-4'>
+										<Skeleton className='h-5 w-48' />
+									</td>
+									<td className='py-4'>
+										<Skeleton className='h-5 w-24' />
+									</td>
+									<td className='py-4'>
+										<Skeleton className='h-5 w-20' />
+									</td>
+									<td className='py-4'>
+										<Skeleton className='h-5 w-32' />
+									</td>
+									<td className='py-4'>
+										<Skeleton className='h-5 w-20' />
+									</td>
+									<td className='py-4'>
+										<Skeleton className='h-5 w-6' />
+									</td>
+								</tr>
+							))
+						: data.map((item) => (
+								<tr
+									key={item.index}
+									className='cursor-pointer border-b border-border_grey text-sm font-semibold hover:border-border_grey/90'
+								>
+									<td className='max-w-[250px] overflow-hidden text-ellipsis whitespace-nowrap py-4 pr-10 font-medium text-text_primary'>
+										<Link href={`/referenda/${item.index}`}>
+											#{item?.index} {item?.title}
+										</Link>
+									</td>
+
+									<td className='py-4'>
+										<span className={`${getSpanStyle(item.track || '', 1)} rounded-md px-1.5 py-1 text-xs`}>{convertCamelCaseToTitleCase(item.track || '')}</span>
+									</td>
+									<td className='py-4'>
+										<div className='flex'>
+											<StatusTag status={item.status} />
+										</div>
+									</td>
+									<td className='py-4'>
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<div>
+													<VotingBar
+														ayePercent={item.ayePercent}
+														nayPercent={item.nayPercent}
+													/>
+												</div>
+											</TooltipTrigger>
+											<TooltipContent
+												side='top'
+												align='center'
+											>
+												<div className='flex flex-col gap-1'>
+													<p>
+														{t('Aye')} ={' '}
+														{formatUSDWithUnits(formatBnBalance(item.totalAyeVotingPower || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
+														{item.ayePercent.toFixed(2)}%)
+													</p>
+													<p>
+														{t('Nay')} ={' '}
+														{formatUSDWithUnits(formatBnBalance(item.totalNayVotingPower || '0', { numberAfterComma: 2, withThousandDelimitor: false, withUnit: true }, network))} (
+														{item.nayPercent.toFixed(2)}%)
+													</p>
+												</div>
+											</TooltipContent>
+										</Tooltip>
+									</td>
+									<td className='py-4'>
+										<div className='flex items-center gap-2'>
+											<div
+												className={`flex h-5 w-5 items-center justify-center rounded-sm ${
+													item.influence === EInfluenceStatus.APPROVED
+														? 'bg-success_vote_bg text-success'
+														: item.influence === EInfluenceStatus.REJECTED
+															? 'bg-toast_error_bg text-toast_error_text'
+															: item.influence === EInfluenceStatus.FAILED
+																? 'bg-toast_error_bg text-toast_error_text'
+																: 'bg-toast_info_bg text-toast_info_text'
+												}`}
+											>
+												{item.influence === EInfluenceStatus.APPROVED ? (
+													<Check size={12} />
+												) : item.influence === EInfluenceStatus.REJECTED || item.influence === EInfluenceStatus.FAILED ? (
+													<X size={12} />
+												) : (
+													<Minus size={12} />
+												)}
+											</div>
+										</div>
+									</td>
+									<td className='py-4 pr-4 text-right'>
+										<button
+											type='button'
+											onClick={() => onReferendumClick(item)}
+											className='hover:bg-bg_secondary rounded-full p-1'
+										>
+											<Menu className='h-4 w-4 text-wallet_btn_text' />
+										</button>
+									</td>
+								</tr>
+							))}
+				</tbody>
+			</table>
+		</div>
+	);
+}
+
+export default InfluenceTable;

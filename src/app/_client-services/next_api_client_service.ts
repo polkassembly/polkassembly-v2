@@ -69,8 +69,8 @@ import {
 	IOGTrackerData,
 	IConversationTurn,
 	IDVCohort,
-	IDVDReferendumResponse,
-	IDVCohortVote
+	IDVCohortVote,
+	ICohortReferenda
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -1643,7 +1643,7 @@ export class NextApiClientService {
 
 	static async fetchDVCohortReferenda(cohortId: number) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS, routeSegments: [cohortId.toString(), 'referenda'] });
-		return this.nextApiClientFetch<IDVDReferendumResponse[]>({ url, method });
+		return this.nextApiClientFetch<ICohortReferenda[]>({ url, method });
 	}
 
 	static async fetchDVCohortVotes(cohortId: number) {
