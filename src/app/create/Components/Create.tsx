@@ -39,6 +39,7 @@ import CancelReferendum from './CancelReferendum/CancelReferendum';
 import KillReferendum from './KillReferendum/KillReferendum';
 import ExistingPreimage from './ExistingPreimage/ExistingPreimage';
 import CreateBounty from './CreateBounty/CreateBounty';
+import CreateProxy from './CreateProxy/CreateProxy';
 
 export interface CreateRef {
 	setStep: (step?: EProposalStep) => void;
@@ -160,7 +161,8 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 		[EProposalStep.CREATE_USDX_PROPOSAL]: t('CreateProposal.usdxProposal'),
 		[EProposalStep.CREATE_CANCEL_REF_PROPOSAL]: t('CreateProposal.cancelReferendum'),
 		[EProposalStep.CREATE_KILL_REF_PROPOSAL]: t('CreateProposal.killReferendum'),
-		[EProposalStep.CREATE_BOUNTY]: t('CreateProposal.createBounty')
+		[EProposalStep.CREATE_BOUNTY]: t('CreateProposal.createBounty'),
+		[EProposalStep.CREATE_PROXY]: t('CreateProposal.createProxy')
 	};
 
 	const stepDescriptions: Partial<Record<EProposalStep, string>> = {
@@ -177,7 +179,8 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 		[EProposalStep.CREATE_USDX_PROPOSAL]: SpendAssethubIcon,
 		[EProposalStep.CREATE_TREASURY_PROPOSAL]: CreateTreasuryIcon,
 		[EProposalStep.CREATE_KILL_REF_PROPOSAL]: KillReferendaIcon,
-		[EProposalStep.CREATE_CANCEL_REF_PROPOSAL]: CancelReferendaIcon
+		[EProposalStep.CREATE_CANCEL_REF_PROPOSAL]: CancelReferendaIcon,
+		[EProposalStep.CREATE_PROXY]: ExistingPreimageIcon
 	};
 
 	// Expose setStep through the ref
@@ -264,6 +267,15 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 						{step === EProposalStep.CREATE_CANCEL_REF_PROPOSAL && <CancelReferendum onSuccess={onProposalCreationSuccess} />}
 						{step === EProposalStep.CREATE_KILL_REF_PROPOSAL && <KillReferendum onSuccess={onProposalCreationSuccess} />}
 						{step === EProposalStep.CREATE_BOUNTY && <CreateBounty onSuccess={onProposalCreationSuccess} />}
+						{step === EProposalStep.CREATE_PROXY && (
+							<CreateProxy
+								onSuccess={() => {
+									if (isModal) {
+										router.back();
+									}
+								}}
+							/>
+						)}
 						{!step && (
 							<div className='flex flex-col gap-y-4'>
 								<p className='text-lg font-semibold leading-none text-text_primary'>{t('CreateProposal.trendingNow')}</p>
@@ -310,6 +322,13 @@ const Create = forwardRef<CreateRef, { isModal?: boolean; onStepChange?: (step?:
 									description={t('CreateProposal.killReferendumDescription')}
 									icon={KillReferendumIcon}
 									iconClassName='bg-create_kill_bg/10'
+								/>
+								<CreateOption
+									label={titles[EProposalStep.CREATE_PROXY]}
+									onClick={() => setStep(EProposalStep.CREATE_PROXY)}
+									description={t('CreateProposal.createProxyDescription')}
+									icon={ExistingPreimageIcon}
+									iconClassName='bg-create_existing_bg/10'
 								/>
 								<Separator />
 								<p className='text-lg font-semibold leading-none text-text_primary'>{t('CreateTreasuryProposal.createProposal')}</p>

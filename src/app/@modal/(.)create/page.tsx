@@ -33,7 +33,8 @@ function CreateModal() {
 		[EProposalStep.CREATE_USDX_PROPOSAL]: t('CreateProposal.usdxProposal'),
 		[EProposalStep.CREATE_CANCEL_REF_PROPOSAL]: t('CreateProposal.cancelReferendum'),
 		[EProposalStep.CREATE_KILL_REF_PROPOSAL]: t('CreateProposal.killReferendum'),
-		[EProposalStep.CREATE_BOUNTY]: t('CreateProposal.createBounty')
+		[EProposalStep.CREATE_BOUNTY]: t('CreateProposal.createBounty'),
+		[EProposalStep.CREATE_PROXY]: t('CreateProposal.createProxy')
 	};
 
 	const goBack = () => {
