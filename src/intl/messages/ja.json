@@ -1,4 +1,7 @@
 {
+	"Common": {
+		"loadingMessage": "ガバナンスの知恵が届きます 🚀"
+	},
 	"HomePage": {
 		"title": "ホームへようこそ"
 	},
@@ -610,6 +613,20 @@
 			"pollVotesList": "投票リスト",
 			"seeMore": "もっと見る",
 			"seeLess": "もっと見る"
+		},
+		"OGTracker": {
+			"heading": "OGTレポート",
+			"viewOnApp": "アプリで見る",
+			"tasksDelivered": "{delivered}/{total} タスク完了",
+			"tasks": "タスク",
+			"proofOfWork": "Proof of Work",
+			"linkedToTask": "タスクにリンク済み",
+			"status": {
+				"Delivered": "配信済み",
+				"InProgress": "進行中",
+				"Flagged": "フラグ付き",
+				"Remodel": "改造"
+			}
 		},
 		"nestedVotes": "ネストされた投票",
 		"flattenedVotes": "フラット化された投票",
@@ -1613,10 +1630,20 @@
 		"dashboard": "ダッシュボード",
 		"registrar": "登録者",
 		"registrars": "登録者",
+		"judgements": "判断",
+		"uniqueIdentitiesSet": "一意の身分設定",
+		"myDashboard": "マイダッシュボード",
 		"judgementsGranted": "判断許可",
 		"judgementsRequested": "判断要求",
 		"judgementsCompleted": "判断完了",
+		"mySubIdentities": "マイサブ身分",
+		"lastUpdatedOn": "最終更新日",
+		"feeEarned": "獲得した料金",
+		"pendingRequests": "保留中の要求",
+		"newRequests": "新しい要求",
 		"thisMonth": "今月",
+		"request": "要求",
+		"overview": "概览",
 		"registrarDescription": "アカウントの身元を検証および検証する権限を持つエンティティまたは個人。登録者はサービスの料金を設定し、特定のフィールドに対するアテステーションを制限できます。",
 		"becomeRegistrarTitle": "登録者になる方法",
 		"becomeRegistrarDescription": "Polkadotで登録者になるには、レファレンダム提案を提出し、コミュニティの承認を得る必要があります。方法は以下の通りです：",
@@ -1631,6 +1658,8 @@
 		"index": "インデックス",
 		"address": "アドレス",
 		"displayName": "表示名",
+		"socials": "ソーシャル",
+		"rank": "ランク",
 		"email": "メール",
 		"twitter": "Twitter",
 		"status": "ステータス",
@@ -1638,10 +1667,22 @@
 		"latestJudgement": "最新の判断",
 		"receivedRequests": "受信要求",
 		"totalGiven": "合計",
-		"fee": "料金",
+		"fees": "料金",
 		"noJudgementsFound": "判断が見つかりません",
 		"noRegistrarsFound": "登録者が見つかりません",
-		"searchByAddressOrName": "アドレスまたは名前で検索"
+		"searchByAddressOrName": "アドレスまたは名前で検索",
+		"reasonable": "合理的",
+		"knownGood": "既知の良",
+		"outOfDate": "期限切れ",
+		"lowQuality": "低品質",
+		"erroneous": "誤り",
+		"feePaid": "料金支払済み",
+		"failedToLoadData": "データの読み込みに失敗しました。もう一度お試しください。",
+		"identityColumn": "アイデンティティ",
+		"socialsColumn": "ソーシャル",
+		"typeColumn": "タイプ",
+		"judgementsColumn": "判断",
+		"actionsColumn": "アクション"
 	},
 	"JudgementStatus": {
 		"pending": "保留中",

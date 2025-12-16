@@ -1,4 +1,7 @@
 {
+	"Common": {
+		"loadingMessage": "Governance-Weisheit kommt an 🚀"
+	},
 	"HomePage": {
 		"title": "Willkommen zu Hause"
 	},
@@ -543,6 +546,20 @@
 		"beneficiary": "Begünstigter",
 		"description": "Beschreibung",
 		"noVotes": "Keine Abstimmungen gefunden",
+		"OGTracker": {
+			"heading": "OGT-Bericht",
+			"viewOnApp": "In der App ansehen",
+			"tasksDelivered": "{delivered}/{total} Aufgaben erledigt",
+			"tasks": "Aufgaben",
+			"proofOfWork": "Proof of Work",
+			"linkedToTask": "Verknüpft mit Aufgabe",
+			"status": {
+				"Delivered": "Geliefert",
+				"InProgress": "In Bearbeitung",
+				"Flagged": "Markiert",
+				"Remodel": "Umbau"
+			}
+		},
 		"timeline": "Zeitlinie",
 		"more": "mehr",
 		"referendum": "Referendum",
@@ -1612,10 +1629,20 @@
 		"dashboard": "Dashboard",
 		"registrar": "Registrar",
 		"registrars": "Registrars",
+		"judgements": "Urteile",
+		"uniqueIdentitiesSet": "Eindeutige Identitäten gesetzt",
+		"myDashboard": "Mein Dashboard",
 		"judgementsGranted": "Urteile vergeben",
 		"judgementsRequested": "Urteile angefordert",
 		"judgementsCompleted": "Urteile abgeschlossen",
+		"mySubIdentities": "Meine Sub-Identitäten",
+		"lastUpdatedOn": "Zuletzt aktualisiert am",
+		"feeEarned": "Verdiente Gebühr",
+		"pendingRequests": "Ausstehende Anfragen",
+		"newRequests": "Neue Anfragen",
 		"thisMonth": "dieser Monat",
+		"request": "Anfrage",
+		"overview": "Übersicht",
 		"registrarDescription": "Eine Entität oder ein Individuum, die/der autorisiert ist, die Identität von Konten zu verifizieren und zu validieren. Registrars können einen Gebührensatz für ihre Dienstleistungen festlegen und ihre Attestation auf bestimmte Felder beschränken.",
 		"becomeRegistrarTitle": "Wie man Registrar wird",
 		"becomeRegistrarDescription": "Um Registrar in Polkadot zu werden, müssen Sie einen Referendumsvorschlag einreichen und von der Community genehmigt werden. So geht's:",
@@ -1630,6 +1657,8 @@
 		"index": "Index",
 		"address": "Adresse",
 		"displayName": "Anzeigename",
+		"socials": "Soziale Medien",
+		"rank": "Rang",
 		"email": "E-Mail",
 		"twitter": "Twitter",
 		"status": "Status",
@@ -1637,10 +1666,22 @@
 		"latestJudgement": "Letztes Urteil",
 		"receivedRequests": "Empfangene Anfragen",
 		"totalGiven": "Gesamt gegeben",
-		"fee": "Gebühr",
+		"fees": "Gebühren",
 		"noJudgementsFound": "Keine Urteile gefunden",
 		"noRegistrarsFound": "Keine Registrars gefunden",
-		"searchByAddressOrName": "Adresse oder Name eingeben, um zu suchen"
+		"searchByAddressOrName": "Adresse oder Name eingeben, um zu suchen",
+		"reasonable": "Angemessen",
+		"knownGood": "Bekannt Gut",
+		"outOfDate": "Veraltet",
+		"lowQuality": "Minderwertig",
+		"erroneous": "Fehlerhaft",
+		"feePaid": "Gebühr bezahlt",
+		"failedToLoadData": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+		"identityColumn": "Identität",
+		"socialsColumn": "Soziale Medien",
+		"typeColumn": "Typ",
+		"judgementsColumn": "Beurteilungen",
+		"actionsColumn": "Aktionen"
 	},
 	"JudgementStatus": {
 		"pending": "Ausstehend",
