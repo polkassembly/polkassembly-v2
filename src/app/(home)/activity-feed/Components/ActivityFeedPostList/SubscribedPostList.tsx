@@ -3,7 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { IPostListing, IGenericListingResponse, EPostOrigin, ESortOption } from '@/_shared/types';
+import { IPostListing, IGenericListingResponse } from '@/_shared/types';
 import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
@@ -17,7 +17,6 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
 import styles from './ActivityFeedPostList.module.scss';
-import ActivityFeedStats from '../ActivityFeedStats/ActivityFeedStats';
 
 interface QueryData {
 	pages: {
@@ -33,8 +32,6 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 	const observerTarget = useRef<HTMLDivElement>(null);
 	const [reachedEnd, setReachedEnd] = useState(false);
 	const [localPosts, setLocalPosts] = useState<IPostListing[]>([]);
-	const [origin, setOrigin] = useState<EPostOrigin | 'All'>('All');
-	const [sortOrder, setSortOrder] = useState<ESortOption>(ESortOption.NEWEST);
 	const queryClient = useQueryClient();
 	const network = getCurrentNetwork();
 
@@ -133,19 +130,8 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 			const dateA = a.onChainInfo?.createdAt ? new Date(a.onChainInfo.createdAt).getTime() : 0;
 			const dateB = b.onChainInfo?.createdAt ? new Date(b.onChainInfo.createdAt).getTime() : 0;
 
-			return sortOrder === ESortOption.NEWEST ? dateB - dateA : dateA - dateB;
+			return dateB - dateA;
 		});
-	}, [filteredPosts, sortOrder]);
-
-	const activeVotesCount = useMemo(() => {
-		return filteredPosts.reduce((total, post) => {
-			if (post.onChainInfo?.voteMetrics) {
-				const ayeCount = post.onChainInfo.voteMetrics.aye?.count || 0;
-				const nayCount = post.onChainInfo.voteMetrics.nay?.count || 0;
-				return total + ayeCount + nayCount;
-			}
-			return total;
-		}, 0);
 	}, [filteredPosts]);
 
 	useEffect(() => {
@@ -194,14 +180,6 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 
 	return (
 		<div className='pb-10'>
-			<ActivityFeedStats
-				activeProposalsCount={data?.pages?.[0]?.totalCount || initialData.totalCount || 0}
-				activeVotesCount={activeVotesCount}
-				currentTab={origin}
-				setCurrentTab={setOrigin}
-				currentSort={sortOrder}
-				onSortChange={setSortOrder}
-			/>
 			{sortedPosts?.length === 0 ? (
 				<div className={styles.allCaughtUp}>
 					<Image
