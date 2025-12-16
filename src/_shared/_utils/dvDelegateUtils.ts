@@ -163,9 +163,9 @@ export function calculateDVInfluence(
 	const referendaInfluence = referenda.map((referendum) => {
 		const refVotes = votesByReferendum.get(referendum.index) || [];
 
-		let dvAyePower: bigint;
-		let dvNayPower: bigint;
-		let dvAbstainPower: bigint;
+		let dvAyePower = BigInt(0);
+		let dvNayPower = BigInt(0);
+		let dvAbstainPower = BigInt(0);
 		const delegateVotes: IDVDelegateVote[] = [];
 		const guardianVotes: IDVDelegateVote[] = [];
 
