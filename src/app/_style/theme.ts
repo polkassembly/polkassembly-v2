@@ -193,7 +193,12 @@ export const THEME_COLORS = {
 		klara_stats_bg: '#EAE4FA',
 		klara_stats_text: '#5421E5',
 		delegatebotx_border: '#E97FBD',
-		question_icon_color: '#B5B6BA'
+		question_icon_color: '#B5B6BA',
+		child_bounties_label_bg: '#FFEEE0',
+		child_bounties_label_text: '#DB511F',
+		bounties_label_bg: '#EEF2FF',
+		bounties_label_text: '#4F46E5',
+		dv_header_text: '#96A4B6'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -385,6 +390,11 @@ export const THEME_COLORS = {
 		klara_stats_bg: '#EAE4FA',
 		klara_stats_text: '#5421E5',
 		delegatebotx_border: '#E97FBD',
-		question_icon_color: '#595959'
+		question_icon_color: '#595959',
+		child_bounties_label_bg: '#FFEEE0',
+		child_bounties_label_text: '#DB511F',
+		bounties_label_bg: '#EEF2FF',
+		bounties_label_text: '#4F46E5',
+		dv_header_text: '#96A4B6'
 	}
 };

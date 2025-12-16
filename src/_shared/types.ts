@@ -152,6 +152,8 @@ export interface IPublicUser {
 	profileScore: number;
 	addresses: string[];
 	rank?: number;
+	followers?: IFollowEntry[];
+	following?: IFollowEntry[];
 	profileDetails: IProfileDetails;
 }
 
@@ -1039,7 +1041,8 @@ export enum EReactQueryKeys {
 	IDENTITY_INFO = 'identityInfo',
 	TOKENS_USD_PRICE = 'tokensUsdPrice',
 	USER_VOTES = 'userVotes',
-	PROFILE_IDENTITIES = 'profileIdentities'
+	PROFILE_IDENTITIES = 'profileIdentities',
+	OGTRACKER_DATA = 'ogtracker-data'
 }
 
 export interface IParamDef {
@@ -1738,8 +1741,11 @@ export interface VotingStrategy {
 }
 
 export enum EJudgementDashboardTabs {
-	DASHBOARD = 'dashboard',
-	REGISTRARS = 'registrars'
+	REQUESTS = 'requests',
+	OVERVIEW = 'overview',
+	JUDGEMENTS = 'judgements',
+	REGISTRARS = 'registrars',
+	MY_DASHBOARD = 'my-dashboard'
 }
 
 export enum EJudgementStatus {
@@ -1755,7 +1761,13 @@ export interface IJudgementRequest {
 	displayName: string;
 	email: string;
 	twitter: string;
+	discord?: string;
+	matrix?: string;
+	github?: string;
+	web?: string;
 	status: EJudgementStatus;
+	judgementType?: string;
+	judgementLabel?: string;
 	dateInitiated: Date;
 	registrarIndex: number;
 	registrarAddress: string;
@@ -1766,4 +1778,257 @@ export interface IJudgementStats {
 	totalRequestedThisMonth: number;
 	percentageIncreaseFromLastMonth: number;
 	percentageCompletedThisMonth: number;
+}
+
+export interface IOGTrackerProposal {
+	id: number;
+	refnum: string;
+	status: string;
+	proposer: string;
+	proposeradd: string;
+	palink: string;
+	sublink: string;
+	reqdot: string;
+	benadd: string;
+	scanlink: string;
+	ptitle: string;
+	track: string;
+	category: string;
+	fdate: string;
+	ldate: string;
+	proplink: string;
+	summary: string;
+	twitter: string;
+	github: string;
+	youtube: string;
+	website: string;
+	articles: string;
+}
+
+export interface IOGTrackerTask {
+	id: number;
+	proposal_id: number;
+	title: string;
+	status: string;
+	code: string | null;
+}
+
+export interface IOGTrackerPoW {
+	id: number;
+	proposal_id: number;
+	task_id: number | null;
+	content: string;
+	created_at: string;
+}
+
+export interface IOGTrackerData {
+	proposal: IOGTrackerProposal | null;
+	tasks: IOGTrackerTask[];
+	proofOfWork: IOGTrackerPoW[];
+}
+
+export enum ECommunityRole {
+	MEMBERS = 'members',
+	DELEGATES = 'delegates',
+	CURATORS = 'curators',
+	DVS = 'decentralized_voices'
+}
+
+export enum EDVDelegateType {
+	DAO = 'DAO',
+	GUARDIAN = 'GUARDIAN'
+}
+
+export enum ECohortStatus {
+	ONGOING = 'Ongoing',
+	CLOSED = 'Closed'
+}
+
+interface IDVCohortDelegate {
+	address: string;
+	startBlock: number;
+	endBlock: number | null;
+	subsquareUrl?: string;
+	cohortId?: number;
+	name?: string;
+	w3f?: string;
+	role: EDVDelegateType;
+	startHeight?: number;
+	endHeight?: number | null;
+}
+
+export interface IDVCohort {
+	index: number;
+	id?: number;
+	network: ENetwork;
+	status: ECohortStatus;
+	startTime: Date;
+	startBlock: number;
+	endTime?: Date;
+	endBlock?: number | null;
+	delegatesCount: number;
+	guardiansCount: number;
+	delegationPerDelegate: number;
+	delegationPerGuardian: number;
+	delegates: IDVCohortDelegate[];
+	tracks: EPostOrigin[];
+	announcementLink?: string;
+	delegation?: number;
+	guardianDelegation?: number;
+	startIndexer?: {
+		blockHeight: number;
+		blockHash: string;
+		blockTime: number;
+	};
+	endIndexer?: {
+		blockHeight: number;
+		blockHash: string;
+		blockTime: number;
+	} | null;
+	allReferendaCnt?: number;
+	dvTrackReferendaCnt?: number;
+}
+
+export enum EInfluenceStatus {
+	APPROVED = 'approved',
+	REJECTED = 'rejected',
+	FAILED = 'failed',
+	NO_IMPACT = 'no_impact'
+}
+
+export enum EDVTrackFilter {
+	DV_TRACKS = 'dv_tracks',
+	ALL = 'all'
+}
+
+export interface IDVDReferendumResponse {
+	index: number;
+	createdAtBlock: number;
+	trackNumber: number;
+	status: EProposalStatus;
+	tally?: {
+		ayes: string;
+		nays: string;
+		support: string;
+	};
+	decisionDeposit?: {
+		amount: string;
+		who: string;
+	};
+	submissionDeposit?: {
+		amount: string;
+		who: string;
+	};
+	preimage?: {
+		proposedCall?: {
+			description?: string;
+		};
+	};
+	proposalArguments?: {
+		description?: string;
+	};
+	description?: string;
+	statusHistory?: Array<{
+		status: string;
+		block: number;
+	}>;
+}
+
+export interface IDelegatedVote {
+	votingPower?: string;
+	balance?: {
+		value?: string;
+		aye?: string;
+		nay?: string;
+		abstain?: string;
+	};
+}
+
+export interface IDVVotes {
+	balance?: {
+		value?: string;
+		aye?: string;
+		nay?: string;
+		abstain?: string;
+	};
+	decision?: string;
+	lockPeriod?: number;
+	delegatedVotes?: IDelegatedVote[];
+	delegatedTo?: string;
+	proposal: {
+		index: number;
+	};
+	voter: string;
+	selfVotingPower?: string;
+}
+
+export interface IDVCohortVote {
+	referendumIndex: number;
+	account: string;
+	isDelegating: boolean;
+	isStandard: boolean;
+	isSplit: boolean;
+	isSplitAbstain: boolean;
+	isAbstain: boolean;
+	balance: string;
+	aye: boolean;
+	conviction?: number;
+	votes: string;
+	delegations: {
+		votes: string;
+		capital: string;
+	};
+	ayeBalance?: string;
+	nayBalance?: string;
+	abstainBalance?: string;
+	ayeVotes?: string;
+	nayVotes?: string;
+	abstainVotes?: string;
+}
+
+export interface IDVDelegateWithStats extends IDVCohortDelegate {
+	voteStats: {
+		ayeCount: number;
+		nayCount: number;
+		abstainCount: number;
+		participation: number;
+		winRate: number;
+	};
+}
+
+export interface IDVDelegateVote {
+	address: string;
+	decision: EVoteDecision | null;
+	votingPower: string;
+	balance: string;
+	conviction: number;
+	percentage?: number;
+}
+
+export interface IDVReferendumInfluence {
+	index: number;
+	title: string;
+	track: string;
+	status: EProposalStatus;
+	ayeVotingPower: string;
+	nayVotingPower: string;
+	ayePercent: number;
+	nayPercent: number;
+	influence: EInfluenceStatus;
+	dvTotalVotingPower: string;
+	delegateVotes: IDVDelegateVote[];
+	guardianVotes: IDVDelegateVote[];
+	totalAyeVotingPower?: string;
+	totalNayVotingPower?: string;
+}
+
+export interface IDVDelegateVotingMatrix {
+	address: string;
+	type: EDVDelegateType;
+	votes: Record<number, EVoteDecision>;
+	participation: number;
+	ayeRate: number;
+	activeCount: number;
+	totalRefs: number;
+	totalVotingPower: string;
 }

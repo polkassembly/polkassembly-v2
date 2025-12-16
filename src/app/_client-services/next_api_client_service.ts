@@ -66,7 +66,11 @@ import {
 	IConversationMessage,
 	IDelegateXAccount,
 	IDelegateXVoteData,
-	IConversationTurn
+	IOGTrackerData,
+	IConversationTurn,
+	IDVCohort,
+	IDVDReferendumResponse,
+	IDVCohortVote
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -171,7 +175,11 @@ enum EApiRoute {
 	CREATE_DELEGATE_X_BOT = 'CREATE_DELEGATE_X_BOT',
 	UPDATE_DELEGATE_X_BOT = 'UPDATE_DELEGATE_X_BOT',
 	GET_DELEGATE_X_DETAILS = 'GET_DELEGATE_X_DETAILS',
-	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY'
+	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY',
+	GET_OGTRACKER_DATA = 'GET_OGTRACKER_DATA',
+	FETCH_COMMUNITY_CURATORS = 'FETCH_COMMUNITY_CURATORS',
+	FETCH_COMMUNITY_MEMBERS = 'FETCH_COMMUNITY_MEMBERS',
+	GET_DV_COHORTS = 'GET_DV_COHORTS'
 }
 
 export class NextApiClientService {
@@ -433,6 +441,19 @@ export class NextApiClientService {
 			case EApiRoute.GET_DELEGATE_X_VOTE_HISTORY:
 				path = '/delegate-x/vote-history';
 				method = 'GET';
+				break;
+
+			case EApiRoute.GET_OGTRACKER_DATA:
+				path = '/external/ogtracker';
+				break;
+
+			case EApiRoute.FETCH_COMMUNITY_CURATORS:
+			case EApiRoute.FETCH_COMMUNITY_MEMBERS:
+				path = '/community';
+				break;
+
+			case EApiRoute.GET_DV_COHORTS:
+				path = '/dv/cohorts';
 				break;
 
 			default:
@@ -1314,19 +1335,21 @@ export class NextApiClientService {
 		proposalType,
 		index,
 		analyticsType,
-		votesType
+		votesType,
+		skipCache = false
 	}: {
 		proposalType: EProposalType;
 		index: string;
 		analyticsType: EAnalyticsType;
 		votesType: EVotesDisplayType;
+		skipCache?: boolean;
 	}) {
 		const queryParams = new URLSearchParams({
 			analyticsType: analyticsType ? analyticsType.toString() : '',
 			votesType: votesType.toString()
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_POST_BUBBLE_VOTES, routeSegments: [proposalType, index, 'votes', 'votes-bubble'], queryParams });
-		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method });
+		return this.nextApiClientFetch<IPostBubbleVotes | null>({ url, method, skipCache });
 	}
 
 	static async addCommentReaction(proposalType: EProposalType, index: string, commentId: string, reactionType: EReaction) {
@@ -1605,5 +1628,53 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_VOTE_HISTORY, queryParams });
 		return this.nextApiClientFetch<{ success: boolean; voteData: IDelegateXVoteData[]; totalCount: number }>({ url, method });
+	}
+
+	static async getOGTrackerData({ refNum }: { refNum: string }) {
+		const queryParams = new URLSearchParams({
+			refNum
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_OGTRACKER_DATA, queryParams });
+		return this.nextApiClientFetch<IOGTrackerData>({ url, method });
+	}
+
+	static async fetchCommunityCurators({ page, limit }: { page: number; limit?: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString() || '1',
+			limit: limit?.toString() || DEFAULT_LISTING_LIMIT.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_COMMUNITY_CURATORS, routeSegments: ['curators'], queryParams });
+		return this.nextApiClientFetch<IDelegateDetails[]>({ url, method });
+	}
+
+	static async fetchCommunityMembers({ page, limit }: { page: number; limit?: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString() || '1',
+			limit: limit?.toString() || DEFAULT_LISTING_LIMIT.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_COMMUNITY_MEMBERS, routeSegments: ['members'], queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IDelegateDetails>>({ url, method });
+	}
+
+	static async fetchDVCohorts() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS });
+		return this.nextApiClientFetch<IDVCohort[]>({ url, method });
+	}
+
+	static async fetchDVCohortDetails(id: number) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS, routeSegments: [id.toString()] });
+		return this.nextApiClientFetch<IDVCohort>({ url, method });
+	}
+
+	static async fetchDVCohortReferenda(cohortId: number) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS, routeSegments: [cohortId.toString(), 'referenda'] });
+		return this.nextApiClientFetch<IDVDReferendumResponse[]>({ url, method });
+	}
+
+	static async fetchDVCohortVotes(cohortId: number) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS, routeSegments: [cohortId.toString(), 'votes'] });
+		return this.nextApiClientFetch<IDVCohortVote[]>({ url, method });
 	}
 }
