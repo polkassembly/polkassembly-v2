@@ -8,7 +8,7 @@ import { ExternalLink } from 'lucide-react';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { useQuery } from '@tanstack/react-query';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSidebar } from '../Sidebar/Sidebar';
 import styles from './NewsBanner.module.scss';
 
@@ -36,6 +36,7 @@ interface INewsItem {
 	Source: string;
 	Priority: string | number;
 	Status: string;
+	id?: string;
 }
 
 const fetchNewsItems = async (): Promise<INewsItem[]> => {
@@ -89,11 +90,13 @@ function NewsBanner() {
 		setAnimationDuration(duration);
 	}, [newsItems]);
 
+	const duplicatedNewsItems = useMemo(() => {
+		return [...newsItems.map((item) => ({ ...item, id: `${item.Title}-1` })), ...newsItems.map((item) => ({ ...item, id: `${item.Title}-2` }))];
+	}, [newsItems]);
+
 	if (!newsItems || newsItems.length === 0) {
 		return null;
 	}
-
-	const duplicatedNewsItems = [...newsItems, ...newsItems];
 
 	const sidebarWidth = state === 'expanded' ? '15.4rem' : '5rem';
 
@@ -124,9 +127,9 @@ function NewsBanner() {
 					className={`${styles.animateMarquee} flex items-center whitespace-nowrap pt-1`}
 					style={{ animationDuration: `${animationDuration}s` }}
 				>
-					{duplicatedNewsItems.map((item: INewsItem) => (
+					{duplicatedNewsItems.map((item) => (
 						<div
-							key={item.Title}
+							key={item.id}
 							className='mr-6 inline-block'
 						>
 							<div className='flex items-center'>
