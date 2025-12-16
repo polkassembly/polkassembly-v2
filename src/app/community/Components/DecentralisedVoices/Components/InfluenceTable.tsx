@@ -166,6 +166,7 @@ function InfluenceTable({ data, network, loading, onReferendumClick }: Influence
 									</td>
 									<td className='py-4 pr-4 text-right'>
 										<button
+											aria-label='Open referendum menu'
 											type='button'
 											onClick={() => onReferendumClick(item)}
 										>

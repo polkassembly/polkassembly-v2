@@ -3,7 +3,6 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/_shared-components/Tooltip';
 import PolkadotLogo from '@assets/parachain-logos/polkadot-logo.jpg';
 import KusamaLogo from '@assets/parachain-logos/kusama-logo.gif';
@@ -24,12 +23,12 @@ function CohortsTableCard() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const pathname = usePathname();
-	const selectedCohortIndex = searchParams.get('cohort') || '5';
 
 	const network = getCurrentNetwork();
 	const { data: cohortsData, isLoading } = useDVCohorts();
 
 	const cohorts = cohortsData ? [...cohortsData].reverse() : [];
+	const selectedCohortIndex = searchParams.get('cohort') || cohortsData?.[0]?.index?.toString() || '';
 
 	const isPolkadot = network === ENetwork.POLKADOT;
 	const networkLogo = isPolkadot ? PolkadotLogo : KusamaLogo;
@@ -119,7 +118,7 @@ function CohortsTableCard() {
 													{getCohortTenureDays(cohort)} {t('Days')}
 												</span>
 											</TableCell>
-											<TableCell className='whitespace-nowrap py-4 text-text_primary'>{cohort.delegatesCount + cohort.guardiansCount}</TableCell>
+											<TableCell className='whitespace-nowrap py-4 text-text_primary'>{(cohort?.delegatesCount || 0) + (cohort?.guardiansCount || 0)}</TableCell>
 											<TableCell className='whitespace-nowrap py-4'>
 												<div className='flex items-center gap-2'>
 													<Image
@@ -129,9 +128,7 @@ function CohortsTableCard() {
 														width={32}
 														height={32}
 													/>
-													<span className='font-medium text-text_primary'>
-														{formatUSDWithUnits(formatBnBalance(delegationAmount.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
-													</span>
+													<span className='font-medium text-text_primary'>{formatBnBalance(delegationAmount.toString(), { withUnit: true, numberAfterComma: 2 }, network)} </span>
 												</div>
 											</TableCell>
 											<TableCell className='whitespace-nowrap py-4'>

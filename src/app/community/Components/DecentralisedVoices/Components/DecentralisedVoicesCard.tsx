@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Check } from 'lucide-react';
 import { MdArrowDropDown } from '@react-icons/all-files/md/MdArrowDropDown';
@@ -29,6 +29,12 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 		participationHighToLow: false,
 		votesCastedHighToLow: true
 	});
+
+	useEffect(() => {
+		if (activeTab === EDVDelegateType.GUARDIAN && (!cohort || cohort.guardiansCount === 0)) {
+			setActiveTab(EDVDelegateType.DAO);
+		}
+	}, [activeTab, cohort]);
 
 	const daos = delegatesWithStats.filter((d) => d.role === EDVDelegateType.DAO);
 	const guardians = delegatesWithStats.filter((d) => d.role === EDVDelegateType.GUARDIAN);
@@ -86,9 +92,9 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 							<button
 								type='button'
 								onClick={() => setActiveTab(EDVDelegateType.GUARDIAN)}
-								className={`flex-1 rounded px-2 py-0.5 text-xs font-medium text-navbar_title transition-colors md:flex-none md:px-3 md:text-sm ${activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay font-semibold'}`}
+								className={`flex-1 rounded px-2 py-0.5 text-xs font-medium uppercase text-navbar_title transition-colors md:flex-none md:px-3 md:text-sm ${activeTab === EDVDelegateType.GUARDIAN && 'bg-section_dark_overlay font-semibold'}`}
 							>
-								{t('Guardian').toUpperCase()} ({guardians.length})
+								{t('Guardian')} ({guardians.length})
 							</button>
 						</div>
 					)}
@@ -134,7 +140,7 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 											<DropdownMenuItem
 												key={key}
 												className='flex cursor-pointer items-center justify-between'
-												onClick={() => setSortOptions((prev) => ({ ...prev, [key]: !prev[key as keyof typeof sortOptions] }))}
+												onClick={() => setSortOptions({ newestToOldest: false, participationHighToLow: false, votesCastedHighToLow: false, [key]: true })}
 											>
 												<span className={active ? 'font-medium text-text_pink' : 'text-basic_text'}>{label}</span>
 
