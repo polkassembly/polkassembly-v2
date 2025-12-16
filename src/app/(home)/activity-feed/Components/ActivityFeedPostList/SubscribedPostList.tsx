@@ -13,8 +13,6 @@ import { NextApiClientService } from '@/app/_client-services/next_api_client_ser
 import { LoadingSpinner } from '@/app/_shared-components/LoadingSpinner';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
-import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import ActivityFeedPostItem from '../ActivityFeedPostItem/ActivityFeedPostItem';
 import styles from './ActivityFeedPostList.module.scss';
 
@@ -33,7 +31,6 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 	const [reachedEnd, setReachedEnd] = useState(false);
 	const [localPosts, setLocalPosts] = useState<IPostListing[]>([]);
 	const queryClient = useQueryClient();
-	const network = getCurrentNetwork();
 
 	const { user } = useUser();
 
@@ -110,29 +107,16 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 		setLocalPosts(posts);
 	}, [data]);
 
-	const filteredPosts = useMemo(() => {
-		if (origin === 'All') return localPosts;
-
-		return localPosts.filter((post: IPostListing) => {
-			if (!(network in NETWORKS_DETAILS)) return false;
-			const networkInfo = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS];
-			if (!networkInfo) return false;
-
-			const postOrigin = post?.onChainInfo?.origin;
-			return postOrigin?.replace(/\s+/g, '') === origin.replace(/\s+/g, '');
-		});
-	}, [localPosts, origin, network]);
-
 	const sortedPosts = useMemo(() => {
-		if (!filteredPosts || filteredPosts.length === 0) return [];
-		const posts = [...filteredPosts];
+		if (!localPosts || localPosts.length === 0) return [];
+		const posts = [...localPosts];
 		return posts.sort((a, b) => {
 			const dateA = a.onChainInfo?.createdAt ? new Date(a.onChainInfo.createdAt).getTime() : 0;
 			const dateB = b.onChainInfo?.createdAt ? new Date(b.onChainInfo.createdAt).getTime() : 0;
 
 			return dateB - dateA;
 		});
-	}, [filteredPosts]);
+	}, []);
 
 	useEffect(() => {
 		if (reachedEnd || isFetching || !hasNextPage) return () => {};
