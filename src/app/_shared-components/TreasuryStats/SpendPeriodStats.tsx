@@ -75,21 +75,21 @@ function SpendPeriodStats({ nextSpendAt, nextBurn }: { nextSpendAt?: Date; nextB
 								'N/A'
 							) : (
 								<span className='font-semibold'>
-									{spendPeriodRemaining?.days ? (
+									{spendPeriodRemaining?.days && spendPeriodRemaining?.days > 0 ? (
 										<>
 											{spendPeriodRemaining?.days} {t('TreasuryStats.days')}{' '}
 										</>
 									) : (
 										''
 									)}
-									{spendPeriodRemaining?.hours ? (
+									{spendPeriodRemaining?.hours && spendPeriodRemaining?.hours > 0 ? (
 										<>
 											{spendPeriodRemaining?.hours} {t('TreasuryStats.hours')}{' '}
 										</>
 									) : (
 										''
 									)}
-									{!spendPeriodRemaining?.days && !spendPeriodRemaining?.hours && spendPeriodRemaining?.minutes ? (
+									{!spendPeriodRemaining?.days && !spendPeriodRemaining?.hours && spendPeriodRemaining?.minutes && spendPeriodRemaining?.minutes > 0 ? (
 										<>
 											{spendPeriodRemaining?.minutes} {t('TreasuryStats.minutes')}
 										</>
