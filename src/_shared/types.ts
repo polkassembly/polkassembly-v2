@@ -1830,3 +1830,8 @@ export interface IOGTrackerData {
 export enum ECommunityRole {
 	DELEGATES = 'delegates'
 }
+
+export enum ESortOption {
+	NEWEST = 'newest',
+	OLDEST = 'oldest'
+}

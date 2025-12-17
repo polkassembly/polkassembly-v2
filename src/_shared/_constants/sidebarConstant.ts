@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import Home from '@assets/sidebar/homeicon.svg';
+import OpenGov from '@assets/sidebar/Opengov.svg';
 import Discussion from '@assets/sidebar/discussion-icon.svg';
 import Preimages from '@assets/sidebar/preimages.svg';
 import Delegation from '@assets/sidebar/delegation.svg';
@@ -64,6 +65,7 @@ export const getSidebarData = (networkKey: ENetwork, pathname: string, t: (key: 
 		initalItems: ActiveItems(
 			[
 				{ title: t('Sidebar.home'), url: '/', icon: Home },
+				{ title: t('Sidebar.openGov'), url: '/activity-feed', icon: OpenGov },
 				{ title: t('Sidebar.discussions'), url: '/discussions', icon: Discussion }
 			],
 			pathname
