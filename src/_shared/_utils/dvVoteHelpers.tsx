@@ -22,11 +22,29 @@ export const getVoteColor = (vote: string) => {
 export const getVoteIcon = (vote: string) => {
 	switch (vote) {
 		case 'aye':
-			return <AiFillLike size={16} />;
+			return (
+				<AiFillLike
+					size={16}
+					aria-label='Voted aye'
+					role='img'
+				/>
+			);
 		case 'nay':
-			return <AiFillDislike size={16} />;
+			return (
+				<AiFillDislike
+					size={16}
+					aria-label='Voted nay'
+					role='img'
+				/>
+			);
 		case 'abstain':
-			return <Ban size={16} />;
+			return (
+				<Ban
+					size={16}
+					aria-label='Voted abstain'
+					role='img'
+				/>
+			);
 		default:
 			return <p>-</p>;
 	}
