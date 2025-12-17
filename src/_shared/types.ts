@@ -2021,3 +2021,8 @@ export interface ICohortReferenda {
 	hash: string;
 	statusHistory?: IStatusHistoryItem[];
 }
+
+export enum ESortOption {
+	NEWEST = 'newest',
+	OLDEST = 'oldest'
+}
