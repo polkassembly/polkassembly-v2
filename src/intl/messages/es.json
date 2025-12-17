@@ -35,10 +35,21 @@
 	},
 	"ActivityFeed": {
 		"title": "Feed de Actividad",
-		"switchToOverview": "Cambiar a Resumen",
 		"ExploreTab": "Explorar",
-		"SubscribedTab": "Suscrito",
+		"Following": "Siguiendo",
+		"description": "Explore todos los miembros contribuyendo al ecosistema de Polkadot.",
 		"About": "Acerca de",
+		"Stats": {
+			"activeProposals": "Propuestas Activas",
+			"activeVotes": "Votos Activos",
+			"filterLabel": "Filtrar",
+			"sortLabel": "Ordenar",
+			"filterAll": "Todos",
+			"filterProposals": "Solo Propuestas",
+			"filterVotes": "Solo Votos",
+			"sortNewest": "Más Recientes",
+			"sortOldest": "Más Antiguos"
+		},
 		"AboutDescription": "Polkadot es el centro DeFi todo en uno de Polkadot.",
 		"KnowMore": "Saber más",
 		"Rank": "Rango",
@@ -60,7 +71,7 @@
 		"unsubscribe": "Desuscribirse",
 		"please": "Por favor",
 		"login": "Iniciar sesión",
-		"toView": "para ver tus publicaciones suscritas",
+		"toView": "para ver tus publicaciones seguidas",
 		"Navbar": {
 			"All": "Todo",
 			"Root": "Root",

@@ -6,13 +6,11 @@
 
 import { EActivityFeedTab, IGenericListingResponse, IPostListing, ITreasuryStats } from '@/_shared/types';
 import { useTranslations } from 'next-intl';
-import { cn } from '@/lib/utils';
-import { Tabs, TabsContent } from '@ui/Tabs';
-import { Button } from '@/app/_shared-components/Button';
-import { RefreshCw } from 'lucide-react';
-import { useRouter } from 'nextjs-toploader/app';
-import ActivityFeedToggleButton from '../ActivityFeedToggleButton/ActivityFeedToggleButton';
-import ActivityFeedSidebar from '../ActivityFeedSidebar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/Tabs';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
+import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import Link from 'next/link';
+import TabContentLayout from '../TabContentLayout/TabContentLayout';
 import styles from './ActivityFeedComp.module.scss';
 import ActivityFeedPostList from '../ActivityFeedPostList/ActivityFeedPostList';
 import SubscribedPostList from '../ActivityFeedPostList/SubscribedPostList';
@@ -27,53 +25,80 @@ function ActivityFeedComp({
 	treasuryStatsData: ITreasuryStats[];
 }) {
 	const t = useTranslations();
-	const router = useRouter();
+	const network = getCurrentNetwork();
+	const socialLinks = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS]?.socialLinks ?? [];
 
 	return (
-		<div className={cn('mx-auto min-h-screen max-w-7xl bg-page_background px-4 pt-5 lg:px-16')}>
-			<div className='container grid grid-cols-12 gap-4'>
-				<div className='col-span-12'>
-					<div className={styles.activityFeedContainer}>
+		<Tabs
+			value={activeTab}
+			defaultValue={activeTab}
+			className={styles.tabsContainer}
+		>
+			<div className={styles.headerContainer}>
+				<div className={styles.headerInner}>
+					<div className={styles.headerTop}>
 						<div className={styles.activityFeedToggleButton}>
-							<div>
-								<h1 className={styles.activityFeedTitle}>{t('ActivityFeed.title')}</h1>
-							</div>
-							<ActivityFeedToggleButton activeTab={activeTab} />
+							<h1 className={styles.activityFeedTitle}>{t('ActivityFeed.title')}</h1>
 						</div>
-						<Button
-							variant='secondary'
-							onClick={() => router.push('/')}
-							rightIcon={<RefreshCw className='h-4 w-4' />}
-						>
-							{t('ActivityFeed.switchToOverview')}
-						</Button>
+						<div className={styles.socialLinks}>
+							{socialLinks?.map((link) => (
+								<Link
+									key={link.id}
+									href={link.href}
+									target='_blank'
+									rel='noopener noreferrer'
+									className={styles.socialLink}
+									title={link.label}
+									aria-label={link.label}
+								>
+									<link.icon />
+								</Link>
+							))}
+						</div>
 					</div>
-				</div>
-
-				<div className={styles.activityFeedTabs}>
-					<Tabs
-						className={styles.activityFeedTabsContent}
-						value={activeTab}
-						defaultValue={activeTab}
-					>
-						{activeTab === EActivityFeedTab.EXPLORE && (
-							<TabsContent value={EActivityFeedTab.EXPLORE}>
-								<ActivityFeedPostList initialData={initialData} />
-							</TabsContent>
-						)}
-						{activeTab === EActivityFeedTab.SUBSCRIBED && (
-							<TabsContent value={EActivityFeedTab.SUBSCRIBED}>
-								<SubscribedPostList initialData={initialData} />
-							</TabsContent>
-						)}
-					</Tabs>
-				</div>
-
-				<div className='hidden xl:col-span-3 xl:block'>
-					<ActivityFeedSidebar treasuryStatsData={treasuryStatsData} />
+					<p className={styles.description}>{t('ActivityFeed.description')}</p>
+					<TabsList className={styles.tabsList}>
+						<TabsTrigger
+							className={styles.tabsTrigger}
+							value={EActivityFeedTab.SUBSCRIBED}
+							asChild
+						>
+							<Link
+								className='uppercase'
+								href={`/activity-feed?tab=${EActivityFeedTab.SUBSCRIBED}`}
+							>
+								{t('ActivityFeed.Following')}
+							</Link>
+						</TabsTrigger>
+						<TabsTrigger
+							className={styles.tabsTrigger}
+							value={EActivityFeedTab.EXPLORE}
+							asChild
+						>
+							<Link
+								href={`/activity-feed?tab=${EActivityFeedTab.EXPLORE}`}
+								className='uppercase'
+							>
+								{t('ActivityFeed.ExploreTab')}
+							</Link>
+						</TabsTrigger>
+					</TabsList>
 				</div>
 			</div>
-		</div>
+
+			<div className={styles.contentContainer}>
+				<TabsContent value={EActivityFeedTab.SUBSCRIBED}>
+					<TabContentLayout treasuryStatsData={treasuryStatsData}>
+						<SubscribedPostList initialData={activeTab === EActivityFeedTab.SUBSCRIBED ? initialData : { items: [], totalCount: 0 }} />
+					</TabContentLayout>
+				</TabsContent>
+				<TabsContent value={EActivityFeedTab.EXPLORE}>
+					<TabContentLayout treasuryStatsData={treasuryStatsData}>
+						<ActivityFeedPostList initialData={activeTab === EActivityFeedTab.EXPLORE ? initialData : { items: [], totalCount: 0 }} />
+					</TabContentLayout>
+				</TabsContent>
+			</div>
+		</Tabs>
 	);
 }
 
