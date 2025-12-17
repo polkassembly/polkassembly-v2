@@ -5,7 +5,7 @@
 import { useTranslations } from 'next-intl';
 import { TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
 import { ECommunityRole } from '@/_shared/types';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import styles from '../../Header/Header.module.scss';
 
 interface TabCardProps {
@@ -19,9 +19,12 @@ function TabCard({ cohortNumber, delegates, guardians, tracks }: TabCardProps) {
 	const t = useTranslations();
 	const router = useRouter();
 	const pathname = usePathname();
+	const searchParams = useSearchParams();
 
 	const onTabChange = (value: ECommunityRole) => {
-		router.push(`${pathname}?tab=${value}`);
+		const params = new URLSearchParams(searchParams.toString());
+		params.set('tab', value);
+		router.push(`${pathname}?${params.toString()}`);
 	};
 
 	const communityTabs = [{ label: t('Community.decentralizedVoices'), value: ECommunityRole.DVS }];

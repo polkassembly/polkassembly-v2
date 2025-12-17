@@ -66,7 +66,7 @@ export default function DVVotesDialog({ open, onOpenChange, data, cohortId }: DV
 			});
 	}, [data, cohortId, network, activeTab]);
 
-	if (!data) return null;
+	if (!data || !cohortId) return null;
 
 	const { delegateVotes = [], guardianVotes = [] } = data;
 
