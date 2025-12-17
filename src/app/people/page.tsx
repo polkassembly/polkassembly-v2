@@ -33,7 +33,7 @@ async function Community({ searchParams }: { searchParams: Promise<{ tab?: EComm
 
 	return (
 		<div className='w-full'>
-			<Tabs defaultValue={activeTab}>
+			<Tabs value={activeTab}>
 				<Header activeTab={activeTab} />
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
 					<TabsContent value={ECommunityRole.CURATORS}>
