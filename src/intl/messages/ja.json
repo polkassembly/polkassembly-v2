@@ -1678,6 +1678,8 @@
 		"decentralizedVoices": "分散化された声"
 	},
 	"DecentralizedVoices": {
+		"WonParticipated": "勝利/参加",
+		"VotedTotal": "投票済み/合計",
 		"Cohort": "コホート",
 		"OnlyDVTracksReferenda": "DVトラックの国民投票のみ",
 		"AllReferenda": "すべての国民投票",

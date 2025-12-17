@@ -1707,6 +1707,8 @@
 		"decentralizedVoices": "Decentralized Voices"
 	},
 	"DecentralizedVoices": {
+		"WonParticipated": "Won/Participated",
+		"VotedTotal": "Voted/Total",
 		"Cohort": "Cohort",
 		"OnlyDVTracksReferenda": "Only DV tracks referenda",
 		"AllReferenda": "All referenda",

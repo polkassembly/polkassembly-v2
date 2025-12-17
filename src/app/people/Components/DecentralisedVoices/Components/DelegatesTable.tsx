@@ -129,7 +129,7 @@ function DelegatesTable({ delegates, loading }: DelegatesTableProps) {
 												<TooltipTrigger className='cursor-pointer font-medium text-text_primary'>{delegate.voteStats.participation.toFixed(2)} %</TooltipTrigger>
 												<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
 													<p>
-														Voted/Total: {totalVotes}/{delegate.voteStats.totalReferenda}
+														{t('VotedTotal')}: {totalVotes}/{delegate.voteStats.totalReferenda}
 													</p>
 												</TooltipContent>
 											</Tooltip>
@@ -143,7 +143,7 @@ function DelegatesTable({ delegates, loading }: DelegatesTableProps) {
 												</TooltipTrigger>
 												<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
 													<p>
-														Won/Participated: {delegate.voteStats.winCount}/{delegate.voteStats.finalVotesCount}
+														{t('WonParticipated')}: {delegate.voteStats.winCount}/{delegate.voteStats.finalVotesCount}
 													</p>
 												</TooltipContent>
 											</Tooltip>
