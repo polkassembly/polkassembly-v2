@@ -1679,8 +1679,8 @@
 		"decentralizedVoices": "Voces Descentralizadas"
 	},
 	"DecentralizedVoices": {
-		"WonParticipated": "Ganado/Participado",
-		"VotedTotal": "Votado/Total",
+		"WonParticipated": "Ganado/Participado: {won}/{participated}",
+		"VotedTotal": "Votado/Total: {voted}/{total}",
 		"Cohort": "Cohorte",
 		"OnlyDVTracksReferenda": "Solo referendos de pistas DV",
 		"AllReferenda": "Todos los referendos",

@@ -1678,8 +1678,8 @@
 		"decentralizedVoices": "去中心化声音"
 	},
 	"DecentralizedVoices": {
-		"WonParticipated": "获胜/参与",
-		"VotedTotal": "已投票/总计",
+		"WonParticipated": "获胜/参与: {won}/{participated}",
+		"VotedTotal": "已投票/总计: {voted}/{total}",
 		"Cohort": "群组",
 		"OnlyDVTracksReferenda": "仅 DV 轨道公投",
 		"AllReferenda": "所有公投",

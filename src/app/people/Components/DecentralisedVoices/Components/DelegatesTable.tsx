@@ -31,12 +31,12 @@ function DelegatesTable({ delegates, loading }: DelegatesTableProps) {
 		<Table className='table-auto'>
 			<TableHeader>
 				<TableRow className='border-b border-t border-border_grey bg-bounty_table_bg pt-3 text-left text-xs font-semibold uppercase text-text_primary'>
-					<TableHead className='whitespace-nowrap py-4 pl-4 font-semibold'>{t('Name').toUpperCase()}</TableHead>
-					<TableHead className='whitespace-nowrap py-4 font-semibold'>{t('VotesCasted').toUpperCase()}</TableHead>
-					<TableHead className='whitespace-nowrap py-4 font-semibold'>{t('VoteCount').toUpperCase()}</TableHead>
+					<TableHead className='whitespace-nowrap py-4 pl-4 font-semibold uppercase'>{t('Name')}</TableHead>
+					<TableHead className='whitespace-nowrap py-4 font-semibold uppercase'>{t('VotesCasted')}</TableHead>
+					<TableHead className='whitespace-nowrap py-4 font-semibold uppercase'>{t('VoteCount')}</TableHead>
 					<TableHead className='whitespace-nowrap py-4 font-semibold'>
 						<div className='flex items-center gap-1'>
-							{t('Participation').toUpperCase()}
+							<span className='uppercase'>{t('Participation')}</span>
 							<TooltipProvider>
 								<Tooltip>
 									<TooltipTrigger>
@@ -51,7 +51,7 @@ function DelegatesTable({ delegates, loading }: DelegatesTableProps) {
 					</TableHead>
 					<TableHead className='whitespace-nowrap py-4 pr-4 font-semibold'>
 						<div className='flex items-center gap-1'>
-							{t('WinRate').toUpperCase()}
+							<span className='uppercase'>{t('WinRate')}</span>
 							<TooltipProvider>
 								<Tooltip>
 									<TooltipTrigger>
@@ -128,9 +128,7 @@ function DelegatesTable({ delegates, loading }: DelegatesTableProps) {
 											<Tooltip>
 												<TooltipTrigger className='cursor-pointer font-medium text-text_primary'>{delegate.voteStats.participation.toFixed(2)} %</TooltipTrigger>
 												<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
-													<p>
-														{t('VotedTotal')}: {totalVotes}/{delegate.voteStats.totalReferenda}
-													</p>
+													<p>{t('VotedTotal', { total: delegate.voteStats.totalReferenda, voted: totalVotes })}</p>
 												</TooltipContent>
 											</Tooltip>
 										</TooltipProvider>
@@ -142,9 +140,7 @@ function DelegatesTable({ delegates, loading }: DelegatesTableProps) {
 													{delegate.voteStats.winRate.toFixed(2)} %
 												</TooltipTrigger>
 												<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
-													<p>
-														{t('WonParticipated')}: {delegate.voteStats.winCount}/{delegate.voteStats.finalVotesCount}
-													</p>
+													<p>{t('WonParticipated', { participated: delegate.voteStats.finalVotesCount, won: delegate.voteStats.winCount })}</p>
 												</TooltipContent>
 											</Tooltip>
 										</TooltipProvider>
