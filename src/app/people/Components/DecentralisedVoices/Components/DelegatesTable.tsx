@@ -11,6 +11,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/app/
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { IDVDelegateWithStats } from '@/_shared/types';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 
 interface DelegatesTableProps {
 	delegates: IDVDelegateWithStats[];
@@ -27,134 +28,132 @@ function DelegatesTable({ delegates, loading }: DelegatesTableProps) {
 	};
 
 	return (
-		<div className='overflow-x-auto'>
-			<table className='w-full min-w-[800px] table-auto'>
-				<thead>
-					<tr className='border-b border-t border-border_grey bg-bounty_table_bg pt-3 text-left text-xs font-semibold uppercase text-text_primary'>
-						<th className='py-4 pl-4'>{t('Name').toUpperCase()}</th>
-						<th className='py-4'>{t('VotesCasted').toUpperCase()}</th>
-						<th className='py-4'>{t('VoteCount').toUpperCase()}</th>
-						<th className='py-4'>
-							<div className='flex items-center gap-1'>
-								{t('Participation').toUpperCase()}
-								<TooltipProvider>
-									<Tooltip>
-										<TooltipTrigger>
-											<BsFillQuestionCircleFill className='ml-1 text-base text-btn_secondary_border' />
-										</TooltipTrigger>
-										<TooltipContent className='bg-tooltip_background p-2 text-btn_primary_text'>
-											<p>{t('ParticipationTooltip')}</p>
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider>
-							</div>
-						</th>
-						<th className='py-4'>
-							<div className='flex items-center gap-1'>
-								{t('WinRate').toUpperCase()}
-								<TooltipProvider>
-									<Tooltip>
-										<TooltipTrigger>
-											<BsFillQuestionCircleFill className='ml-1 text-base text-btn_secondary_border' />
-										</TooltipTrigger>
-										<TooltipContent className='bg-tooltip_background p-2 text-btn_primary_text'>
-											<p>{t('WinRateTooltip')}</p>
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider>
-							</div>
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					{loading
-						? [1, 2, 3, 4, 5].map((i) => (
-								<tr
-									key={i}
-									className='border-b border-border_grey'
+		<Table className='table-auto'>
+			<TableHeader>
+				<TableRow className='border-b border-t border-border_grey bg-bounty_table_bg pt-3 text-left text-xs font-semibold uppercase text-text_primary'>
+					<TableHead className='whitespace-nowrap py-4 pl-4 font-semibold'>{t('Name').toUpperCase()}</TableHead>
+					<TableHead className='whitespace-nowrap py-4 font-semibold'>{t('VotesCasted').toUpperCase()}</TableHead>
+					<TableHead className='whitespace-nowrap py-4 font-semibold'>{t('VoteCount').toUpperCase()}</TableHead>
+					<TableHead className='whitespace-nowrap py-4 font-semibold'>
+						<div className='flex items-center gap-1'>
+							{t('Participation').toUpperCase()}
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger>
+										<BsFillQuestionCircleFill className='ml-1 text-base text-btn_secondary_border' />
+									</TooltipTrigger>
+									<TooltipContent className='bg-tooltip_background p-2 text-btn_primary_text'>
+										<p>{t('ParticipationTooltip')}</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						</div>
+					</TableHead>
+					<TableHead className='whitespace-nowrap py-4 pr-4 font-semibold'>
+						<div className='flex items-center gap-1'>
+							{t('WinRate').toUpperCase()}
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger>
+										<BsFillQuestionCircleFill className='ml-1 text-base text-btn_secondary_border' />
+									</TooltipTrigger>
+									<TooltipContent className='bg-tooltip_background p-2 text-btn_primary_text'>
+										<p>{t('WinRateTooltip')}</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						</div>
+					</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				{loading
+					? [1, 2, 3, 4, 5].map((i) => (
+							<TableRow
+								key={i}
+								className='border-b border-border_grey'
+							>
+								<TableCell className='py-4 pl-4'>
+									<Skeleton className='h-6 w-40' />
+								</TableCell>
+								<TableCell className='py-4'>
+									<Skeleton className='h-5 w-12' />
+								</TableCell>
+								<TableCell className='py-4'>
+									<div className='flex gap-4'>
+										<Skeleton className='h-5 w-10' />
+										<Skeleton className='h-5 w-10' />
+										<Skeleton className='h-5 w-10' />
+									</div>
+								</TableCell>
+								<TableCell className='py-4'>
+									<Skeleton className='h-5 w-16' />
+								</TableCell>
+								<TableCell className='py-4 pr-4'>
+									<Skeleton className='h-5 w-16' />
+								</TableCell>
+							</TableRow>
+						))
+					: delegates.map((delegate) => {
+							const totalVotes = delegate.voteStats.ayeCount + delegate.voteStats.nayCount + delegate.voteStats.abstainCount;
+							return (
+								<TableRow
+									key={delegate.address}
+									className='border-b border-border_grey text-sm font-semibold text-text_primary hover:border-border_grey/90'
 								>
-									<td className='py-4 pl-4'>
-										<Skeleton className='h-6 w-40' />
-									</td>
-									<td className='py-4'>
-										<Skeleton className='h-5 w-12' />
-									</td>
-									<td className='py-4'>
-										<div className='flex gap-4'>
-											<Skeleton className='h-5 w-10' />
-											<Skeleton className='h-5 w-10' />
-											<Skeleton className='h-5 w-10' />
+									<TableCell className='py-4 pl-4'>
+										<div className='flex items-center gap-2'>
+											<Address address={delegate.address} />
 										</div>
-									</td>
-									<td className='py-4'>
-										<Skeleton className='h-5 w-16' />
-									</td>
-									<td className='py-4'>
-										<Skeleton className='h-5 w-16' />
-									</td>
-								</tr>
-							))
-						: delegates.map((delegate) => {
-								const totalVotes = delegate.voteStats.ayeCount + delegate.voteStats.nayCount + delegate.voteStats.abstainCount;
-								return (
-									<tr
-										key={delegate.address}
-										className='border-b border-border_grey text-sm font-semibold text-text_primary hover:border-border_grey/90'
-									>
-										<td className='py-4 pl-4'>
-											<div className='flex items-center gap-2'>
-												<Address address={delegate.address} />
+									</TableCell>
+									<TableCell className='py-4 font-medium'>{totalVotes}</TableCell>
+									<TableCell className='py-4'>
+										<div className='flex items-center gap-4'>
+											<div className='flex items-center gap-1 text-social_green'>
+												<AiFillLike className='fill-current text-sm' />
+												<span className='font-medium text-text_primary'>{delegate.voteStats.ayeCount}</span>
 											</div>
-										</td>
-										<td className='py-4 font-medium'>{totalVotes}</td>
-										<td className='py-4'>
-											<div className='flex items-center gap-4'>
-												<div className='flex items-center gap-1 text-social_green'>
-													<AiFillLike className='fill-current text-sm' />
-													<span className='font-medium text-text_primary'>{delegate.voteStats.ayeCount}</span>
-												</div>
-												<div className='flex items-center gap-1 text-failure'>
-													<AiFillDislike className='fill-current text-sm' />
-													<span className='font-medium text-text_primary'>{delegate.voteStats.nayCount}</span>
-												</div>
-												<div className='flex items-center gap-1 text-dv_abstain_color'>
-													<Ban size={14} />
-													<span className='font-medium text-text_primary'>{delegate.voteStats.abstainCount}</span>
-												</div>
+											<div className='flex items-center gap-1 text-failure'>
+												<AiFillDislike className='fill-current text-sm' />
+												<span className='font-medium text-text_primary'>{delegate.voteStats.nayCount}</span>
 											</div>
-										</td>
-										<td className='py-4'>
-											<TooltipProvider>
-												<Tooltip>
-													<TooltipTrigger className='cursor-pointer font-medium text-text_primary'>{delegate.voteStats.participation.toFixed(2)} %</TooltipTrigger>
-													<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
-														<p>
-															Voted/Total: {totalVotes}/{delegate.voteStats.totalReferenda}
-														</p>
-													</TooltipContent>
-												</Tooltip>
-											</TooltipProvider>
-										</td>
-										<td className='py-4'>
-											<TooltipProvider>
-												<Tooltip>
-													<TooltipTrigger className={`cursor-pointer font-medium ${getWinRateColor(delegate.voteStats.winRate)}`}>
-														{delegate.voteStats.winRate.toFixed(2)} %
-													</TooltipTrigger>
-													<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
-														<p>
-															Won/Participated: {delegate.voteStats.winCount}/{delegate.voteStats.finalVotesCount}
-														</p>
-													</TooltipContent>
-												</Tooltip>
-											</TooltipProvider>
-										</td>
-									</tr>
-								);
-							})}
-				</tbody>
-			</table>
-		</div>
+											<div className='flex items-center gap-1 text-dv_abstain_color'>
+												<Ban size={14} />
+												<span className='font-medium text-text_primary'>{delegate.voteStats.abstainCount}</span>
+											</div>
+										</div>
+									</TableCell>
+									<TableCell className='py-4'>
+										<TooltipProvider>
+											<Tooltip>
+												<TooltipTrigger className='cursor-pointer font-medium text-text_primary'>{delegate.voteStats.participation.toFixed(2)} %</TooltipTrigger>
+												<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
+													<p>
+														Voted/Total: {totalVotes}/{delegate.voteStats.totalReferenda}
+													</p>
+												</TooltipContent>
+											</Tooltip>
+										</TooltipProvider>
+									</TableCell>
+									<TableCell className='py-4 pr-4'>
+										<TooltipProvider>
+											<Tooltip>
+												<TooltipTrigger className={`cursor-pointer font-medium ${getWinRateColor(delegate.voteStats.winRate)}`}>
+													{delegate.voteStats.winRate.toFixed(2)} %
+												</TooltipTrigger>
+												<TooltipContent className='bg-tooltip_background text-btn_primary_text'>
+													<p>
+														Won/Participated: {delegate.voteStats.winCount}/{delegate.voteStats.finalVotesCount}
+													</p>
+												</TooltipContent>
+											</Tooltip>
+										</TooltipProvider>
+									</TableCell>
+								</TableRow>
+							);
+						})}
+			</TableBody>
+		</Table>
 	);
 }
 
