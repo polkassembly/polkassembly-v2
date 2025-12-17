@@ -11,9 +11,7 @@ import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { Tabs, TabsContent } from '@ui/Tabs';
 import { ECommunityRole } from '@/_shared/types';
 import CommunityMembers from './Components/Members/Members';
-import CommunityDelegates from './Components/Delegates/Delegates';
 import CommunityCurators from './Components/Curators/Curators';
-import DecentralisedVoices from './Components/DecentralisedVoices';
 
 export async function generateMetadata(): Promise<Metadata> {
 	const network = await getNetworkFromHeaders();
@@ -42,14 +40,8 @@ async function Community({ searchParams }: { searchParams: Promise<{ tab?: EComm
 					<TabsContent value={ECommunityRole.MEMBERS}>
 						<CommunityMembers page={page} />
 					</TabsContent>
-					<TabsContent value={ECommunityRole.DELEGATES}>
-						<CommunityDelegates page={page} />
-					</TabsContent>
 					<TabsContent value={ECommunityRole.CURATORS}>
 						<CommunityCurators page={page} />
-					</TabsContent>
-					<TabsContent value={ECommunityRole.DVS}>
-						<DecentralisedVoices />
 					</TabsContent>
 				</div>
 			</Tabs>
