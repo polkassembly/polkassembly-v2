@@ -1678,6 +1678,7 @@
 		"decentralizedVoices": "去中心化声音"
 	},
 	"DecentralizedVoices": {
+		"Active": "活跃",
 		"WonParticipated": "获胜/参与: {won}/{participated}",
 		"VotedTotal": "已投票/总计: {voted}/{total}",
 		"Cohort": "群组",

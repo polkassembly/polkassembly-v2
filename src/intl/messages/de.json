@@ -1677,6 +1677,7 @@
 		"decentralizedVoices": "Dezentralisierte Stimmen"
 	},
 	"DecentralizedVoices": {
+		"Active": "aktiv",
 		"WonParticipated": "Gewonnen/Teilgenommen: {won}/{participated}",
 		"VotedTotal": "Abgestimmt/Gesamt: {voted}/{total}",
 		"Cohort": "Kohorte",

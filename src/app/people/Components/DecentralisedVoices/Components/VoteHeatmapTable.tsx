@@ -51,7 +51,9 @@ function VoteHeatmapRow({ item, referendumIndices }: { item: IDVDelegateVotingMa
 			<div className='flex flex-col items-start gap-2 border-b border-border_grey p-4 md:flex-row md:items-center'>
 				<div className='flex items-center gap-2'>
 					<Address address={item.address} />
-					<span className='rounded bg-sidebar_footer px-2 py-1 text-xs text-text_primary'>{item.participation.toFixed(1)}% active</span>
+					<span className='rounded bg-sidebar_footer px-2 py-1 text-xs text-text_primary'>
+						{item.participation.toFixed(1)}% {t('Active')}
+					</span>
 				</div>
 			</div>
 
@@ -61,6 +63,7 @@ function VoteHeatmapRow({ item, referendumIndices }: { item: IDVDelegateVotingMa
 						variant='outline'
 						size='icon'
 						onClick={() => scroll('left')}
+						aria-label='Scroll left'
 						className='absolute left-0 z-10 flex items-center justify-center rounded-full bg-gradient-to-r from-bg_modal to-transparent px-1 hover:text-text_pink'
 					>
 						<ChevronLeft size={18} />
@@ -93,6 +96,7 @@ function VoteHeatmapRow({ item, referendumIndices }: { item: IDVDelegateVotingMa
 						size='icon'
 						variant='outline'
 						onClick={() => scroll('right')}
+						aria-label='Scroll right'
 						className='absolute right-0 z-10 flex items-center justify-center rounded-full bg-gradient-to-l from-bg_modal to-transparent px-1 hover:text-text_pink'
 					>
 						<ChevronRight size={18} />

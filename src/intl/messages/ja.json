@@ -1678,6 +1678,7 @@
 		"decentralizedVoices": "分散化された声"
 	},
 	"DecentralizedVoices": {
+		"Active": "アクティブ",
 		"WonParticipated": "勝利/参加: {won}/{participated}",
 		"VotedTotal": "投票済み/合計: {voted}/{total}",
 		"Cohort": "コホート",
