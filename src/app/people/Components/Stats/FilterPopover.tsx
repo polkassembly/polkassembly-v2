@@ -14,7 +14,10 @@ function FilterPopover({ selectedSources, setSelectedSources }: { selectedSource
 	const t = useTranslations('Delegation');
 	return (
 		<Popover>
-			<PopoverTrigger asChild>
+			<PopoverTrigger
+				className='border border-border_grey'
+				asChild
+			>
 				<Button
 					variant='outline'
 					className='flex h-10 w-10 items-center justify-center'
