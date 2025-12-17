@@ -446,7 +446,7 @@ export class NextApiClientService {
 				break;
 
 			case EApiRoute.GET_DV_COHORTS:
-				path = '/community/dv/cohorts';
+				path = '/people/dv/cohorts';
 				break;
 
 			default:
