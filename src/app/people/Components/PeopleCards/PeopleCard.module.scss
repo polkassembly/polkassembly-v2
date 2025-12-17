@@ -1,5 +1,5 @@
 .memberCard {
-	@apply flex flex-col gap-3 rounded-xl border border-primary_border bg-bg_modal p-5;
+	@apply flex flex-col gap-3 rounded-xl border border-primary_border bg-bg_modal p-2 md:p-4;
 }
 
 .memberSince {

@@ -418,6 +418,53 @@ export class IdentityService {
 		};
 	}
 
+	private static decodeIdentityField(field: any): string {
+		const raw = field?.Raw || '';
+		return isHex(raw) ? hexToString(raw) || raw || '' : raw || '';
+	}
+
+	private formatIdentityFromChain(identityInfoRes: any): IOnChainIdentity {
+		const identityInfo = identityInfoRes?.toHuman?.[0] || identityInfoRes?.toHuman?.();
+		const identityHashInfo = identityInfoRes?.unwrapOr?.(null)?.[0] || identityInfoRes?.unwrapOr?.(null);
+		const { isGood, unverified } = IdentityService.processIdentityInfo(identityInfo);
+		const verifiedByPolkassembly = this.checkVerifiedByPolkassembly(identityInfo);
+
+		const identity = identityInfo?.info;
+		const identityHash = identityHashInfo?.info?.hash?.toHex();
+		const parentProxyInfo = { address: '', title: null };
+
+		return {
+			discord: identity?.discord?.Raw || '',
+			display: IdentityService.decodeIdentityField(identity?.display),
+			displayParent: identity?.displayParent?.Raw || '',
+			email: identity?.email?.Raw || '',
+			github: identity?.github?.Raw || '',
+			isGood: isGood || false,
+			isIdentitySet: !!identity?.display?.Raw,
+			isVerified: !unverified,
+			judgements: identityInfo?.judgements || [],
+			legal: IdentityService.decodeIdentityField(identity?.legal),
+			matrix: identity?.matrix?.Raw || identity?.riot?.Raw || '',
+			nickname: identity?.nickname?.Raw || '',
+			parentProxyAddress: parentProxyInfo?.address || '',
+			parentProxyTitle: parentProxyInfo?.title || null,
+			twitter: identity?.twitter?.Raw || '',
+			verifiedByPolkassembly: verifiedByPolkassembly || false,
+			web: identity?.web?.Raw || '',
+			...(identityHash && { hash: identityHash })
+		};
+	}
+
+	async getIdentities(addresses: string[]): Promise<IOnChainIdentity[]> {
+		if (!addresses.length || !this.peopleChainApi) return [];
+
+		const encodedAddresses = addresses.map((addr) => getEncodedAddress(addr, this.network) || addr);
+
+		const identityInfoResArray: any[] = await this.peopleChainApi.query.identity.identityOf.multi(encodedAddresses);
+
+		return identityInfoResArray.map((identityInfoRes) => this.formatIdentityFromChain(identityInfoRes));
+	}
+
 	getSetIdentityTx({ displayName, email, legalName, twitter, matrix }: { displayName: string; email: string; legalName?: string; twitter?: string; matrix?: string }) {
 		return this.peopleChainApi?.tx.identity.setIdentity({
 			display: { [displayName ? 'raw' : 'none']: displayName || null },

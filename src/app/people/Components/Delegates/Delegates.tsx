@@ -14,11 +14,16 @@ import { useQuery } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
 import { delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
+import { useIdentityService } from '@/hooks/useIdentityService';
+import { useState, useEffect, useRef, RefObject } from 'react';
 import MembersStats from '../Stats/MembersStats';
 import DelegateCard from '../PeopleCards/DelegateCard';
 
 function CommunityDelegates({ page }: { page: number }) {
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
+	const { identityService } = useIdentityService();
+	const [verifiedCount, setVerifiedCount] = useState<number>(0);
+	const searchInputRef = useRef<HTMLInputElement>(null);
 
 	const fetchDelegates = async () => {
 		const { data, error } = await NextApiClientService.fetchDelegates();
@@ -91,13 +96,36 @@ function CommunityDelegates({ page }: { page: number }) {
 		enabled: allUserIds.length > 0
 	});
 
-	const { filteredDelegates, totalDelegates } = useDelegateFiltering(delegates, page);
+	useEffect(() => {
+		const fetchIdentities = async () => {
+			if (!delegates.length || !identityService) return;
+
+			const addresses = delegates.map((d) => d.address);
+			const identities = await identityService.getIdentities(addresses);
+			const verified = identities.filter((identity) => identity.isVerified).length;
+			setVerifiedCount(verified);
+		};
+
+		fetchIdentities();
+	}, [delegates, identityService]);
+
+	const { filteredDelegates, totalDelegates, searchQuery, handleSearchChange, selectedSources, handleSourceChange, sortBy, handleSortChange } = useDelegateFiltering(
+		delegates,
+		page
+	);
 
 	return (
 		<div>
 			<MembersStats
 				totalMembers={delegates.length}
-				verifiedMembers={80}
+				verifiedMembers={verifiedCount}
+				searchQuery={searchQuery}
+				handleSearchChange={handleSearchChange}
+				selectedSources={selectedSources}
+				handleSourceChange={handleSourceChange}
+				sortBy={sortBy}
+				handleSortChange={handleSortChange}
+				searchInputRef={searchInputRef as RefObject<HTMLInputElement>}
 			/>
 			{isLoading ? (
 				<div className='relative mt-20'>

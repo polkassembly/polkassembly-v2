@@ -204,7 +204,7 @@ function DelegateCard({ delegate, publicUser: publicUserProp, followers: followe
 						address={delegate.address}
 						iconSize={30}
 						showIdenticon
-						textClassName='text-left text-lg font-semibold'
+						textClassName='text-left max-w-20 md:max-w-full text-lg font-semibold'
 					/>
 				</div>
 				<div className='flex items-center gap-x-2'>
@@ -272,7 +272,7 @@ function DelegateCard({ delegate, publicUser: publicUserProp, followers: followe
 				</div>
 			</div>
 
-			<div className='flex items-center justify-between gap-x-4'>
+			<div className='flex flex-wrap items-center justify-between gap-4'>
 				<div className='flex items-center gap-x-2'>
 					<CopyToClipboard
 						label={shortenAddress(delegate.address, 5)}
