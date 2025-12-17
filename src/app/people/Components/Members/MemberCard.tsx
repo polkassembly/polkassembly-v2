@@ -28,7 +28,7 @@ import { useIdentityService } from '@/hooks/useIdentityService';
 import { achievementBadges } from '@/_shared/_constants/achievementBadges';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
 import { ESocial, IDelegateDetails, IOnChainIdentity, EUserBadge, IUserBadgeDetails } from '@/_shared/types';
-import styles from './PeopleCard.module.scss';
+import styles from '../../PeopleCard.module.scss';
 
 const SocialIcons: Partial<Record<ESocial, React.ComponentType<React.SVGProps<SVGSVGElement>>>> = {
 	[ESocial.EMAIL]: IoMdMail,
