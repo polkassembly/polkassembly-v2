@@ -11,12 +11,12 @@ import TotalMembers from '@assets/icons/total-members.svg';
 import VerifiedMembers from '@assets/icons/verified-members.svg';
 import { useTranslations } from 'next-intl';
 
-interface MembersStatsProps {
+interface CuratorStatsProps {
 	totalMembers: number;
 	verifiedMembers: number;
 }
 
-function MembersStats({ totalMembers, verifiedMembers }: MembersStatsProps) {
+function CuratorStats({ totalMembers, verifiedMembers }: CuratorStatsProps) {
 	const t = useTranslations('Community.Members');
 
 	return (
@@ -55,4 +55,4 @@ function MembersStats({ totalMembers, verifiedMembers }: MembersStatsProps) {
 		</div>
 	);
 }
-export default MembersStats;
+export default CuratorStats;

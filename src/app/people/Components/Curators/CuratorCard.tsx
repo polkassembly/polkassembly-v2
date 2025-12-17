@@ -24,7 +24,7 @@ import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
 import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
 import { FaGithub } from '@react-icons/all-files/fa/FaGithub';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import styles from './PeopleCard.module.scss';
+import styles from '../../PeopleCard.module.scss';
 
 const SocialIcons: Partial<Record<ESocial, React.ComponentType<React.SVGProps<SVGSVGElement>>>> = {
 	[ESocial.EMAIL]: IoMdMail,

@@ -10,7 +10,6 @@ import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMet
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { Tabs, TabsContent } from '@ui/Tabs';
 import { ECommunityRole } from '@/_shared/types';
-import CommunityMembers from './Components/Members/Members';
 import CommunityCurators from './Components/Curators/Curators';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -37,9 +36,6 @@ async function Community({ searchParams }: { searchParams: Promise<{ tab?: EComm
 			<Tabs defaultValue={activeTab}>
 				<Header activeTab={activeTab} />
 				<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
-					<TabsContent value={ECommunityRole.MEMBERS}>
-						<CommunityMembers page={page} />
-					</TabsContent>
 					<TabsContent value={ECommunityRole.CURATORS}>
 						<CommunityCurators page={page} />
 					</TabsContent>

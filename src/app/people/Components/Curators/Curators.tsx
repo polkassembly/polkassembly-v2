@@ -5,8 +5,8 @@
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import MembersStats from '../Stats/MembersStats';
-import CuratorCard from '../PeopleCards/CuratorCard';
+import CuratorStats from './CuratorStats';
+import CuratorCard from './CuratorCard';
 
 async function CommunityCurators({ page }: { page: number }) {
 	const { data, error } = await NextApiClientService.fetchCommunityCurators({ page: 1, limit: 3000 });
@@ -27,7 +27,7 @@ async function CommunityCurators({ page }: { page: number }) {
 
 	return (
 		<div>
-			<MembersStats
+			<CuratorStats
 				totalMembers={data.length}
 				verifiedMembers={80}
 			/>
