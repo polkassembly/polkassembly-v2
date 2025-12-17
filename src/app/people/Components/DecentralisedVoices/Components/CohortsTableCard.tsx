@@ -46,7 +46,7 @@ function CohortsTableCard() {
 			<div className='mb-4 flex items-center gap-2 sm:mb-5 md:mb-6'>
 				<Image
 					src={TimeLineIcon}
-					alt='Delegation Green Icon'
+					alt='Timeline Icon'
 					width={24}
 					height={24}
 					className='h-6 w-6'
@@ -76,7 +76,7 @@ function CohortsTableCard() {
 							</TableHead>
 							<TableHead className='whitespace-nowrap py-4 font-semibold'>{t('Delegates')}</TableHead>
 							<TableHead className='whitespace-nowrap py-4 font-semibold'>{t('W3FDelegation')}</TableHead>
-							<TableHead className='whitespace-nowrap py-4 font-semibold'>{t('Status').toUpperCase()}</TableHead>
+							<TableHead className='whitespace-nowrap py-4 font-semibold uppercase'>{t('Status')}</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>

@@ -102,7 +102,7 @@ function DecentralisedVoices() {
 						<div className='flex items-center gap-2'>
 							<Image
 								src={TimeLineIcon}
-								alt='Delegation Green Icon'
+								alt='Timeline Icon'
 								width={24}
 								height={24}
 								className='h-6 w-6'

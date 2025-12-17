@@ -72,7 +72,7 @@ function DecentralisedVoicesCard({ delegatesWithStats, cohort, loading }: Decent
 					<div className='order-1 flex min-w-0 items-center gap-2 lg:order-1'>
 						<Image
 							src={TimeLineIcon}
-							alt='Delegation Green Icon'
+							alt='Timeline Icon'
 							width={24}
 							height={24}
 							className='h-6 w-6'
