@@ -28,7 +28,7 @@ function InfluenceTable({ data, network, loading, onReferendumClick }: Influence
 	const t = useTranslations('DecentralizedVoices');
 
 	return (
-		<Table className='table-auto'>
+		<Table className='mt-6 table-auto'>
 			<TableHeader>
 				<TableRow className='border-b border-t border-border_grey bg-bounty_table_bg pt-3 text-left text-xs font-semibold uppercase text-text_primary'>
 					<TableHead className='whitespace-nowrap py-4 pl-4 font-semibold'>{t('Referendum')}</TableHead>

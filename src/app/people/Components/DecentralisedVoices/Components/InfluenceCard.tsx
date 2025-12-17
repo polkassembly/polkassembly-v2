@@ -113,7 +113,7 @@ function InfluenceCard({ referendaInfluence, loading, cohortId }: InfluenceCardP
 			onOpenChange={setIsOpen}
 		>
 			<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
-				<div className='mb-2 grid grid-cols-[1fr_auto] gap-y-4 lg:mb-6 lg:flex lg:flex-nowrap lg:items-center lg:justify-between lg:gap-4'>
+				<div className='grid grid-cols-[1fr_auto] gap-y-4 lg:flex lg:flex-nowrap lg:items-center lg:justify-between lg:gap-4'>
 					<div className='order-1 flex min-w-0 items-center gap-2 lg:order-1'>
 						<Image
 							src={TimeLineIcon}
