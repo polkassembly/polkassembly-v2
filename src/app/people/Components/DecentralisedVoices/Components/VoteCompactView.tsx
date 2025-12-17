@@ -2,11 +2,8 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import { getVoteBarColor, getVoteColor, getVoteIcon } from '@/_shared/_utils/dvVoteHelpers';
-
 import { IDVDelegateVotingMatrix, EVoteDecision } from '@/_shared/types';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
@@ -18,46 +15,51 @@ interface VoteCompactViewProps {
 }
 
 function VoteCompactView({ votingMatrix, referendumIndices, loading }: VoteCompactViewProps) {
-	const t = useTranslations('DecentralizedVoices');
-	const [expandedRows, setExpandedRows] = useState<string[]>(votingMatrix.length > 0 ? [votingMatrix[0].address] : []);
+	const t = useTranslations('');
+	const scrollRef = useRef<HTMLDivElement>(null);
+	const [showRightFade, setShowRightFade] = useState(true);
 
-	const toggleRow = (address: string) => {
-		setExpandedRows((prev) => (prev.includes(address) ? prev.filter((rowAddr) => rowAddr !== address) : [...prev, address]));
+	const checkScroll = () => {
+		if (scrollRef.current) {
+			const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+			setShowRightFade(scrollLeft + clientWidth < scrollWidth - 1);
+		}
 	};
+
+	useEffect(() => {
+		checkScroll();
+		window.addEventListener('resize', checkScroll);
+		return () => window.removeEventListener('resize', checkScroll);
+	}, [referendumIndices.length]);
 
 	if (loading) {
 		return (
-			<div className='grid grid-cols-1 gap-4 pt-2'>
-				{[1, 2, 3, 4].map((i) => (
+			<div className='w-full'>
+				<div className='mb-4 flex gap-4'>
+					<Skeleton className='h-6 w-32' />
+					<div className='flex flex-1 gap-2'>
+						{[1, 2, 3, 4, 5].map((i) => (
+							<Skeleton
+								key={i}
+								className='h-6 w-12'
+							/>
+						))}
+					</div>
+				</div>
+				{[1, 2, 3, 4, 5].map((i) => (
 					<div
 						key={i}
-						className='rounded-xl border border-border_grey bg-bg_modal p-4'
+						className='mb-4 flex items-center gap-4'
 					>
-						<div className='flex items-center justify-between'>
-							<div className='flex items-center gap-3'>
-								<Skeleton className='h-8 w-8 rounded-full' />
-								<div className='space-y-2'>
-									<Skeleton className='h-4 w-32' />
-									<Skeleton className='h-3 w-24' />
-								</div>
-							</div>
-							<Skeleton className='h-5 w-5' />
+						<Skeleton className='h-8 w-48' />
+						<div className='flex flex-1 gap-2'>
+							{[1, 2, 3, 4, 5].map((j) => (
+								<Skeleton
+									key={j}
+									className='h-8 w-12'
+								/>
+							))}
 						</div>
-						<div className='mt-4 grid grid-cols-3 gap-4 rounded-lg bg-bg_modal/70 p-4'>
-							<div className='space-y-2'>
-								<Skeleton className='h-3 w-16' />
-								<Skeleton className='h-6 w-12' />
-							</div>
-							<div className='space-y-2'>
-								<Skeleton className='h-3 w-16' />
-								<Skeleton className='h-6 w-12' />
-							</div>
-							<div className='space-y-2'>
-								<Skeleton className='h-3 w-16' />
-								<Skeleton className='h-6 w-12' />
-							</div>
-						</div>
-						<Skeleton className='mt-4 h-2 w-full rounded-full' />
 					</div>
 				))}
 			</div>
@@ -65,106 +67,94 @@ function VoteCompactView({ votingMatrix, referendumIndices, loading }: VoteCompa
 	}
 
 	return (
-		<div className='grid grid-cols-1 gap-4 pt-2'>
-			{votingMatrix.map((item) => (
-				<div
-					key={item.address}
-					className='rounded-xl border border-border_grey bg-bg_modal px-4 py-2'
-				>
-					<div
-						className='flex cursor-pointer items-center justify-between'
-						onClick={() => toggleRow(item.address)}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								toggleRow(item.address);
-							}
-						}}
-						role='button'
-						tabIndex={0}
-					>
-						<div className='flex w-full items-center justify-between gap-3'>
-							<div className='flex flex-col items-center gap-3 lg:flex-row'>
-								<Address address={item.address} />
-								<div>
-									<p className='text-xs text-text_primary'>
-										{item.activeCount} {t('Of')} {item.totalRefs} {t('Referendums')}
-									</p>
-								</div>
-							</div>
-							<div className='hidden grid-cols-2 gap-4 rounded-lg bg-bg_modal/70 p-4 lg:grid lg:grid-cols-3'>
-								<div>
-									<p className='text-xs text-text_primary'>{t('Participation')}</p>
-									<p className='text-lg font-bold text-text_primary'>{item.participation.toFixed(1)}%</p>
-								</div>
-								<div>
-									<p className='text-xs text-text_primary'>{t('AyeRate')}</p>
-									<p className='text-lg font-bold text-aye_color'>{item.ayeRate.toFixed(1)}%</p>
-								</div>
-								<div>
-									<p className='text-xs text-text_primary'>{t('Total')}</p>
-									<p className='text-lg font-bold text-abstain_color'>{item.activeCount}</p>
-								</div>
-							</div>
-						</div>
-						<div className='text-text_primary'>{expandedRows.includes(item.address) ? <ChevronUp size={20} /> : <ChevronDown size={20} />}</div>
-					</div>
-
-					<div className='mt-4 grid grid-cols-2 gap-4 rounded-lg bg-bg_modal/70 p-4 lg:hidden lg:grid-cols-3'>
-						<div>
-							<p className='text-xs text-text_primary'>{t('Participation')}</p>
-							<p className='text-lg font-bold text-text_primary'>{item.participation.toFixed(1)}%</p>
-						</div>
-						<div>
-							<p className='text-xs text-text_primary'>{t('AyeRate')}</p>
-							<p className='text-lg font-bold text-aye_color'>{item.ayeRate.toFixed(1)}%</p>
-						</div>
-						<div>
-							<p className='text-xs text-text_primary'>{t('Total')}</p>
-							<p className='text-lg font-bold text-abstain_color'>{item.activeCount}</p>
-						</div>
-					</div>
-
-					{expandedRows.includes(item.address) ? (
-						<div className='mb-3'>
-							<div className='grid grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-7 lg:grid-cols-8'>
+		<div className='relative w-full overflow-hidden'>
+			<div
+				ref={scrollRef}
+				onScroll={checkScroll}
+				className='hide_scrollbar overflow-x-auto'
+			>
+				<table className='w-full min-w-max border-separate border-spacing-0'>
+					<thead>
+						<tr className='border-b border-border_grey'>
+							<th className='sticky left-0 z-10 bg-bg_modal py-4 pr-4 text-left text-xs font-semibold uppercase text-text_primary'>{t('PostDetails.account')}</th>
+							{referendumIndices.map((ref) => (
+								<th
+									key={ref}
+									className='px-2 py-4 text-center text-xs font-semibold text-text_primary'
+								>
+									#{ref}
+								</th>
+							))}
+						</tr>
+					</thead>
+					<tbody>
+						{votingMatrix.map((item) => (
+							<tr
+								key={item.address}
+								className='group'
+							>
+								<td className='sticky left-0 z-10 bg-bg_modal py-3 pr-4'>
+									<Address address={item.address} />
+								</td>
 								{referendumIndices.map((ref) => {
-									const vote = item.votes[ref] || '';
+									const vote = item.votes[ref];
+									let bgClass = '';
+
+									switch (vote) {
+										case EVoteDecision.AYE:
+											bgClass = 'bg-social_green/30';
+											break;
+										case EVoteDecision.NAY:
+											bgClass = 'bg-failure/30';
+											break;
+										case EVoteDecision.ABSTAIN:
+											bgClass = 'bg-dv_voting_card_abstain_bar_color/30';
+											break;
+										default:
+											bgClass = 'bg-activity_selected_tab';
+									}
+
 									return (
-										<div
+										<td
 											key={ref}
-											className={`flex flex-col items-center justify-center rounded p-2 ${getVoteColor(vote)}`}
+											className='py-3 text-center'
 										>
-											<div className='mb-1'>{getVoteIcon(vote)}</div>
-											<span className='text-xs font-medium'>#{ref}</span>
-											<span className='text-[10px] capitalize opacity-70'>
-												{vote !== EVoteDecision.AYE && vote !== EVoteDecision.NAY && vote !== EVoteDecision.ABSTAIN ? t('NoVote') : vote}
-											</span>
-										</div>
+											<div className='flex justify-center'>
+												{vote ? (
+													<div className={`h-4 w-4 rounded-sm ${bgClass}`} />
+												) : (
+													<span className={`flex h-4 w-4 items-center justify-center rounded-sm text-text_primary ${bgClass}`}>-</span>
+												)}
+											</div>
+										</td>
 									);
 								})}
-							</div>
-							<div className='mt-3 flex h-2 w-full overflow-hidden rounded-full'>
-								{referendumIndices.map((ref) => (
-									<div
-										key={ref}
-										className={`flex-1 ${getVoteBarColor(item.votes[ref] || '')} border-r border-border_grey last:border-0`}
-									/>
-								))}
-							</div>
-						</div>
-					) : (
-						<div className='mt-3 flex h-2 w-full overflow-hidden rounded-full'>
-							{referendumIndices.map((ref) => (
-								<div
-									key={ref}
-									className={`flex-1 ${getVoteBarColor(item.votes[ref] || '')} border-r border-border_grey last:border-0`}
-								/>
-							))}
-						</div>
-					)}
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+
+			{showRightFade && <div className='pointer-events-none absolute right-0 top-0 z-20 h-full w-24 bg-gradient-to-l from-bg_modal to-transparent' />}
+
+			<div className='mt-6 flex flex-wrap items-center justify-center gap-6 border-t border-border_grey pt-4'>
+				<div className='flex items-center gap-2'>
+					<div className='h-4 w-4 rounded-sm bg-social_green/30' />
+					<span className='text-xs font-medium text-text_primary'>{t('DecentralizedVoices.Aye')}</span>
 				</div>
-			))}
+				<div className='flex items-center gap-2'>
+					<div className='h-4 w-4 rounded-sm bg-failure/30' />
+					<span className='text-xs font-medium text-text_primary'>{t('DecentralizedVoices.Nay')}</span>
+				</div>
+				<div className='flex items-center gap-2'>
+					<div className='h-4 w-4 rounded-sm bg-dv_voting_card_abstain_bar_color/30' />
+					<span className='text-xs font-medium text-text_primary'>{t('DecentralizedVoices.Abstain')}</span>
+				</div>
+				<div className='flex items-center gap-2'>
+					<span className='flex h-4 w-4 items-center justify-center rounded-sm bg-activity_selected_tab text-text_primary'>-</span>
+					<span className='text-xs font-medium text-text_primary'>{t('DecentralizedVoices.NoVote')}</span>
+				</div>
+			</div>
 		</div>
 	);
 }
