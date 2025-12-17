@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { IPostListing, IGenericListingResponse } from '@/_shared/types';
 import Image from 'next/image';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
@@ -82,10 +82,13 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 		queryKey: ['subscribedActivityFeed', userId],
 		queryFn: getSubscribedActivityFeed,
 		initialPageParam: 1,
-		initialData: {
-			pages: [{ ...initialData, page: 1 }],
-			pageParams: [1]
-		},
+		initialData:
+			userId && initialData?.items?.length
+				? {
+						pages: [{ ...initialData, page: 1 }],
+						pageParams: [1]
+					}
+				: undefined,
 		getNextPageParam: (lastPage, allPages) => {
 			if (reachedEnd || (lastPage?.items && lastPage.items.length < DEFAULT_LISTING_LIMIT)) {
 				return undefined;
@@ -106,6 +109,17 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 		const posts = data?.pages?.flatMap((page) => page?.items || []).filter((post): post is IPostListing => post !== undefined) || [];
 		setLocalPosts(posts);
 	}, [data]);
+
+	const sortedPosts = useMemo(() => {
+		if (!localPosts || localPosts.length === 0) return [];
+		const posts = [...localPosts];
+		return posts.sort((a, b) => {
+			const dateA = a.onChainInfo?.createdAt ? new Date(a.onChainInfo.createdAt).getTime() : 0;
+			const dateB = b.onChainInfo?.createdAt ? new Date(b.onChainInfo.createdAt).getTime() : 0;
+
+			return dateB - dateA;
+		});
+	}, [localPosts]);
 
 	useEffect(() => {
 		if (reachedEnd || isFetching || !hasNextPage) return () => {};
@@ -153,7 +167,7 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 
 	return (
 		<div className='pb-10'>
-			{localPosts?.length === 0 ? (
+			{sortedPosts?.length === 0 ? (
 				<div className={styles.allCaughtUp}>
 					<Image
 						src={NoActivity}
@@ -171,8 +185,8 @@ function SubscribedPostList({ initialData }: { initialData: IGenericListingRespo
 					</p>
 				</div>
 			) : (
-				<div className='hide_scrollbar flex flex-col gap-5 pb-16 lg:max-h-[1078px] lg:overflow-y-auto'>
-					{localPosts?.map((post: IPostListing) => (
+				<div className='hide_scrollbar flex flex-col gap-5 pb-16'>
+					{sortedPosts?.map((post: IPostListing) => (
 						<ActivityFeedPostItem
 							key={`${post?.proposalType}-${post?.index}-${post?.onChainInfo?.createdAt}`}
 							postData={post}

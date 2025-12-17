@@ -1,19 +1,71 @@
 .activityFeedContainer {
-	@apply flex w-full max-w-full flex-wrap justify-between gap-2 overflow-x-hidden xl:items-center;
+	@apply mx-auto flex w-full max-w-7xl flex-wrap justify-between gap-2 overflow-x-hidden xl:items-center;
 }
 
 .activityFeedTitle {
-	@apply text-xl font-semibold leading-9 text-navbar_title lg:text-2xl;
+	@apply text-xl font-semibold leading-9 text-navbar_title lg:text-[28px];
 }
 
 .activityFeedToggleButton {
 	@apply flex flex-row flex-wrap items-center gap-4;
 }
 
-.activityFeedTabs {
+.tabsContainer {
+	@apply min-h-screen bg-page_background;
+}
+
+.headerContainer {
+	@apply flex w-full flex-col gap-y-4 bg-bg_modal shadow-lg;
+}
+
+.headerInner {
+	@apply mx-auto w-full max-w-7xl px-4 pt-5 lg:px-10;
+}
+
+.headerTop {
+	@apply flex flex-col justify-between gap-y-3 md:flex-row md:items-center md:gap-y-0;
+}
+
+.switchButtonText {
+	@apply flex gap-1;
+}
+
+.switchButtonBold {
+	@apply font-semibold;
+}
+
+.socialLinks {
+	@apply flex flex-wrap gap-5;
+}
+
+.socialLink {
+	@apply text-lg text-wallet_btn_text;
+}
+
+.description {
+	@apply py-3 text-sm font-medium text-text_primary;
+}
+
+.tabsList {
+	@apply flex flex-nowrap items-center justify-start gap-2 p-0 font-bold;
+}
+
+.tabsTrigger {
+	@apply flex-shrink-0 px-3 py-2 text-sm;
+}
+
+.contentContainer {
+	@apply mx-auto max-w-7xl px-4 pt-5 lg:px-10;
+}
+
+.gridContainer {
+	@apply grid gap-4 xl:grid-cols-12;
+}
+
+.mainContent {
 	@apply col-span-12 w-full max-w-full overflow-x-hidden xl:col-span-9;
 }
 
-.activityFeedTabsContent {
-	@apply w-full max-w-full overflow-x-hidden xl:max-w-5xl xl:flex-grow 2xl:max-w-full;
+.sidebar {
+	@apply hidden xl:col-span-3 xl:block;
 }
