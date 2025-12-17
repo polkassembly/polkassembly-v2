@@ -17,6 +17,7 @@ import TimeLineIcon from '@assets/icons/timeline.svg';
 import { BsFillQuestionCircleFill } from '@react-icons/all-files/bs/BsFillQuestionCircleFill';
 import { useDVCohorts } from '@/hooks/useDVDelegates';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { formatUSDWithUnits } from '@/app/_client-utils/formatUSDWithUnits';
 
 function CohortsTableCard() {
 	const t = useTranslations('DecentralizedVoices');
@@ -128,7 +129,9 @@ function CohortsTableCard() {
 														width={32}
 														height={32}
 													/>
-													<span className='font-medium text-text_primary'>{formatBnBalance(delegationAmount.toString(), { withUnit: true, numberAfterComma: 2 }, network)} </span>
+													<span className='font-medium text-text_primary'>
+														{formatUSDWithUnits(formatBnBalance(delegationAmount.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
+													</span>
 												</div>
 											</TableCell>
 											<TableCell className='whitespace-nowrap py-4'>
