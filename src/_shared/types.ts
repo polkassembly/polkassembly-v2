@@ -1826,3 +1826,8 @@ export interface IOGTrackerData {
 	tasks: IOGTrackerTask[];
 	proofOfWork: IOGTrackerPoW[];
 }
+
+export enum ESortOption {
+	NEWEST = 'newest',
+	OLDEST = 'oldest'
+}
