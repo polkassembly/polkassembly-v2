@@ -21,11 +21,11 @@ interface VoteCompactViewProps {
 const getVoteColor = (vote: string) => {
 	switch (vote) {
 		case 'aye':
-			return 'bg-success_vote_bg text-aye_color';
+			return 'bg-dv_voting_card_aye_bg_color text-social_green';
 		case 'nay':
-			return 'bg-failure_vote_bg text-nay_color';
+			return 'bg-dv_voting_card_nay_bg_color text-failure';
 		case 'abstain':
-			return 'bg-abstain_bubble_bg text-abstain_color';
+			return 'bg-dv_voting_card_abstain_bg_color text-dv_abstain_color';
 		default:
 			return 'bg-activity_selected_tab text-text_primary';
 	}
@@ -47,11 +47,11 @@ const getVoteIcon = (vote: string) => {
 const getVoteBarColor = (vote: string) => {
 	switch (vote) {
 		case 'aye':
-			return 'bg-success';
+			return 'bg-social_green';
 		case 'nay':
 			return 'bg-failure';
 		case 'abstain':
-			return 'bg-abstain_bubble_bg';
+			return 'bg-dv_voting_card_abstain_bar_color';
 		default:
 			return 'bg-activity_selected_tab';
 	}

@@ -133,10 +133,10 @@ function InfluenceTable({ data, network, loading, onReferendumClick }: Influence
 													<div
 														className={`flex h-5 w-5 items-center justify-center rounded-sm ${
 															item.influence === EInfluenceStatus.NOT_APPLICABLE
-																? 'bg-toast_info_bg text-toast_info_text'
+																? 'bg-dv_influence_not_bg_color text-dv_influence_not_text_color'
 																: item.influence === EInfluenceStatus.NO_INFLUENCE
-																	? 'bg-toast_error_bg text-toast_error_text'
-																	: 'bg-success_vote_bg text-success'
+																	? 'bg-dv_influence_no_bg_color text-dv_influence_no_text_color'
+																	: 'bg-dv_influence_yes_bg_color text-dv_influence_yes_text_color'
 														}`}
 													>
 														{item.influence === EInfluenceStatus.NOT_APPLICABLE ? (

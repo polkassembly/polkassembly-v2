@@ -158,7 +158,7 @@ export default function DVVotesDialog({ open, onOpenChange, data, cohortId }: DV
 						<div className='flex h-8 w-full overflow-hidden rounded-full bg-sidebar_footer'>
 							{ayePercentBar > 0 && (
 								<div
-									className='flex items-center justify-center bg-aye_color text-xs font-semibold text-btn_primary_text'
+									className='flex items-center justify-center bg-success text-xs font-semibold text-btn_primary_text'
 									style={{ width: `${ayePercentBar.toFixed(1)}%` }}
 								>
 									{ayePercentBar.toFixed(1)}%
@@ -166,7 +166,7 @@ export default function DVVotesDialog({ open, onOpenChange, data, cohortId }: DV
 							)}
 							{nayPercentBar > 0 && (
 								<div
-									className='flex items-center justify-center bg-nay_color text-xs font-semibold text-btn_primary_text'
+									className='flex items-center justify-center bg-failure text-xs font-semibold text-btn_primary_text'
 									style={{ width: `${nayPercentBar.toFixed(1)}%` }}
 								>
 									{nayPercentBar.toFixed(1)}%
@@ -174,7 +174,7 @@ export default function DVVotesDialog({ open, onOpenChange, data, cohortId }: DV
 							)}
 							{abstainPercentBar > 0 && (
 								<div
-									className='flex items-center justify-center bg-abstain_color text-xs font-semibold text-btn_primary_text'
+									className='flex items-center justify-center bg-dv_voting_dialog_abstain_color text-xs font-semibold text-btn_primary_text'
 									style={{ width: `${abstainPercentBar.toFixed(1)}%` }}
 								>
 									{abstainPercentBar.toFixed(1)}%
@@ -187,10 +187,10 @@ export default function DVVotesDialog({ open, onOpenChange, data, cohortId }: DV
 					</div>
 
 					<div className='grid max-h-[150px] grid-cols-1 gap-4 overflow-y-auto md:max-h-[400px] md:grid-cols-3'>
-						<div className='rounded-xl border border-border_grey bg-aye_color/10 p-4'>
+						<div className='rounded-xl border border-border_grey bg-dv_voting_card_aye_bg_color p-4'>
 							<div className='flex items-center justify-between'>
-								<span className='font-semibold text-success'>{t('Aye').toUpperCase()}</span>
-								<span className='text-xl font-bold text-success'>
+								<span className='font-semibold text-dv_voting_dialog_aye_color'>{t('Aye').toUpperCase()}</span>
+								<span className='text-xl font-bold text-dv_voting_dialog_aye_color'>
 									{formatUSDWithUnits(formatBnBalance(dvAyePower.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
 								</span>
 							</div>
@@ -198,10 +198,10 @@ export default function DVVotesDialog({ open, onOpenChange, data, cohortId }: DV
 								{totalStats.ayeCount} {t('Voters')}
 							</div>
 						</div>
-						<div className='rounded-xl border border-border_grey bg-nay_color/10 p-4'>
+						<div className='rounded-xl border border-border_grey bg-dv_voting_card_nay_bg_color p-4'>
 							<div className='flex items-center justify-between'>
-								<span className='text-failure_vote_text font-semibold'>{t('Nay').toUpperCase()}</span>
-								<span className='text-failure_vote_text text-xl font-bold'>
+								<span className='font-semibold text-dv_voting_dialog_nay_color'>{t('Nay').toUpperCase()}</span>
+								<span className='text-xl font-bold text-dv_voting_dialog_nay_color'>
 									{formatUSDWithUnits(formatBnBalance(dvNayPower.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
 								</span>
 							</div>
@@ -209,14 +209,14 @@ export default function DVVotesDialog({ open, onOpenChange, data, cohortId }: DV
 								{totalStats.nayCount} {t('Voters')}
 							</div>
 						</div>
-						<div className='rounded-xl border border-border_grey bg-abstain_color/10 p-4'>
+						<div className='rounded-xl border border-border_grey bg-dv_voting_card_abstain_bg_color p-4'>
 							<div className='flex items-center justify-between'>
-								<span className='font-semibold text-abstain_color'>{t('DVAbstain')}</span>
-								<span className='text-xl font-bold text-abstain_color'>
+								<span className='font-semibold text-dv_voting_dialog_abstain_color'>{t('DVAbstain')}</span>
+								<span className='text-xl font-bold text-dv_voting_card_abstain_bar_color'>
 									{formatUSDWithUnits(formatBnBalance(dvAbstainPower.toString(), { withUnit: true, numberAfterComma: 2 }, network))}
 								</span>
 							</div>
-							<div className='text-xs text-text_primary'>
+							<div className='text-xs text-wallet_btn_text'>
 								{totalStats.abstainCount} {t('Voters')}
 							</div>
 						</div>

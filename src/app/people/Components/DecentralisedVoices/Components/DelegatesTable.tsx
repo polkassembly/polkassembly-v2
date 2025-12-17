@@ -109,15 +109,15 @@ function DelegatesTable({ delegates, loading }: DelegatesTableProps) {
 										<td className='py-4 font-medium'>{totalVotes}</td>
 										<td className='py-4'>
 											<div className='flex items-center gap-4'>
-												<div className='flex items-center gap-1 text-success'>
+												<div className='flex items-center gap-1 text-social_green'>
 													<AiFillLike className='fill-current text-sm' />
 													<span className='font-medium text-text_primary'>{delegate.voteStats.ayeCount}</span>
 												</div>
-												<div className='flex items-center gap-1 text-toast_error_text'>
+												<div className='flex items-center gap-1 text-failure'>
 													<AiFillDislike className='fill-current text-sm' />
 													<span className='font-medium text-text_primary'>{delegate.voteStats.nayCount}</span>
 												</div>
-												<div className='flex items-center gap-1 text-bg_blue'>
+												<div className='flex items-center gap-1 text-dv_abstain_color'>
 													<Ban size={14} />
 													<span className='font-medium text-text_primary'>{delegate.voteStats.abstainCount}</span>
 												</div>

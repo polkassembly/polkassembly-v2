@@ -14,34 +14,34 @@ const getVoteStyles = (decision: EVoteDecision | string, t: (key: string) => str
 	switch (decision) {
 		case EVoteDecision.AYE:
 			return {
-				containerBg: 'bg-aye_color/10',
+				containerBg: 'bg-dv_voting_card_aye_bg_color',
 				icon: <Check size={12} />,
-				iconBg: 'bg-aye_color text-white',
-				statusColor: 'text-success',
+				iconBg: 'bg-dv_voting_dialog_aye_color text-white',
+				statusColor: 'text-dv_voting_dialog_aye_color',
 				statusText: t('Aye')
 			};
 		case EVoteDecision.NAY:
 			return {
-				containerBg: 'bg-nay_color/10',
+				containerBg: 'bg-dv_voting_card_nay_bg_color',
 				icon: <X size={12} />,
-				iconBg: 'bg-nay_color text-white',
-				statusColor: 'text-failure_vote_text',
+				iconBg: 'bg-dv_voting_dialog_nay_color text-white',
+				statusColor: 'text-dv_voting_dialog_nay_color',
 				statusText: t('Nay')
 			};
 		case EVoteDecision.ABSTAIN:
 			return {
-				containerBg: 'bg-abstain_color/10',
+				containerBg: 'bg-dv_voting_card_abstain_bg_color',
 				icon: <Ban size={12} />,
-				iconBg: 'bg-abstain_color text-white',
-				statusColor: 'text-blue-500',
+				iconBg: 'bg-dv_voting_dialog_abstain_color text-white',
+				statusColor: 'text-dv_voting_dialog_abstain_color',
 				statusText: t('Abstain')
 			};
 		default:
 			return {
-				containerBg: 'bg-text_secondary/20',
+				containerBg: 'bg-dv_voting_card_no_vote_bg_color',
 				icon: <Minus size={12} />,
-				iconBg: 'bg-text_secondary/20 text-text_secondary',
-				statusColor: 'text-text_secondary',
+				iconBg: 'bg-dv_voting_card_no_vote_bg_color text-text_secondary',
+				statusColor: 'text-text_primary',
 				statusText: t('NoVote')
 			};
 	}
