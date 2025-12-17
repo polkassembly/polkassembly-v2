@@ -15,7 +15,7 @@ import CopyToClipboard from '@ui/CopyToClipboard/CopyToClipboard';
 import { Separator } from '@ui/Separator';
 import { Button } from '@ui/Button';
 import Address from '@ui/Profile/Address/Address';
-import { ShieldPlus, CircleDollarSign, UserIcon, ShieldAlert } from 'lucide-react';
+import { ShieldPlus, UserIcon, ShieldAlert } from 'lucide-react';
 import { IoMdMail } from '@react-icons/all-files/io/IoMdMail';
 import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
 import { FaTelegramPlane } from '@react-icons/all-files/fa/FaTelegramPlane';
@@ -101,9 +101,6 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 					)}
 				</div>
 				<div className='flex items-center gap-x-2'>
-					<span className='inline-flex items-center gap-x-1 text-sm font-medium text-text_pink'>
-						<CircleDollarSign className='h-5 w-5' /> {t('Community.Members.tip')}
-					</span>
 					<Button
 						size='sm'
 						className='w-full rounded-3xl sm:w-auto'
