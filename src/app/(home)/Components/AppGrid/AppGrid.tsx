@@ -2,8 +2,13 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
+'use client';
+
+import React from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { useKlara } from '@/hooks/useKlara';
+import { EChatState } from '@/_shared/types';
 
 interface AppItem {
 	icon: string;
@@ -33,34 +38,15 @@ const apps: AppItem[] = [
 		href: '/judgements'
 	},
 	{
-		icon: '🧑‍🤝‍🧑',
-		key: 'People',
-		href: '/people'
-	},
-	{
 		icon: '🧬',
 		key: 'PoP',
 		href: 'https://www.proofofpersonhood.how/'
 	},
-	{
-		icon: '⚖️',
-		key: 'DelegateX',
-		href: '/delegation'
-	},
+
 	{
 		icon: '🦜',
 		key: 'Klara',
 		href: '/'
-	},
-	{
-		icon: '📊',
-		key: 'TreasuryAnalytics',
-		href: '/treasury-analytics'
-	},
-	{
-		icon: '🌐',
-		key: 'Offchain',
-		href: '/discussions'
 	},
 	{
 		icon: '🏗',
@@ -96,6 +82,15 @@ const apps: AppItem[] = [
 
 export default function AppGrid() {
 	const t = useTranslations('Apps');
+	const { setChatState } = useKlara();
+
+	const handleAppClick = (app: AppItem, e: React.MouseEvent) => {
+		if (app.key === 'Klara') {
+			e.preventDefault();
+			setChatState(EChatState.EXPANDED_SMALL);
+		}
+	};
+
 	return (
 		<div>
 			<h2 className='mb-4 text-lg font-semibold text-text_primary'>{t('header')}</h2>
@@ -104,6 +99,7 @@ export default function AppGrid() {
 					<Link
 						key={app.key}
 						href={app.href}
+						onClick={(e) => handleAppClick(app, e)}
 						className='flex flex-col gap-y-2 rounded-2xl border border-border_grey bg-bg_modal p-3 shadow-sm transition-all hover:shadow-md'
 					>
 						<div className='mb-1 flex items-center gap-x-2'>
