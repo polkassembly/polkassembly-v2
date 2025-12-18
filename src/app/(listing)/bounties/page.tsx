@@ -56,7 +56,7 @@ async function OnchainBountyPage({ searchParams }: { searchParams: Promise<{ pag
 
 	statuses = convertStatusToStatusesArray(status);
 
-	const { data, error } = await NextApiClientService.fetchListingData({ proposalType: EProposalType.BOUNTY, page, statuses });
+	const { data, error } = await NextApiClientService.fetchListingData({ proposalType: EProposalType.BOUNTY, page, limit: 9, statuses });
 
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);

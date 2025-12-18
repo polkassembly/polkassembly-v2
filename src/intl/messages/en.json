@@ -1117,7 +1117,7 @@
 		"clearIdentityDescription": "Are you sure you want to clear your identity?"
 	},
 	"Bounties": {
-		"onchainBounties": "On-chain Bounties",
+		"onchainBounties": "Bounties",
 		"createBountyProposal": "Create Bounty Proposal",
 		"loadingChildBounties": "Loading child bounties...",
 		"noChildBountiesFound": "No child bounties found",
