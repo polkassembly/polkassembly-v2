@@ -12,6 +12,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { htmlToMarkdown } from '@/_shared/_utils/htmlToMarkdown';
+import { parseCompositeIndex, getChildBountyIndex } from '@/_shared/_utils/childBountyUtils';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { cacheExchange, Client as UrqlClient, fetchExchange } from '@urql/core';
 import { fetchPostData } from '../../../_api-utils/fetchPostData';
@@ -147,6 +148,7 @@ const subsquidGqlClient = (network: ENetwork) => {
 	});
 };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export const GET = withErrorHandling(async (req: NextRequest) => {
 	const zodQuerySchema = z.object({
 		postId: z.string(),
@@ -177,9 +179,23 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	const gqlClient = subsquidGqlClient(network);
 
-	const { data: subsquidData } = await gqlClient
-		.query(SUBSQUID_QUERY, { ...(proposalType === EProposalType.TIP ? { hash_eq: postId } : { index_eq: Number(postId) }), type_eq: proposalType })
-		.toPromise();
+	// Build query variables, handling child bounty composite indices
+	const queryVariables: Record<string, unknown> = { type_eq: proposalType };
+	if (proposalType === EProposalType.TIP) {
+		queryVariables.hash_eq = postId;
+	} else if (proposalType === EProposalType.CHILD_BOUNTY) {
+		// For child bounties, parse composite index and query by childIndex
+		const parsed = parseCompositeIndex(postId);
+		if (parsed) {
+			queryVariables.index_eq = parsed.childBountyIndex;
+		} else {
+			queryVariables.index_eq = getChildBountyIndex(postId);
+		}
+	} else {
+		queryVariables.index_eq = Number(postId);
+	}
+
+	const { data: subsquidData } = await gqlClient.query(SUBSQUID_QUERY, queryVariables).toPromise();
 
 	const postData = subsquidData?.proposals[0] || null;
 

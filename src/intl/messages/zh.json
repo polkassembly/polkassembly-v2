@@ -1,4 +1,7 @@
 {
+	"Common": {
+		"loadingMessage": "治理智慧即将到来 🚀"
+	},
 	"HomePage": {
 		"title": "欢迎来到主页"
 	},
@@ -32,10 +35,21 @@
 	},
 	"ActivityFeed": {
 		"title": "动态信息",
-		"switchToOverview": "切换到概览",
 		"ExploreTab": "探索",
-		"SubscribedTab": "已订阅",
+		"Following": "关注",
+		"description": "探索所有为Polkadot生态系统做出贡献的成员。",
 		"About": "关于",
+		"Stats": {
+			"activeProposals": "活跃提案",
+			"activeVotes": "活跃投票",
+			"filterLabel": "筛选",
+			"sortLabel": "排序",
+			"filterAll": "全部",
+			"filterProposals": "仅提案",
+			"filterVotes": "仅投票",
+			"sortNewest": "最新优先",
+			"sortOldest": "最旧优先"
+		},
 		"AboutDescription": "Polkadot是Polkadot的一站式DeFi中心。",
 		"KnowMore": "了解更多",
 		"Rank": "排名",
@@ -57,7 +71,7 @@
 		"unsubscribe": "取消订阅",
 		"please": "请",
 		"login": "登录",
-		"toView": "查看您订阅的帖子",
+		"toView": "查看您关注的帖子",
 		"Navbar": {
 			"All": "全部",
 			"Root": "根节点",
@@ -400,6 +414,7 @@
 		"delegation": "委托",
 		"profile": "个人资料",
 		"home": "主页",
+		"openGov": "链下帖子",
 		"overview": "概览",
 		"discussions": "讨论",
 		"preimages": "预映像",
@@ -520,6 +535,20 @@
 		"capital": "资本",
 		"account": "账户",
 		"abstain": "弃权",
+		"OGTracker": {
+			"heading": "OGT 报告",
+			"viewOnApp": "在应用中查看",
+			"tasksDelivered": "已交付 {delivered}/{total} 项任务",
+			"tasks": "任务",
+			"proofOfWork": "工作量证明",
+			"linkedToTask": "链接到任务",
+			"status": {
+				"Delivered": "已交付",
+				"InProgress": "进行中",
+				"Flagged": "已标记",
+				"Remodel": "重塑"
+			}
+		},
 		"BeneficiariesDetails": {
 			"requested": "已请求",
 			"details": "详情",
@@ -1520,10 +1549,20 @@
 		"dashboard": "仪表板",
 		"registrar": "注册者",
 		"registrars": "注册者",
+		"judgements": "判断",
+		"uniqueIdentitiesSet": "唯一身份设置",
+		"myDashboard": "我的仪表板",
 		"judgementsGranted": "判断许可",
 		"judgementsRequested": "判断请求",
 		"judgementsCompleted": "判断完成",
+		"mySubIdentities": "我的子身份",
+		"lastUpdatedOn": "最后更新于",
+		"feeEarned": "赚取的费用",
+		"pendingRequests": "待处理请求",
+		"newRequests": "新请求",
 		"thisMonth": "本月",
+		"request": "请求",
+		"overview": "概览",
 		"registrarDescription": "一个被授权验证和验证账户身份的实体或个人。注册者可以设置服务费用并限制其认证到特定字段。",
 		"becomeRegistrarTitle": "如何成为注册者",
 		"becomeRegistrarDescription": "要在Polkadot上成为注册者，您需要提交公投提案并获得社区批准。方法如下：",
@@ -1538,6 +1577,8 @@
 		"index": "索引",
 		"address": "地址",
 		"displayName": "显示名称",
+		"socials": "社交媒体",
+		"rank": "排名",
 		"email": "电子邮件",
 		"twitter": "Twitter",
 		"status": "状态",
@@ -1545,10 +1586,22 @@
 		"latestJudgement": "最新判断",
 		"receivedRequests": "接收请求",
 		"totalGiven": "总计",
-		"fee": "费用",
+		"fees": "费用",
 		"noJudgementsFound": "未找到判断",
 		"noRegistrarsFound": "未找到注册者",
-		"searchByAddressOrName": "输入地址或名称进行搜索"
+		"searchByAddressOrName": "输入地址或名称进行搜索",
+		"reasonable": "合理",
+		"knownGood": "已知良好",
+		"outOfDate": "过期",
+		"lowQuality": "低质量",
+		"erroneous": "错误",
+		"feePaid": "已付费",
+		"failedToLoadData": "加载数据失败。请再试一次。",
+		"identityColumn": "身份",
+		"socialsColumn": "社交媒体",
+		"typeColumn": "类型",
+		"judgementsColumn": "判断",
+		"actionsColumn": "操作"
 	},
 	"JudgementStatus": {
 		"pending": "待定",

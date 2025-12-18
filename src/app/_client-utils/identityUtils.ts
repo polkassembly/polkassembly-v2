@@ -19,6 +19,22 @@ enum EJudgementStatusType {
 	LOW_QUALITY = 'LowQuality',
 	ERRONEOUS = 'Erroneous'
 }
+
+interface IdentityField {
+	Raw?: string;
+}
+
+interface IdentityData {
+	twitter?: IdentityField;
+	email?: IdentityField;
+	discord?: IdentityField;
+	matrix?: IdentityField;
+	riot?: IdentityField;
+	github?: IdentityField;
+	web?: IdentityField;
+	[key: string]: IdentityField | undefined;
+}
+
 export function mapJudgementStatus(judgementData: string): EJudgementStatus {
 	switch (judgementData) {
 		case EJudgementStatusType.REASONABLE:
@@ -140,4 +156,68 @@ export function getRegistrarsWithStats({
 		console.error('Error fetching registrar stats:', error);
 		return [];
 	}
+}
+
+export function countSocialsFromIdentity(identity: IdentityData): number {
+	let count = 0;
+	if (identity.twitter?.Raw) count += 1;
+	if (identity.email?.Raw) count += 1;
+	if (identity.discord?.Raw) count += 1;
+	if (identity.matrix?.Raw || identity.riot?.Raw) count += 1;
+	if (identity.github?.Raw) count += 1;
+	if (identity.web?.Raw) count += 1;
+	return count;
+}
+
+export function getSocialsFromIdentity(identity: IdentityData) {
+	return {
+		twitter: identity.twitter?.Raw || '',
+		email: identity.email?.Raw || '',
+		discord: identity.discord?.Raw || '',
+		matrix: identity.matrix?.Raw || identity.riot?.Raw || '',
+		github: identity.github?.Raw || '',
+		web: identity.web?.Raw || ''
+	};
+}
+
+export function formatJudgementLabel(judgement: string): string {
+	switch (judgement) {
+		case EJudgementStatusType.REASONABLE:
+			return 'Reasonable';
+		case EJudgementStatusType.KNOWN_GOOD:
+			return 'Known Good';
+		case EJudgementStatusType.OUT_OF_DATE:
+			return 'Out of Date';
+		case EJudgementStatusType.LOW_QUALITY:
+			return 'Low Quality';
+		case EJudgementStatusType.ERRONEOUS:
+			return 'Erroneous';
+		default:
+			return judgement;
+	}
+}
+
+export const JUDGEMENT_OPTIONS = [
+	{ value: 'Unknown', label: 'Unknown', description: 'No judgement' },
+	{ value: 'KnownGood', label: 'Known Good', description: 'The target is known directly by the registrar and the registrar can fully attest to the validity' },
+	{ value: 'Reasonable', label: 'Reasonable', description: 'The information appears reasonable, but no in-depth checks (e.g. formal KYC process) were performed' },
+	{ value: 'Erroneous', label: 'Erroneous', description: 'The information contains errors' },
+	{ value: 'OutOfDate', label: 'Out of Date', description: 'The information was correct in the past but is now outdated' },
+	{ value: 'LowQuality', label: 'Low Quality', description: 'The information is of low quality or imprecise' }
+] as const;
+
+export type JudgementValue = (typeof JUDGEMENT_OPTIONS)[number]['value'];
+
+export function getJudgementLabel(value: JudgementValue): string {
+	const option = JUDGEMENT_OPTIONS.find((opt) => opt.value === value);
+	return option?.label || value;
+}
+
+export function getJudgementDescription(value: JudgementValue): string {
+	const option = JUDGEMENT_OPTIONS.find((opt) => opt.value === value);
+	return option?.description || '';
+}
+
+export function filterJudgementsByStatus(judgements: IJudgementRequest[], status: EJudgementStatus): IJudgementRequest[] {
+	return judgements.filter((judgement) => judgement.status === status);
 }

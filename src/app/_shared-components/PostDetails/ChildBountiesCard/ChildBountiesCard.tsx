@@ -12,6 +12,7 @@ import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { buildCompositeIndex } from '@/_shared/_utils/childBountyUtils';
 import Link from 'next/link';
 import style from './ChildBountiesCard.module.scss';
 import { PaginationWithLinks } from '../../PaginationWithLinks';
@@ -46,21 +47,28 @@ function ChildBountiesCard({ parentIndex }: { parentIndex: string }) {
 				<LoadingSpinner className='h-56' />
 			) : (
 				<div className={style.childBountiesCardItemWrapper}>
-					{data?.items?.map((item: IPost) => (
-						<Link
-							key={item.index}
-							href={`/child-bounty/${item.index}`}
-							className={style.childBountiesCardItem}
-						>
-							<div className='flex gap-1'>
-								<p className='font-bold'>#{item.index}</p>
-								<p className='font-medium'>{item.title}</p>
-							</div>
-							<div>
-								<StatusTag status={item.onChainInfo?.status} />
-							</div>
-						</Link>
-					))}
+					{data?.items?.map((item: IPost) => {
+						// Build composite index from onChainInfo for URL and display
+						const childIndex = item.onChainInfo?.index ?? item.index ?? 0;
+						const itemParentIndex = item.onChainInfo?.parentBountyIndex;
+						const compositeIndex = itemParentIndex !== undefined ? buildCompositeIndex(itemParentIndex, childIndex) : childIndex;
+
+						return (
+							<Link
+								key={compositeIndex}
+								href={`/child-bounty/${compositeIndex}`}
+								className={style.childBountiesCardItem}
+							>
+								<div className='flex gap-1'>
+									<p className='font-bold'>#{childIndex}</p>
+									<p className='font-medium'>{item.title}</p>
+								</div>
+								<div>
+									<StatusTag status={item.onChainInfo?.status} />
+								</div>
+							</Link>
+						);
+					})}
 				</div>
 			)}
 			{ValidatorService.isValidNumber(data?.totalCount) && Number(data?.totalCount) > DEFAULT_LISTING_LIMIT && (

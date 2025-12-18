@@ -22,14 +22,12 @@
 	background: linear-gradient(to bottom, #f5f8ff, #fcfcfc);
 }
 
-:global(.dark) {
-	.postContentGradient {
-		background: linear-gradient(to bottom, #2a2a34, #1e1e28);
-	}
+:global(.dark) .postContentGradient {
+	background: linear-gradient(to bottom, #2a2a34, #1e1e28);
+}
 
-	.commentContentGradient {
-		background: linear-gradient(to bottom, #202331, #1a1c25);
-	}
+:global(.dark) .commentContentGradient {
+	background: linear-gradient(to bottom, #202331, #1a1c25);
 }
 
 .collapsibleTrigger {

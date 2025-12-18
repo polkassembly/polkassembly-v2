@@ -95,6 +95,18 @@ const VotesData = dynamic(() => import('./VotesData/VotesData'), {
 	)
 });
 
+const OGTrackerInfo = dynamic(() => import('./OGTrackerInfo/OGTrackerInfo'), {
+	ssr: false,
+	loading: () => (
+		<div className='flex flex-col gap-4 rounded-lg border border-border_grey bg-bg_modal p-4'>
+			<Skeleton className='h-6 w-40' />
+			<Skeleton className='h-4 w-full' />
+			<Skeleton className='h-4 w-3/4' />
+			<Skeleton className='h-20 w-full' />
+		</div>
+	)
+});
+
 const PlaceDecisionDeposit = dynamic(() => import('./PlaceDecisionDeposit/PlaceDecisionDeposit'), {
 	ssr: false,
 	loading: () => (
@@ -314,7 +326,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 										}}
 									/>
 								)}
-
 							{/* Refund Deposits */}
 							{post.onChainInfo?.status && post.index !== undefined && ValidatorService.isValidNumber(post.index) && post.onChainInfo?.origin && (
 								<RefundDeposits
@@ -343,7 +354,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								voteMetrics={post.onChainInfo?.voteMetrics}
 								approvalThreshold={thresholdValues.approvalThreshold}
 							/>
-
 							<VotesData
 								proposalType={post.proposalType}
 								index={index}
@@ -353,6 +363,12 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								setThresholdValues={setThresholdValues}
 								thresholdValues={thresholdValues}
 							/>
+							{post.index !== undefined && (
+								<OGTrackerInfo
+									refNum={String(post.index)}
+									trackName={post.onChainInfo?.origin}
+								/>
+							)}
 						</div>
 					)}
 

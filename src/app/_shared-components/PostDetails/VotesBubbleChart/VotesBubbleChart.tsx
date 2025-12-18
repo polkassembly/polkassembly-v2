@@ -117,18 +117,21 @@ const getPostAnalytics = async ({
 	proposalType,
 	index,
 	analyticsType,
-	votesType
+	votesType,
+	skipCache = false
 }: {
 	proposalType: EProposalType;
 	index: string;
 	analyticsType: EAnalyticsType;
 	votesType: EVotesDisplayType;
+	skipCache?: boolean;
 }) => {
 	const { data, error } = await NextApiClientService.getPostBubbleVotes({
 		proposalType: proposalType as EProposalType,
 		index: index.toString(),
 		analyticsType,
-		votesType
+		votesType,
+		skipCache
 	});
 	if (error || !data) {
 		throw new Error(error?.message || 'Failed to fetch data');
@@ -169,14 +172,32 @@ function VotesBubbleChart({
 		return THEME_COLORS[`${theme}`][`${decision}_bubble_bg` as keyof (typeof THEME_COLORS)[typeof theme]];
 	};
 
-	const { data: votesBubbleData, isFetching } = useQuery({
-		queryKey: ['postBubbleVotes', proposalType, index, analyticsType, votesType],
+	// First query: fetch from cache
+	const {
+		data: cachedData,
+		isFetching: isFetchingCached,
+		isSuccess: isCachedSuccess
+	} = useQuery({
+		queryKey: ['postBubbleVotes', proposalType, index, analyticsType, votesType, 'cached'],
 		queryFn: () => getPostAnalytics({ proposalType, index, analyticsType, votesType }),
 		enabled: !!proposalType && !!index,
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
 		retry: false
 	});
+
+	// Second query: fetch fresh data after cached data arrives (no loading state shown for this)
+	const { data: freshData } = useQuery({
+		queryKey: ['postBubbleVotes', proposalType, index, analyticsType, votesType, 'fresh'],
+		queryFn: () => getPostAnalytics({ proposalType, index, analyticsType, votesType, skipCache: true }),
+		enabled: !!proposalType && !!index && isCachedSuccess,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+		retry: false
+	});
+
+	// Use fresh data if available, otherwise use cached data
+	const votesBubbleData = useMemo(() => freshData || cachedData, [freshData, cachedData]);
 
 	const allVotes = useVotesDistribution({ votesBubbleData: votesBubbleData?.votes || { aye: [], nay: [], abstain: [] } });
 	const chartData = useMemo(() => {
@@ -327,7 +348,7 @@ function VotesBubbleChart({
 							<Button
 								key={type}
 								variant='ghost'
-								disabled={isFetching}
+								disabled={isFetchingCached}
 								onClick={() => setVotesType(type)}
 								className={cn(
 									'h-7 w-full bg-transparent px-3 text-sm font-medium shadow-none transition-all hover:bg-transparent',
@@ -341,7 +362,7 @@ function VotesBubbleChart({
 				)}
 			</div>
 
-			{isFetching ? (
+			{isFetchingCached ? (
 				<Skeleton className={cn('mt-4 w-full', enableFullHeight ? 'h-full min-h-[50vh]' : 'h-[300px]')} />
 			) : allVotes.length > 0 ? (
 				<div className={enableFilter ? 'mt-6' : ''}>

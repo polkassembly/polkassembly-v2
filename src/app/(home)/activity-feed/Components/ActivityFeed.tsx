@@ -7,7 +7,7 @@ import ActivityFeedComp from './ActivityFeedComp/ActivityFeedComp';
 
 function ActivityFeed({
 	initialData,
-	activeTab = EActivityFeedTab.EXPLORE,
+	activeTab = EActivityFeedTab.SUBSCRIBED,
 	treasuryStatsData
 }: {
 	initialData: IGenericListingResponse<IPostListing>;
