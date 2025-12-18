@@ -11,7 +11,6 @@ import tokens from '@assets/delegation/tokens.svg';
 import DOT from '@assets/delegation/dot.svg';
 import votes from '@assets/delegation/votes.svg';
 import delegates from '@assets/delegation/delegates.svg';
-import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image, { StaticImageData } from 'next/image';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
@@ -46,22 +45,17 @@ function BountiesStats() {
 	const [stats, setStats] = useState<IBountyStats | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const network = getCurrentNetwork();
-	const [totalBountyPool, setTotalBountyPool] = useState<string | null>(null);
 	const [tokenPrice, setTokenPrice] = useState<number>(0);
 
 	useEffect(() => {
 		const fetchStats = async () => {
 			const { data: bountiesStats } = await NextApiClientService.fetchBountiesStats();
-			console.log('Bounties Stats:', { bountiesStats });
 			const to = new Date();
 			const from = new Date();
 			from.setHours(to.getHours() - 2);
 			const { data: treasuryStats } = await NextApiClientService.getTreasuryStats({ from, to });
 			const tokenPrice = treasuryStats?.[0]?.nativeTokenUsdPrice;
 			setTokenPrice(tokenPrice ? parseFloat(tokenPrice) : 0);
-			const bountyPool = treasuryStats?.[0]?.bounties?.nativeToken ?? '0';
-			console.log('Treasury Stats:', { treasuryStats, bountyPool, tokenPrice });
-			setTotalBountyPool(bountyPool);
 			if (bountiesStats) {
 				setStats(bountiesStats);
 			}
@@ -76,12 +70,12 @@ function BountiesStats() {
 				{[1, 2, 3, 4].map((i) => (
 					<div
 						key={i}
-						className='border-section-light-container dark:border-separatorDark flex items-center gap-4 border-r last:border-0'
+						className='flex items-center gap-4 border-r border-border_grey last:border-0'
 					>
-						<div className='h-12 w-12 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700' />
+						<div className='h-12 w-12 animate-pulse rounded-full bg-primary_border' />
 						<div className='space-y-2'>
-							<div className='h-4 w-20 animate-pulse rounded bg-gray-200 dark:bg-gray-700' />
-							<div className='h-6 w-16 animate-pulse rounded bg-gray-200 dark:bg-gray-700' />
+							<div className='h-4 w-20 animate-pulse rounded bg-primary_border' />
+							<div className='h-6 w-16 animate-pulse rounded bg-primary_border' />
 						</div>
 					</div>
 				))}
@@ -89,11 +83,9 @@ function BountiesStats() {
 		);
 	}
 
-	const formattedBountyPool = totalBountyPool
-		? formatBnBalance(totalBountyPool, { withThousandDelimitor: false, withUnit: true, numberAfterComma: 0, compactNotation: true }, network)
-		: '0';
+	const formattedBountyPool = stats?.totalBountyPool ? formatTokenValue(stats.totalBountyPool, network, tokenPrice, NETWORKS_DETAILS[`${network}`].tokenSymbol) : undefined;
 
-	const formattedTotalRewarded = stats?.totalRewarded ? formatTokenValue(stats.totalRewarded, network, tokenPrice, NETWORKS_DETAILS[`${network}`].tokenSymbol) : '-';
+	const formattedTotalRewarded = stats?.totalRewarded ? formatTokenValue(stats.totalRewarded, network, tokenPrice, NETWORKS_DETAILS[network].tokenSymbol) : '-';
 
 	return (
 		<div className='w-full rounded-xl border border-border_grey bg-bg_modal p-6 shadow-sm'>

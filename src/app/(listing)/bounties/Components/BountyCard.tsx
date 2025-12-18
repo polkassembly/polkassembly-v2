@@ -61,7 +61,7 @@ function BountyCard({ item, className }: Props) {
 			<div className='flex flex-col gap-3'>
 				<div className='flex items-center justify-between border-b border-border_grey pb-3'>
 					<div className='flex items-center gap-2'>
-						<span className='rounded-sm bg-bountycard_index_bg px-1 py-0.5 text-xs font-medium text-wallet_btn_text'>#{index}</span>
+						<span className='rounded-sm bg-poll_option_bg px-1 py-0.5 text-xs font-medium text-wallet_btn_text'>#{index}</span>
 						<StatusTag
 							status={status}
 							className='rounded-sm px-1 py-0.5 text-xs'
