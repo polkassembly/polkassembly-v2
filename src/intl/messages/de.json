@@ -1,4 +1,7 @@
 {
+	"Common": {
+		"loadingMessage": "Governance-Weisheit kommt an 🚀"
+	},
 	"HomePage": {
 		"title": "Willkommen zu Hause"
 	},
@@ -32,10 +35,21 @@
 	},
 	"ActivityFeed": {
 		"title": "Aktivitätsfeed",
-		"switchToOverview": "Zur Übersicht wechseln",
 		"ExploreTab": "Erkunden",
-		"SubscribedTab": "Abonniert",
+		"Following": "Folgen",
+		"description": "Erkunden Sie alle Mitglieder, die zum Polkadot-Ökosystem beitragen.",
 		"About": "Über",
+		"Stats": {
+			"activeProposals": "Aktive Vorschläge",
+			"activeVotes": "Aktive Stimmen",
+			"filterLabel": "Filter",
+			"sortLabel": "Sortieren",
+			"filterAll": "Alle",
+			"filterProposals": "Nur Vorschläge",
+			"filterVotes": "Nur Stimmen",
+			"sortNewest": "Neueste zuerst",
+			"sortOldest": "Älteste zuerst"
+		},
 		"AboutDescription": "Polkadot ist die All-in-One DeFi-Zentrale von Polkadot.",
 		"KnowMore": "Mehr erfahren",
 		"Rank": "Rang",
@@ -57,7 +71,7 @@
 		"unsubscribe": "Entfernen",
 		"please": "Bitte",
 		"login": "Anmelden",
-		"toView": "um Ihre abonnierten Beiträge anzuzeigen",
+		"toView": "um Ihre gefolgten Beiträge anzuzeigen",
 		"Navbar": {
 			"All": "Alle",
 			"Root": "Root",
@@ -399,6 +413,7 @@
 		"delegation": "Delegation",
 		"profile": "Profil",
 		"home": "Startseite",
+		"openGov": "OpenGov",
 		"overview": "Übersicht",
 		"discussions": "Diskussionen",
 		"preimages": "Vorbilder",
@@ -1575,7 +1590,19 @@
 		"fees": "Gebühren",
 		"noJudgementsFound": "Keine Urteile gefunden",
 		"noRegistrarsFound": "Keine Registrars gefunden",
-		"searchByAddressOrName": "Adresse oder Name eingeben, um zu suchen"
+		"searchByAddressOrName": "Adresse oder Name eingeben, um zu suchen",
+		"reasonable": "Angemessen",
+		"knownGood": "Bekannt Gut",
+		"outOfDate": "Veraltet",
+		"lowQuality": "Minderwertig",
+		"erroneous": "Fehlerhaft",
+		"feePaid": "Gebühr bezahlt",
+		"failedToLoadData": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+		"identityColumn": "Identität",
+		"socialsColumn": "Soziale Medien",
+		"typeColumn": "Typ",
+		"judgementsColumn": "Beurteilungen",
+		"actionsColumn": "Aktionen"
 	},
 	"JudgementStatus": {
 		"pending": "Ausstehend",

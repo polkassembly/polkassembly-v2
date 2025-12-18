@@ -4,12 +4,11 @@
 
 .warningAlert {
 	@apply mb-4 border-red-300 bg-red-50;
-
-	:global(.dark) & {
-		@apply border-red-700 bg-red-950;
-	}
-
 	@apply sm:mb-3 sm:p-3;
+}
+
+:global(.dark) .warningAlert {
+	@apply border-red-700 bg-red-950;
 }
 
 .warningDescription {

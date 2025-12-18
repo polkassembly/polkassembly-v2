@@ -6,6 +6,7 @@ import { EProposalType, IGenericListingResponse, IOnChainPostInfo, IPost } from 
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@api/_api-utils/withErrorHandling';
+import { buildCompositeIndex } from '@/_shared/_utils/childBountyUtils';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
@@ -27,6 +28,7 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 
 	const network = await getNetworkFromHeaders();
 
+	// Fetch child bounties for the parent bounty (indexer returns per-parent indices)
 	const onchainChildBountiesInfo: IGenericListingResponse<IOnChainPostInfo> = await OnChainDbService.GetChildBountiesByParentBountyIndex({
 		network,
 		index,
@@ -42,10 +44,14 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }: { para
 	}
 
 	const offChainDataPromises = onchainChildBountiesInfo.items.map(async (onChainInfo: IOnChainPostInfo) => {
-		// get offchain child bounties;
+		// Build composite index for Subsquare API lookup (format: parentBountyIndex_childBountyIndex)
+		// This is required because newer child bounties use per-parent indexing
+		const compositeIndex = buildCompositeIndex(index, onChainInfo.index ?? 0);
+
+		// get offchain child bounties using composite index
 		const offchainPost = await OffChainDbService.GetOffChainPostData({
 			network,
-			indexOrHash: onChainInfo.index?.toString() ?? '',
+			indexOrHash: compositeIndex,
 			proposalType: EProposalType.CHILD_BOUNTY
 		});
 

@@ -7,7 +7,8 @@ import dayjs from 'dayjs';
 import * as logger from 'firebase-functions/logger';
 import { initAlgoliaApi } from './initAlgoliaApi';
 import { markdownToPlainText } from './markdownToText';
-import { IAlgoliaPost } from '../types';
+import { buildCompositeIndex } from './childBountyUtils';
+import { EProposalType, IAlgoliaPost } from '../types';
 import { ALGOLIA_MAX_RECORD_SIZE } from '../constants';
 
 // Interface for the API response containing post details
@@ -75,9 +76,17 @@ export const updatePostAlgolia = async (post?: DocumentData): Promise<void> => {
 	let proposer = '';
 	let origin = '';
 
-	if (post.proposalType && post.index !== undefined && post.network) {
+	// For child bounties, use composite index format in API URL
+	const apiIndexOrHash =
+		post.proposalType === EProposalType.CHILD_BOUNTY && post.compositeIndex
+			? post.compositeIndex
+			: post.proposalType === EProposalType.CHILD_BOUNTY && post.parentBountyIndex !== undefined && post.index !== undefined
+				? buildCompositeIndex(post.parentBountyIndex, post.index)
+				: post.index;
+
+	if (post.proposalType && apiIndexOrHash !== undefined && post.network) {
 		try {
-			const apiUrl = `https://${post.network}.polkassembly.io/api/v2/${post.proposalType}/${post.index}`;
+			const apiUrl = `https://${post.network}.polkassembly.io/api/v2/${post.proposalType}/${apiIndexOrHash}`;
 			const response = await fetch(apiUrl);
 
 			if (response.ok) {

@@ -1,4 +1,7 @@
 {
+	"Common": {
+		"loadingMessage": "ガバナンスの知恵が届きます 🚀"
+	},
 	"HomePage": {
 		"title": "ホームへようこそ"
 	},
@@ -32,10 +35,21 @@
 	},
 	"ActivityFeed": {
 		"title": "アクティビティフィード",
-		"switchToOverview": "概要に切り替え",
 		"ExploreTab": "探索",
-		"SubscribedTab": "購読済み",
+		"Following": "フォロー",
+		"description": "Polkadotエコシステムに貢献しているすべてのメンバーを探索します。",
 		"About": "概要",
+		"Stats": {
+			"activeProposals": "アクティブな提案",
+			"activeVotes": "アクティブな投票",
+			"filterLabel": "フィルター",
+			"sortLabel": "並べ替え",
+			"filterAll": "すべて",
+			"filterProposals": "提案のみ",
+			"filterVotes": "投票のみ",
+			"sortNewest": "新しい順",
+			"sortOldest": "古い順"
+		},
 		"AboutDescription": "Polkadotは、Polkadotのオールインワンのデファイハブです。",
 		"KnowMore": "詳細を見る",
 		"Rank": "ランク",
@@ -57,7 +71,7 @@
 		"unsubscribe": "購読解除",
 		"please": "お願い",
 		"login": "ログイン",
-		"toView": "購読している投稿を表示するには",
+		"toView": "フォローしている投稿を表示するには",
 		"Navbar": {
 			"All": "すべて",
 			"Root": "ルート",
@@ -400,6 +414,7 @@
 		"delegation": "委任",
 		"profile": "プロフィール",
 		"home": "ホーム",
+		"openGov": "OpenGov",
 		"overview": "概要",
 		"discussions": "議論",
 		"preimages": "プレイメージ",
@@ -1576,7 +1591,19 @@
 		"fees": "料金",
 		"noJudgementsFound": "判断が見つかりません",
 		"noRegistrarsFound": "登録者が見つかりません",
-		"searchByAddressOrName": "アドレスまたは名前で検索"
+		"searchByAddressOrName": "アドレスまたは名前で検索",
+		"reasonable": "合理的",
+		"knownGood": "既知の良",
+		"outOfDate": "期限切れ",
+		"lowQuality": "低品質",
+		"erroneous": "誤り",
+		"feePaid": "料金支払済み",
+		"failedToLoadData": "データの読み込みに失敗しました。もう一度お試しください。",
+		"identityColumn": "アイデンティティ",
+		"socialsColumn": "ソーシャル",
+		"typeColumn": "タイプ",
+		"judgementsColumn": "判断",
+		"actionsColumn": "アクション"
 	},
 	"JudgementStatus": {
 		"pending": "保留中",

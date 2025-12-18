@@ -6,6 +6,7 @@
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
 import { fetchWithTimeout } from '@/_shared/_utils/fetchWithTimeout';
 import { getDefaultPostContent } from '@/_shared/_utils/getDefaultPostContent';
+import { getChildBountyIndex } from '@/_shared/_utils/childBountyUtils';
 import { EAllowedCommentor, EDataSource, ENetwork, EProposalType, ICommentResponse, IContentSummary, IOffChainPost, IPostLink, IPostOffChainMetrics } from '@/_shared/types';
 import { getSubstrateAddress } from '@/_shared/_utils/getSubstrateAddress';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
@@ -18,6 +19,19 @@ import { FirestoreService } from '../firestore_service';
 
 export class SubsquareOffChainService {
 	private static GetBaseUrl = (network: ENetwork) => `https://${network}-api.subsquare.io`;
+
+	/**
+	 * Parse index from indexOrHash string, handling child bounty composite format
+	 * For child bounties: "43_162" -> 162
+	 * For other types: "123" -> 123
+	 */
+	private static parseIndex(indexOrHash: string, proposalType: EProposalType): number | undefined {
+		if (proposalType === EProposalType.TIP) return undefined;
+		if (proposalType === EProposalType.CHILD_BOUNTY) {
+			return getChildBountyIndex(indexOrHash);
+		}
+		return Number(indexOrHash);
+	}
 
 	private static postDetailsUrlMap = {
 		[EProposalType.BOUNTY]: (id: string, network: ENetwork) => `${this.GetBaseUrl(network)}/treasury/bounties/${id}`,
@@ -80,7 +94,7 @@ export class SubsquareOffChainService {
 
 			return {
 				id: '',
-				index: proposalType !== EProposalType.TIP ? Number(indexOrHash) : undefined,
+				index: this.parseIndex(indexOrHash, proposalType),
 				hash: proposalType === EProposalType.TIP ? indexOrHash : undefined,
 				title: title || DEFAULT_POST_TITLE,
 				content,

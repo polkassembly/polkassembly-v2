@@ -52,6 +52,7 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { ValidatorService } from '@/_shared/_services/validator_service';
 import { DEFAULT_PROFILE_DETAILS } from '@/_shared/_constants/defaultProfileDetails';
+import { getChildBountyIndex, isCompositeIndex } from '@/_shared/_utils/childBountyUtils';
 import { FirestoreUtils } from './firestoreUtils';
 
 export class FirestoreService extends FirestoreUtils {
@@ -279,19 +280,44 @@ export class FirestoreService extends FirestoreUtils {
 	}
 
 	static async GetOffChainPostData({ network, indexOrHash, proposalType }: { network: ENetwork; indexOrHash: string; proposalType: EProposalType }): Promise<IOffChainPost | null> {
-		let postDocSnapshot = await this.postsCollectionRef()
-			.where('proposalType', '==', proposalType)
-			.where('index', '==', Number(indexOrHash))
-			.where('network', '==', network)
-			.where('isDeleted', '==', false)
-			.limit(1)
-			.get();
+		let postDocSnapshot;
 
-		// if proposal type is tip then index is hash
+		// Handle different index formats based on proposal type
 		if (proposalType === EProposalType.TIP) {
+			// Tips use hash instead of index
 			postDocSnapshot = await this.postsCollectionRef()
 				.where('proposalType', '==', proposalType)
 				.where('hash', '==', indexOrHash)
+				.where('network', '==', network)
+				.where('isDeleted', '==', false)
+				.limit(1)
+				.get();
+		} else if (proposalType === EProposalType.CHILD_BOUNTY && isCompositeIndex(indexOrHash)) {
+			// Child bounties with composite format (e.g., "43_4123") - store as string
+			postDocSnapshot = await this.postsCollectionRef()
+				.where('proposalType', '==', proposalType)
+				.where('compositeIndex', '==', indexOrHash)
+				.where('network', '==', network)
+				.where('isDeleted', '==', false)
+				.limit(1)
+				.get();
+
+			// Fallback: try querying by extracted child index as number
+			if (postDocSnapshot.empty) {
+				const childIndex = getChildBountyIndex(indexOrHash);
+				postDocSnapshot = await this.postsCollectionRef()
+					.where('proposalType', '==', proposalType)
+					.where('index', '==', childIndex)
+					.where('network', '==', network)
+					.where('isDeleted', '==', false)
+					.limit(1)
+					.get();
+			}
+		} else {
+			// Standard numeric index query
+			postDocSnapshot = await this.postsCollectionRef()
+				.where('proposalType', '==', proposalType)
+				.where('index', '==', Number(indexOrHash))
 				.where('network', '==', network)
 				.where('isDeleted', '==', false)
 				.limit(1)
@@ -1335,8 +1361,6 @@ export class FirestoreService extends FirestoreUtils {
 	}): Promise<{ id: string; indexOrHash: string }> {
 		const newPostId = this.postsCollectionRef().doc().id;
 
-		const newIndex = proposalType === EProposalType.TIP ? indexOrHash : (Number(indexOrHash) ?? (await this.GetLatestOffChainPostIndex(network, proposalType)) + 1);
-
 		const newPost: IOffChainPost = {
 			id: newPostId,
 			network,
@@ -1354,14 +1378,27 @@ export class FirestoreService extends FirestoreUtils {
 		if (tags && tags.every((tag) => ValidatorService.isValidTag(tag.value))) newPost.tags = tags;
 		if (topic && ValidatorService.isValidOffChainPostTopic(topic)) newPost.topic = topic;
 
+		let returnIndexOrHash: string;
+
 		if (proposalType === EProposalType.TIP) {
 			newPost.hash = indexOrHash;
+			returnIndexOrHash = indexOrHash || '';
+		} else if (proposalType === EProposalType.CHILD_BOUNTY && indexOrHash && isCompositeIndex(indexOrHash)) {
+			// Child bounties with composite format: store both compositeIndex and numeric index
+			const childIndex = getChildBountyIndex(indexOrHash);
+			newPost.index = childIndex;
+			newPost.compositeIndex = indexOrHash;
+			returnIndexOrHash = indexOrHash;
 		} else {
+			// Standard numeric index
+			const newIndex = Number(indexOrHash) ?? (await this.GetLatestOffChainPostIndex(network, proposalType)) + 1;
 			newPost.index = Number(newIndex);
+			returnIndexOrHash = String(newIndex);
 		}
+
 		await this.postsCollectionRef().doc(newPostId).set(newPost, { merge: true });
 
-		return { id: newPostId, indexOrHash: String(newIndex) };
+		return { id: newPostId, indexOrHash: returnIndexOrHash };
 	}
 
 	static async AddUserActivity(activity: IUserActivity) {
@@ -1723,8 +1760,16 @@ export class FirestoreService extends FirestoreUtils {
 		}
 	}
 
-	static async DeleteOffChainPost({ network, proposalType, index }: { network: ENetwork; proposalType: EProposalType; index: number }) {
-		const post = await this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('index', '==', index).limit(1).get();
+	static async DeleteOffChainPost({ network, proposalType, indexOrHash }: { network: ENetwork; proposalType: EProposalType; indexOrHash: string }) {
+		let post;
+
+		// For child bounties with composite index, query by compositeIndex field
+		if (proposalType === EProposalType.CHILD_BOUNTY && isCompositeIndex(indexOrHash)) {
+			post = await this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('compositeIndex', '==', indexOrHash).limit(1).get();
+		} else {
+			// For other proposals, query by numeric index
+			post = await this.postsCollectionRef().where('network', '==', network).where('proposalType', '==', proposalType).where('index', '==', Number(indexOrHash)).limit(1).get();
+		}
 
 		if (post.docs.length) {
 			await post.docs[0].ref.set({ isDeleted: true, updatedAt: new Date() }, { merge: true });

@@ -3,6 +3,7 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useIsRegistrar } from '@/hooks/useIsRegistrar';
+import LoaderGif from '@/app/_shared-components/LoaderGif/LoaderGif';
 import RegistrarRequestsStats from './RegistrarRequestsStats';
 import RegistrarRequestsTable from './RegistrarRequestsTable';
 
@@ -10,11 +11,7 @@ function RegistrarRequestsView() {
 	const { data: isRegistrar, isLoading } = useIsRegistrar();
 
 	if (isLoading) {
-		return (
-			<div className='flex h-64 items-center justify-center'>
-				<p className='text-basic_text'>Loading...</p>
-			</div>
-		);
+		return <LoaderGif />;
 	}
 
 	if (!isRegistrar) {

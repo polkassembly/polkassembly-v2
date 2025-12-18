@@ -49,6 +49,7 @@ import { encodeAddress } from '@polkadot/util-crypto';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { dayjs } from '@shared/_utils/dayjsInit';
 import { getTrackGroups } from '@/_shared/_constants/trackGroups';
+import { parseCompositeIndex } from '@/_shared/_utils/childBountyUtils';
 // import { getTrackNameFromId } from '@/_shared/_utils/getTrackNameFromId'; // Moved to frontend
 import { SubsquidUtils } from './subsquidUtils';
 import { SubsquidQueries } from './subsquidQueries';
@@ -83,6 +84,26 @@ export class SubsquidService extends SubsquidUtils {
 			fetch: fetchWithTimeout
 		});
 	};
+
+	/**
+	 * Get query and variables for fetching a proposal by index or hash
+	 * Handles child bounty composite index format (e.g., "43_162" -> parentBountyIndex=43, index=162)
+	 */
+	private static getProposalQueryAndVariables(indexOrHash: string, proposalType: EProposalType): { query: string; variables: Record<string, unknown> } {
+		if (proposalType === EProposalType.TIP) {
+			return { query: this.GET_PROPOSAL_BY_HASH_AND_TYPE, variables: { hash_eq: indexOrHash, type_eq: proposalType } };
+		}
+		if (proposalType === EProposalType.CHILD_BOUNTY) {
+			const parsed = parseCompositeIndex(indexOrHash);
+			if (parsed) {
+				return {
+					query: this.GET_CHILD_BOUNTY_BY_PARENT_AND_INDEX,
+					variables: { index_eq: parsed.childBountyIndex, parentBountyIndex_eq: parsed.parentBountyIndex }
+				};
+			}
+		}
+		return { query: this.GET_PROPOSAL_BY_INDEX_AND_TYPE, variables: { index_eq: Number(indexOrHash), type_eq: proposalType } };
+	}
 
 	// Helper method to execute GraphQL queries with retry logic for network failures
 	private static async executeWithRetry<T>(gqlClient: UrqlClient, query: string, variables: Record<string, unknown>, errorContext: string): Promise<T> {
@@ -238,9 +259,7 @@ export class SubsquidService extends SubsquidUtils {
 		proposalType: EProposalType;
 	}): Promise<IOnChainPostInfo | null> {
 		const gqlClient = this.subsquidGqlClient(network);
-
-		const query = proposalType === EProposalType.TIP ? this.GET_PROPOSAL_BY_HASH_AND_TYPE : this.GET_PROPOSAL_BY_INDEX_AND_TYPE;
-		const variables = proposalType === EProposalType.TIP ? { hash_eq: indexOrHash, type_eq: proposalType } : { index_eq: Number(indexOrHash), type_eq: proposalType };
+		const { query, variables } = this.getProposalQueryAndVariables(indexOrHash, proposalType);
 
 		const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
 
@@ -304,7 +323,10 @@ export class SubsquidService extends SubsquidUtils {
 
 		let gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE;
 
-		if (statuses?.length && origins?.length) {
+		// Use child bounty specific queries (order by createdAt for per-parent indexing)
+		if (proposalType === EProposalType.CHILD_BOUNTY) {
+			gqlQuery = statuses?.length ? this.GET_CHILD_BOUNTIES_LISTING_BY_STATUSES : this.GET_CHILD_BOUNTIES_LISTING;
+		} else if (statuses?.length && origins?.length) {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES_AND_ORIGINS;
 		} else if (statuses?.length) {
 			gqlQuery = this.GET_PROPOSALS_LISTING_BY_TYPE_AND_STATUSES;
@@ -431,6 +453,7 @@ export class SubsquidService extends SubsquidUtils {
 				...(proposal.curator && { curator: proposal.curator }),
 				description: proposal.description || '',
 				index: proposal.index ?? 0,
+				...((proposal as { parentBountyIndex?: number }).parentBountyIndex !== undefined && { parentBountyIndex: (proposal as { parentBountyIndex?: number }).parentBountyIndex }),
 				origin: proposal.origin,
 				proposer: proposal.proposer || '',
 				...(proposal.reward && { reward: proposal.reward }),
@@ -903,6 +926,7 @@ export class SubsquidService extends SubsquidUtils {
 				proposer: string;
 				status: EProposalStatus;
 				index: number;
+				parentBountyIndex: number;
 				hash: string;
 				origin: EPostOrigin;
 				description: string;
@@ -914,6 +938,7 @@ export class SubsquidService extends SubsquidUtils {
 				proposer: childBounty.proposer || '',
 				status: childBounty.status,
 				index: childBounty.index,
+				parentBountyIndex: childBounty.parentBountyIndex,
 				hash: childBounty.hash,
 				origin: childBounty.origin,
 				description: childBounty.description || '',

@@ -32,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const zodParamsSchema = z.object({
-	tab: z.nativeEnum(EActivityFeedTab).optional().default(EActivityFeedTab.EXPLORE)
+	tab: z.nativeEnum(EActivityFeedTab).optional().default(EActivityFeedTab.SUBSCRIBED)
 });
 
 export default async function ActivityFeedPage({ searchParams }: { searchParams: Promise<{ activeTab?: string }> }) {
@@ -40,10 +40,23 @@ export default async function ActivityFeedPage({ searchParams }: { searchParams:
 
 	const user = await CookieService.getUserFromCookie();
 
-	const { data, error } =
-		tab === EActivityFeedTab.SUBSCRIBED && user?.id
-			? await NextApiClientService.getSubscribedActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId: user?.id })
-			: await NextApiClientService.fetchActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId: user?.id });
+	let data;
+	let error;
+
+	if (tab === EActivityFeedTab.SUBSCRIBED) {
+		if (user?.id) {
+			const result = await NextApiClientService.getSubscribedActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId: user.id });
+			data = result.data;
+			error = result.error;
+		} else {
+			data = { items: [], totalCount: 0 };
+			error = null;
+		}
+	} else {
+		const result = await NextApiClientService.fetchActivityFeed({ page: 1, limit: DEFAULT_LISTING_LIMIT, userId: user?.id });
+		data = result.data;
+		error = result.error;
+	}
 
 	const { data: treasuryStatsData, error: treasuryStatsError } = await NextApiClientService.getTreasuryStats({
 		from: dayjs().subtract(1, 'hour').toDate(),

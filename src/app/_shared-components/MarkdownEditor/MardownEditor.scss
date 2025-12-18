@@ -91,97 +91,97 @@
 	hr {
 		@apply my-4;
 	}
+}
 
-	/* Custom light theme colors using theme.ts variables */
-	:global(.mdxeditor) {
-		/* Base colors using your theme variables */
-		--accentBase: #fff2f9; /* based on sidebar_menu_active */
-		--accentBgSubtle: #fde7f0; /* sidebar_menu_bg */
-		--accentBg: #fde7f0; /* sidebar_menu_bg */
-		--accentBgHover: #fde7f0; /* sidebar_menu_bg */
-		--accentBgActive: #e5007a; /* bg_pink */
-		--accentLine: #e5007a; /* text_pink */
-		--accentBorder: #e5007a; /* text_pink */
-		--accentBorderHover: #e5007a; /* text_pink */
-		--accentSolid: #e5007a; /* bg_pink */
-		--accentSolidHover: #e5007a; /* bg_pink */
-		--accentText: #e5007a; /* text_pink */
-		--accentTextContrast: #fff; /* btn_primary_text */
+/* Custom light theme colors using theme.ts variables */
+.mdxeditor {
+	/* Base colors using your theme variables */
+	--accentBase: #fff2f9; /* based on sidebar_menu_active */
+	--accentBgSubtle: #fde7f0; /* sidebar_menu_bg */
+	--accentBg: #fde7f0; /* sidebar_menu_bg */
+	--accentBgHover: #fde7f0; /* sidebar_menu_bg */
+	--accentBgActive: #e5007a; /* bg_pink */
+	--accentLine: #e5007a; /* text_pink */
+	--accentBorder: #e5007a; /* text_pink */
+	--accentBorderHover: #e5007a; /* text_pink */
+	--accentSolid: #e5007a; /* bg_pink */
+	--accentSolidHover: #e5007a; /* bg_pink */
+	--accentText: #e5007a; /* text_pink */
+	--accentTextContrast: #fff; /* btn_primary_text */
 
-		/* Gray colors from theme */
-		--baseBase: transparent; /* page_background */
-		--baseBgSubtle: #eff1f3; /* post_btn_bg */
-		--baseBg: #f4f6f8; /* grey_bg */
-		--baseBgHover: #e3e4e4; /* search_bg */
-		--baseBgActive: #d2d8e0; /* primary_border */
-		--baseLine: #ced4de; /* listing_page_border */
-		--baseBorder: #d2d8e0; /* primary_border */
-		--baseBorderHover: #7587a0; /* text_grey */
-		--baseSolid: #485f7d; /* basic_text */
-		--baseSolidHover: #243a57; /* text_primary */
-		--baseText: #243a57; /* text_primary */
-		--baseTextContrast: #243a57; /* text_primary */
-		--basePageBg: #1c1d1f; /* page_background */
-	}
+	/* Gray colors from theme */
+	--baseBase: transparent; /* page_background */
+	--baseBgSubtle: #eff1f3; /* post_btn_bg */
+	--baseBg: #f4f6f8; /* grey_bg */
+	--baseBgHover: #e3e4e4; /* search_bg */
+	--baseBgActive: #d2d8e0; /* primary_border */
+	--baseLine: #ced4de; /* listing_page_border */
+	--baseBorder: #d2d8e0; /* primary_border */
+	--baseBorderHover: #7587a0; /* text_grey */
+	--baseSolid: #485f7d; /* basic_text */
+	--baseSolidHover: #243a57; /* text_primary */
+	--baseText: #243a57; /* text_primary */
+	--baseTextContrast: #243a57; /* text_primary */
+	--basePageBg: #1c1d1f; /* page_background */
+}
 
-	/* Custom dark theme colors using theme.ts variables */
-	:global(.dark-theme) {
-		/* Base colors using your theme variables for dark mode */
-		--accentBase: #540e33; /* sidebar_menu_active */
-		--accentBgSubtle: #540e33; /* sidebar_menu_active */
-		--accentBg: #540e33; /* sidebar_menu_active */
-		--accentBgHover: #540e33; /* sidebar_menu_active */
-		--accentBgActive: #ff45a8; /* sidebar_menu_active_text */
-		--accentLine: #e5007a; /* text_pink */
-		--accentBorder: #ff45a8; /* sidebar_menu_active_text */
-		--accentBorderHover: #ff45a8; /* sidebar_menu_active_text */
-		--accentSolid: #e5007a; /* bg_pink */
-		--accentSolidHover: #ff45a8; /* sidebar_menu_active_text */
-		--accentText: #ff45a8; /* sidebar_menu_active_text */
-		--accentTextContrast: #fff; /* btn_primary_text */
+/* Custom dark theme colors using theme.ts variables */
+.dark-theme {
+	/* Base colors using your theme variables for dark mode */
+	--accentBase: #540e33; /* sidebar_menu_active */
+	--accentBgSubtle: #540e33; /* sidebar_menu_active */
+	--accentBg: #540e33; /* sidebar_menu_active */
+	--accentBgHover: #540e33; /* sidebar_menu_active */
+	--accentBgActive: #ff45a8; /* sidebar_menu_active_text */
+	--accentLine: #e5007a; /* text_pink */
+	--accentBorder: #ff45a8; /* sidebar_menu_active_text */
+	--accentBorderHover: #ff45a8; /* sidebar_menu_active_text */
+	--accentSolid: #e5007a; /* bg_pink */
+	--accentSolidHover: #ff45a8; /* sidebar_menu_active_text */
+	--accentText: #ff45a8; /* sidebar_menu_active_text */
+	--accentTextContrast: #fff; /* btn_primary_text */
 
-		/* Gray colors from theme for dark mode */
-		--baseBase: transparent; /* page_background */
-		--baseBgSubtle: #262626; /* active_proposal_bg */
-		--baseBg: #222222; /* grey_bg */
-		--baseBgHover: #2e2e2e; /* activity_selected_tab */
-		--baseBgActive: #333333; /* primary_border */
-		--baseLine: #4b4b4b; /* listing_page_border */
-		--baseBorder: #3f3f46; /* border_grey */
-		--baseBorderHover: #4b4b4b; /* post_btn_bg */
-		--baseSolid: #909090; /* basic_text */
-		--baseSolidHover: #9e9e9e; /* text_primary */
-		--baseText: #9e9e9e; /* text_primary */
-		--baseTextContrast: #ffffff; /* allowed_commentor_text */
+	/* Gray colors from theme for dark mode */
+	--baseBase: transparent; /* page_background */
+	--baseBgSubtle: #262626; /* active_proposal_bg */
+	--baseBg: #222222; /* grey_bg */
+	--baseBgHover: #2e2e2e; /* activity_selected_tab */
+	--baseBgActive: #333333; /* primary_border */
+	--baseLine: #4b4b4b; /* listing_page_border */
+	--baseBorder: #3f3f46; /* border_grey */
+	--baseBorderHover: #4b4b4b; /* post_btn_bg */
+	--baseSolid: #909090; /* basic_text */
+	--baseSolidHover: #9e9e9e; /* text_primary */
+	--baseText: #9e9e9e; /* text_primary */
+	--baseTextContrast: #ffffff; /* allowed_commentor_text */
 
-		/* Set page background color for dark mode */
-		--basePageBg: #000; /* page_background */
-		color: var(--baseText);
-	}
+	/* Set page background color for dark mode */
+	--basePageBg: #000; /* page_background */
+	color: var(--baseText);
+}
 
-	/* Dialog/popup z-index and colors */
-	:global(.mdxeditor-popup-container) {
-		.popupContainer {
-			z-index: 100;
-			--basePageBg: #1c1d1f;
-		}
-
+/* Dialog/popup z-index and colors */
+.mdxEditorWrapper .mdxeditor-popup-container {
+	.popupContainer {
 		z-index: 100;
-
-		[role='dialog'] {
-			background-color: var(--baseBase);
-			border-color: var(--baseBorder);
-			color: var(--baseText);
-
-			/* Additional dialog styling */
-			border-radius: 8px;
-			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-		}
+		--basePageBg: #1c1d1f;
 	}
 
-	._selectTrigger_uazmk_307 {
-		@apply bg-bg_modal text-wallet_btn_text;
+	z-index: 100;
+
+	[role='dialog'] {
+		background-color: var(--baseBase);
+		border-color: var(--baseBorder);
+		color: var(--baseText);
+
+		/* Additional dialog styling */
+		border-radius: 8px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 	}
+}
+
+.mdxEditorWrapper ._selectTrigger_uazmk_307 {
+	@apply bg-bg_modal text-wallet_btn_text;
 }
 
 .mdxeditor-popup-container {
