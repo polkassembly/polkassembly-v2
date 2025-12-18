@@ -449,7 +449,7 @@ export class NextApiClientService {
 
 			case EApiRoute.FETCH_COMMUNITY_CURATORS:
 			case EApiRoute.FETCH_COMMUNITY_MEMBERS:
-				path = '/community';
+				path = '/people';
 				break;
 
 			case EApiRoute.GET_DV_COHORTS:
