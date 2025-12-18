@@ -20,7 +20,7 @@ enum EOverviewTabs {
 	Discussion = 'discussion'
 }
 
-function LatestActivity({ allTracksData }: { allTracksData: IGenericListingResponse<IPostListing> | null }) {
+function LatestActivity({ allTracksData, isLoading = false }: { allTracksData: IGenericListingResponse<IPostListing> | null; isLoading?: boolean }) {
 	const t = useTranslations('Overview');
 	const network = getCurrentNetwork();
 	const tabsListRef = useRef<HTMLDivElement>(null);
@@ -175,7 +175,7 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 				<TabsContent value={EOverviewTabs.All}>
 					<ActivityList
 						items={allTracksData?.items || []}
-						isFetching={false}
+						isFetching={isLoading}
 						noActivityText={t('noactivity')}
 						viewAllUrl='/all'
 					/>
