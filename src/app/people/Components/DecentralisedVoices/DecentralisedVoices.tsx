@@ -97,7 +97,7 @@ function DecentralisedVoices() {
 				tracks={cohort?.tracks.length || 0}
 			/>
 			<div className='mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 py-5 lg:px-16'>
-				<div className='w-full overflow-hidden rounded-2xl border border-border_grey bg-bg_modal p-4 shadow-md sm:p-5 md:p-6 lg:p-8'>
+				<div className='w-full overflow-hidden rounded-2xl border border-border_grey bg-bg_modal p-4 sm:p-5 md:p-6 lg:p-8'>
 					<div className='flex items-center justify-between gap-3'>
 						<div className='flex items-center gap-2'>
 							<Image

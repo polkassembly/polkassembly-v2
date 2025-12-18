@@ -60,7 +60,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 			open={isOpen}
 			onOpenChange={setIsOpen}
 		>
-			<div className='my-4 w-full max-w-full overflow-hidden rounded-3xl border border-border_grey bg-bg_modal p-4 md:p-6'>
+			<div className='my-4 w-full max-w-full overflow-hidden rounded-2xl border border-border_grey bg-bg_modal p-4 md:p-6'>
 				<div className='mb-2 flex w-full flex-wrap gap-y-4 lg:mb-6 lg:flex-nowrap lg:items-center lg:justify-between lg:gap-4'>
 					<div className='order-1 flex items-center gap-2 lg:order-1'>
 						<div>

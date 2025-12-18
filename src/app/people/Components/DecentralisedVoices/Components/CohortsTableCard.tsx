@@ -42,7 +42,7 @@ function CohortsTableCard() {
 	};
 
 	return (
-		<div className='w-full rounded-2xl border border-border_grey bg-bg_modal p-4 shadow-md sm:p-5 md:rounded-3xl md:p-6'>
+		<div className='w-full rounded-2xl border border-border_grey bg-bg_modal p-4 sm:p-5 md:p-6'>
 			<div className='mb-4 flex items-center gap-2 sm:mb-5 md:mb-6'>
 				<Image
 					src={TimeLineIcon}

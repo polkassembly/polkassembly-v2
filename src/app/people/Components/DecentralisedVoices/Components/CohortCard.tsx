@@ -27,7 +27,7 @@ function CohortCard({ cohort, loading, network }: CohortCardProps) {
 
 	if (loading || !cohort) {
 		return (
-			<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
+			<div className='my-4 w-full rounded-2xl border border-border_grey bg-bg_modal p-6'>
 				<div className='grid grid-cols-1 gap-6 md:grid-cols-4'>
 					{[1, 2, 3, 4].map((i) => (
 						<div
@@ -48,7 +48,7 @@ function CohortCard({ cohort, loading, network }: CohortCardProps) {
 	}
 
 	return (
-		<div className='rounded-xxl my-4 w-full rounded-3xl border border-border_grey bg-bg_modal p-6'>
+		<div className='my-4 w-full rounded-2xl border border-border_grey bg-bg_modal p-6'>
 			<div className='flex flex-wrap items-center justify-between gap-6'>
 				<div className='flex items-start gap-4'>
 					<Image
