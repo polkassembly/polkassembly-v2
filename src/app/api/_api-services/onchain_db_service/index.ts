@@ -24,7 +24,8 @@ import {
 	ITrackAnalyticsStats,
 	IGovAnalyticsStats,
 	IGovAnalyticsReferendumOutcome,
-	IGovAnalyticsDelegationStats
+	IGovAnalyticsDelegationStats,
+	ICuratorStats
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -408,5 +409,9 @@ export class OnChainDbService {
 
 	static async GetTrackLevelAnalyticsStats({ network, trackId }: { network: ENetwork; trackId?: number }): Promise<ITrackAnalyticsStats> {
 		return SubsquidService.GetTrackAnalyticsStats({ network, trackId });
+	}
+
+	static async GetCuratorStats({ network, curatorAddress }: { network: ENetwork; curatorAddress: string }): Promise<ICuratorStats[]> {
+		return SubsquidService.GetBountiesByCurator(network, curatorAddress);
 	}
 }

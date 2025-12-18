@@ -12,6 +12,7 @@ import {
 	EVoteDecision,
 	EVoteSortOptions,
 	IBountyProposal,
+	ICuratorStats,
 	IDelegationStats,
 	IFlattenedConvictionVote,
 	IGenericListingResponse,
@@ -1778,5 +1779,18 @@ export class SubsquidService extends SubsquidUtils {
 		}
 
 		return trackStats;
+	}
+
+	static async GetBountiesByCurator(network: ENetwork, curatorAddress: string): Promise<ICuratorStats[]> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const { data, error } = await gqlClient.query(this.GET_BOUNTIES_BY_CURATOR, { curator_eq: curatorAddress }).toPromise();
+
+		if (error || !data) {
+			console.error(`Error fetching bounties by curator ${curatorAddress}:`, error);
+			return [];
+		}
+
+		return data.bounties || [];
 	}
 }

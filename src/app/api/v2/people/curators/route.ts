@@ -7,7 +7,6 @@ import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeader
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
-import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { z } from 'zod';
 
@@ -43,23 +42,49 @@ export const GET = withErrorHandling(async (req: Request) => {
 	const paginatedAddresses = curatorAddresses.slice(startIndex, endIndex);
 
 	const curatorsPromises = paginatedAddresses.map(async (address) => {
-		const [delegateDetails, publicUser] = await Promise.all([OnChainDbService.GetDelegateDetails({ network, address }), OffChainDbService.GetPublicUserByAddress(address)]);
+		const [publicUser, bountyStats] = await Promise.all([
+			OffChainDbService.GetPublicUserByAddress(address),
+			(async () => {
+				try {
+					const curatorStatsArray = await OnChainDbService.GetCuratorStats({ network, curatorAddress: address });
+
+					if (!curatorStatsArray || curatorStatsArray.length === 0) {
+						return {
+							totalRewarded: '0',
+							activeBounties: 0,
+							childBountyDisbursed: 0,
+							unclaimedAmount: '0',
+							bountiesCurated: 0
+						};
+					}
+
+					return curatorStatsArray[0];
+				} catch (error) {
+					console.error(`Error fetching bounty stats for curator ${address}:`, error);
+					return {
+						totalRewarded: '0',
+						activeBounties: 0,
+						childBountyDisbursed: 0,
+						unclaimedAmount: '0',
+						bountiesCurated: 0
+					};
+				}
+			})()
+		]);
 
 		return {
 			address,
-			sources: [EDelegateSource.INDIVIDUAL],
-			name: publicUser?.username,
-			image: publicUser?.profileDetails?.image,
+			bio: publicUser?.profileDetails?.bio || '',
+			createdAt: publicUser?.createdAt,
+			sociallinks: publicUser?.profileDetails?.publicSocialLinks || [],
 			network,
-			delegators: delegateDetails?.delegators || [],
-			receivedDelegationsCount: delegateDetails?.receivedDelegationsCount || 0,
-			maxDelegated: delegateDetails?.maxDelegated || '0',
-			last30DaysVotedProposalsCount: delegateDetails?.last30DaysVotedProposalsCount || 0,
-			publicUser: publicUser ?? undefined
-		} as IDelegateDetails;
+			curatorStats: bountyStats
+		};
 	});
 
 	const results = await Promise.all(curatorsPromises);
+
+	results.sort((a, b) => (b.curatorStats?.activeBounties || 0) - (a.curatorStats?.activeBounties || 0));
 
 	await RedisService.SetCommunityCurators(network, results, page, limit);
 

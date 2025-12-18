@@ -1085,12 +1085,12 @@ export enum ENotificationStatus {
 }
 
 export interface IBountyStats {
-	availableBountyPool: string;
-	activeBounties: number;
-	peopleEarned: number;
-	totalRewarded: string;
-	totalBountyPool: string;
-	bountyAmount: string;
+	availableBountyPool?: string;
+	activeBounties?: number;
+	peopleEarned?: number;
+	totalRewarded?: string;
+	totalBountyPool?: string;
+	bountyAmount?: string;
 }
 
 export enum EBountyStatus {
@@ -1114,6 +1114,15 @@ export interface IBountyProposal {
 	payee: string;
 	reward: string;
 	statusHistory: Array<{ status: EProposalStatus; timestamp: Date }>;
+}
+
+export interface ICuratorStats {
+	totalRewarded: string;
+	activeBounties: number;
+	childBountyDisbursed: number;
+	unclaimedAmount: string;
+	bountiesCurated: number;
+	signatories?: string[];
 }
 
 // generic types are for insignificant tokens if we decide to add later
@@ -1211,6 +1220,7 @@ export interface IDelegateDetails extends IDelegate {
 	delegators: string[];
 	receivedDelegationsCount: number;
 	last30DaysVotedProposalsCount: number;
+	curatorStats?: ICuratorStats;
 }
 
 export enum EDelegationStatus {
@@ -1830,4 +1840,20 @@ export interface IOGTrackerData {
 export enum ESortOption {
 	NEWEST = 'newest',
 	OLDEST = 'oldest'
+}
+
+export interface IMembersDetails {
+	address: string;
+	achievementBadges: IUserBadgeDetails[];
+	network: ENetwork;
+	bio: string;
+	createdAt?: Date;
+}
+
+export interface ICuratorDetails {
+	address: string;
+	bio: string;
+	createdAt?: Date;
+	network: ENetwork;
+	curatorStats: IBountyStats;
 }

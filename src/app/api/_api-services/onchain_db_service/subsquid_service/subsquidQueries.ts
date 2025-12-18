@@ -1609,4 +1609,22 @@ export class SubsquidQueries {
 			}
 		}
 	`;
+
+	protected static GET_BOUNTIES_BY_CURATOR = `
+		query BountiesByCurator($curator_eq: String!) {
+			bounties: proposals(where: {type_in: [Bounty, ChildBounty], curator_eq: $curator_eq}) {
+				index
+				type
+				curator
+				reward
+				status
+				parentBountyIndex
+				payee
+				statusHistory {
+					status
+					timestamp
+				}
+			}
+		}
+	`;
 }
