@@ -24,10 +24,11 @@ import { FaGithub } from '@react-icons/all-files/fa/FaGithub';
 import { useUser } from '@/hooks/useUser';
 import { isUserBlacklisted } from '@/_shared/_utils/isUserBlacklisted';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
+import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { achievementBadges } from '@/_shared/_constants/achievementBadges';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
-import { ESocial, IDelegateDetails, IOnChainIdentity, EUserBadge, IUserBadgeDetails } from '@/_shared/types';
+import { ESocial, IDelegateDetails, IFollowEntry, IOnChainIdentity, EUserBadge, IUserBadgeDetails } from '@/_shared/types';
 import styles from '../../PeopleCard.module.scss';
 
 const SocialIcons: Partial<Record<ESocial, React.ComponentType<React.SVGProps<SVGSVGElement>>>> = {
@@ -46,6 +47,8 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 	const [isReadMoreVisible, setIsReadMoreVisible] = useState(false);
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
 	const [isFetching, setIsFetching] = useState(true);
+	const [followers, setFollowers] = useState<IFollowEntry[]>(member?.publicUser?.followers || []);
+	const [loading, setLoading] = useState(false);
 
 	const userBadges =
 		member?.publicUser?.profileDetails?.achievementBadges?.reduce(
@@ -56,7 +59,47 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 			{} as Partial<Record<EUserBadge, IUserBadgeDetails>>
 		) || {};
 
-	const isFollowing = member?.publicUser?.following?.some((item) => item.followerUserId === user?.id);
+	const isFollowing = followers.some((item) => item.followerUserId === user?.id);
+
+	useEffect(() => {
+		setFollowers(member?.publicUser?.followers || []);
+	}, [member?.publicUser?.followers]);
+
+	const followUser = async () => {
+		if (!user?.id || !member?.publicUser?.id || user.id === member.publicUser.id) return;
+		setLoading(true);
+		const { data, error } = await UserProfileClientService.followUser({ userId: member.publicUser.id });
+		setLoading(false);
+
+		if (data && !error) {
+			setFollowers((prev) => {
+				if (prev.some((entry) => entry.followerUserId === user.id)) {
+					return prev;
+				}
+				return [
+					...prev,
+					{
+						id: String(member.publicUser!.id),
+						createdAt: new Date(),
+						followerUserId: user.id,
+						followedUserId: member.publicUser!.id as number,
+						updatedAt: new Date()
+					}
+				];
+			});
+		}
+	};
+
+	const unfollowUser = async () => {
+		if (!user?.id || !member?.publicUser?.id || user.id === member.publicUser.id) return;
+		setLoading(true);
+		const { data, error } = await UserProfileClientService.unfollowUser({ userId: member.publicUser.id });
+		setLoading(false);
+
+		if (data && !error) {
+			setFollowers((prev) => prev.filter((entry) => entry.followerUserId !== user.id));
+		}
+	};
 
 	useEffect(() => {
 		const fetchIdentity = async () => {
@@ -105,9 +148,9 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 						size='sm'
 						className='w-full rounded-3xl sm:w-auto'
 						leftIcon={<ShieldPlus />}
-						// isLoading={loading}
-						// onClick={isFollowing ? unfollowUser : followUser}
-						disabled={!user?.id}
+						isLoading={loading}
+						onClick={isFollowing ? unfollowUser : followUser}
+						disabled={!user?.id || loading || user?.id === member?.publicUser?.id}
 					>
 						{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
 					</Button>
@@ -178,7 +221,7 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 					orientation='vertical'
 				/>
 				<div className={styles.memberFollowing}>
-					{t('Profile.followers')}: <span className='font-medium text-text_pink'>{member?.publicUser?.followers?.length || 0}</span>
+					{t('Profile.followers')}: <span className='font-medium text-text_pink'>{followers.length}</span>
 				</div>
 			</div>
 			<div>
