@@ -57,9 +57,9 @@ const apps: AppItem[] = [
 		href: '/gov-analytics'
 	},
 	{
-		icon: '🎥',
-		key: 'AAG',
-		href: '/aag'
+		icon: '🌐',
+		key: 'Offchain',
+		href: '/discussions'
 	},
 	{
 		icon: '🛡',
@@ -85,7 +85,7 @@ export default function AppGrid() {
 	const handleAppClick = (app: AppItem, e: MouseEvent) => {
 		if (app.key === 'Klara') {
 			e.preventDefault();
-			setChatState(EChatState.EXPANDED_SMALL);
+			setChatState(EChatState.EXPANDED);
 		}
 	};
 
