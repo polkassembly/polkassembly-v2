@@ -5,6 +5,73 @@
 	"HomePage": {
 		"title": "ホームへようこそ"
 	},
+	"Apps": {
+		"header": "アプリ",
+		"OpenGov": {
+			"title": "OpenGov",
+			"description": "Polkadotのオンチェーンガバナンスを探索し、参加しましょう。"
+		},
+		"Delegation": {
+			"title": "委任",
+			"description": "信頼できる声に投票を委任し、彼らがあなたをどのように代表しているかを追跡します。"
+		},
+		"Bounties": {
+			"title": "報奨金",
+			"description": "コミュニティ主導の作業に資金を提供し、タスクの進捗状況を追跡します。"
+		},
+		"Identity": {
+			"title": "アイデンティティと判定",
+			"description": "オンチェーンのアイデンティティを確認および管理して、評判と透明性を構築します。"
+		},
+		"People": {
+			"title": "人々",
+			"description": "Polkadotの決定を推進するメンバー、委任者、キュレーター、貢献者を発見します。"
+		},
+		"PoP": {
+			"title": "人間性の証明",
+			"description": "ネットワーク内での独自の存在を認証します — 一人一票を確保します。"
+		},
+		"DelegateX": {
+			"title": "DelegateX",
+			"description": "委任者を比較し、パフォーマンスを確認し、ガバナンスの価値観に合った委任者を見つけます。"
+		},
+		"Klara": {
+			"title": "Klara",
+			"description": "あなたのAIガバナンスアシスタント — 提案、投票、オンチェーンアクティビティについて何でも質問してください。"
+		},
+		"TreasuryAnalytics": {
+			"title": "財務分析",
+			"description": "財務支出、資産、トレンドを追跡して、ネットワーク資金がどのように使用されているかを確認します。"
+		},
+		"Offchain": {
+			"title": "オフチェーン",
+			"description": "意思決定のためのオフチェーンディスカッションや提案に参加します。"
+		},
+		"Create": {
+			"title": "作成",
+			"description": "Polkadotの未来を形作るために、提案、事前イメージ、ディスカッションを提出します。"
+		},
+		"GovAnalytics": {
+			"title": "ガバナンス分析",
+			"description": "リファレンダムの傾向、有権者の行動、ネットワークへの参加を長期的に分析します。"
+		},
+		"AAG": {
+			"title": "AAG",
+			"description": "エコシステムからの主要なガバナンスディスカッションや討論を視聴して再確認します。"
+		},
+		"Polkasafe": {
+			"title": "Polkasafe",
+			"description": "マルチシグウォレットを安全に管理し、ウォレット間の取引を追跡します。"
+		},
+		"Fellowship": {
+			"title": "フェローシップ",
+			"description": "Polkadotフェローシップを探索します — コアプロトコルの進化を推進する専門家の集団。"
+		},
+		"Proxy": {
+			"title": "プロキシ",
+			"description": "プロキシアカウントを管理および割り当てて、あなたに代わって安全にアクションを実行します。"
+		}
+	},
 	"TreasuryStats": {
 		"tooltip": "ブロック生成報酬、取引手数料、罰金、ステーキング効率などの一部から収集された資金。",
 		"treasury": "財務",
@@ -181,7 +248,7 @@
 		"locked": "ロック済み",
 		"on": "日時",
 		"judgements": "判定",
-		"since": "日時",
+		"since": "開始日",
 		"noJudgements": "判定がありません",
 		"judgement": "判定",
 		"Delegations": {
@@ -1087,6 +1154,15 @@
 		"clearIdentityDescription": "アイデンティティをクリアしてもよろしいですか？"
 	},
 	"Overview": {
+		"activeProposals": "アクティブな提案",
+		"totalVotes": "今週の総投票数",
+		"totalSpends": "今週の総支出",
+		"decidingEnds": "決定終了まで",
+		"decisionPeriodEnded": "決定期間が終了しました",
+		"totalSpendsTooltip": "今週の総支出 = 最近7日間、ApprovedまたはExecutedとなったすべてのReferendumV2提案の合計。",
+		"aye": "賛成",
+		"nay": "反対",
+		"viewAllActivity": "すべてのアクティビティを表示",
 		"month": "月",
 		"year": "年",
 		"events": "イベント",
@@ -1123,7 +1199,23 @@
 		"switchToActivityFeed": "アクティビティフィードに切り替え",
 		"topic": "トピック",
 		"creator": "作成者",
-		"viewAll": "すべて表示"
+		"viewAll": "すべて表示",
+		"headingTitle": "Polkassembly アプリハブ",
+		"headingSubtitle": "意思決定、国庫の健全性、および重要なアプリを追跡",
+		"readAnnouncement": "お知らせを読む",
+		"treasuryReportTitle": "Q4 国庫レポート",
+		"treasuryReportDescription": "支出実績とエコシステムの成長を確認"
+	},
+	"JobsAndBounties": {
+		"title": "仕事と報奨金",
+		"jobsTab": "仕事",
+		"bountiesTab": "報奨金",
+		"salary": "給与",
+		"applicants": "応募者",
+		"applyNow": "今すぐ応募",
+		"noJobsFound": "仕事が見つかりませんでした",
+		"posted": "投稿日",
+		"noBountiesFound": "報奨金が見つかりませんでした"
 	},
 	"Bounty": {
 		"availableBountyPool": "利用可能な報奨金プール",
