@@ -1085,12 +1085,12 @@ export enum ENotificationStatus {
 }
 
 export interface IBountyStats {
-	availableBountyPool?: string;
-	activeBounties?: number;
-	peopleEarned?: number;
-	totalRewarded?: string;
-	totalBountyPool?: string;
-	bountyAmount?: string;
+	availableBountyPool: string;
+	activeBounties: number;
+	peopleEarned: number;
+	totalRewarded: string;
+	totalBountyPool: string;
+	bountyAmount: string;
 }
 
 export enum EBountyStatus {
@@ -1114,16 +1114,6 @@ export interface IBountyProposal {
 	payee: string;
 	reward: string;
 	statusHistory: Array<{ status: EProposalStatus; timestamp: Date }>;
-}
-
-export interface ICuratorStats {
-	totalRewarded: string;
-	activeBounties: number;
-	childBountyDisbursed: number;
-	childBountiesCurated: number;
-	unclaimedAmount: string;
-	bountiesCurated: number;
-	signatories?: string[];
 }
 
 // generic types are for insignificant tokens if we decide to add later
@@ -1843,6 +1833,15 @@ export enum ESortOption {
 	OLDEST = 'oldest'
 }
 
+export interface ICuratorStats {
+	totalRewarded: string;
+	activeBounties: number;
+	childBountyDisbursed: number;
+	childBountiesCurated: number;
+	unclaimedAmount: string;
+	bountiesCurated: number;
+	signatories?: string[];
+}
 export interface IMembersDetails {
 	address: string;
 	profileScore: number;
@@ -1860,7 +1859,7 @@ export interface ICuratorDetails {
 	bio: string;
 	network: ENetwork;
 	socialLinks?: IUserSocialDetails[];
-	curatorStats: IBountyStats;
+	curatorStats: ICuratorStats;
 	userId: number | null;
 	profileScore: number | null;
 }
