@@ -1120,6 +1120,7 @@ export interface ICuratorStats {
 	totalRewarded: string;
 	activeBounties: number;
 	childBountyDisbursed: number;
+	childBountiesCurated: number;
 	unclaimedAmount: string;
 	bountiesCurated: number;
 	signatories?: string[];
@@ -1844,16 +1845,22 @@ export enum ESortOption {
 
 export interface IMembersDetails {
 	address: string;
-	achievementBadges: IUserBadgeDetails[];
+	profileScore: number;
+	userId: number;
+	achievementBadges: string[];
 	network: ENetwork;
 	bio: string;
 	createdAt?: Date;
+	socialLinks?: IUserSocialDetails[];
+	source?: EDelegateSource[];
 }
 
 export interface ICuratorDetails {
 	address: string;
 	bio: string;
-	createdAt?: Date;
 	network: ENetwork;
+	socialLinks?: IUserSocialDetails[];
 	curatorStats: IBountyStats;
+	userId: number | null;
+	profileScore: number | null;
 }

@@ -41,12 +41,18 @@ export const GET = withErrorHandling(async (req: Request) => {
 	const membersPromises = users.map(async (user: IPublicUser): Promise<IMembersDetails> => {
 		const address = user.addresses?.[0] || '';
 
+		const delegateInfo = await OffChainDbService.GetPolkassemblyDelegateByAddress({ network, address });
+
 		return {
 			address,
-			achievementBadges: user?.profileDetails?.achievementBadges || [],
+			profileScore: user?.profileScore || 0,
+			achievementBadges: user?.profileDetails?.badges || [],
 			network,
+			userId: user.id,
 			bio: user?.profileDetails?.bio || '',
-			createdAt: user.createdAt
+			createdAt: user.createdAt,
+			socialLinks: user?.profileDetails?.publicSocialLinks || [],
+			source: delegateInfo?.sources || []
 		};
 	});
 

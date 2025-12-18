@@ -9,6 +9,67 @@ import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { z } from 'zod';
+import { ICuratorStats } from '@/_shared/types';
+
+interface IBountyRecord {
+	type?: string;
+	parentBountyIndex?: number | null;
+	status?: string;
+	reward?: string;
+	payee?: string;
+}
+
+const aggregateCuratorStats = (bountiesArray: IBountyRecord[]): ICuratorStats => {
+	const initialStats = {
+		totalRewarded: BigInt(0),
+		activeBounties: 0,
+		childBountyDisbursed: 0,
+		childBountiesCurated: 0,
+		unclaimedAmount: BigInt(0),
+		bountiesCurated: 0,
+		signatories: new Set<string>()
+	};
+
+	const aggregated = bountiesArray.reduce((stats, bounty) => {
+		const isChildBounty = bounty.type === 'ChildBounty' || bounty.parentBountyIndex !== null;
+		const childBountiesCurated = isChildBounty ? stats.childBountiesCurated + 1 : stats.childBountiesCurated;
+		const childBountyDisbursed = isChildBounty && bounty.status === 'Claimed' ? stats.childBountyDisbursed + 1 : stats.childBountyDisbursed;
+		const bountiesCurated = !isChildBounty ? stats.bountiesCurated + 1 : stats.bountiesCurated;
+
+		const isActive = bounty.status === 'Active' || bounty.status === 'CuratorProposed' || bounty.status === 'PendingPayout';
+		const activeBounties = isActive ? stats.activeBounties + 1 : stats.activeBounties;
+
+		const totalRewarded = bounty.status === 'Claimed' && bounty.reward ? stats.totalRewarded + BigInt(bounty.reward) : stats.totalRewarded;
+
+		const hasUnclaimedReward = (bounty.status === 'Active' || bounty.status === 'CuratorProposed') && bounty.reward;
+		const unclaimedAmount = hasUnclaimedReward ? stats.unclaimedAmount + BigInt(bounty.reward || 0) : stats.unclaimedAmount;
+
+		const signatories = new Set(stats.signatories);
+		if (bounty.payee && typeof bounty.payee === 'string') {
+			signatories.add(bounty.payee);
+		}
+
+		return {
+			totalRewarded,
+			activeBounties,
+			childBountyDisbursed,
+			childBountiesCurated,
+			unclaimedAmount,
+			bountiesCurated,
+			signatories
+		};
+	}, initialStats);
+
+	return {
+		totalRewarded: aggregated.totalRewarded.toString(),
+		activeBounties: aggregated.activeBounties,
+		childBountyDisbursed: aggregated.childBountyDisbursed,
+		childBountiesCurated: aggregated.childBountiesCurated,
+		unclaimedAmount: aggregated.unclaimedAmount.toString(),
+		bountiesCurated: aggregated.bountiesCurated,
+		signatories: Array.from(aggregated.signatories)
+	};
+};
 
 export const GET = withErrorHandling(async (req: Request) => {
 	const network = await getNetworkFromHeaders();
@@ -53,20 +114,24 @@ export const GET = withErrorHandling(async (req: Request) => {
 							totalRewarded: '0',
 							activeBounties: 0,
 							childBountyDisbursed: 0,
+							childBountiesCurated: 0,
 							unclaimedAmount: '0',
-							bountiesCurated: 0
+							bountiesCurated: 0,
+							signatories: []
 						};
 					}
 
-					return curatorStatsArray[0];
+					return aggregateCuratorStats(curatorStatsArray as IBountyRecord[]);
 				} catch (error) {
 					console.error(`Error fetching bounty stats for curator ${address}:`, error);
 					return {
 						totalRewarded: '0',
 						activeBounties: 0,
 						childBountyDisbursed: 0,
+						childBountiesCurated: 0,
 						unclaimedAmount: '0',
-						bountiesCurated: 0
+						bountiesCurated: 0,
+						signatories: []
 					};
 				}
 			})()
@@ -75,9 +140,10 @@ export const GET = withErrorHandling(async (req: Request) => {
 		return {
 			address,
 			bio: publicUser?.profileDetails?.bio || '',
-			createdAt: publicUser?.createdAt,
-			sociallinks: publicUser?.profileDetails?.publicSocialLinks || [],
+			socialLinks: publicUser?.profileDetails?.publicSocialLinks || [],
 			network,
+			userId: publicUser?.id || null,
+			profileScore: publicUser?.profileScore || null,
 			curatorStats: bountyStats
 		};
 	});
