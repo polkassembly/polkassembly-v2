@@ -66,6 +66,9 @@ import {
 	IConversationMessage,
 	IDelegateXAccount,
 	IDelegateXVoteData,
+	IActivityStats,
+	IOverviewTreasuryReport,
+	IJob,
 	IOGTrackerData,
 	IConversationTurn,
 	IDVCohort,
@@ -177,7 +180,10 @@ enum EApiRoute {
 	GET_DELEGATE_X_DETAILS = 'GET_DELEGATE_X_DETAILS',
 	GET_DELEGATE_X_VOTE_HISTORY = 'GET_DELEGATE_X_VOTE_HISTORY',
 	GET_OGTRACKER_DATA = 'GET_OGTRACKER_DATA',
-	GET_DV_COHORTS = 'GET_DV_COHORTS'
+	GET_DV_COHORTS = 'GET_DV_COHORTS',
+	GET_OVERVIEW_STATS = 'GET_OVERVIEW_STATS',
+	GET_EXTERNAL_JOBS = 'GET_EXTERNAL_JOBS',
+	GET_TREASURY_REPORT = 'GET_TREASURY_REPORT'
 }
 
 export class NextApiClientService {
@@ -418,7 +424,7 @@ export class NextApiClientService {
 				break;
 
 			case EApiRoute.GET_GOOGLE_SHEET_NEWS:
-				path = '/external/news/google-sheets';
+				path = '/external/news';
 				break;
 
 			case EApiRoute.CREATE_DELEGATE_X_BOT:
@@ -439,6 +445,18 @@ export class NextApiClientService {
 			case EApiRoute.GET_DELEGATE_X_VOTE_HISTORY:
 				path = '/delegate-x/vote-history';
 				method = 'GET';
+				break;
+
+			case EApiRoute.GET_OVERVIEW_STATS:
+				path = '/overview-stats';
+				break;
+
+			case EApiRoute.GET_EXTERNAL_JOBS:
+				path = '/external/jobs';
+				break;
+
+			case EApiRoute.GET_TREASURY_REPORT:
+				path = '/external/treasury-report';
 				break;
 
 			case EApiRoute.GET_OGTRACKER_DATA:
@@ -1295,6 +1313,11 @@ export class NextApiClientService {
 		};
 	}
 
+	static async getOverviewStats() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_OVERVIEW_STATS });
+		return this.nextApiClientFetch<IActivityStats | null>({ url, method });
+	}
+
 	static async getUserPostsByAddress({ address, page, limit }: { address: string; page: number; limit: number }) {
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
@@ -1302,6 +1325,28 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_USER_POSTS_BY_ADDRESS, routeSegments: [address, 'posts'], queryParams });
 		return this.nextApiClientFetch<IUserPosts>({ url, method });
+	}
+
+	static async getExternalJobs({ page = 1, limit = 10, sortBy = 'createdAt' }: { page?: number; limit?: number; sortBy?: string }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString(),
+			sortBy
+		});
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_EXTERNAL_JOBS, queryParams });
+		return this.nextApiClientFetch<{
+			data: {
+				job: {
+					data: IJob[];
+					pagination: {
+						totalJobs: number;
+						totalPages: number;
+						currentPage: number;
+						pageSize: number;
+					};
+				};
+			};
+		}>({ url, method });
 	}
 
 	static async addPollVote({ proposalType, index, pollId, decision }: { proposalType: EProposalType; index: number; pollId: string; decision: string }) {
@@ -1621,6 +1666,11 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_VOTE_HISTORY, queryParams });
 		return this.nextApiClientFetch<{ success: boolean; voteData: IDelegateXVoteData[]; totalCount: number }>({ url, method });
+	}
+
+	static async getTreasuryReport() {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_TREASURY_REPORT });
+		return this.nextApiClientFetch<IOverviewTreasuryReport[]>({ url, method });
 	}
 
 	static async getOGTrackerData({ refNum }: { refNum: string }) {

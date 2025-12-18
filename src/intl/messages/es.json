@@ -285,7 +285,85 @@
 		"userSince": "Usuario desde",
 		"rank": "Rango",
 		"judgements": "Juicios",
-		"since": "Desde",
+		"since": "Desde"
+	},
+	"JobsAndBounties": {
+		"title": "Empleos y Recompensas",
+		"jobsTab": "EMPLEOS",
+		"bountiesTab": "RECOMPENSAS",
+		"salary": "Salario",
+		"applicants": "Solicitantes",
+		"applyNow": "Aplicar Ahora",
+		"noJobsFound": "No se encontraron empleos",
+		"posted": "Publicado",
+		"noBountiesFound": "No se encontraron recompensas"
+	},
+	"Apps": {
+		"header": "Aplicaciones",
+		"OpenGov": {
+			"title": "OpenGov",
+			"description": "Explore y participe en la gobernanza on-chain de Polkadot."
+		},
+		"Delegation": {
+			"title": "Delegación",
+			"description": "Empodere voces de confianza para votar en su nombre y rastree cómo lo representan."
+		},
+		"Bounties": {
+			"title": "Recompensas",
+			"description": "Financie trabajo impulsado por la comunidad y siga el progreso de las tareas."
+		},
+		"Identity": {
+			"title": "Identidad y Juicio",
+			"description": "Verifique y gestione su identidad on-chain para construir reputación y transparencia."
+		},
+		"People": {
+			"title": "Personas",
+			"description": "Descubra miembros, delegados, curadores y contribuyentes que impulsan las decisiones de Polkadot."
+		},
+		"PoP": {
+			"title": "Prueba de Humanidad",
+			"description": "Autentique su presencia única en la red: asegurando una persona, un voto."
+		},
+		"DelegateX": {
+			"title": "DelegateX",
+			"description": "Compare delegados, revise el rendimiento y encuentre al que se alinee con sus valores de gobernanza."
+		},
+		"Klara": {
+			"title": "Klara",
+			"description": "Su asistente de gobernanza con IA: pregunte cualquier cosa sobre propuestas, votos o actividad on-chain."
+		},
+		"TreasuryAnalytics": {
+			"title": "Analítica del Tesoro",
+			"description": "Rastree el gasto del tesoro, activos y tendencias para ver cómo se utilizan los fondos de la red."
+		},
+		"Offchain": {
+			"title": "Offchain",
+			"description": "Participe en discusiones y propuestas off-chain para la toma de decisiones."
+		},
+		"Create": {
+			"title": "Crear",
+			"description": "Envíe propuestas, preimágenes y discusiones para dar forma al futuro de Polkadot."
+		},
+		"GovAnalytics": {
+			"title": "Analítica de Gobernanza",
+			"description": "Analice tendencias de referendos, comportamiento de votantes y participación de la red a lo largo del tiempo."
+		},
+		"AAG": {
+			"title": "AAG",
+			"description": "Mire y revise discusiones y debates clave de gobernanza del ecosistema."
+		},
+		"Polkasafe": {
+			"title": "Polkasafe",
+			"description": "Gestione de forma segura carteras multifirma y rastree transacciones entre sus carteras."
+		},
+		"Fellowship": {
+			"title": "Fellowship",
+			"description": "Explore la Polkadot Fellowship: un colectivo de expertos que avanza en la evolución del protocolo central."
+		},
+		"Proxy": {
+			"title": "Proxy",
+			"description": "Gestione y asigne cuentas proxy para realizar acciones en su nombre de forma segura."
+		},
 		"Settings": {
 			"settings": "Configuraciones",
 			"deleteAccount": "Eliminar cuenta",
@@ -1089,6 +1167,15 @@
 		"clearIdentityDescription": "¿Está seguro de que desea borrar su identidad?"
 	},
 	"Overview": {
+		"activeProposals": "Propuestas Activas",
+		"totalVotes": "Votos totales esta semana",
+		"totalSpends": "Gastos totales esta semana",
+		"decidingEnds": "La decisión termina en",
+		"decisionPeriodEnded": "El periodo de decisión ha terminado",
+		"totalSpendsTooltip": "Gastos totales esta semana = la suma de todos los propuestos de ReferendumV2 que se convirtieron en Aprobados o Ejecutados en los últimos 7 días.",
+		"aye": "A favor",
+		"nay": "En contra",
+		"viewAllActivity": "Ver toda la actividad",
 		"month": "Mes",
 		"year": "Año",
 		"events": "Eventos",
@@ -1125,7 +1212,12 @@
 		"switchToActivityFeed": "Cambiar a feed de actividad",
 		"topic": "Tema",
 		"creator": "Creador",
-		"viewAll": "Ver todo"
+		"viewAll": "Ver todo",
+		"headingTitle": "Centro de Aplicaciones Polkassembly",
+		"headingSubtitle": "Seguimiento de decisiones, salud del tesoro y aplicaciones esenciales",
+		"readAnnouncement": "Leer Anuncio",
+		"treasuryReportTitle": "Informe del Tesoro Q4",
+		"treasuryReportDescription": "Revise el rendimiento del gasto y el crecimiento del ecosistema"
 	},
 	"Bounty": {
 		"availableBountyPool": "Piscina de Prémios Disponibles",

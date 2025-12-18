@@ -49,6 +49,12 @@ export interface ITrackCounts {
 	[trackName: string]: number;
 }
 
+export interface IOverviewTreasuryReport {
+	title: string;
+	description: string;
+	redirectLink: string;
+}
+
 export interface IUserSocialDetails {
 	platform: ESocial;
 	url: string;
@@ -1778,6 +1784,40 @@ export interface IJudgementStats {
 	totalRequestedThisMonth: number;
 	percentageIncreaseFromLastMonth: number;
 	percentageCompletedThisMonth: number;
+}
+
+export interface IActivityStats {
+	activeProposalsCount: number;
+	weeklyVotesCount: number;
+	weeklySpends: { amount: string }[];
+}
+
+interface IJobSalaryRange {
+	min: number;
+	max: number;
+}
+
+export interface IJob {
+	_id: string;
+	title: string;
+	description: string;
+	employment_type: string;
+	work_arrangement: string;
+	salary_type: string;
+	salary_range: IJobSalaryRange;
+	company_name: string;
+	company_website: string;
+	company_description: string;
+	company_location: string;
+	logo: string;
+	category: string;
+	salary_token: string;
+	is_active: boolean;
+	requirements: string;
+	postedByAdmin: boolean;
+	createdAt: string;
+	updatedAt: string;
+	applicantCount: number;
 }
 
 export interface IOGTrackerProposal {

@@ -283,7 +283,74 @@
 		"userSince": "Benutzer seit",
 		"rank": "Rang",
 		"judgements": "Beurteilungen",
-		"since": "Seit",
+		"since": "Seit"
+	},
+	"Apps": {
+		"header": "Apps",
+		"OpenGov": {
+			"title": "OpenGov",
+			"description": "Erkunden Sie und nehmen Sie an der On-Chain-Governance von Polkadot teil."
+		},
+		"Delegation": {
+			"title": "Delegation",
+			"description": "Ermächtigen Sie vertrauenswürdige Stimmen, in Ihrem Namen abzustimmen, und verfolgen Sie deren Repräsentation."
+		},
+		"Bounties": {
+			"title": "Bounties",
+			"description": "Finanzieren Sie Community-getriebene Arbeit und verfolgen Sie den Fortschritt von Aufgaben."
+		},
+		"Identity": {
+			"title": "Identität & Beurteilung",
+			"description": "Verifizieren und verwalten Sie Ihre On-Chain-Identität, um Reputation und Transparenz aufzubauen."
+		},
+		"People": {
+			"title": "Menschen",
+			"description": "Entdecken Sie Mitglieder, Delegierte, Kuratoren und Mitwirkende, die Polkadots Entscheidungen vorantreiben."
+		},
+		"PoP": {
+			"title": "Proof of Personhood",
+			"description": "Authentifizieren Sie Ihre einzigartige Präsenz im Netzwerk – sicherstellen: eine Person, eine Stimme."
+		},
+		"DelegateX": {
+			"title": "DelegateX",
+			"description": "Vergleichen Sie Delegierte, überprüfen Sie die Leistung und finden Sie denjenigen, der mit Ihren Governance-Werten übereinstimmt."
+		},
+		"Klara": {
+			"title": "Klara",
+			"description": "Ihr KI-Governance-Assistent – fragen Sie alles über Vorschläge, Abstimmungen oder On-Chain-Aktivitäten."
+		},
+		"TreasuryAnalytics": {
+			"title": "Treasury Analytics",
+			"description": "Verfolgen Sie Treasury-Ausgaben, Vermögenswerte und Trends, um zu sehen, wie Netzwerkgelder verwendet werden."
+		},
+		"Offchain": {
+			"title": "Offchain",
+			"description": "Beteiligen Sie sich an Off-Chain-Diskussionen und Vorschlägen zur Entscheidungsfindung."
+		},
+		"Create": {
+			"title": "Erstellen",
+			"description": "Reichen Sie Vorschläge, Preimages und Diskussionen ein, um die Zukunft von Polkadot zu gestalten."
+		},
+		"GovAnalytics": {
+			"title": "Governance Analytics",
+			"description": "Analysieren Sie Referendums-Trends, Wählerverhalten und Netzwerkteilnahme im Zeitverlauf."
+		},
+		"AAG": {
+			"title": "AAG",
+			"description": "Sehen Sie sich wichtige Governance-Diskussionen und Debatten aus dem Ökosystem an."
+		},
+		"Polkasafe": {
+			"title": "Polkasafe",
+			"description": "Verwalten Sie Multisig-Wallets sicher und verfolgen Sie Transaktionen über Ihre Wallets hinweg."
+		},
+		"Fellowship": {
+			"title": "Fellowship",
+			"description": "Erkunden Sie das Polkadot Fellowship – ein Kollektiv von Experten, die die Entwicklung des Kernprotokolls vorantreiben."
+		},
+		"Proxy": {
+			"title": "Proxy",
+			"description": "Verwalten und weisen Sie Proxy-Konten zu, um Aktionen sicher in Ihrem Namen durchzuführen."
+		},
 		"Settings": {
 			"settings": "Einstellungen",
 			"deleteAccount": "Konto löschen",
@@ -1126,6 +1193,15 @@
 		"viewAllChildBounties": "Alle anzeigen"
 	},
 	"Overview": {
+		"activeProposals": "Aktive Vorschläge",
+		"totalVotes": "Gesamtstimmen diese Woche",
+		"totalSpends": "Gesamtausgaben diese Woche",
+		"decidingEnds": "Entscheidung endet in",
+		"decisionPeriodEnded": "Entscheidungszeitraum ist beendet",
+		"totalSpendsTooltip": "Gesamtausgaben diese Woche = die Summe aller ReferendumV2-Vorschläge, die sich innerhalb der letzten 7 Tage als genehmigt oder ausgeführt erklärten.",
+		"aye": "Ja",
+		"nay": "Nein",
+		"viewAllActivity": "Alle Aktivitäten anzeigen",
 		"month": "Monat",
 		"year": "Jahr",
 		"events": "Ereignisse",
@@ -1162,7 +1238,23 @@
 		"switchToActivityFeed": "Zum Aktivitätsfeed wechseln",
 		"topic": "Thema",
 		"creator": "Ersteller",
-		"viewAll": "Alle anzeigen"
+		"viewAll": "Alle anzeigen",
+		"headingTitle": "Polkassembly App-Hub",
+		"headingSubtitle": "Verfolgen Sie Entscheidungen, Treasury-Status und wichtige Apps",
+		"readAnnouncement": "Ankündigung lesen",
+		"treasuryReportTitle": "Q4 Treasury-Bericht",
+		"treasuryReportDescription": "Überprüfung der Ausgabenleistung und des Ökosystemwachstums"
+	},
+	"JobsAndBounties": {
+		"title": "Jobs und Bounties",
+		"jobsTab": "JOBS",
+		"bountiesTab": "BOUNTIES",
+		"salary": "Gehalt",
+		"applicants": "Bewerber",
+		"applyNow": "Jetzt bewerben",
+		"noJobsFound": "Keine Jobs gefunden",
+		"posted": "Veröffentlicht",
+		"noBountiesFound": "Keine Bounties gefunden"
 	},
 	"BatchVote": {
 		"batchVoting": "Stapelabstimmung",

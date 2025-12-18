@@ -211,7 +211,9 @@ export const THEME_COLORS = {
 		dv_abstain_color: '#1A5FF9',
 		dv_voting_dialog_abstain_color: '#447EFF',
 		dv_voting_dialog_aye_color: '#009B46',
-		dv_voting_dialog_nay_color: '#F9032F'
+		dv_voting_dialog_nay_color: '#F9032F',
+		treasury_stats_border: '#6A41DD',
+		treasury_token_symbol_border: '#C8CCD1'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -421,6 +423,8 @@ export const THEME_COLORS = {
 		dv_abstain_color: '#1A5FF9',
 		dv_voting_dialog_abstain_color: '#447EFF',
 		dv_voting_dialog_aye_color: '#009B46',
-		dv_voting_dialog_nay_color: '#F9032F'
+		dv_voting_dialog_nay_color: '#F9032F',
+		treasury_stats_border: '#6A41DD',
+		treasury_token_symbol_border: '#C8CCD1'
 	}
 };

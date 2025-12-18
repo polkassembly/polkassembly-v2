@@ -92,6 +92,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 							<PopoverTrigger asChild>
 								<button
 									type='button'
+									aria-label='Sort By'
 									className='flex items-center gap-1 rounded-md border border-border_grey p-1.5'
 								>
 									<MdSort className='text-xl text-wallet_btn_text' />
@@ -124,6 +125,7 @@ function DecentralizedVoicesVotingCard({ votingMatrix, referendumIndices, cohort
 						<CollapsibleTrigger asChild>
 							<button
 								type='button'
+								aria-label={isOpen ? t('Collapse') : t('Expand')}
 								className='transition-transform duration-200'
 								style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
 							>

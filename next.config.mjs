@@ -12,6 +12,7 @@ const withNextIntl = createNextIntlPlugin('./src/intl/intlRequest.ts');
 export const ALLOWED_OUTBOUND_IFRAME_DOMAINS = ['https://app.mimir.global'];
 
 const NETWORKS = ['polkadot', 'kusama'];
+const DOMAINS = ['polkassembly.io', 'polkassembly.network'];
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -40,7 +41,7 @@ const nextConfig = {
 							"object-src 'none'",
 							"base-uri 'self'",
 							"form-action 'self'",
-							"connect-src 'self' https://api.github.com https://*.polkassembly.io https://*.firebaseapp.com https://*.googleapis.com https://sentry.io https://o4504609384013824.ingest.sentry.io wss: https://www.google-analytics.com https://*.algolia.net https://*.algolianet.com https://*.algolia.io https://api.imgbb.com https://www.googletagmanager.com",
+							"connect-src 'self' https://api.github.com https://*.polkassembly.io https://*.polkassembly.network https://*.firebaseapp.com https://*.googleapis.com https://sentry.io https://o4504609384013824.ingest.sentry.io wss: https://www.google-analytics.com https://*.algolia.net https://*.algolianet.com https://*.algolia.io https://api.imgbb.com https://www.googletagmanager.com",
 							`frame-src 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')}`,
 							`frame-ancestors 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')}`,
 							'upgrade-insecure-requests'
@@ -68,17 +69,19 @@ const nextConfig = {
 		const ARCHIVE_ROUTES = ['proposal', 'referendum', 'treasury', 'tip', 'motion', 'tech'];
 
 		const dynamicNetworkRedirects = NETWORKS.flatMap((network) =>
-			ARCHIVE_ROUTES.map((route) => ({
-				source: `/${route}/:id`,
-				has: [
-					{
-						type: 'host',
-						value: `${network}.polkassembly.io`
-					}
-				],
-				destination: `https://${network}-old.polkassembly.io/${route}/:id`,
-				permanent: true
-			}))
+			DOMAINS.flatMap((domain) =>
+				ARCHIVE_ROUTES.map((route) => ({
+					source: `/${route}/:id`,
+					has: [
+						{
+							type: 'host',
+							value: `${network}.${domain}`
+						}
+					],
+					destination: `https://${network}-old.polkassembly.io/${route}/:id`,
+					permanent: true
+				}))
+			)
 		);
 
 		return [
@@ -92,16 +95,18 @@ const nextConfig = {
 		];
 	},
 	async rewrites() {
-		const dynamicNetworkRewrites = NETWORKS.map((network) => ({
-			source: '/api/v1/:path*',
-			has: [
-				{
-					type: 'host',
-					value: `${network}.polkassembly.io`
-				}
-			],
-			destination: `https://${network}-old.polkassembly.io/api/v1/:path*`
-		}));
+		const dynamicNetworkRewrites = NETWORKS.flatMap((network) =>
+			DOMAINS.map((domain) => ({
+				source: '/api/v1/:path*',
+				has: [
+					{
+						type: 'host',
+						value: `${network}.${domain}`
+					}
+				],
+				destination: `https://${network}-old.polkassembly.io/api/v1/:path*`
+			}))
+		);
 
 		return [...dynamicNetworkRewrites];
 	},

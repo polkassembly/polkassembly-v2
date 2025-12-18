@@ -417,4 +417,8 @@ export class OnChainDbService {
 	static async GetVotesForReferendaIndices({ network, indices, voterAddresses }: { network: ENetwork; indices: number[]; voterAddresses: string[] }): Promise<IDVVotes[]> {
 		return SubsquidService.GetVotesForReferendaIndices({ network, indices, voterAddresses });
 	}
+
+	static async GetActivityStats({ network, oneWeekAgo }: { network: ENetwork; oneWeekAgo: string }) {
+		return SubsquidService.GetActivityStatsRaw({ network, oneWeekAgo });
+	}
 }
