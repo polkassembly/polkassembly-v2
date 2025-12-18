@@ -16,11 +16,11 @@ export async function generateMetadata(): Promise<Metadata> {
 	const { title } = OPENGRAPH_METADATA;
 
 	return getGeneratedContentMetadata({
-		title: `${title} - Community`,
+		title: `${title} - People`,
 		description: 'Explore all members contributing to the Polkadot ecosystem.',
 		network,
 		url: `https://${network}.polkassembly.io/people`,
-		imageAlt: 'Polkassembly Community'
+		imageAlt: 'Polkassembly People'
 	});
 }
 
