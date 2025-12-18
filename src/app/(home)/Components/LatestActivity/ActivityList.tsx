@@ -17,7 +17,7 @@ interface IActivityListProps {
 function ActivityList({ items, isFetching, noActivityText, viewAllUrl }: IActivityListProps) {
 	const t = useTranslations('Overview');
 	return (
-		<div className='flex flex-col'>
+		<div className='relative flex flex-col'>
 			{isFetching && <LoadingLayover />}
 			<div className='override_scrollbar flex max-h-[400px] flex-col overflow-y-auto'>
 				{items && items.length > 0 ? (
