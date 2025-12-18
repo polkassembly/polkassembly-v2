@@ -7,7 +7,6 @@ import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
-import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { Tabs, TabsContent } from '@ui/Tabs';
 import { ECommunityRole } from '@/_shared/types';
 import CommunityDelegates from './Components/Delegates/Delegates';
@@ -28,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 async function Community({ searchParams }: { searchParams: Promise<{ tab?: ECommunityRole; page?: string }> }) {
 	const searchParamsValue = await searchParams;
 	const activeTab = searchParamsValue?.tab || ECommunityRole.DELEGATES;
-	const page = parseInt(searchParamsValue?.page || '1', DEFAULT_LISTING_LIMIT);
+	const page = parseInt(searchParamsValue?.page || '1', 10);
 
 	return (
 		<div className='w-full'>

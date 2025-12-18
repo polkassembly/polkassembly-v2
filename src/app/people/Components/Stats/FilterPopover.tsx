@@ -45,7 +45,8 @@ function FilterPopover({ selectedSources, setSelectedSources }: { selectedSource
 						>
 							<Checkbox
 								checked={selectedSources.includes(source)}
-								onCheckedChange={(checked: boolean) => {
+								onCheckedChange={(checked: boolean | 'indeterminate') => {
+									if (checked === 'indeterminate') return;
 									setSelectedSources(checked ? [...selectedSources, source] : selectedSources.filter((s) => s !== source));
 								}}
 							/>

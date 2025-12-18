@@ -39,14 +39,14 @@ function DelegateCard({ delegate, publicUser: publicUserProp, followers: followe
 	const queryClient = useQueryClient();
 
 	useEffect(() => {
-		if (publicUserProp) {
-			setPublicUser(publicUserProp);
+		if (!publicUserProp) {
+			setPublicUser(delegate.publicUser);
 		}
-	}, [publicUserProp]);
+	}, [delegate.address, delegate.publicUser, publicUserProp]);
 
 	useEffect(() => {
 		const fetchPublicUser = async () => {
-			if (!publicUser && !publicUserProp && delegate.address) {
+			if (!publicUserProp && !delegate.publicUser && delegate.address) {
 				const { data, error } = await UserProfileClientService.fetchPublicUserByAddress({ address: delegate.address });
 				if (data && !error) {
 					setPublicUser(data);
@@ -54,7 +54,7 @@ function DelegateCard({ delegate, publicUser: publicUserProp, followers: followe
 			}
 		};
 		fetchPublicUser();
-	}, [publicUser, publicUserProp, delegate.address]);
+	}, [publicUserProp, delegate.address, delegate.publicUser]);
 
 	useEffect(() => {
 		const fetchIdentity = async () => {
@@ -124,10 +124,10 @@ function DelegateCard({ delegate, publicUser: publicUserProp, followers: followe
 			followers: [
 				...(oldData?.followers || []),
 				{
-					id: publicUser?.id || 0,
+					id: String(publicUser?.id || 0),
 					createdAt: new Date(),
 					followerUserId: user.id,
-					followedUserId: publicUser?.id || 0,
+					followedUserId: publicUser.id,
 					updatedAt: new Date()
 				}
 			]

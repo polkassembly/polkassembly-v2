@@ -80,7 +80,7 @@ const renderSourceTag = (sources: EDelegateSource[]) => {
 	const platform = String(sources[0]).toLowerCase();
 	const Logo = logoMap[platform as EDelegateSource];
 	const count = sources.length > 1 ? `+${sources.length - 1}` : null;
-	const label = platform === 'na' ? 'Individual' : platform.charAt(0).toUpperCase() + platform.slice(1);
+	const label = platform === EDelegateSource.INDIVIDUAL ? 'Individual' : platform.charAt(0).toUpperCase() + platform.slice(1);
 
 	return (
 		<div className='flex items-center gap-1'>
