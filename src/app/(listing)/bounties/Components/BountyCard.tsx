@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import { Clock, LinkIcon } from 'lucide-react';
@@ -16,6 +17,8 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { MdMenu } from '@react-icons/all-files/md/MdMenu';
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import ChildBountiesDialog from './ChildBountiesDialog';
 
 interface Props {
 	item: IPostListing;
@@ -24,6 +27,7 @@ interface Props {
 
 function BountyCard({ item, className }: Props) {
 	const network = getCurrentNetwork();
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const { title, index, onChainInfo } = item;
 	const status = onChainInfo?.status;
 	const reward = onChainInfo?.reward;
@@ -37,7 +41,7 @@ function BountyCard({ item, className }: Props) {
 			const { data, error } = await NextApiClientService.fetchChildBountiesApi({
 				bountyIndex: index?.toString() || '',
 				page: '1',
-				limit: '1000'
+				limit: DEFAULT_LISTING_LIMIT.toString()
 			});
 			if (error) throw error;
 			return data;
@@ -136,11 +140,31 @@ function BountyCard({ item, className }: Props) {
 			<div className='mt-4 flex items-center justify-between gap-3'>
 				<span className='flex-1 rounded-md bg-poll_option_bg px-2 py-1 text-xs font-semibold text-text_primary'>Child Bounties: {childBountiesCount}</span>
 				{childBountiesCount > 0 && (
-					<span className='rounded-md border border-border_grey p-1'>
+					<button
+						type='button'
+						onClick={(e) => {
+							e.stopPropagation();
+							setIsDialogOpen(true);
+						}}
+						className='cursor-pointer rounded-md border border-border_grey p-1 transition-colors hover:bg-bg_modal'
+					>
 						<MdMenu className='h-4 w-4 text-wallet_btn_text' />
-					</span>
+					</button>
 				)}
 			</div>
+
+			{/* Child Bounties Dialog */}
+			<ChildBountiesDialog
+				isOpen={isDialogOpen}
+				onClose={() => setIsDialogOpen(false)}
+				bountyIndex={index || 0}
+				bountyTitle={title || 'Untitled Bounty'}
+				bountyReward={reward}
+				bountyStatus={status}
+				bountyCurator={curator}
+				bountyCreatedAt={createdAt}
+				childBountiesCount={childBountiesCount}
+			/>
 		</div>
 	);
 }
