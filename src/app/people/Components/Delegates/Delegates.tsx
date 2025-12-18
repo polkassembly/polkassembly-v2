@@ -43,14 +43,23 @@ function CommunityDelegates({ page }: { page: number }) {
 
 	const fetchAllPublicUsers = async () => {
 		const delegatesNeedingPublicUser = delegates.filter((d) => !d.publicUser && d.address);
-		const results = await Promise.allSettled(delegatesNeedingPublicUser.map((d) => UserProfileClientService.fetchPublicUserByAddress({ address: d.address })));
-
 		const publicUsersMap = new Map();
-		results.forEach((result, index) => {
-			if (result.status === 'fulfilled' && result.value.data) {
-				const { address } = delegatesNeedingPublicUser[index];
-				publicUsersMap.set(address, result.value.data);
-			}
+		const BATCH_SIZE = 10;
+
+		const batches: (typeof delegatesNeedingPublicUser)[] = [];
+		for (let i = 0; i < delegatesNeedingPublicUser.length; i += BATCH_SIZE) {
+			batches.push(delegatesNeedingPublicUser.slice(i, i + BATCH_SIZE));
+		}
+
+		const batchResults = await Promise.all(batches.map((batch) => Promise.allSettled(batch.map((d) => UserProfileClientService.fetchPublicUserByAddress({ address: d.address })))));
+
+		batchResults.forEach((results, batchIndex) => {
+			results.forEach((result, index) => {
+				if (result.status === 'fulfilled' && result.value.data) {
+					const { address } = batches[batchIndex][index];
+					publicUsersMap.set(address, result.value.data);
+				}
+			});
 		});
 
 		return publicUsersMap;
@@ -64,46 +73,66 @@ function CommunityDelegates({ page }: { page: number }) {
 	});
 
 	const allUserIds = delegates.map((d) => d.publicUser?.id || publicUsersMap.get(d.address)?.id).filter((id): id is number => id !== undefined);
+	const uniqueUserIds = Array.from(new Set(allUserIds));
 
 	const fetchAllFollowersAndFollowing = async () => {
-		const [followersResults, followingResults] = await Promise.all([
-			Promise.allSettled(allUserIds.map((userId) => UserProfileClientService.getFollowers({ userId }))),
-			Promise.allSettled(allUserIds.map((userId) => UserProfileClientService.getFollowing({ userId })))
-		]);
-
 		const followersMap = new Map();
 		const followingMap = new Map();
+		const BATCH_SIZE = 10;
 
-		followersResults.forEach((result, index) => {
-			if (result.status === 'fulfilled' && result.value.data) {
-				followersMap.set(allUserIds[index], result.value.data);
-			}
-		});
+		const batches: number[][] = [];
+		for (let i = 0; i < uniqueUserIds.length; i += BATCH_SIZE) {
+			batches.push(uniqueUserIds.slice(i, i + BATCH_SIZE));
+		}
 
-		followingResults.forEach((result, index) => {
-			if (result.status === 'fulfilled' && result.value.data) {
-				followingMap.set(allUserIds[index], result.value.data);
-			}
+		const batchResults = await Promise.all(
+			batches.map((batchIds) =>
+				Promise.all([
+					Promise.allSettled(batchIds.map((userId) => UserProfileClientService.getFollowers({ userId }))),
+					Promise.allSettled(batchIds.map((userId) => UserProfileClientService.getFollowing({ userId })))
+				])
+			)
+		);
+
+		batchResults.forEach(([followersResults, followingResults], batchIndex) => {
+			const batchIds = batches[batchIndex];
+
+			followersResults.forEach((result, index) => {
+				if (result.status === 'fulfilled' && result.value.data) {
+					followersMap.set(batchIds[index], result.value.data);
+				}
+			});
+
+			followingResults.forEach((result, index) => {
+				if (result.status === 'fulfilled' && result.value.data) {
+					followingMap.set(batchIds[index], result.value.data);
+				}
+			});
 		});
 
 		return { followersMap, followingMap };
 	};
 
 	const { data: socialData } = useQuery({
-		queryKey: ['delegatesSocialData', allUserIds.join(',')],
+		queryKey: ['delegatesSocialData', uniqueUserIds.join(',')],
 		queryFn: fetchAllFollowersAndFollowing,
 		staleTime: FIVE_MIN_IN_MILLI,
-		enabled: allUserIds.length > 0
+		enabled: uniqueUserIds.length > 0
 	});
 
 	useEffect(() => {
 		const fetchIdentities = async () => {
 			if (!delegates.length || !identityService) return;
 
-			const addresses = delegates.map((d) => d.address);
-			const identities = await identityService.getIdentities(addresses);
-			const verified = identities.filter((identity) => identity.isVerified).length;
-			setVerifiedCount(verified);
+			try {
+				const addresses = delegates.map((d) => d.address);
+				const identities = await identityService.getIdentities(addresses);
+				const verified = identities.filter((identity) => identity.isVerified).length;
+				setVerifiedCount(verified);
+			} catch (error) {
+				console.error('Error fetching identities:', error);
+				setVerifiedCount(0);
+			}
 		};
 
 		fetchIdentities();

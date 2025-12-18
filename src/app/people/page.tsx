@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 		title: `${title} - Community`,
 		description: 'Explore all members contributing to the Polkadot ecosystem.',
 		network,
-		url: `https://${network}.polkassembly.io/community`,
+		url: `https://${network}.polkassembly.io/people`,
 		imageAlt: 'Polkassembly Community'
 	});
 }

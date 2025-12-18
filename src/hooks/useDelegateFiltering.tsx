@@ -4,7 +4,7 @@
 
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from './useDebounce';
 
 type SortOption = 'MAX_DELEGATED' | 'VOTED_PROPOSALS' | 'DELEGATORS';
@@ -16,7 +16,7 @@ const useDelegateFiltering = (delegates: IDelegateDetails[], page?: number) => {
 	const [currentPage, setCurrentPage] = useState(page || 1);
 	const itemsPerPage = DEFAULT_LISTING_LIMIT;
 
-	useMemo(() => {
+	useEffect(() => {
 		if (page) setCurrentPage(page);
 	}, [page]);
 

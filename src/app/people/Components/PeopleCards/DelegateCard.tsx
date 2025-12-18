@@ -34,49 +34,61 @@ function DelegateCard({ delegate, publicUser: publicUserProp, followers: followe
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
 	const [isIdentityFetching, setIsIdentityFetching] = useState(true);
 
-	const [publicUser, setPublicUser] = useState<IPublicUser | undefined>(publicUserProp || delegate.publicUser);
+	const [fetchedPublicUser, setFetchedPublicUser] = useState<IPublicUser | undefined>(delegate.publicUser);
 
 	const queryClient = useQueryClient();
 
-	useEffect(() => {
-		if (!publicUserProp) {
-			setPublicUser(delegate.publicUser);
-		}
-	}, [delegate.address, delegate.publicUser, publicUserProp]);
+	const publicUser = publicUserProp || fetchedPublicUser || delegate.publicUser;
 
 	useEffect(() => {
 		const fetchPublicUser = async () => {
-			if (!publicUserProp && !delegate.publicUser && delegate.address) {
-				const { data, error } = await UserProfileClientService.fetchPublicUserByAddress({ address: delegate.address });
-				if (data && !error) {
-					setPublicUser(data);
+			if (!publicUserProp && !fetchedPublicUser && delegate.address) {
+				try {
+					const { data, error } = await UserProfileClientService.fetchPublicUserByAddress({ address: delegate.address });
+					if (data && !error) {
+						setFetchedPublicUser(data);
+					}
+				} catch (error) {
+					console.error('Error fetching public user:', error);
 				}
 			}
 		};
 		fetchPublicUser();
-	}, [publicUserProp, delegate.address, delegate.publicUser]);
+	}, [publicUserProp, delegate.address, fetchedPublicUser]);
 
 	useEffect(() => {
+		let isMounted = true;
+
 		const fetchIdentity = async () => {
 			if (!delegate?.address) {
-				setIsIdentityFetching(false);
+				if (isMounted) {
+					setIsIdentityFetching(false);
+				}
 				return;
 			}
 
 			try {
-				setIsIdentityFetching(true);
+				if (isMounted) {
+					setIsIdentityFetching(true);
+				}
 				const identityInfo = await getOnChainIdentity(delegate.address);
-				if (identityInfo) {
+				if (isMounted && identityInfo) {
 					setIdentity(identityInfo);
 				}
 			} catch (error) {
 				console.error('Error fetching identity:', error);
 			} finally {
-				setIsIdentityFetching(false);
+				if (isMounted) {
+					setIsIdentityFetching(false);
+				}
 			}
 		};
 
 		fetchIdentity();
+
+		return () => {
+			isMounted = false;
+		};
 	}, [delegate?.address, getOnChainIdentity]);
 
 	const fetchFollowers = async () => {
@@ -124,7 +136,7 @@ function DelegateCard({ delegate, publicUser: publicUserProp, followers: followe
 			followers: [
 				...(oldData?.followers || []),
 				{
-					id: String(publicUser?.id || 0),
+					id: `temp-${Date.now()}`,
 					createdAt: new Date(),
 					followerUserId: user.id,
 					followedUserId: publicUser.id,

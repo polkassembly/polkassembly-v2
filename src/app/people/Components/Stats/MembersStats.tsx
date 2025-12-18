@@ -4,7 +4,7 @@
 
 'use client';
 
-import { RefObject, useState } from 'react';
+import { RefObject } from 'react';
 import { Separator } from '@/app/_shared-components/Separator';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import Image from 'next/image';
@@ -45,11 +45,6 @@ function MembersStats({
 	const t = useTranslations('Community.Members');
 	const tDelegation = useTranslations('Delegation');
 	const tJudgements = useTranslations('Judgements');
-	const [inputValue, setInputValue] = useState(searchQuery);
-
-	const handleSearch = () => {
-		handleSearchChange(inputValue);
-	};
 
 	return (
 		<div className='flex flex-col gap-4 rounded-lg border border-border_grey bg-bg_modal p-4 md:flex-row md:items-center md:justify-between'>
@@ -92,25 +87,19 @@ function MembersStats({
 					<Input
 						ref={searchInputRef}
 						className='h-9 w-full pr-12 sm:pr-12'
-						value={inputValue}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter') {
-								handleSearch();
-							}
-						}}
-						onChange={(e) => {
-							setInputValue(e.target.value);
-							handleSearchChange(e.target.value);
-						}}
+						value={searchQuery}
+						onChange={(e) => handleSearchChange(e.target.value)}
 						placeholder={tJudgements('searchByAddressOrName')}
 					/>
 					<Button
 						variant='ghost'
 						size='icon'
 						className='absolute right-0 top-0 h-full rounded-l-none border-l border-border_grey px-2 text-2xl text-text_grey'
-						onClick={handleSearch}
+						asChild
 					>
-						<Search />
+						<div>
+							<Search />
+						</div>
 					</Button>
 				</div>
 				<FilterPopover
