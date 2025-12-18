@@ -51,10 +51,8 @@ function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGeneri
 						</Suspense>
 					</div>
 
-					<div className='w-full lg:relative lg:col-span-1'>
-						<div className='w-full lg:absolute lg:inset-0 lg:h-full'>
-							<JobsAndBounties />
-						</div>
+					<div className='w-full lg:col-span-1'>
+						<JobsAndBounties />
 					</div>
 				</div>
 			</div>
