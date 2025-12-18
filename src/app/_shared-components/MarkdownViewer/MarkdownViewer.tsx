@@ -373,7 +373,7 @@ export function MarkdownViewer(props: ReactMarkdownProps) {
 			</div>
 			{truncate &&
 				(showMore ? (
-					<div className='flex justify-start pt-2'>
+					<div className='flex justify-center pt-2'>
 						<span
 							onClick={handleShowLess}
 							className='flex cursor-pointer items-center gap-1 rounded-full bg-page_background px-3 py-1.5 text-sm font-medium text-text_primary'
