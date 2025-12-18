@@ -38,6 +38,7 @@ function DelegateBioAndSocials({ delegate, publicUser }: DelegateBioAndSocialsPr
 					<MarkdownViewer
 						markdown={delegate.manifesto}
 						truncate
+						variant='inline'
 						onShowMore={() => setOpenModal(true)}
 						className='line-clamp-2 text-sm text-text_primary'
 					/>
