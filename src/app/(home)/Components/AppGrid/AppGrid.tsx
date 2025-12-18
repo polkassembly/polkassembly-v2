@@ -2,11 +2,9 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
-import React from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { MouseEvent } from 'react';
 import { useKlara } from '@/hooks/useKlara';
 import { EChatState } from '@/_shared/types';
 
@@ -84,7 +82,7 @@ export default function AppGrid() {
 	const t = useTranslations('Apps');
 	const { setChatState } = useKlara();
 
-	const handleAppClick = (app: AppItem, e: React.MouseEvent) => {
+	const handleAppClick = (app: AppItem, e: MouseEvent) => {
 		if (app.key === 'Klara') {
 			e.preventDefault();
 			setChatState(EChatState.EXPANDED_SMALL);

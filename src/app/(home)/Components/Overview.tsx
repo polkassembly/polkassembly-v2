@@ -12,7 +12,6 @@ import OverviewTreasuryStats from './OverviewTreasuryStats';
 import styles from './Overview.module.scss';
 import TreasuryReportBanner from './TreasuryReportBanner';
 import LatestActivity from './LatestActivity/LatestActivity';
-
 import OverviewHeading from './OverviewHeading';
 import AppGrid from './AppGrid/AppGrid';
 import JobsAndBounties from './JobsAndBounties/JobsAndBounties';
