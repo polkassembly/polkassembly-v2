@@ -25,6 +25,7 @@ import {
 	IGovAnalyticsStats,
 	IGovAnalyticsReferendumOutcome,
 	IGovAnalyticsDelegationStats,
+	ICuratorStats,
 	IDVVotes
 } from '@shared/types';
 
@@ -410,6 +411,10 @@ export class OnChainDbService {
 
 	static async GetTrackLevelAnalyticsStats({ network, trackId }: { network: ENetwork; trackId?: number }): Promise<ITrackAnalyticsStats> {
 		return SubsquidService.GetTrackAnalyticsStats({ network, trackId });
+	}
+
+	static async GetCuratorStats({ network, curatorAddress }: { network: ENetwork; curatorAddress: string }): Promise<ICuratorStats[]> {
+		return SubsquidService.GetBountiesByCurator(network, curatorAddress);
 	}
 
 	static async GetCohortReferenda({ network }: { network: ENetwork }) {

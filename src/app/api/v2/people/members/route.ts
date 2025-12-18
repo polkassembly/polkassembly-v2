@@ -4,22 +4,22 @@
 
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
-import { OnChainDbService } from '@/app/api/_api-services/onchain_db_service';
 import { OffChainDbService } from '@/app/api/_api-services/offchain_db_service';
 import { NextResponse } from 'next/server';
-import { EDelegateSource, IDelegateDetails, IPublicUser } from '@/_shared/types';
+import { IMembersDetails, IPublicUser } from '@/_shared/types';
 import { RedisService } from '@/app/api/_api-services/redis_service';
 import { z } from 'zod';
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 
 export const GET = withErrorHandling(async (req: Request) => {
 	const network = await getNetworkFromHeaders();
 	const { searchParams } = new URL(req.url);
 	const page = Number(searchParams.get('page')) || 1;
-	const limit = Number(searchParams.get('limit')) || 25;
+	const limit = Number(searchParams.get('limit')) || DEFAULT_LISTING_LIMIT;
 
 	const schema = z.object({
 		page: z.number().int().positive(),
-		limit: z.number().int().positive().max(100)
+		limit: z.number().int().positive().max(DEFAULT_LISTING_LIMIT)
 	});
 
 	const validationResult = schema.safeParse({ page, limit });
@@ -38,43 +38,22 @@ export const GET = withErrorHandling(async (req: Request) => {
 		return NextResponse.json({ items: [], totalCount: 0 });
 	}
 
-	const buildBaseMember = (user: IPublicUser, address: string) =>
-		({
-			address,
-			sources: [EDelegateSource.INDIVIDUAL],
-			name: user.username,
-			image: user.profileDetails?.image,
-			network,
-			delegators: [],
-			receivedDelegationsCount: 0,
-			maxDelegated: '0',
-			last30DaysVotedProposalsCount: 0,
-			publicUser: user
-		}) as IDelegateDetails;
-
-	const membersPromises = users.map(async (user: IPublicUser) => {
+	const membersPromises = users.map(async (user: IPublicUser): Promise<IMembersDetails> => {
 		const address = user.addresses?.[0] || '';
-		const baseMember = buildBaseMember(user, address);
 
-		if (!address) {
-			return baseMember;
-		}
+		const delegateInfo = await OffChainDbService.GetPolkassemblyDelegateByAddress({ network, address });
 
-		try {
-			const delegateDetails = await OnChainDbService.GetDelegateDetails({ network, address });
-
-			return {
-				...baseMember,
-				delegators: delegateDetails?.delegators || [],
-				receivedDelegationsCount: delegateDetails?.receivedDelegationsCount || 0,
-				maxDelegated: delegateDetails?.maxDelegated || '0',
-				last30DaysVotedProposalsCount: delegateDetails?.last30DaysVotedProposalsCount || 0
-			};
-		} catch (error) {
-			// If on-chain data fetch fails for a user, fall back to base details instead of failing the entire response
-			console.error(`Failed to fetch delegate details for address ${address}:`, error);
-			return baseMember;
-		}
+		return {
+			address,
+			profileScore: user?.profileScore || 0,
+			achievementBadges: user?.profileDetails?.badges || [],
+			network,
+			userId: user.id,
+			bio: user?.profileDetails?.bio || '',
+			createdAt: user.createdAt,
+			socialLinks: user?.profileDetails?.publicSocialLinks || [],
+			source: delegateInfo?.sources || []
+		};
 	});
 
 	const items = await Promise.all(membersPromises);

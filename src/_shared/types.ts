@@ -1834,6 +1834,37 @@ export enum ESortOption {
 	OLDEST = 'oldest'
 }
 
+export interface ICuratorStats {
+	totalRewarded: string;
+	activeBounties: number;
+	childBountyDisbursed: number;
+	childBountiesCurated: number;
+	unclaimedAmount: string;
+	bountiesCurated: number;
+	signatories?: string[];
+}
+export interface IMembersDetails {
+	address: string;
+	profileScore: number;
+	userId: number;
+	achievementBadges: string[];
+	network: ENetwork;
+	bio: string;
+	createdAt?: Date;
+	socialLinks?: IUserSocialDetails[];
+	source?: EDelegateSource[];
+}
+
+export interface ICuratorDetails {
+	address: string;
+	bio: string;
+	network: ENetwork;
+	socialLinks?: IUserSocialDetails[];
+	curatorStats: ICuratorStats;
+	userId: number | null;
+	profileScore: number | null;
+}
+
 export enum ECommunityRole {
 	MEMBERS = 'members',
 	DELEGATES = 'delegates',

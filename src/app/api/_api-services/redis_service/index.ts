@@ -34,7 +34,9 @@ import {
 	IRawTurnoutData,
 	IGovAnalyticsDelegationStats,
 	IGovAnalyticsCategoryCounts,
-	IUserPosts
+	IUserPosts,
+	IMembersDetails,
+	ICuratorDetails
 } from '@/_shared/types';
 import { ACTIVE_PROPOSAL_STATUSES } from '@/_shared/_constants/activeProposalStatuses';
 import { DEFAULT_POST_TITLE } from '@/_shared/_constants/defaultPostTitle';
@@ -1146,7 +1148,7 @@ export class RedisService {
 		return this.Get({ key: this.redisKeysMap[ERedisKeys.COMMUNITY_CURATORS](network, page, limit) });
 	}
 
-	static async SetCommunityCurators(network: string, details: IDelegateDetails[], page: number, limit: number) {
+	static async SetCommunityCurators(network: string, details: ICuratorDetails[], page: number, limit: number) {
 		if (!network || !IS_CACHE_ENABLED) return;
 		await this.Set({ key: this.redisKeysMap[ERedisKeys.COMMUNITY_CURATORS](network, page, limit), value: JSON.stringify(details) });
 	}
@@ -1156,7 +1158,7 @@ export class RedisService {
 		return this.Get({ key: this.redisKeysMap[ERedisKeys.COMMUNITY_MEMBERS](network, page, limit) });
 	}
 
-	static async SetCommunityMembers(network: string, details: IGenericListingResponse<IDelegateDetails>, page: number, limit: number) {
+	static async SetCommunityMembers(network: string, details: IGenericListingResponse<IMembersDetails>, page: number, limit: number) {
 		if (!network || !IS_CACHE_ENABLED) return;
 		await this.Set({ key: this.redisKeysMap[ERedisKeys.COMMUNITY_MEMBERS](network, page, limit), value: JSON.stringify(details) });
 	}
