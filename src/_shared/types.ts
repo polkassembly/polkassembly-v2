@@ -1755,7 +1755,7 @@ export interface IAAGVideoSummary {
 	publishedAt: string;
 	duration: string;
 	agendaUrl: string;
-	network: string | null;
+	network: ENetwork | null;
 	url: string;
 }
 
