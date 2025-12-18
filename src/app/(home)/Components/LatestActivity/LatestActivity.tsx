@@ -2,46 +2,34 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { EPostOrigin, IGenericListingResponse, IPostListing } from '@/_shared/types';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
 import { useTranslations } from 'next-intl';
-import { useState, useRef } from 'react';
-import Address from '@/app/_shared-components/Profile/Address/Address';
-import { dayjs } from '@/_shared/_utils/dayjsInit';
-import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
+import { useState, useRef, useEffect } from 'react';
 import { parseCamelCase } from '@/app/_client-utils/parseCamelCase';
-import Link from 'next/link';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/_shared-components/DropdownMenu';
-import { BsThreeDots } from '@react-icons/all-files/bs/BsThreeDots';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 import DiscussionsTab from './DiscussionsTab';
 import TrackTabs from './TrackTabs';
+import ActivityList from './ActivityList';
+import ActivityStats from './ActivityStats';
 
 enum EOverviewTabs {
 	All = 'all',
 	Discussion = 'discussion'
 }
 
-const parseTabnameforUrl = (tab: string) => {
-	// Convert camelCase to kebab-case
-	return tab.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
-};
-
-function LatestActivity({ allTracksData }: { allTracksData: IGenericListingResponse<IPostListing> | null }) {
+function LatestActivity({ allTracksData, isLoading = false }: { allTracksData: IGenericListingResponse<IPostListing> | null; isLoading?: boolean }) {
 	const t = useTranslations('Overview');
 	const network = getCurrentNetwork();
 	const tabsListRef = useRef<HTMLDivElement>(null);
-	const TAB_TRIGGER_CLASS = 'text-xm border-b border-b-border_grey font-medium text-text_primary data-[state=active]:border-b-0';
-
-	const ACTIVE_DROPDOWN_ITEM_CLASS = 'bg-sidebar_menu_bg text-text_pink';
-
-	const DATE_FORMAT = "Do MMM 'YY";
+	const TAB_TRIGGER_CLASS =
+		'text-xm px-4 py-1.5 rounded-lg border border-transparent font-medium text-text_primary data-[state=active]:border-pink-500 data-[state=active]:text-pink-600 data-[state=active]:bg-pink-50 dark:data-[state=active]:bg-pink-900/10 mr-2';
 
 	const [selectedTab, setSelectedTab] = useState<string>(EOverviewTabs.All);
+	const [showLeftArrow, setShowLeftArrow] = useState(false);
+	const [showRightArrow, setShowRightArrow] = useState(true);
 	const tracks = NETWORKS_DETAILS[`${network}`]?.trackDetails || {};
 	const trackKeys = Object.keys(tracks);
 
@@ -54,7 +42,7 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 		if (tabElement) {
 			const tabPosition = tabElement.getBoundingClientRect().left;
 			const tabsListPosition = tabsList.getBoundingClientRect().left;
-			const scrollLeft = tabPosition - tabsListPosition + tabsList.scrollLeft - 20; // 20px for some padding
+			const scrollLeft = tabPosition - tabsListPosition + tabsList.scrollLeft - 10;
 
 			tabsList.scrollTo({
 				left: scrollLeft,
@@ -68,48 +56,81 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 		scrollToTab(tabValue);
 	};
 
+	const checkScroll = () => {
+		if (tabsListRef.current) {
+			const { scrollLeft, scrollWidth, clientWidth } = tabsListRef.current;
+			setShowLeftArrow(scrollLeft > 0);
+			setShowRightArrow(Math.ceil(scrollLeft + clientWidth) < scrollWidth);
+		}
+	};
+
+	useEffect(() => {
+		const tabsList = tabsListRef.current;
+		if (tabsList) {
+			tabsList.addEventListener('scroll', checkScroll);
+			checkScroll();
+		}
+		return () => {
+			if (tabsList) {
+				tabsList.removeEventListener('scroll', checkScroll);
+			}
+		};
+	}, []);
+
+	const handleScrollLeft = () => {
+		if (tabsListRef.current) {
+			tabsListRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+		}
+	};
+
+	const handleScrollRight = () => {
+		if (tabsListRef.current) {
+			tabsListRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+		}
+	};
+
 	return (
-		<div className='whitespace-nowrap'>
-			<div className='mb-4 flex items-center justify-between gap-x-2'>
-				<h2 className='text-xl font-semibold tracking-tight text-btn_secondary_text'>{t('latestActivity')}</h2>
-				<Link
-					href={`/${parseTabnameforUrl(selectedTab)}`}
-					className='text-medium text-sm text-text_pink'
-				>
-					{t('viewAll')}
-				</Link>
+		<div className='flex flex-col gap-6 rounded-xl border border-border_grey bg-bg_modal p-6 shadow-sm'>
+			<div className='flex items-center justify-between'>
+				<h2 className='text-xl font-bold text-text_primary'>
+					{t('latestActivity')} <span className='text-wallet_btn_text'>({allTracksData?.totalCount || 0})</span>
+				</h2>
 			</div>
+
+			<ActivityStats />
+
 			<Tabs
 				value={selectedTab}
 				onValueChange={handleTabSelect}
+				className='w-full'
 			>
-				<div className='relative w-full'>
+				<div className='relative mb-4 w-full border-b border-border_grey'>
 					<TabsList
 						ref={tabsListRef}
-						className='hide_scrollbar mb-4 flex w-full justify-start overflow-x-auto pr-5'
+						className='hide_scrollbar flex w-full justify-start overflow-x-auto pb-2'
 					>
 						<TabsTrigger
-							showBorder
 							className={TAB_TRIGGER_CLASS}
 							value={EOverviewTabs.All}
+							showBorder={false}
 							data-value={EOverviewTabs.All}
 						>
 							{t('all')} <span className='ml-1 text-xs'>({allTracksData?.totalCount || 0})</span>
 						</TabsTrigger>
 						<TabsTrigger
-							showBorder
 							className={TAB_TRIGGER_CLASS}
 							value={EOverviewTabs.Discussion}
 							data-value={EOverviewTabs.Discussion}
+							showBorder={false}
 						>
 							{t('discussion')}
 						</TabsTrigger>
 						{trackKeys.map((key) => (
 							<TabsTrigger
-								showBorder
 								className={TAB_TRIGGER_CLASS}
 								value={key}
 								key={key}
+								showBorder={false}
 								data-value={key}
 							>
 								{parseCamelCase(key)}
@@ -117,98 +138,53 @@ function LatestActivity({ allTracksData }: { allTracksData: IGenericListingRespo
 						))}
 						<div className='invisible w-12 flex-shrink-0' />
 					</TabsList>
-					<div className='pointer-events-none absolute right-10 top-0 z-10 h-full w-16 shadow-[inset_-8px_0_10px_-4px_rgba(0,0,0,0.1)]' />
-					<div className='absolute right-0 top-0 z-20 flex h-full items-center'>
-						<div className='mr-2 h-[60%] w-[1px] bg-border_grey bg-opacity-50' />
-						<DropdownMenu>
-							<DropdownMenuTrigger
-								noArrow
-								className='flex h-10 w-10 items-center justify-center border-none bg-bg_modal text-text_primary'
-							>
-								<BsThreeDots className='h-5 w-5 text-text_pink' />
-							</DropdownMenuTrigger>
-							<DropdownMenuContent className='w-48'>
-								<DropdownMenuItem
-									className={selectedTab === EOverviewTabs.All ? ACTIVE_DROPDOWN_ITEM_CLASS : ''}
-									onClick={() => handleTabSelect(EOverviewTabs.All)}
+
+					{showLeftArrow && (
+						<>
+							<div className='pointer-events-none absolute left-0 top-0 z-10 h-full w-16 bg-gradient-to-r from-bg_modal' />
+							<div className='absolute left-0 top-0 z-20 flex h-full items-start pt-1'>
+								<button
+									type='button'
+									onClick={handleScrollLeft}
+									aria-label='Scroll tabs left'
+									className='flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-bg_modal hover:bg-bg_modal/80'
 								>
-									{t('all')}
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									className={selectedTab === EOverviewTabs.Discussion ? ACTIVE_DROPDOWN_ITEM_CLASS : ''}
-									onClick={() => handleTabSelect(EOverviewTabs.Discussion)}
+									<ChevronLeft className='h-5 w-5 text-wallet_btn_text' />
+								</button>
+							</div>
+						</>
+					)}
+
+					{showRightArrow && (
+						<>
+							<div className='pointer-events-none absolute right-8 top-0 z-10 h-full w-16 bg-gradient-to-l from-bg_modal' />
+							<div className='absolute right-0 top-0 z-20 flex h-full items-start pt-1'>
+								<button
+									type='button'
+									onClick={handleScrollRight}
+									aria-label='Scroll tabs right'
+									className='flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-bg_modal hover:bg-gray-100 dark:hover:bg-gray-800'
 								>
-									{t('discussion')}
-								</DropdownMenuItem>
-								{trackKeys.map((key) => (
-									<DropdownMenuItem
-										key={key}
-										onClick={() => handleTabSelect(key)}
-										className={selectedTab === key ? ACTIVE_DROPDOWN_ITEM_CLASS : ''}
-									>
-										{parseCamelCase(key)}
-									</DropdownMenuItem>
-								))}
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</div>
+									<ChevronRight className='h-5 w-5 text-wallet_btn_text' />
+								</button>
+							</div>
+						</>
+					)}
 				</div>
-				{/* "All" Tab */}
+
 				<TabsContent value={EOverviewTabs.All}>
-					<Table className='text_text_primary text-sm'>
-						<TableHeader>
-							<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
-								<TableHead className='py-4'>#</TableHead>
-								<TableHead className='py-4'>{t('title')}</TableHead>
-								<TableHead className='py-4'>{t('postedBy')}</TableHead>
-								<TableHead className='py-4'>{t('created')}</TableHead>
-								<TableHead className='py-4'>{t('origin')}</TableHead>
-								<TableHead className='py-4 text-right'>{t('status')}</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{allTracksData?.items && allTracksData.items.length > 0 ? (
-								allTracksData.items.map((row) => (
-									<Link
-										href={`/referenda/${row.index}`}
-										key={row.index}
-										className='contents'
-									>
-										<TableRow key={row.index}>
-											<TableCell className='py-4'>{row.index}</TableCell>
-											<TableCell className='max-w-[300px] truncate py-4'>{row.title}</TableCell>
-											<TableCell className='truncate py-4'>{row.onChainInfo?.proposer && <Address address={row.onChainInfo.proposer} />}</TableCell>
-											<TableCell className='py-4'>{row.onChainInfo?.createdAt && dayjs(row.onChainInfo.createdAt).format(DATE_FORMAT)}</TableCell>
-											<TableCell className='py-4'>{row.onChainInfo?.origin && parseCamelCase(row.onChainInfo?.origin)}</TableCell>
-											<TableCell className='flex justify-end py-4'>
-												<StatusTag
-													className='w-max'
-													status={row.onChainInfo?.status}
-												/>
-											</TableCell>
-										</TableRow>
-									</Link>
-								))
-							) : (
-								<TableRow>
-									<TableCell
-										colSpan={6}
-										className='text-center'
-									>
-										{t('noactivity')}
-									</TableCell>
-								</TableRow>
-							)}
-						</TableBody>
-					</Table>
+					<ActivityList
+						items={allTracksData?.items || []}
+						isFetching={isLoading}
+						noActivityText={t('noactivity')}
+						viewAllUrl='/all'
+					/>
 				</TabsContent>
 
-				{/* "Discussion" Tab */}
 				<TabsContent value={EOverviewTabs.Discussion}>
 					<DiscussionsTab />
 				</TabsContent>
 
-				{/* Individual Track Tabs */}
 				{Object.keys(tracks).map((track) => (
 					<TabsContent
 						key={track}

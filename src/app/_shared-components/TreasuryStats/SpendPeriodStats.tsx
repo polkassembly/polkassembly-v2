@@ -1,7 +1,6 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { dayjs } from '@/_shared/_utils/dayjsInit';
 import { TREASURY_NETWORK_CONFIG } from '@/_shared/_constants/treasury';
@@ -9,10 +8,10 @@ import { useMemo } from 'react';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { getTimeRemaining } from '@/app/_client-utils/getTimeRemaining';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
-import { BN, BN_ZERO } from '@polkadot/util';
+import { BN } from '@polkadot/util';
 import { BlockCalculationsService } from '@/app/_client-services/block_calculations_service';
-import styles from './TreasuryStats.module.scss';
-import { Progress } from '../Progress/Progress';
+import { cn } from '@/lib/utils';
+import { AiFillQuestionCircle } from '@react-icons/all-files/ai/AiFillQuestionCircle';
 import { Tooltip, TooltipTrigger, TooltipContent } from '../Tooltip';
 import { Separator } from '../Separator';
 
@@ -44,65 +43,89 @@ function SpendPeriodStats({ nextSpendAt, nextBurn }: { nextSpendAt?: Date; nextB
 	const spendPeriodProgress = calculateSpendPeriodProgress(nextSpendAt || null, spendPeriodInDays);
 
 	return (
-		<div className={styles.treasuryStatsContainer}>
-			<div className='flex items-center gap-1'>
-				<h2 className='text-sm font-normal text-muted-foreground'>{t('TreasuryStats.spendPeriodRemaining')}</h2>
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<Info className='text-text-grey h-4 w-5' />
-					</TooltipTrigger>
-					<TooltipContent className='w-40 break-words bg-tooltip_background p-2 text-white'>
-						<p>{t('TreasuryStats.spendPeriodTooltip')}</p>
-					</TooltipContent>
-				</Tooltip>
-			</div>
-			<div className='mt-2 flex flex-col gap-2'>
-				<div className='flex items-center gap-2'>
-					<span className='flex items-center gap-1 text-base font-semibold text-muted-foreground'>
-						{spendPeriodRemaining === 'N/A' ? (
-							<span className='text-sm font-normal'>N/A</span>
-						) : (
-							<span className='text-sm font-normal'>
-								{spendPeriodRemaining?.days ? (
-									<>
-										<span className='text-base font-semibold dark:text-white sm:text-lg'>{spendPeriodRemaining?.days}&nbsp;</span>
-										<span className='text-lightBlue dark:text-blue-dark-medium text-xs'>days&nbsp;</span>
-									</>
-								) : null}
-								<span className='text-base font-semibold dark:text-white sm:text-lg'>{spendPeriodRemaining?.hours}&nbsp;</span>
-								<span className='text-xs'>hrs&nbsp;</span>
-								{!spendPeriodRemaining?.days && spendPeriodRemaining?.minutes ? (
-									<>
-										<span className='text-base font-semibold dark:text-white sm:text-lg'>{spendPeriodRemaining?.minutes}&nbsp;</span>
-										<span className='text-xs'>mins&nbsp;</span>
-									</>
-								) : null}
-								/ {spendPeriodInDays} {t('TreasuryStats.days')}
-							</span>
-						)}
-					</span>
+		<div>
+			<div className='flex w-full flex-col gap-2 lg:flex-row lg:items-center lg:justify-between'>
+				<div className='flex flex-1 flex-col justify-between gap-y-2'>
+					<div className='flex items-center gap-1'>
+						<h2 className='text-sm font-semibold text-text_primary'>{t('TreasuryStats.spendPeriodRemaining')}</h2>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<AiFillQuestionCircle className='h-4 w-5 text-question_icon_color' />
+							</TooltipTrigger>
+							<TooltipContent className='w-40 break-words bg-tooltip_background p-2 text-btn_primary_text'>
+								<p>{t('TreasuryStats.spendPeriodTooltip')}</p>
+							</TooltipContent>
+						</Tooltip>
+					</div>
+
+					<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3'>
+						<div className='flex h-5 items-center gap-[2px]'>
+							{Array.from({ length: 40 }, (_, i) => i).map((i) => {
+								const isActive = i < (spendPeriodProgress / 100) * 40;
+								return (
+									<div
+										key={i}
+										className={cn('h-3 w-1 rounded-[1px]', isActive ? 'bg-text_pink' : 'bg-empty_bar_bg')}
+									/>
+								);
+							})}
+						</div>
+						<span className='break-words text-xs text-text_primary'>
+							{spendPeriodRemaining === 'N/A' ? (
+								'N/A'
+							) : (
+								<span className='font-semibold'>
+									{spendPeriodRemaining?.days && spendPeriodRemaining?.days > 0 ? (
+										<>
+											{spendPeriodRemaining?.days} {t('TreasuryStats.days')}{' '}
+										</>
+									) : (
+										''
+									)}
+									{spendPeriodRemaining?.hours && spendPeriodRemaining?.hours > 0 ? (
+										<>
+											{spendPeriodRemaining?.hours} {t('TreasuryStats.hours')}{' '}
+										</>
+									) : (
+										''
+									)}
+									{!spendPeriodRemaining?.days && !spendPeriodRemaining?.hours && spendPeriodRemaining?.minutes && spendPeriodRemaining?.minutes > 0 ? (
+										<>
+											{spendPeriodRemaining?.minutes} {t('TreasuryStats.minutes')}
+										</>
+									) : null}
+									<span className='mx-1 font-normal text-wallet_btn_text'>/</span>
+									<span className='font-normal text-wallet_btn_text'>
+										{spendPeriodInDays} {t('TreasuryStats.days')}
+									</span>
+								</span>
+							)}
+						</span>
+					</div>
 				</div>
-				<div className='flex w-full items-center gap-2'>
-					<Progress
-						value={spendPeriodProgress}
-						className='h-1.5 bg-progress_pink_indicator'
-						indicatorClassName='bg-bg_pink'
-					/>
-					<span className='text-xs font-semibold'>{spendPeriodProgress.toFixed(1)}%</span>
+
+				<Separator
+					orientation='vertical'
+					className='hidden h-16 w-[1px] lg:block'
+				/>
+				<div className='flex flex-col gap-y-1 lg:items-end'>
+					<div className='flex items-center'>
+						<h2 className='whitespace-nowrap text-sm font-semibold text-text_primary'>{t('TreasuryStats.nextBurn')}</h2>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<AiFillQuestionCircle className='h-4 w-5 text-question_icon_color' />
+							</TooltipTrigger>
+							<TooltipContent className='w-40 break-words bg-tooltip_background p-2 text-btn_primary_text'>
+								<p>{t('TreasuryStats.nextBurnTooltip')}</p>
+							</TooltipContent>
+						</Tooltip>
+					</div>
+					<div>
+						<span className='text-lg font-medium text-text_primary'>
+							{nextBurn ? formatBnBalance(nextBurn, { withUnit: true, numberAfterComma: 0, compactNotation: true }, network) : 'N/A'}
+						</span>
+					</div>
 				</div>
-			</div>
-			<Separator
-				orientation='horizontal'
-				className='mt-4 w-full'
-			/>
-			<div className='mt-2 flex gap-2'>
-				<div className='w-[300px] flex-col items-center gap-2'>
-					<h2 className='text-sm font-normal text-muted-foreground'>{t('TreasuryStats.nextBurn')}</h2>
-					<span className='text-base font-bold dark:text-white'>
-						{formatBnBalance(nextBurn || BN_ZERO, { withUnit: true, numberAfterComma: 2, compactNotation: true }, network)}
-					</span>
-				</div>
-				<div className='break-words rounded-md bg-bg_code p-1 text-xs font-medium'>{t('TreasuryStats.nextBurnTooltip')}</div>
 			</div>
 		</div>
 	);
