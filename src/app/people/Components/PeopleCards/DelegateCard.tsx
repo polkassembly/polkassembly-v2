@@ -34,27 +34,9 @@ function DelegateCard({ delegate, publicUser: publicUserProp, followers: followe
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
 	const [isIdentityFetching, setIsIdentityFetching] = useState(true);
 
-	const [fetchedPublicUser, setFetchedPublicUser] = useState<IPublicUser | undefined>(delegate.publicUser);
-
 	const queryClient = useQueryClient();
 
-	const publicUser = publicUserProp || fetchedPublicUser || delegate.publicUser;
-
-	useEffect(() => {
-		const fetchPublicUser = async () => {
-			if (!publicUserProp && !fetchedPublicUser && delegate.address) {
-				try {
-					const { data, error } = await UserProfileClientService.fetchPublicUserByAddress({ address: delegate.address });
-					if (data && !error) {
-						setFetchedPublicUser(data);
-					}
-				} catch (error) {
-					console.error('Error fetching public user:', error);
-				}
-			}
-		};
-		fetchPublicUser();
-	}, [publicUserProp, delegate.address, fetchedPublicUser]);
+	const publicUser = publicUserProp || delegate.publicUser;
 
 	useEffect(() => {
 		let isMounted = true;
