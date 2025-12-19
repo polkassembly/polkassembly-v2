@@ -6,3 +6,4 @@ export const DEFAULT_LISTING_LIMIT = 10;
 export const MAX_LISTING_LIMIT = 100;
 export const STALE_TIME = 5 * 60; // 5 minutes
 export const PREIMAGES_LISTING_LIMIT = 25;
+export const BOUNTY_GRID_LISTING_LIMIT = 9;

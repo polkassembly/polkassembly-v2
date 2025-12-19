@@ -9,7 +9,6 @@ import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import { Users, Clock } from 'lucide-react';
 import dayjs from 'dayjs';
-import { BN, BN_ZERO } from '@polkadot/util';
 import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
@@ -20,7 +19,7 @@ import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import { IPostListing, EProposalStatus } from '@/_shared/types';
-import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 
@@ -34,6 +33,8 @@ interface ChildBountiesDialogProps {
 	bountyCurator?: string;
 	bountyCreatedAt?: Date;
 	childBountiesCount?: number;
+	claimedAmount?: string;
+	progressPercentage?: number;
 }
 
 function ChildBountiesDialog({
@@ -45,7 +46,9 @@ function ChildBountiesDialog({
 	bountyStatus,
 	bountyCurator,
 	bountyCreatedAt,
-	childBountiesCount
+	childBountiesCount,
+	claimedAmount: claimedAmountProp,
+	progressPercentage: progressPercentageProp
 }: ChildBountiesDialogProps) {
 	const network = getCurrentNetwork();
 	const [currentPage, setCurrentPage] = useState(1);
@@ -65,31 +68,11 @@ function ChildBountiesDialog({
 		enabled: isOpen && !!bountyIndex
 	});
 
-	const { data: allChildBounties } = useQuery({
-		queryKey: ['allChildBounties', bountyIndex],
-		queryFn: async () => {
-			const { data, error } = await NextApiClientService.fetchChildBountiesApi({
-				bountyIndex: bountyIndex.toString(),
-				page: '1',
-				limit: MAX_LISTING_LIMIT.toString()
-			});
-			if (error) throw error;
-			return data;
-		},
-		enabled: isOpen && !!bountyIndex
-	});
-
-	const claimedBounties = allChildBounties?.items.filter((cb) => cb.onChainInfo?.status === 'Claimed') || [];
-	const claimedAmount = claimedBounties.reduce((sum, cb) => sum.add(new BN(cb.onChainInfo?.reward || '0')), BN_ZERO);
-	const totalReward = new BN(bountyReward || '0');
-	const progressPercentage = totalReward.gt(BN_ZERO) && claimedAmount.gt(BN_ZERO) ? Math.min(claimedAmount.muln(100).div(totalReward).toNumber(), 100) : 0;
-
 	const formattedReward = bountyReward
 		? formatBnBalance(bountyReward.toString(), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 0, compactNotation: true }, network)
 		: '0';
-	const formattedClaimedAmount = claimedAmount.gt(BN_ZERO)
-		? formatBnBalance(claimedAmount.toString(), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 0, compactNotation: true }, network)
-		: '0';
+	const formattedClaimedAmount = claimedAmountProp || '0';
+	const progressPercentage = progressPercentageProp || 0;
 
 	return (
 		<Dialog

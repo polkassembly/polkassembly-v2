@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { EBountyStatus, EProposalStatus, EProposalStep, EProposalType, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
@@ -20,6 +20,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
 import { useQuery } from '@tanstack/react-query';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import { useDebounce } from '@/hooks/useDebounce';
 import BountiesStats from './BountiesStats';
 import BountiesGrid from './BountiesGrid';
 
@@ -50,7 +51,7 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 	const t = useTranslations();
 	const statusValues = Object.values(EBountyStatus);
 	const { user } = useUser();
-	const [searchQuery, setSearchQuery] = useState('');
+	const { value: searchQuery, debouncedValue: debouncedSearchQuery, setValue: setSearchQuery } = useDebounce('', 300);
 
 	const { data: allBounties } = useQuery({
 		queryKey: ['allBounties', status],
@@ -64,18 +65,18 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 			});
 			return data;
 		},
-		enabled: !!searchQuery.trim()
+		enabled: !!debouncedSearchQuery.trim()
 	});
 
 	const filteredData = useMemo(() => {
-		if (!searchQuery.trim()) {
+		if (!debouncedSearchQuery.trim()) {
 			return initialData;
 		}
 
 		const dataToFilter = allBounties || initialData;
 		const filtered = dataToFilter.items.filter((bounty) => {
-			const titleMatch = bounty.title?.toLowerCase().includes(searchQuery.toLowerCase());
-			const curatorMatch = bounty.onChainInfo?.curator?.toLowerCase().includes(searchQuery.toLowerCase());
+			const titleMatch = bounty.title?.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
+			const curatorMatch = bounty.onChainInfo?.curator?.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
 			return titleMatch || curatorMatch;
 		});
 
@@ -83,7 +84,7 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 			items: filtered,
 			totalCount: filtered.length
 		};
-	}, [initialData, allBounties, searchQuery]);
+	}, [initialData, allBounties, debouncedSearchQuery]);
 
 	const handleTabChange = (value: string) => {
 		if (!Object.values(EBountyStatus).includes(value as EBountyStatus)) {
@@ -159,6 +160,7 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 											value={searchQuery}
 											onChange={(e) => setSearchQuery(e.target.value)}
 											placeholder={t('Bounties.searchPlaceholder')}
+											aria-label={t('Bounties.searchPlaceholder')}
 											className='bg-bg_card w-60 rounded-lg border border-primary_border px-4 py-2 pl-10 text-xs text-text_primary placeholder-basic_text focus:outline-none focus:ring-2 focus:ring-text_pink'
 										/>
 										<span className='absolute left-3 top-1/2 -translate-y-1/2 text-basic_text'>
@@ -169,7 +171,7 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 										<DropdownMenuTrigger
 											asChild
 											noArrow
-											className='bg-bg_card !size-9 rounded-lg border border-primary_border p-2 hover:text-text_primary'
+											className='bg-bg_card size-9 rounded-lg border border-primary_border p-2 hover:text-text_primary'
 										>
 											<button
 												type='button'

@@ -4,9 +4,8 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
-import { IBountyStats } from '@/_shared/types';
 import tokens from '@assets/delegation/tokens.svg';
 import DOT from '@assets/delegation/dot.svg';
 import votes from '@assets/delegation/votes.svg';
@@ -16,6 +15,7 @@ import Image, { StaticImageData } from 'next/image';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
 import { useTranslations } from 'next-intl';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 
 interface StatItemProps {
 	icon: StaticImageData;
@@ -33,7 +33,7 @@ function StatItem({ icon, label, value, className }: StatItemProps) {
 				className='h-10 w-10'
 			/>
 			<div>
-				<p className='text-wallet-btn_text text-xs font-medium'>{label}</p>
+				<p className='text-xs font-medium text-wallet_btn_text'>{label}</p>
 				<div className='flex items-baseline gap-2'>
 					<h3 className='text-xl font-semibold text-text_primary'>{value ?? '-'}</h3>
 				</div>
@@ -43,28 +43,36 @@ function StatItem({ icon, label, value, className }: StatItemProps) {
 }
 
 function BountiesStats() {
-	const [stats, setStats] = useState<IBountyStats | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
-	const network = getCurrentNetwork();
-	const [tokenPrice, setTokenPrice] = useState<number>(0);
 	const t = useTranslations();
 
-	useEffect(() => {
-		const fetchStats = async () => {
-			const { data: bountiesStats } = await NextApiClientService.fetchBountiesStats();
+	// Fetch bounties stats
+	const { data: bountiesStats, isLoading: loadingBounties } = useQuery({
+		queryKey: ['bountiesStats'],
+		queryFn: async () => {
+			const { data } = await NextApiClientService.fetchBountiesStats();
+			return data;
+		},
+		staleTime: FIVE_MIN_IN_MILLI
+	});
+
+	const { data: tokenPriceData, isLoading: loadingPrice } = useQuery({
+		queryKey: ['treasuryTokenPrice'],
+		queryFn: async () => {
 			const to = new Date();
 			const from = new Date();
 			from.setHours(to.getHours() - 2);
 			const { data: treasuryStats } = await NextApiClientService.getTreasuryStats({ from, to });
-			const tokenPrice = treasuryStats?.[0]?.nativeTokenUsdPrice;
-			setTokenPrice(tokenPrice ? parseFloat(tokenPrice) : 0);
-			if (bountiesStats) {
-				setStats(bountiesStats);
-			}
-			setLoading(false);
-		};
-		fetchStats();
-	}, []);
+			const rawPrice = treasuryStats?.[0]?.nativeTokenUsdPrice;
+			const parsedPrice = rawPrice !== undefined ? parseFloat(rawPrice) : NaN;
+			return Number.isFinite(parsedPrice) ? parsedPrice : NaN;
+		},
+		staleTime: FIVE_MIN_IN_MILLI
+	});
+
+	const loading = loadingBounties || loadingPrice;
+	const stats = bountiesStats;
+	const tokenPrice = tokenPriceData ?? NaN;
+	const network = getCurrentNetwork();
 
 	if (loading) {
 		return (
@@ -85,7 +93,7 @@ function BountiesStats() {
 		);
 	}
 
-	const formattedBountyPool = stats?.totalBountyPool ? formatTokenValue(stats.totalBountyPool, network, tokenPrice, NETWORKS_DETAILS[`${network}`].tokenSymbol) : undefined;
+	const formattedBountyPool = stats?.totalBountyPool ? formatTokenValue(stats.totalBountyPool, network, tokenPrice, NETWORKS_DETAILS[network].tokenSymbol) : undefined;
 
 	const formattedTotalRewarded = stats?.totalRewarded ? formatTokenValue(stats.totalRewarded, network, tokenPrice, NETWORKS_DETAILS[network].tokenSymbol) : '-';
 

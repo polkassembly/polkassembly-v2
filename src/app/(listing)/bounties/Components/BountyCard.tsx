@@ -168,6 +168,8 @@ function BountyCard({ item, className }: Props) {
 				bountyCurator={curator}
 				bountyCreatedAt={createdAt}
 				childBountiesCount={childBountiesCount}
+				claimedAmount={formattedClaimedAmount}
+				progressPercentage={progressPercentage}
 			/>
 		</div>
 	);
