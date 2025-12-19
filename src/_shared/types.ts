@@ -1887,7 +1887,7 @@ export interface IMembersDetails {
 	address: string;
 	profileScore: number;
 	userId: number;
-	achievementBadges: string[];
+	achievementBadges: IUserBadgeDetails[];
 	network: ENetwork;
 	bio: string;
 	createdAt?: Date;

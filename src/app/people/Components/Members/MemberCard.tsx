@@ -23,12 +23,14 @@ import { FaDiscord } from '@react-icons/all-files/fa/FaDiscord';
 import { FaGithub } from '@react-icons/all-files/fa/FaGithub';
 import { useUser } from '@/hooks/useUser';
 import { isUserBlacklisted } from '@/_shared/_utils/isUserBlacklisted';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { Skeleton } from '@/app/_shared-components/Skeleton';
 import { UserProfileClientService } from '@/app/_client-services/user_profile_client_service';
 import { useIdentityService } from '@/hooks/useIdentityService';
 import { achievementBadges } from '@/_shared/_constants/achievementBadges';
 import { shortenAddress } from '@/_shared/_utils/shortenAddress';
-import { ESocial, IDelegateDetails, IFollowEntry, IOnChainIdentity, EUserBadge, IUserBadgeDetails } from '@/_shared/types';
+import { ESocial, IFollowEntry, IOnChainIdentity, EUserBadge, IUserBadgeDetails, IMembersDetails } from '@/_shared/types';
 import styles from '../../PeopleCard.module.scss';
 
 const SocialIcons: Partial<Record<ESocial, React.ComponentType<React.SVGProps<SVGSVGElement>>>> = {
@@ -39,7 +41,7 @@ const SocialIcons: Partial<Record<ESocial, React.ComponentType<React.SVGProps<SV
 	[ESocial.GITHUB]: FaGithub
 };
 
-function MemberCard({ member }: { member: IDelegateDetails }) {
+function MemberCard({ member }: { member: IMembersDetails }) {
 	const t = useTranslations();
 	const { user } = useUser();
 
@@ -47,11 +49,14 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 	const [isReadMoreVisible, setIsReadMoreVisible] = useState(false);
 	const [identity, setIdentity] = useState<IOnChainIdentity | null>(null);
 	const [isFetching, setIsFetching] = useState(true);
-	const [followers, setFollowers] = useState<IFollowEntry[]>(member?.publicUser?.followers || []);
 	const [loading, setLoading] = useState(false);
 
+	const queryClient = useQueryClient();
+
+	console.log('member', member);
+
 	const userBadges =
-		member?.publicUser?.profileDetails?.achievementBadges?.reduce(
+		member?.achievementBadges?.reduce(
 			(acc, badge) => {
 				acc[badge.name] = badge;
 				return acc;
@@ -59,47 +64,93 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 			{} as Partial<Record<EUserBadge, IUserBadgeDetails>>
 		) || {};
 
-	const isFollowing = followers.some((item) => item.followerUserId === user?.id);
+	// followers
+	const fetchFollowers = async () => {
+		if (!member) return null;
 
-	useEffect(() => {
-		setFollowers(member?.publicUser?.followers || []);
-	}, [member?.publicUser?.followers]);
+		const { data, error } = await UserProfileClientService.getFollowers({ userId: member.userId });
+
+		if (error) {
+			throw new Error(error.message || 'Failed to fetch data');
+		}
+
+		return data;
+	};
+
+	const { data: followers, isFetching: isFetchingFollowers } = useQuery({
+		queryKey: ['followers', member?.userId, user?.id],
+		queryFn: () => fetchFollowers(),
+		placeholderData: (previousData) => previousData,
+		staleTime: FIVE_MIN_IN_MILLI,
+		enabled: !!member
+	});
+
+	// following
+	const fetchFollowing = async () => {
+		if (!member) return null;
+
+		const { data, error } = await UserProfileClientService.getFollowing({ userId: member.userId });
+
+		if (error) {
+			throw new Error(error.message || 'Failed to fetch data');
+		}
+		return data;
+	};
+
+	const { data: following, isFetching: isFetchingFollowing } = useQuery({
+		queryKey: ['following', member?.userId, user?.id],
+		queryFn: () => fetchFollowing(),
+		placeholderData: (previousData) => previousData,
+		staleTime: FIVE_MIN_IN_MILLI,
+		enabled: !!member
+	});
 
 	const followUser = async () => {
-		if (!user?.id || !member?.publicUser?.id || user.id === member.publicUser.id) return;
+		if (!member) return;
+
+		if (!user?.id || user.id === member.userId) return;
 		setLoading(true);
-		const { data, error } = await UserProfileClientService.followUser({ userId: member.publicUser.id });
+
+		const { data, error } = await UserProfileClientService.followUser({ userId: member.userId });
+
 		setLoading(false);
 
 		if (data && !error) {
-			setFollowers((prev) => {
-				if (prev.some((entry) => entry.followerUserId === user.id)) {
-					return prev;
-				}
-				return [
-					...prev,
-					{
-						id: String(member.publicUser!.id),
-						createdAt: new Date(),
-						followerUserId: user.id,
-						followedUserId: member.publicUser!.id as number,
-						updatedAt: new Date()
-					}
-				];
+			queryClient.setQueryData(['followers', member.userId, user?.id], (oldData: { followers: IFollowEntry[] }) => {
+				return {
+					followers: [
+						...(oldData?.followers || []),
+						{
+							id: member.userId,
+							createdAt: member.createdAt,
+							followerUserId: user.id,
+							followedUserId: member.userId,
+							updatedAt: new Date()
+						}
+					]
+				};
 			});
 		}
 	};
 
 	const unfollowUser = async () => {
-		if (!user?.id || !member?.publicUser?.id || user.id === member.publicUser.id) return;
+		if (!member) return;
+
+		if (!user?.id || user.id === member.userId) return;
 		setLoading(true);
-		const { data, error } = await UserProfileClientService.unfollowUser({ userId: member.publicUser.id });
+
+		const { data, error } = await UserProfileClientService.unfollowUser({ userId: member.userId });
+
 		setLoading(false);
 
 		if (data && !error) {
-			setFollowers((prev) => prev.filter((entry) => entry.followerUserId !== user.id));
+			queryClient.setQueryData(['followers', member.userId, user?.id], (oldData: { followers: IFollowEntry[] }) => {
+				return { ...oldData, followers: oldData.followers.filter((item) => item.followerUserId !== user.id) };
+			});
 		}
 	};
+
+	const isFollowing = followers?.followers.some((item) => item.followerUserId === user?.id);
 
 	useEffect(() => {
 		const fetchIdentity = async () => {
@@ -124,6 +175,15 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 		fetchIdentity();
 	}, [member?.address, getOnChainIdentity]);
 
+	const socialLinks = member?.socialLinks?.length
+		? member?.socialLinks
+		: [
+				{ platform: ESocial.EMAIL, url: identity?.email || '' },
+				{ platform: ESocial.TWITTER, url: identity?.twitter || '' },
+				{ platform: ESocial.DISCORD, url: identity?.discord || '' },
+				{ platform: ESocial.GITHUB, url: identity?.github || '' }
+			];
+
 	return (
 		<div className={styles.memberCard}>
 			<div className='flex items-center justify-between gap-3'>
@@ -137,10 +197,10 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 								showIdenticon
 								textClassName='text-left text-lg font-semibold'
 							/>
-							{isUserBlacklisted(member?.publicUser?.id) && <ShieldAlert className='h-5 w-5 text-red-500' />}
+							{isUserBlacklisted(member?.userId) && <ShieldAlert className='h-5 w-5 text-red-500' />}
 						</>
 					) : (
-						<span className='text-xl font-semibold text-text_primary'>{member?.name || ''}</span>
+						<span className='text-xl font-semibold text-text_primary'>{identity?.display || identity?.nickname || ''}</span>
 					)}
 				</div>
 				<div className='flex items-center gap-x-2'>
@@ -150,7 +210,7 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 						leftIcon={<ShieldPlus />}
 						isLoading={loading}
 						onClick={isFollowing ? unfollowUser : followUser}
-						disabled={!user?.id || loading || user?.id === member?.publicUser?.id}
+						disabled={!user?.id || loading || user?.id === member?.userId}
 					>
 						{isFollowing ? t('Profile.unfollow') : t('Profile.follow')}
 					</Button>
@@ -167,7 +227,7 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 					) : null}
 					<div className='flex items-center gap-1 rounded-md bg-topic_tag_bg px-1.5 py-1'>
 						<UserIcon className='h-4 w-4 text-basic_text' />
-						<span className='text-xs text-basic_text'>{member?.sources[0] || ''}</span>
+						<span className='text-xs text-basic_text'>{member?.source?.[0] || 'Individual'}</span>
 					</div>
 					<span className='flex items-center gap-1 rounded-md bg-rank_card_bg px-1.5 py-0.5 font-medium'>
 						<Image
@@ -176,7 +236,7 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 							width={16}
 							height={16}
 						/>
-						<span className='text-sm font-medium text-leaderboard_score'>{Math.floor(member?.publicUser?.profileScore || 0)}</span>
+						<span className='text-sm font-medium text-leaderboard_score'>{Math.floor(member?.profileScore || 0)}</span>
 					</span>
 				</div>
 				<div className='flex items-center gap-x-1'>
@@ -214,21 +274,22 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 					orientation='vertical'
 				/>
 				<div className={styles.memberFollowing}>
-					{t('Profile.following')}: <span className='font-medium text-text_pink'>{member?.publicUser?.following?.length || 0}</span>
+					{t('Profile.following')}:
+					{isFetchingFollowing ? <Skeleton className='h-4 w-6' /> : <span className='font-medium text-text_pink'>{following?.following?.length || 0}</span>}
 				</div>
 				<Separator
 					className='h-4'
 					orientation='vertical'
 				/>
 				<div className={styles.memberFollowing}>
-					{t('Profile.followers')}: <span className='font-medium text-text_pink'>{followers.length}</span>
+					{t('Profile.followers')}: {isFetchingFollowers ? <Skeleton className='h-4 w-6' /> : <span className='font-medium text-text_pink'>{followers?.followers?.length}</span>}
 				</div>
 			</div>
 			<div>
-				{member?.publicUser?.profileDetails?.bio && (
+				{member?.bio && (
 					<>
-						<div className={`${styles.bio} ${isReadMoreVisible ? '' : styles.bioCollapsed} mt-3`}>{member?.publicUser?.profileDetails?.bio}</div>
-						{member?.publicUser?.profileDetails?.bio.length > 100 && (
+						<div className={`${styles.bio} ${isReadMoreVisible ? '' : styles.bioCollapsed} mt-3`}>{member?.bio}</div>
+						{member?.bio.length > 100 && (
 							<Button
 								variant='ghost'
 								className={styles.readMoreButton}
@@ -242,9 +303,9 @@ function MemberCard({ member }: { member: IDelegateDetails }) {
 				)}
 			</div>
 			<div className='flex items-center gap-x-4'>
-				{member?.publicUser?.profileDetails.publicSocialLinks?.map((social) => {
+				{socialLinks.map((social) => {
 					const IconComponent = SocialIcons[social.platform];
-					return IconComponent ? (
+					return IconComponent && social.url !== '' ? (
 						<a
 							key={social.platform}
 							href={social.platform === ESocial.EMAIL ? `mailto:${social.url}` : social.url}

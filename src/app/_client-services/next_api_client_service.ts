@@ -73,7 +73,8 @@ import {
 	IConversationTurn,
 	IDVCohort,
 	IDVDReferendumResponse,
-	IDVCohortVote
+	IDVCohortVote,
+	IMembersDetails
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -1705,7 +1706,7 @@ export class NextApiClientService {
 		});
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_COMMUNITY_MEMBERS, routeSegments: ['members'], queryParams });
-		return this.nextApiClientFetch<IGenericListingResponse<IDelegateDetails>>({ url, method });
+		return this.nextApiClientFetch<IGenericListingResponse<IMembersDetails>>({ url, method });
 	}
 
 	static async fetchDVCohorts() {

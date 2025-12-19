@@ -46,7 +46,7 @@ export const GET = withErrorHandling(async (req: Request) => {
 		return {
 			address,
 			profileScore: user?.profileScore || 0,
-			achievementBadges: user?.profileDetails?.badges || [],
+			achievementBadges: user?.profileDetails?.achievementBadges || [],
 			network,
 			userId: user.id,
 			bio: user?.profileDetails?.bio || '',
