@@ -128,8 +128,6 @@ function VoteSummary({ voteMetrics, index, approvalThreshold }: { voteMetrics?: 
 
 	return (
 		<div className={classes.voteSummaryWrapper}>
-			<p className={classes.voteSummaryTitle}>{t('PostDetails.summary')}</p>
-
 			<div className={classes.voteSummaryPieChart}>
 				{loading && <LoadingLayover />}
 				<div className={classes.voteSummaryPieChartAyeNay}>

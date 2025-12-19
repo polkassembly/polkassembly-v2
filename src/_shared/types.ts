@@ -1532,6 +1532,7 @@ export interface IVaultQrState {
 }
 
 export enum EVoteBubbleTabs {
+	Summary = 'summary',
 	Bubble = 'bubble',
 	Graph = 'graph'
 }

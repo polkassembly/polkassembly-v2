@@ -667,10 +667,12 @@
 		},
 		"VotesData": {
 			"Votes": "投票",
+			"summary": "摘要",
 			"bubble": "气泡",
 			"graph": "图表",
 			"voteHistory": "投票历史 (嵌套和扁平化)",
 			"votes": "投票",
+			"voteSummary": "投票摘要",
 			"voteGraph": "投票图表",
 			"voteBubble": "投票气泡",
 			"nestedVotes": "嵌套投票",

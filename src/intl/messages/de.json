@@ -655,10 +655,12 @@
 		},
 		"VotesData": {
 			"Votes": "Abstimmungen",
+			"summary": "Zusammenfassung",
 			"bubble": "Blase",
 			"graph": "Graph",
 			"voteHistory": "Abstimmungsverlauf (Verschachtelt und Ebene)",
 			"votes": "Abstimmungen",
+			"voteSummary": "Abstimmungsübersicht",
 			"voteGraph": "Abstimmungsgraph",
 			"voteBubble": "Abstimmungsblase",
 			"nestedVotes": "Verschachtelte Abstimmungen",

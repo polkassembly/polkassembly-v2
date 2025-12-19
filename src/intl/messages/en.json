@@ -595,10 +595,12 @@
 		},
 		"VotesData": {
 			"Votes": "Votes",
+			"summary": "Summary",
 			"bubble": "Bubble",
 			"graph": "Graph",
 			"voteHistory": "Vote History (Nested and Flattened)",
 			"votes": "Votes",
+			"voteSummary": "Vote Summary",
 			"voteGraph": "Vote Graph",
 			"voteBubble": "Vote Bubble",
 			"nestedVotes": "Nested Votes",

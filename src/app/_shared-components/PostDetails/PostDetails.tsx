@@ -21,7 +21,6 @@ import PostComments from '../PostComments/PostComments';
 import classes from './PostDetails.module.scss';
 import { Tabs, TabsContent } from '../Tabs';
 import ProposalPeriods from './ProposalPeriods/ProposalPeriods';
-import VoteSummary from './VoteSummary/VoteSummary';
 import PostContent from './PostContent';
 import SpamPostModal from '../SpamPostModal/SpamPostModal';
 import ChildBountiesCard from './ChildBountiesCard/ChildBountiesCard';
@@ -349,11 +348,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								status={post.onChainInfo?.status || EProposalStatus.Unknown}
 								trackName={post.onChainInfo?.origin || EPostOrigin.ROOT}
 							/>
-							<VoteSummary
-								index={index}
-								voteMetrics={post.onChainInfo?.voteMetrics}
-								approvalThreshold={thresholdValues.approvalThreshold}
-							/>
 							<VotesData
 								proposalType={post.proposalType}
 								index={index}
@@ -362,6 +356,8 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								timeline={post.onChainInfo?.timeline}
 								setThresholdValues={setThresholdValues}
 								thresholdValues={thresholdValues}
+								voteMetrics={post.onChainInfo?.voteMetrics}
+								approvalThreshold={thresholdValues.approvalThreshold}
 							/>
 							{post.index !== undefined && (
 								<OGTrackerInfo

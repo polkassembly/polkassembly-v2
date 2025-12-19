@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, EAnalyticsType, EVoteBubbleTabs } from '@/_shared/types';
+import { EProposalType, EAnalyticsType, EVoteBubbleTabs, IVoteMetrics } from '@/_shared/types';
 import React, { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
@@ -12,6 +12,7 @@ import VoteCurves from '../VoteCurvesData/VoteCurves';
 import VoteCurvesDetails from '../VoteCurvesData/VoteCurvesDetails';
 import classes from './VotesData.module.scss';
 import VotesBubbleChart from '../VotesBubbleChart/VotesBubbleChart';
+import VoteSummary from '../VoteSummary/VoteSummary';
 
 function VotesDataDialog({
 	chartLabels,
@@ -28,7 +29,9 @@ function VotesDataDialog({
 	enableGraph = false,
 	selectedTab,
 	isExpanded,
-	setIsExpanded
+	setIsExpanded,
+	voteMetrics,
+	approvalThreshold
 }: {
 	chartLabels: number[];
 	approvalData: { x: number; y: number }[];
@@ -45,9 +48,11 @@ function VotesDataDialog({
 	selectedTab: EVoteBubbleTabs;
 	isExpanded: boolean;
 	setIsExpanded: (isExpanded: boolean) => void;
+	voteMetrics?: IVoteMetrics;
+	approvalThreshold?: number;
 }) {
 	const t = useTranslations('PostDetails.VotesData');
-	const [activeTab, setActiveTab] = useState(selectedTab || EVoteBubbleTabs.Bubble);
+	const [activeTab, setActiveTab] = useState(selectedTab || EVoteBubbleTabs.Summary);
 
 	useEffect(() => {
 		setActiveTab(selectedTab);
@@ -71,6 +76,7 @@ function VotesDataDialog({
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
+										<SelectItem value={EVoteBubbleTabs.Summary}>{t('voteSummary')}</SelectItem>
 										<SelectItem value={EVoteBubbleTabs.Bubble}>{t('voteBubble')}</SelectItem>
 										<SelectItem value={EVoteBubbleTabs.Graph}>{t('voteGraph')}</SelectItem>
 									</SelectContent>
@@ -85,7 +91,15 @@ function VotesDataDialog({
 					{isFetching && <LoadingLayover />}
 
 					{/* Conditional Rendering based on Active Tab */}
-					{activeTab === EVoteBubbleTabs.Graph ? (
+					{activeTab === EVoteBubbleTabs.Summary ? (
+						<div>
+							<VoteSummary
+								index={index}
+								voteMetrics={voteMetrics}
+								approvalThreshold={approvalThreshold}
+							/>
+						</div>
+					) : activeTab === EVoteBubbleTabs.Graph ? (
 						<div className='mt-4 h-full'>
 							<VoteCurves
 								chartLabels={chartLabels}

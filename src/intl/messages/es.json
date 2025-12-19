@@ -669,10 +669,12 @@
 		},
 		"VotesData": {
 			"Votes": "Votos",
+			"summary": "Resumen",
 			"bubble": "Burbuja",
 			"graph": "Gráfico",
 			"voteHistory": "Historial de Votos (Anidados y Aplanados)",
 			"votes": "Votos",
+			"voteSummary": "Resumen de Votos",
 			"voteGraph": "Gráfico de Votos",
 			"voteBubble": "Burbuja de Votos",
 			"nestedVotes": "Votos Anidados",
