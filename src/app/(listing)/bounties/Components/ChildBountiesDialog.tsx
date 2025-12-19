@@ -193,7 +193,7 @@ function ChildBountiesDialog({
 											>
 												<TableCell className='max-w-[350px] py-4'>
 													<div className='flex items-center gap-2'>
-														<span className='rounded-sm bg-poll_option_bg px-1.5 py-0.5 text-sm font-semibold text-text_primary'>#{childIndex}</span>
+														<span className='text-sm font-semibold text-text_primary'>#{childIndex}</span>
 														<span className='truncate text-sm font-semibold text-text_primary'>{title}</span>
 													</div>
 												</TableCell>
