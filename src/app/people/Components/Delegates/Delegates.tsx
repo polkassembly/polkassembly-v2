@@ -50,16 +50,16 @@ function CommunityDelegates({ page }: { page: number }) {
 			batches.push(delegatesNeedingPublicUser.slice(i, i + BATCH_SIZE));
 		}
 
-		const batchResults = await Promise.all(batches.map((batch) => Promise.allSettled(batch.map((d) => UserProfileClientService.fetchPublicUserByAddress({ address: d.address })))));
-
-		batchResults.forEach((results, batchIndex) => {
+		await batches.reduce(async (previousPromise, batch) => {
+			await previousPromise;
+			const results = await Promise.allSettled(batch.map((d) => UserProfileClientService.fetchPublicUserByAddress({ address: d.address })));
 			results.forEach((result, index) => {
 				if (result.status === 'fulfilled' && result.value.data) {
-					const { address } = batches[batchIndex][index];
+					const { address } = batch[index];
 					publicUsersMap.set(address, result.value.data);
 				}
 			});
-		});
+		}, Promise.resolve());
 
 		return publicUsersMap;
 	};

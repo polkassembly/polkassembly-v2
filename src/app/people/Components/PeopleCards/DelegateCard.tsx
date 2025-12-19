@@ -36,22 +36,7 @@ function DelegateCard({ delegate, publicUser: publicUserProp, followers: followe
 
 	const queryClient = useQueryClient();
 
-	const fetchPublicUserData = async () => {
-		if (!delegate.address) return null;
-		const { data, error } = await UserProfileClientService.fetchPublicUserByAddress({ address: delegate.address });
-		if (error) return null;
-		return data;
-	};
-
-	const { data: fetchedPublicUser } = useQuery({
-		queryKey: ['publicUser', delegate.address],
-		queryFn: fetchPublicUserData,
-		enabled: !publicUserProp && !!delegate.address,
-		staleTime: FIVE_MIN_IN_MILLI,
-		initialData: delegate.publicUser
-	});
-
-	const publicUser = publicUserProp || fetchedPublicUser || delegate.publicUser;
+	const publicUser = publicUserProp || delegate.publicUser;
 
 	useEffect(() => {
 		let isMounted = true;

@@ -462,7 +462,32 @@ export class IdentityService {
 
 		const identityInfoResArray: any[] = await this.peopleChainApi.query.identity.identityOf.multi(encodedAddresses);
 
-		return identityInfoResArray.map((identityInfoRes) => this.formatIdentityFromChain(identityInfoRes));
+		return identityInfoResArray.map((identityInfoRes, index) => {
+			try {
+				return this.formatIdentityFromChain(identityInfoRes);
+			} catch (error) {
+				console.error(`Error parsing identity for address ${addresses[index]}:`, error);
+				return {
+					discord: '',
+					display: '',
+					displayParent: '',
+					email: '',
+					github: '',
+					isGood: false,
+					isIdentitySet: false,
+					isVerified: false,
+					judgements: [],
+					legal: '',
+					matrix: '',
+					nickname: '',
+					parentProxyAddress: '',
+					parentProxyTitle: null,
+					twitter: '',
+					verifiedByPolkassembly: false,
+					web: ''
+				};
+			}
+		});
 	}
 
 	getSetIdentityTx({ displayName, email, legalName, twitter, matrix }: { displayName: string; email: string; legalName?: string; twitter?: string; matrix?: string }) {
