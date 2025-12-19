@@ -413,6 +413,10 @@ export class OnChainDbService {
 		return SubsquidService.GetTrackAnalyticsStats({ network, trackId });
 	}
 
+	static async GetActivityStats({ network, oneWeekAgo }: { network: ENetwork; oneWeekAgo: string }) {
+		return SubsquidService.GetActivityStatsRaw({ network, oneWeekAgo });
+	}
+
 	static async GetCuratorStats({ network, curatorAddress }: { network: ENetwork; curatorAddress: string }): Promise<ICuratorStats[]> {
 		return SubsquidService.GetBountiesByCurator(network, curatorAddress);
 	}

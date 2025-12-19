@@ -1602,6 +1602,37 @@ export class SubsquidQueries {
 		}
 	`;
 
+	protected static GET_ACTIVITY_STATS = `
+		query GetActivityStats($oneWeekAgo: DateTime!) {
+			activeProposals: proposalsConnection(where: {
+				status_in: [DecisionDepositPlaced, Deciding, ConfirmStarted, ConfirmAborted, Submitted],
+				type_eq: ReferendumV2
+			}, orderBy: id_ASC) {
+				totalCount
+			}
+			weeklyVotes: convictionVotesConnection(where: {
+				createdAt_gte: $oneWeekAgo
+			}, orderBy: id_ASC) {
+				totalCount
+			}
+			weeklySpends: proposals(where: {
+				status_in: [Executed, Approved],
+				type_eq: ReferendumV2,
+				statusHistory_some: {
+					status_in: [Executed, Approved],
+					timestamp_gte: $oneWeekAgo
+				}
+			}, orderBy: id_ASC) {
+				reward
+				preimage {
+					proposedCall {
+						args
+					}
+				}
+			}
+		}
+	`;
+
 	protected static GET_ACTIVE_BOUNTY_CURATORS = `
 		query ActiveBountyCurators($status_in: [ProposalStatus!]!) {
 			proposals(where: {type_eq: Bounty, status_in: $status_in, curator_isNull: false}) {
