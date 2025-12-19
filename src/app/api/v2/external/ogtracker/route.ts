@@ -7,6 +7,7 @@ import { withErrorHandling } from '@/app/api/_api-utils/withErrorHandling';
 import { APIError } from '@/app/api/_api-utils/apiError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
+import { OG_TRACKER_API_KEY } from '@/app/api/_api-constants/apiEnvVars';
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
 	const { searchParams } = req.nextUrl;
@@ -14,6 +15,10 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
 	if (!refNum) {
 		throw new APIError(ERROR_CODES.INVALID_PARAMS_ERROR, StatusCodes.BAD_REQUEST, 'Missing refNum parameter');
+	}
+
+	if (!OG_TRACKER_API_KEY) {
+		throw new APIError(ERROR_CODES.API_FETCH_ERROR, StatusCodes.NOT_FOUND, 'OGTracker service is not configured');
 	}
 
 	const data = await OGTrackerService.getOGTrackerData({ refNum });
