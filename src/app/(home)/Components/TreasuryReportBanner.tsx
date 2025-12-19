@@ -33,7 +33,7 @@ function TreasuryReportBanner() {
 
 	if (isLoading) {
 		return (
-			<div className='relative flex h-[100px] items-center justify-between rounded-xl border border-treasury_stats_border bg-klara_stats_bg p-6'>
+			<div className='relative flex h-[100px] items-center justify-between rounded-xl border border-treasury_stats_border bg-treasury_report_bg p-6'>
 				<div className='flex w-full flex-col gap-2 pr-12'>
 					<Skeleton className='h-6 w-3/4' />
 					<Skeleton className='h-4 w-1/2' />
@@ -48,7 +48,7 @@ function TreasuryReportBanner() {
 	const currentReport = reports[currentIndex];
 
 	return (
-		<div className='relative h-[100px] overflow-hidden rounded-xl border border-treasury_stats_border bg-klara_stats_bg p-6'>
+		<div className='relative h-[100px] overflow-hidden rounded-xl border border-treasury_stats_border bg-treasury_report_bg p-6'>
 			<AnimatePresence mode='wait'>
 				<motion.div
 					key={currentIndex}
@@ -59,7 +59,7 @@ function TreasuryReportBanner() {
 					className='absolute inset-0 flex items-center justify-between px-6'
 				>
 					<div className='flex flex-col gap-1 pr-12'>
-						<h3 className='line-clamp-1 text-xl font-bold text-text_primary'>{currentReport.title}</h3>
+						<h3 className='line-clamp-1 text-xl font-bold text-treasury_report_text'>{currentReport.title}</h3>
 						<p className='line-clamp-1 text-sm font-medium text-wallet_btn_text'>{currentReport.description}</p>
 					</div>
 					{currentReport.redirectLink ? (
