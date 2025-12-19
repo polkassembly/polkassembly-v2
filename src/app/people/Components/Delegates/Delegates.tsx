@@ -15,14 +15,13 @@ import { useAtom } from 'jotai';
 import { delegatesAtom } from '@/app/_atoms/delegation/delegationAtom';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import { useIdentityService } from '@/hooks/useIdentityService';
-import { useState, useEffect, useRef, RefObject } from 'react';
+import { useRef, RefObject } from 'react';
 import MembersStats from '../Stats/MembersStats';
 import DelegateCard from '../PeopleCards/DelegateCard';
 
 function CommunityDelegates({ page }: { page: number }) {
 	const [delegates, setDelegates] = useAtom(delegatesAtom);
 	const { identityService } = useIdentityService();
-	const [verifiedCount, setVerifiedCount] = useState<number>(0);
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
 	const fetchDelegates = async () => {
@@ -120,23 +119,25 @@ function CommunityDelegates({ page }: { page: number }) {
 		enabled: uniqueUserIds.length > 0
 	});
 
-	useEffect(() => {
-		const fetchIdentities = async () => {
-			if (!delegates.length || !identityService) return;
+	const fetchIdentities = async () => {
+		if (!delegates.length || !identityService) return 0;
 
-			try {
-				const addresses = delegates.map((d) => d.address);
-				const identities = await identityService.getIdentities(addresses);
-				const verified = identities.filter((identity) => identity.isVerified).length;
-				setVerifiedCount(verified);
-			} catch (error) {
-				console.error('Error fetching identities:', error);
-				setVerifiedCount(0);
-			}
-		};
+		try {
+			const addresses = delegates.map((d) => d.address);
+			const identities = await identityService.getIdentities(addresses);
+			return identities.filter((identity) => identity.isVerified).length;
+		} catch (error) {
+			console.error('Error fetching identities:', error);
+			return 0;
+		}
+	};
 
-		fetchIdentities();
-	}, [delegates, identityService]);
+	const { data: verifiedCount = 0 } = useQuery({
+		queryKey: ['delegatesIdentities', delegates.length],
+		queryFn: fetchIdentities,
+		staleTime: FIVE_MIN_IN_MILLI,
+		enabled: delegates.length > 0 && !!identityService
+	});
 
 	const { filteredDelegates, totalDelegates, searchQuery, handleSearchChange, selectedSources, handleSourceChange, sortBy, handleSortChange } = useDelegateFiltering(
 		delegates,
