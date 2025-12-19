@@ -209,7 +209,7 @@ function ChildBountiesDialog({
 													</div>
 												</TableCell>
 												<TableCell className='py-4'>
-													<span className='text-sm font-semibold text-text_primary'>
+													<span className='whitespace-nowrap text-sm font-semibold text-text_primary'>
 														{reward
 															? formatBnBalance(reward.toString(), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 2, compactNotation: true }, network)
 															: '-'}
