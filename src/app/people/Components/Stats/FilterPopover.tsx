@@ -20,7 +20,7 @@ function FilterPopover({ selectedSources, setSelectedSources }: { selectedSource
 			>
 				<Button
 					variant='outline'
-					className='flex h-10 w-10 items-center justify-center'
+					className='flex items-center justify-center px-3'
 				>
 					<FaFilter className='text-lg text-wallet_btn_text' />
 				</Button>

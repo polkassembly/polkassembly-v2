@@ -11,9 +11,7 @@ import Image from 'next/image';
 import TotalMembers from '@assets/icons/proposals.svg';
 import VerifiedMembers from '@assets/icons/votes.svg';
 import { useTranslations } from 'next-intl';
-import { Input } from '@/app/_shared-components/Input';
-import { Button } from '@/app/_shared-components/Button';
-import { Search } from 'lucide-react';
+import { SearchIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/app/_shared-components/Select/Select';
 import { MdSort } from '@react-icons/all-files/md/MdSort';
 import { EDelegateSource } from '@/_shared/types';
@@ -83,24 +81,18 @@ function MembersStats({
 			</div>
 
 			<div className='flex items-center gap-4'>
-				<div className='relative w-full sm:max-w-60 lg:max-w-xs'>
-					<Input
+				<div className='relative'>
+					<input
+						type='text'
 						ref={searchInputRef}
-						className='h-9 w-full pr-12 sm:pr-12'
 						value={searchQuery}
 						onChange={(e) => handleSearchChange(e.target.value)}
 						placeholder={tJudgements('searchByAddressOrName')}
+						className='bg-bg_card w-60 rounded-lg border border-primary_border px-4 py-2 pl-10 text-xs text-text_primary placeholder-basic_text focus:outline-none focus:ring-2 focus:ring-text_pink'
 					/>
-					<Button
-						variant='ghost'
-						size='icon'
-						className='absolute right-0 top-0 h-full rounded-l-none border-l border-border_grey px-2 text-2xl text-text_grey'
-						asChild
-					>
-						<div>
-							<Search />
-						</div>
-					</Button>
+					<span className='absolute left-3 top-1/2 -translate-y-1/2 text-basic_text'>
+						<SearchIcon size={16} />
+					</span>
 				</div>
 				<FilterPopover
 					selectedSources={selectedSources}
@@ -113,7 +105,7 @@ function MembersStats({
 					>
 						<SelectTrigger
 							hideChevron
-							className='focus:ring-pink_primary h-[40px] w-[40px] rounded-md border border-border_grey px-2 focus:ring-1'
+							className='focus:ring-pink_primary rounded-md border border-border_grey px-2 focus:ring-1'
 						>
 							<MdSort className='text-wallet-btn_text text-xl' />
 						</SelectTrigger>
