@@ -354,7 +354,7 @@ function BountiesSection({ data, network, currentTokenPrice, title }: { data: IT
 					/>
 				)}
 				<Link
-					href={`https://${network}.polkassembly.io/bounty-dashboard`}
+					href={`https://${network}.polkassembly.io/bounties`}
 					className='flex items-center gap-1 text-xs text-text_pink'
 					target='_blank'
 				>
