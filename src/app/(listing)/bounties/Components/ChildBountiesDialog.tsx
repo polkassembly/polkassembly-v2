@@ -187,10 +187,19 @@ function ChildBountiesDialog({
 											<TableRow
 												key={childIndex}
 												className='cursor-pointer hover:bg-bg_modal'
+												role='button'
+												tabIndex={0}
 												onClick={() => {
 													const parentBountyIndex = childBounty.onChainInfo?.parentBountyIndex;
 													const compositeIndex = parentBountyIndex !== undefined ? `${parentBountyIndex}_${childIndex}` : childIndex;
 													window.open(`/child-bounty/${compositeIndex}`, '_blank');
+												}}
+												onKeyDown={(event) => {
+													if (event.key === 'Enter' || event.key === ' ') {
+														const parentBountyIndex = childBounty.onChainInfo?.parentBountyIndex;
+														const compositeIndex = parentBountyIndex !== undefined ? `${parentBountyIndex}_${childIndex}` : childIndex;
+														window.open(`/child-bounty/${compositeIndex}`, '_blank');
+													}
 												}}
 											>
 												<TableCell className='max-w-[350px] py-4'>
