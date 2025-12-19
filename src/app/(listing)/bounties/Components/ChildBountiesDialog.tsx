@@ -17,7 +17,7 @@ import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import Image from 'next/image';
 import { IPostListing, EProposalStatus } from '@/_shared/types';
 import { Users, Clock } from 'lucide-react';
-import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import dayjs from 'dayjs';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { BN, BN_ZERO } from '@polkadot/util';
@@ -63,10 +63,24 @@ function ChildBountiesDialog({
 		enabled: isOpen && !!bountyIndex
 	});
 
-	const claimedBounties = childBounties?.items.filter((cb) => cb.onChainInfo?.status === 'Claimed') || [];
+	const { data: allChildBounties } = useQuery({
+		queryKey: ['allChildBounties', bountyIndex],
+		queryFn: async () => {
+			const { data, error } = await NextApiClientService.fetchChildBountiesApi({
+				bountyIndex: bountyIndex.toString(),
+				page: '1',
+				limit: MAX_LISTING_LIMIT.toString()
+			});
+			if (error) throw error;
+			return data;
+		},
+		enabled: isOpen && !!bountyIndex
+	});
+
+	const claimedBounties = allChildBounties?.items.filter((cb) => cb.onChainInfo?.status === 'Claimed') || [];
 	const claimedAmount = claimedBounties.reduce((sum, cb) => sum.add(new BN(cb.onChainInfo?.reward || '0')), BN_ZERO);
 	const totalReward = new BN(bountyReward || '0');
-	const progressPercentage = totalReward.gt(BN_ZERO) && claimedAmount.gt(BN_ZERO) ? Math.min(Math.round((claimedAmount.toNumber() / totalReward.toNumber()) * 100), 100) : 0;
+	const progressPercentage = totalReward.gt(BN_ZERO) && claimedAmount.gt(BN_ZERO) ? Math.min(claimedAmount.muln(100).div(totalReward).toNumber(), 100) : 0;
 
 	const formattedReward = bountyReward
 		? formatBnBalance(bountyReward.toString(), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 0, compactNotation: true }, network)
@@ -74,7 +88,6 @@ function ChildBountiesDialog({
 	const formattedClaimedAmount = claimedAmount.gt(BN_ZERO)
 		? formatBnBalance(claimedAmount.toString(), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 0, compactNotation: true }, network)
 		: '0';
-	console.log('childBounties', childBounties);
 
 	return (
 		<Dialog
@@ -166,7 +179,7 @@ function ChildBountiesDialog({
 					) : (
 						<>
 							<div className='mb-3 text-sm font-bold text-text_primary'>Child Bounties: {childBounties?.totalCount || 0}</div>
-							<Table className='w-full'>
+							<Table className='mb-3 w-full'>
 								<TableHeader className='bg-page_background'>
 									<TableRow>
 										<TableHead className='text-xs font-semibold text-text_primary'>TITLE</TableHead>

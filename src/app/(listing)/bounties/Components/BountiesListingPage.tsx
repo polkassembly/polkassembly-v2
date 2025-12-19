@@ -5,12 +5,12 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { EBountyStatus, EProposalStep, IGenericListingResponse, IPostListing } from '@/_shared/types';
+import { EBountyStatus, EProposalStatus, EProposalStep, EProposalType, IGenericListingResponse, IPostListing } from '@/_shared/types';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_shared-components/Tabs';
 import { useRouter } from 'next/navigation';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
-import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { useTranslations } from 'next-intl';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
 import Link from 'next/link';
@@ -18,6 +18,8 @@ import { useUser } from '@/hooks/useUser';
 import { ExternalLink, Plus, SearchIcon } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/app/_shared-components/DropdownMenu';
 import { FaFilter } from '@react-icons/all-files/fa/FaFilter';
+import { useQuery } from '@tanstack/react-query';
+import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import BountiesStats from './BountiesStats';
 import BountiesGrid from './BountiesGrid';
 
@@ -26,6 +28,23 @@ enum EBountyTab {
 	ANALYTICS = 'ANALYTICS'
 }
 
+const convertStatusToStatusesArray = (status: EBountyStatus): EProposalStatus[] => {
+	switch (status) {
+		case EBountyStatus.ACTIVE:
+			return [EProposalStatus.Active, EProposalStatus.Extended];
+		case EBountyStatus.CLAIMED:
+			return [EProposalStatus.Claimed];
+		case EBountyStatus.CANCELLED:
+			return [EProposalStatus.Cancelled];
+		case EBountyStatus.REJECTED:
+			return [EProposalStatus.Rejected];
+		case EBountyStatus.PROPOSED:
+			return [EProposalStatus.Proposed];
+		default:
+			return [];
+	}
+};
+
 function BountiesListingPage({ initialData, status, page }: { initialData: IGenericListingResponse<IPostListing>; status: EBountyStatus; page: number }) {
 	const router = useRouter();
 	const t = useTranslations();
@@ -33,12 +52,28 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 	const { user } = useUser();
 	const [searchQuery, setSearchQuery] = useState('');
 
+	const { data: allBounties } = useQuery({
+		queryKey: ['allBounties', status],
+		queryFn: async () => {
+			const statuses = convertStatusToStatusesArray(status);
+			const { data } = await NextApiClientService.fetchListingData({
+				proposalType: EProposalType.BOUNTY,
+				page: 1,
+				limit: MAX_LISTING_LIMIT,
+				statuses
+			});
+			return data;
+		},
+		enabled: !!searchQuery.trim()
+	});
+
 	const filteredData = useMemo(() => {
 		if (!searchQuery.trim()) {
 			return initialData;
 		}
 
-		const filtered = initialData.items.filter((bounty) => {
+		const dataToFilter = allBounties || initialData;
+		const filtered = dataToFilter.items.filter((bounty) => {
 			const titleMatch = bounty.title?.toLowerCase().includes(searchQuery.toLowerCase());
 			const curatorMatch = bounty.onChainInfo?.curator?.toLowerCase().includes(searchQuery.toLowerCase());
 			return titleMatch || curatorMatch;
@@ -48,7 +83,7 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 			items: filtered,
 			totalCount: filtered.length
 		};
-	}, [initialData, searchQuery]);
+	}, [initialData, allBounties, searchQuery]);
 
 	const handleTabChange = (value: string) => {
 		if (!Object.values(EBountyStatus).includes(value as EBountyStatus)) {

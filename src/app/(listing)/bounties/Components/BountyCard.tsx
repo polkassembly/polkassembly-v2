@@ -17,7 +17,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { MdMenu } from '@react-icons/all-files/md/MdMenu';
-import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
+import { MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import ChildBountiesDialog from './ChildBountiesDialog';
 
 interface Props {
@@ -34,14 +34,13 @@ function BountyCard({ item, className }: Props) {
 	const curator = onChainInfo?.curator;
 	const createdAt = onChainInfo?.createdAt;
 	const childBountiesCount = onChainInfo?.childBountiesCount || 0;
-
 	const { data: childBounties, isLoading: loadingChildren } = useQuery({
 		queryKey: ['childBounties', index],
 		queryFn: async () => {
 			const { data, error } = await NextApiClientService.fetchChildBountiesApi({
 				bountyIndex: index?.toString() || '',
 				page: '1',
-				limit: DEFAULT_LISTING_LIMIT.toString()
+				limit: MAX_LISTING_LIMIT.toString()
 			});
 			if (error) throw error;
 			return data;
@@ -53,7 +52,7 @@ function BountyCard({ item, className }: Props) {
 	const claimedAmount = claimedBounties.reduce((sum, cb) => sum.add(new BN(cb.onChainInfo?.reward || '0')), BN_ZERO);
 
 	const totalReward = new BN(reward || '0');
-	const progressPercentage = totalReward.gt(BN_ZERO) && claimedAmount.gt(BN_ZERO) ? Math.min(Math.round((claimedAmount.toNumber() / totalReward.toNumber()) * 100), 100) : 0;
+	const progressPercentage = totalReward.gt(BN_ZERO) && claimedAmount.gt(BN_ZERO) ? Math.min(claimedAmount.muln(100).div(totalReward).toNumber(), 100) : 0;
 
 	const formattedReward = reward ? formatBnBalance(reward.toString(), { withThousandDelimitor: false, withUnit: true, numberAfterComma: 0, compactNotation: true }, network) : '0';
 	const formattedClaimedAmount = claimedAmount.gt(BN_ZERO)
