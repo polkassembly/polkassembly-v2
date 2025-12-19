@@ -106,15 +106,13 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 						<div className='flex flex-col justify-between gap-6 md:flex-row md:items-start'>
 							<div className='flex flex-col gap-2'>
 								<h1 className='text-2xl font-semibold text-text_primary'>{t('Bounties.onchainBounties')}</h1>
-								<p className='text-sm leading-[21px] text-text_primary'>
-									Bounties fund community-led work through on-chain proposals. Discover, apply for, and track tasks that help grow the Polkadot ecosystem.
-								</p>
+								<p className='text-sm leading-[21px] text-text_primary'>{t('Bounties.description')}</p>
 								<Link
 									href='https://wiki.polkadot.network/docs/learn-bounties'
 									target='_blank'
 									className='flex items-center gap-1 text-sm font-medium text-text_pink hover:underline'
 								>
-									Read More <ExternalLink size={14} />
+									{t('Bounties.readMore')} <ExternalLink size={14} />
 								</Link>
 							</div>
 
@@ -124,7 +122,7 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 									className='flex items-center gap-2 rounded-lg bg-navbar_border px-3 py-1.5 text-sm font-medium text-btn_primary_text'
 								>
 									<Plus className='h-4 w-4' />
-									Create
+									{t('Bounties.create')}
 								</Link>
 							</div>
 						</div>
@@ -134,13 +132,13 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 								className='flex-shrink-0 px-3 py-2 text-sm'
 								value={EBountyTab.ALL_BOUNTIES}
 							>
-								All Bounties
+								{t('Bounties.allBounties')}
 							</TabsTrigger>
 							<TabsTrigger
 								className='flex-shrink-0 px-3 py-2 text-sm'
 								value={EBountyTab.ANALYTICS}
 							>
-								Analytics
+								{t('Bounties.analytics')}
 							</TabsTrigger>
 						</TabsList>
 					</div>
@@ -153,14 +151,14 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 						<BountiesStats />
 						<div className='rounded-xl border border-border_grey bg-bg_modal p-6'>
 							<div className='mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center'>
-								<h2 className='text-2xl font-semibold text-text_primary'>Parent Bounties</h2>
+								<h2 className='text-2xl font-semibold text-text_primary'>{t('Bounties.parentBounties')}</h2>
 								<div className='ml-auto flex items-center gap-2'>
 									<div className='relative'>
 										<input
 											type='text'
 											value={searchQuery}
 											onChange={(e) => setSearchQuery(e.target.value)}
-											placeholder='Enter address or name to search'
+											placeholder={t('Bounties.searchPlaceholder')}
 											className='bg-bg_card w-60 rounded-lg border border-primary_border px-4 py-2 pl-10 text-xs text-text_primary placeholder-basic_text focus:outline-none focus:ring-2 focus:ring-text_pink'
 										/>
 										<span className='absolute left-3 top-1/2 -translate-y-1/2 text-basic_text'>
@@ -230,7 +228,7 @@ function BountiesListingPage({ initialData, status, page }: { initialData: IGene
 						className='m-0 p-0'
 					>
 						<div className='flex min-h-[400px] items-center justify-center rounded-lg border border-border_grey bg-bg_modal'>
-							<p className='text-text_secondary'>Analytics coming soon...</p>
+							<p className='text-text_secondary'>{t('Bounties.analyticsComingSoon')}</p>
 						</div>
 					</TabsContent>
 				</div>

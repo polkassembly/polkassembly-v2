@@ -15,6 +15,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Image, { StaticImageData } from 'next/image';
 import { formatTokenValue } from '@/app/_client-utils/tokenValueFormatter';
 import { NETWORKS_DETAILS } from '@/_shared/_constants/networks';
+import { useTranslations } from 'next-intl';
 
 interface StatItemProps {
 	icon: StaticImageData;
@@ -46,6 +47,7 @@ function BountiesStats() {
 	const [loading, setLoading] = useState<boolean>(true);
 	const network = getCurrentNetwork();
 	const [tokenPrice, setTokenPrice] = useState<number>(0);
+	const t = useTranslations();
 
 	useEffect(() => {
 		const fetchStats = async () => {
@@ -92,25 +94,25 @@ function BountiesStats() {
 			<div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
 				<StatItem
 					icon={tokens}
-					label='Active Bounties'
+					label={t('Bounties.activeBounties')}
 					value={stats?.activeBounties}
 					className='border-b border-border_grey pb-4 md:border-b-0 md:border-r md:px-4 md:pb-0 lg:border-r'
 				/>
 				<StatItem
 					icon={DOT}
-					label='Active Bounty Value'
+					label={t('Bounties.activeBountyValue')}
 					value={formattedBountyPool}
 					className='border-b border-border_grey pb-4 md:border-b-0 md:border-r md:px-4 md:pb-0 lg:border-r'
 				/>
 				<StatItem
 					icon={votes}
-					label='Child Bounties Value'
+					label={t('Bounties.childBountiesValue')}
 					value={formattedTotalRewarded}
 					className='border-b border-border_grey pb-4 md:border-b-0 md:border-r md:px-4 md:pb-0 lg:border-r'
 				/>
 				<StatItem
 					icon={delegates}
-					label='Curators / Earners'
+					label={t('Bounties.curatorsEarners')}
 					value={stats?.peopleEarned}
 					className='md:px-4'
 				/>

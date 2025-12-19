@@ -4,8 +4,13 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import Image from 'next/image';
+import { Users, Clock } from 'lucide-react';
+import dayjs from 'dayjs';
+import { BN, BN_ZERO } from '@polkadot/util';
+import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_shared-components/Dialog/Dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/_shared-components/Table';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
@@ -14,13 +19,9 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
 import NoActivity from '@/_assets/activityfeed/gifs/noactivity.gif';
-import Image from 'next/image';
 import { IPostListing, EProposalStatus } from '@/_shared/types';
-import { Users, Clock } from 'lucide-react';
 import { DEFAULT_LISTING_LIMIT, MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
-import dayjs from 'dayjs';
 import Address from '@/app/_shared-components/Profile/Address/Address';
-import { BN, BN_ZERO } from '@polkadot/util';
 import { PaginationWithLinks } from '@/app/_shared-components/PaginationWithLinks';
 
 interface ChildBountiesDialogProps {
@@ -48,6 +49,7 @@ function ChildBountiesDialog({
 }: ChildBountiesDialogProps) {
 	const network = getCurrentNetwork();
 	const [currentPage, setCurrentPage] = useState(1);
+	const t = useTranslations();
 
 	const { data: childBounties, isLoading } = useQuery({
 		queryKey: ['childBounties', bountyIndex, currentPage],
@@ -98,7 +100,7 @@ function ChildBountiesDialog({
 				<DialogHeader className='border-b border-border_grey pb-4'>
 					<DialogTitle className='flex items-center gap-2 text-lg font-semibold text-text_primary'>
 						<Users className='h-5 w-5' />
-						Child Bounties
+						{t('Bounties.childBounties')}
 					</DialogTitle>
 				</DialogHeader>
 
@@ -120,12 +122,14 @@ function ChildBountiesDialog({
 						</div>
 
 						<div className='flex flex-col gap-2'>
-							<h3 className='line-clamp-2 text-sm font-medium'>{bountyTitle || 'Untitled Bounty'}</h3>
+							<h3 className='line-clamp-2 text-sm font-medium'>{bountyTitle || t('Bounties.untitledBounty')}</h3>
 
 							{childBountiesCount && childBountiesCount > 0 && (
 								<div className='space-y-1'>
 									<div className='flex justify-between text-[10px] font-medium text-wallet_btn_text'>
-										<span>Funds Spent: {formattedClaimedAmount}</span>
+										<span>
+											{t('Bounties.fundsSpent')}: {formattedClaimedAmount}
+										</span>
 										<span>{progressPercentage}%</span>
 									</div>
 									<div className='h-1.5 w-full rounded-full bg-klara_ai_msg_bg'>
@@ -140,7 +144,7 @@ function ChildBountiesDialog({
 
 						<div className='grid grid-cols-1 gap-y-2 border-t border-border_grey pt-2 text-xs'>
 							<div className='flex items-center justify-between'>
-								<span className='text-xs font-semibold text-wallet_btn_text'>Curator</span>
+								<span className='text-xs font-semibold text-wallet_btn_text'>{t('Bounties.curator')}</span>
 								<div className='max-w-[120px]'>
 									{bountyCurator ? (
 										<Address
@@ -153,7 +157,7 @@ function ChildBountiesDialog({
 								</div>
 							</div>
 							<div className='flex items-center justify-between'>
-								<span className='text-xs font-semibold text-wallet_btn_text'>Date</span>
+								<span className='text-xs font-semibold text-wallet_btn_text'>{t('Bounties.date')}</span>
 								<div className='flex items-center gap-1 text-sm text-text_primary'>
 									<Clock className='h-4 w-4' />
 									<span>{dayjs(bountyCreatedAt).format("DD MMM 'YY")}</span>
@@ -174,17 +178,19 @@ function ChildBountiesDialog({
 								width={120}
 								height={120}
 							/>
-							<p>No child bounties found</p>
+							<p className='text-text_secondary'>{t('Bounties.noChildBounties')}</p>
 						</div>
 					) : (
 						<>
-							<div className='mb-3 text-sm font-bold text-text_primary'>Child Bounties: {childBounties?.totalCount || 0}</div>
+							<div className='mb-3 text-sm font-bold text-text_primary'>
+								{t('Bounties.childBounties')}: {childBounties?.totalCount || 0}
+							</div>
 							<Table className='mb-3 w-full'>
 								<TableHeader className='bg-page_background'>
 									<TableRow>
-										<TableHead className='text-xs font-semibold text-text_primary'>TITLE</TableHead>
-										<TableHead className='text-xs font-semibold text-text_primary'>AMOUNT</TableHead>
-										<TableHead className='text-xs font-semibold text-text_primary'>STATUS</TableHead>
+										<TableHead className='text-xs font-semibold text-text_primary'>{t('Bounties.tableTitle')}</TableHead>
+										<TableHead className='text-xs font-semibold text-text_primary'>{t('Bounties.tableAmount')}</TableHead>
+										<TableHead className='text-xs font-semibold text-text_primary'>{t('Bounties.tableStatus')}</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
@@ -192,7 +198,7 @@ function ChildBountiesDialog({
 										const childIndex = childBounty.onChainInfo?.index ?? childBounty.index ?? 0;
 										const reward = childBounty.onChainInfo?.reward;
 										const status = childBounty.onChainInfo?.status;
-										const title = childBounty.title || 'Untitled';
+										const title = childBounty.title || t('Bounties.untitled');
 
 										return (
 											<TableRow

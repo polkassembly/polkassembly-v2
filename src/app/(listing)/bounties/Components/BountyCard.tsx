@@ -17,6 +17,7 @@ import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import Address from '@/app/_shared-components/Profile/Address/Address';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { MdMenu } from '@react-icons/all-files/md/MdMenu';
+import { useTranslations } from 'next-intl';
 import { MAX_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import ChildBountiesDialog from './ChildBountiesDialog';
 
@@ -28,6 +29,7 @@ interface Props {
 function BountyCard({ item, className }: Props) {
 	const network = getCurrentNetwork();
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const t = useTranslations();
 	const { title, index, onChainInfo } = item;
 	const status = onChainInfo?.status;
 	const reward = onChainInfo?.reward;
@@ -82,7 +84,7 @@ function BountyCard({ item, className }: Props) {
 				</div>
 
 				<div className='flex flex-col gap-2'>
-					<h3 className='line-clamp-2 text-sm font-medium'>{title || 'Untitled Bounty'}</h3>
+					<h3 className='line-clamp-2 text-sm font-medium'>{title || t('Bounties.untitledBounty')}</h3>
 
 					<div className='flex items-center gap-2'>
 						<span className='text-lg font-semibold text-text_primary'>{formattedReward}</span>
@@ -98,7 +100,9 @@ function BountyCard({ item, className }: Props) {
 							) : (
 								<>
 									<div className='flex justify-between text-[10px] font-medium text-wallet_btn_text'>
-										<span>Funds Spent: {formattedClaimedAmount}</span>
+										<span>
+											{t('Bounties.fundsSpent')}: {formattedClaimedAmount}
+										</span>
 										<span>{progressPercentage}%</span>
 									</div>
 									<div className='h-1.5 w-full rounded-full bg-klara_ai_msg_bg'>
@@ -115,7 +119,7 @@ function BountyCard({ item, className }: Props) {
 
 				<div className='grid grid-cols-1 gap-y-2 border-t border-border_grey pt-2 text-xs'>
 					<div className='flex items-center justify-between'>
-						<span className='text-xs font-semibold text-wallet_btn_text'>Curator</span>
+						<span className='text-xs font-semibold text-wallet_btn_text'>{t('Bounties.curator')}</span>
 						<div className='max-w-[120px]'>
 							{curator ? (
 								<Address
@@ -128,7 +132,7 @@ function BountyCard({ item, className }: Props) {
 						</div>
 					</div>
 					<div className='flex items-center justify-between'>
-						<span className='text-xs font-semibold text-wallet_btn_text'>Date</span>
+						<span className='text-xs font-semibold text-wallet_btn_text'>{t('Bounties.date')}</span>
 						<div className='flex items-center gap-1 text-sm text-text_primary'>
 							<Clock className='h-4 w-4' />
 							<span>{dayjs(createdAt).format("DD MMM 'YY")}</span>
@@ -137,7 +141,9 @@ function BountyCard({ item, className }: Props) {
 				</div>
 			</div>
 			<div className='mt-4 flex items-center justify-between gap-3'>
-				<span className='flex-1 rounded-md bg-poll_option_bg px-2 py-1 text-xs font-semibold text-text_primary'>Child Bounties: {childBountiesCount}</span>
+				<span className='flex-1 rounded-md bg-poll_option_bg px-2 py-1 text-xs font-semibold text-text_primary'>
+					{t('Bounties.childBounties')}: {childBountiesCount}
+				</span>
 				{childBountiesCount > 0 && (
 					<button
 						type='button'
@@ -152,12 +158,11 @@ function BountyCard({ item, className }: Props) {
 				)}
 			</div>
 
-			{/* Child Bounties Dialog */}
 			<ChildBountiesDialog
 				isOpen={isDialogOpen}
 				onClose={() => setIsDialogOpen(false)}
 				bountyIndex={index || 0}
-				bountyTitle={title || 'Untitled Bounty'}
+				bountyTitle={title || t('Bounties.untitledBounty')}
 				bountyReward={reward}
 				bountyStatus={status}
 				bountyCurator={curator}
