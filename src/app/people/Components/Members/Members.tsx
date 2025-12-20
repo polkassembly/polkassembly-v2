@@ -37,7 +37,7 @@ async function CommunityMembers({ page }: { page: number }) {
 		<div>
 			<MembersStats
 				totalMembers={data.totalCount}
-				verifiedMembers={80}
+				verifiedMembers={379}
 			/>
 			<div className='mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6'>
 				{members.map((member) => (
