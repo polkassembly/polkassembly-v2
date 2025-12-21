@@ -38,6 +38,38 @@ export class SubsquidQueries {
 		}
 	`;
 
+	// Query specifically for child bounties with parent bounty index filter
+	protected static GET_CHILD_BOUNTY_BY_PARENT_AND_INDEX = `
+		query ChildBountyByParentAndIndex($index_eq: Int!, $parentBountyIndex_eq: Int!) {
+			proposals(where: {index_eq: $index_eq, type_eq: ChildBounty, parentBountyIndex_eq: $parentBountyIndex_eq}, limit: 1) {
+				index
+				hash
+				createdAt
+				proposer
+				status
+				reward
+				fee
+				deposit
+				curatorDeposit
+				parentBountyIndex
+				payee
+				curator
+				description
+				origin,
+				preimage {
+					proposedCall {
+						args
+					}
+				}
+				statusHistory {
+					status
+					timestamp
+					block
+				}
+			}
+		}
+	`;
+
 	protected static GET_PROPOSAL_BY_HASH_AND_TYPE = `
 		query GetProposalByHash($type_eq: ProposalType!, $hash_eq: String!) {
 			proposals(where: {type_eq: $type_eq, hash_eq: $hash_eq}, limit: 1) {
@@ -64,12 +96,75 @@ export class SubsquidQueries {
 
 	// proposal listing queries
 
+	// Child bounties listing query - orders by createdAt to show newest first (per-parent indexing)
+	protected static GET_CHILD_BOUNTIES_LISTING = `
+		query GetChildBountiesListing($limit: Int!, $offset: Int!, $type_eq: ProposalType!) {
+			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq}, orderBy: createdAt_DESC) {
+				createdAt
+				description
+				index
+				parentBountyIndex
+				origin
+				proposer
+				reward
+				status,
+				curator,
+				hash,
+				preimage {
+					proposedCall {
+						args
+					}
+				}
+				statusHistory {
+					status
+					timestamp
+				}
+			}
+
+			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq}) {
+				totalCount
+			}
+		}
+	`;
+
+	// Child bounties listing query with statuses filter
+	protected static GET_CHILD_BOUNTIES_LISTING_BY_STATUSES = `
+		query GetChildBountiesListingByStatuses($limit: Int!, $offset: Int!, $type_eq: ProposalType!, $status_in: [ProposalStatus!]!) {
+			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq, status_in: $status_in}, orderBy: createdAt_DESC) {
+				createdAt
+				description
+				index
+				parentBountyIndex
+				origin
+				proposer
+				status,
+				reward
+				hash,
+				curator
+				preimage {
+					proposedCall {
+						args
+					}
+				}
+				statusHistory {
+					status
+					timestamp
+				}
+			}
+
+			proposalsConnection(orderBy: id_ASC, where: {type_eq: $type_eq, status_in: $status_in}) {
+				totalCount
+			}
+		}
+	`;
+
 	protected static GET_PROPOSALS_LISTING_BY_TYPE = `
 		query GetProposalsListingByType($limit: Int!, $offset: Int!, $type_eq: ProposalType!) {
 			proposals(limit: $limit, offset: $offset, where: {type_eq: $type_eq}, orderBy: index_DESC) {
 				createdAt
 				description
 				index
+				parentBountyIndex
 				origin
 				proposer
 				reward
@@ -99,6 +194,7 @@ export class SubsquidQueries {
 				createdAt
 				description
 				index
+				parentBountyIndex
 				origin
 				proposer
 				status,
@@ -137,6 +233,7 @@ export class SubsquidQueries {
 					createdAt
 					description
 					index
+					parentBountyIndex
 					origin
 					proposer
 					reward
@@ -183,6 +280,7 @@ export class SubsquidQueries {
 					createdAt
 					description
 					index
+					parentBountyIndex
 					origin
 					proposer
 					reward
@@ -220,6 +318,7 @@ export class SubsquidQueries {
 				createdAt
 				description
 				index
+				parentBountyIndex
 				origin
 				proposer
 				reward
@@ -249,6 +348,7 @@ export class SubsquidQueries {
 				createdAt
 				description
 				index
+				parentBountyIndex
 				origin
 				proposer
 				reward
@@ -934,12 +1034,13 @@ export class SubsquidQueries {
 
 	protected static GET_CHILD_BOUNTIES_BY_PARENT_BOUNTY_INDEX = `
 		query GetChildBountiesByParentBountyIndex($parentBountyIndex_eq: Int!, $limit:Int!, $offset:Int! ) {
-			totalChildBounties: proposalsConnection(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty}) {
+			totalChildBounties: proposalsConnection(orderBy: createdAt_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty}) {
 				totalCount
 			}  
-			childBounties: proposals(orderBy: createdAtBlock_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty},limit: $limit, offset: $offset) {
+			childBounties: proposals(orderBy: createdAt_DESC, where: {parentBountyIndex_eq: $parentBountyIndex_eq, type_eq: ChildBounty},limit: $limit, offset: $offset) {
 				description
 				index
+				parentBountyIndex
 				status
 				reward
 				createdAt
@@ -1497,6 +1598,37 @@ export class SubsquidQueries {
 				balance
 				lockPeriod
 				track
+			}
+		}
+	`;
+
+	protected static GET_ACTIVITY_STATS = `
+		query GetActivityStats($oneWeekAgo: DateTime!) {
+			activeProposals: proposalsConnection(where: {
+				status_in: [DecisionDepositPlaced, Deciding, ConfirmStarted, ConfirmAborted, Submitted],
+				type_eq: ReferendumV2
+			}, orderBy: id_ASC) {
+				totalCount
+			}
+			weeklyVotes: convictionVotesConnection(where: {
+				createdAt_gte: $oneWeekAgo
+			}, orderBy: id_ASC) {
+				totalCount
+			}
+			weeklySpends: proposals(where: {
+				status_in: [Executed, Approved],
+				type_eq: ReferendumV2,
+				statusHistory_some: {
+					status_in: [Executed, Approved],
+					timestamp_gte: $oneWeekAgo
+				}
+			}, orderBy: id_ASC) {
+				reward
+				preimage {
+					proposedCall {
+						args
+					}
+				}
 			}
 		}
 	`;

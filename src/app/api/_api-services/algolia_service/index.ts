@@ -12,6 +12,7 @@ import { StatusCodes } from 'http-status-codes';
 import { getSharedEnvVars } from '@/_shared/_utils/getSharedEnvVars';
 import { markdownToPlainText } from '@/_shared/_utils/markdownToText';
 import { ValidatorService } from '@/_shared/_services/validator_service';
+import { buildCompositeIndex } from '@/_shared/_utils/childBountyUtils';
 import { ALGOLIA_WRITE_API_KEY } from '../../_api-constants/apiEnvVars';
 import { APIError } from '../../_api-utils/apiError';
 import { delay } from '../../_api-utils/delay';
@@ -86,12 +87,26 @@ export class AlgoliaService {
 	}
 
 	// Helper method to extract index/hash from post data
-	private static getPostIdentifier(post: IPost): { indexOrHash: string; index?: number; hash?: string } | null {
+	private static getPostIdentifier(post: IPost): { indexOrHash: string; index?: number; hash?: string; compositeIndex?: string } | null {
 		if (post.proposalType === EProposalType.TIP) {
 			// Tips use hash as identifier
 			const hash = post.onChainInfo?.hash || post.hash || '';
 			return hash ? { indexOrHash: hash, hash } : null;
 		}
+
+		// For child bounties, build composite index if parentBountyIndex is available
+		if (post.proposalType === EProposalType.CHILD_BOUNTY) {
+			const index = post.onChainInfo?.index !== undefined ? post.onChainInfo.index : post.index;
+			const parentBountyIndex = post.onChainInfo?.parentBountyIndex;
+
+			if (index !== undefined && parentBountyIndex !== undefined) {
+				const compositeIndex = buildCompositeIndex(parentBountyIndex, index);
+				return { indexOrHash: compositeIndex, index, compositeIndex };
+			}
+			// Fallback to just numeric index if no parentBountyIndex
+			return index !== undefined ? { indexOrHash: String(index), index } : null;
+		}
+
 		// Other proposal types use index
 		const index = post.onChainInfo?.index !== undefined ? post.onChainInfo.index : post.index;
 		return index !== undefined ? { indexOrHash: String(index), index } : null;

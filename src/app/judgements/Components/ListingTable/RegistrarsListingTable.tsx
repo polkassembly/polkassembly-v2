@@ -2,71 +2,63 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-'use client';
-
 import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
-import { useIdentityService } from '@/hooks/useIdentityService';
-import { useQuery } from '@tanstack/react-query';
 import { getRegistrarsWithStats } from '@/app/_client-utils/identityUtils';
 import { useSearchParams } from 'next/navigation';
-import { Skeleton } from '@/app/_shared-components/Skeleton';
 import Address from '@/app/_shared-components/Profile/Address/Address';
+import { IJudgementRequest } from '@/_shared/types';
 import { Table, TableHead, TableBody, TableRow, TableHeader } from '../../../_shared-components/Table';
 import styles from './ListingTable.module.scss';
 
-function RegistrarsListingTable() {
+interface IRegistrar {
+	account: string;
+	fee: number;
+	fields: number;
+}
+
+interface IRegistrarsListingTableProps {
+	allRegistrarsData:
+		| {
+				registrars: IRegistrar[];
+				judgements: IJudgementRequest[];
+		  }
+		| undefined;
+}
+
+function RegistrarsListingTable({ allRegistrarsData }: IRegistrarsListingTableProps) {
 	const t = useTranslations('Judgements');
 	const network = getCurrentNetwork();
-	const { identityService } = useIdentityService();
 	const searchParams = useSearchParams();
 	const search = searchParams?.get('registrarSearch') || '';
 
-	const { data: allRegistrarsData, isLoading } = useQuery({
-		queryKey: ['allRegistrarsData', identityService],
-		queryFn: async () => {
-			if (!identityService) return { registrars: [], judgements: [] };
-			const registrarsData = await identityService.getRegistrars();
-			const judgements = await identityService.getAllIdentityJudgements();
-			return { registrars: registrarsData, judgements };
-		},
-		enabled: !!identityService,
-		staleTime: 60000
-	});
-
 	const registrars = useMemo(() => {
 		if (!allRegistrarsData?.registrars) return [];
-		return getRegistrarsWithStats({ registrars: allRegistrarsData.registrars, judgements: allRegistrarsData.judgements, search });
-	}, [allRegistrarsData, search]);
-
-	if (isLoading || !identityService) {
-		return (
-			<div className='flex flex-col gap-4 rounded-lg bg-bg_modal p-4'>
-				<Skeleton className='h-12 w-full' />
-				<Skeleton className='h-12 w-full' />
-				<Skeleton className='h-12 w-full' />
-			</div>
+		return getRegistrarsWithStats({ registrars: allRegistrarsData.registrars, judgements: allRegistrarsData.judgements, search }).sort(
+			(a, b) => b.totalReceivedRequests - a.totalReceivedRequests
 		);
-	}
+	}, [allRegistrarsData, search]);
 
 	return (
 		<div className='w-full'>
 			{registrars && registrars.length > 0 ? (
-				<div className='w-full rounded-lg border border-primary_border bg-bg_modal p-6'>
+				<div className='w-full rounded-3xl border border-primary_border bg-bg_modal p-6'>
 					<Table>
 						<TableHeader>
-							<TableRow className={styles.tableRow}>
-								<TableHead className={styles.tableCell_1}>{t('address')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('receivedRequests')}</TableHead>
-								<TableHead className={styles.tableCell}>{t('totalGiven')}</TableHead>
-								<TableHead className={styles.tableCell_last}>{t('fee')}</TableHead>
+							<TableRow className={styles.headerRow}>
+								<TableHead className={styles.headerCell}>{t('rank')}</TableHead>
+								<TableHead className={styles.headerCell}>{t('registrar')}</TableHead>
+								<TableHead className={styles.headerCell}>{t('receivedRequests')}</TableHead>
+								<TableHead className={styles.headerCell}>{t('judgementsGranted')}</TableHead>
+								<TableHead className={styles.headerCell}>{t('fees')}</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{registrars.map((registrar) => (
+							{registrars.map((registrar, index) => (
 								<TableRow key={registrar.address}>
+									<td className='px-6 py-5'>{index + 1}</td>
 									<td className='px-6 py-5'>
 										<Address
 											truncateCharLen={5}

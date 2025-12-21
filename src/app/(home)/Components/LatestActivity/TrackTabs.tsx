@@ -2,19 +2,14 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/app/_shared-components/Table';
-import Link from 'next/link';
-import dayjs from 'dayjs';
 import { useTranslations } from 'next-intl';
-import Address from '@/app/_shared-components/Profile/Address/Address';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { EPostOrigin, EProposalType } from '@/_shared/types';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { useQuery } from '@tanstack/react-query';
 import { FIVE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
-import LoadingLayover from '@/app/_shared-components/LoadingLayover';
-import StatusTag from '@/app/_shared-components/StatusTag/StatusTag';
+import ActivityList from './ActivityList';
 
 function TrackTabs({ trackName }: { trackName: EPostOrigin }) {
 	const t = useTranslations('Overview');
@@ -42,52 +37,15 @@ function TrackTabs({ trackName }: { trackName: EPostOrigin }) {
 		refetchOnMount: false,
 		refetchOnWindowFocus: false
 	});
+	const ViewAllUrl = `/${trackName.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}`;
+
 	return (
-		<Table className='text_text_primary relative text-sm'>
-			{isFetching && <LoadingLayover />}
-			<TableHeader>
-				<TableRow className='bg-page_background text-sm font-medium text-wallet_btn_text'>
-					<TableHead className='py-4'>#</TableHead>
-					<TableHead className='py-4'>{t('title')}</TableHead>
-					<TableHead className='py-4'>{t('postedBy')}</TableHead>
-					<TableHead className='py-4'>{t('created')}</TableHead>
-					<TableHead className='py-4 text-right'>{t('status')}</TableHead>
-				</TableRow>
-			</TableHeader>
-			<TableBody>
-				{data?.items && data.items.length > 0 ? (
-					data.items.map((row) => (
-						<Link
-							href={`/referenda/${row.index}`}
-							className='contents'
-							key={row.index}
-						>
-							<TableRow key={row.index}>
-								<TableCell className='py-4'>{row.index}</TableCell>
-								<TableCell className='max-w-[300px] truncate py-4'>{row.title}</TableCell>
-								<TableCell className='py-4'>{row.onChainInfo?.proposer && <Address address={row.onChainInfo.proposer} />}</TableCell>
-								<TableCell className='py-4'>{row.onChainInfo?.createdAt && dayjs(row.onChainInfo.createdAt).format("Do MMM 'YY")}</TableCell>
-								<TableCell className='flex justify-end py-4'>
-									<StatusTag
-										className='w-max'
-										status={row.onChainInfo?.status}
-									/>
-								</TableCell>
-							</TableRow>
-						</Link>
-					))
-				) : (
-					<TableRow className='h-48'>
-						<TableCell
-							colSpan={6}
-							className='text-center'
-						>
-							{t('no')} {trackName} {t('activityfound')}
-						</TableCell>
-					</TableRow>
-				)}
-			</TableBody>
-		</Table>
+		<ActivityList
+			items={data?.items || []}
+			isFetching={isFetching}
+			noActivityText={`${t('no')} ${trackName} ${t('activityfound')}`}
+			viewAllUrl={ViewAllUrl}
+		/>
 	);
 }
 

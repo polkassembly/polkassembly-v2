@@ -1,4 +1,7 @@
 {
+	"Common": {
+		"loadingMessage": "Sabiduría de gobernanza en camino 🚀"
+	},
 	"HomePage": {
 		"title": "Bienvenido a Inicio"
 	},
@@ -32,10 +35,21 @@
 	},
 	"ActivityFeed": {
 		"title": "Feed de Actividad",
-		"switchToOverview": "Cambiar a Resumen",
 		"ExploreTab": "Explorar",
-		"SubscribedTab": "Suscrito",
+		"Following": "Siguiendo",
+		"description": "Explore todos los miembros contribuyendo al ecosistema de Polkadot.",
 		"About": "Acerca de",
+		"Stats": {
+			"activeProposals": "Propuestas Activas",
+			"activeVotes": "Votos Activos",
+			"filterLabel": "Filtrar",
+			"sortLabel": "Ordenar",
+			"filterAll": "Todos",
+			"filterProposals": "Solo Propuestas",
+			"filterVotes": "Solo Votos",
+			"sortNewest": "Más Recientes",
+			"sortOldest": "Más Antiguos"
+		},
 		"AboutDescription": "Polkadot es el centro DeFi todo en uno de Polkadot.",
 		"KnowMore": "Saber más",
 		"Rank": "Rango",
@@ -57,7 +71,7 @@
 		"unsubscribe": "Desuscribirse",
 		"please": "Por favor",
 		"login": "Iniciar sesión",
-		"toView": "para ver tus publicaciones suscritas",
+		"toView": "para ver tus publicaciones seguidas",
 		"Navbar": {
 			"All": "Todo",
 			"Root": "Root",
@@ -271,7 +285,85 @@
 		"userSince": "Usuario desde",
 		"rank": "Rango",
 		"judgements": "Juicios",
-		"since": "Desde",
+		"since": "Desde"
+	},
+	"JobsAndBounties": {
+		"title": "Empleos y Recompensas",
+		"jobsTab": "EMPLEOS",
+		"bountiesTab": "RECOMPENSAS",
+		"salary": "Salario",
+		"applicants": "Solicitantes",
+		"applyNow": "Aplicar Ahora",
+		"noJobsFound": "No se encontraron empleos",
+		"posted": "Publicado",
+		"noBountiesFound": "No se encontraron recompensas"
+	},
+	"Apps": {
+		"header": "Aplicaciones",
+		"OpenGov": {
+			"title": "OpenGov",
+			"description": "Explore y participe en la gobernanza on-chain de Polkadot."
+		},
+		"Delegation": {
+			"title": "Delegación",
+			"description": "Empodere voces de confianza para votar en su nombre y rastree cómo lo representan."
+		},
+		"Bounties": {
+			"title": "Recompensas",
+			"description": "Financie trabajo impulsado por la comunidad y siga el progreso de las tareas."
+		},
+		"Identity": {
+			"title": "Identidad y Juicio",
+			"description": "Verifique y gestione su identidad on-chain para construir reputación y transparencia."
+		},
+		"People": {
+			"title": "Personas",
+			"description": "Descubra miembros, delegados, curadores y contribuyentes que impulsan las decisiones de Polkadot."
+		},
+		"PoP": {
+			"title": "Prueba de Humanidad",
+			"description": "Autentique su presencia única en la red: asegurando una persona, un voto."
+		},
+		"DelegateX": {
+			"title": "DelegateX",
+			"description": "Compare delegados, revise el rendimiento y encuentre al que se alinee con sus valores de gobernanza."
+		},
+		"Klara": {
+			"title": "Klara",
+			"description": "Su asistente de gobernanza con IA: pregunte cualquier cosa sobre propuestas, votos o actividad on-chain."
+		},
+		"TreasuryAnalytics": {
+			"title": "Analítica del Tesoro",
+			"description": "Rastree el gasto del tesoro, activos y tendencias para ver cómo se utilizan los fondos de la red."
+		},
+		"Offchain": {
+			"title": "Offchain",
+			"description": "Participe en discusiones y propuestas off-chain para la toma de decisiones."
+		},
+		"Create": {
+			"title": "Crear",
+			"description": "Envíe propuestas, preimágenes y discusiones para dar forma al futuro de Polkadot."
+		},
+		"GovAnalytics": {
+			"title": "Analítica de Gobernanza",
+			"description": "Analice tendencias de referendos, comportamiento de votantes y participación de la red a lo largo del tiempo."
+		},
+		"AAG": {
+			"title": "AAG",
+			"description": "Mire y revise discusiones y debates clave de gobernanza del ecosistema."
+		},
+		"Polkasafe": {
+			"title": "Polkasafe",
+			"description": "Gestione de forma segura carteras multifirma y rastree transacciones entre sus carteras."
+		},
+		"Fellowship": {
+			"title": "Fellowship",
+			"description": "Explore la Polkadot Fellowship: un colectivo de expertos que avanza en la evolución del protocolo central."
+		},
+		"Proxy": {
+			"title": "Proxy",
+			"description": "Gestione y asigne cuentas proxy para realizar acciones en su nombre de forma segura."
+		},
 		"Settings": {
 			"settings": "Configuraciones",
 			"deleteAccount": "Eliminar cuenta",
@@ -401,6 +493,7 @@
 		"delegation": "Delegación",
 		"profile": "Perfil",
 		"home": "Inicio",
+		"openGov": "OpenGov",
 		"overview": "Resumen",
 		"discussions": "Discusiones",
 		"preimages": "Preimágenes",
@@ -477,6 +570,20 @@
 		"commentHistory": "Historial de Comentarios",
 		"edited": "Editado",
 		"noVotes": "No se encontraron votos",
+		"OGTracker": {
+			"heading": "Informe OGT",
+			"viewOnApp": "Ver en la aplicación",
+			"tasksDelivered": "{delivered}/{total} tareas entregadas",
+			"tasks": "Tareas",
+			"proofOfWork": "Prueba de Trabajo",
+			"linkedToTask": "Vinculado a tarea",
+			"status": {
+				"Delivered": "Entregado",
+				"InProgress": "En Progreso",
+				"Flagged": "Marcado",
+				"Remodel": "Remodelar"
+			}
+		},
 		"timeline": "Línea de Tiempo",
 		"more": "más",
 		"referendum": "Referendo",
@@ -1059,6 +1166,15 @@
 		"clearIdentityDescription": "¿Está seguro de que desea borrar su identidad?"
 	},
 	"Overview": {
+		"activeProposals": "Propuestas Activas",
+		"totalVotes": "Votos totales esta semana",
+		"totalSpends": "Gastos totales esta semana",
+		"decidingEnds": "La decisión termina en",
+		"decisionPeriodEnded": "El periodo de decisión ha terminado",
+		"totalSpendsTooltip": "Gastos totales esta semana = la suma de todos los propuestos de ReferendumV2 que se convirtieron en Aprobados o Ejecutados en los últimos 7 días.",
+		"aye": "A favor",
+		"nay": "En contra",
+		"viewAllActivity": "Ver toda la actividad",
 		"month": "Mes",
 		"year": "Año",
 		"events": "Eventos",
@@ -1095,7 +1211,12 @@
 		"switchToActivityFeed": "Cambiar a feed de actividad",
 		"topic": "Tema",
 		"creator": "Creador",
-		"viewAll": "Ver todo"
+		"viewAll": "Ver todo",
+		"headingTitle": "Centro de Aplicaciones Polkassembly",
+		"headingSubtitle": "Seguimiento de decisiones, salud del tesoro y aplicaciones esenciales",
+		"readAnnouncement": "Leer Anuncio",
+		"treasuryReportTitle": "Informe del Tesoro Q4",
+		"treasuryReportDescription": "Revise el rendimiento del gasto y el crecimiento del ecosistema"
 	},
 	"Bounty": {
 		"availableBountyPool": "Piscina de Prémios Disponibles",
@@ -1521,10 +1642,20 @@
 		"dashboard": "Panel de control",
 		"registrar": "Registrador",
 		"registrars": "Registradores",
+		"judgements": "Juicios",
+		"uniqueIdentitiesSet": "Identidades únicas establecidas",
+		"myDashboard": "Mi Panel de control",
 		"judgementsGranted": "Juicios concedidos",
 		"judgementsRequested": "Juicios solicitados",
 		"judgementsCompleted": "Juicios completados",
+		"mySubIdentities": "Mis sub-identidades",
+		"lastUpdatedOn": "Última actualización el",
+		"feeEarned": "Tarifa ganada",
+		"pendingRequests": "Solicitudes pendientes",
+		"newRequests": "Nuevas solicitudes",
 		"thisMonth": "este mes",
+		"request": "Solicitud",
+		"overview": "Resumen",
 		"registrarDescription": "Una entidad o individuo autorizado para verificar y validar la identidad de cuentas. Los registradores pueden establecer un cargo por sus servicios y limitar su atestación a ciertos campos.",
 		"becomeRegistrarTitle": "Cómo Convertirse en Registrador",
 		"becomeRegistrarDescription": "Para convertirse en registrador en Polkadot, necesita enviar una propuesta de referéndum y obtener la aprobación de la comunidad. Aquí está cómo:",
@@ -1538,6 +1669,8 @@
 		"cancel": "Cancelar",
 		"index": "Índice",
 		"address": "Dirección",
+		"socials": "Redes sociales",
+		"rank": "Rango",
 		"displayName": "Nombre de visualización",
 		"email": "Correo electrónico",
 		"twitter": "Twitter",
@@ -1546,10 +1679,22 @@
 		"latestJudgement": "Último juicio",
 		"receivedRequests": "Solicitudes recibidas",
 		"totalGiven": "Total dado",
-		"fee": "Tarifa",
+		"fees": "Tarifas",
 		"noJudgementsFound": "No se encontraron juicios",
 		"noRegistrarsFound": "No se encontraron registradores",
-		"searchByAddressOrName": "Ingrese dirección o nombre para buscar"
+		"searchByAddressOrName": "Ingrese dirección o nombre para buscar",
+		"reasonable": "Razonable",
+		"knownGood": "Conocido Bueno",
+		"outOfDate": "Desactualizado",
+		"lowQuality": "Baja Calidad",
+		"erroneous": "Erróneo",
+		"feePaid": "Tarifa Pagada",
+		"failedToLoadData": "No se pudieron cargar los datos. Por favor, inténtelo de nuevo.",
+		"identityColumn": "Identidad",
+		"socialsColumn": "Redes sociales",
+		"typeColumn": "Tipo",
+		"judgementsColumn": "Juicios",
+		"actionsColumn": "Acciones"
 	},
 	"JudgementStatus": {
 		"pending": "Pendiente",

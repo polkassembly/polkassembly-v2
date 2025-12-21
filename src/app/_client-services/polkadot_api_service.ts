@@ -932,94 +932,67 @@ export class PolkadotApiService {
 		beneficiaries.forEach((beneficiary) => {
 			if (ValidatorService.isValidAmount(beneficiary.amount) && ValidatorService.isValidSubstrateAddress(beneficiary.address)) {
 				if (beneficiary.assetId && ValidatorService.isValidAssetId(beneficiary.assetId, this.network)) {
+					// For non-native assets (USDC, USDT, etc.)
+					// Use consistent XCM V4 format for both assetKind and beneficiary on post-migration networks
 					tx.push(
 						this.api.tx?.treasury?.spend(
-							{
-								V3: {
-									assetId: {
-										Concrete: {
-											parents: 0,
-											interior: {
-												X2: [
-													{
-														PalletInstance: NETWORKS_DETAILS[this.network]?.palletInstance
-													},
-													{
-														GeneralIndex: beneficiary.assetId
-													}
-												]
-											}
-										}
-									},
-									location: isPostMigration
-										? {
+							// assetKind: VersionedLocatableAsset
+							// In XCM V4, AssetId is just a Location (no Concrete wrapper like V3)
+							isPostMigration
+								? {
+										V4: {
+											// location: Where the asset exists (Asset Hub = Here for post-migration)
+											location: {
 												parents: 0,
 												interior: 'Here'
+											},
+											// assetId: The asset identifier - in V4 this is a Location, not Concrete
+											assetId: {
+												parents: 0,
+												interior: {
+													X2: [
+														{
+															PalletInstance: NETWORKS_DETAILS[this.network]?.palletInstance
+														},
+														{
+															GeneralIndex: beneficiary.assetId
+														}
+													]
+												}
 											}
-										: {
+										}
+									}
+								: {
+										// Pre-migration: Use V3 with Concrete wrapper
+										V3: {
+											location: {
 												parents: 0,
 												interior: {
 													X1: { Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId }
 												}
-											}
-								}
-							},
-							beneficiary.amount.toString(),
-							isPostMigration
-								? {
-										V4: {
-											location: {
-												parents: 0,
-												interior: 'Here'
 											},
-											accountId: {
-												parents: 0,
-												interior: {
-													X1: [
-														{
-															AccountId32: {
-																id: decodeAddress(beneficiary.address),
-																network: null
+											assetId: {
+												Concrete: {
+													parents: 0,
+													interior: {
+														X2: [
+															{
+																PalletInstance: NETWORKS_DETAILS[this.network]?.palletInstance
+															},
+															{
+																GeneralIndex: beneficiary.assetId
 															}
-														}
-													]
+														]
+													}
 												}
 											}
 										}
-									}
-								: { V3: { parents: 0, interior: { X1: { AccountId32: { id: decodeAddress(beneficiary.address), network: null } } } } },
-							beneficiary.validFromBlock || null
-						)
-					);
-				} else {
-					tx.push(
-						this.api.tx?.treasury?.spend(
-							{
-								V4: {
-									location: isPostMigration
-										? {
-												parents: 0,
-												interior: 'Here'
-											}
-										: {
-												parents: 0,
-												interior: {
-													X1: [
-														{
-															Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId
-														}
-													]
-												}
-											},
-									assetId: {
-										parents: 1,
-										interior: 'here'
-									}
-								}
-							},
+									},
 							beneficiary.amount.toString(),
+							// beneficiary: VersionedLocatableAccount (has location + accountId)
 							isPostMigration
 								? {
+										// V4 beneficiary: VersionedLocatableAccount with location (where) and accountId (which account)
 										V4: {
 											location: {
 												parents: 0,
@@ -1031,8 +1004,8 @@ export class PolkadotApiService {
 													X1: [
 														{
 															AccountId32: {
-																id: decodeAddress(beneficiary.address),
-																network: null
+																network: null,
+																id: u8aToHex(decodeAddress(beneficiary.address))
 															}
 														}
 													]
@@ -1041,13 +1014,91 @@ export class PolkadotApiService {
 										}
 									}
 								: {
+										// V3 beneficiary format - simple Location
 										V3: {
 											parents: 0,
 											interior: {
 												X1: {
 													AccountId32: {
-														id: decodeAddress(beneficiary.address),
-														network: null
+														network: null,
+														id: u8aToHex(decodeAddress(beneficiary.address))
+													}
+												}
+											}
+										}
+									},
+							beneficiary.validFromBlock || null
+						)
+					);
+				} else {
+					// For native token spends
+					tx.push(
+						this.api.tx?.treasury?.spend(
+							// assetKind for native token
+							isPostMigration
+								? {
+										V4: {
+											location: {
+												parents: 0,
+												interior: 'Here'
+											},
+											// Native token assetId: points to relay chain (parents: 1, interior: Here)
+											assetId: {
+												parents: 1,
+												interior: 'Here'
+											}
+										}
+									}
+								: {
+										V3: {
+											location: {
+												parents: 0,
+												interior: {
+													X1: { Parachain: NETWORKS_DETAILS[this.network]?.assetHubParaId }
+												}
+											},
+											assetId: {
+												Concrete: {
+													parents: 1,
+													interior: 'Here'
+												}
+											}
+										}
+									},
+							beneficiary.amount.toString(),
+							// beneficiary: VersionedLocatableAccount (has location + accountId)
+							isPostMigration
+								? {
+										// V4 beneficiary has location (where) and accountId (which account)
+										V4: {
+											location: {
+												parents: 0,
+												interior: 'Here'
+											},
+											accountId: {
+												parents: 0,
+												interior: {
+													X1: [
+														{
+															AccountId32: {
+																network: null,
+																id: u8aToHex(decodeAddress(beneficiary.address))
+															}
+														}
+													]
+												}
+											}
+										}
+									}
+								: {
+										// V3 beneficiary format - simple Location
+										V3: {
+											parents: 0,
+											interior: {
+												X1: {
+													AccountId32: {
+														network: null,
+														id: u8aToHex(decodeAddress(beneficiary.address))
 													}
 												}
 											}
@@ -1464,7 +1515,7 @@ export class PolkadotApiService {
 						treasurySpendData: {
 							beneficiary:
 								getSubstrateAddressFromAccountId(
-									(spendData as any)?.beneficiary?.V4?.interior?.X1?.[0]?.AccountId32?.id || (spendData as any)?.beneficiary?.V3?.interior?.X1?.AccountId32?.id || ''
+									(spendData as any)?.beneficiary?.V4?.accountId?.interior?.X1?.[0]?.AccountId32?.id || (spendData as any)?.beneficiary?.V3?.interior?.X1?.AccountId32?.id || ''
 								) || '',
 							generalIndex:
 								(

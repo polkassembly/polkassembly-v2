@@ -3137,6 +3137,7 @@ export const NETWORKS_DETAILS: Record<ENetwork, INetworkDetails> = {
 		submissionDeposit: new BN('33333333333'),
 		assetHubParaId: '1000',
 		peopleChainParaId: '1004',
+		palletInstance: '50',
 		govtype: EGovType.OPENGOV,
 		name: 'Kusama',
 		blockTime: 6000,

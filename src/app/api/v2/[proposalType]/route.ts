@@ -30,6 +30,7 @@ import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
 import { StatusCodes } from 'http-status-codes';
 import { headers } from 'next/headers';
 import { MAX_POLL_OPTION_LENGTH, MAX_POLL_OPTIONS_COUNT, MIN_POLL_OPTIONS_COUNT } from '@/_shared/_constants/pollLimits';
+import { buildCompositeIndex } from '@/_shared/_utils/childBountyUtils';
 import { APIError } from '../../_api-utils/apiError';
 import { AuthService } from '../../_api-services/auth_service';
 import { getReqBody } from '../../_api-utils/getReqBody';
@@ -76,9 +77,22 @@ export const GET = withErrorHandling(async (req: NextRequest, { params }) => {
 
 		// Fetch off-chain data
 		const offChainDataPromises = onChainPostsListingResponse.items.map((postInfo) => {
+			// Build indexOrHash based on proposal type:
+			// - TIP: use hash
+			// - CHILD_BOUNTY: use composite index (parentBountyIndex_childBountyIndex) for per-parent indexing
+			// - Others: use index
+			let indexOrHash: string;
+			if (proposalType === EProposalType.TIP) {
+				indexOrHash = postInfo.hash!;
+			} else if (proposalType === EProposalType.CHILD_BOUNTY && postInfo.parentBountyIndex !== undefined) {
+				indexOrHash = buildCompositeIndex(postInfo.parentBountyIndex, postInfo.index ?? 0);
+			} else {
+				indexOrHash = postInfo.index!.toString();
+			}
+
 			return OffChainDbService.GetOffChainPostData({
 				network,
-				indexOrHash: proposalType !== EProposalType.TIP ? postInfo.index!.toString() : postInfo.hash!,
+				indexOrHash,
 				proposalType,
 				proposer: postInfo.proposer || ''
 			});

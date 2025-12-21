@@ -1,4 +1,7 @@
 {
+	"Common": {
+		"loadingMessage": "Governance wisdom incoming 🚀"
+	},
 	"HomePage": {
 		"title": "Welcome to Home"
 	},
@@ -33,14 +36,25 @@
 	"ActivityFeed": {
 		"please": "Please",
 		"login": "Login",
-		"toView": "to view your subscribed posts",
+		"toView": "to view your followed posts",
 		"title": "Activity Feed",
-		"switchToOverview": "Switch to Overview",
+		"description": "Explore all members contributing to the Polkadot ecosystem.",
 		"ExploreTab": "Explore",
-		"SubscribedTab": "Subscribed",
+		"Following": "Following",
 		"About": "About",
 		"AboutDescription": "Polkadot is the all-in-one DeFi hub of Polkadot.",
 		"KnowMore": "Know More",
+		"Stats": {
+			"activeProposals": "Active Proposals",
+			"activeVotes": "Active Votes",
+			"filterLabel": "Filter",
+			"sortLabel": "Sort",
+			"filterAll": "All",
+			"filterProposals": "Proposals Only",
+			"filterVotes": "Votes Only",
+			"sortNewest": "Newest First",
+			"sortOldest": "Oldest First"
+		},
 		"Rank": "Rank",
 		"BatchVoting": "Batch Voting",
 		"BatchVotingDescription": "Vote on top proposals in a single transaction",
@@ -402,6 +416,7 @@
 		"delegation": "Delegation",
 		"profile": "Profile",
 		"home": "Home",
+		"openGov": "OpenGov",
 		"overview": "Overview",
 		"discussions": "Discussions",
 		"preimages": "Preimages",
@@ -486,6 +501,20 @@
 		"login": "Login",
 		"toComment": "to comment",
 		"noVotes": "No Votes Found",
+		"OGTracker": {
+			"heading": "OGT Report",
+			"viewOnApp": "View on app",
+			"tasksDelivered": "{delivered}/{total} tasks delivered",
+			"tasks": "Tasks",
+			"proofOfWork": "Proof of Work",
+			"linkedToTask": "Linked to task",
+			"status": {
+				"Delivered": "Delivered",
+				"InProgress": "In Progress",
+				"Flagged": "Flagged",
+				"Remodel": "Remodel"
+			}
+		},
 		"post": "Post",
 		"cancel": "Cancel",
 		"reply": "Reply",
@@ -1140,6 +1169,15 @@
 		"viewAllChildBounties": "View All"
 	},
 	"Overview": {
+		"activeProposals": "Active Proposals",
+		"totalVotes": "Total Votes this week",
+		"totalSpends": "Total Spends this week",
+		"decidingEnds": "Deciding ends in",
+		"totalSpendsTooltip": "Total spends this week = the sum of all ReferendumV2 proposals that became Approved or Executed within the last 7 days.",
+		"decisionPeriodEnded": "Decision period has ended",
+		"aye": "Aye",
+		"nay": "Nay",
+		"viewAllActivity": "View All Activity",
 		"month": "Month",
 		"year": "Year",
 		"events": "Events",
@@ -1176,7 +1214,90 @@
 		"switchToActivityFeed": "Switch to Activity Feed",
 		"topic": "Topic",
 		"creator": "Creator",
-		"viewAll": "View All"
+		"viewAll": "View All",
+		"headingTitle": "Polkassembly App Hub",
+		"headingSubtitle": "Track decisions, treasury health, and essential apps",
+		"readAnnouncement": "Read Announcement",
+		"treasuryReportTitle": "Q4 Treasury Report",
+		"treasuryReportDescription": "Review spending performance and ecosystem growth"
+	},
+	"JobsAndBounties": {
+		"title": "Jobs and Bounties",
+		"jobsTab": "JOBS",
+		"bountiesTab": "BOUNTIES",
+		"salary": "Salary",
+		"applicants": "Applicants",
+		"applyNow": "Apply Now",
+		"noJobsFound": "No jobs found",
+		"posted": "Posted",
+		"noBountiesFound": "No bounties found"
+	},
+	"Apps": {
+		"header": "Apps",
+		"OpenGov": {
+			"title": "OpenGov",
+			"description": "Explore and participate in Polkadot's on-chain governance."
+		},
+		"Delegation": {
+			"title": "Delegation",
+			"description": "Empower trusted voices to vote on your behalf and track how they represent you."
+		},
+		"Bounties": {
+			"title": "Bounties",
+			"description": "Fund community-driven work and follow progress on tasks."
+		},
+		"Identity": {
+			"title": "Identity & Judgement",
+			"description": "Verify and manage your on-chain identity to build reputation and transparency."
+		},
+		"People": {
+			"title": "People",
+			"description": "Discover members, delegates, curators, and contributors driving Polkadot's decisions."
+		},
+		"PoP": {
+			"title": "Proof of Personhood",
+			"description": "Authenticate your unique presence in the network — ensuring one person, one voice."
+		},
+		"DelegateX": {
+			"title": "DelegateX",
+			"description": "Compare delegates, review performance, and find the one who aligns with your gov values."
+		},
+		"Klara": {
+			"title": "Klara",
+			"description": "Your AI governance assistant — ask anything about proposals, votes, or on-chain activity."
+		},
+		"TreasuryAnalytics": {
+			"title": "Treasury Analytics",
+			"description": "Track treasury spending, assets, and trends to see how network funds are being used."
+		},
+		"Offchain": {
+			"title": "Offchain",
+			"description": "Engage with off-chain discussions and proposals for decision-making."
+		},
+		"Create": {
+			"title": "Create",
+			"description": "Submit proposals, preimages, and discussions to shape the future of Polkadot."
+		},
+		"GovAnalytics": {
+			"title": "Governance Analytics",
+			"description": "Analyze referenda trends, voter behavior, and network participation over time."
+		},
+		"AAG": {
+			"title": "AAG",
+			"description": "Watch and revisit key governance discussions and debates from the ecosystem."
+		},
+		"Polkasafe": {
+			"title": "Polkasafe",
+			"description": "Securely manage multisig wallets and track transactions across your wallets."
+		},
+		"Fellowship": {
+			"title": "Fellowship",
+			"description": "Explore the Polkadot Fellowship — a collective of experts advancing core protocol evolution."
+		},
+		"Proxy": {
+			"title": "Proxy",
+			"description": "Manage and assign proxy accounts to perform actions on your behalf safely."
+		}
 	},
 	"BatchVote": {
 		"batchVoting": "Batch Voting",
@@ -1549,10 +1670,20 @@
 		"dashboard": "Dashboard",
 		"registrar": "Registrar",
 		"registrars": "Registrars",
+		"judgements": "Judgements",
+		"uniqueIdentitiesSet": "Unique Identities set",
+		"myDashboard": "My Dashboard",
 		"judgementsGranted": "Judgements Granted",
 		"judgementsRequested": "Judgements Requested",
 		"judgementsCompleted": "Judgements Completed",
+		"mySubIdentities": "My sub-identities",
+		"lastUpdatedOn": "Last Updated On",
+		"feeEarned": "Fee Earned",
+		"pendingRequests": "Pending Requests",
+		"newRequests": "New Requests",
 		"thisMonth": "this month",
+		"request": "Request",
+		"overview": "Overview",
 		"registrarDescription": "An entity or individual authorized to verify and validate the identity of accounts. Registrars can set a fee for their services and limit their attestation to certain fields.",
 		"becomeRegistrarTitle": "How to Become a Registrar",
 		"becomeRegistrarDescription": "To become a registrar on Polkadot, you need to submit a referendum proposal and get it approved by the community. Here's how:",
@@ -1568,16 +1699,30 @@
 		"address": "Address",
 		"displayName": "Display Name",
 		"email": "Email",
+		"socials": "Socials",
+		"rank": "Rank",
 		"twitter": "Twitter",
 		"status": "Status",
 		"initiatedOn": "Initiated On",
 		"latestJudgement": "Latest Judgement",
 		"receivedRequests": "Received Requests",
 		"totalGiven": "Total Given",
-		"fee": "Fee",
+		"fees": "Fees",
 		"noJudgementsFound": "No judgements found",
 		"noRegistrarsFound": "No registrars found",
-		"searchByAddressOrName": "Enter address or name to search"
+		"searchByAddressOrName": "Enter address or name to search",
+		"reasonable": "Reasonable",
+		"knownGood": "Known Good",
+		"outOfDate": "Out of Date",
+		"lowQuality": "Low Quality",
+		"erroneous": "Erroneous",
+		"feePaid": "Fee Paid",
+		"failedToLoadData": "Failed to load data. Please try again.",
+		"identityColumn": "Identity",
+		"socialsColumn": "Socials",
+		"typeColumn": "Type",
+		"judgementsColumn": "Judgements",
+		"actionsColumn": "Actions"
 	},
 	"JudgementStatus": {
 		"pending": "Pending",
