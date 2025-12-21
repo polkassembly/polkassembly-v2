@@ -86,7 +86,8 @@ enum ERedisKeys {
 	USER_POSTS = 'UPS',
 	TRACK_COUNTS = 'TC',
 	KLARA_CONVERSATION_HISTORY = 'KCH',
-	KLARA_REQUEST_DEDUP = 'KRD'
+	KLARA_REQUEST_DEDUP = 'KRD',
+	TREASURY_OVERVIEW = 'TOV'
 }
 
 export class RedisService {
@@ -180,7 +181,8 @@ export class RedisService {
 			return baseKey + proposalTypePart;
 		},
 		[ERedisKeys.KLARA_CONVERSATION_HISTORY]: (conversationId: string): string => `${ERedisKeys.KLARA_CONVERSATION_HISTORY}-${conversationId}`,
-		[ERedisKeys.KLARA_REQUEST_DEDUP]: (userId: string, messageHash: string): string => `${ERedisKeys.KLARA_REQUEST_DEDUP}-${userId}-${messageHash}`
+		[ERedisKeys.KLARA_REQUEST_DEDUP]: (userId: string, messageHash: string): string => `${ERedisKeys.KLARA_REQUEST_DEDUP}-${userId}-${messageHash}`,
+		[ERedisKeys.TREASURY_OVERVIEW]: (network: string): string => `${ERedisKeys.TREASURY_OVERVIEW}-${network}`
 	} as const;
 
 	// helper methods
@@ -325,7 +327,8 @@ export class RedisService {
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_LEVEL_PROPOSALS_ANALYTICS}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TURNOUT_DATA}-${network}-*` }),
 			this.DeleteKeys({ pattern: `${ERedisKeys.TRACK_DELEGATION_ANALYTICS}-${network}-*` }),
-			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK}-${network}-*` })
+			this.DeleteKeys({ pattern: `${ERedisKeys.GOV_ANALYTICS_REFERENDUM_OUTCOME_TRACK}-${network}-*` }),
+			this.DeleteKeys({ pattern: `${ERedisKeys.TREASURY_OVERVIEW}-${network}` })
 		]);
 	}
 
@@ -763,6 +766,19 @@ export class RedisService {
 
 	static async DeleteOverviewPageData({ network }: { network: ENetwork }): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.OVERVIEW_PAGE_DATA](network) });
+	}
+
+	// Treasury Overview (Analytics) caching methods
+	static async GetTreasuryOverview({ network }: { network: ENetwork }): Promise<string | null> {
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.TREASURY_OVERVIEW](network) });
+	}
+
+	static async SetTreasuryOverview({ network, data }: { network: ENetwork; data: string }): Promise<void> {
+		await this.Set({ key: this.redisKeysMap[ERedisKeys.TREASURY_OVERVIEW](network), value: data, ttlSeconds: HALF_HOUR_IN_SECONDS });
+	}
+
+	static async DeleteTreasuryOverview({ network }: { network: ENetwork }): Promise<void> {
+		await this.Delete({ key: this.redisKeysMap[ERedisKeys.TREASURY_OVERVIEW](network) });
 	}
 
 	// Remark login message caching methods
