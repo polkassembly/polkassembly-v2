@@ -3,13 +3,11 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import { useQuery } from '@tanstack/react-query';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ENetwork, IAAGVideoMetadata, IAAGVideoSummary, IGenericListingResponse } from '@/_shared/types';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
 import { ClientError } from '@/app/_client-utils/clientError';
 import { ERROR_CODES } from '@/_shared/_constants/errorLiterals';
-
-const YOUTUBE_ORIGIN = 'https://www.youtube.com';
 
 interface YouTubePlayer {
 	seekTo: (seconds: number, allowSeekAhead: boolean) => void;
@@ -18,21 +16,19 @@ interface YouTubePlayer {
 	getPlayerState: () => number;
 }
 
-interface YouTubeEvent {
-	data: number;
-}
-
 interface YouTubePlayerConfig {
-	events: {
-		onStateChange?: (event: YouTubeEvent) => void;
-		onReady?: () => void;
+	videoId: string;
+	playerVars?: Record<string, string | number>;
+	events?: {
+		onReady?: (event: { target: YouTubePlayer }) => void;
+		onStateChange?: (event: { data: number }) => void;
 	};
 }
 
 declare global {
 	interface Window {
 		YT: {
-			Player: new (elementId: string | HTMLElement, config: YouTubePlayerConfig) => YouTubePlayer;
+			Player: new (elementId: string, config: YouTubePlayerConfig) => YouTubePlayer;
 			PlayerState: {
 				PLAYING: number;
 				PAUSED: number;
@@ -131,238 +127,119 @@ export const useAAGVideosByReferendum = ({ referendaId, limit, enabled = true }:
 	});
 };
 
-export function useYouTubePlayer(currentVideoId: string, playerRef: React.RefObject<HTMLIFrameElement | null>) {
-	const [currentVideoTime, setCurrentVideoTime] = useState<number>(0);
-	const [isVideoPlaying, setIsVideoPlaying] = useState<boolean>(false);
-	const [isVideoLoaded, setIsVideoLoaded] = useState<boolean>(false);
-	const [isPlayerReady, setIsPlayerReady] = useState<boolean>(false);
-	const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	const startTimeRef = useRef<number>(0);
-	const pausedTimeRef = useRef<number>(0);
-	const lastKnownTimeRef = useRef<number>(0);
-	const fallbackCheckRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+export function useYouTubePlayer(videoId: string) {
+	const playerRef = useRef<YouTubePlayer | null>(null);
+	const timeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	const [currentTime, setCurrentTime] = useState(0);
+	const [playerReady, setPlayerReady] = useState(false);
 
-	const startTimer = useCallback(() => {
-		if (timerRef.current) {
-			clearInterval(timerRef.current);
-		}
+	useEffect(() => {
+		if (!videoId) return undefined;
 
-		startTimeRef.current = Date.now();
-		timerRef.current = setInterval(() => {
-			if (isVideoPlaying) {
-				const elapsedSeconds = (Date.now() - startTimeRef.current) / 1000;
-				const newTime = pausedTimeRef.current + elapsedSeconds;
-				if (newTime < 100000) {
-					setCurrentVideoTime(Math.round(newTime * 10) / 10);
-					lastKnownTimeRef.current = newTime;
-				} else if (timerRef.current) {
-					clearInterval(timerRef.current);
-					timerRef.current = null;
-				}
+		let initTimeout: ReturnType<typeof setTimeout> | null = null;
+
+		const initPlayer = () => {
+			if (!window.YT || !window.YT.Player) return;
+
+			const playerElement = document.getElementById('youtube-player');
+			if (!playerElement) {
+				initTimeout = setTimeout(initPlayer, 100);
+				return;
 			}
-		}, 100);
-	}, [isVideoPlaying]);
 
-	const stopTimer = useCallback(() => {
-		if (timerRef.current) {
-			clearInterval(timerRef.current);
-			timerRef.current = null;
-		}
-		if (fallbackCheckRef.current) {
-			clearTimeout(fallbackCheckRef.current);
-			fallbackCheckRef.current = null;
-		}
-		const currentTime = lastKnownTimeRef.current;
-		if (currentTime > 100000) {
-			pausedTimeRef.current = 0;
-			lastKnownTimeRef.current = 0;
-			setCurrentVideoTime(0);
-		} else {
-			pausedTimeRef.current = currentTime;
-			setCurrentVideoTime(Math.round(currentTime * 10) / 10);
-		}
-	}, []);
+			if (playerRef.current) {
+				try {
+					playerRef.current.destroy();
+				} catch {
+					console.error('Failed to destroy YouTube player');
+				}
+				playerRef.current = null;
+			}
+
+			playerRef.current = new window.YT.Player('youtube-player', {
+				videoId,
+				playerVars: {
+					autoplay: 0,
+					modestbranding: 1,
+					rel: 0,
+					origin: typeof window !== 'undefined' ? window.location.origin : ''
+				},
+				events: {
+					onReady: () => {
+						setPlayerReady(true);
+					},
+					onStateChange: (event) => {
+						if (event.data === 1) {
+							if (timeIntervalRef.current) {
+								clearInterval(timeIntervalRef.current);
+							}
+							timeIntervalRef.current = setInterval(() => {
+								if (playerRef.current) {
+									try {
+										setCurrentTime(playerRef.current.getCurrentTime());
+									} catch {
+										// Player might be destroyed
+									}
+								}
+							}, 500);
+						} else if (timeIntervalRef.current) {
+							clearInterval(timeIntervalRef.current);
+							timeIntervalRef.current = null;
+						}
+					}
+				}
+			});
+		};
+
+		const loadYouTubeAPI = () => {
+			if (window.YT && window.YT.Player) {
+				setTimeout(initPlayer, 100);
+				return;
+			}
+
+			const existingScript = document.querySelector('script[src="https://www.youtube.com/iframe_api"]');
+			if (!existingScript) {
+				const tag = document.createElement('script');
+				tag.src = 'https://www.youtube.com/iframe_api';
+				tag.async = true;
+				document.body.appendChild(tag);
+			}
+
+			window.onYouTubeIframeAPIReady = () => {
+				setTimeout(initPlayer, 100);
+			};
+		};
+
+		loadYouTubeAPI();
+
+		return () => {
+			if (initTimeout) {
+				clearTimeout(initTimeout);
+			}
+			if (timeIntervalRef.current) {
+				clearInterval(timeIntervalRef.current);
+			}
+			if (playerRef.current) {
+				try {
+					playerRef.current.destroy();
+				} catch {
+					console.error('Failed to destroy YouTube player');
+				}
+				playerRef.current = null;
+			}
+			setPlayerReady(false);
+		};
+	}, [videoId]);
 
 	const seekToTime = useCallback(
-		(timeInSeconds: number) => {
-			if (timerRef.current) {
-				clearInterval(timerRef.current);
-				timerRef.current = null;
-			}
-			setCurrentVideoTime(timeInSeconds);
-			pausedTimeRef.current = timeInSeconds;
-			lastKnownTimeRef.current = timeInSeconds;
-			startTimeRef.current = Date.now();
-
-			if (playerRef.current?.contentWindow) {
-				try {
-					playerRef.current.contentWindow.postMessage(
-						JSON.stringify({
-							event: 'command',
-							func: 'seekTo',
-							args: [timeInSeconds, true]
-						}),
-						YOUTUBE_ORIGIN
-					);
-				} catch {
-					console.log('Failed to seek to time');
-				}
-			}
-
-			if (isVideoPlaying) {
-				setTimeout(() => {
-					if (isVideoPlaying) {
-						startTimer();
-					}
-				}, 100);
+		(seconds: number) => {
+			if (playerRef.current && playerReady) {
+				playerRef.current.seekTo(seconds, true);
+				setCurrentTime(seconds);
 			}
 		},
-		[playerRef, isVideoPlaying, startTimer]
+		[playerReady]
 	);
 
-	useEffect(() => {
-		if (!currentVideoId) return undefined;
-
-		const checkPlayerReady = () => {
-			if (playerRef.current && !isPlayerReady) {
-				setIsPlayerReady(true);
-			}
-		};
-
-		checkPlayerReady();
-
-		const interval = setInterval(checkPlayerReady, 100);
-
-		return () => clearInterval(interval);
-	}, [currentVideoId, isPlayerReady, playerRef]);
-
-	useEffect(() => {
-		if (!currentVideoId) {
-			return undefined;
-		}
-
-		if (!playerRef.current) {
-			return undefined;
-		}
-
-		const iframe = playerRef.current;
-
-		const initializeVideo = () => {
-			setIsVideoLoaded(true);
-			setIsVideoPlaying(false);
-			setCurrentVideoTime(0);
-			pausedTimeRef.current = 0;
-			lastKnownTimeRef.current = 0;
-			startTimeRef.current = Date.now();
-
-			fallbackCheckRef.current = setTimeout(() => {
-				if (playerRef.current?.src?.includes('autoplay=1')) {
-					setIsVideoPlaying(true);
-				}
-			}, 10000);
-		};
-
-		const handleLoad = () => {
-			setTimeout(initializeVideo, 1000);
-		};
-
-		if (iframe.contentWindow) {
-			handleLoad();
-		} else {
-			iframe.addEventListener('load', handleLoad);
-		}
-
-		return () => {
-			if (iframe) {
-				iframe.removeEventListener('load', handleLoad);
-			}
-			if (timerRef.current) {
-				clearInterval(timerRef.current);
-			}
-			if (fallbackCheckRef.current) {
-				clearTimeout(fallbackCheckRef.current);
-			}
-		};
-	}, [currentVideoId, playerRef, isPlayerReady]);
-
-	useEffect(() => {
-		if (!currentVideoId) return () => {};
-
-		const handleMessage = (event: MessageEvent) => {
-			if (event.origin !== YOUTUBE_ORIGIN) return;
-
-			try {
-				const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-
-				if (data.event === 'onStateChange') {
-					if (fallbackCheckRef.current) {
-						clearTimeout(fallbackCheckRef.current);
-						fallbackCheckRef.current = null;
-					}
-
-					const playerState = data.data;
-					const newIsPlaying = playerState === 1;
-					setIsVideoPlaying(newIsPlaying);
-
-					if (newIsPlaying) {
-						startTimer();
-					} else {
-						stopTimer();
-					}
-				}
-
-				if (data.event === 'infoDelivery' && data.info && typeof data.info.currentTime === 'number' && isVideoPlaying) {
-					const apiTime = Math.round(data.info.currentTime * 10) / 10;
-					setCurrentVideoTime(apiTime);
-					pausedTimeRef.current = apiTime;
-					lastKnownTimeRef.current = apiTime;
-					startTimeRef.current = Date.now();
-				}
-			} catch {
-				console.log('Failed to update time');
-			}
-		};
-
-		window.addEventListener('message', handleMessage);
-
-		const initializePlayer = () => {
-			if (playerRef.current?.contentWindow) {
-				try {
-					playerRef.current.contentWindow.postMessage(
-						JSON.stringify({
-							event: 'listening',
-							id: currentVideoId
-						}),
-						YOUTUBE_ORIGIN
-					);
-				} catch {
-					console.log('Failed to initialize player');
-				}
-			}
-		};
-
-		const initTimeout = setTimeout(initializePlayer, 1000);
-
-		return () => {
-			window.removeEventListener('message', handleMessage);
-			clearTimeout(initTimeout);
-		};
-	}, [currentVideoId, playerRef, startTimer, stopTimer, isVideoPlaying]);
-
-	useEffect(() => {
-		if (isVideoPlaying) {
-			startTimer();
-		} else {
-			stopTimer();
-		}
-	}, [isVideoPlaying, startTimer, stopTimer]);
-
-	useEffect(() => {
-		if (Math.abs(currentVideoTime - pausedTimeRef.current) > 1) {
-			startTimeRef.current = Date.now() - currentVideoTime * 1000;
-			pausedTimeRef.current = currentVideoTime;
-		}
-	}, [currentVideoTime]);
-
-	return { currentVideoTime, isVideoPlaying, seekToTime, isVideoLoaded };
+	return { currentTime, playerReady, seekToTime };
 }

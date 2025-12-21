@@ -43,11 +43,10 @@ function VideoDetailPage() {
 
 	const [selectedVideo, setSelectedVideo] = useState<IAAGVideoSummary | null>(null);
 	const [isPresentationModalOpen, setIsPresentationModalOpen] = useState(false);
-	const playerRef = useRef<HTMLIFrameElement>(null);
 	const chaptersContainerRef = useRef<HTMLDivElement>(null);
 	const activeChapterRef = useRef<HTMLButtonElement>(null);
 
-	const { currentVideoTime, seekToTime } = useYouTubePlayer(currentVideoId || '', playerRef);
+	const { currentTime: currentVideoTime, seekToTime } = useYouTubePlayer(currentVideoId || '');
 
 	const { data: videoMetadata } = useAAGVideoById({
 		videoId: currentVideoId || '',
@@ -242,17 +241,12 @@ function VideoDetailPage() {
 				<div className='flex flex-col gap-6 lg:flex-row'>
 					<div className='flex w-full flex-1 flex-col'>
 						<div className='flex flex-col overflow-hidden rounded-lg border border-border_grey bg-bg_modal shadow-sm'>
-							<div className='relative aspect-[16/9] w-full bg-bg_modal sm:aspect-video'>
-								<iframe
-									ref={playerRef}
+							<div className='relative aspect-[16/9] w-full bg-black sm:aspect-video'>
+								<div
 									id='youtube-player'
-									src={`https://www.youtube.com/embed/${currentVideoId}?enablejsapi=1&autoplay=1&rel=0&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
-									title={selectedVideo.title}
 									className='absolute inset-0 h-full w-full'
-									allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-									allowFullScreen
 								/>
-							</div>{' '}
+							</div>
 							<div className='p-3 sm:p-4 md:p-6'>
 								<div className='mb-4 flex w-full flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
 									<h1 className='break-words text-lg font-bold leading-tight text-text_primary'>{selectedVideo.title}</h1>
