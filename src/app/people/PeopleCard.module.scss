@@ -1,0 +1,39 @@
+.memberCard {
+	@apply flex flex-col gap-3 rounded-xl border border-primary_border bg-bg_modal p-5;
+}
+
+.memberSince {
+	@apply flex items-center gap-x-1 text-sm text-wallet_btn_text;
+}
+
+.memberFollowing {
+	@apply flex items-center gap-x-1 text-sm text-wallet_btn_text;
+}
+
+.bio {
+	@apply text-sm text-basic_text;
+}
+
+.bioCollapsed {
+	@apply line-clamp-2;
+}
+
+.readMoreButton {
+	@apply cursor-pointer !p-0 text-xs text-link;
+}
+
+.delegationCardStats {
+	@apply mt-auto grid grid-cols-3 items-center border-t border-border_grey;
+}
+
+.delegationCardStatsItem {
+	@apply border-r border-border_grey p-5 text-center;
+}
+
+.delegationCardStatsItemText {
+	@apply text-xs text-delegation_card_text xl:whitespace-nowrap;
+}
+
+.delegationCardStatsItemTextPast30Days {
+	@apply block text-[10px] text-delegation_card_text;
+}

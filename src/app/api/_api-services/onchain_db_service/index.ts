@@ -24,8 +24,10 @@ import {
 	ITrackAnalyticsStats,
 	IGovAnalyticsStats,
 	IGovAnalyticsReferendumOutcome,
-	IGovAnalyticsDelegationStats
+	IGovAnalyticsDelegationStats,
+	ICuratorStats
 } from '@shared/types';
+
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
 import { BN, BN_ZERO } from '@polkadot/util';
@@ -265,6 +267,10 @@ export class OnChainDbService {
 		return SubsquidService.GetChildBountiesByParentBountyIndex({ network, index, page, limit });
 	}
 
+	static async GetAllActiveBountyCurators(network: ENetwork): Promise<string[]> {
+		return SubsquidService.GetAllActiveBountyCurators(network);
+	}
+
 	static async GetConvictionVotingDelegationStats(network: ENetwork): Promise<IDelegationStats> {
 		return SubsquidService.GetConvictionVotingDelegationStats(network);
 	}
@@ -408,5 +414,9 @@ export class OnChainDbService {
 
 	static async GetActivityStats({ network, oneWeekAgo }: { network: ENetwork; oneWeekAgo: string }) {
 		return SubsquidService.GetActivityStatsRaw({ network, oneWeekAgo });
+	}
+
+	static async GetCuratorStats({ network, curatorAddress }: { network: ENetwork; curatorAddress: string }): Promise<ICuratorStats[]> {
+		return SubsquidService.GetBountiesByCurator(network, curatorAddress);
 	}
 }
