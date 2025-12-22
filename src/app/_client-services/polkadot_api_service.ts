@@ -16,7 +16,7 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { Signer, ISubmittableResult, TypeDef } from '@polkadot/types/types';
 import { BN, BN_HUNDRED, BN_ZERO, u8aToHex } from '@polkadot/util';
 import { getTypeDef } from '@polkadot/types';
-import { decodeAddress, mnemonicGenerate, cryptoWaitReady } from '@polkadot/util-crypto';
+import { decodeAddress, encodeAddress, mnemonicGenerate, cryptoWaitReady } from '@polkadot/util-crypto';
 import { ERROR_CODES } from '@shared/_constants/errorLiterals';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import {
@@ -901,6 +901,114 @@ export class PolkadotApiService {
 		);
 	}
 
+	getBountyAccountId({ bountyId }: { bountyId: number }): string | null {
+		if (!this.api) return null;
+		const palletId = this.api.consts?.bounties?.palletId;
+		if (!palletId) return null;
+
+		const palletIdU8a = palletId.toU8a();
+		const bountyIndexU8a = new Uint8Array(4);
+		new DataView(bountyIndexU8a.buffer).setUint32(0, bountyId, true);
+
+		const BOUNTY_PREFIX = new TextEncoder().encode('modl');
+		const combined = new Uint8Array(32);
+		combined.set(BOUNTY_PREFIX, 0);
+		combined.set(palletIdU8a.slice(0, 8), 4);
+		combined.set(new TextEncoder().encode('bt:'), 12);
+		combined.set(bountyIndexU8a, 15);
+
+		return encodeAddress(combined, NETWORKS_DETAILS[this.network].ss58Format);
+	}
+
+	getBountyFundingExtrinsic({ bountyId, amount }: { bountyId: number; amount: BN }) {
+		if (!this.api) return null;
+
+		const bountyAccountId = this.getBountyAccountId({ bountyId });
+		if (!bountyAccountId) return null;
+
+		return this.api.tx.treasury.spendLocal(amount, bountyAccountId);
+	}
+
+	async fundBountyViaReferendum({
+		bountyId,
+		amount,
+		track,
+		enactment,
+		enactmentValue,
+		address,
+		wallet,
+		selectedAccount,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		bountyId: number;
+		amount: BN;
+		track: EPostOrigin;
+		enactment: EEnactment;
+		enactmentValue: BN;
+		address: string;
+		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
+		onSuccess?: (referendumIndex: number) => void;
+		onFailed?: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api || !address || amount.isZero()) return;
+
+		const fundingTx = this.getBountyFundingExtrinsic({ bountyId, amount });
+		if (!fundingTx) {
+			onFailed?.('Failed to create bounty funding transaction');
+			return;
+		}
+
+		const preimageDetails = this.getPreimageTxDetails({ extrinsicFn: fundingTx });
+		if (!preimageDetails) {
+			onFailed?.('Failed to get preimage details');
+			return;
+		}
+
+		const notePreimageTx = this.getNotePreimageTx({ extrinsicFn: fundingTx });
+		const submitProposalTx = this.getSubmitProposalTx({
+			track,
+			preimageHash: preimageDetails.preimageHash,
+			preimageLength: preimageDetails.preimageLength,
+			enactment,
+			enactmentValue
+		});
+
+		if (!notePreimageTx || !submitProposalTx) {
+			onFailed?.('Failed to create proposal transactions');
+			return;
+		}
+
+		const preimageExists = await this.getPreimageLengthFromPreimageHash({ preimageHash: preimageDetails.preimageHash });
+		const tx = preimageExists ? submitProposalTx : this.getBatchAllTx([notePreimageTx, submitProposalTx]);
+
+		if (!tx) {
+			onFailed?.('Failed to batch transactions');
+			return;
+		}
+
+		const referendumIndex = Number(await this.api.query.referenda.referendumCount());
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			selectedAccount,
+			errorMessageFallback: 'Failed to submit bounty funding referendum',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.(referendumIndex);
+			},
+			onFailed: (error) => {
+				onFailed?.(error);
+			},
+			setVaultQrState
+		});
+	}
+
 	getTreasurySpendLocalExtrinsic({ beneficiaries }: { beneficiaries: IBeneficiaryInput[] }) {
 		if (!this.api) {
 			return null;
@@ -1179,6 +1287,464 @@ export class PolkadotApiService {
 	getApproveBountyTx({ bountyId }: { bountyId: number }) {
 		if (!this.api) return null;
 		return this.api.tx.bounties.approveBounty(bountyId);
+	}
+
+	getProposeCuratorTx({ bountyId, curator, fee }: { bountyId: number; curator: string; fee: BN }) {
+		if (!this.api) return null;
+		return this.api.tx.bounties.proposeCurator(bountyId, curator, fee);
+	}
+
+	async proposeCurator({
+		bountyId,
+		curator,
+		fee,
+		address,
+		wallet,
+		selectedAccount,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		bountyId: number;
+		curator: string;
+		fee: BN;
+		address: string;
+		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
+		onSuccess?: () => void;
+		onFailed?: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api || !address || !curator) return;
+
+		const tx = this.getProposeCuratorTx({ bountyId, curator, fee });
+
+		if (!tx) {
+			onFailed?.('Failed to create propose curator transaction');
+			return;
+		}
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			selectedAccount,
+			errorMessageFallback: 'Failed to propose curator',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: (error) => {
+				onFailed?.(error);
+			},
+			setVaultQrState
+		});
+	}
+
+	getAcceptCuratorTx({ bountyId }: { bountyId: number }) {
+		if (!this.api) return null;
+		return this.api.tx.bounties.acceptCurator(bountyId);
+	}
+
+	async acceptCurator({
+		bountyId,
+		address,
+		wallet,
+		selectedAccount,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		bountyId: number;
+		address: string;
+		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
+		onSuccess?: () => void;
+		onFailed?: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api || !address) return;
+
+		const tx = this.getAcceptCuratorTx({ bountyId });
+
+		if (!tx) {
+			onFailed?.('Failed to create accept curator transaction');
+			return;
+		}
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			selectedAccount,
+			errorMessageFallback: 'Failed to accept curator role',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: (error) => {
+				onFailed?.(error);
+			},
+			setVaultQrState
+		});
+	}
+
+	getUnassignCuratorTx({ bountyId }: { bountyId: number }) {
+		if (!this.api) return null;
+		return this.api.tx.bounties.unassignCurator(bountyId);
+	}
+
+	async unassignCurator({
+		bountyId,
+		address,
+		wallet,
+		selectedAccount,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		bountyId: number;
+		address: string;
+		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
+		onSuccess?: () => void;
+		onFailed?: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api || !address) return;
+
+		const tx = this.getUnassignCuratorTx({ bountyId });
+
+		if (!tx) {
+			onFailed?.('Failed to create unassign curator transaction');
+			return;
+		}
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			selectedAccount,
+			errorMessageFallback: 'Failed to unassign curator',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: (error) => {
+				onFailed?.(error);
+			},
+			setVaultQrState
+		});
+	}
+
+	getAddChildBountyTx({ parentBountyId, value, description }: { parentBountyId: number; value: BN; description: string }) {
+		if (!this.api) return null;
+		return this.api.tx.childBounties.addChildBounty(parentBountyId, value, description);
+	}
+
+	async addChildBounty({
+		parentBountyId,
+		value,
+		description,
+		address,
+		wallet,
+		selectedAccount,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		parentBountyId: number;
+		value: BN;
+		description: string;
+		address: string;
+		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
+		onSuccess?: (childBountyId: number) => void;
+		onFailed?: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api || !address || !description || value.isZero()) return;
+
+		const childBountyCount = Number(await this.api.query.childBounties.childBountyCount());
+
+		const tx = this.getAddChildBountyTx({ parentBountyId, value, description });
+
+		if (!tx) {
+			onFailed?.('Failed to create add child bounty transaction');
+			return;
+		}
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			selectedAccount,
+			errorMessageFallback: 'Failed to add child bounty',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.(childBountyCount);
+			},
+			onFailed: (error) => {
+				onFailed?.(error);
+			},
+			setVaultQrState
+		});
+	}
+
+	getProposeChildCuratorTx({ parentBountyId, childBountyId, curator, fee }: { parentBountyId: number; childBountyId: number; curator: string; fee: BN }) {
+		if (!this.api) return null;
+		return this.api.tx.childBounties.proposeCurator(parentBountyId, childBountyId, curator, fee);
+	}
+
+	async proposeChildCurator({
+		parentBountyId,
+		childBountyId,
+		curator,
+		fee,
+		address,
+		wallet,
+		selectedAccount,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		parentBountyId: number;
+		childBountyId: number;
+		curator: string;
+		fee: BN;
+		address: string;
+		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
+		onSuccess?: () => void;
+		onFailed?: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api || !address || !curator) return;
+
+		const tx = this.getProposeChildCuratorTx({ parentBountyId, childBountyId, curator, fee });
+
+		if (!tx) {
+			onFailed?.('Failed to create propose child curator transaction');
+			return;
+		}
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			selectedAccount,
+			errorMessageFallback: 'Failed to propose child bounty curator',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: (error) => {
+				onFailed?.(error);
+			},
+			setVaultQrState
+		});
+	}
+
+	getAcceptChildCuratorTx({ parentBountyId, childBountyId }: { parentBountyId: number; childBountyId: number }) {
+		if (!this.api) return null;
+		return this.api.tx.childBounties.acceptCurator(parentBountyId, childBountyId);
+	}
+
+	async acceptChildCurator({
+		parentBountyId,
+		childBountyId,
+		address,
+		wallet,
+		selectedAccount,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		parentBountyId: number;
+		childBountyId: number;
+		address: string;
+		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
+		onSuccess?: () => void;
+		onFailed?: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api || !address) return;
+
+		const tx = this.getAcceptChildCuratorTx({ parentBountyId, childBountyId });
+
+		if (!tx) {
+			onFailed?.('Failed to create accept child curator transaction');
+			return;
+		}
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			selectedAccount,
+			errorMessageFallback: 'Failed to accept child bounty curator role',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: (error) => {
+				onFailed?.(error);
+			},
+			setVaultQrState
+		});
+	}
+
+	getAwardChildBountyTx({ parentBountyId, childBountyId, beneficiary }: { parentBountyId: number; childBountyId: number; beneficiary: string }) {
+		if (!this.api) return null;
+		return this.api.tx.childBounties.awardChildBounty(parentBountyId, childBountyId, beneficiary);
+	}
+
+	async awardChildBounty({
+		parentBountyId,
+		childBountyId,
+		beneficiary,
+		address,
+		wallet,
+		selectedAccount,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		parentBountyId: number;
+		childBountyId: number;
+		beneficiary: string;
+		address: string;
+		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
+		onSuccess?: () => void;
+		onFailed?: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api || !address || !beneficiary) return;
+
+		const tx = this.getAwardChildBountyTx({ parentBountyId, childBountyId, beneficiary });
+
+		if (!tx) {
+			onFailed?.('Failed to create award child bounty transaction');
+			return;
+		}
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			selectedAccount,
+			errorMessageFallback: 'Failed to award child bounty',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: (error) => {
+				onFailed?.(error);
+			},
+			setVaultQrState
+		});
+	}
+
+	getClaimChildBountyTx({ parentBountyId, childBountyId }: { parentBountyId: number; childBountyId: number }) {
+		if (!this.api) return null;
+		return this.api.tx.childBounties.claimChildBounty(parentBountyId, childBountyId);
+	}
+
+	async claimChildBounty({
+		parentBountyId,
+		childBountyId,
+		address,
+		wallet,
+		selectedAccount,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		parentBountyId: number;
+		childBountyId: number;
+		address: string;
+		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
+		onSuccess?: () => void;
+		onFailed?: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api || !address) return;
+
+		const tx = this.getClaimChildBountyTx({ parentBountyId, childBountyId });
+
+		if (!tx) {
+			onFailed?.('Failed to create claim child bounty transaction');
+			return;
+		}
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			selectedAccount,
+			errorMessageFallback: 'Failed to claim child bounty',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: (error) => {
+				onFailed?.(error);
+			},
+			setVaultQrState
+		});
+	}
+
+	getCloseChildBountyTx({ parentBountyId, childBountyId }: { parentBountyId: number; childBountyId: number }) {
+		if (!this.api) return null;
+		return this.api.tx.childBounties.closeChildBounty(parentBountyId, childBountyId);
+	}
+
+	async closeChildBounty({
+		parentBountyId,
+		childBountyId,
+		address,
+		wallet,
+		selectedAccount,
+		onSuccess,
+		onFailed,
+		setVaultQrState
+	}: {
+		parentBountyId: number;
+		childBountyId: number;
+		address: string;
+		wallet: EWallet;
+		selectedAccount?: ISelectedAccount;
+		onSuccess?: () => void;
+		onFailed?: (error: string) => void;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+	}) {
+		if (!this.api || !address) return;
+
+		const tx = this.getCloseChildBountyTx({ parentBountyId, childBountyId });
+
+		if (!tx) {
+			onFailed?.('Failed to create close child bounty transaction');
+			return;
+		}
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			selectedAccount,
+			errorMessageFallback: 'Failed to close child bounty',
+			waitTillFinalizedHash: true,
+			onSuccess: () => {
+				onSuccess?.();
+			},
+			onFailed: (error) => {
+				onFailed?.(error);
+			},
+			setVaultQrState
+		});
 	}
 
 	async createProposal({
