@@ -188,6 +188,11 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 
 	const enableGraph = useMemo(() => !!trackName && !!timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced), [trackName, timeline]);
 
+	const voteTabs = [EVoteBubbleTabs.Summary, EVoteBubbleTabs.Bubble];
+	if (enableGraph) {
+		voteTabs.push(EVoteBubbleTabs.Graph);
+	}
+
 	return (
 		<div className={classes.card}>
 			<div className='flex w-full items-center justify-between'>
@@ -219,62 +224,37 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 					approvalThreshold={approvalThreshold}
 				/>
 			</div>
-			{enableGraph ? (
-				<Tabs
-					value={activeTab}
-					defaultValue={activeTab}
+			<Tabs
+				value={activeTab}
+				defaultValue={activeTab}
+			>
+				<div className={classes.tabs}>
+					{voteTabs.map((tab) => (
+						<Button
+							key={tab}
+							variant='ghost'
+							size='sm'
+							onClick={() => setActiveTab(tab)}
+							className={cn(classes.tab, 'h-7', activeTab === tab ? classes.activeTab : classes.inactiveTab)}
+						>
+							{t(tab)}
+						</Button>
+					))}
+				</div>
+				<TabsContent
+					value={EVoteBubbleTabs.Summary}
+					className='px-6'
 				>
-					<div className={classes.tabs}>
-						{[EVoteBubbleTabs.Summary, EVoteBubbleTabs.Bubble, EVoteBubbleTabs.Graph].map((tab) => (
-							<Button
-								key={tab}
-								variant='ghost'
-								size='sm'
-								onClick={() => setActiveTab(tab)}
-								className={cn(classes.tab, 'h-7', activeTab === tab ? classes.activeTab : classes.inactiveTab)}
-							>
-								{t(tab)}
-							</Button>
-						))}
-					</div>
-					<TabsContent
-						value={EVoteBubbleTabs.Summary}
-						className='px-6'
-					>
-						<VoteSummary
-							index={index}
-							voteMetrics={voteMetrics}
-							approvalThreshold={approvalThreshold}
-						/>
-					</TabsContent>
-					<TabsContent
-						value={EVoteBubbleTabs.Bubble}
-						className='px-6'
-					>
-						<VotesBubbleChart
-							proposalType={proposalType}
-							index={index}
-							analyticsType={EAnalyticsType.CONVICTIONS}
-							enableFullHeight={false}
-							setIsExpanded={setIsExpanded}
-						/>
-					</TabsContent>
-					<TabsContent value={EVoteBubbleTabs.Graph}>
-						<VoteCurvesData
-							latestApproval={voteCurveData?.latestApproval}
-							chartLabels={voteCurveData?.labels || []}
-							approvalData={voteCurveData?.approvalData || []}
-							supportData={voteCurveData?.supportData || []}
-							approvalThresholdData={voteCurveData?.approvalThresholdData || []}
-							supportThresholdData={voteCurveData?.supportThresholdData || []}
-							latestSupport={voteCurveData?.latestSupport}
-							isFetching={isFetching}
-							thresholdValues={thresholdValues}
-						/>
-					</TabsContent>
-				</Tabs>
-			) : (
-				<div className='px-6'>
+					<VoteSummary
+						index={index}
+						voteMetrics={voteMetrics}
+						approvalThreshold={approvalThreshold}
+					/>
+				</TabsContent>
+				<TabsContent
+					value={EVoteBubbleTabs.Bubble}
+					className='px-6'
+				>
 					<VotesBubbleChart
 						proposalType={proposalType}
 						index={index}
@@ -282,9 +262,21 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 						enableFullHeight={false}
 						setIsExpanded={setIsExpanded}
 					/>
-				</div>
-			)}
-
+				</TabsContent>
+				<TabsContent value={EVoteBubbleTabs.Graph}>
+					<VoteCurvesData
+						latestApproval={voteCurveData?.latestApproval}
+						chartLabels={voteCurveData?.labels || []}
+						approvalData={voteCurveData?.approvalData || []}
+						supportData={voteCurveData?.supportData || []}
+						approvalThresholdData={voteCurveData?.approvalThresholdData || []}
+						supportThresholdData={voteCurveData?.supportThresholdData || []}
+						latestSupport={voteCurveData?.latestSupport}
+						isFetching={isFetching}
+						thresholdValues={thresholdValues}
+					/>
+				</TabsContent>
+			</Tabs>
 			<div className={classes.voteHistoryContainer}>
 				<Dialog>
 					<DialogTrigger

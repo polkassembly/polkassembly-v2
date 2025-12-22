@@ -66,25 +66,21 @@ function VotesDataDialog({
 			<DialogContent className={classes.dialogContent}>
 				<DialogHeader className={classes.dialogHeader}>
 					<DialogTitle className={classes.dialogTitle}>
-						{enableGraph ? (
-							<div className='flex items-center justify-between'>
-								<Select
-									value={activeTab}
-									onValueChange={(value: EVoteBubbleTabs) => setActiveTab(value)}
-								>
-									<SelectTrigger className='flex items-center gap-2 border-none text-lg font-semibold text-text_primary shadow-none'>
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value={EVoteBubbleTabs.Summary}>{t('voteSummary')}</SelectItem>
-										<SelectItem value={EVoteBubbleTabs.Bubble}>{t('voteBubble')}</SelectItem>
-										<SelectItem value={EVoteBubbleTabs.Graph}>{t('voteGraph')}</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-						) : (
-							<div className='flex items-center gap-2 border-none text-lg font-semibold text-text_primary shadow-none'>{t('voteBubble')}</div>
-						)}
+						<div className='flex items-center justify-between'>
+							<Select
+								value={activeTab}
+								onValueChange={(value: EVoteBubbleTabs) => setActiveTab(value)}
+							>
+								<SelectTrigger className='flex items-center gap-2 border-none text-lg font-semibold text-text_primary shadow-none'>
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value={EVoteBubbleTabs.Summary}>{t('voteSummary')}</SelectItem>
+									<SelectItem value={EVoteBubbleTabs.Bubble}>{t('voteBubble')}</SelectItem>
+									{enableGraph ? <SelectItem value={EVoteBubbleTabs.Graph}>{t('voteGraph')}</SelectItem> : null}
+								</SelectContent>
+							</Select>
+						</div>
 					</DialogTitle>
 				</DialogHeader>
 				<div className={classes.dialogTabsContent}>
