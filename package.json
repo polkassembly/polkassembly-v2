@@ -119,6 +119,7 @@
 		"turndown": "^7.2.0",
 		"validator": "^13.15.22",
 		"vaul": "^1.1.2",
+		"youtube-caption-extractor": "^1.9.1",
 		"zod": "^3.24.1",
 		"zod-validation-error": "^3.4.0"
 	},

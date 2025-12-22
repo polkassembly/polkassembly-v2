@@ -29,6 +29,7 @@ import { Skeleton } from '../Skeleton';
 import Poll from './Poll/Poll';
 import BeneficiariesDetails from './BeneficiariesDetails/BeneficiariesDetails';
 import UserVoteStatus from './UserVoteStatus/UserVoteStatus';
+import AAGVideosTab from './AAGVideosTab/AAGVideosTab';
 
 const AISummary = dynamic(() => import('../AISummary/AISummary'), {
 	ssr: false,
@@ -224,6 +225,16 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 									isModalOpen={isModalOpen ?? false}
 								/>
 							</div>
+							<div className={classes.commentsBox}>
+								<PostComments
+									proposalType={post.proposalType}
+									index={index}
+									contentSummary={post.contentSummary}
+									comments={post.comments}
+									allowedCommentor={post.allowedCommentor}
+									postUserId={post.userId}
+								/>
+							</div>
 						</TabsContent>
 						<TabsContent
 							value={EPostDetailsTab.ONCHAIN_INFO}
@@ -263,6 +274,14 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								/>
 							</div>
 						</TabsContent>
+						<TabsContent
+							value={EPostDetailsTab.AAG}
+							className='mt-0'
+						>
+							<div className={classes.descBox}>
+								<AAGVideosTab referendaId={index} />
+							</div>
+						</TabsContent>
 						{isModalOpen && !isOffchainPost && post.proposalType === EProposalType.REFERENDUM_V2 && (
 							<div className='sticky bottom-0 z-50 border-t border-border_grey bg-bg_modal p-4'>
 								{canVote(post.onChainInfo?.status) && (
@@ -274,16 +293,6 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 								)}
 							</div>
 						)}
-						<div className={classes.commentsBox}>
-							<PostComments
-								proposalType={post.proposalType}
-								index={index}
-								contentSummary={post.contentSummary}
-								comments={post.comments}
-								allowedCommentor={post.allowedCommentor}
-								postUserId={post.userId}
-							/>
-						</div>
 					</div>
 
 					{isModalOpen && !isOffchainPost && (

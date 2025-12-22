@@ -64,6 +64,9 @@ import {
 	IGovAnalyticsCategoryCounts,
 	IConversationHistory,
 	IConversationMessage,
+	IAAGVideoSummary,
+	IAAGVideoMetadata,
+	ENetwork,
 	IDelegateXAccount,
 	IDelegateXVoteData,
 	IActivityStats,
@@ -172,6 +175,10 @@ enum EApiRoute {
 	KLARA_SEND_FEEDBACK = 'KLARA_SEND_FEEDBACK',
 	KLARA_SEND_MESSAGE = 'KLARA_SEND_MESSAGE',
 	GET_GOOGLE_SHEET_NEWS = 'GET_GOOGLE_SHEET_NEWS',
+	GET_AAG_VIDEO_BY_ID = 'GET_AAG_VIDEO_BY_ID',
+	GET_AAG_VIDEOS = 'GET_AAG_VIDEOS',
+	GET_AAG_VIDEO_BY_REFERENDUM = 'GET_AAG_VIDEO_BY_REFERENDUM',
+	POST_AAG_REQUEST = 'POST_AAG_REQUEST',
 	CREATE_DELEGATE_X_BOT = 'CREATE_DELEGATE_X_BOT',
 	UPDATE_DELEGATE_X_BOT = 'UPDATE_DELEGATE_X_BOT',
 	GET_DELEGATE_X_DETAILS = 'GET_DELEGATE_X_DETAILS',
@@ -423,6 +430,20 @@ export class NextApiClientService {
 				path = '/external/news';
 				break;
 
+			case EApiRoute.GET_AAG_VIDEOS:
+				path = '/aag/videos';
+				break;
+			case EApiRoute.GET_AAG_VIDEO_BY_ID:
+				path = '/aag/videos';
+				break;
+			case EApiRoute.GET_AAG_VIDEO_BY_REFERENDUM:
+				path = '/aag/referenda';
+				break;
+			case EApiRoute.POST_AAG_REQUEST:
+				path = '/aag/request';
+				method = 'POST';
+				break;
+
 			case EApiRoute.CREATE_DELEGATE_X_BOT:
 				path = '/delegate-x';
 				method = 'POST';
@@ -562,6 +583,38 @@ export class NextApiClientService {
 			method,
 			signal
 		});
+	}
+
+	private static async nextApiClientFetchFormData<T>({
+		url,
+		method,
+		formData
+	}: {
+		url: URL;
+		method: Method;
+		formData: FormData;
+	}): Promise<{ data: T | null; error: IErrorResponse | null }> {
+		const currentNetwork = await this.getCurrentNetwork();
+		const isMimir = await isMimirDetected();
+
+		const response = await fetch(url, {
+			body: formData,
+			credentials: 'include',
+			headers: {
+				...(!global.window ? await getCookieHeadersServer() : {}),
+				...(isMimir ? { 'x-iframe-context': 'mimir' } : {}),
+				[EHttpHeaderKey.API_KEY]: getSharedEnvVars().NEXT_PUBLIC_POLKASSEMBLY_API_KEY,
+				[EHttpHeaderKey.NETWORK]: currentNetwork
+			},
+			method
+		});
+
+		const resJSON = await response.json();
+
+		if (response.status === StatusCodes.OK) {
+			return { data: resJSON as T, error: null };
+		}
+		return { data: null, error: resJSON as IErrorResponse };
 	}
 
 	// auth
@@ -1658,6 +1711,78 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DELEGATE_X_VOTE_HISTORY, queryParams });
 		return this.nextApiClientFetch<{ success: boolean; voteData: IDelegateXVoteData[]; totalCount: number }>({ url, method });
+	}
+
+	static async getAAGVideos({ q, limit, page, sort, network }: { q?: string; limit?: number; page?: number; sort?: 'latest' | 'oldest'; network?: ENetwork | null }) {
+		const queryParams = new URLSearchParams();
+
+		if (q) {
+			queryParams.set('q', q);
+		}
+
+		if (limit) {
+			queryParams.set('limit', limit.toString());
+		}
+
+		if (page) {
+			queryParams.set('page', page.toString());
+		}
+
+		if (sort) {
+			queryParams.set('sort', sort);
+		}
+
+		if (network) {
+			queryParams.set('network', network);
+		}
+
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_AAG_VIDEOS,
+			queryParams
+		});
+
+		return this.nextApiClientFetch<IGenericListingResponse<IAAGVideoSummary>>({
+			url,
+			method
+		});
+	}
+
+	static async getAAGVideoById({ videoId }: { videoId: string }) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_AAG_VIDEO_BY_ID,
+			routeSegments: [videoId]
+		});
+
+		return this.nextApiClientFetch<IAAGVideoMetadata | null>({
+			url,
+			method
+		});
+	}
+
+	static async getAAGVideosByReferendum({ referendaId, limit }: { referendaId: string; limit?: number }) {
+		const queryParams = new URLSearchParams();
+
+		if (limit) {
+			queryParams.set('limit', limit.toString());
+		}
+
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.GET_AAG_VIDEO_BY_REFERENDUM,
+			routeSegments: [referendaId],
+			queryParams
+		});
+
+		return this.nextApiClientFetch<IGenericListingResponse<IAAGVideoSummary>>({
+			url,
+			method
+		});
+	}
+
+	static async postAAGRequest(formData: FormData) {
+		const { url, method } = await this.getRouteConfig({
+			route: EApiRoute.POST_AAG_REQUEST
+		});
+		return this.nextApiClientFetchFormData<{ success: boolean; message: string }>({ url, method, formData });
 	}
 
 	static async getTreasuryReport() {

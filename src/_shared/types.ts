@@ -789,7 +789,8 @@ export enum EPostDetailsTab {
 	DESCRIPTION = 'description',
 	ONCHAIN_INFO = 'onchain_info',
 	SUMMARISE = 'summarise',
-	POST_ANALYTICS = 'post_analytics'
+	POST_ANALYTICS = 'post_analytics',
+	AAG = 'aag'
 }
 
 export enum EActivityName {
@@ -1699,6 +1700,99 @@ export interface IChatResponse {
 	followUpQuestions?: string[];
 	isNewConversation?: boolean;
 	conversationId?: string;
+}
+
+export interface IYouTubeCaption {
+	start: number;
+	dur: number;
+	text: string;
+}
+
+export interface IYouTubeThumbnail {
+	url: string;
+	width: number;
+	height: number;
+}
+
+export interface IYouTubeVideoMetadata {
+	id: string;
+	title: string;
+	description: string;
+	thumbnails: {
+		default?: IYouTubeThumbnail;
+		medium?: IYouTubeThumbnail;
+		high?: IYouTubeThumbnail;
+		standard?: IYouTubeThumbnail;
+		maxres?: IYouTubeThumbnail;
+	};
+	publishedAt: string;
+	channelId: string;
+	channelTitle: string;
+	duration: string;
+	viewCount?: string;
+	likeCount?: string;
+	commentCount?: string;
+	url: string;
+	captions?: IYouTubeCaption[];
+	tags?: string[];
+	agendaUrl?: string;
+	chapters?: IYouTubeChapter[];
+}
+
+export interface IYouTubeChapter {
+	id: string;
+	title: string;
+	timestamp: string;
+	start: number;
+	description?: string;
+	duration?: string;
+}
+
+export interface IAAGVideoSummary {
+	id: string;
+	title: string;
+	thumbnail: string;
+	referenda: { referendaNo: string }[];
+	publishedAt: string;
+	duration: string;
+	agendaUrl: string;
+	network: ENetwork | null;
+	url: string;
+}
+
+export interface IAAGVideoMetadata {
+	id: string;
+	title: string;
+	publishedAt: Date;
+	duration: string;
+	description: string;
+	thumbnail: string;
+	url: string;
+	network: ENetwork | null;
+	viewCount: number;
+	likeCount: number;
+	commentCount?: number;
+	agendaUrl?: string;
+	aiSummary: string;
+	referenda?: { referendaNo: string }[];
+	chapters: Array<{
+		id: string;
+		title: string;
+		startTime: number;
+		endTime: number;
+		description?: string;
+	}>;
+	transcript: {
+		language: string;
+		captions: Array<{
+			start: number;
+			dur: number;
+			text: string;
+		}>;
+	};
+	createdAt: Date;
+	updatedAt: Date;
+	isIndexed: boolean;
 }
 
 export interface IDelegateXAccount {

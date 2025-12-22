@@ -74,4 +74,6 @@ export class FirestoreUtils {
 	protected static conversationsCollectionRef = () => this.firestoreDb.collection('klara_conversations');
 
 	protected static messagesCollectionRef = () => this.firestoreDb.collection('klara_messages');
+
+	protected static aagVideoMetadataCollectionRef = () => this.firestoreDb.collection('aag_video_metadata');
 }
