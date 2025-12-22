@@ -71,9 +71,6 @@ import {
 	IJob,
 	IOGTrackerData,
 	IConversationTurn,
-	IDVCohort,
-	IDVDReferendumResponse,
-	IDVCohortVote,
 	IMembersDetails
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
@@ -185,8 +182,7 @@ enum EApiRoute {
 	GET_TREASURY_REPORT = 'GET_TREASURY_REPORT',
 	GET_OGTRACKER_DATA = 'GET_OGTRACKER_DATA',
 	FETCH_COMMUNITY_CURATORS = 'FETCH_COMMUNITY_CURATORS',
-	FETCH_COMMUNITY_MEMBERS = 'FETCH_COMMUNITY_MEMBERS',
-	GET_DV_COHORTS = 'GET_DV_COHORTS'
+	FETCH_COMMUNITY_MEMBERS = 'FETCH_COMMUNITY_MEMBERS'
 }
 
 export class NextApiClientService {
@@ -469,10 +465,6 @@ export class NextApiClientService {
 			case EApiRoute.FETCH_COMMUNITY_CURATORS:
 			case EApiRoute.FETCH_COMMUNITY_MEMBERS:
 				path = '/people';
-				break;
-
-			case EApiRoute.GET_DV_COHORTS:
-				path = '/dv/cohorts';
 				break;
 
 			default:
@@ -1707,25 +1699,5 @@ export class NextApiClientService {
 
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_COMMUNITY_MEMBERS, routeSegments: ['members'], queryParams });
 		return this.nextApiClientFetch<IGenericListingResponse<IMembersDetails>>({ url, method });
-	}
-
-	static async fetchDVCohorts() {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS });
-		return this.nextApiClientFetch<IDVCohort[]>({ url, method });
-	}
-
-	static async fetchDVCohortDetails(id: number) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS, routeSegments: [id.toString()] });
-		return this.nextApiClientFetch<IDVCohort>({ url, method });
-	}
-
-	static async fetchDVCohortReferenda(cohortId: number) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS, routeSegments: [cohortId.toString(), 'referenda'] });
-		return this.nextApiClientFetch<IDVDReferendumResponse[]>({ url, method });
-	}
-
-	static async fetchDVCohortVotes(cohortId: number) {
-		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_DV_COHORTS, routeSegments: [cohortId.toString(), 'votes'] });
-		return this.nextApiClientFetch<IDVCohortVote[]>({ url, method });
 	}
 }

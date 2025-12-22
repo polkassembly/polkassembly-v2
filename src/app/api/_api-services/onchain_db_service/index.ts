@@ -25,8 +25,7 @@ import {
 	IGovAnalyticsStats,
 	IGovAnalyticsReferendumOutcome,
 	IGovAnalyticsDelegationStats,
-	ICuratorStats,
-	IDVVotes
+	ICuratorStats
 } from '@shared/types';
 
 import { ValidatorService } from '@shared/_services/validator_service';
@@ -419,15 +418,5 @@ export class OnChainDbService {
 
 	static async GetCuratorStats({ network, curatorAddress }: { network: ENetwork; curatorAddress: string }): Promise<ICuratorStats[]> {
 		return SubsquidService.GetBountiesByCurator(network, curatorAddress);
-	}
-
-	static async GetCohortReferenda({ network }: { network: ENetwork }) {
-		return SubsquidService.GetCohortReferenda({
-			network
-		});
-	}
-
-	static async GetVotesForReferendaIndices({ network, indices, voterAddresses }: { network: ENetwork; indices: number[]; voterAddresses: string[] }): Promise<IDVVotes[]> {
-		return SubsquidService.GetVotesForReferendaIndices({ network, indices, voterAddresses });
 	}
 }
