@@ -657,10 +657,12 @@
 		},
 		"VotesData": {
 			"Votes": "投票",
+			"summary": "要約",
 			"bubble": "バブル",
 			"graph": "グラフ",
 			"voteHistory": "投票履歴 (ネストされた投票とフラット化された投票)",
 			"votes": "投票",
+			"voteSummary": "投票の要約",
 			"voteGraph": "投票グラフ",
 			"voteBubble": "投票バブル",
 			"nestedVotes": "ネストされた投票",

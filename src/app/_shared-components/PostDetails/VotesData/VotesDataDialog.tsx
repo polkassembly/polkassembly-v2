@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { EProposalType, EAnalyticsType, EVoteBubbleTabs } from '@/_shared/types';
+import { EProposalType, EAnalyticsType, EVoteBubbleTabs, IVoteMetrics } from '@/_shared/types';
 import React, { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../Dialog/Dialog';
@@ -12,6 +12,7 @@ import VoteCurves from '../VoteCurvesData/VoteCurves';
 import VoteCurvesDetails from '../VoteCurvesData/VoteCurvesDetails';
 import classes from './VotesData.module.scss';
 import VotesBubbleChart from '../VotesBubbleChart/VotesBubbleChart';
+import VoteSummary from '../VoteSummary/VoteSummary';
 
 function VotesDataDialog({
 	chartLabels,
@@ -28,7 +29,9 @@ function VotesDataDialog({
 	enableGraph = false,
 	selectedTab,
 	isExpanded,
-	setIsExpanded
+	setIsExpanded,
+	voteMetrics,
+	approvalThreshold
 }: {
 	chartLabels: number[];
 	approvalData: { x: number; y: number }[];
@@ -45,9 +48,11 @@ function VotesDataDialog({
 	selectedTab: EVoteBubbleTabs;
 	isExpanded: boolean;
 	setIsExpanded: (isExpanded: boolean) => void;
+	voteMetrics?: IVoteMetrics;
+	approvalThreshold?: number;
 }) {
 	const t = useTranslations('PostDetails.VotesData');
-	const [activeTab, setActiveTab] = useState(selectedTab || EVoteBubbleTabs.Bubble);
+	const [activeTab, setActiveTab] = useState(selectedTab || EVoteBubbleTabs.Summary);
 
 	useEffect(() => {
 		setActiveTab(selectedTab);
@@ -61,31 +66,36 @@ function VotesDataDialog({
 			<DialogContent className={classes.dialogContent}>
 				<DialogHeader className={classes.dialogHeader}>
 					<DialogTitle className={classes.dialogTitle}>
-						{enableGraph ? (
-							<div className='flex items-center justify-between'>
-								<Select
-									value={activeTab}
-									onValueChange={(value: EVoteBubbleTabs) => setActiveTab(value)}
-								>
-									<SelectTrigger className='flex items-center gap-2 border-none text-lg font-semibold text-text_primary shadow-none'>
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value={EVoteBubbleTabs.Bubble}>{t('voteBubble')}</SelectItem>
-										<SelectItem value={EVoteBubbleTabs.Graph}>{t('voteGraph')}</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-						) : (
-							<div className='flex items-center gap-2 border-none text-lg font-semibold text-text_primary shadow-none'>{t('voteBubble')}</div>
-						)}
+						<div className='flex items-center justify-between'>
+							<Select
+								value={activeTab}
+								onValueChange={(value: EVoteBubbleTabs) => setActiveTab(value)}
+							>
+								<SelectTrigger className='flex items-center gap-2 border-none text-lg font-semibold text-text_primary shadow-none'>
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value={EVoteBubbleTabs.Summary}>{t('voteSummary')}</SelectItem>
+									<SelectItem value={EVoteBubbleTabs.Bubble}>{t('voteBubble')}</SelectItem>
+									{enableGraph ? <SelectItem value={EVoteBubbleTabs.Graph}>{t('voteGraph')}</SelectItem> : null}
+								</SelectContent>
+							</Select>
+						</div>
 					</DialogTitle>
 				</DialogHeader>
 				<div className={classes.dialogTabsContent}>
 					{isFetching && <LoadingLayover />}
 
 					{/* Conditional Rendering based on Active Tab */}
-					{activeTab === EVoteBubbleTabs.Graph ? (
+					{activeTab === EVoteBubbleTabs.Summary ? (
+						<div>
+							<VoteSummary
+								index={index}
+								voteMetrics={voteMetrics}
+								approvalThreshold={approvalThreshold}
+							/>
+						</div>
+					) : activeTab === EVoteBubbleTabs.Graph ? (
 						<div className='mt-4 h-full'>
 							<VoteCurves
 								chartLabels={chartLabels}

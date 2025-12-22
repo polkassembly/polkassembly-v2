@@ -1,7 +1,7 @@
 // Copyright 2019-2025 @polkassembly/polkassembly authors & contributors
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
-import { EAnalyticsType, EPostOrigin, EProposalStatus, EProposalType, EVoteBubbleTabs, EVotesDisplayType, IStatusHistoryItem } from '@/_shared/types';
+import { EAnalyticsType, EPostOrigin, EProposalStatus, EProposalType, EVoteBubbleTabs, EVotesDisplayType, IStatusHistoryItem, IVoteMetrics } from '@/_shared/types';
 import { ChevronDown, ChevronRight, Expand } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
@@ -17,6 +17,7 @@ import { dayjs } from '@shared/_utils/dayjsInit';
 import { getTrackFunctions } from '@/app/_client-utils/trackCurvesUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../Dialog/Dialog';
 import { Button } from '../../Button';
+import VoteSummary from '../VoteSummary/VoteSummary';
 import VoteHistory from '../VoteSummary/VoteHistory/VoteHistory';
 import VoteCurvesData from '../VoteCurvesData/VoteCurvesData';
 import VotesBubbleChart from '../VotesBubbleChart/VotesBubbleChart';
@@ -33,11 +34,13 @@ interface IVotesDataProps {
 	timeline?: IStatusHistoryItem[];
 	setThresholdValues?: (values: { approvalThreshold: number; supportThreshold: number }) => void;
 	thresholdValues?: { approvalThreshold: number; supportThreshold: number };
+	voteMetrics?: IVoteMetrics;
+	approvalThreshold?: number;
 }
 
-function VotesData({ proposalType, index, trackName, createdAt, timeline, setThresholdValues, thresholdValues }: IVotesDataProps) {
+function VotesData({ proposalType, index, trackName, createdAt, timeline, setThresholdValues, thresholdValues, voteMetrics, approvalThreshold }: IVotesDataProps) {
 	const t = useTranslations('PostDetails.VotesData');
-	const [activeTab, setActiveTab] = useState<EVoteBubbleTabs>(EVoteBubbleTabs.Bubble);
+	const [activeTab, setActiveTab] = useState<EVoteBubbleTabs>(EVoteBubbleTabs.Summary);
 	const [votesDisplayType, setVotesDisplayType] = useState<EVotesDisplayType>(EVotesDisplayType.NESTED);
 	const [isExpanded, setIsExpanded] = useState(false);
 
@@ -185,6 +188,11 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 
 	const enableGraph = useMemo(() => !!trackName && !!timeline?.some((s) => s.status === EProposalStatus.DecisionDepositPlaced), [trackName, timeline]);
 
+	const voteTabs = [EVoteBubbleTabs.Summary, EVoteBubbleTabs.Bubble];
+	if (enableGraph) {
+		voteTabs.push(EVoteBubbleTabs.Graph);
+	}
+
 	return (
 		<div className={classes.card}>
 			<div className='flex w-full items-center justify-between'>
@@ -212,54 +220,41 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 					proposalType={proposalType}
 					selectedTab={activeTab}
 					enableGraph={enableGraph}
+					voteMetrics={voteMetrics}
+					approvalThreshold={approvalThreshold}
 				/>
 			</div>
-			{enableGraph ? (
-				<Tabs
-					value={activeTab}
-					defaultValue={activeTab}
+			<Tabs
+				value={activeTab}
+				defaultValue={activeTab}
+			>
+				<div className={classes.tabs}>
+					{voteTabs.map((tab) => (
+						<Button
+							key={tab}
+							variant='ghost'
+							size='sm'
+							onClick={() => setActiveTab(tab)}
+							className={cn(classes.tab, 'h-7', activeTab === tab ? classes.activeTab : classes.inactiveTab)}
+						>
+							{t(tab)}
+						</Button>
+					))}
+				</div>
+				<TabsContent
+					value={EVoteBubbleTabs.Summary}
+					className='px-6'
 				>
-					<div className={classes.tabs}>
-						{[EVoteBubbleTabs.Bubble, EVoteBubbleTabs.Graph].map((tab) => (
-							<Button
-								key={tab}
-								variant='ghost'
-								size='sm'
-								onClick={() => setActiveTab(tab)}
-								className={cn(classes.tab, 'h-7', activeTab === tab ? classes.activeTab : classes.inactiveTab)}
-							>
-								{t(tab)}
-							</Button>
-						))}
-					</div>
-					<TabsContent
-						value={EVoteBubbleTabs.Bubble}
-						className='px-6'
-					>
-						<VotesBubbleChart
-							proposalType={proposalType}
-							index={index}
-							analyticsType={EAnalyticsType.CONVICTIONS}
-							enableFullHeight={false}
-							setIsExpanded={setIsExpanded}
-						/>
-					</TabsContent>
-					<TabsContent value={EVoteBubbleTabs.Graph}>
-						<VoteCurvesData
-							latestApproval={voteCurveData?.latestApproval}
-							chartLabels={voteCurveData?.labels || []}
-							approvalData={voteCurveData?.approvalData || []}
-							supportData={voteCurveData?.supportData || []}
-							approvalThresholdData={voteCurveData?.approvalThresholdData || []}
-							supportThresholdData={voteCurveData?.supportThresholdData || []}
-							latestSupport={voteCurveData?.latestSupport}
-							isFetching={isFetching}
-							thresholdValues={thresholdValues}
-						/>
-					</TabsContent>
-				</Tabs>
-			) : (
-				<div className='px-6'>
+					<VoteSummary
+						index={index}
+						voteMetrics={voteMetrics}
+						approvalThreshold={approvalThreshold}
+					/>
+				</TabsContent>
+				<TabsContent
+					value={EVoteBubbleTabs.Bubble}
+					className='px-6'
+				>
 					<VotesBubbleChart
 						proposalType={proposalType}
 						index={index}
@@ -267,9 +262,21 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 						enableFullHeight={false}
 						setIsExpanded={setIsExpanded}
 					/>
-				</div>
-			)}
-
+				</TabsContent>
+				<TabsContent value={EVoteBubbleTabs.Graph}>
+					<VoteCurvesData
+						latestApproval={voteCurveData?.latestApproval}
+						chartLabels={voteCurveData?.labels || []}
+						approvalData={voteCurveData?.approvalData || []}
+						supportData={voteCurveData?.supportData || []}
+						approvalThresholdData={voteCurveData?.approvalThresholdData || []}
+						supportThresholdData={voteCurveData?.supportThresholdData || []}
+						latestSupport={voteCurveData?.latestSupport}
+						isFetching={isFetching}
+						thresholdValues={thresholdValues}
+					/>
+				</TabsContent>
+			</Tabs>
 			<div className={classes.voteHistoryContainer}>
 				<Dialog>
 					<DialogTrigger
