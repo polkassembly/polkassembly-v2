@@ -195,7 +195,9 @@ export const THEME_COLORS = {
 		delegatebotx_border: '#E97FBD',
 		question_icon_color: '#B5B6BA',
 		treasury_stats_border: '#6A41DD',
-		treasury_token_symbol_border: '#C8CCD1'
+		treasury_token_symbol_border: '#C8CCD1',
+		treasury_report_bg: '#EAE4FA',
+		treasury_report_text: '#243A57'
 	},
 	dark: {
 		wallet_btn_text: '#9E9E9E',
@@ -389,6 +391,8 @@ export const THEME_COLORS = {
 		delegatebotx_border: '#E97FBD',
 		question_icon_color: '#595959',
 		treasury_stats_border: '#6A41DD',
-		treasury_token_symbol_border: '#C8CCD1'
+		treasury_token_symbol_border: '#C8CCD1',
+		treasury_report_bg: '#2D2440',
+		treasury_report_text: '#C4B5FD'
 	}
 };
