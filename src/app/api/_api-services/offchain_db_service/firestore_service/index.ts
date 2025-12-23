@@ -896,8 +896,8 @@ export class FirestoreService extends FirestoreUtils {
 					...data.relayChain,
 					nextSpendAt: data.relayChain?.nextSpendAt?.toDate()
 				},
-				createdAt: data.createdAt?.toDate(),
-				updatedAt: data.updatedAt?.toDate()
+				createdAt: data.createdAt?.toDate?.() || new Date(data.createdAt),
+				updatedAt: data.updatedAt?.toDate() || new Date(data.updatedAt)
 			} as ITreasuryStats;
 		});
 	}

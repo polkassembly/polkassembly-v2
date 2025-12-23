@@ -1872,3 +1872,827 @@ export enum ESortOption {
 	NEWEST = 'newest',
 	OLDEST = 'oldest'
 }
+
+// ==========================================
+// TREASURY ANALYTICS TYPES
+// ==========================================
+
+// Treasury Overview
+export interface ITreasuryOverviewStats {
+	totalTreasuryBalance: {
+		amount: string;
+		amountUsd: string;
+		percentageChange: number;
+		composition: {
+			relayChain: string;
+			assetHub: string;
+			parachains: string;
+		};
+	};
+	ytdSpend: {
+		amount: string;
+		amountUsd: string;
+		percentageChange: number;
+	};
+	treasuryRunway: {
+		months: number;
+		burnRateDescription: string;
+	};
+	stablecoinShare: {
+		percentage: number;
+		amountUsd: string;
+	};
+}
+
+// Asset Breakdown by Token (DOT, USDT, USDC, etc.)
+export interface IAssetDistributionItem {
+	asset: string;
+	symbol: string;
+	amount: string;
+	amountUsd: string;
+	percentage: number;
+	color?: string;
+}
+
+export interface IAssetDistribution {
+	items: IAssetDistributionItem[];
+	totalValueUsd: string;
+}
+
+// Asset Distribution by Chain (PRD Section 1)
+export interface IAssetByChainItem {
+	chain: string; // Relay chain, AssetHub, Hydration, Centrifuge, etc.
+	amount: string;
+	amountUsd: string;
+	percentage: number;
+	reconciliationNotes?: string;
+}
+
+export interface IAssetDistributionByChain {
+	items: IAssetByChainItem[];
+	totalValueUsd: string;
+}
+
+// Assets by Liquidity Class (PRD Section 1)
+export enum ELiquidityClass {
+	LIQUID = 'liquid',
+	DESIGNATED = 'designated',
+	EARMARKED = 'earmarked',
+	DEPLOYED = 'deployed' // staked positions
+}
+
+export interface IAssetByLiquidityItem {
+	liquidityClass: ELiquidityClass;
+	amount: string;
+	amountUsd: string;
+	percentage: number;
+	details?: string;
+}
+
+export interface IAssetsByLiquidity {
+	items: IAssetByLiquidityItem[];
+	totalValueUsd: string;
+}
+
+export interface IStablecoinCoverageItem {
+	month: string;
+	stablecoinBalance: string;
+	totalBalance: string;
+	coveragePercentage: number;
+}
+
+export interface IStablecoinCoverage {
+	currentCoverage: number;
+	historicalData: IStablecoinCoverageItem[];
+}
+
+export enum ETreasuryHealthStatus {
+	EXCELLENT = 'excellent',
+	GOOD = 'good',
+	MODERATE = 'moderate',
+	LOW = 'low',
+	CRITICAL = 'critical'
+}
+
+export interface ITreasuryHealthIndicator {
+	name: string;
+	value: string | number;
+	status: ETreasuryHealthStatus;
+	description?: string;
+}
+
+export interface ITreasuryHealthIndicators {
+	overallHealth: ETreasuryHealthStatus;
+	indicators: ITreasuryHealthIndicator[];
+}
+
+// Income Statement
+export interface IMonthlyOperatingResult {
+	month: string;
+	inflows: string;
+	outflows: string;
+	netResult: string;
+	inflowsUsd: string;
+	outflowsUsd: string;
+	netResultUsd: string;
+	beforeInflationBurn?: string; // Before inflation/burn
+	afterInflationBurn?: string; // After inflation/burn
+}
+
+export interface IInflowsOutflowsData {
+	month: string;
+	inflows: string;
+	outflows: string;
+	burn: string;
+}
+
+// Inflow Composition Trend (PRD Section 2)
+export interface IInflowCompositionItem {
+	month: string;
+	inflation: string;
+	fees: string;
+	slashes: string;
+	transfers: string;
+	other: string;
+}
+
+// Burn per Spend Period (PRD Section 2)
+export interface IBurnPerSpendPeriod {
+	period: string;
+	burn: string;
+	burnUsd: string;
+	spendPeriodIndex: number;
+}
+
+export interface IIncomeStatementTableRow {
+	category: string;
+	currentPeriod: string;
+	previousPeriod: string;
+	ytd: string;
+	percentageChange: number;
+}
+
+export interface IIncomeStatement {
+	monthlyOperatingResults: IMonthlyOperatingResult[];
+	inflowsVsOutflows: IInflowsOutflowsData[];
+	inflowCompositionTrend: IInflowCompositionItem[];
+	burnPerSpendPeriod: IBurnPerSpendPeriod[];
+	tableData: IIncomeStatementTableRow[];
+}
+
+// Balance Sheet
+export interface IBalanceSheetItem {
+	category: string;
+	subcategory?: string;
+	amount: string;
+	amountUsd: string;
+}
+
+export interface IBalanceSheet {
+	assets: IBalanceSheetItem[];
+	liabilities: IBalanceSheetItem[];
+	loansReceivable: IBalanceSheetItem[];
+	loansPayable: IBalanceSheetItem[];
+	netAssets: string;
+	netAssetsUsd: string;
+}
+
+// Spend Analysis
+export interface IRefundsCancellationsData {
+	month: string;
+	refunds: string;
+	cancellations: string;
+	refundsCount: number;
+	cancellationsCount: number;
+}
+
+export interface IProposalExecutionLatency {
+	track: string;
+	averageDays: number;
+	medianDays: number;
+	minDays: number;
+	maxDays: number;
+}
+
+export interface IProposalSizeDistributionBucket {
+	range: string;
+	minAmount: string;
+	maxAmount: string;
+	count: number;
+	percentage: number;
+}
+
+export interface ICategoryMixItem {
+	category: string;
+	currentPercentage: number;
+	previousPercentage: number;
+	change: number;
+}
+
+export interface ICategorySpendTrendItem {
+	month: string;
+	categories: {
+		category: string;
+		amount: string;
+		amountUsd: string;
+	}[];
+}
+
+export interface ISegmentReportItem {
+	segment: string;
+	proposals: number;
+	totalSpend: string;
+	totalSpendUsd: string;
+	averageSize: string;
+	successRate: number;
+}
+
+export interface ISpendAnalysis {
+	refundsCancellations: IRefundsCancellationsData[];
+	executionLatency: IProposalExecutionLatency[];
+	sizeDistribution: IProposalSizeDistributionBucket[];
+	categoryMixShift: ICategoryMixItem[];
+	categorySpendTrend: ICategorySpendTrendItem[];
+	segmentReporting: ISegmentReportItem[];
+}
+
+// ==========================================
+// RECIPIENTS & CONCENTRATION (PRD Section 5)
+// ==========================================
+
+// Top Recipients Share - Lorenz Curve data
+export interface ILorenzCurvePoint {
+	recipientPercentile: number; // % of recipients (X-axis)
+	spendPercentile: number; // % of spend (Y-axis)
+}
+
+export interface ITopRecipientsShare {
+	lorenzCurve: ILorenzCurvePoint[];
+	giniCoefficient: number; // 0-1, higher = more concentrated
+}
+
+// Recipient Leaderboard
+export interface IRecipientLeaderboardItem {
+	rank: number;
+	address: string;
+	identity?: string;
+	totalReceived: string;
+	totalReceivedUsd: string;
+	proposalCount: number;
+	successRate: number;
+	lastReceiptDate: string;
+	categories: string[];
+}
+
+export interface IRecipientLeaderboard {
+	items: IRecipientLeaderboardItem[];
+	totalRecipients: number;
+	totalDistributed: string;
+	totalDistributedUsd: string;
+}
+
+// Counterparty Concentration
+export enum ERiskLevel {
+	LOW = 'low',
+	MEDIUM = 'medium',
+	HIGH = 'high',
+	CRITICAL = 'critical'
+}
+
+export interface ICounterpartyConcentrationItem {
+	address: string;
+	identity?: string;
+	spendPercentage: number;
+	dependencyScore: number; // 0-100
+	categorySpread: number; // Number of categories funded
+	riskLevel: ERiskLevel;
+}
+
+export interface ICounterpartyConcentration {
+	items: ICounterpartyConcentrationItem[];
+	concentrationMetrics: {
+		top5Share: number;
+		top10Share: number;
+		top20Share: number;
+		herfindahlIndex: number; // Market concentration measure
+	};
+}
+
+export interface IRecipientsConcentration {
+	topRecipientsShare: ITopRecipientsShare;
+	leaderboard: IRecipientLeaderboard;
+	counterpartyConcentration: ICounterpartyConcentration;
+}
+
+// Coretime Analytics
+export interface ICoretimePriceData {
+	timestamp: string;
+	bulkPrice: string;
+	instantaneousPrice: string;
+}
+
+export interface ICoreUtilization {
+	coreId: number;
+	utilization: number;
+	status: 'active' | 'idle' | 'reserved';
+}
+
+export interface ICoretimeAnalytics {
+	revenueBurned: {
+		total: string;
+		totalUsd: string;
+		percentageChange: number;
+	};
+	prices: ICoretimePriceData[];
+	activeCores: number;
+	totalCores: number;
+	averageUtilization: number;
+	coreUtilization: ICoreUtilization[];
+}
+
+// Ecosystem Context
+export interface INetworkActivityData {
+	date: string;
+	transactions: number;
+	activeAccounts: number;
+	newAccounts: number;
+}
+
+export interface ITvlStablecoinData {
+	date: string;
+	tvl: string;
+	stablecoinSupply: string;
+}
+
+export interface IXcmData {
+	date: string;
+	transfers: number;
+	messages: number;
+	volume: string;
+}
+
+export interface IEcosystemProject {
+	name: string;
+	category: string;
+	tvl?: string;
+	users?: number;
+	status: 'active' | 'building' | 'inactive';
+}
+
+export interface IEcosystemContext {
+	networkActivity: INetworkActivityData[];
+	tvlAndStablecoin: ITvlStablecoinData[];
+	xcmData: IXcmData[];
+	projects: IEcosystemProject[];
+	projectCount: number;
+}
+
+// ==========================================
+// PROJECTS (PRD Section 8)
+// ==========================================
+
+export interface IProjectFundingHistory {
+	proposalIndex: number;
+	amount: string;
+	amountUsd: string;
+	date: string;
+	status: string;
+}
+
+export interface IProjectDetails {
+	id: string;
+	name: string;
+	description?: string;
+	category: string;
+	website?: string;
+	github?: string;
+	twitter?: string;
+	totalFundsReceived: string;
+	totalFundsReceivedUsd: string;
+	proposalsCount: number;
+	successRate: number;
+	fundingHistory: IProjectFundingHistory[];
+	status: 'active' | 'building' | 'inactive' | 'completed';
+	createdAt: string;
+	lastFundedAt?: string;
+}
+
+export interface IProjects {
+	items: IProjectDetails[];
+	totalProjects: number;
+	totalFundsAwarded: string;
+	totalFundsAwardedUsd: string;
+	categoryCounts: Record<string, number>;
+}
+
+// ==========================================
+// ADVANCED ANALYTICS TYPES
+// ==========================================
+
+// Forecasts
+export interface IForecastDataPoint {
+	date: string;
+	predicted: string;
+	lower: string;
+	upper: string;
+	actual?: string;
+}
+
+export interface IForecastedRunway {
+	currentRunway: {
+		months: number;
+		burnRate: string;
+	};
+	confidence: number;
+	forecasted6mo: {
+		months: number;
+		change: number;
+	};
+	chartData: IForecastDataPoint[];
+}
+
+export interface IForecastedSpendByTrack {
+	track: string;
+	historical: {
+		month: string;
+		amount: string;
+	}[];
+	forecast: {
+		month: string;
+		predicted: string;
+		lower: string;
+		upper: string;
+	}[];
+}
+
+export interface IAIInsight {
+	type: 'trend' | 'warning' | 'opportunity' | 'info';
+	title: string;
+	description: string;
+	confidence: number;
+	relatedMetrics?: string[];
+}
+
+export interface IForecasts {
+	treasuryRunway: IForecastedRunway;
+	spendByTracks: IForecastedSpendByTrack[];
+	insights: IAIInsight[];
+}
+
+// Category Classifier
+export interface ICategoryClassificationConfidence {
+	high: number; // >90%
+	medium: number; // 80-90%
+	low: number; // <80%
+}
+
+export interface ICategoryClassifierItem {
+	proposalIndex: number;
+	proposalTitle: string;
+	predictedCategory: string;
+	confidence: number;
+	confidenceBreakdown: {
+		category: string;
+		probability: number;
+	}[];
+	amount: string;
+}
+
+export interface ICategoryRiskData {
+	category: string;
+	month: string;
+	riskScore: number; // 0-100
+}
+
+export interface ICategoryClassifier {
+	classifications: ICategoryClassifierItem[];
+	confidenceDistribution: ICategoryClassificationConfidence;
+	categoryRiskIndex: ICategoryRiskData[];
+	insights: IAIInsight[];
+}
+
+// Risk & Detection
+export enum EAnomalyType {
+	OUTLIER_SPEND = 'outlier_spend',
+	UNUSUAL_TIMING = 'unusual_timing',
+	CATEGORY_MISMATCH = 'category_mismatch',
+	PATTERN_DEVIATION = 'pattern_deviation',
+	VELOCITY_ANOMALY = 'velocity_anomaly'
+}
+
+export enum EAnomalySeverity {
+	HIGH = 'high',
+	MEDIUM = 'medium',
+	LOW = 'low'
+}
+
+export interface IAnomalyDetectionItem {
+	proposalIndex: number;
+	proposalTitle: string;
+	anomalyType: EAnomalyType;
+	severity: EAnomalySeverity;
+	deviation: string;
+	expectedValue: string;
+	actualValue: string;
+	detectedAt: string;
+}
+
+export interface IProposalImpactMetric {
+	proposalIndex: number;
+	proposalTitle: string;
+	impactScore: number; // 0-100
+	metrics: {
+		treasuryImpact: number;
+		communityImpact: number;
+		technicalImpact: number;
+		timelineImpact: number;
+	};
+}
+
+export enum EDataSourceStatus {
+	LIVE = 'live',
+	SYNCING = 'syncing',
+	STALE = 'stale',
+	ERROR = 'error'
+}
+
+export interface IDataSourceFreshness {
+	source: string;
+	status: EDataSourceStatus;
+	lastSync: string;
+	indexLag: string;
+	latency?: number;
+}
+
+export interface IDotUsdReferenceData {
+	timestamp: string;
+	price: number;
+}
+
+export interface IDotUsdReference {
+	currentPrice: number;
+	sevenDayHigh: number;
+	sevenDayLow: number;
+	sevenDayChange: number;
+	priceHistory: IDotUsdReferenceData[];
+}
+
+export interface ITraceCoverageData {
+	fullyTraced: number;
+	partialUntraced: number;
+	details?: string;
+}
+
+export interface IGovernanceHealthMetric {
+	metric: string;
+	value: string | number;
+	status: ETreasuryHealthStatus;
+}
+
+// Governance Impact Score - Radar Chart (PRD Section 4.3)
+export interface IGovernanceImpactScore {
+	proposalVolume: number; // 0-100
+	votingActivity: number; // 0-100
+	delegateEngagement: number; // 0-100
+	treasuryUsageCorrelation: number; // 0-100
+	categoryFootprint: number; // 0-100
+	overallScore: number; // 0-100
+}
+
+export interface IRiskDetection {
+	anomalies: IAnomalyDetectionItem[];
+	proposalImpactMetrics: IProposalImpactMetric[];
+	governanceImpactScore: IGovernanceImpactScore;
+	dataFreshness: IDataSourceFreshness[];
+	dotUsdReference: IDotUsdReference;
+	traceCoverage: ITraceCoverageData;
+	governanceHealth: {
+		overall: ETreasuryHealthStatus;
+		metrics: IGovernanceHealthMetric[];
+	};
+	insights: IAIInsight[];
+}
+
+// ==========================================
+// DATA QUALITY & METHODOLOGY (PRD Section 4.4)
+// ==========================================
+
+export interface IMethodologyDefinition {
+	metric: string;
+	definition: string;
+	formula?: string;
+	source: string;
+	notes?: string;
+}
+
+export interface IMethodologyAppendix {
+	categoryDefinitions: IMethodologyDefinition[];
+	segmentDefinitions: IMethodologyDefinition[];
+	valuationMethodology: string;
+	accountingAssumptions: string[];
+	tokenConversionAssumptions: string[];
+	chainCoverageNotes: string[];
+	exclusionsAndCaveats: string[];
+	lastUpdated: string;
+}
+
+// ==========================================
+// MONTHLY & ANNUAL REPORTS (PRD Report Specification)
+// ==========================================
+
+export interface IReportCoverPage {
+	period: string;
+	periodType: 'monthly' | 'annual';
+	generatedAt: string;
+	summaryMetrics: {
+		treasuryBalance: string;
+		treasuryBalanceUsd: string;
+		spendForPeriod: string;
+		spendForPeriodUsd: string;
+		netChange: string;
+		netChangeUsd: string;
+		percentageChange: number;
+	};
+}
+
+export interface IReportExecutiveSummary {
+	narrative: string; // AI-generated narrative
+	keyInsights: string[];
+	inflowDrivers: string[];
+	outflowDrivers: string[];
+	categoryShifts: string[];
+	newLiabilities: string[];
+	liquidityNotes: string[];
+	governanceImplications: string[];
+	aiConfidence: number;
+	ratedByDVs?: boolean;
+}
+
+export interface ITreasuryFlowStatement {
+	openingBalance: string;
+	openingBalanceUsd: string;
+	totalInflows: string;
+	totalInflowsUsd: string;
+	inflowBreakdown: {
+		category: string;
+		amount: string;
+		amountUsd: string;
+	}[];
+	totalOutflows: string;
+	totalOutflowsUsd: string;
+	outflowBreakdown: {
+		category: string;
+		amount: string;
+		amountUsd: string;
+	}[];
+	netResult: string;
+	netResultUsd: string;
+	closingBalance: string;
+	closingBalanceUsd: string;
+	monthOnMonthChange: number;
+}
+
+export interface IReportIncomeStatement {
+	inflationRevenue: string;
+	feesRevenue: string;
+	slashes: string;
+	transfers: string;
+	operatingResult: string;
+	burnImpact: string;
+	changeVsPriorPeriod: number;
+}
+
+export interface IReportBalanceSheet {
+	assets: {
+		category: string;
+		amount: string;
+		amountUsd: string;
+	}[];
+	liabilities: {
+		category: string;
+		amount: string;
+		amountUsd: string;
+	}[];
+	netTreasuryPosition: string;
+	netTreasuryPositionUsd: string;
+	dotValuation: string;
+	usdValuation: string;
+}
+
+export interface IReportSegmentData {
+	segment: string;
+	currentPeriodSpend: string;
+	previousPeriodSpend: string;
+	change: number;
+}
+
+export interface IReportCategoryBreakdown {
+	category: string;
+	spend: string;
+	spendUsd: string;
+	spendShare: number;
+	trend: 'up' | 'down' | 'stable';
+	trendPercentage: number;
+}
+
+export interface IReportRecipient {
+	rank: number;
+	address: string;
+	identity?: string;
+	amount: string;
+	amountUsd: string;
+	cumulativePercentage: number;
+}
+
+export interface IReportLiquidityRisk {
+	liquidityRatio: number;
+	stablecoinBuffer: string;
+	stablecoinBufferUsd: string;
+	volatilityExposure: number;
+	concentrationMetrics: {
+		categoryConcentration: number;
+		recipientConcentration: number;
+	};
+}
+
+export interface IReportMethodologyFootnotes {
+	indexDelays: string[];
+	missingData: string[];
+	currencyConversions: string;
+	tokenPriceSnapshot: {
+		token: string;
+		price: number;
+		timestamp: string;
+	}[];
+}
+
+export interface ITreasuryReport {
+	id: string;
+	period: string;
+	periodType: 'monthly' | 'annual';
+	generatedAt: string;
+	coverPage: IReportCoverPage;
+	executiveSummary: IReportExecutiveSummary;
+	flowStatement: ITreasuryFlowStatement;
+	incomeStatement: IReportIncomeStatement;
+	balanceSheet: IReportBalanceSheet;
+	segmentReporting: IReportSegmentData[];
+	categoryBreakdown: IReportCategoryBreakdown[];
+	topRecipients: IReportRecipient[];
+	liquidityRisk: IReportLiquidityRisk;
+	methodologyFootnotes: IReportMethodologyFootnotes;
+	annexes: {
+		definitions: IMethodologyDefinition[];
+		dataSources: string[];
+		references: string[];
+	};
+	downloadUrls?: {
+		pdf?: string;
+		csv?: string;
+		xls?: string;
+	};
+}
+
+export interface IReportArchive {
+	reports: {
+		id: string;
+		period: string;
+		periodType: 'monthly' | 'annual';
+		generatedAt: string;
+		downloadUrls: {
+			pdf?: string;
+			csv?: string;
+			xls?: string;
+		};
+	}[];
+	totalReports: number;
+}
+
+// ==========================================
+// TREASURY ANALYTICS COMBINED RESPONSE TYPES
+// ==========================================
+
+export interface IGeneralAnalyticsResponse {
+	treasuryOverview: {
+		stats: ITreasuryOverviewStats;
+		assetDistribution: IAssetDistribution;
+		assetDistributionByChain: IAssetDistributionByChain;
+		assetsByLiquidity: IAssetsByLiquidity;
+		stablecoinCoverage: IStablecoinCoverage;
+		healthIndicators: ITreasuryHealthIndicators;
+	};
+	incomeStatement: IIncomeStatement;
+	balanceSheet: IBalanceSheet;
+	spendAnalysis: ISpendAnalysis;
+	recipientsConcentration: IRecipientsConcentration;
+	coretimeAnalytics: ICoretimeAnalytics;
+	ecosystemContext: IEcosystemContext;
+	projects: IProjects;
+}
+
+export interface IAdvancedAnalyticsResponse {
+	forecasts: IForecasts;
+	categoryClassifier: ICategoryClassifier;
+	riskDetection: IRiskDetection;
+	methodologyAppendix: IMethodologyAppendix;
+}

@@ -63,7 +63,7 @@ export async function fetchHistoricalTreasuryStats({ network, date }: { network:
 			if (price) {
 				return {
 					network,
-					createdAt: date,
+					createdAt: dayjs(date).toDate(),
 					updatedAt: new Date(),
 					relayChain: {},
 					total: {},
@@ -94,7 +94,7 @@ export async function fetchHistoricalTreasuryStats({ network, date }: { network:
 			if (price) {
 				return {
 					network,
-					createdAt: date,
+					createdAt: dayjs(date).toDate(),
 					updatedAt: new Date(),
 					relayChain: {},
 					total: {},
@@ -113,7 +113,7 @@ export async function fetchHistoricalTreasuryStats({ network, date }: { network:
 			if (price) {
 				return {
 					network,
-					createdAt: date,
+					createdAt: dayjs(date).toDate(),
 					updatedAt: new Date(),
 					relayChain: {},
 					total: {},
@@ -139,7 +139,7 @@ export async function fetchHistoricalTreasuryStats({ network, date }: { network:
 
 		return {
 			network,
-			createdAt: date,
+			createdAt: dayjs(date).toDate(),
 			updatedAt: new Date(),
 			relayChain: {},
 			total: {},
