@@ -86,7 +86,9 @@ enum ERedisKeys {
 	USER_POSTS = 'UPS',
 	TRACK_COUNTS = 'TC',
 	KLARA_CONVERSATION_HISTORY = 'KCH',
-	KLARA_REQUEST_DEDUP = 'KRD'
+	KLARA_REQUEST_DEDUP = 'KRD',
+	DV_COHORTS_REFERENDA = 'DVCR',
+	DV_COHORTS_VOTES = 'DVCV'
 }
 
 export class RedisService {
@@ -180,7 +182,9 @@ export class RedisService {
 			return baseKey + proposalTypePart;
 		},
 		[ERedisKeys.KLARA_CONVERSATION_HISTORY]: (conversationId: string): string => `${ERedisKeys.KLARA_CONVERSATION_HISTORY}-${conversationId}`,
-		[ERedisKeys.KLARA_REQUEST_DEDUP]: (userId: string, messageHash: string): string => `${ERedisKeys.KLARA_REQUEST_DEDUP}-${userId}-${messageHash}`
+		[ERedisKeys.KLARA_REQUEST_DEDUP]: (userId: string, messageHash: string): string => `${ERedisKeys.KLARA_REQUEST_DEDUP}-${userId}-${messageHash}`,
+		[ERedisKeys.DV_COHORTS_REFERENDA]: (network: string, cohortId: string): string => `${ERedisKeys.DV_COHORTS_REFERENDA}-${network}-${cohortId}`,
+		[ERedisKeys.DV_COHORTS_VOTES]: (network: string, cohortId: string): string => `${ERedisKeys.DV_COHORTS_VOTES}-${network}-${cohortId}`
 	} as const;
 
 	// helper methods
@@ -1105,5 +1109,29 @@ export class RedisService {
 
 	static async DeleteKlaraRequestDedup(userId: string, messageHash: string): Promise<void> {
 		await this.Delete({ key: this.redisKeysMap[ERedisKeys.KLARA_REQUEST_DEDUP](userId, messageHash), forceCache: true });
+	}
+
+	static async GetDVCohortReferenda(network: string, cohortId: string): Promise<string | null> {
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.DV_COHORTS_REFERENDA](network, cohortId) });
+	}
+
+	static async SetDVCohortReferenda(network: string, cohortId: string, data: string): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.DV_COHORTS_REFERENDA](network, cohortId),
+			value: data,
+			ttlSeconds: HALF_HOUR_IN_SECONDS
+		});
+	}
+
+	static async GetDVCohortVotes(network: string, cohortId: string): Promise<string | null> {
+		return this.Get({ key: this.redisKeysMap[ERedisKeys.DV_COHORTS_VOTES](network, cohortId) });
+	}
+
+	static async SetDVCohortVotes(network: string, cohortId: string, data: string): Promise<void> {
+		await this.Set({
+			key: this.redisKeysMap[ERedisKeys.DV_COHORTS_VOTES](network, cohortId),
+			value: data,
+			ttlSeconds: HALF_HOUR_IN_SECONDS
+		});
 	}
 }

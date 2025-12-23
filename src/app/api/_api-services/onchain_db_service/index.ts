@@ -24,7 +24,9 @@ import {
 	ITrackAnalyticsStats,
 	IGovAnalyticsStats,
 	IGovAnalyticsReferendumOutcome,
-	IGovAnalyticsDelegationStats
+	IGovAnalyticsDelegationStats,
+	IDVVotes,
+	ICohortReferenda
 } from '@shared/types';
 import { ValidatorService } from '@shared/_services/validator_service';
 import { APIError } from '@api/_api-utils/apiError';
@@ -404,6 +406,16 @@ export class OnChainDbService {
 
 	static async GetTrackLevelAnalyticsStats({ network, trackId }: { network: ENetwork; trackId?: number }): Promise<ITrackAnalyticsStats> {
 		return SubsquidService.GetTrackAnalyticsStats({ network, trackId });
+	}
+
+	static async GetCohortReferenda({ network }: { network: ENetwork }): Promise<ICohortReferenda[]> {
+		return SubsquidService.GetCohortReferenda({
+			network
+		});
+	}
+
+	static async GetVotesForReferendaIndices({ network, indices, voterAddresses }: { network: ENetwork; indices: number[]; voterAddresses: string[] }): Promise<IDVVotes[]> {
+		return SubsquidService.GetVotesForReferendaIndices({ network, indices, voterAddresses });
 	}
 
 	static async GetActivityStats({ network, oneWeekAgo }: { network: ENetwork; oneWeekAgo: string }) {
