@@ -4,8 +4,9 @@
 
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from './useDebounce';
+import { useIdentityService } from './useIdentityService';
 
 type SortOption = 'MAX_DELEGATED' | 'VOTED_PROPOSALS' | 'DELEGATORS';
 
@@ -15,14 +16,58 @@ const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
 	const [sortBy, setSortBy] = useState<SortOption | null>(null);
 	const [currentPage, setCurrentPage] = useState(1);
 	const itemsPerPage = DEFAULT_LISTING_LIMIT;
+	const [delegatesWithIdentity, setDelegatesWithIdentity] = useState<Map<string, string | undefined>>(new Map());
+	const { identityService } = useIdentityService();
 
-	const searchDelegate = useCallback((delegate: IDelegateDetails, query: string) => {
-		if (!query || query.trim() === '') return true;
+	useEffect(() => {
+		if (!delegates?.length || !identityService) return () => {};
+		let isActive = true;
 
-		const searchTerm = query.toLowerCase().trim();
-		return delegate.address.toLowerCase().includes(searchTerm) || (delegate.name && delegate.name.toLowerCase().includes(searchTerm));
-	}, []);
+		(async () => {
+			try {
+				const results = await Promise.all(
+					delegates.map(async (delegate) => {
+						try {
+							const identity = await identityService.getOnChainIdentity(delegate.address);
+							return identity?.display ? ([delegate.address, identity.display] as const) : null;
+						} catch (e) {
+							console.error('Error fetching identity for delegate:', delegate.address, e);
+							return null;
+						}
+					})
+				);
+				if (!isActive) return;
+				const identityMap = new Map<string, string>();
+				results.forEach((entry) => {
+					if (entry) identityMap.set(entry[0], entry[1]);
+				});
+				setDelegatesWithIdentity(identityMap);
+			} catch (e) {
+				console.error('Error fetching identities batch:', e);
+			}
+		})();
 
+		return () => {
+			isActive = false;
+		};
+	}, [delegates, identityService]);
+
+	const searchDelegate = useCallback(
+		(delegate: IDelegateDetails, query: string) => {
+			if (!query || query.trim() === '') return true;
+
+			const searchTerm = query.toLowerCase().trim();
+			const identityName = delegatesWithIdentity.get(delegate.address);
+
+			return (
+				delegate.address.toLowerCase().includes(searchTerm) ||
+				(delegate.name && delegate.name.toLowerCase().includes(searchTerm)) ||
+				(delegate.publicUser?.username && delegate.publicUser.username.toLowerCase().includes(searchTerm)) ||
+				(identityName && identityName.toLowerCase().includes(searchTerm))
+			);
+		},
+		[delegatesWithIdentity]
+	);
 	const filterBySource = useCallback(
 		(delegate: IDelegateDetails) => {
 			if (selectedSources.length === 0) return true;
