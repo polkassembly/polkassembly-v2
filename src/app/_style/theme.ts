@@ -194,6 +194,7 @@ export const THEME_COLORS = {
 		klara_stats_text: '#5421E5',
 		delegatebotx_border: '#E97FBD',
 		question_icon_color: '#B5B6BA',
+		bountycard_index_bg: '#EAEDF0',
 		treasury_stats_border: '#6A41DD',
 		treasury_token_symbol_border: '#C8CCD1'
 	},
@@ -388,6 +389,7 @@ export const THEME_COLORS = {
 		klara_stats_text: '#5421E5',
 		delegatebotx_border: '#E97FBD',
 		question_icon_color: '#595959',
+		bountycard_index_bg: '#EAEDF0',
 		treasury_stats_border: '#6A41DD',
 		treasury_token_symbol_border: '#C8CCD1'
 	}
