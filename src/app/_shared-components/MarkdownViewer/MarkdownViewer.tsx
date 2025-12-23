@@ -296,6 +296,7 @@ const markdownComponents: Components = {
 
 interface ReactMarkdownProps {
 	markdown: string;
+	variant?: 'inline' | 'default';
 	className?: string;
 	truncate?: boolean;
 	lineClampClassName?: string;
@@ -303,7 +304,7 @@ interface ReactMarkdownProps {
 }
 
 export function MarkdownViewer(props: ReactMarkdownProps) {
-	const { markdown, className, truncate = false, lineClampClassName, onShowMore } = props;
+	const { markdown, className, truncate = false, lineClampClassName, onShowMore, variant = 'default' } = props;
 	const [showMore, setShowMore] = useState(false);
 	const [isTruncated, setIsTruncated] = useState(false);
 	const editorRef = useRef<HTMLDivElement>(null);
@@ -382,15 +383,27 @@ export function MarkdownViewer(props: ReactMarkdownProps) {
 						</span>
 					</div>
 				) : isTruncated ? (
-					<div className='flex justify-center pt-2'>
-						<span
-							onClick={handleShowMore}
-							className='flex cursor-pointer items-center gap-1 rounded-full bg-page_background px-3 py-1.5 text-sm font-medium text-text_primary'
-							aria-hidden='true'
-						>
-							Show More <FiArrowDownCircle className='text-lg' />
-						</span>
-					</div>
+					variant === 'inline' ? (
+						<div className='flex justify-start pt-2'>
+							<span
+								onClick={handleShowMore}
+								className='cursor-pointer text-xs font-medium text-text_pink'
+								aria-hidden='true'
+							>
+								Show More
+							</span>
+						</div>
+					) : (
+						<div className='flex justify-center pt-2'>
+							<span
+								onClick={handleShowMore}
+								className='flex cursor-pointer items-center gap-1 rounded-full bg-page_background px-3 py-1.5 text-sm font-medium text-text_primary'
+								aria-hidden='true'
+							>
+								Show More <FiArrowDownCircle className='text-lg' />
+							</span>
+						</div>
+					)
 				) : null)}
 		</div>
 	);

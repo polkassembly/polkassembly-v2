@@ -1,0 +1,39 @@
+.header {
+	@apply flex w-full flex-col gap-y-4 bg-bg_modal;
+}
+
+.header_container {
+	@apply mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 px-4 pt-5 lg:px-16;
+}
+
+.header_create_button {
+	@apply flex items-center gap-x-2 rounded-md bg-bg_pink px-3 py-1.5 text-sm text-white hover:bg-grey_bg;
+}
+
+.header_title {
+	@apply text-2xl font-bold text-navbar_title;
+}
+
+.header_title_container {
+	@apply mb-4 flex flex-col gap-y-4;
+}
+
+.header_description {
+	@apply text-sm font-medium text-text_primary;
+}
+
+.header_tab {
+	@apply uppercase !text-basic_text;
+}
+
+.hideScrollbar {
+	-ms-overflow-style: none;
+	/* IE and Edge */
+	scrollbar-width: none;
+
+	/* Firefox */
+	&::-webkit-scrollbar {
+		/* Chrome, Safari and Opera */
+		display: none;
+	}
+}
