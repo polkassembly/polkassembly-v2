@@ -1,19 +1,15 @@
-.userActivityWrapper {
-    @apply flex flex-col gap-y-4 rounded-[20px] border-[0.6px] border-border_grey bg-bg_modal py-4 shadow-lg
-}
-
 .userActivityHeader {
-    @apply flex items-center gap-x-2 px-6 text-text_primary
+	@apply flex items-center gap-x-2 px-6 text-text_primary;
 }
 
 .userActivityHeaderTitle {
-    @apply text-2xl font-semibold
+	@apply text-2xl font-semibold;
 }
 
 .userActivitySkeleton {
-    @apply flex flex-col gap-y-4 px-6
+	@apply flex flex-col gap-y-4 px-6;
 }
 
 .userActivitySkeletonItem {
-    @apply h-4 w-full
+	@apply h-4 w-full;
 }

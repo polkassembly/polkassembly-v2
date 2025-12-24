@@ -215,6 +215,7 @@
 			"last15Days": "最近15天"
 		},
 		"Activity": {
+			"activity": "活动",
 			"voted_on_proposal": "已投票",
 			"created_proposal": "创建提案",
 			"created_tip": "创建小费",
@@ -268,7 +269,8 @@
 			"unlinked_address": "取消链接地址",
 			"unlinked_multiple_addresses": "取消链接多个地址",
 			"followed_user": "关注用户",
-			"unfollowed_user": "取消关注用户"
+			"unfollowed_user": "取消关注用户",
+			"noData": "未找到活动"
 		},
 		"Posts": {
 			"posts": "帖子",
