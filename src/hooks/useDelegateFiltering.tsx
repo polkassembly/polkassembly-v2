@@ -9,12 +9,16 @@ import { useDebounce } from './useDebounce';
 
 type SortOption = 'MAX_DELEGATED' | 'VOTED_PROPOSALS' | 'DELEGATORS';
 
-const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
+const useDelegateFiltering = (delegates: IDelegateDetails[], initialPage?: number) => {
 	const { debouncedValue: searchQuery, setValue: setSearchQuery, value: searchQueryValue } = useDebounce('');
 	const [selectedSources, setSelectedSources] = useState<EDelegateSource[]>(Object.values(EDelegateSource));
 	const [sortBy, setSortBy] = useState<SortOption | null>(null);
-	const [currentPage, setCurrentPage] = useState(1);
+	const [currentPage, setCurrentPage] = useState(initialPage || 1);
 	const itemsPerPage = DEFAULT_LISTING_LIMIT;
+
+	useMemo(() => {
+		if (initialPage) setCurrentPage(initialPage);
+	}, [initialPage]);
 
 	const searchDelegate = useCallback((delegate: IDelegateDetails, query: string) => {
 		if (!query || query.trim() === '') return true;

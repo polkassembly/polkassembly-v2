@@ -12,6 +12,7 @@ import {
 	EVoteDecision,
 	EVoteSortOptions,
 	IBountyProposal,
+	ICuratorStats,
 	IDelegationStats,
 	IFlattenedConvictionVote,
 	IGenericListingResponse,
@@ -894,6 +895,37 @@ export class SubsquidService extends SubsquidUtils {
 		}
 	}
 
+	static async GetAllActiveBountyCurators(network: ENetwork): Promise<string[]> {
+		try {
+			const gqlClient = this.subsquidGqlClient(network);
+			const query = this.GET_ACTIVE_BOUNTY_CURATORS;
+			const variables = {
+				status_in: [EProposalStatus.CuratorProposed, EProposalStatus.Active, EProposalStatus.Extended]
+			};
+
+			const { data: subsquidData, error: subsquidErr } = await gqlClient.query(query, variables).toPromise();
+
+			if (subsquidErr || !subsquidData) {
+				console.error(`SubsquidService: Error fetching on-chain active bounty curators: ${subsquidErr?.message || subsquidErr}`);
+				return [];
+			}
+
+			if (!subsquidData.proposals) return [];
+
+			const curators = new Set<string>();
+			subsquidData.proposals.forEach((proposal: { curator: string }) => {
+				if (proposal.curator) {
+					curators.add(proposal.curator);
+				}
+			});
+
+			return Array.from(curators);
+		} catch (error) {
+			console.error(`SubsquidService: Exception fetching active bounty curators: ${error}`);
+			return [];
+		}
+	}
+
 	static async GetChildBountiesByParentBountyIndex({
 		network,
 		index,
@@ -1770,5 +1802,18 @@ export class SubsquidService extends SubsquidUtils {
 		}
 
 		return trackStats;
+	}
+
+	static async GetBountiesByCurator(network: ENetwork, curatorAddress: string): Promise<ICuratorStats[]> {
+		const gqlClient = this.subsquidGqlClient(network);
+
+		const { data, error } = await gqlClient.query(this.GET_BOUNTIES_BY_CURATOR, { curator_eq: curatorAddress }).toPromise();
+
+		if (error || !data) {
+			console.error(`Error fetching bounties by curator ${curatorAddress}:`, error);
+			return [];
+		}
+
+		return data.bounties || [];
 	}
 }

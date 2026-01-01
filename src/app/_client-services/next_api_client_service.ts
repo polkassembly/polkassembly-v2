@@ -70,7 +70,8 @@ import {
 	IOverviewTreasuryReport,
 	IJob,
 	IOGTrackerData,
-	IConversationTurn
+	IConversationTurn,
+	IMembersDetails
 } from '@/_shared/types';
 import { StatusCodes } from 'http-status-codes';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
@@ -179,7 +180,9 @@ enum EApiRoute {
 	GET_OVERVIEW_STATS = 'GET_OVERVIEW_STATS',
 	GET_EXTERNAL_JOBS = 'GET_EXTERNAL_JOBS',
 	GET_TREASURY_REPORT = 'GET_TREASURY_REPORT',
-	GET_OGTRACKER_DATA = 'GET_OGTRACKER_DATA'
+	GET_OGTRACKER_DATA = 'GET_OGTRACKER_DATA',
+	FETCH_COMMUNITY_CURATORS = 'FETCH_COMMUNITY_CURATORS',
+	FETCH_COMMUNITY_MEMBERS = 'FETCH_COMMUNITY_MEMBERS'
 }
 
 export class NextApiClientService {
@@ -457,6 +460,11 @@ export class NextApiClientService {
 
 			case EApiRoute.GET_OGTRACKER_DATA:
 				path = '/external/ogtracker';
+				break;
+
+			case EApiRoute.FETCH_COMMUNITY_CURATORS:
+			case EApiRoute.FETCH_COMMUNITY_MEMBERS:
+				path = '/people';
 				break;
 
 			default:
@@ -1671,5 +1679,25 @@ export class NextApiClientService {
 		});
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.GET_OGTRACKER_DATA, queryParams });
 		return this.nextApiClientFetch<IOGTrackerData>({ url, method });
+	}
+
+	static async fetchCommunityCurators({ page, limit }: { page: number; limit?: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString() || '1',
+			limit: limit?.toString() || DEFAULT_LISTING_LIMIT.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_COMMUNITY_CURATORS, routeSegments: ['curators'], queryParams });
+		return this.nextApiClientFetch<IDelegateDetails[]>({ url, method });
+	}
+
+	static async fetchCommunityMembers({ page, limit }: { page: number; limit?: number }) {
+		const queryParams = new URLSearchParams({
+			page: page.toString() || '1',
+			limit: limit?.toString() || DEFAULT_LISTING_LIMIT.toString()
+		});
+
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.FETCH_COMMUNITY_MEMBERS, routeSegments: ['members'], queryParams });
+		return this.nextApiClientFetch<IGenericListingResponse<IMembersDetails>>({ url, method });
 	}
 }

@@ -158,6 +158,8 @@ export interface IPublicUser {
 	profileScore: number;
 	addresses: string[];
 	rank?: number;
+	followers?: IFollowEntry[];
+	following?: IFollowEntry[];
 	profileDetails: IProfileDetails;
 }
 
@@ -1871,4 +1873,42 @@ export interface IOGTrackerData {
 export enum ESortOption {
 	NEWEST = 'newest',
 	OLDEST = 'oldest'
+}
+
+export interface ICuratorStats {
+	totalRewarded: string;
+	activeBounties: number;
+	childBountyDisbursed: number;
+	childBountiesCurated: number;
+	unclaimedAmount: string;
+	bountiesCurated: number;
+	signatories?: string[];
+}
+export interface IMembersDetails {
+	address: string;
+	profileScore: number;
+	userId: number;
+	achievementBadges: IUserBadgeDetails[];
+	network: ENetwork;
+	bio: string;
+	createdAt?: Date;
+	socialLinks?: IUserSocialDetails[];
+	source?: EDelegateSource[];
+}
+
+export interface ICuratorDetails {
+	address: string;
+	bio: string;
+	network: ENetwork;
+	socialLinks?: IUserSocialDetails[];
+	curatorStats: ICuratorStats;
+	userId: number | null;
+	profileScore: number | null;
+}
+
+export enum ECommunityRole {
+	MEMBERS = 'members',
+	DELEGATES = 'delegates',
+	CURATORS = 'curators',
+	DVS = 'decentralized_voices'
 }
