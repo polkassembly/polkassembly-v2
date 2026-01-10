@@ -1955,4 +1955,67 @@ export class PolkadotApiService {
 			setVaultQrState
 		});
 	}
+
+	async addProxy({
+		address,
+		wallet,
+		setVaultQrState,
+		delegate,
+		proxyType,
+		delay,
+		onSuccess,
+		onFailed,
+		selectedAccount
+	}: {
+		address: string;
+		wallet: EWallet;
+		setVaultQrState: Dispatch<SetStateAction<IVaultQrState>>;
+		delegate: string;
+		proxyType: EProxyType;
+		delay: number;
+		onSuccess: (pre?: unknown) => Promise<void> | void;
+		onFailed: (errorMessageFallback: string) => Promise<void> | void;
+		selectedAccount?: ISelectedAccount;
+	}) {
+		if (!this.api) {
+			onFailed('API not ready');
+			return;
+		}
+
+		const encodedDelegate = getEncodedAddress(delegate, this.network) || delegate;
+		const tx = this.api.tx.proxy.addProxy(encodedDelegate, proxyType, delay);
+
+		await this.executeTx({
+			tx,
+			address,
+			wallet,
+			errorMessageFallback: 'Failed to create proxy',
+			waitTillFinalizedHash: true,
+			onSuccess,
+			onFailed,
+			selectedAccount,
+			setVaultQrState
+		});
+	}
+
+	async getProxyDepositBase() {
+		if (!this.api) return BN_ZERO;
+		const depositBase = this.api.consts.proxy?.proxyDepositBase;
+		return depositBase ? new BN(depositBase.toString()) : BN_ZERO;
+	}
+
+	async getProxyDepositFactor() {
+		if (!this.api) return BN_ZERO;
+		const depositFactor = this.api.consts.proxy?.proxyDepositFactor;
+		return depositFactor ? new BN(depositFactor.toString()) : BN_ZERO;
+	}
+
+	async estimateProxyTxFee({ address, delegate, proxyType, delay }: { address: string; delegate: string; proxyType: EProxyType; delay: number }) {
+		if (!this.api) return BN_ZERO;
+
+		const encodedDelegate = getEncodedAddress(delegate, this.network) || delegate;
+		const tx = this.api.tx.proxy.addProxy(encodedDelegate, proxyType, delay);
+		const paymentInfo = await tx.paymentInfo(address);
+		return new BN(paymentInfo.partialFee.toString());
+	}
 }
