@@ -1743,6 +1743,7 @@
 	},
 	"Proxies": {
 		"proxyExplorer": "Explorador de Proxies",
+		"proxyExplorerDescription": "Proxy Explorer le brinda una vista completa de las relaciones de proxy en cadena: un mapa transparente de la actividad que muestra quién está asignado como proxy, qué permisos tienen y cómo están vinculadas las cuentas para votación, staking y gobernanza.",
 		"createProxy": "Crear Proxy",
 		"all": "Todos",
 		"myProxies": "Mis Proxies",

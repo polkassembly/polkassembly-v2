@@ -1741,6 +1741,7 @@
 	},
 	"Proxies": {
 		"proxyExplorer": "Proxy-Explorer",
+		"proxyExplorerDescription": "Proxy Explorer gibt Ihnen einen vollständigen Überblick über On-Chain-Proxy-Beziehungen - eine transparente Karte der Aktivitäten, die zeigt, wer als Proxy zugewiesen ist, welche Berechtigungen sie haben und wie Konten für Abstimmungen, Staking und Governance verknüpft sind.",
 		"createProxy": "Proxy erstellen",
 		"all": "Alle",
 		"myProxies": "Meine Proxies",

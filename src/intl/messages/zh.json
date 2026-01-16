@@ -1742,6 +1742,7 @@
 	},
 	"Proxies": {
 		"proxyExplorer": "代理浏览器",
+		"proxyExplorerDescription": "Proxy Explorer为您提供了链上代理关系的完整视图 - 一张透明的活动地图，显示谁被分配为代理，他们拥有哪些权限，以及账户如何链接以进行投票、质押和治理。",
 		"createProxy": "创建代理",
 		"all": "全部",
 		"myProxies": "我的代理",

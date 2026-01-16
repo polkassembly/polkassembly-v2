@@ -1771,6 +1771,7 @@
 	},
 	"Proxies": {
 		"proxyExplorer": "Proxy Explorer",
+		"proxyExplorerDescription": "Proxy Explorer gives you a complete view of on-chain proxy relationships — a transparent map of activity showing who’s assigned as a proxy, what permissions they hold, and how accounts are linked for voting, staking, and governance.",
 		"createProxy": "Create Proxy",
 		"all": "All",
 		"myProxies": "My Proxies",
