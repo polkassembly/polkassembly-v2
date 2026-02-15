@@ -30,7 +30,7 @@ export const MarkdownEditor = forwardRef<MDXEditorMethods, MDXEditorProps>((prop
 					markdown={props.markdown || ''}
 					editorRef={ref}
 					className={cn('rounded-md border border-border_grey', props.className)}
-					contentEditableClassName={cn('min-h-32', props.contentEditableClassName)}
+					contentEditableClassName={cn('min-h-32 max-h-96 overflow-y-auto', props.contentEditableClassName)}
 				/>
 			</div>
 		</div>
