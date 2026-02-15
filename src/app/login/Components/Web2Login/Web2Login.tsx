@@ -20,6 +20,7 @@ import { useUser } from '@/hooks/useUser';
 import { useTranslations } from 'next-intl';
 import { useToast } from '@/hooks/useToast';
 import { useRouter } from 'nextjs-toploader/app';
+import Link from 'next/link';
 import classes from './Web2Login.module.scss';
 import SwitchToWeb2Signup from '../SwitchToWeb2Signup/SwitchToWeb2Signup';
 
@@ -163,6 +164,14 @@ function Web2Login({
 										</FormItem>
 									)}
 								/>
+							</div>
+							<div className='flex justify-end'>
+								<Link
+									href='/forgot-password'
+									className='text-xs text-text_pink hover:underline sm:text-sm'
+								>
+									{t('Profile.forgotPassword')}
+								</Link>
 							</div>
 						</div>
 						<div className={classes.footer}>

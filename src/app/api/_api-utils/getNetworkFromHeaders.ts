@@ -30,7 +30,6 @@ export async function getNetworkFromHeaders(): Promise<ENetwork> {
 			: null;
 
 	if (network) {
-		console.log('Found valid network from headers:', network);
 		return network;
 	}
 

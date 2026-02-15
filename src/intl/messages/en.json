@@ -164,6 +164,7 @@
 		"authCodeDescription": "Please input the authentication code for your Polkassembly account.",
 		"enterUsernameOrEmail": "Enter Username or Email",
 		"enterPassword": "Enter Password",
+		"forgotPassword": "Forgot Password?",
 		"enterConfirmPassword": "Enter Confirm Password",
 		"enterConfirmPasswordDescription": "Please enter the same password as above.",
 		"orLoginWith": "Or Login with",
@@ -1218,7 +1219,7 @@
 		"creator": "Creator",
 		"viewAll": "View All",
 		"headingTitle": "Polkassembly App Hub",
-		"headingSubtitle": "Track decisions, treasury health, and essential apps",
+		"headingSubtitle": "Track decisions, treasury health, and essential apps.",
 		"readAnnouncement": "Read Announcement",
 		"treasuryReportTitle": "Q4 Treasury Report",
 		"treasuryReportDescription": "Review spending performance and ecosystem growth"
