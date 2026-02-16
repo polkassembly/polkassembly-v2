@@ -9,7 +9,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./src/intl/intlRequest.ts');
 
 // Change src/_shared/_constants/allowedOutboundIFrameDomains.ts if you change this
-export const ALLOWED_OUTBOUND_IFRAME_DOMAINS = ['https://app.mimir.global'];
+export const ALLOWED_OUTBOUND_IFRAME_DOMAINS = ['https://app.mimir.global', 'https://www.youtube.com'];
 
 const NETWORKS = ['polkadot', 'kusama'];
 const DOMAINS = ['polkassembly.io', 'polkassembly.network'];
@@ -33,7 +33,7 @@ const nextConfig = {
 						key: 'Content-Security-Policy',
 						value: [
 							"default-src 'self'",
-							"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.sentry-cdn.com",
+							"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.sentry-cdn.com https://www.youtube.com",
 							"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 							"font-src 'self' https://fonts.gstatic.com",
 							"img-src 'self' data: blob: https:",
