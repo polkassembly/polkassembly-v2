@@ -179,7 +179,9 @@ enum EApiRoute {
 	GET_OVERVIEW_STATS = 'GET_OVERVIEW_STATS',
 	GET_EXTERNAL_JOBS = 'GET_EXTERNAL_JOBS',
 	GET_TREASURY_REPORT = 'GET_TREASURY_REPORT',
-	GET_OGTRACKER_DATA = 'GET_OGTRACKER_DATA'
+	GET_OGTRACKER_DATA = 'GET_OGTRACKER_DATA',
+	SEND_RESET_PASSWORD_EMAIL = 'SEND_RESET_PASSWORD_EMAIL',
+	RESET_PASSWORD_WITH_TOKEN = 'RESET_PASSWORD_WITH_TOKEN'
 }
 
 export class NextApiClientService {
@@ -337,6 +339,14 @@ export class NextApiClientService {
 				break;
 			case EApiRoute.WEB2_SIGNUP:
 				path = '/auth/web2-auth/signup';
+				method = 'POST';
+				break;
+			case EApiRoute.SEND_RESET_PASSWORD_EMAIL:
+				path = '/auth/send-reset-password-email';
+				method = 'POST';
+				break;
+			case EApiRoute.RESET_PASSWORD_WITH_TOKEN:
+				path = '/auth/reset-password-with-token';
 				method = 'POST';
 				break;
 			case EApiRoute.REMARK_LOGIN:
@@ -624,6 +634,16 @@ export class NextApiClientService {
 	protected static async linkAddressApi({ address, signature, wallet }: { address: string; signature: string; wallet: EWallet }) {
 		const { url, method } = await this.getRouteConfig({ route: EApiRoute.LINK_ADDRESS });
 		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { address, signature, wallet } });
+	}
+
+	protected static async sendResetPasswordEmailApi({ email }: { email: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.SEND_RESET_PASSWORD_EMAIL });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { email } });
+	}
+
+	protected static async resetPasswordWithTokenApi({ token, newPassword }: { token: string; newPassword: string }) {
+		const { url, method } = await this.getRouteConfig({ route: EApiRoute.RESET_PASSWORD_WITH_TOKEN });
+		return this.nextApiClientFetch<{ message: string }>({ url, method, data: { token, newPassword } });
 	}
 
 	static async fetchListingData({

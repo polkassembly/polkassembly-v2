@@ -1802,5 +1802,35 @@
 		"assethubMigration": "Notice: {network} has migrated to AssetHub. Balances, data, referenda, and other on-chain activity has moved to AssetHub.",
 		"learnMore": "Learn more",
 		"polkadotMigration": "Notice: Polkadot is undergoing AssetHub migration. Some features may be unavailable during the migration."
+	},
+	"ForgotPassword": {
+		"title": "Forgot Password",
+		"description": "Enter the email address associated with your account and we'll send you a link to reset your password.",
+		"enterEmail": "Email Address",
+		"pleaseEnterEmail": "Please enter your email address",
+		"invalidEmail": "Please enter a valid email address",
+		"sendResetLink": "Send Reset Link",
+		"failedToSendEmail": "Failed to send reset password email",
+		"checkYourEmail": "Check Your Email",
+		"emailSentDescription": "We've sent a password reset link to your email address. Please check your inbox and follow the instructions to reset your password.",
+		"backToLogin": "Back to Login"
+	},
+	"ResetPassword": {
+		"title": "Reset Password",
+		"description": "Enter your new password below.",
+		"newPassword": "New Password",
+		"confirmPassword": "Confirm Password",
+		"pleaseEnterPasswords": "Please enter your new password",
+		"passwordsDoNotMatch": "Passwords do not match",
+		"passwordTooShort": "Password must be at least 6 characters",
+		"resetPassword": "Reset Password",
+		"failedToResetPassword": "Failed to reset password",
+		"invalidToken": "Invalid or expired reset token",
+		"invalidOrMissingToken": "The password reset link is invalid or has expired. Please request a new one.",
+		"requestNewLink": "Request a New Reset Link",
+		"successTitle": "Password Reset Successfully",
+		"successDescription": "Your password has been reset successfully. You can now log in with your new password.",
+		"goToLogin": "Go to Login",
+		"backToLogin": "Back to Login"
 	}
 }

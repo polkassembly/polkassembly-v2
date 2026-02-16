@@ -89,4 +89,12 @@ export class AuthClientService extends NextApiClientService {
 	static async generateQRSession() {
 		return this.generateQRSessionApi();
 	}
+
+	static async sendResetPasswordEmail({ email }: { email: string }) {
+		return this.sendResetPasswordEmailApi({ email });
+	}
+
+	static async resetPasswordWithToken({ token, newPassword }: { token: string; newPassword: string }) {
+		return this.resetPasswordWithTokenApi({ token, newPassword });
+	}
 }
