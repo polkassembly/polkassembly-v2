@@ -1868,6 +1868,10 @@ export interface IOGTrackerData {
 	proofOfWork: IOGTrackerPoW[];
 }
 
+export enum ECommunityRole {
+	DELEGATES = 'delegates'
+}
+
 export enum ESortOption {
 	NEWEST = 'newest',
 	OLDEST = 'oldest'

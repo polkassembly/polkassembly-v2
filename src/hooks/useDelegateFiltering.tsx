@@ -4,17 +4,21 @@
 
 import { DEFAULT_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import { EDelegateSource, IDelegateDetails } from '@/_shared/types';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from './useDebounce';
 
 type SortOption = 'MAX_DELEGATED' | 'VOTED_PROPOSALS' | 'DELEGATORS';
 
-const useDelegateFiltering = (delegates: IDelegateDetails[]) => {
+const useDelegateFiltering = (delegates: IDelegateDetails[], page?: number) => {
 	const { debouncedValue: searchQuery, setValue: setSearchQuery, value: searchQueryValue } = useDebounce('');
 	const [selectedSources, setSelectedSources] = useState<EDelegateSource[]>(Object.values(EDelegateSource));
 	const [sortBy, setSortBy] = useState<SortOption | null>(null);
-	const [currentPage, setCurrentPage] = useState(1);
+	const [currentPage, setCurrentPage] = useState(page || 1);
 	const itemsPerPage = DEFAULT_LISTING_LIMIT;
+
+	useEffect(() => {
+		if (page) setCurrentPage(page);
+	}, [page]);
 
 	const searchDelegate = useCallback((delegate: IDelegateDetails, query: string) => {
 		if (!query || query.trim() === '') return true;
