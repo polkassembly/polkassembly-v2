@@ -31,7 +31,7 @@ function GovOverview() {
 			<CollapsibleTrigger className='group flex w-full items-center gap-x-4 p-3 lg:p-4'>
 				<Image
 					src={TimeLineIcon}
-					alt='Delegation Green Icon'
+					alt='Timeline Icon'
 					width={24}
 					height={24}
 					className='h-6 w-6'
