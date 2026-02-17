@@ -30,6 +30,8 @@ import Poll from './Poll/Poll';
 import BeneficiariesDetails from './BeneficiariesDetails/BeneficiariesDetails';
 import UserVoteStatus from './UserVoteStatus/UserVoteStatus';
 
+const AdBanner = dynamic(() => import('../AdBanner/AdBanner'), { ssr: false });
+
 const AISummary = dynamic(() => import('../AISummary/AISummary'), {
 	ssr: false,
 	loading: () => (
@@ -212,6 +214,7 @@ function PostDetails({ index, isModalOpen, postData }: { index: string; isModalO
 						postData={post}
 					/>
 				</div>
+				{!isModalOpen && <AdBanner />}
 				<div className={cn(classes.detailsWrapper, 'grid-cols-1 xl:grid-cols-3', 'mx-auto max-w-7xl', isModalOpen && classes.modalOpen)}>
 					<div className={classes.leftWrapper}>
 						<TabsContent
