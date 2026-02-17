@@ -3,13 +3,20 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 import React, { useEffect, useRef } from 'react';
+import { ENetwork } from '@/_shared/types';
+import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 
 const AD_CDN_HOSTS = ['cdn.bmcdn6.com'];
 
-const DEFAULT_AD_SCRIPT_ID = '69941e70ce3e72c00151f7f8';
+const NETWORK_AD_SCRIPT_IDS: Partial<Record<ENetwork, string>> = {
+	[ENetwork.POLKADOT]: '69941e70ce3e72c00151f7f8',
+	[ENetwork.KUSAMA]: '69949ccc99501aa67c4f54a7'
+};
+
+const DEFAULT_AD_SCRIPT_ID = NETWORK_AD_SCRIPT_IDS[ENetwork.POLKADOT]!;
 
 function AdBanner() {
-	const adScriptId = DEFAULT_AD_SCRIPT_ID;
+	const adScriptId = NETWORK_AD_SCRIPT_IDS[getCurrentNetwork()] ?? DEFAULT_AD_SCRIPT_ID;
 
 	const adRef = useRef<HTMLDivElement>(null);
 	const scriptRef = useRef<HTMLScriptElement | null>(null);
