@@ -19,7 +19,6 @@ import { ValidatorService } from '@/_shared/_services/validator_service';
 import ListingTab from '../ListingTab/ListingTab';
 import styles from './ListingPage.module.scss';
 
-const AdBanner = dynamic(() => import('../../AdBanner/AdBanner'), { ssr: false });
 const TrackAnalytics = dynamic(() => import('../TrackAnalytics/TrackAnalytics'), { ssr: false });
 const ExternalTab = dynamic(() => import('../ExternalTab'), { ssr: false });
 
@@ -261,7 +260,6 @@ function ListingPage({ proposalType, origin, initialData, statuses, page }: List
 					</div>
 				</div>
 			</div>
-			<AdBanner />
 			<div className={styles.content}>
 				<div>
 					{state.activeTab === EListingTabState.INTERNAL_PROPOSALS ? (

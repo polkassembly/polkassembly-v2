@@ -8,7 +8,6 @@ import { Suspense } from 'react';
 import { IGenericListingResponse, IPostListing, ITreasuryStats } from '@/_shared/types';
 import LoadingLayover from '@/app/_shared-components/LoadingLayover';
 import SpendPeriodStats from '@/app/_shared-components/TreasuryStats/SpendPeriodStats';
-import dynamic from 'next/dynamic';
 import OverviewTreasuryStats from './OverviewTreasuryStats';
 import styles from './Overview.module.scss';
 import TreasuryReportBanner from './TreasuryReportBanner';
@@ -16,8 +15,6 @@ import LatestActivity from './LatestActivity/LatestActivity';
 import OverviewHeading from './OverviewHeading';
 import AppGrid from './AppGrid/AppGrid';
 import JobsAndBounties from './JobsAndBounties/JobsAndBounties';
-
-const AdBanner = dynamic(() => import('@/app/_shared-components/AdBanner/AdBanner'), { ssr: false });
 
 function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGenericListingResponse<IPostListing>; treasuryStatsData: ITreasuryStats[] }) {
 	return (
@@ -40,7 +37,6 @@ function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGeneri
 				<AppGrid />
 
 				<TreasuryReportBanner />
-				<AdBanner />
 				<div className='mt-2 grid grid-cols-1 gap-6 lg:grid-cols-3'>
 					<div className='w-full lg:col-span-2'>
 						<Suspense
