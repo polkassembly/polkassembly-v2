@@ -33,7 +33,7 @@ const nextConfig = {
 						key: 'Content-Security-Policy',
 						value: [
 							"default-src 'self'",
-							"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.sentry-cdn.com",
+							"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.bmcdn6.com https://www.googletagmanager.com https://www.google-analytics.com https://js.sentry-cdn.com",
 							"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 							"font-src 'self' https://fonts.gstatic.com",
 							"img-src 'self' data: blob: https:",
@@ -41,7 +41,7 @@ const nextConfig = {
 							"object-src 'none'",
 							"base-uri 'self'",
 							"form-action 'self'",
-							"connect-src 'self' https://api.github.com https://*.polkassembly.io https://*.polkassembly.network https://*.firebaseapp.com https://*.googleapis.com https://sentry.io https://o4504609384013824.ingest.sentry.io wss: https://www.google-analytics.com https://*.algolia.net https://*.algolianet.com https://*.algolia.io https://api.imgbb.com https://www.googletagmanager.com",
+							"connect-src 'self' https://*.bmcdn6.com https://api.github.com https://*.polkassembly.io https://*.polkassembly.network https://*.firebaseapp.com https://*.googleapis.com https://sentry.io https://o4504609384013824.ingest.sentry.io wss: https://www.google-analytics.com https://*.algolia.net https://*.algolianet.com https://*.algolia.io https://api.imgbb.com https://www.googletagmanager.com",
 							`frame-src 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')}`,
 							`frame-ancestors 'self' ${ALLOWED_OUTBOUND_IFRAME_DOMAINS.join(' ')}`,
 							'upgrade-insecure-requests'
