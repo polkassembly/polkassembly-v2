@@ -33,7 +33,7 @@ const nextConfig = {
 						key: 'Content-Security-Policy',
 						value: [
 							"default-src 'self'",
-							"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.sentry-cdn.com",
+							"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.bmcdn6.com https://www.googletagmanager.com https://www.google-analytics.com https://js.sentry-cdn.com",
 							"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 							"font-src 'self' https://fonts.gstatic.com",
 							"img-src 'self' data: blob: https:",
