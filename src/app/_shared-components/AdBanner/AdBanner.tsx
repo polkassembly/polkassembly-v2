@@ -12,28 +12,39 @@ function AdBanner() {
 	const adScriptId = DEFAULT_AD_SCRIPT_ID;
 
 	const adRef = useRef<HTMLDivElement>(null);
-	const loadedScriptId = useRef<string | null>(null);
+	const scriptRef = useRef<HTMLScriptElement | null>(null);
 
 	useEffect(() => {
-		if (!adScriptId || loadedScriptId.current === adScriptId) return;
-		loadedScriptId.current = adScriptId;
+		if (!adScriptId) return undefined;
 
-		const loadAdScript = (doc: Document, tagName: string, adId: string, hosts: string[], hostIndex: number, cacheBuster?: number) => {
-			const firstScript = doc.getElementsByTagName(tagName)[0];
-			const newScript = doc.createElement(tagName) as HTMLScriptElement;
-			newScript.async = true;
-			newScript.src = `https://${hosts[hostIndex]}/js/${adId}.js?v=${cacheBuster || new Date().getTime()}`;
-			newScript.onerror = function () {
-				newScript.remove();
+		let cancelled = false;
+
+		const loadAdScript = (hosts: string[], hostIndex: number, cacheBuster: number) => {
+			if (cancelled) return;
+
+			const script = document.createElement('script');
+			script.async = true;
+			script.src = `https://${hosts[hostIndex]}/js/${adScriptId}.js?v=${cacheBuster}`;
+			script.onerror = () => {
+				script.remove();
 				const nextIndex = hostIndex + 1;
-				if (nextIndex < hosts.length) {
-					loadAdScript(doc, tagName, adId, hosts, nextIndex, cacheBuster);
+				if (!cancelled && nextIndex < hosts.length) {
+					loadAdScript(hosts, nextIndex, cacheBuster);
 				}
 			};
-			firstScript?.parentNode?.insertBefore(newScript, firstScript);
+			scriptRef.current = script;
+			document.head.appendChild(script);
 		};
 
-		loadAdScript(document, 'script', adScriptId, AD_CDN_HOSTS, 0, new Date().getTime());
+		loadAdScript(AD_CDN_HOSTS, 0, new Date().getTime());
+
+		return () => {
+			cancelled = true;
+			if (scriptRef.current) {
+				scriptRef.current.remove();
+				scriptRef.current = null;
+			}
+		};
 	}, [adScriptId]);
 
 	return (
