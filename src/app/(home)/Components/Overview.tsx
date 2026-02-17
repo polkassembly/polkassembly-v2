@@ -14,7 +14,6 @@ import TreasuryReportBanner from './TreasuryReportBanner';
 import LatestActivity from './LatestActivity/LatestActivity';
 import OverviewHeading from './OverviewHeading';
 import AppGrid from './AppGrid/AppGrid';
-import JobsAndBounties from './JobsAndBounties/JobsAndBounties';
 
 function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGenericListingResponse<IPostListing>; treasuryStatsData: ITreasuryStats[] }) {
 	return (
@@ -37,22 +36,16 @@ function Overview({ allTracksData, treasuryStatsData }: { allTracksData: IGeneri
 				<AppGrid />
 
 				<TreasuryReportBanner />
-				<div className='mt-2 grid grid-cols-1 gap-6 lg:grid-cols-3'>
-					<div className='w-full lg:col-span-2'>
-						<Suspense
-							fallback={
-								<div className='relative flex min-h-40 w-full items-center justify-center'>
-									<LoadingLayover />
-								</div>
-							}
-						>
-							<LatestActivity allTracksData={allTracksData} />
-						</Suspense>
-					</div>
-
-					<div className='w-full lg:col-span-1'>
-						<JobsAndBounties />
-					</div>
+				<div className='mt-2'>
+					<Suspense
+						fallback={
+							<div className='relative flex min-h-40 w-full items-center justify-center'>
+								<LoadingLayover />
+							</div>
+						}
+					>
+						<LatestActivity allTracksData={allTracksData} />
+					</Suspense>
 				</div>
 			</div>
 		</div>
