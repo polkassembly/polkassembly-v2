@@ -23,7 +23,7 @@ export class NotificationService {
 		'Content-Type': 'application/json',
 		'x-api-key': NOTIFICATION_ENGINE_API_KEY,
 		'x-network': network,
-		'x-source': 'polkassembly_v2'
+		'x-source': 'polkassembly'
 	});
 
 	private static async sendNotification({
@@ -68,18 +68,22 @@ export class NotificationService {
 			trigger: ENotificationTrigger.VERIFY_EMAIL,
 			args: {
 				email: email || user.email,
+				username: user.username,
 				verifyUrl: `https://${network}.polkassembly.io/confirm-verification?social=${ESocial.EMAIL}&token=${token}`
 			}
 		});
 	}
 
 	static async SendResetPasswordEmail(user: IUser, token: string) {
+		const network = user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK;
+
 		await this.sendNotification({
-			network: user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK,
+			network,
 			trigger: ENotificationTrigger.RESET_PASSWORD,
 			args: {
 				email: user.email,
-				resetUrl: `https://${user.primaryNetwork || this.DEFAULT_NOTIFICATION_NETWORK}.polkassembly.io/reset-password?token=${token}`
+				username: user.username,
+				resetUrl: `https://${network}.polkassembly.io/reset-password?token=${token}`
 			}
 		});
 	}

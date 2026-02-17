@@ -202,7 +202,7 @@ export class NextApiClientService {
 		routeSegments?: string[];
 		queryParams?: URLSearchParams;
 	}): Promise<{ url: URL; method: Method }> {
-		const baseURL = await getBaseUrl();
+		const baseURL = this.isServerSide() ? await getBaseUrl() : `${window.location.origin}/api/v2`;
 		const segments = routeSegments?.length ? `/${routeSegments.join('/')}` : '';
 		let path = '';
 		let method: Method = 'GET';
