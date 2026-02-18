@@ -10,6 +10,7 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useQuery } from '@tanstack/react-query';
 import { POST_ANALYTICS_ENABLED_PROPOSAL_TYPE } from '@/_shared/_constants/postAnalyticsConstants';
 import { NextApiClientService } from '@/app/_client-services/next_api_client_service';
+import noData from '@/_assets/activityfeed/gifs/noactivity.gif';
 import classes from './PostAnalytics.module.scss';
 import { Skeleton } from '../../Skeleton';
 import AccountsAnalytics from './AccountsAnalytics';
@@ -19,7 +20,7 @@ import VotesAnalytics from './VotesAnalytics';
 
 const getPostAnalytics = async ({ proposalType, index }: { proposalType: EProposalType; index: string }) => {
 	const { data, error } = await NextApiClientService.getPostAnalytics({ proposalType, index });
-	if (error || !data) {
+	if (error) {
 		throw new Error(error?.message || 'Failed to fetch data');
 	}
 	return data;
@@ -72,7 +73,7 @@ function PostAnalytics({ proposalType, index }: { proposalType: EProposalType; i
 						<Skeleton className='h-[250px] w-full rounded-lg' />
 					</div>
 				</div>
-			) : (
+			) : analytics ? (
 				<div>
 					{/* Analytics type selector */}
 					<Select
@@ -138,6 +139,16 @@ function PostAnalytics({ proposalType, index }: { proposalType: EProposalType; i
 							</div>
 						)}
 					</div>
+				</div>
+			) : (
+				<div className='flex flex-col items-center justify-center gap-4 py-8'>
+					<Image
+						src={noData}
+						alt='no data'
+						width={200}
+						height={200}
+					/>
+					{t('Analytics.noData')}
 				</div>
 			)}
 		</div>

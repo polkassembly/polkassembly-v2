@@ -704,7 +704,8 @@
 			"votes": "投票",
 			"convictionAnalyticsDes": "确信度投票是投票中使用的代币数乘以确信度",
 			"accountAnalyticsDes": "账户是投票的唯一地址数",
-			"votesAnalyticsDes": "投票金额是投票中使用的代币数"
+			"votesAnalyticsDes": "投票金额是投票中使用的代币数",
+			"noData": "没有投票数据"
 		},
 		"OnchainInfo": {
 			"metadata": "元数据",

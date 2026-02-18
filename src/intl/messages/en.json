@@ -567,7 +567,7 @@
 		"errorLoadingVote": "Error loading vote data",
 		"noVoteForAddress": "No vote found for this address",
 		"showLikelySpam": "Show Likely Spam",
-		"hideLikelySpam": "Hide Likely Spam",
+		"hideLikelySpam": "Hide Likely Spam",		
 		"BeneficiariesDetails": {
 			"requested": "Requested",
 			"details": "Details",
@@ -635,7 +635,8 @@
 			"votes": "Votes",
 			"convictionAnalyticsDes": "Conviction vote is the number of tokens used for voting multiplied by conviction",
 			"accountAnalyticsDes": "Accounts are the number of unique addresses casting a vote",
-			"votesAnalyticsDes": "Vote amount is the number of tokens used for voting"
+			"votesAnalyticsDes": "Vote amount is the number of tokens used for voting",
+			"noData": "No votes available"
 		},
 		"commentsDisabled": "Comments have been disabled for this post.",
 		"commentsDisabledForNonVerifiedUsers": "Comments have been disabled for non verified users.",

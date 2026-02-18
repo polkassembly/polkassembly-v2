@@ -694,7 +694,8 @@
 			"votes": "投票",
 			"convictionAnalyticsDes": "確信度投票は、投票に使用されたトークン数に確信度を掛けたものです",
 			"accountAnalyticsDes": "アカウントは、投票を行った一意のアドレスの数です",
-			"votesAnalyticsDes": "投票金額は、投票に使用されたトークン数です"
+			"votesAnalyticsDes": "投票金額は、投票に使用されたトークン数です",
+			"noData": "投票が見つかりません"
 		},
 		"OnchainInfo": {
 			"metadata": "メタデータ",
