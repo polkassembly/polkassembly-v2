@@ -14,11 +14,11 @@ import Image from 'next/image';
 import SubscanIcon from '@assets/profile/subscan-link.svg';
 import { formatBnBalance } from '@/app/_client-utils/formatBnBalance';
 import { cn } from '@/lib/utils';
-import StatusTag from '../../StatusTag/StatusTag';
-import Address from '../Address/Address';
-import { Button } from '../../Button';
-import { TableCell, TableRow } from '../../Table';
+import StatusTag from '../../../StatusTag/StatusTag';
+import { Button } from '../../../Button';
+import { TableCell, TableRow } from '../../../Table';
 import classes from './Votes.module.scss';
+import Address from '../../Address/Address';
 
 interface VoteItemProps {
 	vote: IProfileVote;

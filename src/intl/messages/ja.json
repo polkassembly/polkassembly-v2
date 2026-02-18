@@ -337,7 +337,9 @@
 			"unlinked_address": "アドレスのリンクを解除",
 			"unlinked_multiple_addresses": "複数のアドレスのリンクを解除",
 			"followed_user": "ユーザーをフォロー",
-			"unfollowed_user": "ユーザーをフォロー解除"
+			"unfollowed_user": "ユーザーをフォロー解除",
+			"noData": "アクティビティが見つかりません",
+			"activity": "アクティビティ"
 		},
 		"Posts": {
 			"posts": "投稿",

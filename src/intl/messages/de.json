@@ -267,7 +267,9 @@
 			"unlinked_address": "Adresse getrennt",
 			"unlinked_multiple_addresses": "Mehrere Adressen getrennt",
 			"followed_user": "Benutzer folgen",
-			"unfollowed_user": "Benutzer entfolgen"
+			"unfollowed_user": "Benutzer entfolgen",
+			"noData": "Keine Aktivitäten gefunden",
+			"activity": "Aktivität"
 		},
 		"Posts": {
 			"posts": "Beiträge",
