@@ -933,6 +933,7 @@ export class SubsquidService extends SubsquidUtils {
 				origin: EPostOrigin;
 				description: string;
 				statusHistory: IStatusHistoryItem[];
+				reward: string;
 				preimage: { proposedCall: { args: Record<string, unknown> } };
 			}) => ({
 				createdAt: childBounty.createdAt,
@@ -945,6 +946,7 @@ export class SubsquidService extends SubsquidUtils {
 				origin: childBounty.origin,
 				description: childBounty.description || '',
 				timeline: childBounty.statusHistory as IStatusHistoryItem[],
+				reward: childBounty.reward,
 				preimageArgs: childBounty.preimage?.proposedCall?.args
 			})
 		);

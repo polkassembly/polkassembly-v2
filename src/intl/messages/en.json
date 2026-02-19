@@ -1132,7 +1132,7 @@
 		"clearIdentityDescription": "Are you sure you want to clear your identity?"
 	},
 	"Bounties": {
-		"onchainBounties": "On-chain Bounties",
+		"onchainBounties": "Bounties",
 		"createBountyProposal": "Create Bounty Proposal",
 		"loadingChildBounties": "Loading child bounties...",
 		"noChildBountiesFound": "No child bounties found",
@@ -1147,7 +1147,28 @@
 		"proposed": "Proposed",
 		"claimed": "Claimed",
 		"cancelled": "Cancelled",
-		"rejected": "Rejected"
+		"rejected": "Rejected",
+		"description": "Bounties fund community-led work through on-chain proposals. Discover, apply for, and track tasks that help grow the Polkadot ecosystem.",
+		"readMore": "Read More",
+		"create": "Create",
+		"allBounties": "All Bounties",
+		"analytics": "Analytics",
+		"parentBounties": "Parent Bounties",
+		"searchPlaceholder": "Enter address or name to search",
+		"filterByStatus": "Filter by Status",
+		"analyticsComingSoon": "Analytics coming soon...",
+		"activeBounties": "Active Bounties",
+		"activeBountyValue": "Active Bounty Value",
+		"childBountiesValue": "Child Bounties Value",
+		"curatorsEarners": "Curators / Earners",
+		"untitledBounty": "Untitled Bounty",
+		"childBounties": "Child Bounties",
+		"fundsSpent": "Funds Spent",
+		"noChildBounties": "No child bounties found",
+		"tableTitle": "TITLE",
+		"tableAmount": "AMOUNT",
+		"tableStatus": "STATUS",
+		"untitled": "Untitled"
 	},
 	"Bounty": {
 		"dashboard": "Dashboard",

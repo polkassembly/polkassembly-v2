@@ -11,6 +11,7 @@ import { Metadata } from 'next';
 import { OPENGRAPH_METADATA } from '@/_shared/_constants/opengraphMetadata';
 import { getNetworkFromHeaders } from '@/app/api/_api-utils/getNetworkFromHeaders';
 import { getGeneratedContentMetadata } from '@/_shared/_utils/generateContentMetadata';
+import { BOUNTY_GRID_LISTING_LIMIT } from '@/_shared/_constants/listingLimit';
 import BountiesListingPage from './Components/BountiesListingPage';
 
 const zodQuerySchema = z.object({
@@ -56,7 +57,7 @@ async function OnchainBountyPage({ searchParams }: { searchParams: Promise<{ pag
 
 	statuses = convertStatusToStatusesArray(status);
 
-	const { data, error } = await NextApiClientService.fetchListingData({ proposalType: EProposalType.BOUNTY, page, statuses });
+	const { data, error } = await NextApiClientService.fetchListingData({ proposalType: EProposalType.BOUNTY, page, limit: BOUNTY_GRID_LISTING_LIMIT, statuses });
 
 	if (error || !data) {
 		throw new ClientError(ERROR_CODES.CLIENT_ERROR, error?.message || ERROR_MESSAGES[ERROR_CODES.CLIENT_ERROR]);
