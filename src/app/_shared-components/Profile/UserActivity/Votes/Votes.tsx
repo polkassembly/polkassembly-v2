@@ -18,16 +18,16 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { getEncodedAddress } from '@/_shared/_utils/getEncodedAddress';
 import { ONE_MIN_IN_MILLI } from '@/app/api/_api-constants/timeConstants';
 import classes from './Votes.module.scss';
-import { Separator } from '../../Separator';
-import { Skeleton } from '../../Skeleton';
-import { Button } from '../../Button';
-import { PaginationWithLinks } from '../../PaginationWithLinks';
-import { Checkbox } from '../../Checkbox';
-import { Popover, PopoverContent, PopoverTrigger } from '../../Popover/Popover';
-import RemoveVoteDialog from '../../RemoveVoteDialog/RemoveVoteDialog';
-import Address from '../Address/Address';
+import { Separator } from '../../../Separator';
+import { Skeleton } from '../../../Skeleton';
+import { Button } from '../../../Button';
+import { PaginationWithLinks } from '../../../PaginationWithLinks';
+import { Checkbox } from '../../../Checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '../../../Popover/Popover';
+import RemoveVoteDialog from '../../../RemoveVoteDialog/RemoveVoteDialog';
+import Address from '../../Address/Address';
 import VoteItem from './VoteItem';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../Table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../Table';
 
 // Constants
 const DEFAULT_VOTES_SHOW_COUNT = 3;

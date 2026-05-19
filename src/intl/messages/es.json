@@ -269,7 +269,9 @@
 			"unlinked_address": "Desvinculó dirección",
 			"unlinked_multiple_addresses": "Desvinculó múltiples direcciones",
 			"followed_user": "Seguido",
-			"unfollowed_user": "Dejó de seguir"
+			"unfollowed_user": "Dejó de seguir",
+			"noData": "No se encontraron actividades",
+			"activity": "Actividad"
 		},
 		"Posts": {
 			"posts": "Publicaciones",
