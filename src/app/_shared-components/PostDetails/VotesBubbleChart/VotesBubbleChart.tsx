@@ -133,7 +133,7 @@ const getPostAnalytics = async ({
 		votesType,
 		skipCache
 	});
-	if (error || !data) {
+	if (error) {
 		throw new Error(error?.message || 'Failed to fetch data');
 	}
 	return data;

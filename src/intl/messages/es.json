@@ -706,7 +706,8 @@
 			"votes": "Votos",
 			"convictionAnalyticsDes": "La votación de sobrecarga es el número de tokens utilizados para votar multiplicado por la sobrecarga",
 			"accountAnalyticsDes": "Las cuentas son el número de direcciones únicas que emiten un voto",
-			"votesAnalyticsDes": "El monto de la votación es el número de tokens utilizados para votar"
+			"votesAnalyticsDes": "El monto de la votación es el número de tokens utilizados para votar",
+			"noData": "No hay votos disponibles"
 		},
 		"OnchainInfo": {
 			"metadata": "Metadatos",

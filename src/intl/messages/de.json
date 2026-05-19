@@ -692,7 +692,8 @@
 			"votes": "Abstimmungen",
 			"convictionAnalyticsDes": "Überzeugung ist die Anzahl der Token, die für die Abstimmung verwendet werden, multipliziert mit der Überzeugung",
 			"accountAnalyticsDes": "Konten sind die Anzahl der eindeutigen Adressen, die eine Abstimmung abgeben",
-			"votesAnalyticsDes": "Abstimmungsbetrag ist die Anzahl der Token, die für die Abstimmung verwendet werden"
+			"votesAnalyticsDes": "Abstimmungsbetrag ist die Anzahl der Token, die für die Abstimmung verwendet werden",
+			"noData": "Keine Abstimmungen verfügbar"
 		},
 		"OnchainInfo": {
 			"metadata": "Metadaten",
