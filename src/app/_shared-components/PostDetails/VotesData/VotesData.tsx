@@ -281,7 +281,7 @@ function VotesData({ proposalType, index, trackName, createdAt, timeline, setThr
 				<Dialog>
 					<DialogTrigger
 						asChild
-						className='mt-6'
+						className='mt-6 border border-border_grey'
 					>
 						<Button
 							variant='outline'
