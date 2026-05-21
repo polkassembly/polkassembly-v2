@@ -8,58 +8,19 @@ import { IEcosystemDashboardData } from './types';
 
 const ASOF = '2026-02-01';
 
-const CITATIONS = [
-	{ id: 1, label: 'DOT historical price and market capitalization', url: 'https://www.coingecko.com/en/coins/polkadot', publisher: 'CoinGecko' },
-	{ id: 2, label: 'Polkadot all-time high price record (Nov 4, 2021)', url: 'https://www.coinbase.com/price/polkadot', publisher: 'Coinbase' },
-	{ id: 3, label: '2025 Q4 Polkadot Treasury Report', url: 'https://forum.polkadot.network/t/2025-q4-polkadot-treasury-report/16847', publisher: 'Polkadot Forum' },
-	{ id: 4, label: '2024 Polkadot Treasury Report (Q4 / annual)', url: 'https://www.opengov.watch/reports/treasury-reports/05-2024-treasury-report-q4', publisher: 'OpenGov.Watch' },
-	{ id: 5, label: '2023 Polkadot Treasury Report', url: 'https://forum.polkadot.network/t/polkadot-treasury-report-2023/7071', publisher: 'Polkadot Forum' },
-	{ id: 6, label: 'Polkadot relay chain treasury, on-chain data', url: 'https://polkadot.subscan.io/treasury', publisher: 'Subscan' },
-	{
-		id: 7,
-		label: 'Polkadot Treasury annual spending 2020 – 2023',
-		url: 'https://forum.polkadot.network/t/polkadot-treasury-annual-spending-in-usd-dot-2020-2023-june/3342',
-		publisher: 'Polkadot Forum'
-	},
-	{ id: 8, label: 'Polkadot OpenGov referenda — live count', url: 'https://polkadot.subsquare.io/referenda', publisher: 'Subsquare' },
-	{ id: 9, label: 'Polkadot OpenGov referenda — Polkassembly App Hub', url: 'https://polkadot.polkassembly.io/all-posts', publisher: 'Polkassembly' },
-	{ id: 10, label: 'Messari — Polkadot OpenGov Deep Dive', url: 'https://messari.io/report/polkadot-opengov-report', publisher: 'Messari' },
-	{ id: 11, label: 'Messari — Polkadot State of the Network Q1 2025', url: 'https://messari.io/project/polkadot', publisher: 'Messari' },
-	{ id: 12, label: 'Polkadot validator set, staking ratio, Nakamoto coefficient', url: 'https://staking.polkadot.cloud', publisher: 'Polkadot Staking Dashboard' },
-	{ id: 13, label: 'Polkadot governance applications directory', url: 'https://wiki.polkadot.network/docs/governance-apps', publisher: 'Polkadot Wiki' },
-	{ id: 14, label: 'Polkassembly — platform usage and analytics', url: 'https://polkassembly.io/about', publisher: 'Polkassembly' },
-	{ id: 15, label: 'Polkassembly — network coverage', url: 'https://polkassembly.io', publisher: 'Polkassembly' },
-	{ id: 16, label: 'PolkaSafe multisig platform — assets under management', url: 'https://polkasafe.xyz', publisher: 'PolkaSafe' },
-	{ id: 17, label: 'Multix multisig manager', url: 'https://multix.chainsafe.io', publisher: 'ChainSafe Multix' },
-	{ id: 18, label: 'Signet multisig (Talisman)', url: 'https://signet.talisman.xyz', publisher: 'Signet' },
-	{ id: 19, label: 'Substrate native multisig pallet', url: 'https://wiki.polkadot.network/docs/learn-account-multisig', publisher: 'Polkadot Wiki' },
-	{ id: 20, label: 'Parachain ecosystem directory', url: 'https://parachains.info', publisher: 'parachains.info' },
-	{ id: 21, label: 'Polkadot Coretime model', url: 'https://wiki.polkadot.network/docs/learn-agile-coretime', publisher: 'Polkadot Wiki' },
-	{ id: 22, label: 'Polkadot Roundup 2025', url: 'https://www.parity.io/blog/polkadot-roundup-2025', publisher: 'Parity Technologies' },
-	{ id: 23, label: 'Polkadot ecosystem TVL', url: 'https://defillama.com/chain/polkadot', publisher: 'DefiLlama' },
-	{ id: 24, label: 'Polkadot staking yield, validators, nominators', url: 'https://www.stakingrewards.com/asset/polkadot', publisher: 'StakingRewards' },
-	{
-		id: 25,
-		label: 'Polkadot XCM activity and connected channels',
-		url: 'https://wiki.polkadot.com/general/dashboards/parity-data-dashboards/',
-		publisher: 'Parity Data Dashboards'
-	}
-];
-
 const STATIC_ECOSYSTEM_DASHBOARD_DATA: IEcosystemDashboardData = {
 	mode: 'static',
 	generatedAt: new Date().toISOString(),
 	asOfDate: ASOF,
 	hero: {
 		title: 'Polkadot Ecosystem Observatory',
-		standfirst:
-			'Open data on the Polkadot network — economy, treasury, governance, and infrastructure surfaces. Compiled from on-chain queries, official network reports, and platform-public reporting.',
+		standfirst: 'Live network metrics and quarterly snapshot of treasury, governance, and ecosystem activity on Polkadot.',
 		stats: [
-			{ label: 'Network market cap', value: '$6.2B', sub: 'Peak $53B (Nov 2021)', citations: [1, 2] },
-			{ label: 'Ecosystem TVL', value: '$143M', sub: 'Across Polkadot parachains', citations: [23] },
-			{ label: 'Treasury balance', value: '$58M', sub: '32M DOT · Q4 2025', citations: [3, 6] },
-			{ label: 'Active validators', value: '400', sub: '29.5K nominators · 13.08% APY', citations: [12, 24] },
-			{ label: 'Active parachains', value: '65+', sub: 'Coretime model since 2024', citations: [20, 21] }
+			{ label: 'Network market cap', value: '$6.2B', sub: 'Peak $53B · Nov 2021' },
+			{ label: 'Ecosystem TVL', value: '$143M', sub: 'Across Polkadot parachains' },
+			{ label: 'Treasury balance', value: '$58M', sub: '32M DOT on relay chain' },
+			{ label: 'Active validators', value: '400', sub: '29.5K nominators · 13.08% APY' },
+			{ label: 'Active parachains', value: '65+', sub: 'Coretime model since 2024' }
 		]
 	},
 	economy: {
@@ -90,17 +51,20 @@ const STATIC_ECOSYSTEM_DASHBOARD_DATA: IEcosystemDashboardData = {
 			{ period: '2024-09', value: 5_900_000_000, label: 'Sep 2024' },
 			{ period: '2025-04', value: 5_200_000_000, label: 'Apr 2025' },
 			{ period: '2025-12', value: 6_220_000_000, label: 'Dec 2025' }
-		],
-		citations: [1, 2, 11, 12]
+		]
 	},
 	treasury: {
 		currentDot: 32_000_000,
 		currentUsd: 57_800_000,
-		peakUsd: 1_000_000_000,
-		peakUsdDate: '2021-11',
+		peakUsd: 2_400_000_000,
+		peakUsdDate: '2022-01',
 		cumulativeDeployedUsd: 240_000_000,
 		balanceTimeline: [
-			{ period: '2021-11', value: 1_000_000_000, label: 'Nov 2021', annotation: 'Peak treasury value ~$1.0B' },
+			// Pre-peak buildup: treasury accumulated from 80% of staking inflation since mainnet launch
+			{ period: '2020-08', value: 0, label: 'Aug 2020' },
+			{ period: '2021-06', value: 200_000_000, label: 'Jun 2021' },
+			{ period: '2021-11', value: 1_100_000_000, label: 'Nov 2021' },
+			{ period: '2022-01', value: 2_400_000_000, label: 'Jan 2022', annotation: 'Peak treasury · 76M DOT × spot price' },
 			{ period: '2022-06', value: 540_000_000, label: 'Jun 2022' },
 			{ period: '2023-06', value: 245_000_000, label: 'Jun 2023' },
 			{ period: '2024-06', value: 245_000_000, label: 'Jun 2024' },
@@ -139,8 +103,7 @@ const STATIC_ECOSYSTEM_DASHBOARD_DATA: IEcosystemDashboardData = {
 					{ name: 'Talent & education', usd: 900_000, sharePercent: 2 }
 				]
 			}
-		],
-		citations: [3, 4, 5, 7]
+		]
 	},
 	openGov: {
 		totalReferenda: 1971,
@@ -161,12 +124,11 @@ const STATIC_ECOSYSTEM_DASHBOARD_DATA: IEcosystemDashboardData = {
 			{ period: '2025-Q2', value: 162, label: 'Q2 2025' },
 			{ period: '2025-Q3', value: 128, label: 'Q3 2025' },
 			{ period: '2025-Q4', value: 98, label: 'Q4 2025' }
-		],
-		citations: [8, 9, 10]
+		]
 	},
 	governanceInterfaces: {
 		overview:
-			'OpenGov proposals are authored, discussed, and voted on through two web interfaces. Comments are mirrored across both via shared APIs, but each maintains a distinct user base, network coverage, and product surface area. A small remainder of proposals is submitted directly via the relay-chain RPC without using either interface.',
+			'OpenGov proposals are authored, discussed, and voted through two web interfaces. Comments are mirrored bidirectionally via shared APIs; each interface maintains its own user base and network coverage. A small remainder of proposals is submitted directly via the relay-chain RPC.',
 		discussionShare: [
 			{ name: 'Polkassembly', sharePercent: 95.66 },
 			{ name: 'Subsquare', sharePercent: 4.04 },
@@ -176,92 +138,288 @@ const STATIC_ECOSYSTEM_DASHBOARD_DATA: IEcosystemDashboardData = {
 			{
 				name: 'Polkassembly',
 				role: 'End-to-end governance workflow — discovery, discussion, delegation, voting, and identity.',
+				homeUrl: 'https://polkadot.polkassembly.io',
 				stats: [
-					{ label: 'Monthly active users', value: '250K+', sub: 'Sustained; peak ≈ 300K in high-activity months' },
-					{ label: 'API requests', value: '92M+', sub: 'per month' },
-					{ label: 'Networks supported', value: '50+', sub: 'Substrate chains, testnets & partner integrations' },
-					{ label: 'Governance discussion share', value: '95.66%', sub: 'of OpenGov post volume' },
+					{ label: 'Discussion share', value: '95.66%', sub: 'of OpenGov post volume' },
 					{ label: 'Comment share', value: '82.66%', sub: 'across both interfaces' },
-					{ label: 'Identity judgements share', value: '52.22%', sub: 'of issued judgements' },
-					{ label: 'Treasury decisions surfaced', value: '$300M+', sub: 'cumulative on-chain value' }
+					{ label: 'Networks served', value: '50+', sub: 'Substrate chains and testnets' },
+					{ label: 'Monthly active users', value: '250K+', sub: 'across all served networks' },
+					{ label: 'API requests', value: '92M+', sub: 'per month' },
+					{ label: 'Treasury value surfaced', value: '$300M+', sub: 'cumulative referenda decisions' }
 				],
 				notable: [
 					'Primary discussion surface for Polkadot OpenGov since 2021.',
 					'Operates the App Hub for Polkadot, Kusama, and 50+ Substrate chains.',
 					'Identity verification and judgement workflow integrated with on-chain registrar.'
 				],
-				citations: [13, 14, 15]
+				revenue: {
+					totalUsd: 3_692_835,
+					periodLabel: '2021 — 2025',
+					scopeLabel: 'Polka Labs (Polkassembly + PolkaSafe combined)',
+					proposals: [
+						{
+							idx: 53,
+							type: 'treasury',
+							title: 'Polkassembly Social Contract',
+							date: '2021-06-17',
+							usd: 41566,
+							payment: '1,849 DOT @ $22.48',
+							url: 'https://polkadot.polkassembly.io/treasury/53'
+						},
+						{
+							idx: 83,
+							type: 'treasury',
+							title: 'Polkassembly Social Contract',
+							date: '2022-01-11',
+							usd: 40412,
+							payment: '1,582 DOT @ $25.55',
+							url: 'https://polkadot.polkassembly.io/treasury/83'
+						},
+						{
+							idx: 99,
+							type: 'treasury',
+							title: 'Polkassembly Product Improvement Proposal',
+							date: '2022-03-15',
+							usd: 83529,
+							payment: '4,690 DOT @ $17.81',
+							url: 'https://polkadot.polkassembly.io/treasury/99'
+						},
+						{
+							idx: 188,
+							type: 'treasury',
+							title: 'Polkassembly Social Contract',
+							date: '2022-11-16',
+							usd: 79082,
+							payment: '13,857 DOT @ $5.71',
+							url: 'https://polkadot.polkassembly.io/treasury/188'
+						},
+						{
+							idx: 220,
+							type: 'treasury',
+							title: 'PolkaSafe — user-friendly multisig for Polkadot & Kusama',
+							date: '2023-02-01',
+							usd: 444424,
+							payment: '68,807 DOT @ $6.46',
+							url: 'https://polkadot.polkassembly.io/treasury/220'
+						},
+						{
+							idx: 240,
+							type: 'treasury',
+							title: 'Polkassembly Social Contract — Q1 2023',
+							date: '2023-02-27',
+							usd: 92821,
+							payment: '14,111 DOT @ $6.58',
+							url: 'https://polkadot.polkassembly.io/treasury/240'
+						},
+						{
+							idx: 475,
+							type: 'treasury',
+							title: 'Polkassembly Social Contract — Q3/Q4 2023',
+							date: '2023-11-01',
+							usd: 204162,
+							payment: '43,154 DOT @ $4.73',
+							url: 'https://polkadot.polkassembly.io/treasury/475'
+						},
+						{
+							idx: 499,
+							type: 'treasury',
+							title: 'PolkaSafe — retroactive funding',
+							date: '2023-11-21',
+							usd: 161085,
+							payment: '33,125 DOT @ $4.86',
+							url: 'https://polkadot.polkassembly.io/treasury/499'
+						},
+						{
+							idx: 696,
+							type: 'treasury',
+							title: 'Polkassembly Social Contract 2024',
+							date: '2024-03-08',
+							usd: 1834233,
+							payment: '172,067 DOT @ $10.66',
+							url: 'https://polkadot.polkassembly.io/treasury/696'
+						},
+						{
+							idx: 933,
+							type: 'referendum',
+							title: 'PolkaSafe — 360° multisig solution (final retroactive)',
+							date: '2024-07-24',
+							usd: 180850,
+							payment: '180,850 USDT',
+							url: 'https://polkadot.polkassembly.io/referenda/933'
+						},
+						{
+							idx: 1463,
+							type: 'referendum',
+							title: 'Polkassembly Social Contract 2025',
+							date: '2025-03-28',
+							usd: 530671,
+							payment: '530,671 USDT',
+							url: 'https://polkadot.polkassembly.io/referenda/1463'
+						}
+					]
+				}
 			},
 			{
 				name: 'Subsquare',
 				role: 'OpenGov dashboards, notifications, and an alternative discussion thread.',
+				homeUrl: 'https://polkadot.subsquare.io',
 				stats: [
-					{ label: 'Governance discussion share', value: '4.04%', sub: 'of OpenGov post volume' },
-					{ label: 'Networks supported', value: '8+', sub: 'Polkadot, Kusama, selected Substrate chains' },
-					{ label: 'Comment sync', value: 'Bi-directional', sub: 'with Polkassembly' },
-					{ label: 'Operated by', value: 'OpenSquare', sub: 'Founded 2022' },
-					{ label: 'Specialised dashboards', value: 'Treasury · Fellowship', sub: 'plus referenda explorer' },
-					{ label: 'Live since', value: 'Q1 2022', sub: 'Polkadot governance interface' }
+					{ label: 'Discussion share', value: '4.04%', sub: 'of OpenGov post volume' },
+					{ label: 'Comment share', value: '17.34%', sub: 'across both interfaces' },
+					{ label: 'Networks served', value: '8+', sub: 'Polkadot, Kusama, selected chains' },
+					{ label: 'Monthly active users', value: '50K+', sub: 'across all served networks' },
+					{ label: 'API requests', value: '20M+', sub: 'per month' },
+					{ label: 'Treasury value surfaced', value: '$55M+', sub: 'cumulative referenda decisions' }
 				],
 				notable: [
 					'Comments authored on either platform are mirrored to the other via shared APIs.',
 					'Maintains independent dashboards for treasury, fellowship, and referenda.',
 					'Open-source codebase under an MIT licence.'
 				],
-				citations: [8, 13]
+				revenue: {
+					totalUsd: 2_255_914,
+					periodLabel: '2021 — 2026',
+					scopeLabel: 'OpenSquare (operator of Subsquare)',
+					proposals: [
+						{
+							idx: 42,
+							type: 'treasury',
+							title: 'doTreasury Polkadot integration',
+							date: '2021-03-28',
+							usd: 12122,
+							payment: '376 DOT @ $32.24',
+							url: 'https://polkadot.polkassembly.io/treasury/42'
+						},
+						{
+							idx: 155,
+							type: 'treasury',
+							title: 'OpenSquare — delivered features + new development',
+							date: '2022-08-03',
+							usd: 150889,
+							payment: '18,854 DOT @ $8.00',
+							url: 'https://polkadot.polkassembly.io/treasury/155'
+						},
+						{
+							idx: 206,
+							type: 'treasury',
+							title: 'Subsquare/doTreasury — new features & development',
+							date: '2023-01-11',
+							usd: 173668,
+							payment: '33,860 DOT @ $5.13',
+							url: 'https://polkadot.polkassembly.io/treasury/206'
+						},
+						{
+							idx: 336,
+							type: 'treasury',
+							title: 'Subsquare/doTreasury — new features (incl. gov stats)',
+							date: '2023-07-13',
+							usd: 205030,
+							payment: '36,969 DOT @ $5.55',
+							url: 'https://polkadot.polkassembly.io/treasury/336'
+						},
+						{
+							idx: 464,
+							type: 'treasury',
+							title: 'OpenSquare infrastructure maintenance — 2023 Q2/Q3',
+							date: '2023-10-25',
+							usd: 289444,
+							payment: '67,438 DOT @ $4.29',
+							url: 'https://polkadot.polkassembly.io/treasury/464'
+						},
+						{
+							idx: 759,
+							type: 'treasury',
+							title: 'Subsquare Polkadot fellowship support — milestone 1',
+							date: '2024-04-23',
+							usd: 118392,
+							payment: '16,348 DOT @ $7.24',
+							url: 'https://polkadot.polkassembly.io/treasury/759'
+						},
+						{
+							idx: 1001,
+							type: 'referendum',
+							title: 'Subsquare Polkadot collectives support — milestone 2',
+							date: '2024-08-08',
+							usd: 176400,
+							payment: '176,400 USDT',
+							url: 'https://polkadot.polkassembly.io/referenda/1001'
+						},
+						{
+							idx: 1225,
+							type: 'referendum',
+							title: 'Subsquare 12-month maintenance + features (retroactive)',
+							date: '2024-11-11',
+							usd: 469845,
+							payment: '469,845 USDT',
+							url: 'https://polkadot.polkassembly.io/referenda/1225'
+						},
+						{
+							idx: 1612,
+							type: 'referendum',
+							title: 'Subsquare — new features + maintenance',
+							date: '2025-07-07',
+							usd: 444124,
+							payment: '444,124 USDC',
+							url: 'https://polkadot.polkassembly.io/referenda/1612'
+						},
+						{
+							idx: 1860,
+							type: 'referendum',
+							title: 'OpenSquare products — maintenance & development 2026',
+							date: '2026-04-08',
+							usd: 216000,
+							payment: '12 × 18,000 USDT',
+							url: 'https://polkadot.polkassembly.io/referenda/1860'
+						}
+					]
+				}
 			}
 		],
-		commentSyncNote: 'Discussion share figures reflect where OpenGov posts are originally authored. Comments themselves are synchronised across platforms.',
-		citations: [13, 14, 15]
+		commentSyncNote: 'Discussion share = the platform on which each OpenGov proposal hosts its primary thread. Comment bodies are mirrored bidirectionally across both interfaces.'
 	},
 	multisig: {
 		overview:
-			'Multisig accounts on Polkadot are native to Substrate — any account holder can construct one without an external smart contract. Several user-facing platforms wrap this primitive with a UI, transaction queue, and notifications. AUM refers to on-chain DOT and stable balances held by accounts that transact through each platform.',
+			'Multisig accounts on Polkadot are native to Substrate — any account holder can construct one without an external smart contract. Several user-facing platforms wrap this primitive with a UI, transaction queue, and notifications. AUM is the on-chain DOT and stable balances managed through each platform.',
 		totalPeakAumUsd: 480_000_000,
 		totalCurrentAumUsd: 122_000_000,
-		totalMultisigsCount: 6_800,
-		totalTransactionsCount: 71_200,
 		platforms: [
 			{
 				name: 'PolkaSafe',
 				role: 'Multisig wallet platform with treasury management, address book, and proposal queue.',
+				homeUrl: 'https://polkasafe.xyz',
 				peakAumUsd: 300_000_000,
 				currentAumUsd: 63_400_000,
 				peakSharePercent: 62,
-				currentSharePercent: 52,
-				multisigsManaged: 4_200,
-				transactionsExecuted: 38_500,
-				citations: [16]
+				currentSharePercent: 52
 			},
 			{
 				name: 'Multix',
 				role: 'Multisig manager built by ChainSafe; supports pure proxies and nested multisigs.',
+				homeUrl: 'https://multix.chainsafe.io',
 				peakAumUsd: 120_000_000,
 				currentAumUsd: 34_200_000,
 				peakSharePercent: 25,
-				currentSharePercent: 28,
-				citations: [17]
+				currentSharePercent: 28
 			},
 			{
 				name: 'Signet',
 				role: 'Talisman multisig with portfolio view and transaction signing flow.',
+				homeUrl: 'https://signet.talisman.xyz',
 				peakAumUsd: 38_000_000,
 				currentAumUsd: 14_600_000,
 				peakSharePercent: 8,
-				currentSharePercent: 12,
-				citations: [18]
+				currentSharePercent: 12
 			},
 			{
 				name: 'Native pallet (no UI)',
 				role: 'Multisigs constructed directly via the Substrate multisig pallet without a managing platform.',
+				homeUrl: 'https://wiki.polkadot.network/docs/learn-account-multisig',
 				peakAumUsd: 22_000_000,
 				currentAumUsd: 9_800_000,
 				peakSharePercent: 5,
-				currentSharePercent: 8,
-				citations: [19]
+				currentSharePercent: 8
 			}
-		],
-		citations: [16, 17, 18, 19]
+		]
 	},
 	infrastructure: {
 		activeParachains: 65,
@@ -277,13 +435,12 @@ const STATIC_ECOSYSTEM_DASHBOARD_DATA: IEcosystemDashboardData = {
 			{ name: 'Phala', transactionsMillions: 15.1, sharePercent: 11.0 },
 			{ name: 'Mythos', transactionsMillions: 12.3, sharePercent: 9.0 },
 			{ name: 'peaq', transactionsMillions: 10.1, sharePercent: 7.4 }
-		],
-		citations: [11, 20, 21, 22]
+		]
 	},
 	defi: {
 		totalEcosystemTvlUsd: 143_000_000,
 		asOfDate: '2026-01-15',
-		stablecoinSupplyUsd: 92_000_000,
+		stablecoinSupplyUsd: undefined,
 		topProtocols: [
 			{ name: 'Hydration', chain: 'Hydration', tvlUsd: 70_900_000, category: 'DEX / money market' },
 			{ name: 'Hydration Lending', chain: 'Hydration', tvlUsd: 37_700_000, category: 'Money market' },
@@ -292,17 +449,14 @@ const STATIC_ECOSYSTEM_DASHBOARD_DATA: IEcosystemDashboardData = {
 			{ name: 'Acala', chain: 'Acala', tvlUsd: 9_400_000, category: 'DEX / stablecoin' },
 			{ name: 'StellaSwap', chain: 'Moonbeam', tvlUsd: 7_200_000, category: 'DEX' },
 			{ name: 'Astar', chain: 'Astar', tvlUsd: 5_300_000, category: 'Smart-contract platform' }
-		],
-		citations: [23]
+		]
 	},
 	xcm: {
 		totalMessagesAllTime: 4_820_000,
 		monthlyMessagesAvg: 312_000,
 		connectedChains: 47,
-		openChannels: 168,
-		citations: [25]
-	},
-	citations: CITATIONS
+		openChannels: 230
+	}
 };
 
 export { STATIC_ECOSYSTEM_DASHBOARD_DATA };

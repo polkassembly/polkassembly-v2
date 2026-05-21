@@ -2,23 +2,12 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-// Polkadot Ecosystem Observatory — data shape
-
 export type Mode = 'live' | 'static';
-
-export interface ICitation {
-	id: number;
-	label: string;
-	url: string;
-	publisher: string;
-	accessedOn?: string;
-}
 
 export interface IHeroStat {
 	label: string;
 	value: string;
 	sub?: string;
-	citations: number[];
 }
 
 export interface ITimePoint {
@@ -46,7 +35,6 @@ export interface IEconomySection {
 	nakamotoCoefficient: number;
 	weeklyCoreDevs: number;
 	priceTimeline: ITimePoint[];
-	citations: number[];
 }
 
 export interface IDefiSection {
@@ -54,7 +42,6 @@ export interface IDefiSection {
 	asOfDate: string;
 	stablecoinSupplyUsd?: number;
 	topProtocols: { name: string; chain: string; tvlUsd: number; category: string }[];
-	citations: number[];
 }
 
 export interface IXcmSection {
@@ -62,7 +49,6 @@ export interface IXcmSection {
 	monthlyMessagesAvg: number;
 	connectedChains: number;
 	openChannels: number;
-	citations: number[];
 }
 
 export interface ITreasurySection {
@@ -74,7 +60,6 @@ export interface ITreasurySection {
 	balanceTimeline: ITimePoint[];
 	annualSpend: { year: string; usd: number }[];
 	categoryBreakdown: { year: string; categories: { name: string; usd: number; sharePercent: number }[] }[];
-	citations: number[];
 }
 
 export interface IOpenGovSection {
@@ -86,7 +71,23 @@ export interface IOpenGovSection {
 	approvalRatePercent: number;
 	medianTurnoutPercent: number;
 	referendaPerQuarter: ITimePoint[];
-	citations: number[];
+}
+
+export interface ITreasuryRevenueProposal {
+	idx: number; // on-chain proposal/referendum index
+	type: 'treasury' | 'referendum';
+	title: string;
+	date: string; // YYYY-MM-DD
+	usd: number; // USD value at spot price on date (or direct stablecoin value)
+	payment: string; // human display: "172,067 DOT" or "530,671 USDT"
+	url: string; // Polkassembly proposal link
+}
+
+export interface ITreasuryRevenue {
+	totalUsd: number;
+	periodLabel: string; // e.g., "2021 — 2026"
+	scopeLabel: string; // e.g., "Polka Labs (Polkassembly + PolkaSafe)"
+	proposals: ITreasuryRevenueProposal[];
 }
 
 export interface IGovernanceInterface {
@@ -94,7 +95,8 @@ export interface IGovernanceInterface {
 	role: string;
 	stats: { label: string; value: string; sub?: string }[];
 	notable: string[];
-	citations: number[];
+	homeUrl: string;
+	revenue?: ITreasuryRevenue;
 }
 
 export interface IGovernanceInterfacesSection {
@@ -102,7 +104,6 @@ export interface IGovernanceInterfacesSection {
 	discussionShare: { name: string; sharePercent: number }[];
 	interfaces: IGovernanceInterface[];
 	commentSyncNote: string;
-	citations: number[];
 }
 
 export interface IMultisigPlatform {
@@ -112,19 +113,14 @@ export interface IMultisigPlatform {
 	currentAumUsd: number;
 	peakSharePercent: number;
 	currentSharePercent: number;
-	multisigsManaged?: number;
-	transactionsExecuted?: number;
-	citations: number[];
+	homeUrl: string;
 }
 
 export interface IMultisigSection {
 	overview: string;
 	totalPeakAumUsd: number;
 	totalCurrentAumUsd: number;
-	totalMultisigsCount: number;
-	totalTransactionsCount: number;
 	platforms: IMultisigPlatform[];
-	citations: number[];
 }
 
 export interface INetworkInfraSection {
@@ -135,7 +131,6 @@ export interface INetworkInfraSection {
 	finalitySeconds: number;
 	coretimeNote: string;
 	topParachains: { name: string; transactionsMillions: number; sharePercent: number }[];
-	citations: number[];
 }
 
 export interface IEcosystemDashboardData {
@@ -155,5 +150,4 @@ export interface IEcosystemDashboardData {
 	infrastructure: INetworkInfraSection;
 	defi: IDefiSection;
 	xcm: IXcmSection;
-	citations: ICitation[];
 }

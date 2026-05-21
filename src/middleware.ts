@@ -10,10 +10,15 @@ export function middleware(request: NextRequest) {
 		return new NextResponse('OK', { status: 200 });
 	}
 
-	// For non-OPTIONS requests
-	return NextResponse.next();
+	// Forward the request pathname as a header so server components (e.g. AppLayout)
+	// can read it and skip the OpenGov chrome on bare routes like /ecosystem-dashboard.
+	const requestHeaders = new Headers(request.headers);
+	requestHeaders.set('x-pathname', request.nextUrl.pathname);
+
+	return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {
-	matcher: '/api/:path*'
+	// Match every page + api route except Next internals and static assets.
+	matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)']
 };

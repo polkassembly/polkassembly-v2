@@ -2,76 +2,49 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-/* eslint-disable react/function-component-definition */
+/* eslint-disable react/function-component-definition, react/button-has-type, security/detect-object-injection, @next/next/no-img-element */
 
 'use client';
 
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 const STORAGE_KEY = 'observatory-theme';
 
-type ObservatoryTheme = 'light' | 'dark';
-
-type ObservatoryThemeContextValue = {
-	theme: ObservatoryTheme;
-	toggle: () => void;
-	mounted: boolean;
-};
-
-const ObservatoryThemeContext = createContext<ObservatoryThemeContextValue | null>(null);
-
-const getInitialTheme = (): ObservatoryTheme => {
+const getInitialTheme = (): 'light' | 'dark' => {
 	if (typeof window === 'undefined') return 'light';
 	const stored = localStorage.getItem(STORAGE_KEY);
 	if (stored === 'light' || stored === 'dark') return stored;
 	return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
 
-export const ObservatoryThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-	const [theme, setTheme] = useState<ObservatoryTheme>('light');
+export const useTheme = () => {
+	const [theme, setTheme] = useState<'light' | 'dark'>('light');
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => {
-		setTheme(getInitialTheme());
+		const initial = getInitialTheme();
+		setTheme(initial);
 		setMounted(true);
+		document.documentElement.classList.toggle('dark', initial === 'dark');
 	}, []);
 
 	const toggle = useCallback(() => {
 		setTheme((prev) => {
 			const next = prev === 'light' ? 'dark' : 'light';
 			localStorage.setItem(STORAGE_KEY, next);
+			document.documentElement.classList.toggle('dark', next === 'dark');
 			return next;
 		});
 	}, []);
 
-	const contextValue = useMemo(() => ({ theme, toggle, mounted }), [theme, toggle, mounted]);
-
-	return (
-		<ObservatoryThemeContext.Provider value={contextValue}>
-			<div
-				className='ecosystem-observatory -mx-5 -mt-5 sm:-mx-10 sm:-mt-10'
-				data-theme={mounted ? theme : 'light'}
-			>
-				{children}
-			</div>
-		</ObservatoryThemeContext.Provider>
-	);
-};
-
-export const useObservatoryTheme = () => {
-	const ctx = useContext(ObservatoryThemeContext);
-	if (!ctx) {
-		throw new Error('useObservatoryTheme must be used within ObservatoryThemeProvider');
-	}
-	return ctx;
+	return { theme, toggle, mounted };
 };
 
 export const ThemeToggle: React.FC = () => {
-	const { theme, toggle, mounted } = useObservatoryTheme();
+	const { theme, toggle, mounted } = useTheme();
 	if (!mounted) return <div className='h-8 w-8' />;
 	return (
 		<button
-			type='button'
 			onClick={toggle}
 			aria-label='Toggle theme'
 			className='inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--border)] text-[var(--text-faint)] transition hover:border-[var(--border-strong)] hover:text-[var(--text)]'
@@ -124,14 +97,14 @@ type BrandAsset = {
 
 const GOOGLE_FAVICON_HOST = 'www.google.com';
 
-const favicon = (domain: string) => `https://${GOOGLE_FAVICON_HOST}/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`;
+const favicon = (domain: string) => `https://${GOOGLE_FAVICON_HOST}/s2/favicons?domain=${domain}&sz=64`;
 
 const BRAND_LOGOS: Record<string, BrandAsset> = {
 	Polkadot: {
 		initial: 'P',
-		bg: '#ffffff',
-		fg: '#E6007A',
-		src: 'https://polkadot.network/favicon-light.svg',
+		bg: '#E6007A',
+		fg: '#ffffff',
+		src: favicon('polkadot.com'),
 		padding: 2,
 		radius: 999
 	},
@@ -146,39 +119,39 @@ const BRAND_LOGOS: Record<string, BrandAsset> = {
 		initial: 'S',
 		bg: '#ffffff',
 		fg: '#111827',
-		src: 'https://www.subsquare.io/imgs/logo-img.svg',
-		padding: 1
+		src: favicon('subsquare.io'),
+		padding: 2
 	},
 	PolkaSafe: {
 		initial: 'P',
-		bg: '#ffffff',
-		fg: '#14B8A6',
-		src: 'https://polkasafe.xyz/logo.svg',
+		bg: '#14B8A6',
+		fg: '#ffffff',
+		src: favicon('polkasafe.xyz'),
 		padding: 2
 	},
 	Multix: {
 		initial: 'M',
 		bg: '#ffffff',
 		fg: '#0F172A',
-		src: 'https://multix.chainsafe.io/multix-logo.svg',
-		padding: 1
+		src: favicon('multix.chainsafe.io'),
+		padding: 2
 	},
 	Signet: {
 		initial: 'S',
-		bg: '#171717',
-		fg: '#D7FF62',
-		src: 'https://signet.talisman.xyz/mask-icon.svg?v=2021-10-05',
+		bg: '#D7FF62',
+		fg: '#171717',
+		src: favicon('signet.talisman.xyz'),
 		padding: 2
 	},
 	Talisman: {
 		initial: 'T',
-		bg: '#171717',
-		fg: '#D7FF62',
-		src: 'https://talisman.xyz/talisman.svg?v=1749994215',
+		bg: '#D7FF62',
+		fg: '#171717',
+		src: favicon('talisman.xyz'),
 		padding: 2
 	},
-	'Native pallet (no UI)': { initial: 'N', bg: '#475569', fg: '#ffffff' },
-	'Direct RPC / others': { initial: 'RPC', bg: '#94A3B8', fg: '#ffffff' },
+	'Native pallet (no UI)': { initial: 'N', bg: '#94A3B8', fg: '#0F172A' },
+	'Direct RPC / others': { initial: 'RPC', bg: '#CBD5E1', fg: '#0F172A' },
 	Frequency: { initial: 'F', bg: '#ffffff', fg: '#111827', src: favicon('frequency.xyz'), padding: 2 },
 	Moonbeam: {
 		initial: 'M',
@@ -208,14 +181,14 @@ const BRAND_LOGOS: Record<string, BrandAsset> = {
 		initial: 'B',
 		bg: '#ffffff',
 		fg: '#6B5CFF',
-		src: 'https://www.subsquare.io/imgs/icons/project-bifrost.svg',
+		src: favicon('bifrost.finance'),
 		padding: 2
 	},
 	'Bifrost Liquid Staking': {
 		initial: 'B',
 		bg: '#ffffff',
 		fg: '#6B5CFF',
-		src: 'https://www.subsquare.io/imgs/icons/project-bifrost.svg',
+		src: favicon('bifrost.finance'),
 		padding: 2
 	},
 	Moonwell: { initial: 'M', bg: '#ffffff', fg: '#7C3AED', src: favicon('moonwell.fi'), padding: 2 },
@@ -223,7 +196,7 @@ const BRAND_LOGOS: Record<string, BrandAsset> = {
 		initial: 'A',
 		bg: '#ffffff',
 		fg: '#E11D48',
-		src: 'https://www.subsquare.io/imgs/icons/project-acala.svg',
+		src: favicon('acala.network'),
 		padding: 2
 	},
 	StellaSwap: {
@@ -237,22 +210,14 @@ const BRAND_LOGOS: Record<string, BrandAsset> = {
 		initial: 'A',
 		bg: '#ffffff',
 		fg: '#111827',
-		src: 'https://www.subsquare.io/imgs/icons/project-astar.png',
+		src: favicon('astar.network'),
 		padding: 2
 	}
 };
 
-const getBrandAsset = (name: string): BrandAsset => {
-	if (Object.hasOwn(BRAND_LOGOS, name)) {
-		// eslint-disable-next-line security/detect-object-injection -- name validated via Object.hasOwn
-		return BRAND_LOGOS[name];
-	}
-	return { initial: name.charAt(0), bg: '#94A3B8', fg: '#ffffff' };
-};
-
 export const BrandMark: React.FC<{ name: string; size?: number; className?: string }> = ({ name, size = 18, className = '' }) => {
 	const [failed, setFailed] = useState(false);
-	const brand = getBrandAsset(name);
+	const brand = BRAND_LOGOS[name] || { initial: name.charAt(0), bg: '#94A3B8', fg: '#ffffff' };
 	const radius = brand.radius ?? Math.max(4, Math.round(size * 0.22));
 	const canUseImage = Boolean(brand.src && !failed);
 	return (
@@ -269,7 +234,6 @@ export const BrandMark: React.FC<{ name: string; size?: number; className?: stri
 			aria-hidden
 		>
 			{canUseImage ? (
-				// eslint-disable-next-line @next/next/no-img-element
 				<img
 					src={brand.src}
 					alt=''

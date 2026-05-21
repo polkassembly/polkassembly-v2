@@ -16,8 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 	return getGeneratedContentMetadata({
 		title: `${title} - Polkadot Ecosystem Observatory`,
-		description:
-			'Public data on the Polkadot network — economy, treasury, governance throughput, and infrastructure surfaces. Compiled from on-chain sources, official network dashboards, and platform-public reporting.',
+		description: 'Live network metrics and quarterly snapshot of treasury, governance, and ecosystem activity on Polkadot.',
 		network,
 		url: `https://${network}.polkassembly.io/ecosystem-dashboard`,
 		imageAlt: 'Polkadot Ecosystem Observatory'

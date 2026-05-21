@@ -2,47 +2,129 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-// Scoped theme tokens for the Ecosystem Observatory (does not affect global Polkassembly theme).
+// Polkadot Ecosystem Observatory — scoped styles
+// Variables and overrides apply ONLY inside the .ecosystem-observatory wrapper,
+// so they do not bleed into the rest of the Polkassembly app. Dark mode is
+// keyed on the existing `html.dark` class that polkassembly's theme system sets.
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 .ecosystem-observatory {
-	--bg: #f8fafc;
-	--bg-soft: #f1f5f9;
+	--bg: #ffffff;
 	--bg-elev: #ffffff;
+	--bg-soft: #f8fafc;
+	--border: #e2e8f0;
+	--border-strong: #cbd5e1;
 	--text: #0f172a;
 	--text-muted: #475569;
 	--text-faint: #64748b;
 	--text-dim: #94a3b8;
-	--border: #e2e8f0;
-	--border-strong: #cbd5e1;
 	--accent: #e6007a;
+	--accent-soft: rgba(230, 0, 122, 0.08);
 	--grid: #e2e8f0;
-	--bar-fill: #0f172a;
 	--tooltip-bg: #0f172a;
 	--tooltip-text: #ffffff;
+	--bar-fill: #0f172a;
+	--area-stroke: #e6007a;
 	--pie-1: #1e293b;
 	--pie-2: #475569;
 	--pie-3: #94a3b8;
 	--pie-4: #cbd5e1;
 	--pie-5: #e2e8f0;
 
-	&[data-theme='dark'] {
-		--bg: #0b0f17;
-		--bg-soft: #111827;
-		--bg-elev: #151c28;
-		--text: #f1f5f9;
-		--text-muted: #94a3b8;
-		--text-faint: #64748b;
-		--text-dim: #475569;
-		--border: #1e293b;
-		--border-strong: #334155;
-		--accent: #ff4da6;
-		--grid: #1e293b;
-		--bar-fill: #e2e8f0;
-		--tooltip-bg: #f8fafc;
-		--tooltip-text: #0f172a;
-		--pie-1: #f1f5f9;
-		--pie-2: #cbd5e1;
-		--pie-3: #94a3b8;
-		--pie-4: #475569;
-		--pie-5: #334155;
+	font-family:
+		'Inter',
+		-apple-system,
+		BlinkMacSystemFont,
+		sans-serif;
+	font-feature-settings: 'cv11', 'ss01', 'ss03';
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+	background: var(--bg);
+	color: var(--text);
+	min-height: 100vh;
+
+	// Smooth dark↔light transition — only animate the properties that change
+	// between themes (background and text colour). Buttons/borders inherit.
+	transition:
+		background-color 220ms ease,
+		color 220ms ease;
+
+	// Apply the same transition to common surfaces inside the dashboard so the
+	// theme swap feels coordinated, not piecemeal.
+	header,
+	footer,
+	.font-serif,
+	.font-mono,
+	[class*='bg-[var(--bg-'],
+	[class*='border-[var(--border'],
+	[class*='text-[var(--text'] {
+		transition:
+			background-color 220ms ease,
+			color 220ms ease,
+			border-color 220ms ease;
 	}
+
+	.font-serif {
+		font-family: 'Source Serif 4', Georgia, serif;
+		font-feature-settings: 'lnum';
+	}
+	.font-mono {
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+	}
+
+	::selection {
+		background: var(--accent);
+		color: white;
+	}
+
+	// Replace the default browser blue focus outline with a subtle accent ring.
+	// Uses :focus-visible so mouse clicks do not trigger a visible ring, but
+	// keyboard navigation still gets an accessible focus indicator.
+	*:focus {
+		outline: none;
+	}
+	*:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
+		border-radius: 4px;
+	}
+}
+
+// Subtle fade-in for tab content swaps — gives the navigation a smooth feel
+// without delaying interaction. Keyed on the active tab so the animation
+// restarts each time a tab changes.
+@keyframes fadein {
+	from {
+		opacity: 0;
+		transform: translateY(2px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+html.dark .ecosystem-observatory {
+	--bg: #0b1120;
+	--bg-elev: #111827;
+	--bg-soft: #0f172a;
+	--border: #1e293b;
+	--border-strong: #334155;
+	--text: #f1f5f9;
+	--text-muted: #cbd5e1;
+	--text-faint: #94a3b8;
+	--text-dim: #64748b;
+	--accent: #ff2d8e;
+	--accent-soft: rgba(255, 45, 142, 0.12);
+	--grid: #1e293b;
+	--tooltip-bg: #f1f5f9;
+	--tooltip-text: #0f172a;
+	--bar-fill: #f1f5f9;
+	--area-stroke: #ff2d8e;
+	--pie-1: #e2e8f0;
+	--pie-2: #94a3b8;
+	--pie-3: #64748b;
+	--pie-4: #475569;
+	--pie-5: #334155;
 }

@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-/* eslint-disable react/function-component-definition */
+/* eslint-disable react/function-component-definition, @typescript-eslint/no-explicit-any, react/no-array-index-key */
 
 'use client';
 
@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 const fmtUsdCompact = (n: number): string => {
-	if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(1)}B`;
+	if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(1).replace(/\.?0+$/, '')}B`;
 	if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(0)}M`;
 	if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
 	return `$${n.toFixed(0)}`;
@@ -29,8 +29,10 @@ const useThemeTokens = () => {
 
 	useEffect(() => {
 		const read = () => {
-			const root = document.querySelector('.ecosystem-observatory');
-			const cs = root ? getComputedStyle(root) : getComputedStyle(document.documentElement);
+			// Read from .ecosystem-observatory wrapper if it exists (scoped vars),
+			// else fall back to html element.
+			const el = document.querySelector('.ecosystem-observatory') || document.documentElement;
+			const cs = getComputedStyle(el as Element);
 			setTokens({
 				grid: cs.getPropertyValue('--grid').trim() || '#E2E8F0',
 				text: cs.getPropertyValue('--text-faint').trim() || '#64748B',
@@ -48,10 +50,9 @@ const useThemeTokens = () => {
 			});
 		};
 		read();
-		const root = document.querySelector('.ecosystem-observatory');
-		if (!root) return undefined;
+		// Re-read whenever the html class changes (light↔dark toggle on html element)
 		const obs = new MutationObserver(read);
-		obs.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+		obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 		return () => obs.disconnect();
 	}, []);
 
@@ -125,10 +126,11 @@ export const TimeAreaChart: React.FC<{
 				/>
 				<Tooltip
 					contentStyle={tooltipStyle(t.tooltipBg, t.tooltipText)}
-					formatter={(v) => [yFormatter(Number(v ?? 0)), valueLabel]}
+					formatter={(v: any) => [yFormatter(Number(v)), valueLabel]}
 					labelFormatter={(label) => label}
 					labelStyle={{ color: t.tooltipText, fontSize: 11, opacity: 0.7, marginBottom: 2 }}
 					cursor={{ stroke: t.text, strokeOpacity: 0.4, strokeDasharray: '3 3' }}
+					itemStyle={{ color: t.tooltipText }}
 				/>
 				<Area
 					type='monotone'
@@ -136,6 +138,7 @@ export const TimeAreaChart: React.FC<{
 					stroke={t.accent}
 					strokeWidth={2}
 					fill='url(#areaAccent)'
+					isAnimationActive={false}
 				/>
 				{peak && (
 					<ReferenceLine
@@ -185,16 +188,18 @@ export const YearBarChart: React.FC<{
 				/>
 				<Tooltip
 					contentStyle={tooltipStyle(t.tooltipBg, t.tooltipText)}
-					formatter={(v) => [fmtUsdCompact(Number(v ?? 0)), valueLabel]}
+					formatter={(v: any) => [fmtUsdCompact(Number(v)), valueLabel]}
 					labelFormatter={(label) => `Year ${label}`}
 					labelStyle={{ color: t.tooltipText, fontSize: 11, opacity: 0.7, marginBottom: 2 }}
 					cursor={{ fill: t.text, fillOpacity: 0.06 }}
+					itemStyle={{ color: t.tooltipText }}
 				/>
 				<Bar
 					dataKey='usd'
 					fill={t.bar}
 					radius={[3, 3, 0, 0]}
 					maxBarSize={56}
+					isAnimationActive={false}
 				/>
 			</BarChart>
 		</ResponsiveContainer>
@@ -234,16 +239,18 @@ export const QuarterBarChart: React.FC<{
 				/>
 				<Tooltip
 					contentStyle={tooltipStyle(t.tooltipBg, t.tooltipText)}
-					formatter={(v) => [Number(v ?? 0).toLocaleString(), valueLabel]}
+					formatter={(v: any) => [v.toLocaleString(), valueLabel]}
 					labelFormatter={(label) => label}
 					labelStyle={{ color: t.tooltipText, fontSize: 11, opacity: 0.7, marginBottom: 2 }}
 					cursor={{ fill: t.text, fillOpacity: 0.06 }}
+					itemStyle={{ color: t.tooltipText }}
 				/>
 				<Bar
 					dataKey='value'
 					fill={t.bar}
 					radius={[3, 3, 0, 0]}
 					maxBarSize={36}
+					isAnimationActive={false}
 				/>
 			</BarChart>
 		</ResponsiveContainer>
@@ -254,46 +261,79 @@ export const SharePie: React.FC<{
 	data: { name: string; value: number }[];
 	height?: number;
 	formatter?: (v: number) => string;
-}> = ({ data, height = 240, formatter }) => {
+	centerLabel?: string;
+}> = ({ data, height = 240, formatter, centerLabel }) => {
 	const t = useThemeTokens();
 	const fmt = formatter || ((v: number) => `${v.toFixed(2)}%`);
 	return (
-		<ResponsiveContainer
-			width='100%'
-			height={height}
-		>
-			<PieChart>
-				<Pie
-					data={data}
-					dataKey='value'
-					nameKey='name'
-					cx='50%'
-					cy='50%'
-					innerRadius={56}
-					outerRadius={92}
-					paddingAngle={1}
-					stroke='var(--bg-elev)'
-					strokeWidth={2}
+		<div style={{ position: 'relative' }}>
+			<ResponsiveContainer
+				width='100%'
+				height={height}
+			>
+				<PieChart>
+					<Pie
+						data={data}
+						dataKey='value'
+						nameKey='name'
+						cx='50%'
+						cy='50%'
+						innerRadius={56}
+						outerRadius={92}
+						paddingAngle={2}
+						stroke='var(--bg-elev)'
+						strokeWidth={2}
+						isAnimationActive={false}
+					>
+						{data.map((_, i) => (
+							<Cell
+								key={i}
+								fill={t.pie[i % t.pie.length]}
+							/>
+						))}
+					</Pie>
+					<Tooltip
+						contentStyle={tooltipStyle(t.tooltipBg, t.tooltipText)}
+						formatter={(v: any, name: any) => [fmt(Number(v)), String(name)]}
+						separator=' · '
+						itemStyle={{ color: t.tooltipText }}
+					/>
+				</PieChart>
+			</ResponsiveContainer>
+			{centerLabel && (
+				<div
+					style={{
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						right: 0,
+						bottom: 0,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						pointerEvents: 'none'
+					}}
 				>
-					{data.map((entry, i) => (
-						<Cell
-							key={entry.name}
-							fill={t.pie[i % t.pie.length]}
-						/>
-					))}
-				</Pie>
-				<Tooltip
-					contentStyle={tooltipStyle(t.tooltipBg, t.tooltipText)}
-					formatter={(v, name) => [fmt(Number(v ?? 0)), String(name)]}
-					separator=' · '
-				/>
-			</PieChart>
-		</ResponsiveContainer>
+					<span
+						style={{
+							fontFamily: "'Source Serif 4', Georgia, serif",
+							fontSize: 18,
+							fontWeight: 600,
+							color: 'var(--text)',
+							lineHeight: 1,
+							letterSpacing: '-0.01em'
+						}}
+					>
+						{centerLabel}
+					</span>
+				</div>
+			)}
+		</div>
 	);
 };
 
 export const InlineBar: React.FC<{ percent: number; tone?: 'accent' | 'neutral' }> = ({ percent, tone = 'accent' }) => (
-	<div className='h-1.5 w-full overflow-hidden rounded-full bg-[var(--border)]'>
+	<div className='h-1.5 w-full overflow-hidden rounded-full bg-[var(--border-strong)]'>
 		<div
 			className='h-full rounded-full transition-all'
 			style={{ width: `${Math.min(100, Math.max(0, percent))}%`, background: tone === 'accent' ? 'var(--accent)' : 'var(--text)' }}
