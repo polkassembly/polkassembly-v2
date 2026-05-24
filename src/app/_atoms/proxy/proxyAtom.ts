@@ -5,4 +5,12 @@
 import { atom } from 'jotai';
 import { IProxyRequest } from '@/_shared/types';
 
-export const allProxiesAtom = atom<IProxyRequest[]>([]);
+interface IProxyData {
+	items: IProxyRequest[];
+	totalCount: number;
+}
+
+export const allProxiesAtom = atom<IProxyData>({
+	items: [],
+	totalCount: 0
+});

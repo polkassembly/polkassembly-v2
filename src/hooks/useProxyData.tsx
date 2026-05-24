@@ -6,15 +6,40 @@ import { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import { getCurrentNetwork } from '@/_shared/_utils/getCurrentNetwork';
 import { allProxiesAtom } from '@/app/_atoms/proxy/proxyAtom';
+import { IProxyRequest } from '@/_shared/types';
+import { SortDirection } from '@tanstack/react-table';
 import { usePolkadotApiService } from './usePolkadotApiService';
 
-export const useProxyData = (page: number = 1, search: string = '') => {
+type ProxyDataReturn = {
+	items: IProxyRequest[];
+	totalCount: number;
+	isLoading: boolean;
+	error: string | null;
+};
+
+type UseProxyDataParams = {
+	sortBy?: string;
+	sortDirection?: SortDirection | null;
+	page?: number;
+	search?: string;
+	filterTypes?: string[];
+};
+
+export const useProxyData = ({ page = 1, sortBy, sortDirection, search = '', filterTypes = [] }: UseProxyDataParams): ProxyDataReturn => {
 	const { apiService } = usePolkadotApiService();
 	const network = getCurrentNetwork();
-	const [allProxies, setAllProxies] = useAtom(allProxiesAtom);
-	const [totalCount, setTotalCount] = useState(0);
+	const [proxyData, setProxyData] = useAtom(allProxiesAtom);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+
+	// Helper function to check if a proxy has any of the selected proxy types
+	const filterProxiesByType = (proxies: IProxyRequest[], types: string[]): IProxyRequest[] => {
+		if (!types.length) return proxies;
+
+		return proxies.filter((proxy) => {
+			return proxy.individualProxies?.some((ip) => types.includes(ip.proxyType)) || false;
+		});
+	};
 
 	useEffect(() => {
 		let isMounted = true;
@@ -32,23 +57,51 @@ export const useProxyData = (page: number = 1, search: string = '') => {
 				// Wait for API to be fully ready
 				await apiService.apiReady();
 
-				const data = await apiService.getProxyRequests({
+				let data = await apiService.getProxyRequests({
 					page,
 					limit: 10,
 					search
 				});
 
+				// Apply client-side filtering by proxy types if any types are selected
+				if (filterTypes.length > 0 && data?.items?.length) {
+					const filteredItems = filterProxiesByType(data.items, filterTypes);
+
+					data = {
+						items: filteredItems,
+						// keep server-provided totalCount to avoid broken pagination UI
+						totalCount: data.totalCount
+					};
+				}
+				// Apply client-side sorting if sortBy and sortDirection are provided
+				if (sortBy === 'proxies' && sortDirection && data?.items?.length) {
+					const sortedItems = [...data.items].sort((a, b) => {
+						const aProxyCount = typeof a.proxies === 'number' ? a.proxies : a.proxyAddresses?.length || 0;
+						const bProxyCount = typeof b.proxies === 'number' ? b.proxies : b.proxyAddresses?.length || 0;
+
+						return sortDirection === 'asc' ? aProxyCount - bProxyCount : bProxyCount - aProxyCount;
+					});
+
+					data = {
+						items: sortedItems,
+						totalCount: data.totalCount
+					};
+				}
+
 				if (isMounted) {
-					const newItems = data?.items ?? [];
-					const newTotalCount = data?.totalCount ?? 0;
-					setTotalCount(newTotalCount);
-					setAllProxies(newItems);
+					setProxyData({
+						items: data?.items ?? [],
+						totalCount: data?.totalCount ?? 0
+					});
 				}
 			} catch (err) {
 				// Error is handled via error state
 				if (isMounted) {
 					setError(err instanceof Error ? err.message : 'Failed to fetch proxies');
-					setTotalCount(0);
+					setProxyData({
+						items: [],
+						totalCount: 0
+					});
 				}
 			} finally {
 				if (isMounted) {
@@ -62,11 +115,11 @@ export const useProxyData = (page: number = 1, search: string = '') => {
 		return () => {
 			isMounted = false;
 		};
-	}, [apiService, page, search, network, setAllProxies]);
+	}, [apiService, page, search, sortBy, sortDirection, filterTypes, network, setProxyData]);
 
 	return {
-		items: allProxies,
-		totalCount,
+		items: proxyData.items || [],
+		totalCount: proxyData.totalCount || 0,
 		isLoading: !apiService || isLoading,
 		error
 	};

@@ -1,5 +1,5 @@
-.tableRow {
-	@apply overflow-hidden rounded-lg bg-page_background px-6 text-center;
+.tableHeader {
+	@apply overflow-hidden border-none bg-page_background px-6 text-center;
 }
 
 .tableCell_1 {
@@ -15,7 +15,7 @@
 }
 
 .tableCell {
-	@apply p-6;
+	@apply w-fit p-6;
 }
 
 .table_content_cell {
