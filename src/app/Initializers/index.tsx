@@ -176,12 +176,16 @@ function Initializers({ userData, userPreferences }: { userData: IAccessTokenPay
 
 			const newApi = await PolkadotApiService.Init(network);
 			setPolkadotApiAtom(newApi);
+			setUserPreferences({ ...userPreferences, rpcIndex: newApi.getCurrentRpcIndex() });
 
+			// Keep-alive check with auto-switch on failure
 			polkadotApiIntervalId = setInterval(async () => {
 				try {
 					await newApi.keepAlive();
 				} catch {
-					await newApi.switchToNewRpcEndpoint();
+					// switchToNewRpcEndpoint returns the actual connected index (may differ due to fallback)
+					const connectedIndex = await newApi.switchToNewRpcEndpoint();
+					setUserPreferences({ ...userPreferences, rpcIndex: connectedIndex });
 				}
 			}, 6000);
 		})();

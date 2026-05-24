@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { AiFillSignal } from '@react-icons/all-files/ai/AiFillSignal';
 import { NETWORKS_DETAILS } from '@shared/_constants/networks';
 import { usePolkadotApiService } from '@/hooks/usePolkadotApiService';
@@ -20,19 +20,21 @@ export default function RPCSwitchDropdown({ className }: { className?: string })
 	const { apiService } = usePolkadotApiService();
 	const { userPreferences, setUserPreferences } = useUserPreferences();
 
+	const { rpcEndpoints } = NETWORKS_DETAILS[`${network}`];
+
+	const currentEndpoint = useMemo(() => rpcEndpoints[userPreferences?.rpcIndex || 0], [rpcEndpoints, userPreferences?.rpcIndex]);
+
 	if (!(network in NETWORKS_DETAILS)) {
 		return null;
 	}
-
-	const { rpcEndpoints } = NETWORKS_DETAILS[network as keyof typeof NETWORKS_DETAILS];
-	const currentEndpoint = rpcEndpoints[userPreferences?.rpcIndex || 0];
 
 	const handleRpcSwitch = async (index: number) => {
 		if (!apiService || isLoading) return;
 		setIsLoading(true);
 		try {
-			await apiService.switchToNewRpcEndpoint(index);
-			setUserPreferences({ ...userPreferences, rpcIndex: index });
+			// switchToNewRpcEndpoint returns the actual connected index (may differ if fallback occurred)
+			const connectedIndex = await apiService.switchToNewRpcEndpoint(index);
+			setUserPreferences({ ...userPreferences, rpcIndex: connectedIndex });
 		} catch {
 			// TODO: show notification
 		} finally {
